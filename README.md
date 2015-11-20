@@ -1,6 +1,10 @@
 https://travis-ci.org/alphagov/notify-admin-frontend.svg
 
-# notify-admin-frontend
-Frontend application for notify admin
+# notifications-admin
+Application to handle the admin functions of the notifications application.
 
-Running on port 6012
+Register users.
+Register services.
+Download CSV for an email or sms batch.
+Show history of notifications.
+Reports.
