@@ -1,11 +1,27 @@
-from flask import Flask
+#!/usr/bin/env python
 
-app = Flask(__name__)
+from __future__ import print_function
+
+import os
+
+from flask.ext.script import Manager, Server
+
+from app import create_app
+
+application = create_app()
+manager = Manager(application)
+port = int(os.environ.get('PORT', 6012))
+manager.add_command("runserver", Server(host='0.0.0.0', port=port))
+
+# migrate = Migrate(application, db)
+# manager.add_command('db', MigrateCommand)
 
 
-@app.route('/')
-def index():
-    return 'Hello from notifications-admin'
+@manager.command
+def list_routes():
+    """List URLs of all application routes."""
+    for rule in sorted(application.url_map.iter_rules(), key=lambda r: r.rule):
+        print("{:10} {}".format(", ".join(rule.methods - set(['OPTIONS', 'HEAD'])), rule.rule))
 
 if __name__ == '__main__':
-    app.run(port=6012)
+    manager.run()
