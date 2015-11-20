@@ -3,4 +3,4 @@ from flask import Blueprint
 main = Blueprint('main', __name__)
 
 
-from .views import index
+from app.main.views import index
