@@ -29,4 +29,8 @@ Application to handle the admin functions of the notifications application.
 
    pip install -r requirements.txt
 
-   python app.py
+   ./scripts/run_app.sh
+
+   url to test app: localhost:5000/helloworld
+
+
