@@ -19,10 +19,13 @@ Application to handle the admin functions of the notifications application.
  The GOV.UK frontend toolkit is a submodule of this project.
  To get the content of the toolkit run the following two commands
 
-  git submodule init
+  git submodule init 
+  
   git submodule update
 
 
 ### To run the sample application run:
+
    pip install -r requirements.txt
+
    python app.py
