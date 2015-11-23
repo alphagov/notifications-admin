@@ -10,4 +10,3 @@ def create_app():
     application.register_blueprint(main_blueprint)
 
     return application
-

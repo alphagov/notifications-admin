@@ -1,4 +1,4 @@
-https://travis-ci.org/alphagov/notify-admin-frontend.svg
+https://travis-ci.org/alphagov/notificiations-admin.svg
 
 # notifications-admin
 Application to handle the admin functions of the notifications application.
