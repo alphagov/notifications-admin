@@ -20,8 +20,6 @@ env = assets.Environment(app)
 env.config['cache'] = False
 env.config['manifest'] = False
 
-env.config['sass_bin'] = '/Users/rebeccalaw/.rbenv/shims/sass'
-
 # Tell flask-assets where to look for our sass files.
 env.load_path = [
     os.path.join(os.path.dirname(__file__), 'assets/stylesheets'),
