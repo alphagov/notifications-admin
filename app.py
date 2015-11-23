@@ -1,15 +1,10 @@
 import os
 from flask import Flask, render_template
 from flask.ext import assets
-from flask.ext.assets import Environment, Bundle
-#from flask.ext.scss import Scss
-#from flask.ext.sass import sass
 from webassets.filter import get_filter
 
 
 app = Flask(__name__)
-#Scss(app, static_dir='static', asset_dir='assets/stylesheets')
-#sass(app, input_dir='assets/stylesheets', output_dir='static')
 
 # debug mode - switch to False for production
 app.config['ASSETS_DEBUG'] = True
@@ -91,15 +86,16 @@ env.register(
 def index():
     return render_template('index.html')
 
+
 @app.route("/govuk")
 def govuk():
     return render_template('govuk_template.html')
+
 
 @app.route("/helloworld")
 def helloworld():
     return render_template('hello-world.html')
 
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)

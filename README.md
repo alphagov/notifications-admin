@@ -1,4 +1,5 @@
-https://travis-ci.org/alphagov/notifications-admin.svg
+[![Build Status](https://api.travis-ci.org/alphagov/noworlktifications-admin.svg?branch=master)](https://api.travis-ci.org/alphagov/notifications-admin.svg?branch=master)
+
 
 # notifications-admin
 Application to handle the admin functions of the notifications application.
