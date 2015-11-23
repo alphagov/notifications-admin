@@ -1,15 +1,20 @@
 import os
 from flask import Flask, render_template
 from flask.ext import assets
+from flask.ext.script import Manager, Server
 from webassets.filter import get_filter
+from app import create_app
 
 
-app = Flask(__name__)
+application = create_app()
+manager = Manager(application)
+port = int(os.environ.get('PORT', 6012))
+manager.add_command("runserver", Server(host='0.0.0.0', port=port))
 
 # debug mode - switch to False for production
-app.config['ASSETS_DEBUG'] = True
-
-env = assets.Environment(app)
+application.config['ASSETS_DEBUG'] = True
+application.config['DEBUG'] = True
+env = assets.Environment(application)
 
 # debug mode - switch to True for production
 env.config['cache'] = False
@@ -17,10 +22,10 @@ env.config['manifest'] = False
 
 # Tell flask-assets where to look for our sass files.
 env.load_path = [
-    os.path.join(os.path.dirname(__file__), 'assets/stylesheets'),
-    os.path.join(os.path.dirname(__file__), 'assets'),
-    os.path.join(os.path.dirname(__file__), 'assets/stylesheets/stylesheets/govuk_frontend_toolkit'),
-    os.path.join(os.path.dirname(__file__), 'assets/stylesheets/govuk_template')
+    os.path.join(os.path.dirname(__file__), 'app/assets/stylesheets'),
+    os.path.join(os.path.dirname(__file__), 'app/assets'),
+    os.path.join(os.path.dirname(__file__), 'app/assets/stylesheets/stylesheets/govuk_frontend_toolkit'),
+    os.path.join(os.path.dirname(__file__), 'app/assets/stylesheets/govuk_template')
 
 ]
 
@@ -82,20 +87,12 @@ env.register(
 )
 
 
-@app.route("/")
-def index():
-    return render_template('index.html')
-
-
-@app.route("/govuk")
-def govuk():
-    return render_template('govuk_template.html')
-
-
-@app.route("/helloworld")
-def helloworld():
-    return render_template('hello-world.html')
+@manager.command
+def list_routes():
+    """List URLs of all application routes."""
+    for rule in sorted(application.url_map.iter_rules(), key=lambda r: r.rule):
+        print("{:10} {}".format(", ".join(rule.methods - set(['OPTIONS', 'HEAD'])), rule.rule))
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    manager.run()
