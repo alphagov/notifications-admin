@@ -31,6 +31,6 @@ Application to handle the admin functions of the notifications application.
 
    ./scripts/run_app.sh
 
-   url to test app: localhost:5000/helloworld
+   url to test app: localhost:6012/helloworld
 
 
