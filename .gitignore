@@ -63,3 +63,4 @@ assets/stylesheets/govuk_template/.sass-cache/
 cache/
 static/stylesheets/govuk-template*
 static/css*
+static/css_all.css

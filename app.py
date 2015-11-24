@@ -1,24 +1,16 @@
 import os
-from flask import Flask, render_template
 from flask.ext import assets
 from flask.ext.script import Manager, Server
 from webassets.filter import get_filter
 from app import create_app
 
 
-application = create_app()
+application = create_app(os.getenv('NOTIFICATIONS_ADMIN_ENVIRONMENT') or 'development')
 manager = Manager(application)
 port = int(os.environ.get('PORT', 6012))
 manager.add_command("runserver", Server(host='0.0.0.0', port=port))
 
-# debug mode - switch to False for production
-application.config['ASSETS_DEBUG'] = True
-application.config['DEBUG'] = True
 env = assets.Environment(application)
-
-# debug mode - switch to True for production
-env.config['cache'] = False
-env.config['manifest'] = False
 
 # Tell flask-assets where to look for our sass files.
 env.load_path = [

@@ -8,11 +8,6 @@ def index():
     return 'Hello from notifications-admin'
 
 
-@main.route("/")
-def idx():
-    return render_template('index.html')
-
-
 @main.route("/govuk")
 def govuk():
     return render_template('govuk_template.html')
