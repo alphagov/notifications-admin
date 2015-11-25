@@ -4,6 +4,8 @@ python:
 - '3.4'
 addons:
   postgresql: '9.3'
+env:
+- SQLALCHEMY_DATABASE_URI=postgresql://postgres:@localhost:5433/test_notifications_admin
 install:
 - pip install -r requirements_for_test.txt
 env:
