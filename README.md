@@ -1,4 +1,4 @@
-[![Build Status](https://api.travis-ci.org/alphagov/noworlktifications-admin.svg?branch=master)](https://api.travis-ci.org/alphagov/notifications-admin.svg?branch=master)
+[![Build Status](https://api.travis-ci.org/alphagov/notifications-admin.svg?branch=master)](https://api.travis-ci.org/alphagov/notifications-admin.svg?branch=master)
 
 
 # notifications-admin
@@ -14,23 +14,34 @@ Application to handle the admin functions of the notifications application.
 </ul>
 
 ### Create a virtual environment for this project
-  mkvirtualenv -p /usr/local/bin/python3 notifications-admin
+    mkvirtualenv -p /usr/local/bin/python3 notifications-admin 
+ 
 
 ### GOV.UK frontend toolkit
  The GOV.UK frontend toolkit is a submodule of this project.
  To get the content of the toolkit run the following two commands
-
-  git submodule init 
-  
-  git submodule update
-
+ 
+    git submodule init
+    git submodule update
 
 ### To run the sample application run:
+    pip install -r requirements.txt
+    ./scripts/run_app.sh
 
-   pip install -r requirements.txt
+ url to test app: 
+ 
+    localhost:6012/helloworld
+ 
 
-   ./scripts/run_app.sh
+### Database
+Run the following command to create the database
 
-   url to test app: localhost:6012/helloworld
+    python app.py db upgrade
+
+### Domain model
+
+All the domain models are defined in the [models.py](https://github.com/alphagov/notifications-admin/blob/master/app/models.py) file.
+
+
 
 

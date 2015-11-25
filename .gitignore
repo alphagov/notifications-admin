@@ -56,11 +56,14 @@ docs/_build/
 # PyBuilder
 target/
 .idea/
+.DS_Store
 
 # cache and static rebuild files
-assets/stylesheets/govuk_template/.sass-cache/
+app/assets/stylesheets/govuk_template/.sass-cache/
 .sass-cache/
-cache/
-static/stylesheets/govuk-template*
-static/css*
-static/css_all.css
+.cache/
+app/static/stylesheets/govuk-template*
+app/static/css*
+app/static/css_all.css
+app/static/.webassets-cache/
+
