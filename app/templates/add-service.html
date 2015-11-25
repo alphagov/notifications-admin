@@ -1,0 +1,31 @@
+{% extends "admin_template.html" %}
+
+{% block page_title %}
+Hello world!
+{% endblock %}
+
+{% block content %}
+
+<div class="grid-row">
+	<div class="column-two-thirds">
+		<h1 class="heading-xlarge">Set up notifications for your service</h1>
+
+
+		<p>
+		<label class="form-label" for="emailverify">Service name</label>
+  		<input class="form-control" id="emailverify" type="text"><br>
+  		<span class="font-xsmall">For example, 'Vehicle tax' or 'Carer's allowance'</span>
+  		</p>
+
+      <h2 class="heading-small">We'll create your service in test mode</h2>
+    <p>In test mode you can only send notifications to people in your team.</p>
+    <p>When you're ready to go live we'll remove this restriction.</p>
+
+
+  		<p>
+  		<a class="button" href="dashboard" role="button">Continue</a>
+  		</p>
+	</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "admin_template.html" %}
+
+{% block page_title %}
+Hello world!
+{% endblock %}
+
+{% block content %}
+
+<div class="grid-row">
+	<div class="column-two-thirds">
+		<h1 class="heading-xlarge">Create an account</h1>
+
+		<p>If you've used GOV.UK Notify before, <a href="">sign in to your account</a>.</p>
+
+		<p>
+		<label class="form-label" for="name-f1">Name</label>
+  		<input class="form-control-2-3" id="name-f1" type="text">
+  		</p>
+  		<p>
+  		<label class="form-label" for="mobile">Mobile phone number</label>
+  		<input class="form-control-1-4" id="mobile" type="text">
+  		</p>
+  		<p>
+  		<label class="form-label" for="password">Password</label>
+  		<input class="form-control-1-4" id="password" type="password">
+  		</p>
+
+  		<p>
+  		<a class="button" href="verify-mobile" role="button">Continue</a>
+  		</p>
+	</div>
+</div>
+
+{% endblock %}

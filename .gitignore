@@ -61,9 +61,8 @@ target/
 # cache and static rebuild files
 app/assets/stylesheets/govuk_template/.sass-cache/
 .sass-cache/
-.cache/
+cache/
 app/static/stylesheets/govuk-template*
 app/static/css*
 app/static/css_all.css
 app/static/.webassets-cache/
-
