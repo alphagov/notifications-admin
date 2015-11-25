@@ -2,6 +2,8 @@ sudo: false
 language: python
 python:
 - '3.4'
+addons:
+  postgresql: '9.3'
 install:
 - pip install -r requirements_for_test.txt
 env:
