@@ -9,3 +9,7 @@ def insert_user(user):
 
 def get_user_by_id(id):
     return Users.query.filter_by(id=id).first()
+
+
+def get_all_users():
+    return Users.query.all()
