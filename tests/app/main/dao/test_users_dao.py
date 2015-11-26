@@ -21,7 +21,7 @@ def test_insert_user_should_add_user(notifications_admin, notifications_admin_db
 
 
 def test_insert_user_with_role_that_does_not_exist_fails(notifications_admin, notifications_admin_db):
-    user = Users(name='test insert',
+    user = Users(name='role does not exist',
                  password='somepassword',
                  email_address='test@insert.gov.uk',
                  mobile_number='+441234123412',

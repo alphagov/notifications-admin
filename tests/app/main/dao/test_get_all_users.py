@@ -17,7 +17,7 @@ def test_get_all_users_returns_all_users(notifications_admin, notifications_admi
                   mobile_number='+441234123412',
                   created_at=datetime.now(),
                   role_id=1)
-    user3 = Users(name='test two',
+    user3 = Users(name='test three',
                   password='some2ndpassword',
                   email_address='test2@get_all.gov.uk',
                   mobile_number='+441234123412',

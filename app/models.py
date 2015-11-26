@@ -16,7 +16,7 @@ class Users(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, index=True)
+    name = db.Column(db.String, nullable=False, index=True, unique=True)
     email_address = db.Column(db.String(255), nullable=False, index=True)
     password = db.Column(db.String, index=False, unique=False, nullable=False)
     mobile_number = db.Column(db.String, index=False, unique=False, nullable=False)
