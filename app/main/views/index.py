@@ -3,9 +3,9 @@ from flask import render_template
 from app.main import main
 
 
-@main.route('/index')
+@main.route('/')
 def index():
-    return 'Hello from notifications-admin'
+    return render_template('signedout.html')
 
 
 @main.route("/govuk")
@@ -13,6 +13,46 @@ def govuk():
     return render_template('govuk_template.html')
 
 
-@main.route("/helloworld")
+@main.route("/hello-world")
 def helloworld():
     return render_template('hello-world.html')
+
+
+@main.route("/register")
+def register():
+    return render_template('register.html')
+
+
+@main.route("/register-from-invite")
+def registerfrominvite():
+    return render_template('register-from-invite.html')
+
+
+@main.route("/verify")
+def verify():
+    return render_template('verify.html')
+
+
+@main.route("/verify-mobile")
+def verifymobile():
+    return render_template('verify-mobile.html')
+
+
+@main.route("/dashboard")
+def dashboard():
+    return render_template('dashboard.html')
+
+
+@main.route("/sign-in")
+def signin():
+    return render_template('signin.html')
+
+
+@main.route("/add-service")
+def addservice():
+    return render_template('add-service.html')
+
+
+@main.route("/two-factor")
+def twofactor():
+    return render_template('two-factor.html')

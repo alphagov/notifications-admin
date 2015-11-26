@@ -1,11 +1,11 @@
 /* govuk_frontend_toolkit includes */
-@import "../govuk_frontend_toolkit/stylesheets/colours";
-@import "../govuk_frontend_toolkit/stylesheets/conditionals";
-@import "../govuk_frontend_toolkit/stylesheets/css3";
-@import "../govuk_frontend_toolkit/stylesheets/device-pixels";
-@import "../govuk_frontend_toolkit/stylesheets/typography";
-@import "../govuk_frontend_toolkit/stylesheets/grid_layout";
-@import "../govuk_frontend_toolkit/stylesheets/design-patterns/_buttons";
+@import "../../govuk_frontend_toolkit/stylesheets/colours";
+@import "../../govuk_frontend_toolkit/stylesheets/conditionals";
+@import "../../govuk_frontend_toolkit/stylesheets/css3";
+@import "../../govuk_frontend_toolkit/stylesheets/device-pixels";
+@import "../../govuk_frontend_toolkit/stylesheets/typography";
+@import "../../govuk_frontend_toolkit/stylesheets/grid_layout";
+@import "../../govuk_frontend_toolkit/stylesheets/design-patterns/_buttons";
 
 // Edited version of govuk_elements repo
 // https://github.com/alphagov/govuk_elements
@@ -20,5 +20,8 @@
 @import "accessibility";
 @import "header";
 @import "footer";
+
+// Extra CSS for this application
+@import "../app";
 
 

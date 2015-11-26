@@ -1,0 +1,29 @@
+{% extends "admin_template.html" %}
+
+{% block page_title %}
+Hello world!
+{% endblock %}
+
+{% block content %}
+
+<div class="grid-row">
+	<div class="column-two-thirds">
+		<h1 class="heading-xlarge">Confirm your mobile number</h1>
+
+		<p>You need to prove the contact details you gave us are yours.</p>
+		<p>We've sent you an email and a text message containing confirmation codes.</p>
+
+  		<p>
+  		<label class="form-label" for="email">Text message confirmation code<br>
+		<span class="font-xsmall">Enter the code we sent you by text</span></label>
+  		<input class="form-control-1-4" id="email" type="text"><br>
+  		<span class="font-xsmall"><a href="">I haven't received a text</a></span>
+  		</p>
+
+  		<p>
+  		<a class="button" href="dashboard" role="button">Continue</a>
+  		</p>
+	</div>
+</div>
+
+{% endblock %}

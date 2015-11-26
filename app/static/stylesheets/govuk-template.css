@@ -28,7 +28,7 @@
 @-o-viewport {
   width: device-width;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_frontend_toolkit\/stylesheets\/_shims\.scss}line{font-family:\0000346}}
+/* line 46, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_shims.scss */
 .grid-row:after, #global-breadcrumb:after, #content:after, fieldset:after, .form-group:after, .form-block:after, .panel-indent:after, #global-header .header-wrapper:after, #global-header .header-wrapper .header-global:after, #global-header .header-wrapper .header-global .header-logo:after, #global-header .header-proposition #proposition-link:after,
 #global-header .header-proposition #proposition-links:after, #footer .footer-wrapper:after, #footer .footer-meta:after {
   content: "";
@@ -36,25 +36,25 @@
   clear: both;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_frontend_toolkit\/stylesheets\/_grid_layout\.scss}line{font-family:\0000318}}
+/* line 18, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
 #content, #global-header-bar, #global-cookie-message p {
   max-width: 960px;
   margin: 0 15px;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_frontend_toolkit\/stylesheets\/_grid_layout\.scss}line{font-family:\0000318}}
+  /* line 18, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
   #content, #global-header-bar, #global-cookie-message p {
     margin: 0 30px;
   }
 }
 @media (min-width: 1020px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_frontend_toolkit\/stylesheets\/_grid_layout\.scss}line{font-family:\0000318}}
+  /* line 18, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
   #content, #global-header-bar, #global-cookie-message p {
     margin: 0 auto;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_frontend_toolkit\/stylesheets\/_grid_layout\.scss}line{font-family:\0000360}}
+/* line 60, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
 .grid-row, #global-breadcrumb {
   margin: 0 -15px;
 }
@@ -65,7 +65,7 @@
 @-o-viewport {
   width: device-width;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_frontend_toolkit\/stylesheets\/_shims\.scss}line{font-family:\0000346}}
+/* line 46, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_shims.scss */
 .grid-row:after, #global-breadcrumb:after, #content:after, fieldset:after, .form-group:after, .form-block:after, .panel-indent:after, #global-header .header-wrapper:after, #global-header .header-wrapper .header-global:after, #global-header .header-wrapper .header-global .header-logo:after, #global-header .header-proposition #proposition-link:after,
 #global-header .header-proposition #proposition-links:after, #footer .footer-wrapper:after, #footer .footer-meta:after {
   content: "";
@@ -95,7 +95,7 @@
 @-o-viewport {
   width: device-width;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_shims\.scss}line{font-family:\0000346}}
+/* line 46, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_shims.scss */
 .grid-row:after, #global-breadcrumb:after, #content:after, fieldset:after, .form-group:after, .form-block:after, .panel-indent:after, #global-header .header-wrapper:after, #global-header .header-wrapper .header-global:after, #global-header .header-wrapper .header-global .header-logo:after, #global-header .header-proposition #proposition-link:after,
 #global-header .header-proposition #proposition-links:after, #footer .footer-wrapper:after, #footer .footer-meta:after {
   content: "";
@@ -115,7 +115,7 @@
 @-o-viewport {
   width: device-width;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_shims\.scss}line{font-family:\0000346}}
+/* line 46, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_shims.scss */
 .grid-row:after, #global-breadcrumb:after, #content:after, fieldset:after, .form-group:after, .form-block:after, .panel-indent:after, #global-header .header-wrapper:after, #global-header .header-wrapper .header-global:after, #global-header .header-wrapper .header-global .header-logo:after, #global-header .header-proposition #proposition-link:after,
 #global-header .header-proposition #proposition-links:after, #footer .footer-wrapper:after, #footer .footer-meta:after {
   content: "";
@@ -123,25 +123,25 @@
   clear: both;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_grid_layout\.scss}line{font-family:\0000318}}
+/* line 18, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
 #content, #global-header-bar, #global-cookie-message p {
   max-width: 960px;
   margin: 0 15px;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_grid_layout\.scss}line{font-family:\0000318}}
+  /* line 18, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
   #content, #global-header-bar, #global-cookie-message p {
     margin: 0 30px;
   }
 }
 @media (min-width: 1020px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_grid_layout\.scss}line{font-family:\0000318}}
+  /* line 18, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
   #content, #global-header-bar, #global-cookie-message p {
     margin: 0 auto;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_grid_layout\.scss}line{font-family:\0000360}}
+/* line 60, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
 .grid-row, #global-breadcrumb {
   margin: 0 -15px;
 }
@@ -152,7 +152,7 @@
 @-o-viewport {
   width: device-width;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_shims\.scss}line{font-family:\0000346}}
+/* line 46, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_shims.scss */
 .grid-row:after, #global-breadcrumb:after, #content:after, fieldset:after, .form-group:after, .form-block:after, .panel-indent:after, #global-header .header-wrapper:after, #global-header .header-wrapper .header-global:after, #global-header .header-wrapper .header-global .header-logo:after, #global-header .header-proposition #proposition-link:after,
 #global-header .header-proposition #proposition-links:after, #footer .footer-wrapper:after, #footer .footer-meta:after {
   content: "";
@@ -166,17 +166,17 @@
 @-o-viewport {
   width: device-width;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_helpers\.scss}line{font-family:\0000318}}
+/* line 18, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_helpers.scss */
 .example-highlight-grid .grid-row {
   background: #bfc1c3;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_helpers\.scss}line{font-family:\0000322}}
+/* line 22, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_helpers.scss */
 .example-highlight-grid .column-highlight {
   background: #dee0e2;
   width: 100%;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_helpers\.scss}line{font-family:\0000330}}
+/* line 30, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_helpers.scss */
 .visuallyhidden {
   position: absolute;
   overflow: hidden;
@@ -188,13 +188,13 @@
   border: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_helpers\.scss}line{font-family:\0000342}}
+/* line 42, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_helpers.scss */
 .js-enabled .js-hidden {
   display: none;
 }
 
 /* Borrowed from http://meyerweb.com/eric/tools/css/reset/ */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_reset\.scss}line{font-family:\000036}}
+/* line 6, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_reset.scss */
 div, span,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -213,7 +213,7 @@ time, mark {
   padding: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_reset\.scss}line{font-family:\0000324}}
+/* line 24, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_reset.scss */
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 small, strike, strong, sub, sup, tt, var,
 b, u, i, center,
@@ -225,7 +225,7 @@ table, caption, tbody, tfoot, thead, tr, th, td {
   font-weight: normal;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\000037}}
+/* line 7, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 main {
   font-family: "nta", Arial, sans-serif;
   font-size: 16px;
@@ -235,14 +235,14 @@ main {
   -webkit-font-smoothing: antialiased;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\000037}}
+  /* line 7, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   main {
     font-size: 19px;
     line-height: 1.31579;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000313}}
+/* line 13, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .font-xxlarge {
   font-family: "nta", Arial, sans-serif;
   font-size: 53px;
@@ -251,14 +251,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000313}}
+  /* line 13, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .font-xxlarge {
     font-size: 80px;
     line-height: 1;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000317}}
+/* line 17, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .font-xlarge {
   font-family: "nta", Arial, sans-serif;
   font-size: 32px;
@@ -267,14 +267,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000317}}
+  /* line 17, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .font-xlarge {
     font-size: 48px;
     line-height: 1.04167;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000321}}
+/* line 21, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .font-large {
   font-family: "nta", Arial, sans-serif;
   font-size: 24px;
@@ -283,14 +283,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000321}}
+  /* line 21, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .font-large {
     font-size: 36px;
     line-height: 1.11111;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000325}}
+/* line 25, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .font-medium {
   font-family: "nta", Arial, sans-serif;
   font-size: 18px;
@@ -299,14 +299,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000325}}
+  /* line 25, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .font-medium {
     font-size: 24px;
     line-height: 1.25;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000329}}
+/* line 29, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .font-small {
   font-family: "nta", Arial, sans-serif;
   font-size: 16px;
@@ -315,14 +315,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000329}}
+  /* line 29, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .font-small {
     font-size: 19px;
     line-height: 1.31579;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000333}}
+/* line 33, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .font-xsmall {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -331,14 +331,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000333}}
+  /* line 33, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .font-xsmall {
     font-size: 16px;
     line-height: 1.25;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000338}}
+/* line 38, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .bold-xxlarge {
   font-family: "nta", Arial, sans-serif;
   font-size: 53px;
@@ -347,14 +347,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000338}}
+  /* line 38, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .bold-xxlarge {
     font-size: 80px;
     line-height: 1;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000342}}
+/* line 42, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .bold-xlarge {
   font-family: "nta", Arial, sans-serif;
   font-size: 32px;
@@ -363,14 +363,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000342}}
+  /* line 42, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .bold-xlarge {
     font-size: 48px;
     line-height: 1.04167;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000346}}
+/* line 46, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .bold-large {
   font-family: "nta", Arial, sans-serif;
   font-size: 24px;
@@ -379,14 +379,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000346}}
+  /* line 46, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .bold-large {
     font-size: 36px;
     line-height: 1.11111;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000350}}
+/* line 50, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .bold-medium {
   font-family: "nta", Arial, sans-serif;
   font-size: 18px;
@@ -395,14 +395,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000350}}
+  /* line 50, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .bold-medium {
     font-size: 24px;
     line-height: 1.25;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000354}}
+/* line 54, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .bold-small {
   font-family: "nta", Arial, sans-serif;
   font-size: 16px;
@@ -411,14 +411,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000354}}
+  /* line 54, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .bold-small {
     font-size: 19px;
     line-height: 1.31579;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000358}}
+/* line 58, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .bold-xsmall {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -427,14 +427,14 @@ main {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000358}}
+  /* line 58, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .bold-xsmall {
     font-size: 16px;
     line-height: 1.25;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000367}}
+/* line 67, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .heading-xlarge {
   font-family: "nta", Arial, sans-serif;
   font-size: 32px;
@@ -445,20 +445,20 @@ main {
   margin-bottom: 0.9375em;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000367}}
+  /* line 67, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-xlarge {
     font-size: 48px;
     line-height: 1.04167;
   }
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000367}}
+  /* line 67, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-xlarge {
     margin-top: 0.625em;
     margin-bottom: 1.25em;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000378}}
+/* line 78, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .heading-xlarge .heading-secondary {
   font-family: "nta", Arial, sans-serif;
   font-size: 20px;
@@ -471,21 +471,21 @@ main {
   color: #6f777b;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000378}}
+  /* line 78, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-xlarge .heading-secondary {
     font-size: 27px;
     line-height: 1.11111;
   }
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000378}}
+  /* line 78, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-xlarge .heading-secondary {
     padding-top: 4px;
     padding-bottom: 6px;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000387}}
+/* line 87, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .heading-large {
   font-family: "nta", Arial, sans-serif;
   font-size: 24px;
@@ -496,20 +496,20 @@ main {
   margin-bottom: 0.41667em;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000387}}
+  /* line 87, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-large {
     font-size: 36px;
     line-height: 1.11111;
   }
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000387}}
+  /* line 87, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-large {
     margin-top: 1.25em;
     margin-bottom: 0.55556em;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000398}}
+/* line 98, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .heading-large .heading-secondary {
   font-family: "nta", Arial, sans-serif;
   font-size: 18px;
@@ -522,21 +522,21 @@ main {
   color: #6f777b;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000398}}
+  /* line 98, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-large .heading-secondary {
     font-size: 24px;
     line-height: 1.25;
   }
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\0000398}}
+  /* line 98, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-large .heading-secondary {
     padding-top: 6px;
     padding-bottom: 4px;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003107}}
+/* line 107, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .heading-medium {
   font-family: "nta", Arial, sans-serif;
   font-size: 18px;
@@ -547,21 +547,21 @@ main {
   margin-bottom: 0.5em;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003107}}
+  /* line 107, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-medium {
     font-size: 24px;
     line-height: 1.25;
   }
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003107}}
+  /* line 107, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-medium {
     margin-top: 1.875em;
     margin-bottom: 0.83333em;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003120}}
+/* line 120, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .heading-small {
   font-family: "nta", Arial, sans-serif;
   font-size: 16px;
@@ -572,33 +572,33 @@ main {
   margin-bottom: 0.3125em;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003120}}
+  /* line 120, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-small {
     font-size: 19px;
     line-height: 1.31579;
   }
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003120}}
+  /* line 120, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .heading-small {
     margin-top: 1.05263em;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003133}}
+/* line 133, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 p {
   margin-top: 0.3125em;
   margin-bottom: 1.25em;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003133}}
+  /* line 133, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   p {
     margin-top: 0.26316em;
     margin-bottom: 1.05263em;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003145}}
+/* line 145, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .lede {
   font-family: "nta", Arial, sans-serif;
   font-size: 18px;
@@ -607,45 +607,45 @@ p {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003145}}
+  /* line 145, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .lede {
     font-size: 24px;
     line-height: 1.25;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003151}}
+/* line 151, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .text {
   max-width: 30em;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003155}}
+/* line 155, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .text-secondary {
   color: #6f777b;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003160}}
+/* line 160, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .link {
   color: #005ea5;
   text-decoration: underline;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003165}}
+/* line 165, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .link:visited {
   color: #4c2c92;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003169}}
+/* line 169, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .link:hover {
   color: #2e8aca;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003173}}
+/* line 173, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .link:active {
   color: #005ea5;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003179}}
+/* line 179, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .link-back {
   display: -moz-inline-stack;
   display: inline-block;
@@ -663,17 +663,17 @@ p {
   border-bottom: 1px solid #0b0c0c;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003179}}
+  /* line 179, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .link-back {
     font-size: 16px;
     line-height: 1.25;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003191}}
+/* line 191, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .link-back:link, .link-back:visited, .link-back:hover, .link-back:active {
   color: #0b0c0c;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003202}}
+/* line 202, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .link-back::before {
   content: '';
   display: block;
@@ -688,13 +688,13 @@ p {
   margin-top: -6px;
 }
 @-moz-document url-prefix() {
-  /* line 220, /Users/rebeccalaw/dev-projects/notify/notifications-admin/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
+  /* line 220, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
   .link-back::before {
     border-top: 5px dotted rgba(255, 0, 0, 0);
     border-bottom: 5px dotted rgba(255, 0, 0, 0);
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003237}}
+/* line 237, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 .code {
   color: black;
   text-shadow: 0 1px white;
@@ -719,7 +719,7 @@ p {
   padding: 4px 4px 2px 4px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_elements-typography\.scss}line{font-family:\00003265}}
+/* line 265, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_elements-typography.scss */
 hr {
   display: block;
   background: #bfc1c3;
@@ -730,29 +730,29 @@ hr {
   padding: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\000038}}
+/* line 8, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
 #content {
   padding-bottom: 30px;
 }
 @media (min-width: 769px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\000038}}
+  /* line 8, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
   #content {
     padding-bottom: 90px;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\0000322}}
+/* line 22, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
 .phase-banner {
   padding: 10px 0 8px 0;
   border-bottom: 1px solid #bfc1c3;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\0000322}}
+  /* line 22, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
   .phase-banner {
     padding-bottom: 10px;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_alpha-beta\.scss}line{font-family:\0000319}}
+/* line 19, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_alpha-beta.scss */
 .phase-banner p {
   margin: 0;
   color: #000;
@@ -763,13 +763,13 @@ hr {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_alpha-beta\.scss}line{font-family:\0000319}}
+  /* line 19, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_alpha-beta.scss */
   .phase-banner p {
     font-size: 16px;
     line-height: 1.25;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_alpha-beta\.scss}line{font-family:\0000325}}
+/* line 25, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_alpha-beta.scss */
 .phase-banner .phase-tag {
   display: -moz-inline-stack;
   display: inline-block;
@@ -788,30 +788,30 @@ hr {
   background-color: #d53880;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_alpha-beta\.scss}line{font-family:\0000325}}
+  /* line 25, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_alpha-beta.scss */
   .phase-banner .phase-tag {
     vertical-align: baseline;
   }
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_alpha-beta\.scss}line{font-family:\0000325}}
+  /* line 25, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_alpha-beta.scss */
   .phase-banner .phase-tag {
     font-size: 16px;
     line-height: 1.25;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_alpha-beta\.scss}line{font-family:\0000329}}
+/* line 29, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_alpha-beta.scss */
 .phase-banner span {
   vertical-align: top;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_alpha-beta\.scss}line{font-family:\0000329}}
+  /* line 29, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_alpha-beta.scss */
   .phase-banner span {
     vertical-align: baseline;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\0000349}}
+/* line 49, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
 .column-quarter {
   padding: 0 15px;
   -webkit-box-sizing: border-box;
@@ -819,14 +819,14 @@ hr {
   box-sizing: border-box;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\0000349}}
+  /* line 49, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
   .column-quarter {
     float: left;
     width: 25%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\0000353}}
+/* line 53, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
 .column-half {
   padding: 0 15px;
   -webkit-box-sizing: border-box;
@@ -834,14 +834,14 @@ hr {
   box-sizing: border-box;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\0000353}}
+  /* line 53, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
   .column-half {
     float: left;
     width: 50%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\0000357}}
+/* line 57, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
 .column-third {
   padding: 0 15px;
   -webkit-box-sizing: border-box;
@@ -849,14 +849,14 @@ hr {
   box-sizing: border-box;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\0000357}}
+  /* line 57, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
   .column-third {
     float: left;
     width: 33.33333%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\0000361}}
+/* line 61, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
 .column-two-thirds {
   padding: 0 15px;
   -webkit-box-sizing: border-box;
@@ -864,24 +864,24 @@ hr {
   box-sizing: border-box;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_layout\.scss}line{font-family:\0000361}}
+  /* line 61, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_layout.scss */
   .column-two-thirds {
     float: left;
     width: 66.66667%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000317}}
+/* line 17, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 fieldset {
   width: 100%;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000330}}
+/* line 30, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 textarea {
   display: block;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000339}}
+/* line 39, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-group {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -891,36 +891,36 @@ textarea {
   margin-bottom: 15px;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000339}}
+  /* line 39, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-group {
     margin-bottom: 30px;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000354}}
+/* line 54, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-group-related {
   margin-bottom: 10px;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000354}}
+  /* line 54, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-group-related {
     margin-bottom: 20px;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000363}}
+/* line 63, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-group-compound {
   margin-bottom: 10px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000373}}
+/* line 73, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-label,
 .form-label-bold {
   display: block;
   color: #0b0c0c;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000379}}
+/* line 79, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-label {
   font-family: "nta", Arial, sans-serif;
   font-size: 16px;
@@ -929,14 +929,14 @@ textarea {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000379}}
+  /* line 79, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-label {
     font-size: 19px;
     line-height: 1.31579;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000383}}
+/* line 83, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-label-bold {
   font-family: "nta", Arial, sans-serif;
   font-size: 16px;
@@ -945,26 +945,26 @@ textarea {
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000383}}
+  /* line 83, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-label-bold {
     font-size: 19px;
     line-height: 1.31579;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000389}}
+/* line 89, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 legend .form-label,
 legend .form-label-bold {
   padding-bottom: 7px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\0000398}}
+/* line 98, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .error legend .form-label,
 .error legend .form-label-bold {
   padding-bottom: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003105}}
+/* line 105, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-block {
   float: left;
   width: 100%;
@@ -972,14 +972,14 @@ legend .form-label-bold {
   margin-bottom: 5px;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003105}}
+  /* line 105, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-block {
     margin-top: 0;
     margin-bottom: 10px;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003123}}
+/* line 123, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-hint {
   font-family: "nta", Arial, sans-serif;
   font-size: 16px;
@@ -992,14 +992,14 @@ legend .form-label-bold {
   margin-bottom: 5px;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003123}}
+  /* line 123, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-hint {
     font-size: 19px;
     line-height: 1.31579;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003137}}
+/* line 137, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-control {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -1015,108 +1015,108 @@ legend .form-label-bold {
   border: 2px solid #6f777b;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003137}}
+  /* line 137, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-control {
     font-size: 19px;
     line-height: 1.31579;
   }
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003137}}
+  /* line 137, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-control {
     width: 50%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003155}}
+/* line 155, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-radio {
   display: block;
   margin: 10px 0;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003159}}
+/* line 159, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-radio input {
   vertical-align: middle;
   margin: -4px 5px 0 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003166}}
+/* line 166, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-checkbox {
   display: block;
   margin: 15px 0;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003170}}
+/* line 170, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-checkbox input {
   vertical-align: middle;
   margin: -2px 5px 0 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003183}}
+/* line 183, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-control-3-4 {
   width: 100%;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003183}}
+  /* line 183, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-control-3-4 {
     width: 75%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003191}}
+/* line 191, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-control-2-3 {
   width: 100%;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003191}}
+  /* line 191, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-control-2-3 {
     width: 66.66%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003198}}
+/* line 198, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-control-1-2 {
   width: 100%;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003198}}
+  /* line 198, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-control-1-2 {
     width: 50%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003206}}
+/* line 206, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-control-1-3 {
   width: 100%;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003206}}
+  /* line 206, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-control-1-3 {
     width: 33.33%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003213}}
+/* line 213, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-control-1-4 {
   width: 100%;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003213}}
+  /* line 213, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-control-1-4 {
     width: 25%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003220}}
+/* line 220, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
 .form-control-1-8 {
   width: 100%;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_forms\.scss}line{font-family:\00003220}}
+  /* line 220, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_forms.scss */
   .form-control-1-8 {
     width: 12.5%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-block-labels\.scss}line{font-family:\000035}}
+/* line 5, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-block-labels.scss */
 .block-label {
   display: block;
   float: none;
@@ -1129,12 +1129,12 @@ legend .form-label-bold {
   cursor: pointer;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-block-labels\.scss}line{font-family:\000035}}
+  /* line 5, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-block-labels.scss */
   .block-label {
     float: left;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-block-labels\.scss}line{font-family:\0000325}}
+/* line 25, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-block-labels.scss */
 .block-label input {
   position: absolute;
   top: 15px;
@@ -1144,51 +1144,51 @@ legend .form-label-bold {
   width: 29px;
   height: 29px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-block-labels\.scss}line{font-family:\0000339}}
+/* line 39, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-block-labels.scss */
 .block-label:hover {
   border-color: #0b0c0c;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-block-labels\.scss}line{font-family:\0000344}}
+/* line 44, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-block-labels.scss */
 .block-label:last-child {
   margin-bottom: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-block-labels\.scss}line{font-family:\0000349}}
+/* line 49, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-block-labels.scss */
 .inline .block-label {
   clear: none;
   margin-right: 10px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-block-labels\.scss}line{font-family:\0000357}}
+/* line 57, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-block-labels.scss */
 .js-enabled label.selected {
   background: #fff;
   border-color: #0b0c0c;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-block-labels\.scss}line{font-family:\0000363}}
+/* line 63, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-block-labels.scss */
 .js-enabled label.focused {
   outline: 3px solid #ffbf47;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-block-labels\.scss}line{font-family:\0000368}}
+/* line 68, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-block-labels.scss */
 .js-enabled .focused input:focus {
   outline: none;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-date\.scss}line{font-family:\000035}}
+/* line 5, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-date.scss */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-date\.scss}line{font-family:\0000311}}
+/* line 11, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-date.scss */
 input[type=number] {
   -moz-appearance: textfield;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-date\.scss}line{font-family:\0000317}}
+/* line 17, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-date.scss */
 .form-date .form-group {
   float: left;
   width: 50px;
@@ -1196,46 +1196,46 @@ input[type=number] {
   margin-bottom: 0;
   clear: none;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-date\.scss}line{font-family:\0000325}}
+/* line 25, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-date.scss */
 .form-date .form-group label {
   display: block;
   margin-bottom: 5px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-date\.scss}line{font-family:\0000330}}
+/* line 30, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-date.scss */
 .form-date .form-group input {
   width: 100%;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-date\.scss}line{font-family:\0000335}}
+/* line 35, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-date.scss */
 .form-date .form-group-year {
   width: 70px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\000035}}
+/* line 5, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error {
   margin-right: 15px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000312}}
+/* line 12, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error .error-message {
   color: #b10e1e;
   font-weight: bold;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000318}}
+/* line 18, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error .form-control {
   border: 4px solid #b10e1e;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000322}}
+/* line 22, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error .form-hint {
   margin-bottom: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000328}}
+/* line 28, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error,
 .error-summary {
   border-left: 4px solid #b10e1e;
   padding-left: 10px;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000328}}
+  /* line 28, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
   .error,
   .error-summary {
     border-left: 5px solid #b10e1e;
@@ -1243,7 +1243,7 @@ input[type=number] {
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000341}}
+/* line 41, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error-message {
   font-family: "nta", Arial, sans-serif;
   font-size: 16px;
@@ -1256,14 +1256,14 @@ input[type=number] {
   padding: 5px 0 7px 0;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000341}}
+  /* line 41, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
   .error-message {
     font-size: 19px;
     line-height: 1.31579;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000352}}
+/* line 52, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error-summary {
   border: 4px solid #b10e1e;
   margin-top: 15px;
@@ -1271,7 +1271,7 @@ input[type=number] {
   padding: 15px 10px;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000352}}
+  /* line 52, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
   .error-summary {
     border: 5px solid #b10e1e;
     margin-top: 30px;
@@ -1279,42 +1279,42 @@ input[type=number] {
     padding: 20px 15px 15px 15px;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000376}}
+/* line 76, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error-summary:focus {
   outline: 3px solid #ffbf47;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000380}}
+/* line 80, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error-summary .error-summary-heading {
   margin-top: 0;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000384}}
+/* line 84, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error-summary p {
   margin-bottom: 10px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000388}}
+/* line 88, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error-summary .error-summary-list {
   padding-left: 0;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000391}}
+  /* line 91, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
   .error-summary .error-summary-list li {
     margin-bottom: 5px;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/forms\/_form-validation\.scss}line{font-family:\0000398}}
+/* line 98, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/forms/_form-validation.scss */
 .error-summary .error-summary-list a {
   color: #b10e1e;
   font-weight: bold;
   text-decoration: underline;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_tables\.scss}line{font-family:\000034}}
+/* line 4, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_tables.scss */
 table {
   border-collapse: collapse;
   border-spacing: 0;
   width: 100%;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_tables\.scss}line{font-family:\000039}}
+/* line 9, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_tables.scss */
 table th,
 table td {
   font-family: "nta", Arial, sans-serif;
@@ -1328,22 +1328,22 @@ table td {
   border-bottom: 1px solid #bfc1c3;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_tables\.scss}line{font-family:\000039}}
+  /* line 9, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_tables.scss */
   table th,
   table td {
     font-size: 16px;
     line-height: 1.25;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_tables\.scss}line{font-family:\0000319}}
+/* line 19, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_tables.scss */
 table th {
   font-weight: 700;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_tables\.scss}line{font-family:\0000322}}
+/* line 22, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_tables.scss */
 table th.numeric {
   text-align: right;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_tables\.scss}line{font-family:\0000328}}
+/* line 28, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_tables.scss */
 table td.numeric {
   font-family: "ntatabularnumbers", "nta", Arial, sans-serif;
   font-size: 14px;
@@ -1353,50 +1353,50 @@ table td.numeric {
   text-align: right;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_tables\.scss}line{font-family:\0000328}}
+  /* line 28, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_tables.scss */
   table td.numeric {
     font-size: 16px;
     line-height: 1.25;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_lists\.scss}line{font-family:\000034}}
+/* line 4, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_lists.scss */
 ul,
 ol {
   list-style-type: none;
   padding: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_lists\.scss}line{font-family:\0000311}}
+/* line 11, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_lists.scss */
 .list-bullet {
   list-style-type: disc;
   padding-left: 20px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_lists\.scss}line{font-family:\0000317}}
+/* line 17, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_lists.scss */
 .list-number {
   list-style-type: decimal;
   padding-left: 20px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_lists\.scss}line{font-family:\0000326}}
+/* line 26, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_lists.scss */
 .list-bullet,
 .list-number {
   margin-top: 5px;
   margin-bottom: 20px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_lists\.scss}line{font-family:\0000332}}
+/* line 32, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_lists.scss */
 .list-bullet li,
 .list-number li {
   margin-bottom: 5px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_details\.scss}line{font-family:\000034}}
+/* line 4, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_details.scss */
 details {
   display: block;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_details\.scss}line{font-family:\000037}}
+/* line 7, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_details.scss */
 details summary {
   display: inline-block;
   color: #005ea5;
@@ -1404,52 +1404,52 @@ details summary {
   position: relative;
   margin-bottom: 0.26316em;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_details\.scss}line{font-family:\0000314}}
+/* line 14, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_details.scss */
 details summary:hover {
   color: #2e8aca;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_details\.scss}line{font-family:\0000318}}
+/* line 18, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_details.scss */
 details summary:focus {
   outline: 3px solid #ffbf47;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_details\.scss}line{font-family:\0000324}}
+/* line 24, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_details.scss */
 details .summary {
   text-decoration: underline;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_details\.scss}line{font-family:\0000329}}
+/* line 29, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_details.scss */
 details .arrow {
   margin-right: .35em;
   font-style: normal;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_panels\.scss}line{font-family:\000035}}
+/* line 5, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_panels.scss */
 .panel-indent {
   clear: both;
   border-left: 5px solid #bfc1c3;
   padding: 0.78947em;
   margin-bottom: 0.78947em;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_panels\.scss}line{font-family:\0000313}}
+/* line 13, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_panels.scss */
 .panel-indent :first-child {
   margin-top: 0;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_panels\.scss}line{font-family:\0000317}}
+/* line 17, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_panels.scss */
 .panel-indent :only-child,
 .panel-indent :last-child {
   margin-bottom: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_panels\.scss}line{font-family:\0000324}}
+/* line 24, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_panels.scss */
 .panel-indent-info {
   border-left-width: 10px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_panels\.scss}line{font-family:\0000329}}
+/* line 29, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_panels.scss */
 .form-group .panel-indent {
   padding-bottom: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_buttons\.scss}line{font-family:\000034}}
+/* line 4, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_buttons.scss */
 .button {
   background-color: #00823b;
   position: relative;
@@ -1477,44 +1477,44 @@ details .arrow {
   padding: 0.52632em 0.78947em 0.26316em 0.78947em;
   vertical-align: top;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_buttons\.scss}line{font-family:\0000349}}
+/* line 49, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_buttons.scss */
 .button:visited {
   background-color: #00823b;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_buttons\.scss}line{font-family:\0000352}}
+/* line 52, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_buttons.scss */
 .button:hover, .button:focus {
   background-color: #00692f;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_buttons\.scss}line{font-family:\0000356}}
+/* line 56, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_buttons.scss */
 .button:active {
   top: 2px;
   -webkit-box-shadow: 0 0 0 #00823b;
   -moz-box-shadow: 0 0 0 #00823b;
   box-shadow: 0 0 0 #00823b;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_buttons\.scss}line{font-family:\0000362}}
+/* line 62, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_buttons.scss */
 .button.disabled, .button[disabled="disabled"], .button[disabled] {
   zoom: 1;
   filter: alpha(opacity=50);
   opacity: 0.5;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_buttons\.scss}line{font-family:\0000366}}
+/* line 66, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_buttons.scss */
 .button.disabled:hover, .button[disabled="disabled"]:hover, .button[disabled]:hover {
   cursor: default;
   background-color: #00823b;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_buttons\.scss}line{font-family:\0000370}}
+/* line 70, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_buttons.scss */
 .button.disabled:active, .button[disabled="disabled"]:active, .button[disabled]:active {
   top: 0;
   -webkit-box-shadow: 0 2px 0 #003618;
   -moz-box-shadow: 0 2px 0 #003618;
   box-shadow: 0 2px 0 #003618;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_buttons\.scss}line{font-family:\0000382}}
+/* line 82, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_buttons.scss */
 .button:link, .button:hover, .button:focus, .button:visited {
   color: #fff;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_buttons\.scss}line{font-family:\00003100}}
+/* line 100, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_buttons.scss */
 .button:before {
   content: "";
   height: 110%;
@@ -1525,12 +1525,12 @@ details .arrow {
   top: 0;
   left: 0;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_buttons\.scss}line{font-family:\00003110}}
+/* line 110, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_buttons.scss */
 .button:active:before {
   top: -10%;
   height: 120%;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/design-patterns\/_buttons\.scss}line{font-family:\00003123}}
+/* line 123, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/design-patterns/_buttons.scss */
 .button[rel="external"]:after {
   display: none;
   content: none;
@@ -1538,34 +1538,34 @@ details .arrow {
   margin-right: 0;
 }
 @media (max-width: 640px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_buttons\.scss}line{font-family:\000034}}
+  /* line 4, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_buttons.scss */
   .button {
     width: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_buttons\.scss}line{font-family:\0000316}}
+/* line 16, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_buttons.scss */
 .button::-moz-focus-inner {
   border: 0;
   padding: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_buttons\.scss}line{font-family:\0000321}}
+/* line 21, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_buttons.scss */
 .button:focus {
   outline: 3px solid #ffbf47;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_buttons\.scss}line{font-family:\0000326}}
+/* line 26, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_buttons.scss */
 .button[disabled="disabled"] {
   background: #00823b;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_buttons\.scss}line{font-family:\0000330}}
+/* line 30, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_buttons.scss */
 .button[disabled="disabled"]:focus {
   outline: none;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_buttons\.scss}line{font-family:\0000335}}
+/* line 35, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_buttons.scss */
 .button-start,
 .button-get-started {
   font-family: "nta", Arial, sans-serif;
@@ -1579,7 +1579,7 @@ details .arrow {
   padding: 0.36842em 2.15789em 0.21053em 0.84211em;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_buttons\.scss}line{font-family:\0000335}}
+  /* line 35, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_buttons.scss */
   .button-start,
   .button-get-started {
     font-size: 24px;
@@ -1587,7 +1587,7 @@ details .arrow {
   }
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_buttons\.scss}line{font-family:\0000335}}
+  /* line 35, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_buttons.scss */
   .button-start,
   .button-get-started {
     background-image: url("/public/images/icons/icon-pointer-2x.png");
@@ -1595,83 +1595,83 @@ details .arrow {
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\000033}}
+/* line 3, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon {
   background-position: 0 0;
   background-repeat: no-repeat;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\000038}}
+/* line 8, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-calendar {
   width: 27px;
   height: 27px;
   background-image: url("/public/images/icons/icon-calendar.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\000038}}
+  /* line 8, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-calendar {
     background-image: url("/public/images/icons/icon-calendar-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000319}}
+/* line 19, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-download {
   width: 30px;
   height: 39px;
   background-image: url("/public/images/icons/icon-file-download.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000319}}
+  /* line 19, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-download {
     background-image: url("/public/images/icons/icon-file-download-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000330}}
+/* line 30, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-important {
   width: 34px;
   height: 34px;
   background-image: url("/public/images/icons/icon-important.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000330}}
+  /* line 30, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-important {
     background-image: url("/public/images/icons/icon-important-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000341}}
+/* line 41, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-information {
   width: 27px;
   height: 27px;
   background-image: url("/public/images/icons/icon-information.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000341}}
+  /* line 41, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-information {
     background-image: url("/public/images/icons/icon-information-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000352}}
+/* line 52, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-locator {
   width: 26px;
   height: 36px;
   background-image: url("/public/images/icons/icon-locator.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000352}}
+  /* line 52, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-locator {
     background-image: url("/public/images/icons/icon-locator-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000363}}
+/* line 63, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-search {
   width: 30px;
   height: 22px;
@@ -1679,14 +1679,14 @@ details .arrow {
   background-image: url("/public/images/icons/icon-search.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000363}}
+  /* line 63, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-search {
     background-image: url("/public/images/icons/icon-search-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000376}}
+/* line 76, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-pointer {
   width: 30px;
   height: 19px;
@@ -1694,210 +1694,210 @@ details .arrow {
   background-image: url("/public/images/icons/icon-pointer.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000376}}
+  /* line 76, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-pointer {
     background-image: url("/public/images/icons/icon-pointer-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000388}}
+/* line 88, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-pointer-black {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-pointer-black.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\0000388}}
+  /* line 88, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-pointer-black {
     background-image: url("/public/images/icons/icon-pointer-black-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003103}}
+/* line 103, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-1 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-1.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003103}}
+  /* line 103, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-1 {
     background-image: url("/public/images/icons/icon-steps/icon-step-1-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003114}}
+/* line 114, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-2 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-2.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003114}}
+  /* line 114, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-2 {
     background-image: url("/public/images/icons/icon-steps/icon-step-2-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003125}}
+/* line 125, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-3 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-3.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003125}}
+  /* line 125, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-3 {
     background-image: url("/public/images/icons/icon-steps/icon-step-3-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003136}}
+/* line 136, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-4 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-4.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003136}}
+  /* line 136, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-4 {
     background-image: url("/public/images/icons/icon-steps/icon-step-4-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003147}}
+/* line 147, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-5 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-5.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003147}}
+  /* line 147, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-5 {
     background-image: url("/public/images/icons/icon-steps/icon-step-5-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003158}}
+/* line 158, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-6 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-6.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003158}}
+  /* line 158, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-6 {
     background-image: url("/public/images/icons/icon-steps/icon-step-6-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003169}}
+/* line 169, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-7 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-7.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003169}}
+  /* line 169, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-7 {
     background-image: url("/public/images/icons/icon-steps/icon-step-7-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003180}}
+/* line 180, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-8 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-8.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003180}}
+  /* line 180, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-8 {
     background-image: url("/public/images/icons/icon-steps/icon-step-8-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003191}}
+/* line 191, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-9 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-9.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003191}}
+  /* line 191, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-9 {
     background-image: url("/public/images/icons/icon-steps/icon-step-9-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003202}}
+/* line 202, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-10 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-10.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003202}}
+  /* line 202, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-10 {
     background-image: url("/public/images/icons/icon-steps/icon-step-10-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003213}}
+/* line 213, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-11 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-11.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003213}}
+  /* line 213, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-11 {
     background-image: url("/public/images/icons/icon-steps/icon-step-11-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003224}}
+/* line 224, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-12 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-12.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003224}}
+  /* line 224, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-12 {
     background-image: url("/public/images/icons/icon-steps/icon-step-12-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003235}}
+/* line 235, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
 .icon-step-13 {
   width: 23px;
   height: 23px;
   background-image: url("/public/images/icons/icon-steps/icon-step-13.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_icons\.scss}line{font-family:\00003235}}
+  /* line 235, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_icons.scss */
   .icon-step-13 {
     background-image: url("/public/images/icons/icon-steps/icon-step-13-2x.png");
     background-size: 100%;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_components\.scss}line{font-family:\000033}}
+/* line 3, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_components.scss */
 .govuk-box-highlight {
   margin: 1em 0 1em 0;
   padding: 2em 0 1em 0;
@@ -1906,7 +1906,7 @@ details .arrow {
   text-align: center;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_breadcrumb\.scss}line{font-family:\000039}}
+/* line 9, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_breadcrumb.scss */
 #global-breadcrumb ol {
   padding: 0 15px;
   -webkit-box-sizing: border-box;
@@ -1916,13 +1916,13 @@ details .arrow {
   padding-bottom: 0.75em;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_breadcrumb\.scss}line{font-family:\000039}}
+  /* line 9, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_breadcrumb.scss */
   #global-breadcrumb ol {
     float: left;
     width: 100%;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_breadcrumb\.scss}line{font-family:\0000315}}
+/* line 15, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_breadcrumb.scss */
 #global-breadcrumb ol li {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -1940,28 +1940,28 @@ details .arrow {
   padding-right: 1em;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_breadcrumb\.scss}line{font-family:\0000315}}
+  /* line 15, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_breadcrumb.scss */
   #global-breadcrumb ol li {
     font-size: 16px;
     line-height: 1.25;
   }
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_breadcrumb\.scss}line{font-family:\0000315}}
+  /* line 15, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_breadcrumb.scss */
   #global-breadcrumb ol li {
     background-image: url("/public/images/separator-2x.png");
     background-size: 6px 11px;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_breadcrumb\.scss}line{font-family:\0000336}}
+/* line 36, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_breadcrumb.scss */
 #global-breadcrumb ol li a {
   color: #0b0c0c;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_breadcrumb\.scss}line{font-family:\0000340}}
+/* line 40, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_breadcrumb.scss */
 #global-breadcrumb ol li strong {
   font-weight: normal;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_elements\/elements\/_breadcrumb\.scss}line{font-family:\0000344}}
+/* line 44, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_elements/elements/_breadcrumb.scss */
 #global-breadcrumb ol li:last-child {
   background-image: none;
   margin-right: 0;
@@ -1969,24 +1969,24 @@ details .arrow {
 
 /* local styleguide includes */
 /* Old depricated greys, new things should use the toolkit greys */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\000031}}
+/* line 1, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 html, body, button, input, table, td, th {
   font-family: "nta", Arial, sans-serif;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\000034}}
+/* line 4, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 html, body, div, h1, h2, h3, h4, h5, h6, article, aside, footer, header, hgroup, nav, section {
   margin: 0;
   padding: 0;
   vertical-align: baseline;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000311}}
+/* line 11, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 main {
   display: block;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000316}}
+/* line 16, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 .group:before,
 .group:after {
   content: "\0020";
@@ -1995,23 +1995,23 @@ main {
   overflow: hidden;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000324}}
+/* line 24, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 .group:after {
   clear: both;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000327}}
+/* line 27, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 .group {
   zoom: 1;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000332}}
+/* line 32, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 .content-fixed {
   top: 0;
   position: fixed;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000336}}
+/* line 36, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 .shim {
   display: block;
 }
@@ -2020,7 +2020,7 @@ main {
  * 1. Prevents iOS text size adjust after orientation change, without disabling
  *    user zoom.
  */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000344}}
+/* line 44, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 html {
   -webkit-text-size-adjust: 100%;
   /* 1 */
@@ -2032,12 +2032,12 @@ html {
 /*
   Force the scrollbar to always display in IE10/11
  */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000354}}
+/* line 54, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 html {
   -ms-overflow-style: scrollbar;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000358}}
+/* line 58, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 body {
   background: #fff;
   color: #0b0c0c;
@@ -2047,86 +2047,86 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000367}}
+/* line 67, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 ol, ul, nav ol, nav ul {
   list-style: inherit;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000371}}
+/* line 71, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 fieldset {
   border: none;
   padding: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000376}}
+/* line 76, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 a:link {
   color: #005ea5;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000380}}
+/* line 80, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 a:visited {
   color: #4c2c92;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000384}}
+/* line 84, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 a:hover {
   color: #2e8aca;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\0000388}}
+/* line 88, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 a:active {
   color: #2e8aca;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_typography\.scss}line{font-family:\00003290}}
+/* line 290, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 a[rel="external"]:after {
   background-image: url("/public/images/external-links/external-link.png");
   background-repeat: no-repeat;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_typography\.scss}line{font-family:\00003290}}
+  /* line 290, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_typography.scss */
   a[rel="external"]:after {
     background-image: url("/public/images/external-links/external-link-24x24.png");
     background-size: 12px 400px;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_typography\.scss}line{font-family:\00003231}}
+/* line 231, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 a[rel="external"]:after {
   content: "    ";
   background-position: right 6px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_typography\.scss}line{font-family:\00003240}}
+/* line 240, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 a[rel="external"]:hover:after {
   background-position: right -382px;
 }
 @media (max-width: 640px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_typography\.scss}line{font-family:\00003231}}
+  /* line 231, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_typography.scss */
   a[rel="external"]:after {
     content: "     ";
     background-position: right 3px;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_typography\.scss}line{font-family:\00003240}}
+  /* line 240, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_typography.scss */
   a[rel="external"]:hover:after {
     background-position: right -385px;
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_typography\.scss}line{font-family:\00003231}}
+/* line 231, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 .external-link:after {
   content: "        ";
   background-position: right 0px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_typography\.scss}line{font-family:\00003240}}
+/* line 240, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 .external-link:hover:after {
   background-position: right 0px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_typography\.scss}line{font-family:\00003302}}
+/* line 302, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 .external-link:after {
   background-image: url("/public/images/external-links/external-link-black-12x12.png");
   background-repeat: no-repeat;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/govuk_frontend_toolkit\/stylesheets\/_typography\.scss}line{font-family:\00003302}}
+  /* line 302, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/govuk_frontend_toolkit/stylesheets/_typography.scss */
   .external-link:after {
     background-image: url("/public/images/external-links/external-link-black-24x24.png");
     background-size: 12px 400px;
@@ -2142,7 +2142,7 @@ a[rel="external"]:hover:after {
  * 3. Removes Android and iOS tap highlight color to prevent entire container being highlighted
  *    www.yuiblog.com/blog/2010/10/01/quick-tip-customizing-the-mobile-safari-tap-highlight-color/
  */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\00003117}}
+/* line 117, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 html {
   font-size: 62.5%;
   /* 1 */
@@ -2158,7 +2158,7 @@ html {
  *    (62.5% * 160% = 100%)
  * 2. Addresses margins handled incorrectly in IE6/7
  */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\00003130}}
+/* line 130, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 body {
   font-size: 160%;
   /* 1 */
@@ -2166,18 +2166,18 @@ body {
   /* 2 */
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\00003135}}
+/* line 135, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 b,
 strong {
   font-weight: 600;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\00003140}}
+/* line 140, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 img {
   border: 0;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\00003150}}
+/* line 150, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 abbr[title] {
   cursor: help;
 }
@@ -2187,7 +2187,7 @@ abbr[title] {
  * 2. Addresses `box-sizing` set to `border-box` in Safari 5 and Chrome
  *    (include `-moz` to future-proof).
  */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\00003160}}
+/* line 160, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 input[type="search"] {
   -webkit-appearance: textfield;
   /* 1 */
@@ -2197,19 +2197,19 @@ input[type="search"] {
   box-sizing: content-box;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\00003166}}
+/* line 166, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 input[type="search"]::-webkit-search-cancel-button {
   -webkit-appearance: searchfield-cancel-button;
   margin-right: 2px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_basic\.scss}line{font-family:\00003171}}
+/* line 171, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
 
 /* For image replacement */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\000032}}
+/* line 2, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .ir {
   display: block;
   text-indent: -999em;
@@ -2218,20 +2218,20 @@ input[type="search"]::-webkit-search-decoration {
   text-align: left;
   direction: ltr;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000310}}
+/* line 10, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .ir br {
   display: none;
 }
 
 /* Hide for both screenreaders and browsers */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000316}}
+/* line 16, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .hidden {
   display: none;
   visibility: hidden;
 }
 
 /* Hide only visually, but have it available for screenreaders */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000322}}
+/* line 22, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .visually-hidden,
 .visuallyhidden {
   position: absolute;
@@ -2241,7 +2241,7 @@ input[type="search"]::-webkit-search-decoration {
    * focusable when navigated to via the keyboard
    */
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000331}}
+/* line 31, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .visually-hidden.focusable:active, .visually-hidden.focusable:focus,
 .visuallyhidden.focusable:active,
 .visuallyhidden.focusable:focus {
@@ -2254,54 +2254,54 @@ input[type="search"]::-webkit-search-decoration {
 }
 
 /* Hide visually and from screenreaders, but maintain layout */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000343}}
+/* line 43, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .invisible {
   visibility: hidden;
 }
 
 /* Give a strong clear visual idea as to what is currently in focus */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000348}}
+/* line 48, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 a {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000352}}
+/* line 52, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 a:focus {
   background-color: #ffbf47;
   outline: 3px solid #ffbf47;
 }
 
 /* Make skiplinks visible when they are tabbed to */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000359}}
+/* line 59, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .skiplink {
   position: absolute;
   left: -9999em;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000364}}
+/* line 64, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .skiplink:focus {
   position: static;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000368}}
+/* line 68, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 #skiplink-container {
   text-align: center;
   background: #0b0c0c;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000372}}
+/* line 72, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 #skiplink-container div {
   text-align: left;
   margin: 0 auto;
   max-width: 1020px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000378}}
+/* line 78, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 #skiplink-container .skiplink {
   display: -moz-inline-stack;
   display: inline-block;
   margin: 0.75em 0 0 30px;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000384}}
+/* line 84, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 input:focus,
 textarea:focus,
 select:focus,
@@ -2310,12 +2310,12 @@ button:focus,
   outline: 3px solid #ffbf47;
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000393}}
+/* line 93, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 #global-header h1 a:focus {
   background-color: transparent;
   outline: none;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_accessibility\.scss}line{font-family:\0000398}}
+/* line 98, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 #global-header a:focus {
   color: #0b0c0c;
 }
@@ -2323,12 +2323,12 @@ button:focus,
 /* @import '_shims'; */
 /* @import '_conditionals'; */
 /* @import '_measurements'; */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\000035}}
+/* line 5, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header {
   background-color: #0b0c0c;
   width: 100%;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\000039}}
+/* line 9, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-wrapper {
   background-color: #0b0c0c;
   max-width: 990px;
@@ -2337,61 +2337,61 @@ button:focus,
   padding-bottom: 8px;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\000039}}
+  /* line 9, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-wrapper {
     padding-left: 15px;
     padding-right: 15px;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\0000326}}
+/* line 26, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-wrapper .header-global .header-logo {
   float: left;
 }
 @media (min-width: 769px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\0000326}}
+  /* line 26, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-wrapper .header-global .header-logo {
     width: 33.33%;
   }
 }
 @media screen and (max-width: 379px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\0000326}}
+  /* line 26, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-wrapper .header-global .header-logo {
     width: auto;
     float: none;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\0000338}}
+/* line 38, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-wrapper .header-global .header-logo .content {
   margin: 0 15px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\0000342}}
+/* line 42, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-wrapper .header-global .header-logo {
   margin: 5px 0 2px;
 }
 @media (min-width: 769px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\0000349}}
+  /* line 49, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header.with-proposition .header-wrapper .header-global {
     float: left;
     width: 33.33%;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\0000354}}
+  /* line 54, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header.with-proposition .header-wrapper .header-global .header-logo,
   #global-header.with-proposition .header-wrapper .header-global .site-search {
     width: 100%;
   }
 }
 @media (min-width: 769px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\0000360}}
+  /* line 60, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header.with-proposition .header-wrapper .header-proposition {
     width: 66.66%;
     float: left;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\0000365}}
+/* line 65, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header.with-proposition .header-wrapper .header-proposition .content {
   margin: 0 15px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\0000372}}
+/* line 72, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header #logo {
   float: left;
   position: relative;
@@ -2412,7 +2412,7 @@ button:focus,
   background-size: 35px 31px;
   background-position: 0 0;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\0000398}}
+/* line 98, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header #logo img {
   position: relative;
   top: -2px;
@@ -2425,26 +2425,26 @@ button:focus,
   border: none;
   /* visibility: hidden; */
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003115}}
+/* line 115, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header #logo:hover, #global-header #logo:focus {
   text-decoration: none;
   border-bottom-color: #fff;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003121}}
+/* line 121, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header #logo:active {
   color: #2b8cc4;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003125}}
+/* line 125, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition {
   padding-top: 10px;
 }
 @media (min-width: 769px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003125}}
+  /* line 125, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition {
     padding-top: 0;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003130}}
+/* line 130, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-name {
   font-family: "nta", Arial, sans-serif;
   font-size: 18px;
@@ -2456,17 +2456,17 @@ button:focus,
   text-decoration: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003130}}
+  /* line 130, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-name {
     font-size: 24px;
     line-height: 1.25;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003136}}
+/* line 136, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition a#proposition-name:hover {
   text-decoration: underline;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003139}}
+/* line 139, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition a.menu {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -2480,23 +2480,23 @@ button:focus,
   padding-top: 6px;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003139}}
+  /* line 139, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition a.menu {
     font-size: 16px;
     line-height: 1.25;
   }
 }
 @media (min-width: 769px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003139}}
+  /* line 139, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition a.menu {
     display: none;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003149}}
+/* line 149, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition a.menu:hover {
   text-decoration: underline;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003152}}
+/* line 152, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition a.menu:after {
   display: inline-block;
   font-size: 8px;
@@ -2505,45 +2505,45 @@ button:focus,
   vertical-align: middle;
   content: " \25BC";
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003160}}
+/* line 160, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition a.menu.js-hidden:after {
   content: " \25B2";
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003164}}
+/* line 164, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-menu {
   margin-top: 5px;
 }
 @media (min-width: 769px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003168}}
+  /* line 168, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-menu.no-proposition-name {
     margin-top: 37px;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003175}}
+/* line 175, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link,
 #global-header .header-proposition #proposition-links {
   clear: both;
   margin: 2px 0 0 0;
   padding: 0;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003182}}
+/* line 182, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 .js-enabled #global-header .header-proposition #proposition-link, .js-enabled
 #global-header .header-proposition #proposition-links {
   display: none;
 }
 @media (min-width: 769px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003182}}
+  /* line 182, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   .js-enabled #global-header .header-proposition #proposition-link, .js-enabled
   #global-header .header-proposition #proposition-links {
     display: block;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003187}}
+/* line 187, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 .js-enabled #global-header .header-proposition #proposition-link.js-visible, .js-enabled
 #global-header .header-proposition #proposition-links.js-visible {
   display: block;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003192}}
+/* line 192, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link li,
 #global-header .header-proposition #proposition-links li {
   float: left;
@@ -2552,7 +2552,7 @@ button:focus,
   border-bottom: 1px solid #2e3133;
 }
 @media (min-width: 769px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003192}}
+  /* line 192, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link li,
   #global-header .header-proposition #proposition-links li {
     display: block;
@@ -2560,13 +2560,13 @@ button:focus,
     padding: 0 15px 0 0;
     border-bottom: 0;
   }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003204}}
+  /* line 204, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link li.clear-child,
   #global-header .header-proposition #proposition-links li.clear-child {
     clear: left;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003210}}
+/* line 210, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link a,
 #global-header .header-proposition #proposition-links a {
   color: #fff;
@@ -2578,7 +2578,7 @@ button:focus,
   text-transform: none;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003210}}
+  /* line 210, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link a,
   #global-header .header-proposition #proposition-links a {
     font-size: 14px;
@@ -2586,7 +2586,7 @@ button:focus,
   }
 }
 @media (min-width: 769px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003210}}
+  /* line 210, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link a,
   #global-header .header-proposition #proposition-links a {
     font-family: "nta", Arial, sans-serif;
@@ -2598,7 +2598,7 @@ button:focus,
   }
 }
 @media (min-width: 769px) and (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003210}}
+  /* line 210, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link a,
   #global-header .header-proposition #proposition-links a {
     font-size: 16px;
@@ -2606,59 +2606,59 @@ button:focus,
   }
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003220}}
+/* line 220, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link a:hover,
 #global-header .header-proposition #proposition-links a:hover {
   text-decoration: underline;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003223}}
+/* line 223, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link a.active,
 #global-header .header-proposition #proposition-links a.active {
   color: #1d8feb;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003226}}
+/* line 226, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link a:focus,
 #global-header .header-proposition #proposition-links a:focus {
   color: #0b0c0c;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003232}}
+/* line 232, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link {
   float: right;
   line-height: 22px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003235}}
+/* line 235, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 .js-enabled #global-header .header-proposition #proposition-link {
   display: block;
 }
 @media (min-width: 769px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003232}}
+  /* line 232, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link {
     float: none;
   }
 }
 
 /* Global header bar */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003247}}
+/* line 247, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header-bar {
   height: 10px;
   background-color: #005ea5;
 }
 
 /* Global cookie message */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003258}}
+/* line 258, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 .js-enabled #global-cookie-message {
   display: none;
   /* shown with JS, always on for non-JS */
 }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003262}}
+/* line 262, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-cookie-message {
   width: 100%;
   background-color: #d5e8f3;
   padding-top: 10px;
   padding-bottom: 10px;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003267}}
+/* line 267, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-cookie-message p {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -2669,7 +2669,7 @@ button:focus,
   margin-bottom: 0;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_header\.scss}line{font-family:\00003267}}
+  /* line 267, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-cookie-message p {
     font-size: 16px;
     line-height: 1.25;
@@ -2677,12 +2677,12 @@ button:focus,
 }
 
 /* Global footer */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\000033}}
+/* line 3, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer {
   background-color: #DEE0E2;
   border-top: 1px solid #a1acb2;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\000037}}
+/* line 7, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-wrapper {
   margin: 0 auto;
   width: auto;
@@ -2692,20 +2692,20 @@ button:focus,
   margin: 0 auto;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\000037}}
+  /* line 7, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-wrapper {
     padding-top: 60px;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000317}}
+/* line 17, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer a {
   color: #454a4c;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000320}}
+/* line 20, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer a:hover {
   color: #171819;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000325}}
+/* line 25, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer h2 {
   font-family: "nta", Arial, sans-serif;
   font-size: 18px;
@@ -2717,17 +2717,17 @@ button:focus,
   margin: 0;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000325}}
+  /* line 25, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer h2 {
     font-size: 24px;
     line-height: 1.25;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000331}}
+/* line 31, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer h2 a {
   color: inherit;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000336}}
+/* line 36, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta {
   padding-left: 15px;
   padding-right: 15px;
@@ -2737,25 +2737,25 @@ button:focus,
   color: #454a4c;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000336}}
+  /* line 36, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta {
     padding-left: 30px;
     padding-right: 30px;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000344}}
+/* line 44, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner {
   display: inline-block;
   vertical-align: bottom;
   width: 100%;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000344}}
+  /* line 44, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner {
     width: 75%;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000358}}
+/* line 58, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner ul {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -2768,41 +2768,41 @@ button:focus,
   padding: 0;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000358}}
+  /* line 58, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner ul {
     font-size: 16px;
     line-height: 1.5;
   }
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000358}}
+  /* line 58, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner ul {
     margin: 0 0 1em 0;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000369}}
+/* line 69, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner ul li {
   display: inline-block;
   margin: 0 15px 0 0;
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000381}}
+/* line 81, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner .open-government-licence {
   clear: left;
   position: relative;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000381}}
+  /* line 81, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner .open-government-licence {
     padding-left: 53px;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000393}}
+/* line 93, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner .open-government-licence .logo {
   margin-bottom: 1em;
   padding-top: 0;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\0000393}}
+  /* line 93, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner .open-government-licence .logo {
     position: absolute;
     left: 0;
@@ -2811,7 +2811,7 @@ button:focus,
     height: 100%;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\00003104}}
+/* line 104, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner .open-government-licence .logo a {
   display: block;
   width: 41px;
@@ -2821,13 +2821,13 @@ button:focus,
   background: image-url("/static/images/open-government-licence.png") 0 0 no-repeat;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\00003104}}
+  /* line 104, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner .open-government-licence .logo a {
     background-image: image-url("/static/images/open-government-licence_2x.png");
     background-size: 41px 17px;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\00003118}}
+/* line 118, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner .open-government-licence p {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -2838,13 +2838,13 @@ button:focus,
   padding-top: 0.1em;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\00003118}}
+  /* line 118, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner .open-government-licence p {
     font-size: 16px;
     line-height: 1.25;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\00003126}}
+/* line 126, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .copyright {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -2856,14 +2856,14 @@ button:focus,
   display: block;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\00003126}}
+  /* line 126, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .copyright {
     font-size: 16px;
     line-height: 1.25;
   }
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\00003126}}
+  /* line 126, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .copyright {
     display: inline-block;
     text-align: inherit;
@@ -2872,7 +2872,7 @@ button:focus,
     margin-top: 0;
   }
 }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\00003147}}
+/* line 147, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .copyright a {
   display: block;
   background-image: url("/static/images/govuk-crest.png");
@@ -2883,21 +2883,44 @@ button:focus,
   padding: 115px 0 0 0;
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\00003147}}
+  /* line 147, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .copyright a {
     background-position: 100% 0%;
   }
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\00003147}}
+  /* line 147, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .copyright a {
     background-image: url("/static/images/govuk-crest-2x.png");
     background-size: 125px 102px;
   }
 }
 @media (min-width: 641px) {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rebeccalaw\/dev-projects\/notify\/notifications-admin\/assets\/stylesheets\/govuk_template\/_footer\.scss}line{font-family:\00003147}}
+  /* line 147, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .copyright a {
     text-align: right;
+  }
+}
+
+/* line 3, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/app.scss */
+.form-control-2-3, .form-control-1-4 {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  font-family: "nta", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.25;
+  font-weight: 400;
+  text-transform: none;
+  padding: 4px;
+  background-color: #fff;
+  border: 2px solid #6f777b;
+}
+
+@media (min-width: 641px) {
+  /* line 18, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/app.scss */
+  .form-control-2-3, .form-control-1-4 {
+    font-size: 19px;
+    line-height: 1.31579;
   }
 }
