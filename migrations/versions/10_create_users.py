@@ -7,7 +7,7 @@ Create Date: 2015-11-24 10:39:19.827534
 """
 
 # revision identifiers, used by Alembic.
-revision = 'create_users'
+revision = '10_create_users'
 down_revision = None
 
 from alembic import op
