@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import render_template, redirect, url_for, jsonify
+from flask import render_template, redirect, jsonify
 from flask_login import login_user
 
 from app.main import main
@@ -19,25 +19,36 @@ def render_sign_in():
 def process_sign_in():
     form = LoginForm()
     if form.validate_on_submit():
-        user = users_dao.get_user_by_email(form.email_address)
+        user = users_dao.get_user_by_email(form.email_address.data)
         if user is None:
             return jsonify(authorization=False), 404
-        if user.password == encrypt(form.password):
+        if user.password == encrypt(form.password.data):
             login_user(user)
         else:
             return jsonify(authorization=False), 404
-
+    else:
+        return jsonify(form.errors), 404
     return redirect('/two-factor')
 
 
-@main.route('/create_user', methods=(['POST']))
+@main.route('/temp-create-users', methods=(['GET']))
+def render_create_user():
+    return render_template('temp-create-users.html', form=LoginForm())
+
+
+@main.route('/temp-create-users', methods=(['POST']))
 def create_user_for_test():
     form = LoginForm()
-    user = Users(email_address=form.email_address,
-                 name=form.email_address,
-                 password=form.password,
-                 created_at=datetime.now(),
-                 role_id=1)
-    users_dao.insert_user(user)
+    if form.validate_on_submit():
+        user = Users(email_address=form.email_address.data,
+                     name=form.email_address.data,
+                     password=form.password.data,
+                     created_at=datetime.now(),
+                     mobile_number='+447651234534',
+                     role_id=1)
+        users_dao.insert_user(user)
 
-    return 'created'
+        return redirect('/sign-in')
+    else:
+        print(form.errors)
+        return redirect(form.errors), 400

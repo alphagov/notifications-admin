@@ -43,6 +43,30 @@ class Users(db.Model):
 
         return filter_null_value_fields(serialized)
 
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_locked(self):
+        if self.failed_login_count <= current_app.config['MAX_FAILED_LOGIN_COUNT']:
+            return False
+        else:
+            return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
+
+    @staticmethod
+    def load_user(user_id):
+        user = Users.query.filter_by(id=user_id).first()
+        if user.is_active():
+            return user
+
 
 def filter_null_value_fields(obj):
     return dict(

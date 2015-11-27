@@ -1,15 +1,13 @@
 # revision identifiers, used by Alembic.
 revision = '20_initialise_data'
-down_revision = None
-
+down_revision = '10_create_users'
+from app.models import Roles
 from alembic import op
 
 def upgrade():
-    op.bulk_insert('roles',
-                   [
-                       {'role': 'plaform_admin'},
-                       {'role': 'service_user'}
-                   ])
+    op.execute("insert into roles(role) values('platform_admin')")
+    op.execute("insert into roles(role) values('service_user')")
+
 
 def downgrade():
     op.drop_table('users')

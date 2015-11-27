@@ -1,6 +1,6 @@
 """empty message
 
-Revision ID: create_users
+Revision ID: 10_create_users
 Revises: None
 Create Date: 2015-11-24 10:39:19.827534
 
@@ -12,6 +12,7 @@ down_revision = None
 
 from alembic import op
 import sqlalchemy as sa
+
 
 def upgrade():
     op.create_table('roles',

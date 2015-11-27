@@ -4,11 +4,15 @@ from flask import Flask
 from flask._compat import string_types
 from flask.ext import assets
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+from flask_wtf import CsrfProtect
 from webassets.filter import get_filter
 
 from config import configs
 
 db = SQLAlchemy()
+login_manager = LoginManager()
+csrf = CsrfProtect()
 
 
 def create_app(config_name):
@@ -18,6 +22,8 @@ def create_app(config_name):
     application.config.from_object(configs[config_name])
     db.init_app(application)
     init_app(application)
+    csrf.init_app(application)
+    login_manager.init_app(application)
 
     from app.main import main as main_blueprint
     application.register_blueprint(main_blueprint)

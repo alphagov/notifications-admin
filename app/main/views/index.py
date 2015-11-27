@@ -1,4 +1,5 @@
 from flask import render_template
+from flask_login import login_required
 
 from app.main import main
 
@@ -19,36 +20,43 @@ def helloworld():
 
 
 @main.route("/register")
+@login_required
 def register():
     return render_template('register.html')
 
 
 @main.route("/register-from-invite")
+@login_required
 def registerfrominvite():
     return render_template('register-from-invite.html')
 
 
 @main.route("/verify")
+@login_required
 def verify():
     return render_template('verify.html')
 
 
 @main.route("/verify-mobile")
+@login_required
 def verifymobile():
     return render_template('verify-mobile.html')
 
 
 @main.route("/dashboard")
+@login_required
 def dashboard():
     return render_template('dashboard.html')
 
 
 @main.route("/add-service")
+@login_required
 def addservice():
     return render_template('add-service.html')
 
 
 @main.route("/two-factor")
+@login_required
 def twofactor():
     return render_template('two-factor.html')
 
