@@ -1,7 +1,7 @@
 {% extends "admin_template.html" %}
 
 {% block page_title %}
-Hello world!
+Sign in
 {% endblock %}
 
 {% block content %}
@@ -12,19 +12,24 @@ Hello world!
 
 		<p>If you do not have an account, you can <a href="register">register</a>.</p>
 
-  		<p>
-  		<label class="form-label" for="email">Email address</label>
-  		<input class="form-control-2-3" id="email" type="text"><br>
-  		</p>
-  		<p>
-  		<label class="form-label" for="password">Password</label>
-  		<input class="form-control-1-4" id="password" type="password"><br>
-  		<span class="font-xsmall"><a href="forgot-password">Forgotten password?</a></span>
-  		</p>
+		<form autocomplete="off" action="" method="post">
 
-  		<p>
-  		<a class="button" href="two-factor" role="button">Continue</a>
-  		</p>
+			<p>
+			<label class="form-label">Email address</label>
+			{{ form.email_address(class="form-control-2-3", autocomplete="off") }} <br>
+			</p>
+			<p>
+			<label class="form-label">Password</label>
+				 {{ form.password(class="form-control-1-4", autocomplete="off") }} <br>
+			</p>
+			<p>
+			<span class="font-xsmall"><a href="">Forgotten password?</a></span>
+			</p>
+
+			<p>
+			<a class="button" href="two-factor" role="button">Continue</a>
+			</p>
+		</form>
 	</div>
 </div>
 

@@ -13,9 +13,12 @@ def test_insert_role_should_be_able_to_get_role(notifications_admin, notificatio
     assert saved_role == role
 
 
-def test_insert_role_will_throw_error_if_role_already_exists():
+def test_insert_role_will_throw_error_if_role_already_exists(notifications_admin, notifications_admin_db):
+    role1 = roles_dao.get_role_by_id(1)
+    assert role1.id == 1
+
     role = Roles(id=1, role='cannot create a duplicate')
 
-    with pytest.raises(sqlalchemy.exc.IntegrityError) as error:
+    with pytest.raises(sqlalchemy.orm.exc.FlushError) as error:
         roles_dao.insert_role(role)
-    assert 'duplicate key value violates unique constraint "roles_pkey"' in str(error.value)
+    assert 'conflicts with persistent instance' in str(error.value)

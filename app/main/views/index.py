@@ -43,11 +43,6 @@ def dashboard():
     return render_template('dashboard.html')
 
 
-@main.route("/sign-in")
-def signin():
-    return render_template('signin.html')
-
-
 @main.route("/add-service")
 def addservice():
     return render_template('add-service.html')

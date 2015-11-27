@@ -9,6 +9,7 @@ class Config(object):
     SQLALCHEMY_RECORD_QUERIES = True
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/notifications_admin'
     MAX_FAILED_LOGIN_COUNT = 10
+    SECRET_KEY = 'secret-key-unique-changeme'
 
 
 class Development(Config):
