@@ -66,3 +66,13 @@ def sendsms():
 @main.route("/check-sms")
 def checksms():
     return render_template('check_sms.html')
+
+
+@main.route("/email-not-received")
+def emailnotreceived():
+    return render_template('email-not-received.html')
+
+
+@main.route("/text-not-received")
+def textnotreceived():
+    return render_template('text-not-received.html')
