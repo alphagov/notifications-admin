@@ -9,6 +9,7 @@ from flask_wtf import CsrfProtect
 from webassets.filter import get_filter
 from werkzeug.exceptions import abort
 
+from app.its_dangerous_session import ItsdangerousSessionInterface
 from config import configs
 
 db = SQLAlchemy()
@@ -31,6 +32,7 @@ def create_app(config_name):
     from app.main import main as main_blueprint
     application.register_blueprint(main_blueprint)
 
+    application.session_interface = ItsdangerousSessionInterface()
     return application
 
 
