@@ -60,12 +60,12 @@ def twofactor():
 
 @main.route("/send-sms")
 def sendsms():
-    return render_template('send_sms.html')
+    return render_template('send-sms.html')
 
 
 @main.route("/check-sms")
 def checksms():
-    return render_template('check_sms.html')
+    return render_template('check-sms.html')
 
 
 @main.route("/email-not-received")
@@ -80,12 +80,12 @@ def textnotreceived():
 
 @main.route("/send-email")
 def sendemail():
-    return render_template('send_email.html')
+    return render_template('send-email.html')
 
 
 @main.route("/check-email")
 def checkemail():
-    return render_template('check_email.html')
+    return render_template('check-email.html')
 
 
 @main.route("/jobs")
@@ -111,3 +111,23 @@ def forgotpassword():
 @main.route("/new-password")
 def newpassword():
     return render_template('new-password.html')
+
+
+@main.route("/user-profile")
+def userprofile():
+    return render_template('user-profile.html')
+
+
+@main.route("/manage-users")
+def manageusers():
+    return render_template('manage-users.html')
+
+
+@main.route("/service-settings")
+def servicesettings():
+    return render_template('service-settings.html')
+
+
+@main.route("/api-keys")
+def apikeys():
+    return render_template('api-keys.html')
