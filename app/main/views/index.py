@@ -76,3 +76,28 @@ def emailnotreceived():
 @main.route("/text-not-received")
 def textnotreceived():
     return render_template('text-not-received.html')
+
+
+@main.route("/send-email")
+def sendemail():
+    return render_template('send_email.html')
+
+
+@main.route("/check-email")
+def checkemail():
+    return render_template('check_email.html')
+
+
+@main.route("/jobs")
+def showjobs():
+    return render_template('jobs.html')
+
+
+@main.route("/jobs/job")
+def showjob():
+    return render_template('job.html')
+
+
+@main.route("/jobs/job/notification")
+def shownotification():
+    return render_template('notification.html')
