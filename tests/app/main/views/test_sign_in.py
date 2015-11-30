@@ -56,6 +56,12 @@ def test_should_return_locked_out_true_when_user_is_locked(notifications_admin, 
     assert response.status_code == 401
     assert '"locked_out": true' in response.get_data(as_text=True)
 
+    another_bad_attempt = notifications_admin.test_client().post('/sign-in',
+                                                                 data={'email_address': 'valid@example.gov.uk',
+                                                                       'password': 'whatIsMyPassword!'})
+    assert another_bad_attempt.status_code == 401
+    assert '"locked_out": true' in response.get_data(as_text=True)
+
 
 def test_should_return_active_user_is_false_if_user_is_inactive(notifications_admin, notifications_admin_db):
     user = User(email_address='inactive_user@example.gov.uk',
