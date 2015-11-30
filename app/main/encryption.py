@@ -1,7 +1,9 @@
-import hashlib
-from flask import current_app
+from flask.ext.bcrypt import generate_password_hash, check_password_hash
 
 
-def encrypt(value):
-    key = current_app.config['PASS_SECRET_KEY']
-    return hashlib.sha256((key + value).encode('UTF-8')).hexdigest()
+def hashpw(password):
+    return generate_password_hash(password.encode('UTF-8'), 10)
+
+
+def checkpw(password, hashed_password):
+    return check_password_hash(hashed_password, password)

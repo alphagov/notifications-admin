@@ -7,7 +7,7 @@ from app.main import main
 from app.main.forms import LoginForm
 from app.main.dao import users_dao
 from app.models import User
-from app.main.encryption import encrypt
+from app.main.encryption import checkpw
 
 
 @main.route("/sign-in", methods=(['GET']))
@@ -22,7 +22,7 @@ def process_sign_in():
         user = users_dao.get_user_by_email(form.email_address.data)
         if user is None:
             return jsonify(authorization=False), 401
-        if user.password == encrypt(form.password.data):
+        if checkpw(form.password.data, user.password):
             login_user(user)
         else:
             return jsonify(authorization=False), 401

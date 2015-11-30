@@ -1,6 +1,6 @@
 from app import db, login_manager
 from app.models import User
-from app.main.encryption import encrypt
+from app.main.encryption import hashpw
 
 
 @login_manager.user_loader
@@ -9,7 +9,7 @@ def load_user(user_id):
 
 
 def insert_user(user):
-    user.password = encrypt(user.password)
+    user.password = hashpw(user.password)
     db.session.add(user)
     db.session.commit()
 
