@@ -10,7 +10,9 @@ from webassets.filter import get_filter
 from werkzeug.exceptions import abort
 
 from app.its_dangerous_session import ItsdangerousSessionInterface
+import app.proxy_fix
 from config import configs
+
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -32,7 +34,10 @@ def create_app(config_name):
     from app.main import main as main_blueprint
     application.register_blueprint(main_blueprint)
 
+    proxy_fix.init_app(application)
+
     application.session_interface = ItsdangerousSessionInterface()
+
     return application
 
 

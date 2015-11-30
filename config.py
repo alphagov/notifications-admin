@@ -13,6 +13,8 @@ class Config(object):
 
     WTF_CSRF_ENABLED = True
     SECRET_KEY = 'secret-key'
+    HTTP_PROTOCOL = 'http'
+    DANGEROUS_SALT = 'itsdangeroussalt'
 
 
 class Development(Config):
@@ -23,6 +25,11 @@ class Test(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_notifications_admin'
     WTF_CSRF_ENABLED = False
+
+
+class Live(Config):
+    DEBUG = False
+    HTTP_PROTOCOL = 'https'
 
 configs = {
     'development': Development,

@@ -1,6 +1,11 @@
-from app import db
+from app import db, login_manager
 from app.models import User
 from app.main.encryption import encrypt
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return get_user_by_id(user_id)
 
 
 def insert_user(user):

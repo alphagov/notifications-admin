@@ -3,17 +3,11 @@ from datetime import datetime
 from flask import render_template, redirect, jsonify
 from flask_login import login_user
 
-from app import login_manager
 from app.main import main
 from app.main.forms import LoginForm
 from app.main.dao import users_dao
 from app.models import User
 from app.main.encryption import encrypt
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return users_dao.get_user_by_id(user_id)
 
 
 @main.route("/sign-in", methods=(['GET']))
@@ -27,13 +21,13 @@ def process_sign_in():
     if form.validate_on_submit():
         user = users_dao.get_user_by_email(form.email_address.data)
         if user is None:
-            return jsonify(authorization=False), 404
+            return jsonify(authorization=False), 401
         if user.password == encrypt(form.password.data):
             login_user(user)
         else:
-            return jsonify(authorization=False), 404
+            return jsonify(authorization=False), 401
     else:
-        return jsonify(form.errors), 404
+        return jsonify(form.errors), 400
     return redirect('/two-factor')
 
 
