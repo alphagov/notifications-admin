@@ -56,3 +56,13 @@ def addservice():
 @main.route("/two-factor")
 def twofactor():
     return render_template('two-factor.html')
+
+
+@main.route("/send-sms")
+def sendsms():
+    return render_template('send_sms.html')
+    
+
+@main.route("/check-sms")
+def checksms():
+    return render_template('check_sms.html')
