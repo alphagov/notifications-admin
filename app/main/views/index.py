@@ -61,7 +61,7 @@ def twofactor():
 @main.route("/send-sms")
 def sendsms():
     return render_template('send_sms.html')
-    
+
 
 @main.route("/check-sms")
 def checksms():
