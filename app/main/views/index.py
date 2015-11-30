@@ -66,3 +66,13 @@ def sendsms():
 @main.route("/check-sms")
 def checksms():
     return render_template('check_sms.html')
+
+
+@main.route("/send-email")
+def sendemail():
+    return render_template('send_email.html')
+
+
+@main.route("/check-email")
+def checkemail():
+    return render_template('check_email.html')
