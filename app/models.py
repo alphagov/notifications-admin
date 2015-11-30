@@ -12,7 +12,7 @@ class Roles(db.Model):
     role = db.Column(db.String, nullable=False, unique=True)
 
 
-class Users(db.Model):
+class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -63,7 +63,7 @@ class Users(db.Model):
 
     @staticmethod
     def load_user(user_id):
-        user = Users.query.filter_by(id=user_id).first()
+        user = User.query.filter_by(id=user_id).first()
         if user.is_active():
             return user
 

@@ -1,5 +1,5 @@
 from app import db
-from app.models import Users
+from app.models import User
 from app.main.encryption import encrypt
 
 
@@ -10,12 +10,12 @@ def insert_user(user):
 
 
 def get_user_by_id(id):
-    return Users.query.filter_by(id=id).first()
+    return User.query.filter_by(id=id).first()
 
 
 def get_all_users():
-    return Users.query.all()
+    return User.query.all()
 
 
 def get_user_by_email(email_address):
-    return Users.query.filter_by(email_address=email_address).first()
+    return User.query.filter_by(email_address=email_address).first()

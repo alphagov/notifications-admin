@@ -1,12 +1,13 @@
 import os
 
-from flask import Flask
+from flask import Flask, session
 from flask._compat import string_types
 from flask.ext import assets
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from webassets.filter import get_filter
+from werkzeug.exceptions import abort
 
 from config import configs
 
@@ -22,13 +23,34 @@ def create_app(config_name):
     application.config.from_object(configs[config_name])
     db.init_app(application)
     init_app(application)
-    csrf.init_app(application)
+    init_csrf(application)
+
     login_manager.init_app(application)
+    login_manager.login_view = 'main.sign_in.render_sign_in'
 
     from app.main import main as main_blueprint
     application.register_blueprint(main_blueprint)
 
     return application
+
+
+def init_csrf(application):
+    csrf.init_app(application)
+
+    @csrf.error_handler
+    def csrf_handler(reason):
+        if 'user_id' not in session:
+            application.logger.info(
+                u'csrf.session_expired: Redirecting user to log in page'
+            )
+
+            return application.login_manager.unauthorized()
+
+        application.logger.info(
+            u'csrf.invalid_token: Aborting request, user_id: {user_id}',
+            extra={'user_id': session['user_id']})
+
+        abort(400, reason)
 
 
 def init_app(app):

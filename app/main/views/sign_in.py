@@ -3,11 +3,17 @@ from datetime import datetime
 from flask import render_template, redirect, jsonify
 from flask_login import login_user
 
+from app import login_manager
 from app.main import main
 from app.main.forms import LoginForm
 from app.main.dao import users_dao
-from app.models import Users
+from app.models import User
 from app.main.encryption import encrypt
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return users_dao.get_user_by_id(user_id)
 
 
 @main.route("/sign-in", methods=(['GET']))
@@ -40,12 +46,12 @@ def render_create_user():
 def create_user_for_test():
     form = LoginForm()
     if form.validate_on_submit():
-        user = Users(email_address=form.email_address.data,
-                     name=form.email_address.data,
-                     password=form.password.data,
-                     created_at=datetime.now(),
-                     mobile_number='+447651234534',
-                     role_id=1)
+        user = User(email_address=form.email_address.data,
+                    name=form.email_address.data,
+                    password=form.password.data,
+                    created_at=datetime.now(),
+                    mobile_number='+447651234534',
+                    role_id=1)
         users_dao.insert_user(user)
 
         return redirect('/sign-in')
