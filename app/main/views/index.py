@@ -76,3 +76,18 @@ def sendemail():
 @main.route("/check-email")
 def checkemail():
     return render_template('check_email.html')
+
+
+@main.route("/jobs")
+def showjobs():
+    return render_template('jobs.html')
+
+
+@main.route("/jobs/job")
+def showjob():
+    return render_template('job.html')
+
+
+@main.route("/jobs/job/notification")
+def shownotification():
+    return render_template('notification.html')
