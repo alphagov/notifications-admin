@@ -56,7 +56,7 @@ class User(db.Model):
         return self.id
 
     def is_locked(self):
-            if self.failed_login_count <= current_app.config['MAX_FAILED_LOGIN_COUNT']:
+            if self.failed_login_count < current_app.config['MAX_FAILED_LOGIN_COUNT']:
                 return False
             else:
                 return True

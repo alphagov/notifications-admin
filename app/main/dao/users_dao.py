@@ -24,3 +24,9 @@ def get_all_users():
 
 def get_user_by_email(email_address):
     return User.query.filter_by(email_address=email_address).first()
+
+
+def increment_failed_login_count(id):
+    user = User.query.filter_by(id=id).first()
+    user.failed_login_count += 1
+    db.session.commit()

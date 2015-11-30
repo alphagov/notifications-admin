@@ -34,3 +34,24 @@ def test_temp_create_user(notifications_admin, notifications_admin_db):
                                                             'password': 'val1dPassw0rd!'})
 
     assert response.status_code == 302
+
+
+def test_should_return_locked_out_true_when_user_is_locked(notifications_admin, notifications_admin_db):
+    user = User(email_address='valid@example.gov.uk',
+                password='val1dPassw0rd!',
+                mobile_number='+441234123123',
+                name='valid',
+                created_at=datetime.now(),
+                role_id=1)
+    users_dao.insert_user(user)
+    for _ in range(10):
+        notifications_admin.test_client().post('/sign-in',
+                                               data={'email_address': 'valid@example.gov.uk',
+                                                     'password': 'whatIsMyPassword!'})
+
+    response = notifications_admin.test_client().post('/sign-in',
+                                                      data={'email_address': 'valid@example.gov.uk',
+                                                            'password': 'val1dPassw0rd!'})
+
+    assert response.status_code == 401
+    assert '"locked_out": true' in response.get_data(as_text=True)

@@ -20,11 +20,14 @@ def process_sign_in():
     form = LoginForm()
     if form.validate_on_submit():
         user = users_dao.get_user_by_email(form.email_address.data)
+        if user.is_locked():
+            return jsonify(locked_out=True), 401
         if user is None:
             return jsonify(authorization=False), 401
         if checkpw(form.password.data, user.password):
             login_user(user)
         else:
+            users_dao.increment_failed_login_count(user.id)
             return jsonify(authorization=False), 401
     else:
         return jsonify(form.errors), 400

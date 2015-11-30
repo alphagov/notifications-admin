@@ -71,3 +71,37 @@ def test_get_all_users_returns_all_users(notifications_admin, notifications_admi
     users = users_dao.get_all_users()
     assert len(users) == 3
     assert users == [user1, user2, user3]
+
+
+def test_increment_failed_lockout_count_should_increade_count_by_1(notifications_admin, notifications_admin_db):
+    user = User(name='cannot remember password',
+                password='somepassword',
+                email_address='test1@get_all.gov.uk',
+                mobile_number='+441234123412',
+                created_at=datetime.now(),
+                role_id=1)
+    users_dao.insert_user(user)
+
+    savedUser = users_dao.get_user_by_id(user.id)
+    assert savedUser.failed_login_count == 0
+    users_dao.increment_failed_login_count(user.id)
+    assert users_dao.get_user_by_id(user.id).failed_login_count == 1
+
+
+def test_user_is_locked_if_failed_login_count_is_10_or_greater(notifications_admin, notifications_admin_db):
+    user = User(name='cannot remember password',
+                password='somepassword',
+                email_address='test1@get_all.gov.uk',
+                mobile_number='+441234123412',
+                created_at=datetime.now(),
+                role_id=1)
+    users_dao.insert_user(user)
+    saved_user = users_dao.get_user_by_id(user.id)
+    assert saved_user.is_locked() is False
+
+    for _ in range(10):
+        users_dao.increment_failed_login_count(user.id)
+
+    saved_user = users_dao.get_user_by_id(user.id)
+    assert saved_user.failed_login_count == 10
+    assert saved_user.is_locked() is True
