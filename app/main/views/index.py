@@ -101,3 +101,13 @@ def showjob():
 @main.route("/jobs/job/notification")
 def shownotification():
     return render_template('notification.html')
+
+
+@main.route("/forgot-password")
+def forgotpassword():
+    return render_template('forgot-password.html')
+
+
+@main.route("/new-password")
+def newpassword():
+    return render_template('new-password.html')
