@@ -131,3 +131,8 @@ def servicesettings():
 @main.route("/api-keys")
 def apikeys():
     return render_template('api-keys.html')
+
+
+@main.route("/verification-not-received")
+def verificationnotreceived():
+    return render_template('verification-not-received.html')
