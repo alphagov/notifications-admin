@@ -22,6 +22,8 @@ def process_sign_in():
         user = users_dao.get_user_by_email(form.email_address.data)
         if user.is_locked():
             return jsonify(locked_out=True), 401
+        if not user.is_active():
+            return jsonify(active_user=False), 401
         if user is None:
             return jsonify(authorization=False), 401
         if checkpw(form.password.data, user.password):

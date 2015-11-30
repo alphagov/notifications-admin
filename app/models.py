@@ -47,7 +47,10 @@ class User(db.Model):
         return True
 
     def is_active(self):
-        return True
+        if self.state == 'inactive':
+            return False
+        else:
+            return True
 
     def is_anonymous(self):
         return False

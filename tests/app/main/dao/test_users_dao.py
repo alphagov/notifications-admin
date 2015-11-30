@@ -105,3 +105,17 @@ def test_user_is_locked_if_failed_login_count_is_10_or_greater(notifications_adm
     saved_user = users_dao.get_user_by_id(user.id)
     assert saved_user.failed_login_count == 10
     assert saved_user.is_locked() is True
+
+
+def test_user_is_active_is_false_if_state_is_inactive(notifications_admin, notifications_admin_db):
+    user = User(name='inactive user',
+                password='somepassword',
+                email_address='test1@get_all.gov.uk',
+                mobile_number='+441234123412',
+                created_at=datetime.now(),
+                role_id=1,
+                state='inactive')
+    users_dao.insert_user(user)
+
+    saved_user = users_dao.get_user_by_id(user.id)
+    assert saved_user.is_active() is False
