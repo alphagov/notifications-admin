@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from flask import render_template, redirect, jsonify
+from flask_login import login_user
 
 from app.main import main
 from app.main.dao import users_dao
@@ -26,6 +27,7 @@ def process_register():
                     role_id=1)
         try:
             users_dao.insert_user(user)
+            login_user(user)
             return redirect('/two-factor')
         except Exception as e:
             return jsonify(database_error=e.message), 400

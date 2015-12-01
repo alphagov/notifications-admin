@@ -44,7 +44,7 @@ def test_should_return_400_if_password_is_blacklisted(notifications_admin, notif
                                                       data={'name': 'Bad Mobile',
                                                             'email_address': 'bad_mobile@example.not.right',
                                                             'mobile_number': '+44123412345',
-                                                            'password': 'password'})
+                                                            'password': 'password1234'})
 
     response.status_code == 400
     assert 'That password is blacklisted, too common' in response.get_data(as_text=True)
