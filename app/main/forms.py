@@ -2,6 +2,8 @@ from flask_wtf import Form
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
+from app.main.validators import Blacklist
+
 
 class LoginForm(Form):
     email_address = StringField('Email address', validators=[
@@ -32,4 +34,5 @@ class RegisterUserForm(Form):
                                             Regexp(regex=mobile_number, message='Please enter a +44 mobile number')])
     password = PasswordField('Password',
                              validators=[DataRequired(message='Please enter your password'),
-                                         Length(10, 255, message='Password must be at least 10 characters')])
+                                         Length(10, 255, message='Password must be at least 10 characters'),
+                                         Blacklist(message='That password is blacklisted, too common')])
