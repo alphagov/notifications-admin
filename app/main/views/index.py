@@ -38,6 +38,11 @@ def verifymobile():
     return render_template('verify-mobile.html')
 
 
+@main.route("/text-not-received-2")
+def textnotreceived2():
+    return render_template('text-not-received-2.html')
+
+
 @main.route("/dashboard")
 @login_required
 def dashboard():
