@@ -79,3 +79,11 @@ def test_should_return_active_user_is_false_if_user_is_inactive(notifications_ad
 
     assert response.status_code == 401
     assert '"active_user": false' in response.get_data(as_text=True)
+
+
+def test_should_return_401_when_user_does_not_exist(notifications_admin, notifications_admin_db):
+    response = notifications_admin.test_client().post('/sign-in',
+                                                      data={'email_address': 'does_not_exist@gov.uk',
+                                                            'password': 'doesNotExist!'})
+
+    assert response.status_code == 401
