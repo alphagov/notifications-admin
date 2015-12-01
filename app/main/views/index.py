@@ -14,11 +14,6 @@ def govuk():
     return render_template('govuk_template.html')
 
 
-@main.route("/hello-world")
-def helloworld():
-    return render_template('hello-world.html')
-
-
 @main.route("/register")
 @login_required
 def register():
