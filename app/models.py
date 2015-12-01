@@ -12,7 +12,7 @@ class Roles(db.Model):
     role = db.Column(db.String, nullable=False, unique=True)
 
 
-class Users(db.Model):
+class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -42,6 +42,27 @@ class Users(db.Model):
         }
 
         return filter_null_value_fields(serialized)
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        if self.state == 'inactive':
+            return False
+        else:
+            return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
+
+    def is_locked(self):
+            if self.failed_login_count < current_app.config['MAX_FAILED_LOGIN_COUNT']:
+                return False
+            else:
+                return True
 
 
 def filter_null_value_fields(obj):

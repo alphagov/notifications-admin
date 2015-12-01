@@ -1,19 +1,19 @@
 {% extends "admin_template.html" %}
 
 {% block page_title %}
-Sign in
+Temp create users
 {% endblock %}
 
 {% block content %}
 
 <div class="grid-row">
 	<div class="column-two-thirds">
-		<h1 class="heading-xlarge">Sign in</h1>
+		<h1 class="heading-xlarge">Temporary page to create user</h1>
 
-		<p>If you do not have an account, you can <a href="register">register</a>.</p>
+		<p>This is a temporary page to create users, the name will be the same as the email address.</p>
 
-		<form autocomplete="off" action="" method="post">
-			{{ form.hidden_tag() }}
+		 <form autocomplete="off" action="" method="post">
+            {{ form.hidden_tag() }}
 			<p>
 			<label class="form-label">Email address</label>
 			{{ form.email_address(class="form-control-2-3", autocomplete="off") }} <br>
@@ -22,12 +22,9 @@ Sign in
 			<label class="form-label">Password</label>
 				 {{ form.password(class="form-control-1-4", autocomplete="off") }} <br>
 			</p>
-			<p>
-			<span class="font-xsmall"><a href="">Forgotten password?</a></span>
-			</p>
 
 			<p>
-			<button class="button" href="two-factor" role="button">Continue</button>
+			<button class="button" href="sign-in" role="button">Create User</button>
 			</p>
 		</form>
 	</div>
