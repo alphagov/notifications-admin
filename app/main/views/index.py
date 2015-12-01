@@ -15,7 +15,6 @@ def govuk():
 
 
 @main.route("/register")
-@login_required
 def register():
     return render_template('register.html')
 
