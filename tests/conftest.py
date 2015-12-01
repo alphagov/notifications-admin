@@ -1,5 +1,4 @@
 import pytest
-from _pytest.monkeypatch import monkeypatch
 from sqlalchemy.schema import MetaData, DropConstraint
 
 from app import create_app, db
