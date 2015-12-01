@@ -13,11 +13,6 @@ def govuk():
     return render_template('govuk_template.html')
 
 
-@main.route("/hello-world")
-def helloworld():
-    return render_template('hello-world.html')
-
-
 @main.route("/register")
 def register():
     return render_template('register.html')
