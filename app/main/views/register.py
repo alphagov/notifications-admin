@@ -28,6 +28,6 @@ def process_register():
             users_dao.insert_user(user)
             return redirect('/two-factor')
         except Exception as e:
-            return jsonify(database_error=e.message), 400
+            return jsonify(database_error='encountered database error'), 400
     else:
         return jsonify(form.errors), 400
