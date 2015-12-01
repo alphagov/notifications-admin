@@ -5,7 +5,7 @@ from app import create_app, db
 from app.models import Roles
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def notifications_admin(request):
     app = create_app('test')
     ctx = app.app_context()
@@ -18,7 +18,7 @@ def notifications_admin(request):
     return app
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def notifications_admin_db(notifications_admin, request):
     metadata = MetaData(db.engine)
     metadata.reflect()

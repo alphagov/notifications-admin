@@ -1,0 +1,28 @@
+{% extends "admin_template.html" %}
+
+{% block page_title %}
+GOV.UK Notify
+{% endblock %}
+
+{% block content %}
+
+<div class="grid-row">
+  <div class="column-two-thirds">
+    <h1 class="heading-xlarge">Check your email address</h1>
+
+    <p>Check your email address is correct and resend a confirmation code.</p>
+
+      <p>
+      <label class="form-label" for="email">Email address</label>
+      <input class="form-control-2-3" id="email" type="text" value="wrongemail@wrong.com"><br>
+      <span class="font-xsmall">Your email address must end in .gov.uk</span>
+      </p>
+
+
+      <p>
+      <a class="button" href="verify" role="button">Resend confirmation code</a>
+      </p>
+  </div>
+</div>
+
+{% endblock %}

@@ -27,3 +27,5 @@ deploy:
   app: notifications-admin
   on:
     repo: alphagov/notifications-admin
+  run:
+    - python app.py db upgrade

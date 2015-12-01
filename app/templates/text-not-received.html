@@ -1,0 +1,27 @@
+{% extends "admin_template.html" %}
+
+{% block page_title %}
+GOV.UK Notify
+{% endblock %}
+
+{% block content %}
+
+<div class="grid-row">
+  <div class="column-two-thirds">
+    <h1 class="heading-xlarge">Check your mobile number</h1>
+
+    <p>Check your mobile phone number is correct and resend a confirmation code.</p>
+
+      <p>
+      <label class="form-label" for="mobile">Mobile phone number</label>
+      <input class="form-control-1-4" id="mobile" type="text" value="08983336666">
+      </p>
+
+
+      <p>
+      <a class="button" href="verify" role="button">Resend confirmation code</a>
+      </p>
+  </div>
+</div>
+
+{% endblock %}
