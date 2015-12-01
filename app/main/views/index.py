@@ -68,6 +68,16 @@ def checksms():
     return render_template('check-sms.html')
 
 
+@main.route("/email-not-received")
+def emailnotreceived():
+    return render_template('email-not-received.html')
+
+
+@main.route("/text-not-received")
+def textnotreceived():
+    return render_template('text-not-received.html')
+
+
 @main.route("/send-email")
 def sendemail():
     return render_template('send-email.html')
@@ -93,6 +103,16 @@ def shownotification():
     return render_template('notification.html')
 
 
+@main.route("/forgot-password")
+def forgotpassword():
+    return render_template('forgot-password.html')
+
+
+@main.route("/new-password")
+def newpassword():
+    return render_template('new-password.html')
+
+
 @main.route("/user-profile")
 def userprofile():
     return render_template('user-profile.html')
@@ -111,3 +131,8 @@ def servicesettings():
 @main.route("/api-keys")
 def apikeys():
     return render_template('api-keys.html')
+
+
+@main.route("/verification-not-received")
+def verificationnotreceived():
+    return render_template('verification-not-received.html')
