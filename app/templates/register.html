@@ -14,27 +14,29 @@ GOV.UK Notify | Create an account
 
     <p>You need to have access to your email account and a mobile phone to register.</p>
 
-		<p>
-		<label class="form-label" for="name-f1">Name</label>
-  		<input class="form-control-2-3" id="name-f1" type="text">
-  		</p>
-  		<p>
-  		<label class="form-label" for="email">Email address</label>
-  		<input class="form-control-2-3" id="email" type="text"><br>
-  		<span class="font-xsmall">Your email address must end in .gov.uk</span>
-  		</p>
-  		<p>
-  		<label class="form-label" for="mobile">Mobile phone number</label>
-  		<input class="form-control-1-4" id="mobile" type="text">
-  		</p>
-  		<p>
-  		<label class="form-label" for="password">Password</label>
-  		<input class="form-control-1-4" id="password" type="password">
-  		</p>
-
-  		<p>
-  		<a class="button" href="verify" role="button">Continue</a>
-  		</p>
+		<form autocomplete="off" action="" method="post">
+			{{ form.hidden_tag() }}
+			<p>
+			<label class="form-label"> {{ form.name.label }} </label>
+			{{ form.name(class="form-control-2-3", autocomplete="off") }} <br>
+			</p>
+			<p>
+			<label class="form-label">{{ form.email_address.label }} </label>
+			{{ form.email_address(class="form-control-2-3", autocomplete="off") }} <br>
+			<span class="font-xsmall">Your email address must end in .gov.uk</span>
+			</p>
+			<p>
+			<label class="form-label">{{ form.mobile_number.label }}</label>
+			{{ form.mobile_number(class="form-control-1-4", autocomplete="off") }} <br>
+			</p>
+			<p>
+			<label class="form-label"> {{ form.password.label}} </label>
+				{{ form.password(class="form-control-1-4", autocomplete="off") }} <br>
+			</p>
+			<p>
+			<button class="button" role="button">Continue</button>
+			</p>
+		</form>
 	</div>
 </div>
 

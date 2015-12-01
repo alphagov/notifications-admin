@@ -14,11 +14,6 @@ def govuk():
     return render_template('govuk_template.html')
 
 
-@main.route("/register")
-def register():
-    return render_template('register.html')
-
-
 @main.route("/register-from-invite")
 @login_required
 def registerfrominvite():
