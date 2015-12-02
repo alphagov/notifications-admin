@@ -9,7 +9,7 @@ class LoginForm(Form):
         DataRequired(message='Email cannot be empty'),
         Email(message='Please enter a valid email address')
     ])
-    password = PasswordField('Password', validators=[
+    password = PasswordField('Create a password', validators=[
         DataRequired(message='Please enter your password')
     ])
 
