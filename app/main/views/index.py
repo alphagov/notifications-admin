@@ -14,12 +14,6 @@ def govuk():
     return render_template('govuk_template.html')
 
 
-@main.route("/register")
-@login_required
-def register():
-    return render_template('register.html')
-
-
 @main.route("/register-from-invite")
 @login_required
 def registerfrominvite():
@@ -36,6 +30,11 @@ def verify():
 @login_required
 def verifymobile():
     return render_template('verify-mobile.html')
+
+
+@main.route("/text-not-received-2")
+def textnotreceived2():
+    return render_template('text-not-received-2.html')
 
 
 @main.route("/dashboard")
