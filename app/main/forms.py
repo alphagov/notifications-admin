@@ -9,7 +9,7 @@ class LoginForm(Form):
         DataRequired(message='Email cannot be empty'),
         Email(message='Please enter a valid email address')
     ])
-    password = PasswordField('Create a password', validators=[
+    password = PasswordField('Password', validators=[
         DataRequired(message='Please enter your password')
     ])
 
@@ -19,7 +19,7 @@ mobile_number = "^\\+44[\\d]{10}$"
 
 
 class RegisterUserForm(Form):
-    name = StringField('Name',
+    name = StringField('Full name',
                        validators=[DataRequired(message='Name can not be empty')])
     email_address = StringField('Email address', validators=[
         Length(min=5, max=255),
@@ -30,6 +30,6 @@ class RegisterUserForm(Form):
     mobile_number = StringField('Mobile phone number',
                                 validators=[DataRequired(message='Please enter your mobile number'),
                                             Regexp(regex=mobile_number, message='Please enter a +44 mobile number')])
-    password = PasswordField('Password',
+    password = PasswordField('Create a password',
                              validators=[DataRequired(message='Please enter your password'),
                                          Length(10, 255, message='Password must be at least 10 characters')])
