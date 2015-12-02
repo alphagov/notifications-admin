@@ -9,6 +9,6 @@ hooks:
       timeout: 300
       runas: root
   ApplicationStart:
-    - location: scripts/run_app.sh
+    - location: scripts/aws_run_app.sh
       timeout: 300
       runas: root
