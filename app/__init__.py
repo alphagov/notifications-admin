@@ -96,7 +96,8 @@ def init_asset_environment(app):
         assets.Bundle(
             'govuk_template/govuk-template.scss',
             filters='scss',
-            output='stylesheets/govuk-template.css'
+            output='stylesheets/govuk-template.css',
+            depends='*.scss'
         )
     )
 
