@@ -20,3 +20,28 @@
     line-height: 1.31579;
   }
 }
+
+.phase-tag {
+    @include phase-tag(beta);
+}
+
+@media (min-width: 641px) {
+  .phase-tag {
+      font-size: 16px;
+      line-height: 1.25;
+      margin-top: 7px;
+
+  }
+}
+
+@media (max-width: 641px) {
+  .phase-tag {
+      margin-top: 11px;
+  }
+}
+
+
+
+#global-header #logo {
+      white-space: nowrap;
+}
