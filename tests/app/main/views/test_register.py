@@ -37,3 +37,14 @@ def test_should_return_400_when_email_is_not_gov_uk(notifications_admin, notific
 
     assert response.status_code == 400
     assert 'Please enter a gov.uk email address' in response.get_data(as_text=True)
+
+
+def test_should_return_400_if_password_is_blacklisted(notifications_admin, notifications_admin_db):
+    response = notifications_admin.test_client().post('/register',
+                                                      data={'name': 'Bad Mobile',
+                                                            'email_address': 'bad_mobile@example.not.right',
+                                                            'mobile_number': '+44123412345',
+                                                            'password': 'password1234'})
+
+    response.status_code == 400
+    assert 'That password is blacklisted, too common' in response.get_data(as_text=True)
