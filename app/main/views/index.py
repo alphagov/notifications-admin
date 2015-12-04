@@ -19,11 +19,6 @@ def registerfrominvite():
     return render_template('register-from-invite.html')
 
 
-@main.route("/verify")
-def verify():
-    return render_template('verify.html')
-
-
 @main.route("/verify-mobile")
 def verifymobile():
     return render_template('verify-mobile.html')

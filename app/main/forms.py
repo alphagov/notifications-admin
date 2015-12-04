@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, IntegerField
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
 from app.main.validators import Blacklist
@@ -36,3 +36,8 @@ class RegisterUserForm(Form):
                              validators=[DataRequired(message='Please enter your password'),
                                          Length(10, 255, message='Password must be at least 10 characters'),
                                          Blacklist(message='That password is blacklisted, too common')])
+
+
+class VerifyForm(Form):
+    sms_code = IntegerField(DataRequired(message='SMS code can not be empty'))
+    email_code = IntegerField(DataRequired(message='Email code can not be empty'))
