@@ -9,6 +9,7 @@ from flask_wtf import CsrfProtect
 from webassets.filter import get_filter
 from werkzeug.exceptions import abort
 
+from app.notify_client.api_client import AdminAPIClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 import app.proxy_fix
 from config import configs
@@ -17,6 +18,8 @@ from config import configs
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CsrfProtect()
+
+admin_api_client = AdminAPIClient()
 
 
 def create_app(config_name):
@@ -37,6 +40,7 @@ def create_app(config_name):
     proxy_fix.init_app(application)
 
     application.session_interface = ItsdangerousSessionInterface()
+    admin_api_client.init_app(application)
 
     return application
 

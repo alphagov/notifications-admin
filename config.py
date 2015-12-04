@@ -1,3 +1,5 @@
+import os
+
 
 class Config(object):
     DEBUG = False
@@ -10,6 +12,14 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/notifications_admin'
     MAX_FAILED_LOGIN_COUNT = 10
     PASS_SECRET_KEY = 'secret-key-unique-changeme'
+
+    SESSION_COOKIE_NAME = 'notify_admin_session'
+    SESSION_COOKIE_PATH = '/admin'
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = True
+
+    NOTIFY_DATA_API_URL = os.getenv('NOTIFY_API_URL', "http://localhost:6001")
+    NOTIFY_DATA_API_AUTH_TOKEN = os.getenv('NOTIFY_API_TOKEN', "pLuj5kat5auC9Ve")
 
     WTF_CSRF_ENABLED = True
     SECRET_KEY = 'secret-key'
