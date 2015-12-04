@@ -12,9 +12,7 @@ GOV.UK Notify | Create an account
 
 		<p>If you've used GOV.UK Notify before, <a href="">sign in to your account</a>.</p>
 
-    <p>You need access to your email account and a mobile phone to register.</p>
-
-		<form autocomplete="off" action="" method="post">
+   		<form autocomplete="off" action="" method="post">
 			{{ form.hidden_tag() }}
 			<p>
 			<label class="form-label"> {{ form.name.label }} </label>
@@ -32,6 +30,7 @@ GOV.UK Notify | Create an account
 			<p>
 			<label class="form-label"> {{ form.password.label}} </label>
 				{{ form.password(class="form-control-1-4", autocomplete="off") }} <br>
+			<span class="font-xsmall">Your password must have at least 10 characters</span></label>
 			</p>
 			<p>
 			<button class="button" role="button">Continue</button>
