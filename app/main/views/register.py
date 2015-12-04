@@ -34,7 +34,7 @@ def process_register():
             email_code = send_email_code(form.email_address.data)
             session['sms_code'] = hashpw(sms_code)
             session['email_code'] = hashpw(email_code)
-            session['expiry_date'] = str(datetime.now() + timedelta(hours=2))
+            session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
             users_dao.insert_user(user)
         except AdminApiClientException as e:
             return jsonify(admin_api_client_error=e.value)
