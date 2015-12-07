@@ -30,3 +30,10 @@ def increment_failed_login_count(id):
     user = User.query.filter_by(id=id).first()
     user.failed_login_count += 1
     db.session.commit()
+
+
+def activate_user(id):
+    user = get_user_by_id(id)
+    user.state = 'active'
+    db.session.add(user)
+    db.session.commit()

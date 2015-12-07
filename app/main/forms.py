@@ -39,5 +39,7 @@ class RegisterUserForm(Form):
 
 
 class VerifyForm(Form):
-    sms_code = IntegerField(DataRequired(message='SMS code can not be empty'))
-    email_code = IntegerField(DataRequired(message='Email code can not be empty'))
+    sms_code = IntegerField("Text message confirmation code",
+                            validators=[DataRequired(message='SMS code can not be empty')])
+    email_code = IntegerField("Email confirmation code",
+                              validators=[DataRequired(message='Email code can not be empty')])

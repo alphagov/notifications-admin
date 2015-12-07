@@ -119,3 +119,23 @@ def test_user_is_active_is_false_if_state_is_inactive(notifications_admin, notif
 
     saved_user = users_dao.get_user_by_id(user.id)
     assert saved_user.is_active() is False
+
+
+def test_should_update_user_to_active(notifications_admin, notifications_admin_db):
+    user = User(name='Make user active',
+                password='somepassword',
+                email_address='activate@user.gov.uk',
+                mobile_number='+441234123412',
+                created_at=datetime.now(),
+                role_id=1,
+                state='pending')
+    users_dao.insert_user(user)
+    users_dao.activate_user(user.id)
+    updated_user = users_dao.get_user_by_id(user.id)
+    assert updated_user.state == 'active'
+
+
+def test_should_throws_error_when_id_does_not_exist(notifications_admin, notifications_admin_db):
+    with pytest.raises(AttributeError) as error:
+        users_dao.activate_user(123)
+    assert '''object has no attribute 'state''''' in str(error.value)

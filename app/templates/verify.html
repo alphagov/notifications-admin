@@ -12,20 +12,23 @@ GOV.UK Notify | Confirm email address and mobile number
 
 		<p>We've sent you confirmation codes by email and text message. You need to enter both codes here.</p>
 
-		<p>
-		<label class="form-label" for="emailverify">Email confirmation code<br>
-  		<input class="form-control-1-4" id="emailverify" type="text"><br>
-  		<span class="font-xsmall"><a href="email-not-received">I haven't received an email</a></span>
-  		</p>
-  		<p>
-  		<label class="form-label" for="email">Text message confirmation code<br>
-  		<input class="form-control-1-4" id="email" type="text"><br>
-  		<span class="font-xsmall"><a href="text-not-received">I haven't received a text</a></span>
-  		</p>
+		<form  autocomplete="off" action="" method="post">
+			{{ form.hidden_tag() }}
+			<p>
+			<label class="form-label">{{ form.email_code.label }}</label>
+				{{ form.email_code(class="form-control-1-4", autocomplete="off") }}<br>
+			<span class="font-xsmall"><a href="email-not-received">I haven't received an email</a></span>
+			</p>
+			<p>
+			<label class="form-label">{{ form.sms_code.label }}</label>
+				{{ form.sms_code(class="form-control-1-4", autocomplete="off") }} <br>
+			<span class="font-xsmall"><a href="text-not-received">I haven't received a text</a></span>
+			</p>
 
-  		<p>
-  		<a class="button" href="add-service" role="button">Continue</a>
-  		</p>
+			<p>
+			<button class="button" href="add-service" role="button">Continue</button>
+			</p>
+		</form>
 	</div>
 </div>
 
