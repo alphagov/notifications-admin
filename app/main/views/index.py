@@ -15,19 +15,16 @@ def govuk():
 
 
 @main.route("/register-from-invite")
-@login_required
 def registerfrominvite():
     return render_template('register-from-invite.html')
 
 
 @main.route("/verify")
-@login_required
 def verify():
     return render_template('verify.html')
 
 
 @main.route("/verify-mobile")
-@login_required
 def verifymobile():
     return render_template('verify-mobile.html')
 
@@ -50,7 +47,6 @@ def addservice():
 
 
 @main.route("/two-factor")
-@login_required
 def twofactor():
     return render_template('two-factor.html')
 
