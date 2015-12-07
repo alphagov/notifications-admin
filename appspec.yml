@@ -6,7 +6,7 @@ files:
 hooks: 
   AfterInstall: 
     - 
-      location: scripts/install_dependencies.sh
+      location: scripts/aws_install_dependencies.sh
       runas: root
       timeout: 300
   ApplicationStart: 
