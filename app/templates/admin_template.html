@@ -1,11 +1,14 @@
 {% extends "govuk_template.html" %}
 
+
 {% block page_title %}
 GOV.UK notifications admin
 {% endblock %}
 
+
 {% block cookie_message %}
 {% endblock %}
+
 
  {% block inside_header %}
 <div class="phase-banner-beta">
@@ -15,5 +18,13 @@ GOV.UK notifications admin
 </div>
  {% endblock %}
 
+
 {% set global_header_text = "GOV.UK Notify" %}
+
+
+{% if not current_user.is_authenticated() %}
+    {% set homepage_url = url_for('main.index') %}
+{% else %}
+    {% set homepage_url = url_for('main.dashboard') %}
+{% endif %}
 
