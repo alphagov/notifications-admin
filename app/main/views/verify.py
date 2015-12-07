@@ -17,13 +17,11 @@ def process_verify():
     if form.validate_on_submit():
         valid_sms = checkpw(form.sms_code.data, session['sms_code'])
         valid_email = checkpw(form.email_code.data, session['email_code'])
-        if valid_sms == False:
+        if valid_sms is False:
             return jsonify(sms_code='invalid'), 400
-        if valid_email == False:
+        if valid_email is False:
             return jsonify(email_code='invalid'), 400
     else:
         return jsonify(form.errors), 400
 
     return redirect('/add-service')
-
-

@@ -21,7 +21,7 @@ def test_should_redirect_to_add_service_when_code_are_correct(notifications_admi
 
 
 def test_should_return_400_when_sms_code_is_wrong(notifications_admin, notifications_admin_db):
-     with notifications_admin.test_client() as client:
+    with notifications_admin.test_client() as client:
         with client.session_transaction() as session:
             session['sms_code'] = hashpw('12345')
             session['email_code'] = hashpw('23456')
