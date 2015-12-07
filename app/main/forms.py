@@ -41,6 +41,10 @@ class RegisterUserForm(Form):
                                          Blacklist(message='That password is blacklisted, too common')])
 
 
+class TwoFactorForm(Form):
+    sms_code = IntegerField('sms code', validators=[DataRequired(message='Please enter your code')])
+
+
 class VerifyForm(Form):
     sms_code = StringField("Text message confirmation code",
                            validators=[DataRequired(message='SMS code can not be empty'),

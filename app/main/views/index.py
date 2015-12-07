@@ -41,11 +41,6 @@ def addservice():
     return render_template('add-service.html')
 
 
-@main.route("/two-factor")
-def twofactor():
-    return render_template('two-factor.html')
-
-
 @main.route("/send-sms")
 def sendsms():
     return render_template('send-sms.html')
