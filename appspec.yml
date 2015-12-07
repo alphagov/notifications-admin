@@ -9,6 +9,10 @@ hooks:
       timeout: 300
       runas: root
   ApplicationStart:
-    - location: scripts/aws_run_app.sh
+    - location: scripts/aws_start_app.sh
       timeout: 300
-      runas: root
+      runas: ubuntu
+ ApplicationStop:
+    - location: scripts/aws_stop_app.sh
+      timeout: 300
+      runas: ubuntu      
