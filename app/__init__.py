@@ -27,7 +27,7 @@ def create_app(config_name):
 
     application.config['NOTIFY_API_ENVIRONMENT'] = config_name
     application.config.from_object(configs[config_name])
-    if config_name is not 'development':
+    if config_name is not 'development' or 'test':
         application.config.from_envvar('FLASK_CONFIG')
     db.init_app(application)
     init_app(application)
