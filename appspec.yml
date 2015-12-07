@@ -1,19 +1,23 @@
----
-version: 0.0
-os: linux
-files:
-  - source: /
+--- 
+files: 
+  - 
     destination: /home/ubuntu/notifications-admin
-hooks:
-  AfterInstall:
-    - location: scripts/install_dependencies.sh
-      timeout: 300
+    source: /
+hooks: 
+  AfterInstall: 
+    - 
+      location: scripts/install_dependencies.sh
       runas: root
-  ApplicationStart:
-    - location: scripts/aws_start_app.sh
       timeout: 300
+  ApplicationStart: 
+    - 
+      location: scripts/aws_start_app.sh
       runas: ubuntu
- ApplicationStop:
-    - location: scripts/aws_stop_app.sh
       timeout: 300
-      runas: ubuntu      
+  ApplicationStop: 
+    - 
+      location: scripts/aws_stop_app.sh
+      runas: ubuntu
+      timeout: 300
+os: linux
+version: 0.0
