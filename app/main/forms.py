@@ -44,6 +44,14 @@ class RegisterUserForm(Form):
 class TwoFactorForm(Form):
     sms_code = IntegerField('sms code', validators=[DataRequired(message='Please enter your code')])
 
+    def validate_sms_code(self, a):
+        if self.sms_code.data is not None:
+            if checkpw(str(self.sms_code.data), session['sms_code']) is False:
+                self.sms_code.errors.append('Code does not match')
+                return False
+        else:
+            return True
+
 
 class VerifyForm(Form):
     sms_code = StringField("Text message confirmation code",

@@ -43,6 +43,3 @@ def process_register():
     else:
         return jsonify(form.errors), 400
     return redirect('/verify')
-
-
-
