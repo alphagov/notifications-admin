@@ -2924,3 +2924,53 @@ button:focus,
     line-height: 1.31579;
   }
 }
+/* line 24, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/app.scss */
+.phase-tag {
+  display: -moz-inline-stack;
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 8px 0 0;
+  padding: 2px 5px 0;
+  font-family: "nta", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.14286;
+  font-weight: 700;
+  text-transform: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  color: #fff;
+  background-color: #f47738;
+}
+@media (min-width: 641px) {
+  /* line 24, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/app.scss */
+  .phase-tag {
+    vertical-align: baseline;
+  }
+}
+@media (min-width: 641px) {
+  /* line 24, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/app.scss */
+  .phase-tag {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+}
+
+@media (min-width: 641px) {
+  /* line 29, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/app.scss */
+  .phase-tag {
+    font-size: 16px;
+    line-height: 1.25;
+    margin-top: 7px;
+  }
+}
+@media (max-width: 641px) {
+  /* line 38, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/app.scss */
+  .phase-tag {
+    margin-top: 11px;
+  }
+}
+/* line 45, /Users/chrisheathcote/Dropbox/GDS/notifications-dev/notifications-admin/app/assets/stylesheets/app.scss */
+#global-header #logo {
+  white-space: nowrap;
+}
