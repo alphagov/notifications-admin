@@ -1,13 +1,10 @@
-from datetime import datetime
-
 from flask import render_template, redirect, jsonify
 from flask_login import login_user
 
 from app.main import main
-from app.main.forms import LoginForm
 from app.main.dao import users_dao
-from app.models import User
 from app.main.encryption import checkpw
+from app.main.forms import LoginForm
 
 
 @main.route("/sign-in", methods=(['GET']))

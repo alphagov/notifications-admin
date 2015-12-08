@@ -41,10 +41,12 @@ class RegisterUserForm(Form):
 
 
 class VerifyForm(Form):
-    sms_code = IntegerField("Text message confirmation code",
-                            validators=[DataRequired(message='SMS code can not be empty')])
-    email_code = IntegerField("Email confirmation code",
-                              validators=[DataRequired(message='Email code can not be empty')])
+    sms_code = StringField("Text message confirmation code",
+                           validators=[DataRequired(message='SMS code can not be empty'),
+                                       Length(min=5, max=5, message='Code must be 5 digits')])
+    email_code = StringField("Email confirmation code",
+                             validators=[DataRequired(message='Email code can not be empty'),
+                                         Length(min=5, max=5, message='Code must be 5 digits')])
 
     def validate_email_code(self, a):
         if self.email_code.data is not None:

@@ -97,6 +97,34 @@ def test_should_return_400_when_email_code_is_missing(notifications_admin, notif
         assert 'Email code can not be empty' in response.get_data(as_text=True)
 
 
+def test_should_return_400_when_email_code_has_letter(notifications_admin, notifications_admin_db):
+    with notifications_admin.test_client() as client:
+        with client.session_transaction() as session:
+            user = _create_test_user()
+            session['user_id'] = user.id
+            session['sms_code'] = hashpw('23456')
+            session['email_code'] = hashpw('23456')
+        response = client.post('/verify',
+                               data={'sms_code': '23456',
+                                     'email_code': 'abcde'})
+        assert response.status_code == 400
+        assert 'Code does not match' in response.get_data(as_text=True)
+
+
+def test_should_return_302_when_email_code_starts_with_zero(notifications_admin, notifications_admin_db):
+    with notifications_admin.test_client() as client:
+        with client.session_transaction() as session:
+            user = _create_test_user()
+            session['user_id'] = user.id
+            session['sms_code'] = hashpw('23456')
+            session['email_code'] = hashpw('09765')
+        response = client.post('/verify',
+                               data={'sms_code': '23456',
+                                     'email_code': '09765'})
+        assert response.status_code == 302
+        assert response.location == 'http://localhost/add-service'
+
+
 def _create_test_user():
     user = User(name='Test User',
                 password='somepassword',
