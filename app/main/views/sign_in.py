@@ -34,26 +34,3 @@ def process_sign_in():
     else:
         return jsonify(form.errors), 400
     return redirect('/two-factor')
-
-
-@main.route('/temp-create-users', methods=(['GET']))
-def render_create_user():
-    return render_template('temp-create-users.html', form=LoginForm())
-
-
-@main.route('/temp-create-users', methods=(['POST']))
-def create_user_for_test():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User(email_address=form.email_address.data,
-                    name=form.email_address.data,
-                    password=form.password.data,
-                    created_at=datetime.now(),
-                    mobile_number='+447651234534',
-                    role_id=1)
-        users_dao.insert_user(user)
-
-        return redirect('/sign-in')
-    else:
-        print(form.errors)
-        return redirect(form.errors), 400
