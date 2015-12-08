@@ -44,3 +44,15 @@ def test_should_return_400_when_sms_code_is_empty(notifications_admin, notificat
         assert response.status_code == 400
         assert 'sms_code' in response.get_data(as_text=True)
         assert 'Please enter your code' in response.get_data(as_text=True)
+
+
+def test_should_return_400_when_sms_code_is_too_short(notifications_admin, notifications_admin_db):
+    with notifications_admin.test_client() as client:
+        with client.session_transaction() as session:
+            user = create_test_user()
+            session['user_id'] = user.id
+            session['sms_code'] = hashpw('12345')
+        response = client.post('/two-factor', data={'sms_code': '2346'})
+        assert response.status_code == 400
+        assert 'sms_code' in response.get_data(as_text=True)
+        assert 'Code must be 5 digits' in response.get_data(as_text=True)

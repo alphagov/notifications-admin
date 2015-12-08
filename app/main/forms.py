@@ -1,6 +1,6 @@
 from flask import session
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, IntegerField
+from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
 from app.main.encryption import checkpw
@@ -42,7 +42,8 @@ class RegisterUserForm(Form):
 
 
 class TwoFactorForm(Form):
-    sms_code = IntegerField('sms code', validators=[DataRequired(message='Please enter your code')])
+    sms_code = StringField('sms code', validators=[DataRequired(message='Please enter your code'),
+                                                   Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_sms_code(self, a):
         if self.sms_code.data is not None:
