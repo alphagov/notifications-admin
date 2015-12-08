@@ -28,14 +28,6 @@ def test_process_sign_in_return_2fa_template(notifications_admin, notifications_
     assert response.location == 'http://localhost/two-factor'
 
 
-def test_temp_create_user(notifications_admin, notifications_admin_db):
-    response = notifications_admin.test_client().post('/temp-create-users',
-                                                      data={'email_address': 'testing@example.gov.uk',
-                                                            'password': 'val1dPassw0rd!'})
-
-    assert response.status_code == 302
-
-
 def test_should_return_locked_out_true_when_user_is_locked(notifications_admin, notifications_admin_db):
     user = User(email_address='valid@example.gov.uk',
                 password='val1dPassw0rd!',
