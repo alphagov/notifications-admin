@@ -20,6 +20,7 @@ class LoginForm(Form):
 
 gov_uk_email = "(^[^@^\\s]+@[^@^\\.^\\s]+(\\.[^@^\\.^\\s]*)*.gov.uk)"
 mobile_number = "^\\+44[\\d]{10}$"
+verify_code = "[\\d]{5}$"
 
 
 class RegisterUserForm(Form):
@@ -43,10 +44,10 @@ class RegisterUserForm(Form):
 class VerifyForm(Form):
     sms_code = StringField("Text message confirmation code",
                            validators=[DataRequired(message='SMS code can not be empty'),
-                                       Length(min=5, max=5, message='Code must be 5 digits')])
+                                       Regexp(regex=verify_code, message='Code must be 5 digits')])
     email_code = StringField("Email confirmation code",
                              validators=[DataRequired(message='Email code can not be empty'),
-                                         Length(min=5, max=5, message='Code must be 5 digits')])
+                                         Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_email_code(self, a):
         if self.email_code.data is not None:

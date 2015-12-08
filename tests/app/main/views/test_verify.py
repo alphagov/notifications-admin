@@ -107,8 +107,28 @@ def test_should_return_400_when_email_code_has_letter(notifications_admin, notif
         response = client.post('/verify',
                                data={'sms_code': '23456',
                                      'email_code': 'abcde'})
+        data = response.get_data(as_text=True)
         assert response.status_code == 400
-        assert 'Code does not match' in response.get_data(as_text=True)
+        assert 'email_code' in data
+        assert 'Code does not match' in data
+        assert 'Code must be 5 digits' in data
+
+
+def test_should_return_400_when_sms_code_is_too_short(notifications_admin, notifications_admin_db):
+    with notifications_admin.test_client() as client:
+        with client.session_transaction() as session:
+            user = _create_test_user()
+            session['user_id'] = user.id
+            session['sms_code'] = hashpw('23456')
+            session['email_code'] = hashpw('23456')
+        response = client.post('/verify',
+                               data={'sms_code': '2345',
+                                     'email_code': '23456'})
+        assert response.status_code == 400
+        data = response.get_data(as_text=True)
+        assert 'sms_code' in data
+        assert 'Code must be 5 digits' in data
+        assert 'Code does not match' in data
 
 
 def test_should_return_302_when_email_code_starts_with_zero(notifications_admin, notifications_admin_db):
