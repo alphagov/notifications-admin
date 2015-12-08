@@ -1,4 +1,5 @@
 from flask import render_template, redirect, jsonify
+from flask_login import login_user
 
 from app.main import main
 from app.main.forms import TwoFactorForm
@@ -14,6 +15,7 @@ def process_two_factor():
     form = TwoFactorForm()
 
     if form.validate_on_submit():
+        login_user(user)
         return redirect('/dashboard')
     else:
         return jsonify(form.errors), 400

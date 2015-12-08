@@ -8,7 +8,7 @@ def test_should_render_two_factor_page(notifications_admin, notifications_admin_
 
 def test_should_login_user_and_redirect_to_dashboard(notifications_admin, notifications_admin_db):
     response = notifications_admin.test_client().post('/two-factor',
-                                                       data={'sms_code': '12345'})
+                                                      data={'sms_code': '12345'})
 
     assert response.status_code == 302
     assert response.location == 'http://localhost/dashboard'

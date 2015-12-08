@@ -1,15 +1,14 @@
 from datetime import datetime, timedelta
-from random import randint
 
 from flask import render_template, redirect, jsonify, session
 from sqlalchemy.exc import SQLAlchemyError
 
-from app import admin_api_client
 from app.main import main
 from app.main.dao import users_dao
 from app.main.encryption import hashpw
 from app.main.exceptions import AdminApiClientException
 from app.main.forms import RegisterUserForm
+from app.main.views import send_sms_code, send_email_code
 from app.models import User
 
 
@@ -46,28 +45,4 @@ def process_register():
     return redirect('/verify')
 
 
-def send_sms_code(mobile_number):
-    sms_code = _create_code()
-    try:
-        admin_api_client.send_sms(mobile_number, message=sms_code, token=admin_api_client.auth_token)
-    except:
-        raise AdminApiClientException('Exception when sending sms.')
-    return sms_code
 
-
-def send_email_code(email):
-    email_code = _create_code()
-    try:
-        admin_api_client.send_email(email_address=email,
-                                    from_str='notify@digital.cabinet-office.gov.uk',
-                                    message=email_code,
-                                    subject='Verification code',
-                                    token=admin_api_client.auth_token)
-    except:
-        raise AdminApiClientException('Exception when sending email.')
-
-    return email_code
-
-
-def _create_code():
-    return ''.join(["%s" % randint(0, 9) for _ in range(0, 5)])
