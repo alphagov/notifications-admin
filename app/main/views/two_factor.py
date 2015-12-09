@@ -16,7 +16,6 @@ def process_two_factor():
     form = TwoFactorForm()
 
     if form.validate_on_submit():
-
         user = users_dao.get_user_by_id(session['user_id'])
         login_user(user)
         return redirect('/dashboard')

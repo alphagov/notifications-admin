@@ -46,12 +46,7 @@ class TwoFactorForm(Form):
                                                    Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_sms_code(self, a):
-        if self.sms_code.data is not None:
-            if checkpw(str(self.sms_code.data), session['sms_code']) is False:
-                self.sms_code.errors.append('Code does not match')
-                return False
-        else:
-            return True
+        validate_code(self.sms_code, session['sms_code'])
 
 
 class VerifyForm(Form):
@@ -63,17 +58,18 @@ class VerifyForm(Form):
                                          Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_email_code(self, a):
-        if self.email_code.data is not None:
-            if checkpw(str(self.email_code.data), session['email_code']) is False:
-                self.email_code.errors.append('Code does not match')
-                return False
-        else:
-            return True
+        validate_code(self.email_code, session['email_code'])
 
     def validate_sms_code(self, a):
-        if self.sms_code.data is not None:
-            if checkpw(str(self.sms_code.data), session['sms_code']) is False:
-                self.sms_code.errors.append('Code does not match')
-                return False
+        validate_code(self.sms_code, session['sms_code'])
+
+
+def validate_code(field, code):
+    if field.data is not None:
+        if checkpw(str(field.data), code) is False:
+            field.errors.append('Code does not match')
+            return False
         else:
             return True
+    else:
+        return True

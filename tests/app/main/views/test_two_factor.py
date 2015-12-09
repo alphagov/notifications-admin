@@ -1,3 +1,5 @@
+from flask import json
+
 from app.main.encryption import hashpw
 from tests.app.main.views import create_test_user
 
@@ -30,8 +32,7 @@ def test_should_return_400_with_sms_code_error_when_sms_code_is_wrong(notificati
         response = client.post('/two-factor',
                                data={'sms_code': '23456'})
         assert response.status_code == 400
-        assert 'sms_code' in response.get_data(as_text=True)
-        assert 'Code does not match' in response.get_data(as_text=True)
+        assert {'sms_code': ['Code does not match']} == json.loads(response.get_data(as_text=True))
 
 
 def test_should_return_400_when_sms_code_is_empty(notifications_admin, notifications_admin_db):
@@ -42,8 +43,7 @@ def test_should_return_400_when_sms_code_is_empty(notifications_admin, notificat
             session['sms_code'] = hashpw('12345')
         response = client.post('/two-factor')
         assert response.status_code == 400
-        assert 'sms_code' in response.get_data(as_text=True)
-        assert 'Please enter your code' in response.get_data(as_text=True)
+        assert {'sms_code': ['Please enter your code']} == json.loads(response.get_data(as_text=True))
 
 
 def test_should_return_400_when_sms_code_is_too_short(notifications_admin, notifications_admin_db):
@@ -51,8 +51,10 @@ def test_should_return_400_when_sms_code_is_too_short(notifications_admin, notif
         with client.session_transaction() as session:
             user = create_test_user()
             session['user_id'] = user.id
-            session['sms_code'] = hashpw('12345')
+            session['sms_code'] = hashpw('23467')
         response = client.post('/two-factor', data={'sms_code': '2346'})
         assert response.status_code == 400
-        assert 'sms_code' in response.get_data(as_text=True)
-        assert 'Code must be 5 digits' in response.get_data(as_text=True)
+        data = json.loads(response.get_data(as_text=True))
+        assert len(data.keys()) == 1
+        assert 'sms_code' in data
+        assert data['sms_code'].sort() == ['Code must be 5 digits', 'Code does not match'].sort()
