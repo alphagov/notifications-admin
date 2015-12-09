@@ -36,6 +36,7 @@ def process_register():
             session['email_code'] = hashpw(email_code)
             session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
             users_dao.insert_user(user)
+            session['user_id'] = user.id
         except AdminApiClientException as e:
             return jsonify(admin_api_client_error=e.value)
         except SQLAlchemyError:
