@@ -124,3 +124,8 @@ def apikeys():
 @main.route("/verification-not-received")
 def verificationnotreceived():
     return render_template('verification-not-received.html')
+
+
+@main.route("/manage-templates")
+def managetemplates():
+    return render_template('manage-templates.html')
