@@ -12,15 +12,18 @@ GOV.UK Notify | Text verification
 
 		<p>We've sent you a text message with a verification code.</p>
 
-  		<p>
-  		<label class="form-label" for="email">Enter verification code<br>
-  		<input class="form-control-1-4" id="email" type="text"><br>
-  		<span class="font-xsmall"><a href="verification-not-received">I haven't received a text</a></span>
-  		</p>
 
-  		<p>
-  		<a class="button" href="dashboard" role="button">Continue</a>
-  		</p>
+		<form autocomplete="off" action="" method="post">
+			{{ form.hidden_tag() }}
+  			<p>
+				<label class="form-label">Enter verification code</label><br>
+				{{ form.sms_code(class="form-control-1-4", autocomplete="off") }} <br>
+				<span class="font-xsmall"><a href="verification-not-received">I haven't received a text</a></span>
+  			</p>
+  			<p>
+  			<button class="button" href="dashboard" role="button">Continue</button>
+  			</p>
+		</form>
 	</div>
 </div>
 

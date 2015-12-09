@@ -13,7 +13,8 @@ def test_render_sign_in_returns_sign_in_template(notifications_admin):
     assert 'Forgotten password?' in response.get_data(as_text=True)
 
 
-def test_process_sign_in_return_2fa_template(notifications_admin, notifications_admin_db):
+def test_process_sign_in_return_2fa_template(notifications_admin, notifications_admin_db, mocker):
+    _set_up_mocker(mocker)
     user = User(email_address='valid@example.gov.uk',
                 password='val1dPassw0rd!',
                 mobile_number='+441234123123',
@@ -79,3 +80,8 @@ def test_should_return_401_when_user_does_not_exist(notifications_admin, notific
                                                             'password': 'doesNotExist!'})
 
     assert response.status_code == 401
+
+
+def _set_up_mocker(mocker):
+    mocker.patch("app.admin_api_client.send_sms")
+    mocker.patch("app.admin_api_client.send_email")
