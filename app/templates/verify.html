@@ -15,12 +15,12 @@ GOV.UK Notify | Confirm email address and mobile number
 		<form  autocomplete="off" action="" method="post">
 			{{ form.hidden_tag() }}
 			<p>
-			<label class="form-label">{{ form.email_code.label }}</label>
+			<label class="form-label">Email confirmation code</label>
 				{{ form.email_code(class="form-control-1-4", autocomplete="off") }}<br>
 			<span class="font-xsmall"><a href="email-not-received">I haven't received an email</a></span>
 			</p>
 			<p>
-			<label class="form-label">{{ form.sms_code.label }}</label>
+			<label class="form-label">Text message confirmation code</label>
 				{{ form.sms_code(class="form-control-1-4", autocomplete="off") }} <br>
 			<span class="font-xsmall"><a href="text-not-received">I haven't received a text</a></span>
 			</p>
