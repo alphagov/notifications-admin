@@ -25,7 +25,7 @@ def get_code_by_code(user_id, code_type):
 
 
 def use_code(id):
-    verify_code = VerifyCodes.query.filter_by(id=id).first()
+    verify_code = VerifyCodes.query.get(id)
     verify_code.code_used = True
     db.session.add(verify_code)
     db.session.commit()

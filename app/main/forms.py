@@ -6,7 +6,7 @@ from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
 from app.main.dao import verify_codes_dao
-from app.main.encryption import checkpw
+from app.main.encryption import check_hash
 from app.main.validators import Blacklist
 
 
@@ -75,7 +75,7 @@ def validate_code(field, code):
         field.errors.append('Code has expired')
         return False
     if field.data is not None:
-        if checkpw(field.data, code.code) is False:
+        if check_hash(field.data, code.code) is False:
             field.errors.append('Code does not match')
             return False
         else:

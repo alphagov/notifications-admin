@@ -2,7 +2,7 @@ import sqlalchemy
 from pytest import fail
 
 from app.main.dao import verify_codes_dao
-from app.main.encryption import checkpw
+from app.main.encryption import check_hash
 from tests.app.main import create_test_user
 
 
@@ -12,7 +12,7 @@ def test_insert_new_code_and_get_it_back(notifications_admin, notifications_admi
     verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='email')
     saved_code = verify_codes_dao.get_code(user_id=user.id, code_type='email')
     assert saved_code.user_id == user.id
-    assert checkpw('12345', saved_code.code)
+    assert check_hash('12345', saved_code.code)
     assert saved_code.code_type == 'email'
     assert saved_code.code_used is False
 

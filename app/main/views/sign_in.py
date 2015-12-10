@@ -3,7 +3,7 @@ from flask import session
 
 from app.main import main
 from app.main.dao import users_dao
-from app.main.encryption import checkpw
+from app.main.encryption import check_hash
 from app.main.encryption import hashpw
 from app.main.forms import LoginForm
 from app.main.views import send_sms_code
@@ -25,7 +25,7 @@ def process_sign_in():
             return jsonify(locked_out=True), 401
         if not user.is_active():
             return jsonify(active_user=False), 401
-        if checkpw(form.password.data, user.password):
+        if check_hash(form.password.data, user.password):
             sms_code = send_sms_code(user.id, user.mobile_number)
             session['user_id'] = user.id
         else:
