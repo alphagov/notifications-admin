@@ -1,7 +1,8 @@
 {% extends "admin_template.html" %}
+{% from "components/sms-message.html" import sms_message %}
 
 {% block page_title %}
-GOV.UK Notify | Send text messages
+	GOV.UK Notify | Send text messages
 {% endblock %}
 
 {% block content %}
@@ -11,7 +12,7 @@ GOV.UK Notify | Send text messages
 		<h1 class="heading-xlarge">Send text messages</h1>
 
 		<p>This page will be where we construct text messages</p>
-
+		{{ sms_message("hi") }}
   	<p>
   	<a class="button" href="check-sms" role="button">Continue</a>
   	</p>

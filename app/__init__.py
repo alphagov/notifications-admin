@@ -79,11 +79,12 @@ def init_asset_environment(app):
 
     # Tell flask-assets where to look for our sass files.
     env.load_path = [
-        os.path.join(os.path.dirname(__file__), 'assets/stylesheets'),
         os.path.join(os.path.dirname(__file__), 'assets'),
+        os.path.join(os.path.dirname(__file__), 'assets/stylesheets'),
         os.path.join(os.path.dirname(__file__), 'assets/stylesheets/stylesheets/govuk_frontend_toolkit'),
-        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/govuk_template')
-
+        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/govuk_template'),
+        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/views'),
+        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/components'),
     ]
 
     scss = get_filter('scss', as_output=True)
@@ -93,7 +94,7 @@ def init_asset_environment(app):
         assets.Bundle(
             'main.scss',
             filters='scss',
-            output='css_all.css'
+            output='stylesheets/css_all.css'
         )
     )
 

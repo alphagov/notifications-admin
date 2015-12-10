@@ -1,6 +1,6 @@
 // Edited version of govuk_frontend_toolkit
 // https://github.com/alphagov/govuk_frontend_toolkit/
-@import "govuk_frontend_toolkit/stylesheets/conditionals";
+@import "govuk_frontend_toolkit/stylesheets/_conditionals.scss";
 @import "govuk_frontend_toolkit/stylesheets/shims";
 @import "govuk_frontend_toolkit/stylesheets/measurements";
 @import "govuk_frontend_toolkit/stylesheets/css3";
@@ -10,14 +10,6 @@
 @import "govuk_frontend_toolkit/stylesheets/url-helpers";
 @import "govuk_frontend_toolkit/stylesheets/design-patterns/buttons";
 @import "govuk_frontend_toolkit/stylesheets/design-patterns/alpha-beta";
-
-// Edited version of govuk_template repo
-// https://github.com/alphagov/govuk_template
-@import "govuk_template/govuk-template";
-@import "govuk_template/govuk-template-ie6";
-@import "govuk_template/govuk-template-ie7";
-@import "govuk_template/govuk-template-ie8";
-@import "govuk_template/govuk-template-print";
 
 // Edited version of govuk_elements repo
 // https://github.com/alphagov/govuk_elements
@@ -33,5 +25,9 @@
 @import "govuk_elements/elements/panels";
 @import "govuk_elements/elements/tables";
 
+// ////---xxsd----k/
 // Extra CSS for this application
+@import "components/sms-message";
+
+// Break this up
 @import "app";
