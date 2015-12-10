@@ -18,7 +18,7 @@ class Config(object):
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = True
 
-    NOTIFY_DATA_API_URL = os.getenv('NOTIFY_API_URL', "http://localhost:6001")
+    NOTIFY_DATA_API_URL = os.getenv('NOTIFY_API_URL', "http://localhost:6011")
     NOTIFY_DATA_API_AUTH_TOKEN = os.getenv('NOTIFY_API_TOKEN', "dev-token")
 
     WTF_CSRF_ENABLED = True
