@@ -1,13 +1,13 @@
 
 
-def test_render_register_returns_template_with_form(notifications_admin, notifications_admin_db):
+def test_render_register_returns_template_with_form(notifications_admin, notifications_admin_db, notify_db_session):
     response = notifications_admin.test_client().get('/register')
 
     assert response.status_code == 200
     assert 'Create an account' in response.get_data(as_text=True)
 
 
-def test_process_register_creates_new_user(notifications_admin, notifications_admin_db, mocker):
+def test_process_register_creates_new_user(notifications_admin, notifications_admin_db, mocker, notify_db_session):
     _set_up_mocker(mocker)
 
     response = notifications_admin.test_client().post('/register',
@@ -21,7 +21,8 @@ def test_process_register_creates_new_user(notifications_admin, notifications_ad
 
 def test_process_register_returns_400_when_mobile_number_is_invalid(notifications_admin,
                                                                     notifications_admin_db,
-                                                                    mocker):
+                                                                    mocker,
+                                                                    notify_db_session):
     _set_up_mocker(mocker)
     response = notifications_admin.test_client().post('/register',
                                                       data={'name': 'Bad Mobile',
@@ -33,7 +34,10 @@ def test_process_register_returns_400_when_mobile_number_is_invalid(notification
     assert 'Please enter a +44 mobile number' in response.get_data(as_text=True)
 
 
-def test_should_return_400_when_email_is_not_gov_uk(notifications_admin, notifications_admin_db, mocker):
+def test_should_return_400_when_email_is_not_gov_uk(notifications_admin,
+                                                    notifications_admin_db,
+                                                    mocker,
+                                                    notify_db_session):
     _set_up_mocker(mocker)
     response = notifications_admin.test_client().post('/register',
                                                       data={'name': 'Bad Mobile',
@@ -45,7 +49,7 @@ def test_should_return_400_when_email_is_not_gov_uk(notifications_admin, notific
     assert 'Please enter a gov.uk email address' in response.get_data(as_text=True)
 
 
-def test_should_add_verify_codes_on_session(notifications_admin, notifications_admin_db, mocker):
+def test_should_add_verify_codes_on_session(notifications_admin, notifications_admin_db, mocker, notify_db_session):
     _set_up_mocker(mocker)
     with notifications_admin.test_client() as client:
         response = client.post('/register',
@@ -62,7 +66,7 @@ def _set_up_mocker(mocker):
     mocker.patch("app.admin_api_client.send_email")
 
 
-def test_should_return_400_if_password_is_blacklisted(notifications_admin, notifications_admin_db):
+def test_should_return_400_if_password_is_blacklisted(notifications_admin, notifications_admin_db, notify_db_session):
     response = notifications_admin.test_client().post('/register',
                                                       data={'name': 'Bad Mobile',
                                                             'email_address': 'bad_mobile@example.not.right',

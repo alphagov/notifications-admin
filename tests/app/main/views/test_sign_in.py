@@ -13,7 +13,7 @@ def test_render_sign_in_returns_sign_in_template(notifications_admin):
     assert 'Forgotten password?' in response.get_data(as_text=True)
 
 
-def test_process_sign_in_return_2fa_template(notifications_admin, notifications_admin_db, mocker):
+def test_process_sign_in_return_2fa_template(notifications_admin, notifications_admin_db, mocker, notify_db_session):
     _set_up_mocker(mocker)
     user = User(email_address='valid@example.gov.uk',
                 password='val1dPassw0rd!',
@@ -29,7 +29,9 @@ def test_process_sign_in_return_2fa_template(notifications_admin, notifications_
     assert response.location == 'http://localhost/two-factor'
 
 
-def test_should_return_locked_out_true_when_user_is_locked(notifications_admin, notifications_admin_db):
+def test_should_return_locked_out_true_when_user_is_locked(notifications_admin,
+                                                           notifications_admin_db,
+                                                           notify_db_session):
     user = User(email_address='valid@example.gov.uk',
                 password='val1dPassw0rd!',
                 mobile_number='+441234123123',
@@ -56,7 +58,9 @@ def test_should_return_locked_out_true_when_user_is_locked(notifications_admin, 
     assert '"locked_out": true' in response.get_data(as_text=True)
 
 
-def test_should_return_active_user_is_false_if_user_is_inactive(notifications_admin, notifications_admin_db):
+def test_should_return_active_user_is_false_if_user_is_inactive(notifications_admin,
+                                                                notifications_admin_db,
+                                                                notify_db_session):
     user = User(email_address='inactive_user@example.gov.uk',
                 password='val1dPassw0rd!',
                 mobile_number='+441234123123',
@@ -74,7 +78,7 @@ def test_should_return_active_user_is_false_if_user_is_inactive(notifications_ad
     assert '"active_user": false' in response.get_data(as_text=True)
 
 
-def test_should_return_401_when_user_does_not_exist(notifications_admin, notifications_admin_db):
+def test_should_return_401_when_user_does_not_exist(notifications_admin, notifications_admin_db, notify_db_session):
     response = notifications_admin.test_client().post('/sign-in',
                                                       data={'email_address': 'does_not_exist@gov.uk',
                                                             'password': 'doesNotExist!'})

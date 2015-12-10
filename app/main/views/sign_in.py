@@ -26,7 +26,7 @@ def process_sign_in():
         if not user.is_active():
             return jsonify(active_user=False), 401
         if checkpw(form.password.data, user.password):
-            sms_code = send_sms_code(user.mobile_number)
+            sms_code = send_sms_code(user.id, user.mobile_number)
             session['user_id'] = user.id
             session['sms_code'] = hashpw(sms_code)
         else:

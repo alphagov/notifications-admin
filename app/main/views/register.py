@@ -29,12 +29,10 @@ def process_register():
                     created_at=datetime.now(),
                     role_id=1)
         try:
-            sms_code = send_sms_code(form.mobile_number.data)
-            email_code = send_email_code(form.email_address.data)
-            session['sms_code'] = hashpw(sms_code)
-            session['email_code'] = hashpw(email_code)
-            session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
             users_dao.insert_user(user)
+            send_sms_code(user_id=user.id, mobile_number=form.mobile_number.data)
+            send_email_code(user_id=user.id, email=form.email_address.data)
+            session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
             session['user_id'] = user.id
         except AdminApiClientException as e:
             return jsonify(admin_api_client_error=e.value)
