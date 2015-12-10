@@ -24,19 +24,17 @@ Application to handle the admin functions of the notifications application.
     git submodule init
     git submodule update
 
-### To run the sample application run:
+### Running the application:
     pip install -r requirements.txt
+    ./scripts/bootstrap.sh  
     ./scripts/run_app.sh
+
+Note: the ./scripts/bootstrap.sh script only needs to be run the first time to create the database.
 
  url to test app: 
  
     localhost:6012/helloworld
- 
 
-### Database
-Run the following command to create the database
-
-    ./scripts/bootstrap.sh
 
 ### Domain model
 
