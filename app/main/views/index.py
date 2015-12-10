@@ -68,7 +68,13 @@ def sendsms():
 def checksms():
     return render_template(
         'views/check-sms.html',
-        recipient_count=159,
+        recipients=[
+            {'phone': "+44 7815838437", 'registration': 'LC12 BFL', 'date': '25 December 2015'},
+            {'phone': "+44 7815838437", 'registration': 'LC12 BFL', 'date': '25 December 2015'},
+            {'phone': "+44 7815838437", 'registration': 'LC12 BFL', 'date': '25 December 2015'},
+            {'phone': "+44 7815838437", 'registration': 'LC12 BFL', 'date': '25 December 2015'},
+            {'phone': "+44 7815838437", 'registration': 'LC12 BFL', 'date': '25 December 2015'}
+        ],
         message_template="""
             Vehicle tax: Your vehicle tax for ((registration number)) expires on ((date)).
             Tax your vehicle at www.gov.uk/vehicle-tax

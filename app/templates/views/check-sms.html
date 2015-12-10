@@ -1,22 +1,37 @@
 {% extends "admin_template.html" %}
 {% from "components/sms-message.html" import sms_message %}
+{% from "components/table.html" import table, field %}
+{% from "components/placeholder.html" import placeholder %}
 
 {% block page_title %}
-GOV.UK Notify | Send text messages
+	GOV.UK Notify | Send text messages
 {% endblock %}
 
 {% block content %}
 
-<div class="grid-row">
-	<div class="column-two-thirds">
-		<h1 class="heading-xlarge">Send text messages</h1>
+	<div class="grid-row">
+		<div class="column-two-thirds">
+			<h1 class="heading-xlarge">Send text messages</h1>
 
-		{{ sms_message(message_template) }}
+			<h2 class="heading-medium">Check and confirm</h2>
+			{{ sms_message(message_template) }}
 
-  	<p>
-	  	<a class="button" href="/jobs/job" role="button">Send {{recipient_count}} text messages</a>
-  	</p>
+	  	<p>
+		  	<a class="button" href="/jobs/job" role="button">Send {{recipients|length}} text messages</a>
+	  	</p>
+		</div>
 	</div>
-</div>
+
+	{% call(item) table(
+		recipients,
+		caption="Preview of the first 3 recipients",
+		field_headings=[
+			'Recipient', placeholder('registration number'), placeholder('date')
+		]
+	) %}
+		{% call field() %}{{item.phone}}{% endcall %}
+		{% call field() %}{{item.registration}}{% endcall %}
+		{% call field() %}{{item.date}}{% endcall %}
+	{% endcall %}
 
 {% endblock %}
