@@ -7,7 +7,7 @@ from app.models import User
 from app.main.dao import users_dao
 
 
-def test_insert_user_should_add_user(notifications_admin, notifications_admin_db):
+def test_insert_user_should_add_user(notifications_admin, notifications_admin_db, notify_db_session):
     user = User(name='test insert',
                 password='somepassword',
                 email_address='test@insert.gov.uk',
@@ -20,7 +20,9 @@ def test_insert_user_should_add_user(notifications_admin, notifications_admin_db
     assert saved_user == user
 
 
-def test_insert_user_with_role_that_does_not_exist_fails(notifications_admin, notifications_admin_db):
+def test_insert_user_with_role_that_does_not_exist_fails(notifications_admin,
+                                                         notifications_admin_db,
+                                                         notify_db_session):
     user = User(name='role does not exist',
                 password='somepassword',
                 email_address='test@insert.gov.uk',
@@ -32,7 +34,7 @@ def test_insert_user_with_role_that_does_not_exist_fails(notifications_admin, no
     assert 'insert or update on table "users" violates foreign key constraint "users_role_id_fkey"' in str(error.value)
 
 
-def test_get_user_by_email(notifications_admin, notifications_admin_db):
+def test_get_user_by_email(notifications_admin, notifications_admin_db, notify_db_session):
     user = User(name='test_get_by_email',
                 password='somepassword',
                 email_address='email@example.gov.uk',
@@ -45,7 +47,7 @@ def test_get_user_by_email(notifications_admin, notifications_admin_db):
     assert retrieved == user
 
 
-def test_get_all_users_returns_all_users(notifications_admin, notifications_admin_db):
+def test_get_all_users_returns_all_users(notifications_admin, notifications_admin_db, notify_db_session):
     user1 = User(name='test one',
                  password='somepassword',
                  email_address='test1@get_all.gov.uk',
@@ -73,7 +75,9 @@ def test_get_all_users_returns_all_users(notifications_admin, notifications_admi
     assert users == [user1, user2, user3]
 
 
-def test_increment_failed_lockout_count_should_increade_count_by_1(notifications_admin, notifications_admin_db):
+def test_increment_failed_lockout_count_should_increade_count_by_1(notifications_admin,
+                                                                   notifications_admin_db,
+                                                                   notify_db_session):
     user = User(name='cannot remember password',
                 password='somepassword',
                 email_address='test1@get_all.gov.uk',
@@ -88,7 +92,8 @@ def test_increment_failed_lockout_count_should_increade_count_by_1(notifications
     assert users_dao.get_user_by_id(user.id).failed_login_count == 1
 
 
-def test_user_is_locked_if_failed_login_count_is_10_or_greater(notifications_admin, notifications_admin_db):
+def test_user_is_locked_if_failed_login_count_is_10_or_greater(notifications_admin,
+                                                               notifications_admin_db, notify_db_session):
     user = User(name='cannot remember password',
                 password='somepassword',
                 email_address='test1@get_all.gov.uk',
@@ -107,7 +112,7 @@ def test_user_is_locked_if_failed_login_count_is_10_or_greater(notifications_adm
     assert saved_user.is_locked() is True
 
 
-def test_user_is_active_is_false_if_state_is_inactive(notifications_admin, notifications_admin_db):
+def test_user_is_active_is_false_if_state_is_inactive(notifications_admin, notifications_admin_db, notify_db_session):
     user = User(name='inactive user',
                 password='somepassword',
                 email_address='test1@get_all.gov.uk',
@@ -121,7 +126,7 @@ def test_user_is_active_is_false_if_state_is_inactive(notifications_admin, notif
     assert saved_user.is_active() is False
 
 
-def test_should_update_user_to_active(notifications_admin, notifications_admin_db):
+def test_should_update_user_to_active(notifications_admin, notifications_admin_db, notify_db_session):
     user = User(name='Make user active',
                 password='somepassword',
                 email_address='activate@user.gov.uk',
@@ -135,7 +140,7 @@ def test_should_update_user_to_active(notifications_admin, notifications_admin_d
     assert updated_user.state == 'active'
 
 
-def test_should_throws_error_when_id_does_not_exist(notifications_admin, notifications_admin_db):
+def test_should_throws_error_when_id_does_not_exist(notifications_admin, notifications_admin_db, notify_db_session):
     with pytest.raises(AttributeError) as error:
         users_dao.activate_user(123)
     assert '''object has no attribute 'state''''' in str(error.value)

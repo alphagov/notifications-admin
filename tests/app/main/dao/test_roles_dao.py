@@ -5,7 +5,7 @@ from app.models import Roles
 from app.main.dao import roles_dao
 
 
-def test_insert_role_should_be_able_to_get_role(notifications_admin, notifications_admin_db):
+def test_insert_role_should_be_able_to_get_role(notifications_admin, notifications_admin_db, notify_db_session):
     role = Roles(id=1000, role='some role for test')
     roles_dao.insert_role(role)
 
@@ -13,7 +13,9 @@ def test_insert_role_should_be_able_to_get_role(notifications_admin, notificatio
     assert saved_role == role
 
 
-def test_insert_role_will_throw_error_if_role_already_exists(notifications_admin, notifications_admin_db):
+def test_insert_role_will_throw_error_if_role_already_exists(notifications_admin,
+                                                             notifications_admin_db,
+                                                             notify_db_session):
     role1 = roles_dao.get_role_by_id(1)
     assert role1.id == 1
 

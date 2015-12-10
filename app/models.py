@@ -5,6 +5,19 @@ DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DATE_FORMAT = "%Y-%m-%d"
 
 
+class VerifyCodes(db.Model):
+    __tablename__ = 'verify_codes'
+
+    code_types = ['email', 'sms']
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True, unique=False, nullable=False)
+    code = db.Column(db.String, nullable=False)
+    code_type = db.Column(db.Enum(code_types, name='verify_code_types'), index=False, unique=False, nullable=False)
+    expiry_datetime = db.Column(db.DateTime, nullable=False)
+    code_used = db.Column(db.Boolean, default=False)
+
+
 class Roles(db.Model):
     __tablename__ = 'roles'
 

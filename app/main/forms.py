@@ -1,9 +1,12 @@
+from datetime import datetime
+
 from flask import session
 from flask_wtf import Form
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
-from app.main.encryption import checkpw
+from app.main.dao import verify_codes_dao
+from app.main.encryption import check_hash
 from app.main.validators import Blacklist
 
 
@@ -46,7 +49,8 @@ class TwoFactorForm(Form):
                                                    Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_sms_code(self, a):
-        validate_code(self.sms_code, session['sms_code'])
+        code = verify_codes_dao.get_code(session['user_id'], 'sms')
+        validate_code(self.sms_code, code)
 
 
 class VerifyForm(Form):
@@ -58,18 +62,24 @@ class VerifyForm(Form):
                                          Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_email_code(self, a):
-        validate_code(self.email_code, session['email_code'])
+        code = verify_codes_dao.get_code(session['user_id'], 'email')
+        validate_code(self.email_code, code)
 
     def validate_sms_code(self, a):
-        validate_code(self.sms_code, session['sms_code'])
+        code = verify_codes_dao.get_code(session['user_id'], 'sms')
+        validate_code(self.sms_code, code)
 
 
 def validate_code(field, code):
+    if code.expiry_datetime < datetime.now():
+        field.errors.append('Code has expired')
+        return False
     if field.data is not None:
-        if checkpw(str(field.data), code) is False:
+        if check_hash(field.data, code.code) is False:
             field.errors.append('Code does not match')
             return False
         else:
+            verify_codes_dao.use_code(code.id)
             return True
     else:
         return True
