@@ -1,0 +1,15 @@
+.template-picker {
+
+  &-name {
+    @include bold-19;
+    padding-left: 5px;
+  }
+
+  &-option {
+
+    input {
+      float: left;
+    }
+
+  }
+}

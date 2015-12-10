@@ -14,8 +14,13 @@
 
 		<h2 class="heading-medium">1. Choose text message template</h2>
 		{% for template in message_templates %}
-			{{ template.name }}
-			{{ sms_message(template.body) }}
+			<div class="template-picker-option">
+				<label>
+					<span class="template-picker-name">{{ template.name }}</span>
+					<input type="radio" name="template" value="{{ template.name }}" />
+					{{ sms_message(template.body) }}
+				</label>
+			</div>
 		{% endfor %}
 
 		<h2 class="heading-medium">2. Add recipients</h2>

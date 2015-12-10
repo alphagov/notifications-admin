@@ -1,33 +1,35 @@
 // Edited version of govuk_frontend_toolkit
 // https://github.com/alphagov/govuk_frontend_toolkit/
-@import "govuk_frontend_toolkit/stylesheets/_conditionals.scss";
+@import "govuk_frontend_toolkit/stylesheets/conditionals";
 @import "govuk_frontend_toolkit/stylesheets/shims";
 @import "govuk_frontend_toolkit/stylesheets/measurements";
 @import "govuk_frontend_toolkit/stylesheets/css3";
 @import "govuk_frontend_toolkit/stylesheets/colours";
 @import "govuk_frontend_toolkit/stylesheets/typography";
 @import "govuk_frontend_toolkit/stylesheets/grid_layout";
+@import "govuk_frontend_toolkit/stylesheets/helpers";
 @import "govuk_frontend_toolkit/stylesheets/url-helpers";
 @import "govuk_frontend_toolkit/stylesheets/design-patterns/buttons";
 @import "govuk_frontend_toolkit/stylesheets/design-patterns/alpha-beta";
 
 // Edited version of govuk_elements repo
 // https://github.com/alphagov/govuk_elements
-@import "govuk_elements/elements/reset";
-@import "govuk_elements/elements/buttons";
-@import "govuk_elements/elements/details";
-@import "govuk_elements/elements/elements-typography";
-@import "govuk_elements/elements/forms";
-@import "govuk_elements/elements/helpers";
-@import "govuk_elements/elements/icons";
-@import "govuk_elements/elements/layout";
-@import "govuk_elements/elements/lists";
-@import "govuk_elements/elements/panels";
-@import "govuk_elements/elements/tables";
+@import "govuk_elements/public/sass/elements/helpers";
+@import "govuk_elements/public/sass/elements/reset";
+@import "govuk_elements/public/sass/elements/buttons";
+@import "govuk_elements/public/sass/elements/details";
+@import "govuk_elements/public/sass/elements/elements-typography";
+@import "govuk_elements/public/sass/elements/forms";
+@import "govuk_elements/public/sass/elements/icons";
+@import "govuk_elements/public/sass/elements/layout";
+@import "govuk_elements/public/sass/elements/lists";
+@import "govuk_elements/public/sass/elements/panels";
+@import "govuk_elements/public/sass/elements/tables";
 
 // Extra CSS for this application
 @import "components/sms-message";
 @import "components/placeholder";
-// // // sxx
-// Break this up
+@import "components/template-picker";
+
+// Break this uq
 @import "app";
