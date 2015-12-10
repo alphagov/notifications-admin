@@ -8,7 +8,7 @@ from app.main.forms import TwoFactorForm
 
 @main.route("/two-factor", methods=['GET'])
 def render_two_factor():
-    return render_template('two-factor.html', form=TwoFactorForm())
+    return render_template('views/two-factor.html', form=TwoFactorForm())
 
 
 @main.route('/two-factor', methods=['POST'])
