@@ -36,7 +36,7 @@ Application to handle the admin functions of the notifications application.
 ### Database
 Run the following command to create the database
 
-    python app.py db upgrade
+    ./scripts/bootstrap.sh
 
 ### Domain model
 
