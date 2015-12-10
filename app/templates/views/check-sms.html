@@ -17,7 +17,10 @@
 			{{ sms_message(message_template) }}
 
 	  	<p>
-		  	<a class="button" href="/jobs/job" role="button">Send {{recipients|length}} text messages</a>
+				<form method="POST" enctype="multipart/form-data">
+					<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+			  	<input type="submit" class="button" value="Send {{recipients|length}} text messages" />
+				</form>
 	  	</p>
 		</div>
 	</div>

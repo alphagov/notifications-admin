@@ -6,48 +6,50 @@
 {% endblock %}
 
 {% block content %}
+	<form method="POST" enctype="multipart/form-data">
+		<div class="grid-row">
+			<div class="column-two-thirds">
 
-<div class="grid-row">
-	<div class="column-two-thirds">
+				<h1 class="heading-xlarge">Send text messages</h1>
 
-		<h1 class="heading-xlarge">Send text messages</h1>
+				<h2 class="heading-medium">1. Choose text message template</h2>
+				{% for template in message_templates %}
+					<div class="template-picker-option">
+						<label>
+							<span class="template-picker-name">{{ template.name }}</span>
+							<input type="radio" name="template" value="{{ template.name }}" />
+							{{ sms_message(template.body) }}
+						</label>
+					</div>
+				{% endfor %}
 
-		<h2 class="heading-medium">1. Choose text message template</h2>
-		{% for template in message_templates %}
-			<div class="template-picker-option">
-				<label>
-					<span class="template-picker-name">{{ template.name }}</span>
-					<input type="radio" name="template" value="{{ template.name }}" />
-					{{ sms_message(template.body) }}
-				</label>
+				<p>
+					<a href="{{ url_for(".managetemplates") }}">Create a new template</a>
+				</p>
+
+				<h2 class="heading-medium">2. Add recipients</h2>
+
+				<p>
+					Add recipients by uploading a CSV
+				</p>
+				<p>
+					Format the cells as ‘text’ in your spreadsheet app – this stores the mobile
+					numbers correctly
+				</p>
+				<p>
+					You can also <a href="#">download an example</a>
+				</p>
+				<p>
+					<input type="file" />
+				</p>
+
+
+		  	<p>
+					<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+					<input type="submit" class="button" value="Continue" />
+		  	</p>
 			</div>
-		{% endfor %}
-
-		<p>
-			<a href="#">Create a new template</a>
-		</p>
-
-		<h2 class="heading-medium">2. Add recipients</h2>
-
-		<p>
-			Add recipients by uploading a CSV
-		</p>
-		<p>
-			Format the cells as ‘text’ in your spreadsheet app – this stores the mobile
-			numbers correctly
-		</p>
-		<p>
-			You can also <a href="#">download an example</a>
-		</p>
-		<p>
-			<input type="file" />
-		</p>
-
-
-  	<p>
-	  	<a class="button" href="/check-sms" role="button">Continue</a>
-  	</p>
-	</div>
-</div>
+		</div>
+	</form>
 
 {% endblock %}

@@ -41,47 +41,6 @@ def addservice():
     return render_template('views/add-service.html')
 
 
-@main.route("/send-sms")
-def sendsms():
-    return render_template(
-        'views/send-sms.html',
-        message_templates=[
-            {
-                'name': 'Reminder',
-                'body': """
-                    Vehicle tax: Your vehicle tax for ((registration number)) expires on ((date)).
-                    Tax your vehicle at www.gov.uk/vehicle-tax
-                """
-            },
-            {
-                'name': 'Warning',
-                'body': """
-                    Vehicle tax: Your vehicle tax for ((registration number)) has expired.
-                    Tax your vehicle at www.gov.uk/vehicle-tax
-                """
-            },
-        ]
-    )
-
-
-@main.route("/check-sms")
-def checksms():
-    return render_template(
-        'views/check-sms.html',
-        recipients=[
-            {'phone': "+44 7815838437", 'registration': 'LC12 BFL', 'date': '25 December 2015'},
-            {'phone': "+44 7815838437", 'registration': 'LC12 BFL', 'date': '25 December 2015'},
-            {'phone': "+44 7815838437", 'registration': 'LC12 BFL', 'date': '25 December 2015'},
-            {'phone': "+44 7815838437", 'registration': 'LC12 BFL', 'date': '25 December 2015'},
-            {'phone': "+44 7815838437", 'registration': 'LC12 BFL', 'date': '25 December 2015'}
-        ],
-        message_template="""
-            Vehicle tax: Your vehicle tax for ((registration number)) expires on ((date)).
-            Tax your vehicle at www.gov.uk/vehicle-tax
-        """
-    )
-
-
 @main.route("/email-not-received")
 def emailnotreceived():
     return render_template('views/email-not-received.html')
