@@ -1,3 +1,6 @@
-[submodule "app/assets/govuk_frontend_toolkit"]
-	path = app/assets/govuk_frontend_toolkit
+[submodule "app/assets/stylesheets/govuk_frontend_toolkit"]
+	path = app/assets/stylesheets/govuk_frontend_toolkit
 	url = https://github.com/alphagov/govuk_frontend_toolkit.git
+[submodule "app/assets/stylesheets/govuk_elements"]
+	path = app/assets/stylesheets/govuk_elements
+	url = https://github.com/alphagov/govuk_elements.git

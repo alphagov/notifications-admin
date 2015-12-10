@@ -1,0 +1,7 @@
+{% macro sms_message(body) %}
+  <div class="sms-message">
+    <div class="sms-message-wrapper">
+      {{ body|placeholders }}
+    </div>
+  </div>
+{% endmacro %}
