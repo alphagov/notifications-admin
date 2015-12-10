@@ -12,13 +12,31 @@
 
 		<h1 class="heading-xlarge">Send text messages</h1>
 
-		{{ sms_message("
-			Vehicle tax: Your vehicle tax for ((registration number)) expires on
-			((date)). Tax your vehicle at www.gov.uk/vehicle-tax
-		") }}
+		<h2 class="heading-medium">1. Choose text message template</h2>
+		{% for template in message_templates %}
+			{{ template.name }}
+			{{ sms_message(template.body) }}
+		{% endfor %}
+
+		<h2 class="heading-medium">2. Add recipients</h2>
+
+		<p>
+			Add recipients by uploading a CSV
+		</p>
+		<p>
+			Format the cells as ‘text’ in your spreadsheet app – this stores the mobile
+			numbers correctly
+		</p>
+		<p>
+			You can also <a href="#">download an example</a>
+		</p>
+		<p>
+			<input type="file" />
+		</p>
+
 
   	<p>
-	  	<a class="button" href="check-sms" role="button">Continue</a>
+	  	<a class="button" href="/check-sms" role="button">Continue</a>
   	</p>
 	</div>
 </div>

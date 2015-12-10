@@ -43,12 +43,37 @@ def addservice():
 
 @main.route("/send-sms")
 def sendsms():
-    return render_template('views/send-sms.html')
+    return render_template(
+        'views/send-sms.html',
+        message_templates=[
+            {
+                'name': 'Reminder',
+                'body': """
+                    Vehicle tax: Your vehicle tax for ((registration number)) expires on ((date)).
+                    Tax your vehicle at www.gov.uk/vehicle-tax
+                """
+            },
+            {
+                'name': 'Warning',
+                'body': """
+                    Vehicle tax: Your vehicle tax for ((registration number)) has expired.
+                    Tax your vehicle at www.gov.uk/vehicle-tax
+                """
+            },
+        ]
+    )
 
 
 @main.route("/check-sms")
 def checksms():
-    return render_template('views/check-sms.html')
+    return render_template(
+        'views/check-sms.html',
+        recipient_count=159,
+        message_template="""
+            Vehicle tax: Your vehicle tax for ((registration number)) expires on ((date)).
+            Tax your vehicle at www.gov.uk/vehicle-tax
+        """
+    )
 
 
 @main.route("/email-not-received")
