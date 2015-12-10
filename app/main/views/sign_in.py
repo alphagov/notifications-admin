@@ -28,7 +28,6 @@ def process_sign_in():
         if checkpw(form.password.data, user.password):
             sms_code = send_sms_code(user.id, user.mobile_number)
             session['user_id'] = user.id
-            session['sms_code'] = hashpw(sms_code)
         else:
             users_dao.increment_failed_login_count(user.id)
             return jsonify(authorization=False), 401
