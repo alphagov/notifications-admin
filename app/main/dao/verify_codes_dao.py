@@ -31,6 +31,13 @@ def use_code(id):
     db.session.commit()
 
 
+def use_code_for_user_and_type(user_id, code_type):
+    verify_code = VerifyCodes.query.filter_by(user_id=user_id, code_type=code_type).first()
+    verify_code.code_used = True
+    db.session.add(verify_code)
+    db.session.commit()
+
+
 def add_code_with_expiry(user_id, code, code_type, expiry):
     code = VerifyCodes(user_id=user_id,
                        code=code,
