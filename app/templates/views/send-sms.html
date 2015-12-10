@@ -9,12 +9,16 @@
 
 <div class="grid-row">
 	<div class="column-two-thirds">
+
 		<h1 class="heading-xlarge">Send text messages</h1>
 
-		<p>This page will be where we construct text messages</p>
-		{{ sms_message("hi") }}
+		{{ sms_message("
+			Vehicle tax: Your vehicle tax for ((registration number)) expires on
+			((date)). Tax your vehicle at www.gov.uk/vehicle-tax
+		") }}
+
   	<p>
-  	<a class="button" href="check-sms" role="button">Continue</a>
+	  	<a class="button" href="check-sms" role="button">Continue</a>
   	</p>
 	</div>
 </div>

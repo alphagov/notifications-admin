@@ -1,6 +1,7 @@
 import os
+import re
 
-from flask import Flask, session
+from flask import Flask, session, Markup
 from flask._compat import string_types
 from flask.ext import assets
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -43,6 +44,8 @@ def create_app(config_name):
 
     application.session_interface = ItsdangerousSessionInterface()
     admin_api_client.init_app(application)
+
+    application.add_template_filter(placeholders)
 
     return application
 
@@ -153,3 +156,13 @@ def convert_to_boolean(value):
             return False
 
     return value
+
+
+def placeholders(value):
+    if not value:
+        return value
+    return Markup(re.sub(
+        r"\(\(([^\)]+)\)\)",  # anything that looks like ((registration number))
+        lambda match: "<span class='placeholder'>{}</span>".format(match.group(1)),
+        value
+    ))
