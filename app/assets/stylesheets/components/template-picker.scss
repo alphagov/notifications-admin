@@ -10,17 +10,22 @@
     white-space: nowrap;
     clear: both;
 
-    .block-label {
-      float: none;
-      clear: none;
-      display: inline-block;
-      margin-right: 10px;
+    &-radio {
+      padding-right: 10px;
+      box-sizing: border-box;
       vertical-align: top;
+      width: 33%;
+      display: inline-block;
+    }
+
+    .block-label {
+      display: inline-block;
     }
 
     .sms-message {
       display: inline-block;
       vertical-align: top;
+      max-width: 66%;
     }
 
   }

@@ -15,10 +15,12 @@
 				<h2 class="heading-medium">1. Choose text message template</h2>
 				{% for template in message_templates %}
 					<div class="template-picker-option">
-						<label class="block-label" for="template-{{loop.index}}">
-							{{ template.name }}
-							<input type="radio" name="template" id="template-{{loop.index}}" value="{{ template.name }}" />
-						</label>
+						<div class="template-picker-option-radio">
+							<label class="block-label" for="template-{{loop.index}}">
+								{{ template.name }}
+								<input type="radio" name="template" id="template-{{loop.index}}" value="{{ template.name }}" />
+							</label>
+						</div>
 						{{ sms_message(template.body) }}
 					</div>
 				{% endfor %}
@@ -30,14 +32,10 @@
 				<h2 class="heading-medium">2. Add recipients</h2>
 
 				<p>
-					Add recipients by uploading a CSV
+					Upload a CSV file to add your recipients’ details.
 				</p>
 				<p>
-					Format the cells as ‘text’ in your spreadsheet app – this stores the mobile
-					numbers correctly
-				</p>
-				<p>
-					You can also <a href="#">download an example</a>
+					You can also <a href="#">download an example CSV</a>.
 				</p>
 				<p>
 					<input type="file" />
