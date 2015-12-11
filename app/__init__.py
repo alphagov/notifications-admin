@@ -46,6 +46,7 @@ def create_app(config_name):
     admin_api_client.init_app(application)
 
     application.add_template_filter(placeholders)
+    application.add_template_filter(replace_placeholders)
 
     return application
 
@@ -165,4 +166,14 @@ def placeholders(value):
         r"\(\(([^\)]+)\)\)",  # anything that looks like ((registration number))
         lambda match: "<span class='placeholder'>{}</span>".format(match.group(1)),
         value
+    ))
+
+
+def replace_placeholders(template, values):
+    if not template:
+        return template
+    return Markup(re.sub(
+        r"\(\(([^\)]+)\)\)",  # anything that looks like ((registration number))
+        lambda match: values.get(match.group(1), ''),
+        template
     ))

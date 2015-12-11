@@ -1,4 +1,9 @@
-{% macro sms_message(body) %}
+{% macro sms_message(body, recipient) %}
+  {% if recipient %}
+    <p class="sms-message-recipient">
+      {{ recipient }}
+    </p>
+  {% endif %}
   <div class="sms-message">
     <div class="sms-message-wrapper">
       {{ body|placeholders }}

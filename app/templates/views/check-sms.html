@@ -23,6 +23,14 @@
 					<a class="button-secondary" role="button" href="{{ url_for(".sendsms") }}">Back</a>
 				</form>
 	  	</p>
+
+			{% for recipient in recipients %}
+				{{ sms_message(
+					message_template|replace_placeholders(recipient),
+					recipient['phone']
+				) }}
+			{% endfor %}
+
 		</div>
 	</div>
 
@@ -33,9 +41,9 @@
 			'Recipient', placeholder('registration number'), placeholder('date')
 		]
 	) %}
-		{% call field() %}{{item.phone}}{% endcall %}
-		{% call field() %}{{item.registration}}{% endcall %}
-		{% call field() %}{{item.date}}{% endcall %}
+		{% call field() %}{{item['phone']}}{% endcall %}
+		{% call field() %}{{item['registration number']}}{% endcall %}
+		{% call field() %}{{item['date']}}{% endcall %}
 	{% endcall %}
 
 {% endblock %}

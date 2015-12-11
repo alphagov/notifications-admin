@@ -29,10 +29,9 @@
 
 // Extra CSS for this application
 @import "components/template-picker";
-@import "components/sms-message";
 @import "components/placeholder";
+@import "components/sms-message";
 @import "components/button";
 @import "components/table";
-
 // TODO: break this up into components
 @import "app";

@@ -38,4 +38,10 @@
     white-space: normal;
   }
 
+  &-recipient {
+    @include copy-16;
+    color: $secondary-text-colour;
+    margin: 0;
+  }
+
 }
