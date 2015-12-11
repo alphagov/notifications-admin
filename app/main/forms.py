@@ -23,7 +23,7 @@ class LoginForm(Form):
 
 gov_uk_email = "(^[^@^\\s]+@[^@^\\.^\\s]+(\\.[^@^\\.^\\s]*)*.gov.uk)"
 mobile_number = "^\\+44[\\d]{10}$"
-verify_code = "[\\d]{5}$"
+verify_code = '^\d{5}$'
 
 
 class RegisterUserForm(Form):
@@ -62,6 +62,7 @@ class VerifyForm(Form):
                                          Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_email_code(self, a):
+        print('validating the email_code')
         code = verify_codes_dao.get_code(session['user_id'], 'email')
         validate_code(self.email_code, code)
 
