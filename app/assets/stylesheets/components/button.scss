@@ -1,0 +1,10 @@
+.button {
+
+  &-secondary {
+    @include button($grey-1);
+    padding: 0.52632em 0.78947em 0.26316em 0.78947em;
+    @include inline-block;
+    margin-left: 5px;
+  }
+
+}

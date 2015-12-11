@@ -20,6 +20,7 @@
 				<form method="POST" enctype="multipart/form-data">
 					<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 			  	<input type="submit" class="button" value="Send {{recipients|length}} text messages" />
+					<a class="button-secondary" role="button" href="{{ url_for(".sendsms") }}">Back</a>
 				</form>
 	  	</p>
 		</div>
