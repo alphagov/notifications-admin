@@ -7,9 +7,22 @@
 
   &-option {
 
-    input {
-      float: left;
+    white-space: nowrap;
+    clear: both;
+
+    .block-label {
+      float: none;
+      clear: none;
+      display: inline-block;
+      margin-right: 10px;
+      vertical-align: top;
+    }
+
+    .sms-message {
+      display: inline-block;
+      vertical-align: top;
     }
 
   }
+
 }

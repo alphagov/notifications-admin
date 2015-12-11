@@ -20,6 +20,7 @@
 @import "govuk_elements/public/sass/elements/details";
 @import "govuk_elements/public/sass/elements/elements-typography";
 @import "govuk_elements/public/sass/elements/forms";
+@import "govuk_elements/public/sass/elements/forms/form-block-labels";
 @import "govuk_elements/public/sass/elements/icons";
 @import "govuk_elements/public/sass/elements/layout";
 @import "govuk_elements/public/sass/elements/lists";
@@ -27,9 +28,9 @@
 @import "govuk_elements/public/sass/elements/tables";
 
 // Extra CSS for this application
+@import "components/template-picker";
 @import "components/sms-message";
 @import "components/placeholder";
-@import "components/template-picker";
 @import "components/button";
 @import "components/table";
 

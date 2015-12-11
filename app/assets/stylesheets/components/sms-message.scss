@@ -28,14 +28,14 @@
   }
 
   &-wrapper {
+    display: inline-block;
     box-sizing: border-box;
     position: relative;
     z-index: 30;
-    width: 100%;
-    height: 100%;
     padding: $gutter/2;
     background: $panel-colour;
     border-radius: 5px;
+    white-space: normal;
   }
 
 }
