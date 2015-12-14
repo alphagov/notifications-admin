@@ -1,6 +1,7 @@
 import os
+import re
 
-from flask import Flask, session
+from flask import Flask, session, Markup
 from flask._compat import string_types
 from flask.ext import assets
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -44,6 +45,9 @@ def create_app(config_name):
     application.session_interface = ItsdangerousSessionInterface()
     admin_api_client.init_app(application)
 
+    application.add_template_filter(placeholders)
+    application.add_template_filter(replace_placeholders)
+
     return application
 
 
@@ -79,11 +83,12 @@ def init_asset_environment(app):
 
     # Tell flask-assets where to look for our sass files.
     env.load_path = [
-        os.path.join(os.path.dirname(__file__), 'assets/stylesheets'),
         os.path.join(os.path.dirname(__file__), 'assets'),
+        os.path.join(os.path.dirname(__file__), 'assets/stylesheets'),
         os.path.join(os.path.dirname(__file__), 'assets/stylesheets/stylesheets/govuk_frontend_toolkit'),
-        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/govuk_template')
-
+        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/govuk_template'),
+        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/views'),
+        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/components'),
     ]
 
     scss = get_filter('scss', as_output=True)
@@ -93,7 +98,7 @@ def init_asset_environment(app):
         assets.Bundle(
             'main.scss',
             filters='scss',
-            output='css_all.css'
+            output='stylesheets/css_all.css'
         )
     )
 
@@ -152,3 +157,23 @@ def convert_to_boolean(value):
             return False
 
     return value
+
+
+def placeholders(value):
+    if not value:
+        return value
+    return Markup(re.sub(
+        r"\(\(([^\)]+)\)\)",  # anything that looks like ((registration number))
+        lambda match: "<span class='placeholder'>{}</span>".format(match.group(1)),
+        value
+    ))
+
+
+def replace_placeholders(template, values):
+    if not template:
+        return template
+    return Markup(re.sub(
+        r"\(\(([^\)]+)\)\)",  # anything that looks like ((registration number))
+        lambda match: values.get(match.group(1), ''),
+        template
+    ))

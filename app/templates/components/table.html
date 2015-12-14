@@ -1,0 +1,39 @@
+{% macro table(items, caption='', field_headings='', field_headings_visible=True) -%}
+  <table class="table">
+    <caption class="heading-medium table-heading">
+      {{ caption }}
+    </caption>
+    <thead class="table-field-headings{% if field_headings_visible %}-visible{% endif %}">
+      <tr>
+        {% for field_heading in field_headings %}
+          <th scope="col" class="table-field-heading{% if loop.first %}-first{% endif %}">
+            {% if field_headings_visible %}
+              {{ field_heading }}
+            {% else %}
+              <span class="visuallyhidden">{{ field_heading }}</span>
+            {% endif %}
+          </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% if items %}
+        {% for item in items %}
+          <tr class="table-row">
+            {{ caller(item) }}
+          </tr>
+        {% endfor %}
+      {% else %}
+        <p class="table-no-content">
+          {{ empty_message }}
+        </p>
+      {% endif %}
+    </tbody>
+  </table>
+{%- endmacro %}
+
+{% macro field(first=False, wide=False, action=False) -%}
+  <td class="table-field{% if first %}-first{% endif %}{% if first and wide %}-wider{% endif %}{% if action %}-with-action{% endif %}">
+    <span>{{ caller() }}</span>
+  </td>
+{%- endmacro %}

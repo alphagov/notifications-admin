@@ -11,7 +11,7 @@ from app.main.views import send_sms_code
 
 @main.route("/sign-in", methods=(['GET']))
 def render_sign_in():
-    return render_template('signin.html', form=LoginForm())
+    return render_template('views/signin.html', form=LoginForm())
 
 
 @main.route('/sign-in', methods=(['POST']))

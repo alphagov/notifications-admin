@@ -14,7 +14,7 @@ from app.models import User
 
 @main.route("/register", methods=['GET'])
 def render_register():
-    return render_template('register.html', form=RegisterUserForm())
+    return render_template('views/register.html', form=RegisterUserForm())
 
 
 @main.route('/register', methods=['POST'])

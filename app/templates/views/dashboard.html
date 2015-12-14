@@ -1,0 +1,26 @@
+{% extends "admin_template.html" %}
+
+{% block page_title %}
+GOV.UK Notify | Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="grid-row">
+	<div class="column-two-thirds">
+		<h1 class="heading-xlarge">Dashboard</h1>
+
+		<ul>
+			<li><a href="{{ url_for('.sendsms') }}">Send text messages</a></li>
+			<li><a href="{{ url_for('.sendemail') }}">Send email messages</a></li>
+			<li><a href="{{ url_for('.showjobs') }}">View notifications activity</a></li>
+			<li><a href="{{ url_for('.userprofile') }}">User profile</a></li>
+			<li><a href="{{ url_for('.manageusers') }}">Manage users</a></li>
+			<li><a href="{{ url_for('.managetemplates')}}">Manage templates</a></li>
+			<li><a href="{{ url_for('.servicesettings') }}">Service settings</a></li>
+			<li><a href="{{ url_for('.apikeys') }}">API keys and documentation</a></li>
+  		</ul>
+	</div>
+</div>
+
+{% endblock %}

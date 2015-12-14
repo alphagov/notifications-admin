@@ -8,7 +8,7 @@ from app.main.forms import VerifyForm
 
 @main.route('/verify', methods=['GET'])
 def render_verify():
-    return render_template('verify.html', form=VerifyForm())
+    return render_template('views/verify.html', form=VerifyForm())
 
 
 @main.route('/verify', methods=['POST'])

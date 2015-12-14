@@ -1,0 +1,53 @@
+{% extends "admin_template.html" %}
+{% from "components/sms-message.html" import sms_message %}
+
+{% block page_title %}
+	GOV.UK Notify | Send text messages
+{% endblock %}
+
+{% block content %}
+	<form method="POST" enctype="multipart/form-data">
+		<div class="grid-row">
+			<div class="column-two-thirds">
+
+				<h1 class="heading-xlarge">Send text messages</h1>
+
+				<h2 class="heading-medium">1. Choose text message template</h2>
+				{% for template in message_templates %}
+					<div class="template-picker-option">
+						<div class="template-picker-option-radio">
+							<label class="block-label" for="template-{{loop.index}}">
+								{{ template.name }}
+								<input type="radio" name="template" id="template-{{loop.index}}" value="{{ template.name }}" />
+							</label>
+						</div>
+						{{ sms_message(template.body) }}
+					</div>
+				{% endfor %}
+
+				<p>
+					or <a href="{{ url_for(".managetemplates") }}">create a new template</a>
+				</p>
+
+				<h2 class="heading-medium">2. Add recipients</h2>
+
+				<p>
+					Upload a CSV file to add your recipients’ details.
+				</p>
+				<p>
+					You can also <a href="#">download an example CSV</a>.
+				</p>
+				<p>
+					<input type="file" />
+				</p>
+
+
+		  	<p>
+					<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+					<input type="submit" class="button" value="Continue" />
+		  	</p>
+			</div>
+		</div>
+	</form>
+
+{% endblock %}

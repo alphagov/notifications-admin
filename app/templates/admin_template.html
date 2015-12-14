@@ -1,5 +1,10 @@
 {% extends "govuk_template.html" %}
 
+{% block head %}
+  {% assets "css_all" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+  {% endassets %}
+{% endblock %}
 
 {% block page_title %}
 GOV.UK notifications admin
@@ -12,9 +17,9 @@ GOV.UK notifications admin
 
  {% block inside_header %}
 <div class="phase-banner-beta">
-    
+
       <strong class="phase-tag">BETA</strong>
-    
+
 </div>
  {% endblock %}
 
@@ -27,4 +32,3 @@ GOV.UK notifications admin
 {% else %}
     {% set homepage_url = url_for('main.dashboard') %}
 {% endif %}
-

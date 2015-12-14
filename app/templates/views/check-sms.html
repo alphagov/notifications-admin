@@ -1,0 +1,67 @@
+{% extends "admin_template.html" %}
+{% from "components/sms-message.html" import sms_message %}
+{% from "components/table.html" import table, field %}
+{% from "components/placeholder.html" import placeholder %}
+{% from "components/submit-form.html" import submit_form %}
+
+{% block page_title %}
+	GOV.UK Notify | Send text messages
+{% endblock %}
+
+{% block content %}
+
+	<div class="grid-row">
+		<div class="column-two-thirds">
+			<h1 class="heading-xlarge">Send text messages</h1>
+
+			<h2 class="heading-medium">Check and confirm</h2>
+
+			{{ submit_form(
+				"Send {} text messages".format(number_of_recipients),
+				url_for(".sendsms")
+			) }}
+
+			<h3 class="heading-small">First 3 messages</h2>
+
+			{% if recipients.first_three and recipients.last_three %}
+
+				{% for recipient in recipients.first_three %}
+					{{ sms_message(
+						message_template|replace_placeholders(recipient),
+						"{}".format(recipient['phone'])
+					) }}
+				{% endfor %}
+
+				<h3 class="heading-small">Last 3 messages</h2>
+
+				{% for recipient in recipients.last_three %}
+					{{ sms_message(
+						message_template|replace_placeholders(recipient),
+						"{}".format(recipient['phone'])
+					) }}
+				{% endfor %}
+
+			{% else %}
+
+				{% for recipient in recipients.all %}
+					{{ sms_message(
+						message_template|replace_placeholders(recipient),
+						"{}".format(recipient['phone'])
+					) }}
+				{% endfor %}
+
+			{% endif %}
+
+			<p>
+				<a href="#">See all</a>
+			</p>
+
+			{{ submit_form(
+				"Send {} text messages".format(number_of_recipients),
+				url_for(".sendsms")
+			) }}
+
+		</div>
+	</div>
+
+{% endblock %}
