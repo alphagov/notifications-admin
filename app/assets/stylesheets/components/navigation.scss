@@ -1,0 +1,23 @@
+#navigation {
+  padding: 50px 0 0 0;
+}
+
+#navigation li {
+  @include core-16();
+  margin: 3px 0;
+}
+
+#navigation ul {
+  border-bottom: 1px solid #777;
+  margin: 0 20px 0 0;
+  list-style-type: none;
+  padding: 0;
+}
+
+#navigation a:link,a:visited {
+  text-decoration: none;
+}
+
+#navigation a:hover {
+    color: #2e8aca;
+}

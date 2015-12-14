@@ -1,0 +1,15 @@
+{% extends "admin_template.html" %}
+{% from "main_nav.html" import main_nav with context %}
+
+{% block content %}
+
+<div class="grid-row">
+	<div class="column-third">
+		{{ main_nav() }}
+	</div>
+	<div class="column-two-thirds">
+		{% block maincolumn_content %}{% endblock %}
+	</div>
+</div>
+
+{% endblock %}
