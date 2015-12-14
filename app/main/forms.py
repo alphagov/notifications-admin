@@ -79,7 +79,6 @@ def validate_code(field, code):
             field.errors.append('Code does not match')
             return False
         else:
-            verify_codes_dao.use_code(code.id)
             return True
     else:
-        return True
+        return False
