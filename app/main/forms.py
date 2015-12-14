@@ -82,3 +82,7 @@ def validate_code(field, code):
             return True
     else:
         return False
+
+
+class AddServiceForm(Form):
+    service_name = StringField(validators=[DataRequired(message='Name can not be empty')])

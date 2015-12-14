@@ -36,3 +36,7 @@ def activate_service(service_id):
 def add_service(service):
     db.session.add(service)
     db.session.commit()
+
+
+def find_service_by_service_name(service_name):
+    return Service.query.filter_by(name=service_name).first()

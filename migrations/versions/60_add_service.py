@@ -2,7 +2,7 @@
 
 Revision ID: 60_add_service
 Revises: 50_alter_verify_code_type
-Create Date: 2015-12-14 15:22:55.938819
+Create Date: 2015-12-14 16:55:56.612005
 
 """
 
@@ -24,7 +24,8 @@ def upgrade():
     sa.Column('active', sa.Boolean(), nullable=False),
     sa.Column('limit', sa.BigInteger(), nullable=False),
     sa.Column('restricted', sa.Boolean(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
     )
     op.create_index(op.f('ix_services_token_id'), 'services', ['token_id'], unique=True)
     op.create_table('user_to_service',
