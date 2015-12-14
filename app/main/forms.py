@@ -62,7 +62,6 @@ class VerifyForm(Form):
                                          Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_email_code(self, a):
-        print('validating the email_code')
         code = verify_codes_dao.get_code(session['user_id'], 'email')
         validate_code(self.email_code, code)
 
@@ -72,7 +71,7 @@ class VerifyForm(Form):
 
 
 def validate_code(field, code):
-    if code.expiry_datetime < datetime.now():
+    if code.expiry_datetime > datetime.now():
         field.errors.append('Code has expired')
         return False
     if field.data is not None:

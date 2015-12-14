@@ -58,5 +58,4 @@ def test_should_return_400_when_sms_code_is_too_short(notifications_admin, notif
         assert response.status_code == 400
         data = json.loads(response.get_data(as_text=True))
         assert len(data.keys()) == 1
-        assert 'sms_code' in data
-        assert set(data['sms_code']) == ['Code must be 5 digits', 'Code does not match'].sort()
+        assert set(data) == set({'sms_code': ['Code must be 5 digits', 'Code does not match']})

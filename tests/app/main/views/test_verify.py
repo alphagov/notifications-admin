@@ -1,7 +1,4 @@
-from datetime import datetime, timedelta
-
 from flask import json
-
 from app.main.dao import users_dao, verify_codes_dao
 from tests.app.main import create_test_user
 
@@ -55,11 +52,7 @@ def test_should_return_400_when_codes_are_wrong(notifications_admin, notificatio
                                      'email_code': '23456'})
         assert response.status_code == 400
         expected = {'sms_code': ['Code must be 5 digits', 'Code does not match'],
-                        'email_code': ['Code must be 5 digits', 'Code does not match']}
+                    'email_code': ['Code must be 5 digits', 'Code does not match']}
         errors = json.loads(response.get_data(as_text=True))
         assert len(errors) == 2
-        assert 'sms_code' in errors
-        assert errors['sms_code'] == expected['sms_code']
-        assert 'email_code' in errors
-        assert set(errors['email_code']) in set(expected['email_code'])
-
+        assert set(errors) == set(expected)
