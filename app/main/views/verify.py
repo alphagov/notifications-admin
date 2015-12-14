@@ -20,5 +20,4 @@ def process_verify():
         login_user(user)
         return redirect('/add-service')
     else:
-        print(form.errors)
         return jsonify(form.errors), 400

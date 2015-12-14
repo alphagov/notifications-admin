@@ -23,7 +23,7 @@ class LoginForm(Form):
 
 gov_uk_email = "(^[^@^\\s]+@[^@^\\.^\\s]+(\\.[^@^\\.^\\s]*)*.gov.uk)"
 mobile_number = "^\\+44[\\d]{10}$"
-verify_code = "[\\d]{5}$"
+verify_code = '^\d{5}$'
 
 
 class RegisterUserForm(Form):
@@ -71,7 +71,7 @@ class VerifyForm(Form):
 
 
 def validate_code(field, code):
-    if code.expiry_datetime < datetime.now():
+    if code.expiry_datetime <= datetime.now():
         field.errors.append('Code has expired')
         return False
     if field.data is not None:
