@@ -42,6 +42,7 @@ class Live(Config):
     HTTP_PROTOCOL = 'https'
 
 configs = {
+    'live': Live,
     'development': Development,
     'test': Test
 }
