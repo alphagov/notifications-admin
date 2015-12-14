@@ -50,11 +50,11 @@ def test_returns_errors_when_code_contains_letters(notifications_admin, notifica
 
 def test_should_return_errors_when_code_is_expired(notifications_admin, notifications_admin_db, notify_db_session):
     with notifications_admin.test_request_context(method='POST',
-                                                  data={'sms_code': '12345'}) as req:
-        user = set_up_test_data()
+                                                  data={'sms_code': '23456'}) as req:
+        user = create_test_user()
         req.session['user_id'] = user.id
         verify_codes_dao.add_code_with_expiry(user_id=user.id,
-                                              code='12345',
+                                              code='23456',
                                               code_type='sms',
                                               expiry=datetime.now() + timedelta(hours=-2))
         req.session['user_id'] = user.id

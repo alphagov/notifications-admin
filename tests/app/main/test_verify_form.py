@@ -49,7 +49,7 @@ def test_should_return_errors_when_code_is_too_short(notifications_admin, notifi
 
 def test_should_return_errors_when_code_does_not_match(notifications_admin, notifications_admin_db, notify_db_session):
     with notifications_admin.test_request_context(method='POST',
-                                                  data={'sms_code': '23456', 'email_code': '23456'}) as req:
+                                                  data={'sms_code': '34567', 'email_code': '34567'}) as req:
         user = set_up_test_data()
         req.session['user_id'] = user.id
         form = VerifyForm(req.request.form)
@@ -65,7 +65,7 @@ def test_should_return_errors_when_code_is_expired(notifications_admin, notifica
     with notifications_admin.test_request_context(method='POST',
                                                   data={'sms_code': '23456',
                                                         'email_code': '23456'}) as req:
-        user = set_up_test_data()
+        user = create_test_user()
         req.session['user_id'] = user.id
         verify_codes_dao.add_code_with_expiry(user_id=user.id,
                                               code='23456',
@@ -80,10 +80,10 @@ def test_should_return_errors_when_code_is_expired(notifications_admin, notifica
         form = VerifyForm(req.request.form)
         assert form.validate() is False
         errors = form.errors
-        expected = set({'sms_code': ['Code has expired'],
-                        'email_code': ['Code has exprired']})
+        expected = {'sms_code': ['Code has expired'],
+                    'email_code': ['Code has expired']}
         assert len(errors) == 2
-        assert set(errors) == expected
+        assert set(errors) == set(expected)
 
 
 def set_up_test_data():

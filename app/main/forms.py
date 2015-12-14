@@ -71,7 +71,7 @@ class VerifyForm(Form):
 
 
 def validate_code(field, code):
-    if code.expiry_datetime > datetime.now():
+    if code.expiry_datetime <= datetime.now():
         field.errors.append('Code has expired')
         return False
     if field.data is not None:
