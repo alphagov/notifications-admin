@@ -10,11 +10,14 @@ def insert_new_service(service_name, user):
                       limit=1000,
                       active=False,
                       restricted=True)
-
-    add_service(service)
-    service.users.append(user)
-    db.session.commit()
-    return service.id
+    try:
+        add_service(service)
+        service.users.append(user)
+        db.session.commit()
+        return service.id
+    except Exception as e:
+        print(e)
+        raise e
 
 
 def get_service_by_id(id):

@@ -91,8 +91,6 @@ class Service(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False, unique=True)
-
-    token_id = db.Column(db.BigInteger, index=True, unique=True)
     created_at = db.Column(db.DateTime, index=False, unique=False, nullable=False)
     active = db.Column(db.Boolean, index=False, unique=False, nullable=False)
     limit = db.Column(db.BigInteger, index=False, unique=False, nullable=False)
