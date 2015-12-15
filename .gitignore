@@ -63,3 +63,5 @@ app/assets/stylesheets/govuk_template/.sass-cache/
 .sass-cache/
 cache/
 app/static/*
+app/static/stylesheets/*.css
+
