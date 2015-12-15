@@ -28,7 +28,9 @@ def test_should_add_service_and_redirect_to_next_page(notifications_admin, notif
         assert saved_service is not None
 
 
-def test_should_return_form_errors_when_service_name_is_empty(notifications_admin, notifications_admin_db, notify_db_session):
+def test_should_return_form_errors_when_service_name_is_empty(notifications_admin,
+                                                              notifications_admin_db,
+                                                              notify_db_session):
     with notifications_admin.test_client() as client:
         with client.session_transaction() as session:
             user = create_test_user()
