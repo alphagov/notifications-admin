@@ -73,82 +73,9 @@ def init_app(app):
         if key in os.environ:
             app.config[key] = convert_to_boolean(os.environ[key])
 
-    init_asset_environment(app)
-
     @app.context_processor
     def inject_global_template_variables():
         return {'asset_path': '/static/'}
-
-
-def init_asset_environment(app):
-    env = assets.Environment(app)
-
-    # Tell flask-assets where to look for our sass files.
-    env.load_path = [
-        os.path.join(os.path.dirname(__file__), 'assets'),
-        os.path.join(os.path.dirname(__file__), 'assets/stylesheets'),
-        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/stylesheets/govuk_frontend_toolkit'),
-        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/govuk_template'),
-        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/views'),
-        os.path.join(os.path.dirname(__file__), 'assets/stylesheets/components'),
-    ]
-
-    scss = get_filter('scss', as_output=True)
-
-    env.register(
-        'css_all',
-        assets.Bundle(
-            'main.scss',
-            filters='scss',
-            output='stylesheets/css_all.css'
-        )
-    )
-
-    env.register(
-        'css_govuk-template',
-        assets.Bundle(
-            'govuk_template/govuk-template.scss',
-            filters='scss',
-            output='stylesheets/govuk-template.css',
-            depends='*.scss'
-        )
-    )
-
-    env.register(
-        'css_govuk-template-ie6',
-        assets.Bundle(
-            'govuk_template/govuk-template-ie6.scss',
-            filters='scss',
-            output='stylesheets/govuk-template-ie6.css'
-        )
-    )
-
-    env.register(
-        'css_govuk-template-ie7',
-        assets.Bundle(
-            'govuk_template/govuk-template-ie7.scss',
-            filters='scss',
-            output='stylesheets/govuk-template-ie7.css'
-        )
-    )
-
-    env.register(
-        'css_govuk-template-ie8',
-        assets.Bundle(
-            'govuk_template/govuk-template-ie8.scss',
-            filters='scss',
-            output='stylesheets/govuk-template-ie8.css'
-        )
-    )
-
-    env.register(
-        'css_govuk-template-print',
-        assets.Bundle(
-            'govuk_template/govuk-template-print.scss',
-            filters='scss',
-            output='stylesheets/govuk-template-print.css'
-        )
-    )
 
 
 def convert_to_boolean(value):
