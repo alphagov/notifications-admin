@@ -35,16 +35,6 @@ def dashboard():
     return render_template('views/dashboard.html')
 
 
-@main.route("/email-not-received")
-def emailnotreceived():
-    return render_template('views/email-not-received.html')
-
-
-@main.route("/text-not-received")
-def textnotreceived():
-    return render_template('views/text-not-received.html')
-
-
 @main.route("/send-email")
 def sendemail():
     return render_template('views/send-email.html')
