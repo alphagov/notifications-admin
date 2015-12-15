@@ -1,13 +1,22 @@
 {% extends "govuk_template.html" %}
 
 {% block head %}
-  {% assets "css_all" %}
-    <link rel="stylesheet" href="{{ ASSET_URL }}" />
-  {% endassets %}
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" media="screen" href="{{ asset_path }}stylesheets/main.css" />
+  <!--<![endif]-->
+  <!--[if IE 6]>
+  <link rel="stylesheet" media="screen" href="{{ asset_path }}/stylesheets/main-ie6.css" />
+  <![endif]-->
+  <!--[if IE 7]>
+  <link rel="stylesheet" media="screen" href="{{ asset_path }}/stylesheets/main-ie7.css" />
+  <![endif]-->
+  <!--[if IE 8]>
+  <link rel="stylesheet" media="screen" href="{{ asset_path }}/stylesheets/main-ie8.css" />
+  <![endif]-->
 {% endblock %}
 
 {% block page_title %}
-GOV.UK notifications admin
+  GOV.UK Notify admin
 {% endblock %}
 
 
@@ -15,13 +24,11 @@ GOV.UK notifications admin
 {% endblock %}
 
 
- {% block inside_header %}
-<div class="phase-banner-beta">
-
-      <strong class="phase-tag">BETA</strong>
-
-</div>
- {% endblock %}
+{% block inside_header %}
+  <div class="phase-banner-beta">
+    <strong class="phase-tag">BETA</strong>
+  </div>
+{% endblock %}
 
 
 {% set global_header_text = "GOV.UK Notify" %}
@@ -32,3 +39,13 @@ GOV.UK notifications admin
 {% else %}
     {% set homepage_url = url_for('main.dashboard') %}
 {% endif %}
+
+{% block content %}
+  <main id="content" role="main" class="page-container">
+    {% block fullwidth_content %}{% endblock %}
+  </main>
+{% endblock %}
+
+{% block body_end %}
+  <script type="text/javascript" src="{{ asset_path }}javascripts/main.js" /></script>
+{% endblock %}

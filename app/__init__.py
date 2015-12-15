@@ -3,11 +3,9 @@ import re
 
 from flask import Flask, session, Markup
 from flask._compat import string_types
-from flask.ext import assets
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
-from webassets.filter import get_filter
 from werkzeug.exceptions import abort
 
 from app.notify_client.api_client import AdminAPIClient
@@ -76,6 +74,10 @@ def init_app(app):
             app.config[key] = convert_to_boolean(os.environ[key])
 
     init_asset_environment(app)
+
+    @app.context_processor
+    def inject_global_template_variables():
+        return {'asset_path': '/static/'}
 
 
 def init_asset_environment(app):

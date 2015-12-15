@@ -14,32 +14,49 @@ Application to handle the admin functions of the notifications application.
 </ul>
 
 ### Create a virtual environment for this project
-    mkvirtualenv -p /usr/local/bin/python3 notifications-admin 
- 
+```shell
+    mkvirtualenv -p /usr/local/bin/python3 notifications-admin
+```
 
-### GOV.UK frontend toolkit
- The GOV.UK frontend toolkit is a submodule of this project.
- To get the content of the toolkit run the following two commands
- 
-    git submodule init
-    git submodule update
+
+### Building the frontend
+
+You need [Node](http://nodejs.org/) which will also get you [NPM](npmjs.org),
+Node's package management tool.
+```shell
+    brew install node
+```
+
+Most of the frontend dependencies are managed using Git Submodules. Some are
+managed with NPM and Bower. To install or update *all the things*, run
+```shell
+    git submodule init --update
+    npm install
+```
+
+If you want the front end assets to re-compile on changes, leave this running
+in a separate terminal from the app
+```shell
+    npm run watch
+```
 
 ### Running the application:
+```shell
     pip install -r requirements.txt
     ./scripts/bootstrap.sh  
     ./scripts/run_app.sh
+```
 
-Note: the ./scripts/bootstrap.sh script only needs to be run the first time to create the database.
+Note: the ./scripts/bootstrap.sh script only needs to be run the first time to
+create the database.
 
- url to test app: 
- 
+URL to test app:
+
     localhost:6012/helloworld
 
 
 ### Domain model
 
-All the domain models are defined in the [models.py](https://github.com/alphagov/notifications-admin/blob/master/app/models.py) file.
-
-
-
-
+All the domain models are defined in the
+[models.py](https://github.com/alphagov/notifications-admin/blob/master/app/models.py)
+file.

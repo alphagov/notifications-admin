@@ -1,0 +1,8 @@
+{
+  "name": "GOV.UK Notify admin frontend",
+  "version": "0.0.1",
+  "dependencies": {
+    "jquery": "1.11.2",
+    "govuk_template": "https://github.com/alphagov/govuk_template/releases/download/v0.16.0/jinja_govuk_template-0.16.0.tgz"
+  }
+}
