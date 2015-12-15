@@ -5,7 +5,7 @@ from flask_wtf import Form
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
-from app.main.dao import verify_codes_dao
+from app.main.dao import verify_codes_dao, services_dao
 from app.main.encryption import check_hash
 from app.main.validators import Blacklist
 
@@ -82,3 +82,14 @@ def validate_code(field, code):
             return True
     else:
         return False
+
+
+class AddServiceForm(Form):
+    service_name = StringField(validators=[DataRequired(message='Please enter your service name')])
+
+    def validate_service_name(self, a):
+        if services_dao.find_service_by_service_name(self.service_name.data) is not None:
+            self.service_name.errors.append('Duplicate service name')
+            return False
+        else:
+            return True
