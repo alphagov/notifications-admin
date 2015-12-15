@@ -84,6 +84,21 @@ def validate_code(field, code):
         return False
 
 
+class EmailNotReceivedForm(Form):
+    email_address = StringField('Email address', validators=[
+        Length(min=5, max=255),
+        DataRequired(message='Email cannot be empty'),
+        Email(message='Please enter a valid email address'),
+        Regexp(regex=gov_uk_email, message='Please enter a gov.uk email address')
+    ])
+
+
+class TextNotReceivedForm(Form):
+    mobile_number = StringField('Mobile phone number',
+                                validators=[DataRequired(message='Please enter your mobile number'),
+                                            Regexp(regex=mobile_number, message='Please enter a +44 mobile number')])
+
+
 class AddServiceForm(Form):
     service_name = StringField(validators=[DataRequired(message='Please enter your service name')])
 

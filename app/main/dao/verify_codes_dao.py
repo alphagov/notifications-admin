@@ -20,8 +20,8 @@ def get_code(user_id, code_type):
     return verify_code
 
 
-def get_code_by_code(user_id, code_type):
-    return VerifyCodes.query.filter_by(user_id=user_id, code_type=code_type).first()
+def get_code_by_code(user_id, code, code_type):
+    return VerifyCodes.query.filter_by(user_id=user_id, code=code, code_type=code_type).first()
 
 
 def use_code(id):

@@ -144,3 +144,20 @@ def test_should_throws_error_when_id_does_not_exist(notifications_admin, notific
     with pytest.raises(AttributeError) as error:
         users_dao.activate_user(123)
     assert '''object has no attribute 'state''''' in str(error.value)
+
+
+def test_should_update_email_address(notifications_admin, notifications_admin_db, notify_db_session):
+    user = User(name='Update Email',
+                password='somepassword',
+                email_address='test@it.gov.uk',
+                mobile_number='+441234123412',
+                created_at=datetime.now(),
+                role_id=1,
+                state='inactive')
+    users_dao.insert_user(user)
+
+    saved = users_dao.get_user_by_id(user.id)
+    assert saved.email_address == 'test@it.gov.uk'
+    users_dao.update_email_address(user.id, 'new_email@testit.gov.uk')
+    updated = users_dao.get_user_by_id(user.id)
+    assert updated.email_address == 'new_email@testit.gov.uk'
