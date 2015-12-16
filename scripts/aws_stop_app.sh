@@ -1,5 +1,15 @@
 #!/bin/bash
 
+
+function error_exit
+{
+	echo "$1" 1>&2
+	exit 0
+}
+
 echo "Stopping application"
-cd ~/notifications-admin/; 
-sudo service notifications-admin stop
+if sudo service notifications-admin stop; then
+    exit 0
+else
+    error_exit "Could not stop application"
+fi
