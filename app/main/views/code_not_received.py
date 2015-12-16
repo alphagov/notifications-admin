@@ -19,7 +19,6 @@ def check_and_resend_email_code():
     if form.validate_on_submit():
         user = users_dao.get_user_by_id(session['user_id'])
         users_dao.update_email_address(id=user.id, email_address=form.email_address.data)
-        verify_codes_dao.use_code_for_user_and_type(user_id=user.id, code_type='email')
         send_email_code(user_id=user.id, email=user.email_address)
         return redirect('/verify')
     return jsonify(form.errors), 400
@@ -37,7 +36,6 @@ def check_and_resend_text_code():
     if form.validate_on_submit():
         user = users_dao.get_user_by_id(session['user_id'])
         users_dao.update_mobile_number(id=user.id, mobile_number=form.mobile_number.data)
-        verify_codes_dao.use_code_for_user_and_type(user_id=user.id, code_type='sms')
         send_sms_code(user_id=user.id, mobile_number=user.mobile_number)
         return redirect('/verify')
     return jsonify(form.errors), 400

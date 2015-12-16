@@ -13,7 +13,7 @@ def test_should_render_two_factor_page(notifications_admin, notifications_admin_
 def test_should_login_user_and_redirect_to_dashboard(notifications_admin, notifications_admin_db, notify_db_session):
     with notifications_admin.test_client() as client:
         with client.session_transaction() as session:
-            user = create_test_user()
+            user = create_test_user('active')
             session['user_id'] = user.id
         verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
         response = client.post('/two-factor',
@@ -28,7 +28,7 @@ def test_should_return_400_with_sms_code_error_when_sms_code_is_wrong(notificati
                                                                       notify_db_session):
     with notifications_admin.test_client() as client:
         with client.session_transaction() as session:
-            user = create_test_user()
+            user = create_test_user('active')
             session['user_id'] = user.id
         verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
         response = client.post('/two-factor',

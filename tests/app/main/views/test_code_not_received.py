@@ -1,4 +1,3 @@
-from app import admin_api_client
 from app.main.dao import verify_codes_dao, users_dao
 from tests.app.main import create_test_user
 
@@ -8,7 +7,7 @@ def test_should_render_email_code_not_received_template_and_populate_email_addre
                                                                                    notify_db_session):
     with notifications_admin.test_client() as client:
         with client.session_transaction() as session:
-            user = create_test_user()
+            user = create_test_user('pending')
             session['user_id'] = user.id
         response = client.get('/email-not-received')
         assert response.status_code == 200
@@ -24,7 +23,7 @@ def test_should_check_and_resend_email_code_redirect_to_verify(notifications_adm
     with notifications_admin.test_client() as client:
         with client.session_transaction() as session:
             _set_up_mocker(mocker)
-            user = create_test_user()
+            user = create_test_user('pending')
             session['user_id'] = user.id
             verify_codes_dao.add_code(user.id, code='12345', code_type='email')
         response = client.post('/email-not-received',
@@ -40,7 +39,7 @@ def test_should_render_text_code_not_received_template(notifications_admin,
     with notifications_admin.test_client() as client:
         with client.session_transaction() as session:
             _set_up_mocker(mocker)
-            user = create_test_user()
+            user = create_test_user('pending')
             session['user_id'] = user.id
             verify_codes_dao.add_code(user.id, code='12345', code_type='email')
         response = client.get('/text-not-received')
@@ -57,7 +56,7 @@ def test_should_check_and_redirect_to_verify(notifications_admin,
     with notifications_admin.test_client() as client:
         with client.session_transaction() as session:
             _set_up_mocker(mocker)
-            user = create_test_user()
+            user = create_test_user('pending')
             session['user_id'] = user.id
             verify_codes_dao.add_code(user.id, code='12345', code_type='sms')
         response = client.post('/text-not-received',
@@ -73,7 +72,7 @@ def test_should_update_email_address_resend_code(notifications_admin,
     with notifications_admin.test_client() as client:
             with client.session_transaction() as session:
                 _set_up_mocker(mocker)
-                user = create_test_user()
+                user = create_test_user('pending')
                 session['user_id'] = user.id
                 verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='email')
             response = client.post('/email-not-received',
@@ -91,7 +90,7 @@ def test_should_update_mobile_number_resend_code(notifications_admin,
     with notifications_admin.test_client() as client:
             with client.session_transaction() as session:
                 _set_up_mocker(mocker)
-                user = create_test_user()
+                user = create_test_user('pending')
                 session['user_id'] = user.id
                 verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
             response = client.post('/text-not-received',

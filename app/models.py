@@ -60,7 +60,7 @@ class User(db.Model):
         return True
 
     def is_active(self):
-        if self.state == 'inactive':
+        if self.state != 'active':
             return False
         else:
             return True

@@ -65,7 +65,7 @@ def test_should_return_errors_when_code_is_expired(notifications_admin, notifica
     with notifications_admin.test_request_context(method='POST',
                                                   data={'sms_code': '23456',
                                                         'email_code': '23456'}) as req:
-        user = create_test_user()
+        user = create_test_user('pending')
         req.session['user_id'] = user.id
         verify_codes_dao.add_code_with_expiry(user_id=user.id,
                                               code='23456',
@@ -87,7 +87,7 @@ def test_should_return_errors_when_code_is_expired(notifications_admin, notifica
 
 
 def set_up_test_data():
-    user = create_test_user()
+    user = create_test_user('pending')
     verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='email')
     verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
     return user

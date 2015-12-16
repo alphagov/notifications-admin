@@ -13,7 +13,8 @@ GOV.UK Notify
     <p>Check your mobile phone number is correct and then resend the confirmation code.</p>
 
       <form autocomplete="off" action="" method="post">
-      <p>
+        {{ form.hidden_tag() }}
+        <p>
         <label class="form-label">Mobile phone number</label>
         {{ form.mobile_number(class="form-control-1-4", autocomplete="off") }} <br>
         </p>

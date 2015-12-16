@@ -49,8 +49,10 @@ class TwoFactorForm(Form):
                                                    Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_sms_code(self, a):
-        code = verify_codes_dao.get_code(session['user_id'], 'sms')
-        validate_code(self.sms_code, code)
+        codes = verify_codes_dao.get_codes(session['user_id'], 'sms')
+        for code in codes:
+            if validate_code(self.sms_code, code):
+                return True
 
 
 class VerifyForm(Form):
@@ -62,12 +64,16 @@ class VerifyForm(Form):
                                          Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_email_code(self, a):
-        code = verify_codes_dao.get_code(session['user_id'], 'email')
-        validate_code(self.email_code, code)
+        codes = verify_codes_dao.get_codes(session['user_id'], 'email')
+        for code in codes:
+            if validate_code(self.email_code, code):
+                return True
 
     def validate_sms_code(self, a):
-        code = verify_codes_dao.get_code(session['user_id'], 'sms')
-        validate_code(self.sms_code, code)
+        codes = verify_codes_dao.get_codes(session['user_id'], 'sms')
+        for code in codes:
+            if validate_code(self.sms_code, code):
+                return True
 
 
 def validate_code(field, code):

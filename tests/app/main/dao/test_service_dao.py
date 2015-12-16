@@ -6,7 +6,7 @@ from tests.app.main import create_test_user
 
 
 def test_can_insert_and_retrieve_new_service(notifications_admin, notifications_admin_db, notify_db_session):
-    user = create_test_user()
+    user = create_test_user('active')
     id = services_dao.insert_new_service('testing service', user)
     saved_service = services_dao.get_service_by_id(id)
     assert id == saved_service.id
@@ -15,7 +15,7 @@ def test_can_insert_and_retrieve_new_service(notifications_admin, notifications_
 
 
 def test_unrestrict_service_updates_the_service(notifications_admin, notifications_admin_db, notify_db_session):
-    user = create_test_user()
+    user = create_test_user('active')
     id = services_dao.insert_new_service('unrestricted service', user)
     saved_service = services_dao.get_service_by_id(id)
     assert saved_service.restricted is True
@@ -25,7 +25,7 @@ def test_unrestrict_service_updates_the_service(notifications_admin, notificatio
 
 
 def test_activate_service_update_service(notifications_admin, notifications_admin_db, notify_db_session):
-    user = create_test_user()
+    user = create_test_user('active')
     id = services_dao.insert_new_service('activated service', user)
     service = services_dao.get_service_by_id(id)
     assert service.active is False
@@ -44,7 +44,7 @@ def test_get_service_returns_none_if_service_does_not_exist(notifications_admin,
 def test_find_by_service_name_returns_right_service(notifications_admin,
                                                     notifications_admin_db,
                                                     notify_db_session):
-    user = create_test_user()
+    user = create_test_user('active')
     id = services_dao.insert_new_service('testing service', user)
     another = services_dao.insert_new_service('Testing the Service', user)
     found = services_dao.find_service_by_service_name('testing service')
@@ -55,7 +55,7 @@ def test_find_by_service_name_returns_right_service(notifications_admin,
 
 
 def test_should_not_allow_two_services_of_the_same_name(notifications_admin, notifications_admin_db, notify_db_session):
-    user = create_test_user()
+    user = create_test_user('active')
     services_dao.insert_new_service('duplicate service', user)
     with pytest.raises(sqlalchemy.exc.IntegrityError) as error:
         services_dao.insert_new_service('duplicate service', user)

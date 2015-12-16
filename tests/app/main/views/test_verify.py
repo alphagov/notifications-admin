@@ -14,7 +14,7 @@ def test_should_redirect_to_add_service_when_code_are_correct(notifications_admi
                                                               notify_db_session):
     with notifications_admin.test_client() as client:
         with client.session_transaction() as session:
-            user = create_test_user()
+            user = create_test_user('pending')
             session['user_id'] = user.id
         verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
         verify_codes_dao.add_code(user_id=user.id, code='23456', code_type='email')
@@ -28,7 +28,7 @@ def test_should_redirect_to_add_service_when_code_are_correct(notifications_admi
 def test_should_activate_user_after_verify(notifications_admin, notifications_admin_db, notify_db_session):
     with notifications_admin.test_client() as client:
         with client.session_transaction() as session:
-            user = create_test_user()
+            user = create_test_user('pending')
             session['user_id'] = user.id
         verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
         verify_codes_dao.add_code(user_id=user.id, code='23456', code_type='email')
@@ -43,7 +43,7 @@ def test_should_activate_user_after_verify(notifications_admin, notifications_ad
 def test_should_return_400_when_codes_are_wrong(notifications_admin, notifications_admin_db, notify_db_session):
     with notifications_admin.test_client() as client:
         with client.session_transaction() as session:
-            user = create_test_user()
+            user = create_test_user('pending')
             session['user_id'] = user.id
         verify_codes_dao.add_code(user_id=user.id, code='23345', code_type='sms')
         verify_codes_dao.add_code(user_id=user.id, code='98456', code_type='email')
