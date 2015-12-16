@@ -9,7 +9,47 @@ GOV.UK Notify | Dashboard
 
 		<h1 class="heading-xlarge">Dashboard</h1>
 
-		<p>Dashboard goes here.</p>
+		<table>
+		  <thead>
+			<tr>
+			  <th colspan="4">Recent activity</th>
+			</tr>
+		  </thead>
+		  <tbody>
+			<tr>
+			  <td><a href={{ url_for('.showjob') }}>Test message 1</a></td>
+			  <td>dispatch_20151114.csv</td>
+			  <td>Just now</td>
+			  <td>Queued</td>
+			</tr>
+			<tr>
+			  <td><a href={{ url_for('.showjob') }}>Mickey Mouse</a></td>
+			  <td>dispatch_20151117.csv</td>
+			  <td>5 minutes ago</td>
+			  <td>Delivered</td>
+			</tr>
+			<tr>
+			  <td><a href={{ url_for('.showjob') }}>Asdfgg</a></td>
+			  <td>remdinder_monday.csv</td>
+			  <td>30 minutes ago</td>
+			  <td>Failed</td>
+			</tr>
+			<tr>
+			  <td><a href={{ url_for('.showjob') }}>Test message 2</a></td>
+			  <td>appointments_wed.csv</td>
+			  <td>2 hours ago</td>
+			  <td>Delivered</td>
+			</tr>
+			<tr>
+			  <td><a href={{ url_for('.showjob') }}>Reminder file</a></td>
+			  <td>+447889887634</td>
+			  <td>11:44 - 21 Nov 2015</td>
+			  <td>Delivered</td>
+			</tr>
+		  </tbody>
+		</table>
+		<br/>
+		<p><a href={{ url_for('.showjobs') }}>See all notifications activity</a></p>
 
 
 {% endblock %}
