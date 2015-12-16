@@ -1,14 +1,12 @@
-{% extends "admin_template.html" %}
+{% extends "withnav_template.html" %}
 {% from "components/sms-message.html" import sms_message %}
 
 {% block page_title %}
 	GOV.UK Notify | Send text messages
 {% endblock %}
 
-{% block content %}
+{% block maincolumn_content %}
 	<form method="POST" enctype="multipart/form-data">
-		<div class="grid-row">
-			<div class="column-two-thirds">
 
 				<h1 class="heading-xlarge">Send text messages</h1>
 
@@ -46,8 +44,7 @@
 					<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 					<input type="submit" class="button" value="Continue" />
 		  	</p>
-			</div>
-		</div>
+
 	</form>
 
 {% endblock %}

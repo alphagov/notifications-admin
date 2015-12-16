@@ -1,13 +1,12 @@
-{% extends "admin_template.html" %}
+{% extends "withnav_template.html" %}
 
 {% block page_title %}
 GOV.UK Notify | Manage templates
 {% endblock %}
 
-{% block content %}
+{% block maincolumn_content %}
 
-<div class="grid-row">
-	<div class="column-two-thirds">
+
 		<h1 class="heading-xlarge">Manage templates</h1>
 
 		<p>Here's where you can view templates, choose to add one, or edit/delete one.</p>
@@ -17,7 +16,6 @@ GOV.UK Notify | Manage templates
 		<p>
   		<a class="button" href="edit-template" role="button">Add a new message template</a>
   		</p>
-	</div>
-</div>
+
 
 {% endblock %}

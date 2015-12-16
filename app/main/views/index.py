@@ -35,12 +35,6 @@ def dashboard():
     return render_template('views/dashboard.html')
 
 
-@main.route("/add-service")
-@login_required
-def addservice():
-    return render_template('views/add-service.html')
-
-
 @main.route("/email-not-received")
 def emailnotreceived():
     return render_template('views/email-not-received.html')
