@@ -62,7 +62,7 @@ def test_get_all_users_returns_all_users(notifications_admin, notifications_admi
                  role_id=1)
     user3 = User(name='test three',
                  password='some2ndpassword',
-                 email_address='test2@get_all.gov.uk',
+                 email_address='test3@get_all.gov.uk',
                  mobile_number='+441234123412',
                  created_at=datetime.now(),
                  role_id=1)
