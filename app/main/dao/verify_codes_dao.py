@@ -39,9 +39,13 @@ def use_code_for_user_and_type(user_id, code_type):
     db.session.commit()
 
 
+def get_code_by_id(id):
+    return VerifyCodes.query.get(id)
+
+
 def add_code_with_expiry(user_id, code, code_type, expiry):
     code = VerifyCodes(user_id=user_id,
-                       code=code,
+                       code=hashpw(code),
                        code_type=code_type,
                        expiry_datetime=expiry)
 

@@ -86,6 +86,22 @@ def test_should_return_errors_when_code_is_expired(notifications_admin, notifica
         assert set(errors) == set(expected)
 
 
+def test_should_return_valid_form_when_many_codes_exist(notifications_admin,
+                                                        notifications_admin_db,
+                                                        notify_db_session):
+    with notifications_admin.test_request_context(method='POST',
+                                                  data={'sms_code': '23456',
+                                                        'email_code': '23456'}) as req:
+        user = set_up_test_data()
+        verify_codes_dao.add_code(user_id=user.id, code='23456', code_type='email')
+        verify_codes_dao.add_code(user_id=user.id, code='23456', code_type='sms')
+        verify_codes_dao.add_code(user_id=user.id, code='60456', code_type='email')
+        verify_codes_dao.add_code(user_id=user.id, code='27856', code_type='sms')
+        req.session['user_id'] = user.id
+        form = VerifyForm(req.request.form)
+        assert form.validate() is True
+
+
 def set_up_test_data():
     user = create_test_user('pending')
     verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='email')

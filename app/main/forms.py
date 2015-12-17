@@ -49,10 +49,7 @@ class TwoFactorForm(Form):
                                                    Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_sms_code(self, a):
-        codes = verify_codes_dao.get_codes(session['user_id'], 'sms')
-        for code in codes:
-            if validate_code(self.sms_code, code):
-                return True
+        return validate_codes(self.sms_code, 'sms')
 
 
 class VerifyForm(Form):
@@ -64,30 +61,10 @@ class VerifyForm(Form):
                                          Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_email_code(self, a):
-        codes = verify_codes_dao.get_codes(session['user_id'], 'email')
-        for code in codes:
-            if validate_code(self.email_code, code):
-                return True
+        return validate_codes(self.email_code, 'email')
 
     def validate_sms_code(self, a):
-        codes = verify_codes_dao.get_codes(session['user_id'], 'sms')
-        for code in codes:
-            if validate_code(self.sms_code, code):
-                return True
-
-
-def validate_code(field, code):
-    if code.expiry_datetime <= datetime.now():
-        field.errors.append('Code has expired')
-        return False
-    if field.data is not None:
-        if check_hash(field.data, code.code) is False:
-            field.errors.append('Code does not match')
-            return False
-        else:
-            return True
-    else:
-        return False
+        return validate_codes(self.sms_code, 'sms')
 
 
 class EmailNotReceivedForm(Form):
@@ -114,3 +91,25 @@ class AddServiceForm(Form):
             return False
         else:
             return True
+
+
+def validate_codes(field, code_type):
+    codes = verify_codes_dao.get_codes(user_id=session['user_id'], code_type=code_type)
+    for code in codes:
+        if validate_code(field, code):
+            if code.expiry_datetime <= datetime.now():
+                field.errors.append('Code has expired')
+                return False
+            return True
+    field.errors.append('Code does not match')
+    return False
+
+
+def validate_code(field, code):
+    if field.data is not None:
+        if check_hash(field.data, code.code) is False:
+            return False
+        else:
+            return True
+    else:
+        return False
