@@ -40,20 +40,10 @@
   }
 }
 
-
-
 #global-header #logo {
-      white-space: nowrap;
+  white-space: nowrap;
 }
-
-
-.column-three-quarters {
-  @include grid-column(3/4);
-}
-
-
-
 
 a:visited {
-    color: #005ea5;
+  color: $link-colour;
 }

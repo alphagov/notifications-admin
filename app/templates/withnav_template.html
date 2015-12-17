@@ -4,7 +4,7 @@
 {% block fullwidth_content %}
 	<div class="grid-row">
 	  <div class="column-one-quarter">
-	    {{ main_nav() }}
+	    {% include "main_nav.html" %}
 	  </div>
 	  <div class="column-three-quarters">
 	    {% block maincolumn_content %}{% endblock %}
