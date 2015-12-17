@@ -1,6 +1,6 @@
-{% macro table(items, caption='', field_headings='', field_headings_visible=True) -%}
+{% macro table(items, caption='', field_headings='', field_headings_visible=True, caption_visible=True) -%}
   <table class="table">
-    <caption class="heading-medium table-heading">
+    <caption class="heading-medium table-heading{{ ' visuallyhidden' if not caption_visible}}">
       {{ caption }}
     </caption>
     <thead class="table-field-headings{% if field_headings_visible %}-visible{% endif %}">

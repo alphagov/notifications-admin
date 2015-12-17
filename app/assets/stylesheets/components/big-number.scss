@@ -1,0 +1,10 @@
+.big-number {
+
+  @include bold-48;
+
+  &-label {
+    @include core-19;
+    display: block;
+  }
+
+}

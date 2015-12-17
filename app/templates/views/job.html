@@ -11,21 +11,33 @@ GOV.UK Notify | Notifications activity
 			{{ uploaded_file_name }} sent with {{ template_used }}
 		</h1>
 
-		<p>
-	    {{ counts.total }} text messages
-		</p>
+		<ul class="grid-row job-totals">
+			<li class="column-one-third">
+				{{ big_number(
+					counts.total,
+					'text message' if 1 == counts.total else 'text messages'
+				)}}
+			</li>
+			<li class="column-one-third">
+				{{ big_number(
+					counts.failed,
+					'failed delivery' if 1 == counts.failed else 'failed deliveries'
+				)}}
+			</li>
+			<li class="column-one-third">
+				{{ big_number(
+					cost, 'total cost'
+				)}}
+			</li>
+		</ul>
 
-		<p>
-	    {{ counts.failed }} failed deliveries
-		</p>
-
-		<p>
-	    {{ cost }} total cost
-		</p>
+    <p>
+      You uploaded contact-demo.csv today at 13:42
+    </p>
 
     {% call(item) table(
       messages,
-      caption='',
+      caption='Messages',
       caption_visible=False,
       field_headings=[
         'To',

@@ -27,6 +27,7 @@
 @import '../govuk_elements/public/sass/elements/panels';
 @import '../govuk_elements/public/sass/elements/tables';
 
+
 // Specific to this application
 @import 'grids';
 @import 'components/template-picker';
@@ -35,6 +36,9 @@
 @import 'components/submit-form';
 @import 'components/table';
 @import 'components/navigation';
+@import 'components/big-number';
+
+@import 'views/job';
 
 // TODO: break this up
 @import 'app';
