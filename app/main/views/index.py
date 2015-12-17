@@ -45,21 +45,6 @@ def checkemail():
     return render_template('views/check-email.html')
 
 
-@main.route("/jobs")
-def showjobs():
-    return render_template('views/jobs.html')
-
-
-@main.route("/jobs/job")
-def showjob():
-    return render_template('views/job.html')
-
-
-@main.route("/jobs/job/notification")
-def shownotification():
-    return render_template('views/notification.html')
-
-
 @main.route("/forgot-password")
 def forgotpassword():
     return render_template('views/forgot-password.html')

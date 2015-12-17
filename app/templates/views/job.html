@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/table.html" import table, field, right_aligned_field_heading %}
 
 {% block page_title %}
 GOV.UK Notify | Notifications activity
@@ -6,14 +7,44 @@ GOV.UK Notify | Notifications activity
 
 {% block maincolumn_content %}
 
-		<h1 class="heading-xlarge">Notifications for a specific job</h1>
+    <h1 class="heading-large">
+			{{ uploaded_file_name }} sent with {{ template_used }}
+		</h1>
 
-		<p>This page will be where we list the notifications for a specific job.</p>
+		<p>
+	    {{ counts.total }} text messages
+		</p>
 
-  	<ul>
-  		<li><a href="/jobs/job/notification">view a specific notification</a></li>
-		<li><a href="/jobs">view all the activity for this service</a></li>
-  	</ul>
-	
+		<p>
+	    {{ counts.failed }} failed deliveries
+		</p>
+
+		<p>
+	    {{ cost }} total cost
+		</p>
+
+    {% call(item) table(
+      messages,
+      caption='',
+      caption_visible=False,
+      field_headings=[
+        'To',
+        'Message',
+        right_aligned_field_heading('Delivery status')
+      ]
+    ) %}
+      {% call field() %}
+        <a href="{{ url_for('.shownotification', notification_id=item.id) }}">{{item.phone}}</a>
+      {% endcall %}
+      {% call field() %}
+        <a href="{{ url_for('.shownotification', notification_id=item.id) }}">{{item.message}}</a>
+      {% endcall %}
+      {% call field(
+        align='right',
+        status='error' if item.status == 'Failed' else 'default'
+      ) %}
+				{{ item.status }}&emsp;{{ item.time }}
+			{% endcall %}
+    {% endcall %}
 
 {% endblock %}

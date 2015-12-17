@@ -1,7 +1,43 @@
-.table {
+.table-heading {
+  text-align: left;
+}
 
-  &-heading {
-    text-align: left;
+%table-field,
+.table-field {
+
+  &:last-child {
+    padding-right: 0;
   }
 
+  &-status {
+
+    &-default {
+      color: $secondary-text-colour;
+    }
+
+    &-error {
+      color: $error-colour;
+      font-weight: bold;
+    }
+
+  }
+
+}
+
+.table-field-heading {
+
+  &:last-child {
+    padding-right: 0;
+  }
+
+  &-right-aligned {
+    display: block;
+    text-align: right;
+  }
+
+}
+
+.table-field-right-aligned {
+  @extend .table-field;
+  text-align: right;
 }
