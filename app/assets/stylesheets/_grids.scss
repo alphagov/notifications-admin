@@ -1,0 +1,7 @@
+.column-one-quarter {
+  @include grid-column(1/4);
+}
+
+.column-three-quarters {
+  @include grid-column(3/4);
+}
