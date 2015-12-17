@@ -45,4 +45,36 @@
     margin: 0;
   }
 
+  &-history {
+
+    background: $turquoise;
+    color: $white;
+    padding: $gutter-half;
+    @include core-16;
+    margin-bottom: $gutter;
+    @extend %contain-floats;
+
+    &-heading {
+      @include bold-16;
+      margin-bottom: 10px;
+    }
+
+    &-status {
+      float: left;
+      margin: 0 0 10px 0;
+      padding: 0;
+      width: 66%;
+    }
+
+    &-time {
+      float: left;
+      clear: left;
+      padding: 0;
+      width: 33%;
+      min-width: 3.2em;
+      max-width: 4.8em;
+    }
+
+  }
+
 }

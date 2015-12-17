@@ -6,28 +6,28 @@ from app.main import main
 messages = [
     {
         'phone': '+44 7700 900 579',
-        'message': 'Vehicle tax: Your vehicle tax for LV75 TDG expires…',
+        'message': 'Vehicle tax: Your vehicle tax for LV75 TDG expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
         'status': 'Delivered',
         'time': '13:42',
         'id': '0'
     },
     {
         'phone': '+44 7700 900 306',
-        'message': 'Vehicle tax: Your vehicle tax for PL53 GBD expires…',
+        'message': 'Vehicle tax: Your vehicle tax for PL53 GBD expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
         'status': 'Delivered',
         'time': '13:42',
         'id': '1'
     },
     {
         'phone': '+44 7700 900 454',
-        'message': 'Vehicle tax: Your vehicle tax for LV75 TDG expires…',
+        'message': 'Vehicle tax: Your vehicle tax for LV75 TDG expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
         'status': 'Delivered',
         'time': '13:42',
         'id': '2'
     },
     {
         'phone': '+44 7700 900 522',
-        'message': 'Vehicle tax: Your vehicle tax for RE67 PLM expires…',
+        'message': 'Vehicle tax: Your vehicle tax for RE67 PLM expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
         'status': 'Failed',
         'time': '13:42',
         'id': '3'
@@ -67,5 +67,11 @@ def shownotification(notification_id):
         'views/notification.html',
         message=[
             message for message in messages if message['id'] == notification_id
-        ][0]
+        ][0],
+        history=[
+            {'time': '13:42', 'status': 'Delivered'},
+            {'time': '13:42', 'status': 'Received by handset'},
+            {'time': '13:42', 'status': 'Accepted by network'},
+            {'time': '13:41', 'status': 'Sent'},
+        ]
     )

@@ -53,7 +53,7 @@ GOV.UK Notify | Notifications activity
         <a href="{{ url_for('.shownotification', notification_id=item.id) }}">{{item.phone}}</a>
       {% endcall %}
       {% call field() %}
-        <a href="{{ url_for('.shownotification', notification_id=item.id) }}">{{item.message}}</a>
+        <a href="{{ url_for('.shownotification', notification_id=item.id) }}">{{item.message[:50]}}…</a>
       {% endcall %}
       {% call field(
         align='right',

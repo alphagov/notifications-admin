@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/sms-message.html" import sms_message %}
+{% from "components/sms-message.html" import sms_message, message_history %}
 
 {% block page_title %}
 GOV.UK Notify | Notifications activity
@@ -9,10 +9,17 @@ GOV.UK Notify | Notifications activity
 
 
 		<h1 class="heading-large">
-			Text message to {{ message.phone }}
+			Text message
 		</h1>
 
-		{{ sms_message(message.message) }}
+		<div class="grid-row">
+			<div class="column-two-thirds">
+				{{ sms_message(message.message, message.phone) }}
+			</div>
+			<div class="column-one-third">
+				{{ message_history("Message history", history) }}
+			</div>
+		</div>
 
   	<p>
 	  	<a href="{{ url_for('.showjob') }}">View other notifications in this job</a>
