@@ -40,7 +40,7 @@ def showjobs():
     return render_template('views/jobs.html')
 
 
-@main.route("/jobs/job/")
+@main.route("/jobs/job")
 def showjob():
     return render_template(
         'views/job.html',
