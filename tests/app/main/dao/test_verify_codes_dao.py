@@ -3,7 +3,7 @@ from pytest import fail
 
 from app.main.dao import verify_codes_dao
 from app.main.encryption import check_hash
-from tests.app.main import create_test_user
+from tests.app.main import create_test_user, create_another_test_user
 
 
 def test_insert_new_code_and_get_it_back(notifications_admin, notifications_admin_db, notify_db_session):
@@ -68,7 +68,7 @@ def test_should_return_all_unused_code_when_there_are_many(notifications_admin,
                                                            notifications_admin_db,
                                                            notify_db_session):
     user = create_test_user('pending')
-    another_user = create_test_user('active')
+    another_user = create_another_test_user('active')
     verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
     id = verify_codes_dao.add_code(user_id=user.id, code='09876', code_type='email')
     verify_codes_dao.use_code(id)
