@@ -1,0 +1,21 @@
+.banner {
+
+  @include core-19;
+  background: $turquoise;
+  color: $white;
+  display: block;
+  padding: $gutter-half $gutter;
+  margin: 0 0 $gutter 0;
+  text-align: center;
+  position: relative;
+
+  &:before {
+    @include core-24;
+    content: '✔';
+    position: absolute;
+    top: $gutter-half;
+    left: $gutter-half;
+    margin-top: -2px;
+  }
+
+}

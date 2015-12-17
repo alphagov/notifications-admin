@@ -56,7 +56,8 @@ def showjob():
         },
         cost='£0.00',
         uploaded_file_name='contact-demo.csv',
-        template_used='Reminder template'
+        template_used='Reminder template',
+        flash_message='We’ve started sending your notifications'
     )
 
 
