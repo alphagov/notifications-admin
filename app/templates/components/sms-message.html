@@ -1,22 +1,20 @@
 {% macro sms_message(body, recipient) %}
-  {% if recipient %}
-    <p class="sms-message-recipient">
-      {{ recipient }}
-    </p>
-  {% endif %}
   <div class="sms-message">
     <div class="sms-message-wrapper">
       {{ body|placeholders }}
     </div>
   </div>
+  {% if recipient %}
+    <p class="sms-message-recipient">
+      {{ recipient }}
+    </p>
+  {% endif %}
 {% endmacro %}
 
-{% macro message_history(title, log, heading_level=2) %}
-  <dl class="sms-message-history">
-    <h{{heading_level}} class="sms-message-history-heading">{{ title }}</h{{heading_level}}>
-    {% for update in log %}
-      <dt class="sms-message-history-time">{{ update.time }}</dt>
-      <dd class="sms-message-history-status">{{ update.status }}</dd>
-    {% endfor %}
-  </dl>
+{% macro message_status(status, time) %}
+  <div class="sms-message-history">
+    <p class="sms-message-history-heading">
+      {{ status }} <span class="sms-message-history-heading-time">{{ time }}</span>
+    </p>
+  </div>
 {% endmacro %}

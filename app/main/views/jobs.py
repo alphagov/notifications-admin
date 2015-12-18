@@ -75,10 +75,6 @@ def shownotification(notification_id):
         message=[
             message for message in messages if message['id'] == notification_id
         ][0],
-        history=[
-            {'time': now, 'status': 'Delivered'},
-            {'time': now, 'status': 'Received by handset'},
-            {'time': now, 'status': 'Accepted by network'},
-            {'time': now, 'status': 'Sent'},
-        ]
+        delivered_at=now,
+        uploaded_at=now
     )

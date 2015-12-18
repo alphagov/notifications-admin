@@ -42,7 +42,7 @@
   &-recipient {
     @include copy-19;
     color: $secondary-text-colour;
-    margin: 0;
+    margin: -$gutter-half 0 $gutter 0;
   }
 
   &-history {
@@ -50,29 +50,20 @@
     background: $turquoise;
     color: $white;
     padding: $gutter-half;
-    @include core-16;
-    margin-bottom: $gutter;
-    @extend %contain-floats;
+    @include bold-19;
+    margin: 0 0 $gutter 0;
 
     &-heading {
-      @include bold-16;
-      margin-bottom: 10px;
-    }
 
-    &-status {
-      float: left;
-      margin: 0 0 10px 0;
-      padding: 0;
-      width: 66%;
-    }
+      @include bold-19;
+      margin: 0;
 
-    &-time {
-      float: left;
-      clear: left;
-      padding: 0;
-      width: 33%;
-      min-width: 3.2em;
-      max-width: 4.8em;
+      &-time {
+        @include inline-block;
+        margin-left: 10px;
+        font-weight: normal;
+      }
+
     }
 
   }
