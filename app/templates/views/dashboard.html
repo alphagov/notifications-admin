@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/table.html" import table, field %}
+{% from "components/big-number.html" import big_number %}
 
 {% block page_title %}
 	GOV.UK Notify | Dashboard
@@ -7,11 +8,26 @@
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-xlarge">Dashboard</h1>
+    <h1 class="heading-xlarge">Service name</h1>
+
+		<ul class="grid-row job-totals">
+			<li class="column-half">
+				{{ big_number(
+					free_text_messages_remaining,
+					'free text messages remaining'
+				)}}
+			</li>
+			<li class="column-half">
+				{{ big_number(
+					'£' + spent_this_month,
+					'spent this month'
+				)}}
+			</li>
+		</ul>
 
     {% call(item) table(
       jobs[:3],
-      caption="Recent activity",
+      caption="Recent text messages",
       field_headings=['Job', 'File', 'Time', 'Status']
     ) %}
 			{% call field() %}
