@@ -9,6 +9,12 @@ def index():
     return render_template('views/signedout.html')
 
 
+@main.route("/dashboard")
+@login_required
+def dashboard():
+    return render_template('views/dashboard.html')
+
+
 @main.route("/govuk")
 def govuk():
     return render_template('views/govuk_template.html')
