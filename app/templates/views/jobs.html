@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/table.html" import table, field %}
 
 {% block page_title %}
 GOV.UK Notify | Notifications activity
@@ -8,11 +9,25 @@ GOV.UK Notify | Notifications activity
 
 		<h1 class="heading-xlarge">Notifications activity</h1>
 
-		<p>This page will be where we show the list of jobs that this service has processed</p>
-
-  	<p>
-  	<a href="jobs/job">view a particular notification job</a>
-  	</p>
+		{% call(item) table(
+			jobs,
+			caption="Recent activity",
+			caption_visible=False,
+			field_headings=['Job', 'File', 'Time', 'Status']
+		) %}
+			{% call field() %}
+				<a href="{{ url_for('.showjob') }}">{{ item.file }}</a>
+			{% endcall %}
+			{% call field() %}
+				<a href="{{ url_for('.showjob') }}">{{ item.job }}</a>
+			{% endcall %}
+			{% call field() %}
+				{{ item.time }}
+			{% endcall %}
+			{% call field() %}
+				{{ item.status }}
+			{% endcall %}
+		{% endcall %}
 
 
 {% endblock %}

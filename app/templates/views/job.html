@@ -10,7 +10,7 @@ GOV.UK Notify | Notifications activity
 {% block maincolumn_content %}
 
     <h1 class="heading-large">
-			{{ uploaded_file_name }} sent with {{ template_used }}
+			{{ uploaded_file_name }}
 		</h1>
 
     {{ banner(flash_message) }}
@@ -36,7 +36,7 @@ GOV.UK Notify | Notifications activity
 		</ul>
 
     <p>
-      You uploaded contact-demo.csv today at 13:42
+      Sent with template <a href="{{ url_for('.edittemplate') }}">{{ template_used }}</a> at {{ uploaded_file_time }}
     </p>
 
     {% call(item) table(

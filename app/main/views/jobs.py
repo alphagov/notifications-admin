@@ -1,35 +1,38 @@
+import time
 from flask import render_template
-
 from app.main import main
 
+from ._jobs import jobs
+
+now = time.strftime('%H:%M')
 
 messages = [
     {
         'phone': '+44 7700 900 579',
         'message': 'Vehicle tax: Your vehicle tax for LV75 TDG expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
         'status': 'Delivered',
-        'time': '13:42',
+        'time': now,
         'id': '0'
     },
     {
         'phone': '+44 7700 900 306',
         'message': 'Vehicle tax: Your vehicle tax for PL53 GBD expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
         'status': 'Delivered',
-        'time': '13:42',
+        'time': now,
         'id': '1'
     },
     {
         'phone': '+44 7700 900 454',
         'message': 'Vehicle tax: Your vehicle tax for LV75 TDG expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
         'status': 'Delivered',
-        'time': '13:42',
+        'time': now,
         'id': '2'
     },
     {
         'phone': '+44 7700 900 522',
         'message': 'Vehicle tax: Your vehicle tax for RE67 PLM expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
         'status': 'Failed',
-        'time': '13:42',
+        'time': now,
         'id': '3'
     }
 ]
@@ -37,7 +40,10 @@ messages = [
 
 @main.route("/jobs")
 def showjobs():
-    return render_template('views/jobs.html')
+    return render_template(
+        'views/jobs.html',
+        jobs=jobs
+    )
 
 
 @main.route("/jobs/job")
@@ -55,8 +61,9 @@ def showjob():
             ])
         },
         cost='£0.00',
-        uploaded_file_name='contact-demo.csv',
-        template_used='Reminder template',
+        uploaded_file_name='dispatch_20151114.csv',
+        uploaded_file_time=now,
+        template_used='Test message 1',
         flash_message='We’ve started sending your notifications'
     )
 
@@ -69,9 +76,9 @@ def shownotification(notification_id):
             message for message in messages if message['id'] == notification_id
         ][0],
         history=[
-            {'time': '13:42', 'status': 'Delivered'},
-            {'time': '13:42', 'status': 'Received by handset'},
-            {'time': '13:42', 'status': 'Accepted by network'},
-            {'time': '13:41', 'status': 'Sent'},
+            {'time': now, 'status': 'Delivered'},
+            {'time': now, 'status': 'Received by handset'},
+            {'time': now, 'status': 'Accepted by network'},
+            {'time': now, 'status': 'Sent'},
         ]
     )

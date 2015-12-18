@@ -1,55 +1,35 @@
 {% extends "withnav_template.html" %}
-
+{% from "components/table.html" import table, field %}
 
 {% block page_title %}
-GOV.UK Notify | Dashboard
+	GOV.UK Notify | Dashboard
 {% endblock %}
 
 {% block maincolumn_content %}
 
-		<h1 class="heading-xlarge">Dashboard</h1>
+    <h1 class="heading-xlarge">Dashboard</h1>
 
-		<table>
-		  <thead>
-			<tr>
-			  <th colspan="4">Recent activity</th>
-			</tr>
-		  </thead>
-		  <tbody>
-			<tr>
-			  <td><a href={{ url_for('.showjob') }}>Test message 1</a></td>
-			  <td>dispatch_20151114.csv</td>
-			  <td>Just now</td>
-			  <td>Queued</td>
-			</tr>
-			<tr>
-			  <td><a href={{ url_for('.showjob') }}>Mickey Mouse</a></td>
-			  <td>dispatch_20151117.csv</td>
-			  <td>5 minutes ago</td>
-			  <td>Delivered</td>
-			</tr>
-			<tr>
-			  <td><a href={{ url_for('.showjob') }}>Asdfgg</a></td>
-			  <td>remdinder_monday.csv</td>
-			  <td>30 minutes ago</td>
-			  <td>Failed</td>
-			</tr>
-			<tr>
-			  <td><a href={{ url_for('.showjob') }}>Test message 2</a></td>
-			  <td>appointments_wed.csv</td>
-			  <td>2 hours ago</td>
-			  <td>Delivered</td>
-			</tr>
-			<tr>
-			  <td><a href={{ url_for('.showjob') }}>Reminder file</a></td>
-			  <td>+447889887634</td>
-			  <td>11:44 - 21 Nov 2015</td>
-			  <td>Delivered</td>
-			</tr>
-		  </tbody>
-		</table>
-		<br/>
-		<p><a href={{ url_for('.showjobs') }}>See all notifications activity</a></p>
+    {% call(item) table(
+      jobs[:3],
+      caption="Recent activity",
+      field_headings=['Job', 'File', 'Time', 'Status']
+    ) %}
+			{% call field() %}
+				<a href="{{ url_for('.showjob') }}">{{ item.file }}</a>
+			{% endcall %}
+			{% call field() %}
+				<a href="{{ url_for('.showjob') }}">{{ item.job }}</a>
+			{% endcall %}
+			{% call field() %}
+				{{ item.time }}
+			{% endcall %}
+			{% call field() %}
+				{{ item.status }}
+			{% endcall %}
+    {% endcall %}
+    <p>
+      <a href={{ url_for('.showjobs') }}>See all notifications activity</a>
+    </p>
 
 
 {% endblock %}

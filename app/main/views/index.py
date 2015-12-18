@@ -24,17 +24,6 @@ def verifymobile():
     return render_template('views/verify-mobile.html')
 
 
-@main.route("/text-not-received-2")
-def textnotreceived2():
-    return render_template('views/text-not-received-2.html')
-
-
-@main.route("/dashboard")
-@login_required
-def dashboard():
-    return render_template('views/dashboard.html')
-
-
 @main.route("/send-email")
 def sendemail():
     return render_template('views/send-email.html')
@@ -73,11 +62,6 @@ def servicesettings():
 @main.route("/api-keys")
 def apikeys():
     return render_template('views/api-keys.html')
-
-
-@main.route("/verification-not-received")
-def verificationnotreceived():
-    return render_template('views/verification-not-received.html')
 
 
 @main.route("/manage-templates")
