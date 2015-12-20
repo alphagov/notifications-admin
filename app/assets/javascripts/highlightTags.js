@@ -1,6 +1,10 @@
 (function(Modules) {
   "use strict";
 
+  if (
+    !('oninput' in document.createElement('input'))
+  ) return;
+
   const tagPattern = /\(\([^\)\(]+\)\)/g;
 
   Modules.HighlightTags = function() {
