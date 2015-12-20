@@ -34,6 +34,20 @@ gulp.task('copy:govuk_template:assets', function() {
 
 // Concatenate and minify
 
+gulp.task('jquery', function () {
+    return plugins.jquery.src({
+        release: 1,
+        flags: [
+          '-ajax', '-ajax/jsonp', '-ajax/load', '-ajax/parseJSON',
+          '-ajax/parseXML', '-ajax/script', '-ajax/var/nonce',
+          '-ajax/var/rquery', '-ajax/xhr', '-manipulation/_evalUrl',
+          '-deprecated', '-effects', '-effects/Tween',
+          '-effects/animatedSelector', '-effects/support', '-event-alias'
+        ]
+      })
+      .pipe(gulp.dest(paths.dist + 'javascripts/'));
+});
+
 gulp.task('javascripts', function() {
     return gulp.src(paths.src + 'javascripts/main.js')
         .pipe(plugins.include())
@@ -68,7 +82,7 @@ gulp.task('watchForChanges', function() {
 
 // Default: compile everything
 gulp.task('default',
-    ['copy:govuk_template:template', 'copy:govuk_template:assets', 'javascripts', 'sass', 'images']
+    ['copy:govuk_template:template', 'copy:govuk_template:assets', 'jquery', 'javascripts', 'sass', 'images']
 );
 
 // Optional: recompile on changes

@@ -1,5 +1,8 @@
 //= include ../../../bower_components/jquery/dist/jquery.js
+//= include ../govuk_frontend_toolkit/javascripts/govuk/modules.js
 
-(function() {
-  console.log("Hello world");
-})();
+//= include highlightTags.js
+
+$(function(){
+  GOVUK.modules.start();
+});

@@ -12,7 +12,7 @@ GOV.UK Notify | Edit template
 
 		<form method="post">
 			{{ textbox(name='template_name', label='Template name', value=template_name) }}
-			{{ textbox(name='template_body', label='Message', small=False, value=template_body) }}
+			{{ textbox(name='template_body', label='Message', small=False, value=template_body, highlight_tags=True) }}
 			{{ submit_form('Save and continue') }}
 		</form>
 
