@@ -1,4 +1,6 @@
 {% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/submit-form.html" import submit_form %}
 
 {% block page_title %}
 GOV.UK Notify | Edit template
@@ -6,13 +8,14 @@ GOV.UK Notify | Edit template
 
 {% block maincolumn_content %}
 
+		<h1 class="heading-xlarge">{{ h1 }}</h1>
 
-		<h1 class="heading-xlarge">Edit template</h1>
-
-		<p>Here's where you can edit an exiting template (including delete) or add a new one</p>
+		<form method="post">
+			{{ textbox(name='template_name', label='Template name', value=template_name) }}
+			{{ textbox(name='template_body', label='Message', small=False, value=template_body) }}
+			{{ submit_form('Save and continue') }}
+		</form>
 
   	<p><a href="manage-templates">Back to manage templates</a></p>
-
-
 
 {% endblock %}

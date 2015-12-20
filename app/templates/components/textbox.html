@@ -1,0 +1,10 @@
+{% macro textbox(name, label, value='', small=True) %}
+  <div class="form-group">
+    <label class="form-label" for="{{ name }}">{{ label }}</label>
+    {% if small %}
+      <input class="form-control" id="{{ name }}" name="{{ name }}" type="text" value="{{ value }}">
+    {% else %}
+      <textarea class="form-control" id="{{ name }}" name="{{ name }}" cols="30" rows="10">{{ value }}</textarea>
+    {% endif %}
+  </div>
+{% endmacro %}

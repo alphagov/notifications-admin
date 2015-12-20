@@ -9,12 +9,6 @@ def index():
     return render_template('views/signedout.html')
 
 
-@main.route("/dashboard")
-@login_required
-def dashboard():
-    return render_template('views/dashboard.html')
-
-
 @main.route("/govuk")
 def govuk():
     return render_template('views/govuk_template.html')
@@ -70,11 +64,6 @@ def apikeys():
     return render_template('views/api-keys.html')
 
 
-@main.route("/manage-templates")
-def managetemplates():
-    return render_template('views/manage-templates.html')
-
-
-@main.route("/edit-template")
-def edittemplate():
-    return render_template('views/edit-template.html')
+@main.route("/verification-not-received")
+def verificationnotreceived():
+    return render_template('views/verification-not-received.html')
