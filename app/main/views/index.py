@@ -119,3 +119,13 @@ def managetemplates():
 @main.route("/edit-template")
 def edittemplate():
     return render_template('views/edit-template.html')
+
+
+@main.route("/email-template-1")
+def emailtemplate():
+    return render_template('email/email_template_1.html')
+
+
+@main.route("/email-template-2")
+def emailtemplate():
+    return render_template('email/email_template_2.html')
