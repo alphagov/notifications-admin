@@ -13,15 +13,15 @@ def add_code(user_id, code, code_type):
 
     db.session.add(code)
     db.session.commit()
+    return code.id
 
 
-def get_code(user_id, code_type):
-    verify_code = VerifyCodes.query.filter_by(user_id=user_id, code_type=code_type, code_used=False).first()
-    return verify_code
+def get_codes(user_id, code_type):
+    return VerifyCodes.query.filter_by(user_id=user_id, code_type=code_type, code_used=False).all()
 
 
-def get_code_by_code(user_id, code_type):
-    return VerifyCodes.query.filter_by(user_id=user_id, code_type=code_type).first()
+def get_code_by_code(user_id, code, code_type):
+    return VerifyCodes.query.filter_by(user_id=user_id, code=code, code_type=code_type).first()
 
 
 def use_code(id):
@@ -32,15 +32,20 @@ def use_code(id):
 
 
 def use_code_for_user_and_type(user_id, code_type):
-    verify_code = VerifyCodes.query.filter_by(user_id=user_id, code_type=code_type).first()
-    verify_code.code_used = True
-    db.session.add(verify_code)
+    codes = VerifyCodes.query.filter_by(user_id=user_id, code_type=code_type, code_used=False).all()
+    for verify_code in codes:
+        verify_code.code_used = True
+        db.session.add(verify_code)
     db.session.commit()
+
+
+def get_code_by_id(id):
+    return VerifyCodes.query.get(id)
 
 
 def add_code_with_expiry(user_id, code, code_type, expiry):
     code = VerifyCodes(user_id=user_id,
-                       code=code,
+                       code=hashpw(code),
                        code_type=code_type,
                        expiry_datetime=expiry)
 

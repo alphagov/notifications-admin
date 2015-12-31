@@ -49,8 +49,7 @@ class TwoFactorForm(Form):
                                                    Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_sms_code(self, a):
-        code = verify_codes_dao.get_code(session['user_id'], 'sms')
-        validate_code(self.sms_code, code)
+        return validate_codes(self.sms_code, 'sms')
 
 
 class VerifyForm(Form):
@@ -62,26 +61,25 @@ class VerifyForm(Form):
                                          Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_email_code(self, a):
-        code = verify_codes_dao.get_code(session['user_id'], 'email')
-        validate_code(self.email_code, code)
+        return validate_codes(self.email_code, 'email')
 
     def validate_sms_code(self, a):
-        code = verify_codes_dao.get_code(session['user_id'], 'sms')
-        validate_code(self.sms_code, code)
+        return validate_codes(self.sms_code, 'sms')
 
 
-def validate_code(field, code):
-    if code.expiry_datetime <= datetime.now():
-        field.errors.append('Code has expired')
-        return False
-    if field.data is not None:
-        if check_hash(field.data, code.code) is False:
-            field.errors.append('Code does not match')
-            return False
-        else:
-            return True
-    else:
-        return False
+class EmailNotReceivedForm(Form):
+    email_address = StringField('Email address', validators=[
+        Length(min=5, max=255),
+        DataRequired(message='Email cannot be empty'),
+        Email(message='Please enter a valid email address'),
+        Regexp(regex=gov_uk_email, message='Please enter a gov.uk email address')
+    ])
+
+
+class TextNotReceivedForm(Form):
+    mobile_number = StringField('Mobile phone number',
+                                validators=[DataRequired(message='Please enter your mobile number'),
+                                            Regexp(regex=mobile_number, message='Please enter a +44 mobile number')])
 
 
 class AddServiceForm(Form):
@@ -93,3 +91,22 @@ class AddServiceForm(Form):
             return False
         else:
             return True
+
+
+def validate_codes(field, code_type):
+    codes = verify_codes_dao.get_codes(user_id=session['user_id'], code_type=code_type)
+    is_valid = len([code for code in codes if validate_code(field, code)]) == 1
+    if is_valid:
+        field.errors.clear()
+    return is_valid
+
+
+def validate_code(field, code):
+    if field.data and check_hash(field.data, code.code):
+        if code.expiry_datetime <= datetime.now():
+            field.errors.append('Code has expired')
+            return False
+        return True
+    else:
+        field.errors.append('Code does not match')
+        return False

@@ -12,15 +12,16 @@ GOV.UK Notify
 
     <p>Check your mobile phone number is correct and then resend the confirmation code.</p>
 
-      <p>
-      <label class="form-label" for="mobile">Mobile phone number</label>
-      <input class="form-control-1-4" id="mobile" type="text" value="08983336666">
-      </p>
-
-
-      <p>
-      <a class="button" href="verify" role="button">Resend confirmation code</a>
-      </p>
+      <form autocomplete="off" action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+        <label class="form-label">Mobile phone number</label>
+        {{ form.mobile_number(class="form-control-1-4", autocomplete="off") }} <br>
+        </p>
+        <p>
+        <button class="button" href="verify" role="button">Resend confirmation code</button>
+        </p>
+      </form>
   </div>
 </div>
 

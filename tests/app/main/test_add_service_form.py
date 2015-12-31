@@ -8,7 +8,7 @@ def test_form_should_have_errors_when_duplicate_service_is_added(notifications_a
                                                                  notify_db_session):
     with notifications_admin.test_request_context(method='POST',
                                                   data={'service_name': 'some service'}) as req:
-        user = create_test_user()
+        user = create_test_user('active')
         services_dao.insert_new_service('some service', user)
         req.session['user_id'] = user.id
         form = AddServiceForm(req.request.form)

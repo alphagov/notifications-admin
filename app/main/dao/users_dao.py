@@ -37,3 +37,17 @@ def activate_user(id):
     user.state = 'active'
     db.session.add(user)
     db.session.commit()
+
+
+def update_email_address(id, email_address):
+    user = get_user_by_id(id)
+    user.email_address = email_address
+    db.session.add(user)
+    db.session.commit()
+
+
+def update_mobile_number(id, mobile_number):
+    user = get_user_by_id(id)
+    user.mobile_number = mobile_number
+    db.session.add(user)
+    db.session.commit()

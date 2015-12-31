@@ -20,7 +20,8 @@ def test_process_sign_in_return_2fa_template(notifications_admin, notifications_
                 mobile_number='+441234123123',
                 name='valid',
                 created_at=datetime.now(),
-                role_id=1)
+                role_id=1,
+                state='active')
     users_dao.insert_user(user)
     response = notifications_admin.test_client().post('/sign-in',
                                                       data={'email_address': 'valid@example.gov.uk',
@@ -37,7 +38,8 @@ def test_should_return_locked_out_true_when_user_is_locked(notifications_admin,
                 mobile_number='+441234123123',
                 name='valid',
                 created_at=datetime.now(),
-                role_id=1)
+                role_id=1,
+                state='active')
     users_dao.insert_user(user)
     for _ in range(10):
         notifications_admin.test_client().post('/sign-in',
@@ -84,6 +86,22 @@ def test_should_return_401_when_user_does_not_exist(notifications_admin, notific
                                                             'password': 'doesNotExist!'})
 
     assert response.status_code == 401
+
+
+def test_should_return_400_when_user_is_not_active(notifications_admin, notifications_admin_db, notify_db_session):
+    user = User(email_address='PendingUser@example.gov.uk',
+                password='val1dPassw0rd!',
+                mobile_number='+441234123123',
+                name='pending user',
+                created_at=datetime.now(),
+                role_id=1,
+                state='pending')
+    users_dao.insert_user(user)
+    response = notifications_admin.test_client().post('/sign-in',
+                                                      data={'email_address': 'PendingUser@example.gov.uk',
+                                                            'password': 'val1dPassw0rd!'})
+    assert response.status_code == 401
+    assert '"active_user": false' in response.get_data(as_text=True)
 
 
 def _set_up_mocker(mocker):

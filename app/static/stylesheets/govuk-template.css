@@ -28,7 +28,7 @@
 @-o-viewport {
   width: device-width;
 }
-/* line 46, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_shims.scss */
+/* line 46, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_shims.scss */
 #global-header .header-wrapper:after, #global-header .header-wrapper .header-global:after, #global-header .header-wrapper .header-global .header-logo:after, #global-header .header-proposition #proposition-link:after,
 #global-header .header-proposition #proposition-links:after, #footer .footer-wrapper:after, #footer .footer-meta:after {
   content: "";
@@ -36,19 +36,19 @@
   clear: both;
 }
 
-/* line 18, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
+/* line 18, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
 #global-header-bar, #global-cookie-message p {
   max-width: 960px;
   margin: 0 15px;
 }
 @media (min-width: 641px) {
-  /* line 18, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
+  /* line 18, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
   #global-header-bar, #global-cookie-message p {
     margin: 0 30px;
   }
 }
 @media (min-width: 1020px) {
-  /* line 18, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
+  /* line 18, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_grid_layout.scss */
   #global-header-bar, #global-cookie-message p {
     margin: 0 auto;
   }
@@ -60,7 +60,7 @@
 @-o-viewport {
   width: device-width;
 }
-/* line 46, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_shims.scss */
+/* line 46, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_shims.scss */
 #global-header .header-wrapper:after, #global-header .header-wrapper .header-global:after, #global-header .header-wrapper .header-global .header-logo:after, #global-header .header-proposition #proposition-link:after,
 #global-header .header-proposition #proposition-links:after, #footer .footer-wrapper:after, #footer .footer-meta:after {
   content: "";
@@ -76,24 +76,24 @@
 }
 /* local styleguide includes */
 /* Old depricated greys, new things should use the toolkit greys */
-/* line 1, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 1, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 html, body, button, input, table, td, th {
   font-family: "nta", Arial, sans-serif;
 }
 
-/* line 4, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 4, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 html, body, div, h1, h2, h3, h4, h5, h6, article, aside, footer, header, hgroup, nav, section {
   margin: 0;
   padding: 0;
   vertical-align: baseline;
 }
 
-/* line 11, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 11, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 main {
   display: block;
 }
 
-/* line 16, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 16, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 .group:before,
 .group:after {
   content: "\0020";
@@ -102,23 +102,23 @@ main {
   overflow: hidden;
 }
 
-/* line 24, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 24, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 .group:after {
   clear: both;
 }
 
-/* line 27, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 27, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 .group {
   zoom: 1;
 }
 
-/* line 32, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 32, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 .content-fixed {
   top: 0;
   position: fixed;
 }
 
-/* line 36, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 36, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 .shim {
   display: block;
 }
@@ -127,7 +127,7 @@ main {
  * 1. Prevents iOS text size adjust after orientation change, without disabling
  *    user zoom.
  */
-/* line 44, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 44, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 html {
   -webkit-text-size-adjust: 100%;
   /* 1 */
@@ -139,12 +139,12 @@ html {
 /*
   Force the scrollbar to always display in IE10/11
  */
-/* line 54, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 54, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 html {
   -ms-overflow-style: scrollbar;
 }
 
-/* line 58, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 58, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 body {
   background: #fff;
   color: #0b0c0c;
@@ -154,86 +154,86 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* line 67, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 67, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 ol, ul, nav ol, nav ul {
   list-style: inherit;
 }
 
-/* line 71, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 71, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 fieldset {
   border: none;
   padding: 0;
 }
 
-/* line 76, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 76, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 a:link {
   color: #005ea5;
 }
 
-/* line 80, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 80, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 a:visited {
   color: #4c2c92;
 }
 
-/* line 84, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 84, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 a:hover {
   color: #2e8aca;
 }
 
-/* line 88, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 88, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 a:active {
   color: #2e8aca;
 }
 
-/* line 290, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
+/* line 290, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 a[rel="external"]:after {
   background-image: image-url("external-links/external-link.png");
   background-repeat: no-repeat;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-  /* line 290, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
+  /* line 290, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
   a[rel="external"]:after {
     background-image: image-url("external-links/external-link-24x24.png");
     background-size: 12px 400px;
   }
 }
-/* line 231, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
+/* line 231, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 a[rel="external"]:after {
   content: "    ";
   background-position: right 6px;
 }
-/* line 240, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
+/* line 240, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 a[rel="external"]:hover:after {
   background-position: right -382px;
 }
 @media (max-width: 640px) {
-  /* line 231, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
+  /* line 231, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
   a[rel="external"]:after {
     content: "     ";
     background-position: right 3px;
   }
-  /* line 240, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
+  /* line 240, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
   a[rel="external"]:hover:after {
     background-position: right -385px;
   }
 }
 
-/* line 231, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
+/* line 231, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 .external-link:after {
   content: "        ";
   background-position: right 0px;
 }
-/* line 240, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
+/* line 240, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 .external-link:hover:after {
   background-position: right 0px;
 }
-/* line 302, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
+/* line 302, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
 .external-link:after {
   background-image: image-url("external-links/external-link-black-12x12.png");
   background-repeat: no-repeat;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-  /* line 302, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
+  /* line 302, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_frontend_toolkit/stylesheets/_typography.scss */
   .external-link:after {
     background-image: image-url("external-links/external-link-black-24x24.png");
     background-size: 12px 400px;
@@ -249,7 +249,7 @@ a[rel="external"]:hover:after {
  * 3. Removes Android and iOS tap highlight color to prevent entire container being highlighted
  *    www.yuiblog.com/blog/2010/10/01/quick-tip-customizing-the-mobile-safari-tap-highlight-color/
  */
-/* line 117, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 117, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 html {
   font-size: 62.5%;
   /* 1 */
@@ -265,7 +265,7 @@ html {
  *    (62.5% * 160% = 100%)
  * 2. Addresses margins handled incorrectly in IE6/7
  */
-/* line 130, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 130, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 body {
   font-size: 160%;
   /* 1 */
@@ -273,18 +273,18 @@ body {
   /* 2 */
 }
 
-/* line 135, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 135, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 b,
 strong {
   font-weight: 600;
 }
 
-/* line 140, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 140, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 img {
   border: 0;
 }
 
-/* line 150, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 150, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 abbr[title] {
   cursor: help;
 }
@@ -294,7 +294,7 @@ abbr[title] {
  * 2. Addresses `box-sizing` set to `border-box` in Safari 5 and Chrome
  *    (include `-moz` to future-proof).
  */
-/* line 160, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 160, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 input[type="search"] {
   -webkit-appearance: textfield;
   /* 1 */
@@ -304,19 +304,19 @@ input[type="search"] {
   box-sizing: content-box;
 }
 
-/* line 166, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 166, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 input[type="search"]::-webkit-search-cancel-button {
   -webkit-appearance: searchfield-cancel-button;
   margin-right: 2px;
 }
 
-/* line 171, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
+/* line 171, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_basic.scss */
 input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
 
 /* For image replacement */
-/* line 2, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 2, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .ir {
   display: block;
   text-indent: -999em;
@@ -325,20 +325,20 @@ input[type="search"]::-webkit-search-decoration {
   text-align: left;
   direction: ltr;
 }
-/* line 10, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 10, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .ir br {
   display: none;
 }
 
 /* Hide for both screenreaders and browsers */
-/* line 16, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 16, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .hidden {
   display: none;
   visibility: hidden;
 }
 
 /* Hide only visually, but have it available for screenreaders */
-/* line 22, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 22, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .visually-hidden,
 .visuallyhidden {
   position: absolute;
@@ -348,7 +348,7 @@ input[type="search"]::-webkit-search-decoration {
    * focusable when navigated to via the keyboard
    */
 }
-/* line 31, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 31, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .visually-hidden.focusable:active, .visually-hidden.focusable:focus,
 .visuallyhidden.focusable:active,
 .visuallyhidden.focusable:focus {
@@ -361,54 +361,54 @@ input[type="search"]::-webkit-search-decoration {
 }
 
 /* Hide visually and from screenreaders, but maintain layout */
-/* line 43, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 43, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .invisible {
   visibility: hidden;
 }
 
 /* Give a strong clear visual idea as to what is currently in focus */
-/* line 48, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 48, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 a {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
 }
 
-/* line 52, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 52, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 a:focus {
   background-color: #ffbf47;
   outline: 3px solid #ffbf47;
 }
 
 /* Make skiplinks visible when they are tabbed to */
-/* line 59, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 59, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .skiplink {
   position: absolute;
   left: -9999em;
 }
 
-/* line 64, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 64, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 .skiplink:focus {
   position: static;
 }
 
-/* line 68, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 68, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 #skiplink-container {
   text-align: center;
   background: #0b0c0c;
 }
-/* line 72, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 72, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 #skiplink-container div {
   text-align: left;
   margin: 0 auto;
   max-width: 1020px;
 }
-/* line 78, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 78, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 #skiplink-container .skiplink {
   display: -moz-inline-stack;
   display: inline-block;
   margin: 0.75em 0 0 30px;
 }
 
-/* line 84, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 84, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 input:focus,
 textarea:focus,
 select:focus,
@@ -417,12 +417,12 @@ button:focus,
   outline: 3px solid #ffbf47;
 }
 
-/* line 93, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 93, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 #global-header h1 a:focus {
   background-color: transparent;
   outline: none;
 }
-/* line 98, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
+/* line 98, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_accessibility.scss */
 #global-header a:focus {
   color: #0b0c0c;
 }
@@ -430,12 +430,12 @@ button:focus,
 /* @import '_shims'; */
 /* @import '_conditionals'; */
 /* @import '_measurements'; */
-/* line 5, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 5, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header {
   background-color: #0b0c0c;
   width: 100%;
 }
-/* line 9, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 9, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-wrapper {
   background-color: #0b0c0c;
   max-width: 990px;
@@ -444,61 +444,61 @@ button:focus,
   padding-bottom: 8px;
 }
 @media (min-width: 641px) {
-  /* line 9, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 9, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-wrapper {
     padding-left: 15px;
     padding-right: 15px;
   }
 }
-/* line 26, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 26, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-wrapper .header-global .header-logo {
   float: left;
 }
 @media (min-width: 769px) {
-  /* line 26, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 26, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-wrapper .header-global .header-logo {
     width: 33.33%;
   }
 }
 @media screen and (max-width: 379px) {
-  /* line 26, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 26, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-wrapper .header-global .header-logo {
     width: auto;
     float: none;
   }
 }
-/* line 38, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 38, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-wrapper .header-global .header-logo .content {
   margin: 0 15px;
 }
-/* line 42, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 42, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-wrapper .header-global .header-logo {
   margin: 5px 0 2px;
 }
 @media (min-width: 769px) {
-  /* line 49, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 49, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header.with-proposition .header-wrapper .header-global {
     float: left;
     width: 33.33%;
   }
-  /* line 54, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 54, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header.with-proposition .header-wrapper .header-global .header-logo,
   #global-header.with-proposition .header-wrapper .header-global .site-search {
     width: 100%;
   }
 }
 @media (min-width: 769px) {
-  /* line 60, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 60, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header.with-proposition .header-wrapper .header-proposition {
     width: 66.66%;
     float: left;
   }
 }
-/* line 65, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 65, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header.with-proposition .header-wrapper .header-proposition .content {
   margin: 0 15px;
 }
-/* line 72, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 72, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header #logo {
   float: left;
   position: relative;
@@ -519,7 +519,7 @@ button:focus,
   background-size: 35px 31px;
   background-position: 0 0;
 }
-/* line 98, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 98, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header #logo img {
   position: relative;
   top: -2px;
@@ -532,26 +532,26 @@ button:focus,
   border: none;
   /* visibility: hidden; */
 }
-/* line 115, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 115, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header #logo:hover, #global-header #logo:focus {
   text-decoration: none;
   border-bottom-color: #fff;
 }
-/* line 121, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 121, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header #logo:active {
   color: #2b8cc4;
 }
-/* line 125, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 125, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition {
   padding-top: 10px;
 }
 @media (min-width: 769px) {
-  /* line 125, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 125, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition {
     padding-top: 0;
   }
 }
-/* line 130, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 130, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-name {
   font-family: "nta", Arial, sans-serif;
   font-size: 18px;
@@ -563,17 +563,17 @@ button:focus,
   text-decoration: none;
 }
 @media (min-width: 641px) {
-  /* line 130, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 130, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-name {
     font-size: 24px;
     line-height: 1.25;
   }
 }
-/* line 136, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 136, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition a#proposition-name:hover {
   text-decoration: underline;
 }
-/* line 139, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 139, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition a.menu {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -587,23 +587,23 @@ button:focus,
   padding-top: 6px;
 }
 @media (min-width: 641px) {
-  /* line 139, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 139, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition a.menu {
     font-size: 16px;
     line-height: 1.25;
   }
 }
 @media (min-width: 769px) {
-  /* line 139, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 139, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition a.menu {
     display: none;
   }
 }
-/* line 149, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 149, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition a.menu:hover {
   text-decoration: underline;
 }
-/* line 152, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 152, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition a.menu:after {
   display: inline-block;
   font-size: 8px;
@@ -612,45 +612,45 @@ button:focus,
   vertical-align: middle;
   content: " \25BC";
 }
-/* line 160, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 160, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition a.menu.js-hidden:after {
   content: " \25B2";
 }
-/* line 164, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 164, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-menu {
   margin-top: 5px;
 }
 @media (min-width: 769px) {
-  /* line 168, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 168, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-menu.no-proposition-name {
     margin-top: 37px;
   }
 }
-/* line 175, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 175, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link,
 #global-header .header-proposition #proposition-links {
   clear: both;
   margin: 2px 0 0 0;
   padding: 0;
 }
-/* line 182, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 182, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 .js-enabled #global-header .header-proposition #proposition-link, .js-enabled
 #global-header .header-proposition #proposition-links {
   display: none;
 }
 @media (min-width: 769px) {
-  /* line 182, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 182, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   .js-enabled #global-header .header-proposition #proposition-link, .js-enabled
   #global-header .header-proposition #proposition-links {
     display: block;
   }
 }
-/* line 187, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 187, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 .js-enabled #global-header .header-proposition #proposition-link.js-visible, .js-enabled
 #global-header .header-proposition #proposition-links.js-visible {
   display: block;
 }
-/* line 192, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 192, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link li,
 #global-header .header-proposition #proposition-links li {
   float: left;
@@ -659,7 +659,7 @@ button:focus,
   border-bottom: 1px solid #2e3133;
 }
 @media (min-width: 769px) {
-  /* line 192, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 192, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link li,
   #global-header .header-proposition #proposition-links li {
     display: block;
@@ -667,13 +667,13 @@ button:focus,
     padding: 0 15px 0 0;
     border-bottom: 0;
   }
-  /* line 204, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 204, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link li.clear-child,
   #global-header .header-proposition #proposition-links li.clear-child {
     clear: left;
   }
 }
-/* line 210, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 210, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link a,
 #global-header .header-proposition #proposition-links a {
   color: #fff;
@@ -685,7 +685,7 @@ button:focus,
   text-transform: none;
 }
 @media (min-width: 641px) {
-  /* line 210, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 210, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link a,
   #global-header .header-proposition #proposition-links a {
     font-size: 14px;
@@ -693,7 +693,7 @@ button:focus,
   }
 }
 @media (min-width: 769px) {
-  /* line 210, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 210, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link a,
   #global-header .header-proposition #proposition-links a {
     font-family: "nta", Arial, sans-serif;
@@ -705,7 +705,7 @@ button:focus,
   }
 }
 @media (min-width: 769px) and (min-width: 641px) {
-  /* line 210, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 210, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link a,
   #global-header .header-proposition #proposition-links a {
     font-size: 16px;
@@ -713,59 +713,59 @@ button:focus,
   }
 }
 
-/* line 220, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 220, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link a:hover,
 #global-header .header-proposition #proposition-links a:hover {
   text-decoration: underline;
 }
-/* line 223, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 223, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link a.active,
 #global-header .header-proposition #proposition-links a.active {
   color: #1d8feb;
 }
-/* line 226, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 226, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link a:focus,
 #global-header .header-proposition #proposition-links a:focus {
   color: #0b0c0c;
 }
-/* line 232, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 232, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header .header-proposition #proposition-link {
   float: right;
   line-height: 22px;
 }
-/* line 235, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 235, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 .js-enabled #global-header .header-proposition #proposition-link {
   display: block;
 }
 @media (min-width: 769px) {
-  /* line 232, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 232, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-header .header-proposition #proposition-link {
     float: none;
   }
 }
 
 /* Global header bar */
-/* line 247, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 247, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-header-bar {
   height: 10px;
   background-color: #005ea5;
 }
 
 /* Global cookie message */
-/* line 258, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 258, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 .js-enabled #global-cookie-message {
   display: none;
   /* shown with JS, always on for non-JS */
 }
 
-/* line 262, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 262, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-cookie-message {
   width: 100%;
   background-color: #d5e8f3;
   padding-top: 10px;
   padding-bottom: 10px;
 }
-/* line 267, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+/* line 267, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
 #global-cookie-message p {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -776,7 +776,7 @@ button:focus,
   margin-bottom: 0;
 }
 @media (min-width: 641px) {
-  /* line 267, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
+  /* line 267, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_header.scss */
   #global-cookie-message p {
     font-size: 16px;
     line-height: 1.25;
@@ -784,12 +784,12 @@ button:focus,
 }
 
 /* Global footer */
-/* line 3, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 3, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer {
   background-color: #DEE0E2;
   border-top: 1px solid #a1acb2;
 }
-/* line 7, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 7, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-wrapper {
   margin: 0 auto;
   width: auto;
@@ -799,20 +799,20 @@ button:focus,
   margin: 0 auto;
 }
 @media (min-width: 641px) {
-  /* line 7, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 7, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-wrapper {
     padding-top: 60px;
   }
 }
-/* line 17, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 17, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer a {
   color: #454a4c;
 }
-/* line 20, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 20, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer a:hover {
   color: #171819;
 }
-/* line 25, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 25, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer h2 {
   font-family: "nta", Arial, sans-serif;
   font-size: 18px;
@@ -824,17 +824,17 @@ button:focus,
   margin: 0;
 }
 @media (min-width: 641px) {
-  /* line 25, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 25, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer h2 {
     font-size: 24px;
     line-height: 1.25;
   }
 }
-/* line 31, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 31, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer h2 a {
   color: inherit;
 }
-/* line 36, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 36, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta {
   padding-left: 15px;
   padding-right: 15px;
@@ -844,25 +844,25 @@ button:focus,
   color: #454a4c;
 }
 @media (min-width: 641px) {
-  /* line 36, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 36, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta {
     padding-left: 30px;
     padding-right: 30px;
   }
 }
-/* line 44, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 44, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner {
   display: inline-block;
   vertical-align: bottom;
   width: 100%;
 }
 @media (min-width: 641px) {
-  /* line 44, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 44, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner {
     width: 75%;
   }
 }
-/* line 58, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 58, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner ul {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -875,41 +875,41 @@ button:focus,
   padding: 0;
 }
 @media (min-width: 641px) {
-  /* line 58, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 58, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner ul {
     font-size: 16px;
     line-height: 1.5;
   }
 }
 @media (min-width: 641px) {
-  /* line 58, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 58, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner ul {
     margin: 0 0 1em 0;
   }
 }
-/* line 69, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 69, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner ul li {
   display: inline-block;
   margin: 0 15px 0 0;
 }
-/* line 81, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 81, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner .open-government-licence {
   clear: left;
   position: relative;
 }
 @media (min-width: 641px) {
-  /* line 81, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 81, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner .open-government-licence {
     padding-left: 53px;
   }
 }
-/* line 93, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 93, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner .open-government-licence .logo {
   margin-bottom: 1em;
   padding-top: 0;
 }
 @media (min-width: 641px) {
-  /* line 93, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 93, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner .open-government-licence .logo {
     position: absolute;
     left: 0;
@@ -918,7 +918,7 @@ button:focus,
     height: 100%;
   }
 }
-/* line 104, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 104, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner .open-government-licence .logo a {
   display: block;
   width: 41px;
@@ -928,13 +928,13 @@ button:focus,
   background: image-url("/static/images/open-government-licence.png") 0 0 no-repeat;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-  /* line 104, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 104, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner .open-government-licence .logo a {
     background-image: image-url("/static/images/open-government-licence_2x.png");
     background-size: 41px 17px;
   }
 }
-/* line 118, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 118, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .footer-meta-inner .open-government-licence p {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -945,13 +945,13 @@ button:focus,
   padding-top: 0.1em;
 }
 @media (min-width: 641px) {
-  /* line 118, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 118, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .footer-meta-inner .open-government-licence p {
     font-size: 16px;
     line-height: 1.25;
   }
 }
-/* line 126, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 126, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .copyright {
   font-family: "nta", Arial, sans-serif;
   font-size: 14px;
@@ -963,14 +963,14 @@ button:focus,
   display: block;
 }
 @media (min-width: 641px) {
-  /* line 126, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 126, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .copyright {
     font-size: 16px;
     line-height: 1.25;
   }
 }
 @media (min-width: 641px) {
-  /* line 126, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 126, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .copyright {
     display: inline-block;
     text-align: inherit;
@@ -979,7 +979,7 @@ button:focus,
     margin-top: 0;
   }
 }
-/* line 147, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+/* line 147, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
 #footer .footer-meta .copyright a {
   display: block;
   background-image: url("/static/images/govuk-crest.png");
@@ -990,20 +990,20 @@ button:focus,
   padding: 115px 0 0 0;
 }
 @media (min-width: 641px) {
-  /* line 147, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 147, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .copyright a {
     background-position: 100% 0%;
   }
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-  /* line 147, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 147, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .copyright a {
     background-image: url("/static/images/govuk-crest-2x.png");
     background-size: 125px 102px;
   }
 }
 @media (min-width: 641px) {
-  /* line 147, /Users/chs/gdsworkspace/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
+  /* line 147, /Users/rebeccalaw/dev-projects/notify/notifications-admin/app/assets/stylesheets/govuk_template/_footer.scss */
   #footer .footer-meta .copyright a {
     text-align: right;
   }
