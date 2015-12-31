@@ -124,9 +124,28 @@ def test_check_and_redirect_to_two_factor(notifications_admin,
             user = create_test_user('active')
             session['user_id'] = user.id
             _set_up_mocker(mocker)
-        response = client.post('/verification-not-received')
+        response = client.get('/send-new-code')
         assert response.status_code == 302
         assert response.location == 'http://localhost/two-factor'
+
+
+def test_should_create_new_code_for_user(notifications_admin,
+                                         notifications_admin_db,
+                                         notify_db_session,
+                                         mocker):
+    with notifications_admin.test_client() as client:
+        with client.session_transaction() as session:
+            user = create_test_user('active')
+            session['user_id'] = user.id
+            verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
+            _set_up_mocker(mocker)
+        response = client.get('/send-new-code')
+        assert response.status_code == 302
+        assert response.location == 'http://localhost/two-factor'
+        codes = verify_codes_dao.get_codes(user_id=user.id, code_type='sms')
+        assert len(codes) == 2
+        for x in ([used.code_used for used in codes]):
+            assert x is False
 
 
 def _set_up_mocker(mocker):

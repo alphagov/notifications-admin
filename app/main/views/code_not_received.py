@@ -46,7 +46,7 @@ def verification_code_not_received():
     return render_template('views/verification-not-received.html')
 
 
-@main.route('/verification-not-received', methods=['POST'])
+@main.route('/send-new-code', methods=['GET'])
 def check_and_resend_verification_code():
     user = users_dao.get_user_by_id(session['user_id'])
     send_sms_code(user.id, user.mobile_number)
