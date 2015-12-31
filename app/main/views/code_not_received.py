@@ -1,7 +1,7 @@
 from flask import render_template, redirect, jsonify, session
 
 from app.main import main
-from app.main.dao import users_dao, verify_codes_dao
+from app.main.dao import users_dao
 from app.main.forms import EmailNotReceivedForm, TextNotReceivedForm
 from app.main.views import send_sms_code, send_email_code
 
@@ -39,3 +39,15 @@ def check_and_resend_text_code():
         send_sms_code(user_id=user.id, mobile_number=user.mobile_number)
         return redirect('/verify')
     return jsonify(form.errors), 400
+
+
+@main.route('/verification-not-received', methods=['GET'])
+def verification_code_not_received():
+    return render_template('views/verification-not-received.html')
+
+
+@main.route('/verification-not-received', methods=['POST'])
+def check_and_resend_verification_code():
+    user = users_dao.get_user_by_id(session['user_id'])
+    send_sms_code(user.id, user.mobile_number)
+    return redirect('/two-factor')
