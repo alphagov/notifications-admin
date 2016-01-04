@@ -89,11 +89,7 @@ class AddServiceForm(Form):
     service_name = StringField(validators=[DataRequired(message='Please enter your service name')])
 
     def validate_service_name(self, a):
-        print("a {}".format(a))
-        print("self.service_name {}".format(self.service_name.data))
-        print("service_names {}".format(self.service_names))
         if self.service_name.data in self.service_names:
-            print('here')
             raise ValidationError('Service name already exists')
 
 

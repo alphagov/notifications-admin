@@ -51,7 +51,6 @@ def test_should_login_user_when_multiple_valid_codes_exist(notifications_admin,
         response = client.post('/two-factor',
                                data={'sms_code': '23456'})
         assert response.status_code == 302
-        print(user.id)
         codes = verify_codes_dao.get_codes(user_id=user.id, code_type='sms')
         # query will only return codes where code_used == False
         assert len(codes) == 0

@@ -71,4 +71,3 @@ def test_should_return_list_of_service_names(notifications_admin, notifications_
 
     actual = services_dao.find_all_service_names()
     assert actual == expected
-

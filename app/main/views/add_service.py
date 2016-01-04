@@ -9,7 +9,6 @@ from app.main.forms import AddServiceForm
 @login_required
 def add_service():
     form = AddServiceForm(services_dao.find_all_service_names())
-    print("serivce_names {}".format(services_dao.find_all_service_names()))
     if form.validate_on_submit():
 
         user = users_dao.get_user_by_id(session['user_id'])
@@ -17,4 +16,3 @@ def add_service():
         return redirect('/dashboard')
     else:
         return render_template('views/add-service.html', form=form)
-§
