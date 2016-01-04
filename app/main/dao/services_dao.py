@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from sqlalchemy.orm import load_only
+
 from app import db
 from app.models import Service
 
@@ -39,3 +41,7 @@ def add_service(service):
 
 def find_service_by_service_name(service_name):
     return Service.query.filter_by(name=service_name).first()
+
+
+def find_all_service_names():
+    return [x.name for x in Service.query.options(load_only("name")).all()]

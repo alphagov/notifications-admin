@@ -2,10 +2,9 @@ from datetime import datetime
 
 from flask import session
 from flask_wtf import Form
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, ValidationError
 from wtforms.validators import DataRequired, Email, Length, Regexp
-
-from app.main.dao import verify_codes_dao, services_dao
+from app.main.dao import verify_codes_dao
 from app.main.encryption import check_hash
 from app.main.validators import Blacklist
 
@@ -83,14 +82,15 @@ class TextNotReceivedForm(Form):
 
 
 class AddServiceForm(Form):
+    def __init__(self, service_names, *args, **kwargs):
+        self.service_names = service_names
+        super(AddServiceForm, self).__init__(*args, **kwargs)
+
     service_name = StringField(validators=[DataRequired(message='Please enter your service name')])
 
     def validate_service_name(self, a):
-        if services_dao.find_service_by_service_name(self.service_name.data) is not None:
-            self.service_name.errors.append('Duplicate service name')
-            return False
-        else:
-            return True
+        if self.service_name.data in self.service_names:
+            raise ValidationError('Service name already exists')
 
 
 def validate_codes(field, code_type):
