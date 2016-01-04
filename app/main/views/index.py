@@ -39,6 +39,21 @@ def forgotpassword():
     return render_template('views/forgot-password.html')
 
 
+@main.route("/jobs")
+def showjobs():
+    return render_template('views/jobs.html')
+
+
+@main.route("/jobs/job")
+def showjob():
+    return render_template('views/job.html')
+
+
+@main.route("/jobs/job/notification")
+def shownotification():
+    return render_template('views/notification.html')
+
+
 @main.route("/new-password")
 def newpassword():
     return render_template('views/new-password.html')
@@ -62,3 +77,12 @@ def apikeys():
 @main.route("/verification-not-received")
 def verificationnotreceived():
     return render_template('views/verification-not-received.html')
+
+@main.route("/manage-templates")
+def managetemplates():
+    return render_template('views/manage-templates.html')
+
+
+@main.route("/edit-template")
+def edittemplate():
+    return render_template('views/edit-template.html')

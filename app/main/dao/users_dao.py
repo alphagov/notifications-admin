@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from app import db, login_manager
 from app.models import User
 from app.main.encryption import hashpw
@@ -51,5 +53,13 @@ def update_email_address(id, email_address):
 def update_mobile_number(id, mobile_number):
     user = get_user_by_id(id)
     user.mobile_number = mobile_number
+    db.session.add(user)
+    db.session.commit()
+
+
+def update_password(id, password):
+    user = get_user_by_id(id)
+    user.password = hashpw(password)
+    user.password_changed_at = datetime.now()
     db.session.add(user)
     db.session.commit()

@@ -31,3 +31,17 @@ def send_email_code(user_id, email):
         raise AdminApiClientException('Exception when sending email.')
 
     return email_code
+
+
+def send_change_password_email(email):
+    code = create_verify_code()
+    link_to_change_password = 'thelink' + code
+    # TODO needs an expiry date to check?
+    try:
+        admin_api_client.send_email(email_address=email,
+                                    from_str='notify@digital.cabinet-office.gov.uk',
+                                    message=link_to_change_password,
+                                    subject='Verification code',
+                                    token=admin_api_client.auth_token)
+    except:
+        raise AdminApiClientException('Exception when sending email.')
