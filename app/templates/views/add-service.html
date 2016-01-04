@@ -18,9 +18,7 @@ GOV.UK Notify | Set up service
 
 		<form autocomplete="off" action="" method="post">
 			{{ form.hidden_tag() }}
-			<label class="form-label">Service name</label>
-			{{ form.service_name(class="form-control-2-3", autocomplete="off") }} <br>
-			<span class="font-xsmall">For example, 'Vehicle tax' or 'Carer's allowance'</span>
+			{{ render_field(form.service_name, class='form-control-2-3') }}
 
 			<p>
 			<button class="button" href="dashboard" role="button">Continue</button>

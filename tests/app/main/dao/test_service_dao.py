@@ -60,3 +60,15 @@ def test_should_not_allow_two_services_of_the_same_name(notifications_admin, not
     with pytest.raises(sqlalchemy.exc.IntegrityError) as error:
         services_dao.insert_new_service('duplicate service', user)
         assert 'duplicate key value violates unique constraint "services_name_key' in error.value
+
+
+def test_should_return_list_of_service_names(notifications_admin, notifications_admin_db, notify_db_session):
+    user = create_test_user('active')
+    services_dao.insert_new_service('first service', user)
+    services_dao.insert_new_service('second service', user)
+    services_dao.insert_new_service('third service', user)
+    expected = ['first service', 'second service', 'third service']
+
+    actual = services_dao.find_all_service_names()
+    assert actual == expected
+
