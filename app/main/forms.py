@@ -95,18 +95,14 @@ class AddServiceForm(Form):
 
 def validate_codes(field, code_type):
     codes = verify_codes_dao.get_codes(user_id=session['user_id'], code_type=code_type)
-    is_valid = len([code for code in codes if validate_code(field, code)]) == 1
-    if is_valid:
-        field.errors.clear()
-    return is_valid
+    print('validate_codes for user_id: {} are {}'.format(session['user_id'], codes))
+    if not [code for code in codes if validate_code(field, code)]:
+        raise ValidationError('Code does not match')
 
 
 def validate_code(field, code):
     if field.data and check_hash(field.data, code.code):
         if code.expiry_datetime <= datetime.now():
-            field.errors.append('Code has expired')
-            return False
-        return True
-    else:
-        field.errors.append('Code does not match')
-        return False
+            raise ValidationError('Code has expired')
+        else:
+            return code.code
