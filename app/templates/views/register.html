@@ -10,7 +10,7 @@ GOV.UK Notify | Create an account
 	<div class="column-two-thirds">
 		<h1 class="heading-xlarge">Create an account</h1>
 
-		<p>If you've used GOV.UK Notify before, <a href="">sign in to your account</a>.</p>
+		<p>If you've used GOV.UK Notify before, <a href="{{ url_for('.sign_in') }}">sign in to your account</a>.</p>
 
    		<form autocomplete="off" action="" method="post">
 			{{ form.hidden_tag() }}

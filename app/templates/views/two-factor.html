@@ -15,13 +15,10 @@ GOV.UK Notify | Text verification
 
 		<form autocomplete="off" action="" method="post">
 			{{ form.hidden_tag() }}
+			{{ render_field(form.sms_code, class='form-control-1-4') }}
+  			<span class="font-xsmall"><a href="{{ url_for('.verification_code_not_received') }}">I haven't received a text</a></span>
   			<p>
-				<label class="form-label">Enter verification code</label><br>
-				{{ form.sms_code(class="form-control-1-4", autocomplete="off") }} <br>
-				<span class="font-xsmall"><a href="verification-not-received">I haven't received a text</a></span>
-  			</p>
-  			<p>
-  			<button class="button" href="dashboard" role="button">Continue</button>
+  			<button class="button" role="button">Continue</button>
   			</p>
 		</form>
 	</div>

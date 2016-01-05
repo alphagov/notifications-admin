@@ -14,12 +14,9 @@ GOV.UK Notify
 
       <form autocomplete="off" action="" method="post">
         {{ form.hidden_tag() }}
+        {{ render_field(form.mobile_number, class='form-control-2-3') }}
         <p>
-        <label class="form-label">Mobile phone number</label>
-        {{ form.mobile_number(class="form-control-1-4", autocomplete="off") }} <br>
-        </p>
-        <p>
-        <button class="button" href="verify" role="button">Resend confirmation code</button>
+        <button class="button" role="button">Resend confirmation code</button>
         </p>
       </form>
   </div>

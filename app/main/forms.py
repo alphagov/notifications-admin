@@ -92,9 +92,9 @@ class EmailNotReceivedForm(Form):
 
 
 class TextNotReceivedForm(Form):
-    mobile_number = StringField('Mobile phone number',
-                                validators=[DataRequired(message='Please enter your mobile number'),
-                                            Regexp(regex=mobile_number, message='Please enter a +44 mobile number')])
+    mobile_number = StringField('Mobile phone number', validators=[
+        DataRequired(message='Please enter your mobile number'),
+        Regexp(regex=mobile_number, message='Please enter a +44 mobile number')])
 
 
 class AddServiceForm(Form):
@@ -102,7 +102,8 @@ class AddServiceForm(Form):
         self.service_names = service_names
         super(AddServiceForm, self).__init__(*args, **kwargs)
 
-    service_name = StringField(validators=[DataRequired(message='Please enter your service name')])
+    service_name = StringField(validators=[
+        DataRequired(message='Please enter your service name')])
 
     def validate_service_name(self, a):
         if self.service_name.data in self.service_names:
