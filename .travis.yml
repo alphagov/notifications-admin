@@ -9,7 +9,7 @@ env:
 before_install:
 - rvm install 2.0.0
 install:
-- bundle install
+- bundle install 2.0.0
 - pip install -r requirements_for_test.txt
 before_script:
 - psql -c 'create database test_notifications_admin;' -U postgres
