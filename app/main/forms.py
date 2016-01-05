@@ -26,6 +26,12 @@ verify_code = '^\d{5}$'
 
 
 class RegisterUserForm(Form):
+
+    def __init__(self, existing_email_addresses, existing_mobile_numbers, *args, **kwargs):
+        self.existing_emails = existing_email_addresses
+        self.existing_mobiles = existing_mobile_numbers
+        super(RegisterUserForm, self).__init__(*args, **kwargs)
+
     name = StringField('Full name',
                        validators=[DataRequired(message='Name can not be empty')])
     email_address = StringField('Email address', validators=[
@@ -41,6 +47,16 @@ class RegisterUserForm(Form):
                              validators=[DataRequired(message='Please enter your password'),
                                          Length(10, 255, message='Password must be at least 10 characters'),
                                          Blacklist(message='That password is blacklisted, too common')])
+
+    def validate_email_address(self, field):
+        # Validate email address is unique.
+        if field.data in self.existing_emails:
+            raise ValidationError('Email address already exists')
+
+    def validate_mobile_number(self, field):
+        # Validate mobile number is unique
+        if field.data in self.existing_mobiles:
+            raise ValidationError('Mobile number already exists')
 
 
 class TwoFactorForm(Form):

@@ -14,24 +14,13 @@ GOV.UK Notify | Create an account
 
    		<form autocomplete="off" action="" method="post">
 			{{ form.hidden_tag() }}
-			<p>
-			<label class="form-label">Full name </label>
-			{{ form.name(class="form-control-2-3", autocomplete="off") }} <br>
-			</p>
-			<p>
-			<label class="form-label">Email address </label>
-			{{ form.email_address(class="form-control-2-3", autocomplete="off") }} <br>
+
+			{{ render_field(form.name, class='form-control-2-3') }}
+			{{ render_field(form.email_address, class='form-control-2-3') }}
 			<span class="font-xsmall">Your email address must end in .gov.uk</span>
-			</p>
-			<p>
-			<label class="form-label">Mobile phone number</label>
-			{{ form.mobile_number(class="form-control-1-4", autocomplete="off") }} <br>
-			</p>
-			<p>
-			<label class="form-label">Create a password </label>
-				{{ form.password(class="form-control-1-4", autocomplete="off") }} <br>
+			{{ render_field(form.mobile_number, class='form-control-2-3') }}
+			{{ render_field(form.password, class='form-control-2-3') }}
 			<span class="font-xsmall">Your password must have at least 10 characters</span></label>
-			</p>
 			<p>
 			<button class="button" role="button">Continue</button>
 			</p>

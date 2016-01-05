@@ -30,7 +30,7 @@ def test_process_register_returns_400_when_mobile_number_is_invalid(notification
                                                             'mobile_number': 'not good',
                                                             'password': 'validPassword!'})
 
-    assert response.status_code == 400
+    assert response.status_code == 200
     assert 'Please enter a +44 mobile number' in response.get_data(as_text=True)
 
 
@@ -45,7 +45,7 @@ def test_should_return_400_when_email_is_not_gov_uk(notifications_admin,
                                                             'mobile_number': '+44123412345',
                                                             'password': 'validPassword!'})
 
-    assert response.status_code == 400
+    assert response.status_code == 200
     assert 'Please enter a gov.uk email address' in response.get_data(as_text=True)
 
 
@@ -73,5 +73,5 @@ def test_should_return_400_if_password_is_blacklisted(notifications_admin, notif
                                                             'mobile_number': '+44123412345',
                                                             'password': 'password1234'})
 
-    response.status_code == 400
+    response.status_code == 200
     assert 'That password is blacklisted, too common' in response.get_data(as_text=True)

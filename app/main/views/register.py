@@ -12,14 +12,19 @@ from app.main.views import send_sms_code, send_email_code
 from app.models import User
 
 
-@main.route("/register", methods=['GET'])
-def render_register():
-    return render_template('views/register.html', form=RegisterUserForm())
-
-
-@main.route('/register', methods=['POST'])
+# TODO how do we handle duplicate unverifed email addresses?
+# malicious or otherwise.
+@main.route('/register', methods=['GET', 'POST'])
 def process_register():
-    form = RegisterUserForm()
+    try:
+        existing_emails, existing_mobiles = zip(
+            *[(x.email_address, x.mobile_number) for x in
+                users_dao.get_all_users()])
+    except ValueError:
+        # Value error is raised if the db is empty.
+        existing_emails, existing_mobiles = [], []
+
+    form = RegisterUserForm(existing_emails, existing_mobiles)
 
     if form.validate_on_submit():
         user = User(name=form.name.data,
@@ -28,16 +33,16 @@ def process_register():
                     password=form.password.data,
                     created_at=datetime.now(),
                     role_id=1)
-        try:
-            users_dao.insert_user(user)
-            send_sms_code(user_id=user.id, mobile_number=form.mobile_number.data)
-            send_email_code(user_id=user.id, email=form.email_address.data)
-            session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
-            session['user_id'] = user.id
-        except AdminApiClientException as e:
-            return jsonify(admin_api_client_error=e.value)
-        except SQLAlchemyError:
-            return jsonify(database_error='encountered database error'), 400
-    else:
-        return jsonify(form.errors), 400
-    return redirect('/verify')
+        users_dao.insert_user(user)
+        # TODO possibly there should be some exception handling
+        # for sending sms and email codes.
+        # How do we report to the user there is a problem with
+        # sending codes apart from service unavailable?
+        # at the moment i believe http 500 is fine.
+        send_sms_code(user_id=user.id, mobile_number=form.mobile_number.data)
+        send_email_code(user_id=user.id, email=form.email_address.data)
+        session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
+        session['user_id'] = user.id
+        return redirect('/verify')
+
+    return render_template('views/register.html', form=form)
