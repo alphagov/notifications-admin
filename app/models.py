@@ -111,6 +111,13 @@ class Service(db.Model):
         return filter_null_value_fields(serialized)
 
 
+class PasswordResetToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String, unique=True, index=True, nullable=False)
+    user_id = db.Column(db.Integer,  db.ForeignKey('users.id'), unique=False, nullable=False)
+    expiry_date = db.Column(db.DateTime, nullable=False)
+
+
 def filter_null_value_fields(obj):
     return dict(
         filter(lambda x: x[1] is not None, obj.items())

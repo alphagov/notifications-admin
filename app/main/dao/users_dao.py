@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from sqlalchemy.orm import load_only
+
 from app import db, login_manager
 from app.models import User
 from app.main.encryption import hashpw
@@ -63,3 +65,7 @@ def update_password(id, password):
     user.password_changed_at = datetime.now()
     db.session.add(user)
     db.session.commit()
+
+
+def find_all_email_address():
+    return [x.email_address for x in User.query.options(load_only("email_address")).all()]

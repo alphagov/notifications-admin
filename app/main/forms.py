@@ -122,12 +122,20 @@ class AddServiceForm(Form):
             raise ValidationError('Service name already exists')
 
 
-class ForgotPassword(Form):
+class ForgotPasswordForm(Form):
+    def __init__(self, email_addresses, *args, **kargs):
+        self.email_addresses = email_addresses
+        super(ForgotPasswordForm, self).__init__(*args, **kargs)
+
     email_address = StringField('Email address',
                                 validators=[Length(min=5, max=255),
                                             DataRequired(message='Email cannot be empty'),
                                             Email(message='Please enter a valid email address'),
                                             Regexp(regex=gov_uk_email, message='Please enter a gov.uk email address')
                                             ])
+
+    def validate_email_address(self, a):
+        if self.email_address.data not in self.email_addresses:
+            raise ValidationError('Please enter the email address that you registered with')
 
 

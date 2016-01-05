@@ -1,4 +1,6 @@
-from flask import current_app
+import uuid
+
+from tests.app.main import create_test_user
 
 
 def test_should_render_forgot_password(notifications_admin, notifications_admin_db, notify_db_session):
@@ -8,9 +10,30 @@ def test_should_render_forgot_password(notifications_admin, notifications_admin_
            in response.get_data(as_text=True)
 
 
-def test_should_return_400_when_email_is_invalid(notifications_admin, notifications_admin_db, notify_db_session):
+def test_should_have_validate_error_when_email_does_not_exist(notifications_admin,
+                                                              notifications_admin_db,
+                                                              notify_db_session):
+    create_test_user('active')
     response = notifications_admin.test_client().post('/forgot-password',
-                                                      data={'email_address': 'not_a_valid_email'})
-    x = current_app._get_current_object()
-    assert response.status_code == 400
-    assert 'Please enter a valid email address' in response.get_data(as_text=True)
+                                                      data={'email_address': 'email_does_not@exist.gov.uk'})
+    assert response.status_code == 200
+    assert 'Please enter the email address that you registered with' in response.get_data(as_text=True)
+
+
+def test_should_redirect_to_password_reset_sent(notifications_admin,
+                                                notifications_admin_db,
+                                                mocker,
+                                                notify_db_session,
+                                                ):
+    _set_up_mocker(mocker)
+    create_test_user('active')
+    response = notifications_admin.test_client().post('/forgot-password',
+                                                      data={'email_address': 'test@user.gov.uk'})
+
+    assert response.status_code == 200
+    assert 'You have been sent an email containing a url to reset your password.' in response.get_data(as_text=True)
+
+
+def _set_up_mocker(mocker):
+    mocker.patch("app.admin_api_client.send_sms")
+    mocker.patch("app.admin_api_client.send_email")

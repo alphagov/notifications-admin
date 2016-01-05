@@ -1,8 +1,6 @@
 from datetime import datetime
-
 import pytest
 import sqlalchemy
-
 from app.main.encryption import check_hash
 from app.models import User
 from app.main.dao import users_dao
@@ -183,3 +181,26 @@ def test_should_update_password(notifications_admin, notifications_admin_db, not
     assert check_hash('newpassword', updated.password)
     assert updated.password_changed_at < datetime.now()
     assert updated.password_changed_at > start
+
+
+def test_should_return_list_of_all_email_addresses(notifications_admin, notifications_admin_db, notify_db_session):
+    first = User(name='First Person',
+                 password='somepassword',
+                 email_address='first@it.gov.uk',
+                 mobile_number='+441234123412',
+                 created_at=datetime.now(),
+                 role_id=1,
+                 state='active')
+    second = User(name='Second Person',
+                  password='somepassword',
+                  email_address='second@it.gov.uk',
+                  mobile_number='+441234123412',
+                  created_at=datetime.now(),
+                  role_id=1,
+                  state='active')
+    users_dao.insert_user(first)
+    users_dao.insert_user(second)
+
+    email_addresses = users_dao.get_all_users()
+    expected = [first.email_address, second.email_address]
+    assert expected == [x.email_address for x in email_addresses]

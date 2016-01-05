@@ -1,21 +1,16 @@
-from flask import render_template, jsonify
+from flask import render_template
 
 from app.main import main
-from app.main.forms import ForgotPassword
+from app.main.dao import users_dao
+from app.main.forms import ForgotPasswordForm
 from app.main.views import send_change_password_email
 
 
-@main.route('/forgot-password', methods=['GET'])
-def render_forgot_my_password():
-    return render_template('views/forgot-password.html', form=ForgotPassword())
-
-
-@main.route('/forgot-password', methods=['POST'])
-def change_password():
-    form = ForgotPassword()
+@main.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    form = ForgotPasswordForm(users_dao.find_all_email_address())
     if form.validate_on_submit():
-        send_change_password_email(form.email_address)
-
-        return 'You have been sent an email with a link to change your password'
+        send_change_password_email(form.email_address.data)
+        return render_template('views/password-reset-sent.html')
     else:
-        return jsonify(form.errors), 400
+        return render_template('views/forgot-password.html', form=form)
