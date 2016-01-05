@@ -50,14 +50,14 @@ def test_should_return_locked_out_true_when_user_is_locked(notifications_admin,
                                                       data={'email_address': 'valid@example.gov.uk',
                                                             'password': 'val1dPassw0rd!'})
 
-    assert response.status_code == 401
-    assert '"locked_out": true' in response.get_data(as_text=True)
+    assert response.status_code == 200
+    assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
     another_bad_attempt = notifications_admin.test_client().post('/sign-in',
                                                                  data={'email_address': 'valid@example.gov.uk',
                                                                        'password': 'whatIsMyPassword!'})
-    assert another_bad_attempt.status_code == 401
-    assert '"locked_out": true' in response.get_data(as_text=True)
+    assert another_bad_attempt.status_code == 200
+    assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
 
 def test_should_return_active_user_is_false_if_user_is_inactive(notifications_admin,
@@ -76,19 +76,19 @@ def test_should_return_active_user_is_false_if_user_is_inactive(notifications_ad
                                                       data={'email_address': 'inactive_user@example.gov.uk',
                                                             'password': 'val1dPassw0rd!'})
 
-    assert response.status_code == 401
-    assert '"active_user": false' in response.get_data(as_text=True)
+    assert response.status_code == 200
+    assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
 
-def test_should_return_401_when_user_does_not_exist(notifications_admin, notifications_admin_db, notify_db_session):
+def test_should_return_200_when_user_does_not_exist(notifications_admin, notifications_admin_db, notify_db_session):
     response = notifications_admin.test_client().post('/sign-in',
                                                       data={'email_address': 'does_not_exist@gov.uk',
                                                             'password': 'doesNotExist!'})
+    assert response.status_code == 200
+    assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
-    assert response.status_code == 401
 
-
-def test_should_return_400_when_user_is_not_active(notifications_admin, notifications_admin_db, notify_db_session):
+def test_should_return_200_when_user_is_not_active(notifications_admin, notifications_admin_db, notify_db_session):
     user = User(email_address='PendingUser@example.gov.uk',
                 password='val1dPassw0rd!',
                 mobile_number='+441234123123',
@@ -100,8 +100,8 @@ def test_should_return_400_when_user_is_not_active(notifications_admin, notifica
     response = notifications_admin.test_client().post('/sign-in',
                                                       data={'email_address': 'PendingUser@example.gov.uk',
                                                             'password': 'val1dPassw0rd!'})
-    assert response.status_code == 401
-    assert '"active_user": false' in response.get_data(as_text=True)
+    assert response.status_code == 200
+    assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
 
 def _set_up_mocker(mocker):

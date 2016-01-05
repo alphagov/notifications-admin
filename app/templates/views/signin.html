@@ -14,18 +14,11 @@ Sign in
 
 		<form autocomplete="off" action="" method="post">
 			{{ form.hidden_tag() }}
-			<p>
-			<label class="form-label">Email address</label>
-			{{ form.email_address(class="form-control-2-3", autocomplete="off") }} <br>
-			</p>
-			<p>
-			<label class="form-label">Password</label>
-				 {{ form.password(class="form-control-1-4", autocomplete="off") }} <br>
-			</p>
+			{{ render_field(form.email_address, class='form-control-2-3') }}
+			{{ render_field(form.password, class='form-control-2-3') }}
 			<p>
 			<span class="font-xsmall"><a href="">Forgotten password?</a></span>
 			</p>
-
 			<p>
 			<button class="button" href="two-factor" role="button">Continue</button>
 			</p>

@@ -8,28 +8,20 @@ from app.main.forms import LoginForm
 from app.main.views import send_sms_code
 
 
-@main.route("/sign-in", methods=(['GET']))
-def render_sign_in():
-    return render_template('views/signin.html', form=LoginForm())
-
-
-@main.route('/sign-in', methods=(['POST']))
-def process_sign_in():
+@main.route('/sign-in', methods=(['GET', 'POST']))
+def sign_in():
     form = LoginForm()
     if form.validate_on_submit():
         user = users_dao.get_user_by_email(form.email_address.data)
-        if user is None:
-            return jsonify(authorization=False), 401
-        if user.is_locked():
-            return jsonify(locked_out=True), 401
-        if not user.is_active():
-            return jsonify(active_user=False), 401
-        if check_hash(form.password.data, user.password):
-            send_sms_code(user.id, user.mobile_number)
-            session['user_id'] = user.id
-        else:
-            users_dao.increment_failed_login_count(user.id)
-            return jsonify(authorization=False), 401
-    else:
-        return jsonify(form.errors), 400
-    return redirect('/two-factor')
+
+        if user:
+            if not user.is_locked() and user.is_active() and check_hash(form.password.data, user.password):
+                send_sms_code(user.id, user.mobile_number)
+                session['user_id'] = user.id
+                return redirect('/two-factor')
+            else:
+                users_dao.increment_failed_login_count(user.id)
+        # Vague error message for login
+        form.password.errors.append('Username or password is incorrect')
+
+    return render_template('views/signin.html', form=form)
