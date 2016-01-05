@@ -38,7 +38,7 @@ class Test(Config):
 
 
 class Live(Config):
-    DEBUG = False
+    DEBUG = True
     HTTP_PROTOCOL = 'https'
 
 configs = {

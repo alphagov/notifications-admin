@@ -6,8 +6,6 @@ addons:
   postgresql: '9.3'
 env:
   secure: jT9BIioqBMkOdLZhU+WJNdnRJ+06G7qUx4QqEVldp96dJwmWpPEvA0XbitdnQt/WXYkpMlDbgSApvvGj2ZNvdpowRRe5HFX8D2Udhi2g9+cXgKrQxH6zv0evJyQLOjCINW6KtgMCJ5wkYR3qQ4BQawlDt6ecpmeboKTmvs2W8jZ09aV4IKKvdd7BwFon10QVPF5ny10G83unLtKnKgRMjSSLnaEiA78pE/LSUkekK4mhmtl+yfQf60cIuQGcN9NCYIt5PrdYYyMkbUaht9ykwL2C11sp5JYPClI9k6lrlpGJCdL9wbJwejGhR/pEqwJ4tKK8Zv+mngmkbzE6fd5ehuRMnIUAifG4t3p6WbhKwY5pJsdVyPgWcRSPXOJA7yEcAeTAvWcC++6mCIFBeMxt/yQNw02jkFHeNKRh2twTRvr4xWZHq9FsVxTEVz89OOuue3IkkyDNmVusGJ9+AVRIn9Oa+U/r3bDnrs7jz+meSwb82GZUBzFpUe2pe8qeBE572Ay7yHB73VHUgp/2A1qkZ4SnTjTpMbnS5RdXTgwtMkOs5MLZgteCVxFL3sHcr9e/B3UIUnzKUSPXXOjHyDxBwrABWo81V9Vp2IPV7P9Ofv8zroudjQxK5MOcbmiPQF+eEB9L4DvkUBNsGxtJ/nmPp6tmN0Xjo0xXVdZCEVj29Og=
-before_install:
-- rvm install 2.0.0
 install:
 - bundle install
 - pip install -r requirements_for_test.txt
@@ -30,27 +28,3 @@ deploy:
     repo: alphagov/notifications-admin
   run:
     - python app.py db upgrade
-- provider: s3
-  access_key_id: AKIAI37IS2VAC5PJHHDA
-  secret_access_key: &1
-    secure: FZ0OcAyYPY8kyMB+JwdV1XBz9gT0uThGmdti4oR72cdnpoIMbPfwTmkIiRu2tlW8OplS+RnuivFDxBXOdaQUkcOSTZZAywdROVdNSf98XfiWmWopH+FZtp3cCu+tWgePseVUBBEIfQ0gPdZaflh/c4Yw2888MaUKOOMuqYb9CuEvDtzbFJ3fs6lstK2dveE9pHgVFkQgppLohDGaWFEEXG+fngYqPukK4pvoA8LD7TWW9kTbK8HEG56kvVLxrU7HWisCxHjwB761Zenbq3AiWcVtNaD8DfMzEM/1jKliWjjyAdyAH3EkSti0HJnM4b5L9ewIukt/yr3xtH4Hz0xHgQ+nzk0g81+OB1lQSRl63aNk6sExknsUbKPDCoUOYbmp6FXEohN42EJTywMUfsaDgvdcH71MCcIV+z/YIUoI1RfMEGK4jYDYH6j1477BvhxuywD7CSvHRsjLyT4xmFGxlbg7E02TrMUe7Fon2uPa3Olf/vmbkyhur4tTYEwYwQhIk/txVXazh3QFQx3jrtPaisvuf6cjyCCH92LoKYj/JQ9EZaBZjjbfNF4N8b+WNDPGkLPWWtFTkkDkXgFs72pX8NSJiCbq2kdLo0zV0J8cQlgiRuMGHQQE6t5MnoT/UaUPhSMajcIgh6RZDT9wcU4svs8wfVdOnMeN2ClnARa26Kw=
-  local_dir: dpl_cd_upload
-  skip_cleanup: true
-  on: &2
-    repo: alphagov/notifications-admin
-  bucket: notifications-admin-codedeploy
-  region: eu-west-1
-- provider: codedeploy
-  access_key_id: AKIAI37IS2VAC5PJHHDA
-  secret_access_key: *1
-  bucket: notifications-admin-codedeploy
-  key: notifications-admin.zip
-  bundle_type: zip
-  application: notifications-admin
-  deployment_group: notifications_admin_deployment_group
-  region: eu-west-1
-  on: *2
-before_deploy:
-- zip -r notifications-admin *
-- mkdir -p dpl_cd_upload
-- mv notifications-admin.zip dpl_cd_upload/notifications-admin.zip
