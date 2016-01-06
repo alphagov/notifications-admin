@@ -62,7 +62,7 @@ def showjob():
                 message for message in messages if message['status'] == 'Failed'
             ])
         },
-        cost='£0.00',
+        cost=u'£0.00',
         uploaded_file_name='dispatch_20151114.csv',
         uploaded_file_time=now,
         template_used='Test message 1',
