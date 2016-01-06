@@ -26,6 +26,12 @@ verify_code = '^\d{5}$'
 
 
 class RegisterUserForm(Form):
+
+    def __init__(self, existing_email_addresses, existing_mobile_numbers, *args, **kwargs):
+        self.existing_emails = existing_email_addresses
+        self.existing_mobiles = existing_mobile_numbers
+        super(RegisterUserForm, self).__init__(*args, **kwargs)
+
     name = StringField('Full name',
                        validators=[DataRequired(message='Name can not be empty')])
     email_address = StringField('Email address', validators=[
@@ -42,9 +48,21 @@ class RegisterUserForm(Form):
                                          Length(10, 255, message='Password must be at least 10 characters'),
                                          Blacklist(message='That password is blacklisted, too common')])
 
+    def validate_email_address(self, field):
+        # Validate email address is unique.
+        if field.data in self.existing_emails:
+            raise ValidationError('Email address already exists')
+
+    def validate_mobile_number(self, field):
+        # Validate mobile number is unique
+        # Code to re-added later
+        # if field.data in self.existing_mobiles:
+        #    raise ValidationError('Mobile number already exists')
+        pass
+
 
 class TwoFactorForm(Form):
-    sms_code = StringField('sms code', validators=[DataRequired(message='Please enter your code'),
+    sms_code = StringField('sms code', validators=[DataRequired(message='Enter verification code'),
                                                    Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_sms_code(self, a):
@@ -76,9 +94,9 @@ class EmailNotReceivedForm(Form):
 
 
 class TextNotReceivedForm(Form):
-    mobile_number = StringField('Mobile phone number',
-                                validators=[DataRequired(message='Please enter your mobile number'),
-                                            Regexp(regex=mobile_number, message='Please enter a +44 mobile number')])
+    mobile_number = StringField('Mobile phone number', validators=[
+        DataRequired(message='Please enter your mobile number'),
+        Regexp(regex=mobile_number, message='Please enter a +44 mobile number')])
 
 
 class AddServiceForm(Form):
@@ -86,7 +104,8 @@ class AddServiceForm(Form):
         self.service_names = service_names
         super(AddServiceForm, self).__init__(*args, **kwargs)
 
-    service_name = StringField(validators=[DataRequired(message='Please enter your service name')])
+    service_name = StringField(validators=[
+        DataRequired(message='Please enter your service name')])
 
     def validate_service_name(self, a):
         if self.service_name.data in self.service_names:
@@ -95,6 +114,7 @@ class AddServiceForm(Form):
 
 def validate_codes(field, code_type):
     codes = verify_codes_dao.get_codes(user_id=session['user_id'], code_type=code_type)
+    # TODO need to remove this manual logging.
     print('validate_codes for user_id: {} are {}'.format(session['user_id'], codes))
     if not [code for code in codes if validate_code(field, code)]:
         raise ValidationError('Code does not match')

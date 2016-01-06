@@ -3,6 +3,7 @@ from flask_login import login_required
 
 from app.main import main
 
+# TODO move this to the templates directory
 message_templates = [
     {
         'name': 'Reminder',

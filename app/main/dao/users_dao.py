@@ -14,6 +14,8 @@ def insert_user(user):
     db.session.commit()
 
 
+# TODO Would be better to have a generic get and update for user
+# something that replicates the sql functionality.
 def get_user_by_id(id):
     return User.query.filter_by(id=id).first()
 
