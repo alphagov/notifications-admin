@@ -45,7 +45,7 @@ gulp.task('jquery', () => plugins.jquery.src({
   .pipe(gulp.dest(paths.dist + 'javascripts/'))
 );
 
-gulp.task('javascripts', () => gulp.src([
+gulp.task('javascripts', ['jquery'], () => gulp.src([
     paths.src + 'govuk_frontend_toolkit/javascripts/govuk/modules.js',
     paths.src + 'javascripts/highlightTags.js',
     paths.src + 'javascripts/main.js'
@@ -53,6 +53,9 @@ gulp.task('javascripts', () => gulp.src([
   .pipe(plugins.babel({
     presets: ['es2015']
   }))
+  .pipe(plugins.addSrc.prepend(
+    paths.dist + 'javascripts/jquery.custom.js'
+  ))
   .pipe(plugins.uglify())
   .pipe(plugins.concat('all.js'))
   .pipe(gulp.dest(paths.dist + 'javascripts/'))
