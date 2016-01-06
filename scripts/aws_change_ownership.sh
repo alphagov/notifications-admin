@@ -2,4 +2,4 @@
 
 echo "Chown application to be owned by ubuntu"
 cd /home/ubuntu/;
-chown ubuntu:ubuntu notifications-admin
+chown -R ubuntu:ubuntu notifications-admin

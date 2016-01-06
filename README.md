@@ -27,10 +27,17 @@ Node's package management tool.
     brew install node
 ```
 
+n is a tool for managing different versions of node. The following installs n and uses the latest version of node.
+
+    npm install -g n
+    n latest
+    npm rebuild node-sass
+ 
 Most of the frontend dependencies are managed using Git Submodules. Some are
 managed with NPM and Bower. To install or update *all the things*, run
 ```shell
-    git submodule init --update
+    git submodule init 
+    git submodule update
     npm install
 ```
 
