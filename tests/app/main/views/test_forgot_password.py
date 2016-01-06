@@ -1,5 +1,3 @@
-import uuid
-
 from tests.app.main import create_test_user
 
 
@@ -23,8 +21,7 @@ def test_should_have_validate_error_when_email_does_not_exist(notifications_admi
 def test_should_redirect_to_password_reset_sent(notifications_admin,
                                                 notifications_admin_db,
                                                 mocker,
-                                                notify_db_session,
-                                                ):
+                                                notify_db_session):
     _set_up_mocker(mocker)
     create_test_user('active')
     response = notifications_admin.test_client().post('/forgot-password',
@@ -35,5 +32,4 @@ def test_should_redirect_to_password_reset_sent(notifications_admin,
 
 
 def _set_up_mocker(mocker):
-    mocker.patch("app.admin_api_client.send_sms")
     mocker.patch("app.admin_api_client.send_email")

@@ -1,3 +1,5 @@
+from datetime import datetime
+from flask import session
 
 from flask_wtf import Form
 from wtforms import StringField, PasswordField, ValidationError
@@ -139,3 +141,8 @@ class ForgotPasswordForm(Form):
             raise ValidationError('Please enter the email address that you registered with')
 
 
+class NewPasswordForm(Form):
+    new_password = StringField('Create a password',
+                               validators=[DataRequired(message='Please enter your password'),
+                                           Length(10, 255, message='Password must be at least 10 characters'),
+                                           Blacklist(message='That password is blacklisted, too common')])

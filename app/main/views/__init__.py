@@ -6,7 +6,7 @@ from flask import url_for
 
 from app import admin_api_client
 from app.main.exceptions import AdminApiClientException
-from app.main.dao import verify_codes_dao
+from app.main.dao import verify_codes_dao, password_reset_token_dao
 
 
 def create_verify_code():
@@ -38,13 +38,15 @@ def send_email_code(user_id, email):
     return email_code
 
 
-def send_change_password_email(email):
+def send_change_password_email(email, user_id):
     try:
-        link_to_change_password = url_for('.new_password', token=str(uuid.uuid4()))
+        reset_password_token = str(uuid.uuid4()).replace('-', '')
+        link_to_change_password = url_for('.new_password', token=reset_password_token, _external=True)
+        password_reset_token_dao.insert(reset_password_token, user_id)
         admin_api_client.send_email(email_address=email,
                                     from_str='notify@digital.cabinet-office.gov.uk',
                                     message=link_to_change_password,
-                                    subject='Verification code',
+                                    subject='Reset password for GOV.UK Notify',
                                     token=admin_api_client.auth_token)
     except:
         traceback.print_exc()
