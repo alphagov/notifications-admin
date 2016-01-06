@@ -62,7 +62,7 @@ class RegisterUserForm(Form):
 
 
 class TwoFactorForm(Form):
-    sms_code = StringField('sms code', validators=[DataRequired(message='Please enter your code'),
+    sms_code = StringField('sms code', validators=[DataRequired(message='Enter verification code'),
                                                    Regexp(regex=verify_code, message='Code must be 5 digits')])
 
     def validate_sms_code(self, a):
@@ -114,6 +114,7 @@ class AddServiceForm(Form):
 
 def validate_codes(field, code_type):
     codes = verify_codes_dao.get_codes(user_id=session['user_id'], code_type=code_type)
+    # TODO need to remove this manual logging.
     print('validate_codes for user_id: {} are {}'.format(session['user_id'], codes))
     if not [code for code in codes if validate_code(field, code)]:
         raise ValidationError('Code does not match')
