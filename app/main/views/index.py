@@ -24,17 +24,6 @@ def verifymobile():
     return render_template('views/verify-mobile.html')
 
 
-@main.route("/text-not-received-2")
-def textnotreceived2():
-    return render_template('views/text-not-received-2.html')
-
-
-@main.route("/dashboard")
-@login_required
-def dashboard():
-    return render_template('views/dashboard.html')
-
-
 @main.route("/send-email")
 def sendemail():
     return render_template('views/send-email.html')
@@ -43,21 +32,6 @@ def sendemail():
 @main.route("/check-email")
 def checkemail():
     return render_template('views/check-email.html')
-
-
-@main.route("/jobs")
-def showjobs():
-    return render_template('views/jobs.html')
-
-
-@main.route("/jobs/job")
-def showjob():
-    return render_template('views/job.html')
-
-
-@main.route("/jobs/job/notification")
-def shownotification():
-    return render_template('views/notification.html')
 
 
 @main.route("/forgot-password")
@@ -88,11 +62,6 @@ def servicesettings():
 @main.route("/api-keys")
 def apikeys():
     return render_template('views/api-keys.html')
-
-
-@main.route("/verification-not-received")
-def verificationnotreceived():
-    return render_template('views/verification-not-received.html')
 
 
 @main.route("/manage-templates")

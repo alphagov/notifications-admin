@@ -1,6 +1,6 @@
-{% macro table(items, caption='', field_headings='', field_headings_visible=True) -%}
+{% macro table(items, caption='', field_headings='', field_headings_visible=True, caption_visible=True) -%}
   <table class="table">
-    <caption class="heading-medium table-heading">
+    <caption class="heading-medium table-heading{{ ' visuallyhidden' if not caption_visible}}">
       {{ caption }}
     </caption>
     <thead class="table-field-headings{% if field_headings_visible %}-visible{% endif %}">
@@ -32,8 +32,12 @@
   </table>
 {%- endmacro %}
 
-{% macro field(first=False, wide=False, action=False) -%}
-  <td class="table-field{% if first %}-first{% endif %}{% if first and wide %}-wider{% endif %}{% if action %}-with-action{% endif %}">
-    <span>{{ caller() }}</span>
+{% macro field(align='left', status='') -%}
+  <td class="table-field{% if align == 'right' %}-right-aligned{% endif %}">
+    <span class="{{ 'table-field-status-' + status if status }}">{{ caller() }}</span>
   </td>
+{%- endmacro %}
+
+{% macro right_aligned_field_heading(text) %}
+  <span class="table-field-heading-right-aligned">{{ text }}</span>
 {%- endmacro %}
