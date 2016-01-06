@@ -21,7 +21,7 @@ class TestClient(FlaskClient):
             session['user_id'] = user.id
         verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
         response = self.post(
-            url_for('main.process_two_factor'), data={'sms_code': '12345'})
+            url_for('main.two_factor'), data={'sms_code': '12345'})
 
     def logout(self, user):
         self.get(url_for("main.logout"))

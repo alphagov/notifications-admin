@@ -33,7 +33,7 @@ def create_app(config_name):
     init_csrf(application)
 
     login_manager.init_app(application)
-    login_manager.login_view = 'main.render_sign_in'
+    login_manager.login_view = 'main.sign_in'
 
     from app.main import main as main_blueprint
     application.register_blueprint(main_blueprint)

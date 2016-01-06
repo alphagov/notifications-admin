@@ -12,7 +12,7 @@ def test_render_sign_out_redirects_to_sign_in(notifications_admin):
             url_for('main.sign_out'))
         assert response.status_code == 302
         assert response.location == url_for(
-            'main.render_sign_in', _external=True, next=url_for('main.sign_out'))
+            'main.sign_in', _external=True, next=url_for('main.sign_out'))
 
 
 def test_sign_out_user(notifications_admin,
@@ -40,4 +40,4 @@ def test_sign_out_user(notifications_admin,
             response = client.get(url_for('main.sign_out'))
             assert response.status_code == 302
             assert response.location == url_for(
-                'main.render_sign_in', _external=True)
+                'main.sign_in', _external=True)
