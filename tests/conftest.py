@@ -3,11 +3,27 @@ import os
 import pytest
 from alembic.command import upgrade
 from alembic.config import Config
+from flask import url_for
 from flask.ext.migrate import Migrate, MigrateCommand
 from flask.ext.script import Manager
+from flask_login import login_user
 from sqlalchemy.schema import MetaData
+from flask.testing import FlaskClient
+from app.main.dao import verify_codes_dao
 
 from app import create_app, db
+
+class TestClient(FlaskClient):
+    def login(self, user):
+        # Skipping authentication here and just log them in
+        with self.session_transaction() as session:
+            session['user_id'] = user.id
+        verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
+        response = self.post('/two-factor',
+                               data={'sms_code': '12345'})
+
+    def logout(self, user):
+        self.get(url_for("main.logout"))
 
 
 @pytest.fixture(scope='session')
@@ -21,6 +37,7 @@ def notifications_admin(request):
         ctx.pop()
 
     request.addfinalizer(teardown)
+    app.test_client_class = TestClient
     return app
 
 

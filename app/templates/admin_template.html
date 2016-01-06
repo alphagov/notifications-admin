@@ -28,6 +28,11 @@
   <div class="phase-banner-beta">
     <strong class="phase-tag">BETA</strong>
   </div>
+  {% if current_user.is_authenticated %}
+    <div class="">
+      <a class="" href="{{ url_for('main.sign_out') }}">Sign out</a>
+    </div>
+  {% endif %}
 {% endblock %}
 
 
