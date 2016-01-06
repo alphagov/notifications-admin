@@ -2,10 +2,12 @@ from datetime import datetime
 
 from app.main.dao import users_dao
 from app.models import User
+from flask import url_for
 
 
 def test_render_sign_in_returns_sign_in_template(notifications_admin):
-    response = notifications_admin.test_client().get('/sign-in')
+    with notifications_admin.test_request_context():
+        response = notifications_admin.test_client().get(url_for('main.sign_in'))
     assert response.status_code == 200
     assert 'Sign in' in response.get_data(as_text=True)
     assert 'Email address' in response.get_data(as_text=True)
@@ -23,9 +25,11 @@ def test_process_sign_in_return_2fa_template(notifications_admin, notifications_
                 role_id=1,
                 state='active')
     users_dao.insert_user(user)
-    response = notifications_admin.test_client().post('/sign-in',
-                                                      data={'email_address': 'valid@example.gov.uk',
-                                                            'password': 'val1dPassw0rd!'})
+    with notifications_admin.test_request_context():
+        response = notifications_admin.test_client().post(
+            url_for('main.sign_in'), data={
+                'email_address': 'valid@example.gov.uk',
+                'password': 'val1dPassw0rd!'})
     assert response.status_code == 302
     assert response.location == 'http://localhost/two-factor'
 
@@ -41,23 +45,27 @@ def test_should_return_locked_out_true_when_user_is_locked(notifications_admin,
                 role_id=1,
                 state='active')
     users_dao.insert_user(user)
-    for _ in range(10):
-        notifications_admin.test_client().post('/sign-in',
-                                               data={'email_address': 'valid@example.gov.uk',
-                                                     'password': 'whatIsMyPassword!'})
+    with notifications_admin.test_request_context():
+        for _ in range(10):
+            notifications_admin.test_client().post(
+                url_for('main.sign_in'), data={
+                    'email_address': 'valid@example.gov.uk',
+                    'password': 'whatIsMyPassword!'})
 
-    response = notifications_admin.test_client().post('/sign-in',
-                                                      data={'email_address': 'valid@example.gov.uk',
-                                                            'password': 'val1dPassw0rd!'})
+        response = notifications_admin.test_client().post(
+            url_for('main.sign_in'), data={
+                'email_address': 'valid@example.gov.uk',
+                'password': 'val1dPassw0rd!'})
 
-    assert response.status_code == 401
-    assert '"locked_out": true' in response.get_data(as_text=True)
+        assert response.status_code == 200
+        assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
-    another_bad_attempt = notifications_admin.test_client().post('/sign-in',
-                                                                 data={'email_address': 'valid@example.gov.uk',
-                                                                       'password': 'whatIsMyPassword!'})
-    assert another_bad_attempt.status_code == 401
-    assert '"locked_out": true' in response.get_data(as_text=True)
+        another_bad_attempt = notifications_admin.test_client().post(
+            url_for('main.sign_in'), data={
+                'email_address': 'valid@example.gov.uk',
+                'password': 'whatIsMyPassword!'})
+        assert another_bad_attempt.status_code == 200
+        assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
 
 def test_should_return_active_user_is_false_if_user_is_inactive(notifications_admin,
@@ -72,23 +80,27 @@ def test_should_return_active_user_is_false_if_user_is_inactive(notifications_ad
                 state='inactive')
     users_dao.insert_user(user)
 
-    response = notifications_admin.test_client().post('/sign-in',
-                                                      data={'email_address': 'inactive_user@example.gov.uk',
-                                                            'password': 'val1dPassw0rd!'})
+    with notifications_admin.test_request_context():
+        response = notifications_admin.test_client().post(
+            url_for('main.sign_in'), data={
+                'email_address': 'inactive_user@example.gov.uk',
+                'password': 'val1dPassw0rd!'})
 
-    assert response.status_code == 401
-    assert '"active_user": false' in response.get_data(as_text=True)
-
-
-def test_should_return_401_when_user_does_not_exist(notifications_admin, notifications_admin_db, notify_db_session):
-    response = notifications_admin.test_client().post('/sign-in',
-                                                      data={'email_address': 'does_not_exist@gov.uk',
-                                                            'password': 'doesNotExist!'})
-
-    assert response.status_code == 401
+    assert response.status_code == 200
+    assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
 
-def test_should_return_400_when_user_is_not_active(notifications_admin, notifications_admin_db, notify_db_session):
+def test_should_return_200_when_user_does_not_exist(notifications_admin, notifications_admin_db, notify_db_session):
+    with notifications_admin.test_request_context():
+        response = notifications_admin.test_client().post(
+            url_for('main.sign_in'), data={
+                'email_address': 'does_not_exist@gov.uk',
+                'password': 'doesNotExist!'})
+    assert response.status_code == 200
+    assert 'Username or password is incorrect' in response.get_data(as_text=True)
+
+
+def test_should_return_200_when_user_is_not_active(notifications_admin, notifications_admin_db, notify_db_session):
     user = User(email_address='PendingUser@example.gov.uk',
                 password='val1dPassw0rd!',
                 mobile_number='+441234123123',
@@ -97,11 +109,13 @@ def test_should_return_400_when_user_is_not_active(notifications_admin, notifica
                 role_id=1,
                 state='pending')
     users_dao.insert_user(user)
-    response = notifications_admin.test_client().post('/sign-in',
-                                                      data={'email_address': 'PendingUser@example.gov.uk',
-                                                            'password': 'val1dPassw0rd!'})
-    assert response.status_code == 401
-    assert '"active_user": false' in response.get_data(as_text=True)
+    with notifications_admin.test_request_context():
+        response = notifications_admin.test_client().post(
+            url_for('main.sign_in'), data={
+                'email_address': 'PendingUser@example.gov.uk',
+                'password': 'val1dPassw0rd!'})
+    assert response.status_code == 200
+    assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
 
 def _set_up_mocker(mocker):
