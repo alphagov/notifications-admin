@@ -1,8 +1,6 @@
 import os
-from flask.ext import assets
 from flask.ext.script import Manager, Server
 from flask_migrate import Migrate, MigrateCommand
-from webassets.filter import get_filter
 from app import create_app, db
 
 

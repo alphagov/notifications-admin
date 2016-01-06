@@ -58,10 +58,12 @@ target/
 .idea/
 .DS_Store
 
-# cache and static rebuild files
+# Frontend dependencies and compiled assets
 app/assets/stylesheets/govuk_template/.sass-cache/
 .sass-cache/
 cache/
-app/static/*
-app/static/stylesheets/*.css
-
+app/static
+node_modules
+bower_components
+app/templates/govuk_template.html
+npm-debug.log
