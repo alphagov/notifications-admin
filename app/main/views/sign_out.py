@@ -10,4 +10,3 @@ from app.main import main
 def sign_out():
     logout_user()
     return redirect(url_for('main.render_sign_in'))
-
