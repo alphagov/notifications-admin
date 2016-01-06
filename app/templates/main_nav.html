@@ -1,21 +1,18 @@
-{% macro main_nav() %}
-
-<div id="navigation">
-<h3><a href="{{ url_for('.dashboard') }}">Service name</a></h3>
-<ul>
-	<li><a href="{{ url_for('.sendsms') }}">Send text messages</a></li>
-	<li><a href="{{ url_for('.sendemail') }}">Send emails</a></li>
-	<li><a href="{{ url_for('.showjobs') }}">Activity</a></li>
-</ul>
-<ul>
-	<li><a href="{{ url_for('.apikeys') }}">API keys and documentation</a></li>
-</ul>
-<ul>
-	<li><a href="{{ url_for('.manageusers') }}">Manage users</a></li>
-	<li><a href="{{ url_for('.servicesettings') }}">Service settings</a></li>
-</ul>
-<ul>
-	<li><a href="/user-profile">Your details</a></li>
-</ul>
-</div>
-{% endmacro %}
+<nav class="navigation">
+  <h3><a href="{{ url_for('.dashboard') }}">Service name</a></h3>
+  <ul>
+    <li><a href="{{ url_for('.sendsms') }}">Send text messages</a></li>
+    <li><a href="{{ url_for('.sendemail') }}">Send emails</a></li>
+    <li><a href="{{ url_for('.showjobs') }}">Activity</a></li>
+  </ul>
+  <ul>
+    <li><a href="{{ url_for('.apikeys') }}">API keys and documentation</a></li>
+  </ul>
+  <ul>
+    <li><a href="{{ url_for('.manageusers') }}">Manage users</a></li>
+    <li><a href="{{ url_for('.servicesettings') }}">Service settings</a></li>
+  </ul>
+  <ul>
+    <li><a href="/user-profile">Your details</a></li>
+  </ul>
+</nav>

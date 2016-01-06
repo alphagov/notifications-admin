@@ -1,4 +1,7 @@
 {% extends "withnav_template.html" %}
+{% from "components/table.html" import table, field, right_aligned_field_heading %}
+{% from "components/big-number.html" import big_number %}
+{% from "components/banner.html" import banner %}
 
 {% block page_title %}
 GOV.UK Notify | Notifications activity
@@ -6,14 +9,60 @@ GOV.UK Notify | Notifications activity
 
 {% block maincolumn_content %}
 
-		<h1 class="heading-xlarge">Notifications for a specific job</h1>
+    <h1 class="heading-large">
+			{{ uploaded_file_name }}
+		</h1>
 
-		<p>This page will be where we list the notifications for a specific job.</p>
+		<p>
+    {{ banner(flash_message) }}
+		</p>
 
-  	<ul>
-  		<li><a href="/jobs/job/notification">view a specific notification</a></li>
-		<li><a href="/jobs">view all the activity for this service</a></li>
-  	</ul>
-	
+		<ul class="grid-row job-totals">
+			<li class="column-one-third">
+				{{ big_number(
+					counts.total,
+					'text message' if 1 == counts.total else 'text messages'
+				)}}
+			</li>
+			<li class="column-one-third">
+				{{ big_number(
+					counts.failed,
+					'failed delivery' if 1 == counts.failed else 'failed deliveries'
+				)}}
+			</li>
+			<li class="column-one-third">
+				{{ big_number(
+					cost, 'total cost'
+				)}}
+			</li>
+		</ul>
+
+    <p>
+      Sent with template <a href="{{ url_for('.edit_template') }}">{{ template_used }}</a> at {{ uploaded_file_time }}
+    </p>
+
+    {% call(item) table(
+      messages,
+      caption='Messages',
+      caption_visible=False,
+      field_headings=[
+        'To',
+        'Message',
+        right_aligned_field_heading('Delivery status')
+      ]
+    ) %}
+      {% call field() %}
+        <a href="{{ url_for('.shownotification', notification_id=item.id) }}">{{item.phone}}</a>
+      {% endcall %}
+      {% call field() %}
+        <a href="{{ url_for('.shownotification', notification_id=item.id) }}">{{item.message[:50]}}…</a>
+      {% endcall %}
+      {% call field(
+        align='right',
+        status='error' if item.status == 'Failed' else 'default'
+      ) %}
+				{{ item.status }}&emsp;{{ item.time }}
+			{% endcall %}
+    {% endcall %}
 
 {% endblock %}

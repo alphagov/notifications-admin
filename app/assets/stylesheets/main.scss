@@ -1,39 +1,46 @@
-// Edited version of govuk_frontend_toolkit
+// Dependencies from GOV.UK Frontend Toolkit
 // https://github.com/alphagov/govuk_frontend_toolkit/
-@import "govuk_frontend_toolkit/stylesheets/conditionals";
-@import "govuk_frontend_toolkit/stylesheets/shims";
-@import "govuk_frontend_toolkit/stylesheets/measurements";
-@import "govuk_frontend_toolkit/stylesheets/css3";
-@import "govuk_frontend_toolkit/stylesheets/colours";
-@import "govuk_frontend_toolkit/stylesheets/typography";
-@import "govuk_frontend_toolkit/stylesheets/grid_layout";
-@import "govuk_frontend_toolkit/stylesheets/helpers";
-@import "govuk_frontend_toolkit/stylesheets/url-helpers";
-@import "govuk_frontend_toolkit/stylesheets/design-patterns/buttons";
-@import "govuk_frontend_toolkit/stylesheets/design-patterns/alpha-beta";
+@import '../govuk_frontend_toolkit/stylesheets/conditionals';
+@import '../govuk_frontend_toolkit/stylesheets/shims';
+@import '../govuk_frontend_toolkit/stylesheets/measurements';
+@import '../govuk_frontend_toolkit/stylesheets/css3';
+@import '../govuk_frontend_toolkit/stylesheets/colours';
+@import '../govuk_frontend_toolkit/stylesheets/typography';
+@import '../govuk_frontend_toolkit/stylesheets/grid_layout';
+@import '../govuk_frontend_toolkit/stylesheets/helpers';
+@import '../govuk_frontend_toolkit/stylesheets/url-helpers';
+@import '../govuk_frontend_toolkit/stylesheets/design-patterns/buttons';
+@import '../govuk_frontend_toolkit/stylesheets/design-patterns/alpha-beta';
 
-// Edited version of govuk_elements repo
+// Dependencies from GOV.UK Elements
 // https://github.com/alphagov/govuk_elements
-@import "govuk_elements/public/sass/elements/helpers";
-@import "govuk_elements/public/sass/elements/reset";
-@import "govuk_elements/public/sass/elements/buttons";
-@import "govuk_elements/public/sass/elements/details";
-@import "govuk_elements/public/sass/elements/elements-typography";
-@import "govuk_elements/public/sass/elements/forms";
-@import "govuk_elements/public/sass/elements/forms/form-block-labels";
-@import "govuk_elements/public/sass/elements/icons";
-@import "govuk_elements/public/sass/elements/layout";
-@import "govuk_elements/public/sass/elements/lists";
-@import "govuk_elements/public/sass/elements/panels";
-@import "govuk_elements/public/sass/elements/tables";
+@import '../govuk_elements/public/sass/elements/helpers';
+@import '../govuk_elements/public/sass/elements/reset';
+@import '../govuk_elements/public/sass/elements/buttons';
+@import '../govuk_elements/public/sass/elements/details';
+@import '../govuk_elements/public/sass/elements/elements-typography';
+@import '../govuk_elements/public/sass/elements/forms';
+@import '../govuk_elements/public/sass/elements/forms/form-block-labels';
+@import '../govuk_elements/public/sass/elements/icons';
+@import '../govuk_elements/public/sass/elements/layout';
+@import '../govuk_elements/public/sass/elements/lists';
+@import '../govuk_elements/public/sass/elements/panels';
+@import '../govuk_elements/public/sass/elements/tables';
 
-// Extra CSS for this application
-@import "components/template-picker";
-@import "components/placeholder";
-@import "components/sms-message";
-@import "components/submit-form";
-@import "components/table";
-@import "components/navigation";
+
+// Specific to this application
+@import 'grids';
+@import 'components/template-picker';
+@import 'components/placeholder';
+@import 'components/sms-message';
+@import 'components/submit-form';
+@import 'components/table';
+@import 'components/navigation';
+@import 'components/big-number';
+@import 'components/banner';
+@import 'components/textbox';
+
+@import 'views/job';
 
 // TODO: break this up
-@import "app";
+@import 'app';
