@@ -64,11 +64,6 @@ def apikeys():
     return render_template('views/api-keys.html')
 
 
-@main.route("/manage-templates")
-def managetemplates():
-    return render_template('views/manage-templates.html')
-
-
-@main.route("/edit-template")
-def edittemplate():
-    return render_template('views/edit-template.html')
+@main.route("/verification-not-received")
+def verificationnotreceived():
+    return render_template('views/verification-not-received.html')

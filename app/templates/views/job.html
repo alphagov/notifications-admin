@@ -13,7 +13,9 @@ GOV.UK Notify | Notifications activity
 			{{ uploaded_file_name }}
 		</h1>
 
+		<p>
     {{ banner(flash_message) }}
+		</p>
 
 		<ul class="grid-row job-totals">
 			<li class="column-one-third">
@@ -36,7 +38,7 @@ GOV.UK Notify | Notifications activity
 		</ul>
 
     <p>
-      Sent with template <a href="{{ url_for('.edittemplate') }}">{{ template_used }}</a> at {{ uploaded_file_time }}
+      Sent with template <a href="{{ url_for('.edit_template') }}">{{ template_used }}</a> at {{ uploaded_file_time }}
     </p>
 
     {% call(item) table(

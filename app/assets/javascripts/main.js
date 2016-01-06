@@ -1,5 +1,1 @@
-//= include ../../../bower_components/jquery/dist/jquery.js
-
-(function() {
-  console.log("Hello world");
-})();
+$(() => GOVUK.modules.start());
