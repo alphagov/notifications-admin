@@ -1,5 +1,4 @@
-{% macro main_nav() %}
-  <nav id="navigation">
+<nav class="navigation">
   <h3><a href="{{ url_for('.dashboard') }}">Service name</a></h3>
   <ul>
     <li><a href="{{ url_for('.sendsms') }}">Send text messages</a></li>
@@ -16,5 +15,4 @@
   <ul>
     <li><a href="/user-profile">Your details</a></li>
   </ul>
-  </nav>
-{% endmacro %}
+</nav>
