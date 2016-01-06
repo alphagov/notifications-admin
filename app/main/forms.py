@@ -55,8 +55,10 @@ class RegisterUserForm(Form):
 
     def validate_mobile_number(self, field):
         # Validate mobile number is unique
-        if field.data in self.existing_mobiles:
-            raise ValidationError('Mobile number already exists')
+        # Code to re-added later
+        # if field.data in self.existing_mobiles:
+        #    raise ValidationError('Mobile number already exists')
+        pass
 
 
 class TwoFactorForm(Form):
