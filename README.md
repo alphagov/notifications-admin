@@ -36,7 +36,8 @@ n is a tool for managing different versions of node. The following installs n an
 Most of the frontend dependencies are managed using Git Submodules. Some are
 managed with NPM and Bower. To install or update *all the things*, run
 ```shell
-    git submodule init --update
+    git submodule init 
+    git submodule update
     npm install
 ```
 
