@@ -12,6 +12,7 @@ from app.notify_client.api_client import AdminAPIClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 import app.proxy_fix
 from config import configs
+from utils import logging
 
 
 db = SQLAlchemy()
@@ -31,6 +32,7 @@ def create_app(config_name):
     db.init_app(application)
     init_app(application)
     init_csrf(application)
+    logging.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.render_sign_in'
