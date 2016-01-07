@@ -20,7 +20,7 @@ def new_password(token):
             users_dao.update_password(password_reset_token.user_id, form.new_password.data)
             user = users_dao.get_user_by_id(password_reset_token.user_id)
             send_sms_code(user.id, user.mobile_number)
-            return redirect(url_for('main.render_two_factor'))
+            return redirect(url_for('main.two_factor'))
     else:
         return render_template('views/new-password.html', toke=token, form=form)
 
