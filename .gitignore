@@ -67,7 +67,3 @@ node_modules
 bower_components
 app/templates/govuk_template.html
 npm-debug.log
-
-# private environment variables
-environment-private.sh
-
