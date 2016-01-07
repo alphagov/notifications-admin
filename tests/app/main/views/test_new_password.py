@@ -17,6 +17,7 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(notific
                                                                          notifications_admin_db,
                                                                          notify_db_session,
                                                                          mocker):
+    _set_up_mocker(mocker)
     with notifications_admin.test_request_context():
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
