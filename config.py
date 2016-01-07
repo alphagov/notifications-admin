@@ -8,7 +8,7 @@ class Config(object):
     manifest = True
 
     NOTIFY_LOG_LEVEL = 'DEBUG'
-    NOTIFY_APP_NAME = 'api'
+    NOTIFY_APP_NAME = 'admin'
     NOTIFY_LOG_PATH = '/var/log/notify/application.log'
 
     SQLALCHEMY_COMMIT_ON_TEARDOWN = False
@@ -42,7 +42,7 @@ class Test(Config):
 
 
 class Live(Config):
-    DEBUG = True
+    DEBUG = False
     HTTP_PROTOCOL = 'https'
 
 configs = {

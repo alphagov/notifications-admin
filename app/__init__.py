@@ -25,7 +25,7 @@ admin_api_client = AdminAPIClient()
 def create_app(config_name):
     application = Flask(__name__)
 
-    application.config['NOTIFY_API_ENVIRONMENT'] = config_name
+    application.config['NOTIFY_ADMIN_ENVIRONMENT'] = config_name
     application.config.from_object(configs[config_name])
     if 'FLASK_CONFIG' in os.environ:
         application.config.from_envvar('FLASK_CONFIG')
