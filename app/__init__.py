@@ -126,4 +126,3 @@ def register_errorhandlers(application):
         return render_template("error/{0}.html".format(error_code)), error_code
     for errcode in [401, 404, 500]:
         application.errorhandler(errcode)(render_error)
-    return None
