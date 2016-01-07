@@ -10,7 +10,7 @@ def test_should_return_verify_template(notifications_admin, notifications_admin_
             # reassign the session after it is lost mid register process
             with client.session_transaction() as session:
                 user = create_test_user('pending')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
             response = client.get(url_for('main.verify'))
             assert response.status_code == 200
             assert (
@@ -25,7 +25,7 @@ def test_should_redirect_to_add_service_when_code_are_correct(notifications_admi
         with notifications_admin.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('pending')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
             verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
             verify_codes_dao.add_code(user_id=user.id, code='23456', code_type='email')
             response = client.post(url_for('main.verify'),
@@ -40,7 +40,7 @@ def test_should_activate_user_after_verify(notifications_admin, notifications_ad
         with notifications_admin.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('pending')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
             verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
             verify_codes_dao.add_code(user_id=user.id, code='23456', code_type='email')
             client.post(url_for('main.verify'),
@@ -56,12 +56,13 @@ def test_should_return_200_when_codes_are_wrong(notifications_admin, notificatio
         with notifications_admin.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('pending')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
             verify_codes_dao.add_code(user_id=user.id, code='23345', code_type='sms')
             verify_codes_dao.add_code(user_id=user.id, code='98456', code_type='email')
             response = client.post(url_for('main.verify'),
                                    data={'sms_code': '12345',
                                          'email_code': '23456'})
+            print(response.location)
             assert response.status_code == 200
             resp_data = response.get_data(as_text=True)
             assert resp_data.count('Code does not match') == 2
@@ -74,7 +75,7 @@ def test_should_mark_all_codes_as_used_when_many_codes_exist(notifications_admin
         with notifications_admin.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('pending')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
             code1 = verify_codes_dao.add_code(user_id=user.id, code='23345', code_type='sms')
             code2 = verify_codes_dao.add_code(user_id=user.id, code='98456', code_type='email')
             code3 = verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')

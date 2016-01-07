@@ -11,10 +11,12 @@ from app.main.forms import TwoFactorForm
 
 @main.route('/two-factor', methods=['GET', 'POST'])
 def two_factor():
-    form = TwoFactorForm()
+    # TODO handle user_email not in session
+    user = users_dao.get_user_by_email(session['user_email'])
+    codes = verify_codes_dao.get_codes(user.id)
+    form = TwoFactorForm(codes)
 
     if form.validate_on_submit():
-        user = users_dao.get_user_by_id(session['user_id'])
         verify_codes_dao.use_code_for_user_and_type(user_id=user.id, code_type='sms')
         login_user(user)
         return redirect(url_for('.dashboard'))

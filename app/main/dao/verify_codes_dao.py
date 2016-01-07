@@ -16,7 +16,9 @@ def add_code(user_id, code, code_type):
     return code.id
 
 
-def get_codes(user_id, code_type):
+def get_codes(user_id, code_type=None):
+    if not code_type:
+        return VerifyCodes.query.filter_by(user_id=user_id, code_used=False).all()
     return VerifyCodes.query.filter_by(user_id=user_id, code_type=code_type, code_used=False).all()
 
 

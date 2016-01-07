@@ -12,8 +12,9 @@ from app.main.forms import VerifyForm
 def verify():
     # TODO there needs to be a way to regenerate a session id
     # or handle gracefully.
-    user = users_dao.get_user_by_id(session['user_id'])
-    form = VerifyForm()
+    user = users_dao.get_user_by_email(session['user_email'])
+    codes = verify_codes_dao.get_codes(user.id)
+    form = VerifyForm(codes)
     if form.validate_on_submit():
         verify_codes_dao.use_code_for_user_and_type(user_id=user.id, code_type='email')
         verify_codes_dao.use_code_for_user_and_type(user_id=user.id, code_type='sms')
