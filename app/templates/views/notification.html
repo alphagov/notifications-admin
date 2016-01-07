@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/sms-message.html" import sms_message, message_status %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
 GOV.UK Notify | Notifications activity
@@ -21,9 +22,9 @@ GOV.UK Notify | Notifications activity
 			</div>
 		</div>
 
-  	<p>
-	  	<a href="{{ url_for('.showjob') }}">View other notifications in this job</a>
-  	</p>
-
+		{{ page_footer(
+			back_link = url_for('.showjob'),
+			back_link_text = 'View other messages in this job'
+		) }}
 
 {% endblock %}

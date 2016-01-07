@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/submit-form.html" import submit_form %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
 GOV.UK Notify | Service settings
@@ -22,7 +22,7 @@ GOV.UK Notify | Service settings
       </p>
 
       <form method="post">
-        {{ submit_form(
+        {{ page_footer(
           'Turn off outgoing messages',
           destructive=True,
           back_link=url_for('.service_settings')
