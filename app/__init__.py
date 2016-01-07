@@ -1,7 +1,7 @@
 import os
 import re
 
-from flask import Flask, session, Markup
+from flask import Flask, session, Markup, render_template
 from flask._compat import string_types
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -47,6 +47,7 @@ def create_app(config_name):
     application.add_template_filter(replace_placeholders)
 
     application.after_request(useful_headers_after_request)
+    register_errorhandlers(application)
 
     return application
 
@@ -116,3 +117,12 @@ def useful_headers_after_request(response):
     response.headers.add('X-Content-Type-Options', 'nosniff')
     response.headers.add('X-XSS-Protection', '1; mode=block')
     return response
+
+def register_errorhandlers(app):
+    def render_error(error):
+        # If a HTTPException, pull the `code` attribute; default to 500
+        error_code = getattr(error, 'code', 500)
+        return render_template("error/{0}.html".format(error_code)), error_code
+    for errcode in [401, 404, 500]:
+        app.errorhandler(errcode)(render_error)
+    return None
