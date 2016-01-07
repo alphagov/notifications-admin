@@ -46,6 +46,8 @@ def create_app(config_name):
     application.add_template_filter(placeholders)
     application.add_template_filter(replace_placeholders)
 
+    application.after_request(useful_headers_after_request)
+
     return application
 
 
@@ -106,3 +108,11 @@ def replace_placeholders(template, values):
         lambda match: values.get(match.group(1), ''),
         template
     ))
+
+
+# https://www.owasp.org/index.php/List_of_useful_HTTP_headers
+def useful_headers_after_request(response):
+    response.headers.add('X-Frame-Options', 'deny')
+    response.headers.add('X-Content-Type-Options', 'nosniff')
+    response.headers.add('X-XSS-Protection', '1; mode=block')
+    return response
