@@ -13,8 +13,10 @@ def test_should_render_new_password_template(notifications_admin, notifications_
     assert ' You can now create a new password for your account.' in response.get_data(as_text=True)
 
 
-def test_should_redirect_to_two_factor_when_password_reset_is_successful(notifications_admin, notifications_admin_db,
-                                                                         notify_db_session):
+def test_should_redirect_to_two_factor_when_password_reset_is_successful(notifications_admin,
+                                                                         notifications_admin_db,
+                                                                         notify_db_session,
+                                                                         mocker):
     with notifications_admin.test_request_context():
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
@@ -54,3 +56,7 @@ def test_should_return_raise_no_data_found_exception_when_email_address_does_not
                 fail('Expected NoDataFoundException')
             except NoDataFoundException:
                 pass
+
+
+def _set_up_mocker(mocker):
+    mocker.patch("app.admin_api_client.send_sms")
