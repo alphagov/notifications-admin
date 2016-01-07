@@ -1,5 +1,8 @@
+from pytest import fail
+
 from app.main.dao import users_dao
 from app.main.encryption import check_hash
+from app.main.exceptions import NoDataFoundException
 from app.main.views import generate_token
 from tests.app.main import create_test_user
 
@@ -39,11 +42,15 @@ def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_exp
         notifications_admin.config['TOKEN_MAX_AGE_SECONDS'] = 86400
 
 
-def test_should_return_500_error_page_when_email_addres_does_not_exist(notifications_admin, notifications_admin_db,
-                                                                       notify_db_session):
+def test_should_return_raise_no_data_found_exception_when_email_address_does_not_exist(notifications_admin,
+                                                                                       notifications_admin_db,
+                                                                                       notify_db_session):
     with notifications_admin.test_request_context():
         with notifications_admin.test_client() as client:
             token = generate_token('doesnotexist@it.gov.uk')
-        response = client.post('/new-password/{}'.format(token),
-                               data={'new_password': 'a-new_password'})
-        assert response.status_code == 500
+            try:
+                client.post('/new-password/{}'.format(token),
+                            data={'new_password': 'a-new_password'})
+                fail('Expected NoDataFoundException')
+            except NoDataFoundException:
+                pass

@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy.orm import load_only
 
 from app import db, login_manager
+from app.main.exceptions import NoDataFoundException
 from app.models import User
 from app.main.encryption import hashpw
 
@@ -61,11 +62,14 @@ def update_mobile_number(id, mobile_number):
 
 def update_password(email, password):
     user = get_user_by_email(email)
-    user.password = hashpw(password)
-    user.password_changed_at = datetime.now()
-    db.session.add(user)
-    db.session.commit()
-    return user
+    if user:
+        user.password = hashpw(password)
+        user.password_changed_at = datetime.now()
+        db.session.add(user)
+        db.session.commit()
+        return user
+    else:
+        raise NoDataFoundException('The user does not exist')
 
 
 def find_all_email_address():
