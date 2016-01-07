@@ -43,6 +43,7 @@ deploy:
   region: eu-west-1
   on: *2
 before_deploy:
+- rm -rf notifications-admin/node_modules notifications-admin/bower_components notifications-admin/app/assets
 - zip -r notifications-admin *
 - mkdir -p dpl_cd_upload
 - mv notifications-admin.zip dpl_cd_upload/notifications-admin.zip
