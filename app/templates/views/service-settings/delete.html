@@ -7,16 +7,37 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-xlarge">Delete this service</h1>
+  <div class="grid-row">
+    <div class="column-three-quarters">
+      <h1 class="heading-xlarge">Delete service</h1>
 
-  <p>
-    All will be lost.
-  </p>
+      <p>
+        This can’t be undone. You will lose:
+      </p>
 
-  <form method="post">
-    {{ submit_form('Delete', destructive=True) }}
-  </form>
+      <ul class="list list-bullet">
+        <li>
+          any data you’ve uploaded messages
+        </li>
+        <li>
+          any templates you’ve created
+        </li>
+        <li>
+          the history of
+        </li>
+        <li>
+          API keys
+        </li>
+      </ul>
 
-  <p><a href="{{ url_for('.service_settings') }}">Back to service settings</a></p>
+      <form method="post">
+        {{ submit_form(
+          'Yes, delete ‘{}’'.format(service.name),
+          destructive=True,
+          back_link=url_for('.service_settings')
+        ) }}
+      </form>
 
+    </div>
+  </div>
 {% endblock %}

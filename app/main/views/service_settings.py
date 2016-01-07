@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for
+from flask import render_template, redirect, request, url_for, abort
 from flask_login import login_required
 
 from app.main import main
@@ -26,6 +26,18 @@ def name():
             service=service
         )
     elif request.method == 'POST':
+        return redirect(url_for('.confirm_name_change'))
+
+
+@main.route("/service-settings/name/confirm", methods=['GET', 'POST'])
+def confirm_name_change():
+    if request.method == 'GET':
+        return render_template(
+            'views/service-settings/confirm.html',
+            heading='Rename service',
+            submit_button_text='Confirm'
+        )
+    elif request.method == 'POST':
         return redirect(url_for('.service_settings'))
 
 
@@ -48,6 +60,19 @@ def status():
             service=service
         )
     elif request.method == 'POST':
+        return redirect(url_for('.confirm_status_change'))
+
+
+@main.route("/service-settings/status/confirm", methods=['GET', 'POST'])
+def confirm_status_change():
+    if request.method == 'GET':
+        return render_template(
+            'views/service-settings/confirm.html',
+            heading='Turn off outgoing messages',
+            submit_button_text='Confirm',
+            destructive=True
+        )
+    elif request.method == 'POST':
         return redirect(url_for('.service_settings'))
 
 
@@ -59,4 +84,17 @@ def delete():
             service=service
         )
     elif request.method == 'POST':
-        return redirect(url_for('.index'))
+        return redirect(url_for('.confirm_delete'))
+
+
+@main.route("/service-settings/delete/confirm", methods=['GET', 'POST'])
+def confirm_delete():
+    if request.method == 'GET':
+        return render_template(
+            'views/service-settings/confirm.html',
+            heading='Delete service',
+            submit_button_text='Confirm',
+            destructive=True
+        )
+    elif request.method == 'POST':
+        return redirect(url_for('.dashboard'))

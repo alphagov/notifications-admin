@@ -8,22 +8,19 @@ GOV.UK Notify | Service settings
 
 {% block maincolumn_content %}
 
+  <h1 class="heading-xlarge">{{ heading }}</h1>
+
   <div class="grid-row">
     <div class="column-three-quarters">
 
-      <h1 class="heading-xlarge">Rename service</h1>
-
-      <p>
-        Users will see this name where?
-      </p>
-
-      <form method="post">
-        {{ textbox('new_name', 'New name', value=service.name) }}
-        {{ submit_form(
-          'Save',
-          back_link=url_for('.service_settings')
-        ) }}
-      </form>
+    <form method="post">
+      {{ textbox('new_name', 'Enter your password', password=True) }}
+      {{ submit_form(
+        submit_button_text,
+        destructive=destructive,
+        back_link=url_for('.service_settings')
+      ) }}
+    </form>
     </div>
   </div>
 

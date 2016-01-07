@@ -7,24 +7,28 @@ GOV.UK Notify | Service settings
 
 {% block maincolumn_content %}
 
+  <h1 class="heading-xlarge">Turn off outgoing messages</h1>
+
   <div class="grid-row">
-    <div class="column-two-thirds">
-      <h1 class="heading-xlarge">Suspend your service</h1>
+    <div class="column-three-quarters">
 
       <p>
-        Suspending a service means it won’t send messages. Any messages that are
-        already queued will still be sent.
+        You’ll still be able to send messages to yourself by uploading a CSV
+        file.
       </p>
 
       <p>
-        You can undo this at any time.
+        You can start sending messages again when you’re ready.
       </p>
 
       <form method="post">
-        {{ submit_form('Suspend') }}
+        {{ submit_form(
+          'Turn off outgoing messages',
+          destructive=True,
+          back_link=url_for('.service_settings')
+        ) }}
       </form>
 
-      <p><a href="{{ url_for('.service_settings') }}">Back to service settings</a></p>
     </div>
   </div>
 

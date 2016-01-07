@@ -1,6 +1,5 @@
 {% extends "withnav_template.html" %}
 {% from "components/submit-form.html" import submit_form %}
-{% from "components/list.html" import list %}
 
 {% block page_title %}
 GOV.UK Notify | Service settings
@@ -8,26 +7,42 @@ GOV.UK Notify | Service settings
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-xlarge">Make your service live</h1>
+  <h1 class="heading-xlarge">Request to make service live</h1>
 
   <div class="grid-row">
-    <div class="column-two-thirds">
+    <div class="column-three-quarters">
 
       <p>
-        Before you can send messages to anyone, you need to:
+        A live service can send messages to any phone number or email address.
       </p>
 
-      {{ list([
-        "Have spoken to someone",
-        "Have permission from someone else",
-        "etc."
-      ]) }}
+      <p>
+        First you need to:
+      </p>
+
+      <ul class="list list-bullet">
+        <li>
+          have spoken to someone
+        </li>
+        <li>
+          have permission from someone else
+        </li>
+        <li>
+          etc.
+        </li>
+      </ul>
+
+      <p>
+        It takes a few working days for your request to be approved.
+      </p>
 
       <form method="post">
-        {{ submit_form("Request to go live") }}
+        {{ submit_form(
+          'Request to make service live',
+          back_link=url_for('.service_settings')
+        ) }}
       </form>
 
-      <p><a href="{{ url_for('.service_settings') }}">Back to service settings</a></p>
     </div>
   </div>
 
