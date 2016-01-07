@@ -10,3 +10,5 @@ Flask-Login==0.2.11
 Flask-Bcrypt==0.6.2
 
 git+https://github.com/alphagov/notify-api-client.git@0.1.4#egg=notify-api-client==0.1.4
+
+git+https://github.com/alphagov/notifications-utils.git@0.0.3#egg=notifications-utils==0.0.3
