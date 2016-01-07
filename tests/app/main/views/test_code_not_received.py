@@ -12,7 +12,7 @@ def test_should_render_email_code_not_received_template_and_populate_email_addre
             with client.session_transaction() as session:
                 _set_up_mocker(mocker)
                 user = create_test_user('pending')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
             response = client.get(url_for('main.check_and_resend_email_code'))
             assert response.status_code == 200
             assert 'Check your email address is correct and then resend the confirmation code' \
@@ -29,7 +29,7 @@ def test_should_check_and_resend_email_code_redirect_to_verify(notifications_adm
             with client.session_transaction() as session:
                 _set_up_mocker(mocker)
                 user = create_test_user('pending')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user.id, code='12345', code_type='email')
             response = client.post(url_for('main.check_and_resend_email_code'),
                                    data={'email_address': 'test@user.gov.uk'})
@@ -46,7 +46,7 @@ def test_should_render_text_code_not_received_template(notifications_admin,
             with client.session_transaction() as session:
                 _set_up_mocker(mocker)
                 user = create_test_user('pending')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user.id, code='12345', code_type='sms')
             response = client.get(url_for('main.check_and_resend_text_code'))
             assert response.status_code == 200
@@ -64,7 +64,7 @@ def test_should_check_and_redirect_to_verify(notifications_admin,
             with client.session_transaction() as session:
                 _set_up_mocker(mocker)
                 user = create_test_user('pending')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user.id, code='12345', code_type='sms')
             response = client.post(url_for('main.check_and_resend_text_code'),
                                    data={'mobile_number': '+441234123412'})
@@ -81,7 +81,7 @@ def test_should_update_email_address_resend_code(notifications_admin,
             with client.session_transaction() as session:
                 _set_up_mocker(mocker)
                 user = create_test_user('pending')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='email')
             response = client.post(url_for('main.check_and_resend_email_code'),
                                    data={'email_address': 'new@address.gov.uk'})
@@ -100,7 +100,7 @@ def test_should_update_mobile_number_resend_code(notifications_admin,
             with client.session_transaction() as session:
                 _set_up_mocker(mocker)
                 user = create_test_user('pending')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
             response = client.post(url_for('main.check_and_resend_text_code'),
                                    data={'mobile_number': '+443456789012'})
@@ -117,7 +117,7 @@ def test_should_render_verification_code_not_received(notifications_admin,
         with notifications_admin.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('active')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
             response = client.get(url_for('main.verification_code_not_received'))
             assert response.status_code == 200
             assert 'Resend verification code' in response.get_data(as_text=True)
@@ -133,7 +133,7 @@ def test_check_and_redirect_to_two_factor(notifications_admin,
         with notifications_admin.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('active')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
                 _set_up_mocker(mocker)
             response = client.get(url_for('main.check_and_resend_verification_code'))
             assert response.status_code == 302
@@ -148,7 +148,7 @@ def test_should_create_new_code_for_user(notifications_admin,
         with notifications_admin.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('active')
-                session['user_id'] = user.id
+                session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
                 _set_up_mocker(mocker)
             response = client.get(url_for('main.check_and_resend_verification_code'))

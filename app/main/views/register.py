@@ -42,7 +42,7 @@ def process_register():
         send_sms_code(user_id=user.id, mobile_number=form.mobile_number.data)
         send_email_code(user_id=user.id, email=form.email_address.data)
         session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
-        session['user_id'] = user.id
+        session['user_email'] = user.email_address
         return redirect('/verify')
 
     return render_template('views/register.html', form=form)

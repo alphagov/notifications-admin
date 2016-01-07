@@ -7,8 +7,7 @@ def test_should_show_recent_jobs_on_dashboard(notifications_admin,
                                               notify_db_session):
     with notifications_admin.test_request_context():
         with notifications_admin.test_client() as client:
-            with client.session_transaction() as session:
-                user = create_test_user('active')
+            user = create_test_user('active')
             client.login(user)
             response = client.get(url_for('main.dashboard'))
 

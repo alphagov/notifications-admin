@@ -18,7 +18,7 @@ class TestClient(FlaskClient):
     def login(self, user):
         # Skipping authentication here and just log them in
         with self.session_transaction() as session:
-            session['user_id'] = user.id
+            session['user_email'] = user.email_address
         verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
         response = self.post(
             url_for('main.two_factor'), data={'sms_code': '12345'})

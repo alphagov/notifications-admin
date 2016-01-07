@@ -1,12 +1,11 @@
 from datetime import datetime
 
-from flask import session
 from flask_wtf import Form
 from wtforms import StringField, PasswordField, ValidationError
 from wtforms.validators import DataRequired, Email, Length, Regexp
 from app.main.dao import verify_codes_dao
 from app.main.encryption import check_hash
-from app.main.validators import Blacklist
+from app.main.validators import Blacklist, ValidateUserCodes
 
 
 class LoginForm(Form):
@@ -62,26 +61,40 @@ class RegisterUserForm(Form):
 
 
 class TwoFactorForm(Form):
-    sms_code = StringField('sms code', validators=[DataRequired(message='Enter verification code'),
-                                                   Regexp(regex=verify_code, message='Code must be 5 digits')])
 
-    def validate_sms_code(self, a):
-        return validate_codes(self.sms_code, 'sms')
+    def __init__(self, user_codes, *args, **kwargs):
+        '''
+        Keyword arguments:
+        user_codes -- List of user code objects which have the fields
+        (code_type, expiry_datetime, code)
+        '''
+        self.user_codes = user_codes
+        super(TwoFactorForm, self).__init__(*args, **kwargs)
+
+    sms_code = StringField('sms code', validators=[DataRequired(message='Enter verification code'),
+                                                   Regexp(regex=verify_code, message='Code must be 5 digits'),
+                                                   ValidateUserCodes(code_type='sms')])
 
 
 class VerifyForm(Form):
+
+    def __init__(self, user_codes, *args, **kwargs):
+        '''
+        Keyword arguments:
+        user_codes -- List of user code objects which have the fields
+        (code_type, expiry_datetime, code)
+        '''
+        self.user_codes = user_codes
+        super(VerifyForm, self).__init__(*args, **kwargs)
+
     sms_code = StringField("Text message confirmation code",
                            validators=[DataRequired(message='SMS code can not be empty'),
-                                       Regexp(regex=verify_code, message='Code must be 5 digits')])
+                                       Regexp(regex=verify_code, message='Code must be 5 digits'),
+                                       ValidateUserCodes(code_type='sms')])
     email_code = StringField("Email confirmation code",
                              validators=[DataRequired(message='Email code can not be empty'),
-                                         Regexp(regex=verify_code, message='Code must be 5 digits')])
-
-    def validate_email_code(self, a):
-        return validate_codes(self.email_code, 'email')
-
-    def validate_sms_code(self, a):
-        return validate_codes(self.sms_code, 'sms')
+                                         Regexp(regex=verify_code, message='Code must be 5 digits'),
+                                         ValidateUserCodes(code_type='email')])
 
 
 class EmailNotReceivedForm(Form):
@@ -110,19 +123,3 @@ class AddServiceForm(Form):
     def validate_service_name(self, a):
         if self.service_name.data in self.service_names:
             raise ValidationError('Service name already exists')
-
-
-def validate_codes(field, code_type):
-    codes = verify_codes_dao.get_codes(user_id=session['user_id'], code_type=code_type)
-    # TODO need to remove this manual logging.
-    print('validate_codes for user_id: {} are {}'.format(session['user_id'], codes))
-    if not [code for code in codes if validate_code(field, code)]:
-        raise ValidationError('Code does not match')
-
-
-def validate_code(field, code):
-    if field.data and check_hash(field.data, code.code):
-        if code.expiry_datetime <= datetime.now():
-            raise ValidationError('Code has expired')
-        else:
-            return code.code

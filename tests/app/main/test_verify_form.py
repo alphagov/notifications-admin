@@ -8,8 +8,8 @@ def test_form_should_have_error_when_code_is_not_valid(notifications_admin, noti
     with notifications_admin.test_request_context(method='POST',
                                                   data={'sms_code': '12345aa', 'email_code': 'abcde'}) as req:
         user = set_up_test_data()
-        req.session['user_id'] = user.id
-        form = VerifyForm(req.request.form)
+        codes = verify_codes_dao.get_codes(user.id)
+        form = VerifyForm(codes)
         assert form.validate() is False
         errors = form.errors
         assert len(errors) == 2
@@ -23,8 +23,8 @@ def test_should_return_errors_when_code_missing(notifications_admin, notificatio
     with notifications_admin.test_request_context(method='POST',
                                                   data={}) as req:
         user = set_up_test_data()
-        req.session['user_id'] = user.id
-        form = VerifyForm(req.request.form)
+        codes = verify_codes_dao.get_codes(user.id)
+        form = VerifyForm(codes)
         assert form.validate() is False
         errors = form.errors
         expected = {'sms_code': ['SMS code can not be empty'],
@@ -37,8 +37,8 @@ def test_should_return_errors_when_code_is_too_short(notifications_admin, notifi
     with notifications_admin.test_request_context(method='POST',
                                                   data={'sms_code': '123', 'email_code': '123'}) as req:
         user = set_up_test_data()
-        req.session['user_id'] = user.id
-        form = VerifyForm(req.request.form)
+        codes = verify_codes_dao.get_codes(user.id)
+        form = VerifyForm(codes)
         assert form.validate() is False
         errors = form.errors
         expected = {'sms_code': ['Code must be 5 digits', 'Code does not match'],
@@ -51,8 +51,8 @@ def test_should_return_errors_when_code_does_not_match(notifications_admin, noti
     with notifications_admin.test_request_context(method='POST',
                                                   data={'sms_code': '34567', 'email_code': '34567'}) as req:
         user = set_up_test_data()
-        req.session['user_id'] = user.id
-        form = VerifyForm(req.request.form)
+        codes = verify_codes_dao.get_codes(user.id)
+        form = VerifyForm(codes)
         assert form.validate() is False
         errors = form.errors
         expected = {'sms_code': ['Code does not match'],
@@ -66,7 +66,6 @@ def test_should_return_errors_when_code_is_expired(notifications_admin, notifica
                                                   data={'sms_code': '23456',
                                                         'email_code': '23456'}) as req:
         user = create_test_user('pending')
-        req.session['user_id'] = user.id
         verify_codes_dao.add_code_with_expiry(user_id=user.id,
                                               code='23456',
                                               code_type='sms',
@@ -76,8 +75,8 @@ def test_should_return_errors_when_code_is_expired(notifications_admin, notifica
                                               code='23456',
                                               code_type='email',
                                               expiry=datetime.now() + timedelta(hours=-2))
-        req.session['user_id'] = user.id
-        form = VerifyForm(req.request.form)
+        codes = verify_codes_dao.get_codes(user.id)
+        form = VerifyForm(codes)
         assert form.validate() is False
         errors = form.errors
         expected = {'sms_code': ['Code has expired'],
@@ -97,8 +96,8 @@ def test_should_return_valid_form_when_many_codes_exist(notifications_admin,
         verify_codes_dao.add_code(user_id=user.id, code='23456', code_type='sms')
         verify_codes_dao.add_code(user_id=user.id, code='60456', code_type='email')
         verify_codes_dao.add_code(user_id=user.id, code='27856', code_type='sms')
-        req.session['user_id'] = user.id
-        form = VerifyForm(req.request.form)
+        codes = verify_codes_dao.get_codes(user.id)
+        form = VerifyForm(codes)
         assert form.validate() is True
 
 

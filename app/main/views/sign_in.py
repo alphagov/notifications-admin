@@ -18,7 +18,7 @@ def sign_in():
             if user:
                 if not user.is_locked() and user.is_active() and check_hash(form.password.data, user.password):
                     send_sms_code(user.id, user.mobile_number)
-                    session['user_id'] = user.id
+                    session['user_email'] = user.email_address
                     return redirect(url_for('.two_factor'))
                 else:
                     users_dao.increment_failed_login_count(user.id)
