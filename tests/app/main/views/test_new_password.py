@@ -1,19 +1,13 @@
-from datetime import datetime, timedelta
-
-from app.main.dao import password_reset_token_dao, users_dao
-from app.models import PasswordResetToken
-from tests.app.main import create_test_user
+from app.main.dao import users_dao
 from app.main.encryption import check_hash
+from app.main.views import generate_token
+from tests.app.main import create_test_user
 
 
 def test_should_render_new_password_template(notifications_admin, notifications_admin_db, notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
-            user = create_test_user('active')
-            password_reset_token_dao.insert('some_token', user.id)
-        response = client.get('/new-password/some_token')
-        assert response.status_code == 200
-        assert ' You can now create a new password for your account.' in response.get_data(as_text=True)
+    response = notifications_admin.test_client().get('/new-password/some_token')
+    assert response.status_code == 200
+    assert ' You can now create a new password for your account.' in response.get_data(as_text=True)
 
 
 def test_should_redirect_to_two_factor_when_password_reset_is_successful(notifications_admin, notifications_admin_db,
@@ -21,8 +15,8 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(notific
     with notifications_admin.test_request_context():
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
-            password_reset_token_dao.insert('some_token', user.id)
-        response = client.post('/new-password/some_token',
+            token = generate_token(user.email_address)
+        response = client.post('/new-password/{}'.format(token),
                                data={'new_password': 'a-new_password'})
         assert response.status_code == 302
         assert response.location == 'http://localhost/two-factor'
@@ -30,15 +24,26 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(notific
         assert check_hash('a-new_password', saved_user.password)
 
 
-def test_should_return_validation_error_that_token_is_expired(notifications_admin, notifications_admin_db,
-                                                              notify_db_session):
+def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_expired(notifications_admin,
+                                                                                     notifications_admin_db,
+                                                                                     notify_db_session):
     with notifications_admin.test_request_context():
         with notifications_admin.test_client() as client:
+            notifications_admin.config['TOKEN_MAX_AGE_SECONDS'] = -1000
             user = create_test_user('active')
-            expired_token = PasswordResetToken(id=1, token='some_token', user_id=user.id,
-                                               expiry_date=datetime.now() + timedelta(hours=-2))
-            password_reset_token_dao.insert_token(expired_token)
-        response = client.post('/new-password/some_token',
+            token = generate_token(user.email_address)
+        response = client.post('/new-password/{}'.format(token),
                                data={'new_password': 'a-new_password'})
-        assert response.status_code == 200
-        assert 'token is invalid' in response.get_data(as_text=True)
+        assert response.status_code == 302
+        assert response.location == 'http://localhost/forgot-password'
+        notifications_admin.config['TOKEN_MAX_AGE_SECONDS'] = 86400
+
+
+def test_should_return_500_error_page_when_email_addres_does_not_exist(notifications_admin, notifications_admin_db,
+                                                                       notify_db_session):
+    with notifications_admin.test_request_context():
+        with notifications_admin.test_client() as client:
+            token = generate_token('doesnotexist@it.gov.uk')
+        response = client.post('/new-password/{}'.format(token),
+                               data={'new_password': 'a-new_password'})
+        assert response.status_code == 500

@@ -176,7 +176,7 @@ def test_should_update_password(notifications_admin, notifications_admin_db, not
     saved = users_dao.get_user_by_id(user.id)
     assert check_hash('somepassword', saved.password)
     assert saved.password_changed_at is None
-    users_dao.update_password(saved.id, 'newpassword')
+    users_dao.update_password(saved.email_address, 'newpassword')
     updated = users_dao.get_user_by_id(user.id)
     assert check_hash('newpassword', updated.password)
     assert updated.password_changed_at < datetime.now()

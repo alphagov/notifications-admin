@@ -59,12 +59,13 @@ def update_mobile_number(id, mobile_number):
     db.session.commit()
 
 
-def update_password(id, password):
-    user = get_user_by_id(id)
+def update_password(email, password):
+    user = get_user_by_email(email)
     user.password = hashpw(password)
     user.password_changed_at = datetime.now()
     db.session.add(user)
     db.session.commit()
+    return user
 
 
 def find_all_email_address():

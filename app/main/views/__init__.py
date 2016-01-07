@@ -1,12 +1,11 @@
 import traceback
-import uuid
 from random import randint
 
-from flask import url_for
+from flask import url_for, current_app
 
 from app import admin_api_client
+from app.main.dao import verify_codes_dao
 from app.main.exceptions import AdminApiClientException
-from app.main.dao import verify_codes_dao, password_reset_token_dao
 
 
 def create_verify_code():
@@ -38,11 +37,9 @@ def send_email_code(user_id, email):
     return email_code
 
 
-def send_change_password_email(email, user_id):
+def send_change_password_email(email):
     try:
-        reset_password_token = str(uuid.uuid4()).replace('-', '')
-        link_to_change_password = url_for('.new_password', token=reset_password_token, _external=True)
-        password_reset_token_dao.insert(reset_password_token, user_id)
+        link_to_change_password = url_for('.new_password', token=generate_token(email), _external=True)
         admin_api_client.send_email(email_address=email,
                                     from_str='notify@digital.cabinet-office.gov.uk',
                                     message=link_to_change_password,
@@ -51,3 +48,20 @@ def send_change_password_email(email, user_id):
     except:
         traceback.print_exc()
         raise AdminApiClientException('Exception when sending email.')
+
+
+def generate_token(email):
+    from itsdangerous import TimestampSigner
+    signer = TimestampSigner(current_app.config['SECRET_KEY'])
+    return signer.sign(email).decode('utf8')
+
+
+def check_token(token):
+    from itsdangerous import TimestampSigner, SignatureExpired
+    signer = TimestampSigner(current_app.config['SECRET_KEY'])
+    try:
+        email = signer.unsign(token, max_age=current_app.config['TOKEN_MAX_AGE_SECONDS'])
+        return email
+    except SignatureExpired as e:
+        current_app.logger.info('token expired %s' % e)
+        return None

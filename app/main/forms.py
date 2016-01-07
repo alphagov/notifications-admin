@@ -24,7 +24,6 @@ verify_code = '^\d{5}$'
 
 
 class RegisterUserForm(Form):
-
     def __init__(self, existing_email_addresses, existing_mobile_numbers, *args, **kwargs):
         self.existing_emails = existing_email_addresses
         self.existing_mobiles = existing_mobile_numbers
@@ -125,20 +124,12 @@ class AddServiceForm(Form):
 
 
 class ForgotPasswordForm(Form):
-    def __init__(self, email_addresses, *args, **kargs):
-        self.email_addresses = email_addresses
-        super(ForgotPasswordForm, self).__init__(*args, **kargs)
-
     email_address = StringField('Email address',
                                 validators=[Length(min=5, max=255),
                                             DataRequired(message='Email cannot be empty'),
                                             Email(message='Please enter a valid email address'),
                                             Regexp(regex=gov_uk_email, message='Please enter a gov.uk email address')
                                             ])
-
-    def validate_email_address(self, a):
-        if self.email_address.data not in self.email_addresses:
-            raise ValidationError('Please enter the email address that you registered with')
 
 
 class NewPasswordForm(Form):

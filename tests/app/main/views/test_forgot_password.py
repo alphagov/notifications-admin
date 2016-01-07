@@ -8,16 +8,6 @@ def test_should_render_forgot_password(notifications_admin, notifications_admin_
            in response.get_data(as_text=True)
 
 
-def test_should_have_validate_error_when_email_does_not_exist(notifications_admin,
-                                                              notifications_admin_db,
-                                                              notify_db_session):
-    create_test_user('active')
-    response = notifications_admin.test_client().post('/forgot-password',
-                                                      data={'email_address': 'email_does_not@exist.gov.uk'})
-    assert response.status_code == 200
-    assert 'Please enter the email address that you registered with' in response.get_data(as_text=True)
-
-
 def test_should_redirect_to_password_reset_sent(notifications_admin,
                                                 notifications_admin_db,
                                                 mocker,
