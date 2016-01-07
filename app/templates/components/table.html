@@ -1,4 +1,4 @@
-{% macro table(items, caption='', field_headings='', field_headings_visible=True, caption_visible=True) -%}
+{% macro mapping_table(caption='', field_headings=[], field_headings_visible=True, caption_visible=True) -%}
   <table class="table">
     <caption class="heading-medium table-heading{{ ' visuallyhidden' if not caption_visible}}">
       {{ caption }}
@@ -17,19 +17,32 @@
       </tr>
     </thead>
     <tbody>
-      {% if items %}
-        {% for item in items %}
-          <tr class="table-row">
-            {{ caller(item) }}
-          </tr>
-        {% endfor %}
-      {% else %}
-        <p class="table-no-content">
-          {{ empty_message }}
-        </p>
-      {% endif %}
+      {{ caller() }}
     </tbody>
   </table>
+{%- endmacro %}
+
+{% macro list_table(items, caption='', empty_message='', field_headings=[], field_headings_visible=True, caption_visible=True) -%}
+  {% if items %}
+    {% set parent_caller = caller %}
+    {% call mapping_table(caption, field_headings, field_headings_visible, caption_visible) %}
+      {% for item in items %}
+        {% call row() %}
+          {{ parent_caller(item) }}
+        {% endcall %}
+      {% endfor %}
+    {%- endcall %}
+  {% else %}
+    <p class="summary-item-no-content">
+      {{ empty_message }}
+    </p>
+  {% endif %}
+{%- endmacro %}
+
+{% macro row() -%}
+  <tr class="table-row">
+    {{ caller() }}
+  </tr>
 {%- endmacro %}
 
 {% macro field(align='left', status='') -%}

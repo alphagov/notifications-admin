@@ -1,0 +1,22 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/submit-form.html" import submit_form %}
+
+{% block page_title %}
+GOV.UK Notify | Service settings
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <h1 class="heading-xlarge">Rename your service</h1>
+
+    <form method="post">
+      {{ textbox('new_name', 'New name', value=service.name) }}
+      {{ submit_form('Save') }}
+    </form>
+
+    <p><a href="{{ url_for('.service_settings') }}">Back to service settings</a></p>
+
+
+
+{% endblock %}

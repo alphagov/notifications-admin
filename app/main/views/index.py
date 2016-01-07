@@ -54,11 +54,6 @@ def manageusers():
     return render_template('views/manage-users.html')
 
 
-@main.route("/service-settings")
-def servicesettings():
-    return render_template('views/service-settings.html')
-
-
 @main.route("/api-keys")
 def apikeys():
     return render_template('views/api-keys.html')

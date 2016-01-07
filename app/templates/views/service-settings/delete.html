@@ -1,0 +1,22 @@
+{% extends "withnav_template.html" %}
+{% from "components/submit-form.html" import submit_form %}
+
+{% block page_title %}
+  GOV.UK Notify | Service settings
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-xlarge">Delete this service</h1>
+
+  <p>
+    All will be lost.
+  </p>
+
+  <form method="post">
+    {{ submit_form('Delete', destructive=True) }}
+  </form>
+
+  <p><a href="{{ url_for('.service_settings') }}">Back to service settings</a></p>
+
+{% endblock %}

@@ -9,4 +9,10 @@
     margin-left: 5px;
   }
 
+  .button {}
+
+  .button-destructive {
+    @include button($error-colour)
+  }
+
 }

@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import table, field %}
+{% from "components/table.html" import list_table, field %}
 {% from "components/big-number.html" import big_number %}
 
 {% block page_title %}
@@ -25,9 +25,10 @@
 			</li>
 		</ul>
 
-    {% call(item) table(
+    {% call(item) list_table(
       jobs[:3],
       caption="Recent text messages",
+			empty_message="No recent text messages",
       field_headings=['Job', 'File', 'Time', 'Status']
     ) %}
 			{% call field() %}

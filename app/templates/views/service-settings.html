@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/browse-list.html" import browse_list %}
 
 {% block page_title %}
 GOV.UK Notify | Service settings
@@ -6,12 +7,33 @@ GOV.UK Notify | Service settings
 
 {% block maincolumn_content %}
 
-		<h1 class="heading-xlarge">Service settings</h1>
+  <h1 class="heading-xlarge">Service settings</h1>
 
-		<p>Here's where users can update their service profile.</p>
-
-  	<p><a href="dashboard">Back to dashboard</a></p>
-
-
+  {{ browse_list([
+    {
+      'title': 'Rename service',
+      'link': url_for('.name'),
+      'hint': 'Your service is named “{}”'.format(service.name)
+    },
+    {
+      'title': 'Make service live',
+      'link': url_for('.request_to_go_live'),
+      'hint': 'A live service can send messages to anyone',
+    } if not service.live else {
+    },
+    {
+      'title': 'Stop sending messages',
+      'link': url_for('.status')
+    } if service.active else {
+      'title': 'Unsuspend service',
+      'link': url_for('.status')
+    },
+    {
+      'title': 'Delete everything',
+      'link': url_for('.delete'),
+      'hint': '',
+      'destructive': True
+    },
+  ]) }}
 
 {% endblock %}

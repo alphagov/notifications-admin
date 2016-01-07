@@ -1,0 +1,33 @@
+{% extends "withnav_template.html" %}
+{% from "components/submit-form.html" import submit_form %}
+
+{% block page_title %}
+GOV.UK Notify | Service settings
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="grid-row">
+    <div class="column-two-thirds">
+      <h1 class="heading-xlarge">Suspend your service</h1>
+
+      <p>
+        Suspending a service means it won’t send messages. Any messages that are
+        already queued will still be sent.
+      </p>
+
+      <p>
+        You can undo this at any time.
+      </p>
+
+      <form method="post">
+        {{ submit_form('Suspend') }}
+      </form>
+
+      <p><a href="{{ url_for('.service_settings') }}">Back to service settings</a></p>
+    </div>
+  </div>
+
+
+
+{% endblock %}
