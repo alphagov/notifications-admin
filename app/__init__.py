@@ -118,11 +118,12 @@ def useful_headers_after_request(response):
     response.headers.add('X-XSS-Protection', '1; mode=block')
     return response
 
-def register_errorhandlers(app):
+
+def register_errorhandlers(application):
     def render_error(error):
         # If a HTTPException, pull the `code` attribute; default to 500
         error_code = getattr(error, 'code', 500)
         return render_template("error/{0}.html".format(error_code)), error_code
     for errcode in [401, 404, 500]:
-        app.errorhandler(errcode)(render_error)
+        application.errorhandler(errcode)(render_error)
     return None
