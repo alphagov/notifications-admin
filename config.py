@@ -36,7 +36,7 @@ class Development(Config):
 
 
 class Test(Config):
-    DEBUG = False
+    DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_notifications_admin'
     WTF_CSRF_ENABLED = False
 
