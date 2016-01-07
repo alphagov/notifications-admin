@@ -7,6 +7,10 @@ class Config(object):
     cache = False
     manifest = True
 
+    NOTIFY_LOG_LEVEL = 'DEBUG'
+    NOTIFY_APP_NAME = 'api'
+    NOTIFY_LOG_PATH = '/var/log/notify/application.log'
+
     SQLALCHEMY_COMMIT_ON_TEARDOWN = False
     SQLALCHEMY_RECORD_QUERIES = True
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/notifications_admin'
