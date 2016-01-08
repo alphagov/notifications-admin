@@ -1,0 +1,43 @@
+
+#user-bar {
+  border-bottom: 1px solid #bfc1c3;
+  max-width: 960px;
+  margin: 0 15px;
+  @include core-19();
+  padding: 10px 0 8px 0; 
+
+  a:link,
+  a:visited {
+    text-decoration: none;
+  }
+
+  span a:hover {
+    color: $link-hover-colour;
+  }
+
+  }
+  @media (min-width: 641px) {
+    #user-bar {
+      margin: 0 30px;
+      line-height: 1.25; } }
+  @media (min-width: 1020px) {
+    #user-bar {
+      margin: 0 auto; } }
+
+
+#service-switcher {
+}
+
+#user-name {
+
+  margin: 0 20px 0 0;
+}
+
+#user-admin {
+
+}
+@media (min-width: 641px) {
+  #user-admin {
+  display: block;
+  float: right;
+  } }

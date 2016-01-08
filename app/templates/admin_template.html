@@ -31,13 +31,6 @@
       <div class="phase-banner-beta">
         <strong class="phase-tag">BETA</strong>
       </div>
-      {% if current_user.is_authenticated() %}
-      <nav id='proposition-menu'>
-        <p id='proposition-link'>
-          <a href="{{ url_for('main.sign_out')}}">Sign out</a>
-        </p>
-      </nav>
-      {% endif %}
     </div>
   </div>
 {% endblock %}
@@ -53,6 +46,9 @@
 {% endif %}
 
 {% block content %}
+{% if current_user.is_authenticated() %}
+    <nav id="user-bar"><span id="service-switcher">Service name</span> <div id="user-admin"><span id="user-name"><a href="{{ url_for('.userprofile') }}">User name</a></span> <span id="sign-out"><a href="{{ url_for('main.sign_out')}}">Sign out</a></span></div></nav>    
+{% endif %}
 <main id="content" role="main" class="page-container">
     {% with messages = get_flashed_messages() %}
     {% if messages %}
