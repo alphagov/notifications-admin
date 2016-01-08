@@ -10,7 +10,7 @@ from app.main.views import send_sms_code, check_token
 def new_password(token):
     email_address = check_token(token)
     if not email_address:
-        flash('The token we sent you has expired. Enter your email address to try again.')
+        flash('The link in the email we sent you has expired. Enter your email address to resend.')
         return redirect(url_for('.forgot_password'))
 
     user = users_dao.get_user_by_email(email_address=email_address.decode('utf-8'))

@@ -124,14 +124,6 @@ class AddServiceForm(Form):
 class ForgotPasswordForm(Form):
     email_address = email_address()
 
-    def __init__(self, q, *args, **kwargs):
-        self.query_function = q
-        super(ForgotPasswordForm, self).__init__(*args, **kwargs)
-
-    def validate_email_address(self, a):
-        if not self.query_function(a.data):
-            raise ValidationError('The email address is not recognised. Enter the email address you registered with.')
-
 
 class NewPasswordForm(Form):
     new_password = password()
