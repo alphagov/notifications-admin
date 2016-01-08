@@ -13,7 +13,7 @@ def forgot_password():
             send_change_password_email(form.email_address.data)
             return render_template('views/password-reset-sent.html')
         else:
-            flash('The email address is not recognized. Try again.')
+            flash('The email address is not recognized. Enter the password you registered with.')
             return render_template('views/forgot-password.html', form=form)
     else:
         return render_template('views/forgot-password.html', form=form)

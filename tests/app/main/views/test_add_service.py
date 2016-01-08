@@ -39,4 +39,4 @@ def test_should_return_form_errors_when_service_name_is_empty(notifications_admi
             client.post('/two-factor', data={'sms_code': '12345'})
             response = client.post('/add-service', data={})
             assert response.status_code == 200
-            assert 'Please enter your service name' in response.get_data(as_text=True)
+            assert 'Service name can not be empty' in response.get_data(as_text=True)
