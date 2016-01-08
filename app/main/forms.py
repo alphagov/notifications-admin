@@ -126,7 +126,7 @@ class ForgotPasswordForm(Form):
 
     def __init__(self, q, *args, **kwargs):
         self.query_function = q
-        super(ForgotPasswordForm, self).__init__(*args, *kwargs)
+        super(ForgotPasswordForm, self).__init__(*args, **kwargs)
 
     def validate_email_address(self, a):
         if not self.query_function(a.data):
