@@ -16,7 +16,7 @@ GOV.UK Notify | Service settings
     <form method="post">
       {{ textbox('new_name', 'Enter your password', password=True) }}
       {{ page_footer(
-        submit_button_text,
+        'Confirm',
         destructive=destructive,
         back_link=url_for('.service_settings')
       ) }}

@@ -34,8 +34,7 @@ def confirm_name_change():
     if request.method == 'GET':
         return render_template(
             'views/service-settings/confirm.html',
-            heading='Rename service',
-            submit_button_text='Confirm'
+            heading='Change your service name'
         )
     elif request.method == 'POST':
         return redirect(url_for('.service_settings'))
@@ -68,8 +67,7 @@ def confirm_status_change():
     if request.method == 'GET':
         return render_template(
             'views/service-settings/confirm.html',
-            heading='Turn off outgoing messages',
-            submit_button_text='Confirm',
+            heading='Turn off all outgoing notifications',
             destructive=True
         )
     elif request.method == 'POST':
@@ -92,8 +90,7 @@ def confirm_delete():
     if request.method == 'GET':
         return render_template(
             'views/service-settings/confirm.html',
-            heading='Delete service',
-            submit_button_text='Confirm',
+            heading='Delete this service from Notify',
             destructive=True
         )
     elif request.method == 'POST':

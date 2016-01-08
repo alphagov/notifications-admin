@@ -7,23 +7,23 @@ GOV.UK Notify | Service settings
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-xlarge">Turn off outgoing messages</h1>
+  <h1 class="heading-xlarge">Turn off all outgoing notifications</h1>
 
   <div class="grid-row">
     <div class="column-three-quarters">
 
       <p>
-        You’ll still be able to send messages to yourself by uploading a CSV
-        file.
+        You’ll still be able to send notifications to yourself by uploading a
+        CSV file.
       </p>
 
       <p>
-        You can start sending messages again when you’re ready.
+        You can start sending notifications again when you’re ready.
       </p>
 
       <form method="post">
         {{ page_footer(
-          'Turn off outgoing messages',
+          'Turn off all outgoing notifications',
           destructive=True,
           back_link=url_for('.service_settings')
         ) }}
