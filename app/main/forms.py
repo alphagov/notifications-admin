@@ -130,7 +130,7 @@ class ForgotPasswordForm(Form):
 
     def validate_email_address(self, a):
         if not self.query_function(a.data):
-            raise ValidationError('The email address is not recognized. Enter the password you registered with.')
+            raise ValidationError('The email address is not recognised. Enter the email address you registered with.')
 
 
 class NewPasswordForm(Form):
