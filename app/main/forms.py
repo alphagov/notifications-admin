@@ -57,9 +57,8 @@ class LoginForm(Form):
 
 
 class RegisterUserForm(Form):
-    def __init__(self, existing_email_addresses, existing_mobile_numbers, *args, **kwargs):
+    def __init__(self, existing_email_addresses, *args, **kwargs):
         self.existing_emails = existing_email_addresses
-        self.existing_mobiles = existing_mobile_numbers
         super(RegisterUserForm, self).__init__(*args, **kwargs)
 
     name = StringField('Full name',
@@ -70,15 +69,8 @@ class RegisterUserForm(Form):
 
     def validate_email_address(self, field):
         # Validate email address is unique.
-        if field.data in self.existing_emails:
+        if self.existing_emails(field.data):
             raise ValidationError('Email address already exists')
-
-    def validate_mobile_number(self, field):
-        # Validate mobile number is unique
-        # Code to re-added later
-        # if field.data in self.existing_mobiles:
-        #    raise ValidationError('Mobile number already exists')
-        pass
 
 
 class TwoFactorForm(Form):
@@ -131,6 +123,14 @@ class AddServiceForm(Form):
 
 class ForgotPasswordForm(Form):
     email_address = email_address()
+
+    def __init__(self, q, *args, **kwargs):
+        self.query_function = q
+        super(ForgotPasswordForm, self).__init__(*args, *kwargs)
+
+    def validate_email_address(self, a):
+        if not self.query_function(a.data):
+            raise ValidationError('The email address is not recognized. Enter the password you registered with.')
 
 
 class NewPasswordForm(Form):

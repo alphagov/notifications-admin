@@ -1,11 +1,9 @@
-import traceback
 from random import randint
 
 from flask import url_for, current_app
 
 from app import admin_api_client
 from app.main.dao import verify_codes_dao
-from app.main.exceptions import AdminApiClientException
 
 
 def create_verify_code():
@@ -14,40 +12,30 @@ def create_verify_code():
 
 def send_sms_code(user_id, mobile_number):
     sms_code = create_verify_code()
-    try:
-        verify_codes_dao.add_code(user_id=user_id, code=sms_code, code_type='sms')
-        admin_api_client.send_sms(mobile_number=mobile_number, message=sms_code, token=admin_api_client.auth_token)
-    except:
-        raise AdminApiClientException('Exception when sending sms.')
+    verify_codes_dao.add_code(user_id=user_id, code=sms_code, code_type='sms')
+    admin_api_client.send_sms(mobile_number=mobile_number, message=sms_code, token=admin_api_client.auth_token)
+
     return sms_code
 
 
 def send_email_code(user_id, email):
     email_code = create_verify_code()
-    try:
-        verify_codes_dao.add_code(user_id=user_id, code=email_code, code_type='email')
-        admin_api_client.send_email(email_address=email,
-                                    from_str='notify@digital.cabinet-office.gov.uk',
-                                    message=email_code,
-                                    subject='Verification code',
-                                    token=admin_api_client.auth_token)
-    except:
-        raise AdminApiClientException('Exception when sending email.')
-
+    verify_codes_dao.add_code(user_id=user_id, code=email_code, code_type='email')
+    admin_api_client.send_email(email_address=email,
+                                from_str='notify@digital.cabinet-office.gov.uk',
+                                message=email_code,
+                                subject='Verification code',
+                                token=admin_api_client.auth_token)
     return email_code
 
 
 def send_change_password_email(email):
-    try:
-        link_to_change_password = url_for('.new_password', token=generate_token(email), _external=True)
-        admin_api_client.send_email(email_address=email,
-                                    from_str='notify@digital.cabinet-office.gov.uk',
-                                    message=link_to_change_password,
-                                    subject='Reset password for GOV.UK Notify',
-                                    token=admin_api_client.auth_token)
-    except:
-        traceback.print_exc()
-        raise AdminApiClientException('Exception when sending email.')
+    link_to_change_password = url_for('.new_password', token=generate_token(email), _external=True)
+    admin_api_client.send_email(email_address=email,
+                                from_str='notify@digital.cabinet-office.gov.uk',
+                                message=link_to_change_password,
+                                subject='Reset password for GOV.UK Notify',
+                                token=admin_api_client.auth_token)
 
 
 def generate_token(email):
@@ -64,4 +52,3 @@ def check_token(token):
         return email
     except SignatureExpired as e:
         current_app.logger.info('token expired %s' % e)
-        return None

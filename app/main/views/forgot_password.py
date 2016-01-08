@@ -7,13 +7,9 @@ from app.main.views import send_change_password_email
 
 @main.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
-    form = ForgotPasswordForm()
+    form = ForgotPasswordForm(users_dao.get_user_by_email)
     if form.validate_on_submit():
-        if users_dao.get_user_by_email(form.email_address.data):
-            send_change_password_email(form.email_address.data)
-            return render_template('views/password-reset-sent.html')
-        else:
-            flash('The email address is not recognized. Enter the password you registered with.')
-            return render_template('views/forgot-password.html', form=form)
+        send_change_password_email(form.email_address.data)
+        return render_template('views/password-reset-sent.html')
     else:
         return render_template('views/forgot-password.html', form=form)
