@@ -8,6 +8,7 @@ SQLAlchemy-Utils==0.30.5
 Flask-WTF==0.11
 Flask-Login==0.2.11
 Flask-Bcrypt==0.6.2
+credstash==1.8.0
 
 git+https://github.com/alphagov/notify-api-client.git@0.1.4#egg=notify-api-client==0.1.4
 
