@@ -47,7 +47,22 @@
 
 {% block content %}
 {% if current_user.is_authenticated() %}
-    <nav id="user-bar"><span id="service-switcher">Service name</span> <div id="user-admin"><span id="user-name"><a href="{{ url_for('.userprofile') }}">User name</a></span> <span id="sign-out"><a href="{{ url_for('main.sign_out')}}">Sign out</a></span></div></nav>    
+    <nav id="user-bar">
+      <span id="service-switcher">
+        <a id="toggle-service-switcher" href="#"><span id="service-arrow-right">&blacktriangleright;</span><span id="service-arrow-down">&blacktriangledown;</span> Service name goes here</a>
+          
+        </ul>
+      </span> 
+      <div id="user-admin">
+        <span id="user-name"><a href="{{ url_for('.userprofile') }}">Ms. User Name</a></span>
+        <span id="sign-out"><a href="{{ url_for('main.sign_out')}}">Sign out</a></span>
+      </div>
+      <ul id="service-nav">
+            <li><a href="#">Switch to A N Other service</a></li>
+            <li><a href="#">Add a new service to Notify</a></li>
+          </ul>
+    </nav>    
+
 {% endif %}
 <main id="content" role="main" class="page-container">
     {% with messages = get_flashed_messages() %}
