@@ -1,7 +1,10 @@
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, ValidationError
+from wtforms import StringField, PasswordField, ValidationError, FileField
 from wtforms.validators import DataRequired, Email, Length, Regexp
-from app.main.validators import Blacklist, ValidateUserCodes
+
+from app.main.validators import Blacklist, ValidateUserCodes, CsvFileValidator
+from app.main.dao import verify_codes_dao
+from app.main.encryption import check_hash
 
 
 def email_address():
@@ -127,3 +130,9 @@ class ForgotPasswordForm(Form):
 
 class NewPasswordForm(Form):
     new_password = password()
+
+
+class CsvUploadForm(Form):
+    file = FileField('File to upload',
+                     validators=[DataRequired(message='Please pick a file'),
+                                 CsvFileValidator()])

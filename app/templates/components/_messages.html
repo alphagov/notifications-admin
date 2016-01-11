@@ -1,0 +1,11 @@
+{%- with messages = get_flashed_messages(with_categories=true) -%}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="{{category}}-summary">
+        <h1 class="heading-medium {{ category }}-summary-heading">
+          {{ message }}
+        </h1>
+      </div>
+    {% endfor %}
+  {% endif %}
+{%- endwith %}

@@ -1,3 +1,6 @@
+import os
+import io
+
 from wtforms import ValidationError
 from datetime import datetime
 from app.main.encryption import check_hash
@@ -38,3 +41,13 @@ class ValidateUserCodes(object):
                     break
         if not valid_code:
             raise ValidationError(self.invalid_msg)
+
+
+class CsvFileValidator(object):
+
+    def __init__(self, message='Not a csv file'):
+        self.message = message
+
+    def __call__(self, form, field):
+        if not form.file.data.mimetype == 'text/csv':
+            raise ValidationError(self.message)
