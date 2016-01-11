@@ -1,15 +1,21 @@
-{% macro textbox(name, label, value='', small=True, highlight_tags=False, password=False) %}
-  <div class="form-group">
-    <label class="form-label" for="{{ name }}">{{ label }}</label>
-    {% if small %}
-      <input class="form-control" id="{{ name }}" name="{{ name }}" type="{{ 'password' if password else 'text' }}" value="{{ value }}">
-    {% else %}
-      <textarea
-        class="form-control {% if highlight_tags %}textbox-highlight-textbox{% endif %}"
-        id="{{ name }}" name="{{ name }}"
-        cols="30" rows="10"
-        {% if highlight_tags %}data-module='highlight-tags'{% endif %}
-      >{{ value }}</textarea>
-    {% endif %}
+{% macro textbox(field, hint=False, highlight_tags=False) %}
+  <div class="form-group{% if field.errors %} error{% endif %}">
+    <label class="form-label" for="{{ field.name }}">
+      {{ field.label }}
+      {% if hint %}
+        <span class="form-hint">
+          {{ hint }}
+        </span>
+      {% endif %}
+      {% if field.errors %}
+        <span class="error-message">
+          {{ field.errors[0] }}
+        </span>
+      {% endif %}
+    </label>
+    {{ field(**{
+      'class': 'form-control textbox-highlight-textbox' if highlight_tags else 'form-control',
+      'data-module': 'highlight-tags' if highlight_tags else ''
+    }) }}
   </div>
 {% endmacro %}

@@ -14,7 +14,7 @@ GOV.UK Notify | Service settings
     <div class="column-three-quarters">
 
     <form method="post">
-      {{ textbox('new_name', 'Enter your password', password=True) }}
+      {{ textbox(form.password) }}
       {{ page_footer(
         'Confirm',
         destructive=destructive,

@@ -1,5 +1,5 @@
 {% extends "admin_template.html" %}
-{% from "components/form-field.html" import render_field %}
+{% from "components/textbox.html" import textbox %}
 
 {% block page_title %}
 GOV.UK Notify | Set up service
@@ -17,9 +17,8 @@ GOV.UK Notify | Set up service
 				<li>as your email sender name</li>
 			</ul>
 
-		<form autocomplete="off" action="" method="post">
-			{{ form.hidden_tag() }}
-			{{ render_field(form.service_name, class='form-control-2-3') }}
+		<form autocomplete="off" method="post">
+			{{ textbox(form.service_name) }}
 
 			<p>
 			<button class="button" href="dashboard" role="button">Continue</button>

@@ -11,8 +11,8 @@ GOV.UK Notify | Edit template
 		<h1 class="heading-xlarge">{{ h1 }}</h1>
 
 		<form method="post">
-			{{ textbox(name='template_name', label='Template name', value=template_name) }}
-			{{ textbox(name='template_body', label='Message', small=False, value=template_body, highlight_tags=True) }}
+			{{ textbox(form.template_name) }}
+			{{ textbox(form.template_body, highlight_tags=True) }}
 			{{ page_footer(
 				'Save and continue',
 				back_link=url_for('.dashboard'),

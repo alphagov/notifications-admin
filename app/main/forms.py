@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, ValidationError
+from wtforms import StringField, PasswordField, ValidationError, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, Regexp
 from app.main.validators import Blacklist, ValidateUserCodes
 
@@ -119,6 +119,19 @@ class AddServiceForm(Form):
     def validate_service_name(self, a):
         if self.service_name.data in self.service_names:
             raise ValidationError('Service name already exists')
+
+
+class ServiceNameForm(Form):
+    service_name = StringField(u'New name')
+
+
+class ConfirmPasswordForm(Form):
+    password = PasswordField(u'Enter password')
+
+
+class TemplateForm(Form):
+    template_name = StringField(u'Template name')
+    template_body = TextAreaField(u'Message')
 
 
 class ForgotPasswordForm(Form):

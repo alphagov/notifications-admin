@@ -148,15 +148,8 @@
   {% endcall %}
 
   <h2 class="heading-large">Textbox</h2>
-
-  {{ textbox('name', 'Username') }}
-  {{ textbox('password', 'Password', password=True) }}
-  {{ textbox(
-    'message',
-    "Message",
-    value="Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax",
-    small=False,
-    highlight_tags=True
-  ) }}
+  {{ textbox(form.username) }}
+  {{ textbox(form.password) }}
+  {{ textbox(form.message, highlight_tags=True) }}
 
 {% endblock %}
