@@ -45,27 +45,4 @@
     margin: -$gutter-half 0 $gutter 0;
   }
 
-  &-history {
-
-    background: $turquoise;
-    color: $white;
-    padding: $gutter-half;
-    @include bold-19;
-    margin: 0 0 $gutter 0;
-
-    &-heading {
-
-      @include bold-19;
-      margin: 0;
-
-      &-time {
-        @include inline-block;
-        margin-left: 10px;
-        font-weight: normal;
-      }
-
-    }
-
-  }
-
 }
