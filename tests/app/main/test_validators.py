@@ -1,10 +1,9 @@
-from pytest import fail
-
+from app.main.dao import users_dao
 from app.main.forms import RegisterUserForm
 
 
 def test_should_raise_validation_error_for_password(notifications_admin):
-    form = RegisterUserForm([], [])
+    form = RegisterUserForm(users_dao.get_user_by_email)
     form.name.data = 'test'
     form.email_address.data = 'teset@example.gov.uk'
     form.mobile_number.data = '+441231231231'

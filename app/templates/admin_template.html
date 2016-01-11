@@ -43,6 +43,7 @@
   </div>
 {% endblock %}
 
+
 {% set global_header_text = "GOV.UK Notify" %}
 
 
@@ -53,9 +54,20 @@
 {% endif %}
 
 {% block content %}
-  <main id="content" role="main" class="page-container">
+<main id="content" role="main" class="page-container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="error-summary">
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% endwith %}
     {% block fullwidth_content %}{% endblock %}
-  </main>
+</main>
 {% endblock %}
 
 {% block body_end %}

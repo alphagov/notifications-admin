@@ -1,6 +1,4 @@
 from flask import render_template
-from flask_login import login_required
-
 from app.main import main
 
 
@@ -34,16 +32,6 @@ def checkemail():
     return render_template('views/check-email.html')
 
 
-@main.route("/forgot-password")
-def forgotpassword():
-    return render_template('views/forgot-password.html')
-
-
-@main.route("/new-password")
-def newpassword():
-    return render_template('views/new-password.html')
-
-
 @main.route("/user-profile")
 def userprofile():
     return render_template('views/user-profile.html')
@@ -59,6 +47,11 @@ def apikeys():
     return render_template('views/api-keys.html')
 
 
-@main.route("/verification-not-received")
-def verificationnotreceived():
-    return render_template('views/verification-not-received.html')
+@main.route("/manage-templates")
+def managetemplates():
+    return render_template('views/manage-templates.html')
+
+
+@main.route("/edit-template")
+def edittemplate():
+    return render_template('views/edit-template.html')

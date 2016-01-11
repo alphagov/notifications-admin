@@ -18,7 +18,7 @@ Sign in
 			{{ render_field(form.email_address, class='form-control-2-3') }}
 			{{ render_field(form.password, class='form-control-2-3') }}
 			<p>
-			<span class="font-xsmall"><a href="">Forgotten password?</a></span>
+			<span class="font-xsmall"><a href="{{url_for('main.forgot_password')}}">Forgotten password?</a></span>
 			</p>
 			{{ page_footer("Continue") }}
 		</form>
