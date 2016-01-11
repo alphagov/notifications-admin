@@ -1,8 +1,7 @@
 from datetime import datetime
-
 import pytest
 import sqlalchemy
-
+from app.main.encryption import check_hash
 from app.models import User
 from app.main.dao import users_dao
 
@@ -161,3 +160,61 @@ def test_should_update_email_address(notifications_admin, notifications_admin_db
     users_dao.update_email_address(user.id, 'new_email@testit.gov.uk')
     updated = users_dao.get_user_by_id(user.id)
     assert updated.email_address == 'new_email@testit.gov.uk'
+
+
+def test_should_update_password(notifications_admin, notifications_admin_db, notify_db_session):
+    user = User(name='Update Email',
+                password='somepassword',
+                email_address='test@it.gov.uk',
+                mobile_number='+441234123412',
+                created_at=datetime.now(),
+                role_id=1,
+                state='active')
+    start = datetime.now()
+    users_dao.insert_user(user)
+
+    saved = users_dao.get_user_by_id(user.id)
+    assert check_hash('somepassword', saved.password)
+    assert saved.password_changed_at is None
+    users_dao.update_password(saved, 'newpassword')
+    updated = users_dao.get_user_by_id(user.id)
+    assert check_hash('newpassword', updated.password)
+    assert updated.password_changed_at < datetime.now()
+    assert updated.password_changed_at > start
+
+
+def test_should_return_list_of_all_email_addresses(notifications_admin, notifications_admin_db, notify_db_session):
+    first = User(name='First Person',
+                 password='somepassword',
+                 email_address='first@it.gov.uk',
+                 mobile_number='+441234123412',
+                 created_at=datetime.now(),
+                 role_id=1,
+                 state='active')
+    second = User(name='Second Person',
+                  password='somepassword',
+                  email_address='second@it.gov.uk',
+                  mobile_number='+441234123412',
+                  created_at=datetime.now(),
+                  role_id=1,
+                  state='active')
+    users_dao.insert_user(first)
+    users_dao.insert_user(second)
+
+    email_addresses = users_dao.get_all_users()
+    expected = [first.email_address, second.email_address]
+    assert expected == [x.email_address for x in email_addresses]
+
+
+def test_should_update_state_to_request_password_reset(notifications_admin, notifications_admin_db, notify_db_session):
+    user = User(name='Requesting Password Resest',
+                password='somepassword',
+                email_address='request@new_password.gov.uk',
+                mobile_number='+441234123412',
+                created_at=datetime.now(),
+                role_id=1,
+                state='active')
+    users_dao.insert_user(user)
+    users_dao.request_password_reset(user.email_address)
+    saved = users_dao.get_user_by_email(user.email_address)
+    assert saved.state == 'request_password_reset'

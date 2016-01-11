@@ -31,7 +31,7 @@ def test_process_register_returns_400_when_mobile_number_is_invalid(notification
                                                             'password': 'validPassword!'})
 
     assert response.status_code == 200
-    assert 'Please enter a +44 mobile number' in response.get_data(as_text=True)
+    assert 'Enter a +44 mobile number' in response.get_data(as_text=True)
 
 
 def test_should_return_400_when_email_is_not_gov_uk(notifications_admin,
@@ -46,7 +46,7 @@ def test_should_return_400_when_email_is_not_gov_uk(notifications_admin,
                                                             'password': 'validPassword!'})
 
     assert response.status_code == 200
-    assert 'Please enter a gov.uk email address' in response.get_data(as_text=True)
+    assert 'Enter a gov.uk email address' in response.get_data(as_text=True)
 
 
 def test_should_add_verify_codes_on_session(notifications_admin, notifications_admin_db, mocker, notify_db_session):

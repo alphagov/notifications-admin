@@ -1,3 +1,7 @@
+from datetime import datetime
+
+from sqlalchemy.orm import load_only
+
 from app import db, login_manager
 from app.models import User
 from app.main.encryption import hashpw
@@ -51,5 +55,20 @@ def update_email_address(id, email_address):
 def update_mobile_number(id, mobile_number):
     user = get_user_by_id(id)
     user.mobile_number = mobile_number
+    db.session.add(user)
+    db.session.commit()
+
+
+def update_password(user, password):
+    user.password = hashpw(password)
+    user.password_changed_at = datetime.now()
+    user.state = 'active'
+    db.session.add(user)
+    db.session.commit()
+
+
+def request_password_reset(email):
+    user = get_user_by_email(email)
+    user.state = 'request_password_reset'
     db.session.add(user)
     db.session.commit()
