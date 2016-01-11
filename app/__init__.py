@@ -37,6 +37,9 @@ def create_app(config_name, config_overrides=None):
     from app.main import main as main_blueprint
     application.register_blueprint(main_blueprint)
 
+    from .status import status as status_blueprint
+    application.register_blueprint(status_blueprint)
+
     proxy_fix.init_app(application)
 
     application.session_interface = ItsdangerousSessionInterface()
