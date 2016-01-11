@@ -1,15 +1,18 @@
 from flask import request, render_template, redirect, url_for
+from flask_login import login_required
 
 from app.main import main
 from app.main.forms import TemplateForm
 
 
 @main.route("/templates")
+@login_required
 def manage_templates():
     return render_template('views/manage-templates.html')
 
 
 @main.route("/templates/template", methods=['GET', 'POST'])
+@login_required
 def add_template():
 
     form = TemplateForm()
@@ -28,6 +31,7 @@ def add_template():
 
 
 @main.route("/templates/template/add", methods=['GET', 'POST'])
+@login_required
 def edit_template():
 
     form = TemplateForm()

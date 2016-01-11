@@ -2,6 +2,8 @@
 
 import time
 from flask import render_template
+from flask_login import login_required
+
 from app.main import main
 
 from ._jobs import jobs
@@ -41,6 +43,7 @@ messages = [
 
 
 @main.route("/jobs")
+@login_required
 def showjobs():
     return render_template(
         'views/jobs.html',
@@ -49,6 +52,7 @@ def showjobs():
 
 
 @main.route("/jobs/job")
+@login_required
 def showjob():
     return render_template(
         'views/job.html',
@@ -71,6 +75,7 @@ def showjob():
 
 
 @main.route("/jobs/job/notification/<string:notification_id>")
+@login_required
 def shownotification(notification_id):
     return render_template(
         'views/notification.html',

@@ -12,6 +12,7 @@ service = {
 
 
 @main.route("/service-settings")
+@login_required
 def service_settings():
     return render_template(
         'views/service-settings.html',
@@ -20,6 +21,7 @@ def service_settings():
 
 
 @main.route("/service-settings/name", methods=['GET', 'POST'])
+@login_required
 def name():
 
     form = ServiceNameForm()
@@ -36,6 +38,7 @@ def name():
 
 
 @main.route("/service-settings/name/confirm", methods=['GET', 'POST'])
+@login_required
 def confirm_name_change():
 
     form = ConfirmPasswordForm()
@@ -51,6 +54,7 @@ def confirm_name_change():
 
 
 @main.route("/service-settings/request-to-go-live", methods=['GET', 'POST'])
+@login_required
 def request_to_go_live():
     if request.method == 'GET':
         return render_template(
@@ -62,6 +66,7 @@ def request_to_go_live():
 
 
 @main.route("/service-settings/status", methods=['GET', 'POST'])
+@login_required
 def status():
     if request.method == 'GET':
         return render_template(
@@ -73,6 +78,7 @@ def status():
 
 
 @main.route("/service-settings/status/confirm", methods=['GET', 'POST'])
+@login_required
 def confirm_status_change():
 
     form = ConfirmPasswordForm()
@@ -89,6 +95,7 @@ def confirm_status_change():
 
 
 @main.route("/service-settings/delete", methods=['GET', 'POST'])
+@login_required
 def delete():
     if request.method == 'GET':
         return render_template(
@@ -100,6 +107,7 @@ def delete():
 
 
 @main.route("/service-settings/delete/confirm", methods=['GET', 'POST'])
+@login_required
 def confirm_delete():
 
     form = ConfirmPasswordForm()
