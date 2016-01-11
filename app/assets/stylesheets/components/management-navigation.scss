@@ -5,9 +5,18 @@
   border-bottom: 1px solid $border-colour;
   padding: 10px 0 8px;
 
-  a:link,
-  a:visited {
-    text-decoration: none;
+  a {
+
+    &:link,
+    &:visited {
+      text-decoration: none;
+    }
+
+    &:hover {
+      color: $link-hover-colour;
+      text-decoration: underline;
+    }
+
   }
 
   &-account {

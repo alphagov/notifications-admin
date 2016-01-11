@@ -34,9 +34,16 @@
   a {
 
     display: block;
+    margin-top: 3px;
 
     .js-enabled & {
+
       padding-left: 20px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
     }
 
   }
