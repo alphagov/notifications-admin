@@ -1,8 +1,11 @@
 from flask.ext.script import Manager, Server
 from flask_migrate import Migrate, MigrateCommand
 from app import create_app, db
+from credstash import getAllSecrets
 
-application = create_app('live')
+secrets = getAllSecrets(region="eu-west-1")
+
+application = create_app('live', secrets)
 
 manager = Manager(application)
 migrate = Migrate(application, db)
