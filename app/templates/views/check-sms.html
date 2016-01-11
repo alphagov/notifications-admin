@@ -13,7 +13,6 @@
 	<h1 class="heading-xlarge">Send text messages</h1>
 
 	{% if upload_result.rejects %}
-
 		<h3 class="heading-small">The following numbers are invalid</h3>
 		{% for rejected in upload_result.rejects %}
 			<p>Line {{rejected.line_number}}: {{rejected.phone }}</a>
@@ -54,12 +53,6 @@
 						)}}
 					{% endfor %}
 			{% endif %}
-
-	    {{ submit_form(
-			    "Send {} text messages".format(upload_result.valid|count),
-			    url_for(".sendsms")
-			)}}
-
 		</form>
 	{% endif %}
 

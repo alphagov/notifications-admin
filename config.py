@@ -34,6 +34,7 @@ class Config(object):
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10mb
 
 
+
 class Development(Config):
     DEBUG = True
 
