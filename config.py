@@ -31,6 +31,8 @@ class Config(object):
     DANGEROUS_SALT = 'itsdangeroussalt'
     TOKEN_MAX_AGE_SECONDS = 120000
 
+    MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10mb
+
 
 class Development(Config):
     DEBUG = True
