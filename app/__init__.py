@@ -13,7 +13,7 @@ from app.its_dangerous_session import ItsdangerousSessionInterface
 import app.proxy_fix
 from config import configs
 from utils import logging
-
+from credstash import getAllSecrets
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -75,6 +75,13 @@ def init_app(app):
     for key, value in app.config.items():
         if key in os.environ:
             app.config[key] = convert_to_boolean(os.environ[key])
+
+    if app.config['NOTIFY_ADMIN_ENVIRONMENT'] == 'live':
+        secrets = getAllSecrets(region="eu-west-1")
+
+        for key in app.config.keys():
+            if key in secrets:
+                    app.config[key] = secrets[key]
 
     @app.context_processor
     def inject_global_template_variables():
