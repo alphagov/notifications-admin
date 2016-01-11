@@ -1,8 +1,8 @@
-from flask import render_template, flash, current_app
+from flask import render_template, current_app
 from app.main import main
 from app.main.dao import users_dao
 from app.main.forms import ForgotPasswordForm
-from app.main.views import send_change_password_email
+from app.notify_client.sender import send_change_password_email
 
 
 @main.route('/forgot-password', methods=['GET', 'POST'])

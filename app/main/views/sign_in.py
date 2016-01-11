@@ -1,12 +1,12 @@
 from flask import (
-    render_template, redirect, jsonify, url_for)
+    render_template, redirect, url_for)
 from flask import session
 
 from app.main import main
 from app.main.dao import users_dao
 from app.main.encryption import check_hash
 from app.main.forms import LoginForm
-from app.main.views import send_sms_code
+from app.notify_client.sender import send_sms_code
 
 
 @main.route('/sign-in', methods=(['GET', 'POST']))

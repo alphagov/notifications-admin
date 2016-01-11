@@ -29,7 +29,7 @@ class Config(object):
     SECRET_KEY = 'secret-key'
     HTTP_PROTOCOL = 'http'
     DANGEROUS_SALT = 'itsdangeroussalt'
-    TOKEN_MAX_AGE_SECONDS = 120000
+    TOKEN_MAX_AGE_SECONDS = 3600
 
 
 class Development(Config):
