@@ -9,4 +9,4 @@ from app.main import main
 @login_required
 def sign_out():
     logout_user()
-    return redirect(url_for('main.sign_in'))
+    return redirect(url_for('main.index'))
