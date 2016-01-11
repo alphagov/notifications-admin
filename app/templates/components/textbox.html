@@ -1,8 +1,8 @@
-{% macro textbox(name, label, value='', small=True, highlight_tags=False) %}
+{% macro textbox(name, label, value='', small=True, highlight_tags=False, password=False) %}
   <div class="form-group">
     <label class="form-label" for="{{ name }}">{{ label }}</label>
     {% if small %}
-      <input class="form-control" id="{{ name }}" name="{{ name }}" type="text" value="{{ value }}">
+      <input class="form-control" id="{{ name }}" name="{{ name }}" type="{{ 'password' if password else 'text' }}" value="{{ value }}">
     {% else %}
       <textarea
         class="form-control {% if highlight_tags %}textbox-highlight-textbox{% endif %}"

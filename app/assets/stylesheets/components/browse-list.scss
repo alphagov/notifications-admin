@@ -1,0 +1,27 @@
+.browse-list {
+
+  margin-bottom: $gutter;
+
+  &-item {
+    list-style: none;
+    margin-bottom: $gutter-two-thirds;
+  }
+
+  a.browse-list-link {
+
+    @include bold-24;
+
+    &-destructive,
+    &-destructive:visited {
+      @include bold-24;
+      color: $error-colour;
+    }
+
+  }
+
+  &-hint {
+    @include core-19;
+    margin-top: 5px;
+  }
+
+}

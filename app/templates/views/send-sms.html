@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/sms-message.html" import sms_message %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
 	GOV.UK Notify | Send text messages
@@ -39,11 +40,7 @@
 					<input type="file" />
 				</p>
 
-
-		  	<p>
-					<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-					<input type="submit" class="button" value="Continue" />
-		  	</p>
+				{{ page_footer("Continue") }}
 
 	</form>
 

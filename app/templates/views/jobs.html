@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import table, field %}
+{% from "components/table.html" import list_table, field %}
 
 {% block page_title %}
 GOV.UK Notify | Notifications activity
@@ -9,7 +9,7 @@ GOV.UK Notify | Notifications activity
 
 		<h1 class="heading-xlarge">Notifications activity</h1>
 
-		{% call(item) table(
+		{% call(item) list_table(
 			jobs,
 			caption="Recent activity",
 			caption_visible=False,

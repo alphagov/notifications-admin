@@ -1,0 +1,17 @@
+.page-footer {
+
+  margin-bottom: 50px;
+
+  &-back-link {
+    display: block;
+    margin-top: $gutter;
+  }
+
+  .button {}
+
+  .button-destructive {
+    @include button($error-colour);
+    padding: 0.52632em 0.78947em 0.26316em 0.78947em;
+  }
+
+}

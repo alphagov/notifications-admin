@@ -2,7 +2,7 @@
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/table.html" import table, field %}
 {% from "components/placeholder.html" import placeholder %}
-{% from "components/submit-form.html" import submit_form %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
 	GOV.UK Notify | Send text messages
@@ -17,9 +17,8 @@
 
 			<form method="POST" enctype="multipart/form-data">
 
-				{{ submit_form(
-					"Send {} text messages".format(number_of_recipients),
-					url_for(".sendsms")
+				{{ page_footer(
+					"Send {} text messages".format(number_of_recipients)
 				) }}
 
 				<h3 class="heading-small">First 3 messages</h2>
@@ -57,13 +56,11 @@
 					<a href="#">See all</a>
 				</p>
 
-				{{ submit_form(
-					"Send {} text messages".format(number_of_recipients),
-					url_for(".sendsms")
+				{{ page_footer(
+					button_text = "Send {} text messages".format(number_of_recipients),
+					back_link = url_for(".sendsms")
 				) }}
 
 			</form>
-
-
 
 {% endblock %}

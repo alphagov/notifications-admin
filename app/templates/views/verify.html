@@ -1,4 +1,5 @@
 {% extends "admin_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
 GOV.UK Notify | Confirm email address and mobile number
@@ -18,9 +19,7 @@ GOV.UK Notify | Confirm email address and mobile number
 			<span class="font-xsmall"><a href="{{ url_for('.check_and_resend_email_code')}}">I haven't received an email</a></span>
 			{{ render_field(form.sms_code, class='form-control-1-4') }}
 			<span class="font-xsmall"><a href="{{ url_for('.check_and_resend_text_code') }}">I haven't received a text</a></span>
-			<p>
-			<button class="button" role="button">Continue</button>
-			</p>
+			{{ page_footer("Continue") }}
 		</form>
 	</div>
 </div>

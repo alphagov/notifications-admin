@@ -1,4 +1,5 @@
 {% extends "admin_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
 Sign in
@@ -19,9 +20,7 @@ Sign in
 			<p>
 			<span class="font-xsmall"><a href="">Forgotten password?</a></span>
 			</p>
-			<p>
-			<button class="button" role="button">Continue</button>
-			</p>
+			{{ page_footer("Continue") }}
 		</form>
 	</div>
 </div>

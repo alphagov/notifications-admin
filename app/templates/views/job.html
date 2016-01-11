@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import table, field, right_aligned_field_heading %}
+{% from "components/table.html" import list_table, field, right_aligned_field_heading %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/banner.html" import banner %}
 
@@ -41,7 +41,7 @@ GOV.UK Notify | Notifications activity
       Sent with template <a href="{{ url_for('.edit_template') }}">{{ template_used }}</a> at {{ uploaded_file_time }}
     </p>
 
-    {% call(item) table(
+    {% call(item) list_table(
       messages,
       caption='Messages',
       caption_visible=False,

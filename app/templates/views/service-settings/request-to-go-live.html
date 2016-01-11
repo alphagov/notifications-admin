@@ -1,0 +1,49 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+  GOV.UK Notify | Service settings
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-xlarge">Request to go live</h1>
+
+  <div class="grid-row">
+    <div class="column-three-quarters">
+
+      <p>
+        A live service can send messages to any phone number or email address.
+      </p>
+
+      <p>
+        First you need to:
+      </p>
+
+      <ul class="list list-bullet">
+        <li>
+          have spoken to someone
+        </li>
+        <li>
+          have permission from someone else
+        </li>
+        <li>
+          etc.
+        </li>
+      </ul>
+
+      <p>
+        It takes a few working days for your request to be approved.
+      </p>
+
+      <form method="post">
+        {{ page_footer(
+          'Send request',
+          back_link=url_for('.service_settings')
+        ) }}
+      </form>
+
+    </div>
+  </div>
+
+{% endblock %}

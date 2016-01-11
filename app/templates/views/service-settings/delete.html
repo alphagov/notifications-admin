@@ -1,0 +1,44 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+  GOV.UK Notify | Service settings
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-xlarge">Delete this service from Notify</h1>
+
+  <div class="grid-row">
+    <div class="column-three-quarters">
+
+      <p>
+        This can’t be undone. You will lose:
+      </p>
+
+      <ul class="list list-bullet">
+        <li>
+          any data you’ve uploaded messages
+        </li>
+        <li>
+          any templates you’ve created
+        </li>
+        <li>
+          the history of
+        </li>
+        <li>
+          API keys
+        </li>
+      </ul>
+
+      <form method="post">
+        {{ page_footer(
+          'Yes, delete ‘{}’'.format(service.name),
+          destructive=True,
+          back_link=url_for('.service_settings')
+        ) }}
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

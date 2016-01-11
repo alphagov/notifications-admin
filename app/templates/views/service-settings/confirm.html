@@ -1,0 +1,27 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+GOV.UK Notify | Service settings
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-xlarge">{{ heading }}</h1>
+
+  <div class="grid-row">
+    <div class="column-three-quarters">
+
+    <form method="post">
+      {{ textbox('new_name', 'Enter your password', password=True) }}
+      {{ page_footer(
+        'Confirm',
+        destructive=destructive,
+        back_link=url_for('.service_settings')
+      ) }}
+    </form>
+    </div>
+  </div>
+
+{% endblock %}

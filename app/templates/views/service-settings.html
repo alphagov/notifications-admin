@@ -1,17 +1,39 @@
 {% extends "withnav_template.html" %}
+{% from "components/browse-list.html" import browse_list %}
 
 {% block page_title %}
-GOV.UK Notify | Service settings
+  GOV.UK Notify | Service settings
 {% endblock %}
 
 {% block maincolumn_content %}
 
-		<h1 class="heading-xlarge">Service settings</h1>
+    <h1 class="heading-xlarge">Service settings</h1>
 
-		<p>Here's where users can update their service profile.</p>
-
-  	<p><a href="dashboard">Back to dashboard</a></p>
-
-
+    {{ browse_list([
+      {
+        'title': 'Change your service name',
+        'link': url_for('.name'),
+        'hint': 'Your service name ({}) is included in every sent notification'.format(service.name)
+      },
+      {
+        'title': 'Request to go live and turn off sending restrictions',
+        'link': url_for('.request_to_go_live'),
+        'hint': 'A live service can send notifications to any phone number or email address',
+      } if not service.live else {
+      },
+      {
+        'title': 'Turn off all outgoing notifications',
+        'link': url_for('.status'),
+        'destructive': True
+      } if service.active else {
+        'title': 'Restart sending notifications',
+        'link': url_for('.status')
+      },
+      {
+        'title': 'Delete this service from Notify',
+        'link': url_for('.delete'),
+        'destructive': True
+      },
+    ]) }}
 
 {% endblock %}

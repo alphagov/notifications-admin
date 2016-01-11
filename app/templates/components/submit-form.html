@@ -1,9 +1,0 @@
-{% macro submit_form(button_text, back_link=False) %}
-  <div class="submit-form">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-    <input type="submit" class="button" value="{{ button_text }}" />
-    {% if back_link %}
-      <a class="submit-form-back-link" role="button" href="{{ back_link }}">Back</a>
-    {% endif %}
-  </div>
-{% endmacro %}

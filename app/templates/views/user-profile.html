@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
 GOV.UK Notify | User settings
@@ -10,7 +11,9 @@ GOV.UK Notify | User settings
 
 		<p>Here's where users can update their profile, password etc.</p>
 
-  	<p><a href="dashboard">Back to dashboard</a></p>
-
+		{{ page_footer(
+			back_link = url_for('.dashboard'),
+			back_link_text = 'Back to dashboard'
+		) }}
 
 {% endblock %}
