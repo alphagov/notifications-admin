@@ -1,4 +1,5 @@
 {% extends "admin_template.html" %}
+{% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
@@ -13,14 +14,10 @@ Sign in
 
 		<p>If you do not have an account, you can <a href="register">register for one now</a>.</p>
 
-		<form autocomplete="off" action="" method="post">
-			{{ form.hidden_tag() }}
-			{{ render_field(form.email_address, class='form-control-2-3') }}
-			{{ render_field(form.password, class='form-control-2-3') }}
-			<p>
-			<span class="font-xsmall"><a href="{{url_for('main.forgot_password')}}">Forgotten password?</a></span>
-			</p>
-			{{ page_footer("Continue") }}
+		<form autocomplete="off" method="post">
+			{{ textbox(form.email_address) }}
+			{{ textbox(form.password) }}
+			{{ page_footer("Continue", back_link="#", back_link_text="Forgotten password?") }}
 		</form>
 	</div>
 </div>

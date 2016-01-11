@@ -1,4 +1,5 @@
 {% extends "admin_template.html" %}
+{% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
@@ -13,11 +14,10 @@ GOV.UK Notify | Confirm email address and mobile number
 
 		<p>We've sent you confirmation codes by email and text message. You need to enter both codes here.</p>
 
-		<form  autocomplete="off" action="" method="post">
-			{{ form.hidden_tag() }}
-			{{ render_field(form.email_code, class='form-control-1-4') }}
+		<form autocomplete="off" method="post">
+			{{ textbox(form.email_code) }}
 			<span class="font-xsmall"><a href="{{ url_for('.check_and_resend_email_code')}}">I haven't received an email</a></span>
-			{{ render_field(form.sms_code, class='form-control-1-4') }}
+			{{ textbox(form.sms_code) }}
 			<span class="font-xsmall"><a href="{{ url_for('.check_and_resend_text_code') }}">I haven't received a text</a></span>
 			{{ page_footer("Continue") }}
 		</form>
