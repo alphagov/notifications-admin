@@ -3,7 +3,7 @@ from flask import (render_template, url_for, redirect, flash)
 from app.main import main
 from app.main.dao import users_dao
 from app.main.forms import NewPasswordForm
-from app.main.views import send_sms_code, check_token
+from app.notify_client.sender import check_token, send_sms_code
 
 
 @main.route('/new-password/<path:token>', methods=['GET', 'POST'])
@@ -13,7 +13,7 @@ def new_password(token):
         flash('The link in the email we sent you has expired. Enter your email address to resend.')
         return redirect(url_for('.forgot_password'))
 
-    user = users_dao.get_user_by_email(email_address=email_address.decode('utf-8'))
+    user = users_dao.get_user_by_email(email_address=email_address)
     if user and user.state != 'request_password_reset':
         flash('The link in the email we sent you has already been used.')
         return redirect(url_for('.index'))
