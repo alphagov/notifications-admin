@@ -30,13 +30,13 @@ deploy:
   skip_cleanup: true
   on: &2
     repo: alphagov/notifications-admin
-  bucket: notifications-admin-codedeploy/$TRAVIS_COMMIT
+  bucket: notifications-admin-codedeploy
   region: eu-west-1
 - provider: codedeploy
   access_key_id: AKIAJQPPNM6P6V53SWKA
   secret_access_key: *1
-  bucket: notifications-admin-codedeploy/$TRAVIS_COMMIT
-  key: notifications-admin.zip
+  bucket: notifications-admin-codedeploy
+  key: notifications-admin-$TRAVIS_COMMIT.zip
   bundle_type: zip
   application: notifications-admin
   deployment_group: notifications_admin_deployment_group
