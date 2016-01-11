@@ -4,7 +4,7 @@
 {% from "components/big-number.html" import big_number %}
 {% from "components/browse-list.html" import browse_list %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/sms-message.html" import sms_message, message_status %}
+{% from "components/sms-message.html" import sms_message %}
 {% from "components/table.html" import mapping_table, list_table, row, field %}
 {% from "components/textbox.html" import textbox %}
 
@@ -20,7 +20,12 @@
 
   <h2 class="heading-large">Banner</h2>
   <p>Used to show the result of a user’s action.</p>
-  {{ banner("This is a banner") }}
+  {{ banner("This is a banner", with_tick=True) }}
+  <div class="grid-row">
+    <div class="column-one-third">
+      {{ banner("Delivered 10:20") }}
+    </div>
+  </div>
 
   <h2 class="heading-large">Big number</h2>
 
@@ -94,13 +99,6 @@
         "Your vehicle tax for registration number is due on date. Renew online at www.gov.uk/vehicle-tax",
         "+44 7700 900 306"
       ) }}
-    </div>
-  </div>
-
-  <h2 class="heading-large">Message status</h2>
-  <div class="grid-row">
-    <div class="column-third">
-      {{ message_status("Delivered 10:20") }}
     </div>
   </div>
 

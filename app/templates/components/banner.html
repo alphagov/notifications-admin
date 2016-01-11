@@ -1,3 +1,5 @@
-{% macro banner(body) %}
-  <div class='banner'>{{ body }}</div>
+{% macro banner(body, with_tick=False) %}
+  <div class='banner{% if with_tick %}-with-tick{% endif %}'>
+    {{ body }}
+  </div>
 {% endmacro %}
