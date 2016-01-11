@@ -14,7 +14,6 @@ import app.proxy_fix
 from config import configs
 from utils import logging
 
-
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CsrfProtect()
@@ -22,13 +21,13 @@ csrf = CsrfProtect()
 admin_api_client = AdminAPIClient()
 
 
-def create_app(config_name):
+def create_app(config_name, config_overrides=None):
     application = Flask(__name__)
 
     application.config['NOTIFY_ADMIN_ENVIRONMENT'] = config_name
     application.config.from_object(configs[config_name])
+    init_app(application, config_overrides)
     db.init_app(application)
-    init_app(application)
     init_csrf(application)
     logging.init_app(application)
 
@@ -71,10 +70,15 @@ def init_csrf(application):
         abort(400, reason)
 
 
-def init_app(app):
+def init_app(app, config_overrides):
     for key, value in app.config.items():
         if key in os.environ:
             app.config[key] = convert_to_boolean(os.environ[key])
+
+    if config_overrides:
+        for key in app.config.keys():
+            if key in config_overrides:
+                    app.config[key] = config_overrides[key]
 
     @app.context_processor
     def inject_global_template_variables():
