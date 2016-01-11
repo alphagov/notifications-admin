@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/sms-message.html" import sms_message %}
+{% from "components/form-field.html" import render_field %}
 
 {% block page_title %}
 	GOV.UK Notify | Send text messages
@@ -36,10 +37,8 @@
 					You can also <a href="#">download an example CSV</a>.
 				</p>
 				<p>
-					<input type="file" />
+					{{render_field(form.file)}}
 				</p>
-
-
 		  	<p>
 					<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 					<input type="submit" class="button" value="Continue" />

@@ -1,11 +1,12 @@
 from datetime import datetime
 
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, ValidationError
+from wtforms import StringField, PasswordField, ValidationError, FileField
 from wtforms.validators import DataRequired, Email, Length, Regexp
+
+from app.main.validators import Blacklist, ValidateUserCodes, CsvFileValidator
 from app.main.dao import verify_codes_dao
 from app.main.encryption import check_hash
-from app.main.validators import Blacklist, ValidateUserCodes
 
 
 class LoginForm(Form):
@@ -123,3 +124,9 @@ class AddServiceForm(Form):
     def validate_service_name(self, a):
         if self.service_name.data in self.service_names:
             raise ValidationError('Service name already exists')
+
+
+class CsvUploadForm(Form):
+    file = FileField('File to upload',
+                     validators=[DataRequired(message='Please pick a file'),
+                                 CsvFileValidator()])
