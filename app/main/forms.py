@@ -5,7 +5,6 @@ from wtforms.validators import DataRequired, Email, Length, Regexp
 from app.main.validators import Blacklist, ValidateUserCodes, CsvFileValidator
 from app.main.dao import verify_codes_dao
 from app.main.encryption import check_hash
-<<<<<<< HEAD
 
 
 def email_address():
@@ -47,8 +46,6 @@ def email_code():
                        validators=[DataRequired(message='Email confirmation code can not be empty'),
                                    Regexp(regex=verify_code, message='Email confirmation code must be 5 digits'),
                                    ValidateUserCodes(code_type='email')])
-=======
->>>>>>> e0d5455e78505450f77c44aff7ff8796ed8916a8
 
 
 class LoginForm(Form):
@@ -133,6 +130,7 @@ class ForgotPasswordForm(Form):
 
 class NewPasswordForm(Form):
     new_password = password()
+
 
 class CsvUploadForm(Form):
     file = FileField('File to upload',
