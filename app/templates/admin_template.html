@@ -51,9 +51,13 @@
     <nav class="management-navigation">
       <div class="grid-row">
         <div class="column-half">
-          Service name
-          <a href="#">Switch to A N Other service</a>
-          <a href="#">Add a new service to Notify…</a>
+          <div class="dropdown" data-module="dropdown">
+            <div class="dropdown-toggle">
+              Service name
+            </div>
+            <a href="#">Switch to A N Other service</a>
+            <a href="#">Add a new service to Notify…</a>
+          </div>
         </div>
         <div class="column-half management-navigation-account">
           <a href="{{ url_for('.userprofile') }}">{{ current_user.name }}</a>

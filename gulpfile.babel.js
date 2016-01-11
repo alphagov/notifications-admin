@@ -48,6 +48,7 @@ gulp.task('jquery', () => plugins.jquery.src({
 gulp.task('javascripts', ['jquery'], () => gulp.src([
     paths.src + 'govuk_frontend_toolkit/javascripts/govuk/modules.js',
     paths.src + 'javascripts/highlightTags.js',
+    paths.src + 'javascripts/dropdown.js',
     paths.src + 'javascripts/main.js'
   ])
   .pipe(plugins.babel({
