@@ -48,22 +48,18 @@
 {% block content %}
 
   {% if current_user.is_authenticated() %}
-    <nav id="user-bar">
-      <span id="service-switcher">
-        <a id="toggle-service-switcher" href="#">
-          <span id="service-arrow-right">&blacktriangleright;</span>
-          <span id="service-arrow-down">&blacktriangledown;</span>
+    <nav class="management-navigation">
+      <div class="grid-row">
+        <div class="column-half">
           Service name
-        </a>
-      </span>
-      <div id="user-admin">
-        <span id="user-name"><a href="{{ url_for('.userprofile') }}">{{ current_user.name }}</a></span>
-        <span id="sign-out"><a href="{{ url_for('main.sign_out')}}">Sign out</a></span>
+          <a href="#">Switch to A N Other service</a>
+          <a href="#">Add a new service to Notify…</a>
+        </div>
+        <div class="column-half management-navigation-account">
+          <a href="{{ url_for('.userprofile') }}">{{ current_user.name }}</a>
+          <a href="{{ url_for('main.sign_out')}}">Sign out</a>
+        </div>
       </div>
-      <ul id="service-nav">
-        <li><a href="#">Switch to A N Other service</a></li>
-        <li><a href="#">Add a new service to Notify</a></li>
-      </ul>
     </nav>
   {% endif %}
 

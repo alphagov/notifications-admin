@@ -1,67 +1,27 @@
+.management-navigation {
 
-#user-bar {
-  border-bottom: 1px solid #bfc1c3;
-  max-width: 960px;
-  margin: 0 15px;
+  @extend %site-width-container;
   @include core-19();
-  padding: 10px 0 8px 0; 
+  border-bottom: 1px solid $border-colour;
+  padding: 10px 0 8px;
 
   a:link,
   a:visited {
     text-decoration: none;
   }
 
-  span a:hover {
-    color: $link-hover-colour;
-  }
+  &-account {
+
+    @include media(tablet) {
+
+      text-align: right;
+
+      a {
+        margin-left: 20px;
+      }
+
+    }
 
   }
-  @media (min-width: 641px) {
-    #user-bar {
-      margin: 0 30px;
-      line-height: 1.25; } }
-  @media (min-width: 1020px) {
-    #user-bar {
-      margin: 0 auto; } }
-
-
-#service-switcher {
-}
-
-#user-name {
-  margin: 0 20px 0 0;
-}
-
-#user-admin {
-}
-@media (min-width: 641px) {
-  #user-admin {
-  display: block;
-  float: right;
-  } }
-
-
-#service-nav {
-  // display: none;
-  @include core-19();
-  list-style: none;
-  ul li {
-   display: block;position: relative;float: left;
-  }
 
 }
-
-#service-arrow-right {
-  display:none;
-}
-
-
-
-
-
-
-
-
-
-
-
