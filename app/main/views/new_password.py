@@ -14,6 +14,9 @@ def new_password(token):
         return redirect(url_for('.forgot_password'))
 
     user = users_dao.get_user_by_email(email_address=email_address.decode('utf-8'))
+    if user and user.state != 'request_password_reset':
+        flash('The link in the email we sent you has already been used.')
+        return redirect(url_for('.index'))
 
     form = NewPasswordForm()
 

@@ -204,3 +204,17 @@ def test_should_return_list_of_all_email_addresses(notifications_admin, notifica
     email_addresses = users_dao.get_all_users()
     expected = [first.email_address, second.email_address]
     assert expected == [x.email_address for x in email_addresses]
+
+
+def test_should_update_state_to_request_password_reset(notifications_admin, notifications_admin_db, notify_db_session):
+    user = User(name='Requesting Password Resest',
+                password='somepassword',
+                email_address='request@new_password.gov.uk',
+                mobile_number='+441234123412',
+                created_at=datetime.now(),
+                role_id=1,
+                state='active')
+    users_dao.insert_user(user)
+    users_dao.request_password_reset(user.email_address)
+    saved = users_dao.get_user_by_email(user.email_address)
+    assert saved.state == 'request_password_reset'

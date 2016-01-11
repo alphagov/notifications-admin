@@ -62,9 +62,13 @@ def update_mobile_number(id, mobile_number):
 def update_password(user, password):
     user.password = hashpw(password)
     user.password_changed_at = datetime.now()
+    user.state = 'active'
     db.session.add(user)
     db.session.commit()
 
 
-def find_all_email_address():
-    return [x.email_address for x in User.query.options(load_only("email_address")).all()]
+def request_password_reset(email):
+    user = get_user_by_email(email)
+    user.state = 'request_password_reset'
+    db.session.add(user)
+    db.session.commit()

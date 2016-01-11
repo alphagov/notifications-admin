@@ -10,6 +10,7 @@ def forgot_password():
     form = ForgotPasswordForm()
     if form.validate_on_submit():
         if users_dao.get_user_by_email(form.email_address.data):
+            users_dao.request_password_reset(form.email_address.data)
             send_change_password_email(form.email_address.data)
             return render_template('views/password-reset-sent.html')
         else:
