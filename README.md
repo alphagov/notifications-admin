@@ -1,4 +1,6 @@
-[![Build Status](https://api.travis-ci.org/alphagov/notifications-admin.svg?branch=master)](https://api.travis-ci.org/alphagov/notifications-admin.svg?branch=master)
+[![Build Status](https://travis-ci.org/alphagov/notifications-admin.svg)](https://travis-ci.org/alphagov/notifications-admin)
+[![Coverage Status](https://coveralls.io/repos/alphagov/notifications-admin/badge.svg?branch=master&service=github)](https://coveralls.io/github/alphagov/notifications-admin?branch=master)
+[![Requirements Status](https://requires.io/github/alphagov/notifications-admin/requirements.svg?branch=master)](https://requires.io/github/alphagov/notifications-admin/requirements/?branch=master)
 
 
 # notifications-admin
