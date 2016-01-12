@@ -30,6 +30,21 @@ def test_should_redirect_after_email_change(notifications_admin):
     response = notifications_admin.test_client().post('/user-profile/email')
 
     assert response.status_code == 302
+    assert response.location == 'http://localhost/user-profile/email/authenticate'
+
+
+def test_should_show_authenticate_after_email_change(notifications_admin):
+    response = notifications_admin.test_client().get('/user-profile/email/authenticate')
+
+    assert 'Change your email address' in response.get_data(as_text=True)
+    assert 'Confirm' in response.get_data(as_text=True)
+    assert response.status_code == 200
+
+
+def test_should_redirect_after_email_change_confirm(notifications_admin):
+    response = notifications_admin.test_client().post('/user-profile/email/authenticate')
+
+    assert response.status_code == 302
     assert response.location == 'http://localhost/user-profile/email/confirm'
 
 
@@ -59,7 +74,22 @@ def test_should_redirect_after_mobile_number_change(notifications_admin):
     response = notifications_admin.test_client().post('/user-profile/email')
 
     assert response.status_code == 302
-    assert response.location == 'http://localhost/user-profile/email/confirm'
+    assert response.location == 'http://localhost/user-profile/email/authenticate'
+
+
+def test_should_show_authenticate_after_mobile_number_change(notifications_admin):
+    response = notifications_admin.test_client().get('/user-profile/mobile-number/authenticate')
+
+    assert 'Change your mobile number' in response.get_data(as_text=True)
+    assert 'Confirm' in response.get_data(as_text=True)
+    assert response.status_code == 200
+
+
+def test_should_redirect_after_mobile_number_authenticate(notifications_admin):
+    response = notifications_admin.test_client().post('/user-profile/mobile-number/authenticate')
+
+    assert response.status_code == 302
+    assert response.location == 'http://localhost/user-profile/mobile-number/confirm'
 
 
 def test_should_show_confirm_after_mobile_number_change(notifications_admin):
