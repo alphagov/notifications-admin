@@ -37,10 +37,10 @@ class UKMobileNumber(StringField):
         if self.data.startswith('+'):
             self.data = self.data[1:]
 
-        if not sum([
+        if not sum(
             self.data.startswith(prefix) for prefix in ['07', '447', '4407', '00447']
-        ]):
-            raise ValidationError('Must be a mobile number')
+        ):
+            raise ValidationError('Must be a UK mobile number (eg 07700 900460)')
 
         for digit in self.data:
             try:
@@ -54,7 +54,7 @@ class UKMobileNumber(StringField):
             raise ValidationError('Too many digits')
 
         if len(self.data) < 9:
-            raise ValidationError('Too few digits')
+            raise ValidationError('Not enough digits')
 
     def post_validate(self, form, validation_stopped):
 
