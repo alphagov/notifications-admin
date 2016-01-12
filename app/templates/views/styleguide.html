@@ -1,0 +1,155 @@
+{% extends "admin_template.html" %}
+
+{% from "components/banner.html" import banner %}
+{% from "components/big-number.html" import big_number %}
+{% from "components/browse-list.html" import browse_list %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/sms-message.html" import sms_message %}
+{% from "components/table.html" import mapping_table, list_table, row, field %}
+{% from "components/textbox.html" import textbox %}
+
+{% block page_title %}
+  Styleguide – GOV.UK Notify
+{% endblock %}
+
+{% block fullwidth_content %}
+
+  <h1 class="heading-xlarge">
+    Styleguide
+  </h1>
+
+  <p><a href="https://github.com/alphagov/notifications-admin/blob/master/app/templates/views/styleguide.html">View source</a></p>
+
+  <h2 class="heading-large">Banner</h2>
+  <p>Used to show the result of a user’s action.</p>
+  {{ banner("This is a banner", with_tick=True) }}
+  <div class="grid-row">
+    <div class="column-one-third">
+      {{ banner("Delivered 10:20") }}
+    </div>
+  </div>
+
+  <h2 class="heading-large">Big number</h2>
+
+  <p>Used to show some important statistics.</p>
+
+  <div class="grid-row">
+    <div class="column-one-third">
+      {{ big_number("567") }}
+    </div>
+    <div class="column-one-third">
+      {{ big_number("2", "Messages delivered") }}
+    </div>
+  </div>
+
+  <h2 class="heading-large">Browse list</h2>
+
+  <p>Used to navigate to child pages.</p>
+
+  {{ browse_list([
+    {
+      'title': 'Change your username',
+      'link': 'http://example.com',
+    },
+    {
+      'title': 'Change your password',
+      'link': 'http://example.com',
+      'hint': 'Your password is used to log in'
+    },
+    {
+      'title': 'Delete everything',
+      'link': 'http://example.com',
+      'hint': 'You can’t undo this',
+      'destructive': True
+    }
+  ]) }}
+
+  <h2 class="heading-large">Page footer</h2>
+
+  <p>
+    Used to submit forms and optionally provide a link to go back to the
+    previous page.
+  </p>
+  <p>
+    Must be used inside a form.
+  </p>
+  <p>
+    Adds a hidden CSRF token to the page.
+  </p>
+
+  {{ page_footer(
+    button_text='Save and continue'
+  ) }}
+
+  {{ page_footer(
+    button_text='Delete', destructive=True
+  ) }}
+
+  {{ page_footer(
+    button_text='Send', back_link='http://example.com', back_link_text="Back to dashboard"
+  ) }}
+
+  <h2 class="heading-large">SMS message</h2>
+
+  <p>Used to show or preview an SMS message.</p>
+
+  <div class="grid-row">
+    <div class="column-half">
+      {{ sms_message("Your vehicle tax for LC12 BFL is due on 1 March 2016. Renew online at www.gov.uk/vehicle-tax") }}
+      {{ sms_message("Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax") }}
+      {{ sms_message(
+        "Your vehicle tax for registration number is due on date. Renew online at www.gov.uk/vehicle-tax",
+        "+44 7700 900 306"
+      ) }}
+    </div>
+  </div>
+
+  <h2 class="heading-large">Tables</h2>
+
+  {% call mapping_table(
+    caption='Account settings',
+    field_headings=['Label', 'Value'],
+    field_headings_visible=True,
+    caption_visible=True
+  ) %}
+    {% call row() %}
+      {% call field() %}
+        Username
+      {% endcall %}
+      {% call field() %}
+        admin
+      {% endcall %}
+    {% endcall %}
+  {% endcall %}
+
+  {% call(item) list_table(
+    [
+      {
+        'file': 'dispatch_20151114.csv', 'status': 'Queued'
+      },
+      {
+        'file': 'dispatch_20151117.csv', 'status': 'Delivered'
+      },
+      {
+        'file': 'remdinder_monday.csv', 'status': 'Delivered'
+      }
+    ],
+    caption='Messages',
+    field_headings=['File', 'Status'],
+    field_headings_visible=False,
+    caption_visible=True
+  ) %}
+    {% call field() %}
+      {{ item.file }}
+    {% endcall %}
+    {% call field() %}
+      {{ item.status }}
+    {% endcall %}
+  {% endcall %}
+
+  <h2 class="heading-large">Textbox</h2>
+  {{ textbox(form.username) }}
+  {{ textbox(form.password) }}
+  {{ textbox(form.message, highlight_tags=True) }}
+
+{% endblock %}

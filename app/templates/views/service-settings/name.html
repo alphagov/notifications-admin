@@ -13,12 +13,15 @@ GOV.UK Notify | Service settings
   <div class="grid-row">
     <div class="column-three-quarters">
 
-      <p>
-        Your service name ({{ service.name }}) is included in every sent notification
-      </p>
+      <p>Users will see your service name:</p>
+
+      <ul class="list-bullet">
+        <li>at the start of every text message, eg ‘Vehicle tax: we received your payment, thank you’</li>
+        <li>as your email sender name</li>
+      </ul>
 
       <form method="post">
-        {{ textbox('new_name', 'New name', value=service.name) }}
+        {{ textbox(form.service_name) }}
         {{ page_footer(
           'Save',
           back_link=url_for('.service_settings')

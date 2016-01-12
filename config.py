@@ -29,7 +29,7 @@ class Config(object):
     SECRET_KEY = 'secret-key'
     HTTP_PROTOCOL = 'http'
     DANGEROUS_SALT = 'itsdangeroussalt'
-    TOKEN_MAX_AGE_SECONDS = 120000
+    TOKEN_MAX_AGE_SECONDS = 3600
 
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10mb
 

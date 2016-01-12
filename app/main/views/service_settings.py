@@ -2,6 +2,7 @@ from flask import render_template, redirect, request, url_for, abort
 from flask_login import login_required
 
 from app.main import main
+from app.main.forms import ConfirmPasswordForm, ServiceNameForm
 
 service = {
     'name': 'Service name',
@@ -20,10 +21,15 @@ def service_settings():
 
 @main.route("/service-settings/name", methods=['GET', 'POST'])
 def name():
+
+    form = ServiceNameForm()
+    form.service_name.data = 'Service name'
+
     if request.method == 'GET':
         return render_template(
             'views/service-settings/name.html',
-            service=service
+            service=service,
+            form=form
         )
     elif request.method == 'POST':
         return redirect(url_for('.confirm_name_change'))
@@ -31,10 +37,14 @@ def name():
 
 @main.route("/service-settings/name/confirm", methods=['GET', 'POST'])
 def confirm_name_change():
+
+    form = ConfirmPasswordForm()
+
     if request.method == 'GET':
         return render_template(
             'views/service-settings/confirm.html',
-            heading='Change your service name'
+            heading='Change your service name',
+            form=form
         )
     elif request.method == 'POST':
         return redirect(url_for('.service_settings'))
@@ -64,11 +74,15 @@ def status():
 
 @main.route("/service-settings/status/confirm", methods=['GET', 'POST'])
 def confirm_status_change():
+
+    form = ConfirmPasswordForm()
+
     if request.method == 'GET':
         return render_template(
             'views/service-settings/confirm.html',
             heading='Turn off all outgoing notifications',
-            destructive=True
+            destructive=True,
+            form=form
         )
     elif request.method == 'POST':
         return redirect(url_for('.service_settings'))
@@ -87,11 +101,15 @@ def delete():
 
 @main.route("/service-settings/delete/confirm", methods=['GET', 'POST'])
 def confirm_delete():
+
+    form = ConfirmPasswordForm()
+
     if request.method == 'GET':
         return render_template(
             'views/service-settings/confirm.html',
             heading='Delete this service from Notify',
-            destructive=True
+            destructive=True,
+            form=form
         )
     elif request.method == 'POST':
         return redirect(url_for('.dashboard'))

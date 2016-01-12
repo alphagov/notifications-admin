@@ -1,4 +1,5 @@
 {% extends "admin_template.html" %}
+{% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
@@ -14,9 +15,8 @@ GOV.UK Notify | Text verification
 		<p>We've sent you a text message with a verification code.</p>
 
 
-		<form autocomplete="off" action="" method="post">
-			{{ form.hidden_tag() }}
-			{{ render_field(form.sms_code, class='form-control-1-4') }}
+		<form autocomplete="off" method="post">
+			{{ textbox(form.sms_code) }}
 			<span class="font-xsmall"><a href="{{ url_for('.verification_code_not_received') }}">I haven't received a text</a></span>
 			{{ page_footer("Continue") }}
 		</form>

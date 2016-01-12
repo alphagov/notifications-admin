@@ -1,4 +1,5 @@
-[![Build Status](https://api.travis-ci.org/alphagov/notifications-admin.svg?branch=master)](https://api.travis-ci.org/alphagov/notifications-admin.svg?branch=master)
+[![Build Status](https://travis-ci.org/alphagov/notifications-admin.svg)](https://travis-ci.org/alphagov/notifications-admin)
+[![Requirements Status](https://requires.io/github/alphagov/notifications-admin/requirements.svg?branch=master)](https://requires.io/github/alphagov/notifications-admin/requirements/?branch=master)
 
 
 # notifications-admin

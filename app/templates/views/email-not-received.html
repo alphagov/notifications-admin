@@ -1,4 +1,5 @@
 {% extends "admin_template.html" %}
+{% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
@@ -14,13 +15,10 @@ GOV.UK Notify
     <p>Check your email address is correct and then resend the confirmation code.</p>
       <p>
       </p>
-      <form autocomplete="off" action="" method="post">
-          {{ form.hidden_tag() }}
-          {{ render_field(form.email_address, class='form-control-2-3') }}
-          <span class="font-xsmall">Your email address must end in .gov.uk</span>
-          <p>
-          </p>
-          {{ page_footer('Resend confirmation code') }}
+      <form autocomplete="off" method="post">
+        {{ textbox(form.email_address) }}
+        <span class="font-xsmall">Your email address must end in .gov.uk</span>
+        {{ page_footer('Resend confirmation code') }}
       </form>
   </div>
 </div>

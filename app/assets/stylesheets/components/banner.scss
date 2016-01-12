@@ -1,13 +1,21 @@
+%banner,
 .banner {
 
   @include core-19;
   background: $turquoise;
   color: $white;
   display: block;
-  padding: $gutter-half $gutter;
+  padding: $gutter-half;
   margin: 0 0 $gutter 0;
   text-align: center;
   position: relative;
+
+}
+
+.banner-with-tick {
+
+  @extend %banner;
+  padding: $gutter-half $gutter;
 
   &:before {
     @include core-24;

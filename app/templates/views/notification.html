@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/sms-message.html" import sms_message, message_status %}
+{% from "components/banner.html" import banner %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
@@ -18,7 +19,9 @@ GOV.UK Notify | Notifications activity
 				{{ sms_message(message.message, message.phone) }}
 			</div>
 			<div class="column-one-third">
-				{{ message_status(message.status, delivered_at) }}
+				{{ banner(
+					"{} {}".format(message.status, delivered_at)
+				) }}
 			</div>
 		</div>
 

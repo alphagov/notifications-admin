@@ -1,5 +1,12 @@
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, ValidationError, FileField
+
+from wtforms import (
+    StringField,
+    PasswordField,
+    ValidationError,
+    TextAreaField,
+    FileField
+)
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
 from app.main.validators import Blacklist, ValidateUserCodes, CsvFileValidator
@@ -124,6 +131,19 @@ class AddServiceForm(Form):
             raise ValidationError('Service name already exists')
 
 
+class ServiceNameForm(Form):
+    service_name = StringField(u'New name')
+
+
+class ConfirmPasswordForm(Form):
+    password = PasswordField(u'Enter password')
+
+
+class TemplateForm(Form):
+    template_name = StringField(u'Template name')
+    template_body = TextAreaField(u'Message')
+
+
 class ForgotPasswordForm(Form):
     email_address = email_address()
 
@@ -133,6 +153,5 @@ class NewPasswordForm(Form):
 
 
 class CsvUploadForm(Form):
-    file = FileField('File to upload',
-                     validators=[DataRequired(message='Please pick a file'),
-                                 CsvFileValidator()])
+    file = FileField('File to upload', validators=[DataRequired(
+                     message='Please pick a file'), CsvFileValidator()])

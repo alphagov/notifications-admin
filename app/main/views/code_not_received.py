@@ -1,10 +1,10 @@
 from flask import (
-    render_template, redirect, jsonify, session, url_for)
+    render_template, redirect, session, url_for)
 
 from app.main import main
 from app.main.dao import users_dao
 from app.main.forms import EmailNotReceivedForm, TextNotReceivedForm
-from app.main.views import send_sms_code, send_email_code
+from app.notify_client.sender import send_sms_code, send_email_code
 
 
 @main.route('/email-not-received', methods=['GET', 'POST'])
