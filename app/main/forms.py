@@ -1,3 +1,4 @@
+import re
 from flask_wtf import Form
 
 from wtforms import (
@@ -22,6 +23,45 @@ def email_address():
         DataRequired(message='Email cannot be empty'),
         Email(message='Enter a valid email address'),
         Regexp(regex=gov_uk_email, message='Enter a gov.uk email address')])
+
+
+class UKMobileNumber(StringField):
+
+    def pre_validate(self, form):
+
+        self.data = self.data.replace('(', '')
+        self.data = self.data.replace(')', '')
+        self.data = self.data.replace(' ', '')
+        self.data = self.data.replace('-', '')
+
+        if self.data.startswith('+'):
+            self.data = self.data[1:]
+
+        if not sum([
+            self.data.startswith(prefix) for prefix in ['07', '447', '4407', '00447']
+        ]):
+            raise ValidationError('Must be a mobile number')
+
+        for digit in self.data:
+            try:
+                int(digit)
+            except(ValueError):
+                raise ValidationError('Must not contain letters or symbols')
+
+        self.data = self.data.split('7', 1)[1]
+
+        if len(self.data) > 9:
+            raise ValidationError('Too many digits')
+
+        if len(self.data) < 9:
+            raise ValidationError('Too few digits')
+
+    def post_validate(self, form, validation_stopped):
+
+        if len(self.data) != 9:
+            return
+
+        self.data = '+44 7{} {} {}'.format(*re.findall('...', self.data))
 
 
 def mobile_number():
