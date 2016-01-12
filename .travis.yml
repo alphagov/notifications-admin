@@ -10,12 +10,14 @@ before_install:
 - nvm install 5.0.0
 install:
 - npm install
+- npm rebuild node-sass
 - pip install -r requirements_for_test.txt
 before_script:
 - psql -c 'create database test_notifications_admin;' -U postgres
 after_success:
 - ./scripts/trigger-dependent-build.sh
 script:
+- npm run build
 - ./scripts/run_tests.sh
 notifications:
   slack:

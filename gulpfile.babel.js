@@ -29,23 +29,8 @@ gulp.task('copy:govuk_template:assets', () => gulp.src('bower_components/govuk_t
   .pipe(gulp.dest(paths.dist))
 );
 
-
-// Concatenate and minify
-
-gulp.task('jquery', () => plugins.jquery.src({
-    release: 1,
-    flags: [
-      '-ajax', '-ajax/jsonp', '-ajax/load', '-ajax/parseJSON',
-      '-ajax/parseXML', '-ajax/script', '-ajax/var/nonce',
-      '-ajax/var/rquery', '-ajax/xhr', '-manipulation/_evalUrl',
-      '-deprecated', '-effects', '-effects/Tween',
-      '-effects/animatedSelector', '-effects/support', '-event-alias'
-    ]
-  })
-  .pipe(gulp.dest(paths.dist + 'javascripts/'))
-);
-
-gulp.task('javascripts', ['jquery'], () => gulp.src([
+gulp.task('javascripts', () => gulp
+  .src([
     paths.src + 'govuk_frontend_toolkit/javascripts/govuk/modules.js',
     paths.src + 'javascripts/highlightTags.js',
     paths.src + 'javascripts/dropdown.js',
@@ -54,15 +39,16 @@ gulp.task('javascripts', ['jquery'], () => gulp.src([
   .pipe(plugins.babel({
     presets: ['es2015']
   }))
-  .pipe(plugins.addSrc.prepend(
-    paths.dist + 'javascripts/jquery.custom.js'
-  ))
   .pipe(plugins.uglify())
+  .pipe(plugins.addSrc.prepend(
+    './node_modules/jquery/dist/jquery.min.js'
+  ))
   .pipe(plugins.concat('all.js'))
   .pipe(gulp.dest(paths.dist + 'javascripts/'))
 );
 
-gulp.task('sass', () => gulp.src(paths.src + '/stylesheets/main*.scss')
+gulp.task('sass', () => gulp
+  .src(paths.src + '/stylesheets/main*.scss')
   .pipe(plugins.sass({outputStyle: 'compressed'}))
   .pipe(gulp.dest(paths.dist + '/stylesheets'))
 );
@@ -70,7 +56,8 @@ gulp.task('sass', () => gulp.src(paths.src + '/stylesheets/main*.scss')
 
 // Copy images
 
-gulp.task('images', () => gulp.src(paths.src + 'images/**/*')
+gulp.task('images', () => gulp
+  .src(paths.src + 'images/**/*')
   .pipe(gulp.dest(paths.dist + '/images'))
 );
 
