@@ -1,19 +1,35 @@
 {% extends "withnav_template.html" %}
-{% from "components/page-footer.html" import page_footer %}
+{% from "components/table.html" import list_table, row, field %}
 
 {% block page_title %}
-GOV.UK Notify | User settings
+  GOV.UK Notify | Your profile
 {% endblock %}
 
 {% block maincolumn_content %}
 
-		<h1 class="heading-xlarge">User profile</h1>
+  <h1 class="heading-xlarge">Your profile</h1>
 
-		<p>Here's where users can update their profile, password etc.</p>
-
-		{{ page_footer(
-			back_link = url_for('.dashboard'),
-			back_link_text = 'Back to dashboard'
-		) }}
+  {% call(item) list_table(
+    [
+      {'label': 'Name', 'value': current_user.name, 'url': url_for('.userprofile_name')},
+      {'label': 'Email address', 'value': current_user.email_address, 'url': url_for('.userprofile_email')},
+      {'label': 'Mobile number', 'value': current_user.mobile_number, 'url': url_for('.userprofile_mobile_number')},
+      {'label': 'Password', 'value': 'Last changed 1 January 2016, 10:00AM', 'url': url_for('.userprofile_password')},
+    ],
+    caption='Account settings',
+    field_headings=['Setting', 'Value', 'Link to change'],
+    field_headings_visible=False,
+    caption_visible=False
+  ) %}
+    {% call field() %}
+      {{ item.label }}
+    {% endcall %}
+    {% call field() %}
+      {{ item.value }}
+    {% endcall %}
+    {% call field(align='right') %}
+      <a href="{{ item.url }}">Change</a>
+    {% endcall %}
+  {% endcall %}
 
 {% endblock %}
