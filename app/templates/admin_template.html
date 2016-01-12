@@ -31,13 +31,6 @@
       <div class="phase-banner-beta">
         <strong class="phase-tag">BETA</strong>
       </div>
-      {% if current_user.is_authenticated() %}
-      <nav id='proposition-menu'>
-        <p id='proposition-link'>
-          <a href="{{ url_for('main.sign_out')}}">Sign out</a>
-        </p>
-      </nav>
-      {% endif %}
     </div>
   </div>
 {% endblock %}
@@ -53,20 +46,41 @@
 {% endif %}
 
 {% block content %}
-<main id="content" role="main" class="page-container">
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <div class="error-summary">
-        <ul>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
-    {% endwith %}
-    {% block fullwidth_content %}{% endblock %}
-</main>
+
+  {% if current_user.is_authenticated() %}
+    <nav class="management-navigation">
+      <div class="grid-row">
+        <div class="column-half">
+          <div class="dropdown" data-module="dropdown">
+            <div class="dropdown-toggle">
+              Service name
+            </div>
+            <a href="#">Switch to A N Other service</a>
+            <a href="#">Add a new service to Notify…</a>
+          </div>
+        </div>
+        <div class="column-half management-navigation-account">
+          <a href="{{ url_for('.userprofile') }}">{{ current_user.name }}</a>
+          <a href="{{ url_for('main.sign_out')}}">Sign out</a>
+        </div>
+      </div>
+    </nav>
+  {% endif %}
+
+  <main id="content" role="main" class="page-container">
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <div class="error-summary">
+          <ul>
+              {% for message in messages %}
+              <li>{{ message }}</li>
+              {% endfor %}
+          </ul>
+      </div>
+      {% endif %}
+      {% endwith %}
+      {% block fullwidth_content %}{% endblock %}
+  </main>
 {% endblock %}
 
 {% block body_end %}
