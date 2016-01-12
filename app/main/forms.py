@@ -155,3 +155,23 @@ class NewPasswordForm(Form):
 class CsvUploadForm(Form):
     file = FileField('File to upload', validators=[DataRequired(
                      message='Please pick a file'), CsvFileValidator()])
+
+
+class ChangeNameForm(Form):
+    new_name = StringField(u'Your name')
+
+
+class ChangeEmailForm(Form):
+    email_address = email_address()
+
+
+class ConfirmEmailForm(Form):
+    email_code = email_code()
+
+
+class ChangeMobileNumberForm(Form):
+    mobile_number = mobile_number()
+
+
+class ConfirmMobileNumberForm(Form):
+    sms_code = sms_code()
