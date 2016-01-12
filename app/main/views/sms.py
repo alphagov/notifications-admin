@@ -1,7 +1,20 @@
-from flask import request, render_template, redirect, url_for
+import csv
+import re
+
+from flask import (
+    request,
+    render_template,
+    redirect,
+    url_for,
+    session,
+    flash,
+    current_app
+)
+
 from flask_login import login_required
 
 from app.main import main
+from app.main.forms import CsvUploadForm
 
 # TODO move this to the templates directory
 message_templates = [
@@ -23,45 +36,64 @@ message_templates = [
 
 
 @main.route("/sms/send", methods=['GET', 'POST'])
+@login_required
 def sendsms():
-    if request.method == 'GET':
-        return render_template(
-            'views/send-sms.html',
-            message_templates=message_templates
-        )
-    elif request.method == 'POST':
-        return redirect(url_for('.checksms'))
+    form = CsvUploadForm()
+    if form.validate_on_submit():
+        csv_file = form.file.data
+
+        # in memory handing is temporary until next story to save csv file
+        try:
+            results = _build_upload_result(csv_file)
+        except Exception:
+            message = 'There was a problem with the file: {}'.format(
+                      csv_file.filename)
+            flash(message)
+            return redirect(url_for('.sendsms'))
+
+        if not results['valid'] and not results['rejects']:
+            message = "The file {} contained no data".format(csv_file.filename)
+            flash(message, 'error')
+            return redirect(url_for('.sendsms'))
+
+        session[csv_file.filename] = results
+        return redirect(url_for('.checksms', recipients=csv_file.filename))
+
+    return render_template('views/send-sms.html',
+                           message_templates=message_templates,
+                           form=form)
 
 
 @main.route("/sms/check", methods=['GET', 'POST'])
+@login_required
 def checksms():
-
-    recipients = [
-        {'phone': "+44 7700 900989", 'registration number': 'LC12 BFL', 'date': '24 December 2015'},
-        {'phone': "+44 7700 900479", 'registration number': 'DU04 AOM', 'date': '25 December 2015'},
-        {'phone': "+44 7700 900964", 'registration number': 'M91 MJB', 'date': '26 December 2015'},
-        {'phone': "+44 7700 900703", 'registration number': 'Y249 NPU', 'date': '31 December 2015'},
-        {'phone': "+44 7700 900730", 'registration number': 'LG55 UGB', 'date': '1 January 2016'},
-        {'phone': "+44 7700 900989", 'registration number': 'LC12 BFL', 'date': '24 December 2015'},
-        {'phone': "+44 7700 900479", 'registration number': 'DU04 AOM', 'date': '25 December 2015'},
-        {'phone': "+44 7700 900964", 'registration number': 'M91 MJB', 'date': '26 December 2015'},
-        {'phone': "+44 7700 900703", 'registration number': 'Y249 NPU', 'date': '31 December 2015'},
-        {'phone': "+44 7700 900730", 'registration number': 'LG55 UGB', 'date': '1 January 2016'},
-    ]
-
-    number_of_recipients = len(recipients)
-    too_many_recipients_to_display = number_of_recipients > 7
-
     if request.method == 'GET':
+
+        recipients_filename = request.args.get('recipients')
+        # upload results in session until file is persisted in next story
+        upload_result = session.get(recipients_filename)
+        if upload_result.get('rejects'):
+            flash('There was a problem with some of the numbers')
+
         return render_template(
             'views/check-sms.html',
-            number_of_recipients=number_of_recipients,
-            recipients={
-                "first_three": recipients[:3] if too_many_recipients_to_display else [],
-                "last_three": recipients[number_of_recipients - 3:] if too_many_recipients_to_display else [],
-                "all": recipients if not too_many_recipients_to_display else []
-            },
+            upload_result=upload_result,
             message_template=message_templates[0]['body']
         )
     elif request.method == 'POST':
         return redirect(url_for('.showjob'))
+
+
+def _build_upload_result(csv_file):
+    pattern = re.compile(r'^\+44\s?\d{4}\s?\d{6}$')
+    reader = csv.DictReader(
+        csv_file.read().decode('utf-8').splitlines(),
+        lineterminator='\n',
+        quoting=csv.QUOTE_NONE)
+    valid, rejects = [], []
+    for i, row in enumerate(reader):
+        if pattern.match(row['phone']):
+            valid.append(row)
+        else:
+            rejects.append({"line_number": i+2, "phone": row['phone']})
+    return {"valid": valid, "rejects": rejects}
