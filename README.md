@@ -33,13 +33,14 @@ n is a tool for managing different versions of node. The following installs n an
     npm install -g n
     n latest
     npm rebuild node-sass
- 
+
 Most of the frontend dependencies are managed using Git Submodules. Some are
 managed with NPM and Bower. To install or update *all the things*, run
 ```shell
-    git submodule init 
+    git submodule init
     git submodule update
     npm install
+    npm run build
 ```
 
 If you want the front end assets to re-compile on changes, leave this running
