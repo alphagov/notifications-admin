@@ -5,7 +5,10 @@ from unittest.mock import mock_open
 from tests.app.main import create_test_user
 
 
-def test_upload_empty_csvfile_returns_to_upload_page(notifications_admin, notifications_admin_db, notify_db_session, mocker):
+def test_upload_empty_csvfile_returns_to_upload_page(
+        notifications_admin, notifications_admin_db, notify_db_session,
+        mocker):
+
     _setup_mocker_for_empty_file(mocker)
     with notifications_admin.test_request_context():
         with notifications_admin.test_client() as client:
@@ -149,4 +152,3 @@ def _setup_mocker_for_nonemtpy_file(mocker):
 
 def _setup_mocker_for_check(mocker):
     mocker.patch('app.main.views.sms.s3upload').return_value = 456
-
