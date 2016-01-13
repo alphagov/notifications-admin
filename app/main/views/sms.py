@@ -22,7 +22,11 @@ from app.main import main
 from app.main.forms import CsvUploadForm
 from app.main.uploader import s3upload
 
-from ._templates import sms_templates
+from ._templates import templates
+
+sms_templates = [
+    template for template in templates if template['type'] == 'sms'
+]
 
 
 @main.route("/services/<int:service_id>/sms/send", methods=['GET', 'POST'])

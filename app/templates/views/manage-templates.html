@@ -1,5 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/sms-message.html" import sms_message %}
+{% from "components/email-message.html" import email_message %}
+{% from "components/browse-list.html" import browse_list %}
 
 {% block page_title %}
 GOV.UK Notify | Manage templates
@@ -7,28 +9,41 @@ GOV.UK Notify | Manage templates
 
 {% block maincolumn_content %}
 
-
-    <h1 class="heading-xlarge">Manage templates</h1>
-
-    <h2 class="heading-medium">SMS templates</h2>
-
     <div class="grid-row">
       <div class="column-two-thirds">
 
-        {% for template in sms_templates %}
-          {{ sms_message(
-            template.body,
-            name=template.name,
-            edit_link=url_for('.edit_template', service_id=service_id, template_id=1)
-          ) }}
+        <h1 class="heading-xlarge">Templates</h1>
+
+        {% for template in templates %}
+          {% if template.type == 'sms' %}
+            {{ sms_message(
+              template.body,
+              name=template.name,
+              edit_link=url_for('.edit_template', service_id=service_id, template_id=loop.index)
+            ) }}
+          {% elif template.type == 'email' %}
+            {{ email_message(
+              template.subject,
+              template.body,
+              name=template.name,
+              edit_link=url_for('.edit_template', service_id=service_id, template_id=loop.index)
+            ) }}
+          {% endif %}
         {% endfor %}
 
       </div>
+      <div class="column-one-third">
+        {{ browse_list([
+          {
+            'title': 'New text message template',
+            'link': url_for('.add_template', service_id=service_id)
+          },
+          {
+            'title': 'New email template',
+            'link': url_for('.add_template', service_id=service_id)
+          }
+        ]) }}
+      </div>
     </div>
-
-    <p>
-      <a class="button" href="{{ url_for('.add_template', service_id=service_id) }}" role="button">Add a new message template</a>
-    </p>
-
 
 {% endblock %}

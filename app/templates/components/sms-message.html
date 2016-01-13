@@ -1,9 +1,10 @@
 {% macro sms_message(body, recipient=None, name=None, edit_link=None) %}
   {% if name %}
     <h3 class="sms-message-name">
-      {{ name }}
       {% if edit_link %}
-        <a href="{{ edit_link }}">Edit</a>
+        <a href="{{ edit_link }}">{{ name }}</a>
+      {% else %}
+        {{ name }}
       {% endif %}
     </h3>
   {% endif %}

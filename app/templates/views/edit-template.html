@@ -15,8 +15,8 @@ GOV.UK Notify | Edit template
 			{{ textbox(form.template_body, highlight_tags=True) }}
 			{{ page_footer(
 				'Save and continue',
-				back_link=url_for('.dashboard', service_id=service_id),
-				back_link_text='Back to manage templates'
+				back_link=url_for('.manage_templates', service_id=service_id),
+				back_link_text='Back to templates'
 			) }}
 		</form>
 
