@@ -1,4 +1,4 @@
-from flask import render_template, jsonify, redirect, session
+from flask import render_template, jsonify, redirect, session, url_for
 from flask_login import login_required
 from app.main import main
 from app.main.dao import services_dao, users_dao
@@ -13,6 +13,6 @@ def add_service():
 
         user = users_dao.get_user_by_id(session['user_id'])
         services_dao.insert_new_service(form.service_name.data, user)
-        return redirect('/dashboard')
+        return redirect(url_for('.dashboard', service_id=123))
     else:
         return render_template('views/add-service.html', form=form)

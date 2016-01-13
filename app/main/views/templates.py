@@ -5,15 +5,18 @@ from app.main import main
 from app.main.forms import TemplateForm
 
 
-@main.route("/templates")
+@main.route("/<int:service_id>/templates")
 @login_required
-def manage_templates():
-    return render_template('views/manage-templates.html')
+def manage_templates(service_id):
+    return render_template(
+        'views/manage-templates.html',
+        service_id=service_id
+    )
 
 
-@main.route("/templates/template", methods=['GET', 'POST'])
+@main.route("/<int:service_id>/templates/template", methods=['GET', 'POST'])
 @login_required
-def add_template():
+def add_template(service_id):
 
     form = TemplateForm()
 
@@ -24,15 +27,16 @@ def add_template():
         return render_template(
             'views/edit-template.html',
             h1='Edit template',
-            form=form
+            form=form,
+            service_id=service_id
         )
     elif request.method == 'POST':
-        return redirect(url_for('.manage_templates'))
+        return redirect(url_for('.manage_templates', service_id=service_id))
 
 
-@main.route("/templates/template/add", methods=['GET', 'POST'])
+@main.route("/<int:service_id>/templates/template/add", methods=['GET', 'POST'])
 @login_required
-def edit_template():
+def edit_template(service_id):
 
     form = TemplateForm()
 
@@ -40,7 +44,8 @@ def edit_template():
         return render_template(
             'views/edit-template.html',
             h1='Add template',
-            form=form
+            form=form,
+            service_id=service_id
         )
     elif request.method == 'POST':
-        return redirect(url_for('.manage_templates'))
+        return redirect(url_for('.manage_templates', service_id=service_id))

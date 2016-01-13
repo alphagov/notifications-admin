@@ -9,7 +9,7 @@ def test_upload_empty_csvfile_returns_to_upload_page(notifications_admin, notifi
             client.login(user)
 
             upload_data = {'file': (BytesIO(''.encode('utf-8')), 'emtpy.csv')}
-            response = client.post('/sms/send', data=upload_data,
+            response = client.post('/123/sms/send', data=upload_data,
                                    follow_redirects=True)
 
         assert response.status_code == 200
@@ -27,7 +27,7 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
 
             file_contents = 'phone\n+44 123\n+44 456'.encode('utf-8')
             upload_data = {'file': (BytesIO(file_contents), 'invalid.csv')}
-            response = client.post('/sms/send', data=upload_data,
+            response = client.post('/123/sms/send', data=upload_data,
                                    follow_redirects=True)
         assert response.status_code == 200
         content = response.get_data(as_text=True)
@@ -48,7 +48,7 @@ def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(
             file_contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986\n+44 7700 900987\n+44 7700 900988\n+44 7700 900989'.encode('utf-8')  # noqa
 
             upload_data = {'file': (BytesIO(file_contents), 'valid.csv')}
-            response = client.post('/sms/send', data=upload_data,
+            response = client.post('/123/sms/send', data=upload_data,
                                    follow_redirects=True)
 
         content = response.get_data(as_text=True)
@@ -79,7 +79,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(
             file_contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'.encode('utf-8')  # noqa
 
             upload_data = {'file': (BytesIO(file_contents), 'valid.csv')}
-            response = client.post('/sms/send', data=upload_data,
+            response = client.post('/123/sms/send', data=upload_data,
                                    follow_redirects=True)
 
         content = response.get_data(as_text=True)
@@ -102,7 +102,7 @@ def test_should_redirect_to_job(notifications_admin, notifications_admin_db,
             user = create_test_user('active')
             client.login(user)
 
-        response = client.post('/sms/check')
+        response = client.post('/123/sms/check')
 
         assert response.status_code == 302
-        assert response.location == 'http://localhost/jobs/job'
+        assert response.location == 'http://localhost/123/jobs/job'

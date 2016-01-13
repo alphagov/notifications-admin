@@ -38,7 +38,7 @@ GOV.UK Notify | Notifications activity
 		</ul>
 
     <p>
-      Sent with template <a href="{{ url_for('.edit_template') }}">{{ template_used }}</a> at {{ uploaded_file_time }}
+      Sent with template <a href="{{ url_for('.edit_template', service_id=service_id) }}">{{ template_used }}</a> at {{ uploaded_file_time }}
     </p>
 
     {% call(item) list_table(
@@ -52,10 +52,10 @@ GOV.UK Notify | Notifications activity
       ]
     ) %}
       {% call field() %}
-        <a href="{{ url_for('.shownotification', notification_id=item.id) }}">{{item.phone}}</a>
+        <a href="{{ url_for('.shownotification', service_id=service_id, notification_id=item.id) }}">{{item.phone}}</a>
       {% endcall %}
       {% call field() %}
-        <a href="{{ url_for('.shownotification', notification_id=item.id) }}">{{item.message[:50]}}…</a>
+        <a href="{{ url_for('.shownotification', service_id=service_id, notification_id=item.id) }}">{{item.message[:50]}}…</a>
       {% endcall %}
       {% call field(
         align='right',

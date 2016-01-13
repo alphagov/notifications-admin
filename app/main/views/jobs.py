@@ -42,18 +42,19 @@ messages = [
 ]
 
 
-@main.route("/jobs")
+@main.route("/<int:service_id>/jobs")
 @login_required
-def showjobs():
+def showjobs(service_id):
     return render_template(
         'views/jobs.html',
-        jobs=jobs
+        jobs=jobs,
+        service_id=service_id
     )
 
 
-@main.route("/jobs/job")
+@main.route("/<int:service_id>/jobs/job")
 @login_required
-def showjob():
+def showjob(service_id):
     return render_template(
         'views/job.html',
         messages=messages,
@@ -70,18 +71,20 @@ def showjob():
         uploaded_file_name='dispatch_20151114.csv',
         uploaded_file_time=now,
         template_used='Test message 1',
-        flash_message=u'We’ve started sending your messages'
+        flash_message=u'We’ve started sending your messages',
+        service_id=service_id
     )
 
 
-@main.route("/jobs/job/notification/<string:notification_id>")
+@main.route("/<int:service_id>/jobs/job/notification/<string:notification_id>")
 @login_required
-def shownotification(notification_id):
+def shownotification(service_id, notification_id):
     return render_template(
         'views/notification.html',
         message=[
             message for message in messages if message['id'] == notification_id
         ][0],
         delivered_at=now,
-        uploaded_at=now
+        uploaded_at=now,
+        service_id=service_id
     )

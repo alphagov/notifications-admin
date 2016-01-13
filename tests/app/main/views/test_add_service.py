@@ -23,7 +23,7 @@ def test_should_add_service_and_redirect_to_next_page(notifications_admin, notif
             client.post('/two-factor', data={'sms_code': '12345'})
             response = client.post('/add-service', data={'service_name': 'testing the post'})
             assert response.status_code == 302
-            assert response.location == 'http://localhost/dashboard'
+            assert response.location == 'http://localhost/123/dashboard'
             saved_service = services_dao.find_service_by_service_name('testing the post')
             assert saved_service is not None
 

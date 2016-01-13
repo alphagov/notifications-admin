@@ -6,7 +6,7 @@ def test_should_return_list_of_all_templates(notifications_admin, notifications_
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/templates')
+            response = client.get('/123/templates')
 
     assert response.status_code == 200
 
@@ -16,7 +16,7 @@ def test_should_show_page_for_one_templates(notifications_admin, notifications_a
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/templates/template')
+            response = client.get('/123/templates/template')
 
     assert response.status_code == 200
 
@@ -26,7 +26,7 @@ def test_should_redirect_when_saving_a_template(notifications_admin, notificatio
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.post('/templates/template')
+            response = client.post('/123/templates/template')
 
     assert response.status_code == 302
-    assert response.location == 'http://localhost/templates'
+    assert response.location == 'http://localhost/123/templates'
