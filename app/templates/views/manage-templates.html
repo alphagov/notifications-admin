@@ -12,11 +12,11 @@ GOV.UK Notify | Manage templates
     <p>Here's where you can view templates, choose to add one, or edit/delete one.</p>
 
     <p>
-      <a href="{{ url_for('.edit_template', service_id=service_id) }}">Here is my first template</a>
+      <a href="{{ url_for('.edit_template', service_id=service_id, template_id=1) }}">Here is my first template</a>
     </p>
 
     <p>
-      <a class="button" href="{{ url_for('.edit_template', service_id=service_id) }}" role="button">Add a new message template</a>
+      <a class="button" href="{{ url_for('.add_template', service_id=service_id) }}" role="button">Add a new message template</a>
     </p>
 
 

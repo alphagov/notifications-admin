@@ -14,9 +14,26 @@ def manage_templates(service_id):
     )
 
 
-@main.route("/services/<int:service_id>/templates/template", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/templates/add", methods=['GET', 'POST'])
 @login_required
 def add_template(service_id):
+
+    form = TemplateForm()
+
+    if request.method == 'GET':
+        return render_template(
+            'views/edit-template.html',
+            h1='Add template',
+            form=form,
+            service_id=service_id
+        )
+    elif request.method == 'POST':
+        return redirect(url_for('.manage_templates', service_id=service_id))
+
+
+@main.route("/services/<int:service_id>/templates/<template_id>", methods=['GET', 'POST'])
+@login_required
+def edit_template(service_id, template_id):
 
     form = TemplateForm()
 
@@ -27,23 +44,6 @@ def add_template(service_id):
         return render_template(
             'views/edit-template.html',
             h1='Edit template',
-            form=form,
-            service_id=service_id
-        )
-    elif request.method == 'POST':
-        return redirect(url_for('.manage_templates', service_id=service_id))
-
-
-@main.route("/services/<int:service_id>/templates/template/add", methods=['GET', 'POST'])
-@login_required
-def edit_template(service_id):
-
-    form = TemplateForm()
-
-    if request.method == 'GET':
-        return render_template(
-            'views/edit-template.html',
-            h1='Add template',
             form=form,
             service_id=service_id
         )
