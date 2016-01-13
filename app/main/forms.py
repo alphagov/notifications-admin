@@ -31,8 +31,8 @@ def mobile_number():
                                    Regexp(regex=mobile_number_regex, message='Enter a +44 mobile number')])
 
 
-def password():
-    return PasswordField('Create a password',
+def password(label='Create a password'):
+    return PasswordField(label,
                          validators=[DataRequired(message='Password can not be empty'),
                                      Length(10, 255, message='Password must be at least 10 characters'),
                                      Blacklist(message='That password is blacklisted, too common')])
@@ -152,6 +152,31 @@ class NewPasswordForm(Form):
     new_password = password()
 
 
+class ChangePasswordForm(Form):
+    old_password = password('Current password')
+    new_password = password('New password')
+
+
 class CsvUploadForm(Form):
     file = FileField('File to upload', validators=[DataRequired(
                      message='Please pick a file'), CsvFileValidator()])
+
+
+class ChangeNameForm(Form):
+    new_name = StringField(u'Your name')
+
+
+class ChangeEmailForm(Form):
+    email_address = email_address()
+
+
+class ConfirmEmailForm(Form):
+    email_code = email_code()
+
+
+class ChangeMobileNumberForm(Form):
+    mobile_number = mobile_number()
+
+
+class ConfirmMobileNumberForm(Form):
+    sms_code = sms_code()

@@ -32,12 +32,6 @@ def checkemail():
     return render_template('views/check-email.html')
 
 
-@main.route("/user-profile")
-@login_required
-def userprofile():
-    return render_template('views/user-profile.html')
-
-
 @main.route("/manage-users")
 @login_required
 def manageusers():
