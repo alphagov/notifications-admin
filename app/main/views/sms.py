@@ -22,23 +22,7 @@ from app.main import main
 from app.main.forms import CsvUploadForm
 from app.main.uploader import s3upload
 
-# TODO move this to the templates directory
-message_templates = [
-    {
-        'name': 'Reminder',
-        'body': """
-            Vehicle tax: Your vehicle tax for ((registration number)) expires on ((date)).
-            Tax your vehicle at www.gov.uk/vehicle-tax
-        """
-    },
-    {
-        'name': 'Warning',
-        'body': """
-            Vehicle tax: Your vehicle tax for ((registration number)) has expired.
-            Tax your vehicle at www.gov.uk/vehicle-tax
-        """
-    },
-]
+from ._templates import sms_templates
 
 
 @main.route("/services/<int:service_id>/sms/send", methods=['GET', 'POST'])
@@ -66,7 +50,7 @@ def sendsms(service_id):
             return redirect(url_for('.sendsms', service_id=service_id))
 
     return render_template('views/send-sms.html',
-                           message_templates=message_templates,
+                           message_templates=sms_templates,
                            form=form,
                            service_id=service_id)
 
@@ -88,7 +72,7 @@ def checksms(service_id):
             'views/check-sms.html',
             upload_result=upload_result,
             filename=filename,
-            message_template=message_templates[0]['body'],
+            message_template=sms_templates[0]['body'],
             service_id=service_id
         )
     elif request.method == 'POST':

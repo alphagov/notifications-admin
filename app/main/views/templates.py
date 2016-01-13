@@ -4,13 +4,17 @@ from flask_login import login_required
 from app.main import main
 from app.main.forms import TemplateForm
 
+from ._templates import sms_templates, email_templates
+
 
 @main.route("/services/<int:service_id>/templates")
 @login_required
 def manage_templates(service_id):
     return render_template(
         'views/manage-templates.html',
-        service_id=service_id
+        service_id=service_id,
+        sms_templates=sms_templates,
+        email_templates=email_templates
     )
 
 
