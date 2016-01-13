@@ -1,3 +1,4 @@
+import re
 from flask_wtf import Form
 
 from wtforms import (
@@ -24,11 +25,48 @@ def email_address():
         Regexp(regex=gov_uk_email, message='Enter a gov.uk email address')])
 
 
+class UKMobileNumber(StringField):
+
+    def pre_validate(self, form):
+
+        self.data = self.data.replace('(', '')
+        self.data = self.data.replace(')', '')
+        self.data = self.data.replace(' ', '')
+        self.data = self.data.replace('-', '')
+
+        if self.data.startswith('+'):
+            self.data = self.data[1:]
+
+        if not sum(
+            self.data.startswith(prefix) for prefix in ['07', '447', '4407', '00447']
+        ):
+            raise ValidationError('Must be a UK mobile number (eg 07700 900460)')
+
+        for digit in self.data:
+            try:
+                int(digit)
+            except(ValueError):
+                raise ValidationError('Must not contain letters or symbols')
+
+        self.data = self.data.split('7', 1)[1]
+
+        if len(self.data) > 9:
+            raise ValidationError('Too many digits')
+
+        if len(self.data) < 9:
+            raise ValidationError('Not enough digits')
+
+    def post_validate(self, form, validation_stopped):
+
+        if len(self.data) != 9:
+            return
+
+        self.data = '+44 7{} {} {}'.format(*re.findall('...', self.data))
+
+
 def mobile_number():
-    mobile_number_regex = "^\\+44[\\d]{10}$"
-    return StringField('Mobile phone number',
-                       validators=[DataRequired(message='Mobile number can not be empty'),
-                                   Regexp(regex=mobile_number_regex, message='Enter a +44 mobile number')])
+    return UKMobileNumber('Mobile phone number',
+                          validators=[DataRequired(message='Cannot be empty')])
 
 
 def password(label='Create a password'):

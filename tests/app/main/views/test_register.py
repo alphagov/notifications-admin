@@ -13,7 +13,7 @@ def test_process_register_creates_new_user(notifications_admin, notifications_ad
     response = notifications_admin.test_client().post('/register',
                                                       data={'name': 'Some One Valid',
                                                             'email_address': 'someone@example.gov.uk',
-                                                            'mobile_number': '+441231231231',
+                                                            'mobile_number': '+4407700900460',
                                                             'password': 'validPassword!'})
     assert response.status_code == 302
     assert response.location == 'http://localhost/verify'
@@ -31,7 +31,7 @@ def test_process_register_returns_400_when_mobile_number_is_invalid(notification
                                                             'password': 'validPassword!'})
 
     assert response.status_code == 200
-    assert 'Enter a +44 mobile number' in response.get_data(as_text=True)
+    assert 'Must be a UK mobile number (eg 07700 900460)' in response.get_data(as_text=True)
 
 
 def test_should_return_400_when_email_is_not_gov_uk(notifications_admin,
@@ -55,7 +55,7 @@ def test_should_add_verify_codes_on_session(notifications_admin, notifications_a
         response = client.post('/register',
                                data={'name': 'Test Codes',
                                      'email_address': 'test_codes@example.gov.uk',
-                                     'mobile_number': '+441234567890',
+                                     'mobile_number': '+4407700900460',
                                      'password': 'validPassword!'})
         assert response.status_code == 302
         assert 'notify_admin_session' in response.headers.get('Set-Cookie')

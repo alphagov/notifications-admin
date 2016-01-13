@@ -67,7 +67,7 @@ def test_should_check_and_redirect_to_verify(notifications_admin,
                 session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user.id, code='12345', code_type='sms')
             response = client.post(url_for('main.check_and_resend_text_code'),
-                                   data={'mobile_number': '+441234123412'})
+                                   data={'mobile_number': '+447700900460'})
             assert response.status_code == 302
             assert response.location == url_for('main.verify', _external=True)
 
@@ -103,11 +103,11 @@ def test_should_update_mobile_number_resend_code(notifications_admin,
                 session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
             response = client.post(url_for('main.check_and_resend_text_code'),
-                                   data={'mobile_number': '+443456789012'})
+                                   data={'mobile_number': '+447700900460'})
             assert response.status_code == 302
             assert response.location == url_for('main.verify', _external=True)
             updated_user = users_dao.get_user_by_id(user.id)
-            assert updated_user.mobile_number == '+443456789012'
+            assert updated_user.mobile_number == '+44 7700 900 460'
 
 
 def test_should_render_verification_code_not_received(notifications_admin,
