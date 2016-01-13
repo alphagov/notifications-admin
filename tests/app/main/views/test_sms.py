@@ -2,15 +2,22 @@ from io import BytesIO
 from tests.app.main import create_test_user
 
 
+def teardown_function(function):
+    import glob
+    import os
+    files = glob.glob("/tmp/*.csv")
+    for f in files:
+        os.remove(f)
+
+
 def test_upload_empty_csvfile_returns_to_upload_page(notifications_admin, notifications_admin_db, notify_db_session):
     with notifications_admin.test_request_context():
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-
             upload_data = {'file': (BytesIO(''.encode('utf-8')), 'emtpy.csv')}
-            response = client.post('/services/123/sms/send', data=upload_data,
-                                   follow_redirects=True)
+            response = client.post('/services/123/sms/send',
+                                   data=upload_data, follow_redirects=True)
 
         assert response.status_code == 200
         content = response.get_data(as_text=True)

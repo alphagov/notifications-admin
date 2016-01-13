@@ -32,6 +32,7 @@ class Config(object):
     TOKEN_MAX_AGE_SECONDS = 3600
 
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10mb
+    UPLOAD_FOLDER = '/tmp'
 
 
 class Development(Config):
