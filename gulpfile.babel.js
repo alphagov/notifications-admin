@@ -32,6 +32,7 @@ gulp.task('copy:govuk_template:assets', () => gulp.src('bower_components/govuk_t
 gulp.task('javascripts', () => gulp
   .src([
     paths.src + 'govuk_frontend_toolkit/javascripts/govuk/modules.js',
+    paths.src + 'govuk_frontend_toolkit/javascripts/govuk/selection-buttons.js',
     paths.src + 'javascripts/highlightTags.js',
     paths.src + 'javascripts/dropdown.js',
     paths.src + 'javascripts/main.js'
