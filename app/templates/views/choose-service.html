@@ -1,0 +1,31 @@
+{% extends "withnav_template.html" %}
+{% from "components/browse-list.html" import browse_list %}
+
+{% block page_title %}
+  GOV.UK Notify | Dashboard
+{% endblock %}
+
+{% block fullwidth_content %}
+
+  <h1 class="heading-xlarge">
+    Choose service
+  </h1>
+
+  {{ browse_list([
+    {
+      'title': 'MOT Reminders',
+      'link': url_for('.dashboard', service_id=123)
+    },
+    {
+      'title': 'Vehicle Tax',
+      'link': url_for('.dashboard', service_id=123)
+    },
+  ]) }}
+  {{ browse_list([
+    {
+      'title': 'Add a new service…',
+      'link': url_for('.add_service')
+    },
+  ]) }}
+
+{% endblock %}

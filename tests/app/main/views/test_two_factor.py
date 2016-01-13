@@ -28,7 +28,7 @@ def test_should_login_user_and_redirect_to_dashboard(notifications_admin, notifi
                                    data={'sms_code': '12345'})
 
             assert response.status_code == 302
-            assert response.location == url_for('main.dashboard', service_id=123, _external=True)
+            assert response.location == 'http://localhost/services'
 
 
 def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(notifications_admin,
