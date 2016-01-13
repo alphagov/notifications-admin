@@ -5,7 +5,7 @@ from app.main import main
 from app.main.forms import TemplateForm
 
 
-@main.route("/<int:service_id>/templates")
+@main.route("/services/<int:service_id>/templates")
 @login_required
 def manage_templates(service_id):
     return render_template(
@@ -14,7 +14,7 @@ def manage_templates(service_id):
     )
 
 
-@main.route("/<int:service_id>/templates/template", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/templates/template", methods=['GET', 'POST'])
 @login_required
 def add_template(service_id):
 
@@ -34,7 +34,7 @@ def add_template(service_id):
         return redirect(url_for('.manage_templates', service_id=service_id))
 
 
-@main.route("/<int:service_id>/templates/template/add", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/templates/template/add", methods=['GET', 'POST'])
 @login_required
 def edit_template(service_id):
 

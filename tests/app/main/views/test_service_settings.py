@@ -6,7 +6,7 @@ def test_should_show_overview(notifications_admin, notifications_admin_db, notif
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/123/service-settings')
+            response = client.get('/services/123/service-settings')
         assert response.status_code == 200
         assert 'Service settings' in response.get_data(as_text=True)
 
@@ -16,7 +16,7 @@ def test_should_show_service_name(notifications_admin, notifications_admin_db, n
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/123/service-settings/name')
+            response = client.get('/services/123/service-settings/name')
         assert response.status_code == 200
         assert 'Change your service name' in response.get_data(as_text=True)
 
@@ -26,10 +26,10 @@ def test_should_redirect_after_change_service_name(notifications_admin, notifica
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.post('/123/service-settings/request-to-go-live')
+            response = client.post('/services/123/service-settings/request-to-go-live')
 
     assert response.status_code == 302
-    assert 'http://localhost/123/service-settings' == response.location
+    assert 'http://localhost/services/123/service-settings' == response.location
 
 
 def test_should_show_service_name_confirmation(notifications_admin, notifications_admin_db, notify_db_session):
@@ -37,7 +37,7 @@ def test_should_show_service_name_confirmation(notifications_admin, notification
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/123/service-settings/name/confirm')
+            response = client.get('/services/123/service-settings/name/confirm')
 
     assert response.status_code == 200
     assert 'Change your service name' in response.get_data(as_text=True)
@@ -49,10 +49,10 @@ def test_should_redirect_after_service_name_confirmation(notifications_admin, no
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.post('/123/service-settings/name/confirm')
+            response = client.post('/services/123/service-settings/name/confirm')
 
     assert response.status_code == 302
-    assert 'http://localhost/123/service-settings' == response.location
+    assert 'http://localhost/services/123/service-settings' == response.location
 
 
 def test_should_show_request_to_go_live(notifications_admin, notifications_admin_db, notify_db_session):
@@ -60,7 +60,7 @@ def test_should_show_request_to_go_live(notifications_admin, notifications_admin
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/123/service-settings/request-to-go-live')
+            response = client.get('/services/123/service-settings/request-to-go-live')
 
     assert response.status_code == 200
     assert 'Request to go live' in response.get_data(as_text=True)
@@ -71,10 +71,10 @@ def test_should_redirect_after_request_to_go_live(notifications_admin, notificat
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.post('/123/service-settings/request-to-go-live')
+            response = client.post('/services/123/service-settings/request-to-go-live')
 
     assert response.status_code == 302
-    assert 'http://localhost/123/service-settings' == response.location
+    assert 'http://localhost/services/123/service-settings' == response.location
 
 
 def test_should_show_status_page(notifications_admin, notifications_admin_db, notify_db_session):
@@ -82,7 +82,7 @@ def test_should_show_status_page(notifications_admin, notifications_admin_db, no
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/123/service-settings/status')
+            response = client.get('/services/123/service-settings/status')
 
     assert response.status_code == 200
     assert 'Turn off all outgoing notifications' in response.get_data(as_text=True)
@@ -93,10 +93,10 @@ def test_should_show_redirect_after_status_change(notifications_admin, notificat
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.post('/123/service-settings/status')
+            response = client.post('/services/123/service-settings/status')
 
     assert response.status_code == 302
-    assert 'http://localhost/123/service-settings/status/confirm' == response.location
+    assert 'http://localhost/services/123/service-settings/status/confirm' == response.location
 
 
 def test_should_show_status_confirmation(notifications_admin, notifications_admin_db, notify_db_session):
@@ -104,7 +104,7 @@ def test_should_show_status_confirmation(notifications_admin, notifications_admi
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/123/service-settings/status/confirm')
+            response = client.get('/services/123/service-settings/status/confirm')
 
     assert response.status_code == 200
     assert 'Turn off all outgoing notifications' in response.get_data(as_text=True)
@@ -115,10 +115,10 @@ def test_should_redirect_after_status_confirmation(notifications_admin, notifica
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.post('/123/service-settings/status/confirm')
+            response = client.post('/services/123/service-settings/status/confirm')
 
     assert response.status_code == 302
-    assert 'http://localhost/123/service-settings' == response.location
+    assert 'http://localhost/services/123/service-settings' == response.location
 
 
 def test_should_show_delete_page(notifications_admin, notifications_admin_db, notify_db_session):
@@ -126,7 +126,7 @@ def test_should_show_delete_page(notifications_admin, notifications_admin_db, no
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/123/service-settings/delete')
+            response = client.get('/services/123/service-settings/delete')
 
     assert response.status_code == 200
     assert 'Delete this service from Notify' in response.get_data(as_text=True)
@@ -137,10 +137,10 @@ def test_should_show_redirect_after_deleting_service(notifications_admin, notifi
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.post('/123/service-settings/delete')
+            response = client.post('/services/123/service-settings/delete')
 
     assert response.status_code == 302
-    assert 'http://localhost/123/service-settings/delete/confirm' == response.location
+    assert 'http://localhost/services/123/service-settings/delete/confirm' == response.location
 
 
 def test_should_show_delete_confirmation(notifications_admin, notifications_admin_db, notify_db_session):
@@ -148,7 +148,7 @@ def test_should_show_delete_confirmation(notifications_admin, notifications_admi
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/123/service-settings/delete/confirm')
+            response = client.get('/services/123/service-settings/delete/confirm')
 
     assert response.status_code == 200
     assert 'Delete this service from Notify' in response.get_data(as_text=True)
@@ -159,7 +159,7 @@ def test_should_redirect_delete_confirmation(notifications_admin, notifications_
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.post('/123/service-settings/delete/confirm')
+            response = client.post('/services/123/service-settings/delete/confirm')
 
     assert response.status_code == 302
-    assert 'http://localhost/123/dashboard' == response.location
+    assert 'http://localhost/services/123/dashboard' == response.location

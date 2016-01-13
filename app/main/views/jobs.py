@@ -42,7 +42,7 @@ messages = [
 ]
 
 
-@main.route("/<int:service_id>/jobs")
+@main.route("/services/<int:service_id>/jobs")
 @login_required
 def showjobs(service_id):
     return render_template(
@@ -52,7 +52,7 @@ def showjobs(service_id):
     )
 
 
-@main.route("/<int:service_id>/jobs/<job_id>")
+@main.route("/services/<int:service_id>/jobs/<job_id>")
 @login_required
 def showjob(service_id, job_id):
     return render_template(
@@ -76,7 +76,7 @@ def showjob(service_id, job_id):
     )
 
 
-@main.route("/<int:service_id>/jobs/<job_id>/notification/<string:notification_id>")
+@main.route("/services/<int:service_id>/jobs/<job_id>/notification/<string:notification_id>")
 @login_required
 def shownotification(service_id, job_id, notification_id):
     return render_template(

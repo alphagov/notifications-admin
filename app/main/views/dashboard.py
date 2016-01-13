@@ -6,7 +6,7 @@ from app.main import main
 from ._jobs import jobs
 
 
-@main.route("/<int:service_id>/dashboard")
+@main.route("/services/<int:service_id>/dashboard")
 @login_required
 def dashboard(service_id):
     return render_template(

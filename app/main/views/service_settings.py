@@ -11,7 +11,7 @@ service = {
 }
 
 
-@main.route("/<int:service_id>/service-settings")
+@main.route("/services/<int:service_id>/service-settings")
 @login_required
 def service_settings(service_id):
     return render_template(
@@ -21,7 +21,7 @@ def service_settings(service_id):
     )
 
 
-@main.route("/<int:service_id>/service-settings/name", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/service-settings/name", methods=['GET', 'POST'])
 @login_required
 def name(service_id):
 
@@ -39,7 +39,7 @@ def name(service_id):
         return redirect(url_for('.confirm_name_change', service_id=service_id))
 
 
-@main.route("/<int:service_id>/service-settings/name/confirm", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/service-settings/name/confirm", methods=['GET', 'POST'])
 @login_required
 def confirm_name_change(service_id):
 
@@ -56,7 +56,7 @@ def confirm_name_change(service_id):
         return redirect(url_for('.service_settings', service_id=service_id))
 
 
-@main.route("/<int:service_id>/service-settings/request-to-go-live", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/service-settings/request-to-go-live", methods=['GET', 'POST'])
 @login_required
 def request_to_go_live(service_id):
     if request.method == 'GET':
@@ -69,7 +69,7 @@ def request_to_go_live(service_id):
         return redirect(url_for('.service_settings', service_id=service_id))
 
 
-@main.route("/<int:service_id>/service-settings/status", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/service-settings/status", methods=['GET', 'POST'])
 @login_required
 def status(service_id):
     if request.method == 'GET':
@@ -82,7 +82,7 @@ def status(service_id):
         return redirect(url_for('.confirm_status_change', service_id=service_id))
 
 
-@main.route("/<int:service_id>/service-settings/status/confirm", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/service-settings/status/confirm", methods=['GET', 'POST'])
 @login_required
 def confirm_status_change(service_id):
 
@@ -100,7 +100,7 @@ def confirm_status_change(service_id):
         return redirect(url_for('.service_settings', service_id=service_id))
 
 
-@main.route("/<int:service_id>/service-settings/delete", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/service-settings/delete", methods=['GET', 'POST'])
 @login_required
 def delete(service_id):
     if request.method == 'GET':
@@ -113,7 +113,7 @@ def delete(service_id):
         return redirect(url_for('.confirm_delete', service_id=service_id))
 
 
-@main.route("/<int:service_id>/service-settings/delete/confirm", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/service-settings/delete/confirm", methods=['GET', 'POST'])
 @login_required
 def confirm_delete(service_id):
 

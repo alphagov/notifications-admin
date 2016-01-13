@@ -35,7 +35,7 @@ message_templates = [
 ]
 
 
-@main.route("/<int:service_id>/sms/send", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/sms/send", methods=['GET', 'POST'])
 @login_required
 def sendsms(service_id):
     form = CsvUploadForm()
@@ -65,7 +65,7 @@ def sendsms(service_id):
                            service_id=service_id)
 
 
-@main.route("/<int:service_id>/sms/check", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/sms/check", methods=['GET', 'POST'])
 @login_required
 def checksms(service_id):
     if request.method == 'GET':
