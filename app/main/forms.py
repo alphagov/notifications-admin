@@ -65,10 +65,8 @@ class UKMobileNumber(StringField):
 
 
 def mobile_number():
-    mobile_number_regex = "^\\+44[\\d]{10}$"
-    return StringField('Mobile phone number',
-                       validators=[DataRequired(message='Mobile number can not be empty'),
-                                   Regexp(regex=mobile_number_regex, message='Enter a +44 mobile number')])
+    return UKMobileNumber('Mobile phone number',
+                          validators=[DataRequired(message='Cannot be empty')])
 
 
 def password():
