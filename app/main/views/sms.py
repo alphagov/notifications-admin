@@ -116,9 +116,13 @@ def _format_filename(filename):
     return secure_filename(formatted_name)
 
 
+def _open(file):
+    return open(file, 'r')
+
+
 def _build_upload_result(csv_file):
     try:
-        file = open(csv_file, 'r')
+        file = _open(csv_file, 'r')
         pattern = re.compile(r'^\+44\s?\d{4}\s?\d{6}$')
         reader = csv.DictReader(
             file.read().splitlines(),

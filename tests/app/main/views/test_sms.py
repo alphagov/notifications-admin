@@ -37,7 +37,7 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
             user = create_test_user('active')
             client.login(user)
             upload_data = {'file': file_data}
-            with mock.patch('app.main.views.sms.open', m_open):
+            with mock.patch('app.main.views.sms._open', m_open):
                 response = client.post('/services/123/sms/send',
                                        data=upload_data,
                                        follow_redirects=True)
@@ -66,7 +66,7 @@ def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(
             user = create_test_user('active')
             client.login(user)
             upload_data = {'file': file_data}
-            with mock.patch('app.main.views.sms.open', m_open):
+            with mock.patch('app.main.views.sms._open', m_open):
                 response = client.post('/services/123/sms/send',
                                        data=upload_data,
                                        follow_redirects=True)
@@ -103,7 +103,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(
             user = create_test_user('active')
             client.login(user)
             upload_data = {'file': file_data}
-            with mock.patch('app.main.views.sms.open', m_open):
+            with mock.patch('app.main.views.sms._open', m_open):
                 response = client.post('/services/123/sms/send',
                                        data=upload_data,
                                        follow_redirects=True)
