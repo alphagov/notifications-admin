@@ -44,7 +44,6 @@ message_templates = [
 @login_required
 def sendsms(service_id):
     form = CsvUploadForm()
-
     if form.validate_on_submit():
         try:
             csv_file = form.file.data
@@ -98,7 +97,7 @@ def checksms(service_id):
             # TODO when job is created record filename in job itself
             # so downstream pages can get the original filename that way
             session[upload_id] = filename
-            return redirect(url_for('.showjob', service_id=service_id, job_id=upload_id))
+            return redirect(url_for('main.showjob', service_id=service_id, job_id=upload_id))
         except:
             flash('There as a problem saving the file')
             return redirect(url_for('.checksms', recipients=filename))
@@ -118,10 +117,11 @@ def _format_filename(filename):
 
 
 def _build_upload_result(csv_file):
-    pattern = re.compile(r'^\+44\s?\d{4}\s?\d{6}$')
-    with open(csv_file) as f:
+    try:
+        file = open(csv_file, 'r')
+        pattern = re.compile(r'^\+44\s?\d{4}\s?\d{6}$')
         reader = csv.DictReader(
-            f,
+            file.read().splitlines(),
             lineterminator='\n',
             quoting=csv.QUOTE_NONE)
         valid, rejects = [], []
@@ -130,4 +130,6 @@ def _build_upload_result(csv_file):
                 valid.append(row)
             else:
                 rejects.append({"line_number": i+2, "phone": row['phone']})
-    return {"valid": valid, "rejects": rejects}
+        return {"valid": valid, "rejects": rejects}
+    finally:
+        file.close()
