@@ -20,25 +20,25 @@ def verifymobile():
     return render_template('views/verify-mobile.html')
 
 
-@main.route("/send-email")
+@main.route("/services/<int:service_id>/send-email")
 @login_required
-def sendemail():
+def sendemail(service_id):
     return render_template('views/send-email.html')
 
 
-@main.route("/check-email")
+@main.route("/services/<int:service_id>/check-email")
 @login_required
-def checkemail():
+def checkemail(service_id):
     return render_template('views/check-email.html')
 
 
-@main.route("/manage-users")
+@main.route("/services/<int:service_id>/manage-users")
 @login_required
-def manageusers():
-    return render_template('views/manage-users.html')
+def manageusers(service_id):
+    return render_template('views/manage-users.html', service_id=service_id)
 
 
-@main.route("/api-keys")
+@main.route("/services/<int:service_id>/api-keys")
 @login_required
-def apikeys():
-    return render_template('views/api-keys.html')
+def apikeys(service_id):
+    return render_template('views/api-keys.html', service_id=service_id)

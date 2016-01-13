@@ -1,17 +1,17 @@
 <nav class="navigation">
   <ul>
-    <li><a href="{{ url_for('.dashboard') }}">Dashboard</a></li>
+    <li><a href="{{ url_for('.dashboard', service_id=123) }}">Dashboard</a></li>
   </ul>
   <ul>
-    <li><a href="{{ url_for('.sendsms') }}">Send text messages</a></li>
-    <li><a href="{{ url_for('.sendemail') }}">Send emails</a></li>
-    <li><a href="{{ url_for('.showjobs') }}">Activity</a></li>
+    <li><a href="{{ url_for('.sendsms', service_id=123) }}">Send text messages</a></li>
+    <li><a href="{{ url_for('.sendemail', service_id=123) }}">Send emails</a></li>
+    <li><a href="{{ url_for('.showjobs', service_id=123) }}">Activity</a></li>
   </ul>
   <ul>
-    <li><a href="{{ url_for('.apikeys') }}">API keys and documentation</a></li>
+    <li><a href="{{ url_for('.apikeys', service_id=123) }}">API keys and documentation</a></li>
   </ul>
   <ul>
-    <li><a href="{{ url_for('.manageusers') }}">Manage users</a></li>
-    <li><a href="{{ url_for('.service_settings') }}">Service settings</a></li>
+    <li><a href="{{ url_for('.manageusers', service_id=123) }}">Manage users</a></li>
+    <li><a href="{{ url_for('.service_settings', service_id=123) }}">Service settings</a></li>
   </ul>
 </nav>

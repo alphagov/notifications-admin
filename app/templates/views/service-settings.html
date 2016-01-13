@@ -12,26 +12,26 @@
     {{ browse_list([
       {
         'title': 'Change your service name',
-        'link': url_for('.name'),
+        'link': url_for('.name', service_id=service_id),
         'hint': 'Your service name ({}) is included in every sent notification'.format(service.name)
       },
       {
         'title': 'Request to go live and turn off sending restrictions',
-        'link': url_for('.request_to_go_live'),
+        'link': url_for('.request_to_go_live', service_id=service_id),
         'hint': 'A live service can send notifications to any phone number or email address',
       } if not service.live else {
       },
       {
         'title': 'Turn off all outgoing notifications',
-        'link': url_for('.status'),
+        'link': url_for('.status', service_id=service_id),
         'destructive': True
       } if service.active else {
         'title': 'Restart sending notifications',
-        'link': url_for('.status')
+        'link': url_for('.status', service_id=service_id)
       },
       {
         'title': 'Delete this service from Notify',
-        'link': url_for('.delete'),
+        'link': url_for('.delete', service_id=service_id),
         'destructive': True
       },
     ]) }}

@@ -7,13 +7,13 @@ GOV.UK Notify | API keys and documentation
 
 {% block maincolumn_content %}
 
-		<h1 class="heading-xlarge">API keys and documentation</h1>
+    <h1 class="heading-xlarge">API keys and documentation</h1>
 
-		<p>Here's where developers can access information about the API and access keys</p>
+    <p>Here's where developers can access information about the API and access keys</p>
 
-		{{ page_footer(
-			back_link=url_for('.dashboard'),
-			back_link_text='Back to dashboard'
-		) }}
+    {{ page_footer(
+      back_link=url_for('.dashboard', service_id=service_id),
+      back_link_text='Back to dashboard'
+    ) }}
 
 {% endblock %}

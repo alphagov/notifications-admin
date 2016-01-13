@@ -34,8 +34,7 @@ def test_sign_out_user(notifications_admin,
         with notifications_admin.test_client() as client:
             client.login(user)
             # Check we are logged in
-            response = client.get(
-                url_for('main.dashboard'))
+            response = client.get('/services/123/dashboard')
             assert response.status_code == 200
             response = client.get(url_for('main.sign_out'))
             assert response.status_code == 302

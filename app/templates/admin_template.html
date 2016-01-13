@@ -42,7 +42,7 @@
 {% if not current_user.is_authenticated() %}
     {% set homepage_url = url_for('main.index') %}
 {% else %}
-    {% set homepage_url = url_for('main.dashboard') %}
+    {% set homepage_url = url_for('main.dashboard', service_id=123) %}
 {% endif %}
 
 {% block content %}
@@ -60,7 +60,7 @@
           </div>
         </div>
         <div class="column-half management-navigation-account">
-          <a href="{{ url_for('.userprofile') }}">{{ current_user.name }}</a>
+          <a href="{{ url_for('main.userprofile') }}">{{ current_user.name }}</a>
           <a href="{{ url_for('main.sign_out')}}">Sign out</a>
         </div>
       </div>

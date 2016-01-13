@@ -35,9 +35,9 @@ message_templates = [
 ]
 
 
-@main.route("/sms/send", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/sms/send", methods=['GET', 'POST'])
 @login_required
-def sendsms():
+def sendsms(service_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         csv_file = form.file.data
@@ -49,24 +49,25 @@ def sendsms():
             message = 'There was a problem with the file: {}'.format(
                       csv_file.filename)
             flash(message)
-            return redirect(url_for('.sendsms'))
+            return redirect(url_for('.sendsms', service_id=service_id))
 
         if not results['valid'] and not results['rejects']:
             message = "The file {} contained no data".format(csv_file.filename)
             flash(message, 'error')
-            return redirect(url_for('.sendsms'))
+            return redirect(url_for('.sendsms', service_id=service_id))
 
         session[csv_file.filename] = results
-        return redirect(url_for('.checksms', recipients=csv_file.filename))
+        return redirect(url_for('.checksms', service_id=service_id, recipients=csv_file.filename))
 
     return render_template('views/send-sms.html',
                            message_templates=message_templates,
-                           form=form)
+                           form=form,
+                           service_id=service_id)
 
 
-@main.route("/sms/check", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/sms/check", methods=['GET', 'POST'])
 @login_required
-def checksms():
+def checksms(service_id):
     if request.method == 'GET':
 
         recipients_filename = request.args.get('recipients')
@@ -78,10 +79,11 @@ def checksms():
         return render_template(
             'views/check-sms.html',
             upload_result=upload_result,
-            message_template=message_templates[0]['body']
+            message_template=message_templates[0]['body'],
+            service_id=service_id
         )
     elif request.method == 'POST':
-        return redirect(url_for('.showjob'))
+        return redirect(url_for('.showjob', service_id=service_id, job_id=456))
 
 
 def _build_upload_result(csv_file):

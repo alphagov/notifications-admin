@@ -19,6 +19,6 @@ def two_factor():
     if form.validate_on_submit():
         verify_codes_dao.use_code_for_user_and_type(user_id=user.id, code_type='sms')
         login_user(user)
-        return redirect(url_for('.dashboard'))
+        return redirect(url_for('.dashboard', service_id=123))
 
     return render_template('views/two-factor.html', form=form)

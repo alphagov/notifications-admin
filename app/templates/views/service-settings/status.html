@@ -25,7 +25,7 @@ GOV.UK Notify | Service settings
         {{ page_footer(
           'Turn off all outgoing notifications',
           destructive=True,
-          back_link=url_for('.service_settings')
+          back_link=url_for('.service_settings', service_id=service_id)
         ) }}
       </form>
 
