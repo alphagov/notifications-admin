@@ -26,7 +26,7 @@ GOV.UK Notify | Notifications activity
 		</div>
 
 		{{ page_footer(
-			back_link = url_for('.showjob', service_id=service_id),
+			back_link = url_for('.showjob', service_id=service_id, job_id=job_id),
 			back_link_text = 'View other messages in this job'
 		) }}
 

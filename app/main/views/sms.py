@@ -83,7 +83,7 @@ def checksms(service_id):
             service_id=service_id
         )
     elif request.method == 'POST':
-        return redirect(url_for('.showjob', service_id=service_id))
+        return redirect(url_for('.showjob', service_id=service_id, job_id=456))
 
 
 def _build_upload_result(csv_file):

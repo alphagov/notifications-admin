@@ -30,10 +30,10 @@
       field_headings=['Job', 'File', 'Time', 'Status']
     ) %}
 			{% call field() %}
-				<a href="{{ url_for('.showjob', service_id=service_id) }}">{{ item.file }}</a>
+				<a href="{{ url_for('.showjob', service_id=service_id, job_id=456) }}">{{ item.file }}</a>
 			{% endcall %}
 			{% call field() %}
-				<a href="{{ url_for('.showjob', service_id=service_id) }}">{{ item.job }}</a>
+				<a href="{{ url_for('.showjob', service_id=service_id, job_id=456) }}">{{ item.job }}</a>
 			{% endcall %}
 			{% call field() %}
 				{{ item.time }}

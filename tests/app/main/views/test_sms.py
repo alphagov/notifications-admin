@@ -105,4 +105,4 @@ def test_should_redirect_to_job(notifications_admin, notifications_admin_db,
         response = client.post('/123/sms/check')
 
         assert response.status_code == 302
-        assert response.location == 'http://localhost/123/jobs/job'
+        assert response.location == 'http://localhost/123/jobs/456'

@@ -52,9 +52,9 @@ def showjobs(service_id):
     )
 
 
-@main.route("/<int:service_id>/jobs/job")
+@main.route("/<int:service_id>/jobs/<job_id>")
 @login_required
-def showjob(service_id):
+def showjob(service_id, job_id):
     return render_template(
         'views/job.html',
         messages=messages,
@@ -76,9 +76,9 @@ def showjob(service_id):
     )
 
 
-@main.route("/<int:service_id>/jobs/job/notification/<string:notification_id>")
+@main.route("/<int:service_id>/jobs/<job_id>/notification/<string:notification_id>")
 @login_required
-def shownotification(service_id, notification_id):
+def shownotification(service_id, job_id, notification_id):
     return render_template(
         'views/notification.html',
         message=[
@@ -86,5 +86,6 @@ def shownotification(service_id, notification_id):
         ][0],
         delivered_at=now,
         uploaded_at=now,
-        service_id=service_id
+        service_id=service_id,
+        job_id=job_id
     )

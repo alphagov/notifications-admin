@@ -18,7 +18,7 @@ def test_should_show_page_for_one_job(notifications_admin, notifications_admin_d
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/123/jobs/job')
+            response = client.get('/123/jobs/456')
 
         assert response.status_code == 200
         assert 'dispatch_20151114.csv' in response.get_data(as_text=True)
@@ -30,7 +30,7 @@ def test_should_show_page_for_one_notification(notifications_admin, notification
         with notifications_admin.test_client() as client:
             user = create_test_user('active')
             client.login(user)
-            response = client.get('/123/jobs/job/notification/3')
+            response = client.get('/123/jobs/456/notification/3')
 
         assert response.status_code == 200
         assert 'Text message' in response.get_data(as_text=True)
