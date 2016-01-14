@@ -7,6 +7,26 @@
     margin-top: $gutter;
   }
 
+  &-delete-link {
+
+    line-height: 40px;
+    padding: 0 0 0 5px;
+
+    a:visited,
+    a:link {
+      color: $error-colour;
+      display: inline-block;
+      vertical-align: center;
+    }
+
+    a:hover,
+    a:active {
+      color: $mellow-red;
+    }
+
+  }
+
+
   .button {}
 
   .button-destructive {

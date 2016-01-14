@@ -1,0 +1,19 @@
+{% macro email_message(subject, body, name=None, edit_link=None) %}
+  {% if name %}
+    <h3 class="email-message-name">
+      {% if edit_link %}
+        <a href="{{ edit_link }}">{{ name }}</a>
+      {% else %}
+        {{ name }}
+      {% endif %}
+    </h3>
+  {% endif %}
+  <div class="email-message">
+    <div class="email-message-subject">
+      {{ subject|placeholders }}
+    </div>
+    <div class="email-message-body">
+      {{ body|nl2br|placeholders }}
+    </div>
+  </div>
+{% endmacro %}
