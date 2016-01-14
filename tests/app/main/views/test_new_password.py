@@ -72,4 +72,5 @@ def test_should_redirect_to_forgot_password_when_user_is_active_should_be_reques
 
 
 def _set_up_mocker(mocker):
-    mocker.patch("app.admin_api_client.send_sms")
+    # mocker.patch("app.admin_api_client.send_sms")
+    pass

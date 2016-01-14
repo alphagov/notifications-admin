@@ -161,5 +161,6 @@ def test_should_create_new_code_for_user(notifications_admin,
 
 
 def _set_up_mocker(mocker):
-    mocker.patch("app.admin_api_client.send_sms")
-    mocker.patch("app.admin_api_client.send_email")
+    # mocker.patch("app.admin_api_client.send_sms")
+    # mocker.patch("app.admin_api_client.send_email")
+    pass

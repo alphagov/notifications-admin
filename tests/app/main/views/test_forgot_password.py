@@ -15,7 +15,7 @@ def test_should_redirect_to_password_reset_sent_and_state_updated(notifications_
                                                                   notifications_admin_db,
                                                                   mocker,
                                                                   notify_db_session):
-    mocker.patch("app.admin_api_client.send_email")
+    # mocker.patch("app.admin_api_client.send_email")
     with notifications_admin.test_request_context():
         user = create_test_user('active')
         response = notifications_admin.test_client().post(url_for('.forgot_password'),

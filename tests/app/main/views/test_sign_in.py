@@ -119,5 +119,6 @@ def test_should_return_200_when_user_is_not_active(notifications_admin, notifica
 
 
 def _set_up_mocker(mocker):
-    mocker.patch("app.admin_api_client.send_sms")
-    mocker.patch("app.admin_api_client.send_email")
+    # mocker.patch("app.admin_api_client.send_sms")
+    # mocker.patch("app.admin_api_client.send_email")
+    pass

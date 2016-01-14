@@ -8,7 +8,6 @@ from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from werkzeug.exceptions import abort
 
-from app.notify_client.api_client import AdminAPIClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 import app.proxy_fix
 from config import configs
@@ -17,8 +16,6 @@ from utils import logging
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CsrfProtect()
-
-admin_api_client = AdminAPIClient()
 
 
 def create_app(config_name, config_overrides=None):
@@ -43,7 +40,6 @@ def create_app(config_name, config_overrides=None):
     proxy_fix.init_app(application)
 
     application.session_interface = ItsdangerousSessionInterface()
-    admin_api_client.init_app(application)
 
     application.add_template_filter(placeholders)
     application.add_template_filter(replace_placeholders)

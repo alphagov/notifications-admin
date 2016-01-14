@@ -62,8 +62,9 @@ def test_should_add_verify_codes_on_session(notifications_admin, notifications_a
 
 
 def _set_up_mocker(mocker):
-    mocker.patch("app.admin_api_client.send_sms")
-    mocker.patch("app.admin_api_client.send_email")
+    # mocker.patch("app.admin_api_client.send_sms")
+    # mocker.patch("app.admin_api_client.send_email")
+    pass
 
 
 def test_should_return_400_if_password_is_blacklisted(notifications_admin, notifications_admin_db, notify_db_session):
