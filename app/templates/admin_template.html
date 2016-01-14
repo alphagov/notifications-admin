@@ -68,16 +68,22 @@
   {% endif %}
 
   <main id="content" role="main" class="page-container">
-      {% with messages = get_flashed_messages() %}
-      {% if messages %}
-      <div class="error-summary">
-          <ul>
-              {% for message in messages %}
-              <li>{{ message }}</li>
-              {% endfor %}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="banner-dangerous">
+            {% for category, message in messages %}
+              <li class="flash-message">
+                {{ message }}
+                {% if 'delete' == category %}
+                  <form method='post'>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="submit" class="button" name="delete" value="Yes, delete this template" />
+                  </form>
+                {% endif %}
+              </li>
+            {% endfor %}
           </ul>
-      </div>
-      {% endif %}
+        {% endif %}
       {% endwith %}
       {% block fullwidth_content %}{% endblock %}
   </main>

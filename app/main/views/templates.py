@@ -1,4 +1,4 @@
-from flask import request, render_template, redirect, url_for
+from flask import request, render_template, redirect, url_for, flash
 from flask_login import login_required
 
 from app.main import main
@@ -48,7 +48,35 @@ def edit_template(service_id, template_id):
             'views/edit-template.html',
             h1='Edit template',
             form=form,
-            service_id=service_id
+            service_id=service_id,
+            template_id=template_id
         )
     elif request.method == 'POST':
         return redirect(url_for('.manage_templates', service_id=service_id))
+
+
+@main.route("/services/<int:service_id>/templates/<int:template_id>/delete", methods=['GET', 'POST'])
+@login_required
+def delete_template(service_id, template_id):
+
+    form = TemplateForm()
+
+    form.template_name.data = templates[template_id - 1]['name']
+    form.template_body.data = templates[template_id - 1]['body']
+
+    if request.method == 'GET':
+
+        flash('Are you sure you want to delete ‘{}’?'.format(form.template_name.data), 'delete')
+
+        return render_template(
+            'views/edit-template.html',
+            h1='Edit template',
+            form=form,
+            service_id=service_id,
+            template_id=template_id
+        )
+    elif request.method == 'POST':
+        if request.form.get('delete'):
+            return redirect(url_for('.manage_templates', service_id=service_id))
+        else:
+            return redirect(url_for('.manage_templates', service_id=service_id))

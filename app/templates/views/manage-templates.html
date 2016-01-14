@@ -14,6 +14,9 @@ GOV.UK Notify | Manage templates
 
         <h1 class="heading-xlarge">Templates</h1>
 
+        <p>
+          <a href="{{ url_for('.add_template', service_id=service_id) }}">Create new template</a>
+
         {% for template in templates %}
           {% if template.type == 'sms' %}
             {{ sms_message(
@@ -31,18 +34,6 @@ GOV.UK Notify | Manage templates
           {% endif %}
         {% endfor %}
 
-      </div>
-      <div class="column-one-third">
-        {{ browse_list([
-          {
-            'title': 'New text message template',
-            'link': url_for('.add_template', service_id=service_id)
-          },
-          {
-            'title': 'New email template',
-            'link': url_for('.add_template', service_id=service_id)
-          }
-        ]) }}
       </div>
     </div>
 

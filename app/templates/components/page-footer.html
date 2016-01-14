@@ -1,11 +1,23 @@
-{% macro page_footer(button_text=None, back_link=False, back_link_text="Back", destructive=False) %}
+{% macro page_footer(
+  button_text=None,
+  destructive=False,
+  back_link=False,
+  back_link_text="Back",
+  delete_link=False,
+  delete_link_text="delete"
+) %}
   <div class="page-footer">
     {% if button_text %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="submit" class="button{% if destructive %}-destructive{% endif %}" value="{{ button_text }}" />
     {% endif %}
+    {% if delete_link %}
+      <span class="page-footer-delete-link">
+        or <a href="{{ delete_link }}">{{ delete_link_text }}</a>
+      </span>
+    {% endif %}
     {% if back_link %}
-      <a class="page-footer-back-link" role="button" href="{{ back_link }}">{{ back_link_text }}</a>
+      <a class="page-footer-back-link" href="{{ back_link }}">{{ back_link_text }}</a>
     {% endif %}
   </div>
 {% endmacro %}
