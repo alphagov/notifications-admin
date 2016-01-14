@@ -13,7 +13,8 @@ var gulp = require('gulp'),
     paths = {
         src: 'app/assets/',
         dist: 'app/static/',
-        templates: 'app/templates/'
+        templates: 'app/templates/',
+        npm: 'node_modules/'
     };
 
 // 3. TASKS
@@ -31,8 +32,8 @@ gulp.task('copy:govuk_template:assets', () => gulp.src('bower_components/govuk_t
 
 gulp.task('javascripts', () => gulp
   .src([
-    paths.src + 'govuk_frontend_toolkit/javascripts/govuk/modules.js',
-    paths.src + 'govuk_frontend_toolkit/javascripts/govuk/selection-buttons.js',
+    paths.npm + 'govuk_frontend_toolkit/javascripts/govuk/modules.js',
+    paths.npm + 'govuk_frontend_toolkit/javascripts/govuk/selection-buttons.js',
     paths.src + 'javascripts/highlightTags.js',
     paths.src + 'javascripts/dropdown.js',
     paths.src + 'javascripts/main.js'
@@ -50,7 +51,13 @@ gulp.task('javascripts', () => gulp
 
 gulp.task('sass', () => gulp
   .src(paths.src + '/stylesheets/main*.scss')
-  .pipe(plugins.sass({outputStyle: 'compressed'}))
+  .pipe(plugins.sass({
+    outputStyle: 'compressed',
+    includePaths: [
+      paths.npm + 'govuk-elements-sass/public/sass/',
+      paths.npm + 'govuk_frontend_toolkit/stylesheets/'
+    ]
+  }))
   .pipe(gulp.dest(paths.dist + '/stylesheets'))
 );
 
@@ -58,7 +65,10 @@ gulp.task('sass', () => gulp
 // Copy images
 
 gulp.task('images', () => gulp
-  .src(paths.src + 'images/**/*')
+  .src([
+    paths.src + 'images/**/*',
+    paths.npm + 'govuk_frontend_toolkit/images/**/*'
+  ])
   .pipe(gulp.dest(paths.dist + '/images'))
 );
 
