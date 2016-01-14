@@ -16,9 +16,12 @@ def test_should_return_list_of_all_jobs(notifications_admin, notifications_admin
 def test_should_show_page_for_one_job(notifications_admin, notifications_admin_db, notify_db_session):
     with notifications_admin.test_request_context():
         with notifications_admin.test_client() as client:
-            user = create_test_user('active')
-            client.login(user)
-            response = client.get('/services/123/jobs/456')
+            # TODO filename will be part of job metadata not in session
+            with client.session_transaction() as s:
+                s[456] = 'dispatch_20151114.csv'
+        user = create_test_user('active')
+        client.login(user)
+        response = client.get('/services/123/jobs/456')
 
         assert response.status_code == 200
         assert 'dispatch_20151114.csv' in response.get_data(as_text=True)

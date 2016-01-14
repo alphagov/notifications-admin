@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import time
-from flask import render_template
+
+from flask import (
+    render_template,
+    session
+)
 from flask_login import login_required
 
 from app.main import main
-
 from ._jobs import jobs
 
 now = time.strftime('%H:%M')
@@ -55,6 +58,11 @@ def showjobs(service_id):
 @main.route("/services/<int:service_id>/jobs/<job_id>")
 @login_required
 def showjob(service_id, job_id):
+
+    # TODO the uploaded file name could be part of job definition
+    # so won't need to be passed on from last view via session
+    uploaded_file_name = session.get(job_id)
+
     return render_template(
         'views/job.html',
         messages=messages,
@@ -68,7 +76,7 @@ def showjob(service_id, job_id):
             ])
         },
         cost=u'£0.00',
-        uploaded_file_name='dispatch_20151114.csv',
+        uploaded_file_name=uploaded_file_name,
         uploaded_file_time=now,
         template_used='Test message 1',
         flash_message=u'We’ve started sending your messages',
