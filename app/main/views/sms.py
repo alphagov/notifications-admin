@@ -11,7 +11,8 @@ from flask import (
     url_for,
     session,
     flash,
-    current_app
+    current_app,
+    abort
 )
 
 from flask_login import login_required
@@ -75,6 +76,8 @@ def sendsms(service_id):
 def checksms(service_id):
     if request.method == 'GET':
         filename = request.args.get('recipients')
+        if not filename:
+            abort(400)
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'],
                                 filename)
         upload_result = _build_upload_result(filepath)
