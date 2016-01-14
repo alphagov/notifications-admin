@@ -5,5 +5,5 @@ from app.main import main
 
 @main.route("/services")
 @login_required
-def chooseservice():
+def choose_service():
     return render_template('views/choose-service.html')
