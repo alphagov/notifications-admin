@@ -7,9 +7,58 @@ GOV.UK Notify | API keys and documentation
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-xlarge">API keys and documentation</h1>
+    <h1 class="heading-xlarge">API documentation and key</h1>
 
-    <p>Here's where developers can access information about the API and access keys</p>
+    <h2 class="heading-medium">How to integrate Notify into your service</h2>
+
+    <p>blah blah blah this is where we tell you how the API works</p>
+
+    <h2 class="heading-medium">Repositories</h2>
+
+    <p><a href="https://github.com/alphagov/notify-api">https://github.com/alphagov/notify-api</a><br>
+    Notify API</p>
+
+    <p><a href="https://github.com/alphagov/notify-api-client">A python api client for Notify</a></p>
+
+
+    <h2 class="heading-medium">Python client</h2>
+
+    <p>blah blah blah this is what to do for Python</p>
+
+    <div style="width: 80%; border: 1px solid #BFC1C3;">
+    <p style="font-size: 16px; font-family: monospace; white-space: pre;">
+    here is;
+    some() {
+    	code.stuff();
+    }
+    </p>
+    </div>
+
+    <p></p>
+
+    <div style="border-top: 1px solid #BFC1C3;"></div>
+
+    <h2 class="heading-medium">API key for [service name]</h2>
+
+    <p>API endpoint: https://www.notify.works/api/endpoint</p>
+
+	<div id="api-button">
+    <p><a class="button" type="submit" onclick="document.getElementById('api-key').style.display='block'; document.getElementById('api-button').style.display='none'; ">Show API key</a></p>
+    </div>
+
+    <div id="api-key" style="display: none;">
+    <p>API key: hh234hsdf9234sdflwerk234ksdflmwer0234welkfj</p>
+    <p><a class="button" type="submit" onclick="document.getElementById('api-key-copied').style.display='block'; document.getElementById('api-key').style.display='none'; ">Copy API key to clipboard</a></p>
+    </div>
+
+	<div id="api-key-copied" style="display: none;">
+    <p>API key copied to clipboard</p>
+
+    <p><a class="button" type="submit" onclick="document.getElementById('api-key').style.display='block'; document.getElementById('api-key-copied').style.display='none'; ">Show API key</a></p>
+    </div>
+
+
+    <div style="border-top: 1px solid #BFC1C3;"></div>
 
     {{ page_footer(
       back_link=url_for('.dashboard', service_id=service_id),
