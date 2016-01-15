@@ -3,47 +3,50 @@
 {% from "components/api-key.html" import api_key %}
 
 {% block page_title %}
-GOV.UK Notify | API keys and documentation
+  GOV.UK Notify | API keys and documentation
 {% endblock %}
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-xlarge">API documentation and key</h1>
+    <div class="grid-row">
+      <div class="column-two-thirds">
 
-    <h2 class="heading-medium">How to integrate GOV.UK Notify into your service</h2>
+        <h1 class="heading-xlarge">
+          API keys and documentation
+        </h1>
 
-    <p>blah blah blah this is where we tell you how the API works</p>
+        <h2 class="heading-medium">
+          How to integrate GOV.UK Notify into your service
+        </h2>
 
-    <h2 class="heading-medium">Repositories</h2>
+        <p>
+          blah blah blah this is where we tell you how the API works
+        </p>
 
-    <p><a href="https://github.com/alphagov/notifications-api">https://github.com/alphagov/notifications-api</a><br>
-    GOV.UK Notify API</p>
-
-    <p><a href="https://github.com/alphagov/notify-api-client">A python api client for GOV.UK Notify</a></p>
+        <h2 class="heading-medium">Repositories</h2>
 
 
-    <h2 class="heading-medium">Python client</h2>
 
-    <p>blah blah blah this is what to do for Python</p>
+        <p>
+          <a href="https://github.com/alphagov/notifications-api">GOV.UK Notify API</a>
+        </p>
 
-    <div style="width: 80%; border: 1px solid #BFC1C3;">
-    <p style="font-size: 16px; font-family: monospace; white-space: pre;">
-    here is;
-    some() {
-    	code.stuff();
-    }
-    </p>
+        <p>
+          <a href="https://github.com/alphagov/notify-api-client">GOV.UK Notify Python client</a>
+        </p>
+
+        <h2 class="heading-medium">API key for [service name]</h2>
+
+        {{ api_key('d30512af92e1386d63b90e5973b49a10') }}
+
+        <h2 class="heading-medium">API endpoint</h2>
+
+        <p>
+          https://www.notify.works/api/endpoint
+        </p>
+
+      </div>
     </div>
-
-    <p></p>
-
-    <div style="border-top: 1px solid #BFC1C3;"></div>
-
-    <h2 class="heading-medium">API key for [service name]</h2>
-
-    <p>API endpoint: https://www.notify.works/api/endpoint</p>
-
-    {{ api_key('d30512af92e1386d63b90e5973b49a10') }}
 
     {{ page_footer(
       back_link=url_for('.dashboard', service_id=service_id),
