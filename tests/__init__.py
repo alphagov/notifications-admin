@@ -12,7 +12,7 @@ class TestClient(FlaskClient):
         verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
         response = self.post(
             url_for('main.two_factor'), data={'sms_code': '12345'})
-        assert response.status_code == 200
+        assert response.status_code == 302
 
     def logout(self, user):
         self.get(url_for("main.logout"))

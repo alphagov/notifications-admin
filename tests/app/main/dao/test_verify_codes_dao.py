@@ -3,7 +3,7 @@ from pytest import fail
 
 from app.main.dao import verify_codes_dao
 from app.main.encryption import check_hash
-from tests.app.main import create_test_user, create_another_test_user
+from tests import create_test_user, create_another_test_user
 
 
 def test_insert_new_code_and_get_it_back(app_, db_, db_session):
