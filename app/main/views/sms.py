@@ -43,7 +43,7 @@ message_templates = [
 
 @main.route("/services/<int:service_id>/sms/send", methods=['GET', 'POST'])
 @login_required
-def sendsms(service_id):
+def send_sms(service_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
@@ -53,7 +53,7 @@ def sendsms(service_id):
                                     filename)
             csv_file.save(filepath)
             _check_file(csv_file.filename, filepath)
-            return redirect(url_for('.checksms',
+            return redirect(url_for('.check_sms',
                                     service_id=service_id,
                                     recipients=filename))
         except (IOError, ValueError) as e:
@@ -63,7 +63,7 @@ def sendsms(service_id):
             if isinstance(e, ValueError):
                 flash(str(e))
             os.remove(filepath)
-            return redirect(url_for('.sendsms', service_id=service_id))
+            return redirect(url_for('.send_sms', service_id=service_id))
 
     return render_template('views/send-sms.html',
                            message_templates=message_templates,
@@ -73,7 +73,7 @@ def sendsms(service_id):
 
 @main.route("/services/<int:service_id>/sms/check", methods=['GET', 'POST'])
 @login_required
-def checksms(service_id):
+def check_sms(service_id):
     if request.method == 'GET':
         filename = request.args.get('recipients')
         if not filename:
@@ -100,10 +100,10 @@ def checksms(service_id):
             # TODO when job is created record filename in job itself
             # so downstream pages can get the original filename that way
             session[upload_id] = filename
-            return redirect(url_for('main.showjob', service_id=service_id, job_id=upload_id))
+            return redirect(url_for('main.view_job', service_id=service_id, job_id=upload_id))
         except:
             flash('There as a problem saving the file')
-            return redirect(url_for('.checksms', recipients=filename))
+            return redirect(url_for('.check_sms', recipients=filename))
 
 
 def _check_file(filename, filepath):

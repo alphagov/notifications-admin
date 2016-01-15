@@ -1,6 +1,6 @@
 from flask import json, url_for
 from app.main.dao import users_dao, verify_codes_dao
-from tests.app.main import create_test_user
+from tests import create_test_user
 
 
 def test_should_return_verify_template(app_, db_, db_session):

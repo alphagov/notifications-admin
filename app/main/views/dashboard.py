@@ -8,7 +8,7 @@ from ._jobs import jobs
 
 @main.route("/services/<int:service_id>/dashboard")
 @login_required
-def dashboard(service_id):
+def service_dashboard(service_id):
     try:
         service = get_service_by_id(service_id)
     except HTTPError as e:
@@ -17,7 +17,7 @@ def dashboard(service_id):
         else:
             raise e
     return render_template(
-        'views/dashboard.html',
+        'views/service_dashboard.html',
         jobs=jobs,
         free_text_messages_remaining=560,
         spent_this_month='0.00',

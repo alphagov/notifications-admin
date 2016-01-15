@@ -1,4 +1,4 @@
-from tests.app.main import create_test_user
+from tests import create_test_user
 
 
 def test_should_return_list_of_all_templates(app_, db_, db_session):

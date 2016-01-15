@@ -3,10 +3,10 @@ from flask import url_for
 from app.main.dao import users_dao
 from app.main.encryption import check_hash
 from app.notify_client.sender import generate_token
-from tests.app.main import create_test_user
+from tests import create_test_user
 
 
-def test_should_render_new_password_template(db_, db_session):
+def test_should_render_new_password_template(app_, db_, db_session):
     with app_.test_request_context():
         with app_.test_client() as client:
             user = create_test_user('request_password_reset')
@@ -16,7 +16,7 @@ def test_should_render_new_password_template(db_, db_session):
         assert ' You can now create a new password for your account.' in response.get_data(as_text=True)
 
 
-def test_should_render_new_password_template_with_message_of_bad_token(db_, db_session):
+def test_should_render_new_password_template_with_message_of_bad_token(app_, db_, db_session):
     with app_.test_request_context():
         with app_.test_client() as client:
             create_test_user('request_password_reset')
@@ -27,7 +27,8 @@ def test_should_render_new_password_template_with_message_of_bad_token(db_, db_s
                response.get_data(as_text=True)
 
 
-def test_should_redirect_to_two_factor_when_password_reset_is_successful(db_,
+def test_should_redirect_to_two_factor_when_password_reset_is_successful(app_,
+                                                                         db_,
                                                                          db_session,
                                                                          mock_send_sms):
     with app_.test_request_context():
@@ -42,7 +43,8 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(db_,
         assert saved_user.state == 'active'
 
 
-def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_expired(db_,
+def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_expired(app_,
+                                                                                     db_,
                                                                                      db_session):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -55,7 +57,8 @@ def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_exp
         app_.config['TOKEN_MAX_AGE_SECONDS'] = 3600
 
 
-def test_should_redirect_to_forgot_password_when_user_is_active_should_be_request_password_reset(db_,
+def test_should_redirect_to_forgot_password_when_user_is_active_should_be_request_password_reset(app_,
+                                                                                                 db_,
                                                                                                  db_session):
     with app_.test_request_context():
         with app_.test_client() as client:

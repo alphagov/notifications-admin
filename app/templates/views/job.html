@@ -52,10 +52,10 @@ GOV.UK Notify | Notifications activity
       ]
     ) %}
       {% call field() %}
-        <a href="{{ url_for('.shownotification', service_id=service_id, job_id=456, notification_id=item.id) }}">{{item.phone}}</a>
+        <a href="{{ url_for('.view_notification', service_id=service_id, job_id=456, notification_id=item.id) }}">{{item.phone}}</a>
       {% endcall %}
       {% call field() %}
-        <a href="{{ url_for('.shownotification', service_id=service_id, job_id=456, notification_id=item.id) }}">{{item.message[:50]}}…</a>
+        <a href="{{ url_for('.view_notification', service_id=service_id, job_id=456, notification_id=item.id) }}">{{item.message[:50]}}…</a>
       {% endcall %}
       {% call field(
         align='right',

@@ -1,6 +1,6 @@
 from flask import url_for
 from app.main.dao import users_dao
-from tests.app.main import create_test_user
+from tests import create_test_user
 
 
 def test_should_render_forgot_password(app_, db_, db_session):

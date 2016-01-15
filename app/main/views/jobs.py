@@ -47,7 +47,7 @@ messages = [
 
 @main.route("/services/<int:service_id>/jobs")
 @login_required
-def showjobs(service_id):
+def view_jobs(service_id):
     return render_template(
         'views/jobs.html',
         jobs=jobs,
@@ -57,7 +57,7 @@ def showjobs(service_id):
 
 @main.route("/services/<int:service_id>/jobs/<job_id>")
 @login_required
-def showjob(service_id, job_id):
+def view_job(service_id, job_id):
 
     # TODO the uploaded file name could be part of job definition
     # so won't need to be passed on from last view via session
@@ -86,7 +86,7 @@ def showjob(service_id, job_id):
 
 @main.route("/services/<int:service_id>/jobs/<job_id>/notification/<string:notification_id>")
 @login_required
-def shownotification(service_id, job_id, notification_id):
+def view_notification(service_id, job_id, notification_id):
     return render_template(
         'views/notification.html',
         message=[

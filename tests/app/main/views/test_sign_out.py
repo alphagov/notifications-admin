@@ -3,8 +3,6 @@ from flask import url_for
 from app.main.dao import users_dao
 from app.models import User
 
-from .test_sign_in import _set_up_mocker
-
 
 def test_render_sign_out_redirects_to_sign_in(app_):
     with app_.test_request_context():
@@ -19,7 +17,8 @@ def test_sign_out_user(app_,
                        db_,
                        db_session,
                        mock_send_sms,
-                       mock_send_email):
+                       mock_send_email,
+                       mock_get_service):
     with app_.test_request_context():
         email = 'valid@example.gov.uk'
         password = 'val1dPassw0rd!'
@@ -34,7 +33,8 @@ def test_sign_out_user(app_,
         with app_.test_client() as client:
             client.login(user)
             # Check we are logged in
-            response = client.get('/services/123/dashboard')
+            response = client.get(
+                url_for('main.service_dashboard', service_id="123"))
             assert response.status_code == 200
             response = client.get(url_for('main.sign_out'))
             assert response.status_code == 302

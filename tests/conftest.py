@@ -124,5 +124,4 @@ def mock_get_services(mocker, active_user):
         return {'data': [service_one, service_two]}
     mock_class = mocker.patch(
         'app.notifications_api_client.get_services', side_effect=_create)
-    return mock_class 
-
+    return mock_class

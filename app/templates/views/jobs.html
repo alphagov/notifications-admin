@@ -16,10 +16,10 @@ GOV.UK Notify | Notifications activity
 			field_headings=['Job', 'File', 'Time', 'Status']
 		) %}
 			{% call field() %}
-				<a href="{{ url_for('.showjob', service_id=service_id, job_id=456) }}">{{ item.file }}</a>
+				<a href="{{ url_for('.view_job', service_id=service_id, job_id=456) }}">{{ item.file }}</a>
 			{% endcall %}
 			{% call field() %}
-				<a href="{{ url_for('.showjob', service_id=service_id, job_id=456) }}">{{ item.job }}</a>
+				<a href="{{ url_for('.view_job', service_id=service_id, job_id=456) }}">{{ item.job }}</a>
 			{% endcall %}
 			{% call field() %}
 				{{ item.time }}

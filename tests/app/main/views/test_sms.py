@@ -2,7 +2,7 @@ from io import BytesIO
 from unittest import mock
 from unittest.mock import mock_open
 
-from tests.app.main import create_test_user
+from tests import create_test_user
 
 
 def test_upload_empty_csvfile_returns_to_upload_page(

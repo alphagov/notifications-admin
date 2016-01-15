@@ -128,4 +128,4 @@ def confirm_delete(service_id):
             service_id=service_id
         )
     elif request.method == 'POST':
-        return redirect(url_for('.dashboard', service_id=service_id))
+        return redirect(url_for('.service_dashboard', service_id=service_id))

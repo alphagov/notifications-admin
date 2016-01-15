@@ -1,4 +1,4 @@
-from tests.app.main import create_test_user
+from tests import create_test_user
 
 
 def test_should_show_overview(app_, db_, db_session):
