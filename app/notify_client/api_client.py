@@ -4,7 +4,19 @@ from client.notifications import NotificationsAPIClient
 
 class NotificationsAdminAPIClient(NotificationsAPIClient):
 
-    def create_service(self, service_name, active, limit, restricted):
+    # Fudge assert in the super __init__ so
+    # we can set those variables later.
+    def __init__(self):
+        super(NotificationsAdminAPIClient, self).__init__("api_url",
+                                                          "client",
+                                                          "secret")
+
+    def init_app(self, application):
+        self.base_url = application.config['NOTIFY_API_URL']
+        self.client_id = application.config['NOTIFY_API_CLIENT']
+        self.secret = application.config['NOTIFY_API_SECRET']
+
+    def create_service(self, service_name, active, limit, restricted, user_id):
         """
         Create a service and return the json.
         """
@@ -12,6 +24,7 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
             "name": service_name,
             "active": active,
             "limit": limit,
+            "users": [user_id],
             "restricted": restricted
         }
         return self.post("/service", data)
@@ -28,7 +41,8 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
                        service_name,
                        active,
                        limit,
-                       restricted):
+                       restricted,
+                       users):
         """
         Update a service.
         """
@@ -37,7 +51,8 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
             "name": service_name,
             "active": active,
             "limit": limit,
-            "restricted": restricted
+            "restricted": restricted,
+            "users": users
         }
         endpoint = "/service/{0}".format(service_id)
         return self.put(endpoint, update_dict)
@@ -61,3 +76,21 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
         """
         endpoint = "/service/{0}/template/{1}".format(service_id, template_id)
         return self.delete(endpoint)
+
+    # The implementation of these will change after the notifications-api
+    # functionality updates to include the ability to send notifications.
+    def send_sms(self,
+                 mobile_number,
+                 message,
+                 job_id=None,
+                 description=None):
+        pass
+
+    def send_email(self,
+                   email_address,
+                   message,
+                   from_address,
+                   subject,
+                   job_id=None,
+                   description=None):
+        pass

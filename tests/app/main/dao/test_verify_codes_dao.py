@@ -6,7 +6,7 @@ from app.main.encryption import check_hash
 from tests.app.main import create_test_user, create_another_test_user
 
 
-def test_insert_new_code_and_get_it_back(notifications_admin, notifications_admin_db, notify_db_session):
+def test_insert_new_code_and_get_it_back(app_, db_, db_session):
     user = create_test_user('pending')
 
     verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='email')
@@ -19,9 +19,9 @@ def test_insert_new_code_and_get_it_back(notifications_admin, notifications_admi
     assert saved_code.code_used is False
 
 
-def test_insert_new_code_should_thrw_exception_when_type_does_not_exist(notifications_admin,
-                                                                        notifications_admin_db,
-                                                                        notify_db_session):
+def test_insert_new_code_should_thrw_exception_when_type_does_not_exist(app_,
+                                                                        db_,
+                                                                        db_session):
     user = create_test_user('pending')
     try:
         verify_codes_dao.add_code(user_id=user.id, code='23545', code_type='not_real')
@@ -30,9 +30,9 @@ def test_insert_new_code_should_thrw_exception_when_type_does_not_exist(notifica
         assert 'invalid input value for enum verify_code_types: "not_real"' in e.orig.pgerror
 
 
-def test_should_throw_exception_when_user_does_not_exist(notifications_admin,
-                                                         notifications_admin_db,
-                                                         notify_db_session):
+def test_should_throw_exception_when_user_does_not_exist(app_,
+                                                         db_,
+                                                         db_session):
     try:
         verify_codes_dao.add_code(user_id=1, code='12345', code_type='email')
         fail('Should throw exception')
@@ -41,9 +41,9 @@ def test_should_throw_exception_when_user_does_not_exist(notifications_admin,
                'foreign key constraint "verify_codes_user_id_fkey"' in e.orig.pgerror
 
 
-def test_should_return_none_if_code_is_used(notifications_admin,
-                                            notifications_admin_db,
-                                            notify_db_session):
+def test_should_return_none_if_code_is_used(app_,
+                                            db_,
+                                            db_session):
     user = create_test_user('pending')
 
     verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='email')
@@ -52,9 +52,9 @@ def test_should_return_none_if_code_is_used(notifications_admin,
     assert saved_code.code_used is True
 
 
-def test_should_return_none_if_code_is_used(notifications_admin,
-                                            notifications_admin_db,
-                                            notify_db_session):
+def test_should_return_none_if_code_is_used(app_,
+                                            db_,
+                                            db_session):
     user = create_test_user('pending')
 
     verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
@@ -64,9 +64,9 @@ def test_should_return_none_if_code_is_used(notifications_admin,
     assert used_code == []
 
 
-def test_should_return_all_unused_code_when_there_are_many(notifications_admin,
-                                                           notifications_admin_db,
-                                                           notify_db_session):
+def test_should_return_all_unused_code_when_there_are_many(app_,
+                                                           db_,
+                                                           db_session):
     user = create_test_user('pending')
     another_user = create_another_test_user('active')
     verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')

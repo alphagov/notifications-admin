@@ -2,9 +2,9 @@ from app.main.dao import verify_codes_dao, services_dao
 from tests.app.main import create_test_user
 
 
-def test_get_should_render_add_service_template(notifications_admin, notifications_admin_db, notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_get_should_render_add_service_template(app_, db_, db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             user = create_test_user('active')
             client.login(user)
             verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
@@ -14,9 +14,9 @@ def test_get_should_render_add_service_template(notifications_admin, notificatio
             assert 'Set up notifications for your service' in response.get_data(as_text=True)
 
 
-def test_should_add_service_and_redirect_to_next_page(notifications_admin, notifications_admin_db, notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_add_service_and_redirect_to_next_page(app_, db_, db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             user = create_test_user('active')
             client.login(user)
             verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
@@ -28,11 +28,11 @@ def test_should_add_service_and_redirect_to_next_page(notifications_admin, notif
             assert saved_service is not None
 
 
-def test_should_return_form_errors_when_service_name_is_empty(notifications_admin,
-                                                              notifications_admin_db,
-                                                              notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_return_form_errors_when_service_name_is_empty(app_,
+                                                              db_,
+                                                              db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             user = create_test_user('active')
             client.login(user)
             verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')

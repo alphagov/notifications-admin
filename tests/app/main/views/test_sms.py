@@ -6,12 +6,12 @@ from tests.app.main import create_test_user
 
 
 def test_upload_empty_csvfile_returns_to_upload_page(
-        notifications_admin, notifications_admin_db, notify_db_session,
+        app_, db_, db_session,
         mocker):
 
     _setup_mocker_for_empty_file(mocker)
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+    with app_.test_request_context():
+        with app_.test_client() as client:
             user = create_test_user('active')
             client.login(user)
             upload_data = {'file': (BytesIO(''.encode('utf-8')), 'emtpy.csv')}
@@ -24,7 +24,7 @@ def test_upload_empty_csvfile_returns_to_upload_page(
 
 
 def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
-        notifications_admin, notifications_admin_db, notify_db_session,
+        app_, db_, db_session,
         mocker):
 
     contents = 'phone\n+44 123\n+44 456'
@@ -32,8 +32,8 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
     m_open = mock_open(read_data=contents)
     _setup_mocker_for_nonemtpy_file(mocker)
 
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+    with app_.test_request_context():
+        with app_.test_client() as client:
             user = create_test_user('active')
             client.login(user)
             upload_data = {'file': file_data}
@@ -52,7 +52,7 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
 
 
 def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(
-        notifications_admin, notifications_admin_db, notify_db_session,
+        app_, db_, db_session,
         mocker):
 
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986\n+44 7700 900987\n+44 7700 900988\n+44 7700 900989'  # noqa
@@ -61,8 +61,8 @@ def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(
     m_open = mock_open(read_data=contents)
     _setup_mocker_for_nonemtpy_file(mocker)
 
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+    with app_.test_request_context():
+        with app_.test_client() as client:
             user = create_test_user('active')
             client.login(user)
             upload_data = {'file': file_data}
@@ -89,7 +89,7 @@ def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(
 
 
 def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(
-        notifications_admin, notifications_admin_db, notify_db_session,
+        app_, db_, db_session,
         mocker):
 
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
@@ -98,8 +98,8 @@ def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(
     m_open = mock_open(read_data=contents)
     _setup_mocker_for_nonemtpy_file(mocker)
 
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+    with app_.test_request_context():
+        with app_.test_client() as client:
             user = create_test_user('active')
             client.login(user)
             upload_data = {'file': file_data}
@@ -121,11 +121,11 @@ def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(
         assert '+44 7700 900986' in content
 
 
-def test_should_redirect_to_job(notifications_admin, notifications_admin_db,
-                                notify_db_session, mocker):
+def test_should_redirect_to_job(app_, db_,
+                                db_session, mocker):
     _setup_mocker_for_check(mocker)
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+    with app_.test_request_context():
+        with app_.test_client() as client:
             user = create_test_user('active')
             client.login(user)
             with client.session_transaction() as s:

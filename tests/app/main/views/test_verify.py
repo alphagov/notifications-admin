@@ -3,9 +3,9 @@ from app.main.dao import users_dao, verify_codes_dao
 from tests.app.main import create_test_user
 
 
-def test_should_return_verify_template(notifications_admin, notifications_admin_db, notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_return_verify_template(app_, db_, db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             # TODO this lives here until we work out how to
             # reassign the session after it is lost mid register process
             with client.session_transaction() as session:
@@ -18,11 +18,11 @@ def test_should_return_verify_template(notifications_admin, notifications_admin_
                 " You need to enter both codes here.") in response.get_data(as_text=True)
 
 
-def test_should_redirect_to_add_service_when_code_are_correct(notifications_admin,
-                                                              notifications_admin_db,
-                                                              notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_redirect_to_add_service_when_code_are_correct(app_,
+                                                              db_,
+                                                              db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('pending')
                 session['user_email'] = user.email_address
@@ -35,9 +35,9 @@ def test_should_redirect_to_add_service_when_code_are_correct(notifications_admi
             assert response.location == url_for('main.add_service', _external=True)
 
 
-def test_should_activate_user_after_verify(notifications_admin, notifications_admin_db, notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_activate_user_after_verify(app_, db_, db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('pending')
                 session['user_email'] = user.email_address
@@ -51,9 +51,9 @@ def test_should_activate_user_after_verify(notifications_admin, notifications_ad
             assert after_verify.state == 'active'
 
 
-def test_should_return_200_when_codes_are_wrong(notifications_admin, notifications_admin_db, notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_return_200_when_codes_are_wrong(app_, db_, db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('pending')
                 session['user_email'] = user.email_address
@@ -68,11 +68,11 @@ def test_should_return_200_when_codes_are_wrong(notifications_admin, notificatio
             assert resp_data.count('Code does not match') == 2
 
 
-def test_should_mark_all_codes_as_used_when_many_codes_exist(notifications_admin,
-                                                             notifications_admin_db,
-                                                             notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_mark_all_codes_as_used_when_many_codes_exist(app_,
+                                                             db_,
+                                                             db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('pending')
                 session['user_email'] = user.email_address

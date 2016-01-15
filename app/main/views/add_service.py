@@ -8,9 +8,9 @@ from app.main.forms import AddServiceForm
 @main.route("/add-service", methods=['GET', 'POST'])
 @login_required
 def add_service():
+	# TODO fix up this 
     form = AddServiceForm(services_dao.find_all_service_names())
     if form.validate_on_submit():
-
         user = users_dao.get_user_by_id(session['user_id'])
         services_dao.insert_new_service(form.service_name.data, user)
         return redirect(url_for('.dashboard', service_id=123))

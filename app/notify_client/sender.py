@@ -2,6 +2,7 @@ from random import randint
 from flask import url_for, current_app
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from app.main.dao import verify_codes_dao
+from app import notifications_api_client
 
 
 def create_verify_code():
@@ -11,7 +12,8 @@ def create_verify_code():
 def send_sms_code(user_id, mobile_number):
     sms_code = create_verify_code()
     verify_codes_dao.add_code(user_id=user_id, code=sms_code, code_type='sms')
-    # admin_api_client.send_sms(mobile_number=mobile_number, message=sms_code, token=admin_api_client.auth_token)
+    notifications_api_client.send_sms(mobile_number=mobile_number,
+                                      message=sms_code)
 
     return sms_code
 
@@ -19,21 +21,19 @@ def send_sms_code(user_id, mobile_number):
 def send_email_code(user_id, email):
     email_code = create_verify_code()
     verify_codes_dao.add_code(user_id=user_id, code=email_code, code_type='email')
-    # admin_api_client.send_email(email_address=email,
-    #                            from_str='notify@digital.cabinet-office.gov.uk',
-    #                            message=email_code,
-    #                            subject='Verification code',
-    #                            token=admin_api_client.auth_token)
+    notifications_api_client.send_email(email_address=email,
+                                        from_address='notify@digital.cabinet-office.gov.uk',
+                                        message=email_code,
+                                        subject='Verification code')
     return email_code
 
 
 def send_change_password_email(email):
     link_to_change_password = url_for('.new_password', token=generate_token(email), _external=True)
-    # admin_api_client.send_email(email_address=email,
-    #                            from_str='notify@digital.cabinet-office.gov.uk',
-    #                            message=link_to_change_password,
-    #                            subject='Reset password for GOV.UK Notify',
-    #                            token=admin_api_client.auth_token)
+    notifications_api_client.send_email(email_address=email,
+                                        from_address='notify@digital.cabinet-office.gov.uk',
+                                        message=link_to_change_password,
+                                        subject='Reset password for GOV.UK Notify')
 
 
 def generate_token(email):

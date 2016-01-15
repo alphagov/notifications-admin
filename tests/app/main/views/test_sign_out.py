@@ -6,21 +6,21 @@ from app.models import User
 from .test_sign_in import _set_up_mocker
 
 
-def test_render_sign_out_redirects_to_sign_in(notifications_admin):
-    with notifications_admin.test_request_context():
-        response = notifications_admin.test_client().get(
+def test_render_sign_out_redirects_to_sign_in(app_):
+    with app_.test_request_context():
+        response = app_.test_client().get(
             url_for('main.sign_out'))
         assert response.status_code == 302
         assert response.location == url_for(
             'main.sign_in', _external=True, next=url_for('main.sign_out'))
 
 
-def test_sign_out_user(notifications_admin,
-                       notifications_admin_db,
-                       notify_db_session,
-                       mocker):
-    with notifications_admin.test_request_context():
-        _set_up_mocker(mocker)
+def test_sign_out_user(app_,
+                       db_,
+                       db_session,
+                       mock_send_sms,
+                       mock_send_email):
+    with app_.test_request_context():
         email = 'valid@example.gov.uk'
         password = 'val1dPassw0rd!'
         user = User(email_address=email,
@@ -31,7 +31,7 @@ def test_sign_out_user(notifications_admin,
                     role_id=1,
                     state='active')
         users_dao.insert_user(user)
-        with notifications_admin.test_client() as client:
+        with app_.test_client() as client:
             client.login(user)
             # Check we are logged in
             response = client.get('/services/123/dashboard')
