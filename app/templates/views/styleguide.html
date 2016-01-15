@@ -7,6 +7,7 @@
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/table.html" import mapping_table, list_table, row, field %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/api-key.html" import api_key %}
 
 {% block page_title %}
   Styleguide – GOV.UK Notify
@@ -151,5 +152,9 @@
   {{ textbox(form.username) }}
   {{ textbox(form.password) }}
   {{ textbox(form.message, highlight_tags=True) }}
+
+  <h2 class="heading-large">API key</h2>
+
+  {{ api_key('d30512af92e1386d63b90e5973b49a10') }}
 
 {% endblock %}
