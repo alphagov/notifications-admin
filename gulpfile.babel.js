@@ -34,17 +34,19 @@ gulp.task('javascripts', () => gulp
   .src([
     paths.npm + 'govuk_frontend_toolkit/javascripts/govuk/modules.js',
     paths.npm + 'govuk_frontend_toolkit/javascripts/govuk/selection-buttons.js',
-    paths.src + 'javascripts/highlightTags.js',
+    paths.src + 'javascripts/apiKey.js',
     paths.src + 'javascripts/dropdown.js',
+    paths.src + 'javascripts/highlightTags.js',
     paths.src + 'javascripts/main.js'
   ])
   .pipe(plugins.babel({
     presets: ['es2015']
   }))
   .pipe(plugins.uglify())
-  .pipe(plugins.addSrc.prepend(
-    './node_modules/jquery/dist/jquery.min.js'
-  ))
+  .pipe(plugins.addSrc.prepend([
+    paths.npm + 'jquery/dist/jquery.min.js',
+    paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js'
+  ]))
   .pipe(plugins.concat('all.js'))
   .pipe(gulp.dest(paths.dist + 'javascripts/'))
 );
