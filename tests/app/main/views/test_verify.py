@@ -32,7 +32,7 @@ def test_should_redirect_to_add_service_when_code_are_correct(notifications_admi
                                    data={'sms_code': '12345',
                                          'email_code': '23456'})
             assert response.status_code == 302
-            assert response.location == url_for('main.add_service', _external=True)
+            assert response.location == url_for('main.add_service', first='first', _external=True)
 
 
 def test_should_activate_user_after_verify(notifications_admin, notifications_admin_db, notify_db_session):
