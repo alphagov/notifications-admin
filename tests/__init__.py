@@ -28,11 +28,12 @@ def service_json(id_, name, users, limit=1000, active=False, restricted=True):
         'restricted': restricted
     }
 
+TEST_USER_EMAIL = 'test@user.gov.uk'
 
 def create_test_user(state):
     user = User(name='Test User',
                 password='somepassword',
-                email_address='test@user.gov.uk',
+                email_address=TEST_USER_EMAIL,
                 mobile_number='+441234123412',
                 role_id=1,
                 state=state)
@@ -49,3 +50,7 @@ def create_another_test_user(state):
                 state=state)
     users_dao.insert_user(user)
     return user
+
+
+def get_test_user():
+    return users_dao.get_user_by_email(TEST_USER_EMAIL)

@@ -59,6 +59,10 @@ def find_service_by_service_name(service_name):
     return retval
 
 
+def delete_service(id_):
+    return notifications_api_client.delete_service(id_)
+
+
 def find_all_service_names():
     resp = notifications_api_client.get_services()
     return [x['name'] for x in resp['data']]

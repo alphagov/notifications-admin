@@ -166,7 +166,7 @@ class AddServiceForm(Form):
         self._names_func = names_func
         super(AddServiceForm, self).__init__(*args, **kwargs)
 
-    service_name = StringField(validators=[
+    name = StringField('Service Name', validators=[
         DataRequired(message='Service name can not be empty')])
 
     def validate_service_name(self, a):
@@ -175,7 +175,7 @@ class AddServiceForm(Form):
 
 
 class ServiceNameForm(Form):
-    service_name = StringField(u'New name')
+    name = StringField(u'New name')
 
 
 class ConfirmPasswordForm(Form):

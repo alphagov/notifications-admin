@@ -6,7 +6,8 @@ from flask.ext.migrate import Migrate, MigrateCommand
 from flask.ext.script import Manager
 from sqlalchemy.schema import MetaData
 from . import (
-    create_test_user, create_another_test_user, service_json, TestClient)
+    create_test_user, create_another_test_user, service_json, TestClient,
+    get_test_user)
 from app import create_app, db
 
 
@@ -66,6 +67,9 @@ def service_one(request):
 
 @pytest.fixture(scope='function')
 def active_user(request, db_, db_session):
+    usr = get_test_user()
+    if usr:
+        return usr
     return create_test_user('active')
 
 
@@ -80,8 +84,13 @@ def mock_send_email(request, mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_service(mocker):
-    return mocker.patch('app.notifications_api_client.get_service')
+def mock_get_service(mocker, active_user):
+    def _create(service_id):
+        service = service_json(
+            service_id, "Test Service", [active_user.id], limit=1000,
+            active=False, restricted=True)
+        return {'data': service, 'token': 1}
+    return mocker.patch('app.notifications_api_client.get_service', side_effect=_create)
 
 
 @pytest.fixture(scope='function')
@@ -124,4 +133,13 @@ def mock_get_services(mocker, active_user):
         return {'data': [service_one, service_two]}
     mock_class = mocker.patch(
         'app.notifications_api_client.get_services', side_effect=_create)
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_delete_service(mocker, mock_get_service):
+    def _delete(service_id):
+        return mock_get_service.side_effect(service_id)
+    mock_class = mocker.patch(
+        'app.notifications_api_client.delete_service', side_effect=_delete)
     return mock_class
