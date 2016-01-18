@@ -1,8 +1,10 @@
+from flask import url_for
 from datetime import datetime
 from client.errors import HTTPError, InvalidResponse
 from sqlalchemy.orm import load_only
 from flask.ext.login import current_user
 from app import (db, notifications_api_client)
+from app.main.utils import BrowsableItem
 
 
 def insert_new_service(service_name, user_id):
@@ -16,6 +18,10 @@ def insert_new_service(service_name, user_id):
 
 def get_service_by_id(id_):
     return notifications_api_client.get_service(id_)
+
+
+def get_services():
+    return notifications_api_client.get_services()
 
 
 def unrestrict_service(service_id):
@@ -56,3 +62,22 @@ def find_service_by_service_name(service_name):
 def find_all_service_names():
     resp = notifications_api_client.get_services()
     return [x['name'] for x in resp['data']]
+
+
+class ServicesBrowsableItem(BrowsableItem):
+
+    @property
+    def title(self):
+        return self._item['name']
+
+    @property
+    def link(self):
+        return url_for('main.service_dashboard', service_id=self._item['id'])
+
+    @property
+    def destructive(self):
+        return False
+
+    @property
+    def hint(self):
+        return "Some service hint here"

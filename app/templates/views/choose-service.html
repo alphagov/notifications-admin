@@ -11,16 +11,7 @@
     Choose service
   </h1>
 
-  {{ browse_list([
-    {
-      'title': 'MOT Reminders',
-      'link': url_for('.service_dashboard', service_id=123)
-    },
-    {
-      'title': 'Vehicle Tax',
-      'link': url_for('.service_dashboard', service_id=123)
-    },
-  ]) }}
+  {{ browse_list(services) }}
   {{ browse_list([
     {
       'title': 'Add a new service…',
