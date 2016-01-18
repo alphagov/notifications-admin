@@ -5,3 +5,7 @@
 .column-three-quarters {
   @include grid-column(3/4);
 }
+
+.bottom-gutter {
+  margin-bottom: $gutter;
+}

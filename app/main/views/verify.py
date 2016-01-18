@@ -20,5 +20,5 @@ def verify():
         verify_codes_dao.use_code_for_user_and_type(user_id=user.id, code_type='sms')
         users_dao.activate_user(user.id)
         login_user(user)
-        return redirect(url_for('.add_service'))
+        return redirect(url_for('.add_service', first='first'))
     return render_template('views/verify.html', form=form)
