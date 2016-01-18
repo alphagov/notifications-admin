@@ -169,8 +169,8 @@ class AddServiceForm(Form):
     name = StringField('Service Name', validators=[
         DataRequired(message='Service name can not be empty')])
 
-    def validate_service_name(self, a):
-        if self.service_name.data in self._names_func():
+    def validate_name(self, a):
+        if a.data in self._names_func():
             raise ValidationError('Service name already exists')
 
 

@@ -16,9 +16,8 @@ def test_can_insert_new_service(db_,
 def test_unrestrict_service_updates_the_service(db_,
                                                 db_session,
                                                 mock_get_service,
-                                                mock_update_service,
-                                                service_one):
-    mock_get_service.return_value = {'data': service_one}
+                                                mock_update_service):
+    service_one = mock_get_service.side_effect(123)['data']
     services_dao.unrestrict_service(service_one['id'])
     mock_update_service.assert_called_once_with(service_one['id'],
                                                 service_one['name'],
@@ -30,10 +29,10 @@ def test_unrestrict_service_updates_the_service(db_,
 
 def test_activate_service_update_service(db_,
                                          db_session,
+                                         active_user,
                                          mock_get_service,
-                                         mock_update_service,
-                                         service_one):
-    mock_get_service.return_value = {'data': service_one}
+                                         mock_update_service):
+    service_one = mock_get_service.side_effect(123)['data']
     services_dao.activate_service(service_one['id'])
     mock_update_service.assert_called_once_with(service_one['id'],
                                                 service_one['name'],
@@ -44,7 +43,7 @@ def test_activate_service_update_service(db_,
 
 
 def test_get_service_returns_none_if_service_does_not_exist(db_, db_session, mock_get_service):
-    mock_get_service.return_value = None
+    mock_get_service.side_effect = lambda x: None
     service = services_dao.get_service_by_id(1)
     assert service is None
 

@@ -4,11 +4,10 @@ from tests import create_test_user
 from app.models import User
 
 
-def test_get_should_render_add_service_template(app_, db_, db_session, mock_get_service):
+def test_get_should_render_add_service_template(app_, db_, db_session, active_user, mock_get_service):
     with app_.test_request_context():
         with app_.test_client() as client:
-            user = create_test_user('active')
-            client.login(user)
+            client.login(active_user)
             response = client.get(url_for('main.add_service'))
             assert response.status_code == 200
             assert 'Set up notifications for your service' in response.get_data(as_text=True)
@@ -25,7 +24,7 @@ def test_should_add_service_and_redirect_to_next_page(app_,
             client.login(user)
             response = client.post(
                 url_for('main.add_service'),
-                data={'service_name': 'testing the post'})
+                data={'name': 'testing the post'})
             assert response.status_code == 302
             assert response.location == url_for('main.service_dashboard', service_id=101, _external=True)
             assert mock_create_service.called
@@ -54,7 +53,7 @@ def test_should_return_form_errors_with_duplicate_service_name(app_,
             user = User.query.first()
             client.login(user)
             response = client.post(
-                url_for('main.add_service'), data={'service_name': 'service_one'})
+                url_for('main.add_service'), data={'name': 'service_one'})
             assert response.status_code == 200
             assert 'Service name already exists' in response.get_data(as_text=True)
             assert mock_get_services.called

@@ -16,6 +16,16 @@ def insert_new_service(service_name, user_id):
     return resp['data']['id']
 
 
+def update_service(service):
+    return notifications_api_client.update_service(
+        service['id'],
+        service['name'],
+        service['active'],
+        service['limit'],
+        service['restricted'],
+        service['users'])
+
+
 def get_service_by_id(id_):
     return notifications_api_client.get_service(id_)
 

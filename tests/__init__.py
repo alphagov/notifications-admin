@@ -28,7 +28,9 @@ def service_json(id_, name, users, limit=1000, active=False, restricted=True):
         'restricted': restricted
     }
 
+
 TEST_USER_EMAIL = 'test@user.gov.uk'
+
 
 def create_test_user(state):
     user = User(name='Test User',

@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import (url_for, session)
 
 
 def test_should_show_overview(app_, db_, db_session, active_user, mock_get_service):
@@ -28,7 +28,6 @@ def test_should_show_service_name(app_, db_, db_session, active_user, mock_get_s
         assert 'Change your service name' in resp_data
         assert mock_get_service.called
         service = mock_get_service.side_effect(service_id)['data']
-        assert service['name'] in resp_data
 
 
 def test_should_redirect_after_change_service_name(app_, db_, db_session, active_user, mock_get_service):
@@ -39,14 +38,18 @@ def test_should_redirect_after_change_service_name(app_, db_, db_session, active
             response = client.post(url_for(
                 'main.service_name_change', service_id=service_id))
 
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.service_settings', service_id=service_id, _external=True)
-    assert settings_url == response.location
-    assert mock_get_service.called
+        assert response.status_code == 302
+        settings_url = url_for(
+            'main.service_name_change_confirm', service_id=service_id, _external=True)
+        assert settings_url == response.location
+        assert mock_get_service.called
 
 
-def test_should_show_service_name_confirmation(app_, db_, db_session, active_user, mock_get_service):
+def test_should_show_service_name_confirmation(app_,
+                                               db_,
+                                               db_session,
+                                               active_user,
+                                               mock_get_service):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -54,29 +57,35 @@ def test_should_show_service_name_confirmation(app_, db_, db_session, active_use
             response = client.get(url_for(
                 'main.service_name_change_confirm', service_id=service_id))
 
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'Change your service name' in resp_data
-    assert mock_get_service.called
+        assert response.status_code == 200
+        resp_data = response.get_data(as_text=True)
+        assert 'Change your service name' in resp_data
+        assert mock_get_service.called
 
 
 def test_should_redirect_after_service_name_confirmation(app_,
                                                          db_,
                                                          db_session,
                                                          active_user,
-                                                         mock_get_service):
+                                                         mock_get_service,
+                                                         mock_update_service):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
             service_id = 123
+            service_new_name = 'New Name'
+            with client.session_transaction() as session:
+                session['service_name_change'] = service_new_name
             response = client.post(url_for(
                 'main.service_name_change_confirm', service_id=service_id))
 
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.service_settings', service_id=service_id, _external=True)
-    assert settings_url == response.location
-    assert mock_get_service.called
+        assert response.status_code == 302
+        settings_url = url_for(
+            'main.service_settings', service_id=service_id, _external=True)
+        resp_data = response.get_data(as_text=True)
+        assert settings_url == response.location
+        assert mock_get_service.called
+        assert mock_update_service.called
 
 
 def test_should_show_request_to_go_live(app_, db_, db_session, active_user, mock_get_service):
@@ -86,19 +95,19 @@ def test_should_show_request_to_go_live(app_, db_, db_session, active_user, mock
             service_id = 123
             response = client.get(
                 url_for('main.service_request_to_go_live', service_id=service_id))
-    service = mock_get_service.side_effect(service_id)['data']
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'Request to go live' in resp_data
-    assert mock_get_service.called
-    assert service['name'] in resp_data
+        service = mock_get_service.side_effect(service_id)['data']
+        assert response.status_code == 200
+        resp_data = response.get_data(as_text=True)
+        assert 'Request to go live' in resp_data
+        assert mock_get_service.called
 
 
 def test_should_redirect_after_request_to_go_live(app_,
                                                   db_,
                                                   db_session,
                                                   active_user,
-                                                  mock_get_service):
+                                                  mock_get_service,
+                                                  mock_update_service):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -106,11 +115,12 @@ def test_should_redirect_after_request_to_go_live(app_,
             response = client.post(url_for(
                 'main.service_request_to_go_live', service_id=service_id))
 
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.service_settings', service_id=service_id, _external=True)
-    assert settings_url == response.location
-    assert mock_get_service.called
+        assert response.status_code == 302
+        settings_url = url_for(
+            'main.service_settings', service_id=service_id, _external=True)
+        assert settings_url == response.location
+        assert mock_get_service.called
+        assert mock_update_service.called
 
 
 def test_should_show_status_page(app_, db_, db_session, active_user, mock_get_service):
@@ -121,13 +131,17 @@ def test_should_show_status_page(app_, db_, db_session, active_user, mock_get_se
             response = client.get(url_for(
                 'main.service_status_change', service_id=service_id))
 
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'Turn off all outgoing notifications' in resp_data
-    assert mock_get_service.called
+        assert response.status_code == 200
+        resp_data = response.get_data(as_text=True)
+        assert 'Turn off all outgoing notifications' in resp_data
+        assert mock_get_service.called
 
 
-def test_should_show_redirect_after_status_change(app_, db_, db_session, active_user, mock_get_service):
+def test_should_show_redirect_after_status_change(app_,
+                                                  db_,
+                                                  db_session,
+                                                  active_user,
+                                                  mock_get_service):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -135,10 +149,11 @@ def test_should_show_redirect_after_status_change(app_, db_, db_session, active_
             response = client.post(url_for(
                 'main.service_status_change', service_id=service_id))
 
-    assert response.status_code == 302
-    redirect_url = url_for(
-        'main.service_status_change_confirm', service_id=service_id)
-    assert redirect_url == response.location
+        assert response.status_code == 302
+        redirect_url = url_for(
+            'main.service_status_change_confirm', service_id=service_id, _external=True)
+        assert redirect_url == response.location
+        assert mock_get_service.called
 
 
 def test_should_show_status_confirmation(app_, db_, db_session, active_user, mock_get_service):
@@ -149,13 +164,18 @@ def test_should_show_status_confirmation(app_, db_, db_session, active_user, moc
             response = client.get(url_for(
                 'main.service_status_change_confirm', service_id=service_id))
 
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'Turn off all outgoing notifications' in resp_data
-    assert mock_get_service.called
+        assert response.status_code == 200
+        resp_data = response.get_data(as_text=True)
+        assert 'Turn off all outgoing notifications' in resp_data
+        assert mock_get_service.called
 
 
-def test_should_redirect_after_status_confirmation(app_, db_, db_session, active_user, mock_get_service):
+def test_should_redirect_after_status_confirmation(app_,
+                                                   db_,
+                                                   db_session,
+                                                   active_user,
+                                                   mock_get_service,
+                                                   mock_update_service):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -163,10 +183,12 @@ def test_should_redirect_after_status_confirmation(app_, db_, db_session, active
             response = client.post(url_for(
                 'main.service_status_change_confirm', service_id=service_id))
 
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.service_settings', service_id=service_id, _external=True)
-    assert settings_url == response.location
+        assert response.status_code == 302
+        settings_url = url_for(
+            'main.service_settings', service_id=service_id, _external=True)
+        assert settings_url == response.location
+        assert mock_get_service.called
+        assert mock_update_service.called
 
 
 def test_should_show_delete_page(app_, db_, db_session, active_user, mock_get_service):
@@ -177,9 +199,9 @@ def test_should_show_delete_page(app_, db_, db_session, active_user, mock_get_se
             response = client.get(url_for(
                 'main.service_delete', service_id=service_id))
 
-    assert response.status_code == 200
-    assert 'Delete this service from Notify' in response.get_data(as_text=True)
-    assert mock_get_service.called
+        assert response.status_code == 200
+        assert 'Delete this service from Notify' in response.get_data(as_text=True)
+        assert mock_get_service.called
 
 
 def test_should_show_redirect_after_deleting_service(app_, db_, db_session, active_user, mock_get_service):
@@ -190,10 +212,10 @@ def test_should_show_redirect_after_deleting_service(app_, db_, db_session, acti
             response = client.post(url_for(
                 'main.service_delete', service_id=service_id))
 
-    assert response.status_code == 302
-    delete_url = url_for(
-        'main.service_delete_confirm', service_id=service_id)
-    assert delete_url == response.location
+        assert response.status_code == 302
+        delete_url = url_for(
+            'main.service_delete_confirm', service_id=service_id, _external=True)
+        assert delete_url == response.location
 
 
 def test_should_show_delete_confirmation(app_, db_, db_session, active_user, mock_get_service):
@@ -204,9 +226,9 @@ def test_should_show_delete_confirmation(app_, db_, db_session, active_user, moc
             response = client.get(url_for(
                 'main.service_delete_confirm', service_id=service_id))
 
-    assert response.status_code == 200
-    assert 'Delete this service from Notify' in response.get_data(as_text=True)
-    assert mock_get_service.called
+        assert response.status_code == 200
+        assert 'Delete this service from Notify' in response.get_data(as_text=True)
+        assert mock_get_service.called
 
 
 def test_should_redirect_delete_confirmation(app_,
@@ -222,9 +244,9 @@ def test_should_redirect_delete_confirmation(app_,
             response = client.post(url_for(
                 'main.service_delete_confirm', service_id=service_id))
 
-    assert response.status_code == 302
-    choose_url = url_for(
-        'main.choose_service', _external=True)
-    assert choose_url == response.location
-    assert mock_get_service.called
-    assert mock_delete_service.called
+        assert response.status_code == 302
+        choose_url = url_for(
+            'main.choose_service', _external=True)
+        assert choose_url == response.location
+        assert mock_get_service.called
+        assert mock_delete_service.called

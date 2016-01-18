@@ -60,9 +60,8 @@ def db_session(request):
 
 
 @pytest.fixture(scope='function')
-def service_one(request):
-    usr = create_test_user('active')
-    return service_json(1, 'service one', [usr])
+def service_one(request, active_user):
+    return service_json(1, 'service one', [active_user.id])
 
 
 @pytest.fixture(scope='function')
