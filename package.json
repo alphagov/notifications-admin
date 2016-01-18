@@ -22,7 +22,7 @@
     "babel-core": "6.3.26",
     "babel-preset-es2015": "6.3.13",
     "bower": "1.7.1",
-    "govuk-elements-sass": "github:alphagov/govuk_elements#v1.1.1",
+    "govuk-elements-sass": "1.1.1",
     "govuk_frontend_toolkit": "4.6.0",
     "gulp": "3.9.0",
     "gulp-add-src": "0.2.0",
