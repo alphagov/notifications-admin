@@ -41,6 +41,8 @@ class Config(object):
 
 class Development(Config):
     DEBUG = True
+    ADMIN_CLIENT_USER_NAME = 'dev-notify-admin'
+    ADMIN_CLIENT_SECRET = 'dev-notify-secret-key'
 
 
 class Test(Config):
