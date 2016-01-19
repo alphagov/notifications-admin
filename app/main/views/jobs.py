@@ -50,7 +50,7 @@ messages = [
 def view_jobs(service_id):
     return render_template(
         'views/jobs.html',
-        jobs=jobs,
+        jobs=[],  # use `jobs` for placeholder data
         service_id=service_id
     )
 

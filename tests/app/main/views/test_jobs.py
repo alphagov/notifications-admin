@@ -11,8 +11,7 @@ def test_should_return_list_of_all_jobs(app_, db_, db_session, service_one):
             response = client.get(url_for('main.view_jobs', service_id=101))
 
         assert response.status_code == 200
-        assert 'Test message 1' in response.get_data(as_text=True)
-        assert 'Final reminder' in response.get_data(as_text=True)
+        assert 'You haven’t sent any notifications yet' in response.get_data(as_text=True)
 
 
 def test_should_show_page_for_one_job(app_, db_, db_session, service_one):

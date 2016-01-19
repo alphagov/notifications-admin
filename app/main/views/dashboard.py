@@ -19,6 +19,6 @@ def service_dashboard(service_id):
     return render_template(
         'views/service_dashboard.html',
         jobs=jobs,
-        free_text_messages_remaining=560,
+        free_text_messages_remaining='25,000',
         spent_this_month='0.00',
         service_id=service_id)

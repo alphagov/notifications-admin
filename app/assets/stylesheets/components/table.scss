@@ -41,3 +41,10 @@
   @extend .table-field;
   text-align: right;
 }
+
+.table-empty-message {
+  @include core-16;
+  color: $secondary-text-colour;
+  border-bottom: 1px solid $border-colour;
+  padding: 5px 0 8px 0;
+}
