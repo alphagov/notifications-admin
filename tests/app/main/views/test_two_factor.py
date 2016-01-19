@@ -1,12 +1,12 @@
 from flask import json, url_for
 
 from app.main.dao import verify_codes_dao
-from tests.app.main import create_test_user
+from tests import create_test_user
 
 
-def test_should_render_two_factor_page(notifications_admin, notifications_admin_db, notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_render_two_factor_page(app_, db_, db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             # TODO this lives here until we work out how to
             # reassign the session after it is lost mid register process
             with client.session_transaction() as session:
@@ -17,9 +17,9 @@ def test_should_render_two_factor_page(notifications_admin, notifications_admin_
         assert '''We've sent you a text message with a verification code.''' in response.get_data(as_text=True)
 
 
-def test_should_login_user_and_redirect_to_dashboard(notifications_admin, notifications_admin_db, notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_login_user_and_redirect_to_dashboard(app_, db_, db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('active')
                 session['user_email'] = user.email_address
@@ -31,11 +31,11 @@ def test_should_login_user_and_redirect_to_dashboard(notifications_admin, notifi
             assert response.location == url_for('main.choose_service', _external=True)
 
 
-def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(notifications_admin,
-                                                                      notifications_admin_db,
-                                                                      notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(app_,
+                                                                      db_,
+                                                                      db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('active')
                 session['user_email'] = user.email_address
@@ -46,11 +46,11 @@ def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(notificati
             assert 'Code does not match' in response.get_data(as_text=True)
 
 
-def test_should_login_user_when_multiple_valid_codes_exist(notifications_admin,
-                                                           notifications_admin_db,
-                                                           notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_login_user_when_multiple_valid_codes_exist(app_,
+                                                           db_,
+                                                           db_session):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
                 user = create_test_user('active')
                 session['user_email'] = user.email_address

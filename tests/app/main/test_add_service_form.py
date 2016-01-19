@@ -2,11 +2,13 @@ from app.main.forms import AddServiceForm
 from werkzeug.datastructures import MultiDict
 
 
-def test_form_should_have_errors_when_duplicate_service_is_added(notifications_admin,
-                                                                 notifications_admin_db,
-                                                                 notify_db_session):
-    with notifications_admin.test_request_context():
-        form = AddServiceForm(['some service', 'more names'],
-                              formdata=MultiDict([('service_name', 'some service')]))
+def test_form_should_have_errors_when_duplicate_service_is_added(app_,
+                                                                 db_,
+                                                                 db_session):
+    def _get_form_names():
+        return ['some service', 'more names']
+    with app_.test_request_context():
+        form = AddServiceForm(_get_form_names,
+                              formdata=MultiDict([('name', 'some service')]))
         form.validate()
-        assert {'service_name': ['Service name already exists']} == form.errors
+        assert {'name': ['Service name already exists']} == form.errors

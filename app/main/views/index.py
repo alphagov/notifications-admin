@@ -10,29 +10,29 @@ def index():
 
 @main.route("/register-from-invite")
 @login_required
-def registerfrominvite():
+def register_from_invite():
     return render_template('views/register-from-invite.html')
 
 
 @main.route("/verify-mobile")
 @login_required
-def verifymobile():
+def verify_mobile():
     return render_template('views/verify-mobile.html')
 
 
 @main.route("/services/<int:service_id>/send-email")
 @login_required
-def sendemail(service_id):
+def send_email(service_id):
     return render_template('views/send-email.html')
 
 
 @main.route("/services/<int:service_id>/check-email")
 @login_required
-def checkemail(service_id):
+def check_email(service_id):
     return render_template('views/check-email.html')
 
 
 @main.route("/services/<int:service_id>/manage-users")
 @login_required
-def manageusers(service_id):
+def manage_users(service_id):
     return render_template('views/manage-users.html', service_id=service_id)

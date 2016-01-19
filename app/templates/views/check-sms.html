@@ -17,7 +17,7 @@
 		{% for rejected in upload_result.rejects %}
 			<p>Line {{rejected.line_number}}: {{rejected.phone }}</a>
 		{% endfor %}
-		<p><a href="{{url_for('.sendsms', service_id=service_id)}}" class="button">Go back and resolve errors</a></p>
+		<p><a href="{{url_for('.send_sms', service_id=service_id)}}" class="button">Go back and resolve errors</a></p>
 
 	{% else %}
 
@@ -26,7 +26,7 @@
 
 			{{ page_footer(
 					button_text = "Send {} text messages".format(upload_result.valid|count),
-					back_link = url_for(".sendsms", service_id=service_id)
+					back_link = url_for(".send_sms", service_id=service_id)
 			)}}
 
 			{% if upload_result.valid | count > 6 %}
@@ -56,7 +56,7 @@
 
 			{{ page_footer(
 					button_text = "Send {} text messages".format(upload_result.valid|count),
-					back_link = url_for(".sendsms", service_id=service_id)
+					back_link = url_for(".send_sms", service_id=service_id)
 			)}}
 
 		</form>

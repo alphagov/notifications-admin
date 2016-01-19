@@ -2,17 +2,14 @@ from io import BytesIO
 from flask import url_for
 
 import moto
-from tests.app.main import create_test_user
 
 
-def test_upload_empty_csvfile_returns_to_upload_page(
-        notifications_admin, notifications_admin_db, notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
-            user = create_test_user('active')
-            client.login(user)
+def test_upload_empty_csvfile_returns_to_upload_page(app_, db_, db_session, active_user):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user)
             upload_data = {'file': (BytesIO(''.encode('utf-8')), 'emtpy.csv')}
-            response = client.post(url_for('main.sendsms', service_id=123),
+            response = client.post(url_for('main.send_sms', service_id=123),
                                    data=upload_data, follow_redirects=True)
 
         assert response.status_code == 200
@@ -21,18 +18,20 @@ def test_upload_empty_csvfile_returns_to_upload_page(
 
 
 @moto.mock_s3
-def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
-        notifications_admin, notifications_admin_db, notify_db_session):
+def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
+                                                                        db_,
+                                                                        db_session,
+                                                                        mocker,
+                                                                        active_user):
 
     contents = 'phone\n+44 123\n+44 456'
     file_data = (BytesIO(contents.encode('utf-8')), 'invalid.csv')
 
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
-            user = create_test_user('active')
-            client.login(user)
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user)
             upload_data = {'file': file_data}
-            response = client.post(url_for('main.sendsms', service_id=123),
+            response = client.post(url_for('main.send_sms', service_id=123),
                                    data=upload_data,
                                    follow_redirects=True)
         assert response.status_code == 200
@@ -44,20 +43,21 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
 
 
 @moto.mock_s3
-def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(
-        notifications_admin, notifications_admin_db, notify_db_session,
-        mocker):
+def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(app_,
+                                                                        db_,
+                                                                        db_session,
+                                                                        mocker,
+                                                                        active_user):
 
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986\n+44 7700 900987\n+44 7700 900988\n+44 7700 900989'  # noqa
 
     file_data = (BytesIO(contents.encode('utf-8')), 'valid.csv')
 
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
-            user = create_test_user('active')
-            client.login(user)
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user)
             upload_data = {'file': file_data}
-            response = client.post(url_for('main.sendsms', service_id=123),
+            response = client.post(url_for('main.send_sms', service_id=123),
                                    data=upload_data,
                                    follow_redirects=True)
 
@@ -79,18 +79,21 @@ def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(
 
 
 @moto.mock_s3
-def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(
-        notifications_admin, notifications_admin_db, notify_db_session):
+def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(app_,
+                                                                        db_,
+                                                                        db_session,
+                                                                        mocker,
+                                                                        active_user):
 
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
 
     file_data = (BytesIO(contents.encode('utf-8')), 'valid.csv')
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
-            user = create_test_user('active')
-            client.login(user)
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user)
             upload_data = {'file': file_data}
-            response = client.post(url_for('main.sendsms', service_id=123),
+            response = client.post(url_for('main.send_sms', service_id=123),
                                    data=upload_data,
                                    follow_redirects=True)
 
@@ -108,12 +111,11 @@ def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(
 
 
 @moto.mock_s3
-def test_post_to_check_should_redirect_to_job(notifications_admin, notifications_admin_db, notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
-            user = create_test_user('active')
-            client.login(user)
-            response = client.post(url_for('main.checksms',
+def test_should_redirect_to_job(app_, db_, db_session, mocker, active_user):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user)
+            response = client.post(url_for('main.check_sms',
                                            service_id=123,
                                            upload_id='someid'))
         assert response.status_code == 302

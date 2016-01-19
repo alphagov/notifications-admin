@@ -34,14 +34,14 @@ sms_templates = [
 
 @main.route("/services/<int:service_id>/sms/send", methods=['GET', 'POST'])
 @login_required
-def sendsms(service_id):
+def send_sms(service_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
             csv_file = form.file.data
             filedata = _get_filedata(csv_file)
             upload_id = s3upload(service_id, filedata)
-            return redirect(url_for('.checksms',
+            return redirect(url_for('.check_sms',
                                     service_id=service_id,
                                     upload_id=upload_id))
         except ValueError as e:
@@ -49,7 +49,7 @@ def sendsms(service_id):
                       csv_file.filename)
             flash(message)
             flash(str(e))
-            return redirect(url_for('.sendsms', service_id=service_id))
+            return redirect(url_for('.send_sms', service_id=service_id))
 
     return render_template('views/send-sms.html',
                            message_templates=sms_templates,
@@ -60,7 +60,7 @@ def sendsms(service_id):
 @main.route("/services/<int:service_id>/sms/check/<upload_id>",
             methods=['GET', 'POST'])
 @login_required
-def checksms(service_id, upload_id):
+def check_sms(service_id, upload_id):
     if request.method == 'GET':
         contents = s3download(service_id, upload_id)
         upload_result = _get_numbers(contents)
@@ -74,7 +74,7 @@ def checksms(service_id, upload_id):
         )
     elif request.method == 'POST':
         # TODO create the job with template, file location etc.
-        return redirect(url_for('main.showjob',
+        return redirect(url_for('main.view_job',
                         service_id=service_id,
                         job_id=upload_id))
 

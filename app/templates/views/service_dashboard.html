@@ -30,10 +30,10 @@
       field_headings=['Job', 'File', 'Time', 'Status']
     ) %}
 			{% call field() %}
-				<a href="{{ url_for('.showjob', service_id=service_id, job_id=456) }}">{{ item.file }}</a>
+				<a href="{{ url_for('.view_job', service_id=service_id, job_id=456) }}">{{ item.file }}</a>
 			{% endcall %}
 			{% call field() %}
-				<a href="{{ url_for('.showjob', service_id=service_id, job_id=456) }}">{{ item.job }}</a>
+				<a href="{{ url_for('.view_job', service_id=service_id, job_id=456) }}">{{ item.job }}</a>
 			{% endcall %}
 			{% call field() %}
 				{{ item.time }}
@@ -43,7 +43,7 @@
 			{% endcall %}
     {% endcall %}
     <p>
-      <a href={{ url_for('.showjobs', service_id=service_id) }}>See all notifications activity</a>
+      <a href={{ url_for('.view_jobs', service_id=service_id) }}>See all notifications activity</a>
     </p>
 
 

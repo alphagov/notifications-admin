@@ -157,24 +157,29 @@ class TextNotReceivedForm(Form):
 
 
 class AddServiceForm(Form):
-    def __init__(self, service_names, *args, **kwargs):
-        self.service_names = service_names
+    def __init__(self, names_func, *args, **kwargs):
+        """
+        Keyword arguments:
+        names_func -- Returns a list of unique service_names already registered
+        on the system.
+        """
+        self._names_func = names_func
         super(AddServiceForm, self).__init__(*args, **kwargs)
 
-    service_name = StringField(
+    name = StringField(
         'Service name',
         validators=[
             DataRequired(message='Service name can not be empty')
         ]
     )
 
-    def validate_service_name(self, a):
-        if self.service_name.data in self.service_names:
+    def validate_name(self, a):
+        if a.data in self._names_func():
             raise ValidationError('Service name already exists')
 
 
 class ServiceNameForm(Form):
-    service_name = StringField(u'New name')
+    name = StringField(u'New name')
 
 
 class ConfirmPasswordForm(Form):

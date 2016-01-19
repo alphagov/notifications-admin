@@ -1,4 +1,4 @@
-{% extends "withnav_template.html" %}
+{% extends "admin_template.html" %}
 {% from "components/browse-list.html" import browse_list %}
 
 {% block page_title %}
@@ -11,16 +11,7 @@
     Choose service
   </h1>
 
-  {{ browse_list([
-    {
-      'title': 'MOT Reminders',
-      'link': url_for('.dashboard', service_id=123)
-    },
-    {
-      'title': 'Vehicle Tax',
-      'link': url_for('.dashboard', service_id=123)
-    },
-  ]) }}
+  {{ browse_list(services) }}
   {{ browse_list([
     {
       'title': 'Add a new service…',

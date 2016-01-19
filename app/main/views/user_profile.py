@@ -8,12 +8,12 @@ from app.main.forms import (
 
 
 @main.route("/user-profile")
-def userprofile():
+def user_profile():
     return render_template('views/user-profile.html')
 
 
 @main.route("/user-profile/name", methods=['GET', 'POST'])
-def userprofile_name():
+def user_profile_name():
 
     form = ChangeNameForm()
 
@@ -26,11 +26,11 @@ def userprofile_name():
             form_field=form.new_name
         )
     elif request.method == 'POST':
-        return redirect(url_for('.userprofile'))
+        return redirect(url_for('.user_profile'))
 
 
 @main.route("/user-profile/email", methods=['GET', 'POST'])
-def userprofile_email():
+def user_profile_email():
 
     form = ChangeEmailForm()
 
@@ -43,11 +43,11 @@ def userprofile_email():
             form_field=form.email_address
         )
     elif request.method == 'POST':
-        return redirect(url_for('.userprofile_email_authenticate'))
+        return redirect(url_for('.user_profile_email_authenticate'))
 
 
 @main.route("/user-profile/email/authenticate", methods=['GET', 'POST'])
-def userprofile_email_authenticate():
+def user_profile_email_authenticate():
 
     form = ConfirmPasswordForm()
 
@@ -56,14 +56,14 @@ def userprofile_email_authenticate():
             'views/user-profile/authenticate.html',
             thing='email address',
             form=form,
-            back_link=url_for('.userprofile_email')
+            back_link=url_for('.user_profile_email')
         )
     elif request.method == 'POST':
-        return redirect(url_for('.userprofile_email_confirm'))
+        return redirect(url_for('.user_profile_email_confirm'))
 
 
 @main.route("/user-profile/email/confirm", methods=['GET', 'POST'])
-def userprofile_email_confirm():
+def user_profile_email_confirm():
 
     form = ConfirmEmailForm()
 
@@ -74,11 +74,11 @@ def userprofile_email_confirm():
             thing='email address'
         )
     elif request.method == 'POST':
-        return redirect(url_for('.userprofile'))
+        return redirect(url_for('.user_profile'))
 
 
 @main.route("/user-profile/mobile-number", methods=['GET', 'POST'])
-def userprofile_mobile_number():
+def user_profile_mobile_number():
 
     form = ChangeMobileNumberForm()
 
@@ -91,11 +91,11 @@ def userprofile_mobile_number():
             form_field=form.mobile_number
         )
     elif request.method == 'POST':
-        return redirect(url_for('.userprofile_mobile_number_authenticate'))
+        return redirect(url_for('.user_profile_mobile_number_authenticate'))
 
 
 @main.route("/user-profile/mobile-number/authenticate", methods=['GET', 'POST'])
-def userprofile_mobile_number_authenticate():
+def user_profile_mobile_number_authenticate():
 
     form = ConfirmPasswordForm()
 
@@ -104,14 +104,14 @@ def userprofile_mobile_number_authenticate():
             'views/user-profile/authenticate.html',
             thing='mobile number',
             form=form,
-            back_link=url_for('.userprofile_mobile_number_confirm')
+            back_link=url_for('.user_profile_mobile_number_confirm')
         )
     elif request.method == 'POST':
-        return redirect(url_for('.userprofile_mobile_number_confirm'))
+        return redirect(url_for('.user_profile_mobile_number_confirm'))
 
 
 @main.route("/user-profile/mobile-number/confirm", methods=['GET', 'POST'])
-def userprofile_mobile_number_confirm():
+def user_profile_mobile_number_confirm():
 
     form = ConfirmMobileNumberForm()
 
@@ -122,11 +122,11 @@ def userprofile_mobile_number_confirm():
             thing='mobile number'
         )
     elif request.method == 'POST':
-        return redirect(url_for('.userprofile'))
+        return redirect(url_for('.user_profile'))
 
 
 @main.route("/user-profile/password", methods=['GET', 'POST'])
-def userprofile_password():
+def user_profile_password():
 
     form = ChangePasswordForm()
 
@@ -136,4 +136,4 @@ def userprofile_password():
             form=form
         )
     elif request.method == 'POST':
-        return redirect(url_for('.userprofile'))
+        return redirect(url_for('.user_profile'))

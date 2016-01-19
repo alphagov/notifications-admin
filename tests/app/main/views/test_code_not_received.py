@@ -1,16 +1,16 @@
 from app.main.dao import verify_codes_dao, users_dao
-from tests.app.main import create_test_user
+from tests import create_test_user
 from flask import url_for
 
 
-def test_should_render_email_code_not_received_template_and_populate_email_address(notifications_admin,
-                                                                                   notifications_admin_db,
-                                                                                   notify_db_session,
-                                                                                   mocker):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_render_email_code_not_received_template_and_populate_email_address(app_,
+                                                                                   db_,
+                                                                                   db_session,
+                                                                                   mock_send_sms,
+                                                                                   mock_send_email):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
-                _set_up_mocker(mocker)
                 user = create_test_user('pending')
                 session['user_email'] = user.email_address
             response = client.get(url_for('main.check_and_resend_email_code'))
@@ -20,14 +20,14 @@ def test_should_render_email_code_not_received_template_and_populate_email_addre
             assert 'value="test@user.gov.uk"' in response.get_data(as_text=True)
 
 
-def test_should_check_and_resend_email_code_redirect_to_verify(notifications_admin,
-                                                               notifications_admin_db,
-                                                               notify_db_session,
-                                                               mocker):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_check_and_resend_email_code_redirect_to_verify(app_,
+                                                               db_,
+                                                               db_session,
+                                                               mock_send_sms,
+                                                               mock_send_email):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
-                _set_up_mocker(mocker)
                 user = create_test_user('pending')
                 session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user.id, code='12345', code_type='email')
@@ -37,14 +37,14 @@ def test_should_check_and_resend_email_code_redirect_to_verify(notifications_adm
             assert response.location == url_for('main.verify', _external=True)
 
 
-def test_should_render_text_code_not_received_template(notifications_admin,
-                                                       notifications_admin_db,
-                                                       notify_db_session,
-                                                       mocker):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_render_text_code_not_received_template(app_,
+                                                       db_,
+                                                       db_session,
+                                                       mock_send_sms,
+                                                       mock_send_email):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
-                _set_up_mocker(mocker)
                 user = create_test_user('pending')
                 session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user.id, code='12345', code_type='sms')
@@ -55,14 +55,14 @@ def test_should_render_text_code_not_received_template(notifications_admin,
             assert 'value="+441234123412"'
 
 
-def test_should_check_and_redirect_to_verify(notifications_admin,
-                                             notifications_admin_db,
-                                             notify_db_session,
-                                             mocker):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_check_and_redirect_to_verify(app_,
+                                             db_,
+                                             db_session,
+                                             mock_send_sms,
+                                             mock_send_email):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
-                _set_up_mocker(mocker)
                 user = create_test_user('pending')
                 session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user.id, code='12345', code_type='sms')
@@ -72,14 +72,14 @@ def test_should_check_and_redirect_to_verify(notifications_admin,
             assert response.location == url_for('main.verify', _external=True)
 
 
-def test_should_update_email_address_resend_code(notifications_admin,
-                                                 notifications_admin_db,
-                                                 notify_db_session,
-                                                 mocker):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_update_email_address_resend_code(app_,
+                                                 db_,
+                                                 db_session,
+                                                 mock_send_sms,
+                                                 mock_send_email):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
-                _set_up_mocker(mocker)
                 user = create_test_user('pending')
                 session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='email')
@@ -91,14 +91,14 @@ def test_should_update_email_address_resend_code(notifications_admin,
             assert updated_user.email_address == 'new@address.gov.uk'
 
 
-def test_should_update_mobile_number_resend_code(notifications_admin,
-                                                 notifications_admin_db,
-                                                 notify_db_session,
-                                                 mocker):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_update_mobile_number_resend_code(app_,
+                                                 db_,
+                                                 db_session,
+                                                 mock_send_sms,
+                                                 mock_send_email):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
-                _set_up_mocker(mocker)
                 user = create_test_user('pending')
                 session['user_email'] = user.email_address
                 verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
@@ -110,14 +110,14 @@ def test_should_update_mobile_number_resend_code(notifications_admin,
             assert updated_user.mobile_number == '+44 7700 900 460'
 
 
-def test_should_render_verification_code_not_received(notifications_admin,
-                                                      notifications_admin_db,
-                                                      notify_db_session):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_render_verification_code_not_received(app_,
+                                                      db_,
+                                                      db_session,
+                                                      active_user):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
-                user = create_test_user('active')
-                session['user_email'] = user.email_address
+                session['user_email'] = active_user.email_address
             response = client.get(url_for('main.verification_code_not_received'))
             assert response.status_code == 200
             assert 'Resend verification code' in response.get_data(as_text=True)
@@ -125,41 +125,36 @@ def test_should_render_verification_code_not_received(notifications_admin,
                    'speak to your service manager to reset the number.' in response.get_data(as_text=True)
 
 
-def test_check_and_redirect_to_two_factor(notifications_admin,
-                                          notifications_admin_db,
-                                          notify_db_session,
-                                          mocker):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_check_and_redirect_to_two_factor(app_,
+                                          db_,
+                                          db_session,
+                                          active_user,
+                                          mock_send_sms,
+                                          mock_send_email):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
-                user = create_test_user('active')
-                session['user_email'] = user.email_address
-                _set_up_mocker(mocker)
+                session['user_email'] = active_user.email_address
             response = client.get(url_for('main.check_and_resend_verification_code'))
             assert response.status_code == 302
             assert response.location == url_for('main.two_factor', _external=True)
 
 
-def test_should_create_new_code_for_user(notifications_admin,
-                                         notifications_admin_db,
-                                         notify_db_session,
-                                         mocker):
-    with notifications_admin.test_request_context():
-        with notifications_admin.test_client() as client:
+def test_should_create_new_code_for_user(app_,
+                                         db_,
+                                         db_session,
+                                         active_user,
+                                         mock_send_sms,
+                                         mock_send_email):
+    with app_.test_request_context():
+        with app_.test_client() as client:
             with client.session_transaction() as session:
-                user = create_test_user('active')
-                session['user_email'] = user.email_address
-                verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
-                _set_up_mocker(mocker)
+                session['user_email'] = active_user.email_address
+                verify_codes_dao.add_code(user_id=active_user.id, code='12345', code_type='sms')
             response = client.get(url_for('main.check_and_resend_verification_code'))
             assert response.status_code == 302
             assert response.location == url_for('main.two_factor', _external=True)
-            codes = verify_codes_dao.get_codes(user_id=user.id, code_type='sms')
+            codes = verify_codes_dao.get_codes(user_id=active_user.id, code_type='sms')
             assert len(codes) == 2
             for x in ([used.code_used for used in codes]):
                 assert x is False
-
-
-def _set_up_mocker(mocker):
-    mocker.patch("app.admin_api_client.send_sms")
-    mocker.patch("app.admin_api_client.send_email")
