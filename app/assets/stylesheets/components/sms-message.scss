@@ -45,4 +45,9 @@
     margin: -$gutter-half 0 $gutter 0;
   }
 
+  &-name {
+    @include bold-19;
+    margin: 50px 0 10px 0;
+  }
+
 }

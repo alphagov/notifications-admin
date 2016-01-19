@@ -4,45 +4,42 @@
 {% from "components/textbox.html" import textbox %}
 
 {% block page_title %}
-	GOV.UK Notify | Send text messages
+  GOV.UK Notify | Send text messages
 {% endblock %}
 
 {% block maincolumn_content %}
-	<form method="POST" enctype="multipart/form-data">
+  <form method="POST" enctype="multipart/form-data">
 
-				<h1 class="heading-xlarge">Send text messages</h1>
+    <h1 class="heading-xlarge">Send text messages</h1>
 
-				<h2 class="heading-medium">1. Choose text message template</h2>
-				{% for template in message_templates %}
-					<div class="template-picker-option">
-						<div class="template-picker-option-radio">
-							<label class="block-label" for="template-{{loop.index}}">
-								{{ template.name }}
-								<input type="radio" name="template" id="template-{{loop.index}}" value="{{ template.name }}" />
-							</label>
-						</div>
-						{{ sms_message(template.body) }}
-					</div>
-				{% endfor %}
+    <fieldset class='form-group'>
+      <legend class="heading-medium">1. Choose text message template</legend>
+      {% for template in message_templates %}
+        <label class="block-label" for="template-{{loop.index}}">
+          {{ template.name }}
+          <input type="radio" name="template" id="template-{{loop.index}}" value="{{ template.name }}" />
+        </label>
+      {% endfor %}
+    </fieldset>
 
-				<p>
-					or <a href="{{ url_for(".add_template", service_id=service_id) }}">create a new template</a>
-				</p>
+    <p>
+      or <a href="{{ url_for(".add_template", service_id=service_id) }}">create a new template</a>
+    </p>
 
-				<h2 class="heading-medium">2. Add recipients</h2>
+    <h2 class="heading-medium">2. Add recipients</h2>
 
-				<p>
-					Upload a CSV file to add your recipients’ details.
-				</p>
-				<p>
-					You can also <a href="#">download an example CSV</a>.
-				</p>
-				<p>
-					{{textbox(form.file)}}
-				</p>
+    <p>
+      Upload a CSV file to add your recipients’ details.
+    </p>
+    <p>
+      You can also <a href="#">download an example CSV</a>.
+    </p>
+    <p>
+      {{textbox(form.file)}}
+    </p>
 
-				{{ page_footer("Continue") }}
+    {{ page_footer("Continue") }}
 
-	</form>
+  </form>
 
 {% endblock %}

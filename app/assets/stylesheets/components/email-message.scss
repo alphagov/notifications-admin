@@ -1,0 +1,24 @@
+.email-message {
+
+  margin-bottom: $gutter;
+  border: 1px solid $border-colour;
+
+  &-subject {
+    border-bottom: 1px solid $border-colour;;
+    padding: 10px;
+    @include bold-19;
+  }
+
+  &-body {
+    border-bottom: 1px solid white;
+    padding: 10px;
+    overflow: hidden;
+    max-height: 103px;
+  }
+
+  &-name {
+    @include bold-19;
+    margin: 50px 0 10px 0;
+  }
+
+}

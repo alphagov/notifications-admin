@@ -4,7 +4,12 @@ from tests import create_test_user
 from app.models import User
 
 
-def test_get_should_render_add_service_template(app_, db_, db_session, active_user, mock_get_service):
+def test_get_should_render_add_service_template(app_,
+                                                db_,
+                                                db_session,
+                                                active_user,
+                                                mock_get_service,
+                                                mock_get_services):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -35,7 +40,8 @@ def test_should_return_form_errors_when_service_name_is_empty(app_,
                                                               db_,
                                                               db_session,
                                                               active_user,
-                                                              mock_get_service):
+                                                              mock_get_service,
+                                                              mock_get_services):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)

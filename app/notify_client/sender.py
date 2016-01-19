@@ -14,7 +14,6 @@ def send_sms_code(user_id, mobile_number):
     verify_codes_dao.add_code(user_id=user_id, code=sms_code, code_type='sms')
     notifications_api_client.send_sms(mobile_number=mobile_number,
                                       message=sms_code)
-
     return sms_code
 
 

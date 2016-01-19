@@ -1,5 +1,6 @@
 {% extends "admin_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
 GOV.UK Notify | Set up service
@@ -8,24 +9,34 @@ GOV.UK Notify | Set up service
 {% block fullwidth_content %}
 
 <div class="grid-row">
-	<div class="column-two-thirds">
-		<h1 class="heading-xlarge">Set up notifications for your service</h1>
+  <div class="column-two-thirds">
 
-		<p>Users will see your service name:</p>
-			<ul class="list-bullet">
-				<li>at the start of every text message, eg 'Vehicle tax: we received your payment, thank you'</li>
-				<li>as your email sender name</li>
-			</ul>
+    <h1 class="heading-xlarge">
+      {{ heading }}
+    </h1>
 
-		<form autocomplete="off" method="post">
-			{{ textbox(form.name) }}
+    <p>
+      Users will see your service name:
+    </p>
 
-			<p>
-			<button class="button" href="dashboard" role="button">Continue</button>
-			</p>
-		</form>
-		</div>
-	</div>
+    <ul class="list-bullet bottom-gutter">
+      <li>
+        at the start of every text message, eg ‘Vehicle tax: we received your
+        payment, thank you’
+      </li>
+      <li>
+        as your email sender name
+      </li>
+    </ul>
+
+    <form autocomplete="off" method="post">
+      {{ textbox(form.name) }}
+      {{ page_footer(
+        'Continue'
+      ) }}
+    </form>
+
+  </div>
 </div>
 
 {% endblock %}

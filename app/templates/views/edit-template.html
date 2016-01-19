@@ -14,9 +14,10 @@ GOV.UK Notify | Edit template
 			{{ textbox(form.template_name) }}
 			{{ textbox(form.template_body, highlight_tags=True) }}
 			{{ page_footer(
-				'Save and continue',
-				back_link=url_for('.service_dashboard', service_id=service_id),
-				back_link_text='Back to manage templates'
+				'Save',
+				delete_link=url_for('.delete_template', service_id=service_id, template_id=template_id) if template_id or None,
+				back_link=url_for('.manage_templates', service_id=service_id),
+				back_link_text='Back to templates'
 			) }}
 		</form>
 

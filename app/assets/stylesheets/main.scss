@@ -1,33 +1,33 @@
 // Dependencies from GOV.UK Frontend Toolkit
 // https://github.com/alphagov/govuk_frontend_toolkit/
-@import '../govuk_frontend_toolkit/stylesheets/conditionals';
-@import '../govuk_frontend_toolkit/stylesheets/shims';
-@import '../govuk_frontend_toolkit/stylesheets/measurements';
-@import '../govuk_frontend_toolkit/stylesheets/css3';
-@import '../govuk_frontend_toolkit/stylesheets/colours';
-@import '../govuk_frontend_toolkit/stylesheets/typography';
-@import '../govuk_frontend_toolkit/stylesheets/grid_layout';
-@import '../govuk_frontend_toolkit/stylesheets/helpers';
-@import '../govuk_frontend_toolkit/stylesheets/url-helpers';
-@import '../govuk_frontend_toolkit/stylesheets/design-patterns/buttons';
-@import '../govuk_frontend_toolkit/stylesheets/design-patterns/alpha-beta';
+@import 'conditionals';
+@import 'shims';
+@import 'measurements';
+@import 'css3';
+@import 'colours';
+@import 'typography';
+@import 'grid_layout';
+@import 'helpers';
+@import 'url-helpers';
+@import 'design-patterns/buttons';
+@import 'design-patterns/alpha-beta';
 
 // Dependencies from GOV.UK Elements
 // https://github.com/alphagov/govuk_elements
-@import '../govuk_elements/public/sass/elements/helpers';
-@import '../govuk_elements/public/sass/elements/reset';
-@import '../govuk_elements/public/sass/elements/buttons';
-@import '../govuk_elements/public/sass/elements/details';
-@import '../govuk_elements/public/sass/elements/elements-typography';
-@import '../govuk_elements/public/sass/elements/forms';
-@import '../govuk_elements/public/sass/elements/forms/form-validation';
-@import '../govuk_elements/public/sass/elements/forms/form-block-labels';
-@import '../govuk_elements/public/sass/elements/forms/form-validation';
-@import '../govuk_elements/public/sass/elements/icons';
-@import '../govuk_elements/public/sass/elements/layout';
-@import '../govuk_elements/public/sass/elements/lists';
-@import '../govuk_elements/public/sass/elements/panels';
-@import '../govuk_elements/public/sass/elements/tables';
+@import 'elements/helpers';
+@import 'elements/reset';
+@import 'elements/buttons';
+@import 'elements/details';
+@import 'elements/elements-typography';
+@import 'elements/forms';
+@import 'elements/forms/form-validation';
+@import 'elements/forms/form-block-labels';
+@import 'elements/forms/form-validation';
+@import 'elements/icons';
+@import 'elements/layout';
+@import 'elements/lists';
+@import 'elements/panels';
+@import 'elements/tables';
 
 
 // Specific to this application
@@ -44,6 +44,8 @@
 @import 'components/browse-list';
 @import 'components/management-navigation';
 @import 'components/dropdown';
+@import 'components/email-message';
+@import 'components/api-key';
 
 @import 'views/job';
 

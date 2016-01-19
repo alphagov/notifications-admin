@@ -1,7 +1,7 @@
 import os
 import re
 
-from flask import Flask, session, Markup, render_template
+from flask import Flask, session, Markup, escape, render_template
 from flask._compat import string_types
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -47,6 +47,7 @@ def create_app(config_name, config_overrides=None):
 
     application.add_template_filter(placeholders)
     application.add_template_filter(replace_placeholders)
+    application.add_template_filter(nl2br)
 
     application.after_request(useful_headers_after_request)
     register_errorhandlers(application)
@@ -106,6 +107,14 @@ def placeholders(value):
         lambda match: "<span class='placeholder'>{}</span>".format(match.group(1)),
         value
     ))
+
+
+def nl2br(value):
+    _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
+
+    result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', Markup('<br>\n'))
+                          for p in _paragraph_re.split(escape(value)))
+    return Markup(result)
 
 
 def replace_placeholders(template, values):

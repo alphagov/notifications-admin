@@ -20,24 +20,15 @@ from werkzeug import secure_filename
 
 from app.main import main
 from app.main.forms import CsvUploadForm
-from app.main.uploader import s3upload
+from app.main.uploader import (
+    s3upload,
+    s3download
+)
 
-# TODO move this to the templates directory
-message_templates = [
-    {
-        'name': 'Reminder',
-        'body': """
-            Vehicle tax: Your vehicle tax for ((registration number)) expires on ((date)).
-            Tax your vehicle at www.gov.uk/vehicle-tax
-        """
-    },
-    {
-        'name': 'Warning',
-        'body': """
-            Vehicle tax: Your vehicle tax for ((registration number)) has expired.
-            Tax your vehicle at www.gov.uk/vehicle-tax
-        """
-    },
+from ._templates import templates
+
+sms_templates = [
+    template for template in templates if template['type'] == 'sms'
 ]
 
 
@@ -48,68 +39,52 @@ def send_sms(service_id):
     if form.validate_on_submit():
         try:
             csv_file = form.file.data
-            filename = _format_filename(csv_file.filename)
-            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'],
-                                    filename)
-            csv_file.save(filepath)
-            _check_file(csv_file.filename, filepath)
+            filedata = _get_filedata(csv_file)
+            upload_id = s3upload(service_id, filedata)
             return redirect(url_for('.check_sms',
                                     service_id=service_id,
-                                    recipients=filename))
-        except (IOError, ValueError) as e:
+                                    upload_id=upload_id))
+        except ValueError as e:
             message = 'There was a problem uploading: {}'.format(
                       csv_file.filename)
             flash(message)
-            if isinstance(e, ValueError):
-                flash(str(e))
-            os.remove(filepath)
+            flash(str(e))
             return redirect(url_for('.send_sms', service_id=service_id))
 
     return render_template('views/send-sms.html',
-                           message_templates=message_templates,
+                           message_templates=sms_templates,
                            form=form,
                            service_id=service_id)
 
 
-@main.route("/services/<int:service_id>/sms/check", methods=['GET', 'POST'])
+@main.route("/services/<int:service_id>/sms/check/<upload_id>",
+            methods=['GET', 'POST'])
 @login_required
-def check_sms(service_id):
+def check_sms(service_id, upload_id):
     if request.method == 'GET':
-        filename = request.args.get('recipients')
-        if not filename:
-            abort(400)
-        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'],
-                                filename)
-        upload_result = _build_upload_result(filepath)
-        if upload_result.get('rejects'):
-            flash('There was a problem with some of the numbers')
-
+        contents = s3download(service_id, upload_id)
+        upload_result = _get_numbers(contents)
+        # TODO get original file name
         return render_template(
             'views/check-sms.html',
             upload_result=upload_result,
-            filename=filename,
-            message_template=message_templates[0]['body'],
+            filename='someupload_file_name.csv',
+            message_template=sms_templates[0]['body'],
             service_id=service_id
         )
     elif request.method == 'POST':
-        filename = request.form['recipients']
-        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'],
-                                filename)
-        try:
-            upload_id = s3upload(filepath)
-            # TODO when job is created record filename in job itself
-            # so downstream pages can get the original filename that way
-            session[upload_id] = filename
-            return redirect(url_for('main.view_job', service_id=service_id, job_id=upload_id))
-        except:
-            flash('There as a problem saving the file')
-            return redirect(url_for('.check_sms', recipients=filename))
+        # TODO create the job with template, file location etc.
+        return redirect(url_for('main.view_job',
+                        service_id=service_id,
+                        job_id=upload_id))
 
 
-def _check_file(filename, filepath):
-    if os.stat(filepath).st_size == 0:
-        message = 'The file {} contained no data'.format(filename)
+def _get_filedata(file):
+    lines = file.read().decode('utf-8').splitlines()
+    if len(lines) < 2:  # must be at least header and one line
+        message = 'The file {} contained no data'.format(file.filename)
         raise ValueError(message)
+    return {'filename': file.filename, 'data': lines}
 
 
 def _format_filename(filename):
@@ -119,24 +94,16 @@ def _format_filename(filename):
     return secure_filename(formatted_name)
 
 
-def _open(file):
-    return open(file, 'r')
-
-
-def _build_upload_result(csv_file):
-    try:
-        file = _open(csv_file, 'r')
-        pattern = re.compile(r'^\+44\s?\d{4}\s?\d{6}$')
-        reader = csv.DictReader(
-            file.read().splitlines(),
-            lineterminator='\n',
-            quoting=csv.QUOTE_NONE)
-        valid, rejects = [], []
-        for i, row in enumerate(reader):
-            if pattern.match(row['phone']):
-                valid.append(row)
-            else:
-                rejects.append({"line_number": i+2, "phone": row['phone']})
-        return {"valid": valid, "rejects": rejects}
-    finally:
-        file.close()
+def _get_numbers(contents):
+    pattern = re.compile(r'^\+44\s?\d{4}\s?\d{6}$')  # need better validation
+    reader = csv.DictReader(
+        contents.split('\n'),
+        lineterminator='\n',
+        quoting=csv.QUOTE_NONE)
+    valid, rejects = [], []
+    for i, row in enumerate(reader):
+        if pattern.match(row['phone']):
+            valid.append(row)
+        else:
+            rejects.append({"line_number": i+2, "phone": row['phone']})
+    return {"valid": valid, "rejects": rejects}

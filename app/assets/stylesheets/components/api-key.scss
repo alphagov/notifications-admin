@@ -1,0 +1,17 @@
+.api-key {
+
+  &-key {
+    font-family: monospace;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  &-button-show {
+    @include button($grey-3);
+  }
+
+  &-button-copy {
+    @include button($grey-3);
+  }
+
+}

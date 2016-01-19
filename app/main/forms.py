@@ -166,8 +166,12 @@ class AddServiceForm(Form):
         self._names_func = names_func
         super(AddServiceForm, self).__init__(*args, **kwargs)
 
-    name = StringField('Service Name', validators=[
-        DataRequired(message='Service name can not be empty')])
+    name = StringField(
+        'Service name',
+        validators=[
+            DataRequired(message='Service name can not be empty')
+        ]
+    )
 
     def validate_name(self, a):
         if a.data in self._names_func():

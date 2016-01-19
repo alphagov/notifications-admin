@@ -27,3 +27,20 @@
   }
 
 }
+
+.banner-dangerous {
+
+  @extend .banner;
+  background: $white;
+  color: $error-colour;
+  border: 5px solid $error-colour;
+  margin: 15px 0;
+  @include bold-19;
+  text-align: left;
+
+  .button {
+    @include button($error-colour);
+    margin-top: 10px;
+  }
+
+}
