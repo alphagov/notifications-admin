@@ -27,8 +27,8 @@ def create_app(config_name, config_overrides=None):
     application.config.from_object(configs[config_name])
     init_app(application, config_overrides)
     db.init_app(application)
-    init_csrf(application)
     logging.init_app(application)
+    init_csrf(application)
 
     notifications_api_client.init_app(application)
 
