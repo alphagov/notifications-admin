@@ -29,6 +29,16 @@ def service_json(id_, name, users, limit=1000, active=False, restricted=True):
     }
 
 
+def template_json(id_, name, type_, content, service_id):
+    return {
+        'id': id_,
+        'name': name,
+        'template_type': type_,
+        'content': content,
+        'service': service_id
+    }
+
+
 TEST_USER_EMAIL = 'test@user.gov.uk'
 
 
