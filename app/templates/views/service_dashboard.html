@@ -24,9 +24,9 @@
 		</ul>
 
     {% call(item) list_table(
-      jobs[:3],
+      [],
       caption="Recent text messages",
-			empty_message="No recent text messages",
+			empty_message='You haven’t sent any text messages yet',
       field_headings=['Job', 'File', 'Time', 'Status']
     ) %}
 			{% call field() %}
@@ -42,9 +42,5 @@
 				{{ item.status }}
 			{% endcall %}
     {% endcall %}
-    <p>
-      <a href={{ url_for('.view_jobs', service_id=service_id) }}>See all notifications activity</a>
-    </p>
-
 
 {% endblock %}
