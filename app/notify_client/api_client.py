@@ -12,7 +12,7 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
                                                           "secret")
 
     def init_app(self, application):
-        self.base_url = application.config['NOTIFY_API_URL']
+        self.base_url = application.config['API_HOST_NAME']
         self.client_id = application.config['NOTIFY_API_CLIENT']
         self.secret = application.config['NOTIFY_API_SECRET']
 

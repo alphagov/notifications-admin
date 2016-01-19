@@ -22,7 +22,7 @@ class Config(object):
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = True
 
-    NOTIFY_API_URL = os.getenv('NOTIFY_API_URL')
+    API_HOST_NAME = os.getenv('API_HOST_NAME')
     NOTIFY_API_SECRET = os.getenv('NOTIFY_API_SECRET', "dev-secret")
     NOTIFY_API_CLIENT = os.getenv('NOTIFY_API_CLIENT', "admin")
 
@@ -41,7 +41,7 @@ class Config(object):
 
 class Development(Config):
     DEBUG = True
-    NOTIFY_API_URL = 'http://localhost:6011'
+    API_HOST_NAME = 'http://localhost:6011'
     ADMIN_CLIENT_USER_NAME = 'dev-notify-admin'
     ADMIN_CLIENT_SECRET = 'dev-notify-secret-key'
 
