@@ -7,7 +7,7 @@ from flask.ext.script import Manager
 from sqlalchemy.schema import MetaData
 from . import (
     create_test_user, create_another_test_user, service_json, TestClient,
-    get_test_user)
+    get_test_user, template_json)
 from app import create_app, db
 
 
@@ -94,12 +94,11 @@ def mock_get_service(mocker, active_user):
 
 @pytest.fixture(scope='function')
 def mock_create_service(mocker):
-    # TODO fix token generation
     def _create(service_name, active, limit, restricted, user_id):
         service = service_json(
             101, service_name, [user_id], limit=limit,
             active=active, restricted=restricted)
-        return {'data': service, 'token': 1}
+        return {'data': service}
     mock_class = mocker.patch(
         'app.notifications_api_client.create_service', side_effect=_create)
     return mock_class
@@ -145,6 +144,65 @@ def mock_delete_service(mocker, mock_get_service):
 
 
 @pytest.fixture(scope='function')
+def mock_get_service_template(mocker):
+    def _create(service_id, template_id):
+        template = template_json(
+            template_id, "Template Name", "sms", "template content", service_id)
+        return {'data': template}
+    return mocker.patch(
+        'app.notifications_api_client.get_service_template',
+        side_effect=_create)
+
+
+@pytest.fixture(scope='function')
+def mock_create_service_template(mocker):
+    def _create(name, type_, content, service):
+        template = template_json(
+            101, name, type_, content, service)
+        return {'data': template}
+    mock_class = mocker.patch(
+        'app.notifications_api_client.create_service_template',
+        side_effect=_create)
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_update_service_template(mocker):
+    def _update(id_, name, type_, content, service):
+        template = template_json(
+            id_, name, type_, content, service)
+        return {'data': template}
+    mock_class = mocker.patch(
+        'app.notifications_api_client.update_service_template',
+        side_effect=_update)
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_get_service_templates(mocker):
+    def _create(service_id):
+        template_one = template_json(
+            1, "template_one", "sms", "template one content", service_id)
+        template_two = template_json(
+            2, "template_two", "sms", "template two content", service_id)
+        return {'data': [template_one, template_two]}
+    mock_class = mocker.patch(
+        'app.notifications_api_client.get_service_templates',
+        side_effect=_create)
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_delete_service_template(mocker):
+    def _delete(service_id, template_id):
+        template = template_json(
+            template_id, "Template to delete",
+            "sms", "content to be deleted", service_id)
+        return {'data': template}
+    return mocker.patch(
+        'app.notifications_api_client.delete_service_template', side_effect=_delete)
+
+
 def mock_register_user(mocker, user_data):
     data = {
         "email_address": user_data['email_address'],

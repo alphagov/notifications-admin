@@ -15,21 +15,21 @@ GOV.UK Notify | Manage templates
         <h1 class="heading-xlarge">Templates</h1>
 
         <p>
-          <a href="{{ url_for('.add_template', service_id=service_id) }}">Create new template</a>
+          <a href="{{ url_for('.add_service_template', service_id=service_id) }}">Create new template</a>
 
         {% for template in templates %}
           {% if template.type == 'sms' %}
             {{ sms_message(
-              template.body,
+              template.content,
               name=template.name,
-              edit_link=url_for('.edit_template', service_id=service_id, template_id=loop.index)
+              edit_link=url_for('.edit_service_template', service_id=template.service, template_id=template.id)
             ) }}
           {% elif template.type == 'email' %}
             {{ email_message(
-              template.subject,
-              template.body,
+              "template subject",
+              template.content,
               name=template.name,
-              edit_link=url_for('.edit_template', service_id=service_id, template_id=loop.index)
+              edit_link=url_for('.edit_service_template', service_id=template.service, template_id=template.id)
             ) }}
           {% endif %}
         {% endfor %}
