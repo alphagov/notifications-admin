@@ -148,6 +148,21 @@
     {% endcall %}
   {% endcall %}
 
+  {% call(item) list_table(
+    [],
+    caption='Jobs',
+    field_headings=['Job', 'Time'],
+    caption_visible=True,
+    empty_message='You haven’t scheduled any jobs yet'
+  ) %}
+    {% call field() %}
+      {{ item.job }}
+    {% endcall %}
+    {% call field() %}
+      {{ item.time }}
+    {% endcall %}
+  {% endcall %}
+
   <h2 class="heading-large">Textbox</h2>
   {{ textbox(form.username) }}
   {{ textbox(form.password) }}

@@ -22,9 +22,12 @@ class Config(object):
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = True
 
-    NOTIFY_API_URL = os.getenv('NOTIFY_API_URL', "http://localhost:6001")
+    NOTIFY_API_URL = os.getenv('NOTIFY_API_URL')
     NOTIFY_API_SECRET = os.getenv('NOTIFY_API_SECRET', "dev-secret")
     NOTIFY_API_CLIENT = os.getenv('NOTIFY_API_CLIENT', "admin")
+
+    ADMIN_CLIENT_USER_NAME = os.getenv('ADMIN_CLIENT_USER_NAME')
+    ADMIN_CLIENT_SECRET = os.getenv('ADMIN_CLIENT_SECRET')
 
     WTF_CSRF_ENABLED = True
     SECRET_KEY = 'secret-key'
@@ -38,10 +41,12 @@ class Config(object):
 
 class Development(Config):
     DEBUG = True
+    NOTIFY_API_URL = 'http://localhost:6011'
+    ADMIN_CLIENT_USER_NAME = 'dev-notify-admin'
+    ADMIN_CLIENT_SECRET = 'dev-notify-secret-key'
 
 
-class Test(Config):
-    DEBUG = True
+class Test(Development):
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_notifications_admin'
     WTF_CSRF_ENABLED = False
 

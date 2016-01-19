@@ -27,8 +27,8 @@ def create_app(config_name, config_overrides=None):
     application.config.from_object(configs[config_name])
     init_app(application, config_overrides)
     db.init_app(application)
-    init_csrf(application)
     logging.init_app(application)
+    init_csrf(application)
 
     notifications_api_client.init_app(application)
 
@@ -75,14 +75,15 @@ def init_csrf(application):
 
 
 def init_app(app, config_overrides):
-    for key, value in app.config.items():
-        if key in os.environ:
-            app.config[key] = convert_to_boolean(os.environ[key])
 
     if config_overrides:
         for key in app.config.keys():
             if key in config_overrides:
                     app.config[key] = config_overrides[key]
+
+    for key, value in app.config.items():
+        if key in os.environ:
+            app.config[key] = convert_to_boolean(os.environ[key])
 
     @app.context_processor
     def inject_global_template_variables():

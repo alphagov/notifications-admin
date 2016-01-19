@@ -34,8 +34,8 @@ gulp.task('javascripts', () => gulp
   .src([
     paths.npm + 'govuk_frontend_toolkit/javascripts/govuk/modules.js',
     paths.npm + 'govuk_frontend_toolkit/javascripts/govuk/selection-buttons.js',
+    paths.src + 'javascripts/detailsPolyfill.js',
     paths.src + 'javascripts/apiKey.js',
-    paths.src + 'javascripts/dropdown.js',
     paths.src + 'javascripts/highlightTags.js',
     paths.src + 'javascripts/main.js'
   ])

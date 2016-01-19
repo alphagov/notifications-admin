@@ -13,5 +13,4 @@ def test_should_show_recent_jobs_on_dashboard(app_,
             response = client.get(url_for('main.service_dashboard', service_id=123))
 
         assert response.status_code == 200
-        assert 'Test message 1' in response.get_data(as_text=True)
-        assert 'Asdfgg' in response.get_data(as_text=True)
+        assert 'You haven’t sent any text messages yet' in response.get_data(as_text=True)

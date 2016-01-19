@@ -199,6 +199,18 @@ def mock_delete_service_template(mocker):
             template_id, "Template to delete",
             "sms", "content to be deleted", service_id)
         return {'data': template}
-    mock_class = mocker.patch(
+    return mocker.patch(
         'app.notifications_api_client.delete_service_template', side_effect=_delete)
+
+
+def mock_register_user(mocker, user_data):
+    data = {
+        "email_address": user_data['email_address'],
+        "failed_login_count": 0,
+        "mobile_number": user_data['mobile_number'],
+        "name": user_data['name'],
+        "state": "pending"
+    }
+    mock_class = mocker.patch('app.main.views.register.UserApiClient')
+    mock_class.register_user.return_value = data
     return mock_class
