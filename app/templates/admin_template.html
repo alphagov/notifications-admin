@@ -51,13 +51,13 @@
     <nav class="management-navigation">
       <div class="grid-row">
         <div class="column-half">
-          <div class="dropdown" data-module="dropdown">
-            <div class="dropdown-toggle">
+          <details class="dropdown">
+            <summary class="dropdown-toggle">
               Service name
-            </div>
+            </summary>
             <a href="#">Switch to A N Other service</a>
             <a href="{{ url_for('.add_service') }}">Add a new service to GOV.UK Notify</a>
-          </div>
+          </details>
         </div>
         <div class="column-half management-navigation-account">
           <a href="{{ url_for('main.user_profile') }}">{{ current_user.name }}</a>

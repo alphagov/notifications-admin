@@ -3,56 +3,28 @@
 
   position: relative;
 
-  .js-enabled &-toggle {
+  &-toggle {
 
     color: $link-colour;
     position: relative;
-    padding-left: 20px;
     cursor: pointer;
+    outline-offset: 2px;
 
     &:hover {
       color: $link-hover-colour;
       text-decoration: underline;
     }
 
-    &::before {
-      content: '▼';
-      font-size: 12px;
-      position: absolute;
-      top: 1px;
-      left: -1px;
-    }
-
-  }
-
-  .js-closed &-toggle::before {
-    content: '▶';
-    left: -1px;
-    top: 2px;
   }
 
   a {
 
     display: block;
     margin-top: 7px;
+    padding-left: 20px;
 
-    .js-enabled & {
-
-      padding-left: 20px;
-
-      &:hover {
-        text-decoration: underline;
-      }
-
-    }
-
-  }
-
-  &.js-closed {
-
-    a {
-      left: -9999em;
-      position: absolute;
+    &:hover {
+      text-decoration: underline;
     }
 
   }
