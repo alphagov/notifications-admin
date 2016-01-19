@@ -53,6 +53,19 @@ def create_test_user(state):
     return user
 
 
+def create_test_api_user(state):
+    from app.notify_client.user_api_client import User
+    user_data = {'id': 1,
+                 'name': 'Test User',
+                 'password': 'somepassword',
+                 'email_address': TEST_USER_EMAIL,
+                 'mobile_number': '+441234123412',
+                 'state': state
+                 }
+    user = User(user_data)
+    return user
+
+
 def create_another_test_user(state):
     user = User(name='Another Test User',
                 password='someOtherpassword',
