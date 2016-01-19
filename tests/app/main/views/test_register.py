@@ -1,5 +1,7 @@
 from flask import url_for
 
+from tests.conftest import mock_register_user
+
 
 def test_render_register_returns_template_with_form(app_, db_, db_session):
     response = app_.test_client().get('/register')
@@ -12,13 +14,21 @@ def test_process_register_creates_new_user(app_,
                                            db_,
                                            db_session,
                                            mock_send_sms,
-                                           mock_send_email):
+                                           mock_send_email,
+                                           mocker):
+
+    user_data = {
+        'name': 'Some One Valid',
+        'email_address': 'someone@example.gov.uk',
+        'mobile_number': '+4407700900460',
+        'password': 'validPassword!'
+    }
+
+    mock_register_user(mocker, user_data)
+
     with app_.test_request_context():
         response = app_.test_client().post('/register',
-                                           data={'name': 'Some One Valid',
-                                                 'email_address': 'someone@example.gov.uk',
-                                                 'mobile_number': '+4407700900460',
-                                                 'password': 'validPassword!'})
+                                           data=user_data)
         assert response.status_code == 302
         assert response.location == url_for('main.verify', _external=True)
 
@@ -57,13 +67,19 @@ def test_should_add_verify_codes_on_session(app_,
                                             db_,
                                             db_session,
                                             mock_send_sms,
-                                            mock_send_email):
+                                            mock_send_email,
+                                            mocker):
+    user_data = {
+        'name': 'Test Codes',
+        'email_address': 'test@example.gov.uk',
+        'mobile_number': '+4407700900460',
+        'password': 'validPassword!'
+    }
+
+    mock_register_user(mocker, user_data)
     with app_.test_client() as client:
         response = client.post('/register',
-                               data={'name': 'Test Codes',
-                                     'email_address': 'test_codes@example.gov.uk',
-                                     'mobile_number': '+4407700900460',
-                                     'password': 'validPassword!'})
+                               data=user_data)
         assert response.status_code == 302
         assert 'notify_admin_session' in response.headers.get('Set-Cookie')
 
