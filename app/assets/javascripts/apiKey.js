@@ -1,15 +1,11 @@
 (function(Modules) {
   "use strict";
 
+  if (!document.queryCommandSupported('copy')) return;
+
   Modules.ApiKey = function() {
 
     const states = {
-      'initial': `
-        <input type='button' class='api-key-button-show' value='Show API key' />
-      `,
-      'keyVisibleBasic': key => `
-        <span class="api-key-key">${key}</span>
-      `,
       'keyVisible': key => `
         <span class="api-key-key">${key}</span>
         <input type='button' class='api-key-button-copy' value='Copy API key to clipboard' />
@@ -33,23 +29,22 @@
 
     this.start = function(component) {
 
-      const $component = $(component).html(states.initial).attr('aria-live', 'polite'),
+      const $component = $(component),
             key = $component.data('key');
 
       $component
-        .on(
-          'click', '.api-key-button-show', () =>
-            $component.html(
-              document.queryCommandSupported('copy') ?
-                states.keyVisible(key) : states.keyVisibleBasic(key)
-            )
-        )
+        .html(states.keyVisible(key))
+        .attr('aria-live', 'polite')
         .on(
           'click', '.api-key-button-copy', () =>
             this.copyKey(
               $('.api-key-key', component)[0], () =>
                 $component.html(states.keyCopied)
             )
+        )
+        .on(
+          'click', '.api-key-button-show', () =>
+            $component.html(states.keyVisible(key))
         );
 
     };

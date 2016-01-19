@@ -1,3 +1,7 @@
+.table {
+  margin-bottom: $gutter;
+}
+
 .table-heading {
   text-align: left;
 }
@@ -16,8 +20,15 @@
     }
 
     &-error {
+
       color: $error-colour;
       font-weight: bold;
+
+      a:link,
+      a:visited {
+        color: $error-colour;
+      }
+
     }
 
   }

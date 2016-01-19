@@ -235,3 +235,7 @@ class ChangeMobileNumberForm(Form):
 
 class ConfirmMobileNumberForm(Form):
     sms_code = sms_code()
+
+
+class CreateKeyForm(Form):
+    key_name = StringField(u'Description of key')

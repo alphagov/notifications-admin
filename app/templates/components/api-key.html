@@ -1,4 +1,7 @@
-{% macro api_key(key) %}
+{% macro api_key(key, name) %}
+  <h2 class="api-key-name">
+    {{ name }}
+  </h2>
   <div data-module="api-key" data-key="{{ key }}">
     <span class="api-key-key">{{ key }}</span>
   </div>
