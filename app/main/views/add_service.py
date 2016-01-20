@@ -16,7 +16,7 @@ def add_service():
         heading = 'Add a new service'
     if form.validate_on_submit():
         user = users_dao.get_user_by_id(session['user_id'])
-        service_id = services_dao.insert_new_service(form.name.data, user)
+        service_id = services_dao.insert_new_service(form.name.data, user.id)
         return redirect(url_for('main.service_dashboard', service_id=service_id))
     else:
         return render_template(

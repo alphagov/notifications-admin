@@ -22,7 +22,7 @@ class UserApiClient(BaseAPIClient):
             "password": password
         }
         user_data = self.post("/user", data)
-        return User(user_data, max_failed_login_count=self.user_max_failed_login_count)
+        return User(user_data['data'], max_failed_login_count=self.user_max_failed_login_count)
 
 
 class User(object):

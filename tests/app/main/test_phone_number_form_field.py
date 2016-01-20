@@ -72,4 +72,4 @@ def test_phone_number_rejects_invalid_values(phone_number, error_message):
 def test_phone_number_outputs_in_correct_format(phone_number):
     form = FormExample(phone_number=phone_number)
     form.validate()
-    assert form.phone_number.data == '+44 7123 456 789'
+    assert form.phone_number.data == '+447123456789'
