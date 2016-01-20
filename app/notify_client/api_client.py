@@ -13,8 +13,8 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
 
     def init_app(self, application):
         self.base_url = application.config['API_HOST_NAME']
-        self.client_id = application.config['NOTIFY_API_CLIENT']
-        self.secret = application.config['NOTIFY_API_SECRET']
+        self.client_id = application.config['ADMIN_CLIENT_USER_NAME']
+        self.secret = application.config['ADMIN_CLIENT_SECRET']
 
     def create_service(self, service_name, active, limit, restricted, user_id):
         """
@@ -128,6 +128,8 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
                  message,
                  job_id=None,
                  description=None):
+        print("{0} {1} {2} {3}".format(
+            mobile_number, message, job_id, description))
         self.send_sms_notification(mobile_number, message)
 
     def send_email(self,
@@ -137,4 +139,5 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
                    subject,
                    job_id=None,
                    description=None):
-        pass
+        print("{0} {1} {2} {3} {4} {5}".format(
+            email_address, message, from_address, subject, job_id, description))
