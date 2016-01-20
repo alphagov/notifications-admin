@@ -12,7 +12,7 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
                                                           "secret")
 
     def init_app(self, application):
-        self.base_url = application.config['NOTIFY_API_URL']
+        self.base_url = application.config['API_HOST_NAME']
         self.client_id = application.config['NOTIFY_API_CLIENT']
         self.secret = application.config['NOTIFY_API_SECRET']
 
@@ -83,6 +83,20 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
         endpoint = "/service/{0}/template".format(service_id)
         return self.post(endpoint, data)
 
+    def update_service_template(self, id_, name, type_, content, service_id):
+        """
+        Update a service template.
+        """
+        data = {
+            'id': id_,
+            'name': name,
+            'template_type': type_,
+            'content': content,
+            'service': service_id
+        }
+        endpoint = "/service/{0}/template/{1}".format(service_id, id_)
+        return self.put(endpoint, data)
+
     def get_service_template(self, service_id, template_id, *params):
         """
         Retrieve a service template.
@@ -114,7 +128,7 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
                  message,
                  job_id=None,
                  description=None):
-        pass
+        self.send_sms_notification(mobile_number, message)
 
     def send_email(self,
                    email_address,
