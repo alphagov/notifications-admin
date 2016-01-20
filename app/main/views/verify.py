@@ -1,10 +1,12 @@
 from flask import (
     render_template,
     redirect,
-    jsonify,
     session,
-    url_for
+    url_for,
+    abort
 )
+
+from client.errors import HTTPError
 
 from flask_login import login_user
 
@@ -24,9 +26,15 @@ def verify():
         verify_codes_dao.use_code_for_user_and_type(user_id=user_id, code_type='email')
         verify_codes_dao.use_code_for_user_and_type(user_id=user_id, code_type='sms')
 
-        # TODO complete verify and login flow
-        # users_dao.activate_user(user.id)
-        # login_user(user)
+        try:
+            user = users_dao.get_user_by_id(user_id)
+            activated_user = users_dao.activate_user(user)
+            login_user(activated_user)
+            return redirect(url_for('main.add_service', first='first'))
+        except HTTPError as e:
+            if e.status_code == 404:
+                abort(404)
+            else:
+                raise e
 
-        return redirect(url_for('.add_service', first='first'))
     return render_template('views/verify.html', form=form)

@@ -15,7 +15,10 @@ def test_should_redirect_to_password_reset_sent_and_state_updated(app_,
                                                                   db_,
                                                                   db_session,
                                                                   active_user,
-                                                                  mock_send_email):
+                                                                  mock_send_email,
+                                                                  mock_api_user,
+                                                                  mock_user_dao_get_by_email,
+                                                                  mock_user_dao_password_reset):
     with app_.test_request_context():
         response = app_.test_client().post(
             url_for('.forgot_password'),
@@ -24,4 +27,4 @@ def test_should_redirect_to_password_reset_sent_and_state_updated(app_,
         assert (
             'You have been sent an email containing a link'
             ' to reset your password.') in response.get_data(as_text=True)
-        assert users_dao.get_user_by_id(active_user.id).state == 'request_password_reset'
+        assert mock_api_user.state == 'request_password_reset'

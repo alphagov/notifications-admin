@@ -18,7 +18,8 @@ def test_sign_out_user(app_,
                        db_session,
                        mock_send_sms,
                        mock_send_email,
-                       mock_get_service):
+                       mock_get_service,
+                       mock_user_loader):
     with app_.test_request_context():
         email = 'valid@example.gov.uk'
         password = 'val1dPassw0rd!'
