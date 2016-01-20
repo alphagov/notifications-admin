@@ -241,7 +241,7 @@ def mock_activate_user(mocker, mock_api_user):
 
 @pytest.fixture(scope='function')
 def mock_user_dao_get_user(mocker):
-    mock_class = mocker.patch('app.main.dao.users_dao.get_user_by_email')
+    mock_class = mocker.patch('app.main.dao.users_dao.get_user_by_id')
     mock_class.return_value = mock_api_user
     return mock_class
 
