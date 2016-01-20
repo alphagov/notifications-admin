@@ -115,7 +115,7 @@ def test_should_update_mobile_number_resend_code(app_,
                                    data={'mobile_number': '+447700900460'})
             assert response.status_code == 302
             assert response.location == url_for('main.verify', _external=True)
-            assert mock_api_user.mobile_number == '+44 7700 900 460'
+            assert mock_api_user.mobile_number == '+447700900460'
 
 
 def test_should_render_verification_code_not_received(app_,
