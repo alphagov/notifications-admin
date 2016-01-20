@@ -1,6 +1,6 @@
 from flask import url_for
 
-from tests.conftest import mock_register_user
+from tests.conftest import mock_register_user as mock_user
 
 
 def test_render_register_returns_template_with_form(app_, db_, db_session):
@@ -16,7 +16,6 @@ def test_process_register_creates_new_user(app_,
                                            mock_send_sms,
                                            mock_send_email,
                                            mocker):
-
     user_data = {
         'name': 'Some One Valid',
         'email_address': 'someone@example.gov.uk',
@@ -24,7 +23,7 @@ def test_process_register_creates_new_user(app_,
         'password': 'validPassword!'
     }
 
-    mock_register_user(mocker, user_data)
+    mock_user(mocker, user_data)
 
     with app_.test_request_context():
         response = app_.test_client().post('/register',
@@ -76,7 +75,7 @@ def test_should_add_verify_codes_on_session(app_,
         'password': 'validPassword!'
     }
 
-    mock_register_user(mocker, user_data)
+    mock_user(mocker, user_data)
     with app_.test_client() as client:
         response = client.post('/register',
                                data=user_data)
