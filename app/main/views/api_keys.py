@@ -2,6 +2,7 @@ from flask import request, render_template, redirect, url_for, flash
 from flask_login import login_required
 from app.main import main
 from app.main.forms import CreateKeyForm
+from app import api_key_api_client
 
 
 @main.route("/services/<int:service_id>/documentation")
@@ -16,15 +17,7 @@ def api_keys(service_id):
     return render_template(
         'views/api-keys.html',
         service_id=service_id,
-        keys=[
-            {'name': 'Test key 1', 'last_used': '12 January 2016, 10:01AM', 'id': 1},
-            {'name': 'Test key 2', 'last_used': '12 January 2016, 9:50AM', 'id': 1},
-            {'name': 'Test key 3', 'last_used': '12 January 2016, 9:49AM', 'id': 1},
-            {
-                'name': 'My first key', 'last_used': '25 December 2015, 09:49AM', 'id': 1,
-                'revoked': '4 January 2016, 6:00PM'
-            }
-        ]
+        keys=api_key_api_client.get_api_keys(service_id=service_id)['apiKeys']
     )
 
 
@@ -33,7 +26,9 @@ def api_keys(service_id):
 def create_api_key(service_id):
     form = CreateKeyForm()
     if form.validate_on_submit():
-        return redirect(url_for('.show_api_key', service_id=service_id))
+        secret = api_key_api_client.create_api_key(service_id=service_id, key_name=form.key_name.data)
+        return render_template('views/api-keys/show.html', service_id=service_id, secret=secret,
+                               key_name=form.key_name.data)
     return render_template(
         'views/api-keys/create.html',
         service_id=service_id,
@@ -53,5 +48,6 @@ def revoke_api_key(service_id, key_id):
     if request.method == 'GET':
         return render_template('views/api-keys/revoke.html', service_id=service_id)
     elif request.method == 'POST':
+        api_key_api_client.revoke_api_key(service_id=service_id, key_id=key_id)
         flash('‘Test key 1’ was revoked')
         return redirect(url_for('.api_keys', service_id=service_id))

@@ -35,21 +35,18 @@
     empty_message="You haven’t created any API keys yet",
     caption="API keys",
     caption_visible=False,
-    field_headings=['Key name', 'Created at', hidden_field_heading('Action')]
+    field_headings=['Key name', hidden_field_heading('Action')]
   ) %}
     {% call field() %}
       {{ item.name }}
     {% endcall %}
-    {% call field() %}
-      {{ item.last_used }}
-    {% endcall %}
-    {% if item.revoked %}
+    {% if item.expiry_date %}
       {% call field(align='right', status='default') %}
-        Revoked {{ item.revoked }}
+        Revoked {{ item.expiry_date }}
       {% endcall %}
     {% else %}
       {% call field(align='right', status='error') %}
-        <a href='{{ url_for('.revoke_api_key', service_id=123, key_id=item.id) }}'>Revoke</a>
+        <a href='{{ url_for('.revoke_api_key', service_id=service_id, key_id=item.id) }}'>Revoke</a>
       {% endcall %}
     {% endif %}
   {% endcall %}

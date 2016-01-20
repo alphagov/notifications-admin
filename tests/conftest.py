@@ -210,3 +210,7 @@ def mock_register_user(mocker, user_data):
     mock_class = mocker.patch('app.user_api_client.register_user')
     mock_class.return_value = user
     return mock_class
+
+
+def mock_create_api_key(mocker, key_name):
+    mock_class = mocker.patch('app.api')

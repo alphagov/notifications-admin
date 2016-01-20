@@ -8,6 +8,7 @@ from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from werkzeug.exceptions import abort
 from app.notify_client.api_client import NotificationsAdminAPIClient
+from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.user_api_client import UserApiClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 import app.proxy_fix
@@ -20,6 +21,7 @@ csrf = CsrfProtect()
 
 notifications_api_client = NotificationsAdminAPIClient()
 user_api_client = UserApiClient()
+api_key_api_client = ApiKeyApiClient()
 
 
 def create_app(config_name, config_overrides=None):
@@ -34,6 +36,7 @@ def create_app(config_name, config_overrides=None):
 
     notifications_api_client.init_app(application)
     user_api_client.init_app(application)
+    api_key_api_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
