@@ -92,7 +92,7 @@
 
   <h2 class="heading-large">SMS message</h2>
 
-  <p>Used to show or preview an SMS message.</p>
+  <p>Used to show, preview or choose an SMS message.</p>
 
   <div class="grid-row">
     <div class="column-half">
@@ -101,6 +101,12 @@
       {{ sms_message(
         "Your vehicle tax for registration number is due on date. Renew online at www.gov.uk/vehicle-tax",
         "+44 7700 900 306"
+      ) }}
+      {{ sms_message(
+        "Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax",
+        name="Reminder",
+        input_name="template",
+        input_index=1
       ) }}
     </div>
   </div>
