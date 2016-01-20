@@ -10,35 +10,40 @@
 {% block maincolumn_content %}
   <form method="POST" enctype="multipart/form-data">
 
-    <h1 class="heading-xlarge">Send text messages</h1>
+    <div class="grid-row">
+      <div class="column-three-quarters">
 
-    <fieldset class='form-group'>
-      <legend class="heading-medium">1. Choose text message template</legend>
-      {% for template in message_templates %}
-        <label class="block-label" for="template-{{loop.index}}">
-          {{ template.name }}
-          <input type="radio" name="template" id="template-{{loop.index}}" value="{{ template.name }}" />
-        </label>
-      {% endfor %}
-    </fieldset>
+        <h1 class="heading-xlarge">Send text messages</h1>
 
-    <p>
-      or <a href="{{ url_for('.add_service_template', service_id=service_id) }}">create a new template</a>
-    </p>
+        <fieldset class='form-group'>
+          <legend class="heading-medium">1. Choose text message template</legend>
+          {% for template in message_templates %}
+            {{ sms_message(
+              template.body, name=template.name, input_name='template', input_index=loop.index
+            ) }}
+          {% endfor %}
+        </fieldset>
 
-    <h2 class="heading-medium">2. Add recipients</h2>
+        <p>
+          or <a href="{{ url_for(".add_template", service_id=service_id) }}">create a new template</a>
+        </p>
 
-    <p>
-      Upload a CSV file to add your recipients’ details.
-    </p>
-    <p>
-      You can also <a href="#">download an example CSV</a>.
-    </p>
-    <p>
-      {{textbox(form.file)}}
-    </p>
+        <h2 class="heading-medium">2. Add recipients</h2>
 
-    {{ page_footer("Continue") }}
+        <p>
+          Upload a CSV file to add your recipients’ details.
+        </p>
+        <p>
+          You can also <a href="#">download an example CSV</a>.
+        </p>
+        <p>
+          {{textbox(form.file)}}
+        </p>
+
+        {{ page_footer("Continue") }}
+
+      </div>
+    </div>
 
   </form>
 

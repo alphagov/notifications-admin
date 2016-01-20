@@ -1,53 +1,63 @@
-.sms-message {
-
-  position: relative;
+%sms-message-wrapper,
+.sms-message-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+  padding: $gutter/2;
+  background: $panel-colour;
+  border: 1px solid $panel-colour;
+  border-radius: 5px;
+  white-space: normal;
   margin: 0 0 $gutter 0;
+}
 
-  &:before {
-    content: '';
-    position: absolute;
-    z-index: 10;
-    bottom: -12px;
-    right: 5px;
-    width: 20px;
-    height: 25px;
-    border-radius: 100%;
-    background: $panel-colour;
+.sms-message-wrapper-with-radio {
+  @extend %sms-message-wrapper;
+  padding-left: 45px;
+  cursor: pointer;
+}
+
+.sms-message-recipient {
+  @include copy-19;
+  color: $secondary-text-colour;
+  margin: -$gutter-half 0 $gutter 0;
+}
+
+.sms-message-name {
+  @include bold-19;
+  margin: 30px 0 10px 0;
+}
+
+.sms-message-picker {
+  display: block;
+  margin: 7px 0 0 0;
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  z-index: 50;
+}
+
+label.sms-message-option {
+
+  display: block;
+  position: relative;
+
+  &.selected {
+
+    .sms-message-wrapper-with-radio {
+      background: $white;
+      border: 1px solid $text-colour;
+    }
+
   }
 
-  &:after {
-    content: '';
-    position: absolute;
-    z-index: 20;
-    bottom: -15px;
-    right: -5px;
-    border-radius: 100%;
-    width: 20px;
-    height: 20px;
-    background: $white;
-  }
+  &.focused {
 
-  &-wrapper {
-    width: 100%;
-    display: inline-block;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 30;
-    padding: $gutter/2;
-    background: $panel-colour;
-    border-radius: 5px;
-    white-space: normal;
-  }
+    outline: none;
 
-  &-recipient {
-    @include copy-19;
-    color: $secondary-text-colour;
-    margin: -$gutter-half 0 $gutter 0;
-  }
+    .sms-message-wrapper-with-radio {
+      box-shadow: 0 0 0 3px $yellow;
+    }
 
-  &-name {
-    @include bold-19;
-    margin: 50px 0 10px 0;
   }
 
 }
