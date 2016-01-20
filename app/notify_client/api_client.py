@@ -128,8 +128,6 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
                  message,
                  job_id=None,
                  description=None):
-        print("{0} {1} {2} {3}".format(
-            mobile_number, message, job_id, description))
         self.send_sms_notification(mobile_number, message)
 
     def send_email(self,
@@ -139,5 +137,4 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
                    subject,
                    job_id=None,
                    description=None):
-        print("{0} {1} {2} {3} {4} {5}".format(
-            email_address, message, from_address, subject, job_id, description))
+        self.send_email_notification(email_address, message, from_address, subject)
