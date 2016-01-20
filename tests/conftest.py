@@ -204,13 +204,9 @@ def mock_delete_service_template(mocker):
 
 
 def mock_register_user(mocker, user_data):
-    data = {
-        "email_address": user_data['email_address'],
-        "failed_login_count": 0,
-        "mobile_number": user_data['mobile_number'],
-        "name": user_data['name'],
-        "state": "pending"
-    }
-    mock_class = mocker.patch('app.main.views.register.UserApiClient')
-    mock_class.register_user.return_value = data
+    user_data['id'] = 1
+    from app.notify_client.user_api_client import User
+    user = User(user_data)
+    mock_class = mocker.patch('app.user_api_client.register_user')
+    mock_class.return_value = user
     return mock_class

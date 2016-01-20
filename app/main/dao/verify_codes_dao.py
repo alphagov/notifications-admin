@@ -13,7 +13,7 @@ def add_code(user_id, code, code_type):
 
     db.session.add(code)
     db.session.commit()
-    return code.id
+    return code
 
 
 def get_codes(user_id, code_type=None):
@@ -23,7 +23,7 @@ def get_codes(user_id, code_type=None):
 
 
 def get_code_by_code(user_id, code, code_type):
-    return VerifyCodes.query.filter_by(user_id=user_id, code=code, code_type=code_type).first()
+    return VerifyCodes.query.filter_by(user_id=user_id, code=hashpw(code), code_type=code_type).first()
 
 
 def use_code(id):
