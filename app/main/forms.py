@@ -6,7 +6,8 @@ from wtforms import (
     PasswordField,
     ValidationError,
     TextAreaField,
-    FileField
+    FileField,
+    SelectField
 )
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
@@ -187,8 +188,13 @@ class ConfirmPasswordForm(Form):
 
 
 class TemplateForm(Form):
-    template_name = StringField(u'Template name')
-    template_body = TextAreaField(u'Message')
+    name = StringField(
+        u'Template name',
+        validators=[DataRequired(message="Template name cannot be empty")])
+    template_type = SelectField(u'Template type', choices=[('sms', 'SMS')])
+    content = TextAreaField(
+        u'Message',
+        validators=[DataRequired(message="Template content cannot be empty")])
 
 
 class ForgotPasswordForm(Form):

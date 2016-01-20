@@ -37,7 +37,7 @@ def register():
                     role_id=1)
         users_dao.insert_user(user)
 
-        user_api_client = UserApiClient(current_app.config['NOTIFY_API_URL'],
+        user_api_client = UserApiClient(current_app.config['API_HOST_NAME'],
                                         current_app.config['ADMIN_CLIENT_USER_NAME'],
                                         current_app.config['ADMIN_CLIENT_SECRET'])
         try:

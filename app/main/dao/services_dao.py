@@ -1,9 +1,5 @@
 from flask import url_for
-from datetime import datetime
-from client.errors import HTTPError, InvalidResponse
-from sqlalchemy.orm import load_only
-from flask.ext.login import current_user
-from app import (db, notifications_api_client)
+from app import notifications_api_client
 from app.main.utils import BrowsableItem
 
 
