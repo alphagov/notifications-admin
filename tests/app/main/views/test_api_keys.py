@@ -2,15 +2,15 @@ from datetime import date
 from flask import url_for
 
 
-def test_should_show_documentation_page(app_,
-                                        db_,
-                                        db_session,
-                                        active_user,
-                                        mock_get_service,
-                                        mock_get_services,
-                                        mock_user_loader):
+def test_should_show_api_keys_and_documentation_page(app_,
+                                                     db_,
+                                                     db_session,
+                                                     mock_api_user,
+                                                     mock_user_loader,
+                                                     mock_user_dao_get_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
+            client.login(mock_api_user)
             client.login(active_user)
             response = client.get(url_for('main.documentation', service_id=123))
 

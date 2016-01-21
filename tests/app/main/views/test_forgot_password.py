@@ -14,7 +14,6 @@ def test_should_render_forgot_password(app_, db_, db_session):
 def test_should_redirect_to_password_reset_sent_and_state_updated(app_,
                                                                   db_,
                                                                   db_session,
-                                                                  active_user,
                                                                   mock_send_email,
                                                                   mock_api_user,
                                                                   mock_user_dao_get_by_email,
@@ -22,7 +21,7 @@ def test_should_redirect_to_password_reset_sent_and_state_updated(app_,
     with app_.test_request_context():
         response = app_.test_client().post(
             url_for('.forgot_password'),
-            data={'email_address': active_user.email_address})
+            data={'email_address': mock_api_user.email_address})
         assert response.status_code == 200
         assert (
             'You have been sent an email containing a link'

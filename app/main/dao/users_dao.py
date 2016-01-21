@@ -27,17 +27,20 @@ def get_user_by_id(id):
 
 
 def get_all_users():
-    return User.query.all()
+    return user_api_client.get_users()
 
 
 def get_user_by_email(email_address):
-    return User.query.filter_by(email_address=email_address).first()
+    return user_api_client.get_user_by_email(email_address)
+
+
+def verify_password(user, password):
+    return user_api_client.verify_password(user, password)
 
 
 def increment_failed_login_count(id):
-    user = User.query.filter_by(id=id).first()
+    user = get_user_by_id(id)
     user.failed_login_count += 1
-    db.session.commit()
 
 
 def activate_user(user):
