@@ -39,9 +39,8 @@ def verify_password(user, password):
 
 
 def increment_failed_login_count(id):
-    user = User.query.filter_by(id=id).first()
+    user = get_user_by_id(id)
     user.failed_login_count += 1
-    db.session.commit()
 
 
 def activate_user(user):

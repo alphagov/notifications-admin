@@ -16,7 +16,7 @@ class UserApiClient(BaseAPIClient):
         self.base_url = app.config['API_HOST_NAME']
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
-        self.user_max_failed_login_count = app.config["MAX_FAILED_LOGIN_COUNT"]
+        self.failed_login_count = app.config["MAX_FAILED_LOGIN_COUNT"]
 
     def register_user(self, name, email_address,  mobile_number, password):
         data = {

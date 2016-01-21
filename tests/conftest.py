@@ -245,10 +245,10 @@ def mock_activate_user(mocker, mock_api_user):
 
 
 @pytest.fixture(scope='function')
-def mock_user_dao_get_user(mocker):
-    mock_class = mocker.patch('app.main.dao.users_dao.get_user_by_id')
-    mock_class.return_value = mock_api_user
-    return mock_class
+def mock_user_dao_get_user(mocker, mock_api_user):
+    def _get_user(id):
+        return mock_api_user
+    return mocker.patch('app.main.dao.users_dao.get_user_by_id', side_effect=_get_user)
 
 
 @pytest.fixture(scope='function')
@@ -257,6 +257,16 @@ def mock_user_dao_get_by_email(mocker, mock_api_user):
 
     def _get_user(email_address):
         mock_api_user.fields['email_address'] = email_address
+        return mock_api_user
+    return mocker.patch('app.main.dao.users_dao.get_user_by_email', side_effect=_get_user)
+
+
+@pytest.fixture(scope='function')
+def mock_inactive_user_dao_get_by_email(mocker, mock_api_user):
+    def _get_user(email_address):
+        mock_api_user.fields['email_address'] = email_address
+        mock_api_user.state = 'pending'
+        mock_api_user.fields['is_locked'] = True
         return mock_api_user
     return mocker.patch('app.main.dao.users_dao.get_user_by_email', side_effect=_get_user)
 
