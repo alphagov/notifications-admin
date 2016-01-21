@@ -24,6 +24,17 @@ class UserApiClient(BaseAPIClient):
         user_data = self.post("/user", data)
         return User(user_data['data'], max_failed_login_count=self.user_max_failed_login_count)
 
+    def get_user(self, id):
+        url = "{}/user/{}".format(self.base_url, id)
+        user_data = self.get(url)
+        return User(user_data['data'], max_failed_login_count=self.user_max_failed_login_count)
+
+    def update_user(self, user):
+        data = user.serialize()
+        url = "{}/user/{}".format(self.base_url, user.id)
+        user_data = self.put(url, data=data)
+        return User(user_data['data'], max_failed_login_count=self.user_max_failed_login_count)
+
 
 class User(object):
 
@@ -51,24 +62,28 @@ class User(object):
     def password_changed_at(self):
         return self.fields.get('password_changed_at')
 
-    @property
+    def get_id(self):
+        return self.id
+
     def is_authenticated(self):
-        return self.fields.get('is_authenticated')
+        return True
 
-    @property
     def is_active(self):
-        if self.fields.get('state') != 'active':
-            return False
-        else:
-            return True
+        return self.state == 'active'
 
     @property
+    def state(self):
+        return self.fields['state']
+
+    @state.setter
+    def state(self, state):
+        self.fields['state'] = state
+
     def is_anonymous(self):
         return False
 
-    @property
     def is_locked(self):
-        if self.fields.get('failed_login_count') < self.max_failed_login_count:
-            return False
-        else:
-            return True
+        return self.fields.get('failed_login_count') > self.max_failed_login_count
+
+    def serialize(self):
+        return self.fields

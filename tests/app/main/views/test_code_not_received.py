@@ -1,5 +1,5 @@
-from app.main.dao import verify_codes_dao, users_dao
-from tests import create_test_user
+from app.main.dao import verify_codes_dao
+from tests import create_test_api_user
 from flask import url_for
 
 
@@ -7,12 +7,13 @@ def test_should_render_email_code_not_received_template_and_populate_email_addre
                                                                                    db_,
                                                                                    db_session,
                                                                                    mock_send_sms,
-                                                                                   mock_send_email):
+                                                                                   mock_send_email,
+                                                                                   mock_api_user,
+                                                                                   mock_user_dao_get_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
-                user = create_test_user('pending')
-                session['user_email'] = user.email_address
+                session['user_email'] = mock_api_user.email_address
             response = client.get(url_for('main.check_and_resend_email_code'))
             assert response.status_code == 200
             assert 'Check your email address is correct and then resend the confirmation code' \
@@ -24,13 +25,15 @@ def test_should_check_and_resend_email_code_redirect_to_verify(app_,
                                                                db_,
                                                                db_session,
                                                                mock_send_sms,
-                                                               mock_send_email):
+                                                               mock_send_email,
+                                                               mock_api_user,
+                                                               mock_user_dao_get_by_email,
+                                                               mock_user_dao_update_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
-                user = create_test_user('pending')
-                session['user_email'] = user.email_address
-                verify_codes_dao.add_code(user.id, code='12345', code_type='email')
+                session['user_email'] = mock_api_user.email_address
+                verify_codes_dao.add_code(mock_api_user.id, code='12345', code_type='email')
             response = client.post(url_for('main.check_and_resend_email_code'),
                                    data={'email_address': 'test@user.gov.uk'})
             assert response.status_code == 302
@@ -41,13 +44,14 @@ def test_should_render_text_code_not_received_template(app_,
                                                        db_,
                                                        db_session,
                                                        mock_send_sms,
-                                                       mock_send_email):
+                                                       mock_send_email,
+                                                       mock_api_user,
+                                                       mock_user_dao_get_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
-                user = create_test_user('pending')
-                session['user_email'] = user.email_address
-                verify_codes_dao.add_code(user.id, code='12345', code_type='sms')
+                session['user_email'] = mock_api_user.email_address
+                verify_codes_dao.add_code(mock_api_user.id, code='12345', code_type='sms')
             response = client.get(url_for('main.check_and_resend_text_code'))
             assert response.status_code == 200
             assert 'Check your mobile phone number is correct and then resend the confirmation code.' \
@@ -59,13 +63,15 @@ def test_should_check_and_redirect_to_verify(app_,
                                              db_,
                                              db_session,
                                              mock_send_sms,
-                                             mock_send_email):
+                                             mock_send_email,
+                                             mock_api_user,
+                                             mock_user_dao_get_by_email,
+                                             mock_user_dao_update_mobile):
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
-                user = create_test_user('pending')
-                session['user_email'] = user.email_address
-                verify_codes_dao.add_code(user.id, code='12345', code_type='sms')
+                session['user_email'] = mock_api_user.email_address
+                verify_codes_dao.add_code(mock_api_user.id, code='12345', code_type='sms')
             response = client.post(url_for('main.check_and_resend_text_code'),
                                    data={'mobile_number': '+447700900460'})
             assert response.status_code == 302
@@ -76,48 +82,51 @@ def test_should_update_email_address_resend_code(app_,
                                                  db_,
                                                  db_session,
                                                  mock_send_sms,
-                                                 mock_send_email):
+                                                 mock_send_email,
+                                                 mock_api_user,
+                                                 mock_user_dao_get_by_email,
+                                                 mock_user_dao_update_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
-                user = create_test_user('pending')
-                session['user_email'] = user.email_address
-                verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='email')
+                session['user_email'] = mock_api_user.email_address
+                verify_codes_dao.add_code(user_id=mock_api_user.id, code='12345', code_type='email')
             response = client.post(url_for('main.check_and_resend_email_code'),
                                    data={'email_address': 'new@address.gov.uk'})
             assert response.status_code == 302
             assert response.location == url_for('main.verify', _external=True)
-            updated_user = users_dao.get_user_by_id(user.id)
-            assert updated_user.email_address == 'new@address.gov.uk'
+            assert mock_api_user.email_address == 'new@address.gov.uk'
 
 
 def test_should_update_mobile_number_resend_code(app_,
                                                  db_,
                                                  db_session,
                                                  mock_send_sms,
-                                                 mock_send_email):
+                                                 mock_send_email,
+                                                 mock_api_user,
+                                                 mock_user_dao_get_by_email,
+                                                 mock_user_dao_update_mobile):
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
-                user = create_test_user('pending')
-                session['user_email'] = user.email_address
-                verify_codes_dao.add_code(user_id=user.id, code='12345', code_type='sms')
+                session['user_email'] = mock_api_user.email_address
+                verify_codes_dao.add_code(user_id=mock_api_user.id, code='12345', code_type='sms')
             response = client.post(url_for('main.check_and_resend_text_code'),
                                    data={'mobile_number': '+447700900460'})
             assert response.status_code == 302
             assert response.location == url_for('main.verify', _external=True)
-            updated_user = users_dao.get_user_by_id(user.id)
-            assert updated_user.mobile_number == '+447700900460'
+            assert mock_api_user.mobile_number == '+447700900460'
 
 
 def test_should_render_verification_code_not_received(app_,
                                                       db_,
                                                       db_session,
-                                                      active_user):
+                                                      active_user,
+                                                      mock_api_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
-                session['user_email'] = active_user.email_address
+                session['user_email'] = mock_api_user.email_address
             response = client.get(url_for('main.verification_code_not_received'))
             assert response.status_code == 200
             assert 'Resend verification code' in response.get_data(as_text=True)

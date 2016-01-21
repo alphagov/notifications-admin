@@ -16,6 +16,8 @@ def sign_in():
         if form.validate_on_submit():
             user = users_dao.get_user_by_email(form.email_address.data)
             if user:
+                # TODO move to user API in next pr to actually do password check as this
+                # is totally broken now
                 if not user.is_locked() and user.is_active() and check_hash(form.password.data, user.password):
                     send_sms_code(user.id, user.mobile_number)
                     session['user_email'] = user.email_address

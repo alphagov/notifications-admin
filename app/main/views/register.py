@@ -4,14 +4,12 @@ from flask import (
     render_template,
     redirect,
     session,
-    current_app,
     abort
 )
 
 from client.errors import HTTPError
 
 from app.main import main
-from app.models import User
 from app.main.dao import users_dao
 from app.main.forms import RegisterUserForm
 
@@ -27,7 +25,6 @@ def register():
     form = RegisterUserForm(users_dao.get_user_by_email)
 
     if form.validate_on_submit():
-
         try:
             user = user_api_client.register_user(form.name.data,
                                                  form.email_address.data,

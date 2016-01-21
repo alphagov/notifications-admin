@@ -4,7 +4,8 @@ from flask import url_for
 def test_should_show_api_keys_and_documentation_page(app_,
                                                      db_,
                                                      db_session,
-                                                     active_user):
+                                                     active_user,
+                                                     mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)

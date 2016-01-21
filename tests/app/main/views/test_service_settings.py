@@ -1,7 +1,7 @@
 from flask import (url_for, session)
 
 
-def test_should_show_overview(app_, db_, db_session, active_user, mock_get_service):
+def test_should_show_overview(app_, db_, db_session, active_user, mock_get_service, mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -16,7 +16,7 @@ def test_should_show_overview(app_, db_, db_session, active_user, mock_get_servi
         assert mock_get_service.called
 
 
-def test_should_show_service_name(app_, db_, db_session, active_user, mock_get_service):
+def test_should_show_service_name(app_, db_, db_session, active_user, mock_get_service, mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -30,7 +30,8 @@ def test_should_show_service_name(app_, db_, db_session, active_user, mock_get_s
         service = mock_get_service.side_effect(service_id)['data']
 
 
-def test_should_redirect_after_change_service_name(app_, db_, db_session, active_user, mock_get_service):
+def test_should_redirect_after_change_service_name(app_, db_, db_session, active_user, mock_get_service,
+                                                   mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -49,7 +50,8 @@ def test_should_show_service_name_confirmation(app_,
                                                db_,
                                                db_session,
                                                active_user,
-                                               mock_get_service):
+                                               mock_get_service,
+                                               mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -68,7 +70,8 @@ def test_should_redirect_after_service_name_confirmation(app_,
                                                          db_session,
                                                          active_user,
                                                          mock_get_service,
-                                                         mock_update_service):
+                                                         mock_update_service,
+                                                         mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -88,7 +91,7 @@ def test_should_redirect_after_service_name_confirmation(app_,
         assert mock_update_service.called
 
 
-def test_should_show_request_to_go_live(app_, db_, db_session, active_user, mock_get_service):
+def test_should_show_request_to_go_live(app_, db_, db_session, active_user, mock_get_service, mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -107,7 +110,8 @@ def test_should_redirect_after_request_to_go_live(app_,
                                                   db_session,
                                                   active_user,
                                                   mock_get_service,
-                                                  mock_update_service):
+                                                  mock_update_service,
+                                                  mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -123,7 +127,7 @@ def test_should_redirect_after_request_to_go_live(app_,
         assert mock_update_service.called
 
 
-def test_should_show_status_page(app_, db_, db_session, active_user, mock_get_service):
+def test_should_show_status_page(app_, db_, db_session, active_user, mock_get_service, mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -141,7 +145,8 @@ def test_should_show_redirect_after_status_change(app_,
                                                   db_,
                                                   db_session,
                                                   active_user,
-                                                  mock_get_service):
+                                                  mock_get_service,
+                                                  mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -156,7 +161,7 @@ def test_should_show_redirect_after_status_change(app_,
         assert mock_get_service.called
 
 
-def test_should_show_status_confirmation(app_, db_, db_session, active_user, mock_get_service):
+def test_should_show_status_confirmation(app_, db_, db_session, active_user, mock_get_service, mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -175,7 +180,8 @@ def test_should_redirect_after_status_confirmation(app_,
                                                    db_session,
                                                    active_user,
                                                    mock_get_service,
-                                                   mock_update_service):
+                                                   mock_update_service,
+                                                   mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -191,7 +197,7 @@ def test_should_redirect_after_status_confirmation(app_,
         assert mock_update_service.called
 
 
-def test_should_show_delete_page(app_, db_, db_session, active_user, mock_get_service):
+def test_should_show_delete_page(app_, db_, db_session, active_user, mock_get_service, mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -204,7 +210,8 @@ def test_should_show_delete_page(app_, db_, db_session, active_user, mock_get_se
         assert mock_get_service.called
 
 
-def test_should_show_redirect_after_deleting_service(app_, db_, db_session, active_user, mock_get_service):
+def test_should_show_redirect_after_deleting_service(app_, db_, db_session, active_user, mock_get_service,
+                                                     mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -218,7 +225,7 @@ def test_should_show_redirect_after_deleting_service(app_, db_, db_session, acti
         assert delete_url == response.location
 
 
-def test_should_show_delete_confirmation(app_, db_, db_session, active_user, mock_get_service):
+def test_should_show_delete_confirmation(app_, db_, db_session, active_user, mock_get_service, mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -236,7 +243,8 @@ def test_should_redirect_delete_confirmation(app_,
                                              db_session,
                                              active_user,
                                              mock_get_service,
-                                             mock_delete_service):
+                                             mock_delete_service,
+                                             mock_user_loader):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)

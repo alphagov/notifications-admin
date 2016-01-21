@@ -6,6 +6,8 @@ from app import db, login_manager
 from app.models import User
 from app.main.encryption import hashpw
 
+from app import user_api_client
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -21,7 +23,7 @@ def insert_user(user):
 # TODO Would be better to have a generic get and update for user
 # something that replicates the sql functionality.
 def get_user_by_id(id):
-    return User.query.filter_by(id=id).first()
+    return user_api_client.get_user(id)
 
 
 def get_all_users():
@@ -38,11 +40,9 @@ def increment_failed_login_count(id):
     db.session.commit()
 
 
-def activate_user(id):
-    user = get_user_by_id(id)
+def activate_user(user):
     user.state = 'active'
-    db.session.add(user)
-    db.session.commit()
+    return user_api_client.update_user(user)
 
 
 def update_email_address(id, email_address):
