@@ -11,7 +11,6 @@ def test_should_show_api_keys_and_documentation_page(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(mock_api_user)
-            client.login(active_user)
             response = client.get(url_for('main.documentation', service_id=123))
 
         assert response.status_code == 200
@@ -20,14 +19,13 @@ def test_should_show_api_keys_and_documentation_page(app_,
 def test_should_show_empty_api_keys_page(app_,
                                          db_,
                                          db_session,
-                                         active_user,
-                                         mock_get_service,
-                                         mock_get_services,
+                                         mock_api_user,
                                          mock_user_loader,
+                                         mock_user_dao_get_by_email,
                                          mock_get_no_api_keys):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(active_user)
+            client.login(mock_api_user)
             response = client.get(url_for('main.api_keys', service_id=123))
 
         assert response.status_code == 200
@@ -39,14 +37,13 @@ def test_should_show_empty_api_keys_page(app_,
 def test_should_show_api_keys_page(app_,
                                    db_,
                                    db_session,
-                                   active_user,
-                                   mock_get_service,
-                                   mock_get_services,
+                                   mock_api_user,
                                    mock_user_loader,
+                                   mock_user_dao_get_by_email,
                                    mock_get_api_keys):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(active_user)
+            client.login(mock_api_user)
             response = client.get(url_for('main.api_keys', service_id=123))
 
         assert response.status_code == 200
@@ -59,14 +56,13 @@ def test_should_show_api_keys_page(app_,
 def test_should_show_name_api_key_page(app_,
                                        db_,
                                        db_session,
-                                       active_user,
-                                       mock_get_service,
-                                       mock_get_services,
+                                       mock_api_user,
                                        mock_user_loader,
+                                       mock_user_dao_get_by_email,
                                        mock_get_api_keys):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(active_user)
+            client.login(mock_api_user)
             response = client.get(url_for('main.create_api_key', service_id=123))
 
         assert response.status_code == 200
@@ -75,15 +71,14 @@ def test_should_show_name_api_key_page(app_,
 def test_should_render_show_api_key(app_,
                                     db_,
                                     db_session,
-                                    active_user,
-                                    mock_get_service,
-                                    mock_get_services,
+                                    mock_api_user,
                                     mock_user_loader,
+                                    mock_user_dao_get_by_email,
                                     mock_create_api_key,
                                     mock_get_api_keys):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(active_user)
+            client.login(mock_api_user)
             response = client.post(url_for('main.create_api_key', service_id=123),
                                    data={'key_name': 'some default key name'})
 
@@ -95,14 +90,13 @@ def test_should_render_show_api_key(app_,
 def test_should_show_confirm_revoke_api_key(app_,
                                             db_,
                                             db_session,
-                                            active_user,
-                                            mock_get_service,
-                                            mock_get_services,
+                                            mock_api_user,
                                             mock_user_loader,
+                                            mock_user_dao_get_by_email,
                                             mock_get_api_keys):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(active_user)
+            client.login(mock_api_user)
             response = client.get(url_for('main.revoke_api_key', service_id=123, key_id=321))
 
         assert response.status_code == 200
@@ -113,15 +107,14 @@ def test_should_show_confirm_revoke_api_key(app_,
 def test_should_redirect_after_revoking_api_key(app_,
                                                 db_,
                                                 db_session,
-                                                active_user,
-                                                mock_get_service,
-                                                mock_get_services,
+                                                mock_api_user,
                                                 mock_user_loader,
+                                                mock_user_dao_get_by_email,
                                                 mock_revoke_api_key,
                                                 mock_get_api_keys):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(active_user)
+            client.login(mock_api_user)
             response = client.post(url_for('main.revoke_api_key', service_id=123, key_id=321))
 
         assert response.status_code == 302
