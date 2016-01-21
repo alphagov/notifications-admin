@@ -1,6 +1,7 @@
 import os
 import re
 
+import dateutil
 from flask import Flask, session, Markup, escape, render_template
 from flask._compat import string_types
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -54,6 +55,7 @@ def create_app(config_name, config_overrides=None):
     application.add_template_filter(placeholders)
     application.add_template_filter(replace_placeholders)
     application.add_template_filter(nl2br)
+    application.add_template_filter(format_datetime)
 
     application.after_request(useful_headers_after_request)
     register_errorhandlers(application)
@@ -132,6 +134,12 @@ def replace_placeholders(template, values):
         lambda match: values.get(match.group(1), ''),
         template
     ))
+
+
+def format_datetime(date):
+    date = dateutil.parser.parse(date)
+    native = date.replace(tzinfo=None)
+    return native.strftime('%A %d %B %Y at %H:%M')
 
 
 # https://www.owasp.org/index.php/List_of_useful_HTTP_headers

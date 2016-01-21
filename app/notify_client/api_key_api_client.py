@@ -12,8 +12,11 @@ class ApiKeyApiClient(BaseAPIClient):
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
 
-    def get_api_keys(self, service_id, *params):
-        return self.get(url='/service/{}/api-keys'.format(service_id))
+    def get_api_keys(self, service_id, key_id=None, *params):
+        if key_id:
+            return self.get(url='/service/{}/api-keys/{}'.format(service_id, key_id))
+        else:
+            return self.get(url='/service/{}/api-keys'.format(service_id))
 
     def create_api_key(self, service_id, key_name, *params):
         data = {"name": key_name}
