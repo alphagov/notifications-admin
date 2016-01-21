@@ -210,7 +210,7 @@ def mock_api_user(mocker):
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
-                 'mobile_number': '+441234123412',
+                 'mobile_number': '+4412341234',
                  'state': 'pending',
                  'failed_login_count': 0
                  }
@@ -220,7 +220,11 @@ def mock_api_user(mocker):
 
 @pytest.fixture(scope='function')
 def mock_register_user(mocker, mock_api_user):
-    def _register(mock_api_user):
+    def _register(name, email_address, mobile_number, password):
+        mock_api_user.fields['name'] = name
+        mock_api_user.fields['email_address'] = email_address
+        mock_api_user.fields['mobile_number'] = mobile_number
+        mock_api_user.fields['password'] = password
         return mock_api_user
     return mocker.patch('app.user_api_client.register_user', side_effect=_register)
 
@@ -251,9 +255,15 @@ def mock_user_dao_get_user(mocker):
 def mock_user_dao_get_by_email(mocker, mock_api_user):
     mock_api_user.state = 'active'
 
-    def _get_active_user(email_address):
+    def _get_user(email_address):
+        mock_api_user.fields['email_address'] = email_address
         return mock_api_user
-    return mocker.patch('app.main.dao.users_dao.get_user_by_email', side_effect=_get_active_user)
+    return mocker.patch('app.main.dao.users_dao.get_user_by_email', side_effect=_get_user)
+
+
+@pytest.fixture(scope='function')
+def mock_user_by_email_not_found(mocker):
+    return mocker.patch('app.main.dao.users_dao.get_user_by_email', return_value=None)
 
 
 @pytest.fixture(scope='function')
