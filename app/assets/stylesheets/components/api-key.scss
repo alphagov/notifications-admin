@@ -1,5 +1,10 @@
 .api-key {
 
+  &-name {
+    @include bold-19;
+    margin-bottom: 5px;
+  }
+
   &-key {
     font-family: monospace;
     display: block;

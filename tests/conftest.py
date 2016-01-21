@@ -1,14 +1,17 @@
 import os
+from datetime import date
+
 import pytest
 from alembic.command import upgrade
 from alembic.config import Config
 from flask.ext.migrate import Migrate, MigrateCommand
 from flask.ext.script import Manager
 from sqlalchemy.schema import MetaData
-from . import (
-    create_test_user, create_another_test_user, service_json, TestClient,
-    get_test_user, template_json)
+
 from app import create_app, db
+from . import (
+    create_test_user, service_json, TestClient,
+    get_test_user, template_json, api_key_json)
 
 
 @pytest.fixture(scope='session')
@@ -89,6 +92,7 @@ def mock_get_service(mocker, mock_api_user):
             service_id, "Test Service", [mock_api_user.id], limit=1000,
             active=False, restricted=True)
         return {'data': service, 'token': 1}
+
     return mocker.patch('app.notifications_api_client.get_service', side_effect=_create)
 
 
@@ -99,6 +103,7 @@ def mock_create_service(mocker):
             101, service_name, [user_id], limit=limit,
             active=active, restricted=restricted)
         return {'data': service}
+
     mock_class = mocker.patch(
         'app.notifications_api_client.create_service', side_effect=_create)
     return mock_class
@@ -116,6 +121,7 @@ def mock_update_service(mocker):
             service_id, service_name, users, limit=limit,
             active=active, restricted=restricted)
         return {'data': service}
+
     mock_class = mocker.patch(
         'app.notifications_api_client.update_service', side_effect=_update)
     return mock_class
@@ -129,6 +135,7 @@ def mock_get_services(mocker, mock_api_user):
         service_two = service_json(
             2, "service_two", [mock_api_user.id], 1000, True, False)
         return {'data': [service_one, service_two]}
+
     mock_class = mocker.patch(
         'app.notifications_api_client.get_services', side_effect=_create)
     return mock_class
@@ -138,6 +145,7 @@ def mock_get_services(mocker, mock_api_user):
 def mock_delete_service(mocker, mock_get_service):
     def _delete(service_id):
         return mock_get_service.side_effect(service_id)
+
     mock_class = mocker.patch(
         'app.notifications_api_client.delete_service', side_effect=_delete)
     return mock_class
@@ -149,6 +157,7 @@ def mock_get_service_template(mocker):
         template = template_json(
             template_id, "Template Name", "sms", "template content", service_id)
         return {'data': template}
+
     return mocker.patch(
         'app.notifications_api_client.get_service_template',
         side_effect=_create)
@@ -160,6 +169,7 @@ def mock_create_service_template(mocker):
         template = template_json(
             101, name, type_, content, service)
         return {'data': template}
+
     mock_class = mocker.patch(
         'app.notifications_api_client.create_service_template',
         side_effect=_create)
@@ -172,6 +182,7 @@ def mock_update_service_template(mocker):
         template = template_json(
             id_, name, type_, content, service)
         return {'data': template}
+
     mock_class = mocker.patch(
         'app.notifications_api_client.update_service_template',
         side_effect=_update)
@@ -186,6 +197,7 @@ def mock_get_service_templates(mocker):
         template_two = template_json(
             2, "template_two", "sms", "template two content", service_id)
         return {'data': [template_one, template_two]}
+
     mock_class = mocker.patch(
         'app.notifications_api_client.get_service_templates',
         side_effect=_create)
@@ -199,6 +211,7 @@ def mock_delete_service_template(mocker):
             template_id, "Template to delete",
             "sms", "content to be deleted", service_id)
         return {'data': template}
+
     return mocker.patch(
         'app.notifications_api_client.delete_service_template', side_effect=_delete)
 
@@ -313,4 +326,44 @@ def mock_user_dao_get_new_password(mocker, mock_api_user):
     mock_api_user.state = 'request_password_reset'
     mock_class = mocker.patch('app.main.dao.users_dao.get_user_by_email')
     mock_class.return_value = mock_api_user
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_create_api_key(mocker):
+    def _create(service_id, key_name):
+        import uuid
+        return {'data': str(uuid.uuid4())}
+
+    mock_class = mocker.patch('app.api_key_api_client.create_api_key', side_effect=_create)
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_revoke_api_key(mocker):
+    def _revoke(service_id, key_id):
+        return {}
+
+    mock_class = mocker.patch('app.api_key_api_client.revoke_api_key', side_effect=_revoke)
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_get_api_keys(mocker):
+    def _get_keys(service_id, key_id=None):
+        keys = {'apiKeys': [api_key_json(1, 'some key name'),
+                            api_key_json(2, 'another key name', expiry_date=str(date.fromtimestamp(0)))]}
+        return keys
+
+    mock_class = mocker.patch('app.api_key_api_client.get_api_keys', side_effect=_get_keys)
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_get_no_api_keys(mocker):
+    def _get_keys(service_id):
+        keys = {'apiKeys': []}
+        return keys
+
+    mock_class = mocker.patch('app.api_key_api_client.get_api_keys', side_effect=_get_keys)
     return mock_class

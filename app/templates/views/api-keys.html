@@ -1,6 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/page-footer.html" import page_footer %}
-{% from "components/api-key.html" import api_key %}
+{% from "components/table.html" import list_table, field, hidden_field_heading %}
 
 {% block page_title %}
   GOV.UK Notify | API keys and documentation
@@ -8,49 +7,51 @@
 
 {% block maincolumn_content %}
 
-    <div class="grid-row">
-      <div class="column-two-thirds">
+  <h1 class="heading-xlarge">
+    API keys
+  </h1>
 
-        <h1 class="heading-xlarge">
-          API keys and documentation
-        </h1>
+  <p>
+    To connect to the API you will need to send your service ID, encrypted with
+    an API key. The API key stays secret.
+  </p>
 
-        <h2 class="heading-medium">
-          How to integrate GOV.UK Notify into your service
-        </h2>
+  <p>
+    There are client libraries available which can do this for you. See
+    <a href="{{ url_for(".documentation", service_id=service_id) }}">the
+    developer documentation</a> for more information.
+  </p>
 
-        <p>
-          blah blah blah this is where we tell you how the API works
-        </p>
+  <h2 class="api-key-name">
+    Service ID
+  </h2>
+  <p class="api-key-key">
+    {{ service_id }}
+  </p>
 
-        <h2 class="heading-medium">Repositories</h2>
+  {% call(item) list_table(
+    keys,
+    empty_message="You haven’t created any API keys yet",
+    caption="API keys",
+    caption_visible=False,
+    field_headings=['Key name', hidden_field_heading('Action')]
+  ) %}
+    {% call field() %}
+      {{ item.name }}
+    {% endcall %}
+    {% if item.expiry_date %}
+      {% call field(align='right', status='default') %}
+        Revoked {{ item.expiry_date|format_datetime }}
+      {% endcall %}
+    {% else %}
+      {% call field(align='right', status='error') %}
+        <a href='{{ url_for('.revoke_api_key', service_id=service_id, key_id=item.id) }}'>Revoke</a>
+      {% endcall %}
+    {% endif %}
+  {% endcall %}
 
-
-
-        <p>
-          <a href="https://github.com/alphagov/notifications-api">GOV.UK Notify API</a>
-        </p>
-
-        <p>
-          <a href="https://github.com/alphagov/notify-api-client">GOV.UK Notify Python client</a>
-        </p>
-
-        <h2 class="heading-medium">API key for [service name]</h2>
-
-        {{ api_key('d30512af92e1386d63b90e5973b49a10') }}
-
-        <h2 class="heading-medium">API endpoint</h2>
-
-        <p>
-          https://www.notify.works/api/endpoint
-        </p>
-
-      </div>
-    </div>
-
-    {{ page_footer(
-      back_link=url_for('.service_dashboard', service_id=service_id),
-      back_link_text='Back to dashboard'
-    ) }}
+  <p>
+    <a href="{{ url_for('.create_api_key', service_id=service_id) }}">Create a new API key</a>
+  </p>
 
 {% endblock %}

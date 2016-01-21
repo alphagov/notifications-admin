@@ -55,3 +55,7 @@
 {% macro right_aligned_field_heading(text) %}
   <span class="table-field-heading-right-aligned">{{ text }}</span>
 {%- endmacro %}
+
+{% macro hidden_field_heading(text) %}
+  <span class="visuallyhidden">{{ text }}</span>
+{%- endmacro %}

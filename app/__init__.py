@@ -1,6 +1,7 @@
 import os
 import re
 
+import dateutil
 from flask import Flask, session, Markup, escape, render_template
 from flask._compat import string_types
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -8,6 +9,7 @@ from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from werkzeug.exceptions import abort
 from app.notify_client.api_client import NotificationsAdminAPIClient
+from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.user_api_client import UserApiClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 import app.proxy_fix
@@ -20,6 +22,7 @@ csrf = CsrfProtect()
 
 notifications_api_client = NotificationsAdminAPIClient()
 user_api_client = UserApiClient()
+api_key_api_client = ApiKeyApiClient()
 
 
 def create_app(config_name, config_overrides=None):
@@ -34,6 +37,7 @@ def create_app(config_name, config_overrides=None):
 
     notifications_api_client.init_app(application)
     user_api_client.init_app(application)
+    api_key_api_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
@@ -51,6 +55,7 @@ def create_app(config_name, config_overrides=None):
     application.add_template_filter(placeholders)
     application.add_template_filter(replace_placeholders)
     application.add_template_filter(nl2br)
+    application.add_template_filter(format_datetime)
 
     application.after_request(useful_headers_after_request)
     register_errorhandlers(application)
@@ -129,6 +134,12 @@ def replace_placeholders(template, values):
         lambda match: values.get(match.group(1), ''),
         template
     ))
+
+
+def format_datetime(date):
+    date = dateutil.parser.parse(date)
+    native = date.replace(tzinfo=None)
+    return native.strftime('%A %d %B %Y at %H:%M')
 
 
 # https://www.owasp.org/index.php/List_of_useful_HTTP_headers

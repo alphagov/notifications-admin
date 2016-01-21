@@ -39,6 +39,12 @@ def template_json(id_, name, type_, content, service_id):
     }
 
 
+def api_key_json(id_, name, expiry_date=None):
+    return {'id': id_,
+            'name': name,
+            'expiry_date': expiry_date
+            }
+
 TEST_USER_EMAIL = 'test@user.gov.uk'
 
 

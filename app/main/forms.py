@@ -235,3 +235,17 @@ class ChangeMobileNumberForm(Form):
 
 class ConfirmMobileNumberForm(Form):
     sms_code = sms_code()
+
+
+class CreateKeyForm(Form):
+    def __init__(self, existing_key_names=[], *args, **kwargs):
+        self.existing_key_names = [x.lower() for x in existing_key_names]
+        super(CreateKeyForm, self).__init__(*args, **kwargs)
+
+    key_name = StringField(u'Description of key', validators=[
+        DataRequired(message='You need to give the key a name')
+    ])
+
+    def validate_key_name(self, key_name):
+        if key_name.data.lower() in self.existing_key_names:
+            raise ValidationError('A key with this name already exists')
