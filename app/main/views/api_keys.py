@@ -24,7 +24,10 @@ def api_keys(service_id):
 @main.route("/services/<int:service_id>/api-keys/create", methods=['GET', 'POST'])
 @login_required
 def create_api_key(service_id):
-    form = CreateKeyForm()
+    key_names = [
+        key['name'] for key in api_key_api_client.get_api_keys(service_id=service_id)['apiKeys']
+    ]
+    form = CreateKeyForm(key_names)
     if form.validate_on_submit():
         secret = api_key_api_client.create_api_key(service_id=service_id, key_name=form.key_name.data)
         return render_template('views/api-keys/show.html', service_id=service_id, secret=secret,

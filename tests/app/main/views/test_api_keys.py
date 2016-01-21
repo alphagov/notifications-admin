@@ -62,7 +62,8 @@ def test_should_show_name_api_key_page(app_,
                                        active_user,
                                        mock_get_service,
                                        mock_get_services,
-                                       mock_user_loader):
+                                       mock_user_loader,
+                                       mock_get_api_keys):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)
@@ -78,7 +79,8 @@ def test_should_render_show_api_key(app_,
                                     mock_get_service,
                                     mock_get_services,
                                     mock_user_loader,
-                                    mock_create_api_key):
+                                    mock_create_api_key,
+                                    mock_get_api_keys):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user)

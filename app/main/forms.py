@@ -238,4 +238,14 @@ class ConfirmMobileNumberForm(Form):
 
 
 class CreateKeyForm(Form):
-    key_name = StringField(u'Description of key')
+    def __init__(self, existing_key_names=[], *args, **kwargs):
+        self.existing_key_names = existing_key_names
+        super(CreateKeyForm, self).__init__(*args, **kwargs)
+
+    key_name = StringField(u'Description of key', validators=[
+        DataRequired(message='You need to give the key a name')
+    ])
+
+    def validate_key_name(self, key_name):
+        if key_name.data in self.existing_key_names:
+            raise ValidationError('A key with this name already exists')
