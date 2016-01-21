@@ -15,15 +15,13 @@ def test_process_register_creates_new_user(app_,
                                            db_session,
                                            mock_send_sms,
                                            mock_send_email,
-                                           mocker):
+                                           mock_register_user):
     user_data = {
         'name': 'Some One Valid',
         'email_address': 'someone@example.gov.uk',
         'mobile_number': '+4407700900460',
         'password': 'validPassword!'
     }
-
-    mock_user(mocker, user_data)
 
     with app_.test_request_context():
         response = app_.test_client().post('/register',
@@ -67,7 +65,7 @@ def test_should_add_verify_codes_on_session(app_,
                                             db_session,
                                             mock_send_sms,
                                             mock_send_email,
-                                            mocker):
+                                            mock_register_user):
     user_data = {
         'name': 'Test Codes',
         'email_address': 'test@example.gov.uk',
@@ -75,7 +73,6 @@ def test_should_add_verify_codes_on_session(app_,
         'password': 'validPassword!'
     }
 
-    mock_user(mocker, user_data)
     with app_.test_client() as client:
         response = client.post('/register',
                                data=user_data)

@@ -216,12 +216,82 @@ def mock_delete_service_template(mocker):
         'app.notifications_api_client.delete_service_template', side_effect=_delete)
 
 
-def mock_register_user(mocker, user_data):
-    user_data['id'] = 1
+@pytest.fixture(scope='function')
+def mock_api_user(mocker):
     from app.notify_client.user_api_client import User
+    user_data = {'id': 1,
+                 'name': 'Test User',
+                 'password': 'somepassword',
+                 'email_address': 'test@user.gov.uk',
+                 'mobile_number': '+441234123412',
+                 'state': 'pending'
+                 }
     user = User(user_data)
+    return user
+
+
+@pytest.fixture(scope='function')
+def mock_register_user(mocker, mock_api_user):
     mock_class = mocker.patch('app.user_api_client.register_user')
-    mock_class.return_value = user
+    mock_class.return_value = mock_api_user
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_user_loader(mocker, mock_api_user):
+    mock_class = mocker.patch('app.main.dao.users_dao.get_user_by_id')
+    mock_class.return_value = mock_api_user
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_activate_user(mocker, mock_api_user):
+    def _activate(mock_api_user):
+        mock_api_user.state = 'active'
+        return mock_api_user
+    return mocker.patch('app.user_api_client.update_user', side_effect=_activate)
+
+
+@pytest.fixture(scope='function')
+def mock_user_dao_get_user(mocker):
+    mock_class = mocker.patch('app.main.dao.users_dao.get_user_by_id')
+    mock_class.return_value = mock_api_user
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_user_dao_get_by_email(mocker, mock_api_user):
+    mock_class = mocker.patch('app.main.dao.users_dao.get_user_by_email')
+    mock_class.return_value = mock_api_user
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_user_dao_update_email(mocker, mock_api_user):
+    def _update(id, email_address):
+        mock_api_user.fields['email_address'] = email_address
+    return mocker.patch('app.main.dao.users_dao.update_email_address', side_effect=_update)
+
+
+@pytest.fixture(scope='function')
+def mock_user_dao_update_mobile(mocker, mock_api_user):
+    def _update(id, mobile_number):
+        mock_api_user.fields['mobile_number'] = mobile_number
+    return mocker.patch('app.main.dao.users_dao.update_mobile_number', side_effect=_update)
+
+
+@pytest.fixture(scope='function')
+def mock_user_dao_password_reset(mocker, mock_api_user):
+    def _reset(email):
+        mock_api_user.state = 'request_password_reset'
+    return mocker.patch('app.main.dao.users_dao.request_password_reset', side_effect=_reset)
+
+
+@pytest.fixture(scope='function')
+def mock_user_dao_get_new_password(mocker, mock_api_user):
+    mock_api_user.state = 'request_password_reset'
+    mock_class = mocker.patch('app.main.dao.users_dao.get_user_by_email')
+    mock_class.return_value = mock_api_user
     return mock_class
 
 

@@ -1,4 +1,9 @@
-{% macro sms_message(body, recipient=None, name=None, edit_link=None) %}
+{% macro sms_message(
+  body, recipient=None, name=None, edit_link=None, input_name=None, input_index=None
+) %}
+  {% if input_name %}
+    <label class="sms-message-option" for="{{ input_name }}-{{ input_index }}">
+  {% endif %}
   {% if name %}
     <h3 class="sms-message-name">
       {% if edit_link %}
@@ -8,14 +13,18 @@
       {% endif %}
     </h3>
   {% endif %}
-  <div class="sms-message">
-    <div class="sms-message-wrapper">
-      {{ body|placeholders }}
-    </div>
+  {% if input_name %}
+    <input class="sms-message-picker" type="radio" id="{{ input_name }}-{{ input_index }}" name="{{ input_name }}" />
+  {% endif %}
+  <div class="sms-message-wrapper{% if input_name %}-with-radio{% endif %}">
+    {{ body|placeholders }}
   </div>
   {% if recipient %}
     <p class="sms-message-recipient">
       {{ recipient }}
     </p>
+  {% endif %}
+  {% if input_name %}
+    </label>
   {% endif %}
 {% endmacro %}
