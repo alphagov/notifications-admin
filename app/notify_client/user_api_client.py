@@ -1,4 +1,8 @@
 from client.notifications import BaseAPIClient
+from client.errors import (
+    HTTPError,
+    InvalidResponse
+)
 
 
 class UserApiClient(BaseAPIClient):
@@ -29,11 +33,44 @@ class UserApiClient(BaseAPIClient):
         user_data = self.get(url)
         return User(user_data['data'], max_failed_login_count=self.user_max_failed_login_count)
 
+    def get_users(self):
+        url = "{}/user".format(self.base_url)
+        users_data = self.get(url)['data']
+        users = []
+        for user in users_data:
+            users.append(User(user, max_failed_login_count=self.user_max_failed_login_count))
+        return users
+
     def update_user(self, user):
         data = user.serialize()
         url = "{}/user/{}".format(self.base_url, user.id)
         user_data = self.put(url, data=data)
         return User(user_data['data'], max_failed_login_count=self.user_max_failed_login_count)
+
+    def verify_password(self, user, password):
+        try:
+            data = user.serialize()
+            url = "{}/user/{}/verify/password".format(self.base_url, user.id)
+            data["password"] = password
+            resp = self.post(url, data=data)
+            if resp.status_code == 204:
+                return True
+        except HTTPError as e:
+            if e.status_code == 400 or e.status_code == 404:
+                return False
+        # TODO temp work around until client fixed
+        except InvalidResponse as e:
+            if e.status_code == 204:
+                return True
+            else:
+                raise e
+
+    def get_user_by_email(self, email_address):
+        users = self.get_users()
+        user = [u for u in users if u.email_address == email_address]
+        if len(user) == 1:
+            return user[0]
+        return None
 
 
 class User(object):

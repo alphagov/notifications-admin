@@ -1,10 +1,14 @@
 from flask import (
-    render_template, redirect, url_for)
-from flask import session
+    render_template,
+    redirect,
+    url_for,
+    session,
+    abort
+)
+
 
 from app.main import main
 from app.main.dao import users_dao
-from app.main.encryption import check_hash
 from app.main.forms import LoginForm
 from app.notify_client.sender import send_sms_code
 
@@ -16,13 +20,12 @@ def sign_in():
         if form.validate_on_submit():
             user = users_dao.get_user_by_email(form.email_address.data)
             if user:
-                # TODO move to user API in next pr to actually do password check as this
-                # is totally broken now
-                if not user.is_locked() and user.is_active() and check_hash(form.password.data, user.password):
+                if not user.is_locked() and user.is_active() and users_dao.verify_password(user, form.password.data):
                     send_sms_code(user.id, user.mobile_number)
                     session['user_email'] = user.email_address
                     return redirect(url_for('.two_factor'))
                 else:
+                    # TODO re wire this increment to api
                     users_dao.increment_failed_login_count(user.id)
             # Vague error message for login
             form.password.errors.append('Username or password is incorrect')
@@ -31,3 +34,4 @@ def sign_in():
     except:
         import traceback
         traceback.print_exc()
+        abort(500)

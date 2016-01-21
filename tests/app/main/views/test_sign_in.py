@@ -19,15 +19,19 @@ def test_process_sign_in_return_2fa_template(app_,
                                              db_,
                                              db_session,
                                              mock_send_sms,
-                                             mock_send_email):
-    user = User(email_address='valid@example.gov.uk',
-                password='val1dPassw0rd!',
-                mobile_number='+441234123123',
-                name='valid',
-                created_at=datetime.now(),
-                role_id=1,
-                state='active')
-    users_dao.insert_user(user)
+                                             mock_send_email,
+                                             mock_api_user,
+                                             mock_user_loader,
+                                             mock_user_dao_get_by_email,
+                                             mock_user_dao_checkpassword):
+    # user = User(email_address='valid@example.gov.uk',
+    #             password='val1dPassw0rd!',
+    #             mobile_number='+441234123123',
+    #             name='valid',
+    #             created_at=datetime.now(),
+    #             role_id=1,
+    #             state='active')
+    # users_dao.insert_user(user)
     with app_.test_request_context():
         response = app_.test_client().post(
             url_for('main.sign_in'), data={
@@ -39,7 +43,8 @@ def test_process_sign_in_return_2fa_template(app_,
 
 def test_should_return_locked_out_true_when_user_is_locked(app_,
                                                            db_,
-                                                           db_session):
+                                                           db_session,
+                                                           mock_user_dao_get_by_email):
     user = User(email_address='valid@example.gov.uk',
                 password='val1dPassw0rd!',
                 mobile_number='+441234123123',

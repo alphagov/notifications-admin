@@ -19,7 +19,8 @@ def test_sign_out_user(app_,
                        mock_send_sms,
                        mock_send_email,
                        mock_get_service,
-                       mock_user_loader):
+                       mock_user_loader,
+                       mock_user_dao_get_by_email):
     with app_.test_request_context():
         email = 'valid@example.gov.uk'
         password = 'val1dPassw0rd!'
