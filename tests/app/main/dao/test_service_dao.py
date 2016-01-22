@@ -1,5 +1,3 @@
-import pytest
-import sqlalchemy
 from app.main.dao import services_dao
 
 
@@ -58,8 +56,8 @@ def test_find_by_service_name_returns_right_service(db_, db_session, mock_get_se
     assert service['name'] == service_name
 
 
-def test_should_return_list_of_service_names(db_, db_session, mock_get_services):
+def test_should_return_list_of_service_names(db_, db_session, mock_api_user, mock_get_services):
     expected = ['service_one', 'service_two']
-    actual = services_dao.find_all_service_names()
+    actual = services_dao.find_all_service_names(mock_api_user.id)
     assert mock_get_services.called
     assert actual == expected
