@@ -186,7 +186,16 @@ class ServiceNameForm(Form):
 
 
 class ConfirmPasswordForm(Form):
+
+    def __init__(self, validate_password_func, *args, **kwargs):
+        self.validate_password_func = validate_password_func
+        super(ConfirmPasswordForm, self).__init__(*args, **kwargs)
+
     password = PasswordField(u'Enter password')
+
+    def validate_password(self, field):
+        if not self.validate_password_func(field.data):
+            raise ValidationError('Invalid password')
 
 
 class TemplateForm(Form):
