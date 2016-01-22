@@ -13,7 +13,7 @@ GOV.UK Notify | Edit template
 		<form method="post">
 			{{ textbox(form.name) }}
 			{{ textbox(form.template_type) }}
-			{{ textbox(form.content, highlight_tags=True) }}
+			{{ textbox(form.template_content, highlight_tags=True) }}
 			{{ page_footer(
 				'Save',
 				delete_link=url_for('.delete_service_template', service_id=service_id, template_id=template_id) if template_id or None,

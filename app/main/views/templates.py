@@ -40,7 +40,7 @@ def add_service_template(service_id):
 
     if form.validate_on_submit():
         tdao.insert_service_template(
-            form.name.data, form.template_type.data, form.content.data, service_id)
+            form.name.data, form.template_type.data, form.template_content.data, service_id)
         return redirect(url_for(
             '.manage_service_templates', service_id=service_id))
     return render_template(
@@ -60,12 +60,14 @@ def edit_service_template(service_id, template_id):
             abort(404)
         else:
             raise e
+
+    template['template_content'] = template['content']
     form = TemplateForm(**template)
 
     if form.validate_on_submit():
         tdao.update_service_template(
             template_id, form.name.data, form.template_type.data,
-            form.content.data, service_id)
+            form.template_content.data, service_id)
         return redirect(url_for('.manage_service_templates', service_id=service_id))
 
     return render_template(

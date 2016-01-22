@@ -194,7 +194,7 @@ class TemplateForm(Form):
         u'Template name',
         validators=[DataRequired(message="Template name cannot be empty")])
     template_type = SelectField(u'Template type', choices=[('sms', 'SMS')])
-    content = TextAreaField(
+    template_content = TextAreaField(
         u'Message',
         validators=[DataRequired(message="Template content cannot be empty")])
 

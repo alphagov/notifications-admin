@@ -62,7 +62,7 @@ def test_should_redirect_when_saving_a_template(app_,
                 'id': template_id,
                 'name': name,
                 'template_type': type_,
-                "content": content,
+                "template_content": content,
                 "service": service_id
             }
             response = client.post(url_for(
