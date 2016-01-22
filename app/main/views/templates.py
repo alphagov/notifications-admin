@@ -89,8 +89,8 @@ def delete_service_template(service_id, template_id):
 
     form = TemplateForm(**template)
 
-    if form.validate_on_submit():
-        dao.delete_service_template(service_id, template_id)
+    if request.method == 'POST':
+        tdao.delete_service_template(service_id, template_id)
         return redirect(url_for('.manage_service_templates', service_id=service_id))
 
     flash('Are you sure you want to delete ‘{}’?'.format(form.name.data), 'delete')
