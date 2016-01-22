@@ -15,7 +15,7 @@ class UserApiClient(BaseAPIClient):
         self.base_url = app.config['API_HOST_NAME']
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
-        self.failed_login_count = app.config["MAX_FAILED_LOGIN_COUNT"]
+        self.max_failed_login_count = app.config["MAX_FAILED_LOGIN_COUNT"]
 
     def register_user(self, name, email_address, mobile_number, password):
         data = {
@@ -25,26 +25,25 @@ class UserApiClient(BaseAPIClient):
             "password": password
         }
         user_data = self.post("/user", data)
-        return User(user_data['data'], max_failed_login_count=self.failed_login_count)
+        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
     def get_user(self, id):
         url = "/user/{}".format(id)
         user_data = self.get(url)
-        return User(user_data['data'], max_failed_login_count=self.failed_login_count)
+        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
     def get_users(self):
-        url = "/user".format()
-        users_data = self.get(url)['data']
+        users_data = self.get("/user")['data']
         users = []
         for user in users_data:
-            users.append(User(user, max_failed_login_count=self.failed_login_count))
+            users.append(User(user, max_failed_login_count=self.max_failed_login_count))
         return users
 
     def update_user(self, user):
         data = user.serialize()
         url = "/user/{}".format(user.id)
         user_data = self.put(url, data=data)
-        return User(user_data['data'], max_failed_login_count=self.failed_login_count)
+        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
     def verify_password(self, user, password):
         try:
@@ -76,6 +75,7 @@ class User(object):
     def __init__(self, fields, max_failed_login_count=3):
         self.fields = fields
         self.max_failed_login_count = max_failed_login_count
+        self._failed_login_count = 0
 
     @property
     def id(self):
@@ -114,11 +114,19 @@ class User(object):
     def state(self, state):
         self.fields['state'] = state
 
+    @property
+    def failed_login_count(self):
+        return self._failed_login_count
+
+    @failed_login_count.setter
+    def failed_login_count(self, num):
+        self._failed_login_count += num
+
     def is_anonymous(self):
         return False
 
     def is_locked(self):
-        return self.fields.get('failed_login_count') > self.max_failed_login_count
+        return self.failed_login_count > self.max_failed_login_count
 
     def serialize(self):
         return self.fields

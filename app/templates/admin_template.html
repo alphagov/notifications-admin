@@ -53,11 +53,11 @@
         <div class="column-half">
           <details class="dropdown">
             <summary class="dropdown-toggle">
-              Service name
+              Current service
             </summary>
             <div>
-              <a href="#">Switch to A N Other service</a>
-              <a href="{{ url_for('main.add_service') }}">Add a new service to GOV.UK Notify</a>
+              <a href="{{ url_for('main.choose_service') }}">Switch service</a>
+              <a href="{{ url_for('.add_service') }}">Add a new service to GOV.UK Notify</a>
             </div>
           </details>
         </div>

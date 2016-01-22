@@ -1,5 +1,5 @@
-{% macro banner(body, with_tick=False) %}
-  <div class='banner{% if with_tick %}-with-tick{% endif %}'>
+{% macro banner(body, type=None, with_tick=False) %}
+  <div class='banner{% if type %}-{{ type }}{% endif %}{% if with_tick %}-with-tick{% endif %}'>
     {{ body }}
   </div>
 {% endmacro %}
