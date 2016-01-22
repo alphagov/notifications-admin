@@ -15,7 +15,7 @@ class UserApiClient(BaseAPIClient):
         self.base_url = app.config['API_HOST_NAME']
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
-        self.failed_login_count = app.config["MAX_FAILED_LOGIN_COUNT"]
+        self.max_failed_login_count = app.config["MAX_FAILED_LOGIN_COUNT"]
 
     def register_user(self, name, email_address, mobile_number, password):
         data = {
@@ -25,26 +25,26 @@ class UserApiClient(BaseAPIClient):
             "password": password
         }
         user_data = self.post("/user", data)
-        return User(user_data['data'], max_failed_login_count=self.failed_login_count)
+        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
     def get_user(self, id):
         url = "/user/{}".format(id)
         user_data = self.get(url)
-        return User(user_data['data'], max_failed_login_count=self.failed_login_count)
+        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
     def get_users(self):
         url = "/user".format()
         users_data = self.get(url)['data']
         users = []
         for user in users_data:
-            users.append(User(user, max_failed_login_count=self.failed_login_count))
+            users.append(User(user, max_failed_login_count=self.max_failed_login_count))
         return users
 
     def update_user(self, user):
         data = user.serialize()
         url = "/user/{}".format(user.id)
         user_data = self.put(url, data=data)
-        return User(user_data['data'], max_failed_login_count=self.failed_login_count)
+        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
     def verify_password(self, user, password):
         try:
@@ -96,6 +96,14 @@ class User(object):
     @property
     def password_changed_at(self):
         return self.fields.get('password_changed_at')
+
+    @property
+    def failed_login_count(self):
+        return self.fields.get('failed_login_count')
+
+    @failed_login_count.setter
+    def failed_login_count(self, failed_login_count):
+        self.fields['failed_login_count'] = failed_login_count
 
     def get_id(self):
         return self.id
