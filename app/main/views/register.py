@@ -4,8 +4,11 @@ from flask import (
     render_template,
     redirect,
     session,
-    abort
+    abort,
+    url_for
 )
+
+from flask.ext.login import current_user
 
 from client.errors import HTTPError
 
@@ -22,6 +25,9 @@ from app.notify_client.sender import send_sms_code, send_email_code
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user and current_user.is_authenticated():
+        return redirect(url_for('main.choose_service'))
+
     form = RegisterUserForm(users_dao.get_user_by_email)
 
     if form.validate_on_submit():

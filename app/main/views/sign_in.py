@@ -2,9 +2,11 @@ from flask import (
     render_template,
     redirect,
     url_for,
-    session,
-    abort
+    session
 )
+
+
+from flask.ext.login import current_user
 
 
 from app.main import main
@@ -15,6 +17,8 @@ from app.notify_client.sender import send_sms_code
 
 @main.route('/sign-in', methods=(['GET', 'POST']))
 def sign_in():
+    if current_user and current_user.is_authenticated():
+        return redirect(url_for('main.choose_service'))
     try:
         form = LoginForm()
         if form.validate_on_submit():
