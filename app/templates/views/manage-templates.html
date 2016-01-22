@@ -18,18 +18,18 @@ GOV.UK Notify | Manage templates
           <a href="{{ url_for('.add_service_template', service_id=service_id) }}">Create new template</a>
 
         {% for template in templates %}
-          {% if template.type == 'sms' %}
+          {% if template.get_field('template_type') == 'sms' %}
             {{ sms_message(
               template.content,
               name=template.name,
-              edit_link=url_for('.edit_service_template', service_id=template.service, template_id=template.id)
+              edit_link=url_for('.edit_service_template', service_id=template.get_field('service'), template_id=template.get_field('id'))
             ) }}
-          {% elif template.type == 'email' %}
+          {% elif template.get_field('template_type') == 'email' %}
             {{ email_message(
               "template subject",
               template.content,
               name=template.name,
-              edit_link=url_for('.edit_service_template', service_id=template.service, template_id=template.id)
+              edit_link=url_for('.edit_service_template', service_id=template.get_field('service'), template_id=template.get_field('id'))
             ) }}
           {% endif %}
         {% endfor %}

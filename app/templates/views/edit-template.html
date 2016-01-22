@@ -12,6 +12,7 @@ GOV.UK Notify | Edit template
 
 		<form method="post">
 			{{ textbox(form.name) }}
+			{{ textbox(form.template_type) }}
 			{{ textbox(form.content, highlight_tags=True) }}
 			{{ page_footer(
 				'Save',

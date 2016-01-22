@@ -34,6 +34,10 @@ class TemplatesBrowsableItem(BrowsableItem):
         return self._item['name']
 
     @property
+    def type(self):
+        return self._item['template_type']
+
+    @property
     def link(self):
         return url_for(
             'main.edit_service_template',
@@ -47,3 +51,6 @@ class TemplatesBrowsableItem(BrowsableItem):
     @property
     def hint(self):
         return "Some service template hint here"
+
+    def get_field(self, field):
+        return self._item.get(field, None)

@@ -4,7 +4,8 @@ from flask_login import login_required
 from app.main import main
 from app.main.forms import TemplateForm
 from app.main.dao.services_dao import get_service_by_id
-from app.main.dao import templates_dao as dao
+from app.main.dao import templates_dao as tdao
+from app.main.dao import services_dao as sdao
 from client.errors import HTTPError
 
 
@@ -12,7 +13,8 @@ from client.errors import HTTPError
 @login_required
 def manage_service_templates(service_id):
     try:
-        templates = dao.get_service_templates(service_id)['data']
+        templates = tdao.get_service_templates(service_id)['data']
+        print(templates)
     except HTTPError as e:
         if e.status_code == 404:
             abort(404)
@@ -21,14 +23,14 @@ def manage_service_templates(service_id):
     return render_template(
         'views/manage-templates.html',
         service_id=service_id,
-        templates=templates)
+        templates=[tdao.TemplatesBrowsableItem(x) for x in templates])
 
 
 @main.route("/services/<int:service_id>/templates/add", methods=['GET', 'POST'])
 @login_required
 def add_service_template(service_id):
     try:
-        service = dao.get_service_by_id(service_id)['data']
+        service = sdao.get_service_by_id(service_id)['data']
     except HTTPError as e:
         if e.status_code == 404:
             abort(404)
@@ -38,7 +40,7 @@ def add_service_template(service_id):
     form = TemplateForm()
 
     if form.validate_on_submit():
-        dao.insert_service_template(
+        tdao.insert_service_template(
             form.name.data, form.template_type.data, form.content.data, service_id)
         return redirect(url_for(
             '.manage_service_templates', service_id=service_id))
@@ -53,7 +55,7 @@ def add_service_template(service_id):
 @login_required
 def edit_service_template(service_id, template_id):
     try:
-        template = dao.get_service_template(service_id, template_id)['data']
+        template = tdao.get_service_template(service_id, template_id)['data']
     except HTTPError as e:
         if e.status_code == 404:
             abort(404)
@@ -62,7 +64,7 @@ def edit_service_template(service_id, template_id):
     form = TemplateForm(form_data=template)
 
     if form.validate_on_submit():
-        dao.update_service_template(
+        tdao.update_service_template(
             template_id, form.name.data, form.template_type.data,
             form.content.data, service_id)
         return redirect(url_for('.manage_service_templates', service_id=service_id))
@@ -79,7 +81,7 @@ def edit_service_template(service_id, template_id):
 @login_required
 def delete_service_template(service_id, template_id):
     try:
-        template = dao.get_service_template(service_id, template_id)['data']
+        template = tdao.get_service_template(service_id, template_id)['data']
     except HTTPError as e:
         if e.status_code == 404:
             abort(404)
