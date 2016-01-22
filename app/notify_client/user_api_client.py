@@ -26,31 +26,32 @@ class UserApiClient(BaseAPIClient):
             "password": password
         }
         user_data = self.post("/user", data)
-        return User(user_data['data'], max_failed_login_count=self.user_max_failed_login_count)
+        return User(user_data['data'], max_failed_login_count=self.failed_login_count)
 
     def get_user(self, id):
-        url = "{}/user/{}".format(self.base_url, id)
+        url = "/user/{}".format(id)
         user_data = self.get(url)
-        return User(user_data['data'], max_failed_login_count=self.user_max_failed_login_count)
+        return User(user_data['data'], max_failed_login_count=self.failed_login_count)
 
     def get_users(self):
-        url = "{}/user".format(self.base_url)
+        url = "/user".format()
         users_data = self.get(url)['data']
         users = []
         for user in users_data:
-            users.append(User(user, max_failed_login_count=self.user_max_failed_login_count))
+            users.append(User(user, max_failed_login_count=self.failed_login_count))
         return users
+
 
     def update_user(self, user):
         data = user.serialize()
-        url = "{}/user/{}".format(self.base_url, user.id)
+        url = "/user/{}".format(user.id)
         user_data = self.put(url, data=data)
-        return User(user_data['data'], max_failed_login_count=self.user_max_failed_login_count)
+        return User(user_data['data'], max_failed_login_count=self.failed_login_count)
 
     def verify_password(self, user, password):
         try:
             data = user.serialize()
-            url = "{}/user/{}/verify/password".format(self.base_url, user.id)
+            url = "/user/{}/verify/password".format(user.id)
             data["password"] = password
             resp = self.post(url, data=data)
             if resp.status_code == 204:
