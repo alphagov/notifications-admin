@@ -1,11 +1,12 @@
 {% macro sms_message(
-  body, recipient=None, name=None, edit_link=None, input_name=None, input_index=None
+  body, recipient=None, name=None, id=None, edit_link=None, input_name=None, input_index=None
 ) %}
   {% if input_name %}
     <label class="sms-message-option" for="{{ input_name }}-{{ input_index }}">
   {% endif %}
   {% if name %}
     <h3 class="sms-message-name">
+      ID: {{ id }}
       {% if edit_link %}
         <a href="{{ edit_link }}">{{ name }}</a>
       {% else %}
