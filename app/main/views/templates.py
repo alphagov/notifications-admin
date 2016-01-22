@@ -60,7 +60,7 @@ def edit_service_template(service_id, template_id):
             abort(404)
         else:
             raise e
-    form = TemplateForm(form_data=template)
+    form = TemplateForm(**template)
 
     if form.validate_on_submit():
         tdao.update_service_template(
@@ -87,7 +87,7 @@ def delete_service_template(service_id, template_id):
         else:
             raise e
 
-    form = TemplateForm(form_data=template)
+    form = TemplateForm(**template)
 
     if form.validate_on_submit():
         dao.delete_service_template(service_id, template_id)
