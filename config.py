@@ -21,6 +21,7 @@ class Config(object):
     SESSION_COOKIE_PATH = '/admin'
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = True
+    PERMANENT_SESSION_LIFETIME = 3600  # seconds
 
     API_HOST_NAME = os.getenv('API_HOST_NAME')
     NOTIFY_API_SECRET = os.getenv('NOTIFY_API_SECRET', "dev-secret")
@@ -44,6 +45,7 @@ class Development(Config):
     API_HOST_NAME = 'http://localhost:6011'
     ADMIN_CLIENT_USER_NAME = 'dev-notify-admin'
     ADMIN_CLIENT_SECRET = 'dev-notify-secret-key'
+    WTF_CSRF_ENABLED = False
 
 
 class Test(Development):
