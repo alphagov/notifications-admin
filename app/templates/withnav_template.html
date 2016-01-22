@@ -1,13 +1,17 @@
 {% extends "admin_template.html" %}
-{% from "main_nav.html" import main_nav with context %}
+{% from "components/banner.html" import banner %}
 
 {% block fullwidth_content %}
-	<div class="grid-row">
-	  <div class="column-one-quarter">
-	    {% include "main_nav.html" %}
-	  </div>
-	  <div class="column-three-quarters">
-	    {% block maincolumn_content %}{% endblock %}
-	  </div>
-	</div>
+  <div class="grid-row">
+    <div class="column-one-quarter">
+      {% include "main_nav.html" %}
+    </div>
+    <div class="column-three-quarters">
+      {{ banner(
+        'You are in restricted mode. You can only send notifications to yourself.',
+        'info'
+      ) }}
+      {% block maincolumn_content %}{% endblock %}
+    </div>
+  </div>
 {% endblock %}
