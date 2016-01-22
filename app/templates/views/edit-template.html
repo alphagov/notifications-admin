@@ -12,11 +12,20 @@ GOV.UK Notify | Edit template
 
 		<form method="post">
 			{{ textbox(form.name) }}
-			{{ textbox(form.template_type) }}
-			{{ textbox(form.content, highlight_tags=True) }}
+			<fieldset class="form-group">
+				<legend class="form-label">
+					Template type
+				</legend>
+				<label class="block-label" for="template_type">
+					<input type="radio" name="template_type" id="template_type" checked="checked" value="sms" />
+					Text message
+				</label>
+			</fieldset>
+			{{ textbox(form.template_content, highlight_tags=True) }}
 			{{ page_footer(
 				'Save',
 				delete_link=url_for('.delete_service_template', service_id=service_id, template_id=template_id) if template_id or None,
+				delete_link_text='delete this template',
 				back_link=url_for('.manage_service_templates', service_id=service_id),
 				back_link_text='Back to templates'
 			) }}

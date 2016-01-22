@@ -12,8 +12,7 @@
     {{ browse_list([
       {
         'title': 'Change your service name',
-        'link': url_for('.service_name_change', service_id=service_id),
-        'hint': 'Your service name ({}) is included in every sent notification'.format(service.name)
+        'link': url_for('.service_name_change', service_id=service_id)
       },
       {
         'title': 'Request to go live and turn off sending restrictions',
@@ -22,15 +21,15 @@
       } if not service.live else {
       },
       {
-        'title': 'Turn off all outgoing notifications',
+        'title': 'Temporarily suspend API keys',
         'link': url_for('.service_status_change', service_id=service_id),
         'destructive': True
       } if service.active else {
-        'title': 'Restart sending notifications',
+        'title': 'Reactivate API keys',
         'link': url_for('.service_status_change', service_id=service_id)
       },
       {
-        'title': 'Delete this service from Notify',
+        'title': 'Delete this service from GOV.UK Notify',
         'link': url_for('.service_delete', service_id=service_id),
         'destructive': True
       },

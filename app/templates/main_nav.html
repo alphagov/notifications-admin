@@ -9,11 +9,11 @@
     <li><a href="{{ url_for('.manage_service_templates', service_id=service_id) }}">Templates</a></li>
   </ul>
   <ul>
-    <li><a href="{{ url_for('.api_keys', service_id=service_id) }}">API keys</a></li>
     <li><a href="{{ url_for('.documentation', service_id=service_id) }}">Developer documentation</a></li>
+    <li><a href="{{ url_for('.api_keys', service_id=service_id) }}">API keys</a></li>
   </ul>
   <ul>
-    <li><a href="{{ url_for('.manage_users', service_id=service_id) }}">Manage users</a></li>
+    <!--<li><a href="{{ url_for('.manage_users', service_id=service_id) }}">Manage users</a></li>-->
     <li><a href="{{ url_for('.service_settings', service_id=service_id) }}">Service settings</a></li>
   </ul>
 </nav>
