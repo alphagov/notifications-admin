@@ -6,7 +6,6 @@ from client.errors import (
 
 
 class UserApiClient(BaseAPIClient):
-
     def __init__(self, base_url=None, client_id=None, secret=None):
         super(self.__class__, self).__init__(base_url=base_url or 'base_url',
                                              client_id=client_id or 'client_id',
@@ -18,7 +17,7 @@ class UserApiClient(BaseAPIClient):
         self.secret = app.config['ADMIN_CLIENT_SECRET']
         self.failed_login_count = app.config["MAX_FAILED_LOGIN_COUNT"]
 
-    def register_user(self, name, email_address,  mobile_number, password):
+    def register_user(self, name, email_address, mobile_number, password):
         data = {
             "name": name,
             "email_address": email_address,
@@ -40,7 +39,6 @@ class UserApiClient(BaseAPIClient):
         for user in users_data:
             users.append(User(user, max_failed_login_count=self.failed_login_count))
         return users
-
 
     def update_user(self, user):
         data = user.serialize()
@@ -75,7 +73,6 @@ class UserApiClient(BaseAPIClient):
 
 
 class User(object):
-
     def __init__(self, fields, max_failed_login_count=3):
         self.fields = fields
         self.max_failed_login_count = max_failed_login_count
