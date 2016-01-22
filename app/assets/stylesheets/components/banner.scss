@@ -28,6 +28,12 @@
 
 }
 
+.banner-info {
+  @extend .banner;
+  background: $govuk-blue;
+  color: $white;
+}
+
 .banner-dangerous {
 
   @extend .banner;
