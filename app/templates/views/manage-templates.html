@@ -20,15 +20,15 @@ GOV.UK Notify | Manage templates
         {% for template in templates %}
           {% if template.get_field('template_type') == 'sms' %}
             {{ sms_message(
-              template.content,
-              name=template.name,
+              template.get_field('content'),
+              name=template.title,
               edit_link=url_for('.edit_service_template', service_id=template.get_field('service'), template_id=template.get_field('id'))
             ) }}
           {% elif template.get_field('template_type') == 'email' %}
             {{ email_message(
-              "template subject",
-              template.content,
-              name=template.name,
+              template.get_field('subject'),
+              template.get_field('content'),
+              name=template.get_field('name'),
               edit_link=url_for('.edit_service_template', service_id=template.get_field('service'), template_id=template.get_field('id'))
             ) }}
           {% endif %}

@@ -14,7 +14,6 @@ from client.errors import HTTPError
 def manage_service_templates(service_id):
     try:
         templates = tdao.get_service_templates(service_id)['data']
-        print(templates)
     except HTTPError as e:
         if e.status_code == 404:
             abort(404)
