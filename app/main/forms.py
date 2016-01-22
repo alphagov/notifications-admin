@@ -7,7 +7,7 @@ from wtforms import (
     ValidationError,
     TextAreaField,
     FileField,
-    SelectField
+    RadioField
 )
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
@@ -193,7 +193,8 @@ class TemplateForm(Form):
     name = StringField(
         u'Template name',
         validators=[DataRequired(message="Template name cannot be empty")])
-    template_type = SelectField(u'Template type', choices=[('sms', 'SMS')])
+    template_type = RadioField(u'Template type', choices=[('sms', 'SMS')])
+
     template_content = TextAreaField(
         u'Message',
         validators=[DataRequired(message="Template content cannot be empty")])

@@ -12,7 +12,15 @@ GOV.UK Notify | Edit template
 
 		<form method="post">
 			{{ textbox(form.name) }}
-			{{ textbox(form.template_type) }}
+			<fieldset class="form-group">
+				<legend class="form-label">
+					Template type
+				</legend>
+				<label class="block-label" for="template_type">
+					<input type="radio" name="template_type" id="template_type" checked="checked" value="sms" />
+					SMS
+				</label>
+			</fieldset>
 			{{ textbox(form.template_content, highlight_tags=True) }}
 			{{ page_footer(
 				'Save',
