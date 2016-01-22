@@ -51,7 +51,6 @@ def test_process_sign_in_return_2fa_template(app_,
     assert response.location == 'http://localhost/two-factor'
 
 
-@pytest.mark.skip(True, reason='User failed logins not implemented yet')
 def test_should_return_locked_out_true_when_user_is_locked(app_,
                                                            db_,
                                                            db_session,
@@ -80,7 +79,6 @@ def test_should_return_locked_out_true_when_user_is_locked(app_,
         assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
 
-@pytest.mark.skip(True, reason='User failed logins not implemented yet')
 def test_should_return_active_user_is_false_if_user_is_inactive(app_,
                                                                 db_,
                                                                 db_session,
@@ -96,7 +94,9 @@ def test_should_return_active_user_is_false_if_user_is_inactive(app_,
     assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
 
-def test_should_return_200_when_user_does_not_exist(app_, db_, db_session,
+def test_should_return_200_when_user_does_not_exist(app_,
+                                                    db_,
+                                                    db_session,
                                                     mock_user_dao_get_user,
                                                     mock_user_dao_get_by_email):
     with app_.test_request_context():
@@ -108,15 +108,11 @@ def test_should_return_200_when_user_does_not_exist(app_, db_, db_session,
     assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
 
-def test_should_return_200_when_user_is_not_active(app_, db_, db_session):
-    user = User(email_address='PendingUser@example.gov.uk',
-                password='val1dPassw0rd!',
-                mobile_number='+441234123123',
-                name='pending user',
-                created_at=datetime.now(),
-                role_id=1,
-                state='pending')
-    users_dao.insert_user(user)
+def test_should_return_200_when_user_is_not_active(app_,
+                                                   db_,
+                                                   db_session,
+                                                   mock_user_dao_get_user,
+                                                   mock_user_dao_get_by_email):
     with app_.test_request_context():
         response = app_.test_client().post(
             url_for('main.sign_in'), data={
