@@ -1,5 +1,5 @@
-from flask import request, render_template, jsonify, redirect, session, url_for, abort
-from flask_login import login_required
+from flask import render_template, redirect, session, url_for
+from flask_login import login_required, current_user
 from app.main import main
 from app.main.dao import services_dao, users_dao
 from app.main.forms import AddServiceForm
@@ -9,7 +9,7 @@ from app.main.forms import AddServiceForm
 @login_required
 def add_service():
     form = AddServiceForm(services_dao.find_all_service_names)
-    services = services_dao.get_services()
+    services = services_dao.get_services(current_user.id)
     if len(services) > 0:
         heading = 'Set up notifications for your service'
     else:

@@ -1,14 +1,13 @@
 import os
 from datetime import date
-
 import pytest
 from alembic.command import upgrade
 from alembic.config import Config
 from flask.ext.migrate import Migrate, MigrateCommand
 from flask.ext.script import Manager
 from sqlalchemy.schema import MetaData
-
 from app import create_app, db
+
 from . import (
     create_test_user, service_json, TestClient,
     get_test_user, template_json, api_key_json)
@@ -67,14 +66,6 @@ def service_one(request, mock_api_user):
     return service_json(1, 'service one', [mock_api_user.id])
 
 
-# @pytest.fixture(scope='function')
-# def active_user(request, db_, db_session):
-#     usr = get_test_user()
-#     if usr:
-#         return usr
-#     return create_test_user('active')
-
-
 @pytest.fixture(scope='function')
 def mock_send_sms(request, mocker):
     return mocker.patch("app.notifications_api_client.send_sms")
@@ -87,13 +78,13 @@ def mock_send_email(request, mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service(mocker, mock_api_user):
-    def _create(service_id):
+    def _get(service_id):
         service = service_json(
             service_id, "Test Service", [mock_api_user.id], limit=1000,
             active=False, restricted=True)
         return {'data': service, 'token': 1}
 
-    return mocker.patch('app.notifications_api_client.get_service', side_effect=_create)
+    return mocker.patch('app.notifications_api_client.get_service', side_effect=_get)
 
 
 @pytest.fixture(scope='function')
@@ -129,7 +120,21 @@ def mock_update_service(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_services(mocker, mock_api_user):
-    def _create():
+    def _get(user_id):
+        service_one = service_json(
+            1, "service_one", [mock_api_user.id], 1000, True, False)
+        service_two = service_json(
+            2, "service_two", [mock_api_user.id], 1000, True, False)
+        return {'data': [service_one, service_two]}
+
+    mock_class = mocker.patch(
+        'app.notifications_api_client.get_services', side_effect=_get)
+    return mock_class
+
+
+@pytest.fixture(scope='function')
+def mock_get_services(mocker, mock_api_user):
+    def _create(user_id):
         service_one = service_json(
             1, "service_one", [mock_api_user.id], 1000, True, False)
         service_two = service_json(
@@ -318,6 +323,7 @@ def mock_user_dao_password_reset(mocker, mock_api_user):
 
     def _reset(email):
         mock_api_user.state = 'request_password_reset'
+
     return mocker.patch('app.main.dao.users_dao.request_password_reset', side_effect=_reset)
 
 

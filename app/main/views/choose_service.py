@@ -1,5 +1,5 @@
 from flask import (render_template, redirect, url_for)
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.main.dao import services_dao
 from app.main import main
 
@@ -7,7 +7,7 @@ from app.main import main
 @main.route("/services")
 @login_required
 def choose_service():
-    services = services_dao.get_services()
+    services = services_dao.get_services(current_user.id)
     # If there is only one service redirect
     # to the service dashboard.
     if len(services['data']) == 1:
