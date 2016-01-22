@@ -6,7 +6,6 @@
   {% endif %}
   {% if name %}
     <h3 class="sms-message-name">
-      ID: {{ id }}
       {% if edit_link %}
         <a href="{{ edit_link }}">{{ name }}</a>
       {% else %}
@@ -23,6 +22,11 @@
   {% if recipient %}
     <p class="sms-message-recipient">
       {{ recipient }}
+    </p>
+  {% endif %}
+  {% if id %}
+    <p class="sms-message-recipient">
+      Template ID: {{ id }}
     </p>
   {% endif %}
   {% if input_name %}

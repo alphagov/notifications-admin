@@ -13,7 +13,6 @@ def test_should_show_overview(app_, db_, db_session, mock_api_user, mock_get_ser
         resp_data = response.get_data(as_text=True)
         assert 'Service settings' in resp_data
         service = mock_get_service.side_effect(service_id)['data']
-        assert service['name'] in resp_data
         assert mock_get_service.called
 
 
@@ -217,7 +216,7 @@ def test_should_show_delete_page(app_, db_, db_session, mock_api_user, mock_get_
                 'main.service_delete', service_id=service_id))
 
         assert response.status_code == 200
-        assert 'Delete this service from Notify' in response.get_data(as_text=True)
+        assert 'Delete this service from GOV.UK Notify' in response.get_data(as_text=True)
         assert mock_get_service.called
 
 
