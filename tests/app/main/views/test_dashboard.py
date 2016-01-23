@@ -7,8 +7,7 @@ def test_should_show_recent_jobs_on_dashboard(app_,
                                               db_session,
                                               mock_api_user,
                                               mock_get_service,
-                                              mock_user_loader,
-                                              mock_user_dao_get_by_email):
+                                              mock_get_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(mock_api_user)

@@ -3,20 +3,20 @@ from app.main.dao import services_dao
 
 def test_can_insert_new_service(db_,
                                 db_session,
-                                mock_api_user,
+                                mock_active_user,
                                 mock_create_service,
-                                mock_user_dao_get_by_email):
+                                mock_get_by_email):
     service_name = 'testing service'
-    id_ = services_dao.insert_new_service(service_name, mock_api_user.id)
+    id_ = services_dao.insert_new_service(service_name, mock_active_user.id)
     mock_create_service.assert_called_once_with(
-        service_name, False, 1000, True, mock_api_user.id)
+        service_name, False, 1000, True, mock_active_user.id)
 
 
 def test_unrestrict_service_updates_the_service(db_,
                                                 db_session,
                                                 mock_get_service,
                                                 mock_update_service,
-                                                mock_user_dao_get_by_email):
+                                                mock_get_by_email):
     service_one = mock_get_service.side_effect(123)['data']
     services_dao.unrestrict_service(service_one['id'])
     mock_update_service.assert_called_once_with(service_one['id'],
@@ -29,10 +29,10 @@ def test_unrestrict_service_updates_the_service(db_,
 
 def test_activate_service_update_service(db_,
                                          db_session,
-                                         mock_api_user,
+                                         mock_active_user,
                                          mock_get_service,
                                          mock_update_service,
-                                         mock_user_dao_get_by_email):
+                                         mock_get_by_email):
     service_one = mock_get_service.side_effect(123)['data']
     services_dao.activate_service(service_one['id'])
     mock_update_service.assert_called_once_with(service_one['id'],
