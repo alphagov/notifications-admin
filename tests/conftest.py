@@ -160,7 +160,7 @@ def mock_delete_service(mocker, mock_get_service):
 def mock_get_service_template(mocker):
     def _create(service_id, template_id):
         template = template_json(
-            template_id, "Template Name", "sms", "template content", service_id)
+            template_id, "Two week reminder", "sms", "Your vehicle tax is about to expire", service_id)
         return {'data': template}
 
     return mocker.patch(

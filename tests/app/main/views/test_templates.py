@@ -38,6 +38,8 @@ def test_should_show_page_for_one_templates(app_,
                 template_id=template_id))
 
     assert response.status_code == 200
+    assert "Two week reminder" in response.get_data(as_text=True)
+    assert "Your vehicle tax is about to expire" in response.get_data(as_text=True)
     mock_get_service_template.assert_called_with(
         service_id, template_id)
 
