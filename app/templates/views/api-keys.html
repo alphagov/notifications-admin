@@ -12,14 +12,14 @@
   </h1>
 
   <p>
-    To connect to the API you will need to send your service ID, encrypted with
-    an API key. The API key stays secret.
+    To connect to the API you will need to create an API Key. Each service can have multiple API Keys to allow
+    for test and live environments.
   </p>
 
   <p>
-    There are client libraries available which can do this for you. See
-    <a href="{{ url_for(".documentation", service_id=service_id) }}">the
-    developer documentation</a> for more information.
+    API usage is described in
+    <a href="{{ url_for('.documentation', service_id=service_id) }}">the
+    developer documentation</a>.
   </p>
 
   <h2 class="api-key-name">
