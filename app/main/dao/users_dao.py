@@ -51,8 +51,7 @@ def activate_user(user):
 def update_email_address(id, email_address):
     user = get_user_by_id(id)
     user.email_address = email_address
-    db.session.add(user)
-    db.session.commit()
+    return user_api_client.update_user(user)
 
 
 def update_mobile_number(id, mobile_number):
