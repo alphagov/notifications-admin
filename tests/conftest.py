@@ -81,7 +81,7 @@ def mock_get_service(mocker, mock_api_user):
     def _get(service_id):
         service = service_json(
             service_id, "Test Service", [mock_api_user.id], limit=1000,
-            active=False, restricted=True)
+            active=True, restricted=True)
         return {'data': service, 'token': 1}
 
     return mocker.patch('app.notifications_api_client.get_service', side_effect=_get)
