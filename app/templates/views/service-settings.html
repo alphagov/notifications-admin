@@ -24,7 +24,7 @@
         'title': 'Temporarily suspend API keys',
         'link': url_for('.service_status_change', service_id=service_id),
         'destructive': True
-      } if service.active else {
+      } if not service.active else {
         'title': 'Reactivate API keys',
         'link': url_for('.service_status_change', service_id=service_id)
       },
