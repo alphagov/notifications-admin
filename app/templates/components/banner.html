@@ -1,5 +1,11 @@
-{% macro banner(body, type=None, with_tick=False) %}
+{% macro banner(body, type=None, with_tick=False, delete_button=None) %}
   <div class='banner{% if type %}-{{ type }}{% endif %}{% if with_tick %}-with-tick{% endif %}'>
     {{ body }}
+    {% if delete_button %}
+      <form method='post'>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="submit" class="button" name="delete" value="{{ delete_button }}" />
+      </form>
+    {% endif %}
   </div>
 {% endmacro %}
