@@ -14,19 +14,16 @@ def test_render_sign_out_redirects_to_sign_in(app_):
 
 
 def test_sign_out_user(app_,
-                       db_,
-                       db_session,
                        mock_send_sms,
                        mock_send_email,
                        mock_get_service,
-                       mock_api_user,
-                       mock_user_loader,
-                       mock_user_dao_get_by_email):
+                       mock_active_user,
+                       mock_get_by_email):
     with app_.test_request_context():
         email = 'valid@example.gov.uk'
         password = 'val1dPassw0rd!'
         with app_.test_client() as client:
-            client.login(mock_api_user)
+            client.login(mock_active_user)
             # Check we are logged in
             response = client.get(
                 url_for('main.service_dashboard', service_id="123"))

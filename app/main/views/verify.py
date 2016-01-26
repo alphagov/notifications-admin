@@ -22,6 +22,7 @@ def verify():
     user_id = session['user_details']['id']
     codes = verify_codes_dao.get_codes(user_id)
     form = VerifyForm(codes)
+
     if form.validate_on_submit():
         verify_codes_dao.use_code_for_user_and_type(user_id=user_id, code_type='email')
         verify_codes_dao.use_code_for_user_and_type(user_id=user_id, code_type='sms')
