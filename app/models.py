@@ -56,7 +56,6 @@ class User(db.Model):
             'id': self.id,
             'name': self.name,
             'emailAddress': self.email_address,
-            'locked': self.failed_login_count > current_app.config['MAX_FAILED_LOGIN_COUNT'],
             'createdAt': self.created_at.strftime(DATETIME_FORMAT),
             'updatedAt': self.updated_at.strftime(DATETIME_FORMAT),
             'role': self.role,

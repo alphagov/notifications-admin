@@ -160,6 +160,5 @@ class User(object):
                 "mobile_number": self.mobile_number,
                 "password_changed_at": self.password_changed_at,
                 "state": self.state,
-                "failed_login_count": self.failed_login_count,
-                "is_locked": self.is_locked()
+                "failed_login_count": self.failed_login_count
                 }
