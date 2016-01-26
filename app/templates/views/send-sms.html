@@ -17,9 +17,9 @@
 
         <fieldset class='form-group'>
           <legend class="heading-medium">1. Choose text message template</legend>
-          {% for template in message_templates %}
+          {% for template in templates %}
             {{ sms_message(
-              template.body, name=template.name, input_name='template', input_index=loop.index
+              template.content, name=template.name, input_name='template', input_index=template.id
             ) }}
           {% endfor %}
         </fieldset>

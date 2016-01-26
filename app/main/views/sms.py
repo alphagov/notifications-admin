@@ -24,12 +24,7 @@ from app.main.uploader import (
     s3upload,
     s3download
 )
-
-from ._templates import templates
-
-sms_templates = [
-    template for template in templates if template['type'] == 'sms'
-]
+from app.main.dao import templates_dao
 
 
 @main.route("/services/<int:service_id>/sms/send", methods=['GET', 'POST'])
@@ -51,8 +46,16 @@ def send_sms(service_id):
             flash(str(e))
             return redirect(url_for('.send_sms', service_id=service_id))
 
+    try:
+        templates = templates_dao.get_service_templates(service_id)['data']
+    except HTTPError as e:
+        if e.status_code == 404:
+            abort(404)
+        else:
+            raise e
+
     return render_template('views/send-sms.html',
-                           message_templates=sms_templates,
+                           templates=templates,
                            form=form,
                            service_id=service_id)
 
@@ -69,7 +72,9 @@ def check_sms(service_id, upload_id):
             'views/check-sms.html',
             upload_result=upload_result,
             filename='someupload_file_name.csv',
-            message_template=sms_templates[0]['body'],
+            message_template='''
+                ((name)), we’ve received your ((thing)). We’ll contact you again within 1 week.
+            ''',
             service_id=service_id
         )
     elif request.method == 'POST':

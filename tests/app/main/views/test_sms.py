@@ -4,12 +4,32 @@ from flask import url_for
 import moto
 
 
+def test_choose_template_page(app_,
+                              db_,
+                              db_session,
+                              mock_send_sms,
+                              mock_active_user,
+                              mock_get_by_email,
+                              mock_get_service_templates):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(mock_active_user)
+            upload_data = {'file': (BytesIO(''.encode('utf-8')), 'emtpy.csv')}
+            response = client.get(url_for('main.send_sms', service_id=123))
+
+        assert response.status_code == 200
+        content = response.get_data(as_text=True)
+        assert 'template_one' in content
+        assert 'template one content' in content
+
+
 def test_upload_empty_csvfile_returns_to_upload_page(app_,
                                                      db_,
                                                      db_session,
                                                      mock_send_sms,
                                                      mock_active_user,
-                                                     mock_get_by_email):
+                                                     mock_get_by_email,
+                                                     mock_get_service_templates):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(mock_active_user)
@@ -25,7 +45,8 @@ def test_upload_empty_csvfile_returns_to_upload_page(app_,
 @moto.mock_s3
 def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
                                                                         mock_active_user,
-                                                                        mock_get_by_email):
+                                                                        mock_get_by_email,
+                                                                        mock_get_service_template):
 
     contents = 'phone\n+44 123\n+44 456'
     file_data = (BytesIO(contents.encode('utf-8')), 'invalid.csv')
