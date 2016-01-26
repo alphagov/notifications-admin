@@ -38,11 +38,6 @@ def verify_password(user, password):
     return user_api_client.verify_password(user, password)
 
 
-def increment_failed_login_count(id):
-    user = get_user_by_id(id)
-    user.failed_login_count += 1
-
-
 def activate_user(user):
     user.state = 'active'
     return user_api_client.update_user(user)

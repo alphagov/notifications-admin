@@ -41,12 +41,6 @@ def test_get_all_users_calls_api(db_, db_session, mock_get_all_users_from_api):
     assert mock_get_all_users_from_api.called
 
 
-def test_increment_failed_login_count_should_increade_count_by_1(db_, db_session, mock_active_user, mock_get_user):
-    assert mock_active_user.failed_login_count == 0
-    users_dao.increment_failed_login_count(mock_active_user.id)
-    assert mock_active_user.failed_login_count == 1
-
-
 def test_user_is_active_is_false_if_state_is_inactive(db_, db_session, mock_active_user):
     assert mock_active_user.is_active() is True
     mock_active_user.state = 'inactive'
