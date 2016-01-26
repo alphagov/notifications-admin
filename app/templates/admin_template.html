@@ -73,7 +73,11 @@
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
-            {{ banner(message, 'dangerous', delete_button="Yes, delete this template" if 'delete' == category else None)}}
+            {{ banner(
+              message,
+              'default' if category == 'default' else 'dangerous',
+              delete_button="Yes, delete this template" if 'delete' == category else None
+            )}}
           {% endfor %}
         {% endif %}
       {% endwith %}
