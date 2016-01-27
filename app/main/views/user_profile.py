@@ -74,7 +74,7 @@ def user_profile_email_authenticate():
 
     if form.validate_on_submit():
         session[NEW_EMAIL_PASSWORD_CONFIRMED] = True
-        users_dao.send_verify_code(current_user.id, 'email', to=session[NEW_EMAIL])
+        send_verify_code(current_user.id, 'email', to=session[NEW_EMAIL])
         return redirect(url_for('.user_profile_email_confirm'))
 
     return render_template(
