@@ -20,8 +20,12 @@ def two_factor():
     form = TwoFactorForm(_check_code)
 
     if form.validate_on_submit():
-        del session['user_details']
         user = users_dao.get_user_by_id(user_id)
+        # Check if coming from new password page
+        if 'password' in session['user_details']:
+            user.set_password(session['user_details']['password'])
+            users_dao.update_user(user)
+        del session['user_details']
         login_user(user)
         return redirect(url_for('.choose_service'))
 

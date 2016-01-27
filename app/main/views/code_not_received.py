@@ -1,6 +1,8 @@
 from flask import (
     render_template, redirect, session, url_for)
 
+from flask_login import current_user
+
 from app.main import main
 from app.main.dao import users_dao
 from app.main.forms import EmailNotReceivedForm, TextNotReceivedForm
@@ -12,8 +14,9 @@ def check_and_resend_email_code():
     user = users_dao.get_user_by_email(session['user_details']['email'])
     form = EmailNotReceivedForm(email_address=user.email_address)
     if form.validate_on_submit():
-        users_dao.update_email_address(id=user.id, email_address=form.email_address.data)
-        users_dao.send_verify_code(user.id, 'email')
+        users_dao.send_verify_code(user.id, 'email', to=form.email_address.data)
+        user.email_address = form.email_address.data
+        users_dao.update_user(user)
         return redirect(url_for('.verify'))
     return render_template('views/email-not-received.html', form=form)
 
@@ -24,8 +27,9 @@ def check_and_resend_text_code():
     user = users_dao.get_user_by_email(session['user_details']['email'])
     form = TextNotReceivedForm(mobile_number=user.mobile_number)
     if form.validate_on_submit():
-        users_dao.update_mobile_number(id=user.id, mobile_number=form.mobile_number.data)
-        users_dao.send_verify_code(user.id, 'sms')
+        users_dao.send_verify_code(user.id, 'sms', to=form.mobile_number.data)
+        user.mobile_number = form.mobile_number.data
+        users_dao.update_user(user)
         return redirect(url_for('.verify'))
     return render_template('views/text-not-received.html', form=form)
 

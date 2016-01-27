@@ -21,8 +21,11 @@ def new_password(token):
     form = NewPasswordForm()
 
     if form.validate_on_submit():
-        users_dao.update_password(user, form.new_password.data)
         users_dao.send_verify_code(user.id, 'sms')
+        session['user_details'] = {
+            'id': user.id,
+            'email': user.email_address,
+            'password': form.new_password.data}
         return redirect(url_for('main.two_factor'))
     else:
         return render_template('views/new-password.html', token=token, form=form, user=user)

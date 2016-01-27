@@ -14,7 +14,7 @@
     </h3>
   {% endif %}
   {% if input_name %}
-    <input class="sms-message-picker" type="radio" id="{{ input_name }}-{{ input_index }}" name="{{ input_name }}" />
+    <input class="sms-message-picker" type="radio" id="{{ input_name }}-{{ input_index }}" name="{{ input_name }}" value="{{ input_index }}" />
   {% endif %}
   <div class="sms-message-wrapper{% if input_name %}-with-radio{% endif %}">
     {{ body|placeholders }}

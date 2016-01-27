@@ -1,11 +1,11 @@
-from flask import json, url_for
+from flask import url_for
 
 from tests import create_test_user
 
 
 def test_should_render_two_factor_page(app_,
                                        api_user_active,
-                                       mock_user_dao_get_by_email):
+                                       mock_get_user_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             # TODO this lives here until we work out how to
@@ -22,7 +22,7 @@ def test_should_render_two_factor_page(app_,
 def test_should_login_user_and_redirect_to_dashboard(app_,
                                                      api_user_active,
                                                      mock_get_user,
-                                                     mock_user_dao_get_by_email,
+                                                     mock_get_user_by_email,
                                                      mock_check_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -39,7 +39,7 @@ def test_should_login_user_and_redirect_to_dashboard(app_,
 
 def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(app_,
                                                                       api_user_active,
-                                                                      mock_user_dao_get_by_email,
+                                                                      mock_get_user_by_email,
                                                                       mock_check_verify_code_code_not_found):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -56,7 +56,7 @@ def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(app_,
 def test_should_login_user_when_multiple_valid_codes_exist(app_,
                                                            api_user_active,
                                                            mock_get_user,
-                                                           mock_user_dao_get_by_email,
+                                                           mock_get_user_by_email,
                                                            mock_check_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:

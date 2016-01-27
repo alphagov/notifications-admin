@@ -70,8 +70,10 @@ class UserApiClient(BaseAPIClient):
             return user[0]
         return None
 
-    def send_verify_code(self, user_id, code_type):
+    def send_verify_code(self, user_id, code_type, to=None):
         data = {'code_type': code_type}
+        if to:
+            data['to'] = to
         endpoint = '/user/{}/code'.format(user_id)
         resp = self.post(endpoint, data=data)
 
@@ -92,41 +94,14 @@ class UserApiClient(BaseAPIClient):
 
 class User(object):
     def __init__(self, fields, max_failed_login_count=3):
-        self.fields = fields
-        self.max_failed_login_count = max_failed_login_count
+        self._id = fields.get('id')
+        self._name = fields.get('name')
+        self._email_address = fields.get('email_address')
+        self._mobile_number = fields.get('mobile_number')
+        self._password_changed_at = fields.get('password_changed_at')
         self._failed_login_count = 0
-
-    @property
-    def id(self):
-        return self.fields.get('id')
-
-    @property
-    def name(self):
-        return self.fields.get('name')
-
-    @name.setter
-    def name(self, name):
-        self.fields['name'] = name
-
-    @property
-    def email_address(self):
-        return self.fields.get('email_address')
-
-    @email_address.setter
-    def email_address(self, email_address):
-        self.fields['email_address'] = email_address
-
-    @property
-    def mobile_number(self):
-        return self.fields.get('mobile_number')
-
-    @mobile_number.setter
-    def mobile_number(self, mobile_number):
-        self.fields['mobile_number'] = mobile_number
-
-    @property
-    def password_changed_at(self):
-        return self.fields.get('password_changed_at')
+        self._state = fields.get('state')
+        self.max_failed_login_count = max_failed_login_count
 
     def get_id(self):
         return self.id
@@ -138,12 +113,52 @@ class User(object):
         return self.state == 'active'
 
     @property
+    def id(self):
+        return self._id
+
+    @id.setter
+    def id(self, id):
+        self._id = id
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name
+
+    @property
+    def email_address(self):
+        return self._email_address
+
+    @email_address.setter
+    def email_address(self, email_address):
+        self._email_address = email_address
+
+    @property
+    def mobile_number(self):
+        return self._mobile_number
+
+    @mobile_number.setter
+    def mobile_number(self, mobile_number):
+        self._mobile_number = mobile_number
+
+    @property
+    def password_changed_at(self):
+        return self._password_changed_at
+
+    @password_changed_at.setter
+    def password_changed_at(self, password_changed_at):
+        self._password_changed_at = password_changed_at
+
+    @property
     def state(self):
-        return self.fields['state']
+        return self._state
 
     @state.setter
     def state(self, state):
-        self.fields['state'] = state
+        self._state = state
 
     @property
     def failed_login_count(self):
@@ -157,10 +172,19 @@ class User(object):
         return False
 
     def is_locked(self):
-        return self.failed_login_count > self.max_failed_login_count
+        return self.failed_login_count >= self.max_failed_login_count
 
     def serialize(self):
-        return self.fields
+        dct = {"id": self.id,
+               "name": self.name,
+               "email_address": self.email_address,
+               "mobile_number": self.mobile_number,
+               "password_changed_at": self.password_changed_at,
+               "state": self.state,
+               "failed_login_count": self.failed_login_count}
+        if getattr(self, '_password', None):
+            dct['password'] = self._password
+        return dct
 
     def set_password(self, pwd):
-        self.fields['password'] = pwd
+        self._password = pwd

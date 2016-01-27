@@ -6,9 +6,9 @@ import moto
 
 def test_upload_empty_csvfile_returns_to_upload_page(app_,
                                                      api_user_active,
-                                                     mock_user_loader,
-                                                     mock_user_dao_get_by_email,
-                                                     mock_login):
+                                                     mock_get_user,
+                                                     mock_get_service_templates,
+                                                     mock_check_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -25,8 +25,8 @@ def test_upload_empty_csvfile_returns_to_upload_page(app_,
 def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
                                                                         mocker,
                                                                         api_user_active,
-                                                                        mock_user_loader,
-                                                                        mock_user_dao_get_by_email,
+                                                                        mock_get_user,
+                                                                        mock_get_user_by_email,
                                                                         mock_login):
 
     contents = 'phone\n+44 123\n+44 456'
@@ -51,10 +51,9 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
 def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(app_,
                                                                         mocker,
                                                                         api_user_active,
-                                                                        mock_user_loader,
-                                                                        mock_user_dao_get_by_email,
+                                                                        mock_get_user,
+                                                                        mock_get_user_by_email,
                                                                         mock_login):
-
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986\n+44 7700 900987\n+44 7700 900988\n+44 7700 900989'  # noqa
 
     file_data = (BytesIO(contents.encode('utf-8')), 'valid.csv')
@@ -88,8 +87,8 @@ def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(app_,
 def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(app_,
                                                                         mocker,
                                                                         api_user_active,
-                                                                        mock_user_loader,
-                                                                        mock_user_dao_get_by_email,
+                                                                        mock_get_user,
+                                                                        mock_get_user_by_email,
                                                                         mock_login):
 
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
@@ -120,8 +119,8 @@ def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(app_,
 @moto.mock_s3
 def test_should_redirect_to_job(app_,
                                 api_user_active,
-                                mock_user_loader,
-                                mock_user_dao_get_by_email,
+                                mock_get_user,
+                                mock_get_user_by_email,
                                 mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:

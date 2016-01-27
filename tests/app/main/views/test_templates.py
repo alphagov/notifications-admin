@@ -5,8 +5,8 @@ from flask import url_for
 def test_should_return_list_of_all_templates(app_,
                                              api_user_active,
                                              mock_get_service_templates,
-                                             mock_user_loader,
-                                             mock_user_dao_get_by_email,
+                                             mock_get_user,
+                                             mock_get_user_by_email,
                                              mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -22,8 +22,8 @@ def test_should_return_list_of_all_templates(app_,
 def test_should_show_page_for_one_templates(app_,
                                             api_user_active,
                                             mock_get_service_template,
-                                            mock_user_loader,
-                                            mock_user_dao_get_by_email,
+                                            mock_get_user,
+                                            mock_get_user_by_email,
                                             mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -36,6 +36,8 @@ def test_should_show_page_for_one_templates(app_,
                 template_id=template_id))
 
     assert response.status_code == 200
+    assert "Two week reminder" in response.get_data(as_text=True)
+    assert "Your vehicle tax is about to expire" in response.get_data(as_text=True)
     mock_get_service_template.assert_called_with(
         service_id, template_id)
 
@@ -44,8 +46,8 @@ def test_should_redirect_when_saving_a_template(app_,
                                                 api_user_active,
                                                 mock_get_service_template,
                                                 mock_update_service_template,
-                                                mock_user_loader,
-                                                mock_user_dao_get_by_email,
+                                                mock_get_user,
+                                                mock_get_user_by_email,
                                                 mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -77,8 +79,8 @@ def test_should_redirect_when_saving_a_template(app_,
 def test_should_show_delete_template_page(app_,
                                           api_user_active,
                                           mock_get_service_template,
-                                          mock_user_loader,
-                                          mock_user_dao_get_by_email,
+                                          mock_get_user,
+                                          mock_get_user_by_email,
                                           mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -100,8 +102,8 @@ def test_should_redirect_when_deleting_a_template(app_,
                                                   api_user_active,
                                                   mock_get_service_template,
                                                   mock_delete_service_template,
-                                                  mock_user_loader,
-                                                  mock_user_dao_get_by_email,
+                                                  mock_get_user,
+                                                  mock_get_user_by_email,
                                                   mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:

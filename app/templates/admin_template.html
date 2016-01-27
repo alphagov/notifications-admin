@@ -56,7 +56,7 @@
               Current service
             </summary>
             <div>
-              <a href="{{ url_for('main.choose_service') }}">Switchx§ service</a>
+              <a href="{{ url_for('main.choose_service') }}">Switch service</a>
               <a href="{{ url_for('.add_service') }}">Add a new service to GOV.UK Notify</a>
             </div>
           </details>
@@ -72,19 +72,13 @@
   <main id="content" role="main" class="page-container">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-          <ul class="banner-dangerous">
-            {% for category, message in messages %}
-              <li class="flash-message">
-                {{ message }}
-                {% if 'delete' == category %}
-                  <form method='post'>
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <input type="submit" class="button" name="delete" value="Yes, delete this template" />
-                  </form>
-                {% endif %}
-              </li>
-            {% endfor %}
-          </ul>
+          {% for category, message in messages %}
+            {{ banner(
+              message,
+              'default' if category == 'default' else 'dangerous',
+              delete_button="Yes, delete this template" if 'delete' == category else None
+            )}}
+          {% endfor %}
         {% endif %}
       {% endwith %}
       {% block fullwidth_content %}{% endblock %}

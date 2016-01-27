@@ -1,12 +1,11 @@
 from flask import url_for
-from tests import create_test_user
 
 
 def test_should_return_list_of_all_jobs(app_,
                                         service_one,
                                         api_user_active,
-                                        mock_user_loader,
-                                        mock_user_dao_get_by_email,
+                                        mock_get_user,
+                                        mock_get_user_by_email,
                                         mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -21,8 +20,8 @@ def test_should_show_page_for_one_job(app_,
                                       service_one,
                                       api_user_active,
                                       mock_login,
-                                      mock_user_loader,
-                                      mock_user_dao_get_by_email):
+                                      mock_get_user,
+                                      mock_get_user_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             # TODO filename will be part of job metadata not in session
@@ -39,8 +38,8 @@ def test_should_show_page_for_one_job(app_,
 def test_should_show_page_for_one_notification(app_,
                                                service_one,
                                                api_user_active,
-                                               mock_user_loader,
-                                               mock_user_dao_get_by_email,
+                                               mock_get_user,
+                                               mock_get_user_by_email,
                                                mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:

@@ -26,8 +26,11 @@ def get_service_by_id(id_):
     return notifications_api_client.get_service(id_)
 
 
-def get_services():
-    return notifications_api_client.get_services()
+def get_services(user_id=None):
+    if user_id:
+        return notifications_api_client.get_services({'user_id': str(user_id)})
+    else:
+        return notifications_api_client.get_services()
 
 
 def unrestrict_service(service_id):
@@ -55,8 +58,8 @@ def activate_service(service_id):
 
 
 # TODO Fix when functionality is added to the api.
-def find_service_by_service_name(service_name):
-    resp = notifications_api_client.get_services()
+def find_service_by_service_name(service_name, user_id=None):
+    resp = notifications_api_client.get_services(user_id)
     retval = None
     for srv_json in resp['data']:
         if srv_json['name'] == service_name:
@@ -69,8 +72,8 @@ def delete_service(id_):
     return notifications_api_client.delete_service(id_)
 
 
-def find_all_service_names():
-    resp = notifications_api_client.get_services()
+def find_all_service_names(user_id=None):
+    resp = notifications_api_client.get_services(user_id)
     return [x['name'] for x in resp['data']]
 
 
@@ -90,4 +93,4 @@ class ServicesBrowsableItem(BrowsableItem):
 
     @property
     def hint(self):
-        return "Some service hint here"
+        return None

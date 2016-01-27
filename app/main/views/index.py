@@ -1,10 +1,14 @@
-from flask import render_template
+from flask import render_template, url_for, redirect
 from app.main import main
 from flask_login import login_required
+
+from flask.ext.login import current_user
 
 
 @main.route('/')
 def index():
+    if current_user and current_user.is_authenticated():
+        return redirect(url_for('main.choose_service'))
     return render_template('views/signedout.html')
 
 

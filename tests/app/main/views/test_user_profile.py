@@ -5,7 +5,7 @@ from flask import url_for
 def test_should_show_overview_page(app_,
                                    api_user_active,
                                    mock_login,
-                                   mock_user_dao_get_user):
+                                   mock_get_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -18,7 +18,7 @@ def test_should_show_overview_page(app_,
 def test_should_show_name_page(app_,
                                api_user_active,
                                mock_login,
-                               mock_user_dao_get_user):
+                               mock_get_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -32,7 +32,7 @@ def test_should_redirect_after_name_change(app_,
                                            api_user_active,
                                            mock_login,
                                            mock_update_user,
-                                           mock_user_dao_get_user):
+                                           mock_get_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -51,7 +51,7 @@ def test_should_redirect_after_name_change(app_,
 def test_should_show_email_page(app_,
                                 api_user_active,
                                 mock_login,
-                                mock_user_dao_get_user):
+                                mock_get_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -65,7 +65,7 @@ def test_should_show_email_page(app_,
 def test_should_redirect_after_email_change(app_,
                                             api_user_active,
                                             mock_login,
-                                            mock_user_dao_get_user,
+                                            mock_get_user,
                                             mock_get_user_by_email_not_found):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -83,8 +83,8 @@ def test_should_redirect_after_email_change(app_,
 def test_should_show_authenticate_after_email_change(app_,
                                                      api_user_active,
                                                      mock_login,
-                                                     mock_user_dao_get_user,
-                                                     mock_user_dao_checkpassword):
+                                                     mock_get_user,
+                                                     mock_verify_password):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -100,7 +100,7 @@ def test_should_show_authenticate_after_email_change(app_,
 def test_should_redirect_after_email_change_confirm(app_,
                                                     api_user_active,
                                                     mock_login,
-                                                    mock_user_dao_get_user):
+                                                    mock_get_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -119,7 +119,7 @@ def test_should_redirect_after_email_change_confirm(app_,
 def test_should_show_confirm_after_email_change(app_,
                                                 api_user_active,
                                                 mock_login,
-                                                mock_user_dao_get_user):
+                                                mock_get_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -135,7 +135,7 @@ def test_should_show_confirm_after_email_change(app_,
 def test_should_redirect_after_email_change_confirm(app_,
                                                     api_user_active,
                                                     mock_login,
-                                                    mock_user_dao_get_user,
+                                                    mock_get_user,
                                                     mock_check_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -156,7 +156,7 @@ def test_should_redirect_after_email_change_confirm(app_,
 def test_should_show_mobile_number_page(app_,
                                         api_user_active,
                                         mock_login,
-                                        mock_user_dao_get_user):
+                                        mock_get_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -169,7 +169,7 @@ def test_should_show_mobile_number_page(app_,
 def test_should_redirect_after_mobile_number_change(app_,
                                                     api_user_active,
                                                     mock_login,
-                                                    mock_user_dao_get_user):
+                                                    mock_get_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -185,7 +185,7 @@ def test_should_redirect_after_mobile_number_change(app_,
 def test_should_show_authenticate_after_mobile_number_change(app_,
                                                              api_user_active,
                                                              mock_login,
-                                                             mock_user_dao_get_user):
+                                                             mock_get_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -202,7 +202,7 @@ def test_should_show_authenticate_after_mobile_number_change(app_,
 def test_should_redirect_after_mobile_number_authenticate(app_,
                                                           api_user_active,
                                                           mock_login,
-                                                          mock_user_dao_get_user,
+                                                          mock_get_user,
                                                           mock_verify_password):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -222,7 +222,7 @@ def test_should_redirect_after_mobile_number_authenticate(app_,
 def test_should_show_confirm_after_mobile_number_change(app_,
                                                         api_user_active,
                                                         mock_login,
-                                                        mock_user_dao_get_user):
+                                                        mock_get_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -239,7 +239,7 @@ def test_should_show_confirm_after_mobile_number_change(app_,
 def test_should_redirect_after_mobile_number_confirm(app_,
                                                      api_user_active,
                                                      mock_login,
-                                                     mock_user_dao_get_user,
+                                                     mock_get_user,
                                                      mock_check_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -260,7 +260,7 @@ def test_should_redirect_after_mobile_number_confirm(app_,
 def test_should_show_password_page(app_,
                                    api_user_active,
                                    mock_login,
-                                   mock_user_dao_get_user):
+                                   mock_get_user):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)

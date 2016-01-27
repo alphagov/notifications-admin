@@ -4,7 +4,7 @@ import pytest
 
 
 def test_should_show_choose_services_page(app_,
-                                          mock_user_dao_get_user,
+                                          mock_get_user,
                                           api_user_active,
                                           mock_get_services,
                                           mock_login):

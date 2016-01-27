@@ -4,9 +4,10 @@ from flask import url_for
 def test_should_show_recent_jobs_on_dashboard(app_,
                                               api_user_active,
                                               mock_get_service,
-                                              mock_user_loader,
-                                              mock_user_dao_get_by_email,
+                                              mock_get_user,
+                                              mock_get_user_by_email,
                                               mock_login):
+
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)

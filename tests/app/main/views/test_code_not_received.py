@@ -1,12 +1,10 @@
-from tests import create_test_api_user
+import pytest
 from flask import url_for
 
 
 def test_should_render_email_code_not_received_template_and_populate_email_address(app_,
-                                                                                   mock_send_sms,
-                                                                                   mock_send_email,
                                                                                    api_user_active,
-                                                                                   mock_user_dao_get_by_email,
+                                                                                   mock_get_user_by_email,
                                                                                    mock_send_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -22,11 +20,9 @@ def test_should_render_email_code_not_received_template_and_populate_email_addre
 
 
 def test_should_check_and_resend_email_code_redirect_to_verify(app_,
-                                                               mock_send_sms,
-                                                               mock_send_email,
                                                                api_user_active,
-                                                               mock_user_dao_get_by_email,
-                                                               mock_user_dao_update_email,
+                                                               mock_get_user_by_email,
+                                                               mock_update_user,
                                                                mock_send_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -41,10 +37,8 @@ def test_should_check_and_resend_email_code_redirect_to_verify(app_,
 
 
 def test_should_render_text_code_not_received_template(app_,
-                                                       mock_send_sms,
-                                                       mock_send_email,
                                                        api_user_active,
-                                                       mock_user_dao_get_by_email,
+                                                       mock_get_user_by_email,
                                                        mock_send_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -60,11 +54,9 @@ def test_should_render_text_code_not_received_template(app_,
 
 
 def test_should_check_and_redirect_to_verify(app_,
-                                             mock_send_sms,
-                                             mock_send_email,
                                              api_user_active,
-                                             mock_user_dao_get_by_email,
-                                             mock_user_dao_update_mobile,
+                                             mock_get_user_by_email,
+                                             mock_update_user,
                                              mock_send_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -79,11 +71,9 @@ def test_should_check_and_redirect_to_verify(app_,
 
 
 def test_should_update_email_address_resend_code(app_,
-                                                 mock_send_sms,
-                                                 mock_send_email,
                                                  api_user_active,
-                                                 mock_user_dao_get_by_email,
-                                                 mock_user_dao_update_email,
+                                                 mock_get_user_by_email,
+                                                 mock_update_user,
                                                  mock_send_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -95,15 +85,12 @@ def test_should_update_email_address_resend_code(app_,
                                    data={'email_address': 'new@address.gov.uk'})
             assert response.status_code == 302
             assert response.location == url_for('main.verify', _external=True)
-            assert api_user_active.email_address == 'new@address.gov.uk'
 
 
 def test_should_update_mobile_number_resend_code(app_,
-                                                 mock_send_sms,
-                                                 mock_send_email,
                                                  api_user_active,
-                                                 mock_user_dao_get_by_email,
-                                                 mock_user_dao_update_mobile,
+                                                 mock_get_user_by_email,
+                                                 mock_update_user,
                                                  mock_send_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -115,7 +102,7 @@ def test_should_update_mobile_number_resend_code(app_,
                                    data={'mobile_number': '+447700900460'})
             assert response.status_code == 302
             assert response.location == url_for('main.verify', _external=True)
-            assert api_user_active.mobile_number == '+447700900460'
+            api_user_active.mobile_number = '+447700900460'
 
 
 def test_should_render_verification_code_not_received(app_,
@@ -136,9 +123,7 @@ def test_should_render_verification_code_not_received(app_,
 
 def test_check_and_redirect_to_two_factor(app_,
                                           api_user_active,
-                                          mock_send_sms,
-                                          mock_send_email,
-                                          mock_user_dao_get_by_email,
+                                          mock_get_user_by_email,
                                           mock_send_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -153,9 +138,7 @@ def test_check_and_redirect_to_two_factor(app_,
 
 def test_should_create_new_code_for_user(app_,
                                          api_user_active,
-                                         mock_send_sms,
-                                         mock_send_email,
-                                         mock_user_dao_get_by_email,
+                                         mock_get_user_by_email,
                                          mock_send_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:

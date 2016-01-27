@@ -105,8 +105,8 @@ class LoginForm(Form):
 
 
 class RegisterUserForm(Form):
-    def __init__(self, existing_email_addresses, *args, **kwargs):
-        self.existing_emails = existing_email_addresses
+    def __init__(self, unique_email_func, *args, **kwargs):
+        self.unique_email_func = unique_email_func
         super(RegisterUserForm, self).__init__(*args, **kwargs)
 
     name = StringField('Full name',
@@ -117,7 +117,7 @@ class RegisterUserForm(Form):
 
     def validate_email_address(self, field):
         # Validate email address is unique.
-        if self.existing_emails(field.data):
+        if not self.unique_email_func(field.data):
             raise ValidationError('Email address already exists')
 
 
