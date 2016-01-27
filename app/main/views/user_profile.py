@@ -186,7 +186,7 @@ def user_profile_password():
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user, pwd)
+        return verify_password(current_user.id, pwd)
     form = ChangePasswordForm(_check_password)
 
     if form.validate_on_submit():

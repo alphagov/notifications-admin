@@ -203,7 +203,8 @@ def test_should_redirect_after_mobile_number_authenticate(app_,
                                                           api_user_active,
                                                           mock_login,
                                                           mock_get_user,
-                                                          mock_verify_password):
+                                                          mock_verify_password,
+                                                          mock_send_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)

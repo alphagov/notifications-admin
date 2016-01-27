@@ -221,7 +221,16 @@ class TemplateForm(Form):
 
 
 class ForgotPasswordForm(Form):
+
+    def __init__(self, user_email_exists_func, *args, **kwargs):
+        self._user_email_exists_func = user_email_exists_func
+        super(ForgotPasswordForm, self).__init__(*args, **kwargs)
+
     email_address = email_address()
+
+    def validate_email_address(self, field):
+        if not self._user_email_exists_func(field.data):
+            raise ValidationError('The email is not registered on our system')
 
 
 class NewPasswordForm(Form):

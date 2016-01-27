@@ -52,10 +52,9 @@ def is_email_unique(email_address):
     return True
 
 
-def request_password_reset(email):
-    user = get_user_by_email(email)
+def request_password_reset(user):
     user.state = 'request_password_reset'
-    # TODO update user
+    user_api_client.update_user(user)
 
 
 def send_verify_code(user_id, code_type, to=None):
