@@ -45,11 +45,10 @@ class UserApiClient(BaseAPIClient):
         user_data = self.put(url, data=data)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
-    def verify_password(self, user, password):
+    def verify_password(self, user_id, password):
         try:
-            data = user.serialize()
-            url = "/user/{}/verify/password".format(user.id)
-            data["password"] = password
+            url = "/user/{}/verify/password".format(user_id)
+            data = {"password": password}
             self.post(url, data=data)
             return True
         except HTTPError as e:

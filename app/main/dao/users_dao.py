@@ -27,8 +27,8 @@ def get_user_by_email(email_address):
     return user_api_client.get_user_by_email(email_address)
 
 
-def verify_password(user, password):
-    return user_api_client.verify_password(user, password)
+def verify_password(user_id, password):
+    return user_api_client.verify_password(user_id, password)
 
 
 def update_user(user):

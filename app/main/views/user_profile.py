@@ -4,7 +4,8 @@ from flask.ext.login import current_user
 from flask_login import login_required
 from app.main import main
 from app.main.dao.users_dao import (
-    verify_password, update_user, check_verify_code, is_email_unique)
+    verify_password, update_user, check_verify_code, is_email_unique,
+    send_verify_code)
 from app.main.forms import (
     ChangePasswordForm, ChangeNameForm, ChangeEmailForm, ConfirmEmailForm,
     ChangeMobileNumberForm, ConfirmMobileNumberForm, ConfirmPasswordForm
@@ -65,7 +66,7 @@ def user_profile_email_authenticate():
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user, pwd)
+        return verify_password(current_user.id, pwd)
     form = ConfirmPasswordForm(_check_password)
 
     if NEW_EMAIL not in session:
@@ -73,6 +74,7 @@ def user_profile_email_authenticate():
 
     if form.validate_on_submit():
         session[NEW_EMAIL_PASSWORD_CONFIRMED] = True
+        users_dao.send_verify_code(current_user.id, 'email', to=session[NEW_EMAIL])
         return redirect(url_for('.user_profile_email_confirm'))
 
     return render_template(
@@ -132,7 +134,7 @@ def user_profile_mobile_number_authenticate():
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user, pwd)
+        return verify_password(current_user.id, pwd)
     form = ConfirmPasswordForm(_check_password)
 
     if NEW_MOBILE not in session:
@@ -140,6 +142,7 @@ def user_profile_mobile_number_authenticate():
 
     if form.validate_on_submit():
         session[NEW_MOBILE_PASSWORD_CONFIRMED] = True
+        send_verify_code(current_user.id, 'sms', to=session[NEW_MOBILE])
         return redirect(url_for('.user_profile_mobile_number_confirm'))
 
     return render_template(
@@ -156,7 +159,7 @@ def user_profile_mobile_number_confirm():
 
     # Validate verify code for form
     def _check_code(cde):
-        return check_verify_code(current_user, cde, 'sms')
+        return check_verify_code(current_user.id, cde, 'sms')
 
     if NEW_MOBILE_PASSWORD_CONFIRMED not in session:
         return redirect(url_for('.user_profile_mobile_number'))
@@ -164,7 +167,7 @@ def user_profile_mobile_number_confirm():
     form = ConfirmMobileNumberForm(_check_code)
 
     if form.validate_on_submit():
-        current_user.mobile = session[NEW_MOBILE]
+        current_user.mobile_number = session[NEW_MOBILE]
         del session[NEW_MOBILE]
         del session[NEW_MOBILE_PASSWORD_CONFIRMED]
         update_user(current_user)
