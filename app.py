@@ -10,7 +10,6 @@ port = int(os.environ.get('PORT', 6012))
 manager.add_command("runserver", Server(host='0.0.0.0', port=port))
 
 
-
 @manager.command
 def list_routes():
     """List URLs of all application routes."""
