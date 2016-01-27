@@ -22,13 +22,24 @@
   <p><a href="https://github.com/alphagov/notifications-admin/blob/master/app/templates/views/styleguide.html">View source</a></p>
 
   <h2 class="heading-large">Banner</h2>
-  <p>Used to show the result of a user’s action.</p>
-  {{ banner("This is a banner", with_tick=True) }}
+  <p>Used to show the status of a thing or action.</p>
+
+  {{ banner("You sent 1,234 text messages", with_tick=True) }}
+
   <div class="grid-row">
     <div class="column-one-third">
       {{ banner("Delivered 10:20") }}
     </div>
   </div>
+
+  {{ banner(
+    'Your service is in restricted mode. You can only send notifications to yourself.',
+    'info'
+  ) }}
+
+  {{ banner('You’re not allowed to do this', 'dangerous')}}
+
+  {{ banner('Are you sure you want to delete?', 'dangerous', delete_button="Yes, delete this thing")}}
 
   <h2 class="heading-large">Big number</h2>
 
