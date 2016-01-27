@@ -1,20 +1,16 @@
 from tests import create_test_user
 from flask import url_for
-from app.models import User
-
 import pytest
 
 
-@pytest.mark.xfail(reason='Requires completed move of user dao methods to api methods')
 def test_should_show_choose_services_page(app_,
-                                          db_,
-                                          db_session,
-                                          active_user,
-                                          mock_get_services):
+                                          mock_user_dao_get_user,
+                                          api_user_active,
+                                          mock_get_services,
+                                          mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            user = User.query.first()
-            client.login(user)
+            client.login(api_user_active)
             response = client.get(url_for('main.choose_service'))
 
         assert response.status_code == 200

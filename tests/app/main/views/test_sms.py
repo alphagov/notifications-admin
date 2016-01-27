@@ -4,13 +4,14 @@ from flask import url_for
 import moto
 
 
-def test_upload_empty_csvfile_returns_to_upload_page(app_, db_, db_session,
-                                                     mock_api_user,
+def test_upload_empty_csvfile_returns_to_upload_page(app_,
+                                                     api_user_active,
                                                      mock_user_loader,
-                                                     mock_user_dao_get_by_email):
+                                                     mock_user_dao_get_by_email,
+                                                     mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_api_user)
+            client.login(api_user_active)
             upload_data = {'file': (BytesIO(''.encode('utf-8')), 'emtpy.csv')}
             response = client.post(url_for('main.send_sms', service_id=123),
                                    data=upload_data, follow_redirects=True)
@@ -22,19 +23,18 @@ def test_upload_empty_csvfile_returns_to_upload_page(app_, db_, db_session,
 
 @moto.mock_s3
 def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
-                                                                        db_,
-                                                                        db_session,
                                                                         mocker,
-                                                                        mock_api_user,
+                                                                        api_user_active,
                                                                         mock_user_loader,
-                                                                        mock_user_dao_get_by_email):
+                                                                        mock_user_dao_get_by_email,
+                                                                        mock_login):
 
     contents = 'phone\n+44 123\n+44 456'
     file_data = (BytesIO(contents.encode('utf-8')), 'invalid.csv')
 
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_api_user)
+            client.login(api_user_active)
             upload_data = {'file': file_data}
             response = client.post(url_for('main.send_sms', service_id=123),
                                    data=upload_data,
@@ -49,12 +49,11 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
 
 @moto.mock_s3
 def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(app_,
-                                                                        db_,
-                                                                        db_session,
                                                                         mocker,
-                                                                        mock_api_user,
+                                                                        api_user_active,
                                                                         mock_user_loader,
-                                                                        mock_user_dao_get_by_email):
+                                                                        mock_user_dao_get_by_email,
+                                                                        mock_login):
 
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986\n+44 7700 900987\n+44 7700 900988\n+44 7700 900989'  # noqa
 
@@ -62,7 +61,7 @@ def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(app_,
 
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_api_user)
+            client.login(api_user_active)
             upload_data = {'file': file_data}
             response = client.post(url_for('main.send_sms', service_id=123),
                                    data=upload_data,
@@ -87,12 +86,11 @@ def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(app_,
 
 @moto.mock_s3
 def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(app_,
-                                                                        db_,
-                                                                        db_session,
                                                                         mocker,
-                                                                        mock_api_user,
+                                                                        api_user_active,
                                                                         mock_user_loader,
-                                                                        mock_user_dao_get_by_email):
+                                                                        mock_user_dao_get_by_email,
+                                                                        mock_login):
 
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
 
@@ -100,7 +98,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(app_,
 
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_api_user)
+            client.login(api_user_active)
             upload_data = {'file': file_data}
             response = client.post(url_for('main.send_sms', service_id=123),
                                    data=upload_data,
@@ -120,11 +118,14 @@ def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(app_,
 
 
 @moto.mock_s3
-def test_should_redirect_to_job(app_, db_, db_session, mocker, mock_api_user,
-                                mock_user_loader, mock_user_dao_get_by_email):
+def test_should_redirect_to_job(app_,
+                                api_user_active,
+                                mock_user_loader,
+                                mock_user_dao_get_by_email,
+                                mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_api_user)
+            client.login(api_user_active)
             response = client.post(url_for('main.check_sms',
                                            service_id=123,
                                            upload_id='someid'))

@@ -3,15 +3,14 @@ from flask import url_for
 
 
 def test_should_return_list_of_all_templates(app_,
-                                             db_,
-                                             db_session,
-                                             mock_api_user,
+                                             api_user_active,
                                              mock_get_service_templates,
                                              mock_user_loader,
-                                             mock_user_dao_get_by_email):
+                                             mock_user_dao_get_by_email,
+                                             mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_api_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.get(url_for(
                 '.manage_service_templates', service_id=service_id))
@@ -21,15 +20,14 @@ def test_should_return_list_of_all_templates(app_,
 
 
 def test_should_show_page_for_one_templates(app_,
-                                            db_,
-                                            db_session,
-                                            mock_api_user,
+                                            api_user_active,
                                             mock_get_service_template,
                                             mock_user_loader,
-                                            mock_user_dao_get_by_email):
+                                            mock_user_dao_get_by_email,
+                                            mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_api_user)
+            client.login(api_user_active)
             service_id = 123
             template_id = 456
             response = client.get(url_for(
@@ -43,16 +41,15 @@ def test_should_show_page_for_one_templates(app_,
 
 
 def test_should_redirect_when_saving_a_template(app_,
-                                                db_,
-                                                db_session,
-                                                mock_api_user,
+                                                api_user_active,
                                                 mock_get_service_template,
                                                 mock_update_service_template,
                                                 mock_user_loader,
-                                                mock_user_dao_get_by_email):
+                                                mock_user_dao_get_by_email,
+                                                mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_api_user)
+            client.login(api_user_active)
             service_id = 123
             template_id = 456
             name = "new name"
@@ -78,15 +75,14 @@ def test_should_redirect_when_saving_a_template(app_,
 
 
 def test_should_show_delete_template_page(app_,
-                                          db_,
-                                          db_session,
-                                          mock_api_user,
+                                          api_user_active,
                                           mock_get_service_template,
                                           mock_user_loader,
-                                          mock_user_dao_get_by_email):
+                                          mock_user_dao_get_by_email,
+                                          mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_api_user)
+            client.login(api_user_active)
             service_id = 123
             template_id = 456
             response = client.get(url_for(
@@ -101,16 +97,15 @@ def test_should_show_delete_template_page(app_,
 
 
 def test_should_redirect_when_deleting_a_template(app_,
-                                                  db_,
-                                                  db_session,
-                                                  mock_api_user,
+                                                  api_user_active,
                                                   mock_get_service_template,
                                                   mock_delete_service_template,
                                                   mock_user_loader,
-                                                  mock_user_dao_get_by_email):
+                                                  mock_user_dao_get_by_email,
+                                                  mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_api_user)
+            client.login(api_user_active)
             service_id = 123
             template_id = 456
             name = "new name"

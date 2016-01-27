@@ -70,6 +70,25 @@ class UserApiClient(BaseAPIClient):
             return user[0]
         return None
 
+    def send_verify_code(self, user_id, code_type):
+        data = {'code_type': code_type}
+        endpoint = '/user/{}/code'.format(user_id)
+        resp = self.post(endpoint, data=data)
+
+    def check_verify_code(self, user_id, code, code_type):
+        data = {'code_type': code_type, 'code': code}
+        endpoint = '/user/{}/verify/code'.format(user_id)
+        try:
+            resp = self.post(endpoint, data=data)
+            return True, ''
+        except HTTPError as e:
+            if e.status_code == 400 or e.status_code == 404:
+                if 'Code not found' in e.message:
+                    return False, 'Code not found'
+                elif 'Code has expired' in e.message:
+                    return False, 'Code has expired'
+            raise e
+
 
 class User(object):
     def __init__(self, fields, max_failed_login_count=3):
@@ -85,13 +104,25 @@ class User(object):
     def name(self):
         return self.fields.get('name')
 
+    @name.setter
+    def name(self, name):
+        self.fields['name'] = name
+
     @property
     def email_address(self):
         return self.fields.get('email_address')
 
+    @email_address.setter
+    def email_address(self, email_address):
+        self.fields['email_address'] = email_address
+
     @property
     def mobile_number(self):
         return self.fields.get('mobile_number')
+
+    @mobile_number.setter
+    def mobile_number(self, mobile_number):
+        self.fields['mobile_number'] = mobile_number
 
     @property
     def password_changed_at(self):
@@ -130,3 +161,6 @@ class User(object):
 
     def serialize(self):
         return self.fields
+
+    def set_password(self, pwd):
+        self.fields['password'] = pwd
