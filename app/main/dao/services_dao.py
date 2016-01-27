@@ -93,4 +93,4 @@ class ServicesBrowsableItem(BrowsableItem):
 
     @property
     def hint(self):
-        return "Some service hint here"
+        return None
