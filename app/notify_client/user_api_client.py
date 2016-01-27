@@ -50,18 +50,11 @@ class UserApiClient(BaseAPIClient):
             data = user.serialize()
             url = "/user/{}/verify/password".format(user.id)
             data["password"] = password
-            resp = self.post(url, data=data)
-            if resp.status_code == 204:
-                return True
+            self.post(url, data=data)
+            return True
         except HTTPError as e:
             if e.status_code == 400 or e.status_code == 404:
                 return False
-        # TODO temp work around until client fixed
-        except InvalidResponse as e:
-            if e.status_code == 204:
-                return True
-            else:
-                raise e
 
     def get_user_by_email(self, email_address):
         users = self.get_users()
