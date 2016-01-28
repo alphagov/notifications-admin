@@ -64,7 +64,7 @@ def service_name_change_confirm(service_id):
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user, pwd)
+        return verify_password(current_user.id, pwd)
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
@@ -134,7 +134,7 @@ def service_status_change_confirm(service_id):
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user, pwd)
+        return verify_password(current_user.id, pwd)
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
@@ -183,7 +183,7 @@ def service_delete_confirm(service_id):
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user, pwd)
+        return verify_password(current_user.id, pwd)
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
