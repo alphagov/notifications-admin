@@ -6,10 +6,10 @@ from itsdangerous import URLSafeTimedSerializer, BadSignature
 
 
 class ItsdangerousSession(CallbackDict, SessionMixin):
-
     def __init__(self, initial=None):
         def on_update(self):
             self.modified = True
+
         CallbackDict.__init__(self, initial, on_update)
         self.modified = False
 
@@ -45,8 +45,8 @@ class ItsdangerousSessionInterface(SessionInterface):
                 response.delete_cookie(app.session_cookie_name,
                                        domain=domain)
             return
-        session.permanent=True
-        expires=  datetime.utcnow() + timedelta(app.config.get('PERMANENT_SESSION_LIFETIME'))
+        session.permanent = True
+        expires = datetime.utcnow() + timedelta(app.config.get('PERMANENT_SESSION_LIFETIME'))
         val = self.get_serializer(app).dumps(dict(session))
         response.set_cookie(app.session_cookie_name, val,
                             expires=expires, httponly=True,
