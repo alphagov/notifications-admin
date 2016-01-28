@@ -35,5 +35,7 @@ def verify():
                 abort(404)
             else:
                 raise e
+        finally:
+            del session['user_details']
 
     return render_template('views/verify.html', form=form)
