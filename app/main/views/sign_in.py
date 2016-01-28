@@ -39,7 +39,7 @@ def _get_and_verify_user(email_address, password):
         return None
     elif not user.is_active():
         return None
-    elif not users_dao.verify_password(user, password):
+    elif not users_dao.verify_password(user.id, password):
         return None
     else:
         return user
