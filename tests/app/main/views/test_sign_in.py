@@ -31,6 +31,7 @@ def test_logged_in_user_redirects_to_choose_service(app_,
 
 
 def test_process_sign_in_return_2fa_template(app_,
+                                             api_user_active,
                                              mock_send_verify_code,
                                              mock_get_user,
                                              mock_get_user_by_email,
@@ -43,6 +44,7 @@ def test_process_sign_in_return_2fa_template(app_,
                 'password': 'val1dPassw0rd!'})
     assert response.status_code == 302
     assert response.location == 'http://localhost/two-factor'
+    mock_verify_password.assert_called_with(api_user_active.id, 'val1dPassw0rd!')
 
 
 def test_should_return_locked_out_true_when_user_is_locked(app_,
