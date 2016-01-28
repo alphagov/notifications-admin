@@ -16,7 +16,6 @@ import app.proxy_fix
 from config import configs
 from utils import logging
 
-db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CsrfProtect()
 
@@ -31,7 +30,6 @@ def create_app(config_name, config_overrides=None):
     application.config['NOTIFY_ADMIN_ENVIRONMENT'] = config_name
     application.config.from_object(configs[config_name])
     init_app(application, config_overrides)
-    db.init_app(application)
     logging.init_app(application)
     init_csrf(application)
 

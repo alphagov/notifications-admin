@@ -1,7 +1,7 @@
 from flask import url_for
 
 
-def test_render_register_returns_template_with_form(app_, db_, db_session):
+def test_render_register_returns_template_with_form(app_):
     response = app_.test_client().get('/register')
 
     assert response.status_code == 200
@@ -9,13 +9,13 @@ def test_render_register_returns_template_with_form(app_, db_, db_session):
 
 
 def test_logged_in_user_redirects_to_choose_service(app_,
-                                                    db_,
-                                                    db_session,
-                                                    mock_active_user,
-                                                    mock_get_by_email):
+                                                    api_user_active,
+                                                    mock_get_user_by_email,
+                                                    mock_send_verify_code,
+                                                    mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             response = client.get(url_for('main.register'))
             assert response.status_code == 302
 
@@ -24,12 +24,10 @@ def test_logged_in_user_redirects_to_choose_service(app_,
 
 
 def test_process_register_creates_new_user(app_,
-                                           db_,
-                                           db_session,
-                                           mock_send_sms,
-                                           mock_send_email,
+                                           mock_send_verify_code,
                                            mock_register_user,
-                                           mock_get_by_email):
+                                           mock_get_user_by_email_not_found,
+                                           mock_login):
     user_data = {
         'name': 'Some One Valid',
         'email_address': 'notfound@example.gov.uk',
@@ -38,7 +36,7 @@ def test_process_register_creates_new_user(app_,
     }
 
     with app_.test_request_context():
-        response = app_.test_client().post('/register',
+        response = app_.test_client().post(url_for('main.register'),
                                            data=user_data)
         assert response.status_code == 302
         assert response.location == url_for('main.verify', _external=True)
@@ -46,44 +44,41 @@ def test_process_register_creates_new_user(app_,
 
 
 def test_process_register_returns_400_when_mobile_number_is_invalid(app_,
-                                                                    db_,
-                                                                    db_session,
-                                                                    mock_send_sms,
-                                                                    mock_send_email,
-                                                                    mock_get_by_email):
-    response = app_.test_client().post('/register',
-                                       data={'name': 'Bad Mobile',
-                                             'email_address': 'bad_mobile@example.gov.uk',
-                                             'mobile_number': 'not good',
-                                             'password': 'validPassword!'})
+                                                                    mock_send_verify_code,
+                                                                    mock_get_user_by_email_not_found,
+                                                                    mock_login):
+    with app_.test_request_context():
+        response = app_.test_client().post(url_for('main.register'),
+                                           data={'name': 'Bad Mobile',
+                                                 'email_address': 'bad_mobile@example.gov.uk',
+                                                 'mobile_number': 'not good',
+                                                 'password': 'validPassword!'})
 
     assert response.status_code == 200
     assert 'Must be a UK mobile number (eg 07700 900460)' in response.get_data(as_text=True)
 
 
 def test_should_return_400_when_email_is_not_gov_uk(app_,
-                                                    db_,
-                                                    db_session,
-                                                    mock_send_sms,
-                                                    mock_send_email,
-                                                    mock_get_by_email):
-    response = app_.test_client().post('/register',
-                                       data={'name': 'Bad Mobile',
-                                             'email_address': 'bad_mobile@example.not.right',
-                                             'mobile_number': '+44123412345',
-                                             'password': 'validPassword!'})
+                                                    mock_send_verify_code,
+                                                    mock_get_user_by_email,
+                                                    mock_login):
+    with app_.test_request_context():
+        response = app_.test_client().post(url_for('main.register'),
+                                           data={'name': 'Bad Mobile',
+                                                 'email_address': 'bad_mobile@example.not.right',
+                                                 'mobile_number': '+44123412345',
+                                                 'password': 'validPassword!'})
 
     assert response.status_code == 200
     assert 'Enter a gov.uk email address' in response.get_data(as_text=True)
 
 
 def test_should_add_verify_codes_on_session(app_,
-                                            db_,
-                                            db_session,
-                                            mock_send_sms,
-                                            mock_send_email,
+                                            mock_send_verify_code,
                                             mock_register_user,
-                                            mock_get_by_email):
+                                            mock_get_user,
+                                            mock_get_user_by_email_not_found,
+                                            mock_login):
     user_data = {
         'name': 'Test Codes',
         'email_address': 'notfound@example.gov.uk',
@@ -91,22 +86,23 @@ def test_should_add_verify_codes_on_session(app_,
         'password': 'validPassword!'
     }
 
-    with app_.test_client() as client:
-        response = client.post('/register',
-                               data=user_data)
-        assert response.status_code == 302
-        assert 'notify_admin_session' in response.headers.get('Set-Cookie')
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            response = client.post(url_for('main.register'),
+                                   data=user_data)
+            assert response.status_code == 302
+            assert 'notify_admin_session' in response.headers.get('Set-Cookie')
 
 
 def test_should_return_400_if_password_is_blacklisted(app_,
-                                                      db_,
-                                                      db_session,
-                                                      mock_get_by_email):
-    response = app_.test_client().post('/register',
-                                       data={'name': 'Bad Mobile',
-                                             'email_address': 'bad_mobile@example.not.right',
-                                             'mobile_number': '+44123412345',
-                                             'password': 'password1234'})
+                                                      mock_get_user_by_email,
+                                                      mock_login):
+    with app_.test_request_context():
+        response = app_.test_client().post(url_for('main.register'),
+                                           data={'name': 'Bad Mobile',
+                                                 'email_address': 'bad_mobile@example.not.right',
+                                                 'mobile_number': '+44123412345',
+                                                 'password': 'password1234'})
 
     response.status_code == 200
     assert 'That password is blacklisted, too common' in response.get_data(as_text=True)

@@ -1,10 +1,11 @@
 from flask import (
     render_template, redirect, request, url_for, abort, session)
-from flask_login import login_required
+from flask_login import (login_required, current_user)
 
 from app.main import main
 from app.main.dao.services_dao import (
     get_service_by_id, delete_service, update_service)
+from app.main.dao.users_dao import verify_password
 from app.main.forms import ConfirmPasswordForm, ServiceNameForm
 from client.errors import HTTPError
 
@@ -61,7 +62,10 @@ def service_name_change_confirm(service_id):
         else:
             raise e
 
-    form = ConfirmPasswordForm()
+    # Validate password for form
+    def _check_password(pwd):
+        return verify_password(current_user, pwd)
+    form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
         service['name'] = session['service_name_change']
@@ -128,9 +132,10 @@ def service_status_change_confirm(service_id):
         else:
             raise e
 
-    # TODO validate password, will leave until
-    # user management has been moved to the api.
-    form = ConfirmPasswordForm()
+    # Validate password for form
+    def _check_password(pwd):
+        return verify_password(current_user, pwd)
+    form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
         service['active'] = True
@@ -175,9 +180,11 @@ def service_delete_confirm(service_id):
             abort(404)
         else:
             raise e
-    # TODO validate password, will leave until
-    # user management has been moved to the api.
-    form = ConfirmPasswordForm()
+
+    # Validate password for form
+    def _check_password(pwd):
+        return verify_password(current_user, pwd)
+    form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
         try:

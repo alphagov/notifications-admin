@@ -45,23 +45,15 @@ class UserApiClient(BaseAPIClient):
         user_data = self.put(url, data=data)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
-    def verify_password(self, user, password):
+    def verify_password(self, user_id, password):
         try:
-            data = user.serialize()
-            url = "/user/{}/verify/password".format(user.id)
-            data["password"] = password
-            resp = self.post(url, data=data)
-            if resp.status_code == 204:
-                return True
+            url = "/user/{}/verify/password".format(user_id)
+            data = {"password": password}
+            self.post(url, data=data)
+            return True
         except HTTPError as e:
             if e.status_code == 400 or e.status_code == 404:
                 return False
-        # TODO temp work around until client fixed
-        except InvalidResponse as e:
-            if e.status_code == 204:
-                return True
-            else:
-                raise e
 
     def get_user_by_email(self, email_address):
         users = self.get_users()
@@ -69,6 +61,27 @@ class UserApiClient(BaseAPIClient):
         if len(user) == 1:
             return user[0]
         return None
+
+    def send_verify_code(self, user_id, code_type, to=None):
+        data = {'code_type': code_type}
+        if to:
+            data['to'] = to
+        endpoint = '/user/{}/code'.format(user_id)
+        resp = self.post(endpoint, data=data)
+
+    def check_verify_code(self, user_id, code, code_type):
+        data = {'code_type': code_type, 'code': code}
+        endpoint = '/user/{}/verify/code'.format(user_id)
+        try:
+            resp = self.post(endpoint, data=data)
+            return True, ''
+        except HTTPError as e:
+            if e.status_code == 400 or e.status_code == 404:
+                if 'Code not found' in e.message:
+                    return False, 'Code not found'
+                elif 'Code has expired' in e.message:
+                    return False, 'Code has expired'
+            raise e
 
 
 class User(object):
@@ -154,11 +167,16 @@ class User(object):
         return self.failed_login_count >= self.max_failed_login_count
 
     def serialize(self):
-        return {"id": self.id,
-                "name": self.name,
-                "email_address": self.email_address,
-                "mobile_number": self.mobile_number,
-                "password_changed_at": self.password_changed_at,
-                "state": self.state,
-                "failed_login_count": self.failed_login_count
-                }
+        dct = {"id": self.id,
+               "name": self.name,
+               "email_address": self.email_address,
+               "mobile_number": self.mobile_number,
+               "password_changed_at": self.password_changed_at,
+               "state": self.state,
+               "failed_login_count": self.failed_login_count}
+        if getattr(self, '_password', None):
+            dct['password'] = self._password
+        return dct
+
+    def set_password(self, pwd):
+        self._password = pwd

@@ -7,13 +7,15 @@ from app.notify_client.sender import send_change_password_email
 
 @main.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
-    form = ForgotPasswordForm()
+
+    def _email_exists(email):
+        return not users_dao.is_email_unique(email)
+
+    form = ForgotPasswordForm(_email_exists)
     if form.validate_on_submit():
-        if users_dao.get_user_by_email(form.email_address.data):
-            users_dao.request_password_reset(form.email_address.data)
-            send_change_password_email(form.email_address.data)
-            return render_template('views/password-reset-sent.html')
-        else:
-            current_app.logger.info('The email address used does not exist.')
-    else:
-        return render_template('views/forgot-password.html', form=form)
+        user = users_dao.get_user_by_email(form.email_address.data)
+        users_dao.request_password_reset(user)
+        send_change_password_email(form.email_address.data)
+        return render_template('views/password-reset-sent.html')
+
+    return render_template('views/forgot-password.html', form=form)

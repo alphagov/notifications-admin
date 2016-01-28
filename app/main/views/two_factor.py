@@ -5,20 +5,30 @@ from flask import (
 from flask_login import login_user
 
 from app.main import main
-from app.main.dao import users_dao, verify_codes_dao
+from app.main.dao import users_dao
 from app.main.forms import TwoFactorForm
 
 
 @main.route('/two-factor', methods=['GET', 'POST'])
 def two_factor():
     # TODO handle user_email not in session
-    user = users_dao.get_user_by_email(session['user_email'])
-    codes = verify_codes_dao.get_codes(user.id)
-    form = TwoFactorForm(codes)
+    user_id = session['user_details']['id']
+
+    def _check_code(code):
+        return users_dao.check_verify_code(user_id, code, "sms")
+
+    form = TwoFactorForm(_check_code)
 
     if form.validate_on_submit():
-        verify_codes_dao.use_code_for_user_and_type(user_id=user.id, code_type='sms')
-        login_user(user)
+        try:
+            user = users_dao.get_user_by_id(user_id)
+            # Check if coming from new password page
+            if 'password' in session['user_details']:
+                user.set_password(session['user_details']['password'])
+                users_dao.update_user(user)
+            login_user(user)
+        finally:
+            del session['user_details']
         return redirect(url_for('.choose_service'))
 
     return render_template('views/two-factor.html', form=form)

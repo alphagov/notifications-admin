@@ -2,14 +2,14 @@ from flask import (url_for, session)
 
 
 def test_should_show_overview(app_,
-                              db_,
-                              db_session,
-                              mock_active_user,
+                              api_user_active,
                               mock_get_service,
-                              mock_get_by_email):
+                              mock_get_user,
+                              mock_get_user_by_email,
+                              mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.get(url_for(
                 'main.service_settings', service_id=service_id))
@@ -21,14 +21,14 @@ def test_should_show_overview(app_,
 
 
 def test_should_show_service_name(app_,
-                                  db_,
-                                  db_session,
-                                  mock_active_user,
+                                  api_user_active,
                                   mock_get_service,
-                                  mock_get_by_email):
+                                  mock_get_user,
+                                  mock_get_user_by_email,
+                                  mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.get(url_for(
                 'main.service_name_change', service_id=service_id))
@@ -40,14 +40,14 @@ def test_should_show_service_name(app_,
 
 
 def test_should_redirect_after_change_service_name(app_,
-                                                   db_,
-                                                   db_session,
-                                                   mock_active_user,
+                                                   api_user_active,
                                                    mock_get_service,
-                                                   mock_get_by_email):
+                                                   mock_get_user,
+                                                   mock_get_user_by_email,
+                                                   mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.post(url_for(
                 'main.service_name_change', service_id=service_id))
@@ -60,14 +60,14 @@ def test_should_redirect_after_change_service_name(app_,
 
 
 def test_should_show_service_name_confirmation(app_,
-                                               db_,
-                                               db_session,
-                                               mock_active_user,
+                                               api_user_active,
                                                mock_get_service,
-                                               mock_get_by_email):
+                                               mock_get_user,
+                                               mock_get_user_by_email,
+                                               mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.get(url_for(
                 'main.service_name_change_confirm', service_id=service_id))
@@ -79,15 +79,16 @@ def test_should_show_service_name_confirmation(app_,
 
 
 def test_should_redirect_after_service_name_confirmation(app_,
-                                                         db_,
-                                                         db_session,
-                                                         mock_active_user,
+                                                         api_user_active,
                                                          mock_get_service,
                                                          mock_update_service,
-                                                         mock_get_by_email):
+                                                         mock_get_user,
+                                                         mock_get_user_by_email,
+                                                         mock_login,
+                                                         mock_verify_password):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             service_new_name = 'New Name'
             with client.session_transaction() as session:
@@ -105,14 +106,14 @@ def test_should_redirect_after_service_name_confirmation(app_,
 
 
 def test_should_show_request_to_go_live(app_,
-                                        db_,
-                                        db_session,
-                                        mock_active_user,
+                                        api_user_active,
                                         mock_get_service,
-                                        mock_get_by_email):
+                                        mock_get_user,
+                                        mock_get_user_by_email,
+                                        mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.get(
                 url_for('main.service_request_to_go_live', service_id=service_id))
@@ -124,15 +125,15 @@ def test_should_show_request_to_go_live(app_,
 
 
 def test_should_redirect_after_request_to_go_live(app_,
-                                                  db_,
-                                                  db_session,
-                                                  mock_active_user,
+                                                  api_user_active,
                                                   mock_get_service,
                                                   mock_update_service,
-                                                  mock_get_by_email):
+                                                  mock_get_user,
+                                                  mock_get_user_by_email,
+                                                  mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.post(url_for(
                 'main.service_request_to_go_live', service_id=service_id))
@@ -146,14 +147,14 @@ def test_should_redirect_after_request_to_go_live(app_,
 
 
 def test_should_show_status_page(app_,
-                                 db_,
-                                 db_session,
-                                 mock_active_user,
+                                 api_user_active,
                                  mock_get_service,
-                                 mock_get_by_email):
+                                 mock_get_user,
+                                 mock_get_user_by_email,
+                                 mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.get(url_for(
                 'main.service_status_change', service_id=service_id))
@@ -165,14 +166,14 @@ def test_should_show_status_page(app_,
 
 
 def test_should_show_redirect_after_status_change(app_,
-                                                  db_,
-                                                  db_session,
-                                                  mock_active_user,
+                                                  api_user_active,
                                                   mock_get_service,
-                                                  mock_get_by_email):
+                                                  mock_get_user,
+                                                  mock_get_user_by_email,
+                                                  mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.post(url_for(
                 'main.service_status_change', service_id=service_id))
@@ -185,14 +186,14 @@ def test_should_show_redirect_after_status_change(app_,
 
 
 def test_should_show_status_confirmation(app_,
-                                         db_,
-                                         db_session,
-                                         mock_active_user,
+                                         api_user_active,
                                          mock_get_service,
-                                         mock_get_by_email):
+                                         mock_get_user,
+                                         mock_get_user_by_email,
+                                         mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.get(url_for(
                 'main.service_status_change_confirm', service_id=service_id))
@@ -204,15 +205,16 @@ def test_should_show_status_confirmation(app_,
 
 
 def test_should_redirect_after_status_confirmation(app_,
-                                                   db_,
-                                                   db_session,
-                                                   mock_active_user,
+                                                   api_user_active,
                                                    mock_get_service,
                                                    mock_update_service,
-                                                   mock_get_by_email):
+                                                   mock_get_user,
+                                                   mock_get_user_by_email,
+                                                   mock_login,
+                                                   mock_verify_password):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.post(url_for(
                 'main.service_status_change_confirm', service_id=service_id))
@@ -226,14 +228,14 @@ def test_should_redirect_after_status_confirmation(app_,
 
 
 def test_should_show_delete_page(app_,
-                                 db_,
-                                 db_session,
-                                 mock_active_user,
+                                 api_user_active,
                                  mock_get_service,
-                                 mock_get_by_email):
+                                 mock_get_user,
+                                 mock_get_user_by_email,
+                                 mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.get(url_for(
                 'main.service_delete', service_id=service_id))
@@ -244,14 +246,14 @@ def test_should_show_delete_page(app_,
 
 
 def test_should_show_redirect_after_deleting_service(app_,
-                                                     db_,
-                                                     db_session,
-                                                     mock_active_user,
+                                                     api_user_active,
                                                      mock_get_service,
-                                                     mock_get_by_email):
+                                                     mock_get_user,
+                                                     mock_get_user_by_email,
+                                                     mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.post(url_for(
                 'main.service_delete', service_id=service_id))
@@ -263,14 +265,14 @@ def test_should_show_redirect_after_deleting_service(app_,
 
 
 def test_should_show_delete_confirmation(app_,
-                                         db_,
-                                         db_session,
-                                         mock_active_user,
+                                         api_user_active,
                                          mock_get_service,
-                                         mock_get_by_email):
+                                         mock_get_user,
+                                         mock_get_user_by_email,
+                                         mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.get(url_for(
                 'main.service_delete_confirm', service_id=service_id))
@@ -281,15 +283,16 @@ def test_should_show_delete_confirmation(app_,
 
 
 def test_should_redirect_delete_confirmation(app_,
-                                             db_,
-                                             db_session,
-                                             mock_active_user,
+                                             api_user_active,
                                              mock_get_service,
                                              mock_delete_service,
-                                             mock_get_by_email):
+                                             mock_get_user,
+                                             mock_get_user_by_email,
+                                             mock_login,
+                                             mock_verify_password):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             service_id = 123
             response = client.post(url_for(
                 'main.service_delete_confirm', service_id=service_id))

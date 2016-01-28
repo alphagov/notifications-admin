@@ -2,14 +2,14 @@ from flask import url_for
 
 
 def test_should_return_list_of_all_jobs(app_,
-                                        db_,
-                                        db_session,
                                         service_one,
-                                        mock_active_user,
-                                        mock_get_by_email):
+                                        api_user_active,
+                                        mock_get_user,
+                                        mock_get_user_by_email,
+                                        mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             response = client.get(url_for('main.view_jobs', service_id=101))
 
         assert response.status_code == 200
@@ -17,17 +17,17 @@ def test_should_return_list_of_all_jobs(app_,
 
 
 def test_should_show_page_for_one_job(app_,
-                                      db_,
-                                      db_session,
                                       service_one,
-                                      mock_active_user,
-                                      mock_get_by_email):
+                                      api_user_active,
+                                      mock_login,
+                                      mock_get_user,
+                                      mock_get_user_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             # TODO filename will be part of job metadata not in session
             with client.session_transaction() as s:
                 s[456] = 'dispatch_20151114.csv'
-        client.login(mock_active_user)
+        client.login(api_user_active)
         response = client.get(url_for('main.view_job', service_id=123, job_id=456))
 
         assert response.status_code == 200
@@ -36,14 +36,14 @@ def test_should_show_page_for_one_job(app_,
 
 
 def test_should_show_page_for_one_notification(app_,
-                                               db_,
-                                               db_session,
                                                service_one,
-                                               mock_active_user,
-                                               mock_get_by_email):
+                                               api_user_active,
+                                               mock_get_user,
+                                               mock_get_user_by_email,
+                                               mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(mock_active_user)
+            client.login(api_user_active)
             response = client.get(url_for(
                 'main.view_notification',
                 service_id=101,

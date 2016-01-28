@@ -11,8 +11,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
-from app.main.validators import Blacklist, ValidateUserCodes, CsvFileValidator
-from app.main.dao import verify_codes_dao
+from app.main.validators import Blacklist, CsvFileValidator
 from app.main.encryption import check_hash
 
 
@@ -84,16 +83,14 @@ def sms_code():
     return StringField('Text message confirmation code',
                        validators=[DataRequired(message='Text message confirmation code can not be empty'),
                                    Regexp(regex=verify_code,
-                                          message='Text message confirmation code must be 5 digits'),
-                                   ValidateUserCodes(code_type='sms')])
+                                          message='Text message confirmation code must be 5 digits')])
 
 
 def email_code():
     verify_code = '^\d{5}$'
     return StringField("Email confirmation code",
                        validators=[DataRequired(message='Email confirmation code can not be empty'),
-                                   Regexp(regex=verify_code, message='Email confirmation code must be 5 digits'),
-                                   ValidateUserCodes(code_type='email')])
+                                   Regexp(regex=verify_code, message='Email confirmation code must be 5 digits')])
 
 
 class LoginForm(Form):
@@ -108,8 +105,8 @@ class LoginForm(Form):
 
 
 class RegisterUserForm(Form):
-    def __init__(self, existing_email_addresses, *args, **kwargs):
-        self.existing_emails = existing_email_addresses
+    def __init__(self, unique_email_func, *args, **kwargs):
+        self.unique_email_func = unique_email_func
         super(RegisterUserForm, self).__init__(*args, **kwargs)
 
     name = StringField('Full name',
@@ -120,35 +117,49 @@ class RegisterUserForm(Form):
 
     def validate_email_address(self, field):
         # Validate email address is unique.
-        if self.existing_emails(field.data):
+        if not self.unique_email_func(field.data):
             raise ValidationError('Email address already exists')
 
 
 class TwoFactorForm(Form):
-    def __init__(self, user_codes, *args, **kwargs):
+    def __init__(self, validate_code_func, *args, **kwargs):
         '''
         Keyword arguments:
-        user_codes -- List of user code objects which have the fields
-        (code_type, expiry_datetime, code)
+        validate_code_func -- Validates the code with the API.
         '''
-        self.user_codes = user_codes
+        self.validate_code_func = validate_code_func
         super(TwoFactorForm, self).__init__(*args, **kwargs)
 
     sms_code = sms_code()
 
+    def validate_sms_code(self, field):
+        is_valid, reason = self.validate_code_func(field.data)
+        if not is_valid:
+            raise ValidationError(reason)
+
 
 class VerifyForm(Form):
-    def __init__(self, user_codes, *args, **kwargs):
+    def __init__(self, validate_code_func, *args, **kwargs):
         '''
         Keyword arguments:
-        user_codes -- List of user code objects which have the fields
-        (code_type, expiry_datetime, code)
+        validate_code_func -- Validates the code with the API.
         '''
-        self.user_codes = user_codes
+        self.validate_code_func = validate_code_func
         super(VerifyForm, self).__init__(*args, **kwargs)
 
     sms_code = sms_code()
     email_code = email_code()
+
+    def _validate_code(self, cde, code_type):
+        is_valid, reason = self.validate_code_func(cde, code_type)
+        if not is_valid:
+            raise ValidationError(reason)
+
+    def validate_email_code(self, field):
+        self._validate_code(field.data, 'email')
+
+    def validate_sms_code(self, field):
+        self._validate_code(field.data, 'sms')
 
 
 class EmailNotReceivedForm(Form):
@@ -186,7 +197,16 @@ class ServiceNameForm(Form):
 
 
 class ConfirmPasswordForm(Form):
+
+    def __init__(self, validate_password_func, *args, **kwargs):
+        self.validate_password_func = validate_password_func
+        super(ConfirmPasswordForm, self).__init__(*args, **kwargs)
+
     password = PasswordField(u'Enter password')
+
+    def validate_password(self, field):
+        if not self.validate_password_func(field.data):
+            raise ValidationError('Invalid password')
 
 
 class TemplateForm(Form):
@@ -201,7 +221,16 @@ class TemplateForm(Form):
 
 
 class ForgotPasswordForm(Form):
+
+    def __init__(self, user_email_exists_func, *args, **kwargs):
+        self._user_email_exists_func = user_email_exists_func
+        super(ForgotPasswordForm, self).__init__(*args, **kwargs)
+
     email_address = email_address()
+
+    def validate_email_address(self, field):
+        if not self._user_email_exists_func(field.data):
+            raise ValidationError('The email is not registered on our system')
 
 
 class NewPasswordForm(Form):
@@ -209,8 +238,17 @@ class NewPasswordForm(Form):
 
 
 class ChangePasswordForm(Form):
+
+    def __init__(self, validate_password_func, *args, **kwargs):
+        self.validate_password_func = validate_password_func
+        super(ChangePasswordForm, self).__init__(*args, **kwargs)
+
     old_password = password('Current password')
     new_password = password('New password')
+
+    def validate_old_password(self, field):
+        if not self.validate_password_func(field.data):
+            raise ValidationError('Invalid password')
 
 
 class CsvUploadForm(Form):
@@ -223,11 +261,31 @@ class ChangeNameForm(Form):
 
 
 class ChangeEmailForm(Form):
+
+    def __init__(self, validate_email_func, *args, **kwargs):
+        self.validate_email_func = validate_email_func
+        super(ChangeEmailForm, self).__init__(*args, **kwargs)
+
     email_address = email_address()
+
+    def validate_email_address(self, field):
+        is_valid = self.validate_email_func(field.data)
+        if not is_valid:
+            raise ValidationError("The email address is already in use")
 
 
 class ConfirmEmailForm(Form):
+
+    def __init__(self, validate_code_func, *args, **kwargs):
+        self.validate_code_func = validate_code_func
+        super(ConfirmEmailForm, self).__init__(*args, **kwargs)
+
     email_code = email_code()
+
+    def validate_email_code(self, field):
+        is_valid, msg = self.validate_code_func(field.data)
+        if not is_valid:
+            raise ValidationError(msg)
 
 
 class ChangeMobileNumberForm(Form):
@@ -235,7 +293,17 @@ class ChangeMobileNumberForm(Form):
 
 
 class ConfirmMobileNumberForm(Form):
+
+    def __init__(self, validate_code_func, *args, **kwargs):
+        self.validate_code_func = validate_code_func
+        super(ConfirmMobileNumberForm, self).__init__(*args, **kwargs)
+
     sms_code = sms_code()
+
+    def validate_sms_code(self, field):
+        is_valid, msg = self.validate_code_func(field.data)
+        if not is_valid:
+            raise ValidationError(msg)
 
 
 class CreateKeyForm(Form):

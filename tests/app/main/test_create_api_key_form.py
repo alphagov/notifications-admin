@@ -3,9 +3,7 @@ from werkzeug.datastructures import MultiDict
 from app.main.forms import CreateKeyForm
 
 
-def test_return_validation_error_when_key_name_exists(app_,
-                                                      db_,
-                                                      db_session):
+def test_return_validation_error_when_key_name_exists(app_):
     def _get_names():
         return ['some key', 'another key']
 
