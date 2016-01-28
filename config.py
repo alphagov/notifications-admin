@@ -20,7 +20,7 @@ class Config(object):
     SESSION_COOKIE_NAME = 'notify_admin_session'
     SESSION_COOKIE_PATH = '/admin'
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = False
     PERMANENT_SESSION_LIFETIME = 3600  # seconds
 
     API_HOST_NAME = os.getenv('API_HOST_NAME')
@@ -56,6 +56,8 @@ class Test(Development):
 class Live(Config):
     DEBUG = False
     HTTP_PROTOCOL = 'https'
+    SESSION_COOKIE_SECURE = True
+
 
 configs = {
     'live': Live,
