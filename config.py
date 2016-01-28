@@ -56,6 +56,8 @@ class Test(Development):
 class Live(Config):
     DEBUG = False
     HTTP_PROTOCOL = 'https'
+    SESSION_COOKIE_SECURE = True
+
 
 configs = {
     'live': Live,
