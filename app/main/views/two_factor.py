@@ -29,6 +29,6 @@ def two_factor():
             login_user(user)
         finally:
             del session['user_details']
-        return redirect(url_for('.choose_service'))
+        return redirect(url_for('main.choose_service'))
 
     return render_template('views/two-factor.html', form=form)

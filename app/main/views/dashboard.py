@@ -1,4 +1,4 @@
-from flask import (abort, render_template)
+from flask import (abort, render_template, session)
 from flask_login import login_required
 from app.main import main
 from app.main.dao.services_dao import get_service_by_id
@@ -11,6 +11,7 @@ from ._jobs import jobs
 def service_dashboard(service_id):
     try:
         service = get_service_by_id(service_id)
+        session['service_name'] = service['data']['name']
     except HTTPError as e:
         if e.status_code == 404:
             abort(404)
