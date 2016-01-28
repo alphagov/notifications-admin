@@ -42,8 +42,8 @@ def test_process_sign_in_return_2fa_template(app_,
             url_for('main.sign_in'), data={
                 'email_address': 'valid@example.gov.uk',
                 'password': 'val1dPassw0rd!'})
-    assert response.status_code == 302
-    assert response.location == 'http://localhost/two-factor'
+        assert response.status_code == 302
+        assert response.location == url_for('.two_factor', _external=True)
     mock_verify_password.assert_called_with(api_user_active.id, 'val1dPassw0rd!')
 
 
@@ -80,11 +80,13 @@ def test_should_return_200_when_user_does_not_exist(app_, mock_get_user_by_email
     assert 'Username or password is incorrect' in response.get_data(as_text=True)
 
 
-def test_should_return_200_when_user_is_pending(app_, mock_get_user_by_email_pending):
+def test_should_return_redirect_when_user_is_pending(app_,
+                                                     mock_get_user_by_email_pending,
+                                                     mock_verify_password):
     with app_.test_request_context():
         response = app_.test_client().post(
             url_for('main.sign_in'), data={
                 'email_address': 'pending_user@example.gov.uk',
                 'password': 'val1dPassw0rd!'})
-    assert response.status_code == 200
-    assert 'Username or password is incorrect' in response.get_data(as_text=True)
+        assert response.status_code == 302
+        assert response.location == url_for('main.verify', _external=True)

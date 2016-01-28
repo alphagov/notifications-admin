@@ -3,7 +3,8 @@ from flask import (
     redirect,
     url_for,
     session,
-    abort
+    abort,
+    flash
 )
 
 from flask.ext.login import current_user
@@ -19,25 +20,25 @@ def sign_in():
         return redirect(url_for('main.choose_service'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = _get_and_verify_user(form.email_address.data, form.password.data)
+        user = users_dao.get_user_by_email(form.email_address.data)
+        user = _get_and_verify_user(user, form.password.data)
         if user:
-            users_dao.send_verify_code(user.id, 'sms')
             session['user_details'] = {"email": user.email_address, "id": user.id}
-            return redirect(url_for('.two_factor'))
-        else:
-            # Vague error message for login in case of user not known, locked, inactive or password not verified
-            form.password.errors.append('Username or password is incorrect')
+            if user.state == 'pending':
+                return redirect(url_for('.verify'))
+            elif user.is_active():
+                users_dao.send_verify_code(user.id, 'sms')
+                return redirect(url_for('.two_factor'))
+        # Vague error message for login in case of user not known, locked, inactive or password not verified
+        flash('Username or password is incorrect')
 
     return render_template('views/signin.html', form=form)
 
 
-def _get_and_verify_user(email_address, password):
-    user = users_dao.get_user_by_email(email_address)
+def _get_and_verify_user(user, password):
     if not user:
         return None
     elif user.is_locked():
-        return None
-    elif not user.is_active():
         return None
     elif not users_dao.verify_password(user.id, password):
         return None
