@@ -105,20 +105,12 @@ class LoginForm(Form):
 
 
 class RegisterUserForm(Form):
-    def __init__(self, unique_email_func, *args, **kwargs):
-        self.unique_email_func = unique_email_func
-        super(RegisterUserForm, self).__init__(*args, **kwargs)
 
     name = StringField('Full name',
                        validators=[DataRequired(message='Name can not be empty')])
     email_address = email_address()
     mobile_number = mobile_number()
     password = password()
-
-    def validate_email_address(self, field):
-        # Validate email address is unique.
-        if not self.unique_email_func(field.data):
-            raise ValidationError('Email address already exists')
 
 
 class TwoFactorForm(Form):
@@ -221,16 +213,7 @@ class TemplateForm(Form):
 
 
 class ForgotPasswordForm(Form):
-
-    def __init__(self, user_email_exists_func, *args, **kwargs):
-        self._user_email_exists_func = user_email_exists_func
-        super(ForgotPasswordForm, self).__init__(*args, **kwargs)
-
     email_address = email_address()
-
-    def validate_email_address(self, field):
-        if not self._user_email_exists_func(field.data):
-            raise ValidationError('The email is not registered on our system')
 
 
 class NewPasswordForm(Form):
