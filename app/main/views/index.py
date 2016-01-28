@@ -27,7 +27,7 @@ def verify_mobile():
 @main.route("/services/<int:service_id>/send-email")
 @login_required
 def send_email(service_id):
-    return render_template('views/send-email.html')
+    return render_template('views/send-email.html', service_id=service_id)
 
 
 @main.route("/services/<int:service_id>/check-email")
