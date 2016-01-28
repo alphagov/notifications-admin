@@ -4,6 +4,8 @@ from client.errors import (
     InvalidResponse
 )
 
+from flask.ext.login import UserMixin
+
 
 class UserApiClient(BaseAPIClient):
     def __init__(self, base_url=None, client_id=None, secret=None):
@@ -84,7 +86,7 @@ class UserApiClient(BaseAPIClient):
             raise e
 
 
-class User(object):
+class User(UserMixin):
     def __init__(self, fields, max_failed_login_count=3):
         self._id = fields.get('id')
         self._name = fields.get('name')
@@ -97,9 +99,6 @@ class User(object):
 
     def get_id(self):
         return self.id
-
-    def is_authenticated(self):
-        return True
 
     def is_active(self):
         return self.state == 'active'
@@ -159,9 +158,6 @@ class User(object):
     @failed_login_count.setter
     def failed_login_count(self, num):
         self._failed_login_count += num
-
-    def is_anonymous(self):
-        return False
 
     def is_locked(self):
         return self.failed_login_count >= self.max_failed_login_count
