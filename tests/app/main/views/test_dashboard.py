@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import url_for, session
 
 
 def test_should_show_recent_jobs_on_dashboard(app_,
@@ -14,4 +14,6 @@ def test_should_show_recent_jobs_on_dashboard(app_,
             response = client.get(url_for('main.service_dashboard', service_id=123))
 
         assert response.status_code == 200
-        assert 'You haven’t sent any text messages yet' in response.get_data(as_text=True)
+        text = response.get_data(as_text=True)
+        assert 'You haven’t sent any text messages yet' in text
+        assert 'Test Service' in text

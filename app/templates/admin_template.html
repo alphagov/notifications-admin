@@ -54,7 +54,7 @@
         <div class="column-half">
           <details class="dropdown">
             <summary class="dropdown-toggle">
-              Current service
+              {{ session['service_name'] }}
             </summary>
             <div>
               <a href="{{ url_for('main.choose_service') }}">Switch service</a>
