@@ -59,6 +59,7 @@
 					back_link = url_for(".send_sms", service_id=service_id)
 			)}}
 
+			<input type="hidden" name="file_name" value="{{file_name}}" />
 		</form>
 	{% endif %}
 {% endblock %}

@@ -117,15 +117,25 @@ def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(app_,
 
 
 @moto.mock_s3
-def test_should_redirect_to_job(app_,
-                                api_user_active,
-                                mock_get_user,
-                                mock_get_user_by_email,
-                                mock_login):
+def test_create_job_should_call_api(app_,
+                                    service_one,
+                                    api_user_active,
+                                    mock_get_user,
+                                    mock_get_user_by_email,
+                                    mock_login,
+                                    job_data,
+                                    mock_create_job):
+
+    service_id = job_data['service']
+    template_id = job_data['template']
+    upload_id = job_data['id']
+    file_name = job_data['original_file_name']
+
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            response = client.post(url_for('main.check_sms',
-                                           service_id=123,
-                                           upload_id='someid'))
-        assert response.status_code == 302
+            url = url_for('main.check_sms', service_id=service_id, upload_id=upload_id, file_name=file_name)
+            response = client.post(url, data=job_data, follow_redirects=True)
+
+        assert response.status_code == 200
+        mock_create_job.assert_called_with(service_id, template_id, file_name)
