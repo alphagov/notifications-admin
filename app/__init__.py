@@ -1,5 +1,6 @@
 import os
 import re
+import ast
 
 import dateutil
 from flask import Flask, session, Markup, escape, render_template
@@ -12,6 +13,7 @@ from app.notify_client.api_client import NotificationsAdminAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.user_api_client import UserApiClient
 from app.notify_client.job_api_client import JobApiClient
+from app.notify_client.status_api_client import StatusApiClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 import app.proxy_fix
 from config import configs
@@ -24,6 +26,7 @@ notifications_api_client = NotificationsAdminAPIClient()
 user_api_client = UserApiClient()
 api_key_api_client = ApiKeyApiClient()
 job_api_client = JobApiClient()
+status_api_client = StatusApiClient()
 
 
 def create_app(config_name, config_overrides=None):
@@ -39,6 +42,7 @@ def create_app(config_name, config_overrides=None):
     user_api_client.init_app(application)
     api_key_api_client.init_app(application)
     job_api_client.init_app(application)
+    status_api_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
@@ -160,3 +164,13 @@ def register_errorhandlers(application):
         return render_template("error/{0}.html".format(error_code)), error_code
     for errcode in [401, 404, 500]:
         application.errorhandler(errcode)(render_error)
+
+
+def get_app_version():
+    _version_re = re.compile(r'__version__\s+=\s+(.*)')
+    version = 'n/a'
+    dir_path = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(dir_path, 'version.py'), 'rb') as f:
+        version = str(ast.literal_eval(_version_re.search(
+            f.read().decode('utf-8')).group(1)))
+    return version
