@@ -425,15 +425,9 @@ def mock_check_verify_code_code_expired(mocker):
 def job_data(mocker):
     import uuid
     job_id = uuid.uuid4()
-    original_file_name = 'thisisatest.csv'
-    bucket_name = 'service-2-notify'
-    file_name = '{}.csv'.format(job_id)
+    file_name = 'thisisatest.csv'
     data = {
         'id': str(job_id),
-        'service': 1,
-        'template': 1,
-        'original_file_name': original_file_name,
-        'bucket_name': bucket_name,
         'file_name': file_name,
     }
     return data
@@ -442,5 +436,10 @@ def job_data(mocker):
 @pytest.fixture(scope='function')
 def mock_create_job(mocker, job_data):
     def _create(service_id, template_id, file_name):
+        job_data['service'] = service_id
+        job_data['template'] = template_id
+        job_data['bucket_name'] = 'service-{}-{}-notify'.format(service_id, job_data['id'])
+        job_data['original_file_name'] = file_name
+        job_data['file_name'] = '{}.csv'.format(job_data['id'])
         return job_data
     return mocker.patch('app.job_api_client.create_job', side_effect=_create)

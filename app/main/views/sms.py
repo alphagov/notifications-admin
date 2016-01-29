@@ -64,6 +64,7 @@ def send_sms(service_id):
             methods=['GET', 'POST'])
 @login_required
 def check_sms(service_id, upload_id):
+
     if request.method == 'GET':
         contents = s3download(service_id, upload_id)
         upload_result = _get_numbers(contents)
@@ -78,9 +79,10 @@ def check_sms(service_id, upload_id):
             service_id=service_id
         )
     elif request.method == 'POST':
-        file_name = request.form['original_file_name']
 
-        # TODO need a real template id picked from form
+        file_name = request.form['file_name']
+        # TODO - template id should come from form but is not wired in yet.
+        # that will be done in another story
         template_id = 1
 
         job_api_client.create_job(service_id, template_id, file_name)
