@@ -126,16 +126,20 @@ def test_create_job_should_call_api(app_,
                                     job_data,
                                     mock_create_job):
 
-    service_id = job_data['service']
-    template_id = job_data['template']
-    upload_id = job_data['id']
-    file_name = job_data['original_file_name']
+    service_id = service_one['id']
+    job_id = job_data['id']
+    file_name = job_data['file_name']
+
+    # TODO - template id should come from form but is not wired in yet.
+    # that will be done in another story
+    template_id = 1
 
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            url = url_for('main.check_sms', service_id=service_id, upload_id=upload_id, file_name=file_name)
+            url = url_for('main.check_sms', service_id=service_one['id'], upload_id=job_id, file_name=file_name)
             response = client.post(url, data=job_data, follow_redirects=True)
 
         assert response.status_code == 200
         mock_create_job.assert_called_with(service_id, template_id, file_name)
+        assert job_data['bucket_name'] == "service-{}-{}-notify".format(service_id, job_id)

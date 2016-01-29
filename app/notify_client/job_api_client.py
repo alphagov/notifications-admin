@@ -21,7 +21,7 @@ class JobApiClient(BaseAPIClient):
             "service": service_id,
             "template": template_id,
             "original_file_name": file_name,
-            "bucket_name": "service-{}-notify".format(service_id),
+            "bucket_name": "service-{}-{}-notify".format(service_id, job_id),
             "file_name": "{}.csv".format(job_id)
         }
 
