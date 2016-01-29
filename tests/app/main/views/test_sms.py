@@ -124,10 +124,12 @@ def test_create_job_should_call_api(app_,
                                     mock_get_user_by_email,
                                     mock_login,
                                     job_data,
-                                    mock_create_job):
+                                    mock_create_job,
+                                    mock_get_job):
 
+    import uuid
     service_id = service_one['id']
-    job_id = job_data['id']
+    job_id = str(uuid.uuid4())
     file_name = job_data['file_name']
 
     # TODO - template id should come from form but is not wired in yet.
@@ -141,5 +143,5 @@ def test_create_job_should_call_api(app_,
             response = client.post(url, data=job_data, follow_redirects=True)
 
         assert response.status_code == 200
-        mock_create_job.assert_called_with(service_id, template_id, file_name)
+        mock_create_job.assert_called_with(job_id, service_id, template_id, file_name)
         assert job_data['bucket_name'] == "service-{}-{}-notify".format(service_id, job_id)

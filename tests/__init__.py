@@ -80,3 +80,21 @@ def create_another_test_user(state):
 def get_test_user():
     from app.main.dao import users_dao
     return users_dao.get_user_by_email(TEST_USER_EMAIL)
+
+
+def job_json():
+    import uuid
+    import datetime
+    uuid.uuid4()
+    job_id = str(uuid.uuid4())
+    created_at = str(datetime.datetime.now().time())
+    data = {
+        'id': str(job_id),
+        'service': 1,
+        'template': 1,
+        'original_file_name': 'thisisatest.csv',
+        'bucket_name': 'service-1-{}-notify'.format(job_id),
+        'file_name': '{}.csv'.format(job_id),
+        'created_at': created_at
+        }
+    return data

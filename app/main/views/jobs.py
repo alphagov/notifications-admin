@@ -4,84 +4,64 @@ import time
 
 from flask import (
     render_template,
-    session
+    abort
 )
 from flask_login import login_required
+from client.errors import HTTPError
 
+from app import job_api_client
 from app.main import main
-from ._jobs import jobs
 
 now = time.strftime('%H:%M')
-
-messages = [
-    {
-        'phone': '+44 7700 900 579',
-        'message': 'Vehicle tax: Your vehicle tax for LV75 TDG expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
-        'status': 'Delivered',
-        'time': now,
-        'id': '0'
-    },
-    {
-        'phone': '+44 7700 900 306',
-        'message': 'Vehicle tax: Your vehicle tax for PL53 GBD expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
-        'status': 'Delivered',
-        'time': now,
-        'id': '1'
-    },
-    {
-        'phone': '+44 7700 900 454',
-        'message': 'Vehicle tax: Your vehicle tax for LV75 TDG expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
-        'status': 'Delivered',
-        'time': now,
-        'id': '2'
-    },
-    {
-        'phone': '+44 7700 900 522',
-        'message': 'Vehicle tax: Your vehicle tax for RE67 PLM expires on 18 January 2016. Renew at www.gov.uk/vehicletax',  # noqa
-        'status': 'Failed',
-        'time': now,
-        'id': '3'
-    }
-]
 
 
 @main.route("/services/<int:service_id>/jobs")
 @login_required
 def view_jobs(service_id):
-    return render_template(
-        'views/jobs.html',
-        jobs=[],  # use `jobs` for placeholder data
-        service_id=service_id
-    )
+    try:
+        jobs = job_api_client.get_job(service_id)['data']
+        return render_template(
+            'views/jobs.html',
+            jobs=jobs,
+            service_id=service_id
+        )
+    except HTTPError as e:
+        if e.status_code == 404:
+            abort(404)
+        else:
+            raise e
 
 
 @main.route("/services/<int:service_id>/jobs/<job_id>")
 @login_required
 def view_job(service_id, job_id):
-
-    # TODO the uploaded file name could be part of job definition
-    # so won't need to be passed on from last view via session
-    uploaded_file_name = session.get(job_id)
-
-    return render_template(
-        'views/job.html',
-        messages=messages,
-        counts={
-            'total': len(messages),
-            'delivered': len([
-                message for message in messages if message['status'] == 'Delivered'
-            ]),
-            'failed': len([
-                message for message in messages if message['status'] == 'Failed'
-            ])
-        },
-        cost=u'£0.00',
-        uploaded_file_name=uploaded_file_name,
-        uploaded_file_time=now,
-        template_used='Test message 1',
-        flash_message=u'We’ve started sending your messages',
-        service_id=service_id
-    )
+    try:
+        job = job_api_client.get_job(service_id, job_id)['data']
+        messages = []
+        return render_template(
+            'views/job.html',
+            messages=messages,
+            counts={
+                'total': len(messages),
+                'delivered': len([
+                    message for message in messages if message['status'] == 'Delivered'
+                ]),
+                'failed': len([
+                    message for message in messages if message['status'] == 'Failed'
+                ])
+            },
+            cost=u'£0.00',
+            uploaded_file_name=job['original_file_name'],
+            uploaded_file_time=job['created_at'],
+            template_used=job['template'],
+            flash_message="We’ve accepted {} for processing".format(job['original_file_name']),
+            service_id=service_id
+        )
+    except HTTPError as e:
+        if e.status_code == 404:
+            abort(404)
+        else:
+            raise e
 
 
 @main.route("/services/<int:service_id>/jobs/<job_id>/notification/<string:notification_id>")
