@@ -14,8 +14,13 @@ class JobApiClient(BaseAPIClient):
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
 
-    def create_job(self, service_id, template_id, file_name):
-        job_id = str(uuid.uuid4())
+    def get_job(self, service_id, job_id=None):
+        if job_id:
+            return self.get(url='/service/{}/job/{}'.format(service_id, job_id))
+        else:
+            return self.get(url='/service/{}/job'.format(service_id))
+
+    def create_job(self, job_id, service_id, template_id, file_name):
         data = {
             "id": job_id,
             "service": service_id,

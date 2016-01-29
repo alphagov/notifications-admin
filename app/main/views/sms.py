@@ -1,5 +1,6 @@
 import csv
 import re
+import uuid
 
 from datetime import date
 
@@ -34,7 +35,8 @@ def send_sms(service_id):
         try:
             csv_file = form.file.data
             filedata = _get_filedata(csv_file)
-            upload_id = s3upload(service_id, filedata)
+            upload_id = str(uuid.uuid4())
+            s3upload(upload_id, service_id, filedata)
             return redirect(url_for('.check_sms',
                                     service_id=service_id,
                                     upload_id=upload_id,
@@ -85,7 +87,7 @@ def check_sms(service_id, upload_id):
         # that will be done in another story
         template_id = 1
 
-        job_api_client.create_job(service_id, template_id, file_name)
+        job_api_client.create_job(upload_id, service_id, template_id, file_name)
         return redirect(url_for('main.view_job',
                         service_id=service_id,
                         job_id=upload_id))

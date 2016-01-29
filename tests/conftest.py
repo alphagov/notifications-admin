@@ -1,17 +1,16 @@
 import os
 from datetime import date
 import pytest
-from alembic.command import upgrade
-from alembic.config import Config
-from flask.ext.migrate import Migrate, MigrateCommand
-from flask.ext.script import Manager
-from sqlalchemy.schema import MetaData
 
 from app import create_app
 
 from . import (
-    create_test_user, service_json, TestClient,
-    get_test_user, template_json, api_key_json)
+    service_json,
+    TestClient,
+    template_json,
+    api_key_json,
+    job_json
+)
 
 
 @pytest.fixture(scope='session')
@@ -422,24 +421,41 @@ def mock_check_verify_code_code_expired(mocker):
 
 
 @pytest.fixture(scope='function')
-def job_data(mocker):
-    import uuid
-    job_id = uuid.uuid4()
-    file_name = 'thisisatest.csv'
-    data = {
-        'id': str(job_id),
-        'file_name': file_name,
-    }
-    return data
+def job_data():
+    return job_json()
 
 
 @pytest.fixture(scope='function')
 def mock_create_job(mocker, job_data):
-    def _create(service_id, template_id, file_name):
+    def _create(job_id, service_id, template_id, file_name):
+        job_data['id'] = job_id
         job_data['service'] = service_id
         job_data['template'] = template_id
-        job_data['bucket_name'] = 'service-{}-{}-notify'.format(service_id, job_data['id'])
+        job_data['bucket_name'] = 'service-{}-{}-notify'.format(service_id, job_id)
         job_data['original_file_name'] = file_name
-        job_data['file_name'] = '{}.csv'.format(job_data['id'])
+        job_data['file_name'] = '{}.csv'.format(job_id)
         return job_data
     return mocker.patch('app.job_api_client.create_job', side_effect=_create)
+
+
+@pytest.fixture(scope='function')
+def mock_get_job(mocker, job_data):
+    def _get_job(service_id, job_id):
+        job_data['id'] = job_id
+        job_data['service'] = service_id
+        return {"data": job_data}
+    return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
+
+
+@pytest.fixture(scope='function')
+def mock_get_jobs(mocker):
+    def _get_jobs(service_id):
+        import uuid
+        data = []
+        for i in range(5):
+            job_data = job_json()
+            job_data['id'] = str(uuid.uuid4())
+            job_data['service'] = service_id
+            data.append(job_data)
+        return {"data": data}
+    return mocker.patch('app.job_api_client.get_job', side_effect=_get_jobs)
