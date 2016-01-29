@@ -48,17 +48,17 @@
 
 {% block content %}
 
-  {% if current_user.is_authenticated() %}
+  {% if current_user.is_authenticated() and session['service_name'] != None %}
     <nav class="management-navigation">
       <div class="grid-row">
         <div class="column-half">
           <details class="dropdown">
             <summary class="dropdown-toggle">
-              {{ session['service_name'] }}
+              {{ session.get('service_name', 'Choose service') }}
             </summary>
             <div>
               <a href="{{ url_for('main.choose_service') }}">Switch service</a>
-              <a href="{{ url_for('.add_service') }}">Add a new service to GOV.UK Notify</a>
+              <a href="{{ url_for('main.add_service') }}">Add a new service to GOV.UK Notify</a>
             </div>
           </details>
         </div>
