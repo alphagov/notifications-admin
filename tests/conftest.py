@@ -422,6 +422,25 @@ def mock_check_verify_code_code_expired(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_send_email(mocker):
-    return mocker.patch(
-        'app.notifications_api_client.send_email', return_value=None)
+def job_data(mocker):
+    import uuid
+    job_id = uuid.uuid4()
+    original_file_name = 'thisisatest.csv'
+    bucket_name = 'service-2-notify'
+    file_name = '{}.csv'.format(job_id)
+    data = {
+        'id': str(job_id),
+        'service': 1,
+        'template': 1,
+        'original_file_name': original_file_name,
+        'bucket_name': bucket_name,
+        'file_name': file_name,
+    }
+    return data
+
+
+@pytest.fixture(scope='function')
+def mock_create_job(mocker, job_data):
+    def _create(service_id, template_id, file_name):
+        return job_data
+    return mocker.patch('app.job_api_client.create_job', side_effect=_create)
