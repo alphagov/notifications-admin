@@ -1,5 +1,4 @@
 {% extends "admin_template.html" %}
-{% from "components/banner.html" import banner %}
 
 {% block fullwidth_content %}
   <div class="grid-row">
@@ -11,6 +10,7 @@
         'Your service is in restricted mode. You can only send notifications to yourself.',
         'info'
       ) }}
+      {% include 'flash_messages.html' %}
       {% block maincolumn_content %}{% endblock %}
     </div>
   </div>
