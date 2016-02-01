@@ -1,5 +1,4 @@
 import csv
-import re
 import uuid
 
 from datetime import date
@@ -26,6 +25,10 @@ from app.main.uploader import (
 )
 from app.main.dao import templates_dao
 from app import job_api_client
+from app.main.utils import (
+    validate_phone_number,
+    InvalidPhoneError
+)
 
 
 @main.route("/services/<int:service_id>/sms/send", methods=['GET', 'POST'])
@@ -116,15 +119,15 @@ def _format_filename(filename):
 
 
 def _get_numbers(contents):
-    pattern = re.compile(r'^\+44\s?\d{4}\s?\d{6}$')  # TODO need better validation
     reader = csv.DictReader(
         contents.split('\n'),
         lineterminator='\n',
         quoting=csv.QUOTE_NONE)
     valid, rejects = [], []
     for i, row in enumerate(reader):
-        if pattern.match(row['phone']):
+        try:
+            validate_phone_number(row['phone'])
             valid.append(row)
-        else:
+        except InvalidPhoneError:
             rejects.append({"line_number": i+2, "phone": row['phone']})
     return {"valid": valid, "rejects": rejects}
