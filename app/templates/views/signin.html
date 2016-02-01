@@ -9,17 +9,17 @@ Sign in
 {% block maincolumn_content %}
 
 <div class="grid-row">
-	<div class="column-two-thirds">
-		<h1 class="heading-xlarge">Sign in</h1>
+  <div class="column-two-thirds">
+    <h1 class="heading-xlarge">Sign in</h1>
 
-		<p>If you do not have an account, you can <a href="register">register for one now</a>.</p>
+    <p>If you do not have an account, you can <a href="register">register for one now</a>.</p>
 
-		<form autocomplete="off" method="post">
-			{{ textbox(form.email_address) }}
-			{{ textbox(form.password) }}
-			{{ page_footer("Continue", back_link=url_for('.forgot_password'), back_link_text="Forgotten password?") }}
-		</form>
-	</div>
+    <form autocomplete="off" method="post">
+      {{ textbox(form.email_address) }}
+      {{ textbox(form.password) }}
+      {{ page_footer("Continue", back_link=url_for('.forgot_password'), back_link_text="Forgotten password?") }}
+    </form>
+  </div>
 </div>
 
 {% endblock %}

@@ -16,9 +16,8 @@ def test_should_render_new_password_template(app_,
         with app_.test_client() as client:
             token = generate_token(api_user_active.email_address)
         response = client.get(url_for('.new_password', token=token))
-        print(response.location)
         assert response.status_code == 200
-        assert ' You can now create a new password for your account.' in response.get_data(as_text=True)
+        assert 'You can now create a new password for your account.' in response.get_data(as_text=True)
 
 
 @pytest.mark.skipif(True, reason='Password reset no implemented')

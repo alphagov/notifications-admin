@@ -5,60 +5,60 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
-	GOV.UK Notify | Send text messages
+  GOV.UK Notify | Send text messages
 {% endblock %}
 
 {% block maincolumn_content %}
 
-	<h1 class="heading-xlarge">Send text messages</h1>
+  <h1 class="heading-xlarge">Send text messages</h1>
 
-	{% if upload_result.rejects %}
-		<h3 class="heading-small">The following numbers are invalid</h3>
-		{% for rejected in upload_result.rejects %}
-			<p>Line {{rejected.line_number}}: {{rejected.phone }}</a>
-		{% endfor %}
-		<p><a href="{{url_for('.send_sms', service_id=service_id)}}" class="button">Go back and resolve errors</a></p>
+  {% if upload_result.rejects %}
+    <h3 class="heading-small">The following numbers are invalid</h3>
+    {% for rejected in upload_result.rejects %}
+      <p>Line {{rejected.line_number}}: {{rejected.phone }}</a>
+    {% endfor %}
+    <p><a href="{{url_for('.send_sms', service_id=service_id)}}" class="button">Go back and resolve errors</a></p>
 
-	{% else %}
+  {% else %}
 
-		<h2 class="heading-medium">Check and confirm</h2>
-		<form method="POST" enctype="multipart/form-data">
+    <h2 class="heading-medium">Check and confirm</h2>
+    <form method="POST" enctype="multipart/form-data">
 
-			{{ page_footer(
-					button_text = "Send {} text messages".format(upload_result.valid|count),
-					back_link = url_for(".send_sms", service_id=service_id)
-			)}}
+      {{ page_footer(
+          button_text = "Send {} text messages".format(upload_result.valid|count),
+          back_link = url_for(".send_sms", service_id=service_id)
+      )}}
 
-			{% if upload_result.valid | count > 6 %}
-		    <h3 class="heading-small">First three message in file</h3>
-		    	{% for recipient in upload_result.valid[:3] %}
-				   	{{ sms_message(message_template|replace_placeholders(
-				            recipient),
-				            '{}'.format(recipient['phone'])
-						)}}
-					{% endfor %}
-					<h3 class="heading-small">Last three messages in file</h3>
-					{% for recipient in upload_result.valid[-3:] %}
-						{{ sms_message(message_template|replace_placeholders(
-			            recipient),
-			            '{}'.format(recipient['phone'])
-						)}}
-					{% endfor %}
-			{% else %}
-				<h3 class="heading-small">All messages in file</h3>
-		    	{% for recipient in upload_result.valid %}
-				   	{{ sms_message(message_template|replace_placeholders(
-				            recipient),
-				            '{}'.format(recipient['phone'])
-						)}}
-					{% endfor %}
-			{% endif %}
+      {% if upload_result.valid | count > 6 %}
+        <h3 class="heading-small">First three message in file</h3>
+          {% for recipient in upload_result.valid[:3] %}
+             {{ sms_message(message_template|replace_placeholders(
+                    recipient),
+                    '{}'.format(recipient['phone'])
+            )}}
+          {% endfor %}
+          <h3 class="heading-small">Last three messages in file</h3>
+          {% for recipient in upload_result.valid[-3:] %}
+            {{ sms_message(message_template|replace_placeholders(
+                  recipient),
+                  '{}'.format(recipient['phone'])
+            )}}
+          {% endfor %}
+      {% else %}
+        <h3 class="heading-small">All messages in file</h3>
+          {% for recipient in upload_result.valid %}
+             {{ sms_message(message_template|replace_placeholders(
+                    recipient),
+                    '{}'.format(recipient['phone'])
+            )}}
+          {% endfor %}
+      {% endif %}
 
-			{{ page_footer(
-					button_text = "Send {} text messages".format(upload_result.valid|count),
-					back_link = url_for(".send_sms", service_id=service_id)
-			)}}
+      {{ page_footer(
+          button_text = "Send {} text messages".format(upload_result.valid|count),
+          back_link = url_for(".send_sms", service_id=service_id)
+      )}}
 
-		</form>
-	{% endif %}
+    </form>
+  {% endif %}
 {% endblock %}
