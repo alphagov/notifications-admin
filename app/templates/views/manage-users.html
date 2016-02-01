@@ -7,13 +7,13 @@ GOV.UK Notify | Manage users
 
 {% block maincolumn_content %}
 
-		<h1 class="heading-xlarge">Manage users</h1>
+    <h1 class="heading-xlarge">Manage users</h1>
 
-		<p>Here's where you can add or remove users of a service.</p>
+    <p>Here's where you can add or remove users of a service.</p>
 
-		{{ page_footer(
-			back_link = url_for('.service_dashboard', service_id=service_id),
-			back_link_text = 'Back to dashboard'
-		) }}
+    {{ page_footer(
+      back_link = url_for('.service_dashboard', service_id=service_id),
+      back_link_text = 'Back to dashboard'
+    ) }}
 
 {% endblock %}

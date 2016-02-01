@@ -10,24 +10,24 @@ GOV.UK Notify | Notifications activity
 {% block maincolumn_content %}
 
 
-		<h1 class="heading-large">
-			Text message
-		</h1>
+    <h1 class="heading-large">
+      Text message
+    </h1>
 
-		<div class="grid-row">
-			<div class="column-two-thirds">
-				{{ sms_message(message.message, message.phone) }}
-			</div>
-			<div class="column-one-third">
-				{{ banner(
-					"{} {}".format(message.status, delivered_at)
-				) }}
-			</div>
-		</div>
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ sms_message(message.message, message.phone) }}
+      </div>
+      <div class="column-one-third">
+        {{ banner(
+          "{} {}".format(message.status, delivered_at)
+        ) }}
+      </div>
+    </div>
 
-		{{ page_footer(
-			back_link = url_for('.view_job', service_id=service_id, job_id=job_id),
-			back_link_text = 'View other messages in this job'
-		) }}
+    {{ page_footer(
+      back_link = url_for('.view_job', service_id=service_id, job_id=job_id),
+      back_link_text = 'View other messages in this job'
+    ) }}
 
 {% endblock %}

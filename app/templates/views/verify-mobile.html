@@ -7,21 +7,21 @@ GOV.UK Notify | Confirm mobile number
 {% block maincolumn_content %}
 
 <div class="grid-row">
-	<div class="column-two-thirds">
-		<h1 class="heading-xlarge">Confirm your mobile number</h1>
+  <div class="column-two-thirds">
+    <h1 class="heading-xlarge">Confirm your mobile number</h1>
 
-		<p>We've sent you a confirmation code by text message.</p>
+    <p>We've sent you a confirmation code by text message.</p>
 
-  		<p>
-  		<label class="form-label" for="email">Enter confirmation code<br>
-  		<input class="form-control-1-4" id="email" type="text"><br>
-  		<span class="font-xsmall"><a href="{{ url_for('.text-not-received-2') }}">I haven't received a text</a></span>
-  		</p>
+      <p>
+      <label class="form-label" for="email">Enter confirmation code<br>
+      <input class="form-control-1-4" id="email" type="text"><br>
+      <span class="font-xsmall"><a href="{{ url_for('.text-not-received-2') }}">I haven't received a text</a></span>
+      </p>
 
-  		<p>
-  		<a class="button" href="dashboard" role="button">Continue</a>
-  		</p>
-	</div>
+      <p>
+      <a class="button" href="dashboard" role="button">Continue</a>
+      </p>
+  </div>
 </div>
 
 {% endblock %}

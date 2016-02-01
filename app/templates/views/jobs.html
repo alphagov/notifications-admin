@@ -7,28 +7,28 @@ GOV.UK Notify | Notifications activity
 
 {% block maincolumn_content %}
 
-		<h1 class="heading-xlarge">Notifications activity</h1>
+    <h1 class="heading-xlarge">Notifications activity</h1>
 
-		{% call(item) list_table(
-			jobs,
-			caption="Recent activity",
-			caption_visible=False,
-			empty_message='You haven’t sent any notifications yet',
-			field_headings=['Job', 'File', 'Time', 'Status']
-		) %}
-			{% call field() %}
-				<a href="{{ url_for('.view_job', service_id=service_id, job_id=item.id) }}">{{ item.id }}</a>
-			{% endcall %}
-			{% call field() %}
-				<a href="{{ url_for('.view_job', service_id=service_id, job_id=item.id) }}">{{ item.original_file_name }}</a>
-			{% endcall %}
-			{% call field() %}
-				{{ item.created_at | format_datetime}}
-			{% endcall %}
-			{% call field() %}
-				{{ item.status }}
-			{% endcall %}
-		{% endcall %}
+    {% call(item) list_table(
+      jobs,
+      caption="Recent activity",
+      caption_visible=False,
+      empty_message='You haven’t sent any notifications yet',
+      field_headings=['Job', 'File', 'Time', 'Status']
+    ) %}
+      {% call field() %}
+        <a href="{{ url_for('.view_job', service_id=service_id, job_id=item.id) }}">{{ item.id }}</a>
+      {% endcall %}
+      {% call field() %}
+        <a href="{{ url_for('.view_job', service_id=service_id, job_id=item.id) }}">{{ item.original_file_name }}</a>
+      {% endcall %}
+      {% call field() %}
+        {{ item.created_at | format_datetime}}
+      {% endcall %}
+      {% call field() %}
+        {{ item.status }}
+      {% endcall %}
+    {% endcall %}
 
 
 {% endblock %}

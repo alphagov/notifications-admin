@@ -9,20 +9,20 @@ GOV.UK Notify | Text verification
 {% block maincolumn_content %}
 
 <div class="grid-row">
-	<div class="column-two-thirds">
-		<h1 class="heading-xlarge">Text verification</h1>
+  <div class="column-two-thirds">
+    <h1 class="heading-xlarge">Text verification</h1>
 
-		<p>We've sent you a text message with a verification code.</p>
+    <p>We've sent you a text message with a verification code.</p>
 
-		<form autocomplete="off" method="post">
-			{{ textbox(form.sms_code) }}
-			{{ page_footer(
-				"Continue",
-				back_link=url_for('.verification_code_not_received'),
-				back_link_text='I haven’t received a text'
-			) }}
-		</form>
-	</div>
+    <form autocomplete="off" method="post">
+      {{ textbox(form.sms_code) }}
+      {{ page_footer(
+        "Continue",
+        back_link=url_for('.verification_code_not_received'),
+        back_link_text='I haven’t received a text'
+      ) }}
+    </form>
+  </div>
 </div>
 
 {% endblock %}
