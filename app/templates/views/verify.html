@@ -16,9 +16,13 @@ GOV.UK Notify | Confirm email address and mobile number
 
 		<form autocomplete="off" method="post">
 			{{ textbox(form.email_code) }}
-			<span class="font-xsmall"><a href="{{ url_for('.check_and_resend_email_code')}}">I haven't received an email</a></span>
+			<p>
+				<a href="{{ url_for('.check_and_resend_email_code')}}">I haven't received an email</a>
+			</p>
 			{{ textbox(form.sms_code) }}
-			<span class="font-xsmall"><a href="{{ url_for('.check_and_resend_text_code') }}">I haven't received a text</a></span>
+			<p>
+				<a href="{{ url_for('.check_and_resend_text_code') }}">I haven't received a text</a></span>
+			</p>
 			{{ page_footer("Continue") }}
 		</form>
 	</div>

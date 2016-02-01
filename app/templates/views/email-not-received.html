@@ -13,13 +13,11 @@ GOV.UK Notify
     <h1 class="heading-xlarge">Check your email address</h1>
 
     <p>Check your email address is correct and then resend the confirmation code.</p>
-      <p>
-      </p>
-      <form autocomplete="off" method="post">
-        {{ textbox(form.email_address) }}
-        <span class="font-xsmall">Your email address must end in .gov.uk</span>
-        {{ page_footer('Resend confirmation code') }}
-      </form>
+
+    <form autocomplete="off" method="post">
+      {{ textbox(form.email_address, hint='Your email address must end in .gov.uk') }}
+      {{ page_footer('Resend confirmation code') }}
+    </form>
   </div>
 </div>
 
