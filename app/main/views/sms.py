@@ -10,7 +10,8 @@ from flask import (
     redirect,
     url_for,
     flash,
-    abort
+    abort,
+    session
 )
 
 from flask_login import login_required
@@ -36,11 +37,12 @@ def send_sms(service_id):
             csv_file = form.file.data
             filedata = _get_filedata(csv_file)
             upload_id = str(uuid.uuid4())
+            template_id = request.form.get('template')
             s3upload(upload_id, service_id, filedata)
+            session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
             return redirect(url_for('.check_sms',
                                     service_id=service_id,
-                                    upload_id=upload_id,
-                                    file_name=filedata['file_name']))
+                                    upload_id=upload_id))
         except ValueError as e:
             message = 'There was a problem uploading: {}'.format(
                       csv_file.filename)
@@ -70,24 +72,29 @@ def check_sms(service_id, upload_id):
     if request.method == 'GET':
         contents = s3download(service_id, upload_id)
         upload_result = _get_numbers(contents)
-        file_name = request.args.get('file_name')
+        upload_data = session['upload_data']
+        original_file_name = upload_data.get('original_file_name')
+        template_id = upload_data.get('template_id')
+        template = templates_dao.get_service_template(service_id, template_id)['data']
         return render_template(
             'views/check-sms.html',
             upload_result=upload_result,
-            file_name=file_name,
-            message_template='''
-                ((name)), we’ve received your ((thing)). We’ll contact you again within 1 week.
-            ''',
+            message_template=template['content'],
             service_id=service_id
         )
     elif request.method == 'POST':
+        upload_data = session['upload_data']
+        original_file_name = upload_data.get('original_file_name')
+        template_id = upload_data.get('template_id')
+        session.pop('upload_data')
+        try:
+            job_api_client.create_job(upload_id, service_id, template_id, original_file_name)
+        except HTTPError as e:
+            if e.status_code == 404:
+                abort(404)
+            else:
+                raise e
 
-        file_name = request.form['file_name']
-        # TODO - template id should come from form but is not wired in yet.
-        # that will be done in another story
-        template_id = 1
-
-        job_api_client.create_job(upload_id, service_id, template_id, file_name)
         return redirect(url_for('main.view_job',
                         service_id=service_id,
                         job_id=upload_id))

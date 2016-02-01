@@ -27,7 +27,8 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
                                                                         api_user_active,
                                                                         mock_get_user,
                                                                         mock_get_user_by_email,
-                                                                        mock_login):
+                                                                        mock_login,
+                                                                        mock_get_service_template):
 
     contents = 'phone\n+44 123\n+44 456'
     file_data = (BytesIO(contents.encode('utf-8')), 'invalid.csv')
@@ -53,7 +54,8 @@ def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(app_,
                                                                         api_user_active,
                                                                         mock_get_user,
                                                                         mock_get_user_by_email,
-                                                                        mock_login):
+                                                                        mock_login,
+                                                                        mock_get_service_template):
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986\n+44 7700 900987\n+44 7700 900988\n+44 7700 900989'  # noqa
 
     file_data = (BytesIO(contents.encode('utf-8')), 'valid.csv')
@@ -89,7 +91,8 @@ def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(app_,
                                                                         api_user_active,
                                                                         mock_get_user,
                                                                         mock_get_user_by_email,
-                                                                        mock_login):
+                                                                        mock_login,
+                                                                        mock_get_service_template):
 
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
 
@@ -125,23 +128,22 @@ def test_create_job_should_call_api(app_,
                                     mock_login,
                                     job_data,
                                     mock_create_job,
-                                    mock_get_job):
+                                    mock_get_job,
+                                    mock_get_service_template):
 
-    import uuid
     service_id = service_one['id']
-    job_id = str(uuid.uuid4())
-    file_name = job_data['file_name']
-
-    # TODO - template id should come from form but is not wired in yet.
-    # that will be done in another story
-    template_id = 1
+    job_id = job_data['id']
+    original_file_name = job_data['original_file_name']
+    template_id = job_data['template']
 
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            url = url_for('main.check_sms', service_id=service_one['id'], upload_id=job_id, file_name=file_name)
+            with client.session_transaction() as session:
+                session['upload_data'] = {'original_file_name': original_file_name, 'template_id': template_id}
+            url = url_for('main.check_sms', service_id=service_one['id'], upload_id=job_id)
             response = client.post(url, data=job_data, follow_redirects=True)
 
         assert response.status_code == 200
-        mock_create_job.assert_called_with(job_id, service_id, template_id, file_name)
+        mock_create_job.assert_called_with(job_id, service_id, template_id, original_file_name)
         assert job_data['bucket_name'] == "service-{}-{}-notify".format(service_id, job_id)
