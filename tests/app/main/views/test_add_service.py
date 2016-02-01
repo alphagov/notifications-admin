@@ -14,7 +14,7 @@ def test_get_should_render_add_service_template(app_,
             client.login(api_user_active)
             response = client.get(url_for('main.add_service'))
             assert response.status_code == 200
-            assert 'Set up notifications for your service' in response.get_data(as_text=True)
+            assert 'Add a new service' in response.get_data(as_text=True)
 
 
 def test_should_add_service_and_redirect_to_next_page(app_,

@@ -21,27 +21,31 @@
   }
 }
 
-.phase-tag {
-    @include phase-tag(beta);
-}
-
-@media (min-width: 641px) {
-  .phase-tag {
-      font-size: 16px;
-      line-height: 1.25;
-      margin-top: 7px;
-
-  }
-}
-
-@media (max-width: 641px) {
-  .phase-tag {
-      margin-top: 11px;
-  }
+#global-header-bar {
+  background-color: $red;
 }
 
 #global-header #logo {
   white-space: nowrap;
+  font-size: 27px;
+  line-height: 32px;
+
+  img {
+    padding-right: 8px;
+  }
+
+}
+
+@include media(desktop) {
+
+  #proposition-menu {
+    float: right;
+  }
+
+  #global-header .header-proposition #proposition-links li {
+    padding: 0 0 0 15px;
+  }
+
 }
 
 a:visited {

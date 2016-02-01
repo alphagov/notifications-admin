@@ -2,16 +2,16 @@
 
   padding: 3px 0 0 0;
 
-  li {
-    @include core-16();
-    margin: 3px 0;
-  }
-
-  ul {
+  ul, h2 {
+    @include core-16;
     border-bottom: 1px solid $border-colour;
     margin: 10px 20px 0 0;
     list-style-type: none;
     padding: 0 0 8px 0;
+  }
+
+  h2 {
+    font-weight: bold;
   }
 
   li {
