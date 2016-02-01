@@ -39,6 +39,8 @@ class Config(object):
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10mb
     UPLOAD_FOLDER = '/tmp'
 
+    HEADER_COLOUR = '#FFBF47'  # $yellow
+
 
 class Development(Config):
     DEBUG = True
@@ -53,10 +55,19 @@ class Test(Development):
     WTF_CSRF_ENABLED = False
 
 
-class Live(Config):
+class Preview(Config):
     DEBUG = False
     HTTP_PROTOCOL = 'https'
     SESSION_COOKIE_SECURE = True
+    HEADER_COLOUR = '#F47738'  # $orange
+
+
+class Staging(Preview):
+    pass
+
+
+class Live(Staging):
+    HEADER_COLOUR = '#B10E1E'  # $red
 
 
 configs = {
