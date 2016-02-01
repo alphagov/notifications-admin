@@ -100,7 +100,10 @@ def init_app(app, config_overrides):
 
     @app.context_processor
     def inject_global_template_variables():
-        return {'asset_path': '/static/'}
+        return {
+            'asset_path': '/static/',
+            'header_colour': app.config['HEADER_COLOUR']
+        }
 
 
 def convert_to_boolean(value):
