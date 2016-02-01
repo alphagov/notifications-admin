@@ -1,4 +1,7 @@
 <nav class="navigation">
+  <h2 class="navigation-service-name">
+    {{ session.get('service_name', 'Choose service') }}
+  </h2>
   <ul>
     <li><a href="{{ url_for('.service_dashboard', service_id=service_id) }}">Dashboard</a></li>
   </ul>

@@ -28,10 +28,26 @@
 {% block header_class %}with-proposition{% endblock %}
 {% block proposition_header %}
   <div class="header-proposition">
-    <div class='content'>
+    <div class="content">
       <div class="phase-banner-beta">
         <strong class="phase-tag">BETA</strong>
       </div>
+      {% if current_user.is_authenticated() %}
+        <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
+        <nav id="proposition-menu">
+          <ul id="proposition-links">
+            <li>
+              <a href="{{ url_for('main.user_profile') }}">{{ current_user.name }}</a>
+            </li>
+            <li>
+              <a href="{{ url_for('main.choose_service') }}">Switch service</a>
+            </li>
+            <li>
+              <a href="{{ url_for('main.sign_out')}}">Sign out</a>
+            </li>
+          </ul>
+        </nav>
+      {% endif %}
     </div>
   </div>
 {% endblock %}
@@ -47,28 +63,6 @@
 {% endif %}
 
 {% block content %}
-
-  {% if current_user.is_authenticated() and session['service_name'] != None %}
-    <nav class="management-navigation">
-      <div class="grid-row">
-        <div class="column-half">
-          <details class="dropdown">
-            <summary class="dropdown-toggle">
-              {{ session.get('service_name', 'Choose service') }}
-            </summary>
-            <div>
-              <a href="{{ url_for('main.choose_service') }}">Switch service</a>
-              <a href="{{ url_for('main.add_service') }}">Add a new service to GOV.UK Notify</a>
-            </div>
-          </details>
-        </div>
-        <div class="column-half management-navigation-account">
-          <a href="{{ url_for('main.user_profile') }}">{{ current_user.name }}</a>
-          <a href="{{ url_for('main.sign_out')}}">Sign out</a>
-        </div>
-      </div>
-    </nav>
-  {% endif %}
 
   <main id="content" role="main" class="page-container">
       {% with messages = get_flashed_messages(with_categories=true) %}

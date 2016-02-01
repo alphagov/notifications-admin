@@ -21,8 +21,12 @@
   }
 }
 
+.phase-banner-beta {
+  display: inline-block;
+}
+
 .phase-tag {
-    @include phase-tag(beta);
+  @include phase-tag(beta);
 }
 
 @media (min-width: 641px) {
@@ -42,6 +46,18 @@
 
 #global-header #logo {
   white-space: nowrap;
+}
+
+@include media(desktop) {
+
+  #proposition-menu {
+    float: right;
+  }
+
+  #global-header .header-proposition #proposition-links li {
+    padding: 0 0 0 15px;
+  }
+
 }
 
 a:visited {

@@ -8,12 +8,6 @@ from app.main import main
 @login_required
 def choose_service():
     services = services_dao.get_services(current_user.id)
-    # If there is only one service redirect
-    # to the service dashboard.
-    if len(services['data']) == 1:
-        session['service_name'] = services['data'][0]['name']
-        return redirect(url_for(
-            'main.service_dashboard', service_id=services['data'][0]['id']))
     return render_template(
         'views/choose-service.html',
         services=[services_dao.ServicesBrowsableItem(x) for x in services['data']])
