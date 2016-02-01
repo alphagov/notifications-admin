@@ -46,6 +46,13 @@
 
 #global-header #logo {
   white-space: nowrap;
+  font-size: 27px;
+  line-height: 32px;
+
+  img {
+    padding-right: 8px;
+  }
+
 }
 
 @include media(desktop) {
