@@ -70,6 +70,8 @@ def service_name_change_confirm(service_id):
     if form.validate_on_submit():
         service['name'] = session['service_name_change']
         update_service(service)
+        session['service_name'] = service['name']
+        session.pop('service_name_change')
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/confirm.html',
