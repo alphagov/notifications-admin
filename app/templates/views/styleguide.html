@@ -7,6 +7,7 @@
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/table.html" import mapping_table, list_table, row, field %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/file-upload.html" import file_upload %}
 {% from "components/api-key.html" import api_key %}
 
 {% block page_title %}
@@ -204,6 +205,9 @@
   {{ textbox(form.username) }}
   {{ textbox(form.password) }}
   {{ textbox(form.message, highlight_tags=True) }}
+
+  <h2 class="heading-large">File upload</h2>
+  {{ file_upload(form.file_upload) }}
 
   <h2 class="heading-large">API key</h2>
 

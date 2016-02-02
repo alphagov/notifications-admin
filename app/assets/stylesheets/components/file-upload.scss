@@ -1,0 +1,36 @@
+.js-enabled {
+
+  .file-upload {
+
+    &-label {
+      @include bold-19;
+      display: block;
+      margin: 0 0 10px 0;
+    }
+
+    &-field {
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+    }
+
+    &-field:focus + .file-upload-button {
+      outline: 3px solid $yellow;
+    }
+
+    &-button {
+      @include button($panel-colour);
+      display: inline-block;
+    }
+
+    &-filename {
+      display: inline-block;
+      padding-left: $gutter-half;
+    }
+
+  }
+
+}

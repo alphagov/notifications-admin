@@ -1,6 +1,6 @@
 from flask import render_template
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, TextAreaField, validators
+from wtforms import StringField, PasswordField, TextAreaField, FileField, validators
 from app.main import main
 
 
@@ -11,6 +11,7 @@ def styleguide():
         username = StringField(u'Username')
         password = PasswordField(u'Password', [validators.required()])
         message = TextAreaField(u'Message')
+        file_upload = FileField('Upload a CSV file to add your recipients’ details')
 
     form = FormExamples()
 

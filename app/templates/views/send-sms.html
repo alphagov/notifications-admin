@@ -12,6 +12,12 @@
 
     <h1 class="heading-large">Send text messages</h1>
 
+    {{ banner(
+      'You can only send notifications to yourself',
+      subhead='Trial mode',
+      type='info'
+    ) }}
+
     {{ sms_message(
       template.content, name='Preview'
     ) }}
