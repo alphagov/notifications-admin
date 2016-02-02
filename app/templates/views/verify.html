@@ -15,14 +15,16 @@ GOV.UK Notify | Confirm email address and mobile number
     <p>We’ve sent you confirmation codes by email and text message. You need to enter both codes here.</p>
 
     <form autocomplete="off" method="post">
-      {{ textbox(form.email_code) }}
-      <p>
-        <a href="{{ url_for('.check_and_resend_email_code')}}">I haven’t received an email</a>
-      </p>
-      {{ textbox(form.sms_code) }}
-      <p>
-        <a href="{{ url_for('.check_and_resend_text_code') }}">I haven’t received a text</a></span>
-      </p>
+      {{ textbox(
+        form.email_code,
+        help_link=url_for('.check_and_resend_email_code'),
+        help_link_text='I haven’t received an email'
+      ) }}
+      {{ textbox(
+        form.sms_code,
+        help_link=url_for('.check_and_resend_text_code'),
+        help_link_text='I haven’t received a text'
+      ) }}
       {{ page_footer("Continue") }}
     </form>
   </div>

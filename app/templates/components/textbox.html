@@ -1,4 +1,4 @@
-{% macro textbox(field, hint=False, highlight_tags=False) %}
+{% macro textbox(field, hint=False, highlight_tags=False, help_link=None, help_link_text=None) %}
   <div class="form-group{% if field.errors %} error{% endif %}">
     <label class="form-label" for="{{ field.name }}">
       {{ field.label }}
@@ -17,5 +17,10 @@
       'class': 'form-control textbox-highlight-textbox' if highlight_tags else 'form-control',
       'data-module': 'highlight-tags' if highlight_tags else ''
     }) }}
+    {% if help_link and help_link_text %}
+      <p class="textbox-help-link">
+        <a href='{{ help_link }}'>{{ help_link_text }}</a>
+      </p>
+    {% endif %}
   </div>
 {% endmacro %}
