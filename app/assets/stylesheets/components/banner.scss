@@ -51,3 +51,19 @@
   }
 
 }
+
+.banner-tip {
+
+  @extend .banner;
+  background: $yellow;
+  color: $text-colour;
+  text-align: left;
+  border: 5px solid $text-colour;
+  font-weight: bold;
+
+  a:link, a:visited {
+    color: $text-colour;
+    text-decoration: underline;
+  }
+
+}

@@ -8,6 +8,15 @@
 
 {% block maincolumn_content %}
 
+    {% if not has_templates %}
+      {{ banner(
+        '<a href="{}">Add a template</a> to start sending notifications'.format(
+          url_for(".add_service_template", service_id=service_id)
+        )|safe,
+        type="tip"
+      )}}
+    {% endif %}
+
     <ul class="grid-row job-totals">
       <li class="column-half">
         {{ big_number(

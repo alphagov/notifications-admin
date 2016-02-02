@@ -4,6 +4,7 @@ from flask import url_for, session
 def test_should_show_recent_jobs_on_dashboard(app_,
                                               api_user_active,
                                               mock_get_service,
+                                              mock_get_service_templates,
                                               mock_get_user,
                                               mock_get_user_by_email,
                                               mock_login):

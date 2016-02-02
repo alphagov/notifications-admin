@@ -17,6 +17,7 @@ def test_sign_out_user(app_,
                        api_user_active,
                        mock_get_user,
                        mock_get_user_by_email,
+                       mock_get_service_templates,
                        mock_login):
     with app_.test_request_context():
         email = 'valid@example.gov.uk'
