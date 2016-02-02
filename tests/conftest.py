@@ -30,7 +30,8 @@ def app_(request):
 
 @pytest.fixture(scope='function')
 def service_one(request, api_user_active):
-    return service_json(1, 'service one', [api_user_active.id])
+    import uuid
+    return service_json(str(uuid.uuid4()), 'service one', [api_user_active.id])
 
 
 @pytest.fixture(scope='function')
@@ -89,10 +90,11 @@ def mock_get_services(mocker, user=None):
         user = api_user_active()
 
     def _create(user_id=None):
+        import uuid
         service_one = service_json(
-            1, "service_one", [user.id], 1000, True, False)
+            uuid.uuid4(), "service_one", [user.id], 1000, True, False)
         service_two = service_json(
-            2, "service_two", [user.id], 1000, True, False)
+            uuid.uuid4(), "service_two", [user.id], 1000, True, False)
         return {'data': [service_one, service_two]}
 
     return mocker.patch(

@@ -24,19 +24,19 @@ def verify_mobile():
     return render_template('views/verify-mobile.html')
 
 
-@main.route("/services/<int:service_id>/send-email")
+@main.route("/services/<service_id>/send-email")
 @login_required
 def send_email(service_id):
     return render_template('views/send-email.html', service_id=service_id)
 
 
-@main.route("/services/<int:service_id>/check-email")
+@main.route("/services/<service_id>/check-email")
 @login_required
 def check_email(service_id):
     return render_template('views/check-email.html')
 
 
-@main.route("/services/<int:service_id>/manage-users")
+@main.route("/services/<service_id>/manage-users")
 @login_required
 def manage_users(service_id):
     return render_template('views/manage-users.html', service_id=service_id)
