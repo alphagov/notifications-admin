@@ -10,10 +10,10 @@ GOV.UK Notify | Confirm email address and mobile number
 
 <div class="grid-row">
   <div class="column-two-thirds">
-    <h1 class="heading-large">Activate your account</h1>
-
-    <p>We’ve sent you confirmation codes by email and text message. You need to enter both codes here.</p>
-
+    <h1 class="heading-large">Enter the codes we’ve sent you</h1>
+    <p>
+      We’ve sent you confirmation codes by email and text message.
+    </p>
     <form autocomplete="off" method="post">
       {{ textbox(
         form.email_code,
@@ -25,7 +25,7 @@ GOV.UK Notify | Confirm email address and mobile number
         form.sms_code,
         width='5em',
         help_link=url_for('.check_and_resend_text_code'),
-        help_link_text='I haven’t received a text'
+        help_link_text='I haven’t received a text message'
       ) }}
       {{ page_footer("Continue") }}
     </form>
