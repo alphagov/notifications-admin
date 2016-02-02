@@ -3,7 +3,7 @@ import re
 import ast
 
 import dateutil
-from flask import Flask, session, Markup, escape, render_template
+from flask import (Flask, session, Markup, escape, render_template, make_response)
 from flask._compat import string_types
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -160,7 +160,7 @@ def useful_headers_after_request(response):
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']
     response.headers.add(
-        'Cache-Control', 'no-store, max-age=43200, no-cache, private, must-revalidate')
+        'Cache-Control', 'no-store, no-cache, private, must-revalidate')
     return response
 
 
@@ -168,7 +168,8 @@ def register_errorhandlers(application):
     def render_error(error):
         # If a HTTPException, pull the `code` attribute; default to 500
         error_code = getattr(error, 'code', 500)
-        return render_template("error/{0}.html".format(error_code)), error_code
+        resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
+        return useful_headers_after_request(resp)
     for errcode in [401, 404, 500]:
         application.errorhandler(errcode)(render_error)
 
