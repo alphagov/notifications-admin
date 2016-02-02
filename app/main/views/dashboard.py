@@ -30,5 +30,5 @@ def service_dashboard(service_id):
         jobs=jobs,
         free_text_messages_remaining='25,000',
         spent_this_month='0.00',
-        has_templates=bool(len(templates)),
+        template_count=len(templates),
         service_id=str(service_id))

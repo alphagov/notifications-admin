@@ -8,15 +8,6 @@
 
 {% block maincolumn_content %}
 
-    {% if not has_templates %}
-      {{ banner(
-        '<a href="{}">Add a template</a> to start sending notifications'.format(
-          url_for(".add_service_template", service_id=service_id)
-        )|safe,
-        type="tip"
-      )}}
-    {% endif %}
-
     <ul class="grid-row job-totals">
       <li class="column-half">
         {{ big_number(
@@ -32,24 +23,44 @@
       </li>
     </ul>
 
-    {% call(item) list_table(
-      [],
-      caption="Recent text messages",
-      empty_message='You haven’t sent any text messages yet',
-      field_headings=['Job', 'File', 'Time', 'Status']
-    ) %}
-      {% call field() %}
-        <a href="{{ url_for('.view_job', service_id=service_id, job_id=456) }}">{{ item.file }}</a>
+    {% if not template_count %}
+      {{ banner(
+        '<a href="{}">Add a text message template</a>'.format(
+          url_for(".add_service_template", service_id=service_id)
+        )|safe,
+        subhead='Get started',
+        type="tip"
+      )}}
+    {% else %}
+      {{ banner(
+        '<a href="{}">Try sending a text message</a>'.format(
+          url_for(".send_sms", service_id=service_id)
+        )|safe,
+        subhead='Next step',
+        type="tip"
+      )}}
+    {% endif %}
+
+    {% if [] %}
+      {% call(item) list_table(
+        [],
+        caption="Recent text messages",
+        empty_message='You haven’t sent any text messages yet',
+        field_headings=['Job', 'File', 'Time', 'Status']
+      ) %}
+        {% call field() %}
+          <a href="{{ url_for('.view_job', service_id=service_id, job_id=456) }}">{{ item.file }}</a>
+        {% endcall %}
+        {% call field() %}
+          <a href="{{ url_for('.view_job', service_id=service_id, job_id=456) }}">{{ item.job }}</a>
+        {% endcall %}
+        {% call field() %}
+          {{ item.time }}
+        {% endcall %}
+        {% call field() %}
+          {{ item.status }}
+        {% endcall %}
       {% endcall %}
-      {% call field() %}
-        <a href="{{ url_for('.view_job', service_id=service_id, job_id=456) }}">{{ item.job }}</a>
-      {% endcall %}
-      {% call field() %}
-        {{ item.time }}
-      {% endcall %}
-      {% call field() %}
-        {{ item.status }}
-      {% endcall %}
-    {% endcall %}
+    {% endif %}
 
 {% endblock %}

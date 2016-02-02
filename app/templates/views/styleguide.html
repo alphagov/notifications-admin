@@ -35,15 +35,20 @@
   </div>
 
   {{ banner(
-    'Your service is in restricted mode. You can only send notifications to yourself.',
-    'info'
+    'You can only send notifications to yourself',
+    type='info',
+    subhead='Restricted mode'
   ) }}
 
   {{ banner('You’re not allowed to do this', 'dangerous')}}
 
   {{ banner('Are you sure you want to delete?', 'dangerous', delete_button="Yes, delete this thing")}}
 
-  {{ banner('<a href="#">Send your first message</a>'|safe, 'tip')}}
+  {{ banner(
+    '<a href="#">Send your first message</a>'|safe,
+    subhead='Get started',
+    type='tip'
+  )}}
 
   <h2 class="heading-large">Big number</h2>
 

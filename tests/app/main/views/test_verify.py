@@ -17,7 +17,7 @@ def test_should_return_verify_template(app_,
             response = client.get(url_for('main.verify'))
             assert response.status_code == 200
             assert (
-                "We've sent you confirmation codes by email and text message."
+                "We’ve sent you confirmation codes by email and text message."
                 " You need to enter both codes here.") in response.get_data(as_text=True)
 
 

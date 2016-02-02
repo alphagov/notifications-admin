@@ -12,16 +12,16 @@ GOV.UK Notify | Confirm email address and mobile number
   <div class="column-two-thirds">
     <h1 class="heading-large">Activate your account</h1>
 
-    <p>We've sent you confirmation codes by email and text message. You need to enter both codes here.</p>
+    <p>We’ve sent you confirmation codes by email and text message. You need to enter both codes here.</p>
 
     <form autocomplete="off" method="post">
       {{ textbox(form.email_code) }}
       <p>
-        <a href="{{ url_for('.check_and_resend_email_code')}}">I haven't received an email</a>
+        <a href="{{ url_for('.check_and_resend_email_code')}}">I haven’t received an email</a>
       </p>
       {{ textbox(form.sms_code) }}
       <p>
-        <a href="{{ url_for('.check_and_resend_text_code') }}">I haven't received a text</a></span>
+        <a href="{{ url_for('.check_and_resend_text_code') }}">I haven’t received a text</a></span>
       </p>
       {{ page_footer("Continue") }}
     </form>

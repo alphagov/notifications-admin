@@ -8,7 +8,7 @@
   display: block;
   padding: $gutter-half;
   margin: $gutter-half 0 $gutter 0;
-  text-align: center;
+  text-align: left;
   position: relative;
 
 }
@@ -16,7 +16,7 @@
 .banner-with-tick {
 
   @extend %banner;
-  padding: $gutter-half $gutter;
+  padding: $gutter-half ($gutter + $gutter-half);
 
   &:before {
     @include core-24;
@@ -58,7 +58,6 @@
   background: $yellow;
   color: $text-colour;
   text-align: left;
-  border: 5px solid $text-colour;
   font-weight: bold;
 
   a:link, a:visited {

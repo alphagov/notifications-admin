@@ -16,5 +16,4 @@ def test_should_show_recent_jobs_on_dashboard(app_,
 
         assert response.status_code == 200
         text = response.get_data(as_text=True)
-        assert 'You haven’t sent any text messages yet' in text
         assert 'Test Service' in text
