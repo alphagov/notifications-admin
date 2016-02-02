@@ -15,11 +15,14 @@ GOV.UK Notify | Text verification
     <p>We've sent you a text message with a verification code.</p>
 
     <form autocomplete="off" method="post">
-      {{ textbox(form.sms_code) }}
+      {{ textbox(
+        form.sms_code,
+        width='5em',
+        help_link=url_for('.verification_code_not_received'),
+        help_link_text='I haven’t received a text message'
+      ) }}
       {{ page_footer(
-        "Continue",
-        back_link=url_for('.verification_code_not_received'),
-        back_link_text='I haven’t received a text'
+        "Continue"
       ) }}
     </form>
   </div>
