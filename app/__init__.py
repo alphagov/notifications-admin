@@ -157,6 +157,10 @@ def useful_headers_after_request(response):
     response.headers.add('X-XSS-Protection', '1; mode=block')
     response.headers.add('Content-Security-Policy',
                          "default-src 'self' 'unsafe-inline'; font-src 'self' data:;")  # noqa
+    if 'Cache-Control' in response.headers:
+        del response.headers['Cache-Control']
+    response.headers.add(
+        'Cache-Control', 'no-store, max-age=43200, no-cache, private, must-revalidate')
     return response
 
 
