@@ -18,6 +18,7 @@ GOV.UK Notify | Text verification
       {{ textbox(
         form.sms_code,
         width='5em',
+        autofocus=True,
         help_link=url_for('.verification_code_not_received'),
         help_link_text='I haven’t received a text message'
       ) }}
