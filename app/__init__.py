@@ -173,7 +173,7 @@ def register_errorhandlers(application):
         application.errorhandler(errcode)(render_error)
 
 
-def get_api_version():
+def get_app_version():
     build = 'n/a'
     build_time = "n/a"
     try:
