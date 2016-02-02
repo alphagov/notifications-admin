@@ -18,7 +18,7 @@ def test_should_return_verify_template(app_,
             assert response.status_code == 200
             assert (
                 "We’ve sent you confirmation codes by email and text message."
-                " You need to enter both codes here.") in response.get_data(as_text=True)
+            ) in response.get_data(as_text=True)
 
 
 def test_should_redirect_to_add_service_when_code_are_correct(app_,

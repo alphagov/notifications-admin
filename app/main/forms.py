@@ -62,7 +62,7 @@ def password(label='Create a password'):
 
 def sms_code():
     verify_code = '^\d{5}$'
-    return StringField('Text message confirmation code',
+    return StringField('Text message code',
                        validators=[DataRequired(message='Text message confirmation code can not be empty'),
                                    Regexp(regex=verify_code,
                                           message='Text message confirmation code must be 5 digits')])
@@ -70,7 +70,7 @@ def sms_code():
 
 def email_code():
     verify_code = '^\d{5}$'
-    return StringField("Email confirmation code",
+    return StringField("Email code",
                        validators=[DataRequired(message='Email confirmation code can not be empty'),
                                    Regexp(regex=verify_code, message='Email confirmation code must be 5 digits')])
 
