@@ -3,7 +3,7 @@ import re
 import ast
 
 import dateutil
-from flask import Flask, session, Markup, escape, render_template
+from flask import (Flask, session, Markup, escape, render_template, make_response)
 from flask._compat import string_types
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -160,7 +160,7 @@ def useful_headers_after_request(response):
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']
     response.headers.add(
-        'Cache-Control', 'no-store, max-age=43200, no-cache, private, must-revalidate')
+        'Cache-Control', 'no-store, no-cache, private, must-revalidate')
     return response
 
 
@@ -168,16 +168,19 @@ def register_errorhandlers(application):
     def render_error(error):
         # If a HTTPException, pull the `code` attribute; default to 500
         error_code = getattr(error, 'code', 500)
-        return render_template("error/{0}.html".format(error_code)), error_code
+        resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
+        return useful_headers_after_request(resp)
     for errcode in [401, 404, 500]:
         application.errorhandler(errcode)(render_error)
 
 
 def get_app_version():
-    _version_re = re.compile(r'__version__\s+=\s+(.*)')
-    version = 'n/a'
-    dir_path = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(dir_path, 'version.py'), 'rb') as f:
-        version = str(ast.literal_eval(_version_re.search(
-            f.read().decode('utf-8')).group(1)))
-    return version
+    build = 'n/a'
+    build_time = "n/a"
+    try:
+        from app import version
+        build = version.__build__
+        build_time = version.__time__
+    except:
+        pass
+    return build, build_time
