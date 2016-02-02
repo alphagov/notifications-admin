@@ -15,7 +15,7 @@ GOV.UK Notify | Manage templates
         <h1 class="heading-xlarge">Templates</h1>
 
         <p>
-          <a href="{{ url_for('.add_service_template', service_id=service_id) }}">Create new template</a>
+          <a href="{{ url_for('.add_service_template', service_id=service_id) }}">Add new template</a>
 
         {% for template in templates %}
           {% if template.get_field('template_type') == 'sms' %}
