@@ -17,11 +17,13 @@ GOV.UK Notify | Confirm email address and mobile number
     <form autocomplete="off" method="post">
       {{ textbox(
         form.email_code,
+        width='5em',
         help_link=url_for('.check_and_resend_email_code'),
         help_link_text='I haven’t received an email'
       ) }}
       {{ textbox(
         form.sms_code,
+        width='5em',
         help_link=url_for('.check_and_resend_text_code'),
         help_link_text='I haven’t received a text'
       ) }}

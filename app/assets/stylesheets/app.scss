@@ -30,3 +30,11 @@
 a:visited {
   color: $link-colour;
 }
+
+.form-control-5em {
+  width: 100%;
+
+  @include media(tablet) {
+    width: 5em;
+  }
+}
