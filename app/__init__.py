@@ -174,10 +174,12 @@ def register_errorhandlers(application):
 
 
 def get_app_version():
-    _version_re = re.compile(r'__version__\s+=\s+(.*)')
-    version = 'n/a'
-    dir_path = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(dir_path, 'version.py'), 'rb') as f:
-        version = str(ast.literal_eval(_version_re.search(
-            f.read().decode('utf-8')).group(1)))
-    return version
+    build = 'n/a'
+    build_time = "n/a"
+    try:
+        from app import version
+        build = version.__build__
+        build_time = version.__time__
+    except:
+        pass
+    return build, build_time

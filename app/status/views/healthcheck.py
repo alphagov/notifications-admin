@@ -11,6 +11,8 @@ def status():
         api_status = status_api_client.get_status()
     except:
         api_status = 'n/a'
+    build, build_time = get_app_version()
     return jsonify(status="ok",
-                   app_version=get_app_version(),
-                   api_status=api_status), 200
+                   api_status=api_status,
+                   api_build=build,
+                   api_built_time=build_time), 200
