@@ -2,14 +2,10 @@
 
 {% block fullwidth_content %}
   <div class="grid-row">
-    <div class="column-one-quarter">
+    <div class="column-one-third">
       {% include "main_nav.html" %}
     </div>
-    <div class="column-three-quarters">
-      {{ banner(
-        'Your service is in restricted mode. You can only send notifications to yourself.',
-        'info'
-      ) }}
+    <div class="column-two-thirds">
       {% include 'flash_messages.html' %}
       {% block maincolumn_content %}{% endblock %}
     </div>

@@ -9,13 +9,18 @@ GOV.UK Notify | Manage templates
 
 {% block maincolumn_content %}
 
+    <h1 class="heading-large">Templates</h1>
+
+    {{ banner(
+      '<a href="{}">Try sending a text message</a>'.format(
+        url_for(".send_sms", service_id=service_id)
+      )|safe,
+      subhead='Next step',
+      type="tip"
+    )}}
+
     <div class="grid-row">
       <div class="column-two-thirds">
-
-        <h1 class="heading-large">Templates</h1>
-
-        <p>
-          <a href="{{ url_for('.add_service_template', service_id=service_id) }}">Add new template</a>
 
         {% for template in templates %}
           {% if template.get_field('template_type') == 'sms' %}
@@ -34,6 +39,10 @@ GOV.UK Notify | Manage templates
             ) }}
           {% endif %}
         {% endfor %}
+
+        <p>
+          <a href="{{ url_for('.add_service_template', service_id=service_id) }}" class="button">Add new template</a>
+        </p>
 
       </div>
     </div>

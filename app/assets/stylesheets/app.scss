@@ -1,26 +1,5 @@
 // Extra CSS overlaying elements
 
-.form-control-2-3, .form-control-1-4 {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  font-family: "nta", Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.25;
-  font-weight: 400;
-  text-transform: none;
-  padding: 4px;
-  background-color: #fff;
-  border: 2px solid #6f777b;
-}
-
-@media (min-width: 641px) {
-  .form-control-2-3, .form-control-1-4 {
-    font-size: 19px;
-    line-height: 1.31579;
-  }
-}
-
 #global-header-bar {
   background-color: $red;
 }
