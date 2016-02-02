@@ -217,7 +217,7 @@ class ChangePasswordForm(Form):
 
 
 class CsvUploadForm(Form):
-    file = FileField('File to upload', validators=[DataRequired(
+    file = FileField('Upload a CSV file to add your recipients’ details', validators=[DataRequired(
                      message='Please pick a file'), CsvFileValidator()])
 
 

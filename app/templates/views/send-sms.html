@@ -10,34 +10,31 @@
 {% block maincolumn_content %}
   <form method="POST" enctype="multipart/form-data">
 
-        <h1 class="heading-large">Send text messages</h1>
+    <h1 class="heading-large">Send text messages</h1>
 
-    <fieldset class='form-group'>
-      <legend class="heading-medium">1. Choose text message template</legend>
-      {% for template in templates %}
-        {{ sms_message(
-          template.content, name=template.name, input_name='template', input_index=template.id
-        ) }}
-      {% endfor %}
-    </fieldset>
-
-    <h2 class="heading-medium">2. Add recipients</h2>
     {{ banner(
       'You can only send notifications to yourself',
       subhead='Trial mode',
       type='info'
     ) }}
-    <p>
-      Upload a CSV file to add your recipients’ details.
-    </p>
-    <p>
-      You can also <a href="#">download an example CSV</a>.
-    </p>
+
+    {{ sms_message(
+      template.content, name='Preview'
+    ) }}
+
     <p>
       {{textbox(form.file)}}
     </p>
 
-    {{ page_footer("Continue") }}
+    <p>
+      <a href="#">Download an example CSV</a> to test with.
+    </p>
+
+    {{ page_footer(
+      "Continue",
+      back_link=url_for(".choose_sms_template", service_id=service_id),
+      back_link_text="Back to templates"
+    ) }}
 
   </form>
 {% endblock %}

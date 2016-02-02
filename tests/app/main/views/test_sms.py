@@ -4,16 +4,54 @@ from flask import url_for
 import moto
 
 
+def test_choose_sms_template(app_,
+                             api_user_active,
+                             mock_get_user,
+                             mock_get_service_templates,
+                             mock_check_verify_code,
+                             mock_get_service_template):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(url_for('main.choose_sms_template', service_id=12345))
+
+        assert response.status_code == 200
+        content = response.get_data(as_text=True)
+        assert 'template_one' in content
+        assert 'template one content' in content
+        assert 'template_two' in content
+        assert 'template two content' in content
+
+
+def test_choose_sms_template_redirects(app_,
+                                       api_user_active,
+                                       mock_get_user,
+                                       mock_get_service_templates,
+                                       mock_check_verify_code,
+                                       mock_get_service_template):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.post(
+                url_for('main.choose_sms_template', service_id=12345),
+                data={'template': '54321'}
+            )
+
+        assert response.status_code == 302
+        assert response.location == url_for('main.send_sms', service_id=12345, template_id=54321, _external=True)
+
+
 def test_upload_empty_csvfile_returns_to_upload_page(app_,
                                                      api_user_active,
                                                      mock_get_user,
                                                      mock_get_service_templates,
-                                                     mock_check_verify_code):
+                                                     mock_check_verify_code,
+                                                     mock_get_service_template):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
             upload_data = {'file': (BytesIO(''.encode('utf-8')), 'emtpy.csv')}
-            response = client.post(url_for('main.send_sms', service_id=123),
+            response = client.post(url_for('main.send_sms', service_id=12345, template_id=54321),
                                    data=upload_data, follow_redirects=True)
 
         assert response.status_code == 200
@@ -37,7 +75,7 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
         with app_.test_client() as client:
             client.login(api_user_active)
             upload_data = {'file': file_data}
-            response = client.post(url_for('main.send_sms', service_id=123),
+            response = client.post(url_for('main.send_sms', service_id=12345, template_id=54321),
                                    data=upload_data,
                                    follow_redirects=True)
         assert response.status_code == 200
@@ -64,7 +102,7 @@ def test_upload_csvfile_with_valid_phone_shows_first3_and_last3_numbers(app_,
         with app_.test_client() as client:
             client.login(api_user_active)
             upload_data = {'file': file_data}
-            response = client.post(url_for('main.send_sms', service_id=123),
+            response = client.post(url_for('main.send_sms', service_id=12345, template_id=54321),
                                    data=upload_data,
                                    follow_redirects=True)
 
@@ -102,7 +140,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_if_6_or_less_numbers(app_,
         with app_.test_client() as client:
             client.login(api_user_active)
             upload_data = {'file': file_data}
-            response = client.post(url_for('main.send_sms', service_id=123),
+            response = client.post(url_for('main.send_sms', service_id=12345, template_id=54321),
                                    data=upload_data,
                                    follow_redirects=True)
 

@@ -33,15 +33,34 @@ from app.main.utils import (
 
 
 @main.route("/services/<service_id>/sms/send", methods=['GET', 'POST'])
+def choose_sms_template(service_id):
+    if request.method == 'POST':
+        return redirect(url_for('.send_sms',
+                                service_id=service_id,
+                                template_id=request.form.get('template')))
+
+    try:
+        templates = templates_dao.get_service_templates(service_id)['data']
+    except HTTPError as e:
+        if e.status_code == 404:
+            abort(404)
+        else:
+            raise e
+
+    return render_template('views/choose-sms-template.html',
+                           templates=templates,
+                           service_id=service_id)
+
+
+@main.route("/services/<service_id>/sms/send/<template_id>", methods=['GET', 'POST'])
 @login_required
-def send_sms(service_id):
+def send_sms(service_id, template_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
             csv_file = form.file.data
             filedata = _get_filedata(csv_file)
             upload_id = str(uuid.uuid4())
-            template_id = request.form.get('template')
             s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
             session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
             return redirect(url_for('.check_sms',
@@ -52,10 +71,10 @@ def send_sms(service_id):
                       csv_file.filename)
             flash(message)
             flash(str(e))
-            return redirect(url_for('.send_sms', service_id=service_id))
+            return redirect(url_for('.send_sms', service_id=service_id, template_id=template_id))
 
     try:
-        templates = templates_dao.get_service_templates(service_id)['data']
+        template = templates_dao.get_service_template(service_id, template_id)['data']
     except HTTPError as e:
         if e.status_code == 404:
             abort(404)
@@ -63,7 +82,7 @@ def send_sms(service_id):
             raise e
 
     return render_template('views/send-sms.html',
-                           templates=templates,
+                           template=template,
                            form=form,
                            service_id=service_id)
 
@@ -84,6 +103,7 @@ def check_sms(service_id, upload_id):
             'views/check-sms.html',
             upload_result=upload_result,
             message_template=template['content'],
+            template_id=template_id,
             service_id=service_id
         )
     elif request.method == 'POST':
