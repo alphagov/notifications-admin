@@ -19,7 +19,9 @@
     Styleguide
   </h1>
 
-  <p><a href="https://github.com/alphagov/notifications-admin/blob/master/app/templates/views/styleguide.html">View source</a></p>
+  <p>
+    <a href="https://github.com/alphagov/notifications-admin/blob/master/app/templates/views/styleguide.html">View source</a>
+  </p>
 
   <h2 class="heading-large">Banner</h2>
   <p>Used to show the status of a thing or action.</p>
@@ -40,6 +42,8 @@
   {{ banner('You’re not allowed to do this', 'dangerous')}}
 
   {{ banner('Are you sure you want to delete?', 'dangerous', delete_button="Yes, delete this thing")}}
+
+  {{ banner('<a href="#">Send your first message</a>'|safe, 'tip')}}
 
   <h2 class="heading-large">Big number</h2>
 
@@ -90,8 +94,14 @@
   </p>
 
   {{ page_footer(
-    button_text='Save and continue'
+    button_text='Next step'
   ) }}
+
+  {{ page_footer(
+    button_text='Save',
+    delete_link='http://example.com',
+    delete_link_text='delete this thing'
+  )}}
 
   {{ page_footer(
     button_text='Delete', destructive=True
@@ -112,6 +122,11 @@
       {{ sms_message(
         "Your vehicle tax for registration number is due on date. Renew online at www.gov.uk/vehicle-tax",
         "+44 7700 900 306"
+      ) }}
+      {{ sms_message(
+        "Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax",
+        name='Two week reminder',
+        edit_link='#'
       ) }}
       {{ sms_message(
         "Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax",
