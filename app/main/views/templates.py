@@ -9,7 +9,7 @@ from app.main.dao import services_dao as sdao
 from client.errors import HTTPError
 
 
-@main.route("/services/<int:service_id>/templates")
+@main.route("/services/<service_id>/templates")
 @login_required
 def manage_service_templates(service_id):
     try:
@@ -25,7 +25,7 @@ def manage_service_templates(service_id):
         templates=[tdao.TemplatesBrowsableItem(x) for x in templates])
 
 
-@main.route("/services/<int:service_id>/templates/add", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/add", methods=['GET', 'POST'])
 @login_required
 def add_service_template(service_id):
     try:
@@ -50,7 +50,7 @@ def add_service_template(service_id):
         service_id=service_id)
 
 
-@main.route("/services/<int:service_id>/templates/<int:template_id>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/<int:template_id>", methods=['GET', 'POST'])
 @login_required
 def edit_service_template(service_id, template_id):
     try:
@@ -78,7 +78,7 @@ def edit_service_template(service_id, template_id):
         template_id=template_id)
 
 
-@main.route("/services/<int:service_id>/templates/<int:template_id>/delete", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/<int:template_id>/delete", methods=['GET', 'POST'])
 @login_required
 def delete_service_template(service_id, template_id):
     try:

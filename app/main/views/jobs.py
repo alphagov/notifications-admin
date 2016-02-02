@@ -15,7 +15,7 @@ from app.main import main
 now = time.strftime('%H:%M')
 
 
-@main.route("/services/<int:service_id>/jobs")
+@main.route("/services/<service_id>/jobs")
 @login_required
 def view_jobs(service_id):
     try:
@@ -32,7 +32,7 @@ def view_jobs(service_id):
             raise e
 
 
-@main.route("/services/<int:service_id>/jobs/<job_id>")
+@main.route("/services/<service_id>/jobs/<job_id>")
 @login_required
 def view_job(service_id, job_id):
     try:
@@ -64,7 +64,7 @@ def view_job(service_id, job_id):
             raise e
 
 
-@main.route("/services/<int:service_id>/jobs/<job_id>/notification/<string:notification_id>")
+@main.route("/services/<service_id>/jobs/<job_id>/notification/<string:notification_id>")
 @login_required
 def view_notification(service_id, job_id, notification_id):
     return render_template(

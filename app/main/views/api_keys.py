@@ -5,13 +5,13 @@ from app.main.forms import CreateKeyForm
 from app import api_key_api_client
 
 
-@main.route("/services/<int:service_id>/documentation")
+@main.route("/services/<service_id>/documentation")
 @login_required
 def documentation(service_id):
     return render_template('views/documentation.html', service_id=service_id)
 
 
-@main.route("/services/<int:service_id>/api-keys")
+@main.route("/services/<service_id>/api-keys")
 @login_required
 def api_keys(service_id):
     return render_template(
@@ -21,7 +21,7 @@ def api_keys(service_id):
     )
 
 
-@main.route("/services/<int:service_id>/api-keys/create", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/api-keys/create", methods=['GET', 'POST'])
 @login_required
 def create_api_key(service_id):
     key_names = [
@@ -39,7 +39,7 @@ def create_api_key(service_id):
     )
 
 
-@main.route("/services/<int:service_id>/api-keys/revoke/<int:key_id>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/api-keys/revoke/<int:key_id>", methods=['GET', 'POST'])
 @login_required
 def revoke_api_key(service_id, key_id):
     key_name = api_key_api_client.get_api_keys(service_id=service_id, key_id=key_id)['apiKeys'][0]['name']

@@ -1,4 +1,6 @@
 import json
+import uuid
+
 from flask import url_for
 
 
@@ -11,7 +13,7 @@ def test_should_return_list_of_all_templates(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = str(uuid.uuid4())
             response = client.get(url_for(
                 '.manage_service_templates', service_id=service_id))
 
@@ -28,7 +30,7 @@ def test_should_show_page_for_one_templates(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = str(uuid.uuid4())
             template_id = 456
             response = client.get(url_for(
                 '.edit_service_template',
@@ -52,7 +54,7 @@ def test_should_redirect_when_saving_a_template(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = str(uuid.uuid4())
             template_id = 456
             name = "new name"
             type_ = "sms"
@@ -85,7 +87,7 @@ def test_should_show_delete_template_page(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = str(uuid.uuid4())
             template_id = 456
             response = client.get(url_for(
                 '.delete_service_template',
@@ -108,7 +110,7 @@ def test_should_redirect_when_deleting_a_template(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = str(uuid.uuid4())
             template_id = 456
             name = "new name"
             type_ = "sms"

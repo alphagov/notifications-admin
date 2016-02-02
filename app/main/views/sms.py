@@ -31,7 +31,7 @@ from app.main.utils import (
 )
 
 
-@main.route("/services/<int:service_id>/sms/send", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/sms/send", methods=['GET', 'POST'])
 @login_required
 def send_sms(service_id):
     form = CsvUploadForm()
@@ -67,7 +67,7 @@ def send_sms(service_id):
                            service_id=service_id)
 
 
-@main.route("/services/<int:service_id>/sms/check/<upload_id>",
+@main.route("/services/<service_id>/sms/check/<upload_id>",
             methods=['GET', 'POST'])
 @login_required
 def check_sms(service_id, upload_id):

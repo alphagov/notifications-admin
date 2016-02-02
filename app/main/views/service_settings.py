@@ -10,7 +10,7 @@ from app.main.forms import ConfirmPasswordForm, ServiceNameForm
 from client.errors import HTTPError
 
 
-@main.route("/services/<int:service_id>/service-settings")
+@main.route("/services/<service_id>/service-settings")
 @login_required
 def service_settings(service_id):
     try:
@@ -27,7 +27,7 @@ def service_settings(service_id):
     )
 
 
-@main.route("/services/<int:service_id>/service-settings/name", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/name", methods=['GET', 'POST'])
 @login_required
 def service_name_change(service_id):
     try:
@@ -51,7 +51,7 @@ def service_name_change(service_id):
         service_id=service_id)
 
 
-@main.route("/services/<int:service_id>/service-settings/name/confirm", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/name/confirm", methods=['GET', 'POST'])
 @login_required
 def service_name_change_confirm(service_id):
     try:
@@ -80,7 +80,7 @@ def service_name_change_confirm(service_id):
         service_id=service_id)
 
 
-@main.route("/services/<int:service_id>/service-settings/request-to-go-live", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/request-to-go-live", methods=['GET', 'POST'])
 @login_required
 def service_request_to_go_live(service_id):
     try:
@@ -102,7 +102,7 @@ def service_request_to_go_live(service_id):
         return redirect(url_for('.service_settings', service_id=service_id))
 
 
-@main.route("/services/<int:service_id>/service-settings/status", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/status", methods=['GET', 'POST'])
 @login_required
 def service_status_change(service_id):
     try:
@@ -123,7 +123,7 @@ def service_status_change(service_id):
         return redirect(url_for('.service_status_change_confirm', service_id=service_id))
 
 
-@main.route("/services/<int:service_id>/service-settings/status/confirm", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/status/confirm", methods=['GET', 'POST'])
 @login_required
 def service_status_change_confirm(service_id):
     try:
@@ -151,7 +151,7 @@ def service_status_change_confirm(service_id):
         service_id=service_id)
 
 
-@main.route("/services/<int:service_id>/service-settings/delete", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/delete", methods=['GET', 'POST'])
 @login_required
 def service_delete(service_id):
     try:
@@ -172,7 +172,7 @@ def service_delete(service_id):
         return redirect(url_for('.service_delete_confirm', service_id=service_id))
 
 
-@main.route("/services/<int:service_id>/service-settings/delete/confirm", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/delete/confirm", methods=['GET', 'POST'])
 @login_required
 def service_delete_confirm(service_id):
     try:

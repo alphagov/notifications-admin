@@ -7,7 +7,7 @@ from client.errors import HTTPError
 from ._jobs import jobs
 
 
-@main.route("/services/<int:service_id>/dashboard")
+@main.route("/services/<service_id>/dashboard")
 @login_required
 def service_dashboard(service_id):
     try:
@@ -31,4 +31,4 @@ def service_dashboard(service_id):
         free_text_messages_remaining='25,000',
         spent_this_month='0.00',
         has_templates=bool(len(templates)),
-        service_id=service_id)
+        service_id=str(service_id))
