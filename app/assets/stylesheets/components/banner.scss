@@ -13,7 +13,8 @@
 
 }
 
-.banner-with-tick {
+.banner-with-tick,
+.banner-default-with-tick {
 
   @extend %banner;
   padding: $gutter-half ($gutter + $gutter-half);

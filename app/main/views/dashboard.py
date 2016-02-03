@@ -4,7 +4,7 @@ from app.main import main
 from app.main.dao.services_dao import get_service_by_id
 from app.main.dao import templates_dao
 from client.errors import HTTPError
-from ._jobs import jobs
+from app import job_api_client
 
 
 @main.route("/services/<service_id>/dashboard")
@@ -12,6 +12,7 @@ from ._jobs import jobs
 def service_dashboard(service_id):
     try:
         templates = templates_dao.get_service_templates(service_id)['data']
+        jobs = job_api_client.get_job(service_id)['data']
     except HTTPError as e:
         if e.status_code == 404:
             abort(404)
@@ -27,7 +28,7 @@ def service_dashboard(service_id):
             raise e
     return render_template(
         'views/service_dashboard.html',
-        jobs=jobs,
+        jobs=reversed(jobs),
         free_text_messages_remaining='25,000',
         spent_this_month='0.00',
         template_count=len(templates),

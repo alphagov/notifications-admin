@@ -8,9 +8,12 @@
 {% endblock %}
 
 {% block maincolumn_content %}
+
+  <h1 class="heading-large">Send text messages</h1>
+
   <form method="POST" enctype="multipart/form-data">
 
-    <h1 class="heading-large">Send text messages</h1>
+    {{ sms_message(template.content) }}
 
     {{ banner(
       'You can only send notifications to yourself',

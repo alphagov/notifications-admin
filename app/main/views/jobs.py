@@ -11,6 +11,7 @@ from client.errors import HTTPError
 
 from app import job_api_client
 from app.main import main
+from app.main.dao import templates_dao
 
 now = time.strftime('%H:%M')
 
@@ -37,6 +38,7 @@ def view_jobs(service_id):
 def view_job(service_id, job_id):
     try:
         job = job_api_client.get_job(service_id, job_id)['data']
+        template = templates_dao.get_service_template(service_id, job['template'])['data']
         messages = []
         return render_template(
             'views/job.html',
@@ -53,8 +55,7 @@ def view_job(service_id, job_id):
             cost=u'£0.00',
             uploaded_file_name=job['original_file_name'],
             uploaded_file_time=job['created_at'],
-            template_used=job['template'],
-            flash_message="We’ve accepted {} for processing".format(job['original_file_name']),
+            template=template,
             service_id=service_id
         )
     except HTTPError as e:

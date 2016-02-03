@@ -2,23 +2,33 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/banner.html" import banner %}
+{% from "components/sms-message.html" import sms_message %}
 
 {% block page_title %}
-GOV.UK Notify | Notifications activity
+  GOV.UK Notify | Notifications activity
 {% endblock %}
 
 {% block maincolumn_content %}
 
     <h1 class="heading-large">
-      {{ uploaded_file_name }}
+      Sent text messages
     </h1>
 
-    <p>
-      {{ banner(flash_message, with_tick=True) }}
+    {{ sms_message(
+      template['content'],
+    )}}
+
+    <p class='heading-small'>
+      Started {{ uploaded_file_time|format_datetime }}
     </p>
 
     <ul class="grid-row job-totals">
-      <li class="column-one-third">
+      <li class="column-one-quarter">
+        {{ big_number(
+          counts.total, 'queued'
+        )}}
+      </li>
+      <li class="column-one-quarter">
         {{ big_number(
           counts.total,
           'text message' if 1 == counts.total else 'text messages'
@@ -27,7 +37,7 @@ GOV.UK Notify | Notifications activity
       <li class="column-one-third">
         {{ big_number(
           counts.failed,
-          'failed delivery' if 1 == counts.failed else 'failed deliveries'
+          'failed'
         )}}
       </li>
       <li class="column-one-third">
@@ -37,14 +47,10 @@ GOV.UK Notify | Notifications activity
       </li>
     </ul>
 
-    <p>
-      Sent with template <a href="{{ url_for('.edit_service_template', service_id=service_id, template_id=template_used) }}">{{ template_used }}</a> on {{ uploaded_file_time | format_datetime}}
-    </p>
-
     {% call(item) list_table(
       messages,
-      caption='Messages',
-      caption_visible=False,
+      caption=uploaded_file_name,
+      empty_message="Messages go here",
       field_headings=[
         'To',
         'Message',

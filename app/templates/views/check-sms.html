@@ -10,7 +10,7 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Send text messages</h1>
+  <h1 class="heading-large">Check and confirm</h1>
 
   {% if upload_result.rejects %}
     <h3 class="heading-small">The following numbers are invalid</h3>
@@ -22,8 +22,7 @@
   {% else %}
 
     {{ sms_message(
-      message_template|replace_placeholders(upload_result.valid[0]),
-      name='Preview'
+      message_template|replace_placeholders(upload_result.valid[0])
     )}}
 
     <form method="POST" enctype="multipart/form-data">

@@ -25,19 +25,21 @@
 {% macro list_table(items, caption='', empty_message='', field_headings=[], field_headings_visible=True, caption_visible=True) -%}
 
   {% set parent_caller = caller %}
-  {% if items %}
-    {% call mapping_table(caption, field_headings, field_headings_visible, caption_visible) %}
-      {% for item in items %}
-        {% call row() %}
-          {{ parent_caller(item) }}
-        {% endcall %}
-      {% endfor %}
-    {%- endcall %}
-  {% else %}
-    <p class="table-empty-message">
-      {{ empty_message }}
-    </p>
-  {% endif %}
+
+  {% call mapping_table(caption, field_headings, field_headings_visible, caption_visible) %}
+    {% for item in items %}
+      {% call row() %}
+        {{ parent_caller(item) }}
+      {% endcall %}
+    {% endfor %}
+    {% if not items %}
+      {% call row() %}
+        <td class="table-empty-message" colspan="10">
+          {{ empty_message }}
+        </td>
+      {% endcall %}
+    {% endif %}
+  {%- endcall %}
 
 {%- endmacro %}
 

@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import list_table, field %}
+{% from "components/table.html" import list_table, field, right_aligned_field_heading %}
 {% from "components/big-number.html" import big_number %}
 
 {% block page_title %}
@@ -31,7 +31,7 @@
         subhead='Get started',
         type="tip"
       )}}
-    {% else %}
+    {% elif not jobs %}
       {{ banner(
         '<a href="{}">Try sending a text message</a>'.format(
           url_for(".choose_sms_template", service_id=service_id)
@@ -41,23 +41,20 @@
       )}}
     {% endif %}
 
-    {% if [] %}
+    {% if jobs %}
       {% call(item) list_table(
-        [],
+        jobs,
         caption="Recent text messages",
         empty_message='You haven’t sent any text messages yet',
-        field_headings=['Job', 'File', 'Time', 'Status']
+        field_headings=['Job', 'Created', right_aligned_field_heading('Status')]
       ) %}
         {% call field() %}
-          <a href="{{ url_for('.view_job', service_id=service_id, job_id=456) }}">{{ item.file }}</a>
+          <a href="{{ url_for('.view_job', service_id=service_id, job_id=item.id) }}">{{ item.original_file_name }}</a>
         {% endcall %}
         {% call field() %}
-          <a href="{{ url_for('.view_job', service_id=service_id, job_id=456) }}">{{ item.job }}</a>
+          {{ item.created_at|format_datetime }}
         {% endcall %}
-        {% call field() %}
-          {{ item.time }}
-        {% endcall %}
-        {% call field() %}
+        {% call field(align='right') %}
           {{ item.status }}
         {% endcall %}
       {% endcall %}
