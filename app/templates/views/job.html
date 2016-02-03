@@ -11,7 +11,7 @@
 {% block maincolumn_content %}
 
     <h1 class="heading-large">
-      Sent text messages
+      {{ uploaded_file_name }}
     </h1>
 
     {{ sms_message(
@@ -30,31 +30,35 @@
       </li>
       <li class="column-one-quarter">
         {{ big_number(
-          counts.total,
-          'text message' if 1 == counts.total else 'text messages'
+          0, 'sent'
         )}}
       </li>
-      <li class="column-one-third">
+      <li class="column-one-quarter">
         {{ big_number(
           counts.failed,
           'failed'
         )}}
       </li>
-      <li class="column-one-third">
+      <li class="column-one-quarter">
         {{ big_number(
           cost, 'total cost'
         )}}
       </li>
     </ul>
 
+    {{ sms_message(
+      'Your application has been received. Register online at www.gov.uk/register-to-vote',
+    )}}
+
     {% call(item) list_table(
       messages,
       caption=uploaded_file_name,
+      caption_visible=False,
       empty_message="Messages go here",
       field_headings=[
         'To',
         'Message',
-        right_aligned_field_heading('Delivery status')
+        right_aligned_field_heading('Status')
       ]
     ) %}
       {% call field() %}

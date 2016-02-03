@@ -15,15 +15,11 @@
 
     {{ sms_message(template.content) }}
 
-    {{ banner(
-      'You can only send notifications to yourself',
-      subhead='Trial mode',
-      type='info'
-    ) }}
+    {{file_upload(form.file)}}
 
-    {{ sms_message(
-      template.content, name='Preview'
-    ) }}
+    <p>
+      <a href="#">Download an example CSV file</a>
+    </p>
 
     {{ banner(
       'You can only send messages to yourself until you <a href="{}">request to go live</a>'.format(
@@ -32,16 +28,10 @@
       type='info'
     ) }}
 
-    {{file_upload(form.file)}}
-
-    <p>
-      <a href="#">Download an example CSV</a> to test with.
-    </p>
-
     {{ page_footer(
-      "Continue",
+      "Continue to preview",
       back_link=url_for(".choose_sms_template", service_id=service_id),
-      back_link_text="Back to templates"
+      back_link_text="Back"
     ) }}
 
   </form>

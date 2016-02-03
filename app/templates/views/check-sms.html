@@ -28,6 +28,7 @@
     <form method="POST" enctype="multipart/form-data">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="submit" class="button" value="{{ "Send {} text message{}".format(upload_result.valid|count, '' if upload_result.valid|count == 1 else 's') }}" />
+      <a href="{{url_for('.send_sms', service_id=service_id, template_id=template_id)}}" class="page-footer-back-link">Back</a>
     </form>
 
     {% call(item) list_table(
