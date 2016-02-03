@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/textbox.html" import textbox %}
+{% from "components/file-upload.html" import file_upload %}
 
 {% block page_title %}
   GOV.UK Notify | Send text messages
@@ -29,9 +29,7 @@
       type='info'
     ) }}
 
-    <p>
-      {{textbox(form.file)}}
-    </p>
+    {{file_upload(form.file)}}
 
     <p>
       <a href="#">Download an example CSV</a> to test with.
