@@ -12,15 +12,23 @@
 
     <h1 class="heading-large">Send text messages</h1>
 
-    <fieldset class='form-group'>
-      {% for template in templates %}
-        {{ sms_message(
-          template.content, name=template.name, input_name='template', input_index=template.id
-        ) }}
-      {% endfor %}
-    </fieldset>
-
-    {{ page_footer("Continue") }}
+    {% if templates %}
+      <fieldset class='form-group'>
+        {% for template in templates %}
+          {{ sms_message(
+            template.content, name=template.name, input_name='template', input_index=template.id
+          ) }}
+        {% endfor %}
+      </fieldset>
+      {{ page_footer("Continue") }}
+    {% else %}
+      {{ banner(
+        '<a href="{}">Add a text message template</a> to start sending messages'.format(
+          url_for(".add_service_template", service_id=service_id)
+        )|safe,
+        type="tip"
+      )}}
+    {% endif %}
 
   </form>
 {% endblock %}
