@@ -39,4 +39,58 @@ def check_email(service_id):
 @main.route("/services/<service_id>/manage-users")
 @login_required
 def manage_users(service_id):
-    return render_template('views/manage-users.html', service_id=service_id)
+    users = [
+        {
+            'name': 'Henry Hadlow',
+            'permission_send_messages': True,
+            'permission_manage_service': False,
+            'permission_manage_api_keys': False
+        },
+
+        {
+            'name': 'Pete Herlihy',
+            'permission_send_messages': False,
+            'permission_manage_service': False,
+            'permission_manage_api_keys': False,
+        },
+        {
+            'name': 'Chris Hill-Scott',
+            'permission_send_messages': True,
+            'permission_manage_service': True,
+            'permission_manage_api_keys': True
+        },
+        {
+            'name': 'Martyn Inglis',
+            'permission_send_messages': True,
+            'permission_manage_service': True,
+            'permission_manage_api_keys': True
+        }
+    ]
+    invited_users = [
+        {
+            'email_localpart': 'caley.smolska',
+            'permission_send_messages': True,
+            'permission_manage_service': False,
+            'permission_manage_api_keys': False
+        },
+
+        {
+            'email_localpart': 'ash.stephens',
+            'permission_send_messages': False,
+            'permission_manage_service': False,
+            'permission_manage_api_keys': False
+        },
+        {
+            'email_localpart': 'nicholas.staples',
+            'permission_send_messages': True,
+            'permission_manage_service': True,
+            'permission_manage_api_keys': True
+        },
+        {
+            'email_localpart': 'adam.shimali',
+            'permission_send_messages': True,
+            'permission_manage_service': True,
+            'permission_manage_api_keys': True
+        }
+    ]
+    return render_template('views/manage-users.html', service_id=service_id, users=users, invited_users=invited_users)
