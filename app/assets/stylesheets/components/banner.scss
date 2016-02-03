@@ -33,6 +33,16 @@
   @extend .banner;
   background: $govuk-blue;
   color: $white;
+
+  a:link, a:visited {
+    color: $white;
+    text-decoration: underline;
+  }
+
+  a:hover {
+    color: $light-blue-25;
+  }
+
 }
 
 .banner-dangerous {
