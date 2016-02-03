@@ -10,7 +10,8 @@ from flask import (
     url_for,
     flash,
     abort,
-    session
+    session,
+    current_app
 )
 
 from flask_login import login_required
@@ -41,7 +42,7 @@ def send_sms(service_id):
             filedata = _get_filedata(csv_file)
             upload_id = str(uuid.uuid4())
             template_id = request.form.get('template')
-            s3upload(upload_id, service_id, filedata)
+            s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
             session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
             return redirect(url_for('.check_sms',
                                     service_id=service_id,

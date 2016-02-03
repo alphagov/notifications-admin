@@ -41,6 +41,8 @@ class Config(object):
 
     HEADER_COLOUR = '#FFBF47'  # $yellow
 
+    AWS_REGION = 'eu-west-1'
+
 
 class Development(Config):
     DEBUG = True
