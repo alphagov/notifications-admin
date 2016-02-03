@@ -13,7 +13,7 @@ GOV.UK Notify | Manage templates
 
     {{ banner(
       '<a href="{}">Try sending a text message</a>'.format(
-        url_for(".send_sms", service_id=service_id)
+        url_for(".choose_sms_template", service_id=service_id)
       )|safe,
       subhead='Next step',
       type="tip"

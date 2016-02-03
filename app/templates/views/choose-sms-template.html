@@ -1,0 +1,34 @@
+{% extends "withnav_template.html" %}
+{% from "components/sms-message.html" import sms_message %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/textbox.html" import textbox %}
+
+{% block page_title %}
+  GOV.UK Notify | Send text messages
+{% endblock %}
+
+{% block maincolumn_content %}
+  <form method="POST" enctype="multipart/form-data">
+
+    <h1 class="heading-large">Send text messages</h1>
+
+    {% if templates %}
+      <fieldset class='form-group'>
+        {% for template in templates %}
+          {{ sms_message(
+            template.content, name=template.name, input_name='template', input_index=template.id
+          ) }}
+        {% endfor %}
+      </fieldset>
+      {{ page_footer("Continue") }}
+    {% else %}
+      {{ banner(
+        '<a href="{}">Add a text message template</a> to start sending messages'.format(
+          url_for(".add_service_template", service_id=service_id)
+        )|safe,
+        type="tip"
+      )}}
+    {% endif %}
+
+  </form>
+{% endblock %}
