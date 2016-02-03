@@ -3,24 +3,18 @@
 
 
 # notifications-admin
+
 Application to handle the admin functions of the notifications application.
 
-### Features of this application:
-<ul>
- <li>Register users
- <li>Register services
- <li>Download CSV for an email or sms batch
- <li>Show history of notifications
- <li>Reports
-</ul>
+## Features of this application
 
-### Create a virtual environment for this project
-```shell
-    mkvirtualenv -p /usr/local/bin/python3 notifications-admin
-```
+ - Register users
+ - Register services
+ - Download CSV for an email or SMS batch
+ - Show history of notifications
+ - Reports
 
-
-### Building the frontend
+## First-time setup
 
 You need [Node](http://nodejs.org/) which will also get you [NPM](npmjs.org),
 Node's package management tool.
@@ -43,28 +37,36 @@ The frontend dependencies are managed using NPM and Bower. To install or update
     npm run build
 ```
 
+The app runs within a virtual environment. To [install virtualenv](https://virtualenv.readthedocs.org/en/latest/installation.html), run
+```shell
+    [sudo] pip install virtualenv
+```
+
+To make a virtualenv for this app, run
+```shell
+    mkvirtualenv -p /usr/local/bin/python3 notifications-admin
+    pip install -r requirements.txt
+    ./scripts/bootstrap.sh
+```
+
+## Building the frontend
+
 If you want the front end assets to re-compile on changes, leave this running
 in a separate terminal from the app
 ```shell
     npm run watch
 ```
 
-### Running the application:
+## Running the application
+
 ```shell
-    pip install -r requirements.txt
-    ./scripts/bootstrap.sh  
+    workon notifications-admin
     ./scripts/run_app.sh
 ```
 
-Note: the ./scripts/bootstrap.sh script only needs to be run the first time to
-create the database.
+Then visit [localhost:6012](localhost:6012)
 
-URL to test app:
-
-    localhost:6012/helloworld
-
-
-### Domain model
+## Domain model
 
 All the domain models are defined in the
 [models.py](https://github.com/alphagov/notifications-admin/blob/master/app/models.py)
