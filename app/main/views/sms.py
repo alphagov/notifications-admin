@@ -103,6 +103,7 @@ def check_sms(service_id, upload_id):
             'views/check-sms.html',
             upload_result=upload_result,
             message_template=template['content'],
+            original_file_name=original_file_name,
             template_id=template_id,
             service_id=service_id
         )
