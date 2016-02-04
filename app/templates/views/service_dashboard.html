@@ -58,6 +58,11 @@
           {{ item.status }}
         {% endcall %}
       {% endcall %}
+      {% if more_jobs_to_show %}
+        <p class="table-show-more-link">
+          <a href="{{ url_for('.view_jobs', service_id=service_id) }}">See all sent text messages</a>
+        </p>
+      {% endif %}
     {% endif %}
 
 {% endblock %}
