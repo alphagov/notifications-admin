@@ -32,13 +32,8 @@ from app.main.utils import (
 )
 
 
-@main.route("/services/<service_id>/sms/send", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/sms/send", methods=['GET'])
 def choose_sms_template(service_id):
-    if request.method == 'POST':
-        return redirect(url_for('.send_sms',
-                                service_id=service_id,
-                                template_id=request.form.get('template')))
-
     try:
         templates = templates_dao.get_service_templates(service_id)['data']
     except HTTPError as e:
