@@ -23,25 +23,25 @@
       </li>
     </ul>
 
-    {% if not template_count %}
+    {% if not jobs %}
       {{ banner(
-        '<a href="{}">Add a text message template</a>'.format(
-          url_for(".add_service_template", service_id=service_id)
+        """
+          <ol>
+            <li>
+              <a href='{}'>Add a template</a>
+            </li>
+            <li>
+              <a href='{}'>Send yourself a text message</a>
+            </li>
+          </ol>
+        """.format(
+          url_for(".add_service_template", service_id=service_id),
+          url_for(".choose_sms_template", service_id=service_id)
         )|safe,
         subhead='Get started',
         type="tip"
       )}}
-    {% elif not jobs %}
-      {{ banner(
-        '<a href="{}">Try sending a text message</a>'.format(
-          url_for(".choose_sms_template", service_id=service_id)
-        )|safe,
-        subhead='Next step',
-        type="tip"
-      )}}
-    {% endif %}
-
-    {% if jobs %}
+    {% else %}
       {% call(item) list_table(
         jobs,
         caption="Recent text messages",

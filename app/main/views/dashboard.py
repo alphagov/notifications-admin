@@ -28,7 +28,7 @@ def service_dashboard(service_id):
             raise e
     return render_template(
         'views/service_dashboard.html',
-        jobs=reversed(jobs),
+        jobs=list(reversed(jobs)),
         free_text_messages_remaining='25,000',
         spent_this_month='0.00',
         template_count=len(templates),
