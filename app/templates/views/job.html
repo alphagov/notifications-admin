@@ -2,9 +2,10 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/banner.html" import banner %}
+{% from "components/sms-message.html" import sms_message %}
 
 {% block page_title %}
-GOV.UK Notify | Notifications activity
+  GOV.UK Notify | Notifications activity
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -13,55 +14,66 @@ GOV.UK Notify | Notifications activity
       {{ uploaded_file_name }}
     </h1>
 
-    <p>
-      {{ banner(flash_message, with_tick=True) }}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ sms_message(
+          template['content'],
+        )}}
+      </div>
+    </div>
+
+    <p class='heading-small'>
+      Started {{ uploaded_file_time|format_datetime }}
     </p>
 
     <ul class="grid-row job-totals">
-      <li class="column-one-third">
+      <li class="column-one-quarter">
         {{ big_number(
-          counts.total,
-          'text message' if 1 == counts.total else 'text messages'
+          1, 'queued'
         )}}
       </li>
-      <li class="column-one-third">
+      <li class="column-one-quarter">
+        {{ big_number(
+          0, 'sent'
+        )}}
+      </li>
+      <li class="column-one-quarter">
         {{ big_number(
           counts.failed,
-          'failed delivery' if 1 == counts.failed else 'failed deliveries'
+          'failed'
         )}}
       </li>
-      <li class="column-one-third">
+      <li class="column-one-quarter">
         {{ big_number(
           cost, 'total cost'
         )}}
       </li>
     </ul>
 
-    <p>
-      Sent with template <a href="{{ url_for('.edit_service_template', service_id=service_id, template_id=template_used) }}">{{ template_used }}</a> on {{ uploaded_file_time | format_datetime}}
-    </p>
-
     {% call(item) list_table(
-      messages,
-      caption='Messages',
+      [
+        {'phone': '+447700 900995', 'template': template['name'], 'status': 'queued'}
+      ],
+      caption=uploaded_file_name,
       caption_visible=False,
+      empty_message="Messages go here",
       field_headings=[
-        'To',
-        'Message',
-        right_aligned_field_heading('Delivery status')
+        'Recipient',
+        'Template',
+        right_aligned_field_heading('Status')
       ]
     ) %}
       {% call field() %}
-        <a href="{{ url_for('.view_notification', service_id=service_id, job_id=456, notification_id=item.id) }}">{{item.phone}}</a>
+        {{item.phone}}
       {% endcall %}
       {% call field() %}
-        <a href="{{ url_for('.view_notification', service_id=service_id, job_id=456, notification_id=item.id) }}">{{item.message[:50]}}…</a>
+        {{item.template}}
       {% endcall %}
       {% call field(
         align='right',
         status='error' if item.status == 'Failed' else 'default'
       ) %}
-        {{ item.status }}&emsp;{{ item.time }}
+        {{ item.status }}
       {% endcall %}
     {% endcall %}
 

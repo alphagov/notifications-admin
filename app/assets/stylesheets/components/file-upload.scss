@@ -29,6 +29,7 @@
     &-filename {
       display: inline-block;
       padding-left: $gutter-half;
+      @include bold-19;
     }
 
   }

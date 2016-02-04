@@ -10,10 +10,12 @@
   margin: $gutter-half 0 $gutter 0;
   text-align: left;
   position: relative;
+  clear: both;
 
 }
 
-.banner-with-tick {
+.banner-with-tick,
+.banner-default-with-tick {
 
   @extend %banner;
   padding: $gutter-half ($gutter + $gutter-half);
@@ -75,4 +77,19 @@
     text-decoration: underline;
   }
 
+  ol {
+    list-style-type: decimal;
+  }
+
+}
+
+.banner-important {
+  @extend %banner;
+  background: $white;
+  color: $text-colour;
+  background-image: file-url("icon-important-2x.png");
+  background-size: 34px 34px;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  padding: 7px 0 5px 50px;
 }

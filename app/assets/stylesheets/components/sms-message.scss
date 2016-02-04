@@ -24,7 +24,7 @@
 
 .sms-message-name {
   @include bold-19;
-  margin: 30px 0 10px 0;
+  margin: 20px 0 10px 0;
 }
 
 .sms-message-picker {
@@ -60,4 +60,9 @@ label.sms-message-option {
 
   }
 
+}
+
+.sms-message-use-link {
+  margin-top: 70px;
+  @include bold-19;
 }

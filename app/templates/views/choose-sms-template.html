@@ -8,20 +8,24 @@
 {% endblock %}
 
 {% block maincolumn_content %}
+
+  <h1 class="heading-large">Send text messages</h1>
+
   <form method="POST" enctype="multipart/form-data">
 
-    <h1 class="heading-large">Send text messages</h1>
-
     {% if templates %}
-      <fieldset class='form-group'>
+      <div class="grid-row">
         {% for template in templates %}
-          {{ sms_message(
-            template.content, name=template.name, input_name='template', input_index=template.id
-          ) }}
+          <div class="column-two-thirds">
+            {{ sms_message(template.content, name=template.name) }}
+          </div>
+          <div class="column-one-third">
+            <div class="sms-message-use-link">
+              <a href="{{ url_for(".send_sms", service_id=service_id, template_id=template.id) }}">Use this template</a>
+            </div>
+          </div>
         {% endfor %}
-      </fieldset>
-
-    {{ page_footer("Continue") }}
+      </div>
     {% else %}
       {{ banner(
         '<a href="{}">Add a text message template</a> to start sending messages'.format(

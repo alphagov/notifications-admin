@@ -38,3 +38,11 @@ a:visited {
     width: 5em;
   }
 }
+
+.column-main {
+
+  > .heading-large {
+    margin-top: $gutter;
+  }
+
+}

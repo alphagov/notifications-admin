@@ -1,6 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/sms-message.html" import sms_message %}
-{% from "components/table.html" import table, field %}
+{% from "components/table.html" import list_table, field %}
 {% from "components/placeholder.html" import placeholder %}
 {% from "components/page-footer.html" import page_footer %}
 
@@ -10,7 +10,7 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Send text messages</h1>
+  <h1 class="heading-large">Check and confirm</h1>
 
   {% if upload_result.rejects %}
     <h3 class="heading-small">The following numbers are invalid</h3>
@@ -21,44 +21,29 @@
 
   {% else %}
 
-    <h2 class="heading-medium">Check and confirm</h2>
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ sms_message(
+          message_template|replace_placeholders(upload_result.valid[0])
+        )}}
+      </div>
+    </div>
+
     <form method="POST" enctype="multipart/form-data">
-
-      {{ page_footer(
-          button_text = "Send {} text messages".format(upload_result.valid|count),
-          back_link = url_for(".send_sms", service_id=service_id, template_id=template_id)
-      )}}
-
-      {% if upload_result.valid | count > 6 %}
-        <h3 class="heading-small">First three message in file</h3>
-          {% for recipient in upload_result.valid[:3] %}
-             {{ sms_message(message_template|replace_placeholders(
-                    recipient),
-                    '{}'.format(recipient['phone'])
-            )}}
-          {% endfor %}
-          <h3 class="heading-small">Last three messages in file</h3>
-          {% for recipient in upload_result.valid[-3:] %}
-            {{ sms_message(message_template|replace_placeholders(
-                  recipient),
-                  '{}'.format(recipient['phone'])
-            )}}
-          {% endfor %}
-      {% else %}
-        <h3 class="heading-small">All messages in file</h3>
-          {% for recipient in upload_result.valid %}
-             {{ sms_message(message_template|replace_placeholders(
-                    recipient),
-                    '{}'.format(recipient['phone'])
-            )}}
-          {% endfor %}
-      {% endif %}
-
-      {{ page_footer(
-          button_text = "Send {} text messages".format(upload_result.valid|count),
-          back_link = url_for(".send_sms", service_id=service_id, template_id=template_id)
-      )}}
-
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="submit" class="button" value="{{ "Send {} text message{}".format(upload_result.valid|count, '' if upload_result.valid|count == 1 else 's') }}" />
+      <a href="{{url_for('.send_sms', service_id=service_id, template_id=template_id)}}" class="page-footer-back-link">Back</a>
     </form>
+
+    {% call(item) list_table(
+      upload_result.valid,
+      caption=original_file_name,
+      field_headings=['Phone number']
+    ) %}
+      {% call field() %}
+        {{ item.phone }}
+      {% endcall %}
+    {% endcall %}
+
   {% endif %}
 {% endblock %}

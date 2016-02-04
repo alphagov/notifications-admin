@@ -16,7 +16,8 @@ GOV.UK Notify | Set up service
     </h1>
 
     <p>
-      Users will see your service name:
+      Users will see your service name when they receive messages through GOV.UK
+      Notify:
     </p>
 
     <ul class="list-bullet bottom-gutter">
@@ -30,7 +31,7 @@ GOV.UK Notify | Set up service
     </ul>
 
     <form autocomplete="off" method="post">
-      {{ textbox(form.name) }}
+      {{ textbox(form.name, hint="You can change this later") }}
       {{ page_footer('Continue') }}
     </form>
 

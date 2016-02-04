@@ -8,37 +8,28 @@
 {% endblock %}
 
 {% block maincolumn_content %}
+
+  <h1 class="heading-large">Send text messages</h1>
+
   <form method="POST" enctype="multipart/form-data">
 
-    <h1 class="heading-large">Send text messages</h1>
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ sms_message(template.content) }}
+      </div>
+    </div>
 
-    {{ banner(
-      'You can only send notifications to yourself',
-      subhead='Trial mode',
-      type='info'
-    ) }}
-
-    {{ sms_message(
-      template.content, name='Preview'
-    ) }}
+    {{file_upload(form.file, button_text='Choose a CSV file')}}
 
     {{ banner(
       'You can only send messages to yourself until you <a href="{}">request to go live</a>'.format(
         url_for('.service_request_to_go_live', service_id=service_id)
       )|safe,
-      type='info'
+      type='important'
     ) }}
 
-    {{file_upload(form.file)}}
-
-    <p>
-      <a href="#">Download an example CSV</a> to test with.
-    </p>
-
     {{ page_footer(
-      "Continue",
-      back_link=url_for(".choose_sms_template", service_id=service_id),
-      back_link_text="Back to templates"
+      "Continue to preview"
     ) }}
 
   </form>

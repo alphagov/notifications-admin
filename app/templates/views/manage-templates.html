@@ -11,13 +11,16 @@ GOV.UK Notify | Manage templates
 
     <h1 class="heading-large">Templates</h1>
 
-    {{ banner(
-      '<a href="{}">Try sending a text message</a>'.format(
-        url_for(".choose_sms_template", service_id=service_id)
-      )|safe,
-      subhead='Next step',
-      type="tip"
-    )}}
+
+    {% if not has_jobs %}
+      {{ banner(
+        '<a href="{}">Send yourself a text message</a>'.format(
+          url_for(".choose_sms_template", service_id=service_id)
+        )|safe,
+        subhead='Next step',
+        type="tip"
+      )}}
+    {% endif %}
 
     <div class="grid-row">
       <div class="column-two-thirds">

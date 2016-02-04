@@ -9,7 +9,8 @@ def test_should_return_list_of_all_templates(app_,
                                              mock_get_service_templates,
                                              mock_get_user,
                                              mock_get_user_by_email,
-                                             mock_login):
+                                             mock_login,
+                                             mock_get_jobs):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
