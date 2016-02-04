@@ -46,10 +46,6 @@
       </li>
     </ul>
 
-    {{ sms_message(
-      'Your application has been received. Register online at www.gov.uk/register-to-vote',
-    )}}
-
     {% call(item) list_table(
       messages,
       caption=uploaded_file_name,
