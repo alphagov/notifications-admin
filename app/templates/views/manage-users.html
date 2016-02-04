@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/table.html" import list_table, row, field %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
@@ -7,13 +8,58 @@ GOV.UK Notify | Manage users
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-large">Manage users</h1>
+<h1 class="heading-large">Manage users</h1>
 
-    <p>Here's where you can add or remove users of a service.</p>
+<p>
+  <a href="#" class="button">Invite users</a>
+</p>
 
-    {{ page_footer(
-      back_link = url_for('.service_dashboard', service_id=service_id),
-      back_link_text = 'Back to dashboard'
-    ) }}
+{% call(item) list_table(
+  users,
+  caption='Active users',
+  field_headings=['Name', 'Send messages', 'Manage Service', 'Manage API keys', 'Link to change'],
+  field_headings_visible=True,
+  caption_visible=True
+) %}
+  {% call field() %}
+    {{ item.name }}
+  {% endcall %}
+  {% call field() %}
+    {{ "✔" if item.permission_send_messages else "❌" }}
+  {% endcall %}
+  {% call field() %}
+    {{ "✔" if item.permission_manage_service else "❌" }}
+  {% endcall %}
+  {% call field() %}
+    {{ "✔" if item.permission_manage_api_keys else "❌" }}
+  {% endcall %}
+  {% call field(align='right') %}
+    <a href="#">Change</a>
+  {% endcall %}
+{% endcall %}
+
+{% call(item) list_table(
+  invited_users,
+  caption='Invited users',
+  field_headings=['Name', 'Send messages', 'Manage Service', 'Manage API keys', 'Link to change'],
+  field_headings_visible=True,
+  caption_visible=True
+) %}
+  {% call field() %}
+    {{ item.email_localpart }}
+  {% endcall %}
+  {% call field() %}
+    {{ "✔" if item.permission_send_messages else "❌" }}
+  {% endcall %}
+  {% call field() %}
+    {{ "✔" if item.permission_manage_service else "❌" }}
+  {% endcall %}
+  {% call field() %}
+    {{ "✔" if item.permission_manage_api_keys else "❌" }}
+  {% endcall %}
+  {% call field(align='right') %}
+    <a href="#">Change</a>
+  {% endcall %}
+{% endcall %}
 
 {% endblock %}
