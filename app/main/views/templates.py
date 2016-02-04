@@ -3,6 +3,7 @@ from flask_login import login_required
 
 from app.main import main
 from app.main.forms import TemplateForm
+from app import job_api_client
 from app.main.dao.services_dao import get_service_by_id
 from app.main.dao import templates_dao as tdao
 from app.main.dao import services_dao as sdao
@@ -13,6 +14,7 @@ from client.errors import HTTPError
 @login_required
 def manage_service_templates(service_id):
     try:
+        jobs = job_api_client.get_job(service_id)['data']
         templates = tdao.get_service_templates(service_id)['data']
     except HTTPError as e:
         if e.status_code == 404:
@@ -22,6 +24,7 @@ def manage_service_templates(service_id):
     return render_template(
         'views/manage-templates.html',
         service_id=service_id,
+        has_jobs=bool(jobs),
         templates=[tdao.TemplatesBrowsableItem(x) for x in templates])
 
 
