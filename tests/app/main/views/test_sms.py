@@ -184,4 +184,3 @@ def test_create_job_should_call_api(app_,
 
         assert response.status_code == 200
         mock_create_job.assert_called_with(job_id, service_id, template_id, original_file_name)
-        assert job_data['bucket_name'] == "service-{}-{}-notify".format(service_id, job_id)

@@ -433,7 +433,7 @@ def mock_create_job(mocker, job_data):
         job_data['id'] = job_id
         job_data['service'] = service_id
         job_data['template'] = template_id
-        job_data['bucket_name'] = 'service-{}-{}-notify'.format(service_id, job_id)
+        job_data['bucket_name'] = 'service-{}-notify'.format(job_id)
         job_data['original_file_name'] = file_name
         job_data['file_name'] = '{}.csv'.format(job_id)
         return job_data

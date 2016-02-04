@@ -7,7 +7,6 @@ def s3upload(upload_id, service_id, filedata, region):
     bucket_name = 'service-{}-notify'.format(service_id)
     contents = '\n'.join(filedata['data'])
 
-    bucket = s3.Bucket(bucket_name)
     exists = True
     try:
         s3.meta.client.head_bucket(Bucket=bucket_name)
@@ -20,13 +19,15 @@ def s3upload(upload_id, service_id, filedata, region):
         s3.create_bucket(Bucket=bucket_name,
                          CreateBucketConfiguration={'LocationConstraint': region})
 
-    key = s3.Object(bucket_name, upload_id)
+    upload_file_name = "{}.csv".format(upload_id)
+    key = s3.Object(bucket_name, upload_file_name)
     key.put(Body=contents, ServerSideEncryption='AES256')
 
 
 def s3download(service_id, upload_id):
     s3 = resource('s3')
     bucket_name = 'service-{}-notify'.format(service_id)
-    key = s3.Object(bucket_name, upload_id)
+    upload_file_name = "{}.csv".format(upload_id)
+    key = s3.Object(bucket_name, upload_file_name)
     contents = key.get()['Body'].read().decode('utf-8')
     return contents
