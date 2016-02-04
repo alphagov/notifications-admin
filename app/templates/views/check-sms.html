@@ -21,9 +21,13 @@
 
   {% else %}
 
-    {{ sms_message(
-      message_template|replace_placeholders(upload_result.valid[0])
-    )}}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ sms_message(
+          message_template|replace_placeholders(upload_result.valid[0])
+        )}}
+      </div>
+    </div>
 
     <form method="POST" enctype="multipart/form-data">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />

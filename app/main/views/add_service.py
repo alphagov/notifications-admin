@@ -10,8 +10,8 @@ from app.main.forms import AddServiceForm
 def add_service():
     form = AddServiceForm(services_dao.find_all_service_names)
     services = services_dao.get_services(current_user.id)
-    if len(services) == 0:
-        heading = 'Set up notifications for your service'
+    if len(services['data']) == 0:
+        heading = 'Which service do you want to set up notifications for?'
     else:
         heading = 'Add a new service'
     if form.validate_on_submit():

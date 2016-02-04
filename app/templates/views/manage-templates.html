@@ -14,7 +14,7 @@ GOV.UK Notify | Manage templates
 
     {% if not has_jobs %}
       {{ banner(
-        '<a href="{}">Try sending a text message</a>'.format(
+        '<a href="{}">Send yourself a text message</a>'.format(
           url_for(".choose_sms_template", service_id=service_id)
         )|safe,
         subhead='Next step',
