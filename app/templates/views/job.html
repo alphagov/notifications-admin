@@ -14,9 +14,13 @@
       {{ uploaded_file_name }}
     </h1>
 
-    {{ sms_message(
-      template['content'],
-    )}}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ sms_message(
+          template['content'],
+        )}}
+      </div>
+    </div>
 
     <p class='heading-small'>
       Started {{ uploaded_file_time|format_datetime }}
@@ -47,27 +51,29 @@
     </ul>
 
     {% call(item) list_table(
-      messages,
+      [
+        {'phone': '+447700 900995', 'template': template['name'], 'status': 'queued'}
+      ],
       caption=uploaded_file_name,
       caption_visible=False,
       empty_message="Messages go here",
       field_headings=[
-        'To',
-        'Message',
+        'Recipient',
+        'Template',
         right_aligned_field_heading('Status')
       ]
     ) %}
       {% call field() %}
-        <a href="{{ url_for('.view_notification', service_id=service_id, job_id=456, notification_id=item.id) }}">{{item.phone}}</a>
+        {{item.phone}}
       {% endcall %}
       {% call field() %}
-        <a href="{{ url_for('.view_notification', service_id=service_id, job_id=456, notification_id=item.id) }}">{{item.message[:50]}}…</a>
+        {{item.template}}
       {% endcall %}
       {% call field(
         align='right',
         status='error' if item.status == 'Failed' else 'default'
       ) %}
-        {{ item.status }}&emsp;{{ item.time }}
+        {{ item.status }}
       {% endcall %}
     {% endcall %}
 
