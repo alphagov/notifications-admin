@@ -23,9 +23,10 @@
   </p>
 
   {{ banner(
-    'You can only send notifications to yourself',
-    subhead='Trial mode',
-    type='info'
+    'You can only send messages to yourself until you <a href="{}">request to go live</a>'.format(
+      url_for('.service_request_to_go_live', service_id=service_id)
+    )|safe,
+    type='important'
   ) }}
 
   <h2 class="api-key-name">
