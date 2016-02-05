@@ -161,7 +161,7 @@ def test_should_show_status_page(app_,
 
         assert response.status_code == 200
         resp_data = response.get_data(as_text=True)
-        assert 'Turn off all outgoing notifications' in resp_data
+        assert 'Suspend API keys' in resp_data
         assert mock_get_service.called
 
 

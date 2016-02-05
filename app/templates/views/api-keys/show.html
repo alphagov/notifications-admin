@@ -26,8 +26,8 @@
     </div>
 
     {{ page_footer(
-      back_link=url_for('.api_keys', service_id=service_id),
-      back_link_text='Back to API keys'
+      secondary_link=url_for('.api_keys', service_id=service_id),
+      secondary_link_text='Back to API keys'
     ) }}
 
 {% endblock %}

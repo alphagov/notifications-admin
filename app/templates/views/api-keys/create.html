@@ -14,11 +14,7 @@
 
   <form method="post">
     {{ textbox(key_name, hint='eg CRM application') }}
-    {{ page_footer(
-      'Continue',
-      back_link=url_for('.api_keys', service_id=service_id),
-      back_link_text='Back to API keys'
-    ) }}
+    {{ page_footer('Continue') }}
   </form>
 
 {% endblock %}
