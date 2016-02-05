@@ -398,11 +398,23 @@ def mock_get_no_api_keys(mocker):
 
 @pytest.fixture(scope='function')
 def mock_login(mocker, mock_get_user, mock_update_user):
+
     def _verify_code(user_id, code, code_type):
         return True, ''
-    return mocker.patch(
-        'app.user_api_client.check_verify_code',
-        side_effect=_verify_code)
+
+    def _no_services(user_id=None):
+        return {'data': []}
+
+    return (
+        mocker.patch(
+            'app.user_api_client.check_verify_code',
+            side_effect=_verify_code
+        ),
+        mocker.patch(
+            'app.notifications_api_client.get_services',
+            side_effect=_no_services
+        )
+    )
 
 
 @pytest.fixture(scope='function')
