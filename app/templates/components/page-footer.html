@@ -3,6 +3,8 @@
   destructive=False,
   back_link=False,
   back_link_text="Back",
+  secondary_link=False,
+  secondary_link_text=None,
   delete_link=False,
   delete_link_text="delete"
 ) %}
@@ -18,6 +20,9 @@
     {% endif %}
     {% if back_link %}
       <a class="page-footer-back-link" href="{{ back_link }}">{{ back_link_text }}</a>
+    {% endif %}
+    {% if secondary_link and secondary_link_text %}
+      <a class="page-footer-secondary-link" href="{{ secondary_link }}">{{ secondary_link_text }}</a>
     {% endif %}
   </div>
 {% endmacro %}

@@ -51,6 +51,8 @@
     type='tip'
   )}}
 
+  {{ banner('You could go to jail', 'important')}}
+
   <h2 class="heading-large">Big number</h2>
 
   <p>Used to show some important statistics.</p>
@@ -115,6 +117,10 @@
 
   {{ page_footer(
     button_text='Send', back_link='http://example.com', back_link_text="Back to dashboard"
+  ) }}
+
+  {{ page_footer(
+    button_text='Sign in', secondary_link='http://example.com', secondary_link_text="I’ve forgotten my password"
   ) }}
 
   <h2 class="heading-large">SMS message</h2>

@@ -23,9 +23,10 @@ GOV.UK Notify | Service settings
 
       <form method="post">
         {{ page_footer(
-          'Turn off all outgoing notifications',
+          'Suspend API keys',
           destructive=True,
-          back_link=url_for('.service_settings', service_id=service_id)
+          back_link=url_for('.service_settings', service_id=service_id),
+          back_link_text='Back to settings'
         ) }}
       </form>
 

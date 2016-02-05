@@ -24,7 +24,8 @@ GOV.UK Notify | Service settings
         {{ textbox(form.name) }}
         {{ page_footer(
           'Save',
-          back_link=url_for('.service_settings', service_id=service_id)
+          back_link=url_for('.service_settings', service_id=service_id),
+          back_link_text='Back to settings'
         ) }}
       </form>
     </div>

@@ -51,5 +51,5 @@ def revoke_api_key(service_id, key_id):
         )
     elif request.method == 'POST':
         api_key_api_client.revoke_api_key(service_id=service_id, key_id=key_id)
-        flash('‘{}’ was revoked'.format(key_name), 'default')
+        flash('‘{}’ was revoked'.format(key_name), 'default_with_tick')
         return redirect(url_for('.api_keys', service_id=service_id))
