@@ -4,11 +4,11 @@ from app.main.dao import services_dao
 
 def test_get_should_render_add_service_template(app_,
                                                 api_user_active,
+                                                mock_login,
                                                 mock_get_service,
                                                 mock_get_services,
                                                 mock_get_user,
-                                                mock_get_user_by_email,
-                                                mock_login):
+                                                mock_get_user_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -18,12 +18,12 @@ def test_get_should_render_add_service_template(app_,
 
 
 def test_should_add_service_and_redirect_to_next_page(app_,
+                                                      mock_login,
                                                       mock_create_service,
                                                       mock_get_services,
                                                       api_user_active,
                                                       mock_get_user,
-                                                      mock_get_user_by_email,
-                                                      mock_login):
+                                                      mock_get_user_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -52,11 +52,11 @@ def test_should_return_form_errors_when_service_name_is_empty(app_,
 
 
 def test_should_return_form_errors_with_duplicate_service_name(app_,
+                                                               mock_login,
                                                                mock_get_services,
                                                                mock_get_user,
                                                                api_user_active,
-                                                               mock_get_user_by_email,
-                                                               mock_login):
+                                                               mock_get_user_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)

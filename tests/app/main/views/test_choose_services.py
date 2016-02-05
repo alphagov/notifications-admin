@@ -4,10 +4,10 @@ import pytest
 
 
 def test_should_show_choose_services_page(app_,
+                                          mock_login,
                                           mock_get_user,
                                           api_user_active,
-                                          mock_get_services,
-                                          mock_login):
+                                          mock_get_services):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)

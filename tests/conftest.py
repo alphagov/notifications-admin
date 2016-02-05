@@ -92,10 +92,25 @@ def mock_get_services(mocker, user=None):
     def _create(user_id=None):
         import uuid
         service_one = service_json(
-            uuid.uuid4(), "service_one", [user.id], 1000, True, False)
+            "596364a0-858e-42c8-9062-a8fe822260eb", "service_one", [user.id], 1000, True, False)
         service_two = service_json(
-            uuid.uuid4(), "service_two", [user.id], 1000, True, False)
+            "147ad62a-2951-4fa1-9ca0-093cd1a52c52", "service_two", [user.id], 1000, True, False)
         return {'data': [service_one, service_two]}
+
+    return mocker.patch(
+        'app.notifications_api_client.get_services', side_effect=_create)
+
+
+@pytest.fixture(scope='function')
+def mock_get_services_with_one_service(mocker, user=None):
+    if user is None:
+        user = api_user_active()
+
+    def _create(user_id=None):
+        import uuid
+        return {'data': [service_json(
+            "596364a0-858e-42c8-9062-a8fe822260eb", "service_one", [user.id], 1000, True, False
+        )]}
 
     return mocker.patch(
         'app.notifications_api_client.get_services', side_effect=_create)
@@ -383,11 +398,23 @@ def mock_get_no_api_keys(mocker):
 
 @pytest.fixture(scope='function')
 def mock_login(mocker, mock_get_user, mock_update_user):
+
     def _verify_code(user_id, code, code_type):
         return True, ''
-    return mocker.patch(
-        'app.user_api_client.check_verify_code',
-        side_effect=_verify_code)
+
+    def _no_services(user_id=None):
+        return {'data': []}
+
+    return (
+        mocker.patch(
+            'app.user_api_client.check_verify_code',
+            side_effect=_verify_code
+        ),
+        mocker.patch(
+            'app.notifications_api_client.get_services',
+            side_effect=_no_services
+        )
+    )
 
 
 @pytest.fixture(scope='function')

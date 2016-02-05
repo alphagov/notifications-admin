@@ -6,6 +6,7 @@ import moto
 
 def test_choose_sms_template(app_,
                              api_user_active,
+                             mock_login,
                              mock_get_user,
                              mock_get_service_templates,
                              mock_check_verify_code,
@@ -25,6 +26,7 @@ def test_choose_sms_template(app_,
 
 def test_upload_empty_csvfile_returns_to_upload_page(app_,
                                                      api_user_active,
+                                                     mock_login,
                                                      mock_get_user,
                                                      mock_get_service_templates,
                                                      mock_check_verify_code,
@@ -45,9 +47,9 @@ def test_upload_empty_csvfile_returns_to_upload_page(app_,
 def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
                                                                         mocker,
                                                                         api_user_active,
+                                                                        mock_login,
                                                                         mock_get_user,
                                                                         mock_get_user_by_email,
-                                                                        mock_login,
                                                                         mock_get_service_template):
 
     contents = 'phone\n+44 123\n+44 456'
@@ -72,9 +74,9 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
 def test_upload_csvfile_with_valid_phone_shows_all_numbers(app_,
                                                            mocker,
                                                            api_user_active,
+                                                           mock_login,
                                                            mock_get_user,
                                                            mock_get_user_by_email,
-                                                           mock_login,
                                                            mock_get_service_template):
 
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
