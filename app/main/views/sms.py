@@ -1,5 +1,6 @@
 import csv
 import uuid
+import botocore
 
 from datetime import date
 
@@ -88,7 +89,10 @@ def send_sms(service_id, template_id):
 def check_sms(service_id, upload_id):
 
     if request.method == 'GET':
+
         contents = s3download(service_id, upload_id)
+        if not contents:
+            flash('There was a problem reading your upload file')
         upload_result = _get_numbers(contents)
         upload_data = session['upload_data']
         original_file_name = upload_data.get('original_file_name')

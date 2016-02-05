@@ -2,9 +2,12 @@ import botocore
 from boto3 import resource
 
 
+BUCKET_NAME = 'service-{}-notify'
+
+
 def s3upload(upload_id, service_id, filedata, region):
     s3 = resource('s3')
-    bucket_name = 'service-{}-notify'.format(service_id)
+    bucket_name = BUCKET_NAME.format(service_id)
     contents = '\n'.join(filedata['data'])
 
     exists = True
@@ -25,9 +28,17 @@ def s3upload(upload_id, service_id, filedata, region):
 
 
 def s3download(service_id, upload_id):
-    s3 = resource('s3')
-    bucket_name = 'service-{}-notify'.format(service_id)
-    upload_file_name = "{}.csv".format(upload_id)
-    key = s3.Object(bucket_name, upload_file_name)
-    contents = key.get()['Body'].read().decode('utf-8')
+    contents = ''
+    try:
+        s3 = resource('s3')
+        bucket_name = BUCKET_NAME.format(service_id)
+        upload_file_name = "{}.csv".format(upload_id)
+        key = s3.Object(bucket_name, upload_file_name)
+        contents = key.get()['Body'].read().decode('utf-8')
+    except botocore.exceptions.ClientError as e:
+        err = e.response['Error']
+        if err['Code'] == 'NoSuchBucket':
+            err_msg = '{}:{}'.format(err['BucketName'], err['Message'])
+            # TODO properly log error
+            print(err_msg)
     return contents
