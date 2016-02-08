@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import url_for, abort
 from app import notifications_api_client
 from app.main.utils import BrowsableItem
 
@@ -17,9 +17,24 @@ def get_service_templates(service_id):
     return notifications_api_client.get_service_templates(service_id)
 
 
-def get_service_template(service_id, template_id):
-    return notifications_api_client.get_service_template(
-        service_id, template_id)
+def get_service_templates_or_404(service_id):
+    try:
+        get_service_templates(service_id)
+    except HTTPError as e:
+        if e.status_code == 404:
+            abort(404)
+        else:
+            raise e
+
+
+def get_service_template_or_404(service_id, template_id):
+    try:
+        return notifications_api_client.get_service_template(service_id, template_id)
+    except HTTPError as e:
+        if e.status_code == 404:
+            abort(404)
+        else:
+            raise e
 
 
 def delete_service_template(service_id, template_id):

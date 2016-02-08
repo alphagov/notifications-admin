@@ -8,6 +8,7 @@ from flask import (
 )
 from flask_login import login_required
 from notifications_python_client.errors import HTTPError
+from utils.template import Template
 
 from app import job_api_client
 from app.main import main
@@ -38,7 +39,6 @@ def view_jobs(service_id):
 def view_job(service_id, job_id):
     try:
         job = job_api_client.get_job(service_id, job_id)['data']
-        template = templates_dao.get_service_template(service_id, job['template'])['data']
         messages = []
         return render_template(
             'views/job.html',
@@ -55,7 +55,9 @@ def view_job(service_id, job_id):
             cost=u'£0.00',
             uploaded_file_name=job['original_file_name'],
             uploaded_file_time=job['created_at'],
-            template=template,
+            template=Template(
+                templates_dao.get_service_template_or_404(service_id, job['template'])['data']
+            ),
             service_id=service_id
         )
     except HTTPError as e:

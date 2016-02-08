@@ -1,6 +1,8 @@
 import csv
 import uuid
 import botocore
+import re
+import io
 
 from datetime import date
 
@@ -12,12 +14,14 @@ from flask import (
     flash,
     abort,
     session,
-    current_app
+    current_app,
+    Markup
 )
 
 from flask_login import login_required
 from werkzeug import secure_filename
 from notifications_python_client.errors import HTTPError
+from utils.template import Template
 
 from app.main import main
 from app.main.forms import CsvUploadForm
@@ -35,22 +39,19 @@ from app.main.utils import (
 
 @main.route("/services/<service_id>/sms/send", methods=['GET'])
 def choose_sms_template(service_id):
-    try:
-        templates = templates_dao.get_service_templates(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
-
-    return render_template('views/choose-sms-template.html',
-                           templates=templates,
-                           service_id=service_id)
+    return render_template(
+        'views/choose-sms-template.html',
+        templates=[
+            Template(template) for template in templates_dao.get_service_templates(service_id)['data']
+        ],
+        service_id=service_id
+    )
 
 
 @main.route("/services/<service_id>/sms/send/<template_id>", methods=['GET', 'POST'])
 @login_required
 def send_sms(service_id, template_id):
+
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
@@ -63,24 +64,33 @@ def send_sms(service_id, template_id):
                                     service_id=service_id,
                                     upload_id=upload_id))
         except ValueError as e:
-            message = 'There was a problem uploading: {}'.format(
-                      csv_file.filename)
-            flash(message)
+            flash('There was a problem uploading: {}'.format(csv_file.filename))
             flash(str(e))
             return redirect(url_for('.send_sms', service_id=service_id, template_id=template_id))
 
-    try:
-        template = templates_dao.get_service_template(service_id, template_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    template = Template(
+       templates_dao.get_service_template_or_404(service_id, template_id)['data']
+    )
 
-    return render_template('views/send-sms.html',
-                           template=template,
-                           form=form,
-                           service_id=service_id)
+    return render_template(
+        'views/send-sms.html',
+        template=template,
+        column_headers=['phone number'] + template.placeholders_as_markup,
+        form=form,
+        service_id=service_id
+    )
+
+
+@main.route("/services/<service_id>/sms/send/<template_id>.csv", methods=['GET'])
+@login_required
+def get_example_csv(service_id, template_id):
+    template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
+    output = io.StringIO()
+    csv.writer(output).writerow(
+        ['phone number'] + Template(template).list_placeholders
+    )
+
+    return(output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'})
 
 
 @main.route("/services/<service_id>/sms/check/<upload_id>",
@@ -89,21 +99,23 @@ def send_sms(service_id, template_id):
 def check_sms(service_id, upload_id):
 
     if request.method == 'GET':
-
         contents = s3download(service_id, upload_id)
         if not contents:
             flash('There was a problem reading your upload file')
         upload_result = _get_numbers(contents)
         upload_data = session['upload_data']
-        original_file_name = upload_data.get('original_file_name')
         template_id = upload_data.get('template_id')
-        template = templates_dao.get_service_template(service_id, template_id)['data']
+        template = Template(
+            templates_dao.get_service_template_or_404(service_id, template_id)['data'],
+            values=upload_result['valid'][0] if upload_result['valid'] else {},
+            drop_values={'phone'}
+        )
         return render_template(
             'views/check-sms.html',
             upload_result=upload_result,
-            message_template=template['content'],
-            original_file_name=original_file_name,
-            template_id=template_id,
+            template=template,
+            column_headers=['phone number'] + template.placeholders_as_markup,
+            original_file_name=upload_data.get('original_file_name'),
             service_id=service_id
         )
     elif request.method == 'POST':
@@ -153,3 +165,16 @@ def _get_numbers(contents):
         except InvalidPhoneError:
             rejects.append({"line_number": i+2, "phone": row['phone']})
     return {"valid": valid, "rejects": rejects}
+
+
+def _get_column_headers(template_content, marked_up=False):
+    headers = re.findall(
+        r"\(\(([^\)]+)\)\)",  # anything that looks like ((registration number))
+        template_content
+    )
+    if marked_up:
+        return [
+            Markup("<span class='placeholder'>{}</span>".format(header))
+            for header in headers
+        ]
+    return headers

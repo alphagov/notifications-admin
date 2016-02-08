@@ -62,8 +62,6 @@ def create_app(config_name, config_overrides=None):
 
     application.session_interface = ItsdangerousSessionInterface()
 
-    application.add_template_filter(placeholders)
-    application.add_template_filter(replace_placeholders)
     application.add_template_filter(nl2br)
     application.add_template_filter(format_datetime)
     application.add_template_filter(syntax_highlight_json)
@@ -123,32 +121,12 @@ def convert_to_boolean(value):
     return value
 
 
-def placeholders(value):
-    if not value:
-        return value
-    return Markup(re.sub(
-        r"\(\(([^\)]+)\)\)",  # anything that looks like ((registration number))
-        lambda match: "<span class='placeholder'>{}</span>".format(match.group(1)),
-        value
-    ))
-
-
 def nl2br(value):
     _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
     result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', Markup('<br>\n'))
                           for p in _paragraph_re.split(escape(value)))
     return Markup(result)
-
-
-def replace_placeholders(template, values):
-    if not template:
-        return template
-    return Markup(re.sub(
-        r"\(\(([^\)]+)\)\)",  # anything that looks like ((registration number))
-        lambda match: values.get(match.group(1), ''),
-        template
-    ))
 
 
 def syntax_highlight_json(code):

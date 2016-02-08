@@ -11,7 +11,7 @@
     </h3>
   {% endif %}
   <div class="sms-message-wrapper{% if input_name %}-with-radio{% endif %}">
-    {{ body|placeholders }}
+    {{ body }}
   </div>
   {% if recipient %}
     <p class="sms-message-recipient">

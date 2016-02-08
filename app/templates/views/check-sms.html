@@ -17,14 +17,14 @@
     {% for rejected in upload_result.rejects %}
       <p>Line {{rejected.line_number}}: {{rejected.phone }}</a>
     {% endfor %}
-    <p><a href="{{url_for('.send_sms', service_id=service_id, template_id=template_id)}}" class="button">Go back and resolve errors</a></p>
+    <p><a href="{{url_for('.send_sms', service_id=service_id, template_id=template.id)}}" class="button">Go back and resolve errors</a></p>
 
   {% else %}
 
     <div class="grid-row">
       <div class="column-two-thirds">
         {{ sms_message(
-          message_template|replace_placeholders(upload_result.valid[0])
+          template.replaced
         )}}
       </div>
     </div>
@@ -32,13 +32,13 @@
     <form method="POST" enctype="multipart/form-data">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="submit" class="button" value="{{ "Send {} text message{}".format(upload_result.valid|count, '' if upload_result.valid|count == 1 else 's') }}" />
-      <a href="{{url_for('.send_sms', service_id=service_id, template_id=template_id)}}" class="page-footer-back-link">Back</a>
+      <a href="{{url_for('.send_sms', service_id=service_id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
     </form>
 
     {% call(item) list_table(
       upload_result.valid,
       caption=original_file_name,
-      field_headings=['Phone number']
+      field_headings=column_headers
     ) %}
       {% call field() %}
         {{ item.phone }}
