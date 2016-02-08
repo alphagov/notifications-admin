@@ -25,9 +25,13 @@
       color: $error-colour;
       font-weight: bold;
 
-      a:link,
-      a:visited {
-        color: $error-colour;
+      a {
+
+        &:link,
+        &:visited {
+          color: $error-colour;
+        }
+
       }
 
     }
@@ -50,7 +54,7 @@
 }
 
 .table-field-right-aligned {
-  @extend .table-field;
+  @extend %table-field;
   text-align: right;
 }
 
@@ -62,8 +66,8 @@
 }
 
 .table-show-more-link {
+  @include bold-16;
   margin-top: -20px;
   border-bottom: 1px solid $border-colour;
   padding-bottom: 10px;
-  @include bold-16;
 }

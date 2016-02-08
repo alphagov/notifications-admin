@@ -7,14 +7,25 @@
     margin-bottom: $gutter-two-thirds;
   }
 
-  a.browse-list-link {
+  &-link {
 
     @include bold-24;
 
-    &-destructive,
-    &-destructive:visited {
+    &-destructive {
+
       @include bold-24;
       color: $error-colour;
+
+      &:visited,
+      &:link {
+        @include bold-24;
+        color: $error-colour;
+      }
+
+      &:hover {
+        color: $mellow-red;
+      }
+
     }
 
   }

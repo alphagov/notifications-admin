@@ -4,39 +4,50 @@
   background-color: $red;
 }
 
-#global-header #logo {
-  white-space: nowrap;
-  font-size: 27px;
-  line-height: 32px;
+#global-header {
 
-  img {
-    padding-right: 8px;
+  #logo {
+
+    white-space: nowrap;
+    font-size: 27px;
+    line-height: 32px;
+
+    img {
+      padding-right: 8px;
+    }
+
+  }
+
+  .header-proposition {
+    #proposition-links {
+      li {
+        padding: 0 0 0 15px;
+      }
+    }
   }
 
 }
 
 @include media(desktop) {
-
   #proposition-menu {
     float: right;
   }
-
-  #global-header .header-proposition #proposition-links li {
-    padding: 0 0 0 15px;
-  }
-
 }
 
-a:visited {
-  color: $link-colour;
+a {
+  &:visited {
+    color: $link-colour;
+  }
 }
 
 .form-control-5em {
+
   width: 100%;
 
   @include media(tablet) {
     width: 5em;
   }
+
 }
 
 .column-main {
