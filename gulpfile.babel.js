@@ -7,6 +7,7 @@
 // - - - - - - - - - - - - - - -
 var gulp = require('gulp'),
     plugins = require('gulp-load-plugins')(),
+    stylish = require('jshint-stylish'),
 
 // 2. CONFIGURATION
 // - - - - - - - - - - - - - - -
@@ -82,6 +83,24 @@ gulp.task('watchForChanges', function() {
   gulp.watch(paths.src + 'stylesheets/**/*', ['sass']);
   gulp.watch(paths.src + 'images/**/*', ['images']);
 });
+
+gulp.task('lint:sass', () => gulp
+  .src(paths.src + '/stylesheets/**/*.scss')
+    .pipe(plugins.sassLint())
+    .pipe(plugins.sassLint.format(stylish))
+    .pipe(plugins.sassLint.failOnError())
+);
+
+gulp.task('lint:js', () => gulp
+  .src(paths.src + 'javascripts/**/*.js')
+    .pipe(plugins.jshint({'esversion': 6, 'esnext': false}))
+    .pipe(plugins.jshint.reporter(stylish))
+    .pipe(plugins.jshint.reporter('fail'))
+);
+
+gulp.task('lint',
+  ['lint:sass', 'lint:js']
+);
 
 // Default: compile everything
 gulp.task('default',

@@ -15,10 +15,11 @@
       overflow: hidden;
       position: absolute;
       z-index: -1;
-    }
 
-    &-field:focus + .file-upload-button {
-      outline: 3px solid $yellow;
+      &:focus + .file-upload-button {
+        outline: 3px solid $yellow;
+      }
+
     }
 
     &-button {
@@ -27,9 +28,9 @@
     }
 
     &-filename {
+      @include bold-19;
       display: inline-block;
       padding-left: $gutter-half;
-      @include bold-19;
     }
 
   }

@@ -32,29 +32,35 @@
 }
 
 .banner-info {
-  @extend .banner;
+
+  @extend %banner;
   background: $govuk-blue;
   color: $white;
 
-  a:link, a:visited {
-    color: $white;
-    text-decoration: underline;
-  }
+  a {
 
-  a:hover {
-    color: $light-blue-25;
+    &:link,
+    &:visited {
+      color: $white;
+      text-decoration: underline;
+    }
+
+    &:hover {
+      color: $light-blue-25;
+    }
+
   }
 
 }
 
 .banner-dangerous {
 
-  @extend .banner;
+  @extend %banner;
+  @include bold-19;
   background: $white;
   color: $error-colour;
   border: 5px solid $error-colour;
   margin: 15px 0;
-  @include bold-19;
   text-align: left;
 
   .button {
@@ -66,15 +72,18 @@
 
 .banner-tip {
 
-  @extend .banner;
+  @extend %banner;
   background: $yellow;
   color: $text-colour;
   text-align: left;
   font-weight: bold;
 
-  a:link, a:visited {
-    color: $text-colour;
-    text-decoration: underline;
+  a {
+    &:link,
+    &:visited {
+      color: $text-colour;
+      text-decoration: underline;
+    }
   }
 
   ol {
@@ -87,7 +96,7 @@
   @extend %banner;
   background: $white;
   color: $text-colour;
-  background-image: file-url("icon-important-2x.png");
+  background-image: file-url('icon-important-2x.png');
   background-size: 34px 34px;
   background-position: 0 0;
   background-repeat: no-repeat;

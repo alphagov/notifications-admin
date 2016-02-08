@@ -2,7 +2,7 @@
 .sms-message-wrapper {
   width: 100%;
   box-sizing: border-box;
-  padding: $gutter/2;
+  padding: $gutter-half;
   background: $panel-colour;
   border: 1px solid $panel-colour;
   border-radius: 5px;
@@ -36,33 +36,7 @@
   z-index: 50;
 }
 
-label.sms-message-option {
-
-  display: block;
-  position: relative;
-
-  &.selected {
-
-    .sms-message-wrapper-with-radio {
-      background: $white;
-      border: 1px solid $text-colour;
-    }
-
-  }
-
-  &.focused {
-
-    outline: none;
-
-    .sms-message-wrapper-with-radio {
-      box-shadow: 0 0 0 3px $yellow;
-    }
-
-  }
-
-}
-
 .sms-message-use-link {
-  margin-top: 70px;
   @include bold-19;
+  margin-top: 70px;
 }

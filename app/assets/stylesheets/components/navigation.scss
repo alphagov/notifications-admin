@@ -2,7 +2,8 @@
 
   padding: 20px 0 0 0;
 
-  ul, h2 {
+  ul,
+  h2 {
     @include core-19;
     border-bottom: 1px solid $border-colour;
     margin: 10px 20px 15px 0;
@@ -18,14 +19,18 @@
     margin: 10px 0 0 0;
   }
 
-  a:link,
-  a:visited {
-    text-decoration: none;
-  }
+  a {
 
-  a:hover {
-    color: $link-hover-colour;
-    text-decoration: underline;
+    &:link,
+    &:visited {
+      text-decoration: none;
+    }
+
+    &:hover {
+      color: $link-hover-colour;
+      text-decoration: underline;
+    }
+
   }
 
 }

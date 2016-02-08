@@ -14,16 +14,20 @@
     line-height: 40px;
     padding: 0 0 0 5px;
 
-    a:visited,
-    a:link {
-      color: $error-colour;
-      display: inline-block;
-      vertical-align: center;
-    }
+    a {
 
-    a:hover,
-    a:active {
-      color: $mellow-red;
+      &:visited,
+      &:link {
+        color: $error-colour;
+        display: inline-block;
+        vertical-align: center;
+      }
+
+      &:hover,
+      &:active {
+        color: $mellow-red;
+      }
+
     }
 
   }
@@ -32,8 +36,6 @@
     display: block;
     margin-top: $gutter;
   }
-
-  .button {}
 
   .button-destructive {
     @include button($error-colour);

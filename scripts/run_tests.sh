@@ -25,9 +25,12 @@ function display_result {
 pep8 .
 display_result $? 1 "Code style check"
 
+npm test
+display_result $? 2 "Front end code style check"
+
 ## Code coverage
 #py.test --cov=app tests/
-#display_result $? 2 "Code coverage"
+#display_result $? 3 "Code coverage"
 
 py.test -v
-display_result $? 3 "Unit tests"
+display_result $? 4 "Unit tests"

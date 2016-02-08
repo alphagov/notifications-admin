@@ -1,5 +1,7 @@
 .textbox-highlight {
 
+  $tag-background: rgba($light-blue, 0.7);
+
   &-wrapper {
     position: relative;
   }
@@ -72,8 +74,7 @@
       border-radius: 3px;
       overflow: hidden;
       display: inline;
-      box-shadow: inset 0.75em 0 0 0 rgba($light-blue, .7),
-                  inset -0.75em 0 0 0 rgba($light-blue, .7);
+      box-shadow: inset 0.75em 0 0 0 $tag-background, inset -0.75em 0 0 0 $tag-background;
     }
 
   }
