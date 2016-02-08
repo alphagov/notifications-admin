@@ -42,6 +42,7 @@ class Config(object):
     HEADER_COLOUR = '#FFBF47'  # $yellow
 
     AWS_REGION = 'eu-west-1'
+    TWILIO_TEST_NUMBER = os.getenv('TWILIO_TEST_NUMBER')
 
 
 class Development(Config):
