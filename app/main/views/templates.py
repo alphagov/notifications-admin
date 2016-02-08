@@ -92,6 +92,7 @@ def delete_service_template(service_id, template_id):
         else:
             raise e
 
+    template['template_content'] = template['content']
     form = TemplateForm(**template)
 
     if request.method == 'POST':
