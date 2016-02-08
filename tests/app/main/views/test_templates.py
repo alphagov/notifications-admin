@@ -95,8 +95,11 @@ def test_should_show_delete_template_page(app_,
                 service_id=service_id,
                 template_id=template_id))
 
+    content = response.get_data(as_text=True)
     assert response.status_code == 200
-    assert 'Are you sure' in response.get_data(as_text=True)
+    assert 'Are you sure' in content
+    assert 'Two week reminder' in content
+    assert 'Your vehicle tax is about to expire' in content
     mock_get_service_template.assert_called_with(
         service_id, template_id)
 
