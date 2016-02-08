@@ -23,6 +23,10 @@
         .on("input", this.update)
         .on("scroll", this.maintainScrollParity);
 
+      this.$backgroundMaskForeground.width(
+        this.$textbox.width()
+      );
+
       this.$textbox
         .trigger("input");
 
