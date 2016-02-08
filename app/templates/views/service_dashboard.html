@@ -3,7 +3,7 @@
 {% from "components/big-number.html" import big_number %}
 
 {% block page_title %}
-  GOV.UK Notify | Dashboard
+  {{ session.get('service_name', 'Dashboard') }} – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
