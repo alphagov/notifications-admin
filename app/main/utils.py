@@ -33,9 +33,6 @@ class InvalidPhoneError(Exception):
 
 
 def validate_phone_number(number):
-    if number == current_app.config['TWILIO_TEST_NUMBER']:
-        return number
-
     sanitised_number = number.replace('(', '')
     sanitised_number = sanitised_number.replace(')', '')
     sanitised_number = sanitised_number.replace(' ', '')
