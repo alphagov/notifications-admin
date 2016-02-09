@@ -13,7 +13,7 @@
 </h1>
 
 <div class="grid-row">
-    <div class="column-two-thirds">
+    <div class="column-three-quarters">
 
         <h2 class="heading-medium">
             How to integrate GOV.UK Notify into your service
@@ -32,22 +32,28 @@
             Notify uses <a href="https://jwt.io/">JSON Web Tokens (JWT)</a> for authentication.
             JWT tokens have a series of claims, standard and application specific.
         </p>
-
+    </div>
+</div>
         <p>Notify standard claims:</p>
 
-        <pre>
-            typ: JWT
-            alg: HS256
-        </pre>
+        {{'''
+{
+  "typ": "JWT",
+  "alg": "HS256"
+}
+        '''|syntax_highlight_json}}
 
         <p>Notify application specific:</p>
-        <pre>
-            iss: service id
-            iat: creation time in  epoch seconds (UTC)
-            req: signed request
-            pay: signed payload (POST requests only)
-        </pre>
-
+        {{"""
+{
+  iss: 'string', // service id
+  iat: 0, // creation time in  epoch seconds (UTC)
+  req: 'string', // signed request
+  pay: 'string', // signed payload (POST requests only)
+}
+        """|syntax_highlight_json}}
+<div class="grid-row">
+    <div class="column-three-quarters">
         <p>Notify API tokens sign both the request being made, and for POST requests, the payload.</p>
 
         <p>
@@ -56,7 +62,7 @@
 
         <p>Request signing is of the form HTTP METHOD PATH.</p>
 
-        <code>GET /notification/1234</code>
+        {{ "GET /notification/1234"|syntax_highlight_json }}
 
         <p></p>
 
@@ -68,64 +74,68 @@
         </h3>
 
         <p>To create a text notification</p>
+    </div>
+</div>
+        {{ "POST /notifications/sms"|syntax_highlight_json }}
 
-        <code>POST /notifications/sms</code>
-
+        {{
+          """
+{
+  'to': '+441234123123',
+  'template': 1
+}
+          """|syntax_highlight_json
+        }}
+<div class="grid-row">
+    <div class="column-three-quarters">
         <p>
-            <pre>
-                {
-                    'to': '+441234123123',
-                    'template': 1
-                }
-            </pre>
-        Where 'to' is the phone number and 'template' is the template id to send.
+          Where ‘to’ is the phone number and ‘template’ is the template ID to send.
         </p>
 
         <p>
-            Response:
-            <pre>
-                {
-                    'notification':
-                    {
-                        'to': '+441234123123',
-                        'createdAt': '2016-01-01T09:00:00.999999Z',
-                        'status': 'created',
-                        'id': 1,
-                        'message': '....',
-                        'method': 'sms',
-                        'jobId': 1
-                    }
-                }
-            </pre>
+          Response:
         </p>
+    </div>
+</div>
+        {{"""
+{
+  'notification':
+  {
+    'to': '+441234123123',
+    'createdAt': '2016-01-01T09:00:00.999999Z',
+    'status': 'created',
+    'id': 1,
+    'message': '....',
+    'method': 'sms',
+    'jobId': 1
+  }
+}
+        """|syntax_highlight_json }}
+
 
         <p>To get the status of a text notification</p>
 
-        <p>
-            <code>
-                GET /notifications/{id}
-            </code>
-        </p>
+        {{ "GET /notifications/{id}"|syntax_highlight_json }}
 
-        <p>
-            <pre>
-            {
-                'notification':
-                {
-                    'status': 'sent',
-                    'createdAt': '2016-01-01T09:00:00.999999Z',
-                    'to': '+447827992607',
-                    'method': 'sms',
-                    'sentAt': '2016-01-01T09:01:00.999999Z',
-                    'id': 1,
-                    'message': '...',
-                    'jobId': 1,
-                    'sender': 'sms-partner'
-                }
-            }
-            </pre>
-        </p>
+        {{"""
+{
+  'notification':
+  {
+    'status': 'sent',
+    'createdAt': '2016-01-01T09:00:00.999999Z',
+    'to': '+447827992607',
+    'method': 'sms',
+    'sentAt': '2016-01-01T09:01:00.999999Z',
+    'id': 1,
+    'message': '...',
+    'jobId': 1,
+    'sender': 'sms-partner'
+  }
+}
+        """|syntax_highlight_json }}
 
+<div class="grid-row">
+    <div class="column-three-quarters">
         <h2 class="heading-medium">
             API client libraries
         </h2>

@@ -9,6 +9,9 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from werkzeug.exceptions import abort
+from pygments import highlight
+from pygments.lexers import JavascriptLexer
+from pygments.formatters import HtmlFormatter
 from app.notify_client.api_client import NotificationsAdminAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.user_api_client import UserApiClient
@@ -61,6 +64,7 @@ def create_app(config_name, config_overrides=None):
     application.add_template_filter(replace_placeholders)
     application.add_template_filter(nl2br)
     application.add_template_filter(format_datetime)
+    application.add_template_filter(syntax_highlight_json)
 
     application.after_request(useful_headers_after_request)
     register_errorhandlers(application)
@@ -142,6 +146,10 @@ def replace_placeholders(template, values):
         lambda match: values.get(match.group(1), ''),
         template
     ))
+
+
+def syntax_highlight_json(code):
+    return Markup(highlight(code, JavascriptLexer(), HtmlFormatter(noclasses=True)))
 
 
 def format_datetime(date):
