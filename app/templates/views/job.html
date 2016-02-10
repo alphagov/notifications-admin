@@ -29,12 +29,12 @@
     <ul class="grid-row job-totals">
       <li class="column-one-quarter">
         {{ big_number(
-          1, 'queued'
+          0, 'queued'
         )}}
       </li>
       <li class="column-one-quarter">
         {{ big_number(
-          0, 'sent'
+          1, 'sent'
         )}}
       </li>
       <li class="column-one-quarter">
@@ -52,19 +52,23 @@
 
     {% call(item) list_table(
       [
-        {'phone': '+447700 900995', 'template': template['name'], 'status': 'queued'}
+        {'row': 1, 'phone': '+447700 900995', 'template': template['name'], 'status': 'queued'}
       ],
       caption=uploaded_file_name,
       caption_visible=False,
       empty_message="Messages go here",
       field_headings=[
+        'Row',
         'Recipient',
         'Template',
         right_aligned_field_heading('Status')
       ]
     ) %}
       {% call field() %}
-        {{item.phone}}
+        {{ item.row }}.
+      {% endcall %}
+      {% call field() %}
+        {{item.phone[:3]}} •••• ••••••
       {% endcall %}
       {% call field() %}
         {{item.template}}
