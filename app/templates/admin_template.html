@@ -3,19 +3,19 @@
 
 {% block head %}
   <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" media="screen" href="{{ asset_path }}stylesheets/main.css" />
+  <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main.css') }}" />
   <!--<![endif]-->
   <style>
     #global-header-bar { background-color: {{header_colour}} }
   </style>
   <!--[if IE 6]>
-  <link rel="stylesheet" media="screen" href="{{ asset_path }}/stylesheets/main-ie6.css" />
+  <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main-ie6.css') }}" />
   <![endif]-->
   <!--[if IE 7]>
-  <link rel="stylesheet" media="screen" href="{{ asset_path }}/stylesheets/main-ie7.css" />
+  <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main-ie7.css') }}" />
   <![endif]-->
   <!--[if IE 8]>
-  <link rel="stylesheet" media="screen" href="{{ asset_path }}/stylesheets/main-ie8.css" />
+  <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main-ie8.css') }}" />
   <![endif]-->
 {% endblock %}
 
@@ -69,5 +69,5 @@
 {% endblock %}
 
 {% block body_end %}
-  <script type="text/javascript" src="{{ asset_path }}javascripts/all.js" /></script>
+  <script type="text/javascript" src="{{ asset_url('javascripts/all.js') }}" /></script>
 {% endblock %}
