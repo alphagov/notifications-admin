@@ -1,6 +1,8 @@
 {% extends "admin_template.html" %}
 
 {% block fullwidth_content %}
-  {% include 'flash_messages.html' %}
-  {% block maincolumn_content %}{% endblock %}
+  <main role="main">
+    {% include 'flash_messages.html' %}
+    {% block maincolumn_content %}{% endblock %}
+  </main>
 {% endblock %}
