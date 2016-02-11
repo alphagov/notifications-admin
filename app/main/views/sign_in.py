@@ -36,8 +36,6 @@ def sign_in():
 
 
 def _get_and_verify_user(user, password):
-    print(user.serialize())
-    print(password)
     if not user:
         return None
     elif user.is_locked():
