@@ -1,5 +1,5 @@
-from client.notifications import BaseAPIClient
-from client.errors import (
+from notifications_python_client.notifications import BaseAPIClient
+from notifications_python_client.errors import (
     HTTPError,
     InvalidResponse
 )

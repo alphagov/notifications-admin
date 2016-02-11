@@ -17,7 +17,7 @@ from flask import (
 
 from flask_login import login_required
 from werkzeug import secure_filename
-from client.errors import HTTPError
+from notifications_python_client.errors import HTTPError
 
 from app.main import main
 from app.main.forms import CsvUploadForm

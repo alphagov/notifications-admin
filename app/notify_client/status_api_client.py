@@ -1,4 +1,4 @@
-from client.base import BaseAPIClient
+from notifications_python_client.base import BaseAPIClient
 
 
 class StatusApiClient(BaseAPIClient):

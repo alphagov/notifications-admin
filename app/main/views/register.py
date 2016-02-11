@@ -11,7 +11,7 @@ from flask import (
 
 from flask.ext.login import current_user
 
-from client.errors import HTTPError
+from notifications_python_client.errors import HTTPError
 
 from app.main import main
 from app.main.dao import users_dao

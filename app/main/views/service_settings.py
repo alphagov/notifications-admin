@@ -7,7 +7,7 @@ from app.main.dao.services_dao import (
     get_service_by_id, delete_service, update_service)
 from app.main.dao.users_dao import verify_password
 from app.main.forms import ConfirmPasswordForm, ServiceNameForm
-from client.errors import HTTPError
+from notifications_python_client.errors import HTTPError
 
 
 @main.route("/services/<service_id>/service-settings")
