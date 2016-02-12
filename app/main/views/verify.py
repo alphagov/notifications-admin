@@ -6,7 +6,7 @@ from flask import (
     abort
 )
 
-from client.errors import HTTPError
+from notifications_python_client.errors import HTTPError
 
 from flask_login import login_user
 

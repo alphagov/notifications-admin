@@ -7,7 +7,7 @@ from flask import (
     abort
 )
 from flask_login import login_required
-from client.errors import HTTPError
+from notifications_python_client.errors import HTTPError
 
 from app import job_api_client
 from app.main import main

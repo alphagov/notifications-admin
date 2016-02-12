@@ -7,7 +7,7 @@ from app import job_api_client
 from app.main.dao.services_dao import get_service_by_id
 from app.main.dao import templates_dao as tdao
 from app.main.dao import services_dao as sdao
-from client.errors import HTTPError
+from notifications_python_client.errors import HTTPError
 
 
 @main.route("/services/<service_id>/templates")

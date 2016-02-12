@@ -1,4 +1,4 @@
-from flask import (render_template, url_for, redirect, flash)
+from flask import (render_template, url_for, redirect, flash, session)
 
 from app.main import main
 from app.main.dao import users_dao
@@ -26,6 +26,7 @@ def new_password(token):
             'id': user.id,
             'email': user.email_address,
             'password': form.new_password.data}
+        users_dao.activate_user(user)
         return redirect(url_for('main.two_factor'))
     else:
         return render_template('views/new-password.html', token=token, form=form, user=user)

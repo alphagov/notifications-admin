@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from client.notifications import NotificationsAPIClient
+from notifications_python_client.notifications import NotificationsAPIClient
 
 
 class NotificationsAdminAPIClient(NotificationsAPIClient):
