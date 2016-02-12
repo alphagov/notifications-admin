@@ -8,7 +8,6 @@ from app.main import main
 @main.route('/sign-out', methods=(['GET']))
 @login_required
 def sign_out():
-    if session.get('service_name', None):
-        session.pop('service_name')
+    session.clear()
     logout_user()
     return redirect(url_for('main.index'))
