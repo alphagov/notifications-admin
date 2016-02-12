@@ -83,6 +83,9 @@ class UserApiClient(BaseAPIClient):
                     return False, 'Code not found'
                 elif 'Code has expired' in e.message:
                     return False, 'Code has expired'
+                else:
+                    # TODO what is the default message?
+                    return False, 'Code not found'
             raise e
 
 
