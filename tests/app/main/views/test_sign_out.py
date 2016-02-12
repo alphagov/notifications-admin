@@ -1,6 +1,4 @@
-from datetime import datetime
 from flask import url_for
-from app.main.dao import users_dao
 
 
 def test_render_sign_out_redirects_to_sign_in(app_):
@@ -24,6 +22,8 @@ def test_sign_out_user(app_,
         email = 'valid@example.gov.uk'
         password = 'val1dPassw0rd!'
         with app_.test_client() as client:
+            with client.session_transaction() as session:
+                print('session: {}'.format(session))
             client.login(api_user_active)
             # Check we are logged in
             response = client.get(
@@ -33,3 +33,4 @@ def test_sign_out_user(app_,
             assert response.status_code == 302
             assert response.location == url_for(
                 'main.index', _external=True)
+            assert session.get('ItsdangerousSession') is None
