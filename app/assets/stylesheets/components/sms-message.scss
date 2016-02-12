@@ -36,7 +36,20 @@
   z-index: 50;
 }
 
-.sms-message-use-link {
-  @include bold-19;
-  margin-top: 70px;
+.sms-message-use-links {
+
+  @include copy-19;
+  margin-top: 55px;
+
+  a {
+
+    display: block;
+    margin-bottom: 5px;
+
+    &:first-child {
+      @include bold-19;
+    }
+
+  }
+
 }
