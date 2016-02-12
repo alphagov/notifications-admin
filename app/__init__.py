@@ -18,6 +18,7 @@ from app.notify_client.user_api_client import UserApiClient
 from app.notify_client.job_api_client import JobApiClient
 from app.notify_client.status_api_client import StatusApiClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
+from app.asset_fingerprinter import AssetFingerprinter
 import app.proxy_fix
 from config import configs
 from utils import logging
@@ -30,6 +31,7 @@ user_api_client = UserApiClient()
 api_key_api_client = ApiKeyApiClient()
 job_api_client = JobApiClient()
 status_api_client = StatusApiClient()
+asset_fingerprinter = AssetFingerprinter()
 
 
 def create_app(config_name, config_overrides=None):
@@ -106,7 +108,8 @@ def init_app(app, config_overrides):
     def inject_global_template_variables():
         return {
             'asset_path': '/static/',
-            'header_colour': app.config['HEADER_COLOUR']
+            'header_colour': app.config['HEADER_COLOUR'],
+            'asset_url': asset_fingerprinter.get_url
         }
 
 

@@ -5,6 +5,7 @@ class Config(object):
     DEBUG = False
     ASSETS_DEBUG = False
     cache = False
+    SEND_FILE_MAX_AGE_DEFAULT = 365 * 24 * 60 * 60  # 1 year
     manifest = True
 
     NOTIFY_LOG_LEVEL = 'DEBUG'
