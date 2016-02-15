@@ -44,6 +44,8 @@ class Config(object):
 
     AWS_REGION = 'eu-west-1'
 
+    SHOW_STYLEGUIDE = True
+
 
 class Development(Config):
     DEBUG = True
@@ -66,7 +68,7 @@ class Preview(Config):
 
 
 class Staging(Preview):
-    pass
+    SHOW_STYLEGUIDE = False
 
 
 class Live(Staging):
