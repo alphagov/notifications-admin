@@ -14,7 +14,7 @@ Create an account – GOV.UK Notify
 
     <p>If you've used GOV.UK Notify before, <a href="{{ url_for('.sign_in') }}">sign in to your account</a>.</p>
 
-    <form autocomplete="off" action="" method="post">
+    <form method="post" autocomplete="nope">
       {{ textbox(form.name, width='3-4') }}
       {{ textbox(form.email_address, hint="Your email address must end in .gov.uk", width='3-4') }}
       {{ textbox(form.mobile_number, width='3-4') }}
