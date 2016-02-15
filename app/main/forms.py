@@ -9,6 +9,7 @@ from wtforms import (
     FileField,
     RadioField
 )
+from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
 from app.main.validators import Blacklist, CsvFileValidator
@@ -23,14 +24,14 @@ from app.main.utils import (
 def email_address():
     gov_uk_email \
         = "(^[^@^\\s]+@[^@^\\.^\\s]+(\\.[^@^\\.^\\s]*)*.gov.uk)"
-    return StringField('Email address', validators=[
+    return EmailField('Email address', validators=[
         Length(min=5, max=255),
         DataRequired(message='Email cannot be empty'),
         Email(message='Enter a valid email address'),
         Regexp(regex=gov_uk_email, message='Enter a gov.uk email address')])
 
 
-class UKMobileNumber(StringField):
+class UKMobileNumber(TelField):
 
     def pre_validate(self, form):
         try:
