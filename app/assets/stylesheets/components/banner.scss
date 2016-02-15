@@ -31,28 +31,6 @@
 
 }
 
-.banner-info {
-
-  @extend %banner;
-  background: $govuk-blue;
-  color: $white;
-
-  a {
-
-    &:link,
-    &:visited {
-      color: $white;
-      text-decoration: underline;
-    }
-
-    &:hover {
-      color: $light-blue-25;
-    }
-
-  }
-
-}
-
 .banner-dangerous {
 
   @extend %banner;

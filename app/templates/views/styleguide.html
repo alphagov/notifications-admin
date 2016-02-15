@@ -29,18 +29,6 @@
 
   {{ banner("You sent 1,234 text messages", with_tick=True) }}
 
-  <div class="grid-row">
-    <div class="column-one-third">
-      {{ banner("Delivered 10:20") }}
-    </div>
-  </div>
-
-  {{ banner(
-    'You can only send notifications to yourself',
-    type='info',
-    subhead='Restricted mode'
-  ) }}
-
   {{ banner('You’re not allowed to do this', 'dangerous')}}
 
   {{ banner('Are you sure you want to delete?', 'dangerous', delete_button="Yes, delete this thing")}}
@@ -134,14 +122,19 @@
 
   <div class="grid-row">
     <div class="column-half">
-      {{ sms_message("Your vehicle tax for LC12 BFL is due on 1 March 2016. Renew online at www.gov.uk/vehicle-tax") }}
-      {{ sms_message("Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax") }}
       {{ sms_message(
-        "Your vehicle tax for registration number is due on date. Renew online at www.gov.uk/vehicle-tax",
-        "+44 7700 900 306"
+        'Your vehicle tax for LC12 BFL is due on 1 March 2016. Renew online at www.gov.uk/vehicle-tax',
+        name='Two week reminder',
       ) }}
       {{ sms_message(
-        "Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax",
+        'Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax'
+      ) }}
+      {{ sms_message(
+        'Your vehicle tax for registration number is due on date. Renew online at www.gov.uk/vehicle-tax',
+        '+44 7700 900 306'
+      ) }}
+      {{ sms_message(
+        'Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax',
         name='Two week reminder',
         edit_link='#'
       ) }}
