@@ -5,7 +5,7 @@
 {% from "components/browse-list.html" import browse_list %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/sms-message.html" import sms_message %}
-{% from "components/table.html" import mapping_table, list_table, row, field %}
+{% from "components/table.html" import mapping_table, list_table, row, field, right_aligned_field_heading %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/api-key.html" import api_key %}
@@ -17,7 +17,7 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    Styleguide
+    <a href="http://www.notify.works/_styleguide" style="text-decoration: none;">www.notify.works/_styleguide</a>
   </h1>
 
   <p>
@@ -28,18 +28,6 @@
   <p>Used to show the status of a thing or action.</p>
 
   {{ banner("You sent 1,234 text messages", with_tick=True) }}
-
-  <div class="grid-row">
-    <div class="column-one-third">
-      {{ banner("Delivered 10:20") }}
-    </div>
-  </div>
-
-  {{ banner(
-    'You can only send notifications to yourself',
-    type='info',
-    subhead='Restricted mode'
-  ) }}
 
   {{ banner('You’re not allowed to do this', 'dangerous')}}
 
@@ -134,14 +122,19 @@
 
   <div class="grid-row">
     <div class="column-half">
-      {{ sms_message("Your vehicle tax for LC12 BFL is due on 1 March 2016. Renew online at www.gov.uk/vehicle-tax") }}
-      {{ sms_message("Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax") }}
       {{ sms_message(
-        "Your vehicle tax for registration number is due on date. Renew online at www.gov.uk/vehicle-tax",
-        "+44 7700 900 306"
+        'Your vehicle tax for LC12 BFL is due on 1 March 2016. Renew online at www.gov.uk/vehicle-tax',
+        name='Two week reminder',
       ) }}
       {{ sms_message(
-        "Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax",
+        'Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax'
+      ) }}
+      {{ sms_message(
+        'Your vehicle tax for registration number is due on date. Renew online at www.gov.uk/vehicle-tax',
+        '+44 7700 900 306'
+      ) }}
+      {{ sms_message(
+        'Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax',
         name='Two week reminder',
         edit_link='#'
       ) }}
@@ -149,11 +142,10 @@
   </div>
 
   <h2 class="heading-large">Tables</h2>
-
   {% call mapping_table(
     caption='Account settings',
-    field_headings=['Label', 'Value'],
-    field_headings_visible=True,
+    field_headings=['Label', 'Value', 'Action'],
+    field_headings_visible=False,
     caption_visible=True
   ) %}
     {% call row() %}
@@ -162,6 +154,9 @@
       {% endcall %}
       {% call field() %}
         admin
+      {% endcall %}
+      {% call field(align='right') %}
+        <a href="#">Change</a>
       {% endcall %}
     {% endcall %}
   {% endcall %}
@@ -175,18 +170,21 @@
         'file': 'dispatch_20151117.csv', 'status': 'Delivered'
       },
       {
-        'file': 'remdinder_monday.csv', 'status': 'Delivered'
+        'file': 'remdinder_monday.csv', 'status': 'Failed'
       }
     ],
     caption='Messages',
-    field_headings=['File', 'Status'],
-    field_headings_visible=False,
-    caption_visible=True
+    field_headings=['File', right_aligned_field_heading('Status')],
+    field_headings_visible=True,
+    caption_visible=False
   ) %}
     {% call field() %}
       {{ item.file }}
     {% endcall %}
-    {% call field() %}
+    {% call field(
+      align='right',
+      status='error' if item.status == 'Failed' else 'default'
+    ) %}
       {{ item.status }}
     {% endcall %}
   {% endcall %}
@@ -210,6 +208,7 @@
   {{ textbox(form.username) }}
   {{ textbox(form.password) }}
   {{ textbox(form.message, highlight_tags=True) }}
+  {{ textbox(form.code, width='1-8') }}
 
   <h2 class="heading-large">File upload</h2>
   {{ file_upload(form.file_upload) }}
