@@ -23,6 +23,7 @@ class Config(object):
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = False
     PERMANENT_SESSION_LIFETIME = 3600  # seconds
+    SESSION_REFRESH_EACH_REQUEST = True
 
     API_HOST_NAME = os.getenv('API_HOST_NAME')
     NOTIFY_API_SECRET = os.getenv('NOTIFY_API_SECRET', "dev-secret")
