@@ -46,7 +46,7 @@ class ItsdangerousSessionInterface(SessionInterface):
                                        domain=domain)
             return
         session.permanent = True
-        expires = datetime.utcnow() + timedelta(app.config.get('PERMANENT_SESSION_LIFETIME'))
+        expires = datetime.utcnow() + timedelta(seconds=app.config.get('PERMANENT_SESSION_LIFETIME'))
         val = self.get_serializer(app).dumps(dict(session))
         response.set_cookie(app.session_cookie_name, val,
                             expires=expires, httponly=True,
