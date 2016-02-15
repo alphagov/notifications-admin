@@ -10,6 +10,7 @@ def styleguide():
     class FormExamples(Form):
         username = StringField(u'Username')
         password = PasswordField(u'Password', [validators.required()])
+        code = StringField('Enter code')
         message = TextAreaField(u'Message')
         file_upload = FileField('Upload a CSV file to add your recipients’ details')
 

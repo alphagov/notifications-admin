@@ -5,7 +5,7 @@
 {% from "components/browse-list.html" import browse_list %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/sms-message.html" import sms_message %}
-{% from "components/table.html" import mapping_table, list_table, row, field %}
+{% from "components/table.html" import mapping_table, list_table, row, field, right_aligned_field_heading %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/api-key.html" import api_key %}
@@ -149,11 +149,10 @@
   </div>
 
   <h2 class="heading-large">Tables</h2>
-
   {% call mapping_table(
     caption='Account settings',
-    field_headings=['Label', 'Value'],
-    field_headings_visible=True,
+    field_headings=['Label', 'Value', 'Action'],
+    field_headings_visible=False,
     caption_visible=True
   ) %}
     {% call row() %}
@@ -162,6 +161,9 @@
       {% endcall %}
       {% call field() %}
         admin
+      {% endcall %}
+      {% call field(align='right') %}
+        <a href="#">Change</a>
       {% endcall %}
     {% endcall %}
   {% endcall %}
@@ -175,18 +177,21 @@
         'file': 'dispatch_20151117.csv', 'status': 'Delivered'
       },
       {
-        'file': 'remdinder_monday.csv', 'status': 'Delivered'
+        'file': 'remdinder_monday.csv', 'status': 'Failed'
       }
     ],
     caption='Messages',
-    field_headings=['File', 'Status'],
-    field_headings_visible=False,
-    caption_visible=True
+    field_headings=['File', right_aligned_field_heading('Status')],
+    field_headings_visible=True,
+    caption_visible=False
   ) %}
     {% call field() %}
       {{ item.file }}
     {% endcall %}
-    {% call field() %}
+    {% call field(
+      align='right',
+      status='error' if item.status == 'Failed' else 'default'
+    ) %}
       {{ item.status }}
     {% endcall %}
   {% endcall %}
@@ -210,6 +215,7 @@
   {{ textbox(form.username) }}
   {{ textbox(form.password) }}
   {{ textbox(form.message, highlight_tags=True) }}
+  {{ textbox(form.code, width='1-8') }}
 
   <h2 class="heading-large">File upload</h2>
   {{ file_upload(form.file_upload) }}
