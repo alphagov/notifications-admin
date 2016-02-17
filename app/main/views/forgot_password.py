@@ -1,4 +1,8 @@
-from flask import render_template, current_app
+from flask import (
+    render_template,
+    flash
+)
+
 from app.main import main
 from app.main.dao import users_dao
 from app.main.forms import ForgotPasswordForm
