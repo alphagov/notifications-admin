@@ -15,6 +15,7 @@ def forgot_password():
             users_dao.request_password_reset(user)
             send_change_password_email(form.email_address.data)
             return render_template('views/password-reset-sent.html')
-        flash('There was an error processing your request')
+        else:
+            return render_template('views/password-reset-sent.html')
 
     return render_template('views/forgot-password.html', form=form)
