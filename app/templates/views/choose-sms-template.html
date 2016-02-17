@@ -17,7 +17,7 @@
       <div class="grid-row">
         {% for template in templates %}
           <div class="column-two-thirds">
-            {{ sms_message(template.content, name=template.name) }}
+            {{ sms_message(template.formatted_as_markup, name=template.name) }}
           </div>
           <div class="column-one-third">
             <div class="sms-message-use-link">

@@ -2,7 +2,7 @@
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
-{% from "components/table.html" import list_table %}
+{% from "components/table.html" import list_table, field %}
 
 {% block page_title %}
   Send text messages – GOV.UK Notify
@@ -16,7 +16,7 @@
 
     <div class="grid-row">
       <div class="column-two-thirds">
-        {{ sms_message(template.content) }}
+        {{ sms_message(template.formatted_as_markup) }}
       </div>
     </div>
 
@@ -35,13 +35,21 @@
 
     {% if column_headers %}
       {% call(item) list_table(
-        [],
+        example_data,
         caption='Preview',
         field_headings=column_headers,
         field_headings_visible=True,
         caption_visible=False,
         empty_message="Your data here"
       ) %}
+        {% call field() %}
+          {{ item.phone }}
+        {% endcall %}
+        {% for column in template.placeholders %}
+          {% call field() %}
+            {{ item.get(column) }}
+          {% endcall %}
+        {% endfor %}
       {% endcall %}
     {% endif %}
     <p class="table-show-more-link">

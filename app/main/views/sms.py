@@ -14,11 +14,10 @@ from flask import (
     flash,
     abort,
     session,
-    current_app,
-    Markup
+    current_app
 )
 
-from flask_login import login_required
+from flask_login import login_required, current_user
 from werkzeug import secure_filename
 from notifications_python_client.errors import HTTPError
 from utils.template import Template
@@ -72,10 +71,19 @@ def send_sms(service_id, template_id):
        templates_dao.get_service_template_or_404(service_id, template_id)['data']
     )
 
+    example_data = [dict(
+        phone=current_user.mobile_number,
+        **{
+            header: "test {}".format(header) for header in template.placeholders
+        }
+    )]
+
     return render_template(
         'views/send-sms.html',
         template=template,
-        column_headers=['phone number'] + template.placeholders_as_markup,
+        column_headers=['phone'] + template.placeholders_as_markup,
+        placeholders=template.placeholders,
+        example_data=example_data,
         form=form,
         service_id=service_id
     )
@@ -85,10 +93,11 @@ def send_sms(service_id, template_id):
 @login_required
 def get_example_csv(service_id, template_id):
     template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
+    placeholders = list(Template(template).placeholders)
     output = io.StringIO()
-    csv.writer(output).writerow(
-        ['phone number'] + Template(template).list_placeholders
-    )
+    writer = csv.writer(output)
+    writer.writerow(['phone'] + placeholders)
+    writer.writerow([current_user.mobile_number] + ["test {}".format(header) for header in placeholders])
 
     return(output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'})
 
@@ -116,7 +125,8 @@ def check_sms(service_id, upload_id):
             template=template,
             column_headers=['phone number'] + template.placeholders_as_markup,
             original_file_name=upload_data.get('original_file_name'),
-            service_id=service_id
+            service_id=service_id,
+            form=CsvUploadForm()
         )
     elif request.method == 'POST':
         upload_data = session['upload_data']
