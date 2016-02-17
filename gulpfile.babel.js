@@ -23,11 +23,11 @@ var gulp = require('gulp'),
 
 // Move GOV.UK template resources
 
-gulp.task('copy:govuk_template:template', () => gulp.src('bower_components/govuk_template/views/layouts/govuk_template.html')
+gulp.task('copy:govuk_template:template', () => gulp.src(paths.npm + '/govuk_template_jinja/views/layouts/govuk_template.html')
   .pipe(gulp.dest(paths.templates))
 );
 
-gulp.task('copy:govuk_template:assets', () => gulp.src('bower_components/govuk_template/assets/**/*')
+gulp.task('copy:govuk_template:assets', () => gulp.src(paths.npm + '/govuk_template_jinja/assets/**/*')
   .pipe(gulp.dest(paths.dist))
 );
 
