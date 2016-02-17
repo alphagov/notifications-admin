@@ -41,7 +41,7 @@ def mock_send_sms(request, mocker):
 
 @pytest.fixture(scope='function')
 def mock_send_email(request, mocker):
-    return mocker.patch("app.notifications_api_client.send_email")
+    return mocker.patch("app.notifications_api_client.send_email", autospec=True)
 
 
 @pytest.fixture(scope='function')
@@ -285,6 +285,18 @@ def mock_get_user_by_email(mocker, api_user_active):
         api_user_active._email_address = email_address
         return api_user_active
     return mocker.patch('app.user_api_client.get_user_by_email', side_effect=_get_user)
+
+
+@pytest.fixture(scope='function')
+def mock_dont_get_user_by_email(mocker):
+
+    def _get_user(email_address):
+        return None
+    return mocker.patch(
+        'app.user_api_client.get_user_by_email',
+        side_effect=_get_user,
+        autospec=True
+    )
 
 
 @pytest.fixture(scope='function')
