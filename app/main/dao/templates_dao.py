@@ -1,6 +1,6 @@
 from flask import url_for, abort
 from app import notifications_api_client
-from app.main.utils import BrowsableItem
+from app.utils import BrowsableItem
 
 
 def insert_service_template(name, type_, content, service_id):

@@ -19,6 +19,7 @@ from app.notify_client.job_api_client import JobApiClient
 from app.notify_client.status_api_client import StatusApiClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.asset_fingerprinter import AssetFingerprinter
+from app.utils import validate_phone_number, InvalidPhoneError
 import app.proxy_fix
 from config import configs
 from utils import logging
@@ -65,6 +66,7 @@ def create_app(config_name, config_overrides=None):
     application.add_template_filter(nl2br)
     application.add_template_filter(format_datetime)
     application.add_template_filter(syntax_highlight_json)
+    application.add_template_filter(valid_phone_number)
 
     application.after_request(useful_headers_after_request)
     register_errorhandlers(application)
@@ -137,6 +139,14 @@ def format_datetime(date):
     date = dateutil.parser.parse(date)
     native = date.replace(tzinfo=None)
     return native.strftime('%A %d %B %Y at %H:%M')
+
+
+def valid_phone_number(phone_number):
+    try:
+        validate_phone_number(phone_number)
+        return True
+    except InvalidPhoneError:
+        return False
 
 
 # https://www.owasp.org/index.php/List_of_useful_HTTP_headers

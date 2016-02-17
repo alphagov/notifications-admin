@@ -1,4 +1,4 @@
-from app.main.utils import (
+from app.utils import (
     validate_phone_number,
     InvalidPhoneError
 )

@@ -63,10 +63,10 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
                                    follow_redirects=True)
         assert response.status_code == 200
         content = response.get_data(as_text=True)
-        assert 'The following numbers are invalid' in content
+        assert 'Your CSV file contained missing or invalid data' in content
         assert '+44 123' in content
         assert '+44 456' in content
-        assert 'Go back and resolve errors' in content
+        assert 'Choose a CSV file' in content
 
 
 @moto.mock_s3

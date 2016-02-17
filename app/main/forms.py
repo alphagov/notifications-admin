@@ -14,7 +14,7 @@ from wtforms.validators import DataRequired, Email, Length, Regexp
 
 from app.main.validators import Blacklist, CsvFileValidator
 
-from app.main.utils import (
+from app.utils import (
     validate_phone_number,
     format_phone_number,
     InvalidPhoneError

@@ -20,7 +20,7 @@ from flask import (
 from flask_login import login_required, current_user
 from werkzeug import secure_filename
 from notifications_python_client.errors import HTTPError
-from utils.template import Template
+from utils.template import Template, NeededByTemplateError, NoPlaceholderForDataError
 
 from app.main import main
 from app.main.forms import CsvUploadForm
@@ -30,7 +30,7 @@ from app.main.uploader import (
 )
 from app.main.dao import templates_dao
 from app import job_api_client
-from app.main.utils import (
+from app.utils import (
     validate_phone_number,
     InvalidPhoneError
 )
@@ -68,7 +68,7 @@ def send_sms(service_id, template_id):
             return redirect(url_for('.send_sms', service_id=service_id, template_id=template_id))
 
     template = Template(
-       templates_dao.get_service_template_or_404(service_id, template_id)['data']
+        templates_dao.get_service_template_or_404(service_id, template_id)['data']
     )
 
     example_data = [dict(
@@ -111,19 +111,22 @@ def check_sms(service_id, upload_id):
         contents = s3download(service_id, upload_id)
         if not contents:
             flash('There was a problem reading your upload file')
-        upload_result = _get_numbers(contents)
         upload_data = session['upload_data']
         template_id = upload_data.get('template_id')
+        raw_template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
+        upload_result = _get_rows(contents, raw_template)
         template = Template(
-            templates_dao.get_service_template_or_404(service_id, template_id)['data'],
-            values=upload_result['valid'][0] if upload_result['valid'] else {},
+            raw_template,
+            values=upload_result['rows'][0] if upload_result['valid'] else {},
             drop_values={'phone'}
         )
         return render_template(
             'views/check-sms.html',
             upload_result=upload_result,
             template=template,
-            column_headers=['phone number'] + template.placeholders_as_markup,
+            column_headers=['phone number'] + list(
+                template.placeholders if upload_result['valid'] else template.placeholders_as_markup
+            ),
             original_file_name=upload_data.get('original_file_name'),
             service_id=service_id,
             form=CsvUploadForm()
@@ -155,36 +158,19 @@ def _get_filedata(file):
     return {'file_name': file.filename, 'data': lines}
 
 
-def _format_filename(filename):
-    d = date.today()
-    basename, extenstion = filename.split('.')
-    formatted_name = '{}_{}.csv'.format(basename, d.strftime('%Y%m%d'))
-    return secure_filename(formatted_name)
-
-
-def _get_numbers(contents):
+def _get_rows(contents, raw_template):
     reader = csv.DictReader(
         contents.split('\n'),
         lineterminator='\n',
-        quoting=csv.QUOTE_NONE)
-    valid, rejects = [], []
-    for i, row in enumerate(reader):
+        quoting=csv.QUOTE_NONE
+    )
+    valid = True
+    rows = []
+    for row in reader:
+        rows.append(row)
         try:
             validate_phone_number(row['phone'])
-            valid.append(row)
-        except InvalidPhoneError:
-            rejects.append({"line_number": i+2, "phone": row['phone']})
-    return {"valid": valid, "rejects": rejects}
-
-
-def _get_column_headers(template_content, marked_up=False):
-    headers = re.findall(
-        r"\(\(([^\)]+)\)\)",  # anything that looks like ((registration number))
-        template_content
-    )
-    if marked_up:
-        return [
-            Markup("<span class='placeholder'>{}</span>".format(header))
-            for header in headers
-        ]
-    return headers
+            Template(raw_template, values=row, drop_values={'phone'}).replaced
+        except (InvalidPhoneError, NeededByTemplateError, NoPlaceholderForDataError):
+            valid = False
+    return {"valid": valid, "rows": rows}

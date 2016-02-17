@@ -1,6 +1,3 @@
-from flask import current_app
-
-
 class BrowsableItem(object):
     """
     Maps for the template browse-list.
