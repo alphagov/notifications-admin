@@ -188,7 +188,6 @@ class TemplateForm(Form):
     name = StringField(
         u'Template name',
         validators=[DataRequired(message="Template name cannot be empty")])
-    template_type = RadioField(u'Template type', choices=[('sms', 'SMS')])
 
     template_content = TextAreaField(
         u'Message',
