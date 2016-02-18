@@ -48,7 +48,7 @@ def add_service_template(service_id):
 
     if form.validate_on_submit():
         tdao.insert_service_template(
-            form.name.data, form.template_content.data, service_id)
+            form.name.data, 'sms', form.template_content.data, service_id)
         return redirect(url_for(
             '.manage_service_templates', service_id=service_id))
     return render_template(
