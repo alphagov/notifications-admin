@@ -5,7 +5,8 @@
   autofocus=False,
   help_link=None,
   help_link_text=None,
-  width='2-3'
+  width='2-3',
+  suffix=None
 ) %}
   <div class="form-group{% if field.errors %} error{% endif %}" {% if autofocus %}data-module="autofocus"{% endif %}>
     <label class="form-label" for="{{ field.name }}">
@@ -22,9 +23,12 @@
       {% endif %}
     </label>
     {{ field(**{
-      'class': 'form-control form-control-{} textbox-highlight-textbox'.format(width) if highlight_tags else 'form-control form-control-{}'.format(width),
+      'class': 'form-control form-control-{} textbox-highlight-textbox'.format(width) if highlight_tags else 'form-control form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else ''),
       'data-module': 'highlight-tags' if highlight_tags else ''
     }) }}
+    {% if suffix %}
+      <span>{{ suffix }}</span>
+    {% endif %}
     {% if help_link and help_link_text %}
       <p class="textbox-help-link">
         <a href='{{ help_link }}'>{{ help_link_text }}</a>

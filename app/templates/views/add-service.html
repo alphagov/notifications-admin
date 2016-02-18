@@ -12,27 +12,21 @@
   <div class="column-two-thirds">
 
     <h1 class="heading-large">
-      {{ heading }}
+      When people receive notifications, who should they be from?
     </h1>
 
     <p>
-      Users will see your service name when they receive messages through GOV.UK
-      Notify:
+      Be specific. Remember that there might be other people in your
+      organisation using GOV.UK Notify.
     </p>
 
-    <ul class="list-bullet bottom-gutter">
-      <li>
-        at the start of every text message, eg ‘Vehicle tax: we received your
-        payment, thank you’
-      </li>
-      <li>
-        as your email sender name
-      </li>
-    </ul>
-
     <form autocomplete="off" method="post">
+
       {{ textbox(form.name, hint="You can change this later") }}
+
+
       {{ page_footer('Continue') }}
+
     </form>
 
   </div>

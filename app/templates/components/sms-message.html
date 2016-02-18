@@ -1,5 +1,5 @@
 {% macro sms_message(
-  body, recipient=None, name=None, id=None, edit_link=None
+  body, recipient=None, name=None, id=None, edit_link=None, from=None
 ) %}
   {% if name %}
     <h3 class="sms-message-name">
@@ -11,6 +11,11 @@
     </h3>
   {% endif %}
   <div class="sms-message-wrapper{% if input_name %}-with-radio{% endif %}">
+    {% if from %}
+      <span class="sms-message-from">
+        {{ from }}
+      </span>
+    {% endif %}
     {{ body }}
   </div>
   {% if recipient %}
