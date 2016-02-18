@@ -36,6 +36,13 @@
 
     }
 
+    &-missing {
+      color: $error-colour;
+      font-weight: bold;
+      border-left: 5px solid $error-colour;
+      padding-left: 7px;
+    }
+
   }
 
 }

@@ -1,6 +1,6 @@
 from flask import url_for
 from app import notifications_api_client
-from app.main.utils import BrowsableItem
+from app.utils import BrowsableItem
 
 
 def insert_new_service(service_name, user_id):

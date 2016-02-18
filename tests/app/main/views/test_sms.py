@@ -8,9 +8,8 @@ def test_choose_sms_template(app_,
                              api_user_active,
                              mock_login,
                              mock_get_user,
-                             mock_get_service_templates,
                              mock_check_verify_code,
-                             mock_get_service_template):
+                             mock_get_service_templates):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -64,10 +63,10 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
                                    follow_redirects=True)
         assert response.status_code == 200
         content = response.get_data(as_text=True)
-        assert 'The following numbers are invalid' in content
+        assert 'Your CSV file contained missing or invalid data' in content
         assert '+44 123' in content
         assert '+44 456' in content
-        assert 'Go back and resolve errors' in content
+        assert 'Choose a CSV file' in content
 
 
 @moto.mock_s3

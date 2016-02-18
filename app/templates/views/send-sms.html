@@ -2,6 +2,7 @@
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
+{% from "components/table.html" import list_table, field %}
 
 {% block page_title %}
   Send text messages – GOV.UK Notify
@@ -15,22 +16,38 @@
 
     <div class="grid-row">
       <div class="column-two-thirds">
-        {{ sms_message(template.content) }}
+        {{ sms_message(template.formatted_as_markup) }}
       </div>
     </div>
 
     {{file_upload(form.file, button_text='Choose a CSV file')}}
 
-    {{ banner(
-      'You can only send messages to yourself until you <a href="{}">request to go live</a>'.format(
-        url_for('.service_request_to_go_live', service_id=service_id)
-      )|safe,
-      type='important'
-    ) }}
-
     {{ page_footer(
       "Continue to preview"
     ) }}
+
+    {% if column_headers %}
+      {% call(item) list_table(
+        example_data,
+        caption='Example',
+        field_headings=column_headers,
+        field_headings_visible=True,
+        caption_visible=True,
+        empty_message="Your data here"
+      ) %}
+        {% call field() %}
+          {{ item.phone }}
+        {% endcall %}
+        {% for column in template.placeholders %}
+          {% call field() %}
+            {{ item.get(column) }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    {% endif %}
+    <p class="table-show-more-link">
+      <a href="{{ url_for('.get_example_csv', service_id=service_id, template_id=template.id) }}">Download this CSV file</a>
+    </p>
 
   </form>
 {% endblock %}

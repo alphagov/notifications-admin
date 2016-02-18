@@ -2,6 +2,7 @@
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/table.html" import list_table, field %}
 {% from "components/placeholder.html" import placeholder %}
+{% from "components/file-upload.html" import file_upload %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
@@ -10,40 +11,73 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Check and confirm</h1>
 
-  {% if upload_result.rejects %}
-    <h3 class="heading-small">The following numbers are invalid</h3>
-    {% for rejected in upload_result.rejects %}
-      <p>Line {{rejected.line_number}}: {{rejected.phone }}</a>
-    {% endfor %}
-    <p><a href="{{url_for('.send_sms', service_id=service_id, template_id=template_id)}}" class="button">Go back and resolve errors</a></p>
+  {% if template.additional_data %}
+    {{ banner(
+      "Remove these columns from your CSV file:" + ", ".join(template.missing_data),
+      type="dangerous"
+    ) }}
+  {% elif not upload_result.valid %}
+    {{ banner(
+      "Your CSV file contained missing or invalid data",
+      type="dangerous"
+    ) }}
+  {% endif %}
 
-  {% else %}
+  <h1 class="heading-large">
+    {{ "Check and confirm" if upload_result.valid else "Send text messages" }}
+  </h1>
 
-    <div class="grid-row">
-      <div class="column-two-thirds">
-        {{ sms_message(
-          message_template|replace_placeholders(upload_result.valid[0])
-        )}}
-      </div>
+  <div class="grid-row">
+    <div class="column-two-thirds">
+      {% if template.missing_data or template.additional_data %}
+        {{ sms_message(template.formatted_as_markup)}}
+      {% else %}
+        {{ sms_message(template.replaced)}}
+      {% endif %}
     </div>
+  </div>
 
-    <form method="POST" enctype="multipart/form-data">
+  {% if upload_result.valid %}
+    <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <input type="submit" class="button" value="{{ "Send {} text message{}".format(upload_result.valid|count, '' if upload_result.valid|count == 1 else 's') }}" />
-      <a href="{{url_for('.send_sms', service_id=service_id, template_id=template_id)}}" class="page-footer-back-link">Back</a>
+      <input type="submit" class="button" value="{{ "Send {} text message{}".format(upload_result.rows|count, '' if upload_result.rows|count == 1 else 's') }}" />
+      <a href="{{url_for('.send_sms', service_id=service_id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
     </form>
+  {% else %}
+    <form method="post" action="{{ url_for('.send_sms', service_id=service_id, template_id=template.id) }}" enctype="multipart/form-data">
+      {{file_upload(form.file, button_text='Choose a CSV file')}}
+      {{ page_footer(
+        "Upload"
+      ) }}
+    </form>
+  {% endif %}
 
-    {% call(item) list_table(
-      upload_result.valid,
-      caption=original_file_name,
-      field_headings=['Phone number']
-    ) %}
+  {% call(item) list_table(
+    upload_result.rows,
+    caption=original_file_name,
+    field_headings=column_headers
+  ) %}
+    {% if item.phone|valid_phone_number %}
       {% call field() %}
         {{ item.phone }}
       {% endcall %}
-    {% endcall %}
+    {% else %}
+      {% call field(status='missing') %}
+        {{ item.phone }}
+      {% endcall %}
+    {% endif %}
+    {% for column in template.placeholders %}
+      {% if item.get(column) %}
+        {% call field() %}
+          {{ item.get(column) }}
+        {% endcall %}
+      {% else %}
+        {% call field(status='missing') %}
+          missing
+        {% endcall %}
+      {% endif %}
+    {% endfor %}
+  {% endcall %}
 
-  {% endif %}
 {% endblock %}

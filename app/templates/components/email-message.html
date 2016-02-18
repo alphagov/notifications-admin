@@ -10,10 +10,10 @@
   {% endif %}
   <div class="email-message">
     <div class="email-message-subject">
-      {{ subject|placeholders }}
+      {{ subject }}
     </div>
     <div class="email-message-body">
-      {{ body|nl2br|placeholders }}
+      {{ body|nl2br }}
     </div>
   </div>
 {% endmacro %}

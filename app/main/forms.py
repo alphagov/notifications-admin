@@ -14,7 +14,7 @@ from wtforms.validators import DataRequired, Email, Length, Regexp
 
 from app.main.validators import Blacklist, CsvFileValidator
 
-from app.main.utils import (
+from app.utils import (
     validate_phone_number,
     format_phone_number,
     InvalidPhoneError
@@ -188,7 +188,6 @@ class TemplateForm(Form):
     name = StringField(
         u'Template name',
         validators=[DataRequired(message="Template name cannot be empty")])
-    template_type = RadioField(u'Template type', choices=[('sms', 'SMS')])
 
     template_content = TextAreaField(
         u'Message',

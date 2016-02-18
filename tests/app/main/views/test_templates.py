@@ -58,12 +58,10 @@ def test_should_redirect_when_saving_a_template(app_,
             service_id = str(uuid.uuid4())
             template_id = 456
             name = "new name"
-            type_ = "sms"
             content = "template content"
             data = {
                 'id': template_id,
                 'name': name,
-                'template_type': type_,
                 "template_content": content,
                 "service": service_id
             }
@@ -76,7 +74,7 @@ def test_should_redirect_when_saving_a_template(app_,
             assert response.location == url_for(
                 '.manage_service_templates', service_id=service_id, _external=True)
             mock_update_service_template.assert_called_with(
-                template_id, name, type_, content, service_id)
+                template_id, name, 'sms', content, service_id)
 
 
 def test_should_show_delete_template_page(app_,

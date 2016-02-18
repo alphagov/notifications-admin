@@ -26,19 +26,19 @@ Manage templates – GOV.UK Notify
       <div class="column-two-thirds">
 
         {% for template in templates %}
-          {% if template.get_field('template_type') == 'sms' %}
-            {{ sms_message(
-              template.get_field('content'),
-              name=template.title,
-              id=template.get_field('id'),
-              edit_link=url_for('.edit_service_template', service_id=template.get_field('service'), template_id=template.get_field('id'))
-            ) }}
-          {% elif template.get_field('template_type') == 'email' %}
+          {% if template.template_type == 'email' %}
             {{ email_message(
               template.get_field('subject'),
               template.get_field('content'),
               name=template.get_field('name'),
-              edit_link=url_for('.edit_service_template', service_id=template.get_field('service'), template_id=template.get_field('id'))
+              edit_link=url_for('.edit_service_template', service_id=service_id, template_id=template.id)
+            ) }}
+          {% else %}
+            {{ sms_message(
+              template.formatted_as_markup,
+              name=template.name,
+              id=template.id,
+              edit_link=url_for('.edit_service_template', service_id=service_id, template_id=template.id)
             ) }}
           {% endif %}
         {% endfor %}
