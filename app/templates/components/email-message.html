@@ -1,4 +1,4 @@
-{% macro email_message(subject, body, name=None, edit_link=None) %}
+{% macro email_message(subject, body, name=None, edit_link=None, from_name=None, from_address=None) %}
   {% if name %}
     <h3 class="email-message-name">
       {% if edit_link %}
@@ -9,9 +9,30 @@
     </h3>
   {% endif %}
   <div class="email-message">
-    <div class="email-message-subject">
-      {{ subject }}
-    </div>
+    {% if from_name and from_address %}
+      <div class="email-message-from">
+        <div class="grid-row">
+          <div class="column-one-eighth">
+            <span class="form-hint">From</span>
+          </div>
+          <div class="column-seven-eighths">
+            {{ from_name }} &lt;{{ from_address }}&gt;
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    {% if subject %}
+      <div class="email-message-subject">
+        <div class="grid-row">
+          <div class="column-one-eighth">
+            <span class="form-hint">Subject</span>
+          </div>
+          <div class="column-seven-eighths">
+            {{ subject }}
+          </div>
+        </div>
+      </div>
+    {% endif %}
     <div class="email-message-body">
       {{ body|nl2br }}
     </div>

@@ -1,11 +1,17 @@
-.column-one-quarter {
-  @include grid-column(1/4);
-}
-
 .column-three-quarters {
   @include grid-column(3/4);
 }
 
+
+.column-one-eighth {
+  @include grid-column(1/8);
+}
+
+.column-seven-eighths {
+  @include grid-column(7/8);
+}
+
 .bottom-gutter {
   margin-bottom: $gutter;
+  clear: both;
 }
