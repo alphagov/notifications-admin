@@ -20,8 +20,9 @@
             {{ sms_message(template.formatted_as_markup, name=template.name) }}
           </div>
           <div class="column-one-third">
-            <div class="sms-message-use-link">
-              <a href="{{ url_for(".send_sms", service_id=service_id, template_id=template.id) }}">Use this template</a>
+            <div class="sms-message-use-links">
+              <a href="{{ url_for(".send_sms", service_id=service_id, template_id=template.id) }}">Add recipients</a>
+              <a href="{{ url_for(".send_sms_to_self", service_id=service_id, template_id=template.id) }}">Send yourself a test</a>
             </div>
           </div>
         {% endfor %}

@@ -70,6 +70,53 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
 
 
 @moto.mock_s3
+def test_send_test_message_to_self(
+    app_,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_get_service_template
+):
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(
+                url_for('main.send_sms_to_self', service_id=12345, template_id=54321),
+                follow_redirects=True
+            )
+        assert response.status_code == 200
+        content = response.get_data(as_text=True)
+        assert 'Test run' in content
+        assert '+4412341234' in content
+
+
+@moto.mock_s3
+def test_download_example_csv(
+    app_,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_get_service_template
+):
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(
+                url_for('main.get_example_csv', service_id=12345, template_id=54321),
+                follow_redirects=True
+            )
+        assert response.status_code == 200
+        assert response.get_data(as_text=True) == 'phone\r\n+4412341234\r\n'
+        assert 'text/csv' in response.headers['Content-Type']
+
+
+@moto.mock_s3
 def test_upload_csvfile_with_valid_phone_shows_all_numbers(app_,
                                                            mocker,
                                                            api_user_active,

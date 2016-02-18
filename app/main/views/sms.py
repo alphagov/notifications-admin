@@ -1,8 +1,7 @@
 import csv
+import io
 import uuid
 import botocore
-import re
-import io
 
 from datetime import date
 
@@ -100,6 +99,26 @@ def get_example_csv(service_id, template_id):
     writer.writerow([current_user.mobile_number] + ["test {}".format(header) for header in placeholders])
 
     return(output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'})
+
+
+@main.route("/services/<service_id>/sms/send/<template_id>/to-self", methods=['GET'])
+@login_required
+def send_sms_to_self(service_id, template_id):
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['phone'])
+    writer.writerow([current_user.mobile_number])
+    filedata = {
+        'file_name': 'Test run',
+        'data': output.getvalue().splitlines()
+    }
+    upload_id = str(uuid.uuid4())
+    s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
+    session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
+
+    return redirect(url_for('.check_sms',
+                            service_id=service_id,
+                            upload_id=upload_id))
 
 
 @main.route("/services/<service_id>/sms/check/<upload_id>",
