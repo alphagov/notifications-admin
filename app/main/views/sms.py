@@ -162,7 +162,8 @@ def _get_rows(contents, raw_template):
     reader = csv.DictReader(
         contents.split('\n'),
         lineterminator='\n',
-        quoting=csv.QUOTE_NONE
+        quoting=csv.QUOTE_NONE,
+        skipinitialspace=True
     )
     valid = True
     rows = []
