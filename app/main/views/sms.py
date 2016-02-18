@@ -70,19 +70,10 @@ def send_sms(service_id, template_id):
         templates_dao.get_service_template_or_404(service_id, template_id)['data']
     )
 
-    example_data = [dict(
-        phone=current_user.mobile_number,
-        **{
-            header: "test {}".format(header) for header in template.placeholders
-        }
-    )]
-
     return render_template(
         'views/send-sms.html',
         template=template,
         column_headers=['phone'] + template.placeholders_as_markup,
-        placeholders=template.placeholders,
-        example_data=example_data,
         form=form,
         service_id=service_id
     )
