@@ -26,7 +26,6 @@ def register():
         return redirect(url_for('main.choose_service'))
 
     form = RegisterUserForm()
-
     if form.validate_on_submit():
         if users_dao.is_email_unique(form.email_address.data):
             try:

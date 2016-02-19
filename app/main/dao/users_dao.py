@@ -1,4 +1,5 @@
 from datetime import datetime
+from notifications_python_client import HTTPError
 
 from sqlalchemy.orm import load_only
 
@@ -47,9 +48,15 @@ def activate_user(user):
 
 
 def is_email_unique(email_address):
-    if user_api_client.get_user_by_email(email_address):
-        return False
-    return True
+    try:
+        if user_api_client.get_user_by_email(email_address):
+            return False
+        return True
+    except HTTPError as ex:
+        if ex.status_code == 404:
+            return True
+        else:
+            raise ex
 
 
 def request_password_reset(user):

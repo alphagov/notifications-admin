@@ -24,7 +24,7 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
             "name": service_name,
             "active": active,
             "limit": limit,
-            "users": [user_id],
+            "user_id": user_id,
             "restricted": restricted
         }
         return self.post("/service", data)
