@@ -82,6 +82,7 @@ gulp.task('watchForChanges', function() {
   gulp.watch(paths.src + 'javascripts/**/*', ['javascripts']);
   gulp.watch(paths.src + 'stylesheets/**/*', ['sass']);
   gulp.watch(paths.src + 'images/**/*', ['images']);
+  gulp.watch('gulpfile.babel.js', ['default']);
 });
 
 gulp.task('lint:sass', () => gulp

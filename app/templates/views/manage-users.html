@@ -1,6 +1,14 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import list_table, row, field %}
+{% from "components/table.html" import list_table, row, field, boolean_field, hidden_field_heading %}
 {% from "components/page-footer.html" import page_footer %}
+
+{% set table_options = {
+  'field_headings': [
+    'Name', 'Send messages', 'Manage service', 'Manage API keys', hidden_field_heading('Link to change')
+  ],
+  'field_headings_visible': True,
+  'caption_visible': True
+} %}
 
 {% block page_title %}
 Manage users – GOV.UK Notify
@@ -8,58 +16,41 @@ Manage users – GOV.UK Notify
 
 {% block maincolumn_content %}
 
-<h1 class="heading-large">Manage users</h1>
+  <h1 class="heading-large">
+    Manage team
+  </h1>
 
-<p>
-  <a href="#" class="button">Invite users</a>
-</p>
+  {% call(item) list_table(
+    users, caption='Active', **table_options
+  ) %}
+    {% call field() %}
+      {{ item.name }}
+    {% endcall %}
+    {{ boolean_field(item.permission_send_messages) }}
+    {{ boolean_field(item.permission_manage_service) }}
+    {{ boolean_field(item.permission_manage_api_keys) }}
+    {% call field(align='right') %}
+      <a href="{{ url_for('.edit_user', service_id=service_id, user_id=item.id)}}">Change</a>
+    {% endcall %}
+  {% endcall %}
+  <p class='table-show-more-link'>
+    <a href="{{ url_for('.invite_user', service_id=service_id) }}">Add a new team member</a>
+  </p>
 
-{% call(item) list_table(
-  users,
-  caption='Active users',
-  field_headings=['Name', 'Send messages', 'Manage Service', 'Manage API keys', 'Link to change'],
-  field_headings_visible=True,
-  caption_visible=True
-) %}
-  {% call field() %}
-    {{ item.name }}
-  {% endcall %}
-  {% call field() %}
-    {{ "✔" if item.permission_send_messages else "❌" }}
-  {% endcall %}
-  {% call field() %}
-    {{ "✔" if item.permission_manage_service else "❌" }}
-  {% endcall %}
-  {% call field() %}
-    {{ "✔" if item.permission_manage_api_keys else "❌" }}
-  {% endcall %}
-  {% call field(align='right') %}
-    <a href="#">Change</a>
-  {% endcall %}
-{% endcall %}
-
-{% call(item) list_table(
-  invited_users,
-  caption='Invited users',
-  field_headings=['Name', 'Send messages', 'Manage Service', 'Manage API keys', 'Link to change'],
-  field_headings_visible=True,
-  caption_visible=True
-) %}
-  {% call field() %}
-    {{ item.email_localpart }}
-  {% endcall %}
-  {% call field() %}
-    {{ "✔" if item.permission_send_messages else "❌" }}
-  {% endcall %}
-  {% call field() %}
-    {{ "✔" if item.permission_manage_service else "❌" }}
-  {% endcall %}
-  {% call field() %}
-    {{ "✔" if item.permission_manage_api_keys else "❌" }}
-  {% endcall %}
-  {% call field(align='right') %}
-    <a href="#">Change</a>
-  {% endcall %}
-{% endcall %}
+  {% if invited_users %}
+    {% call(item) list_table(
+      invited_users, caption='Invited', **table_options
+    ) %}
+      {% call field() %}
+        {{ item.email_localpart }}
+      {% endcall %}
+      {{ boolean_field(item.permission_send_messages) }}
+      {{ boolean_field(item.permission_manage_service) }}
+      {{ boolean_field(item.permission_manage_api_keys) }}
+      {% call field(align='right') %}
+        <a href="{{ url_for('.edit_user', service_id=service_id, user_id=item.id)}}">Change</a>
+      {% endcall %}
+    {% endcall %}
+  {% endif %}
 
 {% endblock %}

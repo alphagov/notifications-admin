@@ -1,0 +1,48 @@
+{% extends "withnav_template.html" %}
+{% from "components/yes-no.html" import yes_no %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+Manage users – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    {{ user.name or user.email_localpart or "Add a new team member" }}
+  </h1>
+
+  <div class="grid-row">
+    <form method="post" class="column-three-quarters">
+
+      {% if user %}
+        <p class='bottom-gutter'>
+          {{ user.email_localpart }}@digital.cabinet-office.gov.uk
+        </p>
+      {% else %}
+        {{ textbox(form.email_address, hint='Email address must end in .gov.uk', width='1-1') }}
+      {% endif %}
+
+      <fieldset class='yes-no-wrapper'>
+        <legend class='heading-small'>
+          Permissions
+        </legend>
+        {{ yes_no('send_messages', 'Send messages', user.permission_send_messages) }}
+        {{ yes_no('manage_service', 'Manage service', user.permission_manage_service) }}
+        {{ yes_no('manage_api_keys', 'Manage API keys', user.permission_manage_api_keys) }}
+      </fieldset>
+
+      {% if user %}
+        {{ page_footer(
+          'Save',
+          delete_link=url_for('.delete_user', service_id=service_id, user_id=user_id),
+          delete_link_text='delete this account'
+        ) }}
+      {% else %}
+        {{ page_footer('Send invitation email') }}
+      {% endif %}
+
+    </form>
+  </div>
+{% endblock %}

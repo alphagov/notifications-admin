@@ -16,19 +16,13 @@
 
 .banner-with-tick,
 .banner-default-with-tick {
-
   @extend %banner;
   padding: $gutter-half ($gutter + $gutter-half);
-
-  &:before {
-    @include core-24;
-    content: '✔';
-    position: absolute;
-    top: $gutter-half;
-    left: $gutter-half;
-    margin-top: -2px;
-  }
-
+  background-image: file-url('tick-white.png');
+  background-size: 19px;
+  background-repeat: no-repeat;
+  background-position: $gutter-half $gutter-half;
+  font-weight: bold;
 }
 
 .banner-dangerous {
