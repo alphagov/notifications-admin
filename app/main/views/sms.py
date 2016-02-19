@@ -70,19 +70,10 @@ def send_sms(service_id, template_id):
         templates_dao.get_service_template_or_404(service_id, template_id)['data']
     )
 
-    example_data = [dict(
-        phone=current_user.mobile_number,
-        **{
-            header: "test {}".format(header) for header in template.placeholders
-        }
-    )]
-
     return render_template(
         'views/send-sms.html',
         template=template,
         column_headers=['phone'] + template.placeholders_as_markup,
-        placeholders=template.placeholders,
-        example_data=example_data,
         form=form,
         service_id=service_id
     )
@@ -104,10 +95,12 @@ def get_example_csv(service_id, template_id):
 @main.route("/services/<service_id>/sms/send/<template_id>/to-self", methods=['GET'])
 @login_required
 def send_sms_to_self(service_id, template_id):
+    template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
+    placeholders = list(Template(template).placeholders)
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(['phone'])
-    writer.writerow([current_user.mobile_number])
+    writer.writerow(['phone'] + placeholders)
+    writer.writerow([current_user.mobile_number] + ["test {}".format(header) for header in placeholders])
     filedata = {
         'file_name': 'Test run',
         'data': output.getvalue().splitlines()
