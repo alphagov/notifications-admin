@@ -65,10 +65,8 @@ class UserApiClient(BaseAPIClient):
         return None
 
     def send_verify_code(self, user_id, code_type, to=None):
-        data = {'code_type': code_type}
-        if to:
-            data['to'] = to
-        endpoint = '/user/{}/code'.format(user_id)
+        data = {'to': to} if to else {}
+        endpoint = '/user/{0}/{1}-code'.format(user_id, code_type)
         resp = self.post(endpoint, data=data)
 
     def check_verify_code(self, user_id, code, code_type):
