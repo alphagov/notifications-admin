@@ -8,6 +8,7 @@
   border-radius: 5px;
   white-space: normal;
   margin: 0 0 $gutter 0;
+  clear: both;
 }
 
 .sms-message-wrapper-with-radio {
@@ -52,4 +53,9 @@
 
   }
 
+}
+
+.sms-message-from {
+  @include bold-19;
+  display: block;
 }
