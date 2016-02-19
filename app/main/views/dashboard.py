@@ -6,6 +6,8 @@ from app.main.dao import templates_dao
 from notifications_python_client.errors import HTTPError
 from app import job_api_client
 
+from app.utils import user_has_permissions
+
 
 @main.route("/services/<service_id>/dashboard")
 @login_required
