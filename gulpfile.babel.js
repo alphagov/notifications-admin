@@ -62,6 +62,7 @@ gulp.task('sass', () => gulp
       paths.npm + 'govuk_frontend_toolkit/stylesheets/'
     ]
   }))
+  .pipe(plugins.base64({baseDir: 'app', debug: true}))
   .pipe(gulp.dest(paths.dist + '/stylesheets'))
 );
 
