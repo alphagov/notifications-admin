@@ -15,7 +15,9 @@ var gulp = require('gulp'),
         src: 'app/assets/',
         dist: 'app/static/',
         templates: 'app/templates/',
-        npm: 'node_modules/'
+        npm: 'node_modules/',
+        template: 'node_modules/govuk_template_jinja/',
+        toolkit: 'node_modules/govuk_frontend_toolkit/'
     };
 
 // 3. TASKS
@@ -23,18 +25,24 @@ var gulp = require('gulp'),
 
 // Move GOV.UK template resources
 
-gulp.task('copy:govuk_template:template', () => gulp.src(paths.npm + '/govuk_template_jinja/views/layouts/govuk_template.html')
+gulp.task('copy:govuk_template:template', () => gulp.src(paths.template + 'views/layouts/govuk_template.html')
   .pipe(gulp.dest(paths.templates))
 );
 
-gulp.task('copy:govuk_template:assets', () => gulp.src(paths.npm + '/govuk_template_jinja/assets/**/*')
-  .pipe(gulp.dest(paths.dist))
+gulp.task('copy:govuk_template:css', () => gulp.src(paths.template + 'assets/stylesheets/**/*.css')
+  .pipe(plugins.sass({outputStyle: 'compressed'}))
+  .pipe(gulp.dest(paths.dist + 'stylesheets/'))
+);
+
+gulp.task('copy:govuk_template:js', () => gulp.src(paths.template + 'assets/javascripts/**/*.js')
+  .pipe(plugins.uglify())
+  .pipe(gulp.dest(paths.dist + 'javascripts/'))
 );
 
 gulp.task('javascripts', () => gulp
   .src([
-    paths.npm + 'govuk_frontend_toolkit/javascripts/govuk/modules.js',
-    paths.npm + 'govuk_frontend_toolkit/javascripts/govuk/selection-buttons.js',
+    paths.toolkit + 'javascripts/govuk/modules.js',
+    paths.toolkit + 'javascripts/govuk/selection-buttons.js',
     paths.src + 'javascripts/apiKey.js',
     paths.src + 'javascripts/autofocus.js',
     paths.src + 'javascripts/highlightTags.js',
@@ -59,11 +67,11 @@ gulp.task('sass', () => gulp
     outputStyle: 'compressed',
     includePaths: [
       paths.npm + 'govuk-elements-sass/public/sass/',
-      paths.npm + 'govuk_frontend_toolkit/stylesheets/'
+      paths.toolkit + 'stylesheets/'
     ]
   }))
-  .pipe(plugins.base64({baseDir: 'app', debug: true}))
-  .pipe(gulp.dest(paths.dist + '/stylesheets'))
+  .pipe(plugins.base64({baseDir: 'app'}))
+  .pipe(gulp.dest(paths.dist + 'stylesheets/'))
 );
 
 
@@ -72,9 +80,10 @@ gulp.task('sass', () => gulp
 gulp.task('images', () => gulp
   .src([
     paths.src + 'images/**/*',
-    paths.npm + 'govuk_frontend_toolkit/images/**/*'
+    paths.toolkit + 'images/**/*',
+    paths.template + 'assets/images/**/*'
   ])
-  .pipe(gulp.dest(paths.dist + '/images'))
+  .pipe(gulp.dest(paths.dist + 'images/'))
 );
 
 
@@ -87,7 +96,7 @@ gulp.task('watchForChanges', function() {
 });
 
 gulp.task('lint:sass', () => gulp
-  .src(paths.src + '/stylesheets/**/*.scss')
+  .src(paths.src + 'stylesheets/**/*.scss')
     .pipe(plugins.sassLint())
     .pipe(plugins.sassLint.format(stylish))
     .pipe(plugins.sassLint.failOnError())
@@ -106,7 +115,14 @@ gulp.task('lint',
 
 // Default: compile everything
 gulp.task('default',
-    ['copy:govuk_template:template', 'copy:govuk_template:assets', 'javascripts', 'sass', 'images']
+  [
+    'copy:govuk_template:template',
+    'copy:govuk_template:css',
+    'copy:govuk_template:js',
+    'javascripts',
+    'sass',
+    'images'
+  ]
 );
 
 // Optional: recompile on changes
