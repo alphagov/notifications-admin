@@ -5,9 +5,11 @@
 {% from "components/browse-list.html" import browse_list %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/sms-message.html" import sms_message %}
-{% from "components/table.html" import mapping_table, list_table, row, field, right_aligned_field_heading %}
+{% from "components/email-message.html" import email_message %}
+{% from "components/table.html" import mapping_table, list_table, row, field, text_field, boolean_field, right_aligned_field_heading %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/file-upload.html" import file_upload %}
+{% from "components/yes-no.html" import yes_no %}
 {% from "components/api-key.html" import api_key %}
 
 {% block page_title %}
@@ -25,21 +27,26 @@
   </p>
 
   <h2 class="heading-large">Banner</h2>
-  <p>Used to show the status of a thing or action.</p>
+  <div class="grid-row">
+    <div class="column-three-quarters">
+      <p>Used to show the status of a thing or action.</p>
 
-  {{ banner("You sent 1,234 text messages", with_tick=True) }}
+      {{ banner("You sent 1,234 text messages", with_tick=True) }}
 
-  {{ banner('You’re not allowed to do this', 'dangerous')}}
+      {{ banner('You’re not allowed to do this', 'dangerous')}}
 
-  {{ banner('Are you sure you want to delete?', 'dangerous', delete_button="Yes, delete this thing")}}
+      {{ banner('Are you sure you want to delete?', 'dangerous', delete_button="Yes, delete this thing")}}
 
-  {{ banner(
-    '<a href="#">Send your first message</a>'|safe,
-    subhead='Get started',
-    type='tip'
-  )}}
+      {{ banner(
+        '<a href="#">Send your first message</a>'|safe,
+        subhead='Get started',
+        type='tip'
+      )}}
 
-  {{ banner('You could go to jail', 'important')}}
+      {{ banner('You could go to jail', 'important')}}
+    </div>
+  </div>
+
 
   <h2 class="heading-large">Big number</h2>
 
@@ -118,7 +125,7 @@
 
   <h2 class="heading-large">SMS message</h2>
 
-  <p>Used to show, preview or choose an SMS message.</p>
+  <p>Used to show, preview or choose an SMS template.</p>
 
   <div class="grid-row">
     <div class="column-half">
@@ -127,82 +134,105 @@
         name='Two week reminder',
       ) }}
       {{ sms_message(
-        'Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax'
+        template.formatted_as_markup
       ) }}
       {{ sms_message(
-        'Your vehicle tax for registration number is due on date. Renew online at www.gov.uk/vehicle-tax',
+        'Your vehicle tax for LC12 BFL is due on 1 March 2016. Renew online at www.gov.uk/vehicle-tax',
         '+44 7700 900 306'
       ) }}
       {{ sms_message(
-        'Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax',
+        template.formatted_as_markup,
         name='Two week reminder',
         edit_link='#'
       ) }}
     </div>
   </div>
 
+  <h2 class="heading-large">Email message</h2>
+
+  <p>Used to show, preview or choose an email template.</p>
+
+  <div class="grid-row">
+    <div class="column-two-thirds">
+      {{ email_message(
+        subject="Vehicle tax reminder",
+        body="Dear Alice Smith,\n\nYour vehicle tax for LC12 BFL is due on 1 March 2016.\n\nRenew online at www.gov.uk/vehicle-tax",
+        from_name="Vehicle tax",
+        from_address="vehicle.tax@notifications.service.gov.uk",
+        name="Two week reminder",
+      ) }}
+    </div>
+  </div>
+
   <h2 class="heading-large">Tables</h2>
-  {% call mapping_table(
-    caption='Account settings',
-    field_headings=['Label', 'Value', 'Action'],
-    field_headings_visible=False,
-    caption_visible=True
-  ) %}
-    {% call row() %}
-      {% call field() %}
-        Username
+  <div class="grid-row">
+    <div class="column-three-quarters">
+      <p>
+        Used for comparing rows of data.
+      </p>
+      {% call mapping_table(
+        caption='Account settings',
+        field_headings=['Label', 'True', 'False', 'Action'],
+        field_headings_visible=False,
+        caption_visible=True
+      ) %}
+        {% call row() %}
+          {{ text_field('Username' )}}
+          {{ boolean_field(True) }}
+          {{ boolean_field(False) }}
+          {% call field(align='right') %}
+            <a href="#">Change</a>
+          {% endcall %}
+        {% endcall %}
       {% endcall %}
-      {% call field() %}
-        admin
-      {% endcall %}
-      {% call field(align='right') %}
-        <a href="#">Change</a>
-      {% endcall %}
-    {% endcall %}
-  {% endcall %}
 
-  {% call(item) list_table(
-    [
-      {
-        'file': 'dispatch_20151114.csv', 'status': 'Queued'
-      },
-      {
-        'file': 'dispatch_20151117.csv', 'status': 'Delivered'
-      },
-      {
-        'file': 'remdinder_monday.csv', 'status': 'Failed'
-      }
-    ],
-    caption='Messages',
-    field_headings=['File', right_aligned_field_heading('Status')],
-    field_headings_visible=True,
-    caption_visible=False
-  ) %}
-    {% call field() %}
-      {{ item.file }}
-    {% endcall %}
-    {% call field(
-      align='right',
-      status='error' if item.status == 'Failed' else 'default'
-    ) %}
-      {{ item.status }}
-    {% endcall %}
-  {% endcall %}
+      {% call(item) list_table(
+        [
+          {
+            'file': 'dispatch_20151114.csv', 'status': 'Queued'
+          },
+          {
+            'file': 'dispatch_20151117.csv', 'status': 'Delivered'
+          },
+          {
+            'file': 'remdinder_monday.csv', 'status': 'Failed'
+          }
+        ],
+        caption='Messages',
+        field_headings=['File', right_aligned_field_heading('Status')],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% call field() %}
+          {{ item.file }}
+        {% endcall %}
+        {% call field(
+          align='right',
+          status='error' if item.status == 'Failed' else 'default'
+        ) %}
+          {{ item.status }}
+        {% endcall %}
+      {% endcall %}
 
-  {% call(item) list_table(
-    [],
-    caption='Jobs',
-    field_headings=['Job', 'Time'],
-    caption_visible=True,
-    empty_message='You haven’t scheduled any jobs yet'
-  ) %}
-    {% call field() %}
-      {{ item.job }}
-    {% endcall %}
-    {% call field() %}
-      {{ item.time }}
-    {% endcall %}
-  {% endcall %}
+      {% call(item) list_table(
+        [],
+        caption='Jobs',
+        field_headings=['Job', 'Time'],
+        caption_visible=True,
+        empty_message='You haven’t scheduled any jobs yet'
+      ) %}
+        {% call field() %}
+          {{ item.job }}
+        {% endcall %}
+        {% call field() %}
+          {{ item.time }}
+        {% endcall %}
+      {% endcall %}
+      <p class="table-show-more-link">
+        <a href="#">Add a job now</a>
+      </p>
+    </div>
+  </div>
 
   <h2 class="heading-large">Textbox</h2>
   {{ textbox(form.username) }}
@@ -212,6 +242,17 @@
 
   <h2 class="heading-large">File upload</h2>
   {{ file_upload(form.file_upload) }}
+
+  <h2 class="heading-large">Yes/no</h2>
+  <div class="grid-row">
+    <div class='column-half'>
+      <fieldset class='yes-no-wrapper'>
+        {{ yes_no('manage_service', 'Manage service', True) }}
+        {{ yes_no('templates', 'Create templates', True) }}
+      </fieldset>
+    </div>
+  </div>
+
 
   <h2 class="heading-large">API key</h2>
 
