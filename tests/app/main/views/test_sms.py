@@ -66,7 +66,7 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
         assert 'Your CSV file contained missing or invalid data' in content
         assert '+44 123' in content
         assert '+44 456' in content
-        assert 'Choose a CSV file' in content
+        assert 'Upload a CSV file' in content
 
 
 @moto.mock_s3
