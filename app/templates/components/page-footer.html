@@ -13,13 +13,13 @@
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="submit" class="button{% if destructive %}-destructive{% endif %}" value="{{ button_text }}" />
     {% endif %}
-    {% if delete_link %}
-      <span class="page-footer-delete-link">
-        or <a href="{{ delete_link }}">{{ delete_link_text }}</a>
-      </span>
-    {% endif %}
     {% if back_link %}
       <a class="page-footer-back-link" href="{{ back_link }}">{{ back_link_text }}</a>
+    {% endif %}
+    {% if delete_link %}
+      <span class="page-footer-delete-link">
+        <a href="{{ delete_link }}">{{ delete_link_text }}</a>
+      </span>
     {% endif %}
     {% if secondary_link and secondary_link_text %}
       <a class="page-footer-secondary-link" href="{{ secondary_link }}">{{ secondary_link_text }}</a>

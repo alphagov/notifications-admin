@@ -6,4 +6,4 @@ def test_owasp_useful_headers_set(app_):
     assert response.headers['X-Frame-Options'] == 'deny'
     assert response.headers['X-Content-Type-Options'] == 'nosniff'
     assert response.headers['X-XSS-Protection'] == '1; mode=block'
-    assert response.headers['Content-Security-Policy'] == "default-src 'self' 'unsafe-inline'; font-src 'self' data:;"  # noqa
+    assert response.headers['Content-Security-Policy'] == "default-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:;"  # noqa

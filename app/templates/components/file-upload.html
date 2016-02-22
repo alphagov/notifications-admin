@@ -1,7 +1,7 @@
 {% macro file_upload(field, button_text="Choose file") %}
   <div class="form-group{% if field.errors %} error{% endif %}" data-module="file-upload">
     <label class="file-upload-label" for="{{ field.name }}">
-      {{ field.label }}
+      <span class="visually-hidden">{{ field.label }}</span>
       {% if hint %}
         <span class="form-hint">
           {{ hint }}

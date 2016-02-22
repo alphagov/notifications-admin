@@ -21,10 +21,10 @@ from app.utils import (
 )
 
 
-def email_address():
+def email_address(label='Email address'):
     gov_uk_email \
         = "(^[^@^\\s]+@[^@^\\.^\\s]+(\\.[^@^\\.^\\s]*)*.gov.uk)"
-    return EmailField('Email address', validators=[
+    return EmailField(label, validators=[
         Length(min=5, max=255),
         DataRequired(message='Email cannot be empty'),
         Email(message='Enter a valid email address'),
@@ -94,6 +94,10 @@ class RegisterUserForm(Form):
     email_address = email_address()
     mobile_number = mobile_number()
     password = password()
+
+
+class InviteUserForm(Form):
+    email_address = email_address('Their email address')
 
 
 class TwoFactorForm(Form):
