@@ -31,6 +31,45 @@ def test_should_add_service_and_redirect_to_next_page(app_,
                 url_for('main.add_service'),
                 data={'name': 'testing the post'})
             assert response.status_code == 302
+            assert response.location == url_for('main.add_from_address', _external=True)
+
+
+def test_should_confirm_add_service(
+    app_,
+    mock_login,
+    mock_get_services,
+    api_user_active,
+    mock_get_user,
+    mock_get_user_by_email
+):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            with client.session_transaction() as session:
+                session['service_name'] = 'Renew Your Pet Passport'
+            response = client.get(url_for('main.add_from_address'))
+            assert response.status_code == 200
+            assert 'Preview your service name' in response.get_data(as_text=True)
+            assert 'Renew Your Pet Passport' in response.get_data(as_text=True)
+            assert 'renew.your.pet.passport@notifications.service.gov.uk' in response.get_data(as_text=True)
+
+
+def test_should_add_service_after_confirmation(
+    app_,
+    mock_login,
+    mock_create_service,
+    mock_get_services,
+    api_user_active,
+    mock_get_user,
+    mock_get_user_by_email
+):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            with client.session_transaction() as session:
+                session['service_name'] = 'Renew Your Pet Passport'
+            response = client.post(url_for('main.add_from_address'))
+            assert response.status_code == 302
             assert response.location == url_for('main.service_dashboard', service_id=101, _external=True)
             assert mock_create_service.called
             assert mock_get_services.called

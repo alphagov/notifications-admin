@@ -1,0 +1,42 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/sms-message.html" import sms_message %}
+{% from "components/email-message.html" import email_message %}
+
+{% block page_title %}
+  Preview your service name – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    Preview your service name
+  </h1>
+
+  <div class="grid-row">
+    <div class="column-two-thirds">
+        {{ sms_message(
+          "{}: we received your payment, thank you".format(service_name),
+          name="Text message",
+          recipient='Sent from 40604'
+        ) }}
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class='column-two-thirds'>
+      {{ email_message(
+        subject="We received your payment, thank you",
+        body="Dear Alice Smith,\n\nThank you for…",
+        from_name=service_name,
+        from_address=from_address,
+        name="Email",
+      ) }}
+    </div>
+  </div>
+
+  <form method="post">
+    {{page_footer('Looks good', back_link=url_for(".add_service"))}}
+  </form>
+
+{% endblock %}
