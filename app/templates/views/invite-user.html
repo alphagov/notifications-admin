@@ -18,7 +18,7 @@ Manage users – GOV.UK Notify
 
       {% if user %}
         <p class='bottom-gutter'>
-          {{ user.email_localpart }}@digital.cabinet-office.gov.uk
+          {{ current_user.email_address }}
         </p>
       {% else %}
         {{ textbox(form.email_address, hint='Email address must end in .gov.uk', width='1-1') }}
@@ -37,7 +37,9 @@ Manage users – GOV.UK Notify
         {{ page_footer(
           'Save',
           delete_link=url_for('.delete_user', service_id=service_id, user_id=user_id),
-          delete_link_text='delete this account'
+          delete_link_text='Delete this account',
+          back_link=url_for('.manage_users', service_id=service_id),
+          back_link_text='Cancel'
         ) }}
       {% else %}
         {{ page_footer('Send invitation email') }}

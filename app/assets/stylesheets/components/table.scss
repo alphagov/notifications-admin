@@ -55,10 +55,6 @@
       background-image: file-url('tick.png');
     }
 
-    &-no {
-      background-image: file-url('cross.png');
-    }
-
     &-missing {
       color: $error-colour;
       font-weight: bold;

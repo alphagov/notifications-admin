@@ -14,8 +14,6 @@ def test_should_show_overview_page(
             response = client.get(url_for('main.manage_users', service_id=55555))
 
         assert 'Manage team' in response.get_data(as_text=True)
-        assert 'Henry Hadlow' in response.get_data(as_text=True)
-        assert 'caley.smolska' in response.get_data(as_text=True)
         assert response.status_code == 200
 
 
@@ -30,7 +28,6 @@ def test_should_show_page_for_one_user(
             client.login(api_user_active)
             response = client.get(url_for('main.edit_user', service_id=55555, user_id=0))
 
-        assert 'Henry Hadlow' in response.get_data(as_text=True)
         assert response.status_code == 200
 
 

@@ -30,9 +30,9 @@
       {{ page_footer(
         'Save',
         delete_link=url_for('.delete_service_template', service_id=service_id, template_id=template_id) if template_id or None,
-        delete_link_text='delete this template',
-        secondary_link=url_for('.manage_service_templates', service_id=service_id),
-        secondary_link_text='Back to templates'
+        delete_link_text='Delete this template',
+        back_link=url_for('.choose_sms_template', service_id=service_id),
+        back_link_text='Cancel'
       ) }}
     </form>
 

@@ -23,7 +23,7 @@
     }
 
     &-button {
-      @include button($panel-colour);
+      @include button($button-colour);
       display: inline-block;
     }
 
