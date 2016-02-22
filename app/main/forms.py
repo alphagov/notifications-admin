@@ -188,7 +188,7 @@ class ConfirmPasswordForm(Form):
             raise ValidationError('Invalid password')
 
 
-class TemplateForm(Form):
+class SMSTemplateForm(Form):
     name = StringField(
         u'Template name',
         validators=[DataRequired(message="Template name cannot be empty")])
@@ -196,6 +196,13 @@ class TemplateForm(Form):
     template_content = TextAreaField(
         u'Message',
         validators=[DataRequired(message="Template content cannot be empty")])
+
+
+class EmailTemplateForm(SMSTemplateForm):
+
+    subject = StringField(
+        u'Subject',
+        validators=[DataRequired(message="Subject cannot be empty")])
 
 
 class ForgotPasswordForm(Form):

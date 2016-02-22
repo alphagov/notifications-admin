@@ -3,8 +3,8 @@
     <a href="{{ url_for('.service_dashboard', service_id=service_id) }}">{{ session.get('service_name', 'Service') }}</a>
   </h2>
   <ul>
-    <li><a href="{{ url_for('.choose_sms_template', service_id=service_id) }}">Send text messages</a></li>
-    <li><a href="{{ url_for('.send_email', service_id=service_id) }}">Send emails</a></li>
+    <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='sms') }}">Send text messages</a></li>
+    <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='email') }}">Send emails</a></li>
   </ul>
   <ul>
     <li><a href="{{ url_for('.manage_users', service_id=service_id) }}">Manage team</a></li>

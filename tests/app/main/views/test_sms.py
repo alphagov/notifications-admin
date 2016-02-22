@@ -14,7 +14,7 @@ def test_choose_sms_template(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            response = client.get(url_for('main.choose_sms_template', service_id=12345))
+            response = client.get(url_for('main.choose_template', template_type='sms', service_id=12345))
 
         assert response.status_code == 200
         content = response.get_data(as_text=True)

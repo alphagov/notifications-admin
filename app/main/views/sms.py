@@ -35,8 +35,10 @@ from app.utils import (
 )
 
 
-@main.route("/services/<service_id>/sms/send", methods=['GET'])
-def choose_sms_template(service_id):
+@main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
+def choose_template(service_id, template_type):
+    if template_type not in ['email', 'sms']:
+        abort(404)
     try:
         jobs = job_api_client.get_job(service_id)['data']
     except HTTPError as e:
@@ -44,21 +46,18 @@ def choose_sms_template(service_id):
             abort(404)
         else:
             raise e
-    print("="*80)
-    print(jobs)
-    print(len(jobs))
-    print(bool(len(jobs)))
     return render_template(
-        'views/choose-sms-template.html',
+        'views/choose-{}-template.html'.format(template_type),
         templates=[
             Template(template) for template in templates_dao.get_service_templates(service_id)['data']
+            if template['template_type'] == template_type
         ],
         has_jobs=len(jobs),
         service_id=service_id
     )
 
 
-@main.route("/services/<service_id>/sms/send/<template_id>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/send/<int:template_id>", methods=['GET', 'POST'])
 @login_required
 def send_sms(service_id, template_id):
 
@@ -91,7 +90,7 @@ def send_sms(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/sms/send/<template_id>.csv", methods=['GET'])
+@main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
 @login_required
 def get_example_csv(service_id, template_id):
     template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
@@ -104,7 +103,7 @@ def get_example_csv(service_id, template_id):
     return(output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'})
 
 
-@main.route("/services/<service_id>/sms/send/<template_id>/to-self", methods=['GET'])
+@main.route("/services/<service_id>/send/<template_id>/to-self", methods=['GET'])
 @login_required
 def send_sms_to_self(service_id, template_id):
     template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
@@ -126,7 +125,7 @@ def send_sms_to_self(service_id, template_id):
                             upload_id=upload_id))
 
 
-@main.route("/services/<service_id>/sms/check/<upload_id>",
+@main.route("/services/<service_id>/check/<upload_id>",
             methods=['GET', 'POST'])
 @login_required
 def check_sms(service_id, upload_id):
