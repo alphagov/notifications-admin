@@ -127,7 +127,7 @@ def check_sms(service_id, upload_id):
         template_id = upload_data.get('template_id')
         raw_template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
         upload_result = _get_rows(contents, raw_template)
-        print(upload_result)
+        session['upload_data']['notification_count'] = len(upload_result['rows'])
         template = Template(
             raw_template,
             values=upload_result['rows'][0] if upload_result['valid'] else {},
@@ -148,9 +148,10 @@ def check_sms(service_id, upload_id):
         upload_data = session['upload_data']
         original_file_name = upload_data.get('original_file_name')
         template_id = upload_data.get('template_id')
+        notification_count = upload_data.get('notification_count')
         session.pop('upload_data')
         try:
-            job_api_client.create_job(upload_id, service_id, template_id, original_file_name)
+            job_api_client.create_job(upload_id, service_id, template_id, original_file_name, notification_count)
         except HTTPError as e:
             if e.status_code == 404:
                 abort(404)
