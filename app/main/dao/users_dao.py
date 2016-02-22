@@ -57,8 +57,8 @@ def request_password_reset(user):
     user_api_client.update_user(user)
 
 
-def send_verify_code(user_id, code_type, to=None):
-    return user_api_client.send_verify_code(user_id, code_type, to=to)
+def send_verify_code(user_id, code_type, to):
+    return user_api_client.send_verify_code(user_id, code_type, to)
 
 
 def check_verify_code(user_id, code, code_type):

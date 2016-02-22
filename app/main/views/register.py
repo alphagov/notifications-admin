@@ -45,8 +45,8 @@ def register():
             # How do we report to the user there is a problem with
             # sending codes apart from service unavailable?
             # at the moment i believe http 500 is fine.
-            users_dao.send_verify_code(user.id, 'sms')
-            users_dao.send_verify_code(user.id, 'email')
+            users_dao.send_verify_code(user.id, 'sms', user.mobile_number)
+            users_dao.send_verify_code(user.id, 'email', user.email_address)
             session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
             session['user_details'] = {"email": user.email_address, "id": user.id}
             return redirect(url_for('main.verify'))

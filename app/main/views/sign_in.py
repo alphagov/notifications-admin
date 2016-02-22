@@ -27,7 +27,7 @@ def sign_in():
             if user.state == 'pending':
                 return redirect(url_for('.verify'))
             elif user.is_active():
-                users_dao.send_verify_code(user.id, 'sms')
+                users_dao.send_verify_code(user.id, 'sms', user.mobile_number)
                 return redirect(url_for('.two_factor'))
         # Vague error message for login in case of user not known, locked, inactive or password not verified
         flash('Username or password is incorrect')

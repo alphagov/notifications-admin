@@ -21,7 +21,7 @@ def new_password(token):
     form = NewPasswordForm()
 
     if form.validate_on_submit():
-        users_dao.send_verify_code(user.id, 'sms')
+        users_dao.send_verify_code(user.id, 'sms', user.mobile_number)
         session['user_details'] = {
             'id': user.id,
             'email': user.email_address,

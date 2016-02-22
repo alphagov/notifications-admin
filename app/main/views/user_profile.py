@@ -74,7 +74,7 @@ def user_profile_email_authenticate():
 
     if form.validate_on_submit():
         session[NEW_EMAIL_PASSWORD_CONFIRMED] = True
-        send_verify_code(current_user.id, 'email', to=session[NEW_EMAIL])
+        send_verify_code(current_user.id, 'email', session[NEW_EMAIL])
         return redirect(url_for('.user_profile_email_confirm'))
 
     return render_template(
@@ -142,7 +142,7 @@ def user_profile_mobile_number_authenticate():
 
     if form.validate_on_submit():
         session[NEW_MOBILE_PASSWORD_CONFIRMED] = True
-        send_verify_code(current_user.id, 'sms', to=session[NEW_MOBILE])
+        send_verify_code(current_user.id, 'sms', session[NEW_MOBILE])
         return redirect(url_for('.user_profile_mobile_number_confirm'))
 
     return render_template(
