@@ -17,14 +17,13 @@ def test_get_should_render_add_service_template(app_,
             assert 'Add a new service' in response.get_data(as_text=True)
 
 
-def test_should_add_service_and_redirect_to_next_page(
-    app_,
-    mock_login,
-    mock_get_services,
-    api_user_active,
-    mock_get_user,
-    mock_get_user_by_email
-):
+def test_should_add_service_and_redirect_to_next_page(app_,
+                                                      mock_login,
+                                                      mock_create_service,
+                                                      mock_get_services,
+                                                      api_user_active,
+                                                      mock_get_user,
+                                                      mock_get_user_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -68,7 +67,6 @@ def test_should_add_service_after_confirmation(
         with app_.test_client() as client:
             client.login(api_user_active)
             with client.session_transaction() as session:
-                print('session: {}'.format(session))
                 session['service_name'] = 'Renew Your Pet Passport'
             response = client.post(url_for('main.add_from_address'))
             assert response.status_code == 302
