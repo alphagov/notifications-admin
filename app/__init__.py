@@ -169,7 +169,7 @@ def register_errorhandlers(application):
         error_code = getattr(error, 'code', 500)
         resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
         return useful_headers_after_request(resp)
-    for errcode in [401, 404, 500]:
+    for errcode in [401, 404, 403, 500]:
         application.errorhandler(errcode)(render_error)
 
 

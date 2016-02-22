@@ -94,6 +94,7 @@ class User(UserMixin):
         self._email_address = fields.get('email_address')
         self._mobile_number = fields.get('mobile_number')
         self._password_changed_at = fields.get('password_changed_at')
+        self._permissions = set(fields.get('permissions')) if fields.get('permission') is not None else set()
         self._failed_login_count = 0
         self._state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
@@ -153,6 +154,25 @@ class User(UserMixin):
         self._state = state
 
     @property
+    def permissions(self):
+        return self._permissions
+
+    @permissions.setter
+    def permissions(self, permissions):
+        if permissions is None:
+            permissions = set()
+        self._permissions = set(permissions)
+
+    def add_permissions(self, permissions):
+        self._permissions.update(permissions)
+
+    def remove_permissions(self, permissions):
+        self._permissions -= permissions
+
+    def has_permissions(self, permissions):
+        return self._permissions > set(permissions)
+
+    @property
     def failed_login_count(self):
         return self._failed_login_count
 
@@ -170,7 +190,8 @@ class User(UserMixin):
                "mobile_number": self.mobile_number,
                "password_changed_at": self.password_changed_at,
                "state": self.state,
-               "failed_login_count": self.failed_login_count}
+               "failed_login_count": self.failed_login_count,
+               "permissions": [x for x in self._permissions]}
         if getattr(self, '_password', None):
             dct['password'] = self._password
         return dct

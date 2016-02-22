@@ -1,3 +1,7 @@
+from functools import wraps
+from flask import abort
+
+
 class BrowsableItem(object):
     """
     Maps for the template browse-list.
@@ -68,3 +72,16 @@ def format_phone_number(number):
     if len(number) < 9:
         raise InvalidPhoneError('Not enough digits')
     return '+447{}{}{}'.format(*re.findall('...', number))
+
+
+def user_has_permissions(*permissions):
+    def wrap(func):
+        @wraps(func)
+        def wrap_func(*args, **kwargs):
+            # We are making the assumption that the user is logged in.
+            from flask_login import current_user
+            if set(permissions) > set(current_user.permissions):
+                abort(403)
+            return func(*args, **kwargs)
+        return wrap_func
+    return wrap
