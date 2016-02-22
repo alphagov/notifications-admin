@@ -95,6 +95,7 @@ def job_json():
         'original_file_name': 'thisisatest.csv',
         'bucket_name': 'service-1-{}-notify'.format(job_id),
         'file_name': '{}.csv'.format(job_id),
-        'created_at': created_at
+        'created_at': created_at,
+        'notification_count': 1
         }
     return data
