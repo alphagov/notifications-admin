@@ -20,22 +20,21 @@ Manage users – GOV.UK Notify
     Manage team
   </h1>
 
+  <a href="{{ url_for('.invite_user', service_id=service_id) }}" class="button">Invite a team member</a>
+
   {% call(item) list_table(
     users, caption='Active', **table_options
   ) %}
     {% call field() %}
-      {{ item.name }}
+      {{ current_user.name }}
     {% endcall %}
     {{ boolean_field(item.permission_send_messages) }}
     {{ boolean_field(item.permission_manage_service) }}
     {{ boolean_field(item.permission_manage_api_keys) }}
     {% call field(align='right') %}
-      <a href="{{ url_for('.edit_user', service_id=service_id, user_id=item.id)}}">Change</a>
+      <a href="{{ url_for('.edit_user', service_id=service_id, user_id=0)}}">Change</a>
     {% endcall %}
   {% endcall %}
-  <p class='table-show-more-link'>
-    <a href="{{ url_for('.invite_user', service_id=service_id) }}">Add a new team member</a>
-  </p>
 
   {% if invited_users %}
     {% call(item) list_table(
