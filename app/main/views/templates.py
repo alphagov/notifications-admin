@@ -31,7 +31,7 @@ def add_service_template(service_id, template_type):
 
     if form.validate_on_submit():
         tdao.insert_service_template(
-            form.name.data, form.template_content.data, service_id, form.subject.data or None
+            form.name.data, template['template_type'], form.template_content.data, service_id, form.subject.data or None
         )
         return redirect(
             url_for('.choose_template', service_id=service_id, template_type=template_type)
@@ -54,8 +54,9 @@ def edit_service_template(service_id, template_id):
 
     if form.validate_on_submit():
         tdao.update_service_template(
-            template_id, form.name.data,
-            form.template_content.data, service_id)
+            template_id, form.name.data, template['template_type'],
+            form.template_content.data, service_id
+        )
         return redirect(url_for(
             '.choose_template',
             service_id=service_id,

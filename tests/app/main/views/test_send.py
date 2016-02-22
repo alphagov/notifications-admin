@@ -1,42 +1,56 @@
 from io import BytesIO
 from flask import url_for
 
+import pytest
 import moto
 
+template_types = ['email', 'sms']
 
-def test_choose_sms_template(app_,
-                             api_user_active,
-                             mock_login,
-                             mock_get_user,
-                             mock_check_verify_code,
-                             mock_get_service_templates,
-                             mock_get_jobs):
+
+@pytest.mark.parametrize("template_type", template_types)
+def test_choose_template(
+    template_type,
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_get_service,
+    mock_check_verify_code,
+    mock_get_service_templates,
+    mock_get_jobs
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            response = client.get(url_for('main.choose_template', template_type='sms', service_id=12345))
+            response = client.get(url_for('main.choose_template', template_type=template_type, service_id=12345))
 
         assert response.status_code == 200
         content = response.get_data(as_text=True)
-        assert 'template_one' in content
-        assert 'template one content' in content
-        assert 'template_two' in content
-        assert 'template two content' in content
+        assert '{}_template_one'.format(template_type) in content
+        assert '{} template one content'.format(template_type) in content
+        assert '{}_template_two'.format(template_type) in content
+        assert '{} template two content'.format(template_type) in content
 
 
-def test_upload_empty_csvfile_returns_to_upload_page(app_,
-                                                     api_user_active,
-                                                     mock_login,
-                                                     mock_get_user,
-                                                     mock_get_service_templates,
-                                                     mock_check_verify_code,
-                                                     mock_get_service_template):
+def test_upload_empty_csvfile_returns_to_upload_page(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_get_service,
+    mock_get_service_templates,
+    mock_check_verify_code,
+    mock_get_service_template
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
             upload_data = {'file': (BytesIO(''.encode('utf-8')), 'emtpy.csv')}
-            response = client.post(url_for('main.send_sms', service_id=12345, template_id=54321),
-                                   data=upload_data, follow_redirects=True)
+            response = client.post(
+                url_for('main.send_messages', service_id=12345, template_id=54321),
+                data=upload_data,
+                follow_redirects=True
+            )
 
         assert response.status_code == 200
         content = response.get_data(as_text=True)
@@ -44,13 +58,15 @@ def test_upload_empty_csvfile_returns_to_upload_page(app_,
 
 
 @moto.mock_s3
-def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
-                                                                        mocker,
-                                                                        api_user_active,
-                                                                        mock_login,
-                                                                        mock_get_user,
-                                                                        mock_get_user_by_email,
-                                                                        mock_get_service_template):
+def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
+    app_,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_get_service_template
+):
 
     contents = 'phone\n+44 123\n+44 456'
     file_data = (BytesIO(contents.encode('utf-8')), 'invalid.csv')
@@ -59,9 +75,11 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
         with app_.test_client() as client:
             client.login(api_user_active)
             upload_data = {'file': file_data}
-            response = client.post(url_for('main.send_sms', service_id=12345, template_id=54321),
-                                   data=upload_data,
-                                   follow_redirects=True)
+            response = client.post(
+                url_for('main.send_messages', service_id=12345, template_id=54321),
+                data=upload_data,
+                follow_redirects=True
+            )
         assert response.status_code == 200
         content = response.get_data(as_text=True)
         assert 'Your CSV file contained missing or invalid data' in content
@@ -85,7 +103,7 @@ def test_send_test_message_to_self(
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.get(
-                url_for('main.send_sms_to_self', service_id=12345, template_id=54321),
+                url_for('main.send_message_to_self', service_id=12345, template_id=54321),
                 follow_redirects=True
             )
         assert response.status_code == 200
@@ -118,13 +136,15 @@ def test_download_example_csv(
 
 
 @moto.mock_s3
-def test_upload_csvfile_with_valid_phone_shows_all_numbers(app_,
-                                                           mocker,
-                                                           api_user_active,
-                                                           mock_login,
-                                                           mock_get_user,
-                                                           mock_get_user_by_email,
-                                                           mock_get_service_template):
+def test_upload_csvfile_with_valid_phone_shows_all_numbers(
+    app_,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_get_service_template
+):
 
     contents = 'phone\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
 
@@ -134,7 +154,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(app_,
         with app_.test_client() as client:
             client.login(api_user_active)
             upload_data = {'file': file_data}
-            response = client.post(url_for('main.send_sms', service_id=12345, template_id=54321),
+            response = client.post(url_for('main.send_messages', service_id=12345, template_id=54321),
                                    data=upload_data,
                                    follow_redirects=True)
             with client.session_transaction() as sess:
@@ -154,16 +174,18 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(app_,
 
 
 @moto.mock_s3
-def test_create_job_should_call_api(app_,
-                                    service_one,
-                                    api_user_active,
-                                    mock_get_user,
-                                    mock_get_user_by_email,
-                                    mock_login,
-                                    job_data,
-                                    mock_create_job,
-                                    mock_get_job,
-                                    mock_get_service_template):
+def test_create_job_should_call_api(
+    app_,
+    service_one,
+    api_user_active,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_login,
+    job_data,
+    mock_create_job,
+    mock_get_job,
+    mock_get_service_template
+):
 
     service_id = service_one['id']
     job_id = job_data['id']
@@ -178,7 +200,7 @@ def test_create_job_should_call_api(app_,
                 session['upload_data'] = {'original_file_name': original_file_name,
                                           'template_id': template_id,
                                           'notification_count': notification_count}
-            url = url_for('main.check_sms', service_id=service_one['id'], upload_id=job_id)
+            url = url_for('main.check_messages', service_id=service_one['id'], upload_id=job_id)
             response = client.post(url, data=job_data, follow_redirects=True)
 
         assert response.status_code == 200

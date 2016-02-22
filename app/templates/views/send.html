@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/sms-message.html" import sms_message %}
+{% from "components/email-message.html" import email_message %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/table.html" import list_table, field %}
@@ -14,14 +15,22 @@
 
   <div class="grid-row">
     <div class="column-two-thirds">
-
-      {{ sms_message(template.formatted_as_markup) }}
-
+      {% if 'sms' == template.template_type %}
+        {{ sms_message(template.formatted_as_markup) }}
+      {% elif 'email' == template.template_type %}
+        {{ email_message(
+          template.subject,
+          template.formatted_as_markup,
+          from_address='{}@notifications.service.gov.uk'.format(service.email_from),
+          from_name=service.name
+        ) }}
+      {% endif %}
       {{ banner(
-        'You can upload real data, but we’ll only send to your mobile number until you <a href="{}">request to go live</a>'|safe,
+        'You can upload real data, but we’ll only send to your mobile number until you <a href="{}">request to go live</a>'.format(
+          url_for('.service_request_to_go_live', service_id=service_id)
+        )|safe,
         'info'
       )}}
-
     </div>
   </div>
 

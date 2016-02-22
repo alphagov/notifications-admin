@@ -42,7 +42,7 @@
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="submit" class="button" value="{{ "Send {} text message{}".format(upload_result.rows|count, '' if upload_result.rows|count == 1 else 's') }}" />
-      <a href="{{url_for('.send_sms', service_id=service_id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
+      <a href="{{url_for('.send_messages', service_id=service_id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
     </form>
   {% else %}
     {{file_upload(form.file, button_text='Upload a CSV file')}}
