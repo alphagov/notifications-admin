@@ -468,13 +468,14 @@ def job_data():
 
 @pytest.fixture(scope='function')
 def mock_create_job(mocker, job_data):
-    def _create(job_id, service_id, template_id, file_name):
+    def _create(job_id, service_id, template_id, file_name, notification_count):
         job_data['id'] = job_id
         job_data['service'] = service_id
         job_data['template'] = template_id
         job_data['bucket_name'] = 'service-{}-notify'.format(job_id)
         job_data['original_file_name'] = file_name
         job_data['file_name'] = '{}.csv'.format(job_id)
+        job_data['notification_count'] = notification_count
         return job_data
     return mocker.patch('app.job_api_client.create_job', side_effect=_create)
 
