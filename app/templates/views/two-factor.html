@@ -1,5 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/checkbox.html" import checkbox %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
@@ -22,6 +23,7 @@
         help_link=url_for('.verification_code_not_received'),
         help_link_text='I haven’t received a text message'
       ) }}
+      {{ checkbox(form.remember_me) }}
       {{ page_footer(
         "Continue"
       ) }}

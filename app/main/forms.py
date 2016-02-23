@@ -7,7 +7,8 @@ from wtforms import (
     ValidationError,
     TextAreaField,
     FileField,
-    RadioField
+    RadioField,
+    BooleanField
 )
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import DataRequired, Email, Length, Regexp
@@ -110,6 +111,7 @@ class TwoFactorForm(Form):
         super(TwoFactorForm, self).__init__(*args, **kwargs)
 
     sms_code = sms_code()
+    remember_me = BooleanField("Remember me")
 
     def validate_sms_code(self, field):
         is_valid, reason = self.validate_code_func(field.data)

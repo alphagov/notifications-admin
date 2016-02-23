@@ -92,3 +92,20 @@ def test_should_login_user_when_multiple_valid_codes_exist(app_,
             response = client.post(url_for('main.two_factor'),
                                    data={'sms_code': '23456'})
             assert response.status_code == 302
+
+
+def test_remember_me_set(app_,
+                         api_user_active,
+                         mock_get_user,
+                         mock_get_user_by_email,
+                         mock_check_verify_code,
+                         mock_get_services_with_one_service):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                session['user_details'] = {
+                    'id': api_user_active.id,
+                    'email': api_user_active.email_address}
+            response = client.post(url_for('main.two_factor'),
+                                   data={'sms_code': '23456', 'remember_me': True})
+            assert response.status_code == 302
