@@ -14,14 +14,21 @@
 
   <div class="grid-row">
     <div class="column-two-thirds">
+
       {{ sms_message(template.formatted_as_markup) }}
+
+      {{ banner(
+        'You can upload real data, but we’ll only send to your mobile number until you <a href="{}">request to go live</a>'|safe,
+        'info'
+      )}}
+
     </div>
   </div>
+
+  {{file_upload(form.file, button_text='Upload a CSV file')}}
 
   <p>
     <a href="{{ url_for('.get_example_csv', service_id=service_id, template_id=template.id) }}">Download an example CSV file</a>
   </p>
-
-  {{file_upload(form.file, button_text='Upload a CSV file')}}
 
 {% endblock %}

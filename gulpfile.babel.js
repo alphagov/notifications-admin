@@ -31,12 +31,19 @@ gulp.task('copy:govuk_template:template', () => gulp.src(paths.template + 'views
 
 gulp.task('copy:govuk_template:css', () => gulp.src(paths.template + 'assets/stylesheets/**/*.css')
   .pipe(plugins.sass({outputStyle: 'compressed'}))
+  .pipe(plugins.cssUrlAdjuster({
+    prependRelative: '/static/',
+  }))
   .pipe(gulp.dest(paths.dist + 'stylesheets/'))
 );
 
 gulp.task('copy:govuk_template:js', () => gulp.src(paths.template + 'assets/javascripts/**/*.js')
   .pipe(plugins.uglify())
   .pipe(gulp.dest(paths.dist + 'javascripts/'))
+);
+
+gulp.task('copy:govuk_template:images', () => gulp.src(paths.template + 'assets/stylesheets/images/**/*')
+  .pipe(gulp.dest(paths.dist + 'images/'))
 );
 
 gulp.task('javascripts', () => gulp
@@ -117,6 +124,7 @@ gulp.task('lint',
 gulp.task('default',
   [
     'copy:govuk_template:template',
+    'copy:govuk_template:images',
     'copy:govuk_template:css',
     'copy:govuk_template:js',
     'javascripts',

@@ -37,11 +37,23 @@ from app.utils import (
 
 @main.route("/services/<service_id>/sms/send", methods=['GET'])
 def choose_sms_template(service_id):
+    try:
+        jobs = job_api_client.get_job(service_id)['data']
+    except HTTPError as e:
+        if e.status_code == 404:
+            abort(404)
+        else:
+            raise e
+    print("="*80)
+    print(jobs)
+    print(len(jobs))
+    print(bool(len(jobs)))
     return render_template(
         'views/choose-sms-template.html',
         templates=[
             Template(template) for template in templates_dao.get_service_templates(service_id)['data']
         ],
+        has_jobs=len(jobs),
         service_id=service_id
     )
 
