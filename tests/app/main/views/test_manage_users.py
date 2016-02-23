@@ -6,7 +6,8 @@ def test_should_show_overview_page(
     app_,
     api_user_active,
     mock_login,
-    mock_get_service
+    mock_get_service,
+    mock_get_users_by_service
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -35,7 +36,8 @@ def test_redirect_after_saving_user(
     app_,
     api_user_active,
     mock_login,
-    mock_get_service
+    mock_get_service,
+    mock_get_users_by_service
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -69,7 +71,8 @@ def test_invite_user(
     app_,
     api_user_active,
     mock_login,
-    mock_get_service
+    mock_get_service,
+    mock_get_users_by_service
 ):
     with app_.test_request_context():
         with app_.test_client() as client:

@@ -81,6 +81,11 @@ class UserApiClient(BaseAPIClient):
                     return False, 'Code not found'
             raise e
 
+    def get_users_for_service(self, service_id):
+        endpoint = '/service/{}/users'.format(service_id)
+        resp = self.get(endpoint)
+        return resp['data']
+
 
 class User(UserMixin):
     def __init__(self, fields, max_failed_login_count=3):
