@@ -9,29 +9,27 @@
     </h3>
   {% endif %}
   <div class="email-message">
-    {% if from_name and from_address %}
-      <div class="email-message-from">
-        <div class="grid-row">
-          <div class="column-one-eighth">
-            <span class="form-hint">From</span>
-          </div>
-          <div class="column-seven-eighths">
-            {{ from_name }} &lt;{{ from_address }}&gt;
-          </div>
-        </div>
-      </div>
-    {% endif %}
-    {% if subject %}
-      <div class="email-message-subject">
-        <div class="grid-row">
-          <div class="column-one-eighth">
-            <span class="form-hint">Subject</span>
-          </div>
-          <div class="column-seven-eighths">
-            {{ subject }}
-          </div>
-        </div>
-      </div>
+    {% if from_name or subject %}
+      <table class="email-message-meta">
+        <tbody>
+          {% if from_name and from_address %}
+            <tr>
+              <th>From</th>
+              <td>
+                {{ from_name }} &lt;{{ from_address }}&gt;
+              </td>
+            </tr>
+          {% endif %}
+          {% if subject %}
+            <tr class="email-message-meta">
+              <th>Subject</th>
+              <td>
+                {{ subject }}
+              </td>
+            </div>
+          {% endif %}
+        </tbody>
+      </table>
     {% endif %}
     <div class="email-message-body">
       {{ body|nl2br }}
