@@ -9,7 +9,8 @@ def test_choose_sms_template(app_,
                              mock_login,
                              mock_get_user,
                              mock_check_verify_code,
-                             mock_get_service_templates):
+                             mock_get_service_templates,
+                             mock_get_jobs):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
