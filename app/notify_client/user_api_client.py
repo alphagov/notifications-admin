@@ -1,7 +1,8 @@
+from flask import session
 from notifications_python_client.notifications import BaseAPIClient
 from notifications_python_client.errors import HTTPError
 
-from flask.ext.login import UserMixin
+from flask.ext.login import (UserMixin, login_fresh)
 
 
 class UserApiClient(BaseAPIClient):
@@ -93,6 +94,12 @@ class User(UserMixin):
         self._failed_login_count = 0
         self._state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
+
+    def is_authenticated(self):
+        # To handle remember me token renewal
+        if not login_fresh():
+            return False
+        return super(User, self).is_authenticated()
 
     def get_id(self):
         return self.id
