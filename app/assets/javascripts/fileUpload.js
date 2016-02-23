@@ -3,20 +3,16 @@
 
   Modules.FileUpload = function() {
 
-    let $field;
+    let $form;
 
-    this.submit = function() {
-
-      $field.parents('form').trigger('submit');
-
-    };
+    this.submit = () => $form.trigger('submit');
 
     this.start = function(component) {
 
-      $field = $('.file-upload-field', component);
+      $form = $(component);
 
       // Need to put the event on the container, not the input for it to work properly
-      $(component).on('change', '.file-upload-field', this.submit);
+      $form.on('change', '.file-upload-field', this.submit);
 
     };
 
