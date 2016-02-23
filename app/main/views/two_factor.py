@@ -15,7 +15,7 @@ def two_factor():
     try:
         user_id = session['user_details']['id']
     except KeyError:
-        redirect('main.sign-in')
+        return redirect('main.sign_in')
 
     def _check_code(code):
         return users_dao.check_verify_code(user_id, code, "sms")
