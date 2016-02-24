@@ -65,7 +65,8 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
     mock_login,
     mock_get_user,
     mock_get_user_by_email,
-    mock_get_service_template
+    mock_get_service_template,
+    mock_get_service
 ):
 
     contents = 'phone\n+44 123\n+44 456'
