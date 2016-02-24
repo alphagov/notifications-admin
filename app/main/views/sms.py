@@ -127,7 +127,6 @@ def check_sms(service_id, upload_id):
         template_id = upload_data.get('template_id')
         raw_template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
         upload_result = _get_rows(contents, raw_template)
-        print(upload_result)
         template = Template(
             raw_template,
             values=upload_result['rows'][0] if upload_result['valid'] else {},

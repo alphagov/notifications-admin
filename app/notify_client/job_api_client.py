@@ -1,4 +1,3 @@
-import uuid
 
 from notifications_python_client.base import BaseAPIClient
 
@@ -23,7 +22,6 @@ class JobApiClient(BaseAPIClient):
     def create_job(self, job_id, service_id, template_id, original_file_name):
         data = {
             "id": job_id,
-            "service": service_id,
             "template": template_id,
             "original_file_name": original_file_name,
             "bucket_name": "service-{}-notify".format(service_id),
