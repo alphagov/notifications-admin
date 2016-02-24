@@ -60,7 +60,6 @@ def test_upload_empty_csvfile_returns_to_upload_page(
 @moto.mock_s3
 def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
     app_,
-    mocker,
     api_user_active,
     mock_login,
     mock_get_service_template
