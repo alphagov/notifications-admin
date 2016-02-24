@@ -7,6 +7,12 @@
   margin: 40px 0 5px 0;
 }
 
+.table-field-headings {
+  th {
+    padding: 0 0 5px 0;
+  }
+}
+
 %table-field,
 .table-field {
 
@@ -34,6 +40,19 @@
 
       }
 
+    }
+
+    &-yes,
+    &-no {
+      display: block;
+      text-indent: -999em;
+      background-size: 19px 19px;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+    }
+
+    &-yes {
+      background-image: file-url('tick.png');
     }
 
     &-missing {
@@ -77,4 +96,5 @@
   margin-top: -20px;
   border-bottom: 1px solid $border-colour;
   padding-bottom: 10px;
+  text-align: center;
 }

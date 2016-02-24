@@ -1,0 +1,17 @@
+{% macro yes_no(name, label, current_value=None) %}
+  <fieldset class='yes-no'>
+    <legend class='yes-no-label'>
+      {{ label }}
+    </legend>
+    <div class='yes-no-fields inline'>
+      <label class='block-label'>
+        <input type='radio' name='{{ name }}' {% if current_value == True %}checked{% endif %} />
+        Yes
+      </label>
+      <label class='block-label'>
+        <input type='radio' name='{{ name }}' {% if current_value == False %}checked{% endif %} />
+        No
+      </label>
+    </div>
+  </fieldset>
+{% endmacro %}

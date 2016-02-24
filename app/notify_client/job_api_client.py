@@ -19,13 +19,14 @@ class JobApiClient(BaseAPIClient):
         else:
             return self.get(url='/service/{}/job'.format(service_id))
 
-    def create_job(self, job_id, service_id, template_id, original_file_name):
+    def create_job(self, job_id, service_id, template_id, original_file_name, notification_count):
         data = {
             "id": job_id,
             "template": template_id,
             "original_file_name": original_file_name,
             "bucket_name": "service-{}-notify".format(service_id),
-            "file_name": "{}.csv".format(job_id)
+            "file_name": "{}.csv".format(job_id),
+            "notification_count": notification_count
         }
 
         resp = self.post(url='/service/{}/job'.format(service_id), data=data)

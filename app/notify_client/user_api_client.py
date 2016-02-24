@@ -1,8 +1,5 @@
 from notifications_python_client.notifications import BaseAPIClient
-from notifications_python_client.errors import (
-    HTTPError,
-    InvalidResponse
-)
+from notifications_python_client.errors import HTTPError
 
 from flask.ext.login import UserMixin
 
@@ -34,6 +31,11 @@ class UserApiClient(BaseAPIClient):
         user_data = self.get(url)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
+    def get_user_by_email(self, email_address):
+        params = {'email': email_address}
+        user_data = self.get('/user/email', params=params)
+        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
+
     def get_users(self):
         users_data = self.get("/user")['data']
         users = []
@@ -56,13 +58,6 @@ class UserApiClient(BaseAPIClient):
         except HTTPError as e:
             if e.status_code == 400 or e.status_code == 404:
                 return False
-
-    def get_user_by_email(self, email_address):
-        users = self.get_users()
-        user = [u for u in users if u.email_address == email_address]
-        if len(user) == 1:
-            return user[0]
-        return None
 
     def send_verify_code(self, user_id, code_type, to):
         data = {'to': to}

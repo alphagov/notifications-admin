@@ -23,7 +23,7 @@
       </li>
     </ul>
 
-    {% if not jobs %}
+    {% if not template_count and not jobs %}
       {{ banner(
         """
           <ol>
@@ -39,6 +39,16 @@
           url_for(".choose_sms_template", service_id=service_id)
         )|safe,
         subhead='Get started',
+        type="tip"
+      )}}
+    {% elif not jobs %}
+      {{ banner(
+        """
+          <a href='{}'>Send yourself a text message</a>
+        """.format(
+          url_for(".choose_sms_template", service_id=service_id)
+        )|safe,
+        subhead='Next step',
         type="tip"
       )}}
     {% else %}

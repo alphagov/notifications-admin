@@ -15,22 +15,10 @@ from app.main.dao import services_dao as sdao
 @main.route("/services/<service_id>/templates")
 @login_required
 def manage_service_templates(service_id):
-    try:
-        jobs = job_api_client.get_job(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
-    return render_template(
-        'views/manage-templates.html',
-        service_id=service_id,
-        has_jobs=bool(jobs),
-        templates=[
-            Template(template)
-            for template in tdao.get_service_templates(service_id)['data']
-        ]
-    )
+    return redirect(url_for(
+        '.choose_sms_template',
+        service_id=service_id
+    ))
 
 
 @main.route("/services/<service_id>/templates/add", methods=['GET', 'POST'])
@@ -50,10 +38,10 @@ def add_service_template(service_id):
         tdao.insert_service_template(
             form.name.data, form.template_content.data, service_id)
         return redirect(url_for(
-            '.manage_service_templates', service_id=service_id))
+            '.choose_sms_template', service_id=service_id))
     return render_template(
         'views/edit-template.html',
-        h1='Add template',
+        h1='Add a text message template',
         form=form,
         service_id=service_id)
 
@@ -69,7 +57,7 @@ def edit_service_template(service_id, template_id):
         tdao.update_service_template(
             template_id, form.name.data,
             form.template_content.data, service_id)
-        return redirect(url_for('.manage_service_templates', service_id=service_id))
+        return redirect(url_for('.choose_sms_template', service_id=service_id))
 
     return render_template(
         'views/edit-template.html',

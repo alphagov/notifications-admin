@@ -37,11 +37,23 @@ from app.utils import (
 
 @main.route("/services/<service_id>/sms/send", methods=['GET'])
 def choose_sms_template(service_id):
+    try:
+        jobs = job_api_client.get_job(service_id)['data']
+    except HTTPError as e:
+        if e.status_code == 404:
+            abort(404)
+        else:
+            raise e
+    print("="*80)
+    print(jobs)
+    print(len(jobs))
+    print(bool(len(jobs)))
     return render_template(
         'views/choose-sms-template.html',
         templates=[
             Template(template) for template in templates_dao.get_service_templates(service_id)['data']
         ],
+        has_jobs=len(jobs),
         service_id=service_id
     )
 
@@ -127,6 +139,7 @@ def check_sms(service_id, upload_id):
         template_id = upload_data.get('template_id')
         raw_template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
         upload_result = _get_rows(contents, raw_template)
+        session['upload_data']['notification_count'] = len(upload_result['rows'])
         template = Template(
             raw_template,
             values=upload_result['rows'][0] if upload_result['valid'] else {},
@@ -147,9 +160,10 @@ def check_sms(service_id, upload_id):
         upload_data = session['upload_data']
         original_file_name = upload_data.get('original_file_name')
         template_id = upload_data.get('template_id')
+        notification_count = upload_data.get('notification_count')
         session.pop('upload_data')
         try:
-            job_api_client.create_job(upload_id, service_id, template_id, original_file_name)
+            job_api_client.create_job(upload_id, service_id, template_id, original_file_name, notification_count)
         except HTTPError as e:
             if e.status_code == 404:
                 abort(404)

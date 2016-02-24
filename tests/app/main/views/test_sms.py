@@ -9,7 +9,8 @@ def test_choose_sms_template(app_,
                              mock_login,
                              mock_get_user,
                              mock_check_verify_code,
-                             mock_get_service_templates):
+                             mock_get_service_templates,
+                             mock_get_jobs):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -66,7 +67,7 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(app_,
         assert 'Your CSV file contained missing or invalid data' in content
         assert '+44 123' in content
         assert '+44 456' in content
-        assert 'Choose a CSV file' in content
+        assert 'Upload a CSV file' in content
 
 
 @moto.mock_s3
@@ -136,16 +137,20 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(app_,
             response = client.post(url_for('main.send_sms', service_id=12345, template_id=54321),
                                    data=upload_data,
                                    follow_redirects=True)
+            with client.session_transaction() as sess:
+                assert int(sess['upload_data']['template_id']) == 54321
+                assert sess['upload_data']['original_file_name'] == 'valid.csv'
+                assert sess['upload_data']['notification_count'] == 6
 
-        content = response.get_data(as_text=True)
+            content = response.get_data(as_text=True)
 
-        assert response.status_code == 200
-        assert '+44 7700 900981' in content
-        assert '+44 7700 900982' in content
-        assert '+44 7700 900983' in content
-        assert '+44 7700 900984' in content
-        assert '+44 7700 900985' in content
-        assert '+44 7700 900986' in content
+            assert response.status_code == 200
+            assert '+44 7700 900981' in content
+            assert '+44 7700 900982' in content
+            assert '+44 7700 900983' in content
+            assert '+44 7700 900984' in content
+            assert '+44 7700 900985' in content
+            assert '+44 7700 900986' in content
 
 
 @moto.mock_s3
@@ -164,15 +169,18 @@ def test_create_job_should_call_api(app_,
     job_id = job_data['id']
     original_file_name = job_data['original_file_name']
     template_id = job_data['template']
+    notification_count = job_data['notification_count']
 
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
             with client.session_transaction() as session:
-                session['upload_data'] = {'original_file_name': original_file_name, 'template_id': template_id}
+                session['upload_data'] = {'original_file_name': original_file_name,
+                                          'template_id': template_id,
+                                          'notification_count': notification_count}
             url = url_for('main.check_sms', service_id=service_one['id'], upload_id=job_id)
             response = client.post(url, data=job_data, follow_redirects=True)
 
         assert response.status_code == 200
         assert 'We’ve started sending your messages' in response.get_data(as_text=True)
-        mock_create_job.assert_called_with(job_id, service_id, template_id, original_file_name)
+        mock_create_job.assert_called_with(job_id, service_id, template_id, original_file_name, notification_count)

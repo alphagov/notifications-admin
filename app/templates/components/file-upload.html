@@ -1,7 +1,7 @@
 {% macro file_upload(field, button_text="Choose file") %}
-  <div class="form-group{% if field.errors %} error{% endif %}" data-module="file-upload">
+  <form method="post" enctype="multipart/form-data" class="form-group{% if field.errors %} error{% endif %}" data-module="file-upload">
     <label class="file-upload-label" for="{{ field.name }}">
-      {{ field.label }}
+      <span class="visually-hidden">{{ field.label }}</span>
       {% if hint %}
         <span class="form-hint">
           {{ hint }}
@@ -20,5 +20,7 @@
       {{ button_text }}
     </label>
     <label class="file-upload-filename" for="{{ field.name }}"></label>
-  </div>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <input type="submit" class="file-upload-submit" value="Submit" />
+  </form>
 {% endmacro %}

@@ -5,7 +5,7 @@
       {{ banner(
         message,
         'default' if ((category == 'default') or (category == 'default_with_tick')) else 'dangerous',
-        delete_button="Yes, delete this template" if 'delete' == category else None,
+        delete_button="Yes, delete" if 'delete' == category else None,
         with_tick=True if category == 'default_with_tick' else False
       )}}
     {% endfor %}

@@ -16,7 +16,7 @@ def test_should_return_list_of_all_templates(app_,
             client.login(api_user_active)
             service_id = str(uuid.uuid4())
             response = client.get(url_for(
-                '.manage_service_templates', service_id=service_id))
+                '.manage_service_templates', service_id=service_id), follow_redirects=True)
 
     assert response.status_code == 200
     mock_get_service_templates.assert_called_with(service_id)
@@ -72,7 +72,7 @@ def test_should_redirect_when_saving_a_template(app_,
 
             assert response.status_code == 302
             assert response.location == url_for(
-                '.manage_service_templates', service_id=service_id, _external=True)
+                '.choose_sms_template', service_id=service_id, _external=True)
             mock_update_service_template.assert_called_with(
                 template_id, name, 'sms', content, service_id)
 

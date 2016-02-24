@@ -45,12 +45,7 @@
       <a href="{{url_for('.send_sms', service_id=service_id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
     </form>
   {% else %}
-    <form method="post" action="{{ url_for('.send_sms', service_id=service_id, template_id=template.id) }}" enctype="multipart/form-data">
-      {{file_upload(form.file, button_text='Choose a CSV file')}}
-      {{ page_footer(
-        "Upload"
-      ) }}
-    </form>
+    {{file_upload(form.file, button_text='Upload a CSV file')}}
   {% endif %}
 
   {% call(item) list_table(

@@ -16,19 +16,13 @@
 
 .banner-with-tick,
 .banner-default-with-tick {
-
   @extend %banner;
   padding: $gutter-half ($gutter + $gutter-half);
-
-  &:before {
-    @include core-24;
-    content: '✔';
-    position: absolute;
-    top: $gutter-half;
-    left: $gutter-half;
-    margin-top: -2px;
-  }
-
+  background-image: file-url('tick-white.png');
+  background-size: 19px;
+  background-repeat: no-repeat;
+  background-position: $gutter-half $gutter-half;
+  font-weight: bold;
 }
 
 .banner-dangerous {
@@ -70,13 +64,18 @@
 
 }
 
+.banner-info,
 .banner-important {
   @extend %banner;
   background: $white;
   color: $text-colour;
   background-image: file-url('icon-important-2x.png');
   background-size: 34px 34px;
-  background-position: 0 0;
+  background-position: 0 0px;
   background-repeat: no-repeat;
   padding: 7px 0 5px 50px;
+}
+
+.banner-info {
+  background-image: file-url('icon-information-2x.png');
 }
