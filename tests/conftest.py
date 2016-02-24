@@ -525,4 +525,4 @@ def mock_get_users_by_service(mocker):
                  'email_address': 'notify@digital.cabinet-office.gov.uk',
                  'failed_login_count': 0}]
         return data
-    return mocker.patch('app.user_api_client.get_users_for_service', side_effect=_get_users_for_service)
+    return mocker.patch('app.user_api_client.get_users_for_service', side_effect=_get_users_for_service, autospec=True)
