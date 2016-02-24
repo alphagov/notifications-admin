@@ -4,24 +4,6 @@ import uuid
 from flask import url_for
 
 
-def test_should_return_list_of_all_templates(app_,
-                                             api_user_active,
-                                             mock_get_service_templates,
-                                             mock_get_user,
-                                             mock_get_user_by_email,
-                                             mock_login,
-                                             mock_get_jobs):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = str(uuid.uuid4())
-            response = client.get(url_for(
-                '.manage_service_templates', service_id=service_id), follow_redirects=True)
-
-    assert response.status_code == 200
-    mock_get_service_templates.assert_called_with(service_id)
-
-
 def test_should_show_page_for_one_templates(app_,
                                             api_user_active,
                                             mock_get_service_template,
@@ -62,8 +44,9 @@ def test_should_redirect_when_saving_a_template(app_,
             data = {
                 'id': template_id,
                 'name': name,
-                "template_content": content,
-                "service": service_id
+                'template_content': content,
+                'type': 'sms',
+                'service': service_id
             }
             response = client.post(url_for(
                 '.edit_service_template',
@@ -72,7 +55,7 @@ def test_should_redirect_when_saving_a_template(app_,
 
             assert response.status_code == 302
             assert response.location == url_for(
-                '.choose_sms_template', service_id=service_id, _external=True)
+                '.choose_template', service_id=service_id, template_type='sms', _external=True)
             mock_update_service_template.assert_called_with(
                 template_id, name, 'sms', content, service_id)
 
@@ -127,12 +110,13 @@ def test_should_redirect_when_deleting_a_template(app_,
             response = client.post(url_for(
                 '.delete_service_template',
                 service_id=service_id,
-                template_id=template_id), data=data)
+                template_id=template_id
+            ), data=data)
 
             assert response.status_code == 302
             assert response.location == url_for(
-                '.manage_service_templates',
-                service_id=service_id, _external=True)
+                '.choose_template',
+                service_id=service_id, template_type=type_, _external=True)
             mock_get_service_template.assert_called_with(
                 service_id, template_id)
             mock_delete_service_template.assert_called_with(

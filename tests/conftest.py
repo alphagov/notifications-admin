@@ -163,11 +163,20 @@ def mock_update_service_template(mocker):
 @pytest.fixture(scope='function')
 def mock_get_service_templates(mocker):
     def _create(service_id):
-        template_one = template_json(
-            1, "template_one", "sms", "template one content", service_id)
-        template_two = template_json(
-            2, "template_two", "sms", "template two content", service_id)
-        return {'data': [template_one, template_two]}
+        return {'data': [
+            template_json(
+                1, "sms_template_one", "sms", "sms template one content", service_id
+            ),
+            template_json(
+                2, "sms_template_two", "sms", "sms template two content", service_id
+            ),
+            template_json(
+                3, "email_template_one", "email", "email template one content", service_id
+            ),
+            template_json(
+                4, "email_template_two", "email", "email template two content", service_id
+            )
+        ]}
 
     return mocker.patch(
         'app.notifications_api_client.get_service_templates',

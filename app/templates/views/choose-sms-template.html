@@ -30,8 +30,8 @@
           </div>
           <div class="column-one-third">
             <div class="sms-message-use-links">
-              <a href="{{ url_for(".send_sms", service_id=service_id, template_id=template.id) }}">Add recipients</a>
-              <a href="{{ url_for(".send_sms_to_self", service_id=service_id, template_id=template.id) }}">Send yourself a test</a>
+              <a href="{{ url_for(".send_messages", service_id=service_id, template_id=template.id) }}">Add recipients</a>
+              <a href="{{ url_for(".send_message_to_self", service_id=service_id, template_id=template.id) }}">Send yourself a test</a>
               <a href="{{ url_for(".edit_service_template", service_id=service_id, template_id=template.id) }}">Edit template</a>
             </div>
           </div>
@@ -40,7 +40,7 @@
     {% endif %}
 
     <p>
-      <a href="{{ url_for('.add_service_template', service_id=service_id) }}" class="button">Add a new template</a>
+      <a href="{{ url_for('.add_service_template', service_id=service_id, template_type='sms') }}" class="button">Add a new template</a>
     </p>
 
   </form>

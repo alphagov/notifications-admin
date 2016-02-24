@@ -7,9 +7,26 @@
     margin: 20px 0 10px 0;
   }
 
-  &-subject,
-  &-from {
-    margin: 10px 0;
+  &-meta {
+
+    @include core-19;
+    margin: 0;
+
+    td,
+    th {
+      @include core-19;
+      border-bottom: 0;
+      border-top: 1px solid $border-colour;
+    }
+
+    th {
+      color: $secondary-text-colour;
+    }
+
+    td {
+      width: 99%;
+    }
+
   }
 
   &-from {

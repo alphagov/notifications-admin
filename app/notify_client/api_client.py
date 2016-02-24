@@ -70,7 +70,7 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
         endpoint = "/service/{0}".format(service_id)
         return self.put(endpoint, data)
 
-    def create_service_template(self, name, type_, content, service_id):
+    def create_service_template(self, name, type_, content, service_id, subject=None):
         """
         Create a service template.
         """
@@ -80,10 +80,14 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
             "content": content,
             "service": service_id
         }
+        if subject:
+            data.update({
+                'subject': subject
+            })
         endpoint = "/service/{0}/template".format(service_id)
         return self.post(endpoint, data)
 
-    def update_service_template(self, id_, name, type_, content, service_id):
+    def update_service_template(self, id_, name, type_, content, service_id, subject=None):
         """
         Update a service template.
         """
@@ -94,8 +98,12 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
             'content': content,
             'service': service_id
         }
+        if subject:
+            data.update({
+                'subject': subject
+            })
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
-        return self.put(endpoint, data)
+        return self.post(endpoint, data)
 
     def get_service_template(self, service_id, template_id, *params):
         """

@@ -4,14 +4,14 @@ from app.utils import BrowsableItem
 from notifications_python_client.errors import HTTPError
 
 
-def insert_service_template(name, content, service_id):
+def insert_service_template(name, type_, content, service_id, subject=None):
     return notifications_api_client.create_service_template(
-        name, 'sms', content, service_id)
+        name, type_, content, service_id, subject)
 
 
-def update_service_template(id_, name, content, service_id):
+def update_service_template(id_, name, type_, content, service_id, subject=None):
     return notifications_api_client.update_service_template(
-        id_, name, 'sms', content, service_id)
+        id_, name, type_, content, service_id)
 
 
 def get_service_templates(service_id):
