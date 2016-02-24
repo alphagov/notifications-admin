@@ -510,3 +510,19 @@ def mock_get_jobs(mocker):
             data.append(job_data)
         return {"data": data}
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_jobs)
+
+
+@pytest.fixture(scope='function')
+def mock_get_users_by_service(mocker):
+    def _get_users_for_service(service_id):
+        data = [{'id': 1,
+                 'logged_in_at': None,
+                 'mobile_number': '+447700900986',
+                 'permissions': [],
+                 'state': 'active',
+                 'password_changed_at': None,
+                 'name': 'Test User',
+                 'email_address': 'notify@digital.cabinet-office.gov.uk',
+                 'failed_login_count': 0}]
+        return data
+    return mocker.patch('app.user_api_client.get_users_for_service', side_effect=_get_users_for_service, autospec=True)
