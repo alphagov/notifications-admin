@@ -5,45 +5,44 @@ from notifications_python_client.errors import HTTPError
 from utils.template import Template
 
 from app.main import main
-from app.main.forms import TemplateForm
+from app.main.forms import SMSTemplateForm, EmailTemplateForm
 from app import job_api_client
-from app.main.dao.services_dao import get_service_by_id
+from app.main.dao.services_dao import get_service_by_id_or_404
 from app.main.dao import templates_dao as tdao
 from app.main.dao import services_dao as sdao
 
 
-@main.route("/services/<service_id>/templates")
+form_objects = {
+    'email': EmailTemplateForm,
+    'sms': SMSTemplateForm
+}
+
+
+@main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
 @login_required
-def manage_service_templates(service_id):
-    return redirect(url_for(
-        '.choose_sms_template',
-        service_id=service_id
-    ))
+def add_service_template(service_id, template_type):
 
+    service = sdao.get_service_by_id_or_404(service_id)
 
-@main.route("/services/<service_id>/templates/add", methods=['GET', 'POST'])
-@login_required
-def add_service_template(service_id):
-    try:
-        service = sdao.get_service_by_id(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    if template_type not in ['sms', 'email']:
+        abort(404)
 
-    form = TemplateForm()
+    form = form_objects[template_type]()
 
     if form.validate_on_submit():
         tdao.insert_service_template(
-            form.name.data, form.template_content.data, service_id)
-        return redirect(url_for(
-            '.choose_sms_template', service_id=service_id))
+            form.name.data, template_type, form.template_content.data, service_id, form.subject.data or None
+        )
+        return redirect(
+            url_for('.choose_template', service_id=service_id, template_type=template_type)
+        )
+
     return render_template(
-        'views/edit-template.html',
-        h1='Add a text message template',
+        'views/edit-{}-template.html'.format(template_type),
         form=form,
-        service_id=service_id)
+        template_type=template_type,
+        service_id=service_id
+    )
 
 
 @main.route("/services/<service_id>/templates/<int:template_id>", methods=['GET', 'POST'])
@@ -51,20 +50,26 @@ def add_service_template(service_id):
 def edit_service_template(service_id, template_id):
     template = tdao.get_service_template_or_404(service_id, template_id)['data']
     template['template_content'] = template['content']
-    form = TemplateForm(**template)
+    form = form_objects[template['template_type']](**template)
 
     if form.validate_on_submit():
         tdao.update_service_template(
-            template_id, form.name.data,
-            form.template_content.data, service_id)
-        return redirect(url_for('.choose_sms_template', service_id=service_id))
+            template_id, form.name.data, template['template_type'],
+            form.template_content.data, service_id
+        )
+        return redirect(url_for(
+            '.choose_template',
+            service_id=service_id,
+            template_type=template['template_type']
+        ))
 
     return render_template(
-        'views/edit-template.html',
-        h1='Edit template',
+        'views/edit-{}-template.html'.format(template['template_type']),
         form=form,
         service_id=service_id,
-        template_id=template_id)
+        template_id=template_id,
+        template_type=template['template_type']
+    )
 
 
 @main.route("/services/<service_id>/templates/<int:template_id>/delete", methods=['GET', 'POST'])
@@ -74,13 +79,17 @@ def delete_service_template(service_id, template_id):
 
     if request.method == 'POST':
         tdao.delete_service_template(service_id, template_id)
-        return redirect(url_for('.manage_service_templates', service_id=service_id))
+        return redirect(url_for(
+            '.choose_template',
+            service_id=service_id,
+            template_type=template['template_type']
+        ))
 
     template['template_content'] = template['content']
-    form = TemplateForm(**template)
+    form = form_objects[template['template_type']](**template)
     flash('Are you sure you want to delete ‘{}’?'.format(form.name.data), 'delete')
     return render_template(
-        'views/edit-template.html',
+        'views/edit-{}-template.html'.format(template['template_type']),
         h1='Edit template',
         form=form,
         service_id=service_id,

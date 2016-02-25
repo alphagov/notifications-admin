@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 
 class Config(object):
@@ -21,9 +22,14 @@ class Config(object):
     SESSION_COOKIE_NAME = 'notify_admin_session'
     SESSION_COOKIE_PATH = '/admin'
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = True
     PERMANENT_SESSION_LIFETIME = 3600  # seconds
     SESSION_REFRESH_EACH_REQUEST = True
+    REMEMBER_COOKIE_NAME = 'notify_admin_remember_me'
+    REMEMBER_COOKIE_PATH = '/admin'
+    REMEMBER_COOKIE_DURATION = timedelta(days=1)
+    REMEMBER_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_SECURE = True
 
     API_HOST_NAME = os.getenv('API_HOST_NAME')
     NOTIFY_API_SECRET = os.getenv('NOTIFY_API_SECRET', "dev-secret")
@@ -54,6 +60,8 @@ class Development(Config):
     ADMIN_CLIENT_USER_NAME = 'dev-notify-admin'
     ADMIN_CLIENT_SECRET = 'dev-notify-secret-key'
     WTF_CSRF_ENABLED = False
+    REMEMBER_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
 
 
 class Test(Development):
@@ -64,7 +72,6 @@ class Test(Development):
 class Preview(Config):
     DEBUG = False
     HTTP_PROTOCOL = 'https'
-    SESSION_COOKIE_SECURE = True
     HEADER_COLOUR = '#F47738'  # $orange
 
 

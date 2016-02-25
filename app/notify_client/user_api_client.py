@@ -1,7 +1,7 @@
 from notifications_python_client.notifications import BaseAPIClient
 from notifications_python_client.errors import HTTPError
 
-from flask.ext.login import UserMixin
+from flask.ext.login import (UserMixin, login_fresh)
 
 
 class UserApiClient(BaseAPIClient):
@@ -81,6 +81,11 @@ class UserApiClient(BaseAPIClient):
                     return False, 'Code not found'
             raise e
 
+    def get_users_for_service(self, service_id):
+        endpoint = '/service/{}/users'.format(service_id)
+        resp = self.get(endpoint)
+        return resp['data']
+
 
 class User(UserMixin):
     def __init__(self, fields, max_failed_login_count=3):
@@ -99,6 +104,12 @@ class User(UserMixin):
 
     def is_active(self):
         return self.state == 'active'
+
+    def is_authenticated(self):
+        # To handle remember me token renewal
+        if not login_fresh():
+            return False
+        return super(User, self).is_authenticated()
 
     @property
     def id(self):

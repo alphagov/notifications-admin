@@ -28,15 +28,23 @@ from app.main.uploader import (
     s3download
 )
 from app.main.dao import templates_dao
+from app.main.dao import services_dao
 from app import job_api_client
-from app.utils import (
-    validate_phone_number,
-    InvalidPhoneError
-)
+from app.utils import validate_recipient, InvalidPhoneError, InvalidEmailError
+
+first_column_header = {
+    'email': 'email',
+    'sms': 'phone'
+}
 
 
-@main.route("/services/<service_id>/sms/send", methods=['GET'])
-def choose_sms_template(service_id):
+@main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
+def choose_template(service_id, template_type):
+
+    services_dao.get_service_by_id_or_404(service_id)
+
+    if template_type not in ['email', 'sms']:
+        abort(404)
     try:
         jobs = job_api_client.get_job(service_id)['data']
     except HTTPError as e:
@@ -44,23 +52,20 @@ def choose_sms_template(service_id):
             abort(404)
         else:
             raise e
-    print("="*80)
-    print(jobs)
-    print(len(jobs))
-    print(bool(len(jobs)))
     return render_template(
-        'views/choose-sms-template.html',
+        'views/choose-{}-template.html'.format(template_type),
         templates=[
             Template(template) for template in templates_dao.get_service_templates(service_id)['data']
+            if template['template_type'] == template_type
         ],
         has_jobs=len(jobs),
         service_id=service_id
     )
 
 
-@main.route("/services/<service_id>/sms/send/<template_id>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/send/<int:template_id>", methods=['GET', 'POST'])
 @login_required
-def send_sms(service_id, template_id):
+def send_messages(service_id, template_id):
 
     form = CsvUploadForm()
     if form.validate_on_submit():
@@ -70,48 +75,50 @@ def send_sms(service_id, template_id):
             upload_id = str(uuid.uuid4())
             s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
             session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
-            return redirect(url_for('.check_sms',
+            return redirect(url_for('.check_messages',
                                     service_id=service_id,
                                     upload_id=upload_id))
         except ValueError as e:
             flash('There was a problem uploading: {}'.format(csv_file.filename))
             flash(str(e))
-            return redirect(url_for('.send_sms', service_id=service_id, template_id=template_id))
+            return redirect(url_for('.send_messages', service_id=service_id, template_id=template_id))
 
+    service = services_dao.get_service_by_id_or_404(service_id)
     template = Template(
         templates_dao.get_service_template_or_404(service_id, template_id)['data']
     )
 
     return render_template(
-        'views/send-sms.html',
+        'views/send.html',
         template=template,
-        column_headers=['phone'] + template.placeholders_as_markup,
+        column_headers=[first_column_header[template.template_type]] + template.placeholders_as_markup,
         form=form,
+        service=service,
         service_id=service_id
     )
 
 
-@main.route("/services/<service_id>/sms/send/<template_id>.csv", methods=['GET'])
+@main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
 @login_required
 def get_example_csv(service_id, template_id):
     template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
     placeholders = list(Template(template).placeholders)
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(['phone'] + placeholders)
+    writer.writerow([first_column_header[template['template_type']]] + placeholders)
     writer.writerow([current_user.mobile_number] + ["test {}".format(header) for header in placeholders])
 
     return(output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'})
 
 
-@main.route("/services/<service_id>/sms/send/<template_id>/to-self", methods=['GET'])
+@main.route("/services/<service_id>/send/<template_id>/to-self", methods=['GET'])
 @login_required
-def send_sms_to_self(service_id, template_id):
+def send_message_to_self(service_id, template_id):
     template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
     placeholders = list(Template(template).placeholders)
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(['phone'] + placeholders)
+    writer.writerow([first_column_header[template['template_type']]] + placeholders)
     writer.writerow([current_user.mobile_number] + ["test {}".format(header) for header in placeholders])
     filedata = {
         'file_name': 'Test run',
@@ -121,35 +128,37 @@ def send_sms_to_self(service_id, template_id):
     s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
     session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
 
-    return redirect(url_for('.check_sms',
+    return redirect(url_for('.check_messages',
                             service_id=service_id,
                             upload_id=upload_id))
 
 
-@main.route("/services/<service_id>/sms/check/<upload_id>",
+@main.route("/services/<service_id>/check/<upload_id>",
             methods=['GET', 'POST'])
 @login_required
-def check_sms(service_id, upload_id):
+def check_messages(service_id, upload_id):
+
+    upload_data = session['upload_data']
+    template_id = upload_data.get('template_id')
 
     if request.method == 'GET':
         contents = s3download(service_id, upload_id)
         if not contents:
             flash('There was a problem reading your upload file')
-        upload_data = session['upload_data']
-        template_id = upload_data.get('template_id')
         raw_template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
+        recipient_type = first_column_header[raw_template['template_type']]
         upload_result = _get_rows(contents, raw_template)
         session['upload_data']['notification_count'] = len(upload_result['rows'])
         template = Template(
             raw_template,
             values=upload_result['rows'][0] if upload_result['valid'] else {},
-            drop_values={'phone'}
+            drop_values={recipient_type}
         )
         return render_template(
             'views/check-sms.html',
             upload_result=upload_result,
             template=template,
-            column_headers=['phone number'] + list(
+            column_headers=[recipient_type] + list(
                 template.placeholders if upload_result['valid'] else template.placeholders_as_markup
             ),
             original_file_name=upload_data.get('original_file_name'),
@@ -157,9 +166,7 @@ def check_sms(service_id, upload_id):
             form=CsvUploadForm()
         )
     elif request.method == 'POST':
-        upload_data = session['upload_data']
         original_file_name = upload_data.get('original_file_name')
-        template_id = upload_data.get('template_id')
         notification_count = upload_data.get('notification_count')
         session.pop('upload_data')
         try:
@@ -171,9 +178,9 @@ def check_sms(service_id, upload_id):
                 raise e
 
         flash('We’ve started sending your messages', 'default_with_tick')
-        return redirect(url_for('main.view_job',
-                        service_id=service_id,
-                        job_id=upload_id))
+        return redirect(
+            url_for('main.view_job', service_id=service_id, job_id=upload_id)
+        )
 
 
 def _get_filedata(file):
@@ -196,8 +203,12 @@ def _get_rows(contents, raw_template):
     for row in reader:
         rows.append(row)
         try:
-            validate_phone_number(row['phone'])
-            Template(raw_template, values=row, drop_values={'phone'}).replaced
-        except (InvalidPhoneError, NeededByTemplateError, NoPlaceholderForDataError):
+            recipient_column = first_column_header[raw_template['template_type']]
+            validate_recipient(
+                row[recipient_column],
+                template_type=raw_template['template_type']
+            )
+            Template(raw_template, values=row, drop_values={recipient_column}).replaced
+        except (InvalidEmailError, InvalidPhoneError, NeededByTemplateError, NoPlaceholderForDataError):
             valid = False
     return {"valid": valid, "rows": rows}
