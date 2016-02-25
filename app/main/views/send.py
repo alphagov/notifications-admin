@@ -1,9 +1,6 @@
 import csv
 import io
 import uuid
-import botocore
-
-from datetime import date
 
 from flask import (
     request,
@@ -17,7 +14,6 @@ from flask import (
 )
 
 from flask_login import login_required, current_user
-from werkzeug import secure_filename
 from notifications_python_client.errors import HTTPError
 from utils.template import Template, NeededByTemplateError, NoPlaceholderForDataError
 
@@ -31,11 +27,6 @@ from app.main.dao import templates_dao
 from app.main.dao import services_dao
 from app import job_api_client
 from app.utils import validate_recipient, InvalidPhoneError, InvalidEmailError
-
-first_column_header = {
-    'email': 'email',
-    'sms': 'phone'
-}
 
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
@@ -91,7 +82,7 @@ def send_messages(service_id, template_id):
     return render_template(
         'views/send.html',
         template=template,
-        column_headers=[first_column_header[template.template_type]] + template.placeholders_as_markup,
+        column_headers=['to'] + template.placeholders_as_markup,
         form=form,
         service=service,
         service_id=service_id
@@ -105,10 +96,9 @@ def get_example_csv(service_id, template_id):
     placeholders = list(Template(template).placeholders)
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow([first_column_header[template['template_type']]] + placeholders)
+    writer.writerow(['to'] + placeholders)
     writer.writerow([current_user.mobile_number] + ["test {}".format(header) for header in placeholders])
-
-    return(output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'})
+    return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
 
 
 @main.route("/services/<service_id>/send/<template_id>/to-self", methods=['GET'])
@@ -118,7 +108,7 @@ def send_message_to_self(service_id, template_id):
     placeholders = list(Template(template).placeholders)
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow([first_column_header[template['template_type']]] + placeholders)
+    writer.writerow(['to'] + placeholders)
     writer.writerow([current_user.mobile_number] + ["test {}".format(header) for header in placeholders])
     filedata = {
         'file_name': 'Test run',
@@ -146,19 +136,18 @@ def check_messages(service_id, upload_id):
         if not contents:
             flash('There was a problem reading your upload file')
         raw_template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
-        recipient_type = first_column_header[raw_template['template_type']]
         upload_result = _get_rows(contents, raw_template)
         session['upload_data']['notification_count'] = len(upload_result['rows'])
         template = Template(
             raw_template,
             values=upload_result['rows'][0] if upload_result['valid'] else {},
-            drop_values={recipient_type}
+            drop_values={'to'}
         )
         return render_template(
             'views/check-sms.html',
             upload_result=upload_result,
             template=template,
-            column_headers=[recipient_type] + list(
+            column_headers=['to'] + list(
                 template.placeholders if upload_result['valid'] else template.placeholders_as_markup
             ),
             original_file_name=upload_data.get('original_file_name'),
@@ -203,12 +192,11 @@ def _get_rows(contents, raw_template):
     for row in reader:
         rows.append(row)
         try:
-            recipient_column = first_column_header[raw_template['template_type']]
             validate_recipient(
-                row[recipient_column],
+                row['to'],
                 template_type=raw_template['template_type']
             )
-            Template(raw_template, values=row, drop_values={recipient_column}).replaced
+            Template(raw_template, values=row, drop_values={'to'}).replaced
         except (InvalidEmailError, InvalidPhoneError, NeededByTemplateError, NoPlaceholderForDataError):
             valid = False
     return {"valid": valid, "rows": rows}

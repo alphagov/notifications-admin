@@ -53,13 +53,13 @@
     caption=original_file_name,
     field_headings=column_headers
   ) %}
-    {% if item.phone|valid_phone_number %}
+    {% if item.to|valid_phone_number %}
       {% call field() %}
-        {{ item.phone }}
+        {{ item.to }}
       {% endcall %}
     {% else %}
       {% call field(status='missing') %}
-        {{ item.phone }}
+        {{ item.to }}
       {% endcall %}
     {% endif %}
     {% for column in template.placeholders %}
