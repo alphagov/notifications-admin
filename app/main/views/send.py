@@ -105,7 +105,12 @@ def get_example_csv(service_id, template_id):
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(['to'] + placeholders)
-    writer.writerow([current_user.mobile_number] + ["test {}".format(header) for header in placeholders])
+    writer.writerow([
+        {
+            'email': current_user.email_address,
+            'sms': current_user.mobile_number
+        }[template['template_type']]
+    ] + ["test {}".format(header) for header in placeholders])
     return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
 
 
