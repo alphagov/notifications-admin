@@ -35,7 +35,7 @@
             </li>
           </ol>
         """.format(
-          url_for(".add_service_template", service_id=service_id),
+          url_for(".add_service_template", service_id=service_id, template_type="sms"),
           url_for(".choose_template", service_id=service_id, template_type="sms")
         )|safe,
         subhead='Get started',
