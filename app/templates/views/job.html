@@ -14,13 +14,22 @@
       {{ uploaded_file_name }}
     </h1>
 
-    <div class="grid-row">
-      <div class="column-two-thirds">
-        {{ sms_message(
-          template.formatted_as_markup,
-        )}}
+    {% if 'sms' == template.template_type %}
+      <div class="grid-row">
+        <div class="column-two-thirds">
+          {{ sms_message(
+            template,
+          )}}
+        </div>
       </div>
-    </div>
+    {% elif 'email' == template.template_type %}
+      {{ email_message(
+        template.subject,
+        template,
+        from_address='{}@notifications.service.gov.uk'.format(service.email_from),
+        from_name=service.name
+      )}}
+    {% endif %}
 
     <p class='heading-small'>
       Started {{ uploaded_file_time|format_datetime }}

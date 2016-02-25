@@ -13,6 +13,7 @@ from utils.template import Template
 from app import job_api_client
 from app.main import main
 from app.main.dao import templates_dao
+from app.main.dao import services_dao
 
 now = time.strftime('%H:%M')
 
@@ -37,6 +38,7 @@ def view_jobs(service_id):
 @main.route("/services/<service_id>/jobs/<job_id>")
 @login_required
 def view_job(service_id, job_id):
+    service = services_dao.get_service_by_id_or_404(service_id)
     try:
         job = job_api_client.get_job(service_id, job_id)['data']
         messages = []
@@ -58,7 +60,8 @@ def view_job(service_id, job_id):
             template=Template(
                 templates_dao.get_service_template_or_404(service_id, job['template'])['data']
             ),
-            service_id=service_id
+            service_id=service_id,
+            service=service
         )
     except HTTPError as e:
         if e.status_code == 404:

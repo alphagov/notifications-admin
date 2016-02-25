@@ -1,15 +1,16 @@
 {% extends "withnav_template.html" %}
+{% from "components/email-message.html" import email_message %}
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
 
 {% block page_title %}
-  Send text messages – GOV.UK Notify
+  {{ page_heading }} – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Send text messages</h1>
+  <h1 class="heading-large">{{ page_heading }}</h1>
 
   <form method="POST" enctype="multipart/form-data">
 
@@ -26,7 +27,15 @@
       <div class="grid-row">
         {% for template in templates %}
           <div class="column-two-thirds">
-            {{ sms_message(template.formatted_as_markup, name=template.name) }}
+            {% if 'email' == template_type %}
+              {{ email_message(
+                template.subject,
+                template.formatted_as_markup,
+                name=template.name
+              ) }}
+            {% elif 'sms' == template_type %}
+              {{ sms_message(template.formatted_as_markup, name=template.name) }}
+            {% endif %}
           </div>
           <div class="column-one-third">
             <div class="sms-message-use-links">
@@ -40,7 +49,7 @@
     {% endif %}
 
     <p>
-      <a href="{{ url_for('.add_service_template', service_id=service_id, template_type='sms') }}" class="button">Add a new template</a>
+      <a href="{{ url_for('.add_service_template', service_id=service_id, template_type=template_type) }}" class="button">Add a new template</a>
     </p>
 
   </form>
