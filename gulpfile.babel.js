@@ -103,11 +103,10 @@ gulp.task('watchForChanges', function() {
 });
 
 gulp.task('lint:sass', () => gulp
-// Removed until gulp-sass-lint installs cleanly
-//  .src(paths.src + 'stylesheets/**/*.scss')
-//    .pipe(plugins.sassLint())
-//    .pipe(plugins.sassLint.format(stylish))
-//    .pipe(plugins.sassLint.failOnError())
+  .src(paths.src + 'stylesheets/**/*.scss')
+    .pipe(plugins.sassLint())
+    .pipe(plugins.sassLint.format(stylish))
+    .pipe(plugins.sassLint.failOnError())
 );
 
 gulp.task('lint:js', () => gulp
