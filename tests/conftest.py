@@ -526,3 +526,10 @@ def mock_get_users_by_service(mocker):
                  'failed_login_count': 0}]
         return data
     return mocker.patch('app.user_api_client.get_users_for_service', side_effect=_get_users_for_service, autospec=True)
+
+
+@pytest.fixture(scope='function')
+def mock_s3_upload(mocker):
+    def _upload(upload_id, service_id, filedata, region):
+        pass
+    return mocker.patch('app.main.views.send.s3upload', side_effect=_upload)

@@ -79,7 +79,7 @@ def send_messages(service_id, template_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
-            csv_file = form.file.data
+            csv_file = form.file
             filedata = _get_filedata(csv_file)
             upload_id = str(uuid.uuid4())
             s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
@@ -88,7 +88,7 @@ def send_messages(service_id, template_id):
                                     service_id=service_id,
                                     upload_id=upload_id))
         except ValueError as e:
-            flash('There was a problem uploading: {}'.format(csv_file.filename))
+            flash('There was a problem uploading: {}'.format(csv_file.data.filename))
             flash(str(e))
             return redirect(url_for('.send_messages', service_id=service_id, template_id=template_id))
 
@@ -199,17 +199,34 @@ def check_messages(service_id, upload_id):
 
 
 def _get_filedata(file):
-    lines = file.read().decode('utf-8').splitlines()
-    if len(lines) < 2:  # must be at least header and one line
-        message = 'The file {} contained no data'.format(file.filename)
+    import itertools
+    reader = csv.reader(
+        file.data.getvalue().decode('utf-8').splitlines(),
+        quoting=csv.QUOTE_NONE,
+        skipinitialspace=True
+    )
+    lines = []
+    for row in reader:
+        non_empties = itertools.dropwhile(lambda x: x.strip() == '', row)
+        has_content = []
+        for item in non_empties:
+            has_content.append(item)
+        if has_content:
+            lines.append(row)
+
+    if len(lines) < 2:  # must be header row and at least one data row
+        message = 'The file {} contained no data'.format(file.data.filename)
         raise ValueError(message)
-    return {'file_name': file.filename, 'data': lines}
+
+    content_lines = []
+    for row in lines:
+        content_lines.append(','.join(row).rstrip(','))
+    return {'file_name': file.data.filename, 'data': content_lines}
 
 
 def _get_rows(contents, raw_template):
     reader = csv.DictReader(
         contents.split('\n'),
-        lineterminator='\n',
         quoting=csv.QUOTE_NONE,
         skipinitialspace=True
     )
