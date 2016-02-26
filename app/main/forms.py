@@ -164,13 +164,13 @@ class AddServiceForm(Form):
     name = StringField(
         'Service name',
         validators=[
-            DataRequired(message='Service name can not be empty')
+            DataRequired(message='Service name can’t be empty')
         ]
     )
 
     def validate_name(self, a):
         if a.data in self._names_func():
-            raise ValidationError('Service name already exists')
+            raise ValidationError('This service name is already in use')
 
 
 class ServiceNameForm(Form):

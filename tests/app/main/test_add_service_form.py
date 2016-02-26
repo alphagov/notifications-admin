@@ -9,4 +9,4 @@ def test_form_should_have_errors_when_duplicate_service_is_added(app_):
         form = AddServiceForm(_get_form_names,
                               formdata=MultiDict([('name', 'some service')]))
         form.validate()
-        assert {'name': ['Service name already exists']} == form.errors
+        assert {'name': ['This service name is already in use']} == form.errors
