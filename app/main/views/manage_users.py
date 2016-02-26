@@ -34,14 +34,19 @@ fake_users = [
 @main.route("/services/<service_id>/users")
 @login_required
 def manage_users(service_id):
-    users = user_api_client.get_users_for_service(service_id=service_id)
-    return render_template(
-        'views/manage-users.html',
-        service_id=service_id,
-        users=users,
-        current_user=current_user,
-        invited_users=[]
-    )
+    try:
+        users = user_api_client.get_users_for_service(service_id=service_id)
+        invited_users = invite_api_client.get_invites_for_service(service_id=service_id)
+        return render_template('views/manage-users.html',
+                               service_id=service_id,
+                               users=users,
+                               current_user=current_user,
+                               invited_users=invited_users)
+    except HTTPError as e:
+        if e.status_code == 404:
+            abort(404)
+        else:
+            raise e
 
 
 @main.route("/services/<service_id>/users/invite", methods=['GET', 'POST'])

@@ -41,7 +41,7 @@ Manage users – GOV.UK Notify
       invited_users, caption='Invited', **table_options
     ) %}
       {% call field() %}
-        {{ item.email_localpart }}
+        {{ item.email_address }}
       {% endcall %}
       {{ boolean_field(item.permission_send_messages) }}
       {{ boolean_field(item.permission_manage_service) }}

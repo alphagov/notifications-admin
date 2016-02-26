@@ -21,3 +21,8 @@ class InviteApiClient(BaseAPIClient):
         }
         resp = self.post(url='/service/{}/invite'.format(service_id), data=data)
         return resp['data']
+
+    def get_invites_for_service(self, service_id):
+        endpoint = '/service/{}/invite'.format(service_id)
+        resp = self.get(endpoint)
+        return resp['data']
