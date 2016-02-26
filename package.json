@@ -38,6 +38,7 @@
   "devDependencies": {
     "gulp-css-url-adjuster": "0.2.3",
     "gulp-jshint": "2.0.0",
+    "gulp-sass-lint": "1.1.1",
     "jshint": "2.9.1",
     "jshint-stylish": "2.1.0"
   }
