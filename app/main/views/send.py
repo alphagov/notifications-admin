@@ -34,6 +34,13 @@ page_headings = {
 }
 
 
+@main.route("/services/<service_id>/send/letters", methods=['GET'])
+def letters_stub(service_id):
+    return render_template(
+        'views/letters.html', service_id=service_id
+    )
+
+
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
 def choose_template(service_id, template_type):
 
