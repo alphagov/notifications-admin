@@ -51,7 +51,10 @@ def choose_template(service_id, template_type):
     return render_template(
         'views/choose-template.html',
         templates=[
-            Template(template) for template in templates_dao.get_service_templates(service_id)['data']
+            Template(
+                template,
+                prefix=service['name']
+            ) for template in templates_dao.get_service_templates(service_id)['data']
             if template['template_type'] == template_type
         ],
         template_type=template_type,
@@ -84,7 +87,8 @@ def send_messages(service_id, template_id):
 
     service = services_dao.get_service_by_id_or_404(service_id)
     template = Template(
-        templates_dao.get_service_template_or_404(service_id, template_id)['data']
+        templates_dao.get_service_template_or_404(service_id, template_id)['data'],
+        prefix=service['name']
     )
 
     return render_template(
@@ -155,7 +159,8 @@ def check_messages(service_id, upload_id):
         template = Template(
             raw_template,
             values=upload_result['rows'][0] if upload_result['valid'] else {},
-            drop_values={'to'}
+            drop_values={'to'},
+            prefix=service['name']
         )
         return render_template(
             'views/check.html',

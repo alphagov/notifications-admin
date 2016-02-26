@@ -58,7 +58,8 @@ def view_job(service_id, job_id):
             uploaded_file_name=job['original_file_name'],
             uploaded_file_time=job['created_at'],
             template=Template(
-                templates_dao.get_service_template_or_404(service_id, job['template'])['data']
+                templates_dao.get_service_template_or_404(service_id, job['template'])['data'],
+                prefix=service['name']
             ),
             service_id=service_id,
             service=service

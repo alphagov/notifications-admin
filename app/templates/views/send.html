@@ -16,13 +16,13 @@
   {% if 'sms' == template.template_type %}
     <div class="grid-row">
       <div class="column-two-thirds">
-        {{ sms_message(template) }}
+        {{ sms_message(template.formatted_as_markup) }}
       </div>
     </div>
   {% elif 'email' == template.template_type %}
     {{ email_message(
       template.subject,
-      template,
+      template.formatted_as_markup,
       from_address='{}@notifications.service.gov.uk'.format(service.email_from),
       from_name=service.name
     ) }}
