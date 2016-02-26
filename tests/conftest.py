@@ -9,7 +9,8 @@ from . import (
     TestClient,
     template_json,
     api_key_json,
-    job_json
+    job_json,
+    invite_json
 )
 
 
@@ -545,3 +546,17 @@ def mock_create_invite(mocker):
                 'status': 'pending'}
         return data
     return mocker.patch('app.invite_api_client.create_invite', side_effect=_create_invite)
+
+
+@pytest.fixture(scope='function')
+def mock_get_invites_for_service(mocker, service_one):
+    def _get_invites(service_id):
+        data = []
+        from_user = service_one['users'][0]
+        service_id = service_one['id']
+        for i in range(0, 5):
+            email_address = 'user_{}@testnotify.gov.uk'.format(i)
+            invite = invite_json(uuid.uuid4(), from_user, service_id, email_address)
+            data.append(invite)
+        return data
+    return mocker.patch('app.invite_api_client.get_invites_for_service', side_effect=_get_invites)
