@@ -7,13 +7,18 @@ from flask import (
     flash
 )
 
-from flask_login import login_required, current_user
+from flask_login import (
+    login_required,
+    current_user
+)
+
+from notifications_python_client.errors import HTTPError
 
 from app.main import main
-from app.main.dao import users_dao
 from app.main.forms import InviteUserForm
 from app.main.dao.services_dao import get_service_by_id_or_404
 from app import user_api_client
+from app import invite_api_client
 
 fake_users = [
     {
@@ -44,10 +49,18 @@ def manage_users(service_id):
 def invite_user(service_id):
 
     form = InviteUserForm()
-
     if form.validate_on_submit():
-        flash('Invite sent to {}'.format(form.email_address.data), 'default_with_tick')
-        return redirect(url_for('.manage_users', service_id=service_id))
+        email_address = form.email_address.data
+        try:
+            resp = invite_api_client.create_invite(current_user.id, service_id, email_address)
+            flash('Invite sent to {}'.format(resp['email_address']), 'default_with_tick')
+            return redirect(url_for('.manage_users', service_id=service_id))
+
+        except HTTPError as e:
+            if e.status_code == 404:
+                abort(404)
+            else:
+                raise e
 
     return render_template(
         'views/invite-user.html',
