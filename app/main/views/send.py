@@ -167,9 +167,7 @@ def check_messages(service_id, upload_id):
             upload_result=upload_result,
             template=template,
             page_heading=page_headings[template.template_type],
-            column_headers=['to'] + list(
-                template.placeholders if upload_result['valid'] else template.placeholders_as_markup
-            ),
+            column_headers=['to'] + list(template.placeholders_as_markup),
             original_file_name=upload_data.get('original_file_name'),
             service_id=service_id,
             service=service,
