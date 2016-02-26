@@ -28,11 +28,16 @@ from app.main.dao import services_dao
 from app import job_api_client
 from app.utils import validate_recipient, InvalidPhoneError, InvalidEmailError
 
+page_headings = {
+    'email': 'Send emails',
+    'sms': 'Send text messages'
+}
+
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
 def choose_template(service_id, template_type):
 
-    services_dao.get_service_by_id_or_404(service_id)
+    service = services_dao.get_service_by_id_or_404(service_id)
 
     if template_type not in ['email', 'sms']:
         abort(404)
@@ -44,11 +49,17 @@ def choose_template(service_id, template_type):
         else:
             raise e
     return render_template(
-        'views/choose-{}-template.html'.format(template_type),
+        'views/choose-template.html',
         templates=[
-            Template(template) for template in templates_dao.get_service_templates(service_id)['data']
+            Template(
+                template,
+                prefix=service['name']
+            ) for template in templates_dao.get_service_templates(service_id)['data']
             if template['template_type'] == template_type
         ],
+        template_type=template_type,
+        page_heading=page_headings[template_type],
+        service=service,
         has_jobs=len(jobs),
         service_id=service_id
     )
@@ -76,7 +87,8 @@ def send_messages(service_id, template_id):
 
     service = services_dao.get_service_by_id_or_404(service_id)
     template = Template(
-        templates_dao.get_service_template_or_404(service_id, template_id)['data']
+        templates_dao.get_service_template_or_404(service_id, template_id)['data'],
+        prefix=service['name']
     )
 
     return render_template(
@@ -97,7 +109,12 @@ def get_example_csv(service_id, template_id):
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(['to'] + placeholders)
-    writer.writerow([current_user.mobile_number] + ["test {}".format(header) for header in placeholders])
+    writer.writerow([
+        {
+            'email': current_user.email_address,
+            'sms': current_user.mobile_number
+        }[template['template_type']]
+    ] + ["test {}".format(header) for header in placeholders])
     return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
 
 
@@ -130,6 +147,7 @@ def check_messages(service_id, upload_id):
 
     upload_data = session['upload_data']
     template_id = upload_data.get('template_id')
+    service = services_dao.get_service_by_id_or_404(service_id)
 
     if request.method == 'GET':
         contents = s3download(service_id, upload_id)
@@ -141,17 +159,18 @@ def check_messages(service_id, upload_id):
         template = Template(
             raw_template,
             values=upload_result['rows'][0] if upload_result['valid'] else {},
-            drop_values={'to'}
+            drop_values={'to'},
+            prefix=service['name']
         )
         return render_template(
-            'views/check-sms.html',
+            'views/check.html',
             upload_result=upload_result,
             template=template,
-            column_headers=['to'] + list(
-                template.placeholders if upload_result['valid'] else template.placeholders_as_markup
-            ),
+            page_heading=page_headings[template.template_type],
+            column_headers=['to'] + list(template.placeholders_as_markup),
             original_file_name=upload_data.get('original_file_name'),
             service_id=service_id,
+            service=service,
             form=CsvUploadForm()
         )
     elif request.method == 'POST':
@@ -193,7 +212,7 @@ def _get_rows(contents, raw_template):
         rows.append(row)
         try:
             validate_recipient(
-                row['to'],
+                row.get('to', ''),
                 template_type=raw_template['template_type']
             )
             Template(raw_template, values=row, drop_values={'to'}).replaced

@@ -27,6 +27,7 @@ def test_should_show_page_for_one_job(app_,
                                       mock_login,
                                       mock_get_user,
                                       mock_get_user_by_email,
+                                      mock_get_service,
                                       mock_get_service_template,
                                       job_data,
                                       mock_get_job):
