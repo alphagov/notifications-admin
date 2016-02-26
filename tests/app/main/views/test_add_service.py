@@ -47,7 +47,7 @@ def test_should_return_form_errors_when_service_name_is_empty(app_,
             client.login(api_user_active)
             response = client.post(url_for('main.add_service'), data={})
             assert response.status_code == 200
-            assert 'Service name can not be empty' in response.get_data(as_text=True)
+            assert 'Service name can’t be empty' in response.get_data(as_text=True)
 
 
 def test_should_return_form_errors_with_duplicate_service_name(app_,
@@ -62,5 +62,5 @@ def test_should_return_form_errors_with_duplicate_service_name(app_,
             response = client.post(
                 url_for('main.add_service'), data={'name': 'service_one'})
             assert response.status_code == 200
-            assert 'Service name already exists' in response.get_data(as_text=True)
+            assert 'This service name is already in use' in response.get_data(as_text=True)
             assert mock_get_services.called
