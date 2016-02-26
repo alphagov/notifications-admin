@@ -1,4 +1,4 @@
-import os
+import uuid
 from datetime import date
 import pytest
 
@@ -533,3 +533,15 @@ def mock_s3_upload(mocker):
     def _upload(upload_id, service_id, filedata, region):
         pass
     return mocker.patch('app.main.views.send.s3upload', side_effect=_upload)
+
+
+@pytest.fixture(scope='function')
+def mock_create_invite(mocker):
+    def _create_invite(from_user, service_id, email_address):
+        data = {'id': uuid.uuid4(),
+                'from_user': from_user,
+                'service': service_id,
+                'email_address': email_address,
+                'status': 'pending'}
+        return data
+    return mocker.patch('app.invite_api_client.create_invite', side_effect=_create_invite)
