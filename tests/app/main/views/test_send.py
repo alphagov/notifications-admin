@@ -62,6 +62,7 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
     api_user_active,
     mocker,
     mock_login,
+    mock_get_service,
     mock_get_service_template,
     mock_s3_upload
 ):
@@ -92,6 +93,7 @@ def test_upload_csvfile_removes_empty_lines_and_trailing_commas(
     api_user_active,
     mocker,
     mock_login,
+    mock_get_service,
     mock_get_service_template,
     mock_s3_upload
 ):
@@ -123,6 +125,7 @@ def test_send_test_message_to_self(
     mocker,
     api_user_active,
     mock_login,
+    mock_get_service,
     mock_get_service_template,
     mock_s3_upload
 ):
@@ -146,6 +149,7 @@ def test_download_example_csv(
     mocker,
     api_user_active,
     mock_login,
+    mock_get_service,
     mock_get_service_template
 ):
 
@@ -166,6 +170,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mocker,
     api_user_active,
     mock_login,
+    mock_get_service,
     mock_get_service_template,
     mock_s3_upload
 ):
@@ -205,6 +210,7 @@ def test_create_job_should_call_api(
     job_data,
     mock_create_job,
     mock_get_job,
+    mock_get_service,
     mock_get_service_template
 ):
 
