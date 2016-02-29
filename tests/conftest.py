@@ -538,12 +538,13 @@ def mock_s3_upload(mocker):
 
 @pytest.fixture(scope='function')
 def mock_create_invite(mocker):
-    def _create_invite(from_user, service_id, email_address):
+    def _create_invite(from_user, service_id, email_address, permissions):
         data = {'id': uuid.uuid4(),
                 'from_user': from_user,
                 'service': service_id,
                 'email_address': email_address,
-                'status': 'pending'}
+                'status': 'pending',
+                'permissions': permissions}
         return data
     return mocker.patch('app.invite_api_client.create_invite', side_effect=_create_invite)
 

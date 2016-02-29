@@ -28,6 +28,7 @@ Manage users – GOV.UK Notify
         <legend class='heading-small'>
           Permissions
         </legend>
+        <span class="form-hint">All team members can see message history</span>
         {{ yes_no('send_messages', 'Send messages', user.permission_send_messages) }}
         {{ yes_no('manage_service', 'Manage service', user.permission_manage_service) }}
         {{ yes_no('manage_api_keys', 'Manage API keys', user.permission_manage_api_keys) }}

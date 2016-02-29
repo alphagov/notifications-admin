@@ -83,18 +83,22 @@ def test_invite_user(
     from_user = api_user_active.id
     service_id = service_one['id']
     email_address = 'test@example.gov.uk'
+    permissions = 'send_messages,manage_service,manage_api_keys'
 
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.post(
                 url_for('main.invite_user', service_id=service_id),
-                data={'email_address': email_address},
+                data={'email_address': email_address,
+                      'send_messages': 'yes',
+                      'manage_service': 'yes',
+                      'manage_api_keys': 'yes'},
                 follow_redirects=True
             )
 
         assert response.status_code == 200
-        mock_create_invite.assert_called_with(from_user, service_id, email_address)
+        mock_create_invite.assert_called_with(from_user, service_id, email_address, permissions)
         mock_get_invites_for_service.assert_called_with(service_id=service_id)
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Manage team'
