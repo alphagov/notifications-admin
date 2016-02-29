@@ -13,11 +13,12 @@ class InviteApiClient(BaseAPIClient):
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
 
-    def create_invite(self, invite_from_id, service_id, email_address):
+    def create_invite(self, invite_from_id, service_id, email_address, permissions):
         data = {
             'service': str(service_id),
             'email_address': email_address,
-            'from_user': invite_from_id
+            'from_user': invite_from_id,
+            'permissions': permissions
         }
         resp = self.post(url='/service/{}/invite'.format(service_id), data=data)
         return resp['data']

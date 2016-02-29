@@ -56,8 +56,9 @@ def invite_user(service_id):
     form = InviteUserForm()
     if form.validate_on_submit():
         email_address = form.email_address.data
+        permissions = _get_permissions(request.form)
         try:
-            resp = invite_api_client.create_invite(current_user.id, service_id, email_address)
+            resp = invite_api_client.create_invite(current_user.id, service_id, email_address, permissions)
             flash('Invite sent to {}'.format(resp['email_address']), 'default_with_tick')
             return redirect(url_for('.manage_users', service_id=service_id))
 
@@ -113,3 +114,14 @@ def delete_user(service_id, user_id):
         service=get_service_by_id_or_404(service_id),
         service_id=service_id
     )
+
+
+def _get_permissions(form):
+    permissions = []
+    if form.get('send_messages') and form['send_messages'] == 'yes':
+        permissions.append('send_messages')
+    if form.get('manage_service') and form['manage_service'] == 'yes':
+        permissions.append('manage_service')
+    if form.get('manage_api_keys') and form['manage_api_keys'] == 'yes':
+        permissions.append('manage_api_keys')
+    return ','.join(permissions)
