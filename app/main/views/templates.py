@@ -5,6 +5,7 @@ from notifications_python_client.errors import HTTPError
 from utils.template import Template
 
 from app.main import main
+from app.utils import user_has_permissions
 from app.main.forms import SMSTemplateForm, EmailTemplateForm
 from app import job_api_client
 from app.main.dao.services_dao import get_service_by_id_or_404
@@ -20,6 +21,7 @@ form_objects = {
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_templates')
 def add_service_template(service_id, template_type):
 
     service = sdao.get_service_by_id_or_404(service_id)
@@ -51,6 +53,7 @@ def add_service_template(service_id, template_type):
 
 @main.route("/services/<service_id>/templates/<int:template_id>", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_templates')
 def edit_service_template(service_id, template_id):
     template = tdao.get_service_template_or_404(service_id, template_id)['data']
     template['template_content'] = template['content']
@@ -78,6 +81,7 @@ def edit_service_template(service_id, template_id):
 
 @main.route("/services/<service_id>/templates/<int:template_id>/delete", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_templates')
 def delete_service_template(service_id, template_id):
     template = tdao.get_service_template_or_404(service_id, template_id)['data']
 
