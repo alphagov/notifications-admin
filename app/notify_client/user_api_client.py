@@ -167,8 +167,10 @@ class User(UserMixin):
     def permissions(self, permissions):
         raise AttributeError("Read only property")
 
-    def has_permissions(self, service_id, permissions):
+    def has_permissions(self, service_id, permissions, or_=False):
         if service_id in self._permissions:
+            if or_:
+                return any([x in self._permissions[service_id] for x in permissions])
             return set(self._permissions[service_id]) > set(permissions)
         return False
 
