@@ -12,7 +12,10 @@ from app.main.forms import TwoFactorForm
 @main.route('/two-factor', methods=['GET', 'POST'])
 def two_factor():
     # TODO handle user_email not in session
-    user_id = session['user_details']['id']
+    try:
+        user_id = session['user_details']['id']
+    except KeyError:
+        return redirect('main.sign_in')
 
     def _check_code(code):
         return users_dao.check_verify_code(user_id, code, "sms")
@@ -27,7 +30,7 @@ def two_factor():
             if 'password' in session['user_details']:
                 user.set_password(session['user_details']['password'])
                 users_dao.update_user(user)
-            login_user(user)
+            login_user(user, remember=form.remember_me.data if form.remember_me.data else False)
         finally:
             del session['user_details']
         if (len(services) == 1):

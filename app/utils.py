@@ -1,3 +1,5 @@
+import re
+
 from functools import wraps
 from flask import (abort, session)
 
@@ -26,6 +28,11 @@ class BrowsableItem(object):
     @property
     def destructive(self):
         pass
+
+
+class InvalidEmailError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 
 class InvalidPhoneError(Exception):
@@ -72,6 +79,19 @@ def format_phone_number(number):
     if len(number) < 9:
         raise InvalidPhoneError('Not enough digits')
     return '+447{}{}{}'.format(*re.findall('...', number))
+
+
+def validate_email_address(email_address):
+    if re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email_address):
+        return
+    raise InvalidEmailError('Not a valid email address')
+
+
+def validate_recipient(recipient, template_type):
+    return {
+        'email': validate_email_address,
+        'sms': validate_phone_number
+    }[template_type](recipient)
 
 
 def user_has_permissions(*permissions):

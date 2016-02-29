@@ -1,0 +1,30 @@
+{% macro checkbox(
+  field,
+  hint=False,
+  help_link=None,
+  help_link_text=None,
+  width='2-3',
+  suffix=None
+) %}
+    <label class="form-checkbox" for="{{ field.name }}">
+        {{ field.label }}
+        {% if hint %}
+            <span class="form-hint">
+                {{ hint }}
+            </span>
+        {% endif %}
+        {% if field.errors %}
+            <span class="error-message">
+                {{ field.errors[0] }}
+            </span>
+        {% endif %}
+        {{ field(**{
+            'class': 'form-control form-control-{} textbox-highlight-textbox'.format(width) if highlight_tags else 'form-control form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else ''),
+            'data-module': 'highlight-tags' if highlight_tags else ''})}}
+        {% if help_link and help_link_text %}
+            <p class="textbox-help-link">
+                <a href='{{ help_link }}'>{{ help_link_text }}</a>
+            </p>
+        {% endif %}
+    </label>
+{% endmacro %}

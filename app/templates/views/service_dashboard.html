@@ -35,8 +35,8 @@
             </li>
           </ol>
         """.format(
-          url_for(".add_service_template", service_id=service_id),
-          url_for(".choose_sms_template", service_id=service_id)
+          url_for(".add_service_template", service_id=service_id, template_type="sms"),
+          url_for(".choose_template", service_id=service_id, template_type="sms")
         )|safe,
         subhead='Get started',
         type="tip"
@@ -46,7 +46,7 @@
         """
           <a href='{}'>Send yourself a text message</a>
         """.format(
-          url_for(".choose_sms_template", service_id=service_id)
+          url_for(".choose_template", service_id=service_id, template_type="sms")
         )|safe,
         subhead='Next step',
         type="tip"

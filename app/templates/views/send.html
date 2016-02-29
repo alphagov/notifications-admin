@@ -1,0 +1,54 @@
+{% extends "withnav_template.html" %}
+{% from "components/sms-message.html" import sms_message %}
+{% from "components/email-message.html" import email_message %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/table.html" import list_table, field %}
+
+{% block page_title %}
+  Send text messages – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">Add recipients</h1>
+
+  {% if 'sms' == template.template_type %}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ sms_message(template.formatted_as_markup) }}
+      </div>
+    </div>
+  {% elif 'email' == template.template_type %}
+    {{ email_message(
+      template.subject,
+      template.formatted_as_markup,
+      from_address='{}@notifications.service.gov.uk'.format(service.email_from),
+      from_name=service.name
+    ) }}
+  {% endif %}
+
+  <div class="grid-row">
+    <div class="column-two-thirds">
+      <p>
+        Add recipients by uploading a .csv file with
+        {{ template.placeholders|length + 1 }}
+        {% if template.placeholders %}
+          columns:
+        {% else %}
+          column:
+        {% endif %}
+      </p>
+      <p class="bottom-gutter-2-3">
+        <span class='placeholder'>to</span>
+        {{ template.placeholders_as_markup|join(" ") }}
+      </p>
+      <p>
+        <a href="{{ url_for('.get_example_csv', service_id=service_id, template_id=template.id) }}">Download an example</a>
+      </p>
+    </div>
+  </div>
+
+  {{file_upload(form.file, button_text='Upload your CSV file')}}
+
+{% endblock %}

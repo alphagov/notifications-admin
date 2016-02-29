@@ -14,7 +14,7 @@ def test_get_should_render_add_service_template(app_,
             client.login(api_user_active)
             response = client.get(url_for('main.add_service'))
             assert response.status_code == 200
-            assert 'Add a new service' in response.get_data(as_text=True)
+            assert 'Which service do you want to set up notifications for?' in response.get_data(as_text=True)
 
 
 def test_should_add_service_and_redirect_to_next_page(app_,
@@ -31,48 +31,8 @@ def test_should_add_service_and_redirect_to_next_page(app_,
                 url_for('main.add_service'),
                 data={'name': 'testing the post'})
             assert response.status_code == 302
-            assert response.location == url_for('main.add_from_address', _external=True)
-
-
-def test_should_confirm_add_service(
-    app_,
-    mock_login,
-    mock_get_services,
-    api_user_active,
-    mock_get_user,
-    mock_get_user_by_email
-):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            with client.session_transaction() as session:
-                session['service_name'] = 'Renew Your Pet Passport'
-            response = client.get(url_for('main.add_from_address'))
-            assert response.status_code == 200
-            assert 'Preview your service name' in response.get_data(as_text=True)
-            assert 'Renew Your Pet Passport' in response.get_data(as_text=True)
-            assert 'renew.your.pet.passport@notifications.service.gov.uk' in response.get_data(as_text=True)
-
-
-def test_should_add_service_after_confirmation(
-    app_,
-    mock_login,
-    mock_create_service,
-    mock_get_services,
-    api_user_active,
-    mock_get_user,
-    mock_get_user_by_email
-):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            with client.session_transaction() as session:
-                session['service_name'] = 'Renew Your Pet Passport'
-            response = client.post(url_for('main.add_from_address'))
-            assert response.status_code == 302
             assert response.location == url_for('main.service_dashboard', service_id=101, _external=True)
             assert mock_create_service.called
-            assert mock_get_services.called
 
 
 def test_should_return_form_errors_when_service_name_is_empty(app_,
@@ -87,7 +47,7 @@ def test_should_return_form_errors_when_service_name_is_empty(app_,
             client.login(api_user_active)
             response = client.post(url_for('main.add_service'), data={})
             assert response.status_code == 200
-            assert 'Service name can not be empty' in response.get_data(as_text=True)
+            assert 'Service name can’t be empty' in response.get_data(as_text=True)
 
 
 def test_should_return_form_errors_with_duplicate_service_name(app_,
@@ -102,5 +62,5 @@ def test_should_return_form_errors_with_duplicate_service_name(app_,
             response = client.post(
                 url_for('main.add_service'), data={'name': 'service_one'})
             assert response.status_code == 200
-            assert 'Service name already exists' in response.get_data(as_text=True)
+            assert 'This service name is already in use' in response.get_data(as_text=True)
             assert mock_get_services.called

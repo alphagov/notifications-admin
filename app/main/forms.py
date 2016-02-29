@@ -7,7 +7,8 @@ from wtforms import (
     ValidationError,
     TextAreaField,
     FileField,
-    RadioField
+    RadioField,
+    BooleanField
 )
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import DataRequired, Email, Length, Regexp
@@ -110,6 +111,7 @@ class TwoFactorForm(Form):
         super(TwoFactorForm, self).__init__(*args, **kwargs)
 
     sms_code = sms_code()
+    remember_me = BooleanField("Remember me")
 
     def validate_sms_code(self, field):
         is_valid, reason = self.validate_code_func(field.data)
@@ -162,13 +164,13 @@ class AddServiceForm(Form):
     name = StringField(
         'Service name',
         validators=[
-            DataRequired(message='Service name can not be empty')
+            DataRequired(message='Service name can’t be empty')
         ]
     )
 
     def validate_name(self, a):
         if a.data in self._names_func():
-            raise ValidationError('Service name already exists')
+            raise ValidationError('This service name is already in use')
 
 
 class ServiceNameForm(Form):
@@ -188,7 +190,7 @@ class ConfirmPasswordForm(Form):
             raise ValidationError('Invalid password')
 
 
-class TemplateForm(Form):
+class SMSTemplateForm(Form):
     name = StringField(
         u'Template name',
         validators=[DataRequired(message="Template name cannot be empty")])
@@ -196,6 +198,13 @@ class TemplateForm(Form):
     template_content = TextAreaField(
         u'Message',
         validators=[DataRequired(message="Template content cannot be empty")])
+
+
+class EmailTemplateForm(SMSTemplateForm):
+
+    subject = StringField(
+        u'Subject',
+        validators=[DataRequired(message="Subject cannot be empty")])
 
 
 class ForgotPasswordForm(Form):

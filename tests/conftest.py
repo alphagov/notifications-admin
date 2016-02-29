@@ -1,4 +1,4 @@
-import os
+import uuid
 from datetime import date
 import pytest
 
@@ -9,7 +9,8 @@ from . import (
     TestClient,
     template_json,
     api_key_json,
-    job_json
+    job_json,
+    invite_json
 )
 
 
@@ -163,11 +164,20 @@ def mock_update_service_template(mocker):
 @pytest.fixture(scope='function')
 def mock_get_service_templates(mocker):
     def _create(service_id):
-        template_one = template_json(
-            1, "template_one", "sms", "template one content", service_id)
-        template_two = template_json(
-            2, "template_two", "sms", "template two content", service_id)
-        return {'data': [template_one, template_two]}
+        return {'data': [
+            template_json(
+                1, "sms_template_one", "sms", "sms template one content", service_id
+            ),
+            template_json(
+                2, "sms_template_two", "sms", "sms template two content", service_id
+            ),
+            template_json(
+                3, "email_template_one", "email", "email template one content", service_id
+            ),
+            template_json(
+                4, "email_template_two", "email", "email template two content", service_id
+            )
+        ]}
 
     return mocker.patch(
         'app.notifications_api_client.get_service_templates',
@@ -514,3 +524,53 @@ def mock_has_permissions(mocker):
     return mocker.patch(
         'app.notify_client.user_api_client.User.has_permissions',
         side_effect=_has_permission)
+
+
+@pytest.fixture(scope='function')
+def mock_get_users_by_service(mocker):
+    def _get_users_for_service(service_id):
+        data = [{'id': 1,
+                 'logged_in_at': None,
+                 'mobile_number': '+447700900986',
+                 'permissions': [],
+                 'state': 'active',
+                 'password_changed_at': None,
+                 'name': 'Test User',
+                 'email_address': 'notify@digital.cabinet-office.gov.uk',
+                 'failed_login_count': 0}]
+        return data
+    return mocker.patch('app.user_api_client.get_users_for_service', side_effect=_get_users_for_service, autospec=True)
+
+
+@pytest.fixture(scope='function')
+def mock_s3_upload(mocker):
+    def _upload(upload_id, service_id, filedata, region):
+        pass
+    return mocker.patch('app.main.views.send.s3upload', side_effect=_upload)
+
+
+@pytest.fixture(scope='function')
+def mock_create_invite(mocker):
+    def _create_invite(from_user, service_id, email_address, permissions):
+        data = {'id': uuid.uuid4(),
+                'from_user': from_user,
+                'service': service_id,
+                'email_address': email_address,
+                'status': 'pending',
+                'permissions': permissions}
+        return data
+    return mocker.patch('app.invite_api_client.create_invite', side_effect=_create_invite)
+
+
+@pytest.fixture(scope='function')
+def mock_get_invites_for_service(mocker, service_one):
+    def _get_invites(service_id):
+        data = []
+        from_user = service_one['users'][0]
+        service_id = service_one['id']
+        for i in range(0, 5):
+            email_address = 'user_{}@testnotify.gov.uk'.format(i)
+            invite = invite_json(uuid.uuid4(), from_user, service_id, email_address)
+            data.append(invite)
+        return data
+    return mocker.patch('app.invite_api_client.get_invites_for_service', side_effect=_get_invites)

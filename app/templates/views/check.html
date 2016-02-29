@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/email-message.html" import email_message %}
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/table.html" import list_table, field %}
 {% from "components/placeholder.html" import placeholder %}
@@ -6,7 +7,7 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
-  Check and confirm – GOV.UK Notify
+  {{ "Check and confirm" if upload_result.valid else page_heading }} – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -25,24 +26,31 @@
   {% endif %}
 
   <h1 class="heading-large">
-    {{ "Check and confirm" if upload_result.valid else "Send text messages" }}
+    {{ "Check and confirm" if upload_result.valid else page_heading }}
   </h1>
 
-  <div class="grid-row">
-    <div class="column-two-thirds">
-      {% if template.missing_data or template.additional_data %}
-        {{ sms_message(template.formatted_as_markup)}}
-      {% else %}
-        {{ sms_message(template.replaced)}}
-      {% endif %}
+  {% if 'email' == template.template_type %}
+    {{ email_message(
+      template.subject,
+      template.replaced if upload_result.valid else template.formatted_as_markup,
+      from_address='{}@notifications.service.gov.uk'.format(service.email_from),
+      from_name=service.name
+    )}}
+  {% elif 'sms' == template.template_type %}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ sms_message(
+          template.replaced if upload_result.valid else template.formatted_as_markup
+        )}}
+      </div>
     </div>
-  </div>
+  {% endif %}
 
   {% if upload_result.valid %}
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="submit" class="button" value="{{ "Send {} text message{}".format(upload_result.rows|count, '' if upload_result.rows|count == 1 else 's') }}" />
-      <a href="{{url_for('.send_sms', service_id=service_id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
+      <a href="{{url_for('.send_messages', service_id=service_id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
     </form>
   {% else %}
     {{file_upload(form.file, button_text='Upload a CSV file')}}
@@ -53,13 +61,13 @@
     caption=original_file_name,
     field_headings=column_headers
   ) %}
-    {% if item.phone|valid_phone_number %}
+    {% if item.to or ''|valid_phone_number %}
       {% call field() %}
-        {{ item.phone }}
+        {{ item.to }}
       {% endcall %}
     {% else %}
       {% call field(status='missing') %}
-        {{ item.phone }}
+        {{ item.to }}
       {% endcall %}
     {% endif %}
     {% for column in template.placeholders %}

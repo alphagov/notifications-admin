@@ -26,13 +26,13 @@ Manage users – GOV.UK Notify
     users, caption='Active', **table_options
   ) %}
     {% call field() %}
-      {{ current_user.name }}
+      {{ item.name }}
     {% endcall %}
     {{ boolean_field(item.permission_send_messages) }}
     {{ boolean_field(item.permission_manage_service) }}
     {{ boolean_field(item.permission_manage_api_keys) }}
     {% call field(align='right') %}
-      <a href="{{ url_for('.edit_user', service_id=service_id, user_id=0)}}">Change</a>
+      <a href="{{ url_for('.edit_user', service_id=service_id, user_id=item.id)}}">Change</a>
     {% endcall %}
   {% endcall %}
 
@@ -41,7 +41,7 @@ Manage users – GOV.UK Notify
       invited_users, caption='Invited', **table_options
     ) %}
       {% call field() %}
-        {{ item.email_localpart }}
+        {{ item.email_address }}
       {% endcall %}
       {{ boolean_field(item.permission_send_messages) }}
       {{ boolean_field(item.permission_manage_service) }}

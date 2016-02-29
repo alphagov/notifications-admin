@@ -7,13 +7,18 @@ from flask import (
     flash
 )
 
-from flask_login import login_required, current_user
+from flask_login import (
+    login_required,
+    current_user
+)
+
+from notifications_python_client.errors import HTTPError
 
 from app.main import main
-from app.main.dao import users_dao
 from app.main.forms import InviteUserForm
 from app.main.dao.services_dao import get_service_by_id_or_404
 from app import user_api_client
+from app import invite_api_client
 
 fake_users = [
     {
@@ -29,13 +34,19 @@ fake_users = [
 @main.route("/services/<service_id>/users")
 @login_required
 def manage_users(service_id):
-    return render_template(
-        'views/manage-users.html',
-        service_id=service_id,
-        users=fake_users,
-        current_user=current_user,
-        invited_users=[]
-    )
+    try:
+        users = user_api_client.get_users_for_service(service_id=service_id)
+        invited_users = invite_api_client.get_invites_for_service(service_id=service_id)
+        return render_template('views/manage-users.html',
+                               service_id=service_id,
+                               users=users,
+                               current_user=current_user,
+                               invited_users=invited_users)
+    except HTTPError as e:
+        if e.status_code == 404:
+            abort(404)
+        else:
+            raise e
 
 
 @main.route("/services/<service_id>/users/invite", methods=['GET', 'POST'])
@@ -43,10 +54,19 @@ def manage_users(service_id):
 def invite_user(service_id):
 
     form = InviteUserForm()
-
     if form.validate_on_submit():
-        flash('Invite sent to {}'.format(form.email_address.data), 'default_with_tick')
-        return redirect(url_for('.manage_users', service_id=service_id))
+        email_address = form.email_address.data
+        permissions = _get_permissions(request.form)
+        try:
+            resp = invite_api_client.create_invite(current_user.id, service_id, email_address, permissions)
+            flash('Invite sent to {}'.format(resp['email_address']), 'default_with_tick')
+            return redirect(url_for('.manage_users', service_id=service_id))
+
+        except HTTPError as e:
+            if e.status_code == 404:
+                abort(404)
+            else:
+                raise e
 
     return render_template(
         'views/invite-user.html',
@@ -94,3 +114,14 @@ def delete_user(service_id, user_id):
         service=get_service_by_id_or_404(service_id),
         service_id=service_id
     )
+
+
+def _get_permissions(form):
+    permissions = []
+    if form.get('send_messages') and form['send_messages'] == 'yes':
+        permissions.append('send_messages')
+    if form.get('manage_service') and form['manage_service'] == 'yes':
+        permissions.append('manage_service')
+    if form.get('manage_api_keys') and form['manage_api_keys'] == 'yes':
+        permissions.append('manage_api_keys')
+    return ','.join(permissions)

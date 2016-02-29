@@ -8,15 +8,14 @@
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-large">{{ h1 }}</h1>
+    <h1 class="heading-large">Edit email template</h1>
 
     <form method="post">
       <div class="grid-row">
         <div class="column-two-thirds">
           {{ textbox(form.name, width='1-1') }}
+          {{ textbox(form.subject, width='1-1') }}
         </div>
-      </div>
-      <div class="grid-row">
         <div class="column-two-thirds">
           {{ textbox(form.template_content, highlight_tags=True, width='1-1') }}
         </div>
@@ -31,7 +30,7 @@
         'Save',
         delete_link=url_for('.delete_service_template', service_id=service_id, template_id=template_id) if template_id or None,
         delete_link_text='Delete this template',
-        back_link=url_for('.choose_sms_template', service_id=service_id),
+        back_link=url_for('.choose_template', template_type=template_type, service_id=service_id),
         back_link_text='Cancel'
       ) }}
     </form>

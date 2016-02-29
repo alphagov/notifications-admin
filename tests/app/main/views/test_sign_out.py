@@ -7,7 +7,7 @@ def test_render_sign_out_redirects_to_sign_in(app_):
             url_for('main.sign_out'))
         assert response.status_code == 302
         assert response.location == url_for(
-            'main.sign_in', _external=True, next=url_for('main.sign_out'))
+            'main.sign_in', _external=True)
 
 
 def test_sign_out_user(app_,
@@ -22,9 +22,9 @@ def test_sign_out_user(app_,
         email = 'valid@example.gov.uk'
         password = 'val1dPassw0rd!'
         with app_.test_client() as client:
-            with client.session_transaction() as session:
-                print('session: {}'.format(session))
             client.login(api_user_active)
+            with client.session_transaction() as session:
+                assert session.get('user_id') is not None
             # Check we are logged in
             response = client.get(
                 url_for('main.service_dashboard', service_id="123"))
@@ -32,5 +32,6 @@ def test_sign_out_user(app_,
             response = client.get(url_for('main.sign_out'))
             assert response.status_code == 302
             assert response.location == url_for(
-                'main.index', _external=True)
-            assert session.get('ItsdangerousSession') is None
+                'main.sign_in', _external=True)
+            with client.session_transaction() as session:
+                assert session.get('user_id') is None

@@ -47,6 +47,15 @@ def api_key_json(id_, name, expiry_date=None):
             'expiry_date': expiry_date
             }
 
+
+def invite_json(id, from_user, service_id, email_address):
+    return {'id': id,
+            'from_user': from_user,
+            'service': service_id,
+            'email_address': email_address,
+            'status': 'pending'}
+
+
 TEST_USER_EMAIL = 'test@user.gov.uk'
 
 
