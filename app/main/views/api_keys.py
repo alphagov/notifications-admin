@@ -3,6 +3,7 @@ from flask_login import login_required
 from app.main import main
 from app.main.forms import CreateKeyForm
 from app import api_key_api_client
+from app.utils import user_has_permissions
 
 
 @main.route("/services/<service_id>/documentation")
@@ -13,6 +14,7 @@ def documentation(service_id):
 
 @main.route("/services/<service_id>/api-keys")
 @login_required
+@user_has_permissions('manage_api_keys')
 def api_keys(service_id):
     return render_template(
         'views/api-keys.html',
@@ -23,6 +25,7 @@ def api_keys(service_id):
 
 @main.route("/services/<service_id>/api-keys/create", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_api_keys')
 def create_api_key(service_id):
     key_names = [
         key['name'] for key in api_key_api_client.get_api_keys(service_id=service_id)['apiKeys']
@@ -41,6 +44,7 @@ def create_api_key(service_id):
 
 @main.route("/services/<service_id>/api-keys/revoke/<int:key_id>", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_api_keys')
 def revoke_api_key(service_id, key_id):
     key_name = api_key_api_client.get_api_keys(service_id=service_id, key_id=key_id)['apiKeys'][0]['name']
     if request.method == 'GET':
