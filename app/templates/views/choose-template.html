@@ -16,6 +16,7 @@
 
     {% if templates %}
       {% if not has_jobs %}
+        {% if current_user.has_permissions(session.get('service_id', ''), ['manage_service']) %}
         {{ banner(
           """
             Send yourself a test message
@@ -23,6 +24,7 @@
           subhead='Next step',
           type="tip"
         )}}
+        {% endif %}
       {% endif %}
       <div class="grid-row">
         {% for template in templates %}
@@ -39,9 +41,13 @@
           </div>
           <div class="column-one-third">
             <div class="sms-message-use-links">
+              {% if current_user.has_permissions(session.get('service_id', ''), ['manage_service']) %}
               <a href="{{ url_for(".send_messages", service_id=service_id, template_id=template.id) }}">Add recipients</a>
               <a href="{{ url_for(".send_message_to_self", service_id=service_id, template_id=template.id) }}">Send yourself a test</a>
+              {% endif %}
+              {% if current_user.has_permissions(session.get('service_id', ''), ['manage_templates']) %}
               <a href="{{ url_for(".edit_service_template", service_id=service_id, template_id=template.id) }}">Edit template</a>
+              {% endif %}
             </div>
           </div>
         {% endfor %}
@@ -49,7 +55,9 @@
     {% endif %}
 
     <p>
+      {% if current_user.has_permissions(session.get('service_id', ''), ['manage_templates']) %}
       <a href="{{ url_for('.add_service_template', service_id=service_id, template_type=template_type) }}" class="button">Add a new template</a>
+      {% endif %}
     </p>
 
   </form>
