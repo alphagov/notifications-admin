@@ -44,10 +44,6 @@ def choose_sms_template(service_id):
             abort(404)
         else:
             raise e
-    print("="*80)
-    print(jobs)
-    print(len(jobs))
-    print(bool(len(jobs)))
     return render_template(
         'views/choose-sms-template.html',
         templates=[

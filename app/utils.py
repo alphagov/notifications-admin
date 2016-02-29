@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import abort
+from flask import (abort, session)
 
 
 class BrowsableItem(object):
@@ -80,8 +80,10 @@ def user_has_permissions(*permissions):
         def wrap_func(*args, **kwargs):
             # We are making the assumption that the user is logged in.
             from flask_login import current_user
-            if set(permissions) > set(current_user.permissions):
+            service_id = session.get('service_id', '')
+            if current_user and current_user.has_permissions(service_id, permissions):
+                return func(*args, **kwargs)
+            else:
                 abort(403)
-            return func(*args, **kwargs)
         return wrap_func
     return wrap

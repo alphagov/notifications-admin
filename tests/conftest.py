@@ -195,7 +195,8 @@ def api_user_pending():
                  'email_address': 'test@user.gov.uk',
                  'mobile_number': '+4412341234',
                  'state': 'pending',
-                 'failed_login_count': 0
+                 'failed_login_count': 0,
+                 'permissions': {}
                  }
     user = User(user_data)
     return user
@@ -210,7 +211,8 @@ def api_user_active():
                  'email_address': 'test@user.gov.uk',
                  'mobile_number': '+4412341234',
                  'state': 'active',
-                 'failed_login_count': 0
+                 'failed_login_count': 0,
+                 'permissions': {}
                  }
     user = User(user_data)
     return user
@@ -225,7 +227,8 @@ def api_user_locked():
                  'email_address': 'test@user.gov.uk',
                  'mobile_number': '+4412341234',
                  'state': 'active',
-                 'failed_login_count': 5
+                 'failed_login_count': 5,
+                 'permissions': {}
                  }
     user = User(user_data)
     return user
@@ -240,7 +243,8 @@ def api_user_request_password_reset():
                  'email_address': 'test@user.gov.uk',
                  'mobile_number': '+4412341234',
                  'state': 'request_password_reset',
-                 'failed_login_count': 5
+                 'failed_login_count': 5,
+                 'permissions': {}
                  }
     user = User(user_data)
     return user
@@ -501,3 +505,12 @@ def mock_get_jobs(mocker):
             data.append(job_data)
         return {"data": data}
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_jobs)
+
+
+@pytest.fixture(scope='function')
+def mock_has_permissions(mocker):
+    def _has_permission(service_id, permissions):
+        return True
+    return mocker.patch(
+        'app.notify_client.user_api_client.User.has_permissions',
+        side_effect=_has_permission)

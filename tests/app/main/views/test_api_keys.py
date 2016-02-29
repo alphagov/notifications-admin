@@ -21,7 +21,8 @@ def test_should_show_empty_api_keys_page(app_,
                                          mock_get_user,
                                          mock_get_user_by_email,
                                          mock_get_no_api_keys,
-                                         mock_login):
+                                         mock_login,
+                                         mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -39,7 +40,8 @@ def test_should_show_api_keys_page(app_,
                                    mock_get_user,
                                    mock_get_user_by_email,
                                    mock_get_api_keys,
-                                   mock_login):
+                                   mock_login,
+                                   mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -58,7 +60,8 @@ def test_should_show_name_api_key_page(app_,
                                        mock_get_user,
                                        mock_get_user_by_email,
                                        mock_get_api_keys,
-                                       mock_login):
+                                       mock_login,
+                                       mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -74,7 +77,8 @@ def test_should_render_show_api_key(app_,
                                     mock_get_user_by_email,
                                     mock_create_api_key,
                                     mock_get_api_keys,
-                                    mock_login):
+                                    mock_login,
+                                    mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -92,7 +96,8 @@ def test_should_show_confirm_revoke_api_key(app_,
                                             mock_get_user,
                                             mock_get_user_by_email,
                                             mock_get_api_keys,
-                                            mock_login):
+                                            mock_login,
+                                            mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -110,7 +115,8 @@ def test_should_redirect_after_revoking_api_key(app_,
                                                 mock_get_user_by_email,
                                                 mock_revoke_api_key,
                                                 mock_get_api_keys,
-                                                mock_login):
+                                                mock_login,
+                                                mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
