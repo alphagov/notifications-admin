@@ -29,15 +29,24 @@ from app import job_api_client
 from app.utils import (
     validate_recipient, InvalidPhoneError, InvalidEmailError, user_has_permissions)
 
-page_headings = {
-    'manage_service': {
-        'email': 'Send emails',
-        'sms': 'Send text messages'},
-    'manage_templates': {
-        'email': 'Manage templates',
-        'sms': 'Manage templates'
-    }
+
+manage_service_page_headings = {
+    'email': 'Send emails',
+    'sms': 'Send text messages'
 }
+
+
+manage_templates_page_headings = {
+    'email': 'Manage templates',
+    'sms': 'Manage templates'
+}
+
+
+def get_page_headings(template_type):
+    if current_user.has_permissions(session.get('service_id', ''), 'manage_service'):
+        return manage_service_page_headings[template_type]
+    else:
+        return manage_templates_page_headings[template_type]
 
 
 @main.route("/services/<service_id>/send/letters", methods=['GET'])
@@ -63,9 +72,6 @@ def choose_template(service_id, template_type):
             abort(404)
         else:
             raise e
-    # TODO fix up how page_heading is loaded.
-    page_heading = page_headings['manage_service'][template_type] if current_user.has_permissions(session.get('service_id', ''), 'manage_service') else \
-        page_headings['manage_templates'][template_type]
     return render_template(
         'views/choose-template.html',
         templates=[
@@ -76,7 +82,7 @@ def choose_template(service_id, template_type):
             if template['template_type'] == template_type
         ],
         template_type=template_type,
-        page_heading=page_heading,
+        page_heading=get_page_headings(template_type),
         service=service,
         has_jobs=len(jobs),
         service_id=service_id
@@ -188,7 +194,7 @@ def check_messages(service_id, upload_id):
             'views/check.html',
             upload_result=upload_result,
             template=template,
-            page_heading=page_headings[template.template_type],
+            page_heading=get_page_headings(template.template_type),
             column_headers=['to'] + list(template.placeholders_as_markup),
             original_file_name=upload_data.get('original_file_name'),
             service_id=service_id,
