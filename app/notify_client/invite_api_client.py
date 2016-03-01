@@ -1,5 +1,6 @@
 
 from notifications_python_client.base import BaseAPIClient
+from app.notify_client.models import User
 
 
 class InviteApiClient(BaseAPIClient):
@@ -26,4 +27,4 @@ class InviteApiClient(BaseAPIClient):
     def get_invites_for_service(self, service_id):
         endpoint = '/service/{}/invite'.format(service_id)
         resp = self.get(endpoint)
-        return resp['data']
+        return [User(data) for data in resp['data']]

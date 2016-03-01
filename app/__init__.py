@@ -22,7 +22,7 @@ from app.asset_fingerprinter import AssetFingerprinter
 from app.utils import validate_phone_number, InvalidPhoneError
 import app.proxy_fix
 from config import configs
-from notification_utils import logging
+from utils import logging
 
 login_manager = LoginManager()
 csrf = CsrfProtect()

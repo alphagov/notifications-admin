@@ -1,7 +1,7 @@
 from flask import render_template, current_app, abort
 from flask_wtf import Form
 from wtforms import StringField, PasswordField, TextAreaField, FileField, validators
-from notification_utils.template import Template
+from utils.template import Template
 from app.main import main
 
 
