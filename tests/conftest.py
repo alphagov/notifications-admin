@@ -595,12 +595,12 @@ def mock_get_invites_for_service(mocker, service_one, sample_invite):
 @pytest.fixture(scope='function')
 def mock_accept_invite(mocker, sample_invite):
     def _accept_token(token):
-        return sample_invite
+        return InvitedUser(**sample_invite)
     return mocker.patch('app.invite_api_client.accept_invite', side_effect=_accept_token)
 
 
 @pytest.fixture(scope='function')
-def mock_add_user_to_service(mocker, service_one):
-    def _add_user(service_id, user_id, invitation):
+def mock_add_user_to_service(mocker, service_one, api_user_active):
+    def _add_user(service_id, user_id):
         return api_user_active
     return mocker.patch('app.user_api_client.add_user_to_service', side_effect=_add_user)

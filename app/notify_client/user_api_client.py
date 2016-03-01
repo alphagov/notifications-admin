@@ -1,3 +1,5 @@
+import json
+
 from notifications_python_client.notifications import BaseAPIClient
 from notifications_python_client.errors import HTTPError
 
@@ -86,7 +88,7 @@ class UserApiClient(BaseAPIClient):
         resp = self.get(endpoint)
         return [User(data) for data in resp['data']]
 
-    def add_user_to_service(self, service_id, user_id, invited_user):
+    def add_user_to_service(self, service_id, user_id):
         endpoint = '/service/{}/users/{}'.format(service_id, user_id)
-        resp = self.post(endpoint, data=invited_user)
+        resp = self.post(endpoint)
         return User(resp['data'], max_failed_login_count=self.max_failed_login_count)

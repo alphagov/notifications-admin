@@ -17,13 +17,13 @@ from app import (
 def accept_invite(token):
     try:
         invited_user = invite_api_client.accept_invite(token)
-        existing_user = user_api_client.get_user_by_email(invited_user['email_address'])
+        existing_user = user_api_client.get_user_by_email(invited_user.email_address)
 
         if existing_user:
-            user_api_client.add_user_to_service(invited_user['service'],
-                                                existing_user.id,
-                                                invited_user)
-            return redirect(url_for('main.service_dashboard', service_id=invited_user['service']))
+            user_api_client.add_user_to_service(invited_user.service,
+                                                existing_user.id)
+
+            return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
         else:
             # TODO implement registration flow for new users
             abort(404)
