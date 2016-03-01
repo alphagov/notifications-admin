@@ -1,6 +1,5 @@
-
 from notifications_python_client.base import BaseAPIClient
-from app.notify_client.models import User
+from app.notify_client.models import InvitedUser
 
 
 class InviteApiClient(BaseAPIClient):
@@ -22,9 +21,23 @@ class InviteApiClient(BaseAPIClient):
             'permissions': permissions
         }
         resp = self.post(url='/service/{}/invite'.format(service_id), data=data)
-        return resp['data']
+        return InvitedUser(**resp['data'])
 
     def get_invites_for_service(self, service_id):
         endpoint = '/service/{}/invite'.format(service_id)
         resp = self.get(endpoint)
-        return [User(data) for data in resp['data']]
+        invites = resp['data']
+        invited_users = _get_invited_users(invites)
+        return invited_users
+
+    def accept_invite(self, token):
+        resp = self.get(url='/invite/{}'.format(token))
+        return InvitedUser(**resp['data'])
+
+
+def _get_invited_users(invites):
+    invited_users = []
+    for invite in invites:
+        invited_user = InvitedUser(**invite)
+        invited_users.append(invited_user)
+    return invited_users
