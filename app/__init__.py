@@ -1,11 +1,9 @@
 import os
 import re
-import ast
 
 import dateutil
 from flask import (Flask, session, Markup, escape, render_template, make_response)
 from flask._compat import string_types
-from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from werkzeug.exceptions import abort
