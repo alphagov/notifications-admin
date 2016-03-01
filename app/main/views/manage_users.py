@@ -57,8 +57,8 @@ def invite_user(service_id):
         email_address = form.email_address.data
         permissions = _get_permissions(request.form)
         try:
-            resp = invite_api_client.create_invite(current_user.id, service_id, email_address, permissions)
-            flash('Invite sent to {}'.format(resp['email_address']), 'default_with_tick')
+            invited_user = invite_api_client.create_invite(current_user.id, service_id, email_address, permissions)
+            flash('Invite sent to {}'.format(invited_user.email_address), 'default_with_tick')
             return redirect(url_for('.manage_users', service_id=service_id))
 
         except HTTPError as e:

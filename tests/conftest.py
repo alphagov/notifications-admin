@@ -12,7 +12,10 @@ from . import (
     job_json,
     invite_json
 )
-from app.notify_client.models import User
+from app.notify_client.models import (
+    User,
+    InvitedUser
+)
 
 
 @pytest.fixture(scope='session')
@@ -551,27 +554,53 @@ def mock_s3_upload(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_create_invite(mocker):
+def sample_invite(mocker, service_one):
+    import datetime
+    id = str(uuid.uuid4())
+    from_user = service_one['users'][0]
+    email_address = 'invited_user@test.gov.uk'
+    service_id = service_one['id']
+    permissions = 'send_messages,manage_service,manage_api_keys'
+    created_at = datetime.datetime.now()
+    return invite_json(id, from_user, service_id, email_address, permissions, created_at)
+
+
+@pytest.fixture(scope='function')
+def mock_create_invite(mocker, sample_invite):
+
     def _create_invite(from_user, service_id, email_address, permissions):
-        data = {'id': uuid.uuid4(),
-                'from_user': from_user,
-                'service': service_id,
-                'email_address': email_address,
-                'status': 'pending',
-                'permissions': permissions}
-        return data
+        sample_invite['from_user'] = from_user
+        sample_invite['service'] = service_id
+        sample_invite['email_address'] = email_address
+        sample_invite['status'] = 'pending'
+        sample_invite['permissions'] = permissions
+        return InvitedUser(**sample_invite)
     return mocker.patch('app.invite_api_client.create_invite', side_effect=_create_invite)
 
 
 @pytest.fixture(scope='function')
-def mock_get_invites_for_service(mocker, service_one):
+def mock_get_invites_for_service(mocker, service_one, sample_invite):
+    import copy
+
     def _get_invites(service_id):
         data = []
-        from_user = service_one['users'][0]
-        service_id = service_one['id']
         for i in range(0, 5):
-            email_address = 'user_{}@testnotify.gov.uk'.format(i)
-            invite = invite_json(uuid.uuid4(), from_user, service_id, email_address)
-            data.append(invite)
+            invite = copy.copy(sample_invite)
+            invite['email_address'] = 'user_{}@testnotify.gov.uk'.format(i)
+            data.append(InvitedUser(**invite))
         return data
     return mocker.patch('app.invite_api_client.get_invites_for_service', side_effect=_get_invites)
+
+
+@pytest.fixture(scope='function')
+def mock_accept_invite(mocker, sample_invite):
+    def _accept_token(token):
+        return InvitedUser(**sample_invite)
+    return mocker.patch('app.invite_api_client.accept_invite', side_effect=_accept_token)
+
+
+@pytest.fixture(scope='function')
+def mock_add_user_to_service(mocker, service_one, api_user_active):
+    def _add_user(service_id, user_id):
+        return api_user_active
+    return mocker.patch('app.user_api_client.add_user_to_service', side_effect=_add_user)
