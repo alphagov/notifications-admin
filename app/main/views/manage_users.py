@@ -115,7 +115,7 @@ def delete_user(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/cancel-invited-user/<invited_user_id>", methods=['POST'])
+@main.route("/services/<service_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
 def cancel_invited_user(service_id, invited_user_id):
     invite_api_client.cancel_invited_user(service_id=service_id, invited_user_id=invited_user_id)
 

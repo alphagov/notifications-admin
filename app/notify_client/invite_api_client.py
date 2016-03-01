@@ -31,6 +31,6 @@ class InviteApiClient(BaseAPIClient):
 
     def cancel_invited_user(self, service_id, invited_user_id):
         data = {'status': 'cancelled'}
-        resp = self.post(url='/service/{0}/invite/{0}'.format(service_id, invited_user_id),
-                         data = data)
+        resp = self.post(url='/service/{0}/invite/{1}'.format(service_id, invited_user_id),
+                         data=data)
         return resp['data']

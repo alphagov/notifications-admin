@@ -114,8 +114,8 @@ def test_cancel_invited_user_cancels_user_invitations(app_, api_user_active, moc
             invited_user_id = uuid.uuid4()
             client.login(api_user_active)
             service_id = uuid.uuid4()
-            response = client.post(url_for('main.cancel_invited_user', service_id=service_id,
-                                           invited_user_id=invited_user_id))
+            response = client.get(url_for('main.cancel_invited_user', service_id=service_id,
+                                          invited_user_id=invited_user_id))
 
             assert response.status_code == 302
             assert response.location == url_for('main.manage_users', service_id=service_id, _external=True)
