@@ -1,14 +1,9 @@
 from flask import request, render_template, redirect, url_for, flash, abort
 from flask_login import login_required
 
-from notifications_python_client.errors import HTTPError
-from utils.template import Template
-
 from app.main import main
 from app.utils import user_has_permissions
 from app.main.forms import SMSTemplateForm, EmailTemplateForm
-from app import job_api_client
-from app.main.dao.services_dao import get_service_by_id_or_404
 from app.main.dao import templates_dao as tdao
 from app.main.dao import services_dao as sdao
 
