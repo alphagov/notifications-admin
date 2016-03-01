@@ -13,31 +13,42 @@
 
   <h1 class="heading-large">Add recipients</h1>
 
+  {% if 'sms' == template.template_type %}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ sms_message(template.formatted_as_markup) }}
+      </div>
+    </div>
+  {% elif 'email' == template.template_type %}
+    {{ email_message(
+      template.subject,
+      template.formatted_as_markup,
+      from_address='{}@notifications.service.gov.uk'.format(service.email_from),
+      from_name=service.name
+    ) }}
+  {% endif %}
+
   <div class="grid-row">
     <div class="column-two-thirds">
-      {% if 'sms' == template.template_type %}
-        {{ sms_message(template.formatted_as_markup) }}
-      {% elif 'email' == template.template_type %}
-        {{ email_message(
-          template.subject,
-          template.formatted_as_markup,
-          from_address='{}@notifications.service.gov.uk'.format(service.email_from),
-          from_name=service.name
-        ) }}
-      {% endif %}
-      {{ banner(
-        'You can upload real data, but we’ll only send to your mobile number until you <a href="{}">request to go live</a>'.format(
-          url_for('.service_request_to_go_live', service_id=service_id)
-        )|safe,
-        'info'
-      )}}
+      <p>
+        Add recipients by uploading a .csv file with
+        {{ template.placeholders|length + 1 }}
+        {% if template.placeholders %}
+          columns:
+        {% else %}
+          column:
+        {% endif %}
+      </p>
+      <p class="bottom-gutter-2-3">
+        <span class='placeholder'>to</span>
+        {{ template.placeholders_as_markup|join(" ") }}
+      </p>
+      <p>
+        <a href="{{ url_for('.get_example_csv', service_id=service_id, template_id=template.id) }}">Download an example</a>
+      </p>
     </div>
   </div>
 
-  {{file_upload(form.file, button_text='Upload a CSV file')}}
-
-  <p>
-    <a href="{{ url_for('.get_example_csv', service_id=service_id, template_id=template.id) }}">Download an example CSV file</a>
-  </p>
+  {{file_upload(form.file, button_text='Upload your CSV file')}}
 
 {% endblock %}

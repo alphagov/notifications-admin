@@ -5,11 +5,11 @@
     </legend>
     <div class='yes-no-fields inline'>
       <label class='block-label'>
-        <input type='radio' name='{{ name }}' {% if current_value == True %}checked{% endif %} />
+        <input type='radio' name='{{ name }}' value='yes' {% if current_value == True %}checked{% endif %} />
         Yes
       </label>
       <label class='block-label'>
-        <input type='radio' name='{{ name }}' {% if current_value == False %}checked{% endif %} />
+        <input type='radio' name='{{ name }}' value='no' {% if current_value == False %}checked{% endif %} />
         No
       </label>
     </div>

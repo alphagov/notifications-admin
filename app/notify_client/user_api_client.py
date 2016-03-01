@@ -94,7 +94,7 @@ class User(UserMixin):
         self._email_address = fields.get('email_address')
         self._mobile_number = fields.get('mobile_number')
         self._password_changed_at = fields.get('password_changed_at')
-        self._permissions = set(fields.get('permissions')) if fields.get('permission') is not None else set()
+        self._permissions = fields.get('permissions')
         self._failed_login_count = 0
         self._state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
@@ -165,18 +165,12 @@ class User(UserMixin):
 
     @permissions.setter
     def permissions(self, permissions):
-        if permissions is None:
-            permissions = set()
-        self._permissions = set(permissions)
+        raise AttributeError("Read only property")
 
-    def add_permissions(self, permissions):
-        self._permissions.update(permissions)
-
-    def remove_permissions(self, permissions):
-        self._permissions -= permissions
-
-    def has_permissions(self, permissions):
-        return self._permissions > set(permissions)
+    def has_permissions(self, service_id, permissions):
+        if service_id in self._permissions:
+            return set(self._permissions[service_id]) > set(permissions)
+        return False
 
     @property
     def failed_login_count(self):

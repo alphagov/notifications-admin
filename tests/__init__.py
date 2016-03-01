@@ -47,6 +47,15 @@ def api_key_json(id_, name, expiry_date=None):
             'expiry_date': expiry_date
             }
 
+
+def invite_json(id, from_user, service_id, email_address):
+    return {'id': id,
+            'from_user': from_user,
+            'service': service_id,
+            'email_address': email_address,
+            'status': 'pending'}
+
+
 TEST_USER_EMAIL = 'test@user.gov.uk'
 
 
@@ -57,14 +66,15 @@ def create_test_user(state):
     return user
 
 
-def create_test_api_user(state):
+def create_test_api_user(state, permissions={}):
     from app.notify_client.user_api_client import User
     user_data = {'id': 1,
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': TEST_USER_EMAIL,
                  'mobile_number': '+441234123412',
-                 'state': state
+                 'state': state,
+                 'permissions': permissions
                  }
     user = User(user_data)
     return user

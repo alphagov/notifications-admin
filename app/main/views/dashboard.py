@@ -23,6 +23,7 @@ def service_dashboard(service_id):
     try:
         service = get_service_by_id(service_id)
         session['service_name'] = service['data']['name']
+        session['service_id'] = service['data']['id']
     except HTTPError as e:
         if e.status_code == 404:
             abort(404)
