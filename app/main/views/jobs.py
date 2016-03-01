@@ -8,7 +8,7 @@ from flask import (
 )
 from flask_login import login_required
 from notifications_python_client.errors import HTTPError
-from utils.template import Template
+from notification_utils.template import Template
 
 from app import job_api_client
 from app.main import main

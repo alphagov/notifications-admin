@@ -1,11 +1,9 @@
 import os
 import re
-import ast
 
 import dateutil
 from flask import (Flask, session, Markup, escape, render_template, make_response)
 from flask._compat import string_types
-from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from werkzeug.exceptions import abort
@@ -22,7 +20,7 @@ from app.asset_fingerprinter import AssetFingerprinter
 from app.utils import validate_phone_number, InvalidPhoneError
 import app.proxy_fix
 from config import configs
-from utils import logging
+from notification_utils import logging
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
