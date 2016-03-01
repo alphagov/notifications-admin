@@ -520,7 +520,7 @@ def mock_get_jobs(mocker):
 
 @pytest.fixture(scope='function')
 def mock_has_permissions(mocker):
-    def _has_permission(service_id, permissions):
+    def _has_permission(service_id, permissions, or_=False):
         return True
     return mocker.patch(
         'app.notify_client.user_api_client.User.has_permissions',

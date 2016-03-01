@@ -9,7 +9,8 @@ def test_should_show_page_for_one_templates(app_,
                                             mock_get_service_template,
                                             mock_get_user,
                                             mock_get_user_by_email,
-                                            mock_login):
+                                            mock_login,
+                                            mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -33,7 +34,8 @@ def test_should_redirect_when_saving_a_template(app_,
                                                 mock_update_service_template,
                                                 mock_get_user,
                                                 mock_get_user_by_email,
-                                                mock_login):
+                                                mock_login,
+                                                mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -65,7 +67,8 @@ def test_should_show_delete_template_page(app_,
                                           mock_get_service_template,
                                           mock_get_user,
                                           mock_get_user_by_email,
-                                          mock_login):
+                                          mock_login,
+                                          mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -91,7 +94,8 @@ def test_should_redirect_when_deleting_a_template(app_,
                                                   mock_delete_service_template,
                                                   mock_get_user,
                                                   mock_get_user_by_email,
-                                                  mock_login):
+                                                  mock_login,
+                                                  mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
