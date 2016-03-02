@@ -114,3 +114,18 @@ class User(UserMixin):
 
     def set_password(self, pwd):
         self._password = pwd
+
+
+class InvitedUser(object):
+
+    def __init__(self, id, service, from_user, email_address, permissions, status, created_at):
+        self.id = id
+        self.service = str(service)
+        self.from_user = from_user
+        self.email_address = email_address
+        self.permissions = permissions.split(',')
+        self.status = status
+        self.created_at = created_at
+
+    def has_permissions(self, permission):
+        return permission in self.permissions

@@ -43,9 +43,9 @@ Manage users – GOV.UK Notify
       {% call field() %}
         {{ item.email_address }}
       {% endcall %}
-      {{ boolean_field(item.has_permissions(service_id, 'send_messages')) }}
-      {{ boolean_field(item.has_permissions(service_id, 'manage_service')) }}
-      {{ boolean_field(item.has_permissions(service_id, 'api_keys')) }}
+      {{ boolean_field(item.has_permissions('send_messages')) }}
+      {{ boolean_field(item.has_permissions('manage_service')) }}
+      {{ boolean_field(item.has_permissions('manage_api_keys')) }}
       {% call field(align='right') %}
         <a href="{{ url_for('.edit_user', service_id=service_id, user_id=item.id)}}">Change</a>
       {% endcall %}
