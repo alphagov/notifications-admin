@@ -56,6 +56,7 @@ def create_app(config_name, config_overrides=None):
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
+    login_manager.login_message_category = 'default'
 
     from app.main import main as main_blueprint
     application.register_blueprint(main_blueprint)
