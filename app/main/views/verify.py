@@ -17,6 +17,7 @@ from app.main.forms import VerifyForm
 
 @main.route('/verify', methods=['GET', 'POST'])
 def verify():
+
     # TODO there needs to be a way to regenerate a session id
     # or handle gracefully.
     user_id = session['user_details']['id']

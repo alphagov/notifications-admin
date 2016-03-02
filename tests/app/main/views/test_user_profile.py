@@ -252,7 +252,6 @@ def test_should_redirect_after_mobile_number_confirm(app_,
         response = client.post(
             url_for('main.user_profile_mobile_number_confirm'),
             data=data)
-        print(response.get_data(as_text=True))
         assert response.status_code == 302
         assert response.location == url_for(
             'main.user_profile', _external=True)
@@ -287,7 +286,6 @@ def test_should_redirect_after_password_change(app_,
             url_for('main.user_profile_password'),
             data=data)
 
-        print(response.get_data(as_text=True))
         assert response.status_code == 302
         assert response.location == url_for(
             'main.user_profile', _external=True)

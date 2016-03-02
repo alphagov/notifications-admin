@@ -34,8 +34,14 @@ class UserApiClient(BaseAPIClient):
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
     def get_user_by_email(self, email_address):
-        params = {'email': email_address}
-        user_data = self.get('/user/email', params=params)
+        try:
+            params = {'email': email_address}
+            user_data = self.get('/user/email', params=params)
+        except HTTPError as e:
+            if e.status_code == 404:
+                return None
+            else:
+                raise e
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
     def get_users(self):

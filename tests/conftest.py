@@ -572,7 +572,7 @@ def sample_invite(mocker, service_one):
     email_address = 'invited_user@test.gov.uk'
     service_id = service_one['id']
     permissions = 'send_messages,manage_service,manage_api_keys'
-    created_at = datetime.datetime.now()
+    created_at = str(datetime.datetime.now())
     return invite_json(id, from_user, service_id, email_address, permissions, created_at)
 
 
