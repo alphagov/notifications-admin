@@ -242,6 +242,7 @@ def test_create_job_should_call_api(
     job_data,
     mock_create_job,
     mock_get_job,
+    mock_get_notifications,
     mock_get_service,
     mock_get_service_template,
     mock_has_permissions

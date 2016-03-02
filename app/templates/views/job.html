@@ -61,24 +61,18 @@
     </ul>
 
     {% call(item) list_table(
-      [
-        {'row': 1, 'phone': '+447700 900995', 'template': template['name'], 'status': 'sent'}
-      ],
+      notifications,
       caption=uploaded_file_name,
       caption_visible=False,
       empty_message="Messages go here",
       field_headings=[
-        'Row',
         'Recipient',
         'Template',
         right_aligned_field_heading('Status')
       ]
     ) %}
       {% call field() %}
-        {{ item.row }}.
-      {% endcall %}
-      {% call field() %}
-        {{item.phone[:3]}} •••• ••••••
+        {{ item.to }}
       {% endcall %}
       {% call field() %}
         {{item.template}}
