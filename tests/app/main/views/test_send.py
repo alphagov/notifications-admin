@@ -67,7 +67,7 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
     mock_s3_upload
 ):
 
-    contents = 'to,name\n+44 123,test1\n+44 456,test2'
+    contents = 'phone number,name\n+44 123,test1\n+44 456,test2'
     file_data = (BytesIO(contents.encode('utf-8')), 'invalid.csv')
     mocker.patch('app.main.views.send.s3download', return_value=contents)
 
@@ -98,14 +98,14 @@ def test_upload_csvfile_removes_empty_lines_and_trailing_commas(
     mock_s3_upload
 ):
 
-    contents = 'to,name,,,\n++44 7700 900981,test1,,,\n+44 7700 900981,test2,,,\n ,,, \n ,,, \t \t \n'
+    contents = 'phone number,name,,,\n++44 7700 900981,test1,,,\n+44 7700 900981,test2,,,\n ,,, \n ,,, \t \t \n'
     file_data = (BytesIO(contents.encode('utf-8')), 'invalid.csv')
 
-    expected_data = {'data': ['to,name', '++44 7700 900981,test1', '+44 7700 900981,test2'],
+    expected_data = {'data': ['phone number,name', '++44 7700 900981,test1', '+44 7700 900981,test2'],
                      'file_name': 'invalid.csv'}
 
     mocker.patch('app.main.views.send.s3download',
-                 return_value='to,name\n++44 7700 900981,test1\n+44 7700 900981,test2')
+                 return_value='phone number,name\n++44 7700 900981,test1\n+44 7700 900981,test2')
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -130,8 +130,8 @@ def test_send_test_message_to_self(
     mock_s3_upload
 ):
 
-    expected_data = {'data': ['to', '+4412341234'], 'file_name': 'Test run'}
-    mocker.patch('app.main.views.send.s3download', return_value='to\r\n+4412341234')
+    expected_data = {'data': ['phone number', '+4412341234'], 'file_name': 'Test run'}
+    mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -161,7 +161,7 @@ def test_download_example_csv(
                 follow_redirects=True
             )
         assert response.status_code == 200
-        assert response.get_data(as_text=True) == 'to\r\n+4412341234\r\n'
+        assert response.get_data(as_text=True) == 'phone number\r\n+4412341234\r\n'
         assert 'text/csv' in response.headers['Content-Type']
 
 
@@ -175,7 +175,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_s3_upload
 ):
 
-    contents = 'to\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
+    contents = 'phone number\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
     file_data = (BytesIO(contents.encode('utf-8')), 'valid.csv')
     mocker.patch('app.main.views.send.s3download', return_value=contents)
 

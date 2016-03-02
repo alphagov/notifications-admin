@@ -61,13 +61,17 @@
     caption=original_file_name,
     field_headings=column_headers
   ) %}
-    {% if item.to or ''|valid_phone_number %}
+    {% if item.get('phone number', '')|valid_phone_number %}
       {% call field() %}
-        {{ item.to }}
+        {{ item['phone number'] }}
+      {% endcall %}
+    {% elif item.get('email address') %}
+      {% call field() %}
+        {{ item['email address'] }}
       {% endcall %}
     {% else %}
       {% call field(status='missing') %}
-        {{ item.to }}
+        {{ item['phone number'] }}
       {% endcall %}
     {% endif %}
     {% for column in template.placeholders %}

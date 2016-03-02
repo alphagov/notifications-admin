@@ -3,6 +3,8 @@ import re
 from functools import wraps
 from flask import (abort, session)
 
+from utils.process_csv import get_recipient_from_row
+
 
 class BrowsableItem(object):
     """
@@ -87,11 +89,11 @@ def validate_email_address(email_address):
     raise InvalidEmailError('Not a valid email address')
 
 
-def validate_recipient(recipient, template_type):
+def validate_recipient(row, template_type):
     return {
         'email': validate_email_address,
         'sms': validate_phone_number
-    }[template_type](recipient)
+    }[template_type](get_recipient_from_row(row, template_type))
 
 
 def user_has_permissions(*permissions):
