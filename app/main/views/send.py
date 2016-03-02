@@ -230,7 +230,6 @@ def check_messages(service_id, upload_id):
             else:
                 raise e
 
-        flash('We’ve started sending your messages', 'default_with_tick')
         return redirect(
             url_for('main.view_job', service_id=service_id, job_id=upload_id)
         )

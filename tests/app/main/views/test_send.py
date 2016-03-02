@@ -265,5 +265,5 @@ def test_create_job_should_call_api(
             response = client.post(url, data=job_data, follow_redirects=True)
 
         assert response.status_code == 200
-        assert 'We’ve started sending your messages' in response.get_data(as_text=True)
+        assert original_file_name in response.get_data(as_text=True)
         mock_create_job.assert_called_with(job_id, service_id, template_id, original_file_name, notification_count)
