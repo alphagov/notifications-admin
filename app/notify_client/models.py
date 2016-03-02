@@ -125,3 +125,12 @@ class InvitedUser(object):
 
     def has_permissions(self, permission):
         return permission in self.permissions
+
+    def serialize(self):
+        return {'id': self.id,
+                'service': self.service,
+                'from_user': self.from_user,
+                'email_address': self.email_address,
+                'permissions': self.permissions,
+                'status': self.status
+                }
