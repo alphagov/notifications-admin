@@ -144,6 +144,30 @@ def test_send_test_message_to_self(
         mock_s3_upload.assert_called_with(ANY, '12345', expected_data, 'eu-west-1')
 
 
+def test_send_test_message_to_self(
+    app_,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_service_email_template,
+    mock_s3_upload
+):
+
+    expected_data = {'data': ['email address', 'test@user.gov.uk'], 'file_name': 'Test run'}
+    mocker.patch('app.main.views.send.s3download', return_value='email address\r\ntest@user.gov.uk')
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(
+                url_for('main.send_message_to_self', service_id=12345, template_id=54321),
+                follow_redirects=True
+            )
+        assert response.status_code == 200
+        mock_s3_upload.assert_called_with(ANY, '12345', expected_data, 'eu-west-1')
+
+
 def test_download_example_csv(
     app_,
     mocker,
