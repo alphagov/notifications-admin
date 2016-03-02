@@ -30,7 +30,8 @@ def test_should_show_page_for_one_job(app_,
                                       mock_get_service,
                                       mock_get_service_template,
                                       job_data,
-                                      mock_get_job):
+                                      mock_get_job,
+                                      mock_get_notifications):
     service_id = job_data['service']
     job_id = job_data['id']
     file_name = job_data['original_file_name']

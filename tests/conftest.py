@@ -10,6 +10,7 @@ from . import (
     template_json,
     api_key_json,
     job_json,
+    notification_json,
     invite_json
 )
 from app.notify_client.models import (
@@ -539,6 +540,16 @@ def mock_get_jobs(mocker):
             data.append(job_data)
         return {"data": data}
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_jobs)
+
+
+@pytest.fixture(scope='function')
+def mock_get_notifications(mocker):
+    def _get_notifications(service_id, job_id):
+        return notification_json()
+    return mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=_get_notifications
+    )
 
 
 @pytest.fixture(scope='function')

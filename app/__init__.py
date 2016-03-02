@@ -73,6 +73,7 @@ def create_app(config_name, config_overrides=None):
 
     application.add_template_filter(nl2br)
     application.add_template_filter(format_datetime)
+    application.add_template_filter(format_time)
     application.add_template_filter(syntax_highlight_json)
     application.add_template_filter(valid_phone_number)
 
@@ -147,6 +148,12 @@ def format_datetime(date):
     date = dateutil.parser.parse(date)
     native = date.replace(tzinfo=None)
     return native.strftime('%A %d %B %Y at %H:%M')
+
+
+def format_time(date):
+    date = dateutil.parser.parse(date)
+    native = date.replace(tzinfo=None)
+    return native.strftime('%H:%M')
 
 
 def valid_phone_number(phone_number):

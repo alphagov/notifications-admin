@@ -109,6 +109,18 @@ def job_json():
         'bucket_name': 'service-1-{}-notify'.format(job_id),
         'file_name': '{}.csv'.format(job_id),
         'created_at': created_at,
-        'notification_count': 1
+        'notification_count': 1,
+        'status': ''
         }
+    return data
+
+
+def notification_json():
+    import datetime
+    data = {
+        'notifications': [{
+            'sent_at': str(datetime.datetime.now().time())
+        } for i in range(5)],
+        'links': {}
+    }
     return data

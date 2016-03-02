@@ -28,23 +28,29 @@
         template.subject,
         template,
         from_address='{}@notifications.service.gov.uk'.format(service.email_from),
-        from_name=service.name
+        from_name=from_name
       )}}
     {% endif %}
 
-    <p class='heading-small'>
-      Started {{ uploaded_file_time|format_datetime }}
-    </p>
+    {% if finished_at %}
+      <p class='heading-small'>
+        Finished {{ finished_at|format_datetime }}
+      </p>
+    {% else %}
+      <p class='heading-small'>
+        Started {{ uploaded_at|format_datetime }}
+      </p>
+    {% endif %}
 
     <ul class="grid-row job-totals">
       <li class="column-one-quarter">
         {{ big_number(
-          0, 'queued'
+          counts.queued, 'queued'
         )}}
       </li>
       <li class="column-one-quarter">
         {{ big_number(
-          1, 'sent'
+          counts.sent, 'sent'
         )}}
       </li>
       <li class="column-one-quarter">
@@ -60,26 +66,32 @@
       </li>
     </ul>
 
-    {% call(item) list_table(
-      notifications,
-      caption=uploaded_file_name,
-      caption_visible=False,
-      empty_message="Messages go here",
-      field_headings=[
-        'Recipient',
-        'Template',
-        right_aligned_field_heading('Status')
-      ]
-    ) %}
-      {% call field() %}
-        {{ item.to }}
-      {% endcall %}
-      {% call field(
-        align='right',
-        status='error' if item.status == 'Failed' else 'default'
+
+    {% if notifications %}
+      {% call(item) list_table(
+        notifications,
+        caption=uploaded_file_name,
+        caption_visible=False,
+        empty_message="Messages go here",
+        field_headings=[
+          'Recipient',
+          right_aligned_field_heading('Status')
+        ]
       ) %}
-        {{ item.status }}
+        {% call field() %}
+          {{ item.to }}
+        {% endcall %}
+        {% call field(
+          align='right',
+          status='error' if item.status == 'Failed' else 'default'
+        ) %}
+          {{ item.status|title }} at {{ item.sent_at|format_time }}
+        {% endcall %}
       {% endcall %}
-    {% endcall %}
+    {% else %}
+      <p>
+        <a href="{{ url_for(".view_job", service_id=service_id, job_id=job_id) }}">Refresh</a>
+      </p>
+    {% endif %}
 
 {% endblock %}
