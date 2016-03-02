@@ -1,0 +1,69 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner %}
+{% from "components/sms-message.html" import sms_message %}
+{% from "components/email-message.html" import email_message %}
+
+{% block page_title %}
+  {{ uploaded_file_name }} – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <h1 class="heading-large">
+      {{ uploaded_file_name }}
+    </h1>
+
+    {% if 'sms' == template.template_type %}
+      <div class="grid-row">
+        <div class="column-two-thirds">
+          {{ sms_message(
+            template.formatted_as_markup,
+          )}}
+        </div>
+      </div>
+    {% elif 'email' == template.template_type %}
+      {{ email_message(
+        template.subject,
+        template,
+        from_address='{}@notifications.service.gov.uk'.format(service.email_from),
+        from_name=from_name
+      )}}
+    {% endif %}
+
+    {% if not finished_at %}
+      <div
+        data-module="update-content"
+        data-resource="{{url_for(".view_job_updates", service_id=service_id, job_id=job_id)}}"
+        data-key="status"
+      >
+    {% endif %}
+      {% include 'partials/jobs/status.html' %}
+    {% if not finished_at %}
+      </div>
+    {% endif %}
+
+    {% if not finished_at %}
+      <div
+        data-module="update-content"
+        data-resource="{{url_for(".view_job_updates", service_id=service_id, job_id=job_id)}}"
+        data-key="counts"
+      >
+    {% endif %}
+      {% include 'partials/jobs/count.html' %}
+    {% if not finished_at %}
+      </div>
+    {% endif %}
+
+    {% if not finished_at %}
+      <div
+        data-module="update-content"
+        data-resource="{{url_for(".view_job_updates", service_id=service_id, job_id=job_id)}}"
+        data-key="notifications"
+      >
+    {% endif %}
+      {% include 'partials/jobs/notifications.html' %}
+    {% if not finished_at %}
+      </div>
+    {% endif %}
+
+{% endblock %}

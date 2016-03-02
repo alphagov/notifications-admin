@@ -1,5 +1,6 @@
 from flask import url_for
 from bs4 import BeautifulSoup
+import json
 
 
 def test_should_return_list_of_all_jobs(app_,
@@ -21,17 +22,19 @@ def test_should_return_list_of_all_jobs(app_,
         assert len(jobs) == 5
 
 
-def test_should_show_page_for_one_job(app_,
-                                      service_one,
-                                      api_user_active,
-                                      mock_login,
-                                      mock_get_user,
-                                      mock_get_user_by_email,
-                                      mock_get_service,
-                                      mock_get_service_template,
-                                      job_data,
-                                      mock_get_job,
-                                      mock_get_notifications):
+def test_should_show_page_for_one_job(
+    app_,
+    service_one,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_get_service,
+    mock_get_service_template,
+    job_data,
+    mock_get_job,
+    mock_get_notifications
+):
     service_id = job_data['service']
     job_id = job_data['id']
     file_name = job_data['original_file_name']
@@ -45,3 +48,35 @@ def test_should_show_page_for_one_job(app_,
         content = response.get_data(as_text=True)
         assert "Test Service: Your vehicle tax is about to expire" in content
         assert file_name in content
+
+
+def test_should_show_updates_for_one_job_as_json(
+    app_,
+    service_one,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_get_service,
+    mock_get_service_template,
+    job_data,
+    mock_get_job,
+    mock_get_notifications
+):
+    service_id = job_data['service']
+    job_id = job_data['id']
+    file_name = job_data['original_file_name']
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(url_for('main.view_job_updates', service_id=service_id, job_id=job_id))
+
+        assert response.status_code == 200
+        content = json.loads(response.get_data(as_text=True))
+        assert 'sent' in content['counts']
+        assert 'queued' in content['counts']
+        assert 'failed' in content['counts']
+        assert 'Recipient' in content['notifications']
+        assert 'Status' in content['notifications']
+        assert 'Started' in content['status']
