@@ -74,9 +74,6 @@
       {% call field() %}
         {{ item.to }}
       {% endcall %}
-      {% call field() %}
-        {{item.template}}
-      {% endcall %}
       {% call field(
         align='right',
         status='error' if item.status == 'Failed' else 'default'
