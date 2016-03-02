@@ -27,6 +27,7 @@ from app.main.dao import templates_dao
 from app.main.dao import services_dao
 from app import job_api_client
 from app.utils import validate_recipient, InvalidPhoneError, InvalidEmailError
+from utils.process_csv import first_column_heading
 
 page_headings = {
     'email': 'Send emails',
@@ -97,11 +98,12 @@ def send_messages(service_id, template_id):
         templates_dao.get_service_template_or_404(service_id, template_id)['data'],
         prefix=service['name']
     )
+    recipient_column = first_column_heading[template.template_type]
 
     return render_template(
         'views/send.html',
         template=template,
-        column_headers=['to'] + template.placeholders_as_markup,
+        recipient_column=first_column_heading[template.template_type],
         form=form,
         service=service,
         service_id=service_id
@@ -111,29 +113,36 @@ def send_messages(service_id, template_id):
 @main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
 @login_required
 def get_example_csv(service_id, template_id):
-    template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
-    placeholders = list(Template(template).placeholders)
+    template = Template(templates_dao.get_service_template_or_404(service_id, template_id)['data'])
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(['to'] + placeholders)
+    writer.writerow(
+        [first_column_heading[template.template_type]] +
+        list(template.placeholders)
+    )
     writer.writerow([
         {
             'email': current_user.email_address,
             'sms': current_user.mobile_number
-        }[template['template_type']]
-    ] + ["test {}".format(header) for header in placeholders])
+        }[template.template_type]
+    ] + ["test {}".format(header) for header in template.placeholders])
     return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
 
 
 @main.route("/services/<service_id>/send/<template_id>/to-self", methods=['GET'])
 @login_required
 def send_message_to_self(service_id, template_id):
-    template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
-    placeholders = list(Template(template).placeholders)
+    template = Template(templates_dao.get_service_template_or_404(service_id, template_id)['data'])
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(['to'] + placeholders)
-    writer.writerow([current_user.mobile_number] + ["test {}".format(header) for header in placeholders])
+    writer.writerow(
+        [first_column_heading[template.template_type]] +
+        list(template.placeholders)
+    )
+    writer.writerow(
+        [current_user.mobile_number] +
+        ["test {}".format(header) for header in template.placeholders]
+    )
     filedata = {
         'file_name': 'Test run',
         'data': output.getvalue().splitlines()
@@ -166,7 +175,7 @@ def check_messages(service_id, upload_id):
         template = Template(
             raw_template,
             values=upload_result['rows'][0] if upload_result['valid'] else {},
-            drop_values={'to'},
+            drop_values={first_column_heading[raw_template['template_type']]},
             prefix=service['name']
         )
         return render_template(
@@ -174,7 +183,7 @@ def check_messages(service_id, upload_id):
             upload_result=upload_result,
             template=template,
             page_heading=page_headings[template.template_type],
-            column_headers=['to'] + list(template.placeholders_as_markup),
+            column_headers=[first_column_heading[template.template_type]] + list(template.placeholders_as_markup),
             original_file_name=upload_data.get('original_file_name'),
             service_id=service_id,
             service=service,
@@ -236,10 +245,13 @@ def _get_rows(contents, raw_template):
         rows.append(row)
         try:
             validate_recipient(
-                row.get('to', ''),
-                template_type=raw_template['template_type']
+                row, template_type=raw_template['template_type']
             )
-            Template(raw_template, values=row, drop_values={'to'}).replaced
+            Template(
+                raw_template,
+                values=row,
+                drop_values={first_column_heading[raw_template['template_type']]}
+            ).replaced
         except (InvalidEmailError, InvalidPhoneError, NeededByTemplateError, NoPlaceholderForDataError):
             valid = False
     return {"valid": valid, "rows": rows}
