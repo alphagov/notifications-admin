@@ -12,6 +12,7 @@ from flask_login import (
 )
 
 from notifications_python_client.errors import HTTPError
+from app import user_api_client
 
 from app.main import main
 from app.main.forms import InviteUserForm
@@ -19,16 +20,6 @@ from app.main.dao.services_dao import get_service_by_id
 from app import user_api_client
 from app import invite_api_client
 from app.utils import user_has_permissions
-
-fake_users = [
-    {
-        'name': '',
-        'permission_send_messages': True,
-        'permission_manage_service': True,
-        'permission_manage_api_keys': True,
-        'active': True
-    }
-]
 
 
 @main.route("/services/<service_id>/users")
@@ -83,6 +74,14 @@ def edit_user_permissions(service_id, user_id):
         'manage_api_keys': user.has_permissions(['manage_api_keys', 'access_developer_docs'])
         })
     if form.validate_on_submit():
+        permissions = []
+        permissions.extend(
+            _convert_role_to_permissions('send_messages') if form.send_messages.data == 'yes' else [])
+        permissions.extend(
+            _convert_role_to_permissions('manage_service') if form.manage_service.data == 'yes' else [])
+        permissions.extend(
+            _convert_role_to_permissions('manage_api_keys') if form.manage_api_keys.data == 'yes' else [])
+        user_api_client.set_user_permissions(user_id, service_id, permissions)
         return redirect(url_for('.manage_users', service_id=service_id))
 
     return render_template(
@@ -123,6 +122,18 @@ def cancel_invited_user(service_id, invited_user_id):
     return redirect(url_for('main.manage_users', service_id=service_id))
 
 
+def _convert_role_to_permissions(role):
+    if role == 'send_messages':
+        return ['send_texts', 'send_emails', 'send_letters']
+    elif role == 'manage_service':
+        return ['manage_users', 'manage_templates', 'manage_settings']
+    elif role == 'manage_api_keys':
+        return ['manage_api_keys', 'access_developer_docs']
+    return []
+
+
+# TODO replace with method which converts each 'role' into the list
+# of permissions like the method above :)
 def _get_permissions(form):
     permissions = []
     if form.get('send_messages') and form['send_messages'] == 'yes':

@@ -110,9 +110,11 @@ class RegisterUserFromInviteForm(Form):
 class InviteUserForm(Form):
     email_address = email_address('Their email address')
 
-    send_messages = BooleanField("Send messages")
-    manage_service = BooleanField("Manage service")
-    manage_api_keys = BooleanField("Manage API keys")
+    # TODO fix this Radio field so we are not having to test for yes or no rather
+    # use operator equality.
+    send_messages = RadioField("Send messages", choices=[('yes', 'Yes'), ('no', 'No')])
+    manage_service = RadioField("Manage service", choices=[('yes', 'Yes'), ('no', 'No')])
+    manage_api_keys = RadioField("Manage API keys", choices=[('yes', 'Yes'), ('no', 'No')])
 
 
 class TwoFactorForm(Form):
