@@ -66,13 +66,18 @@ def edit_user_permissions(service_id, user_id):
     # call as well. eg. /user/<user_id>?&service_id=service_id
     user = user_api_client.get_user(user_id)
     service = get_service_by_id(service_id)
-
+    # Need to make the email address read only, or a disabled field?
+    # Do it through the template or the form class?
     form = InviteUserForm(**{
         'email_address': user.email_address,
-        'send_messages': user.has_permissions(['send_texts', 'send_emails', 'send_letters']),
-        'manage_service': user.has_permissions(['manage_users', 'manage_templates', 'manage_settings']),
-        'manage_api_keys': user.has_permissions(['manage_api_keys', 'access_developer_docs'])
+        'send_messages': 'yes' if user.has_permissions(
+            ['send_texts', 'send_emails', 'send_letters']) else 'no',
+        'manage_service': 'yes' if user.has_permissions(
+            ['manage_users', 'manage_templates', 'manage_settings']) else 'no',
+        'manage_api_keys': 'yes' if user.has_permissions(
+            ['manage_api_keys', 'access_developer_docs']) else 'no'
         })
+
     if form.validate_on_submit():
         permissions = []
         permissions.extend(
