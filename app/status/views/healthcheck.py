@@ -1,10 +1,7 @@
-from flask import jsonify
-
-from flask import request
-
+from flask import jsonify, request
 from app import version
-
 from app.status import status
+
 
 @status.route('/_status', methods=['GET'])
 def show_status():
