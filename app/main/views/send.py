@@ -44,7 +44,7 @@ manage_templates_page_headings = {
 
 
 def get_page_headings(template_type):
-    if current_user.has_permissions(session.get('service_id', ''), 'manage_service'):
+    if current_user.has_permissions(['manage_service']):
         return manage_service_page_headings[template_type]
     else:
         return manage_templates_page_headings[template_type]

@@ -100,10 +100,8 @@ def user_has_permissions(*permissions, or_=False):
     def wrap(func):
         @wraps(func)
         def wrap_func(*args, **kwargs):
-            # We are making the assumption that the user is logged in.
             from flask_login import current_user
-            service_id = session.get('service_id', '')
-            if current_user and current_user.has_permissions(service_id, permissions, or_=or_):
+            if current_user and current_user.has_permissions(permissions, or_=or_):
                 return func(*args, **kwargs)
             else:
                 abort(403)
