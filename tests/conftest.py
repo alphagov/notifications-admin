@@ -597,6 +597,11 @@ def sample_invite(mocker, service_one):
 
 
 @pytest.fixture(scope='function')
+def sample_invited_user(mocker, sample_invite):
+    return InvitedUser(**sample_invite)
+
+
+@pytest.fixture(scope='function')
 def mock_create_invite(mocker, sample_invite):
 
     def _create_invite(from_user, service_id, email_address, permissions):
@@ -632,6 +637,6 @@ def mock_accept_invite(mocker, sample_invite):
 
 @pytest.fixture(scope='function')
 def mock_add_user_to_service(mocker, service_one, api_user_active):
-    def _add_user(service_id, user_id):
+    def _add_user(service_id, user_id, invited_user):
         return api_user_active
     return mocker.patch('app.user_api_client.add_user_to_service', side_effect=_add_user)

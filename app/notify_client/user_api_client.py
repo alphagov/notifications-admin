@@ -94,9 +94,9 @@ class UserApiClient(BaseAPIClient):
         resp = self.get(endpoint)
         return [User(data) for data in resp['data']]
 
-    def add_user_to_service(self, service_id, user_id):
+    def add_user_to_service(self, service_id, user_id, invited_user):
         endpoint = '/service/{}/users/{}'.format(service_id, user_id)
-        resp = self.post(endpoint, data={})
+        resp = self.post(endpoint, data=invited_user.serialize(permissions_as_string=True))
         return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
 
     def set_user_permissions(self, user_id, service_id, permissions):
