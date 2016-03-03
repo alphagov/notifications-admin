@@ -110,6 +110,10 @@ class RegisterUserFromInviteForm(Form):
 class InviteUserForm(Form):
     email_address = email_address('Their email address')
 
+    send_messages = BooleanField("Send messages")
+    manage_service = BooleanField("Manage service")
+    manage_api_keys = BooleanField("Manage API keys")
+
 
 class TwoFactorForm(Form):
     def __init__(self, validate_code_func, *args, **kwargs):

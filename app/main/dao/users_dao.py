@@ -9,6 +9,10 @@ from app.main.encryption import hashpw
 from app import user_api_client
 
 
+# TODO fix up this, do we really need this class why not just use the clients
+# directly??
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return get_user_by_id(user_id)
