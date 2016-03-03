@@ -8,7 +8,8 @@ from wtforms import (
     TextAreaField,
     FileField,
     RadioField,
-    BooleanField
+    BooleanField,
+    HiddenField
 )
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import DataRequired, Email, Length, Regexp
@@ -95,6 +96,15 @@ class RegisterUserForm(Form):
     email_address = email_address()
     mobile_number = mobile_number()
     password = password()
+
+
+class RegisterUserFromInviteForm(Form):
+    name = StringField('Full name',
+                       validators=[DataRequired(message='Name can not be empty')])
+    mobile_number = mobile_number()
+    password = password()
+    service = HiddenField('service')
+    email_address = HiddenField('email_address')
 
 
 class InviteUserForm(Form):

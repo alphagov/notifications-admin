@@ -4,8 +4,7 @@ from flask import (
     redirect,
     abort,
     url_for,
-    flash
-)
+    flash)
 
 from flask_login import (
     login_required,
@@ -79,7 +78,7 @@ def invite_user(service_id):
 
 @main.route("/services/<service_id>/users/<user_id>", methods=['GET', 'POST'])
 @login_required
-def edit_user(service_id, user_id):
+def edit_user_permissions(service_id, user_id):
 
     if request.method == 'POST':
         return redirect(url_for('.manage_users', service_id=service_id))
@@ -114,6 +113,13 @@ def delete_user(service_id, user_id):
         service=get_service_by_id_or_404(service_id),
         service_id=service_id
     )
+
+
+@main.route("/services/<service_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
+def cancel_invited_user(service_id, invited_user_id):
+    invite_api_client.cancel_invited_user(service_id=service_id, invited_user_id=invited_user_id)
+
+    return redirect(url_for('main.manage_users', service_id=service_id))
 
 
 def _get_permissions(form):

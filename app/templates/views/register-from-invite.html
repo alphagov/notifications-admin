@@ -1,4 +1,6 @@
 {% extends "withoutnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
 Create an account – GOV.UK Notify
@@ -9,26 +11,14 @@ Create an account – GOV.UK Notify
 <div class="grid-row">
   <div class="column-two-thirds">
     <h1 class="heading-large">Create an account</h1>
-
-    <p>If you've used GOV.UK Notify before, <a href="">sign in to your account</a>.</p>
-
-    <p>
-    <label class="form-label" for="name-f1">Full name</label>
-      <input class="form-control-2-3" id="name-f1" type="text">
-      </p>
-      <p>
-      <label class="form-label" for="mobile">Mobile phone number</label>
-      <input class="form-control-1-4" id="mobile" type="text">
-      </p>
-      <p>
-      <label class="form-label" for="password">Create a password</label>
-      <input class="form-control-1-4" id="password" type="password"><br>
-      <span class="font-xsmall">Your password must have at least 10 characters</span></label>
-      </p>
-
-      <p>
-      <a class="button" href="verify-mobile" role="button">Continue</a>
-      </p>
+    <form method="post" autocomplete="nope">
+      {{ textbox(form.name, width='3-4') }}
+      {{ textbox(form.mobile_number, width='3-4') }}
+      {{ textbox(form.password, hint="Your password must have at least 10 characters", width='3-4') }}
+      {{ page_footer("Continue") }}
+      {{form.service}}
+      {{form.email_address}}
+    </form>
   </div>
 </div>
 

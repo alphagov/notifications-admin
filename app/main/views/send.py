@@ -159,10 +159,17 @@ def send_message_to_self(service_id, template_id):
         [first_column_heading[template.template_type]] +
         list(template.placeholders)
     )
-    writer.writerow(
-        [current_user.mobile_number] +
-        ["test {}".format(header) for header in template.placeholders]
-    )
+    if template.template_type == 'sms':
+        writer.writerow(
+            [current_user.mobile_number] +
+            ["test {}".format(header) for header in template.placeholders]
+        )
+    if template.template_type == 'email':
+        writer.writerow(
+            [current_user.email_address] +
+            ["test {}".format(header) for header in template.placeholders]
+        )
+
     filedata = {
         'file_name': 'Test run',
         'data': output.getvalue().splitlines()

@@ -1,3 +1,4 @@
+
 from notifications_python_client.base import BaseAPIClient
 from app.notify_client.models import InvitedUser
 
@@ -27,17 +28,21 @@ class InviteApiClient(BaseAPIClient):
         endpoint = '/service/{}/invite'.format(service_id)
         resp = self.get(endpoint)
         invites = resp['data']
-        invited_users = _get_invited_users(invites)
+        invited_users = self._get_invited_users(invites)
         return invited_users
 
     def accept_invite(self, token):
         resp = self.get(url='/invite/{}'.format(token))
         return InvitedUser(**resp['data'])
 
+    def cancel_invited_user(self, service_id, invited_user_id):
+        data = {'status': 'cancelled'}
+        self.post(url='/service/{0}/invite/{1}'.format(service_id, invited_user_id),
+                  data=data)
 
-def _get_invited_users(invites):
-    invited_users = []
-    for invite in invites:
-        invited_user = InvitedUser(**invite)
-        invited_users.append(invited_user)
-    return invited_users
+    def _get_invited_users(self, invites):
+        invited_users = []
+        for invite in invites:
+            invited_user = InvitedUser(**invite)
+            invited_users.append(invited_user)
+        return invited_users

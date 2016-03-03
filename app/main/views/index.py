@@ -12,12 +12,6 @@ def index():
     return render_template('views/signedout.html')
 
 
-@main.route("/register-from-invite")
-@login_required
-def register_from_invite():
-    return render_template('views/register-from-invite.html')
-
-
 @main.route("/verify-mobile")
 @login_required
 def verify_mobile():
