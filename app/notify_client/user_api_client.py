@@ -98,3 +98,8 @@ class UserApiClient(BaseAPIClient):
         endpoint = '/service/{}/users/{}'.format(service_id, user_id)
         resp = self.post(endpoint, data={})
         return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
+
+    def set_user_permissions(self, user_id, service_id, permissions):
+        data = [{'permission': x} for x in permissions]
+        endpoint = '/user/{}/service/{}/permission'.format(user_id, service_id)
+        resp = self.post(endpoint, data=data)

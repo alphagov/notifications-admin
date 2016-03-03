@@ -27,3 +27,5 @@ fi
 
 # Install Python development dependencies
 pip3 install -r requirements_for_test.txt
+
+npm install && npm run build

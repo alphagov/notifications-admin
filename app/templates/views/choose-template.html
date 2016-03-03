@@ -16,7 +16,7 @@
 
     {% if templates %}
       {% if not has_jobs %}
-        {% if current_user.has_permissions(['manage_service']) %}
+        {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], or_=True) %}
         {{ banner(
           """
             Send yourself a test message
@@ -41,7 +41,7 @@
           </div>
           <div class="column-one-third">
             <div class="sms-message-use-links">
-              {% if current_user.has_permissions(['manage_service']) %}
+              {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
               <a href="{{ url_for(".send_messages", service_id=service_id, template_id=template.id) }}">Add recipients</a>
               <a href="{{ url_for(".send_message_to_self", service_id=service_id, template_id=template.id) }}">Send yourself a test</a>
               {% endif %}

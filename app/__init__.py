@@ -15,7 +15,6 @@ from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.user_api_client import UserApiClient
 from app.notify_client.job_api_client import JobApiClient
 from app.notify_client.status_api_client import StatusApiClient
-from app.notify_client.permission_api_client import PermissionApiClient
 from app.notify_client.invite_api_client import InviteApiClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.asset_fingerprinter import AssetFingerprinter
@@ -34,7 +33,6 @@ job_api_client = JobApiClient()
 status_api_client = StatusApiClient()
 invite_api_client = InviteApiClient()
 asset_fingerprinter = AssetFingerprinter()
-permission_api_client = PermissionApiClient()
 
 
 def create_app(config_name, config_overrides=None):
@@ -51,7 +49,6 @@ def create_app(config_name, config_overrides=None):
     api_key_api_client.init_app(application)
     job_api_client.init_app(application)
     status_api_client.init_app(application)
-    permission_api_client.init_app(application)
     invite_api_client.init_app(application)
 
     login_manager.init_app(application)
