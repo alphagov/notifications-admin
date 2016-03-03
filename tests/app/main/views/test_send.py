@@ -156,7 +156,8 @@ def test_send_test_message_to_self(
     mock_login,
     mock_get_service,
     mock_get_service_email_template,
-    mock_s3_upload
+    mock_s3_upload,
+    mock_has_permissions
 ):
 
     expected_data = {'data': ['email address', 'test@user.gov.uk'], 'file_name': 'Test run'}
