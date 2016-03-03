@@ -267,3 +267,36 @@ def test_create_job_should_call_api(
         assert response.status_code == 200
         assert 'We’ve started sending your messages' in response.get_data(as_text=True)
         mock_create_job.assert_called_with(job_id, service_id, template_id, original_file_name, notification_count)
+
+
+def test_check_messages_should_revalidate_file_when_uploading_file(
+    app_,
+    service_one,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    job_data,
+    mock_create_job,
+    mock_get_service_template,
+    mock_s3_upload,
+    mocker,
+    mock_has_permissions
+):
+
+    service_id = service_one['id']
+    contents = 'phone number,name,,,\n++44 7700 900981,test1,,,\n+44 7700 900981,test2,,,\n ,,, \n ,,, \t \t \n'
+    file_data = (BytesIO(contents.encode('utf-8')), 'invalid.csv')
+    upload_data = {'file': file_data}
+
+    mocker.patch('app.main.views.send.s3download', return_value=contents)
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            with client.session_transaction() as session:
+                session['upload_data'] = {'original_file_name': 'invalid.csv',
+                                          'template_id': job_data['template'],
+                                          'notification_count': job_data['notification_count']}
+            url = url_for('main.check_messages', service_id=service_id, upload_id=job_data['id'])
+            response = client.post(url, data=upload_data, follow_redirects=True)
+            assert response.status_code == 200
+            assert 'Your CSV file contained missing or invalid data' in response.get_data(as_text=True)

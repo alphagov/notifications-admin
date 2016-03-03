@@ -219,6 +219,10 @@ def check_messages(service_id, upload_id):
             form=CsvUploadForm()
         )
     elif request.method == 'POST':
+        if request.files:
+            # The csv was invalid, validate the csv again
+            return send_messages(service_id, template_id)
+
         original_file_name = upload_data.get('original_file_name')
         notification_count = upload_data.get('notification_count')
         session.pop('upload_data')
