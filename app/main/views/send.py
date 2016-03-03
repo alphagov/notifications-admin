@@ -200,22 +200,22 @@ def check_messages(service_id, upload_id):
         if request.files:
             # The csv was invalid, validate the csv again
             return send_messages(service_id, template_id)
-        else:
-            original_file_name = upload_data.get('original_file_name')
-            notification_count = upload_data.get('notification_count')
-            session.pop('upload_data')
-            try:
-                job_api_client.create_job(upload_id, service_id, template_id, original_file_name, notification_count)
-            except HTTPError as e:
-                if e.status_code == 404:
-                    abort(404)
-                else:
-                    raise e
 
-            flash('We’ve started sending your messages', 'default_with_tick')
-            return redirect(
-                url_for('main.view_job', service_id=service_id, job_id=upload_id)
-            )
+        original_file_name = upload_data.get('original_file_name')
+        notification_count = upload_data.get('notification_count')
+        session.pop('upload_data')
+        try:
+            job_api_client.create_job(upload_id, service_id, template_id, original_file_name, notification_count)
+        except HTTPError as e:
+            if e.status_code == 404:
+                abort(404)
+            else:
+                raise e
+
+        flash('We’ve started sending your messages', 'default_with_tick')
+        return redirect(
+            url_for('main.view_job', service_id=service_id, job_id=upload_id)
+        )
 
 
 def _get_filedata(file):
