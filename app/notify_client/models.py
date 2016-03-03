@@ -126,18 +126,37 @@ class InvitedUser(object):
         self.service = str(service)
         self.from_user = from_user
         self.email_address = email_address
-        self.permissions = permissions.split(',')
+        if isinstance(permissions, list):
+            self.permissions = permissions
+        else:
+            self.permissions = permissions.split(',')
         self.status = status
         self.created_at = created_at
 
     def has_permissions(self, permission):
         return permission in self.permissions
 
-    def serialize(self):
-        return {'id': self.id,
+    def __eq__(self, other):
+        return ((self.id,
+                self.service,
+                self.from_user,
+                self.email_address,
+                self.status) == (other.id,
+                other.service,
+                other.from_user,
+                other.email_address,
+                other.status))
+
+    def serialize(self, permissions_as_string=False):
+        data = {'id': self.id,
                 'service': self.service,
                 'from_user': self.from_user,
                 'email_address': self.email_address,
-                'permissions': self.permissions,
-                'status': self.status
+                'status': self.status,
+                'created_at': str(self.created_at)
                 }
+        if permissions_as_string:
+            data['permissions'] = ','.join(self.permissions)
+        else:
+            data['permissions'] = self.permissions
+        return data

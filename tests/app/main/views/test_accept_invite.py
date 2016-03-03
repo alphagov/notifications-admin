@@ -7,6 +7,7 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(app_,
                                                                           service_one,
                                                                           api_user_active,
                                                                           sample_invite,
+                                                                          sample_invited_user,
                                                                           mock_accept_invite,
                                                                           mock_get_user_by_email,
                                                                           mock_add_user_to_service):
@@ -21,7 +22,7 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(app_,
 
             mock_accept_invite.assert_called_with('thisisnotarealtoken')
             mock_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
-            mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id)
+            mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id, sample_invited_user)
 
             assert response.status_code == 302
             assert response.location == expected_redirect_location
@@ -31,12 +32,12 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
                                                                      service_one,
                                                                      api_user_active,
                                                                      sample_invite,
+                                                                     sample_invited_user,
                                                                      mock_accept_invite,
                                                                      mock_get_user_by_email,
                                                                      mock_add_user_to_service):
 
     expected_service = service_one['id']
-    expected_redirect_location = 'http://localhost/services/{}/dashboard'.format(expected_service)
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -45,7 +46,7 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
 
             mock_accept_invite.assert_called_with('thisisnotarealtoken')
             mock_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
-            mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id)
+            mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id, sample_invited_user)
 
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -59,7 +60,6 @@ def test_new_user_accept_invite_calls_api_and_redirects_to_registration(app_,
                                                                         mock_dont_get_user_by_email,
                                                                         mock_add_user_to_service):
 
-    expected_service = service_one['id']
     expected_redirect_location = 'http://localhost/register-from-invite'
 
     with app_.test_request_context():
@@ -122,6 +122,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(a
 def test_new_invited_user_verifies_and_added_to_service(app_,
                                                         service_one,
                                                         sample_invite,
+                                                        sample_invited_user,
                                                         mock_accept_invite,
                                                         mock_dont_get_user_by_email,
                                                         mock_register_user,
@@ -157,7 +158,7 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
             # service and sent on to dash board
             with client.session_transaction() as session:
                 new_user_id = session['user_id']
-                mock_add_user_to_service.assert_called_with(data['service'], new_user_id)
+                mock_add_user_to_service.assert_called_with(data['service'], new_user_id, sample_invited_user)
 
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             element = page.find('h2', class_='navigation-service-name').find('a')
