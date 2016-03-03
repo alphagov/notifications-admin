@@ -126,7 +126,10 @@ class InvitedUser(object):
         self.service = str(service)
         self.from_user = from_user
         self.email_address = email_address
-        self.permissions = permissions.split(',')
+        if isinstance(permissions, list):
+            self.permissions = permissions
+        else:
+            self.permissions = permissions.split(',')
         self.status = status
         self.created_at = created_at
 
@@ -139,5 +142,6 @@ class InvitedUser(object):
                 'from_user': self.from_user,
                 'email_address': self.email_address,
                 'permissions': self.permissions,
-                'status': self.status
+                'status': self.status,
+                'created_at': str(self.created_at)
                 }

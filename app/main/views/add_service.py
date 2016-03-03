@@ -10,6 +10,8 @@ from flask_login import login_required
 from app.main import main
 from app.main.dao import services_dao, users_dao
 from app.main.forms import AddServiceForm
+from app.notify_client.models import InvitedUser
+
 from app import user_api_client
 
 
@@ -19,10 +21,11 @@ def add_service():
 
     invited_user = session.get('invited_user')
     if invited_user:
+        invitation = InvitedUser(**invited_user)
         # if invited user add to service and redirect to dashboard
         user = users_dao.get_user_by_id(session['user_id'])
         service_id = invited_user['service']
-        user_api_client.add_user_to_service(service_id, user.id)
+        user_api_client.add_user_to_service(service_id, user.id, invitation.permissions)
         session.pop('invited_user', None)
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
