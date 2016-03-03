@@ -17,7 +17,8 @@ def test_choose_template(
     mock_get_service,
     mock_check_verify_code,
     mock_get_service_templates,
-    mock_get_jobs
+    mock_get_jobs,
+    mock_has_permissions
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -40,7 +41,8 @@ def test_upload_empty_csvfile_returns_to_upload_page(
     mock_get_service,
     mock_get_service_templates,
     mock_check_verify_code,
-    mock_get_service_template
+    mock_get_service_template,
+    mock_has_permissions
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -64,7 +66,8 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
     mock_login,
     mock_get_service,
     mock_get_service_template,
-    mock_s3_upload
+    mock_s3_upload,
+    mock_has_permissions
 ):
 
     contents = 'phone number,name\n+44 123,test1\n+44 456,test2'
@@ -95,7 +98,8 @@ def test_upload_csvfile_removes_empty_lines_and_trailing_commas(
     mock_login,
     mock_get_service,
     mock_get_service_template,
-    mock_s3_upload
+    mock_s3_upload,
+    mock_has_permissions
 ):
 
     contents = 'phone number,name,,,\n++44 7700 900981,test1,,,\n+44 7700 900981,test2,,,\n ,,, \n ,,, \t \t \n'
@@ -127,7 +131,8 @@ def test_send_test_message_to_self(
     mock_login,
     mock_get_service,
     mock_get_service_template,
-    mock_s3_upload
+    mock_s3_upload,
+    mock_has_permissions
 ):
 
     expected_data = {'data': ['phone number', '+4412341234'], 'file_name': 'Test run'}
@@ -151,7 +156,8 @@ def test_send_test_message_to_self(
     mock_login,
     mock_get_service,
     mock_get_service_email_template,
-    mock_s3_upload
+    mock_s3_upload,
+    mock_has_permissions
 ):
 
     expected_data = {'data': ['email address', 'test@user.gov.uk'], 'file_name': 'Test run'}
@@ -174,7 +180,8 @@ def test_download_example_csv(
     api_user_active,
     mock_login,
     mock_get_service,
-    mock_get_service_template
+    mock_get_service_template,
+    mock_has_permissions
 ):
 
     with app_.test_request_context():
@@ -196,7 +203,8 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_login,
     mock_get_service,
     mock_get_service_template,
-    mock_s3_upload
+    mock_s3_upload,
+    mock_has_permissions
 ):
 
     contents = 'phone number\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
@@ -234,8 +242,10 @@ def test_create_job_should_call_api(
     job_data,
     mock_create_job,
     mock_get_job,
+    mock_get_notifications,
     mock_get_service,
-    mock_get_service_template
+    mock_get_service_template,
+    mock_has_permissions
 ):
 
     service_id = service_one['id']

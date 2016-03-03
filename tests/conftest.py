@@ -10,6 +10,7 @@ from . import (
     template_json,
     api_key_json,
     job_json,
+    notification_json,
     invite_json
 )
 from app.notify_client.models import (
@@ -317,6 +318,15 @@ def mock_get_user_by_email(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_user_with_permissions(mocker, api_user_active):
+    def _get_user(id):
+        api_user_active._permissions[''] = ['manage_users', 'manage_templates', 'manage_settings']
+        return api_user_active
+    return mocker.patch(
+        'app.user_api_client.get_user', side_effect=_get_user)
+
+
+@pytest.fixture(scope='function')
 def mock_dont_get_user_by_email(mocker):
 
     def _get_user(email_address):
@@ -533,8 +543,18 @@ def mock_get_jobs(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_notifications(mocker):
+    def _get_notifications(service_id, job_id):
+        return notification_json()
+    return mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=_get_notifications
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_has_permissions(mocker):
-    def _has_permission(service_id, permissions):
+    def _has_permission(permissions, service_id=None, or_=False):
         return True
     return mocker.patch(
         'app.notify_client.user_api_client.User.has_permissions',

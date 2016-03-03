@@ -26,13 +26,29 @@ from app.main.uploader import (
 from app.main.dao import templates_dao
 from app.main.dao import services_dao
 from app import job_api_client
-from app.utils import validate_recipient, InvalidPhoneError, InvalidEmailError
+from app.utils import (
+    validate_recipient, InvalidPhoneError, InvalidEmailError, user_has_permissions)
 from utils.process_csv import first_column_heading
 
-page_headings = {
+
+send_messages_page_headings = {
     'email': 'Send emails',
     'sms': 'Send text messages'
 }
+
+
+manage_templates_page_headings = {
+    'email': 'Manage templates',
+    'sms': 'Manage templates'
+}
+
+
+def get_page_headings(template_type):
+    # User has manage_service role
+    if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']):
+        return send_messages_page_headings[template_type]
+    else:
+        return manage_templates_page_headings[template_type]
 
 
 @main.route("/services/<service_id>/send/letters", methods=['GET'])
@@ -43,6 +59,8 @@ def letters_stub(service_id):
 
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
+@login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', or_=True)
 def choose_template(service_id, template_type):
 
     service = services_dao.get_service_by_id_or_404(service_id)
@@ -66,7 +84,7 @@ def choose_template(service_id, template_type):
             if template['template_type'] == template_type
         ],
         template_type=template_type,
-        page_heading=page_headings[template_type],
+        page_heading=get_page_headings(template_type),
         service=service,
         has_jobs=len(jobs),
         service_id=service_id
@@ -75,6 +93,7 @@ def choose_template(service_id, template_type):
 
 @main.route("/services/<service_id>/send/<int:template_id>", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_messages(service_id, template_id):
 
     form = CsvUploadForm()
@@ -112,6 +131,7 @@ def send_messages(service_id, template_id):
 
 @main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
 @login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', or_=True)
 def get_example_csv(service_id, template_id):
     template = Template(templates_dao.get_service_template_or_404(service_id, template_id)['data'])
     output = io.StringIO()
@@ -131,6 +151,7 @@ def get_example_csv(service_id, template_id):
 
 @main.route("/services/<service_id>/send/<template_id>/to-self", methods=['GET'])
 @login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_message_to_self(service_id, template_id):
     template = Template(templates_dao.get_service_template_or_404(service_id, template_id)['data'])
     output = io.StringIO()
@@ -166,6 +187,7 @@ def send_message_to_self(service_id, template_id):
 @main.route("/services/<service_id>/check/<upload_id>",
             methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def check_messages(service_id, upload_id):
 
     upload_data = session['upload_data']
@@ -189,7 +211,7 @@ def check_messages(service_id, upload_id):
             'views/check.html',
             upload_result=upload_result,
             template=template,
-            page_heading=page_headings[template.template_type],
+            page_heading=get_page_headings(template.template_type),
             column_headers=[first_column_heading[template.template_type]] + list(template.placeholders_as_markup),
             original_file_name=upload_data.get('original_file_name'),
             service_id=service_id,

@@ -3,6 +3,7 @@ from flask import (
 from flask_login import (login_required, current_user)
 
 from app.main import main
+from app.utils import user_has_permissions
 from app.main.dao.services_dao import (
     get_service_by_id, delete_service, update_service)
 from app.main.dao.users_dao import verify_password
@@ -12,6 +13,7 @@ from notifications_python_client.errors import HTTPError
 
 @main.route("/services/<service_id>/service-settings")
 @login_required
+@user_has_permissions('manage_settings')
 def service_settings(service_id):
     try:
         service = get_service_by_id(service_id)['data']
@@ -29,6 +31,7 @@ def service_settings(service_id):
 
 @main.route("/services/<service_id>/service-settings/name", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_settings')
 def service_name_change(service_id):
     try:
         service = get_service_by_id(service_id)['data']
@@ -53,6 +56,7 @@ def service_name_change(service_id):
 
 @main.route("/services/<service_id>/service-settings/name/confirm", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_settings')
 def service_name_change_confirm(service_id):
     try:
         service = get_service_by_id(service_id)['data']
@@ -82,6 +86,7 @@ def service_name_change_confirm(service_id):
 
 @main.route("/services/<service_id>/service-settings/request-to-go-live", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_settings')
 def service_request_to_go_live(service_id):
     try:
         service = get_service_by_id(service_id)['data']
@@ -104,6 +109,7 @@ def service_request_to_go_live(service_id):
 
 @main.route("/services/<service_id>/service-settings/status", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_settings')
 def service_status_change(service_id):
     try:
         service = get_service_by_id(service_id)['data']
@@ -125,6 +131,7 @@ def service_status_change(service_id):
 
 @main.route("/services/<service_id>/service-settings/status/confirm", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_settings')
 def service_status_change_confirm(service_id):
     try:
         service = get_service_by_id(service_id)['data']
@@ -153,6 +160,7 @@ def service_status_change_confirm(service_id):
 
 @main.route("/services/<service_id>/service-settings/delete", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_settings')
 def service_delete(service_id):
     try:
         service = get_service_by_id(service_id)['data']
@@ -174,6 +182,7 @@ def service_delete(service_id):
 
 @main.route("/services/<service_id>/service-settings/delete/confirm", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_settings')
 def service_delete_confirm(service_id):
     try:
         service = get_service_by_id(service_id)['data']

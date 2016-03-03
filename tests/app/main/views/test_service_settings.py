@@ -6,7 +6,8 @@ def test_should_show_overview(app_,
                               mock_get_service,
                               mock_get_user,
                               mock_get_user_by_email,
-                              mock_login):
+                              mock_login,
+                              mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -25,7 +26,8 @@ def test_should_show_service_name(app_,
                                   mock_get_service,
                                   mock_get_user,
                                   mock_get_user_by_email,
-                                  mock_login):
+                                  mock_login,
+                                  mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -44,7 +46,8 @@ def test_should_redirect_after_change_service_name(app_,
                                                    mock_get_service,
                                                    mock_get_user,
                                                    mock_get_user_by_email,
-                                                   mock_login):
+                                                   mock_login,
+                                                   mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -64,7 +67,8 @@ def test_should_show_service_name_confirmation(app_,
                                                mock_get_service,
                                                mock_get_user,
                                                mock_get_user_by_email,
-                                               mock_login):
+                                               mock_login,
+                                               mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -85,7 +89,8 @@ def test_should_redirect_after_service_name_confirmation(app_,
                                                          mock_get_user,
                                                          mock_get_user_by_email,
                                                          mock_login,
-                                                         mock_verify_password):
+                                                         mock_verify_password,
+                                                         mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -110,7 +115,8 @@ def test_should_show_request_to_go_live(app_,
                                         mock_get_service,
                                         mock_get_user,
                                         mock_get_user_by_email,
-                                        mock_login):
+                                        mock_login,
+                                        mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -130,7 +136,8 @@ def test_should_redirect_after_request_to_go_live(app_,
                                                   mock_update_service,
                                                   mock_get_user,
                                                   mock_get_user_by_email,
-                                                  mock_login):
+                                                  mock_login,
+                                                  mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -151,7 +158,8 @@ def test_should_show_status_page(app_,
                                  mock_get_service,
                                  mock_get_user,
                                  mock_get_user_by_email,
-                                 mock_login):
+                                 mock_login,
+                                 mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -170,7 +178,8 @@ def test_should_show_redirect_after_status_change(app_,
                                                   mock_get_service,
                                                   mock_get_user,
                                                   mock_get_user_by_email,
-                                                  mock_login):
+                                                  mock_login,
+                                                  mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -190,7 +199,8 @@ def test_should_show_status_confirmation(app_,
                                          mock_get_service,
                                          mock_get_user,
                                          mock_get_user_by_email,
-                                         mock_login):
+                                         mock_login,
+                                         mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -211,7 +221,8 @@ def test_should_redirect_after_status_confirmation(app_,
                                                    mock_get_user,
                                                    mock_get_user_by_email,
                                                    mock_login,
-                                                   mock_verify_password):
+                                                   mock_verify_password,
+                                                   mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -232,7 +243,8 @@ def test_should_show_delete_page(app_,
                                  mock_get_service,
                                  mock_get_user,
                                  mock_get_user_by_email,
-                                 mock_login):
+                                 mock_login,
+                                 mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -250,7 +262,8 @@ def test_should_show_redirect_after_deleting_service(app_,
                                                      mock_get_service,
                                                      mock_get_user,
                                                      mock_get_user_by_email,
-                                                     mock_login):
+                                                     mock_login,
+                                                     mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -269,7 +282,8 @@ def test_should_show_delete_confirmation(app_,
                                          mock_get_service,
                                          mock_get_user,
                                          mock_get_user_by_email,
-                                         mock_login):
+                                         mock_login,
+                                         mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -289,7 +303,8 @@ def test_should_redirect_delete_confirmation(app_,
                                              mock_get_user,
                                              mock_get_user_by_email,
                                              mock_login,
-                                             mock_verify_password):
+                                             mock_verify_password,
+                                             mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)

@@ -30,7 +30,8 @@ def test_should_show_page_for_one_job(app_,
                                       mock_get_service,
                                       mock_get_service_template,
                                       job_data,
-                                      mock_get_job):
+                                      mock_get_job,
+                                      mock_get_notifications):
     service_id = job_data['service']
     job_id = job_data['id']
     file_name = job_data['original_file_name']
@@ -41,4 +42,6 @@ def test_should_show_page_for_one_job(app_,
             response = client.get(url_for('main.view_job', service_id=service_id, job_id=job_id))
 
         assert response.status_code == 200
-        assert file_name in response.get_data(as_text=True)
+        content = response.get_data(as_text=True)
+        assert "Test Service: Your vehicle tax is about to expire" in content
+        assert file_name in content

@@ -96,14 +96,12 @@ def validate_recipient(row, template_type):
     }[template_type](get_recipient_from_row(row, template_type))
 
 
-def user_has_permissions(*permissions):
+def user_has_permissions(*permissions, or_=False):
     def wrap(func):
         @wraps(func)
         def wrap_func(*args, **kwargs):
-            # We are making the assumption that the user is logged in.
             from flask_login import current_user
-            service_id = session.get('service_id', '')
-            if current_user and current_user.has_permissions(service_id, permissions):
+            if current_user and current_user.has_permissions(permissions, or_=or_):
                 return func(*args, **kwargs)
             else:
                 abort(403)

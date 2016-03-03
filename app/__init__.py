@@ -14,8 +14,8 @@ from app.notify_client.api_client import NotificationsAdminAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.user_api_client import UserApiClient
 from app.notify_client.job_api_client import JobApiClient
+from app.notify_client.notification_api_client import NotificationApiClient
 from app.notify_client.status_api_client import StatusApiClient
-from app.notify_client.permission_api_client import PermissionApiClient
 from app.notify_client.invite_api_client import InviteApiClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.asset_fingerprinter import AssetFingerprinter
@@ -31,10 +31,10 @@ notifications_api_client = NotificationsAdminAPIClient()
 user_api_client = UserApiClient()
 api_key_api_client = ApiKeyApiClient()
 job_api_client = JobApiClient()
+notification_api_client = NotificationApiClient()
 status_api_client = StatusApiClient()
 invite_api_client = InviteApiClient()
 asset_fingerprinter = AssetFingerprinter()
-permission_api_client = PermissionApiClient()
 
 
 def create_app(config_name, config_overrides=None):
@@ -50,8 +50,8 @@ def create_app(config_name, config_overrides=None):
     user_api_client.init_app(application)
     api_key_api_client.init_app(application)
     job_api_client.init_app(application)
+    notification_api_client.init_app(application)
     status_api_client.init_app(application)
-    permission_api_client.init_app(application)
     invite_api_client.init_app(application)
 
     login_manager.init_app(application)
@@ -70,6 +70,7 @@ def create_app(config_name, config_overrides=None):
 
     application.add_template_filter(nl2br)
     application.add_template_filter(format_datetime)
+    application.add_template_filter(format_time)
     application.add_template_filter(syntax_highlight_json)
     application.add_template_filter(valid_phone_number)
 
@@ -144,6 +145,12 @@ def format_datetime(date):
     date = dateutil.parser.parse(date)
     native = date.replace(tzinfo=None)
     return native.strftime('%A %d %B %Y at %H:%M')
+
+
+def format_time(date):
+    date = dateutil.parser.parse(date)
+    native = date.replace(tzinfo=None)
+    return native.strftime('%H:%M')
 
 
 def valid_phone_number(phone_number):

@@ -4,37 +4,31 @@
 
 # notifications-admin
 
-Application to handle the admin functions of the notifications application.
+GOV.UK Notify admin application.
 
 ## Features of this application
 
- - Register users
- - Register services
- - Download CSV for an email or SMS batch
+ - Register and manage users
+ - Create and manage services
+ - Send batch emails and SMS by uploading a CSV
  - Show history of notifications
- - Reports
 
 ## First-time setup
 
-You need [Node](http://nodejs.org/) which will also get you [NPM](npmjs.org),
-Node's package management tool.
+Languages needed
+- Python 3
+- [Node](http://nodejs.org/) 5.0.0 or greater
 ```shell
     brew install node
 ```
 
-n is a tool for managing different versions of node. The following installs n
-and uses the latest version of node.
+[NPM](npmjs.org) is Node's package management tool. `n` is a tool for managing
+different versions of Node. The following installs `n` and uses the latest
+version of Node.
 ```shell
     npm install -g n
     n latest
     npm rebuild node-sass
-```
-
-The frontend dependencies are managed using NPM and Bower. To install or update
-*all the things*, run
-```shell
-    npm install
-    npm run build
 ```
 
 The app runs within a virtual environment. To [install virtualenv](https://virtualenv.readthedocs.org/en/latest/installation.html), run
@@ -42,14 +36,17 @@ The app runs within a virtual environment. To [install virtualenv](https://virtu
     [sudo] pip install virtualenv
 ```
 
-To make a virtualenv for this app, run
+Make a virtual environment for this app:
 ```shell
     mkvirtualenv -p /usr/local/bin/python3 notifications-admin
-    pip install -r requirements.txt
+```
+
+Install dependencies and build the frontend assets:
+```shell
     ./scripts/bootstrap.sh
 ```
 
-## Building the frontend
+## Rebuilding the frontend assets
 
 If you want the front end assets to re-compile on changes, leave this running
 in a separate terminal from the app
@@ -64,10 +61,4 @@ in a separate terminal from the app
     ./scripts/run_app.sh
 ```
 
-Then visit [localhost:6012](localhost:6012)
-
-## Domain model
-
-All the domain models are defined in the
-[models.py](https://github.com/alphagov/notifications-admin/blob/master/app/models.py)
-file.
+Then visit [localhost:6012](http://localhost:6012)
