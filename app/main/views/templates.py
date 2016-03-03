@@ -2,6 +2,7 @@ from flask import request, render_template, redirect, url_for, flash, abort
 from flask_login import login_required
 
 from app.main import main
+from app.utils import user_has_permissions
 from app.main.forms import SMSTemplateForm, EmailTemplateForm
 from app.main.dao import templates_dao as tdao
 from app.main.dao import services_dao as sdao
@@ -15,6 +16,7 @@ form_objects = {
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_templates')
 def add_service_template(service_id, template_type):
 
     service = sdao.get_service_by_id_or_404(service_id)
@@ -46,6 +48,7 @@ def add_service_template(service_id, template_type):
 
 @main.route("/services/<service_id>/templates/<int:template_id>", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_templates')
 def edit_service_template(service_id, template_id):
     template = tdao.get_service_template_or_404(service_id, template_id)['data']
     template['template_content'] = template['content']
@@ -73,6 +76,7 @@ def edit_service_template(service_id, template_id):
 
 @main.route("/services/<service_id>/templates/<int:template_id>/delete", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_templates')
 def delete_service_template(service_id, template_id):
     template = tdao.get_service_template_or_404(service_id, template_id)['data']
 
