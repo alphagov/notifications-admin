@@ -10,7 +10,7 @@ from flask_login import login_required
 from notifications_python_client.errors import HTTPError
 from utils.template import Template
 
-from app import job_api_client
+from app import job_api_client, notification_api_client
 from app.main import main
 from app.main.dao import templates_dao
 from app.main.dao import services_dao
@@ -41,28 +41,27 @@ def view_job(service_id, job_id):
     service = services_dao.get_service_by_id_or_404(service_id)
     try:
         job = job_api_client.get_job(service_id, job_id)['data']
-        messages = []
+        notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
+        finished = job['status'] == 'finished'
         return render_template(
             'views/job.html',
-            messages=messages,
+            notifications=notifications['notifications'],
             counts={
-                'total': len(messages),
-                'delivered': len([
-                    message for message in messages if message['status'] == 'Delivered'
-                ]),
-                'failed': len([
-                    message for message in messages if message['status'] == 'Failed'
-                ])
+                'queued': 0 if finished else job['notification_count'],
+                'sent': job['notification_count'] if finished else 0,
+                'failed': 0
             },
+            uploaded_at=job['created_at'],
+            finished_at=job['updated_at'] if finished else None,
             cost=u'£0.00',
             uploaded_file_name=job['original_file_name'],
-            uploaded_file_time=job['created_at'],
             template=Template(
                 templates_dao.get_service_template_or_404(service_id, job['template'])['data'],
                 prefix=service['name']
             ),
             service_id=service_id,
-            service=service
+            from_name=service['name'],
+            job_id=job_id
         )
     except HTTPError as e:
         if e.status_code == 404:
