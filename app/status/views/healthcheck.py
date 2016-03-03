@@ -1,18 +1,15 @@
-from flask import jsonify
-
+from flask import jsonify, request
+from app import version
 from app.status import status
 
 
-@status.route('/_status')
-def status():
-    from app import (get_app_version, status_api_client)
-    api_status = 'n/a'
-    try:
-        api_status = status_api_client.get_status()
-    except:
-        api_status = 'n/a'
-    build, build_time = get_app_version()
-    return jsonify(status="ok",
-                   api_status=api_status,
-                   api_build=build,
-                   api_built_time=build_time), 200
+@status.route('/_status', methods=['GET'])
+def show_status():
+    if request.args.get('elb', None):
+        return jsonify(status="ok"), 200
+    else:
+        return jsonify(
+            status="ok",
+            travis_commit=version.__travis_commit__,
+            travis_build_number=version.__travis_job_number__,
+            build_time=version.__time__), 200

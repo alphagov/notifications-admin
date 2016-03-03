@@ -183,15 +183,3 @@ def register_errorhandlers(application):
         return useful_headers_after_request(resp)
     for errcode in [401, 404, 403, 500]:
         application.errorhandler(errcode)(render_error)
-
-
-def get_app_version():
-    build = 'n/a'
-    build_time = "n/a"
-    try:
-        from app import version
-        build = version.__build__
-        build_time = version.__time__
-    except:
-        pass
-    return build, build_time
