@@ -279,7 +279,8 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
     mock_create_job,
     mock_get_service_template,
     mock_s3_upload,
-    mocker
+    mocker,
+    mock_has_permissions
 ):
 
     service_id = service_one['id']
