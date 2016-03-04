@@ -56,7 +56,7 @@
         jobs,
         caption="Recent text messages",
         empty_message='You haven’t sent any text messages yet',
-        field_headings=['Job', 'Created', right_aligned_field_heading('Status')]
+        field_headings=['Job', 'Created', right_aligned_field_heading('completion')]
       ) %}
         {% call field() %}
           <a href="{{ url_for('.view_job', service_id=service_id, job_id=item.id) }}">{{ item.original_file_name }}</a>
@@ -65,7 +65,7 @@
           {{ item.created_at|format_datetime }}
         {% endcall %}
         {% call field(align='right') %}
-          {{ item.status }}
+          {{ (item.notifications_sent / item.notification_count * 100)|round|int }}%
         {% endcall %}
       {% endcall %}
       {% if more_jobs_to_show %}

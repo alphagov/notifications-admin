@@ -110,6 +110,7 @@ def job_json():
         'file_name': '{}.csv'.format(job_id),
         'created_at': created_at,
         'notification_count': 1,
+        'notifications_sent': 1,
         'status': ''
         }
     return data
