@@ -27,7 +27,8 @@ from app.main.dao import templates_dao
 from app.main.dao import services_dao
 from app import job_api_client
 from app.utils import (
-    validate_recipient, InvalidPhoneError, InvalidEmailError, user_has_permissions)
+    validate_recipient, validate_header_row, InvalidPhoneError, InvalidEmailError, user_has_permissions,
+    InvalidHeaderError)
 from utils.process_csv import first_column_heading
 
 
@@ -284,6 +285,7 @@ def _get_rows(contents, raw_template):
                 values=row,
                 drop_values={first_column_heading[raw_template['template_type']]}
             ).replaced
-        except (InvalidEmailError, InvalidPhoneError, NeededByTemplateError, NoPlaceholderForDataError):
+        except (InvalidEmailError, InvalidPhoneError, NeededByTemplateError,
+                NoPlaceholderForDataError, InvalidHeaderError):
             valid = False
     return {"valid": valid, "rows": rows}
