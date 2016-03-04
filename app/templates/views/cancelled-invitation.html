@@ -1,0 +1,17 @@
+{% extends "withoutnav_template.html" %}
+{% block page_title %}Invitation has been cancelled{% endblock %}
+{% block maincolumn_content %}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        <h1 class="heading-large">
+          The invitation you were sent has been cancelled
+        </h1>
+        <p>
+          {{ from_user }} decided to cancel this invitation.
+        </p>
+        <p>
+          If you need access to {{ service_name }}, you’ll have to ask them to invite you again.
+        </p>
+      </div>
+    </div>
+{% endblock %}

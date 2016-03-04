@@ -48,12 +48,12 @@ def api_key_json(id_, name, expiry_date=None):
             }
 
 
-def invite_json(id, from_user, service_id, email_address, permissions, created_at):
+def invite_json(id, from_user, service_id, email_address, permissions, created_at, status):
     return {'id': id,
             'from_user': from_user,
             'service': service_id,
             'email_address': email_address,
-            'status': 'pending',
+            'status': status,
             'permissions': permissions,
             'created_at': created_at
             }
