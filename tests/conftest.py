@@ -585,7 +585,7 @@ def mock_s3_upload(mocker):
 
 
 @pytest.fixture(scope='function')
-def sample_invite(mocker, service_one):
+def sample_invite(mocker, service_one, status='pending'):
     import datetime
     id = str(uuid.uuid4())
     from_user = service_one['users'][0]
@@ -593,7 +593,7 @@ def sample_invite(mocker, service_one):
     service_id = service_one['id']
     permissions = 'send_messages,manage_service,manage_api_keys'
     created_at = str(datetime.datetime.now())
-    return invite_json(id, from_user, service_id, email_address, permissions, created_at)
+    return invite_json(id, from_user, service_id, email_address, permissions, created_at, status)
 
 
 @pytest.fixture(scope='function')

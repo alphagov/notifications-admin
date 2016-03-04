@@ -2,6 +2,10 @@ from flask import url_for
 
 from bs4 import BeautifulSoup
 
+import app
+from tests.conftest import sample_invite as create_sample_invite
+from tests.conftest import mock_check_invite_token as mock_check_token_invite
+
 
 def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(app_,
                                                                           service_one,
@@ -58,7 +62,6 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
 
 def test_new_user_accept_invite_calls_api_and_redirects_to_registration(app_,
                                                                         service_one,
-                                                                        sample_invite,
                                                                         mock_check_invite_token,
                                                                         mock_dont_get_user_by_email,
                                                                         mock_add_user_to_service,
@@ -76,6 +79,21 @@ def test_new_user_accept_invite_calls_api_and_redirects_to_registration(app_,
 
             assert response.status_code == 302
             assert response.location == expected_redirect_location
+
+
+def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation(app_,
+                                                                                 service_one,
+                                                                                 mocker
+                                                                                 ):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            cancelled_invitation = create_sample_invite(mocker, service_one, status='cancelled')
+            mock_check_token_invite(mocker, cancelled_invitation)
+            response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
+
+            app.invite_api_client.check_token.assert_called_with('thisisnotarealtoken')
+            assert response.status_code == 200
+            assert 'Invitation has been cancelled' in response.get_data(as_text=True)
 
 
 def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(app_,

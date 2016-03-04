@@ -2,7 +2,8 @@ from flask import (
     redirect,
     url_for,
     session,
-    abort
+    abort,
+    render_template
 )
 
 from notifications_python_client.errors import HTTPError
@@ -20,6 +21,9 @@ def accept_invite(token):
     try:
 
         invited_user = invite_api_client.check_token(token)
+        if invited_user.status == 'cancelled':
+                return render_template('views/cancelled-invitation.html')
+
         existing_user = user_api_client.get_user_by_email(invited_user.email_address)
 
         if existing_user:
