@@ -21,6 +21,27 @@ notifications:
       secure: A6n6Gdz3dsE+KQcOd1nWTvdjOF2YbgItT1E40r25poG6p04WHd8qWtC4T2FuZaxPN/TQdKr/dKa/WCkmiEdxT5O0SOwAnAD3u6Fn2nthoI4M5916UrK1ZrqupvnFPSQc8Ivh51PGkcmB4wrb0ylRhMB94RmLcUZcVuXLDx57GO8bPFyLC3E9bgcVVFWaX45sKs74sBSQWi9EBbzHIuduLdjIpW7wX07dA++HlY14W5WgiurmiYohfP11VdAMmMxJs2WdWk16O/qy0HZXaldNIsSnuDBkhAZOMeSrcvp+62yOiN8jK0nSa1IRr3IoUkITdC9YGys3xFJb8gyIQE9T3hUnTYAKCcgsgpVFS6UzsRN42JUAJ8rFTgK9/J299yTk4lqL8uWzcV1QcKXIPNoG0QfqkmlB9B1fKbXuE/KkPEXPCKAcVQpCzEon09FgTCrlVZqJ6HxQonnLcPlIpVzWHAFokLZVHLAFMKYJnGBcZ6zaRK5pdc1babcOXMIPBC8j028G5bhBaCviDvZlimxOsUK1sJTpjzMU0tBQZa8lI+0O5otvMKiX8jPyaedjVvUmsftF2O5FH5nz2ofJC7BThb76/Tac2pNTCn0pWiVz9wi/YXALOMdIzkYgHnyZdEqAjRlpFwZuOrzR6MuvivBebPxjYaRWzCjOeC1uIwz+48E=
 deploy:
 - provider: s3
+  access_key_id: AKIAJ5MKF6G3P2JQP4QQ
+  secret_access_key: &1
+    secure: xfjg4kNBvU0B9xhRETr14mB0bCpVonlAKqGnKL2AoqpnF19yihqGNA8sv/pOGUFpeWZO3cW2GA3anyL2gGG1X0K3f81649mneVJkSHaZ2fiG/S1eKtS0Ws5XblSqLmKTPC7H9ndUxT8r+r2wLg62netBE5g8tAxw2QwN/gVz2fK/68owiyeD/jl6gw/iQ47F+mmGdAY/eFe8sUuGR4Oxj2xNAYARaDQOmHpQF/IG3M69FO5uOJtck8fUWnpd0rWxsyWBOVwwIRQHL6cWOyodeIK7YvLmzviCi1GojBPKQwQbjJu89LHfMJJTW1625drj5CNounuENTFte0Pip8zp90bg090VA8OlTXNWcyFjBQD1vNIE59vyQ/hCh90NK1nlTXdnNOwL0VZTMxQ/zYulXoMqwDLfDozhQbmnkXmexJl6BF4/dz+XmwDu7st5A/PI6U5zCK86ST/6g3MklGSseFi5Rkt6kmJrdlRIhiLnoaab8YgI0FPWjzHBC6B98ZtgIUiUk7Ng5ZTM8Sjq1HCC7mUDrDL0c7aerZA5bq2hQiKGhvjBXFU17iHZ0eEDZ8kO+jumeMwmpW6NbjlS0PuDx+lHywMSG7r+YVmkjxq5gwrTVl3evRxhHe8H/lU18y2dOKpIyX5UEZpXRq9kAWuQruCDBwoDe3Y3QP+Rg7HVGBU=
+  local_dir: dpl_cd_upload
+  skip_cleanup: true
+  on: &2
+    repo: alphagov/notifications-admin
+    branch: staging
+  bucket: staging-notifications-api-codedeploy
+  region: eu-west-1
+- provider: codedeploy
+  access_key_id: AKIAJ5MKF6G3P2JQP4QQ
+  secret_access_key: *1
+  bucket: staging-notifications-api-codedeploy
+  key: notifications-admin-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
+  bundle_type: zip
+  application: notifications-admin
+  deployment_group: notifications_admin_deployment_group
+  region: eu-west-1
+  on: *2
+- provider: s3
   access_key_id: AKIAJQPPNM6P6V53SWKA
   secret_access_key: &1
     secure: 7qVw4gmn7zMCaam9PqIfqwC1z82gXxa+rT/VakoMDY7u62BXA8/fWGFn7yU4qyPSrTWttYdDXmdwrgoEDjGIzLXSpufRqhmXc3xBoRktFSRQAFVom49mWo7WDKgX6gZ3GcuVR8HQ1XpojlkLH/a6cKV9jreDiGHy3sHulBkJRXGIGkTNCiVNVbUsFeiOj/YGaIdZ6ZLjDBSOTwLkLsnzZm7S+xcRd0kxT3VJrV0B3x14igK2Rchv9LteT+fafELURO2asASgLPHy5ny3yGF7vVz6tLBrTpy2N7xxpaDkP/LQi38PRGhZkYPHdqgMfq7fFwN2oJF66zxeQ6kzR9lIwVZnqNYwgAapJAx7TrfX2UaR0zoZgs/TBhFijqJ2CK8fIQ7TKW0wEd84rd5FS8ocHmAsiJSLOSXn665m/nUPrWrUi7mK7/9/85rLiZihw862BhwIn83VQcahK4QEDFkK0PC7JqGvLiH3prjlibsA7ONDbFi8NPtvf3bFaofb6a3NO3qjgSvdftIujw86ZmVBAkQXghyZBlgCPiseOphrxZ4Thl54fo86cbiEqAs8c6DCHtPEiAHZ++sK1aitMtepdGORC1SrLICWO4vFAl6oLptzvY+j9+BhOK28JnRUXpQS7DjkrahqcgE/LbCN55lu1UhWWGY0q20QeKgGnsRuOAU=
@@ -42,6 +63,6 @@ deploy:
   on: *2
 before_deploy:
 - rm -rf node_modules bower_components app/assets
-- zip -r notifications-admin *
+- zip -r  --exclude=*__pycache__* notifications-admin *
 - mkdir -p dpl_cd_upload
 - mv notifications-admin.zip dpl_cd_upload/notifications-admin-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
