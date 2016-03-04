@@ -83,7 +83,9 @@ def test_new_user_accept_invite_calls_api_and_redirects_to_registration(app_,
 
 def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation(app_,
                                                                                  service_one,
-                                                                                 mocker
+                                                                                 mocker,
+                                                                                 mock_get_user,
+                                                                                 mock_get_service
                                                                                  ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -93,7 +95,8 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
 
             app.invite_api_client.check_token.assert_called_with('thisisnotarealtoken')
             assert response.status_code == 200
-            assert 'Invitation has been cancelled' in response.get_data(as_text=True)
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            assert page.h1.string.strip() == 'The invitation you were sent has been cancelled'
 
 
 def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(app_,
