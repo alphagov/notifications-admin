@@ -133,8 +133,8 @@ class InvitedUser(object):
         self.status = status
         self.created_at = created_at
 
-    def has_permissions(self, permission):
-        return permission in self.permissions
+    def has_permissions(self, permissions):
+        return set(self.permissions) > set(permissions)
 
     def __eq__(self, other):
         return ((self.id,
