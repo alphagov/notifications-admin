@@ -3,7 +3,7 @@ import re
 from functools import wraps
 from flask import (abort, session)
 
-from utils.process_csv import get_recipient_from_row
+from utils.process_csv import get_recipient_from_row, first_column_heading
 
 
 class BrowsableItem(object):
@@ -38,6 +38,11 @@ class InvalidEmailError(Exception):
 
 
 class InvalidPhoneError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class InvalidHeaderError(Exception):
     def __init__(self, message):
         self.message = message
 
@@ -90,10 +95,19 @@ def validate_email_address(email_address):
 
 
 def validate_recipient(row, template_type):
+    validate_header_row(row, template_type)
     return {
         'email': validate_email_address,
         'sms': validate_phone_number
     }[template_type](get_recipient_from_row(row, template_type))
+
+
+def validate_header_row(row, template_type):
+    try:
+        column_heading = first_column_heading[template_type]
+        row[column_heading]
+    except KeyError as e:
+        raise InvalidHeaderError('Invalid header name, should be {}'.format(column_heading))
 
 
 def user_has_permissions(*permissions, or_=False):
