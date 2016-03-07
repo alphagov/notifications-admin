@@ -2,6 +2,8 @@ from flask import url_for
 
 from bs4 import BeautifulSoup
 
+from app.notify_client.models import InvitedUser
+
 
 def test_should_show_overview_page(
     app_,
@@ -180,3 +182,34 @@ def test_cancel_invited_user_cancels_user_invitations(app_,
 
             assert response.status_code == 302
             assert response.location == url_for('main.manage_users', service_id=service_id, _external=True)
+
+
+def test_manage_users_shows_invited_user(app_,
+                                         mocker,
+                                         api_user_active,
+                                         mock_get_service,
+                                         mock_login,
+                                         mock_has_permissions,
+                                         mock_get_users_by_service,
+                                         sample_invite):
+
+    import uuid
+    invited_user_id = uuid.uuid4()
+    sample_invite['id'] = invited_user_id
+    data = [InvitedUser(**sample_invite)]
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+
+            mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
+
+            response = client.get(url_for('main.manage_users', service_id=55555))
+
+            assert response.status_code == 200
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            assert page.h1.string.strip() == 'Manage team'
+            invites_table = page.find_all('table')[1]
+            cols = invites_table.find_all('td')
+            assert cols[0].text.strip() == 'invited_user@test.gov.uk'
+            assert cols[4].text.strip() == 'Cancel invitation'

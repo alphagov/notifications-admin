@@ -48,6 +48,7 @@ class InviteApiClient(BaseAPIClient):
     def _get_invited_users(self, invites):
         invited_users = []
         for invite in invites:
-            invited_user = InvitedUser(**invite)
-            invited_users.append(invited_user)
+            if invite['status'] != 'accepted':
+                invited_user = InvitedUser(**invite)
+                invited_users.append(invited_user)
         return invited_users
