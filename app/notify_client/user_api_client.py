@@ -102,4 +102,9 @@ class UserApiClient(BaseAPIClient):
     def set_user_permissions(self, user_id, service_id, permissions):
         data = [{'permission': x} for x in permissions]
         endpoint = '/user/{}/service/{}/permission'.format(user_id, service_id)
-        resp = self.post(endpoint, data=data)
+        self.post(endpoint, data=data)
+
+    def send_reset_password_url(self, email_address):
+        endpoint = '/user/reset-password'
+        data = {'email': email_address}
+        self.post(endpoint, data=data)

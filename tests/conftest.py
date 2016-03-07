@@ -1,5 +1,5 @@
 import uuid
-from datetime import date
+from datetime import date, datetime, timedelta
 import pytest
 
 from app import create_app
@@ -268,9 +268,27 @@ def api_user_request_password_reset():
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
                  'mobile_number': '+4412341234',
-                 'state': 'request_password_reset',
+                 'state': 'active',
                  'failed_login_count': 5,
-                 'permissions': {}
+                 'permissions': {},
+                 'password_changed_at': None
+                 }
+    user = User(user_data)
+    return user
+
+
+@pytest.fixture(scope='function')
+def api_user_changed_password():
+    from app.notify_client.user_api_client import User
+    user_data = {'id': 555,
+                 'name': 'Test User',
+                 'password': 'somepassword',
+                 'email_address': 'test@user.gov.uk',
+                 'mobile_number': '+4412341234',
+                 'state': 'active',
+                 'failed_login_count': 5,
+                 'permissions': {},
+                 'password_changed_at': str(datetime.now() + timedelta(minutes=1))
                  }
     user = User(user_data)
     return user
@@ -346,6 +364,13 @@ def mock_get_user_by_email_request_password_reset(mocker, api_user_request_passw
 
 
 @pytest.fixture(scope='function')
+def mock_get_user_by_email_user_changed_password(mocker, api_user_changed_password):
+    return mocker.patch(
+        'app.user_api_client.get_user_by_email',
+        return_value=api_user_changed_password)
+
+
+@pytest.fixture(scope='function')
 def mock_get_user_by_email_locked(mocker, api_user_locked):
     return mocker.patch(
         'app.user_api_client.get_user_by_email', return_value=api_user_locked)
@@ -380,14 +405,6 @@ def mock_verify_password(mocker):
     return mocker.patch(
         'app.user_api_client.verify_password',
         side_effect=_verify_password)
-
-
-@pytest.fixture(scope='function')
-def mock_password_reset(mocker, api_user_active):
-
-    def _reset(email):
-        api_user_active.state = 'request_password_reset'
-    return mocker.patch('app.main.dao.users_dao.request_password_reset', side_effect=_reset)
 
 
 @pytest.fixture(scope='function')
@@ -645,3 +662,8 @@ def mock_add_user_to_service(mocker, service_one, api_user_active):
 @pytest.fixture(scope='function')
 def mock_set_user_permissions(mocker):
     return mocker.patch('app.user_api_client.set_user_permissions', return_value=None)
+
+
+@pytest.fixture(scope='function')
+def mock_reset_user_password(mocker):
+    return mocker.patch('app.user_api_client.send_reset_password_url', return_value=None)

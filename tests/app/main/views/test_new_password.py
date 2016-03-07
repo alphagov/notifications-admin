@@ -1,9 +1,8 @@
+import json
+from datetime import datetime
+
 from flask import url_for
-
-from app.main.dao import users_dao
-from app.main.encryption import check_hash
-from app.notify_client.sender import generate_token
-
+from utils.url_safe_token import generate_token
 import pytest
 
 
@@ -14,59 +13,62 @@ def test_should_render_new_password_template(app_,
                                              mock_get_user_by_email_request_password_reset):
     with app_.test_request_context():
         with app_.test_client() as client:
-            token = generate_token(api_user_active.email_address)
+            data = json.dumps({'email': api_user_active.email_address, 'created_at': str(datetime.now())})
+            token = generate_token(data, app_.config['SECRET_KEY'],
+                                   app_.config['DANGEROUS_SALT'])
         response = client.get(url_for('.new_password', token=token))
         assert response.status_code == 200
         assert 'You can now create a new password for your account.' in response.get_data(as_text=True)
 
 
-@pytest.mark.skipif(True, reason='Password reset no implemented')
-def test_should_render_new_password_template_with_message_of_bad_token(app_,
-                                                                       mock_get_user_by_email):
+def test_should_return_404_when_email_address_does_not_exist(app_, mock_get_user_by_email_not_found):
     with app_.test_request_context():
         with app_.test_client() as client:
-            token = generate_token('no_user@d.gov.uk')
+            data = json.dumps({'email': 'no_user@d.gov.uk', 'created_at': str(datetime.now())})
+            token = generate_token(data, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
         response = client.get(url_for('.new_password', token=token))
-        assert response.status_code == 200
-        assert 'Message about email address does not exist. Some one needs to figure out the words here.' in \
-               response.get_data(as_text=True)
+        assert response.status_code == 404
 
 
-@pytest.mark.skipif(True, reason='Password reset no implemented')
 def test_should_redirect_to_two_factor_when_password_reset_is_successful(app_,
                                                                          mock_get_user_by_email_request_password_reset,
-                                                                         mock_login):
+                                                                         mock_login,
+                                                                         mock_send_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
             user = mock_get_user_by_email_request_password_reset.return_value
-            token = generate_token(user.email_address)
+            data = json.dumps({'email': user.email_address, 'created_at': str(datetime.now())})
+            token = generate_token(data, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
         response = client.post(url_for('.new_password', token=token), data={'new_password': 'a-new_password'})
         assert response.status_code == 302
         assert response.location == url_for('.two_factor', _external=True)
+        mock_get_user_by_email_request_password_reset.assert_called_once_with(user.email_address)
+
+
+def test_should_redirect_index_if_user_has_already_changed_password(app_,
+                                                                    mock_get_user_by_email_user_changed_password,
+                                                                    mock_login,
+                                                                    mock_send_verify_code):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            user = mock_get_user_by_email_user_changed_password.return_value
+            data = json.dumps({'email': user.email_address, 'created_at': str(datetime.now())})
+            token = generate_token(data, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
+        response = client.post(url_for('.new_password', token=token), data={'new_password': 'a-new_password'})
+        assert response.status_code == 302
+        assert response.location == url_for('.index', _external=True)
+        mock_get_user_by_email_user_changed_password.assert_called_once_with(user.email_address)
 
 
 def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_expired(
-    app_, mock_get_user_by_email_request_password_reset, mock_login
+        app_, mock_get_user_by_email_request_password_reset, mock_login
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
             app_.config['TOKEN_MAX_AGE_SECONDS'] = -1000
             user = mock_get_user_by_email_request_password_reset.return_value
-            token = generate_token(user.email_address)
+            token = generate_token(user.email_address, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
         response = client.post(url_for('.new_password', token=token), data={'new_password': 'a-new_password'})
         assert response.status_code == 302
         assert response.location == url_for('.forgot_password', _external=True)
         app_.config['TOKEN_MAX_AGE_SECONDS'] = 3600
-
-
-@pytest.mark.skipif(True, reason='Password reset no implemented')
-def test_should_redirect_to_forgot_pass_when_user_active_should_be_request_passw_reset(
-    app_, mock_get_user_by_email_request_password_reset, mock_login
-):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            user = mock_get_user_by_email_request_password_reset.return_value
-            token = generate_token(user.email_address)
-        response = client.post(url_for('.new_password', token=token), data={'new_password': 'a-new_password'})
-        assert response.status_code == 302
-        assert response.location == url_for('.index', _external=True)
