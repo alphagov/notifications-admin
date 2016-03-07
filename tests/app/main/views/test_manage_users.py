@@ -213,3 +213,34 @@ def test_manage_users_shows_invited_user(app_,
             cols = invites_table.find_all('td')
             assert cols[0].text.strip() == 'invited_user@test.gov.uk'
             assert cols[4].text.strip() == 'Cancel invitation'
+
+
+def test_manage_users_does_not_show_accepted_invite(app_,
+                                                    mocker,
+                                                    api_user_active,
+                                                    mock_get_service,
+                                                    mock_login,
+                                                    mock_has_permissions,
+                                                    mock_get_users_by_service,
+                                                    sample_invite):
+
+    import uuid
+    invited_user_id = uuid.uuid4()
+    sample_invite['id'] = invited_user_id
+    sample_invite['status'] = 'accepted'
+    data = [InvitedUser(**sample_invite)]
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+
+            mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
+
+            response = client.get(url_for('main.manage_users', service_id=55555))
+
+            assert response.status_code == 200
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            assert page.h1.string.strip() == 'Manage team'
+            tables = page.find_all('table')
+            assert len(tables) == 1
+            assert not page.find(text='invited_user@test.gov.uk')
