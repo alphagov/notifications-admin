@@ -81,6 +81,39 @@ def test_new_user_accept_invite_calls_api_and_redirects_to_registration(app_,
             assert response.location == expected_redirect_location
 
 
+def test_new_user_accept_invite_calls_api_and_views_registration_page(app_,
+                                                                      service_one,
+                                                                      mock_check_invite_token,
+                                                                      mock_dont_get_user_by_email,
+                                                                      mock_add_user_to_service,
+                                                                      mock_accept_invite):
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+
+            response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
+
+            mock_check_invite_token.assert_called_with('thisisnotarealtoken')
+            mock_dont_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
+
+            assert response.status_code == 200
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            assert page.h1.string.strip() == 'Create an account'
+
+            form = page.find('form')
+            email = form.find('input', id='email_address')
+            name = form.find('input', id='name')
+            password = form.find('input', id='password')
+            service = form.find('input', type='hidden', id='service')
+
+            assert email
+            assert email.attrs['disabled']
+            assert name
+            assert password
+            assert service
+            assert service.attrs['value'] == service_one['id']
+
+
 def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation(app_,
                                                                                  service_one,
                                                                                  mocker,

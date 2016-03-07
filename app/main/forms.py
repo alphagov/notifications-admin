@@ -104,7 +104,7 @@ class RegisterUserFromInviteForm(Form):
     mobile_number = mobile_number()
     password = password()
     service = HiddenField('service')
-    email_address = HiddenField('email_address')
+    email_address = email_address()
 
 
 class InviteUserForm(Form):
