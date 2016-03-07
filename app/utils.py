@@ -3,8 +3,6 @@ import re
 from functools import wraps
 from flask import (abort, session)
 
-from utils.process_csv import get_recipient_from_row, first_column_heading
-
 
 class BrowsableItem(object):
     """
@@ -43,3 +41,44 @@ def user_has_permissions(*permissions, or_=False):
                 abort(403)
         return wrap_func
     return wrap
+
+
+def get_errors_for_csv(recipients, template_type):
+
+    errors = []
+
+    missing_column_headers = list(recipients.missing_column_headers)
+
+    if len(missing_column_headers) == 1:
+        errors.append("add a column called ‘{}’".format("".join(missing_column_headers)))
+    elif len(missing_column_headers) == 2:
+        errors.append("add 2 columns, ‘{}’".format("’ and ‘".join(missing_column_headers)))
+    elif len(missing_column_headers) > 2:
+        errors.append(
+            "add columns called ‘{}’, and ‘{}’".format(
+                "’, ‘".join(missing_column_headers[0:-1]),
+                missing_column_headers[-1]
+            )
+        )
+
+    if recipients.rows_with_bad_recipients:
+        number_of_bad_recipients = len(list(recipients.rows_with_bad_recipients))
+        if 'sms' == template_type:
+            if 1 == number_of_bad_recipients:
+                errors.append("fix 1 phone number")
+            else:
+                errors.append("fix {} phone numbers".format(number_of_bad_recipients))
+        elif 'email' == template_type:
+            if 1 == number_of_bad_recipients:
+                errors.append("fix 1 email address")
+            else:
+                errors.append("fix {} email addresses".format(number_of_bad_recipients))
+
+    if recipients.rows_with_missing_data:
+        number_of_rows_with_missing_data = len(list(recipients.rows_with_missing_data))
+        if 1 == number_of_rows_with_missing_data:
+            errors.append("fill in 1 empty cell")
+        else:
+            errors.append("fill in {} empty cells".format(number_of_rows_with_missing_data))
+
+    return errors

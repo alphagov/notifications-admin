@@ -16,8 +16,24 @@
 %table-field,
 .table-field {
 
+  vertical-align: top;
+
   &:last-child {
     padding-right: 0;
+  }
+
+  &-error {
+
+    border-left: 5px solid $error-colour;
+    padding-left: 7px;
+    display: block;
+
+    &-label {
+      display: block;
+      color: $error-colour;
+      font-weight: bold;
+    }
+
   }
 
   &-status {
@@ -55,13 +71,6 @@
       background-image: file-url('tick.png');
     }
 
-    &-missing {
-      color: $error-colour;
-      font-weight: bold;
-      border-left: 5px solid $error-colour;
-      padding-left: 7px;
-    }
-
   }
 
 }
@@ -92,9 +101,15 @@
 }
 
 .table-show-more-link {
-  @include bold-16;
+  @include core-16;
+  color: $secondary-text-colour;
   margin-top: -20px;
   border-bottom: 1px solid $border-colour;
   padding-bottom: 10px;
   text-align: center;
+}
+
+a.table-show-more-link {
+  @include bold-16;
+  color: $link-colour;
 }

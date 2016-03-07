@@ -12,6 +12,18 @@
   position: relative;
   clear: both;
 
+  &-title {
+    @include bold-24;
+  }
+
+  p {
+    margin: 10px 0 5px 0;
+  }
+
+  .list-bullet {
+    @include copy-19;
+  }
+
 }
 
 .banner-with-tick,

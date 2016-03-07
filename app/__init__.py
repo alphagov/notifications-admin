@@ -19,7 +19,7 @@ from app.notify_client.status_api_client import StatusApiClient
 from app.notify_client.invite_api_client import InviteApiClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.asset_fingerprinter import AssetFingerprinter
-from app.utils import validate_phone_number, InvalidPhoneError
+from utils.recipients import validate_phone_number, InvalidPhoneError
 import app.proxy_fix
 from config import configs
 from utils import logging
