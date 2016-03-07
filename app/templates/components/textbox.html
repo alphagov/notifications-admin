@@ -24,11 +24,12 @@
       {% endif %}
     </label>
       {% if disabled %}
-        {{ field(**{
-        'class': 'form-control form-control-{} textbox-highlight-textbox'.format(width) if highlight_tags else 'form-control form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else ''),
-        'data-module': 'highlight-tags' if highlight_tags else '',
-        'disabled': 'disabled'
-      }) }}
+        <p>{{ field(**{
+          'class': 'form-control form-control-{} textbox-highlight-textbox'.format(width) if highlight_tags else 'form-control form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else ''),
+          'data-module': 'highlight-tags' if highlight_tags else '',
+          'disabled': 'disabled'
+        }) }}
+      </p>
       {% else %}
         {{ field(**{
           'class': 'form-control form-control-{} textbox-highlight-textbox'.format(width) if highlight_tags else 'form-control form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else ''),
