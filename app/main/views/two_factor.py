@@ -1,6 +1,9 @@
-
 from flask import (
-    render_template, redirect, jsonify, session, url_for)
+    render_template,
+    redirect,
+    session,
+    url_for
+)
 
 from flask_login import login_user
 
@@ -26,14 +29,13 @@ def two_factor():
         try:
             user = users_dao.get_user_by_id(user_id)
             services = services_dao.get_services(user_id).get('data', [])
-            # Check if coming from new password page
             if 'password' in session['user_details']:
                 user.set_password(session['user_details']['password'])
                 users_dao.update_user(user)
-            login_user(user, remember=form.remember_me.data if form.remember_me.data else False)
+            login_user(user, remember=True)
         finally:
             del session['user_details']
-        if (len(services) == 1):
+        if len(services) == 1:
             return redirect(url_for('main.service_dashboard', service_id=services[0]['id']))
         else:
             return redirect(url_for('main.choose_service'))
