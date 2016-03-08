@@ -12,7 +12,10 @@ from app.main.dao import services_dao, users_dao
 from app.main.forms import AddServiceForm
 from app.notify_client.models import InvitedUser
 
-from app import user_api_client
+from app import (
+    invite_api_client,
+    user_api_client
+)
 
 
 @main.route("/add-service", methods=['GET', 'POST'])
@@ -25,8 +28,8 @@ def add_service():
         # if invited user add to service and redirect to dashboard
         user = users_dao.get_user_by_id(session['user_id'])
         service_id = invited_user['service']
-        user_api_client.add_user_to_service(service_id, user.id, invitation)
-        session.pop('invited_user', None)
+        user_api_client.add_user_to_service(service_id, user.id, invitation.permissions)
+        invite_api_client.accept_invite(service_id, invitation.id)
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
     form = AddServiceForm(services_dao.find_all_service_names)

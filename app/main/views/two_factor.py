@@ -1,6 +1,10 @@
 
 from flask import (
-    render_template, redirect, session, url_for)
+    render_template,
+    redirect,
+    session,
+    url_for
+)
 
 from flask_login import login_user
 
@@ -30,7 +34,7 @@ def two_factor():
             if 'password' in session['user_details']:
                 user.set_password(session['user_details']['password'])
                 users_dao.update_user(user)
-            login_user(user, remember=form.remember_me.data if form.remember_me.data else False)
+            login_user(user, remember=True)
         finally:
             del session['user_details']
         if len(services) == 1:

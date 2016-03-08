@@ -28,11 +28,15 @@ from app.utils import user_has_permissions
 def manage_users(service_id):
     users = user_api_client.get_users_for_service(service_id=service_id)
     invited_users = invite_api_client.get_invites_for_service(service_id=service_id)
+    filtered_invites = []
+    for invite in invited_users:
+        if invite.status != 'accepted':
+            filtered_invites.append(invite)
     return render_template('views/manage-users.html',
                            service_id=service_id,
                            users=users,
                            current_user=current_user,
-                           invited_users=invited_users)
+                           invited_users=filtered_invites)
 
 
 @main.route("/services/<service_id>/users/invite", methods=['GET', 'POST'])

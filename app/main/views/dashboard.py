@@ -1,12 +1,16 @@
-from flask import (abort, render_template, session)
+from flask import (
+    abort,
+    render_template,
+    session,
+    flash
+)
+
 from flask_login import login_required
 from app.main import main
 from app.main.dao.services_dao import get_service_by_id
 from app.main.dao import templates_dao
 from notifications_python_client.errors import HTTPError
 from app import job_api_client
-
-from app.utils import user_has_permissions
 
 
 @main.route("/services/<service_id>/dashboard")
@@ -24,6 +28,12 @@ def service_dashboard(service_id):
         service = get_service_by_id(service_id)
         session['service_name'] = service['data']['name']
         session['service_id'] = service['data']['id']
+
+        if session.get('invited_user'):
+            session.pop('invited_user', None)
+            service_name = service['data']['name']
+            message = 'You have sucessfully accepted your invitation and been added to {}'.format(service_name)
+            flash(message, 'default_with_tick')
     except HTTPError as e:
         if e.status_code == 404:
             abort(404)

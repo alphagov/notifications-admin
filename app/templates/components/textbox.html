@@ -6,7 +6,8 @@
   help_link=None,
   help_link_text=None,
   width='2-3',
-  suffix=None
+  suffix=None,
+  disabled=False
 ) %}
   <div class="form-group{% if field.errors %} error{% endif %}" {% if autofocus %}data-module="autofocus"{% endif %}>
     <label class="form-label" for="{{ field.name }}">
@@ -22,10 +23,21 @@
         </span>
       {% endif %}
     </label>
-    {{ field(**{
-      'class': 'form-control form-control-{} textbox-highlight-textbox'.format(width) if highlight_tags else 'form-control form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else ''),
-      'data-module': 'highlight-tags' if highlight_tags else ''
-    }) }}
+      {% if disabled %}
+        <p>{{ field(**{
+          'class': 'form-control form-control-{} textbox-highlight-textbox'.format(width) if highlight_tags else 'form-control form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else ''),
+          'data-module': 'highlight-tags' if highlight_tags else '',
+          'disabled': 'disabled'
+        }) }}
+      </p>
+      {% else %}
+        {{ field(**{
+          'class': 'form-control form-control-{} textbox-highlight-textbox'.format(width) if highlight_tags else 'form-control form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else ''),
+          'data-module': 'highlight-tags' if highlight_tags else ''
+        }) }}
+      {% endif %}
+
+
     {% if suffix %}
       <span>{{ suffix }}</span>
     {% endif %}

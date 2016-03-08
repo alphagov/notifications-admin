@@ -104,7 +104,7 @@ class RegisterUserFromInviteForm(Form):
     mobile_number = mobile_number()
     password = password()
     service = HiddenField('service')
-    email_address = HiddenField('email_address')
+    email_address = email_address()
 
 
 class InviteUserForm(Form):
@@ -127,7 +127,6 @@ class TwoFactorForm(Form):
         super(TwoFactorForm, self).__init__(*args, **kwargs)
 
     sms_code = sms_code()
-    remember_me = BooleanField("Remember me")
 
     def validate_sms_code(self, field):
         is_valid, reason = self.validate_code_func(field.data)
