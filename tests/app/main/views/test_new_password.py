@@ -3,7 +3,6 @@ from datetime import datetime
 
 from flask import url_for
 from utils.url_safe_token import generate_token
-import pytest
 
 
 def test_should_render_new_password_template(app_,

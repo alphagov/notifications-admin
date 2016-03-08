@@ -1,6 +1,6 @@
 
 from flask import (
-    render_template, redirect, jsonify, session, url_for)
+    render_template, redirect, session, url_for)
 
 from flask_login import login_user
 
@@ -33,7 +33,7 @@ def two_factor():
             login_user(user, remember=form.remember_me.data if form.remember_me.data else False)
         finally:
             del session['user_details']
-        if (len(services) == 1):
+        if len(services) == 1:
             return redirect(url_for('main.service_dashboard', service_id=services[0]['id']))
         else:
             return redirect(url_for('main.choose_service'))

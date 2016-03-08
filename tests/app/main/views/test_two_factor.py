@@ -1,7 +1,5 @@
 from flask import url_for
 
-from tests import create_test_user
-
 
 def test_should_render_two_factor_page(app_,
                                        api_user_active,
@@ -109,3 +107,30 @@ def test_remember_me_set(app_,
             response = client.post(url_for('main.two_factor'),
                                    data={'sms_code': '23456', 'remember_me': True})
             assert response.status_code == 302
+
+
+def test_two_factor_should_set_password_when_new_password_exists_in_session(app_,
+                                                                            api_user_active,
+                                                                            mock_get_user,
+                                                                            mock_check_verify_code,
+                                                                            mock_get_services_with_one_service,
+                                                                            mock_update_user):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                session['user_details'] = {
+                    'id': api_user_active.id,
+                    'email': api_user_active.email_address,
+                    'password': 'changedpassword'}
+
+            response = client.post(url_for('main.two_factor'),
+                                   data={'sms_code': '12345'})
+
+            assert response.status_code == 302
+            assert response.location == url_for(
+                'main.service_dashboard',
+                service_id="596364a0-858e-42c8-9062-a8fe822260eb",
+                _external=True
+            )
+            api_user_active.password = 'changedpassword'
+            mock_update_user.assert_called_once_with(api_user_active)
