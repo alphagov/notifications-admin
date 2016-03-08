@@ -247,25 +247,19 @@ def start_job(service_id, upload_id):
     upload_data = session['upload_data']
     services_dao.get_service_by_id_or_404(service_id)
 
-    if request.files or not session['upload_data'].get('valid'):
+    if request.files or not upload_data.get('valid'):
         # The csv was invalid, validate the csv again
         return send_messages(service_id, upload_data.get('template_id'))
 
     session.pop('upload_data')
 
-    try:
-        job_api_client.create_job(
-            upload_id,
-            service_id,
-            upload_data.get('template_id'),
-            upload_data.get('original_file_name'),
-            upload_data.get('notification_count')
-        )
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    job_api_client.create_job(
+        upload_id,
+        service_id,
+        upload_data.get('template_id'),
+        upload_data.get('original_file_name'),
+        upload_data.get('notification_count')
+    )
 
     return redirect(
         url_for('main.view_job', service_id=service_id, job_id=upload_id)
