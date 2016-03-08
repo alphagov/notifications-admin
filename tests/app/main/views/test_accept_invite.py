@@ -194,3 +194,6 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
             assert element.text == 'Test Service'
             service_link = element.attrs['href']
             assert service_link == '/services/{}/dashboard'.format(service_one['id'])
+
+            flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
+            assert flash_banner == 'You have sucessfully accepted your invitation and been added to Test Service'
