@@ -88,7 +88,7 @@ class User(UserMixin):
         if service_id in self._permissions:
             if or_:
                 return any([x in self._permissions[service_id] for x in permissions])
-            return set(self._permissions[service_id]) > set(permissions)
+            return set(self._permissions[service_id]) >= set(permissions)
         return False
 
     @property
