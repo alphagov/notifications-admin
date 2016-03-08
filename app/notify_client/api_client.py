@@ -68,7 +68,7 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
             "users": users
         }
         endpoint = "/service/{0}".format(service_id)
-        return self.put(endpoint, data)
+        return self.post(endpoint, data)
 
     def create_service_template(self, name, type_, content, service_id, subject=None):
         """
