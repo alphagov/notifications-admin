@@ -30,8 +30,6 @@ def add_service():
         service_id = invited_user['service']
         user_api_client.add_user_to_service(service_id, user.id, invitation.permissions)
         invite_api_client.accept_invite(service_id, invitation.id)
-
-        session.pop('invited_user', None)
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
     form = AddServiceForm(services_dao.find_all_service_names)
