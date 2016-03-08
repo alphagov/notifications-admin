@@ -37,18 +37,9 @@ class UKMobileNumber(TelField):
 
     def pre_validate(self, form):
         try:
-            self.data = validate_phone_number(self.data)
+            validate_phone_number(self.data)
         except InvalidPhoneError as e:
             raise ValidationError(e.message)
-
-    def post_validate(self, form, validation_stopped):
-
-        if len(self.data) != 9:
-            return
-        # TODO implement in the render field method.
-        # API's require no spaces in the number
-        # self.data = '+44 7{} {} {}'.format(*re.findall('...', self.data))
-        self.data = format_phone_number(self.data)
 
 
 def mobile_number():
