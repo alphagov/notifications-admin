@@ -101,13 +101,13 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(app_,
             assert page.h1.string.strip() == 'Create an account'
 
             form = page.find('form')
-            email = form.find('input', id='email_address')
             name = form.find('input', id='name')
             password = form.find('input', id='password')
             service = form.find('input', type='hidden', id='service')
+            email = form.find('input', type='hidden', id='email_address')
 
             assert email
-            assert email.attrs['disabled']
+            assert email.attrs['value'] == 'invited_user@test.gov.uk'
             assert name
             assert password
             assert service
