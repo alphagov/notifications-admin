@@ -98,14 +98,26 @@ class RegisterUserFromInviteForm(Form):
     email_address = HiddenField('email_address')
 
 
-class InviteUserForm(Form):
+class PermisisonsForm(Form):
 
-    email_address = email_address('Their email address')
     # TODO fix this Radio field so we are not having to test for yes or no rather
     # use operator equality.
     send_messages = RadioField("Send messages", choices=[('yes', 'yes'), ('no', 'no')])
     manage_service = RadioField("Manage service", choices=[('yes', 'yes'), ('no', 'no')])
     manage_api_keys = RadioField("Manage API keys", choices=[('yes', 'yes'), ('no', 'no')])
+
+
+class InviteUserForm(PermisisonsForm):
+
+    email_address = email_address('Their email address')
+
+    def __init__(self, invalid_email_address, *args, **kwargs):
+        super(InviteUserForm, self).__init__(*args, **kwargs)
+        self.invalid_email_address = invalid_email_address.lower()
+
+    def validate_email_address(self, field):
+        if field.data.lower() == self.invalid_email_address:
+            raise ValidationError("You can't send an invitation to yourself")
 
 
 class TwoFactorForm(Form):
