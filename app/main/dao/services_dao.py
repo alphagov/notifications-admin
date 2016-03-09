@@ -1,14 +1,12 @@
-from flask import url_for, abort
+from flask import url_for, abort, current_app
 from app import notifications_api_client
 from app.utils import BrowsableItem
 from notifications_python_client.errors import HTTPError
 
 
 def insert_new_service(service_name, user_id):
-    # Add a service with default attributes
-    # Should we try and handle exception here
     resp = notifications_api_client.create_service(
-        service_name, False, 1000, True, user_id)
+        service_name, False, current_app.config['DEFAULT_SERVICE_LIMIT'], True, user_id)
 
     return resp['data']['id']
 
