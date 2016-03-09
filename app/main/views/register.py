@@ -51,7 +51,7 @@ def register_from_invite():
     form.service.data = invited_user['service']
     form.email_address.data = invited_user['email_address']
 
-    return render_template('views/register-from-invite.html', form=form)
+    return render_template('views/register-from-invite.html', email_address=invited_user['email_address'], form=form)
 
 
 def _do_registration(form, service=None):

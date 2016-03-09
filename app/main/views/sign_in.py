@@ -45,6 +45,11 @@ def sign_in():
         # Vague error message for login in case of user not known, locked, inactive or password not verified
         flash('Username or password is incorrect')
 
+    invited_user = session.get('invited_user')
+    if invited_user:
+        message = 'You already have an account with GOV.UK Notify. Sign in to your account to accept this invitation.'
+        flash(message, 'default')
+
     return render_template('views/signin.html', form=form)
 
 
