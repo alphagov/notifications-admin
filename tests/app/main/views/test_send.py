@@ -3,6 +3,7 @@ import pytest
 from io import BytesIO
 from flask import url_for
 from unittest.mock import ANY
+from tests import validate_route_permission
 
 template_types = ['email', 'sms']
 
@@ -300,3 +301,78 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
             response = client.post(url, data=upload_data, follow_redirects=True)
             assert response.status_code == 200
             assert 'Your CSV file contained missing or invalid data' in response.get_data(as_text=True)
+
+
+def test_route_permissions(mocker,
+                           app_,
+                           api_user_active,
+                           service_one,
+                           mock_get_service_template,
+                           mock_get_jobs,
+                           mock_get_notifications,
+                           mock_create_job,
+                           mock_s3_upload):
+    routes = [
+        'main.choose_template',
+        'main.send_messages',
+        'main.get_example_csv']
+    with app_.test_request_context():
+        for route in routes:
+            validate_route_permission(
+                mocker,
+                app_,
+                "GET",
+                200,
+                url_for(
+                    route,
+                    service_id=service_one['id'],
+                    template_type='sms',
+                    template_id=123),
+                ['send_texts', 'send_emails', 'send_letters'],
+                api_user_active,
+                service_one)
+
+    with app_.test_request_context():
+        validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            302,
+            url_for(
+                'main.send_message_to_self',
+                service_id=service_one['id'],
+                template_type='sms',
+                template_id=123),
+            ['send_texts', 'send_emails', 'send_letters'],
+            api_user_active,
+            service_one)
+
+
+def test_route_invalid_permissions(mocker,
+                                   app_,
+                                   api_user_active,
+                                   service_one,
+                                   mock_get_service_template,
+                                   mock_get_jobs,
+                                   mock_get_notifications,
+                                   mock_create_job):
+    routes = [
+        'main.choose_template',
+        'main.send_messages',
+        'main.get_example_csv',
+        'main.send_message_to_self']
+    with app_.test_request_context():
+        for route in routes:
+            validate_route_permission(
+                mocker,
+                app_,
+                "GET",
+                403,
+                url_for(
+                    route,
+                    service_id=service_one['id'],
+                    template_type='sms',
+                    template_id=123),
+                ['blah'],
+                api_user_active,
+                service_one)
