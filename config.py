@@ -44,6 +44,8 @@ class Config(object):
     DANGEROUS_SALT = 'itsdangeroussalt'
     TOKEN_MAX_AGE_SECONDS = 3600
 
+    DEFAULT_SERVICE_LIMIT = 50
+
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10mb
     UPLOAD_FOLDER = '/tmp'
 
