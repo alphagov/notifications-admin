@@ -203,12 +203,14 @@ def check_messages(service_id, upload_id):
     if not contents:
         flash('There was a problem reading your upload file')
 
+    template = templates_dao.get_service_template_or_404(
+        service_id,
+        session['upload_data'].get('template_id')
+    )['data']
+
     template = Template(
-        templates_dao.get_service_template_or_404(
-            service_id,
-            session['upload_data'].get('template_id')
-        )['data'],
-        prefix=service['name']
+        template,
+        prefix=service['name'] if template['template_type'] == 'sms' else ''
     )
 
     recipients = RecipientCSV(
