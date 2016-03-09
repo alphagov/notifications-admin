@@ -12,12 +12,12 @@ Create an account – GOV.UK Notify
   <div class="column-two-thirds">
     <h1 class="heading-large">Create an account</h1>
     <form method="post" autocomplete="nope">
-      {{ textbox(form.email_address, width='3-4', disabled=True ) }}
       {{ textbox(form.name, width='3-4') }}
       {{ textbox(form.mobile_number, width='3-4') }}
       {{ textbox(form.password, hint="Your password must have at least 10 characters", width='3-4') }}
       {{ page_footer("Continue") }}
       {{form.service}}
+      {{form.email_address}}
     </form>
   </div>
 </div>
