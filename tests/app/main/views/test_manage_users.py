@@ -244,3 +244,39 @@ def test_manage_users_does_not_show_accepted_invite(app_,
             tables = page.find_all('table')
             assert len(tables) == 1
             assert not page.find(text='invited_user@test.gov.uk')
+
+
+def test_user_cant_invite_themselves(
+    app_,
+    service_one,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_get_service,
+    mock_get_users_by_service,
+    mock_create_invite,
+    mock_get_invites_for_service,
+    mock_has_permissions
+):
+    from_user = api_user_active.id
+    service_id = service_one['id']
+    email_address = api_user_active.email_address
+    permissions = 'send_messages,manage_service,manage_api_keys'
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.post(
+                url_for('main.invite_user', service_id=service_id),
+                data={'email_address': email_address,
+                      'send_messages': 'yes',
+                      'manage_service': 'yes',
+                      'manage_api_keys': 'yes'},
+                follow_redirects=True
+            )
+
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.h1.string.strip() == 'Add a new team member'
+        form_error = page.find('span', class_='error-message').string.strip()
+        assert form_error == "You can't send an invitation to yourself"

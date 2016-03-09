@@ -15,7 +15,10 @@ from notifications_python_client.errors import HTTPError
 from app import user_api_client
 
 from app.main import main
-from app.main.forms import InviteUserForm
+from app.main.forms import (
+    InviteUserForm,
+    PermisisonsForm
+)
 from app.main.dao.services_dao import get_service_by_id
 from app import user_api_client
 from app import invite_api_client
@@ -46,7 +49,7 @@ def invite_user(service_id):
 
     service = get_service_by_id(service_id)
 
-    form = InviteUserForm()
+    form = InviteUserForm(current_user.email_address)
     if form.validate_on_submit():
         email_address = form.email_address.data
         permissions = _get_permissions(request.form)
@@ -72,8 +75,7 @@ def edit_user_permissions(service_id, user_id):
     service = get_service_by_id(service_id)
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
-    form = InviteUserForm(**{
-        'email_address': user.email_address,
+    form = PermisisonsForm(**{
         'send_messages': 'yes' if user.has_permissions(
             ['send_texts', 'send_emails', 'send_letters']) else 'no',
         'manage_service': 'yes' if user.has_permissions(
@@ -94,7 +96,7 @@ def edit_user_permissions(service_id, user_id):
         return redirect(url_for('.manage_users', service_id=service_id))
 
     return render_template(
-        'views/invite-user.html',
+        'views/edit-user-permissions.html',
         user=user,
         form=form,
         service_id=service_id
