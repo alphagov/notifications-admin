@@ -1,38 +1,53 @@
 {% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
 {% from "components/email-message.html" import email_message %}
 {% from "components/sms-message.html" import sms_message %}
-{% from "components/table.html" import list_table, field %}
+{% from "components/table.html" import list_table, field, text_field, hidden_field_heading %}
 {% from "components/placeholder.html" import placeholder %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
-  {{ "Check and confirm" if upload_result.valid else page_heading }} – GOV.UK Notify
+  {{ page_heading if errors else "Check and confirm" }} – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
-
-  {% if template.additional_data %}
-    {{ banner(
-      "Remove these columns from your CSV file:" + ", ".join(template.missing_data),
-      type="dangerous"
-    ) }}
-  {% elif not upload_result.valid %}
-    {{ banner(
-      "Your CSV file contained missing or invalid data",
-      type="dangerous"
-    ) }}
+  {% if errors %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% if errors|length == 1 %}
+          <h1 class='banner-title'>
+            There was a problem with {{ original_file_name }}
+          </h1>
+          <p>
+            You need to {{ errors[0] }}
+          </p>
+        {% else %}
+          <h1 class='banner-title'>
+            There were some problems with {{ original_file_name }}
+          </h1>
+          <p>
+            You need to:
+          </p>
+          <ul class="list-bullet">
+            {% for error in errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endcall %}
+    </div>
+  {% else %}
+    <h1 class="heading-large">
+      Check and confirm
+    </h1>
   {% endif %}
-
-  <h1 class="heading-large">
-    {{ "Check and confirm" if upload_result.valid else page_heading }}
-  </h1>
 
   {% if 'email' == template.template_type %}
     {{ email_message(
       template.subject,
-      template.replaced if upload_result.valid else template.formatted_as_markup,
+      template.formatted_as_markup if errors else template.replaced,
       from_address='{}@notifications.service.gov.uk'.format(service.email_from),
       from_name=service.name
     )}}
@@ -40,51 +55,52 @@
     <div class="grid-row">
       <div class="column-two-thirds">
         {{ sms_message(
-          template.replaced if upload_result.valid else template.formatted_as_markup
+          template.formatted_as_markup if errors else template.replaced
         )}}
       </div>
     </div>
   {% endif %}
 
-  {% if upload_result.valid %}
+  {% if errors %}
+    {{file_upload(form.file, button_text='Re-upload your file')}}
+  {% else %}
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <input type="submit" class="button" value="{{ "Send {} message{}".format(upload_result.rows|count, '' if upload_result.rows|count == 1 else 's') }}" />
+      <input type="submit" class="button" value="{{ "Send {} message{}".format(count_of_recipients, '' if count_of_recipients == 1 else 's') }}" />
       <a href="{{url_for('.send_messages', service_id=service_id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
     </form>
-  {% else %}
-    {{file_upload(form.file, button_text='Upload a CSV file')}}
   {% endif %}
 
   {% call(item) list_table(
-    upload_result.rows,
+    recipients.rows_annotated_and_truncated,
     caption=original_file_name,
-    field_headings=column_headers
+    field_headings=['Row'] + recipients.column_headers_with_placeholders_highlighted
   ) %}
-    {% if item.get('phone number', '')|valid_phone_number %}
-      {% call field() %}
-        {{ item['phone number'] }}
-      {% endcall %}
-    {% elif item.get('email address') %}
-      {% call field() %}
-        {{ item['email address'] }}
-      {% endcall %}
-    {% else %}
-      {% call field(status='missing') %}
-        {{ item['phone number'] }}
-      {% endcall %}
-    {% endif %}
-    {% for column in template.placeholders %}
-      {% if item.get(column) %}
+    {% call field() %}
+      {{ item.index + 1 }}
+    {% endcall %}
+    {% for column in recipients.column_headers %}
+      {% if item[column].error %}
         {% call field() %}
-          {{ item.get(column) }}
+          <span class="table-field-error">
+            <span class="table-field-error-label">{{ item[column].error }}</span>
+            {{ item[column].data if item[column].data != None }}
+          </span>
+        {% endcall %}
+      {% elif item[column].ignore %}
+        {% call field(status='default') %}
+          {{ item[column].data if item[column].data != None }}
         {% endcall %}
       {% else %}
-        {% call field(status='missing') %}
-          missing
-        {% endcall %}
+        {{ text_field(item[column].data) }}
       {% endif %}
     {% endfor %}
   {% endcall %}
+
+  {% if count_of_displayed_recipients < count_of_recipients %}
+    <p class="table-show-more-link">
+      {{ count_of_recipients - count_of_displayed_recipients }} more {{ "row" if 1 == (count_of_recipients - count_of_displayed_recipients) else "rows"}} not shown
+    </p>
+  {% endif %}
 
 {% endblock %}

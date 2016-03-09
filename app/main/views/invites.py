@@ -33,6 +33,7 @@ def accept_invite(token):
         session['invited_user'] = invited_user.serialize()
 
         if existing_user:
+
             user_api_client.add_user_to_service(invited_user.service,
                                                 existing_user.id,
                                                 invited_user.permissions)

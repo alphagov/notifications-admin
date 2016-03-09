@@ -58,6 +58,10 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == 'Sign in'
+            flash_banners = page.find_all('div', class_='banner-default')
+            assert len(flash_banners) == 2
+            assert flash_banners[0].text.strip() == 'Please log in to access this page.'
+            assert flash_banners[1].text.strip() == 'You already have an account with GOV.UK Notify. Sign in to your account to accept this invitation.'  # noqa
 
 
 def test_new_user_accept_invite_calls_api_and_redirects_to_registration(app_,
@@ -100,14 +104,17 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(app_,
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == 'Create an account'
 
+            email_in_page = page.find('p')
+            assert email_in_page.text.strip() == 'Your account will be created with this email: invited_user@test.gov.uk'  # noqa
+
             form = page.find('form')
-            email = form.find('input', id='email_address')
             name = form.find('input', id='name')
             password = form.find('input', id='password')
             service = form.find('input', type='hidden', id='service')
+            email = form.find('input', type='hidden', id='email_address')
 
             assert email
-            assert email.attrs['disabled']
+            assert email.attrs['value'] == 'invited_user@test.gov.uk'
             assert name
             assert password
             assert service

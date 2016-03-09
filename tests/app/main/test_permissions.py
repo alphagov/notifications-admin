@@ -1,7 +1,7 @@
 import pytest
 from flask import url_for
 
-from app.utils import user_has_permissions, validate_header_row, validate_recipient, InvalidHeaderError
+from app.utils import user_has_permissions
 from app.main.views.index import index
 from werkzeug.exceptions import Forbidden
 
@@ -58,9 +58,13 @@ def test_user_has_permissions_multiple(app_,
             response = decorated_index()
 
 
-def test_validate_header_row():
-    row = {'bad': '+44 7700 900981'}
-    try:
-        validate_header_row(row, 'sms')
-    except InvalidHeaderError as e:
-        assert e.message == 'Invalid header name, should be phone number'
+def test_exact_permissions(app_,
+                           api_user_active,
+                           mock_login,
+                           mock_get_user_with_permissions):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            decorator = user_has_permissions('manage_users', 'manage_templates', 'manage_settings')
+            decorated_index = decorator(index)
+            response = decorated_index()

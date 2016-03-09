@@ -8,7 +8,7 @@ BUCKET_NAME = 'service-{}-notify'
 def s3upload(upload_id, service_id, filedata, region):
     s3 = resource('s3')
     bucket_name = BUCKET_NAME.format(service_id)
-    contents = '\n'.join(filedata['data'])
+    contents = filedata['data']
 
     exists = True
     try:
