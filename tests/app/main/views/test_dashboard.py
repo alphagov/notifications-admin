@@ -38,7 +38,7 @@ def _test_dashboard_menu(mocker, app_, usr, service, permissions):
             return client.get(url_for('main.service_dashboard', service_id=service['id']))
 
 
-def test_menu_send_messages(mocker, app_, api_user_active, service_one):
+def test_menu_send_messages(mocker, app_, api_user_active, service_one, mock_get_service_templates, mock_get_jobs):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -64,7 +64,7 @@ def test_menu_send_messages(mocker, app_, api_user_active, service_one):
         assert url_for('main.documentation', service_id=service_one['id']) not in page
 
 
-def test_menu_manage_service(mocker, app_, api_user_active, service_one):
+def test_menu_manage_service(mocker, app_, api_user_active, service_one, mock_get_service_templates, mock_get_jobs):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -90,7 +90,7 @@ def test_menu_manage_service(mocker, app_, api_user_active, service_one):
         assert url_for('main.documentation', service_id=service_one['id']) not in page
 
 
-def test_menu_manage_api_keys(mocker, app_, api_user_active, service_one):
+def test_menu_manage_api_keys(mocker, app_, api_user_active, service_one, mock_get_service_templates, mock_get_jobs):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
