@@ -33,33 +33,7 @@ def test_choose_template(
         assert '{} template two content'.format(template_type) in content
 
 
-def test_upload_empty_csvfile_returns_to_upload_page(
-    app_,
-    api_user_active,
-    mock_login,
-    mock_get_user,
-    mock_get_service,
-    mock_get_service_templates,
-    mock_check_verify_code,
-    mock_get_service_template,
-    mock_has_permissions
-):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            upload_data = {'file': (BytesIO(''.encode('utf-8')), 'emtpy.csv')}
-            response = client.post(
-                url_for('main.send_messages', service_id=12345, template_id=54321),
-                data=upload_data,
-                follow_redirects=True
-            )
-
-        assert response.status_code == 200
-        content = response.get_data(as_text=True)
-        assert 'The file emtpy.csv contained no data' in content
-
-
-def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
+def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     app_,
     api_user_active,
     mocker,
@@ -85,43 +59,11 @@ def test_upload_csvfile_with_invalid_phone_shows_check_page_with_errors(
             )
         assert response.status_code == 200
         content = response.get_data(as_text=True)
-        assert 'Your CSV file contained missing or invalid data' in content
+        assert 'There was a problem with invalid.csv' in content
         assert '+44 123' in content
         assert '+44 456' in content
-        assert 'Upload a CSV file' in content
-
-
-def test_upload_csvfile_removes_empty_lines_and_trailing_commas(
-    app_,
-    api_user_active,
-    mocker,
-    mock_login,
-    mock_get_service,
-    mock_get_service_template,
-    mock_s3_upload,
-    mock_has_permissions
-):
-
-    contents = 'phone number,name,,,\n++44 7700 900981,test1,,,\n+44 7700 900981,test2,,,\n ,,, \n ,,, \t \t \n'
-    file_data = (BytesIO(contents.encode('utf-8')), 'invalid.csv')
-
-    expected_data = {'data': ['phone number,name', '++44 7700 900981,test1', '+44 7700 900981,test2'],
-                     'file_name': 'invalid.csv'}
-
-    mocker.patch('app.main.views.send.s3download',
-                 return_value='phone number,name\n++44 7700 900981,test1\n+44 7700 900981,test2')
-
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            upload_data = {'file': file_data}
-            response = client.post(
-                url_for('main.send_messages', service_id=12345, template_id=54321),
-                data=upload_data,
-                follow_redirects=True
-            )
-        assert response.status_code == 200
-        mock_s3_upload.assert_called_with(ANY, '12345', expected_data, 'eu-west-1')
+        assert 'Not a UK mobile number' in content
+        assert 'Re-upload your file' in content
 
 
 def test_send_test_message_to_self(
@@ -160,7 +102,7 @@ def test_send_test_message_to_self(
     mock_has_permissions
 ):
 
-    expected_data = {'data': ['email address', 'test@user.gov.uk'], 'file_name': 'Test run'}
+    expected_data = {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'Test run'}
     mocker.patch('app.main.views.send.s3download', return_value='email address\r\ntest@user.gov.uk')
 
     with app_.test_request_context():
@@ -207,31 +149,32 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_has_permissions
 ):
 
-    contents = 'phone number\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
-    file_data = (BytesIO(contents.encode('utf-8')), 'valid.csv')
-    mocker.patch('app.main.views.send.s3download', return_value=contents)
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value='phone number\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
+    )
 
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            upload_data = {'file': file_data}
-            response = client.post(url_for('main.send_messages', service_id=12345, template_id=54321),
-                                   data=upload_data,
-                                   follow_redirects=True)
+            response = client.post(
+                url_for('main.send_messages', service_id=12345, template_id=54321),
+                data={'file': (BytesIO(), 'valid.csv')},
+                follow_redirects=True
+            )
             with client.session_transaction() as sess:
                 assert int(sess['upload_data']['template_id']) == 54321
                 assert sess['upload_data']['original_file_name'] == 'valid.csv'
                 assert sess['upload_data']['notification_count'] == 6
 
             content = response.get_data(as_text=True)
-
             assert response.status_code == 200
             assert '+44 7700 900981' in content
             assert '+44 7700 900982' in content
             assert '+44 7700 900983' in content
             assert '+44 7700 900984' in content
             assert '+44 7700 900985' in content
-            assert '+44 7700 900986' in content
+            assert '1 more row not shown' in content
 
 
 def test_create_job_should_call_api(
@@ -260,8 +203,9 @@ def test_create_job_should_call_api(
             with client.session_transaction() as session:
                 session['upload_data'] = {'original_file_name': original_file_name,
                                           'template_id': template_id,
-                                          'notification_count': notification_count}
-            url = url_for('main.check_messages', service_id=service_one['id'], upload_id=job_id)
+                                          'notification_count': notification_count,
+                                          'valid': True}
+            url = url_for('main.start_job', service_id=service_one['id'], upload_id=job_id)
             response = client.post(url, data=job_data, follow_redirects=True)
 
         assert response.status_code == 200
@@ -284,11 +228,11 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
 ):
 
     service_id = service_one['id']
-    contents = 'phone number,name,,,\n++44 7700 900981,test1,,,\n+44 7700 900981,test2,,,\n ,,, \n ,,, \t \t \n'
-    file_data = (BytesIO(contents.encode('utf-8')), 'invalid.csv')
-    upload_data = {'file': file_data}
 
-    mocker.patch('app.main.views.send.s3download', return_value=contents)
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value='phone number,name,,,\n++44 7700 900981,test1,,,\n+44 7700 900981,test2,,,\n ,,, \n ,,, \t \t \n'
+    )
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -296,7 +240,10 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
                 session['upload_data'] = {'original_file_name': 'invalid.csv',
                                           'template_id': job_data['template'],
                                           'notification_count': job_data['notification_count']}
-            url = url_for('main.check_messages', service_id=service_id, upload_id=job_data['id'])
-            response = client.post(url, data=upload_data, follow_redirects=True)
+            response = client.post(
+                url_for('main.check_messages', service_id=service_id, upload_id=job_data['id']),
+                data={'file': (BytesIO(), 'invalid.csv')},
+                follow_redirects=True
+            )
             assert response.status_code == 200
-            assert 'Your CSV file contained missing or invalid data' in response.get_data(as_text=True)
+            assert 'There was a problem with invalid.csv' in response.get_data(as_text=True)

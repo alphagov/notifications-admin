@@ -55,7 +55,7 @@ def test_process_register_returns_400_when_mobile_number_is_invalid(app_,
                                                  'password': 'validPassword!'})
 
     assert response.status_code == 200
-    assert 'Must be a UK mobile number (eg 07700 900460)' in response.get_data(as_text=True)
+    assert 'Must not contain letters or symbols' in response.get_data(as_text=True)
 
 
 def test_should_return_400_when_email_is_not_gov_uk(app_,
