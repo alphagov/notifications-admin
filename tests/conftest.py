@@ -90,17 +90,20 @@ def mock_update_service(mocker):
         'app.notifications_api_client.update_service', side_effect=_update)
 
 
+SERVICE_ONE_ID = "596364a0-858e-42c8-9062-a8fe822260eb"
+SERVICE_TWO_ID = "147ad62a-2951-4fa1-9ca0-093cd1a52c52"
+
+
 @pytest.fixture(scope='function')
 def mock_get_services(mocker, user=None):
     if user is None:
         user = api_user_active()
 
     def _create(user_id=None):
-        import uuid
         service_one = service_json(
-            "596364a0-858e-42c8-9062-a8fe822260eb", "service_one", [user.id], 1000, True, False)
+            SERVICE_ONE_ID, "service_one", [user.id], 1000, True, False)
         service_two = service_json(
-            "147ad62a-2951-4fa1-9ca0-093cd1a52c52", "service_two", [user.id], 1000, True, False)
+            SERVICE_TWO_ID, "service_two", [user.id], 1000, True, False)
         return {'data': [service_one, service_two]}
 
     return mocker.patch(
@@ -113,9 +116,8 @@ def mock_get_services_with_one_service(mocker, user=None):
         user = api_user_active()
 
     def _create(user_id=None):
-        import uuid
         return {'data': [service_json(
-            "596364a0-858e-42c8-9062-a8fe822260eb", "service_one", [user.id], 1000, True, False
+            SERVICE_ONE_ID, "service_one", [user.id], 1000, True, False
         )]}
 
     return mocker.patch(
@@ -669,8 +671,3 @@ def mock_add_user_to_service(mocker, service_one, api_user_active):
 @pytest.fixture(scope='function')
 def mock_set_user_permissions(mocker):
     return mocker.patch('app.user_api_client.set_user_permissions', return_value=None)
-
-
-@pytest.fixture(scope='function')
-def mock_reset_user_password(mocker):
-    return mocker.patch('app.user_api_client.send_reset_password_url', return_value=None)

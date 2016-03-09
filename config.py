@@ -39,9 +39,9 @@ class Config(object):
     ADMIN_CLIENT_SECRET = os.getenv('ADMIN_CLIENT_SECRET')
 
     WTF_CSRF_ENABLED = True
-    SECRET_KEY = 'dev-notify-secret-key'
+    SECRET_KEY = 'secret-key'
     HTTP_PROTOCOL = 'http'
-    DANGEROUS_SALT = 'dev-notify-salt'
+    DANGEROUS_SALT = 'itsdangeroussalt'
     TOKEN_MAX_AGE_SECONDS = 3600
 
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10mb

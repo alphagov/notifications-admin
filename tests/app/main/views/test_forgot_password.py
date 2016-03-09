@@ -1,5 +1,7 @@
 from flask import url_for
 
+import app
+
 
 def test_should_render_forgot_password(app_):
     with app_.test_request_context():
@@ -12,8 +14,9 @@ def test_should_render_forgot_password(app_):
 def test_should_redirect_to_password_reset_sent_for_valid_email(
         app_,
         api_user_active,
-        mock_reset_user_password):
+        mocker):
     with app_.test_request_context():
+        mocker.patch('app.user_api_client.send_reset_password_url', return_value=None)
         response = app_.test_client().post(
             url_for('.forgot_password'),
             data={'email_address': api_user_active.email_address})
@@ -21,4 +24,4 @@ def test_should_redirect_to_password_reset_sent_for_valid_email(
         assert (
             'You have been sent an email containing a link'
             ' to reset your password.') in response.get_data(as_text=True)
-        mock_reset_user_password.assert_called_once_with(api_user_active.email_address)
+        app.user_api_client.send_reset_password_url.assert_called_once_with(api_user_active.email_address)
