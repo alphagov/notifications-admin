@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
 {% from "components/table.html" import list_table, field, right_aligned_field_heading %}
 {% from "components/big-number.html" import big_number %}
 
@@ -24,33 +25,26 @@
     </ul>
 
     {% if not template_count and not jobs %}
-      {{ banner(
-        """
-          <ol>
+      {% call banner_wrapper(subhead='Get started', type="tip") %}
+        <ol>
+          {% if current_user.has_permissions(['manage_templates']) %}
             <li>
-              <a href='{}'>Add a template</a>
+              <a href='url_for(".add_service_template", service_id=service_id, template_type="sms")'>Add a template</a>
             </li>
+          {% endif %}
+          {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
             <li>
-              <a href='{}'>Send yourself a text message</a>
+              <a href='url_for(".choose_template", service_id=service_id, template_type="sms")'>Send yourself a text message</a>
             </li>
-          </ol>
-        """.format(
-          url_for(".add_service_template", service_id=service_id, template_type="sms"),
-          url_for(".choose_template", service_id=service_id, template_type="sms")
-        )|safe,
-        subhead='Get started',
-        type="tip"
-      )}}
+          {% endif %}
+        </ol>
+      {% endcall %}
     {% elif not jobs %}
-      {{ banner(
-        """
-          <a href='{}'>Send yourself a text message</a>
-        """.format(
-          url_for(".choose_template", service_id=service_id, template_type="sms")
-        )|safe,
-        subhead='Next step',
-        type="tip"
-      )}}
+      {% call banner_wrapper(subhead='Next step', type="tip") %}
+        {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
+          <a href='url_for(".choose_template", service_id=service_id, template_type="sms")'>Send yourself a text message</a>
+        {% endif %}
+      {% endcall %}
     {% else %}
       {% call(item) list_table(
         jobs,
@@ -69,9 +63,11 @@
         {% endcall %}
       {% endcall %}
       {% if more_jobs_to_show %}
-        <p class="table-show-more-link">
-          <a href="{{ url_for('.view_jobs', service_id=service_id) }}">See all sent text messages</a>
-        </p>
+        {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
+          <p class="table-show-more-link">
+            <a href="{{ url_for('.view_jobs', service_id=service_id) }}">See all sent text messages</a>
+          </p>
+        {% endif %}
       {% endif %}
     {% endif %}
 

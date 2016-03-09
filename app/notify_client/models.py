@@ -85,14 +85,9 @@ class User(UserMixin):
     def has_permissions(self, permissions, service_id=None, or_=False):
         if service_id is None:
             service_id = session.get('service_id', '')
-        #print(permissions)
-        #print(service_id)
-        #print(self._permissions)
-
         if service_id in self._permissions:
             if or_:
                 return any([x in self._permissions[service_id] for x in permissions])
-
             return set(self._permissions[service_id]) >= set(permissions)
         return False
 
