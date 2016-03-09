@@ -28,17 +28,7 @@ Manage users – GOV.UK Notify
         {{ yes_no(form.manage_api_keys.name, form.manage_api_keys.label, form.manage_api_keys.data) }}
       </fieldset>
 
-      {% if user %}
-        {{ page_footer(
-          'Save',
-          delete_link=url_for('.delete_user', service_id=service_id, user_id=user_id),
-          delete_link_text='Delete this account',
-          back_link=url_for('.manage_users', service_id=service_id),
-          back_link_text='Cancel'
-        ) }}
-      {% else %}
-        {{ page_footer('Send invitation email') }}
-      {% endif %}
+      {{ page_footer('Send invitation email') }}
 
     </form>
   </div>
