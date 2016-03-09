@@ -43,6 +43,19 @@ manage_templates_page_headings = {
 }
 
 
+def get_send_button_text(template_type, number_of_messages):
+    if 1 == number_of_messages:
+        return {
+            'email': 'Send 1 email',
+            'sms': 'Send 1 text message'
+        }[template_type]
+    else:
+        return {
+            'email': 'Send {} emails',
+            'sms': 'Send {} text messages'
+        }[template_type].format(number_of_messages)
+
+
 def get_page_headings(template_type):
     # User has manage_service role
     if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']):
@@ -203,12 +216,14 @@ def check_messages(service_id, upload_id):
     if not contents:
         flash('There was a problem reading your upload file')
 
+    template = templates_dao.get_service_template_or_404(
+        service_id,
+        session['upload_data'].get('template_id')
+    )['data']
+
     template = Template(
-        templates_dao.get_service_template_or_404(
-            service_id,
-            session['upload_data'].get('template_id')
-        )['data'],
-        prefix=service['name']
+        template,
+        prefix=service['name'] if template['template_type'] == 'sms' else ''
     )
 
     recipients = RecipientCSV(
@@ -233,6 +248,7 @@ def check_messages(service_id, upload_id):
         count_of_recipients=session['upload_data']['notification_count'],
         count_of_displayed_recipients=len(list(recipients.rows_annotated_and_truncated)),
         original_file_name=session['upload_data'].get('original_file_name'),
+        send_button_text=get_send_button_text(template.template_type, session['upload_data']['notification_count']),
         service_id=service_id,
         service=service,
         form=CsvUploadForm()

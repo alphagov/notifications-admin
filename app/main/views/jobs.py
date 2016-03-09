@@ -40,6 +40,7 @@ def view_job(service_id, job_id):
     service = services_dao.get_service_by_id_or_404(service_id)
     try:
         job = job_api_client.get_job(service_id, job_id)['data']
+        template = templates_dao.get_service_template_or_404(service_id, job['template'])['data']
         notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
         finished = job['status'] == 'finished'
         return render_template(
@@ -55,11 +56,11 @@ def view_job(service_id, job_id):
             finished_at=job['updated_at'] if finished else None,
             uploaded_file_name=job['original_file_name'],
             template=Template(
-                templates_dao.get_service_template_or_404(service_id, job['template'])['data'],
-                prefix=service['name']
+                template,
+                prefix=service['name'] if template['template_type'] == 'sms' else ''
             ),
             service_id=service_id,
-            from_name=service['name'],
+            service=service,
             job_id=job_id
         )
     except HTTPError as e:
