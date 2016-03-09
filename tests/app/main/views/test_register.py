@@ -122,7 +122,7 @@ def test_register_with_existing_email_returns_error(app_,
     with app_.test_request_context():
         response = app_.test_client().post(url_for('main.register'),
                                            data=user_data)
-        assert response.status_code == 200
+        assert response.status_code == 400
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         element = page.find('h1')
         assert element.text == 'Create an account'

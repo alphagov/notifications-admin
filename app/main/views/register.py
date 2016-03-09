@@ -35,6 +35,7 @@ def register():
             return redirect(url_for('main.verify'))
         else:
             flash('There was an error registering your account')
+            return render_template('views/register.html', form=form), 400
 
     return render_template('views/register.html', form=form)
 
