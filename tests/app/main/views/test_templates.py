@@ -1,5 +1,6 @@
 import json
 import uuid
+from tests import validate_route_permission
 
 from flask import url_for
 
@@ -125,3 +126,55 @@ def test_should_redirect_when_deleting_a_template(app_,
                 service_id, template_id)
             mock_delete_service_template.assert_called_with(
                 service_id, template_id)
+
+
+def test_route_permissions(mocker,
+                           app_,
+                           api_user_active,
+                           service_one,
+                           mock_get_service_template):
+    routes = [
+        'main.add_service_template',
+        'main.edit_service_template',
+        'main.delete_service_template']
+    with app_.test_request_context():
+        for route in routes:
+            validate_route_permission(
+                mocker,
+                app_,
+                "GET",
+                200,
+                url_for(
+                    route,
+                    service_id=service_one['id'],
+                    template_type='sms',
+                    template_id=123),
+                ['manage_templates'],
+                api_user_active,
+                service_one)
+
+
+def test_route_invalid_permissions(mocker,
+                                   app_,
+                                   api_user_active,
+                                   service_one,
+                                   mock_get_service_template):
+    routes = [
+        'main.add_service_template',
+        'main.edit_service_template',
+        'main.delete_service_template']
+    with app_.test_request_context():
+        for route in routes:
+            validate_route_permission(
+                mocker,
+                app_,
+                "GET",
+                403,
+                url_for(
+                    route,
+                    service_id=service_one['id'],
+                    template_type='sms',
+                    template_id=123),
+                ['blah'],
+                api_user_active,
+                service_one)

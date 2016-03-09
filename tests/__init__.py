@@ -1,3 +1,4 @@
+import pytest
 from flask.testing import FlaskClient
 from flask import url_for
 
@@ -125,3 +126,39 @@ def notification_json():
         'links': {}
     }
     return data
+
+
+def validate_route_permission(mocker,
+                              app_,
+                              method,
+                              response_code,
+                              route,
+                              permissions,
+                              usr,
+                              service):
+    usr._permissions[str(service['id'])] = permissions
+    mocker.patch(
+        'app.user_api_client.check_verify_code',
+        return_value=(True, ''))
+    mocker.patch(
+        'app.notifications_api_client.get_services',
+        return_value={'data': []})
+    mocker.patch('app.user_api_client.get_user', return_value=usr)
+    mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
+    mocker.patch('app.notifications_api_client.get_service', return_value={'data': service})
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(usr)
+            resp = None
+            with client.session_transaction() as session:
+                session['service_id'] = str(service['id'])
+            if method == 'GET':
+                resp = client.get(route)
+            elif method == 'POST':
+                resp = client.post(route)
+            else:
+                pytest.fail("Invalid method call {}".format(method))
+            if resp.status_code != response_code:
+                pytest.fail("Invalid permissions set for endpoint {}".format(route))
+    return resp

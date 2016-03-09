@@ -3,34 +3,9 @@ import pytest
 from io import BytesIO
 from flask import url_for
 from unittest.mock import ANY
+from tests import validate_route_permission
 
 template_types = ['email', 'sms']
-
-
-@pytest.mark.parametrize("template_type", template_types)
-def test_choose_template(
-    template_type,
-    app_,
-    api_user_active,
-    mock_login,
-    mock_get_user,
-    mock_get_service,
-    mock_check_verify_code,
-    mock_get_service_templates,
-    mock_get_jobs,
-    mock_has_permissions
-):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            response = client.get(url_for('main.choose_template', template_type=template_type, service_id=12345))
-
-        assert response.status_code == 200
-        content = response.get_data(as_text=True)
-        assert '{}_template_one'.format(template_type) in content
-        assert '{} template one content'.format(template_type) in content
-        assert '{}_template_two'.format(template_type) in content
-        assert '{} template two content'.format(template_type) in content
 
 
 def test_upload_csvfile_with_errors_shows_check_page_with_errors(
@@ -247,3 +222,158 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
             )
             assert response.status_code == 200
             assert 'There was a problem with invalid.csv' in response.get_data(as_text=True)
+
+
+def test_route_permissions(mocker,
+                           app_,
+                           api_user_active,
+                           service_one,
+                           mock_get_service_template,
+                           mock_get_service_templates,
+                           mock_get_jobs,
+                           mock_get_notifications,
+                           mock_create_job,
+                           mock_s3_upload):
+    routes = [
+        'main.choose_template',
+        'main.send_messages',
+        'main.get_example_csv']
+    with app_.test_request_context():
+        for route in routes:
+            validate_route_permission(
+                mocker,
+                app_,
+                "GET",
+                200,
+                url_for(
+                    route,
+                    service_id=service_one['id'],
+                    template_type='sms',
+                    template_id=123),
+                ['send_texts', 'send_emails', 'send_letters'],
+                api_user_active,
+                service_one)
+
+    with app_.test_request_context():
+        validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            302,
+            url_for(
+                'main.send_message_to_self',
+                service_id=service_one['id'],
+                template_type='sms',
+                template_id=123),
+            ['send_texts', 'send_emails', 'send_letters'],
+            api_user_active,
+            service_one)
+
+
+def test_route_invalid_permissions(mocker,
+                                   app_,
+                                   api_user_active,
+                                   service_one,
+                                   mock_get_service_template,
+                                   mock_get_service_templates,
+                                   mock_get_jobs,
+                                   mock_get_notifications,
+                                   mock_create_job):
+    routes = [
+        'main.choose_template',
+        'main.send_messages',
+        'main.get_example_csv',
+        'main.send_message_to_self']
+    with app_.test_request_context():
+        for route in routes:
+            validate_route_permission(
+                mocker,
+                app_,
+                "GET",
+                403,
+                url_for(
+                    route,
+                    service_id=service_one['id'],
+                    template_type='sms',
+                    template_id=123),
+                ['blah'],
+                api_user_active,
+                service_one)
+
+
+def test_route_choose_template_manage_service_permissions(mocker,
+                                                          app_,
+                                                          api_user_active,
+                                                          service_one,
+                                                          mock_login,
+                                                          mock_get_user,
+                                                          mock_get_service,
+                                                          mock_check_verify_code,
+                                                          mock_get_service_templates,
+                                                          mock_get_jobs):
+    with app_.test_request_context():
+        template_id = mock_get_service_templates(service_one['id'])['data'][0]['id']
+        resp = validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            200,
+            url_for(
+                'main.choose_template',
+                service_id=service_one['id'],
+                template_type='sms'),
+            ['manage_users', 'manage_templates', 'manage_settings'],
+            api_user_active,
+            service_one)
+        page = resp.get_data(as_text=True)
+        assert url_for(
+            "main.send_messages",
+            service_id=service_one['id'],
+            template_id=template_id) not in page
+        assert url_for(
+            "main.send_message_to_self",
+            service_id=service_one['id'],
+            template_id=template_id) not in page
+        assert url_for(
+            "main.edit_service_template",
+            service_id=service_one['id'],
+            template_id=template_id) in page
+
+
+def test_route_choose_template_send_messages_permissions(mocker,
+                                                         app_,
+                                                         api_user_active,
+                                                         service_one,
+                                                         mock_login,
+                                                         mock_get_user,
+                                                         mock_get_service,
+                                                         mock_check_verify_code,
+                                                         mock_get_service_templates,
+                                                         mock_get_jobs):
+    with app_.test_request_context():
+        template_id = mock_get_service_templates(service_one['id'])['data'][0]['id']
+        resp = validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            200,
+            url_for(
+                'main.choose_template',
+                service_id=service_one['id'],
+                template_type='sms'),
+            ['send_texts', 'send_emails', 'send_letters'],
+            api_user_active,
+            service_one)
+        page = resp.get_data(as_text=True)
+        assert url_for(
+            "main.send_messages",
+            service_id=service_one['id'],
+            template_id=template_id) in page
+        assert url_for(
+            "main.send_message_to_self",
+            service_id=service_one['id'],
+            template_id=template_id) in page
+        assert url_for(
+            "main.edit_service_template",
+            service_id=service_one['id'],
+            template_id=template_id) not in page
