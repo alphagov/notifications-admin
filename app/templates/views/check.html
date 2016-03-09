@@ -66,7 +66,7 @@
   {% else %}
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <input type="submit" class="button" value="{{ "Send {} message{}".format(count_of_recipients, '' if count_of_recipients == 1 else 's') }}" />
+      <input type="submit" class="button" value="{{ send_button_text }}" />
       <a href="{{url_for('.send_messages', service_id=service_id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
     </form>
   {% endif %}
