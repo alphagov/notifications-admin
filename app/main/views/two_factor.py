@@ -1,3 +1,4 @@
+
 from flask import (
     render_template,
     redirect,
@@ -29,6 +30,7 @@ def two_factor():
         try:
             user = users_dao.get_user_by_id(user_id)
             services = services_dao.get_services(user_id).get('data', [])
+            # Check if coming from new password page
             if 'password' in session['user_details']:
                 user.set_password(session['user_details']['password'])
                 users_dao.update_user(user)
