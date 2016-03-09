@@ -103,28 +103,6 @@ def edit_user_permissions(service_id, user_id):
     )
 
 
-@main.route("/services/<service_id>/users/<user_id>/delete", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions('manage_users', 'manage_templates', 'manage_settings')
-def delete_user(service_id, user_id):
-    user = user_api_client.get_user(user_id)
-    service = get_service_by_id(service_id)
-
-    if request.method == 'POST':
-        return redirect(url_for('.manage_users', service_id=service_id))
-
-    flash(
-        'Are you sure you want to delete {}’s account?'.format(user.get('name') or user['email_localpart']),
-        'delete'
-    )
-
-    return render_template(
-        'views/invite-user.html',
-        user=user,
-        service_id=service_id
-    )
-
-
 @main.route("/services/<service_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
 @user_has_permissions('manage_users', 'manage_templates', 'manage_settings')
 def cancel_invited_user(service_id, invited_user_id):
