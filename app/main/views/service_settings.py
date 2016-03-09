@@ -1,14 +1,30 @@
 from flask import (
-    render_template, redirect, request, url_for, abort, session)
-from flask_login import (login_required, current_user)
+    render_template,
+    redirect,
+    request,
+    url_for,
+    abort,
+    session,
+    flash
+)
+
+from flask_login import (
+    login_required,
+    current_user
+)
+
+from notifications_python_client.errors import HTTPError
+
+from app.main.dao.services_dao import (
+    get_service_by_id,
+    delete_service,
+    update_service
+)
 
 from app.main import main
 from app.utils import user_has_permissions
-from app.main.dao.services_dao import (
-    get_service_by_id, delete_service, update_service)
 from app.main.dao.users_dao import verify_password
 from app.main.forms import ConfirmPasswordForm, ServiceNameForm
-from notifications_python_client.errors import HTTPError
 
 
 @main.route("/services/<service_id>/service-settings")
@@ -102,8 +118,8 @@ def service_request_to_go_live(service_id):
             service_id=service_id
         )
     elif request.method == 'POST':
-        service['restricted']
-        update_service(service)
+        flash('Thanks your request to go live is being processed', 'default')
+        # TODO implement whatever this action would do in the real world
         return redirect(url_for('.service_settings', service_id=service_id))
 
 

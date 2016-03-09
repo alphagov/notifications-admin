@@ -1,5 +1,6 @@
-from flask import (url_for, session)
+from flask import url_for
 from tests import validate_route_permission
+from bs4 import BeautifulSoup
 
 
 def test_should_show_overview(app_,
@@ -134,7 +135,6 @@ def test_should_show_request_to_go_live(app_,
 def test_should_redirect_after_request_to_go_live(app_,
                                                   api_user_active,
                                                   mock_get_service,
-                                                  mock_update_service,
                                                   mock_get_user,
                                                   mock_get_user_by_email,
                                                   mock_login,
@@ -151,7 +151,16 @@ def test_should_redirect_after_request_to_go_live(app_,
             'main.service_settings', service_id=service_id, _external=True)
         assert settings_url == response.location
         assert mock_get_service.called
-        assert mock_update_service.called
+
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            service_id = 123
+            response = client.post(url_for(
+                'main.service_request_to_go_live', service_id=service_id), follow_redirects=True)
+
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        flash_banner = page.find('div', class_='banner-default').string.strip()
+        assert flash_banner == 'Thanks your request to go live is being processed'
 
 
 def test_should_show_status_page(app_,
