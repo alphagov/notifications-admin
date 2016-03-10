@@ -168,10 +168,12 @@ class VerifyForm(Form):
             raise ValidationError(reason)
 
     def validate_email_code(self, field):
-        self._validate_code(field.data, 'email')
+        if self.sms_code.data:
+            self._validate_code(field.data, 'email')
 
     def validate_sms_code(self, field):
-        self._validate_code(field.data, 'sms')
+        if self.email_code.data:
+            self._validate_code(field.data, 'sms')
 
 
 class EmailNotReceivedForm(Form):

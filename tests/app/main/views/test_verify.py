@@ -1,8 +1,4 @@
-from flask import json, url_for
-from app.main.dao import users_dao
-from tests import create_test_api_user
-
-import pytest
+from flask import url_for
 
 
 def test_should_return_verify_template(app_,
@@ -67,3 +63,26 @@ def test_should_return_200_when_codes_are_wrong(app_,
             assert response.status_code == 200
             resp_data = response.get_data(as_text=True)
             assert resp_data.count('Code not found') == 2
+
+
+def test_should_only_check_codes_in_validation_if_both_are_present(app_,
+                                                                   api_user_active,
+                                                                   mock_get_user,
+                                                                   mock_update_user,
+                                                                   mock_check_verify_code):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+            response = client.post(url_for('main.verify'), data={'sms_code': '12345'})
+            assert response.status_code == 200
+            assert not mock_check_verify_code.called
+
+            response = client.post(url_for('main.verify'), data={'email_code': '12345'})
+            assert response.status_code == 200
+            assert not mock_check_verify_code.called
+
+            response = client.post(url_for('main.verify'), data={'sms_code': '12345', 'email_code': '12345'})
+            assert response.status_code == 302
+            assert mock_check_verify_code.called
+            assert mock_check_verify_code.call_count == 2

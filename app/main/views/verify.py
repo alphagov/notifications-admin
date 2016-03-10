@@ -24,6 +24,7 @@ def verify():
 
     def _check_code(code, code_type):
         return users_dao.check_verify_code(user_id, code, code_type)
+
     form = VerifyForm(_check_code)
     if form.validate_on_submit():
         try:
@@ -37,6 +38,6 @@ def verify():
             else:
                 raise e
         finally:
-            del session['user_details']
+            session.pop('user_details', None)
 
     return render_template('views/verify.html', form=form)
