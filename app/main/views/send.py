@@ -160,7 +160,7 @@ def get_example_csv(service_id, template_id):
             'email': current_user.email_address,
             'sms': current_user.mobile_number
         }[template.template_type]
-    ] + ["test {}".format(header) for header in template.placeholders])
+    ] + _get_fake_personalisation(template.placeholders))
     return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
 
 
@@ -177,13 +177,11 @@ def send_message_to_self(service_id, template_id):
     )
     if template.template_type == 'sms':
         writer.writerow(
-            [current_user.mobile_number] +
-            ["test {}".format(header) for header in template.placeholders]
+            [current_user.mobile_number] + _get_fake_personalisation(template.placeholders)
         )
     if template.template_type == 'email':
         writer.writerow(
-            [current_user.email_address] +
-            ["test {}".format(header) for header in template.placeholders]
+            [current_user.email_address] + _get_fake_personalisation(template.placeholders)
         )
 
     filedata = {
@@ -274,3 +272,9 @@ def start_job(service_id, upload_id):
     return redirect(
         url_for('main.view_job', service_id=service_id, job_id=upload_id)
     )
+
+
+def _get_fake_personalisation(placeholders):
+    return [
+        "{} 1".format(header) for header in placeholders
+    ]
