@@ -8,7 +8,6 @@ from flask import (
     jsonify
 )
 from flask_login import login_required
-from notifications_python_client.errors import HTTPError
 from utils.template import Template
 
 from app import job_api_client, notification_api_client

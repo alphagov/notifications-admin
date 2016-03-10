@@ -1,11 +1,6 @@
-from datetime import datetime
 from notifications_python_client import HTTPError
 
-from sqlalchemy.orm import load_only
-
 from app import login_manager
-from app.main.encryption import hashpw
-
 from app import user_api_client
 
 #

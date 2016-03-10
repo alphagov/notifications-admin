@@ -7,10 +7,11 @@ from flask._compat import string_types
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from notifications_python_client import HTTPError
-from werkzeug.exceptions import abort
 from pygments import highlight
 from pygments.lexers import JavascriptLexer
 from pygments.formatters import HtmlFormatter
+from werkzeug.exceptions import abort
+
 from app.notify_client.api_client import NotificationsAdminAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.user_api_client import UserApiClient
@@ -177,10 +178,33 @@ def useful_headers_after_request(response):
 
 
 def register_errorhandlers(application):
+    def _error_response(error_code):
+        resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
+        return useful_headers_after_request(resp)
+
     @application.errorhandler(HTTPError)
     def render_http_error(error):
         error_code = getattr(error, 'code', 500)
         if error_code not in [401, 404, 403, 500]:
             error_code = 500
-        resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
-        return useful_headers_after_request(resp)
+        return _error_response(error_code)
+
+    @application.errorhandler(400)
+    def handle_bad_request(error):
+        return _error_response(404)
+
+    @application.errorhandler(404)
+    def handle_not_found(error):
+        return _error_response(404)
+
+    @application.errorhandler(403)
+    def handle_not_authorized(error):
+        return _error_response(403)
+
+    @application.errorhandler(401)
+    def handle_no_permissions(error):
+        return _error_response(401)
+
+    @application.errorhandler(Exception)
+    def handle_bad_request(error):
+        return _error_response(500)

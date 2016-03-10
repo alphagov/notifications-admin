@@ -19,10 +19,7 @@ def get_service_templates(service_id):
 
 
 def get_service_template_or_404(service_id, template_id):
-    try:
-        return notifications_api_client.get_service_template(service_id, template_id)
-    except HTTPError as e:
-        abort(e.status_code)
+    return notifications_api_client.get_service_template(service_id, template_id)
 
 
 def delete_service_template(service_id, template_id):
