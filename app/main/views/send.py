@@ -222,7 +222,8 @@ def check_messages(service_id, upload_id):
         contents,
         template_type=template.template_type,
         placeholders=template.placeholders,
-        max_initial_rows_shown=5
+        max_initial_rows_shown=15,
+        max_errors_shown=15
     )
 
     with suppress(StopIteration):
@@ -237,8 +238,13 @@ def check_messages(service_id, upload_id):
         template=template,
         page_heading=get_page_headings(template.template_type),
         errors=get_errors_for_csv(recipients, template.template_type),
+        rows_have_errors=any(recipients.rows_with_errors),
         count_of_recipients=session['upload_data']['notification_count'],
-        count_of_displayed_recipients=len(list(recipients.rows_annotated_and_truncated)),
+        count_of_displayed_recipients=(
+            len(list(recipients.initial_annotated_rows_with_errors))
+            if any(recipients.rows_with_errors) else
+            len(list(recipients.initial_annotated_rows))
+        ),
         original_file_name=session['upload_data'].get('original_file_name'),
         send_button_text=get_send_button_text(template.template_type, session['upload_data']['notification_count']),
         service_id=service_id,

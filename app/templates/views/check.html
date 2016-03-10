@@ -72,7 +72,7 @@
   {% endif %}
 
   {% call(item) list_table(
-    recipients.rows_annotated_and_truncated,
+    recipients.initial_annotated_rows_with_errors if rows_have_errors else recipients.initial_annotated_rows,
     caption=original_file_name,
     field_headings=['1'] + recipients.column_headers_with_placeholders_highlighted
   ) %}
@@ -99,7 +99,7 @@
 
   {% if count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
-      {{ count_of_recipients - count_of_displayed_recipients }} more {{ "row" if 1 == (count_of_recipients - count_of_displayed_recipients) else "rows"}} not shown
+      {{ count_of_recipients - count_of_displayed_recipients }} {{ "row" if 1 == (count_of_recipients - count_of_displayed_recipients) else "rows"}} not shown
     </p>
   {% endif %}
 
