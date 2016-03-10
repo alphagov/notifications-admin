@@ -1,5 +1,3 @@
-import json
-
 from notifications_python_client.notifications import BaseAPIClient
 from notifications_python_client.errors import HTTPError
 
