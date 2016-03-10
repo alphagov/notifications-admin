@@ -205,7 +205,24 @@ class AddServiceForm(Form):
 
 
 class ServiceNameForm(Form):
-    name = StringField(u'New name')
+    def __init__(self, names_func, *args, **kwargs):
+        """
+        Keyword arguments:
+        names_func -- Returns a list of unique service_names already registered
+        on the system.
+        """
+        self._names_func = names_func
+        super(ServiceNameForm, self).__init__(*args, **kwargs)
+
+    name = StringField(
+        u'New name',
+        validators=[
+            DataRequired(message='Service name can’t be empty')
+        ])
+
+    def validate_name(self, a):
+        if a.data in self._names_func():
+            raise ValidationError('This service name is already in use')
 
 
 class ConfirmPasswordForm(Form):
