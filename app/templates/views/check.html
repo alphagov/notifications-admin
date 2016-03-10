@@ -74,10 +74,10 @@
   {% call(item) list_table(
     recipients.rows_annotated_and_truncated,
     caption=original_file_name,
-    field_headings=['Row'] + recipients.column_headers_with_placeholders_highlighted
+    field_headings=['1'] + recipients.column_headers_with_placeholders_highlighted
   ) %}
     {% call field() %}
-      {{ item.index + 1 }}
+      {{ item.index + 2 }}
     {% endcall %}
     {% for column in recipients.column_headers %}
       {% if item[column].error %}
