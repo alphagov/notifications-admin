@@ -2,11 +2,8 @@ from flask import (
     render_template,
     redirect,
     session,
-    url_for,
-    abort
+    url_for
 )
-
-from notifications_python_client.errors import HTTPError
 
 from flask_login import login_user
 
@@ -31,11 +28,6 @@ def verify():
             activated_user = users_dao.activate_user(user)
             login_user(activated_user)
             return redirect(url_for('main.add_service', first='first'))
-        except HTTPError as e:
-            if e.status_code == 404:
-                abort(404)
-            else:
-                raise e
         finally:
             del session['user_details']
 

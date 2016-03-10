@@ -13,8 +13,6 @@ from flask_login import (
     current_user
 )
 
-from notifications_python_client.errors import HTTPError
-
 from app.main.dao.services_dao import (
     get_service_by_id,
     delete_service,
@@ -31,13 +29,8 @@ from app.main.forms import ConfirmPasswordForm, ServiceNameForm
 @login_required
 @user_has_permissions('manage_settings')
 def service_settings(service_id):
-    try:
-        service = get_service_by_id(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    service = get_service_by_id(service_id)['data']
+
     return render_template(
         'views/service-settings.html',
         service=service,
@@ -49,13 +42,7 @@ def service_settings(service_id):
 @login_required
 @user_has_permissions('manage_settings')
 def service_name_change(service_id):
-    try:
-        service = get_service_by_id(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    service = get_service_by_id(service_id)['data']
 
     form = ServiceNameForm()
 
@@ -74,13 +61,7 @@ def service_name_change(service_id):
 @login_required
 @user_has_permissions('manage_settings')
 def service_name_change_confirm(service_id):
-    try:
-        service = get_service_by_id(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    service = get_service_by_id(service_id)['data']
 
     # Validate password for form
     def _check_password(pwd):
@@ -104,13 +85,7 @@ def service_name_change_confirm(service_id):
 @login_required
 @user_has_permissions('manage_settings')
 def service_request_to_go_live(service_id):
-    try:
-        service = get_service_by_id(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    service = get_service_by_id(service_id)['data']
     if request.method == 'GET':
         return render_template(
             'views/service-settings/request-to-go-live.html',
@@ -127,13 +102,7 @@ def service_request_to_go_live(service_id):
 @login_required
 @user_has_permissions('manage_settings')
 def service_status_change(service_id):
-    try:
-        service = get_service_by_id(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    service = get_service_by_id(service_id)['data']
 
     if request.method == 'GET':
         return render_template(
@@ -149,13 +118,7 @@ def service_status_change(service_id):
 @login_required
 @user_has_permissions('manage_settings')
 def service_status_change_confirm(service_id):
-    try:
-        service = get_service_by_id(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    service = get_service_by_id(service_id)['data']
 
     # Validate password for form
     def _check_password(pwd):
@@ -178,13 +141,7 @@ def service_status_change_confirm(service_id):
 @login_required
 @user_has_permissions('manage_settings')
 def service_delete(service_id):
-    try:
-        service = get_service_by_id(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    service = get_service_by_id(service_id)['data']
 
     if request.method == 'GET':
         return render_template(
@@ -200,13 +157,7 @@ def service_delete(service_id):
 @login_required
 @user_has_permissions('manage_settings')
 def service_delete_confirm(service_id):
-    try:
-        service = get_service_by_id(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    service = get_service_by_id(service_id)['data']
 
     # Validate password for form
     def _check_password(pwd):
@@ -214,13 +165,7 @@ def service_delete_confirm(service_id):
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
-        try:
-            service = delete_service(service_id)
-        except HTTPError as e:
-            if e.status_code == 404:
-                abort(404)
-            else:
-                raise e
+        service = delete_service(service_id)
         return redirect(url_for('.choose_service'))
 
     return render_template(

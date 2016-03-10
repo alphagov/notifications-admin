@@ -16,29 +16,19 @@ from app import job_api_client
 @main.route("/services/<service_id>/dashboard")
 @login_required
 def service_dashboard(service_id):
-    try:
-        templates = templates_dao.get_service_templates(service_id)['data']
-        jobs = job_api_client.get_job(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
-    try:
-        service = get_service_by_id(service_id)
-        session['service_name'] = service['data']['name']
-        session['service_id'] = service['data']['id']
+    templates = templates_dao.get_service_templates(service_id)['data']
+    jobs = job_api_client.get_job(service_id)['data']
 
-        if session.get('invited_user'):
-            session.pop('invited_user', None)
-            service_name = service['data']['name']
-            message = 'You have sucessfully accepted your invitation and been added to {}'.format(service_name)
-            flash(message, 'default_with_tick')
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    service = get_service_by_id(service_id)
+    session['service_name'] = service['data']['name']
+    session['service_id'] = service['data']['id']
+
+    if session.get('invited_user'):
+        session.pop('invited_user', None)
+        service_name = service['data']['name']
+        message = 'You have sucessfully accepted your invitation and been added to {}'.format(service_name)
+        flash(message, 'default_with_tick')
+
     return render_template(
         'views/service_dashboard.html',
         jobs=list(reversed(jobs))[:5],

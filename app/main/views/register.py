@@ -11,8 +11,6 @@ from flask import (
 
 from flask.ext.login import current_user
 
-from notifications_python_client.errors import HTTPError
-
 from app.main import main
 from app.main.dao import users_dao
 from app.main.forms import (
@@ -56,17 +54,10 @@ def register_from_invite():
 
 def _do_registration(form, service=None):
     if users_dao.is_email_unique(form.email_address.data):
-        try:
-            user = user_api_client.register_user(form.name.data,
-                                                 form.email_address.data,
-                                                 form.mobile_number.data,
-                                                 form.password.data)
-
-        except HTTPError as e:
-            if e.status_code == 404:
-                abort(404)
-            else:
-                raise e
+        user = user_api_client.register_user(form.name.data,
+                                             form.email_address.data,
+                                             form.mobile_number.data,
+                                             form.password.data)
 
         # TODO possibly there should be some exception handling
         # for sending sms and email codes.

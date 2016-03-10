@@ -15,7 +15,6 @@ from flask import (
 )
 
 from flask_login import login_required, current_user
-from notifications_python_client.errors import HTTPError
 from utils.template import Template
 from utils.recipients import RecipientCSV, first_column_heading
 
@@ -80,13 +79,8 @@ def choose_template(service_id, template_type):
 
     if template_type not in ['email', 'sms']:
         abort(404)
-    try:
-        jobs = job_api_client.get_job(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    jobs = job_api_client.get_job(service_id)['data']
+
     return render_template(
         'views/choose-template.html',
         templates=[

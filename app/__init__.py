@@ -6,6 +6,7 @@ from flask import (Flask, session, Markup, escape, render_template, make_respons
 from flask._compat import string_types
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
+from notifications_python_client import HTTPError
 from werkzeug.exceptions import abort
 from pygments import highlight
 from pygments.lexers import JavascriptLexer
@@ -176,10 +177,10 @@ def useful_headers_after_request(response):
 
 
 def register_errorhandlers(application):
-    def render_error(error):
-        # If a HTTPException, pull the `code` attribute; default to 500
+    @application.errorhandler(HTTPError)
+    def render_http_error(error):
         error_code = getattr(error, 'code', 500)
+        if error_code not in [401, 404, 403, 500]:
+            error_code = 500
         resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
         return useful_headers_after_request(resp)
-    for errcode in [401, 404, 403, 500]:
-        application.errorhandler(errcode)(render_error)

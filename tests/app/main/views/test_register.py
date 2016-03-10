@@ -43,7 +43,7 @@ def test_process_register_creates_new_user(app_,
         assert mock_register_user.called
 
 
-def test_process_register_returns_400_when_mobile_number_is_invalid(app_,
+def test_process_register_returns_200_when_mobile_number_is_invalid(app_,
                                                                     mock_send_verify_code,
                                                                     mock_get_user_by_email_not_found,
                                                                     mock_login):
