@@ -3,6 +3,8 @@ from flask import url_for
 from bs4 import BeautifulSoup
 
 import app
+
+from app.notify_client.models import InvitedUser
 from tests.conftest import sample_invite as create_sample_invite
 from tests.conftest import mock_check_invite_token as mock_check_token_invite
 
@@ -32,6 +34,25 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(app_,
 
             assert response.status_code == 302
             assert response.location == expected_redirect_location
+
+
+def test_existing_user_cant_accept_twice(app_,
+                                         mocker,
+                                         sample_invite):
+
+    sample_invite['status'] = 'accepted'
+    invite = InvitedUser(**sample_invite)
+    mocker.patch('app.invite_api_client.check_token', return_value=invite)
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
+            assert response.status_code == 200
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            assert page.h1.string.strip() == 'Sign in'
+            flash_banners = page.find_all('div', class_='banner-default')
+            assert len(flash_banners) == 2
+            assert flash_banners[0].text.strip() == 'You have already accepted this invitation'
 
 
 def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
