@@ -23,22 +23,12 @@ Manage users – GOV.UK Notify
           Permissions
         </legend>
         <span class="form-hint">All team members can see message history</span>
-        {{ yes_no(form.send_messages.name, form.send_messages.label, form.send_messages.data) }}
-        {{ yes_no(form.manage_service.name, form.manage_service.label, form.manage_service.data) }}
-        {{ yes_no(form.manage_api_keys.name, form.manage_api_keys.label, form.manage_api_keys.data) }}
+        {{ yes_no(form.send_messages, form.send_messages.data) }}
+        {{ yes_no(form.manage_service, form.manage_service.data) }}
+        {{ yes_no(form.manage_api_keys, form.manage_api_keys.data) }}
       </fieldset>
 
-      {% if user %}
-        {{ page_footer(
-          'Save',
-          delete_link=url_for('.delete_user', service_id=service_id, user_id=user_id),
-          delete_link_text='Delete this account',
-          back_link=url_for('.manage_users', service_id=service_id),
-          back_link_text='Cancel'
-        ) }}
-      {% else %}
-        {{ page_footer('Send invitation email') }}
-      {% endif %}
+      {{ page_footer('Send invitation email') }}
 
     </form>
   </div>

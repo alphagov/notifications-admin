@@ -12,11 +12,13 @@ from flask_login import (
     login_required,
     current_user
 )
+from notifications_python_client import HTTPError
 
 from app.main.dao.services_dao import (
     get_service_by_id,
     delete_service,
-    update_service
+    update_service,
+    find_all_service_names
 )
 
 from app.main import main
@@ -44,7 +46,7 @@ def service_settings(service_id):
 def service_name_change(service_id):
     service = get_service_by_id(service_id)['data']
 
-    form = ServiceNameForm()
+    form = ServiceNameForm(find_all_service_names)
 
     if form.validate_on_submit():
         session['service_name_change'] = form.name.data
@@ -70,10 +72,20 @@ def service_name_change_confirm(service_id):
 
     if form.validate_on_submit():
         service['name'] = session['service_name_change']
-        update_service(service)
-        session['service_name'] = service['name']
-        session.pop('service_name_change')
-        return redirect(url_for('.service_settings', service_id=service_id))
+        try:
+            update_service(service)
+        except HTTPError as e:
+            error_msg = "Duplicate service name '{}'".format(session['service_name_change'])
+            if e.status_code == 400 and error_msg in e.message['name']:
+                # Redirect the user back to the change service name screen
+                flash('This service name is already in use', 'error')
+                return redirect(url_for('main.service_name_change', service_id=service_id))
+            else:
+                raise e
+        else:
+            session['service_name'] = service['name']
+            session.pop('service_name_change')
+            return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/confirm.html',
         heading='Change your service name',

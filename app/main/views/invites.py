@@ -2,8 +2,8 @@ from flask import (
     redirect,
     url_for,
     session,
-    render_template
-)
+    flash,
+    render_template)
 
 
 from app.main import main
@@ -17,12 +17,18 @@ from app import (
 @main.route("/invitation/<token>")
 def accept_invite(token):
     invited_user = invite_api_client.check_token(token)
+
     if invited_user.status == 'cancelled':
         from_user = user_api_client.get_user(invited_user.from_user)
         service = get_service_by_id_or_404(invited_user.service)
         return render_template('views/cancelled-invitation.html',
                                from_user=from_user.name,
                                service_name=service['name'])
+
+    if invited_user.status == 'accepted':
+        session.pop('invited_user', None)
+        flash('You have already accepted this invitation', 'default')
+        return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
 
     existing_user = user_api_client.get_user_by_email(invited_user.email_address)
     session['invited_user'] = invited_user.serialize()
