@@ -1,5 +1,6 @@
 import uuid
 from datetime import date, datetime, timedelta
+from unittest.mock import Mock
 import pytest
 
 from app import create_app
@@ -17,6 +18,8 @@ from app.notify_client.models import (
     User,
     InvitedUser
 )
+
+from notifications_python_client.errors import HTTPError
 
 
 @pytest.fixture(scope='session')
@@ -85,6 +88,24 @@ def mock_update_service(mocker):
             service_id, service_name, users, limit=limit,
             active=active, restricted=restricted)
         return {'data': service}
+
+    return mocker.patch(
+        'app.notifications_api_client.update_service', side_effect=_update)
+
+
+@pytest.fixture(scope='function')
+def mock_update_service_raise_httperror_duplicate_name(mocker):
+
+    def _update(service_id,
+                service_name,
+                active,
+                limit,
+                restricted,
+                users):
+        json_mock = Mock(return_value={'message': {'name': ["Duplicate service name '{}'".format(service_name)]}})
+        resp_mock = Mock(status_code=400, json=json_mock)
+        http_error = HTTPError(response=resp_mock, message="Default message")
+        raise http_error
 
     return mocker.patch(
         'app.notifications_api_client.update_service', side_effect=_update)
