@@ -37,8 +37,8 @@ send_messages_page_headings = {
 
 
 manage_templates_page_headings = {
-    'email': 'Manage templates',
-    'sms': 'Manage templates'
+    'email': 'Email templates',
+    'sms': 'Text message templates'
 }
 
 
