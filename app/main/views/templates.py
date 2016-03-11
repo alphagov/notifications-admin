@@ -13,6 +13,11 @@ form_objects = {
     'sms': SMSTemplateForm
 }
 
+page_headings = {
+    'email': 'email',
+    'sms': 'text message'
+}
+
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
 @login_required
@@ -42,7 +47,8 @@ def add_service_template(service_id, template_type):
         'views/edit-{}-template.html'.format(template_type),
         form=form,
         template_type=template_type,
-        service_id=service_id
+        service_id=service_id,
+        heading_action='Add'
     )
 
 
@@ -70,7 +76,8 @@ def edit_service_template(service_id, template_id):
         form=form,
         service_id=service_id,
         template_id=template_id,
-        template_type=template['template_type']
+        template_type=template['template_type'],
+        heading_action='Edit'
     )
 
 

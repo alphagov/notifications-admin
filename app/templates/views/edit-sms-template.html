@@ -3,12 +3,14 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
-  {{ h1 }} – GOV.UK Notify
+  {{ heading_action }} text message template – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-large">Edit text message template</h1>
+    <h1 class="heading-large">
+      {{ heading_action }} text message template
+    </h1>
 
     <form method="post">
       <div class="grid-row">
