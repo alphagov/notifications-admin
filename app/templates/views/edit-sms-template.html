@@ -28,9 +28,7 @@
       {{ page_footer(
         'Save',
         delete_link=url_for('.delete_service_template', service_id=service_id, template_id=template_id) if template_id or None,
-        delete_link_text='Delete this template',
-        back_link=url_for('.choose_template', service_id=service_id, template_type=template_type),
-        back_link_text='Cancel'
+        delete_link_text='Delete this template'
       ) }}
     </form>
 
