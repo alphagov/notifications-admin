@@ -123,7 +123,7 @@ def test_should_show_page_for_inviting_user(
             client.login(api_user_active)
             response = client.get(url_for('main.invite_user', service_id=55555))
 
-        assert 'Add a new team member' in response.get_data(as_text=True)
+        assert 'Invite a team member' in response.get_data(as_text=True)
         assert response.status_code == 200
 
 
@@ -277,6 +277,6 @@ def test_user_cant_invite_themselves(
 
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string.strip() == 'Add a new team member'
+        assert page.h1.string.strip() == 'Invite a team member'
         form_error = page.find('span', class_='error-message').string.strip()
         assert form_error == "You can't send an invitation to yourself"

@@ -16,11 +16,16 @@ Manage users – GOV.UK Notify
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Manage team
-  </h1>
-
-  <a href="{{ url_for('.invite_user', service_id=service_id) }}" class="button">Invite a team member</a>
+  <div class="grid-row">
+    <div class="column-two-thirds">
+      <h1 class="heading-large">
+        Manage team
+      </h1>
+    </div>
+    <div class="column-one-third">
+      <a href="{{ url_for('.invite_user', service_id=service_id) }}" class="button align-with-heading">Invite team member</a>
+    </div>
+  </div>
 
   {% call(item) list_table(
     users, caption='Active', **table_options
