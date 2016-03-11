@@ -36,6 +36,29 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(app_,
             assert response.location == expected_redirect_location
 
 
+def test_existing_user_with_no_permissions_accept_invite(app_,
+                                                         mocker,
+                                                         service_one,
+                                                         api_user_active,
+                                                         sample_invite,
+                                                         mock_check_invite_token,
+                                                         mock_get_user_by_email,
+                                                         mock_add_user_to_service):
+
+    expected_service = service_one['id']
+    sample_invite['permissions'] = ''
+    expected_permissions = []
+    mocker.patch('app.invite_api_client.accept_invite', return_value=sample_invite)
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+
+            response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
+            mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id, expected_permissions)
+
+            assert response.status_code == 302
+
+
 def test_existing_user_cant_accept_twice(app_,
                                          mocker,
                                          sample_invite):
