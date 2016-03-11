@@ -10,7 +10,7 @@ class User(UserMixin):
         self._mobile_number = fields.get('mobile_number')
         self._password_changed_at = fields.get('password_changed_at')
         self._permissions = fields.get('permissions')
-        self._failed_login_count = 0
+        self._failed_login_count = fields.get('failed_login_count')
         self._state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
 
@@ -129,7 +129,10 @@ class InvitedUser(object):
         if isinstance(permissions, list):
             self.permissions = permissions
         else:
-            self.permissions = permissions.split(',')
+            if permissions:
+                self.permissions = permissions.split(',')
+            else:
+                self.permissions = []
         self.status = status
         self.created_at = created_at
 
