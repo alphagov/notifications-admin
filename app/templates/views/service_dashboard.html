@@ -29,12 +29,12 @@
         <ol>
           {% if current_user.has_permissions(['manage_templates']) %}
             <li>
-              <a href='url_for(".add_service_template", service_id=service_id, template_type="sms")'>Add a template</a>
+              <a href='{{ url_for(".add_service_template", service_id=service_id, template_type="sms") }}'>Add a template</a>
             </li>
           {% endif %}
           {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
             <li>
-              <a href='url_for(".choose_template", service_id=service_id, template_type="sms")'>Send yourself a text message</a>
+              <a href='{{ url_for(".choose_template", service_id=service_id, template_type="sms") }}'>Send yourself a text message</a>
             </li>
           {% endif %}
         </ol>
@@ -42,7 +42,7 @@
     {% elif not jobs %}
       {% call banner_wrapper(subhead='Next step', type="tip") %}
         {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
-          <a href='url_for(".choose_template", service_id=service_id, template_type="sms")'>Send yourself a text message</a>
+          <a href='{{ url_for(".choose_template", service_id=service_id, template_type="sms") }}'>Send yourself a text message</a>
         {% endif %}
       {% endcall %}
     {% else %}
