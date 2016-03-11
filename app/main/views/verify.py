@@ -9,7 +9,10 @@ from flask_login import login_user
 
 from app.main import main
 from app.main.dao import users_dao
-from app.main.forms import VerifyForm
+from app.main.forms import (
+    VerifyForm,
+    VerifySmsForm
+)
 
 
 @main.route('/verify', methods=['GET', 'POST'])
@@ -22,7 +25,11 @@ def verify():
     def _check_code(code, code_type):
         return users_dao.check_verify_code(user_id, code, code_type)
 
-    form = VerifyForm(_check_code)
+    if session.get('invited_user'):
+        form = VerifySmsForm(_check_code)
+    else:
+        form = VerifyForm(_check_code)
+
     if form.validate_on_submit():
         try:
             user = users_dao.get_user_by_id(user_id)

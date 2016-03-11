@@ -150,6 +150,23 @@ class TwoFactorForm(Form):
             raise ValidationError(reason)
 
 
+class VerifySmsForm(Form):
+    def __init__(self, validate_code_func, *args, **kwargs):
+        '''
+        Keyword arguments:
+        validate_code_func -- Validates the code with the API.
+        '''
+        self.validate_code_func = validate_code_func
+        super(VerifySmsForm, self).__init__(*args, **kwargs)
+
+    sms_code = sms_code()
+
+    def validate_sms_code(self, field):
+        is_valid, reason = self.validate_code_func(field.data, 'sms')
+        if not is_valid:
+            raise ValidationError(reason)
+
+
 class VerifyForm(Form):
     def __init__(self, validate_code_func, *args, **kwargs):
         '''
