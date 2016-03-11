@@ -184,14 +184,10 @@ def register_errorhandlers(application):
 
     @application.errorhandler(HTTPError)
     def render_http_error(error):
-        error_code = getattr(error, 'code', 500)
+        error_code = error.status_code
         if error_code not in [401, 404, 403, 500]:
             error_code = 500
         return _error_response(error_code)
-
-    @application.errorhandler(400)
-    def handle_bad_request(error):
-        return _error_response(404)
 
     @application.errorhandler(404)
     def handle_not_found(error):

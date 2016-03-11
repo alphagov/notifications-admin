@@ -1,5 +1,4 @@
 from flask import (
-    abort,
     render_template,
     session,
     flash
@@ -25,7 +24,7 @@ def service_dashboard(service_id):
     if session.get('invited_user'):
         session.pop('invited_user', None)
         service_name = service['data']['name']
-        message = 'You have sucessfully accepted your invitation and been added to {}'.format(service_name)
+        message = 'You have successfully accepted your invitation and been added to {}'.format(service_name)
         flash(message, 'default_with_tick')
 
     return render_template(
