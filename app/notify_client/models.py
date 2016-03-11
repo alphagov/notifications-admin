@@ -129,7 +129,10 @@ class InvitedUser(object):
         if isinstance(permissions, list):
             self.permissions = permissions
         else:
-            self.permissions = permissions.split(',')
+            if permissions:
+                self.permissions = permissions.split(',')
+            else:
+                self.permissions = []
         self.status = status
         self.created_at = created_at
 
