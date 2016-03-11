@@ -401,12 +401,7 @@ def mock_get_user_by_email_locked(mocker, api_user_locked):
 
 @pytest.fixture(scope='function')
 def mock_get_user_by_email_inactive(mocker, api_user_pending):
-
-    def _get_user(email_address):
-        api_user_pending._email_address = email_address
-        api_user_pending._is_locked = True
-        return api_user_pending
-    return mocker.patch('app.user_api_client.get_user_by_email', side_effect=_get_user)
+    return mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_pending)
 
 
 @pytest.fixture(scope='function')
