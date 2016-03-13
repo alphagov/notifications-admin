@@ -3,13 +3,6 @@ from app import notifications_api_client
 from app.utils import BrowsableItem
 
 
-def insert_new_service(service_name, user_id):
-    resp = notifications_api_client.create_service(
-        service_name, False, current_app.config['DEFAULT_SERVICE_LIMIT'], True, user_id)
-
-    return resp['data']['id']
-
-
 def update_service(service):
     return notifications_api_client.update_service(
         service['id'],

@@ -2,8 +2,8 @@ from flask import (
     render_template,
     redirect,
     session,
-    url_for
-)
+    url_for,
+    current_app)
 
 from flask_login import login_required
 
@@ -14,8 +14,8 @@ from app.notify_client.models import InvitedUser
 
 from app import (
     invite_api_client,
-    user_api_client
-)
+    user_api_client,
+    notifications_api_client)
 
 
 @main.route("/add-service", methods=['GET', 'POST'])
@@ -36,8 +36,9 @@ def add_service():
     heading = 'Which service do you want to set up notifications for?'
     if form.validate_on_submit():
         session['service_name'] = form.name.data
-        user = users_dao.get_user_by_id(session['user_id'])
-        service_id = services_dao.insert_new_service(session['service_name'], user.id)
+        service_id = notifications_api_client.create_service(
+            session['service_name'], False, current_app.config['DEFAULT_SERVICE_LIMIT'], True, session['user_id'])
+
         return redirect(url_for('main.service_dashboard', service_id=service_id))
     else:
         return render_template(
