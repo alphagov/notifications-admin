@@ -33,7 +33,7 @@
     };
 
     this.update = () => this.$backgroundMaskForeground.html(
-      this.$textbox.val().replace(
+      $('<div/>').text(this.$textbox.val()).html().replace(
         tagPattern, match => `<span class='tag'>${match}</span>`
       )
     );

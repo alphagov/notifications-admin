@@ -19,8 +19,6 @@ def test_sign_out_user(app_,
                        mock_login,
                        mock_get_jobs):
     with app_.test_request_context():
-        email = 'valid@example.gov.uk'
-        password = 'val1dPassw0rd!'
         with app_.test_client() as client:
             client.login(api_user_active)
             with client.session_transaction() as session:

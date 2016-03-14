@@ -3,6 +3,8 @@ from flask import url_for
 from bs4 import BeautifulSoup
 
 import app
+
+from app.notify_client.models import InvitedUser
 from tests.conftest import sample_invite as create_sample_invite
 from tests.conftest import mock_check_invite_token as mock_check_token_invite
 
@@ -32,6 +34,48 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(app_,
 
             assert response.status_code == 302
             assert response.location == expected_redirect_location
+
+
+def test_existing_user_with_no_permissions_accept_invite(app_,
+                                                         mocker,
+                                                         service_one,
+                                                         api_user_active,
+                                                         sample_invite,
+                                                         mock_check_invite_token,
+                                                         mock_get_user_by_email,
+                                                         mock_add_user_to_service):
+
+    expected_service = service_one['id']
+    sample_invite['permissions'] = ''
+    expected_permissions = []
+    mocker.patch('app.invite_api_client.accept_invite', return_value=sample_invite)
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+
+            response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
+            mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id, expected_permissions)
+
+            assert response.status_code == 302
+
+
+def test_existing_user_cant_accept_twice(app_,
+                                         mocker,
+                                         sample_invite):
+
+    sample_invite['status'] = 'accepted'
+    invite = InvitedUser(**sample_invite)
+    mocker.patch('app.invite_api_client.check_token', return_value=invite)
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
+            assert response.status_code == 200
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            assert page.h1.string.strip() == 'Sign in'
+            flash_banners = page.find_all('div', class_='banner-default')
+            assert len(flash_banners) == 2
+            assert flash_banners[0].text.strip() == 'You have already accepted this invitation'
 
 
 def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
@@ -125,8 +169,7 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
                                                                                  service_one,
                                                                                  mocker,
                                                                                  mock_get_user,
-                                                                                 mock_get_service
-                                                                                 ):
+                                                                                 mock_get_service):
     with app_.test_request_context():
         with app_.test_client() as client:
             cancelled_invitation = create_sample_invite(mocker, service_one, status='cancelled')
@@ -188,6 +231,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(a
 def test_new_invited_user_verifies_and_added_to_service(app_,
                                                         service_one,
                                                         sample_invite,
+                                                        api_user_active,
                                                         mock_check_invite_token,
                                                         mock_dont_get_user_by_email,
                                                         mock_register_user,
@@ -217,8 +261,7 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
             response = client.post(url_for('main.register_from_invite'), data=data)
 
             # that sends user on to verify
-            response = client.post(url_for('main.verify'), data={'sms_code': '12345', 'email_code': '23456'},
-                                   follow_redirects=True)
+            response = client.post(url_for('main.verify'), data={'sms_code': '12345'}, follow_redirects=True)
 
             # when they post codes back to admin user should be added to
             # service and sent on to dash board
@@ -226,8 +269,8 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
             with client.session_transaction() as session:
                 new_user_id = session['user_id']
                 mock_add_user_to_service.assert_called_with(data['service'], new_user_id, expected_permissions)
-
-            mock_accept_invite.assert_called_with(data['service'], sample_invite['id'])
+                mock_accept_invite.assert_called_with(data['service'], sample_invite['id'])
+                mock_check_verify_code.assert_called_once_with(new_user_id, '12345', 'sms')
 
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             element = page.find('h2', class_='navigation-service-name').find('a')
@@ -236,4 +279,4 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
             assert service_link == '/services/{}/dashboard'.format(service_one['id'])
 
             flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
-            assert flash_banner == 'You have sucessfully accepted your invitation and been added to Test Service'
+            assert flash_banner == 'You have successfully accepted your invitation and been added to Test Service'

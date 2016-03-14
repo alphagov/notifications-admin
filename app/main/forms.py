@@ -150,6 +150,23 @@ class TwoFactorForm(Form):
             raise ValidationError(reason)
 
 
+class VerifySmsForm(Form):
+    def __init__(self, validate_code_func, *args, **kwargs):
+        '''
+        Keyword arguments:
+        validate_code_func -- Validates the code with the API.
+        '''
+        self.validate_code_func = validate_code_func
+        super(VerifySmsForm, self).__init__(*args, **kwargs)
+
+    sms_code = sms_code()
+
+    def validate_sms_code(self, field):
+        is_valid, reason = self.validate_code_func(field.data, 'sms')
+        if not is_valid:
+            raise ValidationError(reason)
+
+
 class VerifyForm(Form):
     def __init__(self, validate_code_func, *args, **kwargs):
         '''
@@ -168,10 +185,12 @@ class VerifyForm(Form):
             raise ValidationError(reason)
 
     def validate_email_code(self, field):
-        self._validate_code(field.data, 'email')
+        if self.sms_code.data:
+            self._validate_code(field.data, 'email')
 
     def validate_sms_code(self, field):
-        self._validate_code(field.data, 'sms')
+        if self.email_code.data:
+            self._validate_code(field.data, 'sms')
 
 
 class EmailNotReceivedForm(Form):
@@ -205,7 +224,24 @@ class AddServiceForm(Form):
 
 
 class ServiceNameForm(Form):
-    name = StringField(u'New name')
+    def __init__(self, names_func, *args, **kwargs):
+        """
+        Keyword arguments:
+        names_func -- Returns a list of unique service_names already registered
+        on the system.
+        """
+        self._names_func = names_func
+        super(ServiceNameForm, self).__init__(*args, **kwargs)
+
+    name = StringField(
+        u'New name',
+        validators=[
+            DataRequired(message='Service name can’t be empty')
+        ])
+
+    def validate_name(self, a):
+        if a.data in self._names_func():
+            raise ValidationError('This service name is already in use')
 
 
 class ConfirmPasswordForm(Form):

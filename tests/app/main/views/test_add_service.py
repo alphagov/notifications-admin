@@ -7,7 +7,6 @@ def test_get_should_render_add_service_template(app_,
                                                 mock_login,
                                                 mock_get_service,
                                                 mock_get_services,
-                                                mock_get_user,
                                                 mock_get_user_by_email):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -21,9 +20,7 @@ def test_should_add_service_and_redirect_to_next_page(app_,
                                                       mock_login,
                                                       mock_create_service,
                                                       mock_get_services,
-                                                      api_user_active,
-                                                      mock_get_user,
-                                                      mock_get_user_by_email):
+                                                      api_user_active):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -32,7 +29,9 @@ def test_should_add_service_and_redirect_to_next_page(app_,
                 data={'name': 'testing the post'})
             assert response.status_code == 302
             assert response.location == url_for('main.service_dashboard', service_id=101, _external=True)
-            assert mock_create_service.called
+            mock_create_service.asset_called_once_with('testing the post', False,
+                                                       app_.config['DEFAULT_SERVICE_LIMIT'],
+                                                       True, api_user_active.id)
 
 
 def test_should_return_form_errors_when_service_name_is_empty(app_,

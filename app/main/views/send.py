@@ -15,7 +15,6 @@ from flask import (
 )
 
 from flask_login import login_required, current_user
-from notifications_python_client.errors import HTTPError
 from utils.template import Template
 from utils.recipients import RecipientCSV, first_column_heading
 
@@ -38,8 +37,8 @@ send_messages_page_headings = {
 
 
 manage_templates_page_headings = {
-    'email': 'Manage templates',
-    'sms': 'Manage templates'
+    'email': 'Email templates',
+    'sms': 'Text message templates'
 }
 
 
@@ -80,13 +79,8 @@ def choose_template(service_id, template_type):
 
     if template_type not in ['email', 'sms']:
         abort(404)
-    try:
-        jobs = job_api_client.get_job(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    jobs = job_api_client.get_job(service_id)['data']
+
     return render_template(
         'views/choose-template.html',
         templates=[
@@ -166,7 +160,7 @@ def get_example_csv(service_id, template_id):
             'email': current_user.email_address,
             'sms': current_user.mobile_number
         }[template.template_type]
-    ] + ["test {}".format(header) for header in template.placeholders])
+    ] + _get_fake_personalisation(template.placeholders))
     return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
 
 
@@ -183,13 +177,11 @@ def send_message_to_self(service_id, template_id):
     )
     if template.template_type == 'sms':
         writer.writerow(
-            [current_user.mobile_number] +
-            ["test {}".format(header) for header in template.placeholders]
+            [current_user.mobile_number] + _get_fake_personalisation(template.placeholders)
         )
     if template.template_type == 'email':
         writer.writerow(
-            [current_user.email_address] +
-            ["test {}".format(header) for header in template.placeholders]
+            [current_user.email_address] + _get_fake_personalisation(template.placeholders)
         )
 
     filedata = {
@@ -230,7 +222,8 @@ def check_messages(service_id, upload_id):
         contents,
         template_type=template.template_type,
         placeholders=template.placeholders,
-        max_initial_rows_shown=5
+        max_initial_rows_shown=15,
+        max_errors_shown=15
     )
 
     with suppress(StopIteration):
@@ -245,8 +238,13 @@ def check_messages(service_id, upload_id):
         template=template,
         page_heading=get_page_headings(template.template_type),
         errors=get_errors_for_csv(recipients, template.template_type),
+        rows_have_errors=any(recipients.rows_with_errors),
         count_of_recipients=session['upload_data']['notification_count'],
-        count_of_displayed_recipients=len(list(recipients.rows_annotated_and_truncated)),
+        count_of_displayed_recipients=(
+            len(list(recipients.initial_annotated_rows_with_errors))
+            if any(recipients.rows_with_errors) else
+            len(list(recipients.initial_annotated_rows))
+        ),
         original_file_name=session['upload_data'].get('original_file_name'),
         send_button_text=get_send_button_text(template.template_type, session['upload_data']['notification_count']),
         service_id=service_id,
@@ -280,3 +278,9 @@ def start_job(service_id, upload_id):
     return redirect(
         url_for('main.view_job', service_id=service_id, job_id=upload_id)
     )
+
+
+def _get_fake_personalisation(placeholders):
+    return [
+        "{} 1".format(header) for header in placeholders
+    ]
