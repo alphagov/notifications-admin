@@ -3,7 +3,8 @@ from flask import (
     render_template,
     redirect,
     session,
-    url_for
+    url_for,
+    request
 )
 
 from flask_login import login_user
@@ -37,9 +38,23 @@ def two_factor():
             login_user(user, remember=True)
         finally:
             del session['user_details']
+
+        next_url = request.args.get('next')
+        if next_url and _is_safe_redirect_url(next_url):
+            return redirect(next_url)
+
         if len(services) == 1:
             return redirect(url_for('main.service_dashboard', service_id=services[0]['id']))
         else:
             return redirect(url_for('main.choose_service'))
 
     return render_template('views/two-factor.html', form=form)
+
+
+# see http://flask.pocoo.org/snippets/62/
+def _is_safe_redirect_url(target):
+    from urllib.parse import urlparse, urljoin
+    host_url = urlparse(request.host_url)
+    redirect_url = urlparse(urljoin(request.host_url, target))
+    return redirect_url.scheme in ('http', 'https') and \
+        host_url.netloc == redirect_url.netloc
