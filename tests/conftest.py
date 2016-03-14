@@ -70,7 +70,7 @@ def mock_create_service(mocker):
         service = service_json(
             101, service_name, [user_id], limit=limit,
             active=active, restricted=restricted)
-        return {'data': service}
+        return service['id']
 
     return mocker.patch(
         'app.notifications_api_client.create_service', side_effect=_create)

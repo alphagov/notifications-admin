@@ -27,7 +27,7 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
             "user_id": user_id,
             "restricted": restricted
         }
-        return self.post("/service", data)
+        return self.post("/service", data)['data']['id']
 
     def delete_service(self, service_id):
         """
