@@ -141,7 +141,7 @@ def test_invite_user(
 ):
     from_user = api_user_active.id
     service_id = service_one['id']
-    email_address = 'test@example.gov.uk'
+    email_address = 'not_self@gov.uk'
     permissions = 'send_messages,manage_service,manage_api_keys'
 
     with app_.test_request_context():
@@ -155,14 +155,13 @@ def test_invite_user(
                       'manage_api_keys': 'yes'},
                 follow_redirects=True
             )
-
         assert response.status_code == 200
         mock_create_invite.assert_called_with(from_user, service_id, email_address, permissions)
         mock_get_invites_for_service.assert_called_with(service_id=service_id)
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Manage team'
         flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
-        assert flash_banner == 'Invite sent to test@example.gov.uk'
+        assert flash_banner == 'Invite sent to not_self@gov.uk'
 
 
 def test_cancel_invited_user_cancels_user_invitations(app_,
@@ -243,7 +242,7 @@ def test_manage_users_does_not_show_accepted_invite(app_,
             assert page.h1.string.strip() == 'Manage team'
             tables = page.find_all('table')
             assert len(tables) == 1
-            assert not page.find(text='invited_user@test.gov.uk')
+            assert not page.find(text='invited_user@gov.uk')
 
 
 def test_user_cant_invite_themselves(

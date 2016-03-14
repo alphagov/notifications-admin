@@ -31,7 +31,7 @@ def test_process_register_creates_new_user(app_,
                                            mock_login):
     user_data = {
         'name': 'Some One Valid',
-        'email_address': 'notfound@example.gov.uk',
+        'email_address': 'notfound@gov.uk',
         'mobile_number': '+4407700900460',
         'password': 'validPassword!'
     }
@@ -51,7 +51,7 @@ def test_process_register_returns_200_when_mobile_number_is_invalid(app_,
     with app_.test_request_context():
         response = app_.test_client().post(url_for('main.register'),
                                            data={'name': 'Bad Mobile',
-                                                 'email_address': 'bad_mobile@example.gov.uk',
+                                                 'email_address': 'bad_mobile@gov.uk',
                                                  'mobile_number': 'not good',
                                                  'password': 'validPassword!'})
 
@@ -71,7 +71,7 @@ def test_should_return_400_when_email_is_not_gov_uk(app_,
                                                  'password': 'validPassword!'})
 
     assert response.status_code == 200
-    assert 'Enter a gov.uk email address' in response.get_data(as_text=True)
+    assert 'Enter a central government email address' in response.get_data(as_text=True)
 
 
 def test_should_add_verify_codes_on_session(app_,
@@ -82,7 +82,7 @@ def test_should_add_verify_codes_on_session(app_,
                                             mock_login):
     user_data = {
         'name': 'Test Codes',
-        'email_address': 'notfound@example.gov.uk',
+        'email_address': 'notfound@gov.uk',
         'mobile_number': '+4407700900460',
         'password': 'validPassword!'
     }

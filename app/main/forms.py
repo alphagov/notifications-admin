@@ -14,7 +14,8 @@ from wtforms import (
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import DataRequired, Email, Length, Regexp
 
-from app.main.validators import Blacklist, CsvFileValidator
+from app.main.validators import (
+    Blacklist, CsvFileValidator, EmailList)
 
 from utils.recipients import (
     validate_phone_number,
@@ -24,13 +25,13 @@ from utils.recipients import (
 
 
 def email_address(label='Email address'):
-    gov_uk_email \
-        = "(^[^@^\\s]+@[^@^\\.^\\s]+(\\.[^@^\\.^\\s]*)*.gov.uk)"
+    gov_uk_email = "(^[^\@^\s]+@[^\@^\s]+(\.[^\@^\.^\s]+)$)"
     return EmailField(label, validators=[
         Length(min=5, max=255),
         DataRequired(message='Email cannot be empty'),
         Email(message='Enter a valid email address'),
-        Regexp(regex=gov_uk_email, message='Enter a gov.uk email address')])
+        Regexp(regex=gov_uk_email, message="Enter a central government email address"),
+        EmailList("Enter a central government email address")])
 
 
 class UKMobileNumber(TelField):
