@@ -3,12 +3,14 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
-  {{ h1 }} – GOV.UK Notify
+  {{ heading_action }} email template – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-large">Edit email template</h1>
+    <h1 class="heading-large">
+      {{ heading_action }} email template
+    </h1>
 
     <form method="post">
       <div class="grid-row">
@@ -21,17 +23,19 @@
         </div>
         <div class="column-one-third">
           <label for='template_content' class='edit-template-placeholder-hint'>
-            Add placeholders using double brackets, eg Your thing
-            is due on ((date))
+            <p>
+              Add personalisation with double brackets, eg Dear ((name))
+            </p>
+            <p>
+              You’ll fill in the real data when you send a message.
+            </p>
           </label>
         </div>
       </div>
       {{ page_footer(
         'Save',
         delete_link=url_for('.delete_service_template', service_id=service_id, template_id=template_id) if template_id or None,
-        delete_link_text='Delete this template',
-        back_link=url_for('.choose_template', template_type=template_type, service_id=service_id),
-        back_link_text='Cancel'
+        delete_link_text='Delete this template'
       ) }}
     </form>
 

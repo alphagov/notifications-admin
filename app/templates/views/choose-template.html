@@ -10,55 +10,64 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">{{ page_heading }}</h1>
+  {% if not templates %}
 
-  <form method="POST" enctype="multipart/form-data">
+    <h1 class="heading-large">{{ page_heading }}</h1>
 
-    {% if templates %}
-      {% if not has_jobs %}
-        {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], or_=True) %}
-        {{ banner(
-          """
-            Send yourself a test message
-          """,
-          subhead='Next step',
-          type="tip"
-        )}}
-        {% endif %}
-      {% endif %}
-      <div class="grid-row">
-        {% for template in templates %}
-          <div class="column-two-thirds">
-            {% if 'email' == template_type %}
-              {{ email_message(
-                template.subject,
-                template.formatted_as_markup,
-                name=template.name
-              ) }}
-            {% elif 'sms' == template_type %}
-              {{ sms_message(template.formatted_as_markup, name=template.name) }}
-            {% endif %}
-          </div>
-          <div class="column-one-third">
-            <div class="sms-message-use-links">
-              {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
-              <a href="{{ url_for(".send_messages", service_id=service_id, template_id=template.id) }}">Add recipients</a>
-              <a href="{{ url_for(".send_message_to_self", service_id=service_id, template_id=template.id) }}">Send yourself a test</a>
-              {% endif %}
-              {% if current_user.has_permissions(['manage_templates']) %}
-              <a href="{{ url_for(".edit_service_template", service_id=service_id, template_id=template.id) }}">Edit template</a>
-              {% endif %}
-            </div>
-          </div>
-        {% endfor %}
-      </div>
+    {% if current_user.has_permissions(['manage_templates']) %}
+      <a href="{{ url_for('.add_service_template', service_id=service_id, template_type=template_type) }}" class="button">Add a new template</a>
     {% endif %}
 
-    <p>
-      {% if current_user.has_permissions(['manage_templates']) %}
-      <a href="{{ url_for('.add_service_template', service_id=service_id, template_type=template_type) }}" class="button">Add a new template</a>
-      {% endif %}
-    </p>
+  {% else %}
 
-  </form>
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        <h1 class="heading-large">{{ page_heading }}</h1>
+      </div>
+      {% if current_user.has_permissions(['manage_templates']) %}
+        <div class="column-one-third">
+          <a href="{{ url_for('.add_service_template', service_id=service_id, template_type=template_type) }}" class="button align-with-heading">Add new template</a>
+        </div>
+      {% endif %}
+    </div>
+
+    {% if not has_jobs %}
+      {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], or_=True) %}
+      {{ banner(
+        """
+          Send yourself a test message
+        """,
+        subhead='Next step',
+        type="tip"
+      )}}
+      {% endif %}
+    {% endif %}
+    <div class="grid-row">
+      {% for template in templates %}
+        <div class="column-two-thirds">
+          {% if 'email' == template_type %}
+            {{ email_message(
+              template.subject,
+              template.formatted_as_markup,
+              name=template.name
+            ) }}
+          {% elif 'sms' == template_type %}
+            {{ sms_message(template.formatted_as_markup, name=template.name) }}
+          {% endif %}
+        </div>
+        <div class="column-one-third">
+          <div class="sms-message-use-links">
+            {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
+            <a href="{{ url_for(".send_messages", service_id=service_id, template_id=template.id) }}">Add recipients</a>
+            <a href="{{ url_for(".send_message_to_self", service_id=service_id, template_id=template.id) }}">Send yourself a test</a>
+            {% endif %}
+            {% if current_user.has_permissions(['manage_templates']) %}
+            <a href="{{ url_for(".edit_service_template", service_id=service_id, template_id=template.id) }}">Edit template</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
 {% endblock %}
