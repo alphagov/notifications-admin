@@ -1,6 +1,6 @@
 {% macro yes_no(field, current_value=None) %}
-  <fieldset class='yes-no {% if field.errors %} error{% endif %}'>
-    <legend class='yes-no-label'>
+  <fieldset class='yes-no'>
+    <legend class='yes-no-label{% if field.errors %} error{% endif %}'>
       {{ field.label }}
        {% if field.errors %}
         <span class="error-message">
