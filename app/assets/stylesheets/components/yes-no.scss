@@ -9,8 +9,14 @@
   padding: 10px 0;
 
   &-label {
+
     padding-top: 19px;
     float: left;
+
+    &.error {
+      padding-top: 5px;
+    }
+
   }
 
   &-fields {
