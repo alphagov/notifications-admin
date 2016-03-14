@@ -332,6 +332,7 @@ def mock_register_user(mocker, api_user_pending):
 @pytest.fixture(scope='function')
 def mock_get_user(mocker, api_user_active):
     def _get_user(id):
+        api_user_active.id = id
         return api_user_active
     return mocker.patch(
         'app.user_api_client.get_user', side_effect=_get_user)

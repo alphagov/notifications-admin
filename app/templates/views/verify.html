@@ -3,30 +3,48 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
-  Enter the codes we’ve sent you – GOV.UK Notify
+  {% if form.email_code %}
+    Enter the codes we’ve sent you – GOV.UK Notify
+  {% else %}
+    Enter the code we’ve sent you – GOV.UK Notify
+  {% endif %}
 {% endblock %}
 
 {% block maincolumn_content %}
 
 <div class="grid-row">
   <div class="column-two-thirds">
-    <h1 class="heading-large">Enter the codes we’ve sent you</h1>
-    <p>
-      We’ve sent you confirmation codes by email and text message.
-    </p>
+    {% if form.email_code %}
+      <h1 class="heading-large">Enter the codes we’ve sent you</h1>
+    {% else %}
+      <h1 class="heading-large">Enter the code we’ve sent you</h1>
+    {% endif %}
+    {% if form.email_code %}
+      <p>
+        We’ve sent you confirmation codes by email and text message.
+      </p>
+    {% else %}
+      <p>
+        We’ve sent you a confirmation code by text message.
+      </p>
+    {% endif %}
     <form autocomplete="off" method="post">
+      {% if form.sms_code %}
       {{ textbox(
-        form.sms_code,
-        width='5em',
-        help_link=url_for('.check_and_resend_text_code'),
-        help_link_text='I haven’t received a text message'
-      ) }}
-      {{ textbox(
-        form.email_code,
-        width='5em',
-        help_link=url_for('.check_and_resend_email_code'),
-        help_link_text='I haven’t received an email'
-      ) }}
+          form.sms_code,
+          width='5em',
+          help_link=url_for('.check_and_resend_text_code'),
+          help_link_text='I haven’t received a text message'
+        ) }}
+      {% endif %}
+      {% if form.email_code %}
+        {{ textbox(
+          form.email_code,
+          width='5em',
+          help_link=url_for('.check_and_resend_email_code'),
+          help_link_text='I haven’t received an email'
+        ) }}
+      {% endif %}
       {{ page_footer("Continue") }}
     </form>
   </div>
