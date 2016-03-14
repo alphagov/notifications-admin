@@ -50,6 +50,10 @@
               {% endif %}
             </div>
           </div>
+        {% else %}
+          {% if not current_user.has_permissions(['manage_templates']) %}
+            <div class="column-two-thirds">You need to ask your service manager to add templates before you can send messages</div>
+          {% endif %}
         {% endfor %}
       </div>
     {% endif %}
