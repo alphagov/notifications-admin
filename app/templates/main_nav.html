@@ -12,7 +12,6 @@
   <ul>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='sms') }}">Text message templates</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='email') }}">Email templates</a></li>
-    <li><a href="{{ url_for('.letters_stub', service_id=service_id) }}">Letter templates</a></li>
   </ul>
   {% endif %}
   {% if current_user.has_permissions(['manage_users', 'manage_settings']) %}

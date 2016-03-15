@@ -63,13 +63,6 @@ def get_page_headings(template_type):
         return manage_templates_page_headings[template_type]
 
 
-@main.route("/services/<service_id>/send/letters", methods=['GET'])
-def letters_stub(service_id):
-    return render_template(
-        'views/letters.html', service_id=service_id
-    )
-
-
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', or_=True)
