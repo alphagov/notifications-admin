@@ -6,7 +6,6 @@
   <ul>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='sms') }}">Send text messages</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='email') }}">Send emails</a></li>
-    <li><a href="{{ url_for('.letters_stub', service_id=service_id) }}">Send letters</a></li>
   </ul>
   {% elif current_user.has_permissions(['manage_templates']) %}
   <ul>
