@@ -11,66 +11,52 @@ from flask_login import (
     current_user
 )
 
-from notifications_python_client.errors import HTTPError
-
 from app.main import main
-from app.main.forms import InviteUserForm
-from app.main.dao.services_dao import get_service_by_id_or_404
+from app.main.forms import (
+    InviteUserForm,
+    PermisisonsForm
+)
+from app.main.dao.services_dao import get_service_by_id
 from app import user_api_client
 from app import invite_api_client
-
-fake_users = [
-    {
-        'name': '',
-        'permission_send_messages': True,
-        'permission_manage_service': True,
-        'permission_manage_api_keys': True,
-        'active': True
-    }
-]
+from app.utils import user_has_permissions
 
 
 @main.route("/services/<service_id>/users")
 @login_required
+@user_has_permissions('manage_users', 'manage_templates', 'manage_settings')
 def manage_users(service_id):
-    try:
-        users = user_api_client.get_users_for_service(service_id=service_id)
-        invited_users = invite_api_client.get_invites_for_service(service_id=service_id)
-        return render_template('views/manage-users.html',
-                               service_id=service_id,
-                               users=users,
-                               current_user=current_user,
-                               invited_users=invited_users)
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    users = user_api_client.get_users_for_service(service_id=service_id)
+    invited_users = invite_api_client.get_invites_for_service(service_id=service_id)
+    filtered_invites = []
+    for invite in invited_users:
+        if invite.status != 'accepted':
+            filtered_invites.append(invite)
+    return render_template('views/manage-users.html',
+                           service_id=service_id,
+                           users=users,
+                           current_user=current_user,
+                           invited_users=filtered_invites)
 
 
 @main.route("/services/<service_id>/users/invite", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_users', 'manage_templates', 'manage_settings')
 def invite_user(service_id):
 
-    form = InviteUserForm()
+    service = get_service_by_id(service_id)
+
+    form = InviteUserForm(current_user.email_address)
     if form.validate_on_submit():
         email_address = form.email_address.data
         permissions = _get_permissions(request.form)
-        try:
-            invited_user = invite_api_client.create_invite(current_user.id, service_id, email_address, permissions)
-            flash('Invite sent to {}'.format(invited_user.email_address), 'default_with_tick')
-            return redirect(url_for('.manage_users', service_id=service_id))
-
-        except HTTPError as e:
-            if e.status_code == 404:
-                abort(404)
-            else:
-                raise e
+        invited_user = invite_api_client.create_invite(current_user.id, service_id, email_address, permissions)
+        flash('Invite sent to {}'.format(invited_user.email_address), 'default_with_tick')
+        return redirect(url_for('.manage_users', service_id=service_id))
 
     return render_template(
         'views/invite-user.html',
-        user={},
-        service=get_service_by_id_or_404(service_id),
+        user=None,
         service_id=service_id,
         form=form
     )
@@ -78,50 +64,62 @@ def invite_user(service_id):
 
 @main.route("/services/<service_id>/users/<user_id>", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions('manage_users', 'manage_templates', 'manage_settings')
 def edit_user_permissions(service_id, user_id):
+    # TODO we should probably using the service id here in the get user
+    # call as well. eg. /user/<user_id>?&service_id=service_id
+    user = user_api_client.get_user(user_id)
+    service = get_service_by_id(service_id)
+    # Need to make the email address read only, or a disabled field?
+    # Do it through the template or the form class?
+    form = PermisisonsForm(**{
+        'send_messages': 'yes' if user.has_permissions(
+            ['send_texts', 'send_emails', 'send_letters']) else 'no',
+        'manage_service': 'yes' if user.has_permissions(
+            ['manage_users', 'manage_templates', 'manage_settings']) else 'no',
+        'manage_api_keys': 'yes' if user.has_permissions(
+            ['manage_api_keys', 'access_developer_docs']) else 'no'
+        })
 
-    if request.method == 'POST':
+    if form.validate_on_submit():
+        permissions = []
+        permissions.extend(
+            _convert_role_to_permissions('send_messages') if form.send_messages.data == 'yes' else [])
+        permissions.extend(
+            _convert_role_to_permissions('manage_service') if form.manage_service.data == 'yes' else [])
+        permissions.extend(
+            _convert_role_to_permissions('manage_api_keys') if form.manage_api_keys.data == 'yes' else [])
+        user_api_client.set_user_permissions(user_id, service_id, permissions)
         return redirect(url_for('.manage_users', service_id=service_id))
 
     return render_template(
-        'views/invite-user.html',
-        user=fake_users[int(user_id)],
-        user_id=user_id,
-        service=get_service_by_id_or_404(service_id),
-        service_id=service_id
-    )
-
-
-@main.route("/services/<service_id>/users/<user_id>/delete", methods=['GET', 'POST'])
-@login_required
-def delete_user(service_id, user_id):
-
-    if request.method == 'POST':
-        return redirect(url_for('.manage_users', service_id=service_id))
-
-    user = fake_users[int(user_id)]
-
-    flash(
-        'Are you sure you want to delete {}’s account?'.format(user.get('name') or user['email_localpart']),
-        'delete'
-    )
-
-    return render_template(
-        'views/invite-user.html',
+        'views/edit-user-permissions.html',
         user=user,
-        user_id=user_id,
-        service=get_service_by_id_or_404(service_id),
+        form=form,
         service_id=service_id
     )
 
 
 @main.route("/services/<service_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
+@user_has_permissions('manage_users', 'manage_templates', 'manage_settings')
 def cancel_invited_user(service_id, invited_user_id):
     invite_api_client.cancel_invited_user(service_id=service_id, invited_user_id=invited_user_id)
 
     return redirect(url_for('main.manage_users', service_id=service_id))
 
 
+def _convert_role_to_permissions(role):
+    if role == 'send_messages':
+        return ['send_texts', 'send_emails', 'send_letters']
+    elif role == 'manage_service':
+        return ['manage_users', 'manage_templates', 'manage_settings']
+    elif role == 'manage_api_keys':
+        return ['manage_api_keys', 'access_developer_docs']
+    return []
+
+
+# TODO replace with method which converts each 'role' into the list
+# of permissions like the method above :)
 def _get_permissions(form):
     permissions = []
     if form.get('send_messages') and form['send_messages'] == 'yes':

@@ -7,7 +7,11 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    Send letters
+    {% if current_user.has_permissions(['send_letters']) %}
+      Send letters
+    {% else %}
+      Letter templates
+    {% endif %}
   </h1>
 
   <p>

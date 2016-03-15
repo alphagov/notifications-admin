@@ -1,6 +1,7 @@
 import csv
 import io
 import uuid
+from contextlib import suppress
 
 from flask import (
     request,
@@ -14,8 +15,8 @@ from flask import (
 )
 
 from flask_login import login_required, current_user
-from notifications_python_client.errors import HTTPError
-from utils.template import Template, NeededByTemplateError, NoPlaceholderForDataError
+from utils.template import Template
+from utils.recipients import RecipientCSV, first_column_heading
 
 from app.main import main
 from app.main.forms import CsvUploadForm
@@ -26,9 +27,7 @@ from app.main.uploader import (
 from app.main.dao import templates_dao
 from app.main.dao import services_dao
 from app import job_api_client
-from app.utils import (
-    validate_recipient, InvalidPhoneError, InvalidEmailError, user_has_permissions)
-from utils.process_csv import first_column_heading
+from app.utils import user_has_permissions, get_errors_for_csv
 
 
 send_messages_page_headings = {
@@ -38,9 +37,22 @@ send_messages_page_headings = {
 
 
 manage_templates_page_headings = {
-    'email': 'Manage templates',
-    'sms': 'Manage templates'
+    'email': 'Email templates',
+    'sms': 'Text message templates'
 }
+
+
+def get_send_button_text(template_type, number_of_messages):
+    if 1 == number_of_messages:
+        return {
+            'email': 'Send 1 email',
+            'sms': 'Send 1 text message'
+        }[template_type]
+    else:
+        return {
+            'email': 'Send {} emails',
+            'sms': 'Send {} text messages'
+        }[template_type].format(number_of_messages)
 
 
 def get_page_headings(template_type):
@@ -67,13 +79,8 @@ def choose_template(service_id, template_type):
 
     if template_type not in ['email', 'sms']:
         abort(404)
-    try:
-        jobs = job_api_client.get_job(service_id)['data']
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    jobs = job_api_client.get_job(service_id)['data']
+
     return render_template(
         'views/choose-template.html',
         templates=[
@@ -99,16 +106,25 @@ def send_messages(service_id, template_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
-            csv_file = form.file
-            filedata = _get_filedata(csv_file)
             upload_id = str(uuid.uuid4())
-            s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
-            session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
+            s3upload(
+                upload_id,
+                service_id,
+                {
+                    'file_name': form.file.data.filename,
+                    'data': form.file.data.getvalue().decode('utf-8')
+                },
+                current_app.config['AWS_REGION']
+            )
+            session['upload_data'] = {
+                "template_id": template_id,
+                "original_file_name": form.file.data.filename
+            }
             return redirect(url_for('.check_messages',
                                     service_id=service_id,
                                     upload_id=upload_id))
         except ValueError as e:
-            flash('There was a problem uploading: {}'.format(csv_file.data.filename))
+            flash('There was a problem uploading: {}'.format(form.file.data.filename))
             flash(str(e))
             return redirect(url_for('.send_messages', service_id=service_id, template_id=template_id))
 
@@ -117,7 +133,6 @@ def send_messages(service_id, template_id):
         templates_dao.get_service_template_or_404(service_id, template_id)['data'],
         prefix=service['name']
     )
-    recipient_column = first_column_heading[template.template_type]
 
     return render_template(
         'views/send.html',
@@ -145,7 +160,7 @@ def get_example_csv(service_id, template_id):
             'email': current_user.email_address,
             'sms': current_user.mobile_number
         }[template.template_type]
-    ] + ["test {}".format(header) for header in template.placeholders])
+    ] + _get_fake_personalisation(template.placeholders))
     return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
 
 
@@ -162,18 +177,16 @@ def send_message_to_self(service_id, template_id):
     )
     if template.template_type == 'sms':
         writer.writerow(
-            [current_user.mobile_number] +
-            ["test {}".format(header) for header in template.placeholders]
+            [current_user.mobile_number] + _get_fake_personalisation(template.placeholders)
         )
     if template.template_type == 'email':
         writer.writerow(
-            [current_user.email_address] +
-            ["test {}".format(header) for header in template.placeholders]
+            [current_user.email_address] + _get_fake_personalisation(template.placeholders)
         )
 
     filedata = {
         'file_name': 'Test run',
-        'data': output.getvalue().splitlines()
+        'data': output.getvalue()
     }
     upload_id = str(uuid.uuid4())
     s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
@@ -184,103 +197,90 @@ def send_message_to_self(service_id, template_id):
                             upload_id=upload_id))
 
 
-@main.route("/services/<service_id>/check/<upload_id>",
-            methods=['GET', 'POST'])
+@main.route("/services/<service_id>/check/<upload_id>", methods=['GET'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def check_messages(service_id, upload_id):
 
-    upload_data = session['upload_data']
-    template_id = upload_data.get('template_id')
     service = services_dao.get_service_by_id_or_404(service_id)
 
-    if request.method == 'GET':
-        contents = s3download(service_id, upload_id)
-        if not contents:
-            flash('There was a problem reading your upload file')
-        raw_template = templates_dao.get_service_template_or_404(service_id, template_id)['data']
-        upload_result = _get_rows(contents, raw_template)
-        session['upload_data']['notification_count'] = len(upload_result['rows'])
-        template = Template(
-            raw_template,
-            values=upload_result['rows'][0] if upload_result['valid'] else {},
-            drop_values={first_column_heading[raw_template['template_type']]},
-            prefix=service['name']
-        )
-        return render_template(
-            'views/check.html',
-            upload_result=upload_result,
-            template=template,
-            page_heading=get_page_headings(template.template_type),
-            column_headers=[first_column_heading[template.template_type]] + list(template.placeholders_as_markup),
-            original_file_name=upload_data.get('original_file_name'),
-            service_id=service_id,
-            service=service,
-            form=CsvUploadForm()
-        )
-    elif request.method == 'POST':
-        original_file_name = upload_data.get('original_file_name')
-        notification_count = upload_data.get('notification_count')
-        session.pop('upload_data')
-        try:
-            job_api_client.create_job(upload_id, service_id, template_id, original_file_name, notification_count)
-        except HTTPError as e:
-            if e.status_code == 404:
-                abort(404)
-            else:
-                raise e
+    contents = s3download(service_id, upload_id)
+    if not contents:
+        flash('There was a problem reading your upload file')
 
-        flash('We’ve started sending your messages', 'default_with_tick')
-        return redirect(
-            url_for('main.view_job', service_id=service_id, job_id=upload_id)
-        )
+    template = templates_dao.get_service_template_or_404(
+        service_id,
+        session['upload_data'].get('template_id')
+    )['data']
 
-
-def _get_filedata(file):
-    import itertools
-    reader = csv.reader(
-        file.data.getvalue().decode('utf-8').splitlines(),
-        quoting=csv.QUOTE_NONE,
-        skipinitialspace=True
+    template = Template(
+        template,
+        prefix=service['name'] if template['template_type'] == 'sms' else ''
     )
-    lines = []
-    for row in reader:
-        non_empties = itertools.dropwhile(lambda x: x.strip() == '', row)
-        has_content = []
-        for item in non_empties:
-            has_content.append(item)
-        if has_content:
-            lines.append(row)
 
-    if len(lines) < 2:  # must be header row and at least one data row
-        message = 'The file {} contained no data'.format(file.data.filename)
-        raise ValueError(message)
-
-    content_lines = []
-    for row in lines:
-        content_lines.append(','.join(row).rstrip(','))
-    return {'file_name': file.data.filename, 'data': content_lines}
-
-
-def _get_rows(contents, raw_template):
-    reader = csv.DictReader(
-        contents.split('\n'),
-        quoting=csv.QUOTE_NONE,
-        skipinitialspace=True
+    recipients = RecipientCSV(
+        contents,
+        template_type=template.template_type,
+        placeholders=template.placeholders,
+        max_initial_rows_shown=15,
+        max_errors_shown=15
     )
-    valid = True
-    rows = []
-    for row in reader:
-        rows.append(row)
-        try:
-            validate_recipient(
-                row, template_type=raw_template['template_type']
-            )
-            Template(
-                raw_template,
-                values=row,
-                drop_values={first_column_heading[raw_template['template_type']]}
-            ).replaced
-        except (InvalidEmailError, InvalidPhoneError, NeededByTemplateError, NoPlaceholderForDataError):
-            valid = False
-    return {"valid": valid, "rows": rows}
+
+    with suppress(StopIteration):
+        template.values = next(recipients.rows)
+
+    session['upload_data']['notification_count'] = len(list(recipients.rows))
+    session['upload_data']['valid'] = not recipients.has_errors
+
+    return render_template(
+        'views/check.html',
+        recipients=recipients,
+        template=template,
+        page_heading=get_page_headings(template.template_type),
+        errors=get_errors_for_csv(recipients, template.template_type),
+        rows_have_errors=any(recipients.rows_with_errors),
+        count_of_recipients=session['upload_data']['notification_count'],
+        count_of_displayed_recipients=(
+            len(list(recipients.initial_annotated_rows_with_errors))
+            if any(recipients.rows_with_errors) else
+            len(list(recipients.initial_annotated_rows))
+        ),
+        original_file_name=session['upload_data'].get('original_file_name'),
+        send_button_text=get_send_button_text(template.template_type, session['upload_data']['notification_count']),
+        service_id=service_id,
+        service=service,
+        form=CsvUploadForm()
+    )
+
+
+@main.route("/services/<service_id>/check/<upload_id>", methods=['POST'])
+@login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+def start_job(service_id, upload_id):
+
+    upload_data = session['upload_data']
+    services_dao.get_service_by_id_or_404(service_id)
+
+    if request.files or not upload_data.get('valid'):
+        # The csv was invalid, validate the csv again
+        return send_messages(service_id, upload_data.get('template_id'))
+
+    session.pop('upload_data')
+
+    job_api_client.create_job(
+        upload_id,
+        service_id,
+        upload_data.get('template_id'),
+        upload_data.get('original_file_name'),
+        upload_data.get('notification_count')
+    )
+
+    return redirect(
+        url_for('main.view_job', service_id=service_id, job_id=upload_id)
+    )
+
+
+def _get_fake_personalisation(placeholders):
+    return [
+        "{} 1".format(header) for header in placeholders
+    ]

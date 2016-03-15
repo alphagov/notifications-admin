@@ -54,6 +54,7 @@ gulp.task('javascripts', () => gulp
     paths.src + 'javascripts/autofocus.js',
     paths.src + 'javascripts/highlightTags.js',
     paths.src + 'javascripts/fileUpload.js',
+    paths.src + 'javascripts/updateContent.js',
     paths.src + 'javascripts/main.js'
   ])
   .pipe(plugins.babel({

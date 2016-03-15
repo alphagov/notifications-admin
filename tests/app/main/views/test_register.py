@@ -1,4 +1,5 @@
 from flask import url_for
+from bs4 import BeautifulSoup
 
 
 def test_render_register_returns_template_with_form(app_):
@@ -43,7 +44,7 @@ def test_process_register_creates_new_user(app_,
         assert mock_register_user.called
 
 
-def test_process_register_returns_400_when_mobile_number_is_invalid(app_,
+def test_process_register_returns_200_when_mobile_number_is_invalid(app_,
                                                                     mock_send_verify_code,
                                                                     mock_get_user_by_email_not_found,
                                                                     mock_login):
@@ -55,7 +56,7 @@ def test_process_register_returns_400_when_mobile_number_is_invalid(app_,
                                                  'password': 'validPassword!'})
 
     assert response.status_code == 200
-    assert 'Must be a UK mobile number (eg 07700 900460)' in response.get_data(as_text=True)
+    assert 'Must not contain letters or symbols' in response.get_data(as_text=True)
 
 
 def test_should_return_400_when_email_is_not_gov_uk(app_,
@@ -106,3 +107,24 @@ def test_should_return_400_if_password_is_blacklisted(app_,
 
     response.status_code == 200
     assert 'That password is blacklisted, too common' in response.get_data(as_text=True)
+
+
+def test_register_with_existing_email_returns_error(app_,
+                                                    api_user_active,
+                                                    mock_get_user_by_email):
+    user_data = {
+        'name': 'Already Hasaccount',
+        'email_address': api_user_active.email_address,
+        'mobile_number': '+4407700900460',
+        'password': 'validPassword!'
+    }
+
+    with app_.test_request_context():
+        response = app_.test_client().post(url_for('main.register'),
+                                           data=user_data)
+        assert response.status_code == 400
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        element = page.find('h1')
+        assert element.text == 'Create an account'
+        flash_banner = page.find('div', class_='banner-dangerous').string.strip()
+        assert flash_banner == 'There was an error registering your account'

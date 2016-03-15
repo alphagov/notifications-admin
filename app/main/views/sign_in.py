@@ -4,7 +4,8 @@ from flask import (
     url_for,
     session,
     abort,
-    flash
+    flash,
+    request
 )
 
 from flask.ext.login import (current_user, login_fresh, confirm_login)
@@ -41,9 +42,17 @@ def sign_in():
                 return redirect(url_for('.verify'))
             elif user.is_active():
                 users_dao.send_verify_code(user.id, 'sms', user.mobile_number)
-                return redirect(url_for('.two_factor'))
+                if request.args.get('next'):
+                    return redirect(url_for('.two_factor', next=request.args.get('next')))
+                else:
+                    return redirect(url_for('.two_factor'))
         # Vague error message for login in case of user not known, locked, inactive or password not verified
         flash('Username or password is incorrect')
+
+    invited_user = session.get('invited_user')
+    if invited_user:
+        message = 'You already have an account with GOV.UK Notify. Sign in to your account to accept this invitation.'
+        flash(message, 'default')
 
     return render_template('views/signin.html', form=form)
 

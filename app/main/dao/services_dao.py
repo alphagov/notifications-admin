@@ -1,16 +1,6 @@
-from flask import url_for, abort
+from flask import url_for, current_app
 from app import notifications_api_client
 from app.utils import BrowsableItem
-from notifications_python_client.errors import HTTPError
-
-
-def insert_new_service(service_name, user_id):
-    # Add a service with default attributes
-    # Should we try and handle exception here
-    resp = notifications_api_client.create_service(
-        service_name, False, 1000, True, user_id)
-
-    return resp['data']['id']
 
 
 def update_service(service):
@@ -28,15 +18,7 @@ def get_service_by_id(id_):
 
 
 def get_service_by_id_or_404(id_):
-    try:
-        return notifications_api_client.get_service(id_)['data']
-    except KeyError:
-        abort(404)
-    except HTTPError as e:
-        if e.status_code == 404:
-            abort(404)
-        else:
-            raise e
+    return notifications_api_client.get_service(id_)['data']
 
 
 def get_services(user_id=None):

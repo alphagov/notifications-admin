@@ -1,5 +1,6 @@
 import uuid
-from datetime import date
+from datetime import date, datetime, timedelta
+from unittest.mock import Mock
 import pytest
 
 from app import create_app
@@ -17,6 +18,8 @@ from app.notify_client.models import (
     User,
     InvitedUser
 )
+
+from notifications_python_client.errors import HTTPError
 
 
 @pytest.fixture(scope='session')
@@ -67,7 +70,7 @@ def mock_create_service(mocker):
         service = service_json(
             101, service_name, [user_id], limit=limit,
             active=active, restricted=restricted)
-        return {'data': service}
+        return service['id']
 
     return mocker.patch(
         'app.notifications_api_client.create_service', side_effect=_create)
@@ -91,16 +94,37 @@ def mock_update_service(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_update_service_raise_httperror_duplicate_name(mocker):
+
+    def _update(service_id,
+                service_name,
+                active,
+                limit,
+                restricted,
+                users):
+        json_mock = Mock(return_value={'message': {'name': ["Duplicate service name '{}'".format(service_name)]}})
+        resp_mock = Mock(status_code=400, json=json_mock)
+        http_error = HTTPError(response=resp_mock, message="Default message")
+        raise http_error
+
+    return mocker.patch(
+        'app.notifications_api_client.update_service', side_effect=_update)
+
+
+SERVICE_ONE_ID = "596364a0-858e-42c8-9062-a8fe822260eb"
+SERVICE_TWO_ID = "147ad62a-2951-4fa1-9ca0-093cd1a52c52"
+
+
+@pytest.fixture(scope='function')
 def mock_get_services(mocker, user=None):
     if user is None:
         user = api_user_active()
 
     def _create(user_id=None):
-        import uuid
         service_one = service_json(
-            "596364a0-858e-42c8-9062-a8fe822260eb", "service_one", [user.id], 1000, True, False)
+            SERVICE_ONE_ID, "service_one", [user.id], 1000, True, False)
         service_two = service_json(
-            "147ad62a-2951-4fa1-9ca0-093cd1a52c52", "service_two", [user.id], 1000, True, False)
+            SERVICE_TWO_ID, "service_two", [user.id], 1000, True, False)
         return {'data': [service_one, service_two]}
 
     return mocker.patch(
@@ -113,9 +137,8 @@ def mock_get_services_with_one_service(mocker, user=None):
         user = api_user_active()
 
     def _create(user_id=None):
-        import uuid
         return {'data': [service_json(
-            "596364a0-858e-42c8-9062-a8fe822260eb", "service_one", [user.id], 1000, True, False
+            SERVICE_ONE_ID, "service_one", [user.id], 1000, True, False
         )]}
 
     return mocker.patch(
@@ -268,9 +291,27 @@ def api_user_request_password_reset():
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
                  'mobile_number': '+4412341234',
-                 'state': 'request_password_reset',
+                 'state': 'active',
                  'failed_login_count': 5,
-                 'permissions': {}
+                 'permissions': {},
+                 'password_changed_at': None
+                 }
+    user = User(user_data)
+    return user
+
+
+@pytest.fixture(scope='function')
+def api_user_changed_password():
+    from app.notify_client.user_api_client import User
+    user_data = {'id': 555,
+                 'name': 'Test User',
+                 'password': 'somepassword',
+                 'email_address': 'test@user.gov.uk',
+                 'mobile_number': '+4412341234',
+                 'state': 'active',
+                 'failed_login_count': 5,
+                 'permissions': {},
+                 'password_changed_at': str(datetime.now() + timedelta(minutes=1))
                  }
     user = User(user_data)
     return user
@@ -291,6 +332,7 @@ def mock_register_user(mocker, api_user_pending):
 @pytest.fixture(scope='function')
 def mock_get_user(mocker, api_user_active):
     def _get_user(id):
+        api_user_active.id = id
         return api_user_active
     return mocker.patch(
         'app.user_api_client.get_user', side_effect=_get_user)
@@ -346,6 +388,13 @@ def mock_get_user_by_email_request_password_reset(mocker, api_user_request_passw
 
 
 @pytest.fixture(scope='function')
+def mock_get_user_by_email_user_changed_password(mocker, api_user_changed_password):
+    return mocker.patch(
+        'app.user_api_client.get_user_by_email',
+        return_value=api_user_changed_password)
+
+
+@pytest.fixture(scope='function')
 def mock_get_user_by_email_locked(mocker, api_user_locked):
     return mocker.patch(
         'app.user_api_client.get_user_by_email', return_value=api_user_locked)
@@ -353,12 +402,7 @@ def mock_get_user_by_email_locked(mocker, api_user_locked):
 
 @pytest.fixture(scope='function')
 def mock_get_user_by_email_inactive(mocker, api_user_pending):
-
-    def _get_user(email_address):
-        api_user_pending._email_address = email_address
-        api_user_pending._is_locked = True
-        return api_user_pending
-    return mocker.patch('app.user_api_client.get_user_by_email', side_effect=_get_user)
+    return mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_pending)
 
 
 @pytest.fixture(scope='function')
@@ -380,14 +424,6 @@ def mock_verify_password(mocker):
     return mocker.patch(
         'app.user_api_client.verify_password',
         side_effect=_verify_password)
-
-
-@pytest.fixture(scope='function')
-def mock_password_reset(mocker, api_user_active):
-
-    def _reset(email):
-        api_user_active.state = 'request_password_reset'
-    return mocker.patch('app.main.dao.users_dao.request_password_reset', side_effect=_reset)
 
 
 @pytest.fixture(scope='function')
@@ -585,7 +621,7 @@ def mock_s3_upload(mocker):
 
 
 @pytest.fixture(scope='function')
-def sample_invite(mocker, service_one):
+def sample_invite(mocker, service_one, status='pending'):
     import datetime
     id = str(uuid.uuid4())
     from_user = service_one['users'][0]
@@ -593,7 +629,12 @@ def sample_invite(mocker, service_one):
     service_id = service_one['id']
     permissions = 'send_messages,manage_service,manage_api_keys'
     created_at = str(datetime.datetime.now())
-    return invite_json(id, from_user, service_id, email_address, permissions, created_at)
+    return invite_json(id, from_user, service_id, email_address, permissions, created_at, status)
+
+
+@pytest.fixture(scope='function')
+def sample_invited_user(mocker, sample_invite):
+    return InvitedUser(**sample_invite)
 
 
 @pytest.fixture(scope='function')
@@ -624,14 +665,26 @@ def mock_get_invites_for_service(mocker, service_one, sample_invite):
 
 
 @pytest.fixture(scope='function')
-def mock_accept_invite(mocker, sample_invite):
-    def _accept_token(token):
+def mock_check_invite_token(mocker, sample_invite):
+    def _check_token(token):
         return InvitedUser(**sample_invite)
-    return mocker.patch('app.invite_api_client.accept_invite', side_effect=_accept_token)
+    return mocker.patch('app.invite_api_client.check_token', side_effect=_check_token)
+
+
+@pytest.fixture(scope='function')
+def mock_accept_invite(mocker, sample_invite):
+    def _accept(service_id, invite_id):
+        return InvitedUser(**sample_invite)
+    return mocker.patch('app.invite_api_client.accept_invite', side_effect=_accept)
 
 
 @pytest.fixture(scope='function')
 def mock_add_user_to_service(mocker, service_one, api_user_active):
-    def _add_user(service_id, user_id):
+    def _add_user(service_id, user_id, permissions):
         return api_user_active
     return mocker.patch('app.user_api_client.add_user_to_service', side_effect=_add_user)
+
+
+@pytest.fixture(scope='function')
+def mock_set_user_permissions(mocker):
+    return mocker.patch('app.user_api_client.set_user_permissions', return_value=None)

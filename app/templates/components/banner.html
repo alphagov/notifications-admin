@@ -22,3 +22,7 @@
     {% endif %}
   </div>
 {% endmacro %}
+
+{% macro banner_wrapper(type=None, with_tick=False, delete_button=None, subhead=None) %}
+  {{ banner(caller()|safe, type=type, with_tick=with_tick, delete_button=delete_button, subhead=subhead) }}
+{% endmacro %}

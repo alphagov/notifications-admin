@@ -1,15 +1,20 @@
-{% macro yes_no(name, label, current_value=None) %}
+{% macro yes_no(field, current_value=None) %}
   <fieldset class='yes-no'>
-    <legend class='yes-no-label'>
-      {{ label }}
+    <legend class='yes-no-label{% if field.errors %} error{% endif %}'>
+      {{ field.label }}
+       {% if field.errors %}
+        <span class="error-message">
+          {{ field.errors[0] }}
+        </span>
+      {% endif %}
     </legend>
     <div class='yes-no-fields inline'>
       <label class='block-label'>
-        <input type='radio' name='{{ name }}' value='yes' {% if current_value == True %}checked{% endif %} />
+        <input type='radio' name='{{ field.name }}' value='yes' {% if current_value == 'yes' %}checked{% endif %} />
         Yes
       </label>
       <label class='block-label'>
-        <input type='radio' name='{{ name }}' value='no' {% if current_value == False %}checked{% endif %} />
+        <input type='radio' name='{{ field.name }}' value='no' {% if current_value == 'no' %}checked{% endif %} />
         No
       </label>
     </div>

@@ -10,7 +10,7 @@ class User(UserMixin):
         self._mobile_number = fields.get('mobile_number')
         self._password_changed_at = fields.get('password_changed_at')
         self._permissions = fields.get('permissions')
-        self._failed_login_count = 0
+        self._failed_login_count = fields.get('failed_login_count')
         self._state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
 
@@ -88,7 +88,7 @@ class User(UserMixin):
         if service_id in self._permissions:
             if or_:
                 return any([x in self._permissions[service_id] for x in permissions])
-            return set(self._permissions[service_id]) > set(permissions)
+            return set(self._permissions[service_id]) >= set(permissions)
         return False
 
     @property
@@ -126,18 +126,40 @@ class InvitedUser(object):
         self.service = str(service)
         self.from_user = from_user
         self.email_address = email_address
-        self.permissions = permissions.split(',')
+        if isinstance(permissions, list):
+            self.permissions = permissions
+        else:
+            if permissions:
+                self.permissions = permissions.split(',')
+            else:
+                self.permissions = []
         self.status = status
         self.created_at = created_at
 
-    def has_permissions(self, permission):
-        return permission in self.permissions
+    def has_permissions(self, permissions):
+        return set(self.permissions) > set(permissions)
 
-    def serialize(self):
-        return {'id': self.id,
+    def __eq__(self, other):
+        return ((self.id,
+                self.service,
+                self.from_user,
+                self.email_address,
+                self.status) == (other.id,
+                other.service,
+                other.from_user,
+                other.email_address,
+                other.status))
+
+    def serialize(self, permissions_as_string=False):
+        data = {'id': self.id,
                 'service': self.service,
                 'from_user': self.from_user,
                 'email_address': self.email_address,
-                'permissions': self.permissions,
-                'status': self.status
+                'status': self.status,
+                'created_at': str(self.created_at)
                 }
+        if permissions_as_string:
+            data['permissions'] = ','.join(self.permissions)
+        else:
+            data['permissions'] = self.permissions
+        return data

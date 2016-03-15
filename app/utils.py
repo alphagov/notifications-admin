@@ -3,8 +3,6 @@ import re
 from functools import wraps
 from flask import (abort, session)
 
-from utils.process_csv import get_recipient_from_row
-
 
 class BrowsableItem(object):
     """
@@ -32,70 +30,6 @@ class BrowsableItem(object):
         pass
 
 
-class InvalidEmailError(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
-class InvalidPhoneError(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
-def validate_phone_number(number):
-    sanitised_number = number.replace('(', '')
-    sanitised_number = sanitised_number.replace(')', '')
-    sanitised_number = sanitised_number.replace(' ', '')
-    sanitised_number = sanitised_number.replace('-', '')
-
-    if sanitised_number.startswith('+'):
-        sanitised_number = sanitised_number[1:]
-
-    valid_prefixes = ['07', '447', '4407', '00447']
-    if not sum(sanitised_number.startswith(prefix) for prefix in valid_prefixes):
-        raise InvalidPhoneError('Must be a UK mobile number (eg 07700 900460)')
-
-    for digit in sanitised_number:
-        try:
-            int(digit)
-        except(ValueError):
-            raise InvalidPhoneError('Must not contain letters or symbols')
-
-    # Split number on first 7
-    sanitised_number = sanitised_number.split('7', 1)[1]
-
-    if len(sanitised_number) > 9:
-        raise InvalidPhoneError('Too many digits')
-
-    if len(sanitised_number) < 9:
-        raise InvalidPhoneError('Not enough digits')
-
-    return sanitised_number
-
-
-def format_phone_number(number):
-    import re
-    if len(number) > 9:
-        raise InvalidPhoneError('Too many digits')
-
-    if len(number) < 9:
-        raise InvalidPhoneError('Not enough digits')
-    return '+447{}{}{}'.format(*re.findall('...', number))
-
-
-def validate_email_address(email_address):
-    if re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email_address):
-        return
-    raise InvalidEmailError('Not a valid email address')
-
-
-def validate_recipient(row, template_type):
-    return {
-        'email': validate_email_address,
-        'sms': validate_phone_number
-    }[template_type](get_recipient_from_row(row, template_type))
-
-
 def user_has_permissions(*permissions, or_=False):
     def wrap(func):
         @wraps(func)
@@ -107,3 +41,44 @@ def user_has_permissions(*permissions, or_=False):
                 abort(403)
         return wrap_func
     return wrap
+
+
+def get_errors_for_csv(recipients, template_type):
+
+    errors = []
+
+    missing_column_headers = list(recipients.missing_column_headers)
+
+    if len(missing_column_headers) == 1:
+        errors.append("add a column called ‘{}’".format("".join(missing_column_headers)))
+    elif len(missing_column_headers) == 2:
+        errors.append("add 2 columns, ‘{}’".format("’ and ‘".join(missing_column_headers)))
+    elif len(missing_column_headers) > 2:
+        errors.append(
+            "add columns called ‘{}’, and ‘{}’".format(
+                "’, ‘".join(missing_column_headers[0:-1]),
+                missing_column_headers[-1]
+            )
+        )
+
+    if recipients.rows_with_bad_recipients:
+        number_of_bad_recipients = len(list(recipients.rows_with_bad_recipients))
+        if 'sms' == template_type:
+            if 1 == number_of_bad_recipients:
+                errors.append("fix 1 phone number")
+            else:
+                errors.append("fix {} phone numbers".format(number_of_bad_recipients))
+        elif 'email' == template_type:
+            if 1 == number_of_bad_recipients:
+                errors.append("fix 1 email address")
+            else:
+                errors.append("fix {} email addresses".format(number_of_bad_recipients))
+
+    if recipients.rows_with_missing_data:
+        number_of_rows_with_missing_data = len(list(recipients.rows_with_missing_data))
+        if 1 == number_of_rows_with_missing_data:
+            errors.append("fill in 1 empty cell")
+        else:
+            errors.append("fill in {} empty cells".format(number_of_rows_with_missing_data))
+
+    return errors

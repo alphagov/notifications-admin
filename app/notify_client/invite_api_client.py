@@ -31,12 +31,17 @@ class InviteApiClient(BaseAPIClient):
         invited_users = self._get_invited_users(invites)
         return invited_users
 
-    def accept_invite(self, token):
+    def check_token(self, token):
         resp = self.get(url='/invite/{}'.format(token))
         return InvitedUser(**resp['data'])
 
     def cancel_invited_user(self, service_id, invited_user_id):
         data = {'status': 'cancelled'}
+        self.post(url='/service/{0}/invite/{1}'.format(service_id, invited_user_id),
+                  data=data)
+
+    def accept_invite(self, service_id, invited_user_id):
+        data = {'status': 'accepted'}
         self.post(url='/service/{0}/invite/{1}'.format(service_id, invited_user_id),
                   data=data)
 

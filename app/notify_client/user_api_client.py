@@ -1,5 +1,3 @@
-import json
-
 from notifications_python_client.notifications import BaseAPIClient
 from notifications_python_client.errors import HTTPError
 
@@ -94,12 +92,17 @@ class UserApiClient(BaseAPIClient):
         resp = self.get(endpoint)
         return [User(data) for data in resp['data']]
 
-    def add_user_to_service(self, service_id, user_id):
+    def add_user_to_service(self, service_id, user_id, permissions):
         endpoint = '/service/{}/users/{}'.format(service_id, user_id)
-        resp = self.post(endpoint, data={})
+        resp = self.post(endpoint, data={'permissions': permissions})
         return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
 
     def set_user_permissions(self, user_id, service_id, permissions):
         data = [{'permission': x} for x in permissions]
         endpoint = '/user/{}/service/{}/permission'.format(user_id, service_id)
-        resp = self.post(endpoint, data=data)
+        self.post(endpoint, data=data)
+
+    def send_reset_password_url(self, email_address):
+        endpoint = '/user/reset-password'
+        data = {'email': email_address}
+        self.post(endpoint, data=data)

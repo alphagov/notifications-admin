@@ -1,12 +1,12 @@
-from datetime import datetime
 from notifications_python_client import HTTPError
 
-from sqlalchemy.orm import load_only
-
 from app import login_manager
-from app.main.encryption import hashpw
-
 from app import user_api_client
+
+#
+# TODO fix up this, do we really need this class why not just use the clients
+# directly??
+#
 
 
 @login_manager.user_loader
@@ -57,11 +57,6 @@ def is_email_unique(email_address):
             return True
         else:
             raise ex
-
-
-def request_password_reset(user):
-    user.state = 'request_password_reset'
-    user_api_client.update_user(user)
 
 
 def send_verify_code(user_id, code_type, to):

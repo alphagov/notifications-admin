@@ -11,8 +11,6 @@ from flask import (
 
 from flask.ext.login import current_user
 
-from notifications_python_client.errors import HTTPError
-
 from app.main import main
 from app.main.dao import users_dao
 from app.main.forms import (
@@ -30,9 +28,14 @@ def register():
 
     form = RegisterUserForm()
     if form.validate_on_submit():
-        return _do_registration(form)
-    else:
-        return render_template('views/register.html', form=form)
+        registered = _do_registration(form)
+        if registered:
+            return redirect(url_for('main.verify'))
+        else:
+            flash('There was an error registering your account')
+            return render_template('views/register.html', form=form), 400
+
+    return render_template('views/register.html', form=form)
 
 
 @main.route('/register-from-invite', methods=['GET', 'POST'])
@@ -46,27 +49,24 @@ def register_from_invite():
     if form.validate_on_submit():
         if form.service.data != invited_user['service'] or form.email_address.data != invited_user['email_address']:
             abort(400)
-        return _do_registration(form)
+        registered = _do_registration(form)
+        if registered:
+            return redirect(url_for('main.verify'))
+        else:
+            flash('There was an error registering your account')
 
     form.service.data = invited_user['service']
     form.email_address.data = invited_user['email_address']
 
-    return render_template('views/register-from-invite.html', form=form)
+    return render_template('views/register-from-invite.html', email_address=invited_user['email_address'], form=form)
 
 
 def _do_registration(form, service=None):
     if users_dao.is_email_unique(form.email_address.data):
-        try:
-            user = user_api_client.register_user(form.name.data,
-                                                 form.email_address.data,
-                                                 form.mobile_number.data,
-                                                 form.password.data)
-
-        except HTTPError as e:
-            if e.status_code == 404:
-                abort(404)
-            else:
-                raise e
+        user = user_api_client.register_user(form.name.data,
+                                             form.email_address.data,
+                                             form.mobile_number.data,
+                                             form.password.data)
 
         # TODO possibly there should be some exception handling
         # for sending sms and email codes.
@@ -77,6 +77,6 @@ def _do_registration(form, service=None):
         users_dao.send_verify_code(user.id, 'email', user.email_address)
         session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
         session['user_details'] = {"email": user.email_address, "id": user.id}
-        return redirect(url_for('main.verify'))
+        return True
     else:
-        flash('There was an error registering your account')
+        return False

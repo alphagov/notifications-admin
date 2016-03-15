@@ -13,11 +13,7 @@ class Config(object):
     NOTIFY_APP_NAME = 'admin'
     NOTIFY_LOG_PATH = '/var/log/notify/application.log'
 
-    SQLALCHEMY_COMMIT_ON_TEARDOWN = False
-    SQLALCHEMY_RECORD_QUERIES = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/notifications_admin'
     MAX_FAILED_LOGIN_COUNT = 10
-    PASS_SECRET_KEY = 'secret-key-unique-changeme'
 
     SESSION_COOKIE_NAME = 'notify_admin_session'
     SESSION_COOKIE_PATH = '/admin'
@@ -44,6 +40,8 @@ class Config(object):
     DANGEROUS_SALT = 'itsdangeroussalt'
     TOKEN_MAX_AGE_SECONDS = 3600
 
+    DEFAULT_SERVICE_LIMIT = 50
+
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10mb
     UPLOAD_FOLDER = '/tmp'
 
@@ -65,7 +63,6 @@ class Development(Config):
 
 
 class Test(Development):
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_notifications_admin'
     WTF_CSRF_ENABLED = False
 
 

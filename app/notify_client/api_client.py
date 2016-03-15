@@ -27,7 +27,7 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
             "user_id": user_id,
             "restricted": restricted
         }
-        return self.post("/service", data)
+        return self.post("/service", data)['data']['id']
 
     def delete_service(self, service_id):
         """
@@ -68,7 +68,7 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
             "users": users
         }
         endpoint = "/service/{0}".format(service_id)
-        return self.put(endpoint, data)
+        return self.post(endpoint, data)
 
     def create_service_template(self, name, type_, content, service_id, subject=None):
         """

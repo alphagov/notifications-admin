@@ -16,11 +16,16 @@ Manage users – GOV.UK Notify
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Manage team
-  </h1>
-
-  <a href="{{ url_for('.invite_user', service_id=service_id) }}" class="button">Invite a team member</a>
+  <div class="grid-row">
+    <div class="column-two-thirds">
+      <h1 class="heading-large">
+        Manage team
+      </h1>
+    </div>
+    <div class="column-one-third">
+      <a href="{{ url_for('.invite_user', service_id=service_id) }}" class="button align-with-heading">Invite team member</a>
+    </div>
+  </div>
 
   {% call(item) list_table(
     users, caption='Active', **table_options
@@ -28,9 +33,14 @@ Manage users – GOV.UK Notify
     {% call field() %}
       {{ item.name }}
     {% endcall %}
-    {{ boolean_field(item.has_permissions(service_id, 'send_messages')) }}
-    {{ boolean_field(item.has_permissions(service_id, 'manage_service')) }}
-    {{ boolean_field(item.has_permissions(service_id, 'manage_api_keys')) }}
+    {{ boolean_field(item.has_permissions(['send_texts', 'send_emails', 'send_letters'], service_id=service_id)) }}
+    {{ boolean_field(item.has_permissions(['manage_users', 'manage_templates', 'manage_settings'], service_id=service_id)) }}
+    {{ boolean_field(item.has_permissions(['manage_api_keys', 'access_developer_docs'], service_id=service_id)) }}
+    {% call field(align='right') %}
+      {% if current_user.id != item.id %}
+        <a href="{{ url_for('.edit_user_permissions', service_id=service_id, user_id=item.id)}}">Edit permission</a>
+      {% endif %}
+    {% endcall %}
   {% endcall %}
 
   {% if invited_users %}
@@ -40,9 +50,9 @@ Manage users – GOV.UK Notify
       {% call field() %}
         {{ item.email_address }}
       {% endcall %}
-      {{ boolean_field(item.has_permissions('send_messages')) }}
-      {{ boolean_field(item.has_permissions('manage_service')) }}
-      {{ boolean_field(item.has_permissions('manage_api_keys')) }}
+      {{ boolean_field(item.has_permissions(['send_texts', 'send_emails', 'send_letters'])) }}
+      {{ boolean_field(item.has_permissions(['manage_users', 'manage_templates', 'manage_settings'])) }}
+      {{ boolean_field(item.has_permissions(['manage_api_keys', 'access_developer_docs'])) }}
       {% if item.status == 'pending' %}
         {% call field(align='right') %}
           <a href="{{ url_for('.cancel_invited_user', service_id=service_id, invited_user_id=item.id)}}">Cancel invitation</a>
