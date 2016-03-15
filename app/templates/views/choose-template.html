@@ -17,7 +17,7 @@
     {% if current_user.has_permissions(['manage_templates']) %}
       <a href="{{ url_for('.add_service_template', service_id=service_id, template_type=template_type) }}" class="button">Add a new template</a>
     {% else %}
-      <div class="column-two-thirds">You need to ask your service manager to add templates before you can send messages</div>
+      <p>You need to ask your service manager to add templates before you can send messages</p>
     {% endif %}
 
   {% else %}
