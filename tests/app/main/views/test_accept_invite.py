@@ -212,6 +212,7 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
 def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(app_,
                                                                                service_one,
                                                                                sample_invite,
+                                                                               api_user_active,
                                                                                mock_check_invite_token,
                                                                                mock_dont_get_user_by_email,
                                                                                mock_register_user,
@@ -249,6 +250,9 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(a
             response = client.post(url_for('main.register_from_invite'), data=data)
             assert response.status_code == 302
             assert response.location == expected_redirect_location
+
+            from unittest.mock import ANY
+            mock_send_verify_code.assert_called_once_with(ANY, 'sms', data['mobile_number'])
 
             mock_register_user.assert_called_with(data['name'],
                                                   data['email_address'],
