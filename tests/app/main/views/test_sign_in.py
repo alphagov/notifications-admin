@@ -40,7 +40,7 @@ def test_process_sign_in_return_2fa_template(app_,
     with app_.test_request_context():
         response = app_.test_client().post(
             url_for('main.sign_in'), data={
-                'email_address': 'valid@example.gov.uk',
+                'email_address': 'valid@digital.cabinet-office.gov.uk',
                 'password': 'val1dPassw0rd!'})
         assert response.status_code == 302
         assert response.location == url_for('.two_factor', _external=True)
@@ -52,7 +52,7 @@ def test_should_return_locked_out_true_when_user_is_locked(app_,
     with app_.test_request_context():
         resp = app_.test_client().post(
             url_for('main.sign_in'), data={
-                'email_address': 'valid@example.gov.uk',
+                'email_address': 'valid@digital.cabinet-office.gov.uk',
                 'password': 'whatIsMyPassword!'})
         assert resp.status_code == 200
         assert 'Username or password is incorrect' in resp.get_data(as_text=True)
@@ -62,7 +62,7 @@ def test_should_return_200_when_user_does_not_exist(app_, mock_get_user_by_email
     with app_.test_request_context():
         response = app_.test_client().post(
             url_for('main.sign_in'), data={
-                'email_address': 'notfound@gov.uk',
+                'email_address': 'notfound@digital.cabinet-office.gov.uk',
                 'password': 'doesNotExist!'})
     assert response.status_code == 200
     assert 'Username or password is incorrect' in response.get_data(as_text=True)
@@ -74,7 +74,7 @@ def test_should_return_redirect_when_user_is_pending(app_,
     with app_.test_request_context():
         response = app_.test_client().post(
             url_for('main.sign_in'), data={
-                'email_address': 'pending_user@example.gov.uk',
+                'email_address': 'pending_user@digital.cabinet-office.gov.uk',
                 'password': 'val1dPassw0rd!'})
         assert response.status_code == 302
         assert response.location == url_for('main.verify', _external=True)

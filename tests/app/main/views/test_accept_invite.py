@@ -28,7 +28,7 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(app_,
             response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
 
             mock_check_invite_token.assert_called_with('thisisnotarealtoken')
-            mock_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
+            mock_get_user_by_email.assert_called_with('invited_user@digital.cabinet-office.gov.uk')
             mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id, expected_permissions)
             mock_accept_invite.assert_called_with(expected_service, sample_invite['id'])
 
@@ -95,7 +95,7 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
             response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
 
             mock_check_invite_token.assert_called_with('thisisnotarealtoken')
-            mock_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
+            mock_get_user_by_email.assert_called_with('invited_user@digital.cabinet-office.gov.uk')
             mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id, expected_permissions)
             mock_accept_invite.assert_called_with(expected_service, sample_invite['id'])
 
@@ -123,7 +123,7 @@ def test_new_user_accept_invite_calls_api_and_redirects_to_registration(app_,
             response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
 
             mock_check_invite_token.assert_called_with('thisisnotarealtoken')
-            mock_dont_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
+            mock_dont_get_user_by_email.assert_called_with('invited_user@digital.cabinet-office.gov.uk')
 
             assert response.status_code == 302
             assert response.location == expected_redirect_location
@@ -142,14 +142,14 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(app_,
             response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
 
             mock_check_invite_token.assert_called_with('thisisnotarealtoken')
-            mock_dont_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
+            mock_dont_get_user_by_email.assert_called_with('invited_user@digital.cabinet-office.gov.uk')
 
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == 'Create an account'
 
             email_in_page = page.find('p')
-            assert email_in_page.text.strip() == 'Your account will be created with this email: invited_user@test.gov.uk'  # noqa
+            assert email_in_page.text.strip() == 'Your account will be created with this email: invited_user@digital.cabinet-office.gov.uk'  # noqa
 
             form = page.find('form')
             name = form.find('input', id='name')
@@ -158,7 +158,7 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(app_,
             email = form.find('input', type='hidden', id='email_address')
 
             assert email
-            assert email.attrs['value'] == 'invited_user@test.gov.uk'
+            assert email.attrs['value'] == 'invited_user@digital.cabinet-office.gov.uk'
             assert name
             assert password
             assert service

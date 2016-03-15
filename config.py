@@ -54,7 +54,7 @@ class Config(object):
     AWS_REGION = 'eu-west-1'
 
     SHOW_STYLEGUIDE = True
-    EMAIL_DOMAIN_LIST = os.getenv('EMAIL_DOMAIN_LIST', 'gov.uk').split(',')
+    EMAIL_DOMAIN_LIST = os.getenv('EMAIL_DOMAIN_LIST').split(',')
 
 
 class Development(Config):
@@ -65,12 +65,13 @@ class Development(Config):
     WTF_CSRF_ENABLED = False
     REMEMBER_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
-    EMAIL_DOMAIN_LIST = os.getenv('EMAIL_DOMAIN_LIST', 'gov.uk,notify.gov.uk,cabinet.digital-office.gov.uk').split(',')
+    EMAIL_DOMAIN_LIST = os.getenv('EMAIL_DOMAIN_LIST', 'digital.cabinet-office.gov.uk').split(',')
 
 
 class Test(Development):
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_notifications_admin'
     WTF_CSRF_ENABLED = False
+    EMAIL_DOMAIN_LIST = os.getenv('EMAIL_DOMAIN_LIST', 'digital.cabinet-office.gov.uk').split(',')
 
 
 class Preview(Config):

@@ -6,7 +6,7 @@ def test_should_raise_validation_error_for_password(app_, mock_get_user_by_email
     with app_.test_request_context():
         form = RegisterUserForm()
         form.name.data = 'test'
-        form.email_address.data = 'teset@gov.uk'
+        form.email_address.data = 'teset@digital.cabinet-office.gov.uk'
         form.mobile_number.data = '+441231231231'
         form.password.data = 'password1234'
 
@@ -25,7 +25,7 @@ def test_valid_email_in_valid_domains(app_):
     with app_.test_request_context():
         form = RegisterUserForm(
             name="test",
-            email_address="test@gov.uk",
+            email_address="test@digital.cabinet-office.gov.uk",
             mobile_number='+4407888999111',
             password='1234567890')
         assert form.validate()

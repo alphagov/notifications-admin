@@ -70,7 +70,7 @@ def test_should_redirect_after_email_change(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-        data = {'email_address': 'new_notify@notify.gov.uk'}
+        data = {'email_address': 'new_notify@digital.cabinet-office.gov.uk'}
         response = client.post(
             url_for('main.user_profile_email'),
             data=data)
@@ -89,7 +89,7 @@ def test_should_show_authenticate_after_email_change(app_,
         with app_.test_client() as client:
             client.login(api_user_active)
         with client.session_transaction() as session:
-            session['new-email'] = 'new_notify@notify.gov.uk'
+            session['new-email'] = 'new_notify@digital.cabinet-office.gov.uk'
         response = client.get(url_for('main.user_profile_email_authenticate'))
 
         assert 'Change your email address' in response.get_data(as_text=True)
@@ -106,7 +106,7 @@ def test_should_redirect_after_email_change_confirm(app_,
             client.login(api_user_active)
         data = {'email-code': '12345'}
         with client.session_transaction() as session:
-            session['new-email'] = 'new_notify@notify.gov.uk'
+            session['new-email'] = 'new_notify@digital.cabinet-office.gov.uk'
         response = client.post(
             url_for('main.user_profile_email_authenticate'),
             data=data)
@@ -142,7 +142,7 @@ def test_should_redirect_after_email_change_confirm(app_,
             client.login(api_user_active)
         with client.session_transaction() as session:
             session['new-email-password-confirmed'] = True
-            session['new-email'] = 'new_notify@notify.gov.uk'
+            session['new-email'] = 'new_notify@digital.cabinet-office.gov.uk'
         data = {'email_code': '12345'}
         response = client.post(
             url_for('main.user_profile_email_confirm'),

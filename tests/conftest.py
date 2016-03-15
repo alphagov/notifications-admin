@@ -241,7 +241,7 @@ def api_user_pending():
     user_data = {'id': 111,
                  'name': 'Test User',
                  'password': 'somepassword',
-                 'email_address': 'test@gov.uk',
+                 'email_address': 'test@digital.cabinet-office.gov.uk',
                  'mobile_number': '+4412341234',
                  'state': 'pending',
                  'failed_login_count': 0,
@@ -257,7 +257,7 @@ def api_user_active():
     user_data = {'id': 222,
                  'name': 'Test User',
                  'password': 'somepassword',
-                 'email_address': 'test@gov.uk',
+                 'email_address': 'test@digital.cabinet-office.gov.uk',
                  'mobile_number': '+4412341234',
                  'state': 'active',
                  'failed_login_count': 0,
@@ -273,7 +273,7 @@ def api_user_locked():
     user_data = {'id': 333,
                  'name': 'Test User',
                  'password': 'somepassword',
-                 'email_address': 'test@gov.uk',
+                 'email_address': 'test@digital.cabinet-office.gov.uk',
                  'mobile_number': '+4412341234',
                  'state': 'active',
                  'failed_login_count': 5,
@@ -289,7 +289,7 @@ def api_user_request_password_reset():
     user_data = {'id': 555,
                  'name': 'Test User',
                  'password': 'somepassword',
-                 'email_address': 'test@gov.uk',
+                 'email_address': 'test@digital.cabinet-office.gov.uk',
                  'mobile_number': '+4412341234',
                  'state': 'active',
                  'failed_login_count': 5,
@@ -306,7 +306,7 @@ def api_user_changed_password():
     user_data = {'id': 555,
                  'name': 'Test User',
                  'password': 'somepassword',
-                 'email_address': 'test@user.gov.uk',
+                 'email_address': 'test@digital.cabinet-office.gov.uk',
                  'mobile_number': '+4412341234',
                  'state': 'active',
                  'failed_login_count': 5,
@@ -625,7 +625,7 @@ def sample_invite(mocker, service_one, status='pending'):
     import datetime
     id = str(uuid.uuid4())
     from_user = service_one['users'][0]
-    email_address = 'invited_user@test.gov.uk'
+    email_address = 'invited_user@digital.cabinet-office.gov.uk'
     service_id = service_one['id']
     permissions = 'send_messages,manage_service,manage_api_keys'
     created_at = str(datetime.datetime.now())
@@ -658,7 +658,7 @@ def mock_get_invites_for_service(mocker, service_one, sample_invite):
         data = []
         for i in range(0, 5):
             invite = copy.copy(sample_invite)
-            invite['email_address'] = 'user_{}@testnotify.gov.uk'.format(i)
+            invite['email_address'] = 'user_{}@digital.cabinet-office.gov.uk'.format(i)
             data.append(InvitedUser(**invite))
         return data
     return mocker.patch('app.invite_api_client.get_invites_for_service', side_effect=_get_invites)
