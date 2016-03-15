@@ -13,11 +13,7 @@ class Config(object):
     NOTIFY_APP_NAME = 'admin'
     NOTIFY_LOG_PATH = '/var/log/notify/application.log'
 
-    SQLALCHEMY_COMMIT_ON_TEARDOWN = False
-    SQLALCHEMY_RECORD_QUERIES = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/notifications_admin'
     MAX_FAILED_LOGIN_COUNT = 10
-    PASS_SECRET_KEY = 'secret-key-unique-changeme'
 
     SESSION_COOKIE_NAME = 'notify_admin_session'
     SESSION_COOKIE_PATH = '/admin'
@@ -69,7 +65,6 @@ class Development(Config):
 
 
 class Test(Development):
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_notifications_admin'
     WTF_CSRF_ENABLED = False
     EMAIL_DOMAIN_LIST = os.getenv('EMAIL_DOMAIN_LIST', 'digital.cabinet-office.gov.uk').split(',')
 

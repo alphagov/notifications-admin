@@ -19,17 +19,16 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     mock_has_permissions
 ):
 
-    contents = 'phone number,name\n+44 123,test1\n+44 456,test2'
-    file_data = (BytesIO(contents.encode('utf-8')), 'invalid.csv')
+    contents = u'phone number,name\n+44 123,test1\n+44 456,test2'
     mocker.patch('app.main.views.send.s3download', return_value=contents)
 
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            upload_data = {'file': file_data}
             response = client.post(
                 url_for('main.send_messages', service_id=12345, template_id=54321),
-                data=upload_data,
+                data={'file': (BytesIO(contents.encode('utf-8')), 'invalid.csv')},
+                content_type='multipart/form-data',
                 follow_redirects=True
             )
         assert response.status_code == 200
@@ -126,7 +125,27 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
 
     mocker.patch(
         'app.main.views.send.s3download',
-        return_value='phone number\n+44 7700 900981\n+44 7700 900982\n+44 7700 900983\n+44 7700 900984\n+44 7700 900985\n+44 7700 900986'  # noqa
+        return_value="""
+            phone number
+            +44 7700 9009 01
+            +44 7700 9009 02
+            +44 7700 9009 03
+            +44 7700 9009 04
+            +44 7700 9009 05
+            +44 7700 9009 06
+            +44 7700 9009 07
+            +44 7700 9009 08
+            +44 7700 9009 09
+            +44 7700 9009 10
+            +44 7700 9009 11
+            +44 7700 9009 12
+            +44 7700 9009 13
+            +44 7700 9009 14
+            +44 7700 9009 15
+            +44 7700 9009 99
+            +44 7700 9009 99
+            +44 7700 9009 99
+        """
     )
 
     with app_.test_request_context():
@@ -134,22 +153,21 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
             client.login(api_user_active)
             response = client.post(
                 url_for('main.send_messages', service_id=12345, template_id=54321),
-                data={'file': (BytesIO(), 'valid.csv')},
+                data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
+                content_type='multipart/form-data',
                 follow_redirects=True
             )
             with client.session_transaction() as sess:
                 assert int(sess['upload_data']['template_id']) == 54321
                 assert sess['upload_data']['original_file_name'] == 'valid.csv'
-                assert sess['upload_data']['notification_count'] == 6
+                assert sess['upload_data']['notification_count'] == 18
 
             content = response.get_data(as_text=True)
             assert response.status_code == 200
-            assert '+44 7700 900981' in content
-            assert '+44 7700 900982' in content
-            assert '+44 7700 900983' in content
-            assert '+44 7700 900984' in content
-            assert '+44 7700 900985' in content
-            assert '1 more row not shown' in content
+            assert '+44 7700 9009 01' in content
+            assert '+44 7700 9009 15' in content
+            assert '+44 7700 9009 16' not in content
+            assert '3 rows not shown' in content
 
 
 def test_create_job_should_call_api(
@@ -206,7 +224,14 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
 
     mocker.patch(
         'app.main.views.send.s3download',
-        return_value='phone number,name,,,\n++44 7700 900981,test1,,,\n+44 7700 900981,test2,,,\n ,,, \n ,,, \t \t \n'
+        return_value="""
+            phone number,name,,,
+            ++44 7700 900981,test1,,,
+            +44 7700 900981,test2,,,
+             ,,,
+              ,,, \t \t
+
+        """
     )
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -214,10 +239,12 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
             with client.session_transaction() as session:
                 session['upload_data'] = {'original_file_name': 'invalid.csv',
                                           'template_id': job_data['template'],
-                                          'notification_count': job_data['notification_count']}
+                                          'notification_count': job_data['notification_count'],
+                                          'valid': True}
             response = client.post(
                 url_for('main.check_messages', service_id=service_id, upload_id=job_data['id']),
-                data={'file': (BytesIO(), 'invalid.csv')},
+                data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+                content_type='multipart/form-data',
                 follow_redirects=True
             )
             assert response.status_code == 200
