@@ -30,15 +30,23 @@ def accept_invite(token):
         flash('You have already accepted this invitation', 'default')
         return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
 
-    existing_user = user_api_client.get_user_by_email(invited_user.email_address)
     session['invited_user'] = invited_user.serialize()
 
-    if existing_user:
+    existing_user = user_api_client.get_user_by_email(invited_user.email_address)
 
-        user_api_client.add_user_to_service(invited_user.service,
-                                            existing_user.id,
-                                            invited_user.permissions)
-        invite_api_client.accept_invite(invited_user.service, invited_user.id)
-        return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
+    service_users = user_api_client.get_users_for_service(invited_user.service)
+
+    if existing_user:
+        if existing_user in service_users:
+            session.pop('invited_user', None)
+            flash('You have already accepted an invitation to this service', 'default')
+            invite_api_client.accept_invite(invited_user.service, invited_user.id)
+            return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
+        else:
+            user_api_client.add_user_to_service(invited_user.service,
+                                                existing_user.id,
+                                                invited_user.permissions)
+            invite_api_client.accept_invite(invited_user.service, invited_user.id)
+            return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
     else:
         return redirect(url_for('main.register_from_invite'))
