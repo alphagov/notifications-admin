@@ -24,6 +24,10 @@
 {% endblock %}
 
 {% block cookie_message %}
+  <p>
+    GOV.UK Notify uses cookies to make the site simpler.
+    <a href="{{ url_for("main.cookies") }}">Find out more about cookies</a>
+  </p>
 {% endblock %}
 
 {% block inside_header %}
@@ -66,6 +70,14 @@
   <div id="content">
     {% block fullwidth_content %}{% endblock %}
   </div>
+{% endblock %}
+
+{% block footer_support_links %}
+  <nav class="footer-nav">
+    <a href="https://docs.google.com/forms/d/1AL8U-xJX_HAFEiQiJszGQw0PcEaEUnYATSntEghNDGo/viewform">Support and feedback</a>
+    <a href="{{ url_for("main.cookies") }}">Cookies</a>
+    Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service">Government Digital Service</a>
+  </nav>
 {% endblock %}
 
 {% block body_end %}
