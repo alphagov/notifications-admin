@@ -1,0 +1,62 @@
+{% extends "withnav_template.html" %}
+{% from "components/email-message.html" import email_message %}
+{% from "components/sms-message.html" import sms_message %}
+
+{% block page_title %}
+  Developer documentation – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+      API integration
+  </h1>
+
+  <div class="grid-row">
+    <div class="column-three-quarters">
+
+      {% if 'email' == template.template_type %}
+        {{ email_message(
+          template.subject,
+          template.formatted_as_markup,
+        ) }}
+      {% elif 'sms' == template.template_type %}
+        {{ sms_message(
+          template.formatted_as_markup,
+        ) }}
+      {% endif %}
+
+      <p>
+        You can send this message from your existing apps or systems by
+        connecting them to GOV.UK Notify.
+      </p>
+      <p>
+        You’ll need to work with a developer to do this.
+      </p>
+
+    </div>
+  </div>
+
+  <h3 class="heading-small">
+    Example payload for this template
+  </h3>
+  {{payload|syntax_highlight_json}}
+
+  <h3 class="heading-small">
+    Endpoint
+  </h3>
+
+  <div class="highlight" style="background: #f8f8f8">
+    <pre style="line-height: 125%">
+      {{- 'POST {}/notifications/{}'.format(
+        api_host,
+        template.template_type
+      ) -}}
+    </pre>
+  </div>
+
+  <p>
+    <br />See the <a href="#">developer documentation</a> for full details.
+  </p>
+
+{% endblock %}

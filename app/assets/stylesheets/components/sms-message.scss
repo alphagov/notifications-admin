@@ -43,14 +43,8 @@
   margin-top: 52px;
 
   a {
-
     display: block;
     margin-bottom: 5px;
-
-    &:first-child {
-      @include bold-19;
-    }
-
   }
 
 }

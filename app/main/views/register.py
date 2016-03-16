@@ -49,7 +49,7 @@ def register_from_invite():
     if form.validate_on_submit():
         if form.service.data != invited_user['service'] or form.email_address.data != invited_user['email_address']:
             abort(400)
-        registered = _do_registration(form)
+        registered = _do_registration(form, send_email=False)
         if registered:
             return redirect(url_for('main.verify'))
         else:
@@ -61,7 +61,7 @@ def register_from_invite():
     return render_template('views/register-from-invite.html', email_address=invited_user['email_address'], form=form)
 
 
-def _do_registration(form, service=None):
+def _do_registration(form, service=None, send_email=True):
     if users_dao.is_email_unique(form.email_address.data):
         user = user_api_client.register_user(form.name.data,
                                              form.email_address.data,
@@ -74,7 +74,8 @@ def _do_registration(form, service=None):
         # sending codes apart from service unavailable?
         # at the moment i believe http 500 is fine.
         users_dao.send_verify_code(user.id, 'sms', user.mobile_number)
-        users_dao.send_verify_code(user.id, 'email', user.email_address)
+        if send_email:
+            users_dao.send_verify_code(user.id, 'email', user.email_address)
         session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
         session['user_details'] = {"email": user.email_address, "id": user.id}
         return True

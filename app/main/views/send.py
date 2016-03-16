@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 import uuid
 from contextlib import suppress
 
@@ -61,13 +62,6 @@ def get_page_headings(template_type):
         return send_messages_page_headings[template_type]
     else:
         return manage_templates_page_headings[template_type]
-
-
-@main.route("/services/<service_id>/send/letters", methods=['GET'])
-def letters_stub(service_id):
-    return render_template(
-        'views/letters.html', service_id=service_id
-    )
 
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
@@ -195,6 +189,29 @@ def send_message_to_self(service_id, template_id):
     return redirect(url_for('.check_messages',
                             service_id=service_id,
                             upload_id=upload_id))
+
+
+@main.route("/services/<service_id>/send/<template_id>/from-api", methods=['GET'])
+@login_required
+@user_has_permissions('manage_api_keys', 'access_developer_docs')
+def send_from_api(service_id, template_id):
+    template = Template(
+        templates_dao.get_service_template_or_404(service_id, template_id)['data']
+    )
+    payload = {
+        "to": current_user.mobile_number,
+        "template": template.id,
+        "personalisation": {
+            placeholder: "{} 1".format(placeholder) for placeholder in template.placeholders
+        }
+    }
+    return render_template(
+        'views/send-from-api.html',
+        template=template,
+        payload=json.dumps(payload, indent=4),
+        api_host=current_app.config['API_HOST_NAME'],
+        service_id=service_id
+    )
 
 
 @main.route("/services/<service_id>/check/<upload_id>", methods=['GET'])
