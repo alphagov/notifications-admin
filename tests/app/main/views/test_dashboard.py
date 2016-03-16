@@ -47,7 +47,6 @@ def test_menu_send_messages(mocker, app_, api_user_active, service_one, mock_get
             service_one,
             ['send_texts', 'send_emails', 'send_letters'])
         page = resp.get_data(as_text=True)
-        assert url_for('main.letters_stub', service_id=service_one['id']) in page
         assert url_for(
             'main.choose_template',
             service_id=service_one['id'],
@@ -73,7 +72,6 @@ def test_menu_manage_service(mocker, app_, api_user_active, service_one, mock_ge
             service_one,
             ['manage_users', 'manage_templates', 'manage_settings'])
         page = resp.get_data(as_text=True)
-        assert url_for('main.letters_stub', service_id=service_one['id'])in page
         assert url_for(
             'main.choose_template',
             service_id=service_one['id'],
@@ -99,7 +97,6 @@ def test_menu_manage_api_keys(mocker, app_, api_user_active, service_one, mock_g
             service_one,
             ['manage_api_keys', 'access_developer_docs'])
         page = resp.get_data(as_text=True)
-        assert url_for('main.letters_stub', service_id=service_one['id']) not in page
         assert url_for(
             'main.choose_template',
             service_id=service_one['id'],
