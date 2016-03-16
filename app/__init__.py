@@ -2,7 +2,7 @@ import os
 import re
 
 import dateutil
-from flask import (Flask, session, Markup, escape, render_template, make_response)
+from flask import (Flask, session, Markup, escape, render_template, make_response, current_app)
 from flask._compat import string_types
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
@@ -203,4 +203,7 @@ def register_errorhandlers(application):
 
     @application.errorhandler(Exception)
     def handle_bad_request(error):
+        # We want the Flask in browser stacktrace
+        if current_app.config.get('DEBUG', None):
+            raise error
         return _error_response(500)

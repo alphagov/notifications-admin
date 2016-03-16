@@ -158,7 +158,7 @@ def mock_delete_service(mocker, mock_get_service):
 def mock_get_service_template(mocker):
     def _create(service_id, template_id):
         template = template_json(
-            template_id, "Two week reminder", "sms", "Your vehicle tax is about to expire", service_id)
+            service_id, template_id, "Two week reminder", "sms", "Your vehicle tax is about to expire")
         return {'data': template}
 
     return mocker.patch(
@@ -169,7 +169,7 @@ def mock_get_service_template(mocker):
 def mock_get_service_email_template(mocker):
     def _create(service_id, template_id):
         template = template_json(
-            template_id, "Two week reminder", "email", "Your vehicle tax is about to expire", service_id)
+            service_id, template_id, "Two week reminder", "email", "Your vehicle tax is about to expire")
         return {'data': template}
 
     return mocker.patch(
@@ -180,7 +180,7 @@ def mock_get_service_email_template(mocker):
 def mock_create_service_template(mocker):
     def _create(name, type_, content, service):
         template = template_json(
-            101, name, type_, content, service)
+            service, 101, name, type_, content)
         return {'data': template}
 
     return mocker.patch(
@@ -192,7 +192,7 @@ def mock_create_service_template(mocker):
 def mock_update_service_template(mocker):
     def _update(id_, name, type_, content, service):
         template = template_json(
-            id_, name, type_, content, service)
+            service, id_, name, type_, content)
         return {'data': template}
 
     return mocker.patch(
@@ -205,17 +205,13 @@ def mock_get_service_templates(mocker):
     def _create(service_id):
         return {'data': [
             template_json(
-                1, "sms_template_one", "sms", "sms template one content", service_id
-            ),
+                service_id, 1, "sms_template_one", "sms", "sms template one content"),
             template_json(
-                2, "sms_template_two", "sms", "sms template two content", service_id
-            ),
+                service_id, 2, "sms_template_two", "sms", "sms template two content"),
             template_json(
-                3, "email_template_one", "email", "email template one content", service_id
-            ),
+                service_id, 3, "email_template_one", "email", "email template one content"),
             template_json(
-                4, "email_template_two", "email", "email template two content", service_id
-            )
+                service_id, 4, "email_template_two", "email", "email template two content")
         ]}
 
     return mocker.patch(
@@ -227,8 +223,7 @@ def mock_get_service_templates(mocker):
 def mock_delete_service_template(mocker):
     def _delete(service_id, template_id):
         template = template_json(
-            template_id, "Template to delete",
-            "sms", "content to be deleted", service_id)
+            service_id, template_id, "Template to delete", "sms", "content to be deleted")
         return {'data': template}
 
     return mocker.patch(
@@ -580,8 +575,18 @@ def mock_get_jobs(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_notifications(mocker):
-    def _get_notifications(service_id, job_id):
-        return notification_json()
+    def _get_notifications(service_id, job_id=None, page=1):
+        return notification_json(service_id)
+    return mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=_get_notifications
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_notifications_with_previous_next(mocker):
+    def _get_notifications(service_id, job_id=None, page=1):
+        return notification_json(service_id, with_links=True)
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
         side_effect=_get_notifications
