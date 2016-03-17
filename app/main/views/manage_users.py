@@ -2,7 +2,6 @@ from flask import (
     request,
     render_template,
     redirect,
-    abort,
     url_for,
     flash)
 
@@ -24,7 +23,7 @@ from app.utils import user_has_permissions
 
 @main.route("/services/<service_id>/users")
 @login_required
-@user_has_permissions('manage_users', 'manage_templates', 'manage_settings')
+@user_has_permissions('manage_users', 'manage_templates', 'manage_settings', admin_override=True)
 def manage_users(service_id):
     users = user_api_client.get_users_for_service(service_id=service_id)
     invited_users = invite_api_client.get_invites_for_service(service_id=service_id)
@@ -41,7 +40,7 @@ def manage_users(service_id):
 
 @main.route("/services/<service_id>/users/invite", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_users', 'manage_templates', 'manage_settings')
+@user_has_permissions('manage_users', 'manage_templates', 'manage_settings', admin_override=True)
 def invite_user(service_id):
 
     service = get_service_by_id(service_id)
@@ -64,7 +63,7 @@ def invite_user(service_id):
 
 @main.route("/services/<service_id>/users/<user_id>", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_users', 'manage_templates', 'manage_settings')
+@user_has_permissions('manage_users', 'manage_templates', 'manage_settings', admin_override=True)
 def edit_user_permissions(service_id, user_id):
     # TODO we should probably using the service id here in the get user
     # call as well. eg. /user/<user_id>?&service_id=service_id
@@ -101,7 +100,7 @@ def edit_user_permissions(service_id, user_id):
 
 
 @main.route("/services/<service_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
-@user_has_permissions('manage_users', 'manage_templates', 'manage_settings')
+@user_has_permissions('manage_users', 'manage_templates', 'manage_settings', admin_override=True)
 def cancel_invited_user(service_id, invited_user_id):
     invite_api_client.cancel_invited_user(service_id=service_id, invited_user_id=invited_user_id)
 

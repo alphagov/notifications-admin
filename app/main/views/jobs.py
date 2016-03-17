@@ -4,7 +4,6 @@ import time
 
 from flask import (
     render_template,
-    abort,
     jsonify
 )
 from flask_login import login_required

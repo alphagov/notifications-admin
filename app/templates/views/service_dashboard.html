@@ -27,7 +27,7 @@
     {% if not template_count and not jobs %}
       {% call banner_wrapper(subhead='Get started', type="tip") %}
         <ol>
-          {% if current_user.has_permissions(['manage_templates']) %}
+          {% if current_user.has_permissions(['manage_templates'], admin_override=True) %}
             <li>
               <a href='{{ url_for(".add_service_template", service_id=service_id, template_type="sms") }}'>Add a template</a>
             </li>
