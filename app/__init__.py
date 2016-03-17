@@ -19,6 +19,7 @@ from app.notify_client.job_api_client import JobApiClient
 from app.notify_client.notification_api_client import NotificationApiClient
 from app.notify_client.status_api_client import StatusApiClient
 from app.notify_client.invite_api_client import InviteApiClient
+from app.notify_client.statistics_api_client import StatisticsApiClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.asset_fingerprinter import AssetFingerprinter
 from utils.recipients import validate_phone_number, InvalidPhoneError
@@ -36,6 +37,7 @@ job_api_client = JobApiClient()
 notification_api_client = NotificationApiClient()
 status_api_client = StatusApiClient()
 invite_api_client = InviteApiClient()
+statistics_api_client = StatisticsApiClient()
 asset_fingerprinter = AssetFingerprinter()
 
 
@@ -55,6 +57,7 @@ def create_app(config_name, config_overrides=None):
     notification_api_client.init_app(application)
     status_api_client.init_app(application)
     invite_api_client.init_app(application)
+    statistics_api_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
