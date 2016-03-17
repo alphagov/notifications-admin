@@ -72,18 +72,10 @@ class Preview(Config):
     HEADER_COLOUR = '#F47738'  # $orange
 
 
-class Staging(Preview):
-    SHOW_STYLEGUIDE = False
-
-
-class Live(Staging):
-    HEADER_COLOUR = '#B10E1E'  # $red
-
-
 configs = {
-    'development': Development,
-    'test': Test,
-    'preview': Preview,
-    'staging': Staging,
-    'live': Live
+    'development': 'config.Development',
+    'test': 'config.Test',
+    'preview': 'config.Preview',
+    'staging': 'config_staging.Staging',
+    'live': 'config_live.Live'
 }

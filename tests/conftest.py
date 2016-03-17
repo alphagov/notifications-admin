@@ -24,7 +24,7 @@ from notifications_python_client.errors import HTTPError
 
 @pytest.fixture(scope='session')
 def app_(request):
-    app = create_app('test')
+    app = create_app()
 
     ctx = app.app_context()
     ctx.push()

@@ -39,12 +39,12 @@ invite_api_client = InviteApiClient()
 asset_fingerprinter = AssetFingerprinter()
 
 
-def create_app(config_name, config_overrides=None):
+def create_app():
     application = Flask(__name__)
 
-    application.config['NOTIFY_ADMIN_ENVIRONMENT'] = config_name
-    application.config.from_object(configs[config_name])
-    init_app(application, config_overrides)
+    application.config.from_object(os.environ['NOTIFY_ADMIN_ENVIRONMENT'])
+
+    init_app(application)
     logging.init_app(application)
     init_csrf(application)
 
@@ -101,22 +101,12 @@ def init_csrf(application):
         abort(400, reason)
 
 
-def init_app(app, config_overrides):
-
-    if config_overrides:
-        for key in app.config.keys():
-            if key in config_overrides:
-                    app.config[key] = config_overrides[key]
-
-    for key, value in app.config.items():
-        if key in os.environ:
-            app.config[key] = convert_to_boolean(os.environ[key])
-
-    @app.context_processor
+def init_app(application):
+    @application.context_processor
     def inject_global_template_variables():
         return {
             'asset_path': '/static/',
-            'header_colour': app.config['HEADER_COLOUR'],
+            'header_colour': application.config['HEADER_COLOUR'],
             'asset_url': asset_fingerprinter.get_url
         }
 
