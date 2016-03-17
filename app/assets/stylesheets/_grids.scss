@@ -2,6 +2,10 @@
   @include grid-column(3/4);
 }
 
+.column-one-sixth {
+  @include grid-column(1/6);
+}
+
 .column-one-eighth {
   @include grid-column(1/8);
 }
@@ -16,7 +20,7 @@
 }
 
 .bottom-gutter-2-3 {
-  margin-bottom: $gutter * 2/3;
+  margin-bottom: $gutter-two-thirds;
 }
 
 .align-with-heading {

@@ -1,0 +1,20 @@
+{% extends "withnav_template.html" %}
+
+{% block page_title %}
+  {{ session.get('service_name', 'Dashboard') }} – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {% if service.restricted %}
+    {% include 'views/dashboard/trial-mode-banner.html' %}
+  {% endif %}
+
+  {% if not jobs %}
+    {% include 'views/dashboard/get-started.html' %}
+  {% else %}
+    {% include 'views/dashboard/today.html' %}
+    {% include 'views/dashboard/jobs.html' %}
+  {% endif %}
+
+{% endblock %}

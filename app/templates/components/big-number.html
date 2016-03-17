@@ -4,3 +4,14 @@
     <span class="big-number-label">{{ label }}</span>
   </div>
 {% endmacro %}
+
+
+{% macro big_number_with_status(number, label, status_number, status_label, percentage_bad=0) %}
+  <div class="big-number-with-status">
+    {{ big_number(number, label) }}
+    <div class="big-number-status">
+      <div class="big-number-status-error-percentage" style="opacity: {{ percentage_bad / 100 }}"></div>
+      {{ big_number(status_number, status_label) }}
+    </div>
+  </div>
+{% endmacro %}
