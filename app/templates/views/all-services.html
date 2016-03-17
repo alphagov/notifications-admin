@@ -1,0 +1,16 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/browse-list.html" import browse_list %}
+
+{% block page_title %}
+  All service – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    All services
+  </h1>
+
+  {{ browse_list(services) }}
+
+{% endblock %}

@@ -12,7 +12,7 @@ from pygments.lexers import JavascriptLexer
 from pygments.formatters import HtmlFormatter
 from werkzeug.exceptions import abort
 
-from app.notify_client.api_client import NotificationsAdminAPIClient
+from app.notify_client.api_client import ServiceAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.user_api_client import UserApiClient
 from app.notify_client.job_api_client import JobApiClient
@@ -29,7 +29,7 @@ from utils import logging
 login_manager = LoginManager()
 csrf = CsrfProtect()
 
-notifications_api_client = NotificationsAdminAPIClient()
+service_api_client = ServiceAPIClient()
 user_api_client = UserApiClient()
 api_key_api_client = ApiKeyApiClient()
 job_api_client = JobApiClient()
@@ -48,7 +48,7 @@ def create_app(config_name, config_overrides=None):
     logging.init_app(application)
     init_csrf(application)
 
-    notifications_api_client.init_app(application)
+    service_api_client.init_app(application)
     user_api_client.init_app(application)
     api_key_api_client.init_app(application)
     job_api_client.init_app(application)

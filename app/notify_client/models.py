@@ -13,6 +13,7 @@ class User(UserMixin):
         self._failed_login_count = fields.get('failed_login_count')
         self._state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
+        self.platform_admin = fields.get('platform_admin')
 
     def get_id(self):
         return self.id
@@ -82,7 +83,9 @@ class User(UserMixin):
     def permissions(self, permissions):
         raise AttributeError("Read only property")
 
-    def has_permissions(self, permissions, service_id=None, or_=False):
+    def has_permissions(self, permissions, service_id=None, or_=False, admin_override=False):
+        if admin_override and self.platform_admin:
+            return True
         if service_id is None:
             service_id = session.get('service_id', '')
         if service_id in self._permissions:
@@ -90,6 +93,10 @@ class User(UserMixin):
                 return any([x in self._permissions[service_id] for x in permissions])
             return set(self._permissions[service_id]) >= set(permissions)
         return False
+
+    def has_platform_admin_permissions(self):
+        print('platform_permissions {}'.format(self.platform_admin))
+        self.platform_admin
 
     @property
     def failed_login_count(self):
