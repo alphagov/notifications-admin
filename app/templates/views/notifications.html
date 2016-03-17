@@ -21,7 +21,7 @@
         {{ item.to }}
       {% endcall %}
       {% call field() %}
-        <a href="{{ url_for(".edit_service_template", service_id=service_id, template_id=item.template.id) }}">{{ item.template.name }}</a>
+        <a href="{{ url_for(".choose_template", service_id=service_id, template_type=item.template.template_type, _anchor=item.template.name|linkable_name) }}">{{ item.template.name }}</a>
       {% endcall %}
       {% call field() %}
         {{ item.template.template_type }}

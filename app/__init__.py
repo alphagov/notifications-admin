@@ -2,6 +2,7 @@ import os
 import re
 
 import dateutil
+import urllib
 from flask import (Flask, session, Markup, escape, render_template, make_response, current_app)
 from flask._compat import string_types
 from flask_login import LoginManager
@@ -75,6 +76,7 @@ def create_app(config_name, config_overrides=None):
     application.add_template_filter(format_time)
     application.add_template_filter(syntax_highlight_json)
     application.add_template_filter(valid_phone_number)
+    application.add_template_filter(linkable_name)
 
     application.after_request(useful_headers_after_request)
     register_errorhandlers(application)
@@ -137,6 +139,10 @@ def nl2br(value):
     result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', Markup('<br>\n'))
                           for p in _paragraph_re.split(escape(value)))
     return Markup(result)
+
+
+def linkable_name(value):
+    return urllib.parse.quote_plus(value)
 
 
 def syntax_highlight_json(code):
