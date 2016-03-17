@@ -157,7 +157,7 @@ def mock_delete_service(mocker, mock_get_service):
 @pytest.fixture(scope='function')
 def mock_get_service_statistics(mocker):
     def _create(service_id):
-        return {'data': []}
+        return {'data': [{}]}
 
     return mocker.patch(
         'app.statistics_api_client.get_statistics_for_service', side_effect=_create)

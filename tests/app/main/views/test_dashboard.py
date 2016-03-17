@@ -35,6 +35,7 @@ def _test_dashboard_menu(mocker, app_, usr, service, permissions):
             mocker.patch('app.user_api_client.get_user', return_value=usr)
             mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
             mocker.patch('app.notifications_api_client.get_service', return_value={'data': service})
+            mocker.patch('app.statistics_api_client.get_statistics_for_service', return_value={'data': [{}]})
             client.login(usr)
             return client.get(url_for('main.service_dashboard', service_id=service['id']))
 

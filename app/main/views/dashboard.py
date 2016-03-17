@@ -8,7 +8,7 @@ from flask_login import login_required
 from app.main import main
 from app.main.dao.services_dao import get_service_by_id
 from app.main.dao import templates_dao
-from app import job_api_client
+from app import job_api_client, statistics_api_client
 
 
 @main.route("/services/<service_id>/dashboard")
@@ -27,11 +27,35 @@ def service_dashboard(service_id):
         message = 'You have successfully accepted your invitation and been added to {}'.format(service_name)
         flash(message, 'default_with_tick')
 
+    statistics = statistics_api_client.get_statistics_for_service(service_id)['data']
+
     return render_template(
-        'views/service_dashboard.html',
+        'views/dashboard/dashboard.html',
         jobs=jobs[:5],
         more_jobs_to_show=(len(jobs) > 5),
         free_text_messages_remaining='250,000',
         spent_this_month='0.00',
-        template_count=len(templates),
+        service=service['data'],
+        statistics=expand_statistics(statistics),
+        templates=templates,
         service_id=str(service_id))
+
+
+def expand_statistics(statistics, danger_zone=25):
+
+    if not statistics or not statistics[0]:
+        return {}
+
+    today = statistics[0]
+
+    today.update({
+        'emails_failure_rate': int(today['emails_error'] / today['emails_requested'] * 100),
+        'sms_failure_rate': int(today['sms_error'] / today['sms_requested'] * 100)
+    })
+
+    today.update({
+        'emails_percentage_of_danger_zone': min(today['emails_failure_rate'] / (danger_zone / 100), 100),
+        'sms_percentage_of_danger_zone': min(today['sms_failure_rate'] / (danger_zone / 100), 100)
+    })
+
+    return today

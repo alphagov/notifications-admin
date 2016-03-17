@@ -1,0 +1,25 @@
+{% from "components/big-number.html" import big_number_with_status %}
+
+<h2 class="heading-medium">
+  Sent today
+</h2>
+<div class="grid-row">
+  <div class="column-half">
+    {{ big_number_with_status(
+      statistics.get('emails_requested', 0),
+      'email' if statistics.get('emails_requested') == 1 else 'emails',
+      '{}%'.format(statistics.get('emails_failure_rate', 0)),
+      'failed',
+      statistics.get('emails_percentage_of_danger_zone', 0)
+    ) }}
+  </div>
+  <div class="column-half">
+    {{ big_number_with_status(
+      statistics.get('sms_requested', 0),
+      'text message' if statistics.get('sms_requested') == 1 else 'text messages',
+      '{}%'.format(statistics.get('sms_failure_rate', 0)),
+      'failed',
+      statistics.get('sms_percentage_of_danger_zone', 0)
+    ) }}
+  </div>
+</div>
