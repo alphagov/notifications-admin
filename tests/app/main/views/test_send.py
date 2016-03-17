@@ -76,8 +76,8 @@ def test_send_test_message_to_self(
     mock_has_permissions
 ):
 
-    expected_data = {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'Test run'}
-    mocker.patch('app.main.views.send.s3download', return_value='email address\r\ntest@user.gov.uk')
+    expected_data = {'data': 'email address\r\ntest@digital.cabinet-office.gov.uk\r\n', 'file_name': 'Test run'}
+    mocker.patch('app.main.views.send.s3download', return_value='email address\r\ntest@digital.cabinet-office.gov.uk')
 
     with app_.test_request_context():
         with app_.test_client() as client:

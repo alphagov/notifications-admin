@@ -16,7 +16,7 @@ def test_should_render_email_code_not_received_template_and_populate_email_addre
             assert response.status_code == 200
             assert 'Check your email address is correct and then resend the confirmation code' \
                    in response.get_data(as_text=True)
-            assert 'value="test@user.gov.uk"' in response.get_data(as_text=True)
+            assert 'value="test@digital.cabinet-office.gov.uk"' in response.get_data(as_text=True)
 
 
 def test_should_check_and_resend_email_code_redirect_to_verify(app_,
@@ -31,7 +31,7 @@ def test_should_check_and_resend_email_code_redirect_to_verify(app_,
                     'id': api_user_active.id,
                     'email': api_user_active.email_address}
             response = client.post(url_for('main.check_and_resend_email_code'),
-                                   data={'email_address': 'test@user.gov.uk'})
+                                   data={'email_address': 'test@digital.cabinet-office.gov.uk'})
             assert response.status_code == 302
             assert response.location == url_for('main.verify', _external=True)
 
@@ -82,7 +82,7 @@ def test_should_update_email_address_resend_code(app_,
                     'id': api_user_active.id,
                     'email': api_user_active.email_address}
             response = client.post(url_for('main.check_and_resend_email_code'),
-                                   data={'email_address': 'new@address.gov.uk'})
+                                   data={'email_address': 'new@digital.cabinet-office.gov.uk'})
             assert response.status_code == 302
             assert response.location == url_for('main.verify', _external=True)
 

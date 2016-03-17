@@ -60,7 +60,7 @@ def invite_json(id, from_user, service_id, email_address, permissions, created_a
             }
 
 
-TEST_USER_EMAIL = 'test@user.gov.uk'
+TEST_USER_EMAIL = 'test@digital.cabinet-office.gov.uk'
 
 
 def create_test_user(state):
