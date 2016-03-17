@@ -21,3 +21,8 @@ def verify_mobile():
 @main.route('/cookies')
 def cookies():
     return render_template('views/cookies.html')
+
+
+@main.route('/help')
+def help():
+    return render_template('views/help.html')
