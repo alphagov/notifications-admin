@@ -50,12 +50,12 @@ deploy:
   on: &2
     repo: alphagov/notifications-admin
     branch: live
-  bucket: live_notifications_admin_deployment_group
+  bucket: live-notifications-api-codedeploy
   region: eu-west-1
 - provider: codedeploy
   access_key_id: AKIAJ5MKF6G3P2JQP4QQ
   secret_access_key: *1
-  bucket: staging-notifications-api-codedeploy
+  bucket: live-notifications-api-codedeploy
   key: notifications-admin-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
   bundle_type: zip
   application: notifications-admin
