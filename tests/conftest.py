@@ -445,7 +445,12 @@ def mock_update_user(mocker):
 
 @pytest.fixture(scope='function')
 def mock_is_email_unique(mocker):
-    return mocker.patch('app.user_api_client.get_user_by_email', return_value=None)
+    return mocker.patch('app.user_api_client.is_email_unique', return_value=True)
+
+
+@pytest.fixture(scope='function')
+def mock_is_email_not_unique(mocker):
+    return mocker.patch('app.user_api_client.is_email_unique', return_value=False)
 
 
 @pytest.fixture(scope='function')
@@ -516,6 +521,11 @@ def mock_login(mocker, mock_get_user, mock_update_user):
 @pytest.fixture(scope='function')
 def mock_send_verify_code(mocker):
     return mocker.patch('app.user_api_client.send_verify_code')
+
+
+@pytest.fixture(scope='function')
+def mock_send_verify_email(mocker):
+    return mocker.patch('app.user_api_client.send_verify_email')
 
 
 @pytest.fixture(scope='function')

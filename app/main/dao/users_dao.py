@@ -43,20 +43,11 @@ def increment_failed_login_count(id):
 
 
 def activate_user(user):
-    user.state = 'active'
-    return user_api_client.update_user(user)
+    return user_api_client.activate_user(user)
 
 
 def is_email_unique(email_address):
-    try:
-        if user_api_client.get_user_by_email(email_address):
-            return False
-        return True
-    except HTTPError as ex:
-        if ex.status_code == 404:
-            return True
-        else:
-            raise ex
+    return user_api_client.is_email_unique(email_address)
 
 
 def send_verify_code(user_id, code_type, to):
