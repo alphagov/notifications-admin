@@ -49,8 +49,10 @@ def expand_statistics(statistics, danger_zone=25):
     today = statistics[0]
 
     today.update({
-        'emails_failure_rate': int(today['emails_error'] / today['emails_requested'] * 100),
-        'sms_failure_rate': int(today['sms_error'] / today['sms_requested'] * 100)
+        'emails_failure_rate':
+            int(today['emails_error'] / today['emails_requested'] * 100) if today['emails_requested'] else 0,
+        'sms_failure_rate':
+            int(today['sms_error'] / today['sms_requested'] * 100) if today['sms_requested'] else 0
     })
 
     today.update({
