@@ -30,3 +30,19 @@
   padding-left: 2px;
   padding-right: 2px;
 }
+
+.global-cookie-message {
+  p {
+    @extend %site-width-container;
+  }
+}
+
+.footer-nav {
+  @include copy-16;
+  margin-bottom: $gutter-two-thirds;
+
+  a {
+    display: inline-block;
+    margin-right: $gutter-half;
+  }
+}

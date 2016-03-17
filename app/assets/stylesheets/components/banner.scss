@@ -112,7 +112,7 @@
   margin-top: $gutter;
 
   .heading-medium {
-    margin-top: 0;
+    margin: 0 0 10px 0;
   }
 
   a {
@@ -125,6 +125,16 @@
     &:hover,
     &:active {
       color: $light-blue-25;
+    }
+
+  }
+
+  .big-number {
+
+    margin-top: 10px;
+
+    &-label {
+      padding-bottom: 0;
     }
 
   }
