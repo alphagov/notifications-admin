@@ -1,4 +1,3 @@
-from app import create_app
 from credstash import getAllSecrets
 import os
 
@@ -16,6 +15,8 @@ os.environ.update(getAllSecrets(region="eu-west-1"))
 from config import configs
 
 os.environ['NOTIFY_ADMIN_ENVIRONMENT'] = configs[environment]
+
+from app import create_app
 
 application = create_app()
 
