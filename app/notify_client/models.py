@@ -94,10 +94,6 @@ class User(UserMixin):
             return set(self._permissions[service_id]) >= set(permissions)
         return False
 
-    def has_platform_admin_permissions(self):
-        print('platform_permissions {}'.format(self.platform_admin))
-        self.platform_admin
-
     @property
     def failed_login_count(self):
         return self._failed_login_count

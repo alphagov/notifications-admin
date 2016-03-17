@@ -3,6 +3,7 @@ from flask import url_for
 from bs4 import BeautifulSoup
 
 from app.notify_client.models import InvitedUser
+from tests import validate_route_permission
 
 
 def test_should_show_overview_page(
@@ -258,10 +259,8 @@ def test_user_cant_invite_themselves(
     mock_get_invites_for_service,
     mock_has_permissions
 ):
-    from_user = api_user_active.id
     service_id = service_one['id']
     email_address = api_user_active.email_address
-    permissions = 'send_messages,manage_service,manage_api_keys'
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -280,3 +279,38 @@ def test_user_cant_invite_themselves(
         assert page.h1.string.strip() == 'Invite a team member'
         form_error = page.find('span', class_='error-message').string.strip()
         assert form_error == "You can't send an invitation to yourself"
+
+
+def test_platform_admin_user_can_manage_user(mocker, app_, platform_admin_user, service_one, api_user_active):
+    routes = [
+        'main.manage_users',
+        'main.invite_user'
+        ]
+    with app_.test_request_context():
+        # for route in routes:
+        #     validate_route_permission(mocker,
+        #                               app_,
+        #                               "GET",
+        #                               200,
+        #                               url_for(route, service_id=service_one['id']),
+        #                               [],
+        #                               platform_admin_user,
+        #                               service_one)
+        #
+        # validate_route_permission(mocker,
+        #                           app_,
+        #                           "GET",
+        #                           200,
+        #                           url_for('main.edit_user_permissions', service_id=service_one['id'], user_id=platform_admin_user.id),
+        #                           [],
+        #                           platform_admin_user,
+        #                           service_one)
+        validate_route_permission(mocker,
+                                  app_,
+                                  "GET",
+                                  200,
+                                  url_for('main.cancel_invited_user', service_id=service_one['id'],
+                                          invited_user_id=api_user_active.id),
+                                  [],
+                                  platform_admin_user,
+                                  service_one)

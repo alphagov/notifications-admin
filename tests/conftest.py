@@ -381,6 +381,14 @@ def mock_get_user_with_permissions(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_platform_admin_user_with_permissions(mocker, platform_admin_user):
+    def _get_user(id):
+        return platform_admin_user
+    return mocker.patch(
+        'app.user_api_client.get_user', side_effect=_get_user)
+
+
+@pytest.fixture(scope='function')
 def mock_dont_get_user_by_email(mocker):
 
     def _get_user(email_address):

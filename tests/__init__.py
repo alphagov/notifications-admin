@@ -146,6 +146,10 @@ def validate_route_permission(mocker,
     mocker.patch('app.user_api_client.get_user', return_value=usr)
     mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
     mocker.patch('app.service_api_client.get_service', return_value={'data': service})
+    mocker.patch('app.user_api_client.get_users_for_service', return_value=[usr])
+    mocker.patch('app.invite_api_client.get_invites_for_service', return_value=[])
+    mocker.patch('app.invite_api_client.cancel_invited_user')
+
 
     with app_.test_request_context():
         with app_.test_client() as client:
