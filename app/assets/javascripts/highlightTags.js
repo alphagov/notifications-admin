@@ -23,6 +23,8 @@
         .on("input", this.update)
         .on("scroll", this.maintainScrollParity);
 
+      this.initialHeight = this.$textbox.height();
+
       this.$backgroundMaskForeground.width(
         this.$textbox.width()
       );
@@ -32,11 +34,22 @@
 
     };
 
-    this.update = () => this.$backgroundMaskForeground.html(
+    this.resize = () => this.$textbox.height(
+      Math.max(
+        this.initialHeight,
+        this.$backgroundMaskForeground.outerHeight()
+      )
+    );
+
+    this.replacePlaceholders = () => this.$backgroundMaskForeground.html(
       $('<div/>').text(this.$textbox.val()).html().replace(
         tagPattern, match => `<span class='tag'>${match}</span>`
       )
-    );
+    )
+
+    this.update = () => (
+      this.replacePlaceholders() && this.resize()
+    )
 
     this.maintainScrollParity = () => this.$backgroundMaskForeground.scrollTop(
       this.$textbox.scrollTop()
