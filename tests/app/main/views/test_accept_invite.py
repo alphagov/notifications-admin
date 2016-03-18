@@ -175,7 +175,7 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(app_,
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == 'Create an account'
 
-            email_in_page = page.find('p')
+            email_in_page = page.find('main').find('p')
             assert email_in_page.text.strip() == 'Your account will be created with this email: invited_user@test.gov.uk'  # noqa
 
             form = page.find('form')
