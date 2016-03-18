@@ -96,7 +96,7 @@ def get_page_from_request():
 
 def generate_previous_next_dict(view, view_dict, page, title, label):
     return {
-        'url': url_for(view, **view_dict, page=page),
+        'url': url_for(view, page=page, **view_dict),
         'title': title,
         'label': label
     }
