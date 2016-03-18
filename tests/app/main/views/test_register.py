@@ -1,4 +1,8 @@
-from flask import url_for
+from flask import (
+    url_for,
+    session
+)
+
 from bs4 import BeautifulSoup
 
 
@@ -24,24 +28,31 @@ def test_logged_in_user_redirects_to_choose_service(app_,
             assert response.location == url_for('main.choose_service', _external=True)
 
 
-def test_process_register_creates_new_user(app_,
-                                           mock_send_verify_code,
-                                           mock_register_user,
-                                           mock_get_user_by_email_not_found,
-                                           mock_login):
-    user_data = {
-        'name': 'Some One Valid',
-        'email_address': 'notfound@example.gov.uk',
-        'mobile_number': '+4407700900460',
-        'password': 'validPassword!'
-    }
+def test_register_creates_new_user_and_redirects_to_continue_page(app_,
+                                                                  mock_send_verify_code,
+                                                                  mock_register_user,
+                                                                  mock_get_user_by_email_not_found,
+                                                                  mock_is_email_unique,
+                                                                  mock_send_verify_email,
+                                                                  mock_login):
+
+    user_data = {'name': 'Some One Valid',
+                 'email_address': 'notfound@example.gov.uk',
+                 'mobile_number': '+4407700900460',
+                 'password': 'validPassword!'
+                 }
 
     with app_.test_request_context():
-        response = app_.test_client().post(url_for('main.register'),
-                                           data=user_data)
+        response = app_.test_client().post(url_for('main.register'), data=user_data)
         assert response.status_code == 302
-        assert response.location == url_for('main.verify', _external=True)
-        assert mock_register_user.called
+        assert response.location == url_for('main.registration_continue', _external=True)
+
+        from unittest.mock import ANY
+        mock_send_verify_email.assert_called_with(ANY, user_data['email_address'])
+        mock_register_user.assert_called_with(user_data['name'],
+                                              user_data['email_address'],
+                                              user_data['mobile_number'],
+                                              user_data['password'])
 
 
 def test_process_register_returns_200_when_mobile_number_is_invalid(app_,
@@ -59,7 +70,7 @@ def test_process_register_returns_200_when_mobile_number_is_invalid(app_,
     assert 'Must not contain letters or symbols' in response.get_data(as_text=True)
 
 
-def test_should_return_400_when_email_is_not_gov_uk(app_,
+def test_should_return_200_when_email_is_not_gov_uk(app_,
                                                     mock_send_verify_code,
                                                     mock_get_user_by_email,
                                                     mock_login):
@@ -75,11 +86,13 @@ def test_should_return_400_when_email_is_not_gov_uk(app_,
     assert 'Enter a central government email address' in response.get_data(as_text=True)
 
 
-def test_should_add_verify_codes_on_session(app_,
+def test_should_add_user_details_to_session(app_,
                                             mock_send_verify_code,
                                             mock_register_user,
                                             mock_get_user,
                                             mock_get_user_by_email_not_found,
+                                            mock_is_email_unique,
+                                            mock_send_verify_email,
                                             mock_login):
     user_data = {
         'name': 'Test Codes',
@@ -92,11 +105,12 @@ def test_should_add_verify_codes_on_session(app_,
         with app_.test_client() as client:
             response = client.post(url_for('main.register'),
                                    data=user_data)
+
             assert response.status_code == 302
-            assert 'notify_admin_session' in response.headers.get('Set-Cookie')
+            assert session['user_details']['email'] == user_data['email_address']
 
 
-def test_should_return_400_if_password_is_blacklisted(app_,
+def test_should_return_200_if_password_is_blacklisted(app_,
                                                       mock_get_user_by_email,
                                                       mock_login):
     with app_.test_request_context():
