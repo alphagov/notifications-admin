@@ -24,7 +24,6 @@ from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.asset_fingerprinter import AssetFingerprinter
 from utils.recipients import validate_phone_number, InvalidPhoneError
 import app.proxy_fix
-from config import configs
 from utils import logging
 
 login_manager = LoginManager()
