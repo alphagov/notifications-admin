@@ -32,14 +32,7 @@ class UserApiClient(BaseAPIClient):
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
     def get_user_by_email(self, email_address):
-        try:
-            params = {'email': email_address}
-            user_data = self.get('/user/email', params=params)
-        except HTTPError as e:
-            if e.status_code == 404:
-                return None
-            else:
-                raise e
+        user_data = self.get('/user/email', params={'email': email_address})
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
     def get_users(self):
@@ -68,7 +61,12 @@ class UserApiClient(BaseAPIClient):
     def send_verify_code(self, user_id, code_type, to):
         data = {'to': to}
         endpoint = '/user/{0}/{1}-code'.format(user_id, code_type)
-        resp = self.post(endpoint, data=data)
+        self.post(endpoint, data=data)
+
+    def send_verify_email(self, user_id, to):
+        data = {'to': to}
+        endpoint = '/user/{0}/email-verification'.format(user_id)
+        self.post(endpoint, data=data)
 
     def check_verify_code(self, user_id, code, code_type):
         data = {'code_type': code_type, 'code': code}
@@ -106,3 +104,18 @@ class UserApiClient(BaseAPIClient):
         endpoint = '/user/reset-password'
         data = {'email': email_address}
         self.post(endpoint, data=data)
+
+    def is_email_unique(self, email_address):
+        try:
+            if self.get_user_by_email(email_address):
+                return False
+            return True
+        except HTTPError as ex:
+            if ex.status_code == 404:
+                return True
+            else:
+                raise ex
+
+    def activate_user(self, user):
+        user.state = 'active'
+        return self.update_user(user)

@@ -3,11 +3,15 @@ from flask import (
     url_for,
     session,
     flash,
-    render_template)
+    render_template
+)
 
+
+from notifications_python_client.errors import HTTPError
 
 from app.main import main
 from app.main.dao.services_dao import get_service_by_id_or_404
+
 from app import (
     invite_api_client,
     user_api_client
@@ -32,7 +36,11 @@ def accept_invite(token):
 
     session['invited_user'] = invited_user.serialize()
 
-    existing_user = user_api_client.get_user_by_email(invited_user.email_address)
+    try:
+        existing_user = user_api_client.get_user_by_email(invited_user.email_address)
+    except HTTPError as ex:
+        if ex.status_code == 404:
+            existing_user = False
 
     service_users = user_api_client.get_users_for_service(invited_user.service)
 
