@@ -1,42 +1,72 @@
+import json
+
 from flask import (
     render_template,
     redirect,
     session,
-    url_for
+    url_for,
+    current_app,
+    flash
 )
+
+from itsdangerous import SignatureExpired
 
 from flask_login import login_user
 
+from notifications_python_client.errors import HTTPError
+
 from app.main import main
-from app.main.dao import users_dao
-from app.main.forms import (
-    VerifyForm,
-    VerifySmsForm
-)
+from app.main.forms import TwoFactorForm
+
+from app import user_api_client
 
 
 @main.route('/verify', methods=['GET', 'POST'])
 def verify():
-
     # TODO there needs to be a way to regenerate a session id
     # or handle gracefully.
     user_id = session['user_details']['id']
 
-    def _check_code(code, code_type):
-        return users_dao.check_verify_code(user_id, code, code_type)
+    def _check_code(code):
+        return user_api_client.check_verify_code(user_id, code, 'sms')
 
-    if session.get('invited_user'):
-        form = VerifySmsForm(_check_code)
-    else:
-        form = VerifyForm(_check_code)
+    form = TwoFactorForm(_check_code)
 
     if form.validate_on_submit():
         try:
-            user = users_dao.get_user_by_id(user_id)
-            activated_user = users_dao.activate_user(user)
+            user = user_api_client.get_user(user_id)
+            activated_user = user_api_client.activate_user(user)
             login_user(activated_user)
             return redirect(url_for('main.add_service', first='first'))
         finally:
             session.pop('user_details', None)
 
-    return render_template('views/verify.html', form=form)
+    return render_template('views/two-factor.html', form=form)
+
+
+@main.route('/verify-email/<token>')
+def verify_email(token):
+    from utils.url_safe_token import check_token
+    try:
+        token_data = check_token(token,
+                                 current_app.config['SECRET_KEY'],
+                                 current_app.config['DANGEROUS_SALT'],
+                                 current_app.config['EMAIL_EXPIRY_SECONDS'])
+
+        token_data = json.loads(token_data)
+        verified = user_api_client.check_verify_code(token_data['user_id'], token_data['secret_code'], 'email')
+
+        if verified[0]:
+            user = user_api_client.get_user(token_data['user_id'])
+            user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
+            session['user_details'] = {"email": user.email_address, "id": user.id}
+            return redirect('verify')
+        else:
+            message = "There was a problem verifying your account. Error message: '{}'".format(verified[1])
+            flash(message)
+            # TODO could this ask for a resend instead?
+            return redirect(url_for('main.index'))
+
+    except SignatureExpired:
+        flash('The link in the email we sent you has expired')
+        return redirect(url_for('main.resend_email_verification'))
