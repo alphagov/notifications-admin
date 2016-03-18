@@ -20,8 +20,7 @@
           <div class="textbox-highlight-mask" aria-hidden="true" />
           <div class="textbox-highlight-foreground" aria-hidden="true" />
         `))
-        .on("input", this.update)
-        .on("scroll", this.maintainScrollParity);
+        .on("input", this.update);
 
       this.initialHeight = this.$textbox.height();
 
@@ -45,14 +44,10 @@
       $('<div/>').text(this.$textbox.val()).html().replace(
         tagPattern, match => `<span class='tag'>${match}</span>`
       )
-    )
+    );
 
     this.update = () => (
       this.replacePlaceholders() && this.resize()
-    )
-
-    this.maintainScrollParity = () => this.$backgroundMaskForeground.scrollTop(
-      this.$textbox.scrollTop()
     );
 
   };
