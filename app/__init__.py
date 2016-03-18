@@ -203,4 +203,7 @@ def register_errorhandlers(application):
 
     @application.errorhandler(Exception)
     def handle_bad_request(error):
+        from flask import current_app
+        if current_app.config.get('DEBUG'):
+            print(error)
         return _error_response(500)

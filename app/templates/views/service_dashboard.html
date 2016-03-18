@@ -27,12 +27,12 @@
     {% if not template_count and not jobs %}
       {% call banner_wrapper(subhead='Get started', type="tip") %}
         <ol>
-          {% if current_user.has_permissions(['manage_templates'], admin_override=True) %}
+          {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
             <li>
               <a href='{{ url_for(".add_service_template", service_id=service_id, template_type="sms") }}'>Add a template</a>
             </li>
           {% endif %}
-          {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
+          {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
             <li>
               <a href='{{ url_for(".choose_template", service_id=service_id, template_type="sms") }}'>Send yourself a text message</a>
             </li>
@@ -41,7 +41,7 @@
       {% endcall %}
     {% elif not jobs %}
       {% call banner_wrapper(subhead='Next step', type="tip") %}
-        {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
+        {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
           <a href='{{ url_for(".choose_template", service_id=service_id, template_type="sms") }}'>Send yourself a text message</a>
         {% endif %}
       {% endcall %}
@@ -63,7 +63,7 @@
         {% endcall %}
       {% endcall %}
       {% if more_jobs_to_show %}
-        {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
+        {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
           <p class="table-show-more-link">
             <a href="{{ url_for('.view_jobs', service_id=service_id) }}">See all sent text messages</a>
           </p>

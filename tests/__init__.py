@@ -8,16 +8,13 @@ class TestClient(FlaskClient):
     def login(self, user):
         # Skipping authentication here and just log them in
         with self.session_transaction() as session:
-            session['user_details'] = {
-                "email": user.email_address,
-                "id": user.id}
-        # Include mock_login fixture in test for this to work.
-        # TODO would be better for it to be mocked in this
-        # function
+            session['user_id'] = user.id
+            session['_fresh'] = True
 
-        response = self.post(
-            url_for('main.two_factor'), data={'sms_code': '12345'})
-        assert response.status_code == 302
+        login_user(user, remember=True)
+
+    def login_fresh(self):
+        return True
 
     def logout(self, user):
         self.get(url_for("main.logout"))
@@ -153,8 +150,6 @@ def validate_route_permission(mocker,
         with app_.test_client() as client:
             client.login(usr)
             resp = None
-            with client.session_transaction() as session:
-                session['service_id'] = str(service['id'])
             if method == 'GET':
                 resp = client.get(route)
             elif method == 'POST':

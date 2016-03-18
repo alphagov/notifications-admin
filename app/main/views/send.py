@@ -56,9 +56,9 @@ def get_send_button_text(template_type, number_of_messages):
         }[template_type].format(number_of_messages)
 
 
-def get_page_headings(template_type):
+def get_page_headings(template_type, service_id):
     # User has manage_service role
-    if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']):
+    if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']):
         return send_messages_page_headings[template_type]
     else:
         return manage_templates_page_headings[template_type]
@@ -85,7 +85,7 @@ def choose_template(service_id, template_type):
             if template['template_type'] == template_type
         ],
         template_type=template_type,
-        page_heading=get_page_headings(template_type),
+        page_heading=get_page_headings(template_type, service_id),
         service=service,
         has_jobs=len(jobs),
         service_id=service_id
@@ -253,7 +253,7 @@ def check_messages(service_id, upload_id):
         'views/check.html',
         recipients=recipients,
         template=template,
-        page_heading=get_page_headings(template.template_type),
+        page_heading=get_page_headings(template.template_type, service_id),
         errors=get_errors_for_csv(recipients, template.template_type),
         rows_have_errors=any(recipients.rows_with_errors),
         count_of_recipients=session['upload_data']['notification_count'],

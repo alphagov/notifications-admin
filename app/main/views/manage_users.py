@@ -73,11 +73,11 @@ def edit_user_permissions(service_id, user_id):
     # Do it through the template or the form class?
     form = PermisisonsForm(**{
         'send_messages': 'yes' if user.has_permissions(
-            ['send_texts', 'send_emails', 'send_letters']) else 'no',
+            permissions=['send_texts', 'send_emails', 'send_letters']) else 'no',
         'manage_service': 'yes' if user.has_permissions(
-            ['manage_users', 'manage_templates', 'manage_settings']) else 'no',
+            permissions=['manage_users', 'manage_templates', 'manage_settings']) else 'no',
         'manage_api_keys': 'yes' if user.has_permissions(
-            ['manage_api_keys', 'access_developer_docs']) else 'no'
+            permissions=['manage_api_keys', 'access_developer_docs']) else 'no'
         })
 
     if form.validate_on_submit():

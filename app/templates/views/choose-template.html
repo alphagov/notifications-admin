@@ -14,7 +14,7 @@
 
     <h1 class="heading-large">{{ page_heading }}</h1>
 
-    {% if current_user.has_permissions(['manage_templates'], admin_override=True) %}
+    {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
       <a href="{{ url_for('.add_service_template', service_id=service_id, template_type=template_type) }}" class="button">Add a new template</a>
     {% else %}
       <p>You need to ask your service manager to add templates before you can send messages</p>
@@ -26,7 +26,7 @@
       <div class="column-two-thirds">
         <h1 class="heading-large">{{ page_heading }}</h1>
       </div>
-      {% if current_user.has_permissions(['manage_templates'], admin_override=True) %}
+      {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
         <div class="column-one-third">
           <a href="{{ url_for('.add_service_template', service_id=service_id, template_type=template_type) }}" class="button align-with-heading">Add new template</a>
         </div>
@@ -34,7 +34,7 @@
     </div>
 
     {% if not has_jobs %}
-      {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], or_=True) %}
+      {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters'], or_=True) %}
       {{ banner(
         """
           Send yourself a test message
@@ -54,7 +54,7 @@
               name=template.name,
               edit_link=(
                 url_for(".edit_service_template", service_id=service_id, template_id=template.id)
-                if current_user.has_permissions(['manage_templates'], admin_override=True) else
+                if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) else
                 None
               )
             ) }}
@@ -64,7 +64,7 @@
                 name=template.name,
                 edit_link=(
                   url_for(".edit_service_template", service_id=service_id, template_id=template.id)
-                  if current_user.has_permissions(['manage_templates'], admin_override=True) else
+                  if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) else
                   None
                 )
               ) }}
@@ -72,11 +72,11 @@
         </div>
         <div class="column-one-third">
           <div class="sms-message-use-links">
-            {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
+            {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
               <a href="{{ url_for(".send_messages", service_id=service_id, template_id=template.id) }}">Send a batch</a>
               <a href="{{ url_for(".send_message_to_self", service_id=service_id, template_id=template.id) }}">Send yourself a test</a>
             {% endif %}
-            {% if current_user.has_permissions(['manage_api_keys', 'access_developer_docs']) %}
+            {% if current_user.has_permissions(permissions=['manage_api_keys', 'access_developer_docs']) %}
               <a href="{{ url_for(".send_from_api", service_id=service_id, template_id=template.id) }}">API integration</a>
             {% endif %}
           </div>
