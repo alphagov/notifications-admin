@@ -48,6 +48,7 @@ $path: '/static/images/';
 @import 'components/email-message';
 @import 'components/api-key';
 @import 'components/yes-no';
+@import "components/_previous-next-navigation";
 
 @import 'views/job';
 @import 'views/edit-template';

@@ -1,0 +1,129 @@
+/*
+Taken from the GOV.UK component at
+https://github.com/alphagov/static/blob/a9d462e71709d2ff6348bcce7e8c625af2b86114/app/assets/stylesheets/govuk-component/_previous-and-next-navigation.scss
+and
+https://github.com/alphagov/static/blob/da8aeeaa749093eab30286d7fc9f965533b66f47/app/assets/stylesheets/styleguide/_conditionals2.scss
+*/
+@import "_colours.scss";
+@import "_typography.scss";
+
+// Media query helpers. These make producing IE layouts
+// super easy.
+
+// These are desktop and down media queries
+
+// There is also a local version of this in Smartanswers.
+
+$is-ie: false !default;
+
+@mixin media-down($size: false, $max-width: false, $min-width: false) {
+  @if $is-ie == false {
+    @if $size == mobile {
+      @media (max-width: 640px){
+        @content;
+      }
+    } @else if $size == tablet {
+      @media (max-width: 800px){
+        @content;
+      }
+    }
+  }
+}
+
+.govuk-previous-and-next-navigation {
+
+  @include media-down(mobile) {
+    margin: 2em 0 0 0;
+  }
+
+  display: block;
+
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    @include core-16($line-height: (20 / 16));
+    float: left;
+    list-style: none;
+    text-align: right;
+    margin: 0;
+    padding: 0;
+    width: 49%;
+
+    a {
+
+      @include ie-lte(7) {
+        height: 4.5em;
+      }
+
+      display: block;
+      color: $link-colour;
+      text-decoration: none;
+
+      &:hover,
+      &:active {
+        background-color: $canvas-colour;
+      }
+
+      .pagination-part-title {
+        @include core-27($line-height: (33.75 / 27));
+        margin-bottom: 0.1em;
+        display: block;
+      }
+
+    }
+
+    &.next-page {
+      float: right;
+      text-align: right;
+    }
+
+    &.next-page a:before {
+      background: transparent file-url("arrow-sprite.png") no-repeat -102px -11px;
+      margin: -4px -32px 0 0;
+      display: block;
+      float: right;
+      width: 30px;
+      height: 38px;
+      content: " ";
+    }
+
+    &.previous-page a:before {
+      background: transparent file-url("arrow-sprite.png") no-repeat -20px -11px;
+      margin: -4px 0 0 -32px;
+      display: block;
+      float: left;
+      width: 30px;
+      height: 38px;
+      content: " ";
+      }
+
+    &.previous-page {
+      float: left;
+      text-align: left;
+    }
+
+    &.previous-page a {
+      padding: 0.75em 0 0.75em 3em;
+    }
+
+    &.next-page a {
+      padding: 0.75em 3em 0.75em 0;
+    }
+
+    @include media-down(mobile) {
+      &.previous-page,
+      &.next-page {
+        float: none;
+        width: 100%;
+      }
+
+      &.next-page a {
+        text-align: right;
+      }
+    }
+  }
+
+}
