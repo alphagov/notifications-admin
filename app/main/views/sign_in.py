@@ -3,15 +3,22 @@ from flask import (
     redirect,
     url_for,
     session,
-    abort,
     flash,
     request
 )
 
-from flask.ext.login import (current_user, login_fresh, confirm_login)
+from flask.ext.login import (
+    current_user,
+    login_fresh,
+    confirm_login
+)
 
 from app.main import main
-from app.main.dao import (users_dao, services_dao)
+from app.main.dao import services_dao
+
+from app import user_api_client
+
+
 from app.main.forms import LoginForm
 
 
@@ -22,7 +29,7 @@ def sign_in():
 
     form = LoginForm()
     if form.validate_on_submit():
-        user = users_dao.get_user_by_email(form.email_address.data)
+        user = user_api_client.get_user_by_email(form.email_address.data)
         user = _get_and_verify_user(user, form.password.data)
         if user:
             # Remember me login
@@ -41,7 +48,7 @@ def sign_in():
             if user.state == 'pending':
                 return redirect(url_for('.verify'))
             elif user.is_active():
-                users_dao.send_verify_code(user.id, 'sms', user.mobile_number)
+                user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
                 if request.args.get('next'):
                     return redirect(url_for('.two_factor', next=request.args.get('next')))
                 else:
@@ -62,7 +69,7 @@ def _get_and_verify_user(user, password):
         return None
     elif user.is_locked():
         return None
-    elif not users_dao.verify_password(user.id, password):
+    elif not user_api_client.verify_password(user.id, password):
         return None
     else:
         return user

@@ -1,4 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import (
+    datetime,
+    timedelta
+)
 
 from flask import (
     render_template,
@@ -12,7 +15,7 @@ from flask import (
 from flask.ext.login import current_user
 
 from app.main import main
-from app.main.dao import users_dao
+
 from app.main.forms import (
     RegisterUserForm,
     RegisterUserFromInviteForm
@@ -28,9 +31,9 @@ def register():
 
     form = RegisterUserForm()
     if form.validate_on_submit():
-        registered = _do_registration(form)
+        registered = _do_registration(form, send_sms=False)
         if registered:
-            return redirect(url_for('main.verify'))
+            return redirect(url_for('main.registration_continue'))
         else:
             flash('There was an error registering your account')
             return render_template('views/register.html', form=form), 400
@@ -40,7 +43,6 @@ def register():
 
 @main.route('/register-from-invite', methods=['GET', 'POST'])
 def register_from_invite():
-
     form = RegisterUserFromInviteForm()
     invited_user = session.get('invited_user')
     if not invited_user:
@@ -61,8 +63,8 @@ def register_from_invite():
     return render_template('views/register-from-invite.html', email_address=invited_user['email_address'], form=form)
 
 
-def _do_registration(form, service=None, send_email=True):
-    if users_dao.is_email_unique(form.email_address.data):
+def _do_registration(form, service=None, send_sms=True, send_email=True):
+    if user_api_client.is_email_unique(form.email_address.data):
         user = user_api_client.register_user(form.name.data,
                                              form.email_address.data,
                                              form.mobile_number.data,
@@ -73,11 +75,19 @@ def _do_registration(form, service=None, send_email=True):
         # How do we report to the user there is a problem with
         # sending codes apart from service unavailable?
         # at the moment i believe http 500 is fine.
-        users_dao.send_verify_code(user.id, 'sms', user.mobile_number)
+
         if send_email:
-            users_dao.send_verify_code(user.id, 'email', user.email_address)
+            user_api_client.send_verify_email(user.id, user.email_address)
+
+        if send_sms:
+            user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
         session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
         session['user_details'] = {"email": user.email_address, "id": user.id}
         return True
     else:
         return False
+
+
+@main.route('/registration-continue')
+def registration_continue():
+    return render_template('views/registration-continue.html')

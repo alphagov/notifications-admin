@@ -150,49 +150,6 @@ class TwoFactorForm(Form):
             raise ValidationError(reason)
 
 
-class VerifySmsForm(Form):
-    def __init__(self, validate_code_func, *args, **kwargs):
-        '''
-        Keyword arguments:
-        validate_code_func -- Validates the code with the API.
-        '''
-        self.validate_code_func = validate_code_func
-        super(VerifySmsForm, self).__init__(*args, **kwargs)
-
-    sms_code = sms_code()
-
-    def validate_sms_code(self, field):
-        is_valid, reason = self.validate_code_func(field.data, 'sms')
-        if not is_valid:
-            raise ValidationError(reason)
-
-
-class VerifyForm(Form):
-    def __init__(self, validate_code_func, *args, **kwargs):
-        '''
-        Keyword arguments:
-        validate_code_func -- Validates the code with the API.
-        '''
-        self.validate_code_func = validate_code_func
-        super(VerifyForm, self).__init__(*args, **kwargs)
-
-    sms_code = sms_code()
-    email_code = email_code()
-
-    def _validate_code(self, cde, code_type):
-        is_valid, reason = self.validate_code_func(cde, code_type)
-        if not is_valid:
-            raise ValidationError(reason)
-
-    def validate_email_code(self, field):
-        if self.sms_code.data:
-            self._validate_code(field.data, 'email')
-
-    def validate_sms_code(self, field):
-        if self.email_code.data:
-            self._validate_code(field.data, 'sms')
-
-
 class EmailNotReceivedForm(Form):
     email_address = email_address()
 
