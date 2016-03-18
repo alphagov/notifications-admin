@@ -1,0 +1,25 @@
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/big-number.html" import big_number %}
+
+{% call banner_wrapper(type="mode") %}
+
+  <h2 class="heading-medium">Trial mode</h2>
+  <div class="grid-row">
+    <div class="column-one-half">
+      <p>
+        We’ll only deliver messages to you and members of your team
+        <br>
+        <a href="{{ url_for(".help", _anchor="trial-mode") }}">Find out more</a>
+      </p>
+    </div>
+    <div class="column-one-sixth">
+      &nbsp;
+    </div>
+    <div class="column-one-third">
+      {{ big_number(
+        service.limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0),
+        'messages left today'
+      ) }}
+    </div>
+  </div>
+{% endcall %}

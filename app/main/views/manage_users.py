@@ -3,7 +3,8 @@ from flask import (
     render_template,
     redirect,
     url_for,
-    flash)
+    flash
+)
 
 from flask_login import (
     login_required,

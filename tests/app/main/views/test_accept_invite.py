@@ -175,7 +175,7 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(app_,
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == 'Create an account'
 
-            email_in_page = page.find('p')
+            email_in_page = page.find('main').find('p')
             assert email_in_page.text.strip() == 'Your account will be created with this email: invited_user@test.gov.uk'  # noqa
 
             form = page.find('form')
@@ -215,6 +215,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(a
                                                                                api_user_active,
                                                                                mock_check_invite_token,
                                                                                mock_dont_get_user_by_email,
+                                                                               mock_is_email_unique,
                                                                                mock_register_user,
                                                                                mock_send_verify_code,
                                                                                mock_get_users_by_service,
@@ -266,6 +267,7 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
                                                         api_user_active,
                                                         mock_check_invite_token,
                                                         mock_dont_get_user_by_email,
+                                                        mock_is_email_unique,
                                                         mock_register_user,
                                                         mock_send_verify_code,
                                                         mock_check_verify_code,
@@ -275,6 +277,7 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
                                                         mock_accept_invite,
                                                         mock_get_service,
                                                         mock_get_service_templates,
+                                                        mock_get_service_statistics,
                                                         mock_get_jobs):
 
     with app_.test_request_context():
@@ -298,6 +301,7 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
             # when they post codes back to admin user should be added to
             # service and sent on to dash board
             expected_permissions = ['send_messages', 'manage_service', 'manage_api_keys']
+
             with client.session_transaction() as session:
                 new_user_id = session['user_id']
                 mock_add_user_to_service.assert_called_with(data['service'], new_user_id, expected_permissions)

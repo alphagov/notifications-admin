@@ -37,9 +37,9 @@
       {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters'], or_=True) %}
       {{ banner(
         """
-          Send yourself a test message
+          Send yourself a test
         """,
-        subhead='Next step',
+        subhead='Next step:',
         type="tip"
       )}}
       {% endif %}

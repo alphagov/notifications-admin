@@ -5,6 +5,7 @@ def test_should_show_recent_jobs_on_dashboard(app_,
                                               api_user_active,
                                               mock_get_service,
                                               mock_get_service_templates,
+                                              mock_get_service_statistics,
                                               mock_get_user,
                                               mock_get_user_by_email,
                                               mock_login,
@@ -33,6 +34,7 @@ def _test_dashboard_menu(mocker, app_, usr, service, permissions):
             mocker.patch('app.user_api_client.get_user', return_value=usr)
             mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
             mocker.patch('app.service_api_client.get_service', return_value={'data': service})
+            mocker.patch('app.statistics_api_client.get_statistics_for_service', return_value={'data': [{}]})
             client.login(usr)
             return client.get(url_for('main.service_dashboard', service_id=service['id']))
 

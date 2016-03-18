@@ -1,7 +1,7 @@
 import re
 
 from functools import wraps
-from flask import (abort, session)
+from flask import (abort, session, request, url_for)
 
 
 class BrowsableItem(object):
@@ -83,3 +83,21 @@ def get_errors_for_csv(recipients, template_type):
             errors.append("fill in {} empty cells".format(number_of_rows_with_missing_data))
 
     return errors
+
+
+def get_page_from_request():
+    if 'page' in request.args:
+        try:
+            return int(request.args['page'])
+        except ValueError:
+            return None
+    else:
+        return 1
+
+
+def generate_previous_next_dict(view, view_dict, page, title, label):
+    return {
+        'url': url_for(view, page=page, **view_dict),
+        'title': title,
+        'label': label
+    }

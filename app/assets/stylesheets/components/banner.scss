@@ -26,15 +26,19 @@
 
 }
 
-.banner-with-tick,
-.banner-default-with-tick {
-  @extend %banner;
+%banner-with-tick,
+.banner-with-tick {
   padding: $gutter-half ($gutter + $gutter-half);
   background-image: file-url('tick-white.png');
   background-size: 19px;
   background-repeat: no-repeat;
   background-position: $gutter-half $gutter-half;
   font-weight: bold;
+}
+
+.banner-default-with-tick {
+  @extend %banner;
+  @extend %banner-with-tick;
 }
 
 .banner-dangerous {
@@ -54,13 +58,15 @@
 
 }
 
+%banner-tip,
 .banner-tip {
 
   @extend %banner;
-  background: $yellow;
+  @include bold-19;
+  background-color: $yellow;
   color: $text-colour;
   text-align: left;
-  font-weight: bold;
+  margin-top: 0;
 
   a {
     &:link,
@@ -74,6 +80,12 @@
     list-style-type: decimal;
   }
 
+}
+
+.banner-tip-with-tick {
+  @extend %banner-with-tick;
+  @extend %banner-tip;
+  background-image: file-url('tick-black.png');
 }
 
 .banner-info,
@@ -90,4 +102,41 @@
 
 .banner-info {
   background-image: file-url('icon-information-2x.png');
+}
+
+.banner-mode {
+
+  @extend %banner;
+  background: $govuk-blue;
+  color: $white;
+  margin-top: $gutter;
+
+  .heading-medium {
+    margin: 0 0 10px 0;
+  }
+
+  a {
+
+    &:link,
+    &:visited {
+      color: $white;
+    }
+
+    &:hover,
+    &:active {
+      color: $light-blue-25;
+    }
+
+  }
+
+  .big-number {
+
+    margin-top: 10px;
+
+    &-label {
+      padding-bottom: 0;
+    }
+
+  }
+
 }

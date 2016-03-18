@@ -28,17 +28,16 @@ class Config(object):
     REMEMBER_COOKIE_SECURE = True
 
     API_HOST_NAME = os.getenv('API_HOST_NAME')
-    NOTIFY_API_SECRET = os.getenv('NOTIFY_API_SECRET', "dev-secret")
-    NOTIFY_API_CLIENT = os.getenv('NOTIFY_API_CLIENT', "admin")
 
     ADMIN_CLIENT_USER_NAME = os.getenv('ADMIN_CLIENT_USER_NAME')
     ADMIN_CLIENT_SECRET = os.getenv('ADMIN_CLIENT_SECRET')
 
     WTF_CSRF_ENABLED = True
-    SECRET_KEY = 'secret-key'
+    SECRET_KEY = 'dev-notify-secret-key'
     HTTP_PROTOCOL = 'http'
-    DANGEROUS_SALT = 'itsdangeroussalt'
+    DANGEROUS_SALT = 'dev-notify-salt'
     TOKEN_MAX_AGE_SECONDS = 3600
+    EMAIL_EXPIRY_SECONDS = TOKEN_MAX_AGE_SECONDS * 24 * 7  # one week
 
     DEFAULT_SERVICE_LIMIT = 50
 
@@ -63,6 +62,7 @@ class Development(Config):
 
 
 class Test(Development):
+    DEBUG = True
     WTF_CSRF_ENABLED = False
 
 
@@ -72,18 +72,10 @@ class Preview(Config):
     HEADER_COLOUR = '#F47738'  # $orange
 
 
-class Staging(Preview):
-    SHOW_STYLEGUIDE = False
-
-
-class Live(Staging):
-    HEADER_COLOUR = '#B10E1E'  # $red
-
-
 configs = {
-    'development': Development,
-    'test': Test,
-    'preview': Preview,
-    'staging': Staging,
-    'live': Live
+    'development': 'config.Development',
+    'test': 'config.Test',
+    'preview': 'config.Preview',
+    'staging': 'config_staging.Staging',
+    'live': 'config_live.Live'
 }
