@@ -28,8 +28,6 @@ class Config(object):
     REMEMBER_COOKIE_SECURE = True
 
     API_HOST_NAME = os.getenv('API_HOST_NAME')
-    NOTIFY_API_SECRET = os.getenv('NOTIFY_API_SECRET', "dev-secret")
-    NOTIFY_API_CLIENT = os.getenv('NOTIFY_API_CLIENT', "admin")
 
     ADMIN_CLIENT_USER_NAME = os.getenv('ADMIN_CLIENT_USER_NAME')
     ADMIN_CLIENT_SECRET = os.getenv('ADMIN_CLIENT_SECRET')
@@ -73,18 +71,10 @@ class Preview(Config):
     HEADER_COLOUR = '#F47738'  # $orange
 
 
-class Staging(Preview):
-    SHOW_STYLEGUIDE = False
-
-
-class Live(Staging):
-    HEADER_COLOUR = '#B10E1E'  # $red
-
-
 configs = {
-    'development': Development,
-    'test': Test,
-    'preview': Preview,
-    'staging': Staging,
-    'live': Live
+    'development': 'config.Development',
+    'test': 'config.Test',
+    'preview': 'config.Preview',
+    'staging': 'config_staging.Staging',
+    'live': 'config_live.Live'
 }

@@ -1,17 +1,24 @@
-from app import create_app
 from credstash import getAllSecrets
 import os
 
-config = 'live'
 default_env_file = '/home/ubuntu/environment'
+environment = 'live'
 
 if os.path.isfile(default_env_file):
-        environment = open(default_env_file, 'r')
-        config = environment.readline().strip()
+    with open(default_env_file, 'r') as environment_file:
+        environment = environment_file.readline().strip()
 
-secrets = getAllSecrets(region="eu-west-1")
 
-application = create_app(config, secrets)
+# on aws get secrets and export to env
+os.environ.update(getAllSecrets(region="eu-west-1"))
+
+from config import configs
+
+os.environ['NOTIFY_ADMIN_ENVIRONMENT'] = configs[environment]
+
+from app import create_app
+
+application = create_app()
 
 if __name__ == "__main__":
         application.run()
