@@ -17,7 +17,8 @@ def test_should_return_verify_template(app_,
 
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.text == 'Text verification'
-            assert page.p.text == "We've sent you a text message with a verification code."
+            message = page.find_all('p')[1].text
+            assert message == "We've sent you a text message with a verification code."
 
 
 def test_should_redirect_to_add_service_when_sms_code_is_correct(app_,
