@@ -4,7 +4,7 @@
   {% if name %}
     <h3 class="sms-message-name">
       {% if edit_link %}
-        <a href="{{ edit_link }}">{{ name }}</a>
+        <a name="{{ name|linkable_name }}" href="{{ edit_link }}">{{ name }}</a>
       {% else %}
         {{ name }}
       {% endif %}

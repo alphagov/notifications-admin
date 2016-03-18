@@ -32,7 +32,7 @@ def service_json(id_, name, users, limit=1000, active=False, restricted=True):
     }
 
 
-def template_json(id_, name, type_, content, service_id):
+def template_json(service_id, id_=1, name="sample template", type_="sms", content="template content"):
     return {
         'id': id_,
         'name': name,
@@ -117,13 +117,40 @@ def job_json():
     return data
 
 
-def notification_json():
+def notification_json(service_id,
+                      job=None,
+                      template=None,
+                      to='07123456789',
+                      status='sent',
+                      sent_at=None,
+                      created_at=None,
+                      with_links=False):
     import datetime
+    if job is None:
+        job = job_json()
+    if template is None:
+        template = template_json(service_id)
+    if sent_at is None:
+        sent_at = str(datetime.datetime.now().time())
+    if created_at is None:
+        created_at = str(datetime.datetime.now().time())
+    links = {}
+    if with_links:
+        links = {
+            'prev': '/service/{}/notifications'.format(service_id),
+            'next': '/service/{}/notifications'.format(service_id),
+            'last': '/service/{}/notifications'.format(service_id)
+        }
     data = {
         'notifications': [{
-            'sent_at': str(datetime.datetime.now().time())
+            'to': to,
+            'template': {'id': template['id'], 'name': template['name']},
+            'job': {'id': job['id'], 'original_file_name': job['original_file_name']},
+            'sent_at': sent_at,
+            'status': status,
+            'created_at': created_at
         } for i in range(5)],
-        'links': {}
+        'links': links
     }
     return data
 

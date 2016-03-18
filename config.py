@@ -62,6 +62,7 @@ class Development(Config):
 
 
 class Test(Development):
+    DEBUG = True
     WTF_CSRF_ENABLED = False
 
 

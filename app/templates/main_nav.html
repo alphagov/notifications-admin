@@ -25,4 +25,8 @@
     <li><a href="{{ url_for('.documentation', service_id=service_id) }}">Developer documentation</a></li>
   </ul>
   {% endif %}
+  <ul>
+    <li><a href="{{ url_for('.view_notifications', service_id=service_id) }}">Notification history</a></li>
+    <li><a href="{{ url_for('.view_jobs', service_id=service_id) }}">Job history</a><li>
+  </ul>
 </nav>
