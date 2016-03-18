@@ -28,8 +28,6 @@ class Config(object):
     REMEMBER_COOKIE_SECURE = True
 
     API_HOST_NAME = os.getenv('API_HOST_NAME')
-    NOTIFY_API_SECRET = os.getenv('NOTIFY_API_SECRET', "dev-secret")
-    NOTIFY_API_CLIENT = os.getenv('NOTIFY_API_CLIENT', "admin")
 
     ADMIN_CLIENT_USER_NAME = os.getenv('ADMIN_CLIENT_USER_NAME')
     ADMIN_CLIENT_SECRET = os.getenv('ADMIN_CLIENT_SECRET')
