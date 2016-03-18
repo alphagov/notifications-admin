@@ -15,7 +15,7 @@
     <p>Check your email address is correct and then resend the confirmation code.</p>
 
     <form autocomplete="off" method="post">
-      {{ textbox(form.email_address, hint='Your email address must end in .gov.uk') }}
+      {{ textbox(form.email_address, hint='You must use an email address from a central government organisation', safe_error_message=True) }}
       {{ page_footer('Resend confirmation code') }}
     </form>
   </div>

@@ -16,7 +16,7 @@ Manage users – GOV.UK Notify
   <div class="grid-row">
     <form method="post" class="column-three-quarters">
 
-      {{ textbox(form.email_address, hint='Email address must end in .gov.uk', width='1-1') }}
+      {{ textbox(form.email_address, hint='You must use an email address from a central government organisation', width='1-1', safe_error_message=True) }}
 
       <fieldset class='yes-no-wrapper'>
         <legend class='heading-small'>
