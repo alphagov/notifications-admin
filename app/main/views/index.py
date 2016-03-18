@@ -16,3 +16,13 @@ def index():
 @login_required
 def verify_mobile():
     return render_template('views/verify-mobile.html')
+
+
+@main.route('/cookies')
+def cookies():
+    return render_template('views/cookies.html')
+
+
+@main.route('/help')
+def help():
+    return render_template('views/help.html')
