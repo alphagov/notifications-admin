@@ -2,9 +2,9 @@ from flask import (
     request,
     render_template,
     redirect,
-    abort,
     url_for,
-    flash)
+    flash
+)
 
 from flask_login import (
     login_required,

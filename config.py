@@ -33,10 +33,11 @@ class Config(object):
     ADMIN_CLIENT_SECRET = os.getenv('ADMIN_CLIENT_SECRET')
 
     WTF_CSRF_ENABLED = True
-    SECRET_KEY = 'secret-key'
+    SECRET_KEY = 'dev-notify-secret-key'
     HTTP_PROTOCOL = 'http'
-    DANGEROUS_SALT = 'itsdangeroussalt'
+    DANGEROUS_SALT = 'dev-notify-salt'
     TOKEN_MAX_AGE_SECONDS = 3600
+    EMAIL_EXPIRY_SECONDS = TOKEN_MAX_AGE_SECONDS * 24 * 7  # one week
 
     DEFAULT_SERVICE_LIMIT = 50
 

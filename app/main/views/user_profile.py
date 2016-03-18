@@ -1,15 +1,34 @@
 from flask import (
-    request, render_template, redirect, url_for, session)
+    request,
+    render_template,
+    redirect,
+    url_for,
+    session
+)
+
 from flask.ext.login import current_user
 from flask_login import login_required
 from app.main import main
+
 from app.main.dao.users_dao import (
-    verify_password, update_user, check_verify_code, is_email_unique,
-    send_verify_code)
-from app.main.forms import (
-    ChangePasswordForm, ChangeNameForm, ChangeEmailForm, ConfirmEmailForm,
-    ChangeMobileNumberForm, ConfirmMobileNumberForm, ConfirmPasswordForm
+    verify_password,
+    update_user,
+    check_verify_code,
+    is_email_unique,
+    send_verify_code
 )
+
+from app.main.forms import (
+    ChangePasswordForm,
+    ChangeNameForm,
+    ChangeEmailForm,
+    ConfirmEmailForm,
+    ChangeMobileNumberForm,
+    ConfirmMobileNumberForm,
+    ConfirmPasswordForm
+)
+
+from app import user_api_client
 
 NEW_EMAIL = 'new-email'
 NEW_MOBILE = 'new-mob'
@@ -63,7 +82,6 @@ def user_profile_email():
 @main.route("/user-profile/email/authenticate", methods=['GET', 'POST'])
 @login_required
 def user_profile_email_authenticate():
-
     # Validate password for form
     def _check_password(pwd):
         return verify_password(current_user.id, pwd)

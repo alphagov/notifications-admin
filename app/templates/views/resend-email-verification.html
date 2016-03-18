@@ -1,0 +1,18 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+  Check your email – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-two-thirds">
+    <h1 class="heading-large">Check your email</h1>
+    <p>In order to verify your email address we've sent a new confirmation link to {{email}}</p>
+  </div>
+</div>
+
+{% endblock %}
