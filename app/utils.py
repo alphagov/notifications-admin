@@ -37,7 +37,8 @@ def user_has_permissions(*permissions, admin_override=False, or_=False):
             from flask_login import current_user
             if current_user and admin_override and current_user.platform_admin:
                 return func(*args, **kwargs)
-            if current_user and current_user.has_permissions(permissions, admin_override=admin_override, or_=or_):
+            from flask import request
+            if current_user and current_user.has_permissions(permissions, service_id=request.view_args.get('service_id', None), admin_override=admin_override, or_=or_):
                 return func(*args, **kwargs)
             else:
                 abort(403)

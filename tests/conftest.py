@@ -38,9 +38,8 @@ def app_(request):
 
 
 @pytest.fixture(scope='function')
-def service_one(request, api_user_active):
-    import uuid
-    return service_json(str(uuid.uuid4()), 'service one', [api_user_active.id])
+def service_one(api_user_active):
+    return service_json(SERVICE_ONE_ID, 'service one', [api_user_active.id])
 
 
 @pytest.fixture(scope='function')
@@ -113,7 +112,7 @@ SERVICE_TWO_ID = "147ad62a-2951-4fa1-9ca0-093cd1a52c52"
 @pytest.fixture(scope='function')
 def mock_get_services(mocker, user=None):
     if user is None:
-        user = api_user_active()
+        user = active_user_with_permissions(service_one)
 
     def _create(user_id=None):
         service_one = service_json(
@@ -274,6 +273,30 @@ def api_user_active():
                  'state': 'active',
                  'failed_login_count': 0,
                  'permissions': {}
+                 }
+    user = User(user_data)
+    return user
+
+
+@pytest.fixture(scope='function')
+def active_user_with_permissions(service_one):
+    from app.notify_client.user_api_client import User
+
+    user_data = {'id': 222,
+                 'name': 'Test User',
+                 'password': 'somepassword',
+                 'email_address': 'test@user.gov.uk',
+                 'mobile_number': '+4412341234',
+                 'state': 'active',
+                 'failed_login_count': 0,
+                 'permissions': {SERVICE_ONE_ID: ['send_texts',
+                                                          'send_emails',
+                                                          'send_letters',
+                                                          'manage_users',
+                                                          'manage_templates',
+                                                          'manage_settings',
+                                                          'manage_api_keys',
+                                                          'access_developer_docs']}
                  }
     user = User(user_data)
     return user
@@ -623,7 +646,14 @@ def mock_get_users_by_service(mocker):
         data = [{'id': 1,
                  'logged_in_at': None,
                  'mobile_number': '+447700900986',
-                 'permissions': [],
+                 'permissions': {SERVICE_ONE_ID: ['send_texts',
+                                                  'send_emails',
+                                                  'send_letters',
+                                                  'manage_users',
+                                                  'manage_templates',
+                                                  'manage_settings',
+                                                  'manage_api_keys',
+                                                  'access_developer_docs']},
                  'state': 'active',
                  'password_changed_at': None,
                  'name': 'Test User',

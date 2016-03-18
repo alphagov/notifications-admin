@@ -1,23 +1,25 @@
+import uuid
+
 from flask import url_for
 
 from bs4 import BeautifulSoup
 
 from app.notify_client.models import InvitedUser
 from tests import validate_route_permission
+from tests.conftest import service_one as service_1
 
 
 def test_should_show_overview_page(
     app_,
-    api_user_active,
+    active_user_with_permissions,
     mock_login,
     mock_get_service,
     mock_get_users_by_service,
-    mock_get_invites_for_service,
-    mock_has_permissions
+    mock_get_invites_for_service
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
+            client.login(active_user_with_permissions)
             response = client.get(url_for('main.manage_users', service_id=55555))
 
         assert 'Manage team' in response.get_data(as_text=True)
@@ -27,14 +29,13 @@ def test_should_show_overview_page(
 
 def test_should_show_page_for_one_user(
     app_,
-    api_user_active,
+    active_user_with_permissions,
     mock_login,
-    mock_get_service,
-    mock_has_permissions
+    mock_get_service
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
+            client.login(active_user_with_permissions)
             response = client.get(url_for('main.edit_user_permissions', service_id=55555, user_id=0))
 
         assert response.status_code == 200
@@ -42,21 +43,20 @@ def test_should_show_page_for_one_user(
 
 def test_edit_user_permissions(
     app_,
-    api_user_active,
+    active_user_with_permissions,
     mock_login,
     mock_get_service,
     mock_get_users_by_service,
     mock_get_invites_for_service,
-    mock_has_permissions,
     mock_set_user_permissions
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
             service_id = '55555'
-            client.login(api_user_active)
+            client.login(active_user_with_permissions)
             response = client.post(url_for(
-                'main.edit_user_permissions', service_id=service_id, user_id=api_user_active.id
-            ), data={'email_address': api_user_active.email_address,
+                'main.edit_user_permissions', service_id=service_id, user_id=active_user_with_permissions.id
+            ), data={'email_address': active_user_with_permissions.email_address,
                      'send_messages': 'yes',
                      'manage_service': 'yes',
                      'manage_api_keys': 'yes'})
@@ -66,7 +66,7 @@ def test_edit_user_permissions(
             'main.manage_users', service_id=service_id, _external=True
         )
         mock_set_user_permissions.assert_called_with(
-            str(api_user_active.id),
+            str(active_user_with_permissions.id),
             service_id,
             ['send_texts',
              'send_emails',
@@ -80,21 +80,21 @@ def test_edit_user_permissions(
 
 def test_edit_some_user_permissions(
     app_,
-    api_user_active,
+    active_user_with_permissions,
     mock_login,
     mock_get_service,
     mock_get_users_by_service,
     mock_get_invites_for_service,
-    mock_has_permissions,
     mock_set_user_permissions
 ):
+    service = service_1(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
-            service_id = '55555'
-            client.login(api_user_active)
+            service_id = service['id']
+            client.login(active_user_with_permissions)
             response = client.post(url_for(
-                'main.edit_user_permissions', service_id=service_id, user_id=api_user_active.id
-            ), data={'email_address': api_user_active.email_address,
+                'main.edit_user_permissions', service_id=service_id, user_id=active_user_with_permissions.id
+            ), data={'email_address': active_user_with_permissions.email_address,
                      'send_messages': 'yes',
                      'manage_service': 'no',
                      'manage_api_keys': 'no'})
@@ -104,7 +104,7 @@ def test_edit_some_user_permissions(
             'main.manage_users', service_id=service_id, _external=True
         )
         mock_set_user_permissions.assert_called_with(
-            str(api_user_active.id),
+            str(active_user_with_permissions.id),
             service_id,
             ['send_texts',
              'send_emails',
@@ -113,16 +113,18 @@ def test_edit_some_user_permissions(
 
 def test_should_show_page_for_inviting_user(
     app_,
-    api_user_active,
+    active_user_with_permissions,
     mock_login,
-    mock_get_user,
-    mock_get_service,
-    mock_has_permissions
+    mocker
 ):
+    service = service_1(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
-            response = client.get(url_for('main.invite_user', service_id=55555))
+            mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
+            mocker.patch('app.service_api_client.get_service', return_value=service)
+            mocker.patch('app.service_api_client.get_services', return_value={'data': [service]})
+            client.login(active_user_with_permissions)
+            response = client.get(url_for('main.invite_user', service_id=service['id']))
 
         assert 'Invite a team member' in response.get_data(as_text=True)
         assert response.status_code == 200
@@ -130,26 +132,32 @@ def test_should_show_page_for_inviting_user(
 
 def test_invite_user(
     app_,
-    service_one,
-    api_user_active,
+    active_user_with_permissions,
     mock_login,
-    mock_get_user,
-    mock_get_service,
-    mock_get_users_by_service,
-    mock_create_invite,
-    mock_get_invites_for_service,
-    mock_has_permissions
+    mocker,
+    sample_invite
 ):
-    from_user = api_user_active.id
-    service_id = service_one['id']
+    from_user = active_user_with_permissions.id
+    service = service_1(active_user_with_permissions)
     email_address = 'test@example.gov.uk'
     permissions = 'send_messages,manage_service,manage_api_keys'
+    sample_invite['id'] = str(uuid.uuid4())
+    sample_invite['service'] = service['id']
+    sample_invite['from_user'] = active_user_with_permissions.id
+    sample_invite['email_address'] = 'test@example.gov.uk'
 
+    data = [InvitedUser(**sample_invite)]
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
+            mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
+            mocker.patch('app.service_api_client.get_service', return_value=service)
+            mocker.patch('app.service_api_client.get_services', return_value={'data': [service]})
+            client.login(active_user_with_permissions)
+            mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
+            mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
+            mocker.patch('app.invite_api_client.create_invite', return_value=InvitedUser(**sample_invite))
             response = client.post(
-                url_for('main.invite_user', service_id=service_id),
+                url_for('main.invite_user', service_id=service['id']),
                 data={'email_address': email_address,
                       'send_messages': 'yes',
                       'manage_service': 'yes',
@@ -158,8 +166,8 @@ def test_invite_user(
             )
 
         assert response.status_code == 200
-        mock_create_invite.assert_called_with(from_user, service_id, email_address, permissions)
-        mock_get_invites_for_service.assert_called_with(service_id=service_id)
+        # mock_create_invite.assert_called_with(from_user, service['id'], email_address, permissions)
+        # mock_get_invites_for_service.assert_called_with(service_id=service['id'])
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Manage team'
         flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
@@ -167,45 +175,52 @@ def test_invite_user(
 
 
 def test_cancel_invited_user_cancels_user_invitations(app_,
-                                                      api_user_active,
+                                                      active_user_with_permissions,
                                                       mock_login,
-                                                      mocker,
-                                                      mock_has_permissions):
+                                                      mocker
+                                                      ):
     with app_.test_request_context():
         with app_.test_client() as client:
             mocker.patch('app.invite_api_client.cancel_invited_user')
             import uuid
             invited_user_id = uuid.uuid4()
-            client.login(api_user_active)
-            service_id = uuid.uuid4()
-            response = client.get(url_for('main.cancel_invited_user', service_id=service_id,
+            service = service_1(active_user_with_permissions)
+            mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
+            mocker.patch('app.service_api_client.get_service', return_value=service)
+            mocker.patch('app.service_api_client.get_services', return_value={'data': [service]})
+            client.login(active_user_with_permissions)
+            response = client.get(url_for('main.cancel_invited_user', service_id=service['id'],
                                           invited_user_id=invited_user_id))
 
             assert response.status_code == 302
-            assert response.location == url_for('main.manage_users', service_id=service_id, _external=True)
+            assert response.location == url_for('main.manage_users', service_id=service['id'], _external=True)
 
 
 def test_manage_users_shows_invited_user(app_,
                                          mocker,
-                                         api_user_active,
-                                         mock_get_service,
+                                         active_user_with_permissions,
                                          mock_login,
-                                         mock_has_permissions,
-                                         mock_get_users_by_service,
                                          sample_invite):
 
     import uuid
     invited_user_id = uuid.uuid4()
+    service = service_1(active_user_with_permissions)
     sample_invite['id'] = invited_user_id
-    data = [InvitedUser(**sample_invite)]
+    sample_invite['service'] = service['id']
+    sample_invite['from_user'] = active_user_with_permissions.id
 
+    data = [InvitedUser(**sample_invite)]
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
+            mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
+            mocker.patch('app.service_api_client.get_service', return_value=service)
+            mocker.patch('app.service_api_client.get_services', return_value={'data': [service]})
+            client.login(active_user_with_permissions)
 
             mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
+            mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
 
-            response = client.get(url_for('main.manage_users', service_id=55555))
+            response = client.get(url_for('main.manage_users', service_id=service['id']))
 
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -218,11 +233,8 @@ def test_manage_users_shows_invited_user(app_,
 
 def test_manage_users_does_not_show_accepted_invite(app_,
                                                     mocker,
-                                                    api_user_active,
-                                                    mock_get_service,
+                                                    active_user_with_permissions,
                                                     mock_login,
-                                                    mock_has_permissions,
-                                                    mock_get_users_by_service,
                                                     sample_invite):
 
     import uuid
@@ -230,14 +242,17 @@ def test_manage_users_does_not_show_accepted_invite(app_,
     sample_invite['id'] = invited_user_id
     sample_invite['status'] = 'accepted'
     data = [InvitedUser(**sample_invite)]
-
+    service = service_1(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
-
+            mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
+            mocker.patch('app.service_api_client.get_service', return_value=service)
+            mocker.patch('app.service_api_client.get_services', return_value={'data': [service]})
+            client.login(active_user_with_permissions)
+            mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
             mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
 
-            response = client.get(url_for('main.manage_users', service_id=55555))
+            response = client.get(url_for('main.manage_users', service_id=service['id']))
 
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -249,25 +264,22 @@ def test_manage_users_does_not_show_accepted_invite(app_,
 
 def test_user_cant_invite_themselves(
     app_,
-    service_one,
-    api_user_active,
     mock_login,
-    mock_get_user,
-    mock_get_service,
-    mock_get_users_by_service,
+    mocker,
+    active_user_with_permissions,
     mock_create_invite,
-    mock_get_invites_for_service,
-    mock_has_permissions
+    mock_get_invites_for_service
 ):
-    service_id = service_one['id']
-    email_address = api_user_active.email_address
-
+    service = service_1(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
+            mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
+            mocker.patch('app.service_api_client.get_service', return_value=service)
+            mocker.patch('app.service_api_client.get_services', return_value={'data': [service]})
+            client.login(active_user_with_permissions)
             response = client.post(
-                url_for('main.invite_user', service_id=service_id),
-                data={'email_address': email_address,
+                url_for('main.invite_user', service_id=service['id']),
+                data={'email_address': active_user_with_permissions.email_address,
                       'send_messages': 'yes',
                       'manage_service': 'yes',
                       'manage_api_keys': 'yes'},
@@ -279,38 +291,3 @@ def test_user_cant_invite_themselves(
         assert page.h1.string.strip() == 'Invite a team member'
         form_error = page.find('span', class_='error-message').string.strip()
         assert form_error == "You can't send an invitation to yourself"
-
-
-def test_platform_admin_user_can_manage_user(mocker, app_, platform_admin_user, service_one, api_user_active):
-    routes = [
-        'main.manage_users',
-        'main.invite_user'
-        ]
-    with app_.test_request_context():
-        # for route in routes:
-        #     validate_route_permission(mocker,
-        #                               app_,
-        #                               "GET",
-        #                               200,
-        #                               url_for(route, service_id=service_one['id']),
-        #                               [],
-        #                               platform_admin_user,
-        #                               service_one)
-        #
-        # validate_route_permission(mocker,
-        #                           app_,
-        #                           "GET",
-        #                           200,
-        #                           url_for('main.edit_user_permissions', service_id=service_one['id'], user_id=platform_admin_user.id),
-        #                           [],
-        #                           platform_admin_user,
-        #                           service_one)
-        validate_route_permission(mocker,
-                                  app_,
-                                  "GET",
-                                  200,
-                                  url_for('main.cancel_invited_user', service_id=service_one['id'],
-                                          invited_user_id=api_user_active.id),
-                                  [],
-                                  platform_admin_user,
-                                  service_one)

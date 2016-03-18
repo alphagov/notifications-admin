@@ -86,8 +86,6 @@ class User(UserMixin):
     def has_permissions(self, permissions, service_id=None, or_=False, admin_override=False):
         if admin_override and self.platform_admin:
             return True
-        if service_id is None:
-            service_id = session.get('service_id', '')
         if service_id in self._permissions:
             if or_:
                 return any([x in self._permissions[service_id] for x in permissions])
@@ -140,6 +138,7 @@ class InvitedUser(object):
         self.created_at = created_at
 
     def has_permissions(self, permissions):
+        print('here')
         return set(self.permissions) > set(permissions)
 
     def __eq__(self, other):

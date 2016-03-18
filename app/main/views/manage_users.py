@@ -23,7 +23,7 @@ from app.utils import user_has_permissions
 
 @main.route("/services/<service_id>/users")
 @login_required
-@user_has_permissions('manage_users', 'manage_templates', 'manage_settings', admin_override=True)
+@user_has_permissions('manage_users', admin_override=True)
 def manage_users(service_id):
     users = user_api_client.get_users_for_service(service_id=service_id)
     invited_users = invite_api_client.get_invites_for_service(service_id=service_id)
@@ -40,9 +40,8 @@ def manage_users(service_id):
 
 @main.route("/services/<service_id>/users/invite", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_users', 'manage_templates', 'manage_settings', admin_override=True)
+@user_has_permissions('manage_users', admin_override=True)
 def invite_user(service_id):
-
     service = get_service_by_id(service_id)
 
     form = InviteUserForm(current_user.email_address)
@@ -50,6 +49,7 @@ def invite_user(service_id):
         email_address = form.email_address.data
         permissions = _get_permissions(request.form)
         invited_user = invite_api_client.create_invite(current_user.id, service_id, email_address, permissions)
+
         flash('Invite sent to {}'.format(invited_user.email_address), 'default_with_tick')
         return redirect(url_for('.manage_users', service_id=service_id))
 
@@ -63,7 +63,7 @@ def invite_user(service_id):
 
 @main.route("/services/<service_id>/users/<user_id>", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_users', 'manage_templates', 'manage_settings', admin_override=True)
+@user_has_permissions('manage_users', admin_override=True)
 def edit_user_permissions(service_id, user_id):
     # TODO we should probably using the service id here in the get user
     # call as well. eg. /user/<user_id>?&service_id=service_id
@@ -100,7 +100,7 @@ def edit_user_permissions(service_id, user_id):
 
 
 @main.route("/services/<service_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
-@user_has_permissions('manage_users', 'manage_templates', 'manage_settings', admin_override=True)
+@user_has_permissions('manage_users', admin_override=True)
 def cancel_invited_user(service_id, invited_user_id):
     invite_api_client.cancel_invited_user(service_id=service_id, invited_user_id=invited_user_id)
 

@@ -1,6 +1,7 @@
 import pytest
 from flask.testing import FlaskClient
 from flask import url_for
+from flask_login import login_user
 
 
 class TestClient(FlaskClient):
@@ -13,6 +14,7 @@ class TestClient(FlaskClient):
         # Include mock_login fixture in test for this to work.
         # TODO would be better for it to be mocked in this
         # function
+
         response = self.post(
             url_for('main.two_factor'), data={'sms_code': '12345'})
         assert response.status_code == 302
@@ -147,10 +149,6 @@ def validate_route_permission(mocker,
     mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
     mocker.patch('app.service_api_client.get_service', return_value={'data': service})
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[usr])
-    mocker.patch('app.invite_api_client.get_invites_for_service', return_value=[])
-    mocker.patch('app.invite_api_client.cancel_invited_user')
-
-
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(usr)
