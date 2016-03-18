@@ -66,7 +66,7 @@ def get_page_headings(template_type):
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', or_=True)
+@user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', 'manage_api_keys', or_=True)
 def choose_template(service_id, template_type):
 
     service = services_dao.get_service_by_id_or_404(service_id)
