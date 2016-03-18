@@ -23,8 +23,7 @@ def test_should_render_email_verification_resent_show_email_address_and_resend_v
 
             assert page.h1.string == 'Check your email'
             expected = "In order to verify your email address we've sent a new confirmation link to {}".format(api_user_active.email_address)  # noqa
-            message = page.find_all('p')[1].text
-            assert message == expected
+            assert page.p.string == expected
             mock_send_verify_email.assert_called_with(api_user_active.id, api_user_active.email_address)
 
 
