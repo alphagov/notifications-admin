@@ -2,7 +2,7 @@ import os
 import re
 
 import dateutil
-from flask import (Flask, session, Markup, escape, render_template, make_response)
+from flask import (Flask, session, Markup, escape, render_template, make_response, current_app)
 from flask._compat import string_types
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
@@ -19,11 +19,11 @@ from app.notify_client.job_api_client import JobApiClient
 from app.notify_client.notification_api_client import NotificationApiClient
 from app.notify_client.status_api_client import StatusApiClient
 from app.notify_client.invite_api_client import InviteApiClient
+from app.notify_client.statistics_api_client import StatisticsApiClient
 from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.asset_fingerprinter import AssetFingerprinter
 from utils.recipients import validate_phone_number, InvalidPhoneError
 import app.proxy_fix
-from config import configs
 from utils import logging
 
 login_manager = LoginManager()
@@ -36,15 +36,16 @@ job_api_client = JobApiClient()
 notification_api_client = NotificationApiClient()
 status_api_client = StatusApiClient()
 invite_api_client = InviteApiClient()
+statistics_api_client = StatisticsApiClient()
 asset_fingerprinter = AssetFingerprinter()
 
 
-def create_app(config_name, config_overrides=None):
+def create_app():
     application = Flask(__name__)
 
-    application.config['NOTIFY_ADMIN_ENVIRONMENT'] = config_name
-    application.config.from_object(configs[config_name])
-    init_app(application, config_overrides)
+    application.config.from_object(os.environ['NOTIFY_ADMIN_ENVIRONMENT'])
+
+    init_app(application)
     logging.init_app(application)
     init_csrf(application)
 
@@ -55,6 +56,7 @@ def create_app(config_name, config_overrides=None):
     notification_api_client.init_app(application)
     status_api_client.init_app(application)
     invite_api_client.init_app(application)
+    statistics_api_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
@@ -101,22 +103,12 @@ def init_csrf(application):
         abort(400, reason)
 
 
-def init_app(app, config_overrides):
-
-    if config_overrides:
-        for key in app.config.keys():
-            if key in config_overrides:
-                    app.config[key] = config_overrides[key]
-
-    for key, value in app.config.items():
-        if key in os.environ:
-            app.config[key] = convert_to_boolean(os.environ[key])
-
-    @app.context_processor
+def init_app(application):
+    @application.context_processor
     def inject_global_template_variables():
         return {
             'asset_path': '/static/',
-            'header_colour': app.config['HEADER_COLOUR'],
+            'header_colour': application.config['HEADER_COLOUR'],
             'asset_url': asset_fingerprinter.get_url
         }
 
@@ -203,4 +195,6 @@ def register_errorhandlers(application):
 
     @application.errorhandler(Exception)
     def handle_bad_request(error):
+        if current_app.config.get('DEBUG', None):
+            raise error
         return _error_response(500)

@@ -24,7 +24,7 @@ from notifications_python_client.errors import HTTPError
 
 @pytest.fixture(scope='session')
 def app_(request):
-    app = create_app('test')
+    app = create_app()
 
     ctx = app.app_context()
     ctx.push()
@@ -152,6 +152,15 @@ def mock_delete_service(mocker, mock_get_service):
 
     return mocker.patch(
         'app.notifications_api_client.delete_service', side_effect=_delete)
+
+
+@pytest.fixture(scope='function')
+def mock_get_service_statistics(mocker):
+    def _create(service_id):
+        return {'data': [{}]}
+
+    return mocker.patch(
+        'app.statistics_api_client.get_statistics_for_service', side_effect=_create)
 
 
 @pytest.fixture(scope='function')

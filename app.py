@@ -3,7 +3,7 @@ from flask.ext.script import Manager, Server
 from app import create_app
 
 
-application = create_app(os.getenv('NOTIFICATIONS_ADMIN_ENVIRONMENT') or 'development')
+application = create_app()
 manager = Manager(application)
 port = int(os.environ.get('PORT', 6012))
 manager.add_command("runserver", Server(host='0.0.0.0', port=port))
