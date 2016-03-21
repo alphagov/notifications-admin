@@ -35,6 +35,13 @@ class UserApiClient(BaseAPIClient):
         user_data = self.get('/user/email', params={'email': email_address})
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
+    def get_user_by_email_or_none(self, email_address):
+        try:
+            return self.get_user_by_email(email_address)
+        except HTTPError as e:
+            if HTTPError.status_code == 404:
+                return None
+
     def get_users(self):
         users_data = self.get("/user")['data']
         users = []
@@ -106,15 +113,9 @@ class UserApiClient(BaseAPIClient):
         self.post(endpoint, data=data)
 
     def is_email_unique(self, email_address):
-        try:
-            if self.get_user_by_email(email_address):
-                return False
-            return True
-        except HTTPError as ex:
-            if ex.status_code == 404:
-                return True
-            else:
-                raise ex
+        if self.get_user_by_email_or_none(email_address):
+            return False
+        return True
 
     def activate_user(self, user):
         user.state = 'active'

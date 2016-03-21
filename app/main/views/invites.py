@@ -36,12 +36,7 @@ def accept_invite(token):
 
     session['invited_user'] = invited_user.serialize()
 
-    try:
-        existing_user = user_api_client.get_user_by_email(invited_user.email_address)
-    except HTTPError as ex:
-        if ex.status_code == 404:
-            existing_user = False
-
+    existing_user = user_api_client.get_user_by_email_or_none(invited_user.email_address)
     service_users = user_api_client.get_users_for_service(invited_user.service)
 
     if existing_user:
