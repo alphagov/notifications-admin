@@ -22,7 +22,6 @@
   {% if current_user.has_permissions(['manage_api_keys', 'access_developer_docs']) %}
   <ul>
     <li><a href="{{ url_for('.api_keys', service_id=service_id) }}">API keys</a></li>
-    <li><a href="{{ url_for('.documentation', service_id=service_id) }}">Developer documentation</a></li>
   </ul>
   {% endif %}
   <ul>

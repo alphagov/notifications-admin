@@ -72,10 +72,31 @@
   </div>
 {% endblock %}
 
+{% block footer_top %}
+  <div class="footer-categories">
+    <div class="footer-categories-wrapper">
+      <div class="grid-row">
+        <div class="column-one-third">
+          <h2>Contact</h2>
+          <ul>
+            <li><a href="https://docs.google.com/forms/d/1AL8U-xJX_HAFEiQiJszGQw0PcEaEUnYATSntEghNDGo/viewform">Support and feedback</a></li>
+          </ul>
+        </div>
+        <div class="column-one-third">
+          <h2>About</h2>
+          <a href="{{ url_for("main.help") }}">Help</a>
+        </div>
+        <div class="column-one-third">
+          <h2>Developers</h2>
+          <a href="{{ url_for('main.documentation') }}">API documentation</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
 {% block footer_support_links %}
   <nav class="footer-nav">
-    <a href="{{ url_for("main.help") }}">Help</a>
-    <a href="https://docs.google.com/forms/d/1AL8U-xJX_HAFEiQiJszGQw0PcEaEUnYATSntEghNDGo/viewform">Support and feedback</a>
     <a href="{{ url_for("main.cookies") }}">Cookies</a>
     Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service">Government Digital Service</a>
   </nav>
