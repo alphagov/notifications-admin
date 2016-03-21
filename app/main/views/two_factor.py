@@ -7,8 +7,7 @@ from flask import (
     request
 )
 
-from flask_login import login_user
-
+from flask_login import login_user, current_user
 from app.main import main
 from app.main.dao import users_dao, services_dao
 from app.main.forms import TwoFactorForm
@@ -43,6 +42,8 @@ def two_factor():
         if next_url and _is_safe_redirect_url(next_url):
             return redirect(next_url)
 
+        if current_user.platform_admin:
+            return redirect(url_for('main.show_all_services'))
         if len(services) == 1:
             return redirect(url_for('main.service_dashboard', service_id=services[0]['id']))
         else:

@@ -39,9 +39,9 @@ Manage users – GOV.UK Notify
     {% call field() %}
       {{ item.name }}
     {% endcall %}
-    {{ boolean_field(item.has_permissions(['send_texts', 'send_emails', 'send_letters'], service_id=service_id)) }}
-    {{ boolean_field(item.has_permissions(['manage_users', 'manage_templates', 'manage_settings'], service_id=service_id)) }}
-    {{ boolean_field(item.has_permissions(['manage_api_keys', 'access_developer_docs'], service_id=service_id)) }}
+    {{ boolean_field(item.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters'])) }}
+    {{ boolean_field(item.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings'])) }}
+    {{ boolean_field(item.has_permissions(permissions=['manage_api_keys', 'access_developer_docs'])) }}
     {% call field(align='right') %}
       {% if current_user.has_permissions(['manage_users']) %}
         {% if current_user.id != item.id %}
@@ -58,9 +58,9 @@ Manage users – GOV.UK Notify
       {% call field() %}
         {{ item.email_address }}
       {% endcall %}
-      {{ boolean_field(item.has_permissions(['send_texts', 'send_emails', 'send_letters'])) }}
-      {{ boolean_field(item.has_permissions(['manage_users', 'manage_templates', 'manage_settings'])) }}
-      {{ boolean_field(item.has_permissions(['manage_api_keys', 'access_developer_docs'])) }}
+      {{ boolean_field(item.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters'])) }}
+      {{ boolean_field(item.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings'])) }}
+      {{ boolean_field(item.has_permissions(permissions=['manage_api_keys', 'access_developer_docs'])) }}
       {% if item.status == 'pending' %}
         {% call field(align='right') %}
           <a href="{{ url_for('.cancel_invited_user', service_id=service_id, invited_user_id=item.id)}}">Cancel invitation</a>

@@ -422,3 +422,26 @@ def test_route_invalid_permissions(mocker, app_, api_user_active, service_one):
                 ['blah'],
                 api_user_active,
                 service_one)
+
+
+def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one):
+    routes = [
+        'main.service_settings',
+        'main.service_name_change',
+        'main.service_name_change_confirm',
+        'main.service_request_to_go_live',
+        'main.service_status_change',
+        'main.service_status_change_confirm',
+        'main.service_delete',
+        'main.service_delete_confirm'
+        ]
+    with app_.test_request_context():
+        for route in routes:
+            validate_route_permission(mocker,
+                                      app_,
+                                      "GET",
+                                      200,
+                                      url_for(route, service_id=service_one['id']),
+                                      [],
+                                      platform_admin_user,
+                                      service_one)
