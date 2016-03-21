@@ -17,6 +17,7 @@ from app.main.forms import TwoFactorForm
 @main.route('/two-factor', methods=['GET', 'POST'])
 def two_factor():
     # TODO handle user_email not in session
+
     try:
         user_id = session['user_details']['id']
     except KeyError:
