@@ -2,6 +2,7 @@ import os
 import re
 
 import dateutil
+import urllib
 from flask import (Flask, session, Markup, escape, render_template, make_response, current_app)
 from flask._compat import string_types
 from flask_login import LoginManager
@@ -77,6 +78,7 @@ def create_app():
     application.add_template_filter(format_time)
     application.add_template_filter(syntax_highlight_json)
     application.add_template_filter(valid_phone_number)
+    application.add_template_filter(linkable_name)
 
     application.after_request(useful_headers_after_request)
     register_errorhandlers(application)
@@ -131,6 +133,10 @@ def nl2br(value):
     return Markup(result)
 
 
+def linkable_name(value):
+    return urllib.parse.quote_plus(value)
+
+
 def syntax_highlight_json(code):
     return Markup(highlight(code, JavascriptLexer(), HtmlFormatter(noclasses=True)))
 
@@ -161,7 +167,7 @@ def useful_headers_after_request(response):
     response.headers.add('X-Content-Type-Options', 'nosniff')
     response.headers.add('X-XSS-Protection', '1; mode=block')
     response.headers.add('Content-Security-Policy',
-                         "default-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:;")  # noqa
+                         "default-src 'self' 'unsafe-inline'; script-src 'self' *.google-analytics.com 'unsafe-inline' data:; object-src 'self'; font-src 'self' data:; img-src 'self' *.google-analytics.com data:;")  # noqa
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']
     response.headers.add(
@@ -195,6 +201,7 @@ def register_errorhandlers(application):
 
     @application.errorhandler(Exception)
     def handle_bad_request(error):
+        # We want the Flask in browser stacktrace
         if current_app.config.get('DEBUG', None):
             raise error
         return _error_response(500)

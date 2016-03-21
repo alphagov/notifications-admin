@@ -7,7 +7,7 @@
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='sms') }}">Send text messages</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='email') }}">Send emails</a></li>
   </ul>
-  {% elif current_user.has_permissions(['manage_templates']) %}
+  {% elif current_user.has_permissions(['manage_templates', 'manage_api_keys'], or_=True) %}
   <ul>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='sms') }}">Text message templates</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='email') }}">Email templates</a></li>
@@ -25,4 +25,8 @@
     <li><a href="{{ url_for('.documentation', service_id=service_id) }}">Developer documentation</a></li>
   </ul>
   {% endif %}
+  <ul>
+    <li><a href="{{ url_for('.view_notifications', service_id=service_id) }}">Notification history</a></li>
+    <li><a href="{{ url_for('.view_jobs', service_id=service_id) }}">Job history</a><li>
+  </ul>
 </nav>
