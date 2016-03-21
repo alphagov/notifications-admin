@@ -3,7 +3,6 @@ from flask import (
     redirect,
     request,
     url_for,
-    abort,
     session,
     flash
 )
@@ -29,7 +28,7 @@ from app.main.forms import ConfirmPasswordForm, ServiceNameForm
 
 @main.route("/services/<service_id>/service-settings")
 @login_required
-@user_has_permissions('manage_settings')
+@user_has_permissions('manage_settings', admin_override=True)
 def service_settings(service_id):
     service = get_service_by_id(service_id)['data']
 
@@ -42,7 +41,7 @@ def service_settings(service_id):
 
 @main.route("/services/<service_id>/service-settings/name", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings')
+@user_has_permissions('manage_settings', admin_override=True)
 def service_name_change(service_id):
     service = get_service_by_id(service_id)['data']
 
@@ -61,7 +60,7 @@ def service_name_change(service_id):
 
 @main.route("/services/<service_id>/service-settings/name/confirm", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings')
+@user_has_permissions('manage_settings', admin_override=True)
 def service_name_change_confirm(service_id):
     service = get_service_by_id(service_id)['data']
 
@@ -95,7 +94,7 @@ def service_name_change_confirm(service_id):
 
 @main.route("/services/<service_id>/service-settings/request-to-go-live", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings')
+@user_has_permissions('manage_settings', admin_override=True)
 def service_request_to_go_live(service_id):
     service = get_service_by_id(service_id)['data']
     if request.method == 'GET':
@@ -112,7 +111,7 @@ def service_request_to_go_live(service_id):
 
 @main.route("/services/<service_id>/service-settings/status", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings')
+@user_has_permissions('manage_settings', admin_override=True)
 def service_status_change(service_id):
     service = get_service_by_id(service_id)['data']
 
@@ -128,7 +127,7 @@ def service_status_change(service_id):
 
 @main.route("/services/<service_id>/service-settings/status/confirm", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings')
+@user_has_permissions('manage_settings', admin_override=True)
 def service_status_change_confirm(service_id):
     service = get_service_by_id(service_id)['data']
 
@@ -151,7 +150,7 @@ def service_status_change_confirm(service_id):
 
 @main.route("/services/<service_id>/service-settings/delete", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings')
+@user_has_permissions('manage_settings', admin_override=True)
 def service_delete(service_id):
     service = get_service_by_id(service_id)['data']
 
@@ -167,7 +166,7 @@ def service_delete(service_id):
 
 @main.route("/services/<service_id>/service-settings/delete/confirm", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings')
+@user_has_permissions('manage_settings', admin_override=True)
 def service_delete_confirm(service_id):
     service = get_service_by_id(service_id)['data']
 

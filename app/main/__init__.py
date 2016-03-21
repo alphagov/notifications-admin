@@ -22,5 +22,6 @@ from app.main.views import (
     choose_service,
     api_keys,
     manage_users,
-    invites
+    invites,
+    all_services
 )
