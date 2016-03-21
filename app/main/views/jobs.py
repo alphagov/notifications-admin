@@ -45,9 +45,7 @@ def view_job(service_id, job_id):
         notifications=notifications['notifications'],
         counts={
             'queued': 0 if finished else job['notification_count'],
-            'sent': job['notification_count'] if finished else 0,
-            'failed': 0,
-            'cost': u'£0.00'
+            'sent': job['notification_count'] if finished else 0
         },
         uploaded_at=job['created_at'],
         finished_at=job['updated_at'] if finished else None,
@@ -74,9 +72,7 @@ def view_job_updates(service_id, job_id):
             'partials/jobs/count.html',
             counts={
                 'queued': 0 if finished else job['notification_count'],
-                'sent': job['notification_count'] if finished else 0,
-                'failed': 0,
-                'cost': u'£0.00'
+                'sent': job['notification_count'] if finished else 0
             }
         ),
         'notifications': render_template(

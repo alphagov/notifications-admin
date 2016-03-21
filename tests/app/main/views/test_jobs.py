@@ -74,9 +74,8 @@ def test_should_show_updates_for_one_job_as_json(
 
         assert response.status_code == 200
         content = json.loads(response.get_data(as_text=True))
-        assert 'sent' in content['counts']
+        assert 'processed' in content['counts']
         assert 'queued' in content['counts']
-        assert 'failed' in content['counts']
         assert 'Recipient' in content['notifications']
         assert 'Status' in content['notifications']
         assert 'Started' in content['status']

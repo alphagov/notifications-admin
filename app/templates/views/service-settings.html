@@ -27,12 +27,7 @@
       } if not service.active else {
         'title': 'Reactivate API keys',
         'link': url_for('.service_status_change', service_id=service_id)
-      },
-      {
-        'title': 'Delete this service from GOV.UK Notify',
-        'link': url_for('.service_delete', service_id=service_id),
-        'destructive': True
-      },
+      }
     ]) }}
 
 {% endblock %}
