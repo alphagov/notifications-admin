@@ -7,13 +7,13 @@
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='sms') }}">Send text messages</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='email') }}">Send emails</a></li>
   </ul>
-  {% elif current_user.has_permissions(['manage_templates', 'manage_api_keys'], or_=True) %}
+  {% elif current_user.has_permissions(['manage_templates','manage_api_keys'], admin_override=True, or_=True) %}
   <ul>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='sms') }}">Text message templates</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='email') }}">Email templates</a></li>
   </ul>
   {% endif %}
-  {% if current_user.has_permissions(['manage_users', 'manage_settings']) %}
+  {% if current_user.has_permissions(['manage_users', 'manage_settings'], admin_override=True) %}
   <ul>
     <li><a href="{{ url_for('.manage_users', service_id=service_id) }}">Manage team</a></li>
     <li><a href="{{ url_for('.service_settings', service_id=service_id) }}">Manage settings</a></li>
@@ -24,8 +24,14 @@
     <li><a href="{{ url_for('.api_keys', service_id=service_id) }}">API keys</a></li>
   </ul>
   {% endif %}
+
   <ul>
     <li><a href="{{ url_for('.view_notifications', service_id=service_id) }}">Notification history</a></li>
     <li><a href="{{ url_for('.view_jobs', service_id=service_id) }}">Job history</a><li>
   </ul>
+  {% if current_user.has_permissions(admin_override=True) %}
+    <ul>
+      <li><a href="{{ url_for('.show_all_services') }}"> List all services </a></li>
+    </ul>
+  {% endif %}
 </nav>

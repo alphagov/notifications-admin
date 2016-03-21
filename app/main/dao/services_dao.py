@@ -1,10 +1,10 @@
 from flask import url_for, current_app
-from app import notifications_api_client
+from app import service_api_client
 from app.utils import BrowsableItem
 
 
 def update_service(service):
-    return notifications_api_client.update_service(
+    return service_api_client.update_service(
         service['id'],
         service['name'],
         service['active'],
@@ -14,24 +14,24 @@ def update_service(service):
 
 
 def get_service_by_id(id_):
-    return notifications_api_client.get_service(id_)
+    return service_api_client.get_service(id_)
 
 
 def get_service_by_id_or_404(id_):
-    return notifications_api_client.get_service(id_)['data']
+    return service_api_client.get_service(id_)['data']
 
 
 def get_services(user_id=None):
     if user_id:
-        return notifications_api_client.get_services({'user_id': str(user_id)})
+        return service_api_client.get_services({'user_id': str(user_id)})
     else:
-        return notifications_api_client.get_services()
+        return service_api_client.get_services()
 
 
 def unrestrict_service(service_id):
-    resp = notifications_api_client.get_service(service_id)
+    resp = service_api_client.get_service(service_id)
     if resp['data']['restricted']:
-        resp = notifications_api_client.update_service(
+        resp = service_api_client.update_service(
             service_id,
             resp['data']['name'],
             resp['data']['active'],
@@ -41,9 +41,9 @@ def unrestrict_service(service_id):
 
 
 def activate_service(service_id):
-    resp = notifications_api_client.get_service(service_id)
+    resp = service_api_client.get_service(service_id)
     if not resp['data']['active']:
-        resp = notifications_api_client.update_service(
+        resp = service_api_client.update_service(
             service_id,
             resp['data']['name'],
             True,
@@ -54,7 +54,7 @@ def activate_service(service_id):
 
 # TODO Fix when functionality is added to the api.
 def find_service_by_service_name(service_name, user_id=None):
-    resp = notifications_api_client.get_services(user_id)
+    resp = service_api_client.get_services(user_id)
     retval = None
     for srv_json in resp['data']:
         if srv_json['name'] == service_name:
@@ -64,11 +64,11 @@ def find_service_by_service_name(service_name, user_id=None):
 
 
 def delete_service(id_):
-    return notifications_api_client.delete_service(id_)
+    return service_api_client.delete_service(id_)
 
 
 def find_all_service_names(user_id=None):
-    resp = notifications_api_client.get_services(user_id)
+    resp = service_api_client.get_services(user_id)
     return [x['name'] for x in resp['data']]
 
 

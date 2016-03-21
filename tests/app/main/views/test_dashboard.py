@@ -1,5 +1,4 @@
-from flask import url_for, session
-from bs4 import BeautifulSoup
+from flask import url_for
 
 
 def test_should_show_recent_jobs_on_dashboard(app_,
@@ -30,11 +29,11 @@ def _test_dashboard_menu(mocker, app_, usr, service, permissions):
                 'app.user_api_client.check_verify_code',
                 return_value=(True, ''))
             mocker.patch(
-                'app.notifications_api_client.get_services',
+                'app.service_api_client.get_services',
                 return_value={'data': []})
             mocker.patch('app.user_api_client.get_user', return_value=usr)
             mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
-            mocker.patch('app.notifications_api_client.get_service', return_value={'data': service})
+            mocker.patch('app.service_api_client.get_service', return_value={'data': service})
             mocker.patch('app.statistics_api_client.get_statistics_for_service', return_value={'data': [{}]})
             client.login(usr)
             return client.get(url_for('main.service_dashboard', service_id=service['id']))
@@ -62,6 +61,8 @@ def test_menu_send_messages(mocker, app_, api_user_active, service_one, mock_get
         assert url_for('main.service_settings', service_id=service_one['id']) not in page
 
         assert url_for('main.api_keys', service_id=service_one['id']) not in page
+        assert url_for('main.documentation', service_id=service_one['id']) not in page
+        assert url_for('main.show_all_services') not in page
 
 
 def test_menu_manage_service(mocker, app_, api_user_active, service_one, mock_get_service_templates, mock_get_jobs):
@@ -86,6 +87,7 @@ def test_menu_manage_service(mocker, app_, api_user_active, service_one, mock_ge
         assert url_for('main.service_settings', service_id=service_one['id']) in page
 
         assert url_for('main.api_keys', service_id=service_one['id']) not in page
+        assert url_for('main.show_all_services') not in page
 
 
 def test_menu_manage_api_keys(mocker, app_, api_user_active, service_one, mock_get_service_templates, mock_get_jobs):
@@ -108,6 +110,26 @@ def test_menu_manage_api_keys(mocker, app_, api_user_active, service_one, mock_g
 
         assert url_for('main.manage_users', service_id=service_one['id']) not in page
         assert url_for('main.service_settings', service_id=service_one['id']) not in page
+        assert url_for('main.show_all_services') not in page
 
         assert url_for('main.api_keys', service_id=service_one['id']) in page
-        assert url_for('main.documentation') in page
+
+
+def test_menu_all_services_for_platform_admin_user(mocker, app_, platform_admin_user, service_one,
+                                                   mock_get_service_templates, mock_get_jobs):
+    with app_.test_request_context():
+        resp = _test_dashboard_menu(
+            mocker,
+            app_,
+            platform_admin_user,
+            service_one,
+            [])
+        page = resp.get_data(as_text=True)
+        assert url_for('main.show_all_services') in page
+        assert url_for('main.choose_template', service_id=service_one['id'], template_type='sms') in page
+        assert url_for('main.choose_template', service_id=service_one['id'], template_type='email') in page
+        assert url_for('main.manage_users', service_id=service_one['id']) in page
+        assert url_for('main.service_settings', service_id=service_one['id']) in page
+        assert url_for('main.view_notifications', service_id=service_one['id']) in page
+        assert url_for('main.view_jobs', service_id=service_one['id']) in page
+        assert url_for('main.api_keys', service_id=service_one['id']) not in page

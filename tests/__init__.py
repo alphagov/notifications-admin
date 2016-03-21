@@ -1,21 +1,20 @@
 import pytest
 from flask.testing import FlaskClient
 from flask import url_for
+from flask_login import login_user
 
 
 class TestClient(FlaskClient):
     def login(self, user):
         # Skipping authentication here and just log them in
         with self.session_transaction() as session:
-            session['user_details'] = {
-                "email": user.email_address,
-                "id": user.id}
-        # Include mock_login fixture in test for this to work.
-        # TODO would be better for it to be mocked in this
-        # function
-        response = self.post(
-            url_for('main.two_factor'), data={'sms_code': '12345'})
-        assert response.status_code == 302
+            session['user_id'] = user.id
+            session['_fresh'] = True
+
+        login_user(user, remember=True)
+
+    def login_fresh(self):
+        return True
 
     def logout(self, user):
         self.get(url_for("main.logout"))
@@ -168,18 +167,16 @@ def validate_route_permission(mocker,
         'app.user_api_client.check_verify_code',
         return_value=(True, ''))
     mocker.patch(
-        'app.notifications_api_client.get_services',
+        'app.service_api_client.get_services',
         return_value={'data': []})
     mocker.patch('app.user_api_client.get_user', return_value=usr)
     mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
-    mocker.patch('app.notifications_api_client.get_service', return_value={'data': service})
-
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service})
+    mocker.patch('app.user_api_client.get_users_for_service', return_value=[usr])
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(usr)
             resp = None
-            with client.session_transaction() as session:
-                session['service_id'] = str(service['id'])
             if method == 'GET':
                 resp = client.get(route)
             elif method == 'POST':
