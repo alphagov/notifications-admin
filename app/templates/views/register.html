@@ -16,7 +16,7 @@ Create an account – GOV.UK Notify
 
     <form method="post" autocomplete="nope">
       {{ textbox(form.name, width='3-4') }}
-      {{ textbox(form.email_address, hint="Your email address must end in .gov.uk", width='3-4') }}
+      {{ textbox(form.email_address, hint="You must use an email address from a central government organisation", width='3-4', safe_error_message=True) }}
       {{ textbox(form.mobile_number, width='3-4') }}
       {{ textbox(form.password, hint="Your password must have at least 10 characters", width='3-4') }}
       {{ page_footer("Continue") }}

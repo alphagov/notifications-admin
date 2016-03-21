@@ -1,0 +1,22 @@
+{% macro previous_next_navigation(previous_page, next_page) %}
+  <nav class="govuk-previous-and-next-navigation" role="navigation" aria-label="Pagination">
+    <ul class="group">
+      {% if previous_page %}
+        <li class="previous-page">
+          <a href="{{previous_page['url']}}" rel="previous" >
+            <span class="pagination-part-title">{{previous_page['title']}}</span>
+            <span class="pagination-label">{{previous_page['label']}}</span>
+          </a>
+        </li>
+        {% endif %}
+      {% if next_page %}
+        <li class="next-page">
+          <a href="{{next_page['url']}}" rel="next">
+            <span class="pagination-part-title">{{next_page['title']}}</span>
+            <span class="pagination-label">{{next_page['label']}}</span>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endmacro %}

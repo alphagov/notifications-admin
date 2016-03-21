@@ -96,10 +96,10 @@ def test_should_render_verification_code_not_received(app_,
                    'speak to your service manager to reset the number.' in response.get_data(as_text=True)
 
 
-def test_check_and_redirect_to_two_factor(app_,
-                                          api_user_active,
-                                          mock_get_user_by_email,
-                                          mock_send_verify_code):
+def test_check_and_redirect_to_two_factor_if_user_active(app_,
+                                                         api_user_active,
+                                                         mock_get_user_by_email,
+                                                         mock_send_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
@@ -109,6 +109,25 @@ def test_check_and_redirect_to_two_factor(app_,
             response = client.get(url_for('main.check_and_resend_verification_code'))
             assert response.status_code == 302
             assert response.location == url_for('main.two_factor', _external=True)
+
+
+def test_check_and_redirect_to_verify_if_user_pending(app_,
+                                                      mocker,
+                                                      api_user_pending,
+                                                      mock_get_user_pending,
+                                                      mock_send_verify_code):
+
+    mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_pending)
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                session['user_details'] = {
+                    'id': api_user_pending.id,
+                    'email': api_user_pending.email_address}
+            response = client.get(url_for('main.check_and_resend_verification_code'))
+            assert response.status_code == 302
+            assert response.location == url_for('main.verify', _external=True)
 
 
 def test_should_create_new_code_for_user(app_,

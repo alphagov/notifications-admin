@@ -88,3 +88,23 @@ td {
 .heading-xlarge {
   margin-bottom: 20px;
 }
+
+#footer {
+
+  .footer-categories {
+    
+    @extend %site-width-container;
+
+    &-wrapper {
+      padding: 0 0 $gutter * 2;
+      margin: 0 0 $gutter;
+      border-bottom: 1px solid $border-colour;
+    }
+
+    h2 {
+      margin: 0 0 $gutter-two-thirds;
+    }
+
+  }
+
+}

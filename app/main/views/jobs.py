@@ -5,7 +5,11 @@ import time
 from flask import (
     render_template,
     abort,
-    jsonify
+    jsonify,
+    flash,
+    redirect,
+    request,
+    url_for
 )
 from flask_login import login_required
 from utils.template import Template
@@ -14,6 +18,7 @@ from app import job_api_client, notification_api_client
 from app.main import main
 from app.main.dao import templates_dao
 from app.main.dao import services_dao
+from app.utils import (get_page_from_request, generate_previous_next_dict)
 
 
 @main.route("/services/<service_id>/jobs")
@@ -40,9 +45,7 @@ def view_job(service_id, job_id):
         notifications=notifications['notifications'],
         counts={
             'queued': 0 if finished else job['notification_count'],
-            'sent': job['notification_count'] if finished else 0,
-            'failed': 0,
-            'cost': u'£0.00'
+            'sent': job['notification_count'] if finished else 0
         },
         uploaded_at=job['created_at'],
         finished_at=job['updated_at'] if finished else None,
@@ -69,9 +72,7 @@ def view_job_updates(service_id, job_id):
             'partials/jobs/count.html',
             counts={
                 'queued': 0 if finished else job['notification_count'],
-                'sent': job['notification_count'] if finished else 0,
-                'failed': 0,
-                'cost': u'£0.00'
+                'sent': job['notification_count'] if finished else 0
             }
         ),
         'notifications': render_template(
@@ -84,6 +85,34 @@ def view_job_updates(service_id, job_id):
             finished_at=job['updated_at'] if finished else None
         ),
     })
+
+
+@main.route('/services/<service_id>/notifications')
+@login_required
+def view_notifications(service_id):
+    # TODO get the api to return count of pages as well.
+    page = get_page_from_request()
+    if page is None:
+        abort(404, "Invalid page argument ({}) reverting to page 1.".format(request.args['page'], None))
+    notifications = notification_api_client.get_notifications_for_service(service_id=service_id, page=page)
+    prev_page = None
+    if notifications['links'].get('prev', None):
+        prev_page = generate_previous_next_dict(
+            'main.view_notifications',
+            {'service_id': service_id}, page - 1, 'Previous page', 'page {}'.format(page - 1))
+    next_page = None
+    if notifications['links'].get('next', None):
+        next_page = generate_previous_next_dict(
+            'main.view_notifications',
+            {'service_id': service_id}, page + 1, 'Next page', 'page {}'.format(page + 1))
+    return render_template(
+        'views/notifications.html',
+        service_id=service_id,
+        notifications=notifications['notifications'],
+        page=page,
+        prev_page=prev_page,
+        next_page=next_page
+    )
 
 
 @main.route("/services/<service_id>/jobs/<job_id>/notification/<string:notification_id>")

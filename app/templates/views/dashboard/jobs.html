@@ -4,7 +4,7 @@
   jobs,
   caption="Recent batch jobs",
   empty_message='You haven’t sent any text messages yet',
-  field_headings=['File', 'Started', right_aligned_field_heading('Rows'), right_aligned_field_heading('Sent')]
+  field_headings=['File', 'Started', right_aligned_field_heading('Rows')]
 ) %}
   {% call field() %}
     <a href="{{ url_for('.view_job', service_id=service_id, job_id=item.id) }}">{{ item.original_file_name }}</a>
@@ -14,9 +14,6 @@
   {% endcall %}
   {% call field(align='right') %}
     {{ item.notification_count }}
-  {% endcall %}
-  {% call field(align='right') %}
-    {{ item.notifications_sent }}
   {% endcall %}
 {% endcall %}
 {% if more_jobs_to_show %}

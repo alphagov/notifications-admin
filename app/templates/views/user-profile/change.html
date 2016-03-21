@@ -18,7 +18,7 @@ GOV.UK Notify | Service settings
     {% endif %}
     <div class="column-three-quarters">
       <form method="post">
-        {{ textbox(form_field) }}
+        {{ textbox(form_field, safe_error_message=True) }}
         {{ page_footer(
           'Save',
           back_link=url_for('.user_profile'),

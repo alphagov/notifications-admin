@@ -20,8 +20,9 @@
           <div class="textbox-highlight-mask" aria-hidden="true" />
           <div class="textbox-highlight-foreground" aria-hidden="true" />
         `))
-        .on("input", this.update)
-        .on("scroll", this.maintainScrollParity);
+        .on("input", this.update);
+
+      this.initialHeight = this.$textbox.height();
 
       this.$backgroundMaskForeground.width(
         this.$textbox.width()
@@ -32,14 +33,21 @@
 
     };
 
-    this.update = () => this.$backgroundMaskForeground.html(
+    this.resize = () => this.$textbox.height(
+      Math.max(
+        this.initialHeight,
+        this.$backgroundMaskForeground.outerHeight()
+      )
+    );
+
+    this.replacePlaceholders = () => this.$backgroundMaskForeground.html(
       $('<div/>').text(this.$textbox.val()).html().replace(
         tagPattern, match => `<span class='tag'>${match}</span>`
       )
     );
 
-    this.maintainScrollParity = () => this.$backgroundMaskForeground.scrollTop(
-      this.$textbox.scrollTop()
+    this.update = () => (
+      this.replacePlaceholders() && this.resize()
     );
 
   };
