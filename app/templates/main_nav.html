@@ -20,7 +20,7 @@
   </ul>
   {% else %}
   <ul>
-    <li><a href="{{ url_for('.manage_users', service_id=service_id) }}">Team members</a></li>
+    <li><a href="{{ url_for('.manage_users', service_id=service_id) }}">View team members</a></li>
   </ul>
   {% endif %}
   {% if current_user.has_permissions(['manage_api_keys', 'access_developer_docs']) %}
