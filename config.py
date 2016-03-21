@@ -50,6 +50,18 @@ class Config(object):
 
     SHOW_STYLEGUIDE = True
 
+    EMAIL_DOMAIN_REGEXES = [
+        "gov.uk",
+        "mod.uk",
+        "mil.uk",
+        "ddc-mod.org",
+        "slc.co.uk"
+        "gov.scot",
+        "parliament.uk",
+        "nhs.uk",
+        "nhs.net",
+        "police.uk"]
+
 
 class Development(Config):
     DEBUG = True
