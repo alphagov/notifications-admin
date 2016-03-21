@@ -29,7 +29,7 @@ def sign_in():
 
     form = LoginForm()
     if form.validate_on_submit():
-        user = user_api_client.get_user_by_email(form.email_address.data)
+        user = user_api_client.get_user_by_email_or_none(form.email_address.data)
         user = _get_and_verify_user(user, form.password.data)
         if user:
             # Remember me login

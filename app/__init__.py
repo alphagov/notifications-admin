@@ -168,7 +168,7 @@ def useful_headers_after_request(response):
     response.headers.add('X-Content-Type-Options', 'nosniff')
     response.headers.add('X-XSS-Protection', '1; mode=block')
     response.headers.add('Content-Security-Policy',
-                         "default-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:;")  # noqa
+                         "default-src 'self' 'unsafe-inline'; script-src 'self' *.google-analytics.com 'unsafe-inline' data:; object-src 'self'; font-src 'self' data:; img-src 'self' *.google-analytics.com data:;")  # noqa
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']
     response.headers.add(
