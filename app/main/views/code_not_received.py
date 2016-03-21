@@ -41,4 +41,7 @@ def check_and_resend_verification_code():
     # TODO there needs to be a way to generate a new session id
     user = user_api_client.get_user_by_email(session['user_details']['email'])
     user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
-    return redirect(url_for('main.two_factor'))
+    if user.state == 'pending':
+        return redirect(url_for('main.verify'))
+    else:
+        return redirect(url_for('main.two_factor'))
