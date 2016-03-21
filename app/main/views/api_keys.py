@@ -6,10 +6,9 @@ from app import api_key_api_client
 from app.utils import user_has_permissions
 
 
-@main.route("/services/<service_id>/documentation")
-@login_required
-def documentation(service_id):
-    return render_template('views/documentation.html', service_id=service_id)
+@main.route("/documentation")
+def documentation():
+    return render_template('views/documentation.html')
 
 
 @main.route("/services/<service_id>/api-keys")
