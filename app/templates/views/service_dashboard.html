@@ -49,7 +49,7 @@
       {% call(item) list_table(
         jobs,
         caption="Recent text messages",
-        empty_message='You haven’t sent any text messages yet',
+        empty_message='You haven’t sent any batch messages yet',
         field_headings=['Job', 'Created', right_aligned_field_heading('completion')]
       ) %}
         {% call field() %}
@@ -65,7 +65,7 @@
       {% if more_jobs_to_show %}
         {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
           <p class="table-show-more-link">
-            <a href="{{ url_for('.view_notifications', service_id=service_id) }}">See all sent text messages</a>
+            <a href="{{ url_for('.view_notifications', service_id=service_id) }}">See all sent batch messages</a>
           </p>
         {% endif %}
       {% endif %}
