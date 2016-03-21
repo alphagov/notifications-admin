@@ -210,7 +210,6 @@ def send_from_api(service_id, template_id):
         'views/send-from-api.html',
         template=template,
         payload=json.dumps(payload, indent=4),
-        api_host=current_app.config['API_HOST_NAME'],
         service_id=service_id
     )
 
