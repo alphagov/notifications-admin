@@ -103,7 +103,8 @@ def test_platform_admin_user_can_not_access_page(app_,
         platform_admin_user,
         [],
         '',
-        will_succeed=False)
+        will_succeed=False,
+        admin_override=False)
 
 
 def _user_with_permissions():
