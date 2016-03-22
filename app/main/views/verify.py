@@ -55,17 +55,19 @@ def verify_email(token):
 
         token_data = json.loads(token_data)
         verified = user_api_client.check_verify_code(token_data['user_id'], token_data['secret_code'], 'email')
-
         if verified[0]:
             user = user_api_client.get_user(token_data['user_id'])
             user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
             session['user_details'] = {"email": user.email_address, "id": user.id}
             return redirect('verify')
         else:
-            message = "There was a problem verifying your account. Error message: '{}'".format(verified[1])
-            flash(message)
-            # TODO could this ask for a resend instead?
-            return redirect(url_for('main.index'))
+            if verified[1] == 'Code has expired':
+                flash("The link in the email we sent you has expired. We've sent you a new one.")
+                return redirect(url_for('main.resend_email_verification'))
+            else:
+                message = "There was a problem verifying your account. Error message: '{}'".format(verified[1])
+                flash(message)
+                return redirect(url_for('main.index'))
 
     except SignatureExpired:
         flash('The link in the email we sent you has expired')
