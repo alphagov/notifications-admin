@@ -26,11 +26,13 @@ Manage users – GOV.UK Notify
         {{ yes_no(form.manage_api_keys, form.manage_api_keys.data) }}
       </fieldset>
 
-      {{ page_footer(
-        'Save',
-        back_link=url_for('.manage_users', service_id=service_id),
-        back_link_text='Cancel'
-      ) }}
+      {% if not delete %}
+        {{ page_footer(
+          'Save',
+          delete_link=url_for('.remove_user_from_service', service_id=service_id, user_id=user.id) if user or None,
+          delete_link_text='Remove user from service'
+        ) }}
+      {% endif %}
 
     </form>
   </div>

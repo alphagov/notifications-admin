@@ -38,7 +38,7 @@ Manage users – GOV.UK Notify
     {{ boolean_field(item.has_permissions(permissions=['manage_api_keys', 'access_developer_docs'])) }}
     {% call field(align='right') %}
       {% if current_user.id != item.id %}
-        <a href="{{ url_for('.edit_user_permissions', service_id=service_id, user_id=item.id)}}">Edit permission</a>
+        <a href="{{ url_for('.edit_user_permissions', service_id=service_id, user_id=item.id)}}">Edit</a>
       {% endif %}
     {% endcall %}
   {% endcall %}

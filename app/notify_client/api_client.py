@@ -105,6 +105,15 @@ class ServiceAPIClient(NotificationsAPIClient):
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
         return self.post(endpoint, data)
 
+    def remove_user_from_service(self, service_id, user_id):
+        """
+        Remove a user from a service
+        """
+        endpoint = '/service/{service_id}/users/{user_id}'.format(
+            service_id=service_id,
+            user_id=user_id)
+        return self.delete(endpoint)
+
     def get_service_template(self, service_id, template_id, *params):
         """
         Retrieve a service template.
