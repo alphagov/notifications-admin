@@ -322,3 +322,21 @@ def test_remove_user_from_service(app_,
             assert response.status_code == 302
             assert response.location == url_for(
                 'main.manage_users', service_id=service['id'], _external=True)
+
+
+def test_no_permission_manage_users_page(app_,
+                                         service_one,
+                                         api_user_active,
+                                         mock_login,
+                                         mock_get_user,
+                                         mock_get_service,
+                                         mock_get_users_by_service,
+                                         mock_get_invites_for_service):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(url_for('main.manage_users', service_id=service_one['id']))
+            resp_text = response.get_data(as_text=True)
+            assert url_for('.invite_user', service_id=service_one['id']) not in resp_text
+            assert "Edit permission" not in resp_text
+            assert "Manage team" not in resp_text

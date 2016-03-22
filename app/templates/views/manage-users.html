@@ -19,12 +19,18 @@ Manage users – GOV.UK Notify
   <div class="grid-row">
     <div class="column-two-thirds">
       <h1 class="heading-large">
-        Manage team
+        {% if current_user.has_permissions(['manage_users']) %}
+          Manage team
+        {% else %}
+          View team members
+        {% endif %}
       </h1>
     </div>
-    <div class="column-one-third">
-      <a href="{{ url_for('.invite_user', service_id=service_id) }}" class="button align-with-heading">Invite team member</a>
-    </div>
+    {% if current_user.has_permissions(['manage_users']) %}
+      <div class="column-one-third">
+        <a href="{{ url_for('.invite_user', service_id=service_id) }}" class="button align-with-heading">Invite team member</a>
+      </div>
+    {% endif %}
   </div>
 
   {% call(item) list_table(
@@ -37,8 +43,10 @@ Manage users – GOV.UK Notify
     {{ boolean_field(item.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings'])) }}
     {{ boolean_field(item.has_permissions(permissions=['manage_api_keys', 'access_developer_docs'])) }}
     {% call field(align='right') %}
-      {% if current_user.id != item.id %}
-        <a href="{{ url_for('.edit_user_permissions', service_id=service_id, user_id=item.id)}}">Edit</a>
+      {% if current_user.has_permissions(['manage_users']) %}
+        {% if current_user.id != item.id %}
+          <a href="{{ url_for('.edit_user_permissions', service_id=service_id, user_id=item.id)}}">Edit</a>
+        {% endif %}
       {% endif %}
     {% endcall %}
   {% endcall %}
