@@ -232,7 +232,7 @@ def check_messages(service_id, upload_id):
 
     template = Template(
         template,
-        prefix=service['name'] if template['template_type'] == 'sms' else ''
+        prefix=service['name']
     )
 
     recipients = RecipientCSV(

@@ -52,7 +52,7 @@ def view_job(service_id, job_id):
         uploaded_file_name=job['original_file_name'],
         template=Template(
             template,
-            prefix=service['name'] if template['template_type'] == 'sms' else ''
+            prefix=service['name']
         ),
         service_id=service_id,
         service=service,
