@@ -61,9 +61,9 @@ def test_edit_user_permissions(
             response = client.post(url_for(
                 'main.edit_user_permissions', service_id=service['id'], user_id=active_user_with_permissions.id
             ), data={'email_address': active_user_with_permissions.email_address,
-                     'send_messages': 'yes',
-                     'manage_service': 'yes',
-                     'manage_api_keys': 'yes'})
+                     'send_messages': 'y',
+                     'manage_service': 'y',
+                     'manage_api_keys': 'y'})
 
         assert response.status_code == 302
         assert response.location == url_for(
@@ -72,14 +72,17 @@ def test_edit_user_permissions(
         mock_set_user_permissions.assert_called_with(
             str(active_user_with_permissions.id),
             service['id'],
-            ['send_texts',
-             'send_emails',
-             'send_letters',
-             'manage_users',
-             'manage_templates',
-             'manage_settings',
-             'manage_api_keys',
-             'access_developer_docs'])
+            permissions={
+                'send_texts',
+                'send_emails',
+                'send_letters',
+                'manage_users',
+                'manage_templates',
+                'manage_settings',
+                'manage_api_keys',
+                'access_developer_docs'
+            }
+        )
 
 
 def test_edit_some_user_permissions(
@@ -102,9 +105,9 @@ def test_edit_some_user_permissions(
             response = client.post(url_for(
                 'main.edit_user_permissions', service_id=service_id, user_id=active_user_with_permissions.id
             ), data={'email_address': active_user_with_permissions.email_address,
-                     'send_messages': 'yes',
-                     'manage_service': 'no',
-                     'manage_api_keys': 'no'})
+                     'send_messages': 'y',
+                     'manage_service': '',
+                     'manage_api_keys': ''})
 
         assert response.status_code == 302
         assert response.location == url_for(
@@ -113,9 +116,12 @@ def test_edit_some_user_permissions(
         mock_set_user_permissions.assert_called_with(
             str(active_user_with_permissions.id),
             service_id,
-            ['send_texts',
-             'send_emails',
-             'send_letters'])
+            permissions={
+                'send_texts',
+                'send_emails',
+                'send_letters'
+            }
+        )
 
 
 def _mocks_for_test_manage_users(mocker, active_user_with_permissions, service):
@@ -161,9 +167,9 @@ def test_invite_user(
             response = client.post(
                 url_for('main.invite_user', service_id=service['id']),
                 data={'email_address': email_address,
-                      'send_messages': 'yes',
-                      'manage_service': 'yes',
-                      'manage_api_keys': 'yes'},
+                      'send_messages': 'y',
+                      'manage_service': 'y',
+                      'manage_api_keys': 'y'},
                 follow_redirects=True
             )
 
@@ -267,9 +273,9 @@ def test_user_cant_invite_themselves(
             response = client.post(
                 url_for('main.invite_user', service_id=service['id']),
                 data={'email_address': active_user_with_permissions.email_address,
-                      'send_messages': 'yes',
-                      'manage_service': 'yes',
-                      'manage_api_keys': 'yes'},
+                      'send_messages': 'y',
+                      'manage_service': 'y',
+                      'manage_api_keys': 'y'},
                 follow_redirects=True
             )
 
