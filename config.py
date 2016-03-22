@@ -33,9 +33,9 @@ class Config(object):
     ADMIN_CLIENT_SECRET = os.getenv('ADMIN_CLIENT_SECRET')
 
     WTF_CSRF_ENABLED = True
-    SECRET_KEY = 'dev-notify-secret-key'
     HTTP_PROTOCOL = 'http'
-    DANGEROUS_SALT = 'dev-notify-salt'
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    DANGEROUS_SALT = os.getenv('DANGEROUS_SALT')
     TOKEN_MAX_AGE_SECONDS = 3600
     EMAIL_EXPIRY_SECONDS = TOKEN_MAX_AGE_SECONDS * 24 * 7  # one week
 
@@ -71,6 +71,8 @@ class Development(Config):
     WTF_CSRF_ENABLED = False
     REMEMBER_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
+    SECRET_KEY = 'dev-notify-secret-key'
+    DANGEROUS_SALT = 'dev-notify-salt'
 
 
 class Test(Development):
