@@ -57,7 +57,7 @@ def test_menu_send_messages(mocker, app_, api_user_active, service_one, mock_get
             service_id=service_one['id'],
             template_type='sms')in page
 
-        assert url_for('main.manage_users', service_id=service_one['id']) not in page
+        assert url_for('main.manage_users', service_id=service_one['id']) in page
         assert url_for('main.service_settings', service_id=service_one['id']) not in page
 
         assert url_for('main.api_keys', service_id=service_one['id']) not in page
@@ -108,7 +108,7 @@ def test_menu_manage_api_keys(mocker, app_, api_user_active, service_one, mock_g
             service_id=service_one['id'],
             template_type='sms') in page
 
-        assert url_for('main.manage_users', service_id=service_one['id']) not in page
+        assert url_for('main.manage_users', service_id=service_one['id']) in page
         assert url_for('main.service_settings', service_id=service_one['id']) not in page
         assert url_for('main.show_all_services') not in page
 

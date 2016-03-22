@@ -24,7 +24,6 @@ from app.utils import user_has_permissions
 
 @main.route("/services/<service_id>/users")
 @login_required
-@user_has_permissions('manage_users', admin_override=True)
 def manage_users(service_id):
     users = user_api_client.get_users_for_service(service_id=service_id)
     invited_users = invite_api_client.get_invites_for_service(service_id=service_id)
