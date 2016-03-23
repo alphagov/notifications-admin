@@ -117,7 +117,7 @@ def remove_user_from_service(service_id, user_id):
     service = get_service_by_id(service_id)
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
-    form = PermisisonsForm(**{
+    form = PermissionsForm(**{
         'send_messages': 'yes' if user.has_permissions(
             permissions=['send_texts', 'send_emails', 'send_letters']) else 'no',
         'manage_service': 'yes' if user.has_permissions(
