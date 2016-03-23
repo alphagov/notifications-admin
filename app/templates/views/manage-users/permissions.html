@@ -1,0 +1,21 @@
+{% from "components/checkbox.html" import checkbox %}
+
+<fieldset class="form-group">
+  <legend class="form-label">
+    Permissions
+  </legend>
+  {{ checkbox(form.send_messages, block=True) }}
+  {{ checkbox(form.manage_service, block=True) }}
+  {{ checkbox(form.manage_api_keys, block=True) }}
+</fieldset>
+
+<div class="form-group">
+  <p class="form-label">
+    All team members can see
+  </p>
+  <ul class="list list-bullet">
+    <li>templates</li>
+    <li>history of sent messages</li>
+    <li>who the other team members are</li>
+  </ul>
+</div>

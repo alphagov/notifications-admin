@@ -1,7 +1,6 @@
 from flask import render_template, current_app, abort
 from flask_wtf import Form
 from wtforms import StringField, PasswordField, TextAreaField, FileField, validators
-from app.main.forms import CustomRadioField
 from utils.template import Template
 from app.main import main
 
@@ -18,14 +17,11 @@ def styleguide():
         code = StringField('Enter code')
         message = TextAreaField(u'Message')
         file_upload = FileField('Upload a CSV file to add your recipients’ details')
-        manage_service = CustomRadioField('Manage service', choices=[('yes', 'yes'), ('no', 'no')])
-        manage_templates = CustomRadioField('Manage templates', choices=[('yes', 'yes'), ('no', 'no')])
 
     sms = "Your vehicle tax for ((registration number)) is due on ((date)). Renew online at www.gov.uk/vehicle-tax"
 
     form = FormExamples()
     form.message.data = sms
-    form.manage_service.data = 'yes'
     form.validate()
 
     template = Template({'content': sms})

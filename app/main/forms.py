@@ -96,31 +96,16 @@ class RegisterUserFromInviteForm(Form):
     email_address = HiddenField('email_address')
 
 
-# WTF forms does not give a handy way to customise error messages for
-# radio button fields so just overriding the default here for use
-# in permissions form.
-class CustomRadioField(RadioField):
+class PermissionsForm(Form):
 
-    def pre_validate(self, form):
-        for v, _ in self.choices:
-            if self.data == v:
-                break
-        else:
-            raise ValueError(self.gettext('Choose yes or no'))
+    send_messages = BooleanField("Send messages from existing templates")
+    manage_service = BooleanField("Modify this service, its team, and its&nbsp;templates")
+    manage_api_keys = BooleanField("Create and revoke API keys")
 
 
-class PermisisonsForm(Form):
+class InviteUserForm(PermissionsForm):
 
-    # TODO fix this Radio field so we are not having to test for yes or no rather
-    # use operator equality.
-    send_messages = CustomRadioField("Send messages", choices=[('yes', 'yes'), ('no', 'no')])
-    manage_service = CustomRadioField("Manage service", choices=[('yes', 'yes'), ('no', 'no')])
-    manage_api_keys = CustomRadioField("Manage API keys", choices=[('yes', 'yes'), ('no', 'no')])
-
-
-class InviteUserForm(PermisisonsForm):
-
-    email_address = email_address('Their email address')
+    email_address = email_address('Email address')
 
     def __init__(self, invalid_email_address, *args, **kwargs):
         super(InviteUserForm, self).__init__(*args, **kwargs)
