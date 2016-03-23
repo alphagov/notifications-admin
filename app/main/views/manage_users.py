@@ -137,7 +137,7 @@ def remove_user_from_service(service_id, user_id):
             service_id=service_id
         ))
 
-    flash('Are you sure you want to remove ‘{}’?'.format(user.name), 'delete')
+    flash('Are you sure you want to remove {}?'.format(user.name), 'remove')
     return render_template(
         'views/edit-user-permissions.html',
         user=user,

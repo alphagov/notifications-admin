@@ -298,6 +298,7 @@ def test_get_remove_user_from_service(app_,
                     service_id=service['id'],
                     user_id=api_user_active.id))
             assert response.status_code == 200
+            assert "Remove user from service" in response.get_data(as_text=True)
             assert "Are you sure you want to remove" in response.get_data(as_text=True)
 
 
