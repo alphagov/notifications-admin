@@ -112,3 +112,11 @@ td {
 .form-label {
   margin-bottom: 5px;
 }
+
+a[rel="external"] {
+  @include external-link-default;
+  @include external-link-16;
+  @include media(tablet) {
+    @include external-link-19;
+  }
+}
