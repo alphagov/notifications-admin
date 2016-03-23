@@ -57,7 +57,7 @@ class Development(Config):
 
 
 class Test(Development):
-    pass
+    DEBUG = True
 
 
 class Preview(Config):
