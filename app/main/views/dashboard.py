@@ -1,7 +1,8 @@
 from flask import (
     render_template,
     session,
-    flash
+    flash,
+    jsonify
 )
 
 from flask_login import login_required
@@ -39,6 +40,20 @@ def service_dashboard(service_id):
         statistics=expand_statistics(statistics),
         templates=templates,
         service_id=str(service_id))
+
+
+@main.route("/services/<service_id>/dashboard.json")
+@login_required
+def service_dashboard_updates(service_id):
+
+    statistics = statistics_api_client.get_statistics_for_service(service_id)['data']
+
+    return jsonify(**{
+        'today': render_template(
+            'views/dashboard/today.html',
+            statistics=expand_statistics(statistics),
+        )
+    })
 
 
 def expand_statistics(statistics, danger_zone=25):
