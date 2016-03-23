@@ -56,6 +56,20 @@ in a separate terminal from the app
     npm run watch
 ```
 
+## Create a local environment.sh file containing the following:
+
+```
+echo "
+export NOTIFY_ADMIN_ENVIRONMENT='config.Development'
+export ADMIN_CLIENT_SECRET='dev-notify-secret-key'
+export ADMIN_CLIENT_USER_NAME='dev-notify-admin'
+export API_HOST_NAME='http://localhost:6011'
+export DANGEROUS_SALT='dev-notify-salt'
+export SECRET_KEY='dev-notify-secret-key'
+"> environment.sh
+```
+
+
 ## Running the application
 
 ```shell

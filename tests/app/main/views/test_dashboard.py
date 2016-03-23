@@ -1,4 +1,5 @@
 from flask import url_for
+from tests import validate_route_permission
 
 
 def test_should_show_recent_jobs_on_dashboard(app_,
@@ -9,7 +10,8 @@ def test_should_show_recent_jobs_on_dashboard(app_,
                                               mock_get_user,
                                               mock_get_user_by_email,
                                               mock_login,
-                                              mock_get_jobs):
+                                              mock_get_jobs,
+                                              mock_has_permissions):
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -133,3 +135,30 @@ def test_menu_all_services_for_platform_admin_user(mocker, app_, platform_admin_
         assert url_for('main.view_notifications', service_id=service_one['id']) in page
         assert url_for('main.view_jobs', service_id=service_one['id']) in page
         assert url_for('main.api_keys', service_id=service_one['id']) not in page
+
+
+def test_route_for_service_permissions(mocker,
+                                       app_,
+                                       api_user_active,
+                                       service_one,
+                                       mock_get_service,
+                                       mock_get_user,
+                                       mock_get_service_templates,
+                                       mock_get_jobs,
+                                       mock_get_service_statistics):
+    routes = [
+        'main.service_dashboard']
+    with app_.test_request_context():
+        # Just test that the user is part of the service
+        for route in routes:
+            validate_route_permission(
+                mocker,
+                app_,
+                "GET",
+                200,
+                url_for(
+                    route,
+                    service_id=service_one['id']),
+                [],
+                api_user_active,
+                service_one)
