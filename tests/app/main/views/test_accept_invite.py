@@ -278,7 +278,8 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
                                                         mock_get_service,
                                                         mock_get_service_templates,
                                                         mock_get_service_statistics,
-                                                        mock_get_jobs):
+                                                        mock_get_jobs,
+                                                        mock_has_permissions):
 
     with app_.test_request_context():
         with app_.test_client() as client:

@@ -9,7 +9,8 @@ def test_should_return_list_of_all_jobs(app_,
                                         mock_get_user,
                                         mock_get_user_by_email,
                                         mock_login,
-                                        mock_get_jobs):
+                                        mock_get_jobs,
+                                        mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -33,7 +34,8 @@ def test_should_show_page_for_one_job(
     mock_get_service_template,
     job_data,
     mock_get_job,
-    mock_get_notifications
+    mock_get_notifications,
+    mock_has_permissions
 ):
     service_id = job_data['service']
     job_id = job_data['id']
@@ -61,7 +63,8 @@ def test_should_show_updates_for_one_job_as_json(
     mock_get_service_template,
     job_data,
     mock_get_job,
-    mock_get_notifications
+    mock_get_notifications,
+    mock_has_permissions
 ):
     service_id = job_data['service']
     job_id = job_data['id']
@@ -88,7 +91,8 @@ def test_should_show_notifications_for_a_service(app_,
                                                  mock_get_user,
                                                  mock_get_user_by_email,
                                                  mock_get_service,
-                                                 mock_get_notifications):
+                                                 mock_get_notifications,
+                                                 mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -110,7 +114,8 @@ def test_should_show_notifications_for_a_service_with_next_previous(app_,
                                                                     mock_get_user,
                                                                     mock_get_user_by_email,
                                                                     mock_get_service,
-                                                                    mock_get_notifications_with_previous_next):
+                                                                    mock_get_notifications_with_previous_next,
+                                                                    mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
