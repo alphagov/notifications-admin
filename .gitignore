@@ -67,3 +67,5 @@ node_modules
 bower_components
 app/templates/govuk_template.html
 npm-debug.log
+
+environment.sh

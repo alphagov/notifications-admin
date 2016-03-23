@@ -1,4 +1,4 @@
 #!/bin/bash
 
-export NOTIFY_ADMIN_ENVIRONMENT='config.Development'
+source environment.sh
 python3 app.py runserver
