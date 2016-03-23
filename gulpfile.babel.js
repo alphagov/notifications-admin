@@ -30,7 +30,10 @@ gulp.task('copy:govuk_template:template', () => gulp.src(paths.template + 'views
 );
 
 gulp.task('copy:govuk_template:css', () => gulp.src(paths.template + 'assets/stylesheets/**/*.css')
-  .pipe(plugins.sass({outputStyle: 'compressed'}))
+  .pipe(plugins.sass({
+    outputStyle: 'compressed'
+  }))
+  .on('error', plugins.sass.logError)
   .pipe(plugins.cssUrlAdjuster({
     prependRelative: '/static/',
   }))

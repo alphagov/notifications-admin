@@ -3,7 +3,7 @@
 {% from "components/sms-message.html" import sms_message %}
 
 {% block page_title %}
-  Developer documentation – GOV.UK Notify
+  API integration – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -48,15 +48,14 @@
 
   <div class="highlight" style="background: #f8f8f8">
     <pre style="line-height: 125%">
-      {{- 'POST {}/notifications/{}'.format(
-        api_host,
+      {{- 'POST https://api.notifications.service.gov.uk/notifications/{}'.format(
         template.template_type
       ) -}}
     </pre>
   </div>
 
   <p>
-    <br />See the <a href="#">developer documentation</a> for full details.
+    <br />See the <a href="{{ url_for(".documentation") }}">developer documentation</a> for full details.
   </p>
 
 {% endblock %}

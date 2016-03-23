@@ -15,7 +15,7 @@ from app.notify_client.models import InvitedUser
 from app import (
     invite_api_client,
     user_api_client,
-    notifications_api_client
+    service_api_client
 )
 
 
@@ -36,7 +36,7 @@ def add_service():
     heading = 'Which service do you want to set up notifications for?'
     if form.validate_on_submit():
         session['service_name'] = form.name.data
-        service_id = notifications_api_client.create_service(
+        service_id = service_api_client.create_service(
             session['service_name'], False, current_app.config['DEFAULT_SERVICE_LIMIT'], True, session['user_id'])
 
         return redirect(url_for('main.service_dashboard', service_id=service_id))

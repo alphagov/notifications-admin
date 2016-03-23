@@ -65,3 +65,62 @@ def test_should_return_200_when_sms_code_is_wrong(app_,
             assert response.status_code == 200
             resp_data = response.get_data(as_text=True)
             assert resp_data.count('Code not found') == 1
+
+
+def test_verify_email_redirects_to_verify_if_token_valid(app_,
+                                                         mocker,
+                                                         api_user_active,
+                                                         mock_get_user,
+                                                         mock_send_verify_code,
+                                                         mock_check_verify_code):
+    import json
+    token_data = {"user_id": api_user_active.id, "secret_code": 12345}
+    mocker.patch('utils.url_safe_token.check_token', return_value=json.dumps(token_data))
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+
+            response = client.get(url_for('main.verify_email', token='notreal'))
+
+            assert response.status_code == 302
+            assert response.location == url_for('main.verify', _external=True)
+
+
+def test_verify_email_redirects_to_email_sent_if_token_expired(app_,
+                                                               mocker,
+                                                               api_user_active,
+                                                               mock_check_verify_code):
+    from itsdangerous import SignatureExpired
+    mocker.patch('utils.url_safe_token.check_token', side_effect=SignatureExpired('expired'))
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+
+            response = client.get(url_for('main.verify_email', token='notreal'))
+
+            assert response.status_code == 302
+            assert response.location == url_for('main.resend_email_verification', _external=True)
+
+
+def test_verify_email_redirects_to_email_sent_if_token_used(app_,
+                                                            mocker,
+                                                            api_user_active,
+                                                            mock_get_user,
+                                                            mock_send_verify_code,
+                                                            mock_check_verify_code_code_expired):
+    from itsdangerous import SignatureExpired
+    mocker.patch('utils.url_safe_token.check_token', side_effect=SignatureExpired('expired'))
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+
+            response = client.get(url_for('main.verify_email', token='notreal'))
+
+            assert response.status_code == 302
+            assert response.location == url_for('main.resend_email_verification', _external=True)

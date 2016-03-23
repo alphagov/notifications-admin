@@ -2,14 +2,14 @@ from __future__ import unicode_literals
 from notifications_python_client.notifications import NotificationsAPIClient
 
 
-class NotificationsAdminAPIClient(NotificationsAPIClient):
+class ServiceAPIClient(NotificationsAPIClient):
 
     # Fudge assert in the super __init__ so
     # we can set those variables later.
     def __init__(self):
-        super(NotificationsAdminAPIClient, self).__init__("api_url",
-                                                          "client",
-                                                          "secret")
+        super(ServiceAPIClient, self).__init__("api_url",
+                                               "client",
+                                               "secret")
 
     def init_app(self, application):
         self.base_url = application.config['API_HOST_NAME']
@@ -70,6 +70,15 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)
 
+    def remove_user_from_service(self, service_id, user_id):
+        """
+        Remove a user from a service
+        """
+        endpoint = '/service/{service_id}/users/{user_id}'.format(
+            service_id=service_id,
+            user_id=user_id)
+        return self.delete(endpoint)
+
     def create_service_template(self, name, type_, content, service_id, subject=None):
         """
         Create a service template.
@@ -128,21 +137,3 @@ class NotificationsAdminAPIClient(NotificationsAPIClient):
         """
         endpoint = "/service/{0}/template/{1}".format(service_id, template_id)
         return self.delete(endpoint)
-
-    # The implementation of these will change after the notifications-api
-    # functionality updates to include the ability to send notifications.
-    def send_sms(self,
-                 mobile_number,
-                 message,
-                 job_id=None,
-                 description=None):
-        self.send_sms_notification(mobile_number, message)
-
-    def send_email(self,
-                   email_address,
-                   message,
-                   from_address,
-                   subject,
-                   job_id=None,
-                   description=None):
-        self.send_email_notification(email_address, message, from_address, subject)

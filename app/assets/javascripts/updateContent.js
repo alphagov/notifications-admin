@@ -1,12 +1,10 @@
 (function(GOVUK, Modules) {
   "use strict";
 
-  const interval = 1500; // milliseconds
-
   GOVUK.timeCache = {};
   GOVUK.resultCache = {};
 
-  let getter = function(resource, render) {
+  let getter = function(resource, interval, render) {
 
     if (
       GOVUK.resultCache[resource] &&
@@ -23,8 +21,8 @@
 
   };
 
-  let poller = (resource, key, component) => () => getter(
-    resource, response => component.html(response[key])
+  let poller = (resource, key, component, interval) => () => getter(
+    resource, interval, response => component.html(response[key])
   );
 
   Modules.UpdateContent = function() {
@@ -32,9 +30,10 @@
     this.start = function(component) {
 
       const $component = $(component);
+      interval = ($(component).data("interval-seconds") * 1000) || 1500;
 
       setInterval(
-        poller($component.data('resource'), $component.data('key'), $component),
+        poller($component.data('resource'), $component.data('key'), $component, interval),
         interval / 5
       );
 
