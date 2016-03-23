@@ -1,0 +1,6 @@
+export NOTIFY_ADMIN_ENVIRONMENT='config.Test'
+export ADMIN_CLIENT_SECRET='dev-notify-secret-key'
+export ADMIN_CLIENT_USER_NAME='dev-notify-admin'
+export API_HOST_NAME='http://localhost:6011'
+export DANGEROUS_SALT='dev-notify-salt'
+export SECRET_KEY='dev-notify-secret-key'
