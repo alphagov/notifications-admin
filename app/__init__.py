@@ -200,6 +200,12 @@ def register_errorhandlers(application):
     def handle_no_permissions(error):
         return _error_response(401)
 
+    @application.errorhandler(500)
+    def handle_exception(error):
+        if current_app.config.get('DEBUG', None):
+            raise error
+        return _error_response(500)
+
     @application.errorhandler(Exception)
     def handle_bad_request(error):
         # We want the Flask in browser stacktrace

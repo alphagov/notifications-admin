@@ -21,11 +21,11 @@ Manage users – GOV.UK Notify
 
       {% include 'views/manage-users/permissions.html' %}
 
-      {{ page_footer(
-        'Save',
-        back_link=url_for('.manage_users', service_id=service_id),
-        back_link_text='Cancel'
-      ) }}
+        {{ page_footer(
+          'Save',
+          delete_link=url_for('.remove_user_from_service', service_id=service_id, user_id=user.id) if user or None,
+          delete_link_text='Remove user from service'
+        ) }}
 
     </form>
   </div>

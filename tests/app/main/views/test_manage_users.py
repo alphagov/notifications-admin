@@ -302,3 +302,48 @@ def test_no_permission_manage_users_page(app_,
             assert url_for('.invite_user', service_id=service_one['id']) not in resp_text
             assert "Edit permission" not in resp_text
             assert "Manage team" not in resp_text
+
+
+def test_get_remove_user_from_service(app_,
+                                      api_user_active,
+                                      mock_login,
+                                      mock_get_user_by_email,
+                                      mock_get_service,
+                                      mock_get_users_by_service,
+                                      mock_get_user,
+                                      mock_has_permissions):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            service = mock_get_service("12345")['data']
+            client.login(api_user_active)
+            response = client.get(
+                url_for(
+                    'main.remove_user_from_service',
+                    service_id=service['id'],
+                    user_id=api_user_active.id))
+            assert response.status_code == 200
+            assert "Are you sure you want to remove" in response.get_data(as_text=True)
+            assert "Remove user from service" in response.get_data(as_text=True)
+
+
+def test_remove_user_from_service(app_,
+                                  api_user_active,
+                                  mock_login,
+                                  mock_get_user_by_email,
+                                  mock_get_service,
+                                  mock_get_users_by_service,
+                                  mock_get_user,
+                                  mock_has_permissions,
+                                  mock_remove_user_from_service):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            service = mock_get_service("12345")['data']
+            client.login(api_user_active)
+            response = client.post(
+                url_for(
+                    'main.remove_user_from_service',
+                    service_id=service['id'],
+                    user_id=api_user_active.id))
+            assert response.status_code == 302
+            assert response.location == url_for(
+                'main.manage_users', service_id=service['id'], _external=True)
