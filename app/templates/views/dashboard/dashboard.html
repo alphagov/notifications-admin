@@ -18,6 +18,7 @@
       data-module="update-content"
       data-resource="{{url_for(".service_dashboard_updates", service_id=service_id)}}"
       data-key="today"
+      data-interval-seconds="10"
     >
       {% include 'views/dashboard/today.html' %}
     </div>
