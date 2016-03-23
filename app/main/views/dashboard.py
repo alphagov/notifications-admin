@@ -37,7 +37,7 @@ def service_dashboard(service_id):
         free_text_messages_remaining='250,000',
         spent_this_month='0.00',
         service=service['data'],
-        statistics=expand_statistics(statistics),
+        statistics=add_rates_to(statistics),
         templates=templates,
         service_id=str(service_id))
 
@@ -51,28 +51,27 @@ def service_dashboard_updates(service_id):
     return jsonify(**{
         'today': render_template(
             'views/dashboard/today.html',
-            statistics=expand_statistics(statistics),
+            statistics=add_rates_to(statistics),
         )
     })
 
 
-def expand_statistics(statistics, danger_zone=25):
+def add_rates_to(delivery_statistics):
 
-    if not statistics or not statistics[0]:
+    if not delivery_statistics or not delivery_statistics[0]:
         return {}
 
-    today = statistics[0]
+    today = delivery_statistics[0]
 
     today.update({
-        'emails_failure_rate':
-            int(today['emails_error'] / today['emails_requested'] * 100) if today['emails_requested'] else 0,
-        'sms_failure_rate':
-            int(today['sms_error'] / today['sms_requested'] * 100) if today['sms_requested'] else 0
-    })
-
-    today.update({
-        'emails_percentage_of_danger_zone': min(today['emails_failure_rate'] / (danger_zone / 100), 100),
-        'sms_percentage_of_danger_zone': min(today['sms_failure_rate'] / (danger_zone / 100), 100)
+        'emails_failure_rate': (
+            "{0:.1f}".format((today['emails_error'] / today['emails_requested'] * 100))
+            if today['emails_requested'] else 0
+        ),
+        'sms_failure_rate': (
+            "{0:.1f}".format((today['sms_error'] / today['sms_requested'] * 100))
+            if today['sms_requested'] else 0
+        )
     })
 
     return today
