@@ -1,5 +1,4 @@
 from flask.ext.login import (UserMixin, login_fresh)
-from flask import session
 
 
 class User(UserMixin):
@@ -13,6 +12,7 @@ class User(UserMixin):
         self._failed_login_count = fields.get('failed_login_count')
         self._state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
+        self.platform_admin = fields.get('platform_admin')
 
     def get_id(self):
         return self.id
@@ -82,9 +82,18 @@ class User(UserMixin):
     def permissions(self, permissions):
         raise AttributeError("Read only property")
 
-    def has_permissions(self, permissions, service_id=None, or_=False):
-        if service_id is None:
-            service_id = session.get('service_id', '')
+    def has_permissions(self, permissions=[], or_=False, admin_override=False):
+        # Only available to the platform admin user
+        if admin_override and self.platform_admin:
+            return True
+        # Not available to the non platform admin users.
+        # For example the list all-services page is only available to platform admin users and is not service specific
+        if admin_override and not permissions:
+            return False
+
+        from flask import request
+        # Service id is always set on the request for service specific views.
+        service_id = request.view_args.get('service_id', None)
         if service_id in self._permissions:
             if or_:
                 return any([x in self._permissions[service_id] for x in permissions])

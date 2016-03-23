@@ -9,7 +9,6 @@
 {% from "components/table.html" import mapping_table, list_table, row, field, text_field, boolean_field, right_aligned_field_heading %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/file-upload.html" import file_upload %}
-{% from "components/yes-no.html" import yes_no %}
 {% from "components/api-key.html" import api_key %}
 
 {% block page_title %}
@@ -242,17 +241,6 @@
 
   <h2 class="heading-large">File upload</h2>
   {{ file_upload(form.file_upload) }}
-
-  <h2 class="heading-large">Yes/no</h2>
-  <div class="grid-row">
-    <div class='column-half'>
-      <fieldset class='yes-no-wrapper'>
-        {{ yes_no(form.manage_service, form.manage_service.data) }}
-        {{ yes_no(form.manage_templates, form.manage_templates.data) }}
-      </fieldset>
-    </div>
-  </div>
-
 
   <h2 class="heading-large">API key</h2>
 

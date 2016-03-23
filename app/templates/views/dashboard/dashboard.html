@@ -13,7 +13,16 @@
   {% if not jobs %}
     {% include 'views/dashboard/get-started.html' %}
   {% else %}
-    {% include 'views/dashboard/today.html' %}
+
+    <div
+      data-module="update-content"
+      data-resource="{{url_for(".service_dashboard_updates", service_id=service_id)}}"
+      data-key="today"
+      data-interval-seconds="10"
+    >
+      {% include 'views/dashboard/today.html' %}
+    </div>
+    
     {% include 'views/dashboard/jobs.html' %}
   {% endif %}
 

@@ -2,6 +2,8 @@
 [![Requirements Status](https://requires.io/github/alphagov/notifications-admin/requirements.svg?branch=master)](https://requires.io/github/alphagov/notifications-admin/requirements/?branch=master)
 
 
+[![Deploy to staging](https://notify-build-monitor.herokuapp.com/deploys/notifications-admin/master...staging.svg?prefix=Deploy%20to)](https://github.com/alphagov/notifications-admin/compare/staging...master?expand=1&title=Deploy%20to%20staging) [![Deploy to live](https://notify-build-monitor.herokuapp.com/deploys/notifications-admin/staging...live.svg?prefix=Deploy%20to)](https://github.com/alphagov/notifications-admin/compare/live...staging?expand=1&title=Deploy%20to%20live)
+
 # notifications-admin
 
 GOV.UK Notify admin application.

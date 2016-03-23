@@ -66,7 +66,8 @@ def get_page_headings(template_type):
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', 'manage_api_keys', or_=True)
+@user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', 'manage_api_keys',
+                      admin_override=True, or_=True)
 def choose_template(service_id, template_type):
 
     service = services_dao.get_service_by_id_or_404(service_id)
@@ -209,7 +210,6 @@ def send_from_api(service_id, template_id):
         'views/send-from-api.html',
         template=template,
         payload=json.dumps(payload, indent=4),
-        api_host=current_app.config['API_HOST_NAME'],
         service_id=service_id
     )
 
@@ -232,7 +232,7 @@ def check_messages(service_id, upload_id):
 
     template = Template(
         template,
-        prefix=service['name'] if template['template_type'] == 'sms' else ''
+        prefix=service['name']
     )
 
     recipients = RecipientCSV(

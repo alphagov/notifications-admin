@@ -13,7 +13,7 @@ from pygments.lexers import JavascriptLexer
 from pygments.formatters import HtmlFormatter
 from werkzeug.exceptions import abort
 
-from app.notify_client.api_client import NotificationsAdminAPIClient
+from app.notify_client.api_client import ServiceAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.user_api_client import UserApiClient
 from app.notify_client.job_api_client import JobApiClient
@@ -25,12 +25,13 @@ from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.asset_fingerprinter import AssetFingerprinter
 from utils.recipients import validate_phone_number, InvalidPhoneError
 import app.proxy_fix
+from config import configs
 from utils import logging
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
 
-notifications_api_client = NotificationsAdminAPIClient()
+service_api_client = ServiceAPIClient()
 user_api_client = UserApiClient()
 api_key_api_client = ApiKeyApiClient()
 job_api_client = JobApiClient()
@@ -50,7 +51,7 @@ def create_app():
     logging.init_app(application)
     init_csrf(application)
 
-    notifications_api_client.init_app(application)
+    service_api_client.init_app(application)
     user_api_client.init_app(application)
     api_key_api_client.init_app(application)
     job_api_client.init_app(application)
@@ -198,6 +199,12 @@ def register_errorhandlers(application):
     @application.errorhandler(401)
     def handle_no_permissions(error):
         return _error_response(401)
+
+    @application.errorhandler(500)
+    def handle_exception(error):
+        if current_app.config.get('DEBUG', None):
+            raise error
+        return _error_response(500)
 
     @application.errorhandler(Exception)
     def handle_bad_request(error):

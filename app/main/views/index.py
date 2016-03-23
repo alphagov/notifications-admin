@@ -26,3 +26,8 @@ def cookies():
 @main.route('/help')
 def help():
     return render_template('views/help.html')
+
+
+@main.route('/terms')
+def terms():
+    return render_template('views/terms-of-use.html')
