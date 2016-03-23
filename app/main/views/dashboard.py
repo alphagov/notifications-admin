@@ -9,10 +9,12 @@ from app.main import main
 from app.main.dao.services_dao import get_service_by_id
 from app.main.dao import templates_dao
 from app import job_api_client, statistics_api_client
+from app.utils import user_has_permissions
 
 
 @main.route("/services/<service_id>/dashboard")
 @login_required
+@user_has_permissions()
 def service_dashboard(service_id):
     templates = templates_dao.get_service_templates(service_id)['data']
     jobs = job_api_client.get_job(service_id)['data']

@@ -762,3 +762,10 @@ def mock_set_user_permissions(mocker):
 @pytest.fixture(scope='function')
 def mock_remove_user_from_service(mocker):
     return mocker.patch('app.service_api_client.remove_user_from_service', return_value=None)
+
+
+@pytest.fixture(scope='function')
+def mock_get_service_statistics(mocker):
+    return mocker.patch(
+        'app.statistics_api_client.get_statistics_for_service',
+        return_value={'data': [{}]})
