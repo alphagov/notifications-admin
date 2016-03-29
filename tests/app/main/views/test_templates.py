@@ -154,7 +154,7 @@ def test_route_permissions(mocker,
                 service_one)
 
 
-def test_route_permissions_for_choose_tempalte(mocker,
+def test_route_permissions_for_choose_template(mocker,
                                                app_,
                                                api_user_active,
                                                service_one,
@@ -168,8 +168,7 @@ def test_route_permissions_for_choose_tempalte(mocker,
             url_for(
                 'main.choose_template',
                 service_id=service_one['id'],
-                template_type='sms',
-                template_id=123),
+                template_type='sms'),
             ['view_activity'],
             api_user_active,
             service_one)
