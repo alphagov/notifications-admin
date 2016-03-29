@@ -40,7 +40,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         assert 'Re-upload your file' in content
 
 
-def test_send_test_message_to_self(
+def test_send_test_sms_message_to_self(
     app_,
     mocker,
     api_user_active,
@@ -51,7 +51,7 @@ def test_send_test_message_to_self(
     mock_has_permissions
 ):
 
-    expected_data = {'data': ['phone number', '+4412341234'], 'file_name': 'Test run'}
+    expected_data = {'data': 'phone number\r\n+4412341234\r\n', 'file_name': 'Test run'}
     mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
 
     with app_.test_request_context():
@@ -65,7 +65,7 @@ def test_send_test_message_to_self(
         mock_s3_upload.assert_called_with(ANY, '12345', expected_data, 'eu-west-1')
 
 
-def test_send_test_message_to_self(
+def test_send_test_email_message_to_self(
     app_,
     mocker,
     api_user_active,
@@ -260,7 +260,7 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
                                           'notification_count': job_data['notification_count'],
                                           'valid': True}
             response = client.post(
-                url_for('main.check_messages', service_id=service_id, upload_id=job_data['id']),
+                url_for('main.start_job', service_id=service_id, upload_id=job_data['id']),
                 data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
                 content_type='multipart/form-data',
                 follow_redirects=True
