@@ -80,7 +80,7 @@ def test_edit_user_permissions(
                 'manage_templates',
                 'manage_settings',
                 'manage_api_keys',
-                'access_developer_docs'
+                'view_activity'
             }
         )
 
@@ -119,7 +119,8 @@ def test_edit_some_user_permissions(
             permissions={
                 'send_texts',
                 'send_emails',
-                'send_letters'
+                'send_letters',
+                'view_activity'
             }
         )
 

@@ -99,7 +99,7 @@ def test_menu_manage_api_keys(mocker, app_, api_user_active, service_one, mock_g
             app_,
             api_user_active,
             service_one,
-            ['view_activity', 'manage_api_keys', 'access_developer_docs'])
+            ['view_activity', 'manage_api_keys'])
         page = resp.get_data(as_text=True)
         assert url_for(
             'main.choose_template',

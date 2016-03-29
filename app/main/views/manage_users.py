@@ -30,7 +30,7 @@ from app.utils import user_has_permissions
 roles = {
     'send_messages': ['send_texts', 'send_emails', 'send_letters'],
     'manage_service': ['manage_users', 'manage_templates', 'manage_settings'],
-    'manage_api_keys': ['manage_api_keys', 'access_developer_docs']
+    'manage_api_keys': ['manage_api_keys']
 }
 
 
@@ -98,7 +98,7 @@ def edit_user_permissions(service_id, user_id):
             user_id, service_id,
             permissions=set(chain.from_iterable(
                 permissions for role, permissions in roles.items() if form[role].data
-            ))
+            )) | {'view_activity'}
         )
         return redirect(url_for('.manage_users', service_id=service_id))
 

@@ -14,7 +14,7 @@
 
     <h1 class="heading-large">{{ page_heading }}</h1>
 
-    {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
+    {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True, or_=True) %}
       <a href="{{ url_for('.add_service_template', service_id=service_id, template_type=template_type) }}" class="button">Add a new template</a>
     {% else %}
       <p>You need to ask your service manager to add templates before you can send messages</p>
@@ -76,7 +76,7 @@
               <a href="{{ url_for(".send_messages", service_id=service_id, template_id=template.id) }}">Send a batch</a>
               <a href="{{ url_for(".send_message_to_self", service_id=service_id, template_id=template.id) }}">Send yourself a test</a>
             {% endif %}
-            {% if current_user.has_permissions(permissions=['manage_api_keys', 'access_developer_docs']) %}
+            {% if current_user.has_permissions(permissions=['manage_api_keys']) %}
               <a href="{{ url_for(".send_from_api", service_id=service_id, template_id=template.id) }}">API integration</a>
             {% endif %}
           </div>

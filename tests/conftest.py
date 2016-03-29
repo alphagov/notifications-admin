@@ -302,8 +302,7 @@ def active_user_with_permissions():
                                                   'manage_users',
                                                   'manage_templates',
                                                   'manage_settings',
-                                                  'manage_api_keys',
-                                                  'access_developer_docs']},
+                                                  'manage_api_keys']},
                  'platform_admin': False
                  }
     user = User(user_data)
