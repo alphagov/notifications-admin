@@ -146,4 +146,4 @@ def test_verify_email_redirects_to_sign_in_if_user_active(app_,
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.text == 'Sign in'
             flash_banner = page.find('div', class_='banner-dangerous').string.strip()
-            assert flash_banner == "You have already verified your email address."
+            assert flash_banner == "That verification link has expired."

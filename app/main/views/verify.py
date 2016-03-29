@@ -61,7 +61,7 @@ def verify_email(token):
             abort(404)
 
         if user.is_active():
-            flash("You have already verified your email address.")
+            flash("That verification link has expired.")
             return redirect(url_for('main.sign_in'))
 
         session['user_details'] = {"email": user.email_address, "id": user.id}
