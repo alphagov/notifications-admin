@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
+from flask import url_for
 from notifications_python_client.notifications import NotificationsAPIClient
+from app.utils import BrowsableItem
 
 
 class ServiceAPIClient(NotificationsAPIClient):
@@ -137,3 +139,26 @@ class ServiceAPIClient(NotificationsAPIClient):
         """
         endpoint = "/service/{0}/template/{1}".format(service_id, template_id)
         return self.delete(endpoint)
+
+    def find_all_service_names(self, user_id=None):
+        resp = self.get_services(user_id)
+        return [x['name'] for x in resp['data']]
+
+
+class ServicesBrowsableItem(BrowsableItem):
+
+    @property
+    def title(self):
+        return self._item['name']
+
+    @property
+    def link(self):
+        return url_for('main.service_dashboard', service_id=self._item['id'])
+
+    @property
+    def destructive(self):
+        return False
+
+    @property
+    def hint(self):
+        return None

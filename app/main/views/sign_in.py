@@ -14,9 +14,8 @@ from flask.ext.login import (
 )
 
 from app.main import main
-from app.main.dao import services_dao
 
-from app import user_api_client
+from app import (user_api_client, service_api_client)
 
 
 from app.main.forms import LoginForm
@@ -41,7 +40,7 @@ def sign_in():
                current_user.id == user.id and \
                user.is_active():
                 confirm_login()
-                services = services_dao.get_services(user.id).get('data', [])
+                services = service_api_client.get_services({'user_id': str(user.id)}).get('data', [])
                 if (len(services) == 1):
                     return redirect(url_for('main.service_dashboard', service_id=services[0]['id']))
                 else:

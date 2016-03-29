@@ -10,11 +10,11 @@ from flask import (
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
-from app.main.dao.services_dao import get_service_by_id_or_404
 
 from app import (
     invite_api_client,
-    user_api_client
+    user_api_client,
+    service_api_client
 )
 
 
@@ -24,7 +24,7 @@ def accept_invite(token):
 
     if invited_user.status == 'cancelled':
         from_user = user_api_client.get_user(invited_user.from_user)
-        service = get_service_by_id_or_404(invited_user.service)
+        service = service_api_client.get_service(invited_user.service)['data']
         return render_template('views/cancelled-invitation.html',
                                from_user=from_user.name,
                                service_name=service['name'])

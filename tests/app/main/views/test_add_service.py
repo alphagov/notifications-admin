@@ -1,5 +1,4 @@
 from flask import url_for
-from app.main.dao import services_dao
 
 
 def test_get_should_render_add_service_template(app_,
