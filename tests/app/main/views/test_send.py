@@ -247,11 +247,8 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
         'app.main.views.send.s3download',
         return_value="""
             phone number,name,,,
-            ++44 7700 900981,test1,,,
-            +44 7700 900981,test2,,,
-             ,,,
-              ,,, \t \t
-
+            123,test1,,,
+            123,test2,,,
         """
     )
     with app_.test_request_context():
