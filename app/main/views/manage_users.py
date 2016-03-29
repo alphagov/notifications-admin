@@ -36,7 +36,7 @@ roles = {
 
 @main.route("/services/<service_id>/users")
 @login_required
-@user_has_permissions()
+@user_has_permissions('view_activity')
 def manage_users(service_id):
     return render_template(
         'views/manage-users.html',

@@ -279,7 +279,8 @@ def api_user_active():
                  'mobile_number': '+4412341234',
                  'state': 'active',
                  'failed_login_count': 0,
-                 'permissions': {}
+                 'permissions': {},
+                 'platform_admin': False
                  }
     user = User(user_data)
     return user
@@ -302,7 +303,8 @@ def active_user_with_permissions():
                                                   'manage_users',
                                                   'manage_templates',
                                                   'manage_settings',
-                                                  'manage_api_keys']},
+                                                  'manage_api_keys',
+                                                  'view_activity']},
                  'platform_admin': False
                  }
     user = User(user_data)
