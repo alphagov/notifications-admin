@@ -26,8 +26,10 @@ from app.main.uploader import (
     s3download
 )
 from app.main.dao import templates_dao
-from app.main.dao import services_dao
-from app import job_api_client
+from app import (
+    job_api_client,
+    service_api_client
+)
 from app.utils import user_has_permissions, get_errors_for_csv
 
 
@@ -70,7 +72,7 @@ def get_page_headings(template_type):
                       admin_override=True, or_=True)
 def choose_template(service_id, template_type):
 
-    service = services_dao.get_service_by_id_or_404(service_id)
+    service = service_api_client.get_service(service_id)['data']
 
     if template_type not in ['email', 'sms']:
         abort(404)
@@ -98,7 +100,7 @@ def choose_template(service_id, template_type):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_messages(service_id, template_id):
 
-    service = services_dao.get_service_by_id_or_404(service_id)
+    service = service_api_client.get_service(service_id)['data']
     template = Template(
         templates_dao.get_service_template_or_404(service_id, template_id)['data'],
         prefix=service['name']
@@ -225,7 +227,7 @@ def check_messages(service_id, template_type, upload_id):
     if not session.get('upload_data'):
         return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
 
-    service = services_dao.get_service_by_id_or_404(service_id)
+    service = service_api_client.get_service(service_id)['data']
 
     contents = s3download(service_id, upload_id)
     if not contents:
@@ -283,7 +285,7 @@ def check_messages(service_id, template_type, upload_id):
 def start_job(service_id, upload_id):
 
     upload_data = session['upload_data']
-    services_dao.get_service_by_id_or_404(service_id)
+    service = service_api_client.get_service(service_id)['data']
 
     if request.files or not upload_data.get('valid'):
         # The csv was invalid, validate the csv again
