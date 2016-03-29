@@ -6,7 +6,8 @@ from flask import (
     session,
     url_for,
     current_app,
-    flash
+    flash,
+    abort
 )
 
 from itsdangerous import SignatureExpired
@@ -55,10 +56,17 @@ def verify_email(token):
 
         token_data = json.loads(token_data)
         verified = user_api_client.check_verify_code(token_data['user_id'], token_data['secret_code'], 'email')
+        user = user_api_client.get_user(token_data['user_id'])
+        if not user:
+            abort(404)
+
+        if user.is_active():
+            flash("You have already verified your email address.")
+            return redirect(url_for('main.sign_in'))
+
+        session['user_details'] = {"email": user.email_address, "id": user.id}
         if verified[0]:
-            user = user_api_client.get_user(token_data['user_id'])
             user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
-            session['user_details'] = {"email": user.email_address, "id": user.id}
             return redirect('verify')
         else:
             if verified[1] == 'Code has expired':

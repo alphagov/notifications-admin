@@ -31,6 +31,9 @@ def sign_in():
     if form.validate_on_submit():
         user = user_api_client.get_user_by_email_or_none(form.email_address.data)
         user = _get_and_verify_user(user, form.password.data)
+        if user and user.state == 'pending':
+            flash("You haven't verified your email or mobile number yet.")
+            return redirect(url_for('main.sign_in'))
         if user:
             # Remember me login
             if not login_fresh() and \
@@ -45,9 +48,7 @@ def sign_in():
                     return redirect(url_for('main.choose_service'))
 
             session['user_details'] = {"email": user.email_address, "id": user.id}
-            if user.state == 'pending':
-                return redirect(url_for('.verify'))
-            elif user.is_active():
+            if user.is_active():
                 user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
                 if request.args.get('next'):
                     return redirect(url_for('.two_factor', next=request.args.get('next')))
