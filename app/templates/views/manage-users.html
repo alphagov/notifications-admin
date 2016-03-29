@@ -63,7 +63,9 @@ Manage users – GOV.UK Notify
       {{ boolean_field(item.has_permissions(permissions=['manage_api_keys', 'access_developer_docs'])) }}
       {% if item.status == 'pending' %}
         {% call field(align='right') %}
-          <a href="{{ url_for('.cancel_invited_user', service_id=service_id, invited_user_id=item.id)}}">Cancel invitation</a>
+          {% if current_user.has_permissions(['manage_users']) %}
+            <a href="{{ url_for('.cancel_invited_user', service_id=service_id, invited_user_id=item.id)}}">Cancel invitation</a>
+          {% endif %}
         {% endcall %}
       {% else %}
         {% call field() %}

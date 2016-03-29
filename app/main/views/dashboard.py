@@ -15,7 +15,7 @@ from app.utils import user_has_permissions
 
 @main.route("/services/<service_id>/dashboard")
 @login_required
-@user_has_permissions()
+@user_has_permissions('view_activity', admin_override=True)
 def service_dashboard(service_id):
     templates = templates_dao.get_service_templates(service_id)['data']
     jobs = job_api_client.get_job(service_id)['data']

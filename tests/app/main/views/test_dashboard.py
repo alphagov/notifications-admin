@@ -48,7 +48,7 @@ def test_menu_send_messages(mocker, app_, api_user_active, service_one, mock_get
             app_,
             api_user_active,
             service_one,
-            ['send_texts', 'send_emails', 'send_letters'])
+            ['view_activity', 'send_texts', 'send_emails', 'send_letters'])
         page = resp.get_data(as_text=True)
         assert url_for(
             'main.choose_template',
@@ -74,7 +74,7 @@ def test_menu_manage_service(mocker, app_, api_user_active, service_one, mock_ge
             app_,
             api_user_active,
             service_one,
-            ['manage_users', 'manage_templates', 'manage_settings'])
+            ['view_activity', 'manage_users', 'manage_templates', 'manage_settings'])
         page = resp.get_data(as_text=True)
         assert url_for(
             'main.choose_template',
@@ -99,7 +99,7 @@ def test_menu_manage_api_keys(mocker, app_, api_user_active, service_one, mock_g
             app_,
             api_user_active,
             service_one,
-            ['manage_api_keys', 'access_developer_docs'])
+            ['view_activity', 'manage_api_keys', 'access_developer_docs'])
         page = resp.get_data(as_text=True)
         assert url_for(
             'main.choose_template',
@@ -159,6 +159,6 @@ def test_route_for_service_permissions(mocker,
                 url_for(
                     route,
                     service_id=service_one['id']),
-                [],
+                ['view_activity'],
                 api_user_active,
                 service_one)

@@ -2,15 +2,17 @@
   <h2 class="navigation-service-name">
     <a href="{{ url_for('.service_dashboard', service_id=service_id) }}">{{ session.get('service_name', 'Service') }}</a>
   </h2>
+  {% if current_user.has_permissions(['view_activity'], admin_override=True) %}
   <ul>
     <li><a href="{{ url_for('.view_notifications', service_id=service_id) }}">View activity</a></li>
   </ul>
+  {% endif %}
   {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
   <ul>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='sms') }}">Send text messages</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='email') }}">Send emails</a></li>
   </ul>
-  {% elif current_user.has_permissions(['manage_templates','manage_api_keys'], admin_override=True, or_=True) %}
+  {% elif current_user.has_permissions(['view_activity', 'manage_templates','manage_api_keys'], admin_override=True, or_=True) %}
   <ul>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='sms') }}">Text message templates</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='email') }}">Email templates</a></li>
@@ -21,7 +23,8 @@
     <li><a href="{{ url_for('.manage_users', service_id=service_id) }}">Manage team</a></li>
     <li><a href="{{ url_for('.service_settings', service_id=service_id) }}">Manage settings</a></li>
   </ul>
-  {% else %}
+  {% endif %}
+  {% if current_user.has_permissions(['view_activity'], admin_override=True) %}
   <ul>
     <li><a href="{{ url_for('.manage_users', service_id=service_id) }}">View team members</a></li>
   </ul>

@@ -66,7 +66,11 @@ def get_page_headings(template_type):
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', 'manage_api_keys',
+@user_has_permissions('view_activity',
+                      'send_texts',
+                      'send_emails',
+                      'manage_templates',
+                      'manage_api_keys',
                       admin_override=True, or_=True)
 def choose_template(service_id, template_type):
 
