@@ -46,31 +46,6 @@ def test_send_test_message_to_self(
     api_user_active,
     mock_login,
     mock_get_service,
-    mock_get_service_template,
-    mock_s3_upload,
-    mock_has_permissions
-):
-
-    expected_data = {'data': ['phone number', '+4412341234'], 'file_name': 'Test run'}
-    mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
-
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            response = client.get(
-                url_for('main.send_message_to_self', service_id=12345, template_id=54321),
-                follow_redirects=True
-            )
-        assert response.status_code == 200
-        mock_s3_upload.assert_called_with(ANY, '12345', expected_data, 'eu-west-1')
-
-
-def test_send_test_message_to_self(
-    app_,
-    mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
     mock_get_service_email_template,
     mock_s3_upload,
     mock_has_permissions
@@ -260,7 +235,7 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
                                           'notification_count': job_data['notification_count'],
                                           'valid': True}
             response = client.post(
-                url_for('main.check_messages', service_id=service_id, upload_id=job_data['id']),
+                url_for('main.start_job', service_id=service_id, upload_id=job_data['id']),
                 data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
                 content_type='multipart/form-data',
                 follow_redirects=True

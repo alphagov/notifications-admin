@@ -64,7 +64,7 @@
   {% if errors %}
     {{file_upload(form.file, button_text='Re-upload your file')}}
   {% else %}
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=service_id, upload_id=upload_id)}}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="submit" class="button" value="{{ send_button_text }}" />
       <a href="{{url_for('.send_messages', service_id=service_id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
