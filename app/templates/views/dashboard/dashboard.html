@@ -11,7 +11,9 @@
   {% endif %}
 
   {% if not jobs %}
-    {% include 'views/dashboard/get-started.html' %}
+    {% if current_user.has_permissions(['manage_templates','send_texts', 'send_emails', 'send_letters']) %}
+      {% include 'views/dashboard/get-started.html' %}
+    {% endif%}
   {% else %}
 
     <div

@@ -66,7 +66,7 @@ def invite_user(service_id):
             email_address,
             ','.join(
                 role for role in roles.keys() if request.form.get(role) == 'y'
-            )
+            ).join('view_activity')
         )
 
         flash('Invite sent to {}'.format(invited_user.email_address), 'default_with_tick')
