@@ -70,18 +70,18 @@ def test_should_return_200_when_sms_code_is_wrong(app_,
 
 def test_verify_email_redirects_to_verify_if_token_valid(app_,
                                                          mocker,
-                                                         api_user_active,
-                                                         mock_get_user,
+                                                         api_user_pending,
+                                                         mock_get_user_pending,
                                                          mock_send_verify_code,
                                                          mock_check_verify_code):
     import json
-    token_data = {"user_id": api_user_active.id, "secret_code": 12345}
+    token_data = {"user_id": api_user_pending.id, "secret_code": 12345}
     mocker.patch('utils.url_safe_token.check_token', return_value=json.dumps(token_data))
 
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
-                session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+                session['user_details'] = {'email_address': api_user_pending.email_address, 'id': api_user_pending.id}
 
             response = client.get(url_for('main.verify_email', token='notreal'))
 
@@ -91,7 +91,7 @@ def test_verify_email_redirects_to_verify_if_token_valid(app_,
 
 def test_verify_email_redirects_to_email_sent_if_token_expired(app_,
                                                                mocker,
-                                                               api_user_active,
+                                                               api_user_pending,
                                                                mock_check_verify_code):
     from itsdangerous import SignatureExpired
     mocker.patch('utils.url_safe_token.check_token', side_effect=SignatureExpired('expired'))
@@ -99,7 +99,7 @@ def test_verify_email_redirects_to_email_sent_if_token_expired(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
-                session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+                session['user_details'] = {'email_address': api_user_pending.email_address, 'id': api_user_pending.id}
 
             response = client.get(url_for('main.verify_email', token='notreal'))
 
@@ -109,8 +109,8 @@ def test_verify_email_redirects_to_email_sent_if_token_expired(app_,
 
 def test_verify_email_redirects_to_email_sent_if_token_used(app_,
                                                             mocker,
-                                                            api_user_active,
-                                                            mock_get_user,
+                                                            api_user_pending,
+                                                            mock_get_user_pending,
                                                             mock_send_verify_code,
                                                             mock_check_verify_code_code_expired):
     from itsdangerous import SignatureExpired
@@ -119,9 +119,31 @@ def test_verify_email_redirects_to_email_sent_if_token_used(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
-                session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+                session['user_details'] = {'email_address': api_user_pending.email_address, 'id': api_user_pending.id}
 
             response = client.get(url_for('main.verify_email', token='notreal'))
 
             assert response.status_code == 302
             assert response.location == url_for('main.resend_email_verification', _external=True)
+
+
+def test_verify_email_redirects_to_sign_in_if_user_active(app_,
+                                                          mocker,
+                                                          api_user_active,
+                                                          mock_get_user,
+                                                          mock_send_verify_code,
+                                                          mock_check_verify_code):
+    import json
+    token_data = {"user_id": api_user_active.id, "secret_code": 12345}
+    mocker.patch('utils.url_safe_token.check_token', return_value=json.dumps(token_data))
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+
+            response = client.get(url_for('main.verify_email', token='notreal'), follow_redirects=True)
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            assert page.h1.text == 'Sign in'
+            flash_banner = page.find('div', class_='banner-dangerous').string.strip()
+            assert flash_banner == "That verification link has expired."
