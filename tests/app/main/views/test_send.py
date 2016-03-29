@@ -40,7 +40,32 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         assert 'Re-upload your file' in content
 
 
-def test_send_test_message_to_self(
+def test_send_test_sms_message_to_self(
+    app_,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template,
+    mock_s3_upload,
+    mock_has_permissions
+):
+
+    expected_data = {'data': 'phone number\r\n+4412341234\r\n', 'file_name': 'Test run'}
+    mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(
+                url_for('main.send_message_to_self', service_id=12345, template_id=54321),
+                follow_redirects=True
+            )
+        assert response.status_code == 200
+        mock_s3_upload.assert_called_with(ANY, '12345', expected_data, 'eu-west-1')
+
+
+def test_send_test_email_message_to_self(
     app_,
     mocker,
     api_user_active,
