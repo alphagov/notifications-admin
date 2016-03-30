@@ -25,7 +25,7 @@
     </ul>
 
     {% if not template_count and not jobs %}
-      {% if current_user.has_permissions(['manage_templates', 'send_texts', 'send_emails', 'send_letters'], or_=True, admin_override=True) %}
+      {% if current_user.has_permissions(['manage_templates', 'send_texts', 'send_emails', 'send_letters'], any_=True, admin_override=True) %}
         {% call banner_wrapper(subhead='Get started', type="tip") %}
           <ol>
             {% if current_user.has_permissions(['manage_templates'], admin_override=True) %}

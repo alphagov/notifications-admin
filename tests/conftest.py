@@ -660,7 +660,7 @@ def mock_get_notifications_with_previous_next(mocker):
 
 @pytest.fixture(scope='function')
 def mock_has_permissions(mocker):
-    def _has_permission(permissions=None, or_=False, admin_override=False):
+    def _has_permission(permissions=None, any_=False, admin_override=False):
         return True
     return mocker.patch(
         'app.notify_client.user_api_client.User.has_permissions',

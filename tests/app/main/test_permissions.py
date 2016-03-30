@@ -5,12 +5,12 @@ from werkzeug.exceptions import Forbidden
 from flask import request
 
 
-def _test_permissions(app_, usr, permissions, service_id, will_succeed, or_=False, admin_override=False):
+def _test_permissions(app_, usr, permissions, service_id, will_succeed, any_=False, admin_override=False):
     with app_.test_request_context() as ctx:
         request.view_args.update({'service_id': service_id})
         with app_.test_client() as client:
             client.login(usr)
-            decorator = user_has_permissions(*permissions, or_=or_, admin_override=admin_override)
+            decorator = user_has_permissions(*permissions, any_=any_, admin_override=admin_override)
             decorated_index = decorator(index)
             if will_succeed:
                 response = decorated_index()
@@ -54,7 +54,7 @@ def test_user_has_permissions_or(app_, mocker):
         ['something', 'manage_users'],
         '',
         True,
-        or_=True)
+        any_=True)
 
 
 def test_user_has_permissions_multiple(app_,

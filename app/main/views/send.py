@@ -70,7 +70,7 @@ def get_page_headings(template_type):
                       'send_emails',
                       'manage_templates',
                       'manage_api_keys',
-                      admin_override=True, or_=True)
+                      admin_override=True, any_=True)
 def choose_template(service_id, template_type):
 
     service = service_api_client.get_service(service_id)['data']
@@ -145,7 +145,7 @@ def send_messages(service_id, template_id):
 
 @main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', or_=True)
+@user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', any_=True)
 def get_example_csv(service_id, template_id):
     template = Template(templates_dao.get_service_template_or_404(service_id, template_id)['data'])
     output = io.StringIO()
