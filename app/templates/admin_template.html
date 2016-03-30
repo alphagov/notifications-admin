@@ -59,12 +59,7 @@
 
 {% set global_header_text = "GOV.UK Notify" %}
 
-
-{% if not current_user.is_authenticated() %}
-    {% set homepage_url = url_for('main.index') %}
-{% else %}
-    {% set homepage_url = url_for('main.choose_service') %}
-{% endif %}
+{% set homepage_url = url_for('main.show_all_services_or_dashboard') %}
 
 {% block content %}
   <div id="content">
