@@ -162,6 +162,11 @@ def valid_phone_number(phone_number):
         return False
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    return user_api_client.get_user(user_id)
+
+
 # https://www.owasp.org/index.php/List_of_useful_HTTP_headers
 def useful_headers_after_request(response):
     response.headers.add('X-Frame-Options', 'deny')

@@ -16,8 +16,8 @@ from notifications_python_client import HTTPError
 from app import service_api_client
 from app.main import main
 from app.utils import user_has_permissions
-from app.main.dao.users_dao import verify_password
 from app.main.forms import ConfirmPasswordForm, ServiceNameForm
+from app import user_api_client
 
 
 @main.route("/services/<service_id>/service-settings")
@@ -60,7 +60,7 @@ def service_name_change_confirm(service_id):
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user.id, pwd)
+        return user_api_client.verify_password(current_user.id, pwd)
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
@@ -133,7 +133,7 @@ def service_status_change_confirm(service_id):
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user.id, pwd)
+        return user_api_client.verify_password(current_user.id, pwd)
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
@@ -178,7 +178,7 @@ def service_delete_confirm(service_id):
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user.id, pwd)
+        return user_api_client.verify_password(current_user.id, pwd)
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():

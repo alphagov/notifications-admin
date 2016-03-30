@@ -1,4 +1,3 @@
-from app.main.dao import users_dao
 from app.main.forms import RegisterUserForm
 
 
