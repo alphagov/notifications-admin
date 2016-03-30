@@ -314,6 +314,6 @@ def test_remove_user_from_service(app_,
 
 def _login_user(user, client, mocker, service):
     mocker.patch('app.user_api_client.get_user', return_value=user)
-    mocker.patch('app.service_api_client.get_service', return_value=service)
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service})
     mocker.patch('app.service_api_client.get_services', return_value={'data': [service]})
     client.login(user)

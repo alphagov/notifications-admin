@@ -20,10 +20,7 @@ from app.main.forms import (
     InviteUserForm,
     PermissionsForm
 )
-from app.main.dao.services_dao import get_service_by_id
-from app import user_api_client
-from app import service_api_client
-from app import invite_api_client
+from app import (user_api_client, service_api_client, invite_api_client)
 from app.utils import user_has_permissions
 
 
@@ -54,7 +51,7 @@ def manage_users(service_id):
 @login_required
 @user_has_permissions('manage_users', admin_override=True)
 def invite_user(service_id):
-    get_service_by_id(service_id)
+    service = service_api_client.get_service(service_id)['data']
 
     form = InviteUserForm(invalid_email_address=current_user.email_address)
 
@@ -84,9 +81,9 @@ def invite_user(service_id):
 @user_has_permissions('manage_users', admin_override=True)
 def edit_user_permissions(service_id, user_id):
     # TODO we should probably using the service id here in the get user
-    # call as well. eg. /user/<user_id>?&service_id=service_id
+    # call as well. eg. /user/<user_id>?&service=service_id
     user = user_api_client.get_user(user_id)
-    get_service_by_id(service_id)
+    service = service_api_client.get_service(service_id)['data']
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
     form = PermissionsForm(**{
@@ -115,7 +112,7 @@ def edit_user_permissions(service_id, user_id):
 @user_has_permissions('manage_users', admin_override=True)
 def remove_user_from_service(service_id, user_id):
     user = user_api_client.get_user(user_id)
-    service = get_service_by_id(service_id)
+    service = service_api_client.get_service(service_id)['data']
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
     form = PermissionsForm(**{

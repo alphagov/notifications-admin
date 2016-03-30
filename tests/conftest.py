@@ -457,8 +457,15 @@ def mock_get_user_by_email_pending(mocker, api_user_pending):
 
 
 @pytest.fixture(scope='function')
-def mock_get_user_by_email_not_found(mocker):
-    return mocker.patch('app.user_api_client.get_user_by_email', return_value=None)
+def mock_get_user_by_email_not_found(mocker, api_user_active):
+    def _get_user(email):
+        json_mock = Mock(return_value={'message': "Not found", 'result': 'error'})
+        resp_mock = Mock(status_code=404, json=json_mock)
+        http_error = HTTPError(response=resp_mock, message="Default message")
+        raise http_error
+    return mocker.patch(
+        'app.user_api_client.get_user_by_email',
+        side_effect=_get_user)
 
 
 @pytest.fixture(scope='function')
@@ -490,7 +497,7 @@ def mock_is_email_not_unique(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_all_users_from_api(mocker):
-    return mocker.patch('app.main.dao.users_dao.user_api_client.get_users')
+    return mocker.patch('app.user_api_client.get_users', return_value={'data': []})
 
 
 @pytest.fixture(scope='function')

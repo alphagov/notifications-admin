@@ -26,10 +26,7 @@ from app.main.uploader import (
     s3download
 )
 from app.main.dao import templates_dao
-from app import (
-    job_api_client,
-    service_api_client
-)
+from app import (job_api_client, service_api_client)
 from app.utils import user_has_permissions, get_errors_for_csv
 
 

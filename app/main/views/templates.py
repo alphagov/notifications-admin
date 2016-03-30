@@ -5,7 +5,7 @@ from app.main import main
 from app.utils import user_has_permissions
 from app.main.forms import SMSTemplateForm, EmailTemplateForm
 from app.main.dao import templates_dao as tdao
-from app.main.dao import services_dao as sdao
+from app import service_api_client
 
 
 form_objects = {
@@ -24,7 +24,7 @@ page_headings = {
 @user_has_permissions('manage_templates', admin_override=True)
 def add_service_template(service_id, template_type):
 
-    service = sdao.get_service_by_id_or_404(service_id)
+    service = service_api_client.get_service(service_id)
 
     if template_type not in ['sms', 'email']:
         abort(404)

@@ -59,7 +59,7 @@ def test_should_redirect_if_not_logged_in(app_):
         with app_.test_client() as client:
             response = client.get(url_for('main.show_all_services_or_dashboard'))
             assert response.status_code == 302
-            assert response.location == url_for('main.index', _external=True)
+            assert url_for('main.sign_in', _external=True) in response.location
 
 
 def test_should_show_all_services_for_platform_admin_user(app_,
