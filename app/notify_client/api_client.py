@@ -57,7 +57,8 @@ class ServiceAPIClient(NotificationsAPIClient):
                        active,
                        limit,
                        restricted,
-                       users):
+                       users,
+                       email_from):
         """
         Update a service.
         """
@@ -67,7 +68,8 @@ class ServiceAPIClient(NotificationsAPIClient):
             "active": active,
             "limit": limit,
             "restricted": restricted,
-            "users": users
+            "users": users,
+            "email_from": email_from
         }
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)
@@ -142,7 +144,7 @@ class ServiceAPIClient(NotificationsAPIClient):
 
     def find_all_service_names(self, user_id=None):
         resp = self.get_services(user_id)
-        return [x['name'] for x in resp['data']]
+        return [x['name'].lower() for x in resp['data']]
 
 
 class ServicesBrowsableItem(BrowsableItem):

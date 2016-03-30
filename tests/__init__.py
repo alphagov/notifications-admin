@@ -22,14 +22,15 @@ class TestClient(FlaskClient):
         self.get(url_for("main.logout"))
 
 
-def service_json(id_, name, users, limit=1000, active=False, restricted=True):
+def service_json(id_, name, users, limit=1000, active=False, restricted=True, email_from=None):
     return {
         'id': id_,
         'name': name,
         'users': users,
         'limit': limit,
         'active': active,
-        'restricted': restricted
+        'restricted': restricted,
+        'email_from': email_from
     }
 
 

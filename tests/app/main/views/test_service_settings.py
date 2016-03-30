@@ -1,82 +1,69 @@
 from flask import url_for
+
+import app
+from app.utils import email_safe
 from tests import validate_route_permission
 from bs4 import BeautifulSoup
 
 
 def test_should_show_overview(app_,
-                              api_user_active,
-                              mock_get_service,
-                              mock_get_user,
-                              mock_get_user_by_email,
-                              mock_login,
-                              mock_has_permissions):
+                              active_user_with_permissions,
+                              mocker,
+                              service_one):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = 123
+            client.login(active_user_with_permissions, mocker, service_one)
             response = client.get(url_for(
-                'main.service_settings', service_id=service_id))
+                'main.service_settings', service_id=service_one['id']))
         assert response.status_code == 200
         resp_data = response.get_data(as_text=True)
         assert 'Service settings' in resp_data
-        service = mock_get_service.side_effect(service_id)['data']
-        assert mock_get_service.called
+        app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
 def test_should_show_service_name(app_,
-                                  api_user_active,
-                                  mock_get_service,
-                                  mock_get_user,
-                                  mock_get_user_by_email,
-                                  mock_login,
-                                  mock_has_permissions):
+                                  active_user_with_permissions,
+                                  mocker,
+                                  service_one):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = 123
+            client.login(active_user_with_permissions, mocker, service_one)
             response = client.get(url_for(
-                'main.service_name_change', service_id=service_id))
+                'main.service_name_change', service_id=service_one['id']))
         assert response.status_code == 200
         resp_data = response.get_data(as_text=True)
         assert 'Change your service name' in resp_data
-        assert mock_get_service.called
-        service = mock_get_service.side_effect(service_id)['data']
+        app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
 def test_should_redirect_after_change_service_name(app_,
-                                                   api_user_active,
-                                                   mock_get_service,
-                                                   mock_get_user,
-                                                   mock_get_user_by_email,
-                                                   mock_login,
-                                                   mock_has_permissions):
+                                                   active_user_with_permissions,
+                                                   service_one,
+                                                   mocker,
+                                                   mock_get_services):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = 123
+            client.login(active_user_with_permissions, mocker, service_one)
             response = client.post(
-                url_for('main.service_name_change', service_id=service_id),
+                url_for('main.service_name_change', service_id=service_one['id']),
                 data={'name': "new name"})
 
         assert response.status_code == 302
         settings_url = url_for(
-            'main.service_name_change_confirm', service_id=service_id, _external=True)
+            'main.service_name_change_confirm', service_id=service_one['id'], _external=True)
         assert settings_url == response.location
-        assert mock_get_service.called
+        assert mock_get_services.called
 
 
 def test_should_not_allow_duplicate_names(app_,
-                                          api_user_active,
-                                          mock_get_service,
-                                          mock_get_user,
-                                          mock_get_user_by_email,
-                                          mock_login,
-                                          mock_has_permissions,
+                                          active_user_with_permissions,
+                                          mocker,
+                                          service_one,
                                           mock_get_services):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = 123
+            client.login(active_user_with_permissions, mocker, service_one)
+            service_id = service_one['id']
             response = client.post(
                 url_for('main.service_name_change', service_id=service_id),
                 data={'name': "service_one"})
@@ -87,38 +74,32 @@ def test_should_not_allow_duplicate_names(app_,
 
 
 def test_should_show_service_name_confirmation(app_,
-                                               api_user_active,
-                                               mock_get_service,
-                                               mock_get_user,
-                                               mock_get_user_by_email,
-                                               mock_login,
-                                               mock_has_permissions):
+                                               active_user_with_permissions,
+                                               mocker,
+                                               service_one):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = 123
+            client.login(active_user_with_permissions, mocker, service_one)
+
             response = client.get(url_for(
-                'main.service_name_change_confirm', service_id=service_id))
+                'main.service_name_change_confirm', service_id=service_one['id']))
 
         assert response.status_code == 200
         resp_data = response.get_data(as_text=True)
         assert 'Change your service name' in resp_data
-        assert mock_get_service.called
+        app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
 def test_should_redirect_after_service_name_confirmation(app_,
-                                                         api_user_active,
-                                                         mock_get_service,
+                                                         active_user_with_permissions,
+                                                         service_one,
+                                                         mocker,
                                                          mock_update_service,
-                                                         mock_get_user,
-                                                         mock_get_user_by_email,
-                                                         mock_login,
-                                                         mock_verify_password,
-                                                         mock_has_permissions):
+                                                         mock_verify_password):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = 123
+            client.login(active_user_with_permissions, mocker, service_one)
+            service_id = service_one['id']
             service_new_name = 'New Name'
             with client.session_transaction() as session:
                 session['service_name_change'] = service_new_name
@@ -126,38 +107,40 @@ def test_should_redirect_after_service_name_confirmation(app_,
                 'main.service_name_change_confirm', service_id=service_id))
 
         assert response.status_code == 302
-        settings_url = url_for(
-            'main.service_settings', service_id=service_id, _external=True)
-        resp_data = response.get_data(as_text=True)
+        settings_url = url_for('main.service_settings', service_id=service_id, _external=True)
         assert settings_url == response.location
-        assert mock_get_service.called
-        assert mock_update_service.called
+        mock_update_service.assert_called_once_with(service_id,
+                                                    service_new_name,
+                                                    service_one['active'],
+                                                    service_one['limit'],
+                                                    service_one['restricted'],
+                                                    service_one['users'],
+                                                    email_safe(service_new_name))
+        assert mock_verify_password.called
 
 
 def test_should_raise_duplicate_name_handled(app_,
-                                             api_user_active,
-                                             mock_get_service,
+                                             active_user_with_permissions,
+                                             service_one,
+                                             mocker,
+                                             mock_get_services,
                                              mock_update_service_raise_httperror_duplicate_name,
-                                             mock_get_user,
-                                             mock_get_user_by_email,
-                                             mock_login,
-                                             mock_verify_password,
-                                             mock_has_permissions):
+                                             mock_verify_password):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = 123
+            client.login(active_user_with_permissions, mocker, service_one)
             service_new_name = 'New Name'
             with client.session_transaction() as session:
                 session['service_name_change'] = service_new_name
             response = client.post(url_for(
-                'main.service_name_change_confirm', service_id=service_id))
+                'main.service_name_change_confirm', service_id=service_one['id']))
 
         assert response.status_code == 302
         name_change_url = url_for(
-            'main.service_name_change', service_id=service_id, _external=True)
-        resp_data = response.get_data(as_text=True)
+            'main.service_name_change', service_id=service_one['id'], _external=True)
         assert name_change_url == response.location
+        assert mock_update_service_raise_httperror_duplicate_name.called
+        assert mock_verify_password.called
 
 
 def test_should_show_request_to_go_live(app_,

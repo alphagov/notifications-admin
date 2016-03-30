@@ -15,7 +15,7 @@ from notifications_python_client import HTTPError
 
 from app import service_api_client
 from app.main import main
-from app.utils import user_has_permissions
+from app.utils import user_has_permissions, email_safe
 from app.main.forms import ConfirmPasswordForm, ServiceNameForm
 from app import user_api_client
 
@@ -65,6 +65,7 @@ def service_name_change_confirm(service_id):
 
     if form.validate_on_submit():
         service['name'] = session['service_name_change']
+        service['email_from'] = email_safe(session['service_name_change'])
         try:
             service_api_client.update_service(
                 service['id'],
@@ -72,7 +73,8 @@ def service_name_change_confirm(service_id):
                 service['active'],
                 service['limit'],
                 service['restricted'],
-                service['users'])
+                service['users'],
+                service['email_from'])
         except HTTPError as e:
             error_msg = "Duplicate service name '{}'".format(session['service_name_change'])
             if e.status_code == 400 and error_msg in e.message['name']:
@@ -144,7 +146,8 @@ def service_status_change_confirm(service_id):
             service['active'],
             service['limit'],
             service['restricted'],
-            service['users'])
+            service['users'],
+            service['email_from'])
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/confirm.html',
