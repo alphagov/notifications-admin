@@ -60,7 +60,9 @@ def invite_user(service_id):
         # view_activity is a default role to be added to all users.
         # All users will have at minimum view_activity to allow users to see notifications,
         # templates, team members but no update privileges
-        permissions = ','.join(role for role in roles.keys() if request.form.get(role) == 'y').join('view_activity')
+        selected_permissions = [role for role in roles.keys() if request.form.get(role) == 'y']
+        selected_permissions.append('view_activity')
+        permissions = ','.join(selected_permissions)
         invited_user = invite_api_client.create_invite(
             current_user.id,
             service_id,

@@ -161,6 +161,10 @@ def test_invite_user(
         assert page.h1.string.strip() == 'Manage team'
         flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
         assert flash_banner == 'Invite sent to test@example.gov.uk'
+        app.invite_api_client.create_invite.assert_called_once_with(sample_invite['from_user'],
+                                                                    sample_invite['service'],
+                                                                    email_address,
+                                                                    sample_invite['permissions']+',view_activity')
 
 
 def test_cancel_invited_user_cancels_user_invitations(app_,
