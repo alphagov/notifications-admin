@@ -9,9 +9,9 @@ from flask import (
 
 from flask_login import login_user, current_user
 from app.main import main
-from app.main.dao import users_dao
 from app.main.forms import TwoFactorForm
 from app import service_api_client
+from app import user_api_client
 
 
 @main.route('/two-factor', methods=['GET', 'POST'])
@@ -23,18 +23,18 @@ def two_factor():
         return redirect('main.sign_in')
 
     def _check_code(code):
-        return users_dao.check_verify_code(user_id, code, "sms")
+        return user_api_client.check_verify_code(user_id, code, "sms")
 
     form = TwoFactorForm(_check_code)
 
     if form.validate_on_submit():
         try:
-            user = users_dao.get_user_by_id(user_id)
+            user = user_api_client.get_user(user_id)
             services = service_api_client.get_services({'user_id': str(user_id)}).get('data', [])
             # Check if coming from new password page
             if 'password' in session['user_details']:
                 user.set_password(session['user_details']['password'])
-                users_dao.update_user(user)
+                user_api_client.update_user(user)
             login_user(user, remember=True)
         finally:
             del session['user_details']

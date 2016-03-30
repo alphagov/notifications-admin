@@ -62,13 +62,6 @@ def invite_json(id, from_user, service_id, email_address, permissions, created_a
 TEST_USER_EMAIL = 'test@user.gov.uk'
 
 
-def create_test_user(state):
-    from app.main.dao import users_dao
-    user = None
-    users_dao.insert_user(user)
-    return user
-
-
 def create_test_api_user(state, permissions={}):
     from app.notify_client.user_api_client import User
     user_data = {'id': 1,
@@ -81,18 +74,6 @@ def create_test_api_user(state, permissions={}):
                  }
     user = User(user_data)
     return user
-
-
-def create_another_test_user(state):
-    from app.main.dao import users_dao
-    user = None
-    users_dao.insert_user(user)
-    return user
-
-
-def get_test_user():
-    from app.main.dao import users_dao
-    return users_dao.get_user_by_email(TEST_USER_EMAIL)
 
 
 def job_json():

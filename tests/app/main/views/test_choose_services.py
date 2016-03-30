@@ -1,4 +1,3 @@
-from tests import create_test_user
 from flask import url_for
 import pytest
 
