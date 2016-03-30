@@ -4,6 +4,7 @@ from flask import (
     flash,
     jsonify
 )
+from datetime import date
 
 from flask_login import login_required
 from app.main import main
@@ -61,17 +62,21 @@ def add_rates_to(delivery_statistics):
     if not delivery_statistics or not delivery_statistics[0]:
         return {}
 
-    today = delivery_statistics[0]
+    today = None
+    latest_stats = {}
+    if delivery_statistics[0]['day'] == date.today().strftime('%Y-%m-%d'):
+        today = delivery_statistics[0]
+        latest_stats = delivery_statistics[0]
 
-    today.update({
+    latest_stats.update({
         'emails_failure_rate': (
-            "{0:.1f}".format((today['emails_error'] / today['emails_requested'] * 100))
-            if today['emails_requested'] else 0
+            "{0:.1f}".format((float(today['emails_error']) / today['emails_requested'] * 100))
+            if today and today['emails_requested'] else 0
         ),
         'sms_failure_rate': (
-            "{0:.1f}".format((today['sms_error'] / today['sms_requested'] * 100))
-            if today['sms_requested'] else 0
+            "{0:.1f}".format((float(today['sms_error']) / today['sms_requested'] * 100))
+            if today and today['sms_requested'] else 0
         )
     })
 
-    return today
+    return latest_stats
