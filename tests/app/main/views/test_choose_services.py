@@ -1,5 +1,4 @@
 from flask import url_for
-import pytest
 
 
 def test_should_show_choose_services_page(app_,

@@ -10,14 +10,15 @@ from app.notify_client.api_client import ServicesBrowsableItem
 def choose_service():
     return render_template(
         'views/choose-service.html',
-        services=[ServicesBrowsableItem(x) for x in service_api_client.get_services()['data']]
+        services=[ServicesBrowsableItem(x) for x in
+                  service_api_client.get_services({'user_id': current_user.id})['data']]
     )
 
 
 @main.route("/services-or-dashboard")
 @login_required
 def show_all_services_or_dashboard():
-    services = service_api_client.get_services()['data']
+    services = service_api_client.get_services({'user_id': current_user.id})['data']
 
     if 1 == len(services):
         return redirect(url_for('.service_dashboard', service_id=services[0]['id']))

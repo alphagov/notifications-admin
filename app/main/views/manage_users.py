@@ -27,13 +27,13 @@ from app.utils import user_has_permissions
 roles = {
     'send_messages': ['send_texts', 'send_emails', 'send_letters'],
     'manage_service': ['manage_users', 'manage_templates', 'manage_settings'],
-    'manage_api_keys': ['manage_api_keys', 'access_developer_docs']
+    'manage_api_keys': ['manage_api_keys']
 }
 
 
 @main.route("/services/<service_id>/users")
 @login_required
-@user_has_permissions()
+@user_has_permissions('view_activity', admin_override=True)
 def manage_users(service_id):
     return render_template(
         'views/manage-users.html',
@@ -57,13 +57,15 @@ def invite_user(service_id):
 
     if form.validate_on_submit():
         email_address = form.email_address.data
+        # view_activity is a default role to be added to all users.
+        # All users will have at minimum view_activity to allow users to see notifications,
+        # templates, team members but no update privileges
+        permissions = ','.join(role for role in roles.keys() if request.form.get(role) == 'y').join('view_activity')
         invited_user = invite_api_client.create_invite(
             current_user.id,
             service_id,
             email_address,
-            ','.join(
-                role for role in roles.keys() if request.form.get(role) == 'y'
-            )
+            permissions
         )
 
         flash('Invite sent to {}'.format(invited_user.email_address), 'default_with_tick')
@@ -95,7 +97,7 @@ def edit_user_permissions(service_id, user_id):
             user_id, service_id,
             permissions=set(chain.from_iterable(
                 permissions for role, permissions in roles.items() if form[role].data
-            ))
+            )) | {'view_activity'}
         )
         return redirect(url_for('.manage_users', service_id=service_id))
 

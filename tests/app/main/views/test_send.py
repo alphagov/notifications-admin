@@ -442,7 +442,7 @@ def test_route_choose_template_manage_api_keys_permissions(mocker,
                 'main.choose_template',
                 service_id=service_one['id'],
                 template_type='sms'),
-            ['manage_api_keys', 'access_developer_docs'],
+            ['manage_api_keys'],
             api_user_active,
             service_one)
         page = resp.get_data(as_text=True)
