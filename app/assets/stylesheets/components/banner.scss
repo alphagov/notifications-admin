@@ -80,6 +80,11 @@
     list-style-type: decimal;
   }
 
+  p {
+    @include core-19;
+    margin: 0 0 10px 0;
+  }
+
 }
 
 .banner-tip-with-tick {

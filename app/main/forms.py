@@ -202,7 +202,7 @@ class SMSTemplateForm(Form):
         validators=[DataRequired(message="Template name cannot be empty")])
 
     template_content = TextAreaField(
-        u'Message',
+        u'Message content',
         validators=[DataRequired(message="Template content cannot be empty")])
 
 
