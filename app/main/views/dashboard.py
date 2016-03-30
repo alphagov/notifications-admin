@@ -7,9 +7,8 @@ from flask import (
 
 from flask_login import login_required
 from app.main import main
-from app.main.dao.services_dao import get_service_by_id
 from app.main.dao import templates_dao
-from app import job_api_client, statistics_api_client
+from app import (job_api_client, statistics_api_client, service_api_client)
 from app.utils import user_has_permissions
 
 
@@ -20,7 +19,7 @@ def service_dashboard(service_id):
     templates = templates_dao.get_service_templates(service_id)['data']
     jobs = job_api_client.get_job(service_id)['data']
 
-    service = get_service_by_id(service_id)
+    service = service_api_client.get_service(service_id)
     session['service_name'] = service['data']['name']
     session['service_id'] = service['data']['id']
 
