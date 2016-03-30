@@ -158,7 +158,8 @@ def test_route_permissions_for_choose_template(mocker,
                                                app_,
                                                api_user_active,
                                                service_one,
-                                               mock_get_service_template):
+                                               mock_get_service_templates):
+    mocker.patch('app.job_api_client.get_job')
     with app_.test_request_context():
         validate_route_permission(
             mocker,

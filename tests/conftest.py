@@ -158,13 +158,13 @@ def mock_get_service_statistics(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_template(mocker):
-    def _create(service_id, template_id):
+    def _get(service_id, template_id):
         template = template_json(
             service_id, template_id, "Two week reminder", "sms", "Your vehicle tax is about to expire")
         return {'data': template}
 
     return mocker.patch(
-        'app.service_api_client.get_service_template', side_effect=_create)
+        'app.service_api_client.get_service_template', side_effect=_get)
 
 
 @pytest.fixture(scope='function')
