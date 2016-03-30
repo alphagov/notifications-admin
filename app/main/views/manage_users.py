@@ -57,13 +57,13 @@ def invite_user(service_id):
 
     if form.validate_on_submit():
         email_address = form.email_address.data
+        # view_activity is a default role to be added to all users. All users will have at minimum view_activity
+        permissions = ','.join(role for role in roles.keys() if request.form.get(role) == 'y').join('view_activity')
         invited_user = invite_api_client.create_invite(
             current_user.id,
             service_id,
             email_address,
-            ','.join(
-                role for role in roles.keys() if request.form.get(role) == 'y'
-            ).join('view_activity')
+            permissions
         )
 
         flash('Invite sent to {}'.format(invited_user.email_address), 'default_with_tick')
