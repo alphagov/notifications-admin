@@ -57,7 +57,9 @@ def invite_user(service_id):
 
     if form.validate_on_submit():
         email_address = form.email_address.data
-        # view_activity is a default role to be added to all users. All users will have at minimum view_activity
+        # view_activity is a default role to be added to all users.
+        # All users will have at minimum view_activity to allow users to see notifications,
+        # templates, team members but no update privileges
         permissions = ','.join(role for role in roles.keys() if request.form.get(role) == 'y').join('view_activity')
         invited_user = invite_api_client.create_invite(
             current_user.id,
