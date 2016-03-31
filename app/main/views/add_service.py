@@ -16,6 +16,7 @@ from app import (
     user_api_client,
     service_api_client
 )
+from app.utils import email_safe
 
 
 @main.route("/add-service", methods=['GET', 'POST'])
@@ -31,12 +32,17 @@ def add_service():
         invite_api_client.accept_invite(service_id, invitation.id)
         return redirect(url_for('main.service_dashboard', service_id=service_id))
 
-    form = AddServiceForm(service_api_client.find_all_service_names_lower)
+    form = AddServiceForm(service_api_client.find_all_service_email_from)
     heading = 'Which service do you want to set up notifications for?'
     if form.validate_on_submit():
         session['service_name'] = form.name.data
-        service_id = service_api_client.create_service(
-            session['service_name'], False, current_app.config['DEFAULT_SERVICE_LIMIT'], True, session['user_id'])
+        email_from = email_safe(session['service_name'])
+        service_id = service_api_client.create_service(service_name=session['service_name'],
+                                                       active=False,
+                                                       limit=current_app.config['DEFAULT_SERVICE_LIMIT'],
+                                                       restricted=True,
+                                                       user_id=session['user_id'],
+                                                       email_from=email_from)
 
         return redirect(url_for('main.service_dashboard', service_id=service_id))
     else:

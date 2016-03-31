@@ -18,7 +18,7 @@ class ServiceAPIClient(NotificationsAPIClient):
         self.client_id = application.config['ADMIN_CLIENT_USER_NAME']
         self.secret = application.config['ADMIN_CLIENT_SECRET']
 
-    def create_service(self, service_name, active, limit, restricted, user_id):
+    def create_service(self, service_name, active, limit, restricted, user_id, email_from):
         """
         Create a service and return the json.
         """
@@ -27,7 +27,8 @@ class ServiceAPIClient(NotificationsAPIClient):
             "active": active,
             "limit": limit,
             "user_id": user_id,
-            "restricted": restricted
+            "restricted": restricted,
+            "email_from": email_from
         }
         return self.post("/service", data)['data']['id']
 
@@ -142,9 +143,9 @@ class ServiceAPIClient(NotificationsAPIClient):
         endpoint = "/service/{0}/template/{1}".format(service_id, template_id)
         return self.delete(endpoint)
 
-    def find_all_service_names_lower(self, user_id=None):
+    def find_all_service_email_from(self, user_id=None):
         resp = self.get_services(user_id)
-        return [x['name'].lower() for x in resp['data']]
+        return [x['email_from'] for x in resp['data']]
 
 
 class ServicesBrowsableItem(BrowsableItem):

@@ -1,5 +1,7 @@
 from flask import url_for
 
+import app
+
 
 def test_get_should_render_add_service_template(app_,
                                                 api_user_active,
@@ -26,9 +28,12 @@ def test_should_add_service_and_redirect_to_next_page(app_,
             assert response.status_code == 302
             assert response.location == url_for('main.service_dashboard', service_id=101, _external=True)
             assert mock_get_services.called
-            mock_create_service.asset_called_once_with('testing the post', False,
-                                                       app_.config['DEFAULT_SERVICE_LIMIT'],
-                                                       True, api_user_active.id)
+            mock_create_service.asset_called_once_with(service_name='testing the post',
+                                                       active=False,
+                                                       limit=app_.config['DEFAULT_SERVICE_LIMIT'],
+                                                       restricted=True,
+                                                       user_id=api_user_active.id,
+                                                       email_from='testing.the.post')
 
 
 def test_should_return_form_errors_when_service_name_is_empty(app_,
@@ -45,15 +50,16 @@ def test_should_return_form_errors_when_service_name_is_empty(app_,
 def test_should_return_form_errors_with_duplicate_service_name_regardless_of_case(app_,
                                                                                   mocker,
                                                                                   service_one,
-                                                                                  mock_get_services,
                                                                                   api_user_active,
                                                                                   mock_create_service):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active, mocker, service_one)
-            response = client.post(url_for('main.add_service'), data={'name': 'SERVICE_TWO'})
+            mocker.patch('app.service_api_client.find_all_service_email_from',
+                         return_value=['service_one', 'service.two'])
+            response = client.post(url_for('main.add_service'), data={'name': 'SERVICE TWO'})
 
             assert response.status_code == 200
             assert 'This service name is already in use' in response.get_data(as_text=True)
-            assert mock_get_services.called
+            app.service_api_client.find_all_service_email_from.assert_called_once_with()
             assert not mock_create_service.called

@@ -58,19 +58,21 @@ def test_should_redirect_after_change_service_name(app_,
 def test_should_not_allow_duplicate_names(app_,
                                           active_user_with_permissions,
                                           mocker,
-                                          service_one,
-                                          mock_get_services):
+                                          service_one):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
+            mocker.patch('app.service_api_client.find_all_service_email_from',
+                         return_value=['service_one', 'service.two'])
             service_id = service_one['id']
             response = client.post(
                 url_for('main.service_name_change', service_id=service_id),
-                data={'name': "SErvICE_TWO"})
+                data={'name': "SErvICE TWO"})
 
         assert response.status_code == 200
         resp_data = response.get_data(as_text=True)
         assert 'This service name is already in use' in resp_data
+        app.service_api_client.find_all_service_email_from.assert_called_once_with()
 
 
 def test_should_show_service_name_confirmation(app_,

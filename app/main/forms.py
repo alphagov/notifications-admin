@@ -1,13 +1,14 @@
-import re
 from flask_wtf import Form
-
+from utils.recipients import (
+    validate_phone_number,
+    InvalidPhoneError
+)
 from wtforms import (
     StringField,
     PasswordField,
     ValidationError,
     TextAreaField,
     FileField,
-    RadioField,
     BooleanField,
     HiddenField
 )
@@ -15,12 +16,6 @@ from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp)
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidEmailDomainRegex)
-
-from utils.recipients import (
-    validate_phone_number,
-    format_phone_number,
-    InvalidPhoneError
-)
 
 
 def email_address(label='Email address'):
@@ -159,7 +154,9 @@ class AddServiceForm(Form):
     )
 
     def validate_name(self, a):
-        if a.data.lower() in self._names_func():
+        from app.utils import email_safe
+        # make sure the email_from will be unique to all services
+        if email_safe(a.data) in self._names_func():
             raise ValidationError('This service name is already in use')
 
 
@@ -180,7 +177,9 @@ class ServiceNameForm(Form):
         ])
 
     def validate_name(self, a):
-        if a.data.lower() in self._names_func():
+        from app.utils import email_safe
+        # make sure the email_from will be unique to all services
+        if email_safe(a.data) in self._names_func():
             raise ValidationError('This service name is already in use')
 
 
