@@ -98,6 +98,7 @@ def test_existing_user_of_service_get_redirected_to_signin(app_,
             flash_banners = page.find_all('div', class_='banner-default')
             assert len(flash_banners) == 1
             assert flash_banners[0].text.strip() == 'Please log in to access this page.'
+            assert mock_accept_invite.call_count == 0
 
 
 def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
@@ -107,7 +108,8 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
                                                                      mock_check_invite_token,
                                                                      mock_get_user_by_email,
                                                                      mock_get_users_by_service,
-                                                                     mock_add_user_to_service):
+                                                                     mock_add_user_to_service,
+                                                                     mock_accept_invite):
 
     expected_service = service_one['id']
     expected_permissions = ['send_messages', 'manage_service', 'manage_api_keys']
@@ -119,6 +121,7 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
             mock_check_invite_token.assert_called_with('thisisnotarealtoken')
             mock_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
             mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id, expected_permissions)
+            assert mock_accept_invite.call_count == 0
 
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
