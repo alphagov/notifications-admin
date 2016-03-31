@@ -79,7 +79,11 @@
         </div>
         <div class="column-one-third">
           <h2>About</h2>
-          <a href="{{ url_for("main.help") }}">Help</a>
+          <ul>
+            <li><a href="{{ url_for("main.help") }}">Help</a></li>
+            <li><a href="{{ url_for("main.terms") }}">Terms of use</a></li>
+            <li><a href="{{ url_for("main.cookies") }}">Cookies</a></li>
+          </ul>
         </div>
         <div class="column-one-third">
           <h2>Developers</h2>
@@ -92,8 +96,6 @@
 
 {% block footer_support_links %}
   <nav class="footer-nav">
-    <a href="{{ url_for("main.terms") }}">Terms of use</a>
-    <a href="{{ url_for("main.cookies") }}">Cookies</a>
     Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service">Government Digital Service</a>
   </nav>
 {% endblock %}
