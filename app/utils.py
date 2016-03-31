@@ -101,3 +101,9 @@ def generate_previous_next_dict(view, view_dict, page, title, label):
         'title': title,
         'label': label
     }
+
+
+def email_safe(string):
+    return "".join([
+        character.lower() if character.isalnum() or character == "." else "" for character in re.sub("\s+", ".", string.strip())  # noqa
+    ])

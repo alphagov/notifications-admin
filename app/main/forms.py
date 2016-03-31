@@ -159,7 +159,7 @@ class AddServiceForm(Form):
     )
 
     def validate_name(self, a):
-        if a.data in self._names_func():
+        if a.data.lower() in self._names_func():
             raise ValidationError('This service name is already in use')
 
 
@@ -180,7 +180,7 @@ class ServiceNameForm(Form):
         ])
 
     def validate_name(self, a):
-        if a.data in self._names_func():
+        if a.data.lower() in self._names_func():
             raise ValidationError('This service name is already in use')
 
 

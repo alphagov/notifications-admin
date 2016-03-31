@@ -10,8 +10,9 @@ class TestClient(FlaskClient):
         with self.session_transaction() as session:
             session['user_id'] = user.id
             session['_fresh'] = True
-        if mocker and service:
+        if mocker:
             mocker.patch('app.user_api_client.get_user', return_value=user)
+        if mocker and service:
             mocker.patch('app.service_api_client.get_service', return_value={'data': service})
         login_user(user, remember=True)
 
@@ -22,14 +23,15 @@ class TestClient(FlaskClient):
         self.get(url_for("main.logout"))
 
 
-def service_json(id_, name, users, limit=1000, active=False, restricted=True):
+def service_json(id_, name, users, limit=1000, active=False, restricted=True, email_from=None):
     return {
         'id': id_,
         'name': name,
         'users': users,
         'limit': limit,
         'active': active,
-        'restricted': restricted
+        'restricted': restricted,
+        'email_from': email_from
     }
 
 
