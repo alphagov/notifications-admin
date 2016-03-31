@@ -273,6 +273,7 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(app_,
             flash_banners = page.find_all('div', class_='banner-dangerous')
             assert len(flash_banners) == 1
             assert flash_banners[0].text.strip() == "You can't accept an invite for another person."
+            assert mock_accept_invite.call_count == 0
 
 
 def test_signed_out_existing_user_cannot_use_anothers_invite(app_,
@@ -304,6 +305,7 @@ def test_signed_out_existing_user_cannot_use_anothers_invite(app_,
             flash_banners = page.find_all('div', class_='banner-dangerous')
             assert len(flash_banners) == 1
             assert flash_banners[0].text.strip() == "You can't accept an invite for another person."
+            assert mock_accept_invite.call_count == 0
 
 
 def test_new_invited_user_verifies_and_added_to_service(app_,
