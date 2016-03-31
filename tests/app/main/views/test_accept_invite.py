@@ -16,8 +16,7 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(app_,
                                                                           mock_check_invite_token,
                                                                           mock_get_user_by_email,
                                                                           mock_get_users_by_service,
-                                                                          mock_add_user_to_service,
-                                                                          mock_accept_invite):
+                                                                          mock_add_user_to_service):
 
     expected_service = service_one['id']
     expected_redirect_location = 'http://localhost/services/{}/dashboard'.format(expected_service)
@@ -31,7 +30,6 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(app_,
             mock_check_invite_token.assert_called_with('thisisnotarealtoken')
             mock_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
             mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id, expected_permissions)
-            mock_accept_invite.assert_called_with(expected_service, sample_invite['id'])
 
             assert response.status_code == 302
             assert response.location == expected_redirect_location
@@ -61,9 +59,9 @@ def test_existing_user_with_no_permissions_accept_invite(app_,
             assert response.status_code == 302
 
 
-def test_existing_user_cant_accept_twice(app_,
-                                         mocker,
-                                         sample_invite):
+def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(app_,
+                                                                 mocker,
+                                                                 sample_invite):
 
     sample_invite['status'] = 'accepted'
     invite = InvitedUser(**sample_invite)
@@ -76,16 +74,16 @@ def test_existing_user_cant_accept_twice(app_,
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == 'Sign in'
             flash_banners = page.find_all('div', class_='banner-default')
-            assert len(flash_banners) == 2
-            assert flash_banners[0].text.strip() == 'You have already accepted this invitation'
+            assert len(flash_banners) == 1
+            assert flash_banners[0].text.strip() == 'Please log in to access this page.'
 
 
-def test_existing_of_service_get_message_that_they_are_already_part_of_service(app_,
-                                                                               mocker,
-                                                                               api_user_active,
-                                                                               sample_invite,
-                                                                               mock_get_user_by_email,
-                                                                               mock_accept_invite):
+def test_existing_user_of_service_get_redirected_to_signin(app_,
+                                                           mocker,
+                                                           api_user_active,
+                                                           sample_invite,
+                                                           mock_get_user_by_email,
+                                                           mock_accept_invite):
     sample_invite['email_address'] = api_user_active.email_address
     invite = InvitedUser(**sample_invite)
     mocker.patch('app.invite_api_client.check_token', return_value=invite)
@@ -98,8 +96,9 @@ def test_existing_of_service_get_message_that_they_are_already_part_of_service(a
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == 'Sign in'
             flash_banners = page.find_all('div', class_='banner-default')
-            assert len(flash_banners) == 2
-            assert flash_banners[0].text.strip() == 'You have already accepted an invitation to this service'
+            assert len(flash_banners) == 1
+            assert flash_banners[0].text.strip() == 'Please log in to access this page.'
+            assert mock_accept_invite.call_count == 0
 
 
 def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
@@ -122,15 +121,14 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
             mock_check_invite_token.assert_called_with('thisisnotarealtoken')
             mock_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
             mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id, expected_permissions)
-            mock_accept_invite.assert_called_with(expected_service, sample_invite['id'])
+            assert mock_accept_invite.call_count == 0
 
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == 'Sign in'
             flash_banners = page.find_all('div', class_='banner-default')
-            assert len(flash_banners) == 2
+            assert len(flash_banners) == 1
             assert flash_banners[0].text.strip() == 'Please log in to access this page.'
-            assert flash_banners[1].text.strip() == 'You already have an account with GOV.UK Notify. Sign in to your account to accept this invitation.'  # noqa
 
 
 def test_new_user_accept_invite_calls_api_and_redirects_to_registration(app_,
@@ -138,8 +136,7 @@ def test_new_user_accept_invite_calls_api_and_redirects_to_registration(app_,
                                                                         mock_check_invite_token,
                                                                         mock_dont_get_user_by_email,
                                                                         mock_add_user_to_service,
-                                                                        mock_get_users_by_service,
-                                                                        mock_accept_invite):
+                                                                        mock_get_users_by_service):
 
     expected_redirect_location = 'http://localhost/register-from-invite'
 
@@ -160,8 +157,7 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(app_,
                                                                       mock_check_invite_token,
                                                                       mock_dont_get_user_by_email,
                                                                       mock_add_user_to_service,
-                                                                      mock_get_users_by_service,
-                                                                      mock_accept_invite):
+                                                                      mock_get_users_by_service):
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -219,8 +215,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(a
                                                                                mock_register_user,
                                                                                mock_send_verify_code,
                                                                                mock_get_users_by_service,
-                                                                               mock_add_user_to_service,
-                                                                               mock_accept_invite):
+                                                                               mock_add_user_to_service):
 
     expected_service = service_one['id']
     expected_email = sample_invite['email_address']
@@ -259,6 +254,61 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(a
                                                   data['email_address'],
                                                   data['mobile_number'],
                                                   data['password'])
+
+
+def test_signed_in_existing_user_cannot_use_anothers_invite(app_,
+                                                            mocker,
+                                                            api_user_active,
+                                                            sample_invite,
+                                                            mock_get_user,
+                                                            mock_accept_invite):
+    invite = InvitedUser(**sample_invite)
+    mocker.patch('app.invite_api_client.check_token', return_value=invite)
+    mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
+            assert response.status_code == 403
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            assert page.h1.string.strip() == '403'
+            flash_banners = page.find_all('div', class_='banner-dangerous')
+            assert len(flash_banners) == 1
+            assert flash_banners[0].text.strip() == "You can't accept an invite for another person."
+            assert mock_accept_invite.call_count == 0
+
+
+def test_signed_out_existing_user_cannot_use_anothers_invite(app_,
+                                                             mocker,
+                                                             api_user_active,
+                                                             sample_invite,
+                                                             mock_get_user,
+                                                             mock_get_user_by_email,
+                                                             mock_verify_password,
+                                                             mock_send_verify_code,
+                                                             mock_accept_invite):
+    invite = InvitedUser(**sample_invite)
+    mocker.patch('app.invite_api_client.check_token', return_value=invite)
+    mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
+            assert response.status_code == 200
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            assert page.h1.string.strip() == 'Sign in'
+            response = client.post(url_for('main.sign_in'),
+                                   data={'email_address': 'test@user.gov.uk', 'password': 'somepassword'},
+                                   follow_redirects=True)
+
+            assert response.status_code == 403
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            assert page.h1.string.strip() == '403'
+            flash_banners = page.find_all('div', class_='banner-dangerous')
+            assert len(flash_banners) == 1
+            assert flash_banners[0].text.strip() == "You can't accept an invite for another person."
+            assert mock_accept_invite.call_count == 0
 
 
 def test_new_invited_user_verifies_and_added_to_service(app_,
