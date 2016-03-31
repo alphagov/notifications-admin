@@ -142,7 +142,7 @@ class ServiceAPIClient(NotificationsAPIClient):
         endpoint = "/service/{0}/template/{1}".format(service_id, template_id)
         return self.delete(endpoint)
 
-    def find_all_service_names(self, user_id=None):
+    def find_all_service_names_lower(self, user_id=None):
         resp = self.get_services(user_id)
         return [x['name'].lower() for x in resp['data']]
 

@@ -66,7 +66,7 @@ def test_should_not_allow_duplicate_names(app_,
             service_id = service_one['id']
             response = client.post(
                 url_for('main.service_name_change', service_id=service_id),
-                data={'name': "service_one"})
+                data={'name': "SErvICE_TWO"})
 
         assert response.status_code == 200
         resp_data = response.get_data(as_text=True)

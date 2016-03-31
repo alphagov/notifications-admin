@@ -39,7 +39,7 @@ def service_settings(service_id):
 def service_name_change(service_id):
     service = service_api_client.get_service(service_id)['data']
 
-    form = ServiceNameForm(service_api_client.find_all_service_names)
+    form = ServiceNameForm(service_api_client.find_all_service_names_lower)
 
     if form.validate_on_submit():
         session['service_name_change'] = form.name.data
