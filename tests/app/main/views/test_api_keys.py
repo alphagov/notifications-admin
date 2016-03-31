@@ -161,6 +161,6 @@ def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, m
                 "GET",
                 403,
                 url_for(route, service_id=service_one['id'], key_id=123),
-                ['blah'],
+                ['view_activity'],
                 api_user_active,
                 service_one)

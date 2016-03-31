@@ -158,13 +158,13 @@ def mock_get_service_statistics(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_template(mocker):
-    def _create(service_id, template_id):
+    def _get(service_id, template_id):
         template = template_json(
             service_id, template_id, "Two week reminder", "sms", "Your vehicle tax is about to expire")
         return {'data': template}
 
     return mocker.patch(
-        'app.service_api_client.get_service_template', side_effect=_create)
+        'app.service_api_client.get_service_template', side_effect=_get)
 
 
 @pytest.fixture(scope='function')
@@ -279,7 +279,8 @@ def api_user_active():
                  'mobile_number': '+4412341234',
                  'state': 'active',
                  'failed_login_count': 0,
-                 'permissions': {}
+                 'permissions': {},
+                 'platform_admin': False
                  }
     user = User(user_data)
     return user
@@ -303,7 +304,7 @@ def active_user_with_permissions():
                                                   'manage_templates',
                                                   'manage_settings',
                                                   'manage_api_keys',
-                                                  'access_developer_docs']},
+                                                  'view_activity']},
                  'platform_admin': False
                  }
     user = User(user_data)
@@ -456,8 +457,15 @@ def mock_get_user_by_email_pending(mocker, api_user_pending):
 
 
 @pytest.fixture(scope='function')
-def mock_get_user_by_email_not_found(mocker):
-    return mocker.patch('app.user_api_client.get_user_by_email', return_value=None)
+def mock_get_user_by_email_not_found(mocker, api_user_active):
+    def _get_user(email):
+        json_mock = Mock(return_value={'message': "Not found", 'result': 'error'})
+        resp_mock = Mock(status_code=404, json=json_mock)
+        http_error = HTTPError(response=resp_mock, message="Default message")
+        raise http_error
+    return mocker.patch(
+        'app.user_api_client.get_user_by_email',
+        side_effect=_get_user)
 
 
 @pytest.fixture(scope='function')
@@ -489,7 +497,7 @@ def mock_is_email_not_unique(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_all_users_from_api(mocker):
-    return mocker.patch('app.main.dao.users_dao.user_api_client.get_users')
+    return mocker.patch('app.user_api_client.get_users', return_value={'data': []})
 
 
 @pytest.fixture(scope='function')
@@ -652,7 +660,7 @@ def mock_get_notifications_with_previous_next(mocker):
 
 @pytest.fixture(scope='function')
 def mock_has_permissions(mocker):
-    def _has_permission(permissions=None, or_=False, admin_override=False):
+    def _has_permission(permissions=None, any_=False, admin_override=False):
         return True
     return mocker.patch(
         'app.notify_client.user_api_client.User.has_permissions',

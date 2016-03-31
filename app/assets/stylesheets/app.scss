@@ -60,6 +60,14 @@ a {
     margin-top: $gutter;
   }
 
+  > .grid-row  {
+    
+    .heading-large {
+      margin-top: $gutter;
+    }
+    
+  }
+
 }
 
 .highlight {

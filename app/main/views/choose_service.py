@@ -1,13 +1,26 @@
 from flask import (render_template, redirect, url_for, session)
 from flask_login import login_required, current_user
-from app.main.dao import services_dao
 from app.main import main
+from app import service_api_client
+from app.notify_client.api_client import ServicesBrowsableItem
 
 
 @main.route("/services")
 @login_required
 def choose_service():
-    services = services_dao.get_services(current_user.id)
     return render_template(
         'views/choose-service.html',
-        services=[services_dao.ServicesBrowsableItem(x) for x in services['data']])
+        services=[ServicesBrowsableItem(x) for x in
+                  service_api_client.get_services({'user_id': current_user.id})['data']]
+    )
+
+
+@main.route("/services-or-dashboard")
+@login_required
+def show_all_services_or_dashboard():
+    services = service_api_client.get_services({'user_id': current_user.id})['data']
+
+    if 1 == len(services):
+        return redirect(url_for('.service_dashboard', service_id=services[0]['id']))
+    else:
+        return redirect(url_for('.choose_service'))
