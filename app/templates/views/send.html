@@ -11,7 +11,7 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Send a batch</h1>
+  <h1 class="heading-large">Send from a CSV file</h1>
 
   {% if 'sms' == template.template_type %}
     <div class="grid-row">
@@ -31,13 +31,14 @@
   <div class="grid-row">
     <div class="column-two-thirds">
       <p>
-        Add recipients by uploading a .csv file with
+        You need
         {{ template.placeholders|length + 1 }}
         {% if template.placeholders %}
-          columns:
+          columns
         {% else %}
-          column:
+          column
         {% endif %}
+        in your file:
       </p>
       <p class="bottom-gutter-2-3">
         <span class='placeholder'>{{ recipient_column }}</span>
