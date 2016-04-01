@@ -158,7 +158,10 @@ def get_example_csv(service_id, template_id, number_of_rows=2):
             ] +
             get_example_csv_rows(template, number_of_rows=number_of_rows)
         )
-        return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
+        return output.getvalue(), 200, {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': 'inline; filename="{}.csv"'.format(template.name)
+        }
 
 
 @main.route("/services/<service_id>/send/<template_id>/to-self", methods=['GET'])
