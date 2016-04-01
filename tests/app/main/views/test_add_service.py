@@ -26,7 +26,7 @@ def test_should_add_service_and_redirect_to_next_page(app_,
                 url_for('main.add_service'),
                 data={'name': 'testing the post'})
             assert response.status_code == 302
-            assert response.location == url_for('main.service_dashboard', service_id=101, _external=True)
+            assert response.location == url_for('main.tour', service_id=101, page=1, _external=True)
             assert mock_get_services.called
             mock_create_service.asset_called_once_with(service_name='testing the post',
                                                        active=False,

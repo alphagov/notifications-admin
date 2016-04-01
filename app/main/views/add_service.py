@@ -44,7 +44,7 @@ def add_service():
                                                        user_id=session['user_id'],
                                                        email_from=email_from)
 
-        return redirect(url_for('main.service_dashboard', service_id=service_id))
+        return redirect(url_for('main.tour', service_id=service_id, page=1))
     else:
         return render_template(
             'views/add-service.html',
