@@ -1,7 +1,7 @@
 from credstash import getAllSecrets
 import os
 
-default_env_file = '/home/notufy-app/environment'
+default_env_file = '/home/notify-app/environment'
 environment = 'live'
 
 if os.path.isfile(default_env_file):
