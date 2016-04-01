@@ -29,7 +29,7 @@ deploy:
   on: &2
     repo: alphagov/notifications-admin
     branch: staging
-  bucket: staging-notifications-api-codedeploy
+  bucket: staging-notifications-admin-codedeploy
   region: eu-west-1
 - provider: codedeploy
   access_key_id: AKIAJ5MKF6G3P2JQP4QQ
