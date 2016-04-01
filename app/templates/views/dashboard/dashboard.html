@@ -10,12 +10,11 @@
     {% include 'views/dashboard/trial-mode-banner.html' %}
   {% endif %}
 
-  {% if not jobs %}
-    {% if current_user.has_permissions(['manage_templates','send_texts', 'send_emails', 'send_letters']) %}
-      {% include 'views/dashboard/get-started.html' %}
-    {% endif%}
-  {% else %}
+  {% if not templates and current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
+    {% include 'views/dashboard/get-started.html' %}
+  {% endif %}
 
+  {% if templates %}
     <div
       data-module="update-content"
       data-resource="{{url_for(".service_dashboard_updates", service_id=service_id)}}"

@@ -15,6 +15,10 @@
     <h1 class="heading-large">{{ page_heading }}</h1>
 
     {% if current_user.has_permissions(permissions=['manage_templates'], any_=True) %}
+       <p class="bottom-gutter">
+         You need a template before you can send
+         {{ 'emails' if 'email' == template_type else 'text messages' }}
+       </p>
       <a href="{{ url_for('.add_service_template', service_id=service_id, template_type=template_type) }}" class="button">Add a new template</a>
     {% else %}
       <p>You need to ask your service manager to add templates before you can send messages</p>
