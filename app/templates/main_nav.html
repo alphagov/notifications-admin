@@ -4,15 +4,10 @@
   </h2>
   {% if current_user.has_permissions(['view_activity'], admin_override=True) %}
   <ul>
-    <li><a href="{{ url_for('.view_notifications', service_id=service_id) }}">View activity</a></li>
+    <li><a href="{{ url_for('.view_notifications', service_id=service_id) }}">History</a></li>
   </ul>
   {% endif %}
-  {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
-  <ul>
-    <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='sms') }}">Send text messages</a></li>
-    <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='email') }}">Send emails</a></li>
-  </ul>
-  {% elif current_user.has_permissions(['view_activity', 'manage_templates','manage_api_keys'], admin_override=True, any_=True) %}
+  {% if current_user.has_permissions(['view_activity', 'manage_templates', 'manage_api_keys'], admin_override=True, any_=True) %}
   <ul>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='sms') }}">Text message templates</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=service_id, template_type='email') }}">Email templates</a></li>
@@ -20,17 +15,17 @@
   {% endif %}
   {% if current_user.has_permissions(['manage_users', 'manage_settings'], admin_override=True) %}
   <ul>
-    <li><a href="{{ url_for('.manage_users', service_id=service_id) }}">Manage team</a></li>
-    <li><a href="{{ url_for('.service_settings', service_id=service_id) }}">Manage settings</a></li>
+    <li><a href="{{ url_for('.manage_users', service_id=service_id) }}">Team members</a></li>
+    <li><a href="{{ url_for('.service_settings', service_id=service_id) }}">Settings</a></li>
   </ul>
   {% elif current_user.has_permissions(['view_activity']) %}
   <ul>
-    <li><a href="{{ url_for('.manage_users', service_id=service_id) }}">View team members</a></li>
+    <li><a href="{{ url_for('.manage_users', service_id=service_id) }}">Team members</a></li>
   </ul>
   {% endif %}
   {% if current_user.has_permissions(['manage_api_keys']) %}
   <ul>
-    <li><a href="{{ url_for('.api_keys', service_id=service_id) }}">Manage API keys</a></li>
+    <li><a href="{{ url_for('.api_keys', service_id=service_id) }}">API keys</a></li>
   </ul>
   {% endif %}
   {% if current_user.has_permissions(admin_override=True) %}

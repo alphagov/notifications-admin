@@ -19,11 +19,7 @@ Manage users – GOV.UK Notify
   <div class="grid-row">
     <div class="column-two-thirds">
       <h1 class="heading-large">
-        {% if current_user.has_permissions(['manage_users']) %}
-          Manage team
-        {% else %}
-          View team members
-        {% endif %}
+        Team members
       </h1>
     </div>
     {% if current_user.has_permissions(['manage_users']) %}
