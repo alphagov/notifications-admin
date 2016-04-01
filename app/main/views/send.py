@@ -49,6 +49,18 @@ def get_page_headings(template_type):
     }[template_type]
 
 
+def get_example_csv_rows(template):
+    return [
+        [
+            {
+                'email': current_user.email_address,
+                'sms': current_user.mobile_number
+            }[template.template_type]
+        ] + _get_fake_personalisation(template.placeholders, i)
+        for i in range(1, 3)
+    ]
+
+
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
 @login_required
 @user_has_permissions('view_activity',
@@ -140,16 +152,13 @@ def get_example_csv(service_id, template_id):
     # code may assume its always safe when it might not be.
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(
-        [first_column_heading[template.template_type]] +
-        list(template.placeholders)
+    writer.writerows(
+        [
+            [first_column_heading[template.template_type]] +
+            list(template.placeholders)
+        ] +
+        get_example_csv_rows(template)
     )
-    writer.writerow([
-        {
-            'email': current_user.email_address,
-            'sms': current_user.mobile_number
-        }[template.template_type]
-    ] + _get_fake_personalisation(template.placeholders))
     return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
 
 
@@ -170,11 +179,11 @@ def send_message_to_self(service_id, template_id):
     )
     if template.template_type == 'sms':
         writer.writerow(
-            [current_user.mobile_number] + _get_fake_personalisation(template.placeholders)
+            [current_user.mobile_number] + _get_fake_personalisation(template.placeholders, 1)
         )
     if template.template_type == 'email':
         writer.writerow(
-            [current_user.email_address] + _get_fake_personalisation(template.placeholders)
+            [current_user.email_address] + _get_fake_personalisation(template.placeholders, 1)
         )
 
     filedata = {
@@ -301,7 +310,7 @@ def start_job(service_id, upload_id):
     )
 
 
-def _get_fake_personalisation(placeholders):
+def _get_fake_personalisation(placeholders, index):
     return [
-        "{} 1".format(header) for header in placeholders
+        "{} {}".format(header, index) for header in placeholders
     ]
