@@ -36,10 +36,10 @@
 {% block proposition_header %}
   <div class="header-proposition">
     <div class="content">
-      {% if current_user.is_authenticated() %}
-        <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
-        <nav id="proposition-menu">
-          <ul id="proposition-links">
+      <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
+      <nav id="proposition-menu">
+        <ul id="proposition-links">
+          {% if current_user.is_authenticated() %}
             <li>
               <a href="{{ url_for('main.user_profile') }}">{{ current_user.name }}</a>
             </li>
@@ -49,9 +49,13 @@
             <li>
               <a href="{{ url_for('main.sign_out')}}">Sign out</a>
             </li>
-          </ul>
-        </nav>
-      {% endif %}
+          {% else %}
+            <li>
+              <a href="{{ url_for('main.sign_in' )}}">Sign in to your account</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
     </div>
   </div>
 {% endblock %}
