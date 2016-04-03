@@ -146,20 +146,16 @@ def send_messages(service_id, template_id):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', any_=True)
 def get_example_csv(service_id, template_id):
     template = Template(service_api_client.get_service_template(service_id, template_id)['data'])
-    # Good practice to use context managers
-    # http://stackoverflow.com/questions/9718950/do-i-have-to-do-stringio-close
-    # For this instance it may not be a problem but someone else looking at the
-    # code may assume its always safe when it might not be.
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerows(
-        [
-            [first_column_heading[template.template_type]] +
-            list(template.placeholders)
-        ] +
-        get_example_csv_rows(template)
-    )
-    return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
+    with io.StringIO() as output:
+        writer = csv.writer(output)
+        writer.writerows(
+            [
+                [first_column_heading[template.template_type]] +
+                list(template.placeholders)
+            ] +
+            get_example_csv_rows(template)
+        )
+        return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
 
 
 @main.route("/services/<service_id>/send/<template_id>/to-self", methods=['GET'])
@@ -167,29 +163,27 @@ def get_example_csv(service_id, template_id):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_message_to_self(service_id, template_id):
     template = Template(service_api_client.get_service_template(service_id, template_id)['data'])
-    # Good practice to use context managers
-    # http://stackoverflow.com/questions/9718950/do-i-have-to-do-stringio-close
-    # For this instance it may not be a problem but someone else looking at the
-    # code may assume its always safe when it might not be.
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(
-        [first_column_heading[template.template_type]] +
-        list(template.placeholders)
-    )
-    if template.template_type == 'sms':
-        writer.writerow(
-            [current_user.mobile_number] + _get_fake_personalisation(template.placeholders, 1)
-        )
-    if template.template_type == 'email':
-        writer.writerow(
-            [current_user.email_address] + _get_fake_personalisation(template.placeholders, 1)
-        )
 
-    filedata = {
-        'file_name': 'Test run',
-        'data': output.getvalue()
-    }
+    with io.StringIO() as output:
+        writer = csv.writer(output)
+        writer.writerow(
+            [first_column_heading[template.template_type]] +
+            list(template.placeholders)
+        )
+        if template.template_type == 'sms':
+            writer.writerow(
+                [current_user.mobile_number] + _get_fake_personalisation(template.placeholders, 1)
+            )
+        if template.template_type == 'email':
+            writer.writerow(
+                [current_user.email_address] + _get_fake_personalisation(template.placeholders, 1)
+            )
+
+        filedata = {
+            'file_name': 'Test run',
+            'data': output.getvalue()
+        }
+
     upload_id = str(uuid.uuid4())
 
     s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
