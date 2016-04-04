@@ -260,7 +260,7 @@ def test_user_cant_invite_themselves(
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Invite a team member'
         form_error = page.find('span', class_='error-message').string.strip()
-        assert form_error == "You can't send an invitation to yourself"
+        assert form_error == "You can’t send an invitation to yourself"
         assert not mock_create_invite.called
 
 
