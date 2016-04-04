@@ -9,6 +9,7 @@ def test_should_render_tour_pages(
     app_,
     api_user_active,
     mocker,
+    mock_get_service,
     page
 ):
     with app_.test_request_context():

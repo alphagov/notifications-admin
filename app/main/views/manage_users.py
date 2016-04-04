@@ -37,7 +37,6 @@ roles = {
 def manage_users(service_id):
     return render_template(
         'views/manage-users.html',
-        service_id=service_id,
         users=user_api_client.get_users_for_service(service_id=service_id),
         current_user=current_user,
         invited_users=[
@@ -51,7 +50,6 @@ def manage_users(service_id):
 @login_required
 @user_has_permissions('manage_users', admin_override=True)
 def invite_user(service_id):
-    service = service_api_client.get_service(service_id)['data']
 
     form = InviteUserForm(invalid_email_address=current_user.email_address)
 
@@ -75,7 +73,6 @@ def invite_user(service_id):
 
     return render_template(
         'views/invite-user.html',
-        service_id=service_id,
         form=form
     )
 
@@ -87,7 +84,6 @@ def edit_user_permissions(service_id, user_id):
     # TODO we should probably using the service id here in the get user
     # call as well. eg. /user/<user_id>?&service=service_id
     user = user_api_client.get_user(user_id)
-    service = service_api_client.get_service(service_id)['data']
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
     form = PermissionsForm(**{
@@ -106,8 +102,7 @@ def edit_user_permissions(service_id, user_id):
     return render_template(
         'views/edit-user-permissions.html',
         user=user,
-        form=form,
-        service_id=service_id
+        form=form
     )
 
 
@@ -116,7 +111,6 @@ def edit_user_permissions(service_id, user_id):
 @user_has_permissions('manage_users', admin_override=True)
 def remove_user_from_service(service_id, user_id):
     user = user_api_client.get_user(user_id)
-    service = service_api_client.get_service(service_id)['data']
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
     form = PermissionsForm(**{
@@ -145,8 +139,7 @@ def remove_user_from_service(service_id, user_id):
     return render_template(
         'views/edit-user-permissions.html',
         user=user,
-        form=form,
-        service_id=service_id
+        form=form
     )
 
 

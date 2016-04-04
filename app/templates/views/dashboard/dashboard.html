@@ -1,23 +1,22 @@
 {% extends "withnav_template.html" %}
 
 {% block page_title %}
-  {{ session.get('service_name', 'Dashboard') }} – GOV.UK Notify
+  {{ current_service.name }} – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
   
     {% if not templates and current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
       {% include 'views/dashboard/get-started.html' %}
-    {% elif service.restricted %}
+    {% elif current_service.restricted %}
       <div class="dashboard">
         {% include 'views/dashboard/trial-mode-banner.html' %}
       </div>
     {% endif %}
 
-
       <div
         data-module="update-content"
-        data-resource="{{url_for(".service_dashboard_updates", service_id=service_id)}}"
+        data-resource="{{url_for(".service_dashboard_updates", service_id=current_service.id)}}"
         data-key="today"
         data-interval-seconds="10"
       >

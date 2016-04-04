@@ -9,6 +9,7 @@ def test_should_return_list_of_all_jobs(app_,
                                         mock_get_user,
                                         mock_get_user_by_email,
                                         mock_login,
+                                        mock_get_service,
                                         mock_get_jobs,
                                         mock_has_permissions):
     with app_.test_request_context():

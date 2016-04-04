@@ -9,7 +9,6 @@ from app.main import main
 def tour(service_id, page):
     return render_template(
         'views/tour/{}.html'.format(page),
-        service_id=service_id,  # TODO: fix when Nick’s PR is merged
         current_page=page,
         next_page=(page + 1)
     )
