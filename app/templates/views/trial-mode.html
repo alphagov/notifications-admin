@@ -1,0 +1,80 @@
+{% extends "withoutnav_template.html" %}
+
+{% block page_title %}
+  Trial mode – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-two-thirds">
+    <h1 class="heading-large">Trial mode</h1>
+
+    <p>
+      All new accounts on Notify start off in trial mode.
+    </p>
+    <p>
+      This means:
+    </p>
+    <ul class="list list-bullet">
+      <li>
+        you can only send messages to yourself
+      </li>
+      <li>
+        you can add people to your team, then you can send messages to them too
+      </li>
+      <li>
+        you can only send 50 messages per day
+      </li>
+    </ul>
+
+    <p>
+      When you’re ready we can remove these restrictions.
+    </p>
+
+    <!-- <h2 class="heading-medium">To remove these restrictions</h2>
+
+    <p>
+      You need to request to go live:
+    </p>
+    <ul class="list list-bullet">
+      <li>
+        You’ll need to agree to our terms of use
+      </li>
+      <li>
+        If you plan to send more than 250,000 text messages per year, you’ll need to agree to pay for what you use – take a look at our <a href="{{ url_for("main.pricing") }}">pricing</a>
+      </li>
+      <li>
+        We’ll check your templates to make sure they’re consistent with our
+        design patterns, style guide and information security principles
+      </li>
+    </ul>
+
+    <h2 class="heading-medium">
+      All other aspects of GOV.UK&nbsp;Notify are exactly the same
+    </h2>
+
+    <p>
+      You can still:
+    </p>
+    <ul class="list list-bullet">
+      <li>
+        upload a batch of recipients
+      </li>
+      <li>
+        do an API integration
+      </li>
+    </ul>
+
+    <p>
+      We’ll send the messages you have permission to send. The messages you
+      don’t have permission to send will still be listed on your
+      GOV.UK&nbsp;Notify dashboard but won’t actually get sent. This means you
+      can check that everything is fully working without accidentally sending
+      hundreds of text messages or emails.
+    </p> -->
+
+  </div>
+</div>
+
+{% endblock %}
