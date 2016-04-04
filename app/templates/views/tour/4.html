@@ -4,13 +4,13 @@
 {% from "components/banner.html" import banner_wrapper %}
 
 {% block page_title %}
-  {{heading}} – GOV.UK Notify
+  {{ heading }} – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {% call banner_wrapper(type='tour') %}
-	<h2 class="heading-large">Send your messages</h2>
+	<h2 class="heading-large">{{ heading }}</h2>
 	<p>
 		Notify merges your data with the template and sends the messages
 	</p>
