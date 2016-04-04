@@ -37,17 +37,6 @@
       {% endif %}
     </div>
 
-    {% if not has_jobs %}
-      {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters'], any_=True) %}
-      {{ banner(
-        """
-          Send yourself a test
-        """,
-        subhead='Next step:',
-        type="tip"
-      )}}
-      {% endif %}
-    {% endif %}
     <div class="grid-row">
       {% for template in templates %}
         <div class="column-two-thirds">

@@ -1,9 +1,23 @@
-.edit-template {
+.placeholder-hint {
 
-  &-placeholder-hint {
-    display: block;
-    padding-top: 20px;
-    //color: $secondary-text-colour;
+  display: block;
+
+  &-title {
+    @include bold-19;
   }
 
+  &-action {
+
+    @include bold-19;
+    display: inline-block;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:active {
+      background: $yellow-25;
+      outline: none;
+    }
+
+  }
+  
 }

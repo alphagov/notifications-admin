@@ -77,7 +77,6 @@ def choose_template(service_id, template_type):
 
     if template_type not in ['email', 'sms']:
         abort(404)
-    jobs = job_api_client.get_job(service_id)['data']
 
     return render_template(
         'views/choose-template.html',
@@ -91,7 +90,6 @@ def choose_template(service_id, template_type):
         template_type=template_type,
         page_heading=get_page_headings(template_type),
         service=service,
-        has_jobs=len(jobs),
         service_id=service_id
     )
 

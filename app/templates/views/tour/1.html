@@ -1,0 +1,25 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/banner.html" import banner_wrapper %}
+
+{% block page_title %}
+  {{heading}} – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {% call banner_wrapper(type='tour') %}
+	<h2 class="heading-large">Trial mode</h2>
+	<p>
+		To start off with, you can only send messages to yourself.
+	</p>
+	<p>
+		We can remove these restrictions when you’re ready.
+	</p>
+    <a href='{{ url_for('.tour', service_id=service_id, page=next_page) }}'>
+      Next
+    </a>
+  {% endcall %}
+
+{% endblock %}

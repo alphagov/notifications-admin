@@ -19,23 +19,20 @@
         </div>
         <div class="column-two-thirds">
           {{ textbox(form.template_content, highlight_tags=True, width='1-1') }}
+          {{ page_footer(
+            'Save',
+            delete_link=url_for('.delete_service_template', service_id=service_id, template_id=template_id) if template_id or None,
+            delete_link_text='Delete this template'
+          ) }}
         </div>
         <div class="column-one-third">
-          <label for='template_content' class='edit-template-placeholder-hint'>
-            <p>
-              Add personalisation with double brackets, eg Dear ((name))
-            </p>
-            <p>
-              You'll have to add the real data when you send a message.
-            </p>
+          <label for='template_content' class='placeholder-hint'>
+            <div class="banner-mode" id="placeholder-hint" aria-live="polite">
+              <p>Add fields using ((double brackets))</p>
+            </div>
           </label>
         </div>
       </div>
-      {{ page_footer(
-        'Save',
-        delete_link=url_for('.delete_service_template', service_id=service_id, template_id=template_id) if template_id or None,
-        delete_link_text='Delete this template'
-      ) }}
     </form>
 
 
