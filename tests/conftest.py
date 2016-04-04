@@ -642,7 +642,11 @@ def mock_get_jobs(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_notifications(mocker):
-    def _get_notifications(service_id, job_id=None, page=1):
+    def _get_notifications(service_id,
+                           job_id=None,
+                           page=1,
+                           template_type=None,
+                           status=None):
         return notification_json(service_id)
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
@@ -652,7 +656,11 @@ def mock_get_notifications(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_notifications_with_previous_next(mocker):
-    def _get_notifications(service_id, job_id=None, page=1):
+    def _get_notifications(service_id,
+                           job_id=None,
+                           page=1,
+                           template_type=None,
+                           status=None):
         return notification_json(service_id, with_links=True)
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
