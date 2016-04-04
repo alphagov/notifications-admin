@@ -29,18 +29,6 @@ from app import (job_api_client, service_api_client)
 from app.utils import user_has_permissions, get_errors_for_csv
 
 
-send_messages_page_headings = {
-    'email': 'Send emails',
-    'sms': 'Send text messages'
-}
-
-
-manage_templates_page_headings = {
-    'email': 'Email templates',
-    'sms': 'Text message templates'
-}
-
-
 def get_send_button_text(template_type, number_of_messages):
     if 1 == number_of_messages:
         return {
@@ -55,11 +43,10 @@ def get_send_button_text(template_type, number_of_messages):
 
 
 def get_page_headings(template_type):
-    # User has manage_service role
-    if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']):
-        return send_messages_page_headings[template_type]
-    else:
-        return manage_templates_page_headings[template_type]
+    return {
+        'email': 'Email templates',
+        'sms': 'Text message templates'
+    }[template_type]
 
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])

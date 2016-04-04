@@ -77,7 +77,7 @@
         <div class="column-one-third">
           <div class="sms-message-use-links">
             {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
-              <a href="{{ url_for(".send_messages", service_id=service_id, template_id=template.id) }}">Send a batch</a>
+              <a href="{{ url_for(".send_messages", service_id=service_id, template_id=template.id) }}">Send from a CSV file</a>
               <a href="{{ url_for(".send_message_to_self", service_id=service_id, template_id=template.id) }}">Send yourself a test</a>
             {% endif %}
             {% if current_user.has_permissions(permissions=['manage_api_keys']) %}

@@ -18,7 +18,7 @@ def test_should_show_overview_page(
             mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
             response = client.get(url_for('main.manage_users', service_id=service['id']))
 
-        assert 'Manage team' in response.get_data(as_text=True)
+        assert 'Team members' in response.get_data(as_text=True)
         assert response.status_code == 200
         app.user_api_client.get_users_for_service.assert_called_once_with(service_id=service['id'])
 
@@ -158,7 +158,7 @@ def test_invite_user(
 
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string.strip() == 'Manage team'
+        assert page.h1.string.strip() == 'Team members'
         flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
         assert flash_banner == 'Invite sent to test@example.gov.uk'
         excpected_permissions = 'manage_api_keys,manage_service,send_messages,view_activity'
@@ -203,7 +203,7 @@ def test_manage_users_shows_invited_user(app_,
 
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-            assert page.h1.string.strip() == 'Manage team'
+            assert page.h1.string.strip() == 'Team members'
             invites_table = page.find_all('table')[1]
             cols = invites_table.find_all('td')
             assert cols[0].text.strip() == 'invited_user@test.gov.uk'
@@ -231,7 +231,7 @@ def test_manage_users_does_not_show_accepted_invite(app_,
 
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-            assert page.h1.string.strip() == 'Manage team'
+            assert page.h1.string.strip() == 'Team members'
             tables = page.find_all('table')
             assert len(tables) == 1
             assert not page.find(text='invited_user@test.gov.uk')
@@ -275,7 +275,7 @@ def test_no_permission_manage_users_page(app_,
             resp_text = response.get_data(as_text=True)
             assert url_for('.invite_user', service_id=service_one['id']) not in resp_text
             assert "Edit permission" not in resp_text
-            assert "Manage team" not in resp_text
+            assert "Team members" not in resp_text
 
 
 def test_get_remove_user_from_service(app_,
