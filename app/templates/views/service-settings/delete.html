@@ -35,9 +35,9 @@
 
       <form method="post">
         {{ page_footer(
-          'Yes, delete ‘{}’'.format(service.name),
+          'Yes, delete ‘{}’'.format(current_service.name),
           destructive=True,
-          back_link=url_for('.service_settings', service_id=service_id)
+          back_link=url_for('.service_settings', service_id=current_service.id)
         ) }}
       </form>
 

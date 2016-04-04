@@ -23,7 +23,7 @@ Manage users – GOV.UK Notify
 
         {{ page_footer(
           'Save',
-          delete_link=url_for('.remove_user_from_service', service_id=service_id, user_id=user.id) if user or None,
+          delete_link=url_for('.remove_user_from_service', service_id=current_service.id, user_id=user.id) if user or None,
           delete_link_text='Remove user from service'
         ) }}
 

@@ -3,7 +3,15 @@ import re
 
 import dateutil
 import urllib
-from flask import (Flask, session, Markup, escape, render_template, make_response, current_app)
+from flask import (
+    Flask,
+    session,
+    Markup,
+    escape,
+    render_template,
+    make_response,
+    current_app,
+    request)
 from flask._compat import string_types
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
@@ -27,6 +35,10 @@ from utils.recipients import validate_phone_number, InvalidPhoneError
 import app.proxy_fix
 from config import configs
 from utils import logging
+from werkzeug.local import LocalStack, LocalProxy
+from flask.globals import _lookup_req_object
+from functools import partial
+
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
@@ -40,6 +52,9 @@ status_api_client = StatusApiClient()
 invite_api_client = InviteApiClient()
 statistics_api_client = StatisticsApiClient()
 asset_fingerprinter = AssetFingerprinter()
+
+# The current service attached to the request stack.
+current_service = LocalProxy(partial(_lookup_req_object, 'service'))
 
 
 def create_app():
@@ -82,6 +97,12 @@ def create_app():
     application.add_template_filter(linkable_name)
 
     application.after_request(useful_headers_after_request)
+    application.after_request(save_service_after_request)
+    application.before_request(load_service_before_request)
+
+    def _attach_current_service():
+        return {'current_service': current_service}
+    application.context_processor(_attach_current_service)
     register_errorhandlers(application)
 
     return application
@@ -167,7 +188,26 @@ def load_user(user_id):
     return user_api_client.get_user(user_id)
 
 
-# https://www.owasp.org/index.php/List_of_useful_HTTP_headers
+def load_service_before_request():
+    service_id = request.view_args.get('service_id', None) if request.view_args else None
+    if service_id:
+        from flask.globals import _request_ctx_stack
+        if _request_ctx_stack.top is not None:
+            setattr(
+                _request_ctx_stack.top,
+                'service',
+                service_api_client.get_service(service_id)['data'])
+
+
+def save_service_after_request(response):
+    # Only save the current session if the request is 200
+    service_id = request.view_args.get('service_id', None) if request.view_args else None
+    if response.status_code == 200 and service_id:
+        session['service_id'] = service_id
+    return response
+
+
+#  https://www.owasp.org/index.php/List_of_useful_HTTP_headers
 def useful_headers_after_request(response):
     response.headers.add('X-Frame-Options', 'deny')
     response.headers.add('X-Content-Type-Options', 'nosniff')

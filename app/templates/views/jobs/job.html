@@ -33,7 +33,7 @@
     {% if not finished_at %}
       <div
         data-module="update-content"
-        data-resource="{{url_for(".view_job_updates", service_id=service_id, job_id=job_id)}}"
+        data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job_id)}}"
         data-key="status"
       >
     {% endif %}
@@ -45,7 +45,7 @@
     {% if not finished_at %}
       <div
         data-module="update-content"
-        data-resource="{{url_for(".view_job_updates", service_id=service_id, job_id=job_id)}}"
+        data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job_id)}}"
         data-key="counts"
       >
     {% endif %}
@@ -57,7 +57,7 @@
     {% if not finished_at %}
       <div
         data-module="update-content"
-        data-resource="{{url_for(".view_job_updates", service_id=service_id, job_id=job_id)}}"
+        data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job_id)}}"
         data-key="notifications"
       >
     {% endif %}

@@ -6,9 +6,10 @@ from tests import validate_route_permission
 
 def test_should_show_api_keys_and_documentation_page(app_,
                                                      api_user_active,
+                                                     mock_login,
                                                      mock_get_user,
                                                      mock_get_user_by_email,
-                                                     mock_login):
+                                                     mock_get_service):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -20,9 +21,10 @@ def test_should_show_api_keys_and_documentation_page(app_,
 def test_should_show_empty_api_keys_page(app_,
                                          api_user_active,
                                          mock_get_user,
+                                         mock_login,
                                          mock_get_user_by_email,
                                          mock_get_no_api_keys,
-                                         mock_login,
+                                         mock_get_service,
                                          mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -38,10 +40,11 @@ def test_should_show_empty_api_keys_page(app_,
 
 def test_should_show_api_keys_page(app_,
                                    api_user_active,
+                                   mock_login,
                                    mock_get_user,
                                    mock_get_user_by_email,
                                    mock_get_api_keys,
-                                   mock_login,
+                                   mock_get_service,
                                    mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -58,10 +61,11 @@ def test_should_show_api_keys_page(app_,
 
 def test_should_show_name_api_key_page(app_,
                                        api_user_active,
+                                       mock_login,
                                        mock_get_user,
                                        mock_get_user_by_email,
                                        mock_get_api_keys,
-                                       mock_login,
+                                       mock_get_service,
                                        mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -74,11 +78,12 @@ def test_should_show_name_api_key_page(app_,
 
 def test_should_render_show_api_key(app_,
                                     api_user_active,
+                                    mock_login,
                                     mock_get_user,
                                     mock_get_user_by_email,
                                     mock_create_api_key,
                                     mock_get_api_keys,
-                                    mock_login,
+                                    mock_get_service,
                                     mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -94,10 +99,11 @@ def test_should_render_show_api_key(app_,
 
 def test_should_show_confirm_revoke_api_key(app_,
                                             api_user_active,
+                                            mock_login,
                                             mock_get_user,
                                             mock_get_user_by_email,
                                             mock_get_api_keys,
-                                            mock_login,
+                                            mock_get_service,
                                             mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -112,11 +118,12 @@ def test_should_show_confirm_revoke_api_key(app_,
 
 def test_should_redirect_after_revoking_api_key(app_,
                                                 api_user_active,
+                                                mock_login,
                                                 mock_get_user,
                                                 mock_get_user_by_email,
                                                 mock_revoke_api_key,
                                                 mock_get_api_keys,
-                                                mock_login,
+                                                mock_get_service,
                                                 mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -130,7 +137,11 @@ def test_should_redirect_after_revoking_api_key(app_,
         mock_get_api_keys.assert_called_once_with(service_id=service_id, key_id=321)
 
 
-def test_route_permissions(mocker, app_, api_user_active, service_one, mock_get_api_keys):
+def test_route_permissions(mocker,
+                           app_,
+                           api_user_active,
+                           service_one,
+                           mock_get_api_keys):
     routes = [
         'main.api_keys',
         'main.create_api_key',
@@ -148,7 +159,11 @@ def test_route_permissions(mocker, app_, api_user_active, service_one, mock_get_
                 service_one)
 
 
-def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, mock_get_api_keys):
+def test_route_invalid_permissions(mocker,
+                                   app_,
+                                   api_user_active,
+                                   service_one,
+                                   mock_get_api_keys):
     routes = [
         'main.api_keys',
         'main.create_api_key',
