@@ -4,7 +4,7 @@
   </h2>
   {% if current_user.has_permissions(['view_activity'], admin_override=True) %}
   <ul>
-    <li><a href="{{ url_for('.view_notifications', service_id=service_id) }}">History</a></li>
+    <li><a href="{{ url_for('.view_notifications', service_id=service_id, page=1) }}">History</a></li>
   </ul>
   {% endif %}
   {% if current_user.has_permissions(['view_activity', 'manage_templates', 'manage_api_keys'], admin_override=True, any_=True) %}
