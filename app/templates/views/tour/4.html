@@ -17,12 +17,20 @@
 	<a href="{{ url_for('.service_dashboard', service_id=service_id) }}">
       Next
     </a>
-	<img
+    <picture class="banner-tour-image-flush-bottom">
+	  <source
+		  type="image/svg+xml"
+		  srcset="/static/images/tour/{{ current_page }}.svg"
+		  alt="Three mobiles phones, each showing a text message personalised with data about the recipient"
+		  width="840" height="290"
+	  >
+	  <img
 		src="/static/images/tour/{{ current_page }}.png"
 		class="banner-tour-image-flush-bottom"
 		width="840" height="290"
 		alt="Three mobiles phones, each showing a text message personalised with data about the recipient"
-	>
+	  >
+	</picture>
   {% endcall %}
 
 {% endblock %}

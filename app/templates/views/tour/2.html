@@ -15,11 +15,19 @@
 		Set up a template like this:
 	</p>
 	<p>
-		<img
+	    <picture>
+		  <source
+			  type="image/svg+xml"
+			  srcset="/static/images/tour/{{ current_page }}.svg"
+			  alt="A template for a text message with placeholders for the recipients name, document and date"
+			  width="554" height="97"
+		  >
+		  <img
 			src="/static/images/tour/{{ current_page }}.png"
 			width="554" height="97"
-			alt="A template for a text message with placeholders for the recipients name, document and date"
-		>
+			alt="A screenshot of a spreadsheet containing data about three people"
+		  >
+		</picture>
 	</p>
     <a href='{{ url_for('.tour', service_id=service_id, page=next_page) }}'>
       Next
