@@ -14,7 +14,11 @@
 
     <h1 class="heading-large">{{ page_heading }}</h1>
 
-    {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
+    {% if current_user.has_permissions(permissions=['manage_templates'], any_=True) %}
+       <p class="bottom-gutter">
+         You need a template before you can send
+         {{ 'emails' if 'email' == template_type else 'text messages' }}
+       </p>
       <a href="{{ url_for('.add_service_template', service_id=service_id, template_type=template_type) }}" class="button">Add a new template</a>
     {% else %}
       <p>You need to ask your service manager to add templates before you can send messages</p>
@@ -33,17 +37,6 @@
       {% endif %}
     </div>
 
-    {% if not has_jobs %}
-      {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters'], or_=True) %}
-      {{ banner(
-        """
-          Send yourself a test
-        """,
-        subhead='Next step:',
-        type="tip"
-      )}}
-      {% endif %}
-    {% endif %}
     <div class="grid-row">
       {% for template in templates %}
         <div class="column-two-thirds">
@@ -73,10 +66,10 @@
         <div class="column-one-third">
           <div class="sms-message-use-links">
             {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
-              <a href="{{ url_for(".send_messages", service_id=service_id, template_id=template.id) }}">Send a batch</a>
+              <a href="{{ url_for(".send_messages", service_id=service_id, template_id=template.id) }}">Send from a CSV file</a>
               <a href="{{ url_for(".send_message_to_self", service_id=service_id, template_id=template.id) }}">Send yourself a test</a>
             {% endif %}
-            {% if current_user.has_permissions(permissions=['manage_api_keys', 'access_developer_docs']) %}
+            {% if current_user.has_permissions(permissions=['manage_api_keys']) %}
               <a href="{{ url_for(".send_from_api", service_id=service_id, template_id=template.id) }}">API integration</a>
             {% endif %}
           </div>

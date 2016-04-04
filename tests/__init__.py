@@ -5,12 +5,15 @@ from flask_login import login_user
 
 
 class TestClient(FlaskClient):
-    def login(self, user):
+    def login(self, user, mocker=None, service=None):
         # Skipping authentication here and just log them in
         with self.session_transaction() as session:
             session['user_id'] = user.id
             session['_fresh'] = True
-
+        if mocker:
+            mocker.patch('app.user_api_client.get_user', return_value=user)
+        if mocker and service:
+            mocker.patch('app.service_api_client.get_service', return_value={'data': service})
         login_user(user, remember=True)
 
     def login_fresh(self):
@@ -20,14 +23,15 @@ class TestClient(FlaskClient):
         self.get(url_for("main.logout"))
 
 
-def service_json(id_, name, users, limit=1000, active=False, restricted=True):
+def service_json(id_, name, users, limit=1000, active=False, restricted=True, email_from=None):
     return {
         'id': id_,
         'name': name,
         'users': users,
         'limit': limit,
         'active': active,
-        'restricted': restricted
+        'restricted': restricted,
+        'email_from': email_from
     }
 
 
@@ -62,13 +66,6 @@ def invite_json(id, from_user, service_id, email_address, permissions, created_a
 TEST_USER_EMAIL = 'test@user.gov.uk'
 
 
-def create_test_user(state):
-    from app.main.dao import users_dao
-    user = None
-    users_dao.insert_user(user)
-    return user
-
-
 def create_test_api_user(state, permissions={}):
     from app.notify_client.user_api_client import User
     user_data = {'id': 1,
@@ -81,18 +78,6 @@ def create_test_api_user(state, permissions={}):
                  }
     user = User(user_data)
     return user
-
-
-def create_another_test_user(state):
-    from app.main.dao import users_dao
-    user = None
-    users_dao.insert_user(user)
-    return user
-
-
-def get_test_user():
-    from app.main.dao import users_dao
-    return users_dao.get_user_by_email(TEST_USER_EMAIL)
 
 
 def job_json():

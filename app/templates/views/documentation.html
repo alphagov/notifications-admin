@@ -99,16 +99,11 @@
 </div>
         {{"""
 {
-  'notification':
-  {
-    'to': '+441234123123',
-    'createdAt': '2016-01-01T09:00:00.999999Z',
-    'status': 'created',
-    'id': 1,
-    'message': '....',
-    'method': 'sms',
-    'jobId': 1
-  }
+   'data':{
+      'notification': {
+         'id':1
+      }
+   }
 }
         """|syntax_highlight_json }}
 
@@ -119,18 +114,19 @@
 
         {{"""
 {
-  'notification':
-  {
-    'status': 'sent',
-    'createdAt': '2016-01-01T09:00:00.999999Z',
-    'to': '+447827992607',
-    'method': 'sms',
-    'sentAt': '2016-01-01T09:01:00.999999Z',
-    'id': 1,
-    'message': '...',
-    'jobId': 1,
-    'sender': 'sms-partner'
-  }
+   'data':{
+      'notification': {
+         'status':'sent',
+         'createdAt':'2016-01-01T09:00:00.999999Z',
+         'to':'+447827992607',
+         'method':'sms',
+         'sentAt':'2016-01-01T09:01:00.999999Z',
+         'id':1,
+         'message':'...',
+         'jobId':1,
+         'sender':'sms-partner'
+      }
+   }
 }
         """|syntax_highlight_json }}
 

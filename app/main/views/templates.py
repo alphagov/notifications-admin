@@ -4,8 +4,7 @@ from flask_login import login_required
 from app.main import main
 from app.utils import user_has_permissions
 from app.main.forms import SMSTemplateForm, EmailTemplateForm
-from app.main.dao import templates_dao as tdao
-from app.main.dao import services_dao as sdao
+from app import service_api_client
 
 
 form_objects = {
@@ -24,7 +23,7 @@ page_headings = {
 @user_has_permissions('manage_templates', admin_override=True)
 def add_service_template(service_id, template_type):
 
-    service = sdao.get_service_by_id_or_404(service_id)
+    service = service_api_client.get_service(service_id)
 
     if template_type not in ['sms', 'email']:
         abort(404)
@@ -32,7 +31,7 @@ def add_service_template(service_id, template_type):
     form = form_objects[template_type]()
 
     if form.validate_on_submit():
-        tdao.insert_service_template(
+        service_api_client.create_service_template(
             form.name.data,
             template_type,
             form.template_content.data,
@@ -56,12 +55,12 @@ def add_service_template(service_id, template_type):
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
 def edit_service_template(service_id, template_id):
-    template = tdao.get_service_template_or_404(service_id, template_id)['data']
+    template = service_api_client.get_service_template(service_id, template_id)['data']
     template['template_content'] = template['content']
     form = form_objects[template['template_type']](**template)
 
     if form.validate_on_submit():
-        tdao.update_service_template(
+        service_api_client.update_service_template(
             template_id, form.name.data, template['template_type'],
             form.template_content.data, service_id
         )
@@ -85,10 +84,10 @@ def edit_service_template(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
 def delete_service_template(service_id, template_id):
-    template = tdao.get_service_template_or_404(service_id, template_id)['data']
+    template = service_api_client.get_service_template(service_id, template_id)['data']
 
     if request.method == 'POST':
-        tdao.delete_service_template(service_id, template_id)
+        service_api_client.delete_service_template(service_id, template_id)
         return redirect(url_for(
             '.choose_template',
             service_id=service_id,

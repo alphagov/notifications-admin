@@ -20,23 +20,20 @@ from app.main.forms import (
     InviteUserForm,
     PermissionsForm
 )
-from app.main.dao.services_dao import get_service_by_id
-from app import user_api_client
-from app import service_api_client
-from app import invite_api_client
+from app import (user_api_client, service_api_client, invite_api_client)
 from app.utils import user_has_permissions
 
 
 roles = {
     'send_messages': ['send_texts', 'send_emails', 'send_letters'],
     'manage_service': ['manage_users', 'manage_templates', 'manage_settings'],
-    'manage_api_keys': ['manage_api_keys', 'access_developer_docs']
+    'manage_api_keys': ['manage_api_keys']
 }
 
 
 @main.route("/services/<service_id>/users")
 @login_required
-@user_has_permissions()
+@user_has_permissions('view_activity', admin_override=True)
 def manage_users(service_id):
     return render_template(
         'views/manage-users.html',
@@ -54,19 +51,23 @@ def manage_users(service_id):
 @login_required
 @user_has_permissions('manage_users', admin_override=True)
 def invite_user(service_id):
-    get_service_by_id(service_id)
+    service = service_api_client.get_service(service_id)['data']
 
     form = InviteUserForm(invalid_email_address=current_user.email_address)
 
     if form.validate_on_submit():
         email_address = form.email_address.data
+        # view_activity is a default role to be added to all users.
+        # All users will have at minimum view_activity to allow users to see notifications,
+        # templates, team members but no update privileges
+        selected_permissions = [role for role in sorted(roles.keys()) if request.form.get(role) == 'y']
+        selected_permissions.append('view_activity')
+        permissions = ','.join(selected_permissions)
         invited_user = invite_api_client.create_invite(
             current_user.id,
             service_id,
             email_address,
-            ','.join(
-                role for role in roles.keys() if request.form.get(role) == 'y'
-            )
+            permissions
         )
 
         flash('Invite sent to {}'.format(invited_user.email_address), 'default_with_tick')
@@ -84,9 +85,9 @@ def invite_user(service_id):
 @user_has_permissions('manage_users', admin_override=True)
 def edit_user_permissions(service_id, user_id):
     # TODO we should probably using the service id here in the get user
-    # call as well. eg. /user/<user_id>?&service_id=service_id
+    # call as well. eg. /user/<user_id>?&service=service_id
     user = user_api_client.get_user(user_id)
-    get_service_by_id(service_id)
+    service = service_api_client.get_service(service_id)['data']
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
     form = PermissionsForm(**{
@@ -98,7 +99,7 @@ def edit_user_permissions(service_id, user_id):
             user_id, service_id,
             permissions=set(chain.from_iterable(
                 permissions for role, permissions in roles.items() if form[role].data
-            ))
+            )) | {'view_activity'}
         )
         return redirect(url_for('.manage_users', service_id=service_id))
 
@@ -115,7 +116,7 @@ def edit_user_permissions(service_id, user_id):
 @user_has_permissions('manage_users', admin_override=True)
 def remove_user_from_service(service_id, user_id):
     user = user_api_client.get_user(user_id)
-    service = get_service_by_id(service_id)
+    service = service_api_client.get_service(service_id)['data']
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
     form = PermissionsForm(**{

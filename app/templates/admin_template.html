@@ -36,10 +36,10 @@
 {% block proposition_header %}
   <div class="header-proposition">
     <div class="content">
-      {% if current_user.is_authenticated() %}
-        <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
-        <nav id="proposition-menu">
-          <ul id="proposition-links">
+      <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
+      <nav id="proposition-menu">
+        <ul id="proposition-links">
+          {% if current_user.is_authenticated() %}
             <li>
               <a href="{{ url_for('main.user_profile') }}">{{ current_user.name }}</a>
             </li>
@@ -49,9 +49,13 @@
             <li>
               <a href="{{ url_for('main.sign_out')}}">Sign out</a>
             </li>
-          </ul>
-        </nav>
-      {% endif %}
+          {% else %}
+            <li>
+              <a href="{{ url_for('main.sign_in' )}}">Sign in to your account</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
     </div>
   </div>
 {% endblock %}
@@ -59,12 +63,7 @@
 
 {% set global_header_text = "GOV.UK Notify" %}
 
-
-{% if not current_user.is_authenticated() %}
-    {% set homepage_url = url_for('main.index') %}
-{% else %}
-    {% set homepage_url = url_for('main.choose_service') %}
-{% endif %}
+{% set homepage_url = url_for('main.show_all_services_or_dashboard') %}
 
 {% block content %}
   <div id="content">
@@ -84,7 +83,11 @@
         </div>
         <div class="column-one-third">
           <h2>About</h2>
-          <a href="{{ url_for("main.help") }}">Help</a>
+          <ul>
+            <li><a href="{{ url_for("main.help") }}">Help</a></li>
+            <li><a href="{{ url_for("main.terms") }}">Terms of use</a></li>
+            <li><a href="{{ url_for("main.cookies") }}">Cookies</a></li>
+          </ul>
         </div>
         <div class="column-one-third">
           <h2>Developers</h2>
@@ -97,8 +100,6 @@
 
 {% block footer_support_links %}
   <nav class="footer-nav">
-    <a href="{{ url_for("main.terms") }}">Terms of use</a>
-    <a href="{{ url_for("main.cookies") }}">Cookies</a>
     Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service">Government Digital Service</a>
   </nav>
 {% endblock %}

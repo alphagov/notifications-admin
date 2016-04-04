@@ -3,7 +3,7 @@
 {% from "components/email-message.html" import email_message %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
-{% from "components/table.html" import list_table, field %}
+{% from "components/table.html" import list_table, text_field %}
 
 {% block page_title %}
   Send text messages – GOV.UK Notify
@@ -28,26 +28,32 @@
     ) }}
   {% endif %}
 
-  <div class="grid-row">
-    <div class="column-two-thirds">
-      <p>
-        Add recipients by uploading a .csv file with
-        {{ template.placeholders|length + 1 }}
-        {% if template.placeholders %}
-          columns:
-        {% else %}
-          column:
-        {% endif %}
-      </p>
-      <p class="bottom-gutter-2-3">
-        <span class='placeholder'>{{ recipient_column }}</span>
-        {{ template.placeholders_as_markup|join(" ") }}
-      </p>
-      <p>
-        <a href="{{ url_for('.get_example_csv', service_id=service_id, template_id=template.id) }}">Download an example</a>
-      </p>
-    </div>
-  </div>
+  <p>
+    You need
+    {{ template.placeholders|length + 1 }}
+    {% if template.placeholders %}
+      columns
+    {% else %}
+      column
+    {% endif %}
+    in your file, like this:
+  </p>
+
+  {% call(item) list_table(
+    example,
+    caption="Example",
+    caption_visible=False,
+    field_headings=[recipient_column] + template.placeholders|list
+  ) %}
+    {% for column in item %}
+      {{ text_field(column) }}
+    {% endfor %}
+  {% endcall %}
+
+  <p class="bottom-gutter">
+    <a href="{{ url_for('.get_example_csv', service_id=service_id, template_id=template.id) }}">Download this example</a>
+  </p>
+
 
   {{file_upload(form.file, button_text='Upload your CSV file')}}
 

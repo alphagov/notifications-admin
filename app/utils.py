@@ -30,13 +30,13 @@ class BrowsableItem(object):
         pass
 
 
-def user_has_permissions(*permissions, admin_override=False, or_=False):
+def user_has_permissions(*permissions, admin_override=False, any_=False):
     def wrap(func):
         @wraps(func)
         def wrap_func(*args, **kwargs):
             from flask_login import current_user
             if current_user and current_user.has_permissions(permissions=permissions,
-                                                             admin_override=admin_override, or_=or_):
+                                                             admin_override=admin_override, any_=any_):
                 return func(*args, **kwargs)
             else:
                 abort(403)
@@ -101,3 +101,9 @@ def generate_previous_next_dict(view, view_dict, page, title, label):
         'title': title,
         'label': label
     }
+
+
+def email_safe(string):
+    return "".join([
+        character.lower() if character.isalnum() or character == "." else "" for character in re.sub("\s+", ".", string.strip())  # noqa
+    ])

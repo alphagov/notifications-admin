@@ -1,19 +1,23 @@
 {% from "components/banner.html" import banner_wrapper %}
 
-<h2 class="heading-medium">Get started</h2>
-<ol class="grid-row">
-  {% if current_user.has_permissions(['manage_templates']) %}
-    <li class="column-half">
-      {% call banner_wrapper(type="tip", subhead='1.' if not templates else None, with_tick=templates|length) %}
-        <a href='{{ url_for(".add_service_template", service_id=service_id, template_type="sms") }}'>Add a template</a>
-      {% endcall %}
-    </li>
-  {% endif %}
-  {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
-    <li class="column-half">
-      {% call banner_wrapper(type="tip", subhead='2.') %}
-        <a href='{{ url_for(".choose_template", service_id=service_id, template_type="sms") }}'>Send yourself a message</a>
-      {% endcall %}
-    </li>
-  {% endif %}
-</ol>
+{% if current_user.has_permissions(['manage_templates']) %}
+  {% call banner_wrapper(type='tour') %}
+    <h2 class="heading-large">You’re ready to get started</h2>
+    <p>
+      <a href='{{ url_for(".add_service_template", service_id=service_id, template_type="sms") }}'>
+        Set up a text message template
+      </a>
+    </p>
+    <p>
+      <a href='{{ url_for(".add_service_template", service_id=service_id, template_type="email") }}'>
+        Set up an email template
+      </a>
+    </p>
+  {% endcall %}
+{% else %}
+  {% call banner_wrapper(type='mode') %}
+    <p>
+      You need to ask your service manager to set up some templates before you can send messages
+    </p>
+  {% endcall %}
+{% endif %}

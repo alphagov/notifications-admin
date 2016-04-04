@@ -6,24 +6,22 @@ from flask import (
     render_template,
     abort,
     jsonify,
-    flash,
-    redirect,
-    request,
-    url_for
+    request
 )
 from flask_login import login_required
 from utils.template import Template
 
-from app import job_api_client, notification_api_client
+from app import (job_api_client, notification_api_client, service_api_client)
 from app.main import main
-from app.main.dao import templates_dao
-from app.main.dao import services_dao
-from app.utils import (get_page_from_request, generate_previous_next_dict, user_has_permissions)
+from app.utils import (
+    get_page_from_request,
+    generate_previous_next_dict,
+    user_has_permissions)
 
 
 @main.route("/services/<service_id>/jobs")
 @login_required
-@user_has_permissions()
+@user_has_permissions('view_activity', admin_override=True)
 def view_jobs(service_id):
     jobs = job_api_client.get_job(service_id)['data']
     return render_template(
@@ -35,11 +33,11 @@ def view_jobs(service_id):
 
 @main.route("/services/<service_id>/jobs/<job_id>")
 @login_required
-@user_has_permissions()
+@user_has_permissions('view_activity', admin_override=True)
 def view_job(service_id, job_id):
-    service = services_dao.get_service_by_id_or_404(service_id)
+    service = service_api_client.get_service(service_id)['data']
     job = job_api_client.get_job(service_id, job_id)['data']
-    template = templates_dao.get_service_template_or_404(service_id, job['template'])['data']
+    template = service_api_client.get_service_template(service_id, job['template'])['data']
     notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
     finished = job['status'] == 'finished'
     return render_template(
@@ -64,9 +62,9 @@ def view_job(service_id, job_id):
 
 @main.route("/services/<service_id>/jobs/<job_id>.json")
 @login_required
-@user_has_permissions()
+@user_has_permissions('view_activity')
 def view_job_updates(service_id, job_id):
-    service = services_dao.get_service_by_id_or_404(service_id)
+    service = service_api_client.get_service(service_id)['data']
     job = job_api_client.get_job(service_id, job_id)['data']
     notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
     finished = job['status'] == 'finished'
@@ -92,7 +90,7 @@ def view_job_updates(service_id, job_id):
 
 @main.route('/services/<service_id>/notifications')
 @login_required
-@user_has_permissions()
+@user_has_permissions('view_activity', admin_override=True)
 def view_notifications(service_id):
     # TODO get the api to return count of pages as well.
     page = get_page_from_request()
@@ -121,7 +119,7 @@ def view_notifications(service_id):
 
 @main.route("/services/<service_id>/jobs/<job_id>/notification/<string:notification_id>")
 @login_required
-@user_has_permissions()
+@user_has_permissions('view_activity', admin_override=True)
 def view_notification(service_id, job_id, notification_id):
 
     now = time.strftime('%H:%M')

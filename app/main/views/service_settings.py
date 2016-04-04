@@ -13,24 +13,18 @@ from flask_login import (
 )
 from notifications_python_client import HTTPError
 
-from app.main.dao.services_dao import (
-    get_service_by_id,
-    delete_service,
-    update_service,
-    find_all_service_names
-)
-
+from app import service_api_client
 from app.main import main
-from app.utils import user_has_permissions
-from app.main.dao.users_dao import verify_password
+from app.utils import user_has_permissions, email_safe
 from app.main.forms import ConfirmPasswordForm, ServiceNameForm
+from app import user_api_client
 
 
 @main.route("/services/<service_id>/service-settings")
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_settings(service_id):
-    service = get_service_by_id(service_id)['data']
+    service = service_api_client.get_service(service_id)['data']
 
     return render_template(
         'views/service-settings.html',
@@ -43,9 +37,9 @@ def service_settings(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_name_change(service_id):
-    service = get_service_by_id(service_id)['data']
+    service = service_api_client.get_service(service_id)['data']
 
-    form = ServiceNameForm(find_all_service_names)
+    form = ServiceNameForm(service_api_client.find_all_service_email_from)
 
     if form.validate_on_submit():
         session['service_name_change'] = form.name.data
@@ -62,17 +56,25 @@ def service_name_change(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_name_change_confirm(service_id):
-    service = get_service_by_id(service_id)['data']
+    service = service_api_client.get_service(service_id)['data']
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user.id, pwd)
+        return user_api_client.verify_password(current_user.id, pwd)
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
         service['name'] = session['service_name_change']
+        service['email_from'] = email_safe(session['service_name_change'])
         try:
-            update_service(service)
+            service_api_client.update_service(
+                service['id'],
+                service['name'],
+                service['active'],
+                service['limit'],
+                service['restricted'],
+                service['users'],
+                service['email_from'])
         except HTTPError as e:
             error_msg = "Duplicate service name '{}'".format(session['service_name_change'])
             if e.status_code == 400 and error_msg in e.message['name']:
@@ -96,7 +98,7 @@ def service_name_change_confirm(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_request_to_go_live(service_id):
-    service = get_service_by_id(service_id)['data']
+    service = service_api_client.get_service(service_id)['data']
     if request.method == 'GET':
         return render_template(
             'views/service-settings/request-to-go-live.html',
@@ -113,7 +115,7 @@ def service_request_to_go_live(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_status_change(service_id):
-    service = get_service_by_id(service_id)['data']
+    service = service_api_client.get_service(service_id)['data']
 
     if request.method == 'GET':
         return render_template(
@@ -129,16 +131,23 @@ def service_status_change(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_status_change_confirm(service_id):
-    service = get_service_by_id(service_id)['data']
+    service = service_api_client.get_service(service_id)['data']
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user.id, pwd)
+        return user_api_client.verify_password(current_user.id, pwd)
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
         service['active'] = True
-        update_service(service)
+        service_api_client.update_service(
+            service['id'],
+            service['name'],
+            service['active'],
+            service['limit'],
+            service['restricted'],
+            service['users'],
+            service['email_from'])
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/confirm.html',
@@ -152,7 +161,7 @@ def service_status_change_confirm(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_delete(service_id):
-    service = get_service_by_id(service_id)['data']
+    service = service_api_client.get_service(service_id)['data']
 
     if request.method == 'GET':
         return render_template(
@@ -168,15 +177,15 @@ def service_delete(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_delete_confirm(service_id):
-    service = get_service_by_id(service_id)['data']
+    service = service_api_client.get_service(service_id)['data']
 
     # Validate password for form
     def _check_password(pwd):
-        return verify_password(current_user.id, pwd)
+        return user_api_client.verify_password(current_user.id, pwd)
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
-        service = delete_service(service_id)
+        service = service_api_client.delete_service(service_id)
         return redirect(url_for('.choose_service'))
 
     return render_template(

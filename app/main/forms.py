@@ -1,13 +1,14 @@
-import re
 from flask_wtf import Form
-
+from utils.recipients import (
+    validate_phone_number,
+    InvalidPhoneError
+)
 from wtforms import (
     StringField,
     PasswordField,
     ValidationError,
     TextAreaField,
     FileField,
-    RadioField,
     BooleanField,
     HiddenField
 )
@@ -16,17 +17,11 @@ from wtforms.validators import (DataRequired, Email, Length, Regexp)
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidEmailDomainRegex)
 
-from utils.recipients import (
-    validate_phone_number,
-    format_phone_number,
-    InvalidPhoneError
-)
-
 
 def email_address(label='Email address'):
     return EmailField(label, validators=[
         Length(min=5, max=255),
-        DataRequired(message='Email cannot be empty'),
+        DataRequired(message='Can’t be empty'),
         Email(message='Enter a valid email address'),
         ValidEmailDomainRegex()])
 
@@ -42,35 +37,35 @@ class UKMobileNumber(TelField):
 
 def mobile_number():
     return UKMobileNumber('Mobile phone number',
-                          validators=[DataRequired(message='Cannot be empty')])
+                          validators=[DataRequired(message='Can’t be empty')])
 
 
 def password(label='Create a password'):
     return PasswordField(label,
-                         validators=[DataRequired(message='Password can not be empty'),
-                                     Length(10, 255, message='Password must be at least 10 characters'),
+                         validators=[DataRequired(message='Can’t be empty'),
+                                     Length(10, 255, message='Must be at least 10 characters'),
                                      Blacklist(message='That password is blacklisted, too common')])
 
 
 def sms_code():
     verify_code = '^\d{5}$'
     return StringField('Text message code',
-                       validators=[DataRequired(message='Text message confirmation code can not be empty'),
+                       validators=[DataRequired(message='Can’t be empty'),
                                    Regexp(regex=verify_code,
-                                          message='Text message confirmation code must be 5 digits')])
+                                          message='Must be 5 digits')])
 
 
 def email_code():
     verify_code = '^\d{5}$'
     return StringField("Email code",
-                       validators=[DataRequired(message='Email confirmation code can not be empty'),
-                                   Regexp(regex=verify_code, message='Email confirmation code must be 5 digits')])
+                       validators=[DataRequired(message='Can’t be empty'),
+                                   Regexp(regex=verify_code, message='Must be 5 digits')])
 
 
 class LoginForm(Form):
     email_address = StringField('Email address', validators=[
         Length(min=5, max=255),
-        DataRequired(message='Email cannot be empty'),
+        DataRequired(message='Can’t be empty'),
         Email(message='Enter a valid email address')
     ])
     password = PasswordField('Password', validators=[
@@ -81,7 +76,7 @@ class LoginForm(Form):
 class RegisterUserForm(Form):
 
     name = StringField('Full name',
-                       validators=[DataRequired(message='Name can not be empty')])
+                       validators=[DataRequired(message='Can’t be empty')])
     email_address = email_address()
     mobile_number = mobile_number()
     password = password()
@@ -89,7 +84,7 @@ class RegisterUserForm(Form):
 
 class RegisterUserFromInviteForm(Form):
     name = StringField('Full name',
-                       validators=[DataRequired(message='Name can not be empty')])
+                       validators=[DataRequired(message='Can’t be empty')])
     mobile_number = mobile_number()
     password = password()
     service = HiddenField('service')
@@ -113,7 +108,7 @@ class InviteUserForm(PermissionsForm):
 
     def validate_email_address(self, field):
         if field.data.lower() == self.invalid_email_address:
-            raise ValidationError("You can't send an invitation to yourself")
+            raise ValidationError("You can’t send an invitation to yourself")
 
 
 class TwoFactorForm(Form):
@@ -154,12 +149,14 @@ class AddServiceForm(Form):
     name = StringField(
         'Service name',
         validators=[
-            DataRequired(message='Service name can’t be empty')
+            DataRequired(message='Can’t be empty')
         ]
     )
 
     def validate_name(self, a):
-        if a.data in self._names_func():
+        from app.utils import email_safe
+        # make sure the email_from will be unique to all services
+        if email_safe(a.data) in self._names_func():
             raise ValidationError('This service name is already in use')
 
 
@@ -176,11 +173,13 @@ class ServiceNameForm(Form):
     name = StringField(
         u'New name',
         validators=[
-            DataRequired(message='Service name can’t be empty')
+            DataRequired(message='Can’t be empty')
         ])
 
     def validate_name(self, a):
-        if a.data in self._names_func():
+        from app.utils import email_safe
+        # make sure the email_from will be unique to all services
+        if email_safe(a.data) in self._names_func():
             raise ValidationError('This service name is already in use')
 
 
@@ -200,18 +199,18 @@ class ConfirmPasswordForm(Form):
 class SMSTemplateForm(Form):
     name = StringField(
         u'Template name',
-        validators=[DataRequired(message="Template name cannot be empty")])
+        validators=[DataRequired(message="Can’t be empty")])
 
     template_content = TextAreaField(
-        u'Message',
-        validators=[DataRequired(message="Template content cannot be empty")])
+        u'Message content',
+        validators=[DataRequired(message="Can’t be empty")])
 
 
 class EmailTemplateForm(SMSTemplateForm):
 
     subject = StringField(
         u'Subject',
-        validators=[DataRequired(message="Subject cannot be empty")])
+        validators=[DataRequired(message="Can’t be empty")])
 
 
 class ForgotPasswordForm(Form):

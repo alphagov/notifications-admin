@@ -4,23 +4,22 @@ from flask import (
     flash,
     jsonify
 )
+from datetime import date
 
 from flask_login import login_required
 from app.main import main
-from app.main.dao.services_dao import get_service_by_id
-from app.main.dao import templates_dao
-from app import job_api_client, statistics_api_client
+from app import (job_api_client, statistics_api_client, service_api_client)
 from app.utils import user_has_permissions
 
 
 @main.route("/services/<service_id>/dashboard")
 @login_required
-@user_has_permissions()
+@user_has_permissions('view_activity', admin_override=True)
 def service_dashboard(service_id):
-    templates = templates_dao.get_service_templates(service_id)['data']
+    templates = service_api_client.get_service_templates(service_id)['data']
     jobs = job_api_client.get_job(service_id)['data']
 
-    service = get_service_by_id(service_id)
+    service = service_api_client.get_service(service_id)
     session['service_name'] = service['data']['name']
     session['service_id'] = service['data']['id']
 
@@ -63,17 +62,21 @@ def add_rates_to(delivery_statistics):
     if not delivery_statistics or not delivery_statistics[0]:
         return {}
 
-    today = delivery_statistics[0]
+    today = None
+    latest_stats = {}
+    if delivery_statistics[0]['day'] == date.today().strftime('%Y-%m-%d'):
+        today = delivery_statistics[0]
+        latest_stats = delivery_statistics[0]
 
-    today.update({
+    latest_stats.update({
         'emails_failure_rate': (
-            "{0:.1f}".format((today['emails_error'] / today['emails_requested'] * 100))
-            if today['emails_requested'] else 0
+            "{0:.1f}".format((float(today['emails_error']) / today['emails_requested'] * 100))
+            if today and today['emails_requested'] else 0
         ),
         'sms_failure_rate': (
-            "{0:.1f}".format((today['sms_error'] / today['sms_requested'] * 100))
-            if today['sms_requested'] else 0
+            "{0:.1f}".format((float(today['sms_error']) / today['sms_requested'] * 100))
+            if today and today['sms_requested'] else 0
         )
     })
 
-    return today
+    return latest_stats
