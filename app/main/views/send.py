@@ -49,6 +49,20 @@ def get_page_headings(template_type):
     }[template_type]
 
 
+def get_example_csv_rows(template, number_of_rows=2):
+    return [
+        [
+            {
+                'email': current_user.email_address,
+                'sms': current_user.mobile_number
+            }[template.template_type]
+        ] + [
+            "{} {}".format(header, i) for header in template.placeholders
+        ]
+        for i in range(1, number_of_rows + 1)
+    ]
+
+
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
 @login_required
 @user_has_permissions('view_activity',
@@ -123,6 +137,7 @@ def send_messages(service_id, template_id):
         'views/send.html',
         template=template,
         recipient_column=first_column_heading[template.template_type],
+        example=get_example_csv_rows(template),
         form=form,
         service=service,
         service_id=service_id
@@ -132,25 +147,21 @@ def send_messages(service_id, template_id):
 @main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', any_=True)
-def get_example_csv(service_id, template_id):
+def get_example_csv(service_id, template_id, number_of_rows=2):
     template = Template(service_api_client.get_service_template(service_id, template_id)['data'])
-    # Good practice to use context managers
-    # http://stackoverflow.com/questions/9718950/do-i-have-to-do-stringio-close
-    # For this instance it may not be a problem but someone else looking at the
-    # code may assume its always safe when it might not be.
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(
-        [first_column_heading[template.template_type]] +
-        list(template.placeholders)
-    )
-    writer.writerow([
-        {
-            'email': current_user.email_address,
-            'sms': current_user.mobile_number
-        }[template.template_type]
-    ] + _get_fake_personalisation(template.placeholders))
-    return output.getvalue(), 200, {'Content-Type': 'text/csv; charset=utf-8'}
+    with io.StringIO() as output:
+        writer = csv.writer(output)
+        writer.writerows(
+            [
+                [first_column_heading[template.template_type]] +
+                list(template.placeholders)
+            ] +
+            get_example_csv_rows(template, number_of_rows=number_of_rows)
+        )
+        return output.getvalue(), 200, {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': 'inline; filename="{}.csv"'.format(template.name)
+        }
 
 
 @main.route("/services/<service_id>/send/<template_id>/to-self", methods=['GET'])
@@ -158,29 +169,12 @@ def get_example_csv(service_id, template_id):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_message_to_self(service_id, template_id):
     template = Template(service_api_client.get_service_template(service_id, template_id)['data'])
-    # Good practice to use context managers
-    # http://stackoverflow.com/questions/9718950/do-i-have-to-do-stringio-close
-    # For this instance it may not be a problem but someone else looking at the
-    # code may assume its always safe when it might not be.
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(
-        [first_column_heading[template.template_type]] +
-        list(template.placeholders)
-    )
-    if template.template_type == 'sms':
-        writer.writerow(
-            [current_user.mobile_number] + _get_fake_personalisation(template.placeholders)
-        )
-    if template.template_type == 'email':
-        writer.writerow(
-            [current_user.email_address] + _get_fake_personalisation(template.placeholders)
-        )
 
     filedata = {
         'file_name': 'Test run',
-        'data': output.getvalue()
+        'data': get_example_csv(service_id, template_id, number_of_rows=1)[0]
     }
+
     upload_id = str(uuid.uuid4())
 
     s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
@@ -299,9 +293,3 @@ def start_job(service_id, upload_id):
     return redirect(
         url_for('main.view_job', service_id=service_id, job_id=upload_id)
     )
-
-
-def _get_fake_personalisation(placeholders):
-    return [
-        "{} 1".format(header) for header in placeholders
-    ]
