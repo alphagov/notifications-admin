@@ -5,27 +5,26 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-
-  {% if service.restricted %}
-    {% include 'views/dashboard/trial-mode-banner.html' %}
-  {% endif %}
-
-  {% if not jobs %}
-    {% if current_user.has_permissions(['manage_templates','send_texts', 'send_emails', 'send_letters']) %}
+  
+    {% if not templates and current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
       {% include 'views/dashboard/get-started.html' %}
-    {% endif%}
-  {% else %}
+    {% elif service.restricted %}
+      <div class="dashboard">
+        {% include 'views/dashboard/trial-mode-banner.html' %}
+      </div>
+    {% endif %}
 
-    <div
-      data-module="update-content"
-      data-resource="{{url_for(".service_dashboard_updates", service_id=service_id)}}"
-      data-key="today"
-      data-interval-seconds="10"
-    >
-      {% include 'views/dashboard/today.html' %}
-    </div>
+
+      <div
+        data-module="update-content"
+        data-resource="{{url_for(".service_dashboard_updates", service_id=service_id)}}"
+        data-key="today"
+        data-interval-seconds="10"
+      >
+        {% include 'views/dashboard/today.html' %}
+      </div>
     
-    {% include 'views/dashboard/jobs.html' %}
-  {% endif %}
+      {% include 'views/dashboard/jobs.html' %}
+  
 
 {% endblock %}

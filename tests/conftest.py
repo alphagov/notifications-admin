@@ -60,10 +60,10 @@ def mock_get_service(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_create_service(mocker):
-    def _create(service_name, active, limit, restricted, user_id):
+    def _create(service_name, active, limit, restricted, user_id, email_from):
         service = service_json(
             101, service_name, [user_id], limit=limit,
-            active=active, restricted=restricted)
+            active=active, restricted=restricted, email_from=email_from)
         return service['id']
 
     return mocker.patch(
@@ -77,14 +77,15 @@ def mock_update_service(mocker):
                 active,
                 limit,
                 restricted,
-                users):
+                users,
+                email_from):
         service = service_json(
             service_id, service_name, users, limit=limit,
-            active=active, restricted=restricted)
+            active=active, restricted=restricted, email_from=email_from)
         return {'data': service}
 
     return mocker.patch(
-        'app.service_api_client.update_service', side_effect=_update)
+        'app.service_api_client.update_service', side_effect=_update, autospec=True)
 
 
 @pytest.fixture(scope='function')
@@ -94,7 +95,8 @@ def mock_update_service_raise_httperror_duplicate_name(mocker):
                 active,
                 limit,
                 restricted,
-                users):
+                users,
+                email_from):
         json_mock = Mock(return_value={'message': {'name': ["Duplicate service name '{}'".format(service_name)]}})
         resp_mock = Mock(status_code=400, json=json_mock)
         http_error = HTTPError(response=resp_mock, message="Default message")

@@ -23,5 +23,6 @@ from app.main.views import (
     api_keys,
     manage_users,
     invites,
-    all_services
+    all_services,
+    tour
 )

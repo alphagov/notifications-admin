@@ -129,7 +129,7 @@ def test_download_example_csv(
                 follow_redirects=True
             )
         assert response.status_code == 200
-        assert response.get_data(as_text=True) == 'phone number\r\n+4412341234\r\n'
+        assert response.get_data(as_text=True) == 'phone number\r\n+4412341234\r\n+4412341234\r\n'
         assert 'text/csv' in response.headers['Content-Type']
 
 
