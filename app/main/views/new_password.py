@@ -4,9 +4,9 @@ from flask import (render_template, url_for, redirect, flash, session, current_a
 from itsdangerous import SignatureExpired
 
 from app.main import main
-from app.main.dao import users_dao
 from app.main.forms import NewPasswordForm
 from datetime import datetime
+from app import user_api_client
 
 
 @main.route('/new-password/<path:token>', methods=['GET', 'POST'])
@@ -20,10 +20,7 @@ def new_password(token):
         return redirect(url_for('.forgot_password'))
 
     email_address = json.loads(token_data)['email']
-    user = users_dao.get_user_by_email(email_address=email_address)
-    # TODO: what should this be??
-    if not user:
-        abort(404, 'user not found')
+    user = user_api_client.get_user_by_email(email_address)
     if user.password_changed_at and datetime.strptime(user.password_changed_at, '%Y-%m-%d %H:%M:%S.%f') > \
             datetime.strptime(json.loads(token_data)['created_at'], '%Y-%m-%d %H:%M:%S.%f'):
         flash('The link in the email has already been used')
@@ -32,7 +29,7 @@ def new_password(token):
     form = NewPasswordForm()
 
     if form.validate_on_submit():
-        users_dao.send_verify_code(user.id, 'sms', user.mobile_number)
+        user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
         session['user_details'] = {
             'id': user.id,
             'email': user.email_address,

@@ -1,9 +1,5 @@
-
-from datetime import datetime
-
-from app.main.dao import users_dao
-
 from flask import url_for
+from bs4 import BeautifulSoup
 
 
 def test_render_sign_in_returns_sign_in_template(app_):
@@ -75,9 +71,11 @@ def test_should_return_redirect_when_user_is_pending(app_,
         response = app_.test_client().post(
             url_for('main.sign_in'), data={
                 'email_address': 'pending_user@example.gov.uk',
-                'password': 'val1dPassw0rd!'})
-        assert response.status_code == 302
-        assert response.location == url_for('main.verify', _external=True)
+                'password': 'val1dPassw0rd!'}, follow_redirects=True)
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.h1.string == 'Sign in'
+        flash_banner = page.find('div', class_='banner-dangerous').string.strip()
+        assert flash_banner == "You haven't verified your email or mobile number yet."
 
 
 def test_not_fresh_session_login(app_,

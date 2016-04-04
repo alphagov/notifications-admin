@@ -58,64 +58,59 @@
 
 }
 
-%banner-tip,
-.banner-tip {
-
-  @extend %banner;
-  @include bold-19;
-  background-color: $yellow;
-  color: $text-colour;
-  text-align: left;
-  margin-top: 0;
-
-  a {
-    &:link,
-    &:visited {
-      color: $text-colour;
-      text-decoration: underline;
-    }
-  }
-
-  ol {
-    list-style-type: decimal;
-  }
-
-}
-
-.banner-tip-with-tick {
-  @extend %banner-with-tick;
-  @extend %banner-tip;
-  background-image: file-url('tick-black.png');
-}
-
-.banner-info,
-.banner-important {
-  @extend %banner;
-  background: $white;
-  color: $text-colour;
-  background-image: file-url('icon-important-2x.png');
-  background-size: 34px 34px;
-  background-position: 0 0;
-  background-repeat: no-repeat;
-  padding: 7px 0 5px 50px;
-}
-
-.banner-info {
-  background-image: file-url('icon-information-2x.png');
-}
-
 .banner-mode {
 
   @extend %banner;
   background: $govuk-blue;
   color: $white;
   margin-top: $gutter;
+  padding: $gutter-half;
 
-  .heading-medium {
+  p {
     margin: 0 0 10px 0;
   }
 
+  &-action {
+    text-align: right;
+  }
+
+}
+
+.banner-tour {
+
+  @extend %banner;
+  background: $govuk-blue;
+  color: $white;
+  margin-top: $gutter;
+  padding: $gutter * 2;
+
+  .heading-large {
+    margin: 0 0 $gutter 0;
+  }
+
+  p {
+    
+    margin-bottom: $gutter;
+
+    &:last-child {
+      margin-bottom: 0
+    }
+
+    & + p {
+      margin-top: -$gutter-half;
+    }
+
+  }
+
   a {
+
+    @include bold-24;
+    display: inline-block;
+    background-image: file-url('tour-next.png');
+    background-size: auto 24px;
+    padding: 0 23px 0 0;
+    background-position: right 3px;
+    background-repeat: no-repeat;
 
     &:link,
     &:visited {
@@ -124,19 +119,25 @@
 
     &:hover,
     &:active {
-      color: $light-blue-25;
+      background-color: $link-hover-colour;
+      outline: 10px solid $link-hover-colour;
+    }
+
+    &:active,
+    &:focus {
+      background-color: $yellow;
+      outline: 10px solid $yellow;
     }
 
   }
 
-  .big-number {
+  img {
+    max-width: 100%;
+    display: block;
+  }
 
-    margin-top: 10px;
-
-    &-label {
-      padding-bottom: 0;
-    }
-
+  &-image-flush-bottom {
+    margin: 40px 0 -60px 0;
   }
 
 }

@@ -154,6 +154,27 @@ def test_route_permissions(mocker,
                 service_one)
 
 
+def test_route_permissions_for_choose_template(mocker,
+                                               app_,
+                                               api_user_active,
+                                               service_one,
+                                               mock_get_service_templates):
+    mocker.patch('app.job_api_client.get_job')
+    with app_.test_request_context():
+        validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            200,
+            url_for(
+                'main.choose_template',
+                service_id=service_one['id'],
+                template_type='sms'),
+            ['view_activity'],
+            api_user_active,
+            service_one)
+
+
 def test_route_invalid_permissions(mocker,
                                    app_,
                                    api_user_active,
@@ -175,6 +196,6 @@ def test_route_invalid_permissions(mocker,
                     service_id=service_one['id'],
                     template_type='sms',
                     template_id=123),
-                ['blah'],
+                ['view_activity'],
                 api_user_active,
                 service_one)

@@ -82,7 +82,7 @@ class User(UserMixin):
     def permissions(self, permissions):
         raise AttributeError("Read only property")
 
-    def has_permissions(self, permissions=[], or_=False, admin_override=False):
+    def has_permissions(self, permissions=[], any_=False, admin_override=False):
         # Only available to the platform admin user
         if admin_override and self.platform_admin:
             return True
@@ -95,7 +95,7 @@ class User(UserMixin):
         # Service id is always set on the request for service specific views.
         service_id = request.view_args.get('service_id', None)
         if service_id in self._permissions:
-            if or_:
+            if any_:
                 return any([x in self._permissions[service_id] for x in permissions])
             return set(self._permissions[service_id]) >= set(permissions)
         return False
