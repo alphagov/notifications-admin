@@ -25,19 +25,26 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            response = client.post(
+            initial_upload = client.post(
                 url_for('main.send_messages', service_id=12345, template_id=54321),
                 data={'file': (BytesIO(contents.encode('utf-8')), 'invalid.csv')},
                 content_type='multipart/form-data',
                 follow_redirects=True
             )
-        assert response.status_code == 200
-        content = response.get_data(as_text=True)
-        assert 'There was a problem with invalid.csv' in content
-        assert '+44 123' in content
-        assert '+44 456' in content
-        assert 'Not a UK mobile number' in content
-        assert 'Re-upload your file' in content
+            reupload = client.post(
+                url_for('main.check_messages', service_id=12345, template_type='sms', upload_id='abc123'),
+                data={'file': (BytesIO(contents.encode('utf-8')), 'invalid.csv')},
+                content_type='multipart/form-data',
+                follow_redirects=True
+            )
+        for response in [initial_upload, reupload]:
+            assert response.status_code == 200
+            content = response.get_data(as_text=True)
+            assert 'There was a problem with invalid.csv' in content
+            assert '+44 123' in content
+            assert '+44 456' in content
+            assert 'Not a UK mobile number' in content
+            assert 'Re-upload your file' in content
 
 
 def test_send_test_sms_message_to_self(
