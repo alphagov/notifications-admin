@@ -370,11 +370,7 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
                 mock_accept_invite.assert_called_with(data['service'], sample_invite['id'])
                 mock_check_verify_code.assert_called_once_with(new_user_id, '12345', 'sms')
 
-            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-            element = page.find('h2', class_='navigation-service-name').find('a')
-            assert element.text == 'Test Service'
-            service_link = element.attrs['href']
-            assert service_link == '/services/{}/dashboard'.format(service_one['id'])
-
-            flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
-            assert flash_banner == 'You have successfully accepted your invitation and been added to Test Service'
+            raw_html = response.data.decode('utf-8')
+            page = BeautifulSoup(raw_html, 'html.parser')
+            element = page.find('h2').text == 'Trial mode'
+            assert service_one['id'] in raw_html
