@@ -178,7 +178,7 @@
         {% endcall %}
       {% endcall %}
 
-      {% call(item) list_table(
+      {% call(item, row_number) list_table(
         [
           {
             'file': 'dispatch_20151114.csv', 'status': 'Queued'
@@ -206,7 +206,7 @@
         {% endcall %}
       {% endcall %}
 
-      {% call(item) list_table(
+      {% call(item, row_number) list_table(
         [],
         caption='Jobs',
         field_headings=['Job', 'Time'],
