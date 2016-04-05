@@ -2,6 +2,8 @@ from datetime import date
 
 from flask import (
     render_template,
+    redirect,
+    url_for,
     session,
     flash,
     jsonify
@@ -30,9 +32,7 @@ def service_dashboard(service_id):
 
     if session.get('invited_user'):
         session.pop('invited_user', None)
-        message = 'You have successfully accepted your invitation and been added to {}'.format(
-            current_service['name'])
-        flash(message, 'default_with_tick')
+        return redirect(url_for("main.tour", service_id=service_id, page=1))
 
     statistics = statistics_api_client.get_statistics_for_service(service_id)['data']
     template_statistics = template_statistics_client.get_template_statistics_for_service(service_id)
