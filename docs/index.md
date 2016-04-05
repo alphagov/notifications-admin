@@ -32,7 +32,7 @@ To get started:
 
   At first your service will be in trial mode. When you’re fully integrated and ready to go live, send a request to the GOV.UK Notify team. 
 
-3. Add a template to be able to send sms and email notifications. You can personalise the template using double brackets for replaceables. For example: 
+3. Add a template so you can send sms and email notifications. You can personalise the template using double brackets for replaceables. For example: 
 
   Dear ((name))
 
@@ -53,12 +53,12 @@ Integrate the GOV.UK API into your service
 A client (on github) will make calls to GOV.UK Notify on your behalf. 
 
 You can either:
-* use the user client library provided by Notify - there is currently 1 python library but more will be added in different languages.
-* develop your own ???
+* use a client library provided by Notify - there is currently 1 python library but more will be added in different languages
+* develop your own [???]
 
 To make an IPA call to a client you need:
-* the service ID - this is aviailable on the API keys page on the GOV.UK Notify interface
-* an API key - this is a secret key so save it somewhere safe; do not commit keys to public source code repositories
+* the service ID - this is aviailable under API keys on the GOV.UK Notify interface
+* an API key - this is a secret key so save it somewhere safe; do not commit API keys to public source code repositories
 
 API integration
 ------------------
@@ -72,7 +72,7 @@ You can use the API to:
 * retrieve one or more notifications
 * retrieve all notifications
 
-To send a text notification:
+To send a text notification: 
 ```
 POST /notifications/sms
 ```
@@ -83,7 +83,7 @@ POST /notifications/sms
   'template': 1
 }
 ```
-Where ‘to’ is the phone number and ‘template’ is the template ID to send.
+where ‘to’ is the phone number and ‘template’ is the template ID to send.
 
 The response will be:
 ```
@@ -95,7 +95,7 @@ The response will be:
    }
 }
 ```
-To get the status of a text notification:
+To get the status of a single text notification:
 ```
 GET /notifications/{id}
 ```
@@ -117,10 +117,10 @@ GET /notifications/{id}
    }
 }
 ```
+where ‘status’ is the the status of the notification. 
 
 
-
-
+To get the status of all text notifications: [do we want this? why do we only explain how to get text notifciations, do we want to explain how to do the same for email notifications?]
 
 
 
