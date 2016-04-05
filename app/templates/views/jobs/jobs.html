@@ -8,7 +8,17 @@
 {% block maincolumn_content %}
 
     <h1 class="heading-large">Notifications activity</h1>
-
+    <p>
+      <a href="{{ url_for(".view_notifications", service_id=current_service.id, job_id=job_id, page=1) }}">All messages</a>
+    </p>
+    <p>
+      <a href="{{ url_for(".view_notifications", service_id=current_service.id, job_id=job_id, type="sms", page=1) }}">Text messages</a>&emsp;
+      <a href="{{ url_for(".view_notifications", service_id=current_service.id, job_id=job_id, type="email", page=1) }}">Email messages</a>
+    </p>
+    <p>
+      <a href="{{ url_for(".view_notifications", service_id=current_service.id, job_id=job_id, status=['sent', 'delivered'], page=1) }}">Successful messages</a>&emsp;
+      <a href="{{ url_for(".view_notifications", service_id=current_service.id, job_id=job_id, status=['failed', 'complaint', 'bounce'], page=1) }}">Failed messages</a>
+    </p>
     {% call(item) list_table(
       jobs,
       caption="Recent activity",
@@ -17,7 +27,7 @@
       field_headings=['Job', 'Time', right_aligned_field_heading('Status')]
     ) %}
       {% call field() %}
-        <a href="{{ url_for('.view_job', service_id=service_id, job_id=item.id) }}">{{ item.original_file_name }}</a>
+        <a href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
       {% endcall %}
       {% call field() %}
         {{ item.created_at | format_datetime}}

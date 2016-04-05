@@ -1,4 +1,4 @@
-from flask import render_template, url_for, redirect
+from flask import render_template, url_for, redirect, jsonify
 from app.main import main
 from flask_login import login_required
 
@@ -23,9 +23,14 @@ def cookies():
     return render_template('views/cookies.html')
 
 
-@main.route('/help')
-def help():
-    return render_template('views/help.html')
+@main.route('/trial-mode')
+def trial_mode():
+    return render_template('views/trial-mode.html')
+
+
+@main.route('/pricing')
+def pricing():
+    return render_template('views/pricing.html')
 
 
 @main.route('/terms')

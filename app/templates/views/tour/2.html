@@ -10,18 +10,26 @@
 {% block maincolumn_content %}
 
   {% call banner_wrapper(type='tour') %}
-	<h2 class="heading-large">Start with templates</h2>
+	<h2 class="heading-large">{{ heading }}</h2>
 	<p>
 		Set up a template like this:
 	</p>
 	<p>
-		<img
+	    <picture>
+		  <source
+			  type="image/svg+xml"
+			  srcset="/static/images/tour/{{ current_page }}.svg"
+			  alt="A template for a text message with placeholders for the recipients name, document and date"
+			  width="554" height="97"
+		  >
+		  <img
 			src="/static/images/tour/{{ current_page }}.png"
 			width="554" height="97"
-			alt="A template for a text message with placeholders for the recipients name, document and date"
-		>
+			alt="A screenshot of a spreadsheet containing data about three people"
+		  >
+		</picture>
 	</p>
-    <a href='{{ url_for('.tour', service_id=service_id, page=next_page) }}'>
+    <a href='{{ url_for('.tour', service_id=current_service.id, page=next_page) }}'>
       Next
     </a>
   {% endcall %}

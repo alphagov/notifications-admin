@@ -71,7 +71,27 @@
   }
 
   &-action {
+    
+    display: block;
     text-align: right;
+    float: right;
+
+    &:link,
+    &:visited {
+      color: $white;
+    }
+
+    &:hover,
+    &:active {
+      color: $light-blue-25;
+    }
+
+    &:active,
+    &:focus {
+      background-color: $yellow;
+      color: $govuk-blue;
+    }
+
   }
 
 }
@@ -131,7 +151,8 @@
 
   }
 
-  img {
+  img,
+  source {
     max-width: 100%;
     display: block;
   }

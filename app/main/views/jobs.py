@@ -9,14 +9,30 @@ from flask import (
     request
 )
 from flask_login import login_required
+from werkzeug.datastructures import MultiDict
 from utils.template import Template
 
-from app import (job_api_client, notification_api_client, service_api_client)
+from app import (
+    job_api_client,
+    notification_api_client,
+    service_api_client,
+    current_service)
 from app.main import main
 from app.utils import (
     get_page_from_request,
     generate_previous_next_dict,
     user_has_permissions)
+
+
+def _parse_filter_args(filter_dict):
+    if not isinstance(filter_dict, MultiDict):
+        filter_dict = MultiDict(filter_dict)
+    out_dict = MultiDict()
+    if 'type' in filter_dict:
+        out_dict.setlist('template_type', filter_dict.getlist('type'))
+    if 'status' in filter_dict:
+        out_dict.setlist('status', filter_dict.getlist('status'))
+    return out_dict
 
 
 @main.route("/services/<service_id>/jobs")
@@ -26,8 +42,7 @@ def view_jobs(service_id):
     jobs = job_api_client.get_job(service_id)['data']
     return render_template(
         'views/jobs/jobs.html',
-        jobs=jobs,
-        service_id=service_id
+        jobs=jobs
     )
 
 
@@ -35,7 +50,6 @@ def view_jobs(service_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_job(service_id, job_id):
-    service = service_api_client.get_service(service_id)['data']
     job = job_api_client.get_job(service_id, job_id)['data']
     template = service_api_client.get_service_template(service_id, job['template'])['data']
     notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
@@ -52,10 +66,8 @@ def view_job(service_id, job_id):
         uploaded_file_name=job['original_file_name'],
         template=Template(
             template,
-            prefix=service['name']
+            prefix=current_service['name']
         ),
-        service_id=service_id,
-        service=service,
         job_id=job_id
     )
 
@@ -64,7 +76,6 @@ def view_job(service_id, job_id):
 @login_required
 @user_has_permissions('view_activity')
 def view_job_updates(service_id, job_id):
-    service = service_api_client.get_service(service_id)['data']
     job = job_api_client.get_job(service_id, job_id)['data']
     notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
     finished = job['status'] == 'finished'
@@ -96,20 +107,33 @@ def view_notifications(service_id):
     page = get_page_from_request()
     if page is None:
         abort(404, "Invalid page argument ({}) reverting to page 1.".format(request.args['page'], None))
-    notifications = notification_api_client.get_notifications_for_service(service_id=service_id, page=page)
+    filter_args = _parse_filter_args(request.args)
+    notifications = notification_api_client.get_notifications_for_service(
+        service_id=service_id,
+        page=page,
+        template_type=filter_args.getlist('template_type') if 'template_type' in filter_args else None,
+        status=filter_args.getlist('status') if 'status' in filter_args else None)
+    view_dict = MultiDict(request.args)
     prev_page = None
     if notifications['links'].get('prev', None):
         prev_page = generate_previous_next_dict(
             'main.view_notifications',
-            {'service_id': service_id}, page - 1, 'Previous page', 'page {}'.format(page - 1))
+            service_id,
+            view_dict,
+            page - 1,
+            'Previous page',
+            'page {}'.format(page - 1))
     next_page = None
     if notifications['links'].get('next', None):
         next_page = generate_previous_next_dict(
             'main.view_notifications',
-            {'service_id': service_id}, page + 1, 'Next page', 'page {}'.format(page + 1))
+            service_id,
+            view_dict,
+            page + 1,
+            'Next page',
+            'page {}'.format(page + 1))
     return render_template(
         'views/notifications.html',
-        service_id=service_id,
         notifications=notifications['notifications'],
         page=page,
         prev_page=prev_page,
@@ -131,6 +155,5 @@ def view_notification(service_id, job_id, notification_id):
         ][0],
         delivered_at=now,
         uploaded_at=now,
-        service_id=service_id,
         job_id=job_id
     )

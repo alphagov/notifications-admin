@@ -10,21 +10,29 @@
 {% block maincolumn_content %}
 
   {% call banner_wrapper(type='tour') %}
-	<h2 class="heading-large">Add recipients</h2>
+	<h2 class="heading-large">{{ heading }}</h2>
 	<p>
 		Add recipients by uploading a .csv spreadsheet:
 	</p>
 	<p>
-		<img
+	    <picture>
+		  <source
+			  type="image/svg+xml"
+			  srcset="/static/images/tour/{{ current_page }}.svg"
+			  alt="A screenshot of a spreadsheet containing data about three people"
+			  width="554" height="118"
+		  >
+		  <img
 			src="/static/images/tour/{{ current_page }}.png"
 			width="554" height="118"
 			alt="A screenshot of a spreadsheet containing data about three people"
-		>
+		  >
+		</picture>
 	</p>
 	<p>
 		Developers, you can add data automatically using an API
 	</p>
-    <a href='{{ url_for('.tour', service_id=service_id, page=next_page) }}'>
+    <a href='{{ url_for('.tour', service_id=current_service.id, page=next_page) }}'>
       Next
     </a>
   {% endcall %}

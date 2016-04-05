@@ -3,7 +3,15 @@ import re
 
 import dateutil
 import urllib
-from flask import (Flask, session, Markup, escape, render_template, make_response, current_app)
+from flask import (
+    Flask,
+    session,
+    Markup,
+    escape,
+    render_template,
+    make_response,
+    current_app,
+    request)
 from flask._compat import string_types
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
@@ -21,12 +29,18 @@ from app.notify_client.notification_api_client import NotificationApiClient
 from app.notify_client.status_api_client import StatusApiClient
 from app.notify_client.invite_api_client import InviteApiClient
 from app.notify_client.statistics_api_client import StatisticsApiClient
+from app.notify_client.template_statistics_api_client import TemplateStatisticsApiClient
+
 from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.asset_fingerprinter import AssetFingerprinter
 from utils.recipients import validate_phone_number, InvalidPhoneError
 import app.proxy_fix
 from config import configs
 from utils import logging
+from werkzeug.local import LocalStack, LocalProxy
+from flask.globals import _lookup_req_object
+from functools import partial
+
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
@@ -39,7 +53,11 @@ notification_api_client = NotificationApiClient()
 status_api_client = StatusApiClient()
 invite_api_client = InviteApiClient()
 statistics_api_client = StatisticsApiClient()
+template_statistics_client = TemplateStatisticsApiClient()
 asset_fingerprinter = AssetFingerprinter()
+
+# The current service attached to the request stack.
+current_service = LocalProxy(partial(_lookup_req_object, 'service'))
 
 
 def create_app():
@@ -59,6 +77,7 @@ def create_app():
     status_api_client.init_app(application)
     invite_api_client.init_app(application)
     statistics_api_client.init_app(application)
+    template_statistics_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
@@ -80,8 +99,15 @@ def create_app():
     application.add_template_filter(syntax_highlight_json)
     application.add_template_filter(valid_phone_number)
     application.add_template_filter(linkable_name)
+    application.add_template_filter(format_date)
 
     application.after_request(useful_headers_after_request)
+    application.after_request(save_service_after_request)
+    application.before_request(load_service_before_request)
+
+    def _attach_current_service():
+        return {'current_service': current_service}
+    application.context_processor(_attach_current_service)
     register_errorhandlers(application)
 
     return application
@@ -154,6 +180,11 @@ def format_time(date):
     return native.strftime('%H:%M')
 
 
+def format_date(date):
+    date = dateutil.parser.parse(date)
+    return date.strftime('%A %d %B %Y')
+
+
 def valid_phone_number(phone_number):
     try:
         validate_phone_number(phone_number)
@@ -167,7 +198,26 @@ def load_user(user_id):
     return user_api_client.get_user(user_id)
 
 
-# https://www.owasp.org/index.php/List_of_useful_HTTP_headers
+def load_service_before_request():
+    service_id = request.view_args.get('service_id', None) if request.view_args else None
+    if service_id:
+        from flask.globals import _request_ctx_stack
+        if _request_ctx_stack.top is not None:
+            setattr(
+                _request_ctx_stack.top,
+                'service',
+                service_api_client.get_service(service_id)['data'])
+
+
+def save_service_after_request(response):
+    # Only save the current session if the request is 200
+    service_id = request.view_args.get('service_id', None) if request.view_args else None
+    if response.status_code == 200 and service_id:
+        session['service_id'] = service_id
+    return response
+
+
+#  https://www.owasp.org/index.php/List_of_useful_HTTP_headers
 def useful_headers_after_request(response):
     response.headers.add('X-Frame-Options', 'deny')
     response.headers.add('X-Content-Type-Options', 'nosniff')

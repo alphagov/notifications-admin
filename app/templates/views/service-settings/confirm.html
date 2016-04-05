@@ -18,7 +18,7 @@
       {{ page_footer(
         'Confirm',
         destructive=destructive,
-        back_link=url_for('.service_settings', service_id=service_id)
+        back_link=url_for('.service_settings', service_id=current_service.id)
       ) }}
     </form>
     </div>

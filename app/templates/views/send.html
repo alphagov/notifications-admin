@@ -11,7 +11,7 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Send a batch</h1>
+  <h1 class="heading-large">Send from a CSV file</h1>
 
   {% if 'sms' == template.template_type %}
     <div class="grid-row">
@@ -23,8 +23,8 @@
     {{ email_message(
       template.subject,
       template.formatted_as_markup,
-      from_address='{}@notifications.service.gov.uk'.format(service.email_from),
-      from_name=service.name
+      from_address='{}@notifications.service.gov.uk'.format(current_service.email_from),
+      from_name=current_service.name
     ) }}
   {% endif %}
 
@@ -51,9 +51,8 @@
   {% endcall %}
 
   <p class="bottom-gutter">
-    <a href="{{ url_for('.get_example_csv', service_id=service_id, template_id=template.id) }}">Download this example</a>
+    <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
   </p>
-
 
   {{file_upload(form.file, button_text='Upload your CSV file')}}
 

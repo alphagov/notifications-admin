@@ -7,7 +7,7 @@
   field_headings=['File', 'Started', right_aligned_field_heading('Rows')]
 ) %}
   {% call field() %}
-    <a href="{{ url_for('.view_job', service_id=service_id, job_id=item.id) }}">{{ item.original_file_name }}</a>
+    <a href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
   {% endcall %}
   {% call field() %}
     {{ item.created_at|format_datetime }}
@@ -19,7 +19,7 @@
 {% if more_jobs_to_show %}
   {% if current_user.has_permissions(['send_texts', 'send_emails', 'send_letters']) %}
     <p class="table-show-more-link">
-      <a href="{{ url_for('.view_jobs', service_id=service_id) }}">See all sent batch messages</a>
+      <a href="{{ url_for('.view_jobs', service_id=current_service.id) }}">See all sent batch messages</a>
     </p>
   {% endif %}
 {% endif %}
