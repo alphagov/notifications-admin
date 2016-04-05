@@ -252,6 +252,17 @@ def check_messages(service_id, template_type, upload_id):
     )
 
 
+@main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['POST'])
+@login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+def recheck_messages(service_id, template_type, upload_id):
+
+    if not session.get('upload_data'):
+        return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
+
+    return send_messages(service_id, session['upload_data'].get('template_id'))
+
+
 @main.route("/services/<service_id>/start-job/<upload_id>", methods=['POST'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
