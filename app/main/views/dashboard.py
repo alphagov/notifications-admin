@@ -45,7 +45,6 @@ def service_dashboard(service_id):
         spent_this_month='0.00',
         statistics=add_rates_to(statistics),
         templates=templates,
-        service_id=str(service_id),
         template_statistics=template_statistics)
 
 
