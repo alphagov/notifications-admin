@@ -2,6 +2,7 @@ import csv
 import io
 import json
 import uuid
+import itertools
 from contextlib import suppress
 
 from flask import (
@@ -25,8 +26,8 @@ from app.main.uploader import (
     s3upload,
     s3download
 )
-from app import (job_api_client, service_api_client, current_service)
-from app.utils import (user_has_permissions, get_errors_for_csv)
+from app import job_api_client, service_api_client, current_service, user_api_client
+from app.utils import user_has_permissions, get_errors_for_csv
 
 
 def get_send_button_text(template_type, number_of_messages):
@@ -204,6 +205,8 @@ def check_messages(service_id, template_type, upload_id):
     if not session.get('upload_data'):
         return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
 
+    users = user_api_client.get_users_for_service(service_id=service_id)
+
     contents = s3download(service_id, upload_id)
     if not contents:
         flash('There was a problem reading your upload file')
@@ -223,7 +226,10 @@ def check_messages(service_id, template_type, upload_id):
         template_type=template.template_type,
         placeholders=template.placeholders,
         max_initial_rows_shown=15,
-        max_errors_shown=15
+        max_errors_shown=15,
+        whitelist=itertools.chain.from_iterable(
+            [user.mobile_number, user.email_address] for user in users
+        ) if current_service['restricted'] else None
     )
 
     with suppress(StopIteration):

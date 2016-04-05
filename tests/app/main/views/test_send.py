@@ -16,7 +16,8 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     mock_get_service,
     mock_get_service_template,
     mock_s3_upload,
-    mock_has_permissions
+    mock_has_permissions,
+    mock_get_users_by_service
 ):
 
     contents = u'phone number,name\n+44 123,test1\n+44 456,test2'
@@ -55,10 +56,11 @@ def test_send_test_sms_message_to_self(
     mock_get_service,
     mock_get_service_template,
     mock_s3_upload,
-    mock_has_permissions
+    mock_has_permissions,
+    mock_get_users_by_service
 ):
 
-    expected_data = {'data': 'phone number\r\n+4412341234\r\n', 'file_name': 'Test run'}
+    expected_data = {'data': 'phone number\r\n07700 900762\r\n', 'file_name': 'Test run'}
     mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
 
     with app_.test_request_context():
@@ -80,7 +82,8 @@ def test_send_test_email_message_to_self(
     mock_get_service,
     mock_get_service_email_template,
     mock_s3_upload,
-    mock_has_permissions
+    mock_has_permissions,
+    mock_get_users_by_service
 ):
 
     expected_data = {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'Test run'}
@@ -136,7 +139,7 @@ def test_download_example_csv(
                 follow_redirects=True
             )
         assert response.status_code == 200
-        assert response.get_data(as_text=True) == 'phone number\r\n+4412341234\r\n+4412341234\r\n'
+        assert response.get_data(as_text=True) == 'phone number\r\n07700 900762\r\n07700 900762\r\n'
         assert 'text/csv' in response.headers['Content-Type']
 
 
@@ -148,31 +151,32 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_get_service,
     mock_get_service_template,
     mock_s3_upload,
-    mock_has_permissions
+    mock_has_permissions,
+    mock_get_users_by_service
 ):
 
     mocker.patch(
         'app.main.views.send.s3download',
         return_value="""
             phone number
-            +44 7700 9009 01
-            +44 7700 9009 02
-            +44 7700 9009 03
-            +44 7700 9009 04
-            +44 7700 9009 05
-            +44 7700 9009 06
-            +44 7700 9009 07
-            +44 7700 9009 08
-            +44 7700 9009 09
-            +44 7700 9009 10
-            +44 7700 9009 11
-            +44 7700 9009 12
-            +44 7700 9009 13
-            +44 7700 9009 14
-            +44 7700 9009 15
-            +44 7700 9009 99
-            +44 7700 9009 99
-            +44 7700 9009 99
+            07700 900701
+            07700 900702
+            07700 900703
+            07700 900704
+            07700 900705
+            07700 900706
+            07700 900707
+            07700 900708
+            07700 900709
+            07700 900710
+            07700 900711
+            07700 900712
+            07700 900713
+            07700 900714
+            07700 900715
+            07700 900799
+            07700 900799
+            07700 900799
         """
     )
 
@@ -192,9 +196,9 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
 
             content = response.get_data(as_text=True)
             assert response.status_code == 200
-            assert '+44 7700 9009 01' in content
-            assert '+44 7700 9009 15' in content
-            assert '+44 7700 9009 16' not in content
+            assert '07700 900701' in content
+            assert '07700 900715' in content
+            assert '07700 900716' not in content
             assert '3 rows not shown' in content
 
 
@@ -245,7 +249,8 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
     mock_get_service_template,
     mock_s3_upload,
     mocker,
-    mock_has_permissions
+    mock_has_permissions,
+    mock_get_users_by_service
 ):
 
     service_id = service_one['id']
