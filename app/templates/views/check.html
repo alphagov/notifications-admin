@@ -48,8 +48,8 @@
     {{ email_message(
       template.subject,
       template.formatted_as_markup if errors else template.replaced,
-      from_address='{}@notifications.service.gov.uk'.format(service.email_from),
-      from_name=service.name
+      from_address='{}@notifications.service.gov.uk'.format(current_service.email_from),
+      from_name=current_service.name
     )}}
   {% elif 'sms' == template.template_type %}
     <div class="grid-row">
@@ -64,10 +64,10 @@
   {% if errors %}
     {{file_upload(form.file, button_text='Re-upload your file')}}
   {% else %}
-    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=service_id, upload_id=upload_id)}}">
+    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="submit" class="button" value="{{ send_button_text }}" />
-      <a href="{{url_for('.send_messages', service_id=service_id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
+      <a href="{{url_for('.send_messages', service_id=current_service.id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
     </form>
   {% endif %}
 

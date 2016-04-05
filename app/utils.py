@@ -95,9 +95,13 @@ def get_page_from_request():
         return 1
 
 
-def generate_previous_next_dict(view, view_dict, page, title, label):
+def generate_previous_next_dict(view, service_id, view_dict, page, title, label):
+    if 'page' in view_dict:
+        view_dict.pop('page')
+    if 'service_id' in view_dict:
+        view_dict.pop('service_id')
     return {
-        'url': url_for(view, page=page, **view_dict),
+        'url': url_for(view, service_id=service_id, page=page, **view_dict),
         'title': title,
         'label': label
     }

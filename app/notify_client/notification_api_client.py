@@ -21,10 +21,14 @@ class NotificationApiClient(BaseAPIClient):
             params=params
         )
 
-    def get_notifications_for_service(self, service_id, job_id=None, page=None):
+    def get_notifications_for_service(self, service_id, job_id=None, template_type=None, status=None, page=None):
         params = {}
         if page is not None:
             params['page'] = page
+        if template_type is not None:
+            params['template_type'] = template_type
+        if status is not None:
+            params['status'] = status
         if job_id:
             return self.get(
                 url='/service/{}/job/{}/notifications'.format(service_id, job_id),

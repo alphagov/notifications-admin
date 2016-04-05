@@ -245,7 +245,7 @@ def api_user_pending():
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
-                 'mobile_number': '+4412341234',
+                 'mobile_number': '07700 900762',
                  'state': 'pending',
                  'failed_login_count': 0,
                  'permissions': {}
@@ -261,7 +261,7 @@ def platform_admin_user():
                  'name': 'Platform admin user',
                  'password': 'somepassword',
                  'email_address': 'platform@admin.gov.uk',
-                 'mobile_number': '+4472341234',
+                 'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 0,
                  'permissions': {},
@@ -278,7 +278,7 @@ def api_user_active():
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
-                 'mobile_number': '+4412341234',
+                 'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 0,
                  'permissions': {},
@@ -296,7 +296,7 @@ def active_user_with_permissions():
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
-                 'mobile_number': '+4412341234',
+                 'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 0,
                  'permissions': {SERVICE_ONE_ID: ['send_texts',
@@ -320,7 +320,7 @@ def api_user_locked():
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
-                 'mobile_number': '+4412341234',
+                 'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 5,
                  'permissions': {}
@@ -336,7 +336,7 @@ def api_user_request_password_reset():
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
-                 'mobile_number': '+4412341234',
+                 'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 5,
                  'permissions': {},
@@ -353,7 +353,7 @@ def api_user_changed_password():
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
-                 'mobile_number': '+4412341234',
+                 'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 5,
                  'permissions': {},
@@ -642,7 +642,11 @@ def mock_get_jobs(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_notifications(mocker):
-    def _get_notifications(service_id, job_id=None, page=1):
+    def _get_notifications(service_id,
+                           job_id=None,
+                           page=1,
+                           template_type=None,
+                           status=None):
         return notification_json(service_id)
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
@@ -652,7 +656,11 @@ def mock_get_notifications(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_notifications_with_previous_next(mocker):
-    def _get_notifications(service_id, job_id=None, page=1):
+    def _get_notifications(service_id,
+                           job_id=None,
+                           page=1,
+                           template_type=None,
+                           status=None):
         return notification_json(service_id, with_links=True)
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',

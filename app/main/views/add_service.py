@@ -35,9 +35,8 @@ def add_service():
     form = AddServiceForm(service_api_client.find_all_service_email_from)
     heading = 'Which service do you want to set up notifications for?'
     if form.validate_on_submit():
-        session['service_name'] = form.name.data
-        email_from = email_safe(session['service_name'])
-        service_id = service_api_client.create_service(service_name=session['service_name'],
+        email_from = email_safe(form.name.data)
+        service_id = service_api_client.create_service(service_name=form.name.data,
                                                        active=False,
                                                        limit=current_app.config['DEFAULT_SERVICE_LIMIT'],
                                                        restricted=True,

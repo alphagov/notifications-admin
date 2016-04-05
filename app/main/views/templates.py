@@ -23,8 +23,6 @@ page_headings = {
 @user_has_permissions('manage_templates', admin_override=True)
 def add_service_template(service_id, template_type):
 
-    service = service_api_client.get_service(service_id)
-
     if template_type not in ['sms', 'email']:
         abort(404)
 
@@ -46,7 +44,6 @@ def add_service_template(service_id, template_type):
         'views/edit-{}-template.html'.format(template_type),
         form=form,
         template_type=template_type,
-        service_id=service_id,
         heading_action='Add'
     )
 
@@ -73,7 +70,6 @@ def edit_service_template(service_id, template_id):
     return render_template(
         'views/edit-{}-template.html'.format(template['template_type']),
         form=form,
-        service_id=service_id,
         template_id=template_id,
         template_type=template['template_type'],
         heading_action='Edit'
@@ -101,5 +97,4 @@ def delete_service_template(service_id, template_id):
         'views/edit-{}-template.html'.format(template['template_type']),
         h1='Edit template',
         form=form,
-        service_id=service_id,
         template_id=template_id)

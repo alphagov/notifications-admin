@@ -7,10 +7,11 @@ from flask import url_for
 
 def test_should_show_page_for_one_templates(app_,
                                             api_user_active,
+                                            mock_login,
+                                            mock_get_service,
                                             mock_get_service_template,
                                             mock_get_user,
                                             mock_get_user_by_email,
-                                            mock_login,
                                             mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -31,11 +32,12 @@ def test_should_show_page_for_one_templates(app_,
 
 def test_should_redirect_when_saving_a_template(app_,
                                                 api_user_active,
+                                                mock_login,
                                                 mock_get_service_template,
                                                 mock_update_service_template,
                                                 mock_get_user,
+                                                mock_get_service,
                                                 mock_get_user_by_email,
-                                                mock_login,
                                                 mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -65,10 +67,11 @@ def test_should_redirect_when_saving_a_template(app_,
 
 def test_should_show_delete_template_page(app_,
                                           api_user_active,
+                                          mock_login,
+                                          mock_get_service,
                                           mock_get_service_template,
                                           mock_get_user,
                                           mock_get_user_by_email,
-                                          mock_login,
                                           mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -91,11 +94,12 @@ def test_should_show_delete_template_page(app_,
 
 def test_should_redirect_when_deleting_a_template(app_,
                                                   api_user_active,
+                                                  mock_login,
+                                                  mock_get_service,
                                                   mock_get_service_template,
                                                   mock_delete_service_template,
                                                   mock_get_user,
                                                   mock_get_user_by_email,
-                                                  mock_login,
                                                   mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:

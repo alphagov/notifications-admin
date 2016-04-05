@@ -17,7 +17,6 @@ def documentation():
 def api_keys(service_id):
     return render_template(
         'views/api-keys.html',
-        service_id=service_id,
         keys=api_key_api_client.get_api_keys(service_id=service_id)['apiKeys']
     )
 
@@ -32,11 +31,10 @@ def create_api_key(service_id):
     form = CreateKeyForm(key_names)
     if form.validate_on_submit():
         secret = api_key_api_client.create_api_key(service_id=service_id, key_name=form.key_name.data)
-        return render_template('views/api-keys/show.html', service_id=service_id, secret=secret,
+        return render_template('views/api-keys/show.html', secret=secret,
                                key_name=form.key_name.data)
     return render_template(
         'views/api-keys/create.html',
-        service_id=service_id,
         key_name=form.key_name
     )
 
@@ -49,7 +47,6 @@ def revoke_api_key(service_id, key_id):
     if request.method == 'GET':
         return render_template(
             'views/api-keys/revoke.html',
-            service_id=service_id,
             key_name=key_name
         )
     elif request.method == 'POST':

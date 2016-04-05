@@ -2,6 +2,7 @@ import csv
 import io
 import json
 import uuid
+import itertools
 from contextlib import suppress
 
 from flask import (
@@ -25,7 +26,7 @@ from app.main.uploader import (
     s3upload,
     s3download
 )
-from app import (job_api_client, service_api_client)
+from app import job_api_client, service_api_client, current_service, user_api_client
 from app.utils import user_has_permissions, get_errors_for_csv
 
 
@@ -72,9 +73,6 @@ def get_example_csv_rows(template, number_of_rows=2):
                       'manage_api_keys',
                       admin_override=True, any_=True)
 def choose_template(service_id, template_type):
-
-    service = service_api_client.get_service(service_id)['data']
-
     if template_type not in ['email', 'sms']:
         abort(404)
 
@@ -83,14 +81,12 @@ def choose_template(service_id, template_type):
         templates=[
             Template(
                 template,
-                prefix=service['name']
+                prefix=current_service['name']
             ) for template in service_api_client.get_service_templates(service_id)['data']
             if template['template_type'] == template_type
         ],
         template_type=template_type,
-        page_heading=get_page_headings(template_type),
-        service=service,
-        service_id=service_id
+        page_heading=get_page_headings(template_type)
     )
 
 
@@ -98,11 +94,9 @@ def choose_template(service_id, template_type):
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_messages(service_id, template_id):
-
-    service = service_api_client.get_service(service_id)['data']
     template = Template(
         service_api_client.get_service_template(service_id, template_id)['data'],
-        prefix=service['name']
+        prefix=current_service['name']
     )
 
     form = CsvUploadForm()
@@ -136,9 +130,7 @@ def send_messages(service_id, template_id):
         template=template,
         recipient_column=first_column_heading[template.template_type],
         example=get_example_csv_rows(template),
-        form=form,
-        service=service,
-        service_id=service_id
+        form=form
     )
 
 
@@ -179,8 +171,8 @@ def send_message_to_self(service_id, template_id):
     session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
 
     return redirect(url_for('.check_messages',
-                            service_id=service_id,
                             upload_id=upload_id,
+                            service_id=service_id,
                             template_type=template.template_type))
 
 
@@ -201,8 +193,7 @@ def send_from_api(service_id, template_id):
     return render_template(
         'views/send-from-api.html',
         template=template,
-        payload=json.dumps(payload, indent=4),
-        service_id=service_id
+        payload=json.dumps(payload, indent=4)
     )
 
 
@@ -214,7 +205,7 @@ def check_messages(service_id, template_type, upload_id):
     if not session.get('upload_data'):
         return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
 
-    service = service_api_client.get_service(service_id)['data']
+    users = user_api_client.get_users_for_service(service_id=service_id)
 
     contents = s3download(service_id, upload_id)
     if not contents:
@@ -227,7 +218,7 @@ def check_messages(service_id, template_type, upload_id):
 
     template = Template(
         template,
-        prefix=service['name']
+        prefix=current_service['name']
     )
 
     recipients = RecipientCSV(
@@ -235,7 +226,10 @@ def check_messages(service_id, template_type, upload_id):
         template_type=template.template_type,
         placeholders=template.placeholders,
         max_initial_rows_shown=15,
-        max_errors_shown=15
+        max_errors_shown=15,
+        whitelist=itertools.chain.from_iterable(
+            [user.mobile_number, user.email_address] for user in users
+        ) if current_service['restricted'] else None
     )
 
     with suppress(StopIteration):
@@ -259,11 +253,20 @@ def check_messages(service_id, template_type, upload_id):
         ),
         original_file_name=session['upload_data'].get('original_file_name'),
         send_button_text=get_send_button_text(template.template_type, session['upload_data']['notification_count']),
-        service_id=service_id,
-        service=service,
         upload_id=upload_id,
         form=CsvUploadForm()
     )
+
+
+@main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['POST'])
+@login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+def recheck_messages(service_id, template_type, upload_id):
+
+    if not session.get('upload_data'):
+        return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
+
+    return send_messages(service_id, session['upload_data'].get('template_id'))
 
 
 @main.route("/services/<service_id>/start-job/<upload_id>", methods=['POST'])
@@ -272,7 +275,6 @@ def check_messages(service_id, template_type, upload_id):
 def start_job(service_id, upload_id):
 
     upload_data = session['upload_data']
-    service = service_api_client.get_service(service_id)['data']
 
     if request.files or not upload_data.get('valid'):
         # The csv was invalid, validate the csv again
@@ -289,5 +291,5 @@ def start_job(service_id, upload_id):
     )
 
     return redirect(
-        url_for('main.view_job', service_id=service_id, job_id=upload_id)
+        url_for('main.view_job', job_id=upload_id, service_id=service_id)
     )

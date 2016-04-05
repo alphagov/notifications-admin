@@ -9,6 +9,7 @@ def test_should_return_list_of_all_jobs(app_,
                                         mock_get_user,
                                         mock_get_user_by_email,
                                         mock_login,
+                                        mock_get_service,
                                         mock_get_jobs,
                                         mock_has_permissions):
     with app_.test_request_context():
@@ -97,6 +98,58 @@ def test_should_show_notifications_for_a_service(app_,
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.get(url_for('main.view_notifications', service_id=service_one['id']))
+        assert response.status_code == 200
+        content = response.get_data(as_text=True)
+        notifications = mock_get_notifications(service_one['id'])
+        notification = notifications['notifications'][0]
+        assert notification['to'] in content
+        assert notification['status'] in content
+        assert notification['template']['name'] in content
+        assert '.csv' in content
+
+
+def test_can_view_only_sms_notifications_for_a_service(app_,
+                                                       service_one,
+                                                       api_user_active,
+                                                       mock_login,
+                                                       mock_get_user,
+                                                       mock_get_user_by_email,
+                                                       mock_get_service,
+                                                       mock_get_notifications,
+                                                       mock_has_permissions):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(url_for(
+                'main.view_notifications',
+                service_id=service_one['id'],
+                type='sms'))
+        assert response.status_code == 200
+        content = response.get_data(as_text=True)
+        notifications = mock_get_notifications(service_one['id'])
+        notification = notifications['notifications'][0]
+        assert notification['to'] in content
+        assert notification['status'] in content
+        assert notification['template']['name'] in content
+        assert '.csv' in content
+
+
+def test_can_view_successful_notifications_for_a_service(app_,
+                                                         service_one,
+                                                         api_user_active,
+                                                         mock_login,
+                                                         mock_get_user,
+                                                         mock_get_user_by_email,
+                                                         mock_get_service,
+                                                         mock_get_notifications,
+                                                         mock_has_permissions):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(url_for(
+                'main.view_notifications',
+                service_id=service_one['id'],
+                status=['sent', 'delivered']))
         assert response.status_code == 200
         content = response.get_data(as_text=True)
         notifications = mock_get_notifications(service_one['id'])

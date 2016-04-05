@@ -283,10 +283,10 @@ def test_should_redirect_after_status_confirmation(app_,
 
 def test_should_show_delete_page(app_,
                                  api_user_active,
+                                 mock_login,
                                  mock_get_service,
                                  mock_get_user,
                                  mock_get_user_by_email,
-                                 mock_login,
                                  mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
