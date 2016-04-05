@@ -1,5 +1,7 @@
 from flask import url_for
+
 from tests import validate_route_permission
+from tests.conftest import SERVICE_ONE_ID
 
 
 def test_should_show_recent_jobs_on_dashboard(app_,
@@ -7,20 +9,22 @@ def test_should_show_recent_jobs_on_dashboard(app_,
                                               mock_get_service,
                                               mock_get_service_templates,
                                               mock_get_service_statistics,
+                                              mock_get_template_statistics,
                                               mock_get_user,
                                               mock_get_user_by_email,
                                               mock_login,
                                               mock_get_jobs,
                                               mock_has_permissions):
-
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            response = client.get(url_for('main.service_dashboard', service_id=123))
+            response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
         assert response.status_code == 200
         text = response.get_data(as_text=True)
         assert 'Test Service' in text
+        mock_get_service_statistics.assert_called_once_with(SERVICE_ONE_ID)
+        mock_get_template_statistics.assert_called_once_with(SERVICE_ONE_ID)
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):
@@ -37,7 +41,14 @@ def _test_dashboard_menu(mocker, app_, usr, service, permissions):
             return client.get(url_for('main.service_dashboard', service_id=service['id']))
 
 
-def test_menu_send_messages(mocker, app_, api_user_active, service_one, mock_get_service_templates, mock_get_jobs):
+def test_menu_send_messages(mocker,
+                            app_,
+                            api_user_active,
+                            service_one,
+                            mock_get_service_templates,
+                            mock_get_jobs,
+                            mock_get_template_statistics):
+
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -63,7 +74,13 @@ def test_menu_send_messages(mocker, app_, api_user_active, service_one, mock_get
         assert url_for('main.show_all_services') not in page
 
 
-def test_menu_manage_service(mocker, app_, api_user_active, service_one, mock_get_service_templates, mock_get_jobs):
+def test_menu_manage_service(mocker,
+                             app_,
+                             api_user_active,
+                             service_one,
+                             mock_get_service_templates,
+                             mock_get_jobs,
+                             mock_get_template_statistics):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -89,7 +106,13 @@ def test_menu_manage_service(mocker, app_, api_user_active, service_one, mock_ge
         assert url_for('main.show_all_services') not in page
 
 
-def test_menu_manage_api_keys(mocker, app_, api_user_active, service_one, mock_get_service_templates, mock_get_jobs):
+def test_menu_manage_api_keys(mocker,
+                              app_,
+                              api_user_active,
+                              service_one,
+                              mock_get_service_templates,
+                              mock_get_jobs,
+                              mock_get_template_statistics):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -114,8 +137,13 @@ def test_menu_manage_api_keys(mocker, app_, api_user_active, service_one, mock_g
         assert url_for('main.api_keys', service_id=service_one['id']) in page
 
 
-def test_menu_all_services_for_platform_admin_user(mocker, app_, platform_admin_user, service_one,
-                                                   mock_get_service_templates, mock_get_jobs):
+def test_menu_all_services_for_platform_admin_user(mocker,
+                                                   app_,
+                                                   platform_admin_user,
+                                                   service_one,
+                                                   mock_get_service_templates,
+                                                   mock_get_jobs,
+                                                   mock_get_template_statistics):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -130,8 +158,8 @@ def test_menu_all_services_for_platform_admin_user(mocker, app_, platform_admin_
         assert url_for('main.manage_users', service_id=service_one['id']) in page
         assert url_for('main.service_settings', service_id=service_one['id']) in page
         assert url_for('main.view_notifications', service_id=service_one['id']) in page
-        assert url_for('main.view_jobs', service_id=service_one['id']) in page
         assert url_for('main.api_keys', service_id=service_one['id']) not in page
+        assert url_for('main.edit_service_template', service_id=service_one['id'], template_id=1) in page
 
 
 def test_route_for_service_permissions(mocker,
@@ -142,7 +170,8 @@ def test_route_for_service_permissions(mocker,
                                        mock_get_user,
                                        mock_get_service_templates,
                                        mock_get_jobs,
-                                       mock_get_service_statistics):
+                                       mock_get_service_statistics,
+                                       mock_get_template_statistics):
     routes = [
         'main.service_dashboard']
     with app_.test_request_context():

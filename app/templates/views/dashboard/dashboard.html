@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  
+
     {% if not templates and current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
       {% include 'views/dashboard/get-started.html' %}
     {% elif current_service.restricted %}
@@ -22,8 +22,5 @@
       >
         {% include 'views/dashboard/today.html' %}
       </div>
-    
-      {% include 'views/dashboard/jobs.html' %}
-  
 
 {% endblock %}
