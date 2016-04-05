@@ -29,6 +29,8 @@ from app.notify_client.notification_api_client import NotificationApiClient
 from app.notify_client.status_api_client import StatusApiClient
 from app.notify_client.invite_api_client import InviteApiClient
 from app.notify_client.statistics_api_client import StatisticsApiClient
+from app.notify_client.template_statistics_api_client import TemplateStatisticsApiClient
+
 from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.asset_fingerprinter import AssetFingerprinter
 from utils.recipients import validate_phone_number, InvalidPhoneError
@@ -51,6 +53,7 @@ notification_api_client = NotificationApiClient()
 status_api_client = StatusApiClient()
 invite_api_client = InviteApiClient()
 statistics_api_client = StatisticsApiClient()
+template_statistics_client = TemplateStatisticsApiClient()
 asset_fingerprinter = AssetFingerprinter()
 
 # The current service attached to the request stack.
@@ -74,6 +77,7 @@ def create_app():
     status_api_client.init_app(application)
     invite_api_client.init_app(application)
     statistics_api_client.init_app(application)
+    template_statistics_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
@@ -95,6 +99,7 @@ def create_app():
     application.add_template_filter(syntax_highlight_json)
     application.add_template_filter(valid_phone_number)
     application.add_template_filter(linkable_name)
+    application.add_template_filter(format_date)
 
     application.after_request(useful_headers_after_request)
     application.after_request(save_service_after_request)
@@ -173,6 +178,11 @@ def format_time(date):
     date = dateutil.parser.parse(date)
     native = date.replace(tzinfo=None)
     return native.strftime('%H:%M')
+
+
+def format_date(date):
+    date = dateutil.parser.parse(date)
+    return date.strftime('%A %d %B %Y')
 
 
 def valid_phone_number(phone_number):

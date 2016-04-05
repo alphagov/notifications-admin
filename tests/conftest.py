@@ -783,7 +783,24 @@ def mock_remove_user_from_service(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_statistics(mocker):
+def mock_get_template_statistics(mocker, service_one):
+
+    import uuid
+    template = template_json(service_one['id'], 1, "Test template", "sms", "Something very interesting")
+    data = {
+        "usage_count": 1,
+        "template": {
+            "name": template['name'],
+            "template_type": template['template_type'],
+            "id": template['id']
+        },
+        "service": template['service'],
+        "id": str(uuid.uuid4()),
+        "day": "2016-04-04"
+    }
+
+    def _get_stats(service_id):
+        return [data]
+
     return mocker.patch(
-        'app.statistics_api_client.get_statistics_for_service',
-        return_value={'data': [{}]})
+        'app.template_statistics_client.get_template_statistics_for_service', side_effect=_get_stats)

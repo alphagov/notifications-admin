@@ -15,11 +15,12 @@ def test_sign_out_user(app_,
                        api_user_active,
                        mock_get_user,
                        mock_get_user_by_email,
+                       mock_login,
                        mock_get_service_templates,
                        mock_get_service_statistics,
-                       mock_login,
                        mock_get_jobs,
-                       mock_has_permissions):
+                       mock_has_permissions,
+                       mock_get_template_statistics):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)

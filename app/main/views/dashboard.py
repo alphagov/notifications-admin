@@ -1,15 +1,23 @@
+from datetime import date
+
 from flask import (
     render_template,
     session,
     flash,
-    jsonify,
-    request
+    jsonify
 )
-from datetime import date
 
 from flask_login import login_required
+
 from app.main import main
-from app import (job_api_client, statistics_api_client, service_api_client, current_service)
+from app import (
+    job_api_client,
+    statistics_api_client,
+    service_api_client,
+    template_statistics_client,
+    current_service
+)
+
 from app.utils import user_has_permissions
 
 
@@ -27,6 +35,7 @@ def service_dashboard(service_id):
         flash(message, 'default_with_tick')
 
     statistics = statistics_api_client.get_statistics_for_service(service_id)['data']
+    template_statistics = template_statistics_client.get_template_statistics_for_service(service_id)
 
     return render_template(
         'views/dashboard/dashboard.html',
@@ -36,7 +45,7 @@ def service_dashboard(service_id):
         spent_this_month='0.00',
         statistics=add_rates_to(statistics),
         templates=templates,
-        service_id=str(service_id))
+        template_statistics=template_statistics)
 
 
 @main.route("/services/<service_id>/dashboard.json")
@@ -44,11 +53,13 @@ def service_dashboard(service_id):
 def service_dashboard_updates(service_id):
 
     statistics = statistics_api_client.get_statistics_for_service(service_id)['data']
+    template_statistics = template_statistics_client.get_template_statistics_for_service(service_id)
 
     return jsonify(**{
         'today': render_template(
             'views/dashboard/today.html',
             statistics=add_rates_to(statistics),
+            template_statistics=template_statistics
         )
     })
 
