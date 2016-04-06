@@ -19,7 +19,7 @@
       <a href="{{ url_for(".view_notifications", service_id=current_service.id, job_id=job_id, status=['sent', 'delivered'], page=1) }}">Successful messages</a>&emsp;
       <a href="{{ url_for(".view_notifications", service_id=current_service.id, job_id=job_id, status=['failed', 'complaint', 'bounce'], page=1) }}">Failed messages</a>
     </p>
-    {% call(item) list_table(
+    {% call(item, row_number) list_table(
       jobs,
       caption="Recent activity",
       caption_visible=False,

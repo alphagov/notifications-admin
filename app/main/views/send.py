@@ -18,7 +18,7 @@ from flask import (
 
 from flask_login import login_required, current_user
 from utils.template import Template
-from utils.recipients import RecipientCSV, first_column_heading
+from utils.recipients import RecipientCSV, first_column_heading, validate_and_format_phone_number
 
 from app.main import main
 from app.main.forms import CsvUploadForm
@@ -55,7 +55,9 @@ def get_example_csv_rows(template, number_of_rows=2):
         [
             {
                 'email': current_user.email_address,
-                'sms': current_user.mobile_number
+                'sms': validate_and_format_phone_number(
+                    current_user.mobile_number, human_readable=True
+                )
             }[template.template_type]
         ] + [
             "{} {}".format(header, i) for header in template.placeholders
