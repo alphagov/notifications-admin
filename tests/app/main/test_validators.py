@@ -57,6 +57,8 @@ def _gen_mock_field(x):
 
 @pytest.mark.parametrize("email", [
     'test@gov.uk',
+    'test@GOV.UK',
+    'test@gov.uK',
     'test@test.test.gov.uk',
     'test@test.gov.uk',
     'test@mod.uk',
@@ -71,7 +73,8 @@ def _gen_mock_field(x):
     'test@nhs.net',
     'test@gov.nhs.net',
     'test@police.uk',
-    'test@gov.police.uk'
+    'test@gov.police.uk',
+    'test@GOV.PoliCe.uk',
 ])
 def test_valid_list_of_white_list_email_domains(app_, email):
     with app_.test_request_context():
