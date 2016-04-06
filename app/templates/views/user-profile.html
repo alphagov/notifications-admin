@@ -9,7 +9,7 @@
 
   <h1 class="heading-large">Your profile</h1>
 
-  {% call(item) list_table(
+  {% call(item, row_number) list_table(
     [
       {'label': 'Name', 'value': current_user.name, 'url': url_for('.user_profile_name')},
       {'label': 'Email address', 'value': current_user.email_address, 'url': url_for('.user_profile_email')},

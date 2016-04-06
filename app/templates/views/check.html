@@ -2,7 +2,7 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/email-message.html" import email_message %}
 {% from "components/sms-message.html" import sms_message %}
-{% from "components/table.html" import list_table, field, text_field, hidden_field_heading %}
+{% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
 {% from "components/placeholder.html" import placeholder %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-footer.html" import page_footer %}
@@ -71,14 +71,12 @@
     </form>
   {% endif %}
 
-  {% call(item) list_table(
+  {% call(item, row_number) list_table(
     recipients.initial_annotated_rows_with_errors if rows_have_errors else recipients.initial_annotated_rows,
     caption=original_file_name,
     field_headings=['1'] + recipients.column_headers_with_placeholders_highlighted
   ) %}
-    {% call field() %}
-      {{ item.index + 2 }}
-    {% endcall %}
+    {{ index_field(item.index + 2) }}
     {% for column in recipients.column_headers %}
       {% if item[column].error %}
         {% call field() %}

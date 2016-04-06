@@ -29,7 +29,7 @@ Manage users – GOV.UK Notify
     {% endif %}
   </div>
 
-  {% call(item) list_table(
+  {% call(item, row_number) list_table(
     users, caption='Active', **table_options
   ) %}
     {% call field() %}
@@ -48,7 +48,7 @@ Manage users – GOV.UK Notify
   {% endcall %}
 
   {% if invited_users %}
-    {% call(item) list_table(
+    {% call(item, row_number) list_table(
       invited_users, caption='Invited', **table_options
     ) %}
       {% call field() %}
