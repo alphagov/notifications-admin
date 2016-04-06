@@ -45,20 +45,31 @@ To get started:
   You can provide all your developers with test keys so they can experiment in the Sandbox environment. But keep the number of keys for real integrations to a minimum number of people on your team.
 
 
-
-
 Integrate the GOV.UK API into your service
 ============================================
 
 A client (on github) will make calls to GOV.UK Notify on your behalf.
 
-You can either:
-* use a client library provided by Notify - there is currently 1 python library but more will be added in different languages
-* develop your own [???]
-
 To make an API call to a client you need:
 * the service ID - this is aviailable under API keys on the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application
 * an API key - this is a secret key so save it somewhere safe; do not commit API keys to public source code repositories
+
+We use JWT tokens for authentication and identification. These are built into our  prebuilt clients. you just have to do get service, it returns id
+if you dont use a prebuilt client you have to manually create the token which uses the service ID and API key 
+
+To implement API calls you can :
+* use a client library provided by Notify - there is currently 1 python library but more will be added in different languages
+* develop your own API implementation - 
+
+These are used to create a JWT token:
+* service id (in JWT token terms this is called the client ID) - identifies who you are
+* API keys are used to create an individual request for an API resource. 
+
+If you use the client, the client creates that toekn
+If you not using the client, you have to create the tokebn. 
+
+essentially it creates urls
+ if using a language that we don't have a library for you have to de
 
 
 API integration
@@ -69,8 +80,8 @@ API endpoints
 ----------------
 
 You can use the API to:
-* send notifications
-* retrieve one or more notifications
+* send a notification
+* retrieve one notification
 * retrieve all notifications
 
 To send a text notification:
@@ -81,10 +92,18 @@ POST /notifications/sms
 ```
 {
   'to': '+447700900404',
-  'template': 1
+  'template': 1, 
+  'personalisation': {
+    'name': 'myname',
+    'date': '2016'
+  }
 }
 ```
-where ‘to’ is the phone number and ‘template’ is the template ID to send.
+where:
+* ‘to’ is the phone number (required)
+* ‘template’ is the template ID to send (required)
+* personalisation (optional) specifies the replaceables [where do these come from, the csv file?]
+
 
 The response will be:
 ```
@@ -96,7 +115,24 @@ The response will be:
    }
 }
 ```
-To get the status of a single text notification:
+
+To send an email notification:
+```
+POST /notifications/email
+```
+
+```
+{
+  'to': 'email@gov.uk',
+  'template': 1,
+    'personalisation': {
+    'name': 'myname',
+    'date': '2016'
+  }
+}
+```
+
+To retrieve the status of a single text or email notification:
 ```
 GET /notifications/{id}
 ```
@@ -118,10 +154,58 @@ GET /notifications/{id}
    }
 }
 ```
-where ‘status’ is the the status of the notification.
+where 
+* ‘status’ is the the status of the notification.
+* 'status' can be 'sent', 'delivered',  'failed', 'complaint', 'bounce'
+* 'method' is sms or email
+* 'jobId' is unique identifier for the process of sending the notification.
+* 'message' - contents of message
+* 'sender' - ??? may be provider???
 
+The above fields are populated once the message has been processed, initially you just get back the response above)
+CATH - send email with status responses
 
-To get the status of all text notifications: [do we want this? why do we only explain how to get text notifciations, do we want to explain how to do the same for email notifications?]
+To get the status of all notifications: 
+```
+GET /notifications
+```
+
+```
+{
+   'data':[{
+      'notification': {
+         'status':'sent',
+         'createdAt':'2016-01-01T09:00:00.999999Z',
+         'to':'+447827992607',
+         'method':'sms',
+         'sentAt':'2016-01-01T09:01:00.999999Z',
+         'id':1,
+         'message':'...',
+         'jobId':1,
+         'sender':'sms-partner'
+      }
+   },
+   {
+         'notification': {
+         'status':'sent',
+         'createdAt':'2016-01-01T09:00:00.999999Z',
+         'to':'+447827992607',
+         'method':'email',
+         'sentAt':'2016-01-01T09:01:00.999999Z',
+         'id':1,
+         'message':'...',
+         'jobId':1,
+         'sender':'email-partner'
+      }
+   }...]
+}
+```
+This list will be split into pages. To scroll through the pages run:
+
+```
+GET /notifications?&page=2
+```
+
 
 
 
