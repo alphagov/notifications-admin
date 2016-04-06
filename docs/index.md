@@ -38,7 +38,7 @@ To get started:
 
   Your ((item)) will expire on ((date)).
 
-4. Upload a csv file containing a header row that corresponds to the replaceables in your template, and data rows with the values for substituting the replaceables.
+4. Upload a csv file containing a header row with the replaceables in your template, and data rows with values for the replaceables.
 5. Send an sms or email notification.
 6. Create a new API key. This will be used to connect to the API.
 
