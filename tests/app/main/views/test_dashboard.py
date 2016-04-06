@@ -1,20 +1,22 @@
 from flask import url_for
 
+from bs4 import BeautifulSoup
+
 from tests import validate_route_permission
 from tests.conftest import SERVICE_ONE_ID
 
 
-def test_should_show_recent_jobs_on_dashboard(app_,
-                                              api_user_active,
-                                              mock_get_service,
-                                              mock_get_service_templates,
-                                              mock_get_service_statistics,
-                                              mock_get_template_statistics,
-                                              mock_get_user,
-                                              mock_get_user_by_email,
-                                              mock_login,
-                                              mock_get_jobs,
-                                              mock_has_permissions):
+def test_should_show_recent_templates_on_dashboard(app_,
+                                                   api_user_active,
+                                                   mock_get_service,
+                                                   mock_get_service_templates,
+                                                   mock_get_service_statistics,
+                                                   mock_get_template_statistics,
+                                                   mock_get_user,
+                                                   mock_get_user_by_email,
+                                                   mock_login,
+                                                   mock_get_jobs,
+                                                   mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -22,9 +24,16 @@ def test_should_show_recent_jobs_on_dashboard(app_,
 
         assert response.status_code == 200
         text = response.get_data(as_text=True)
-        assert 'Test Service' in text
         mock_get_service_statistics.assert_called_once_with(SERVICE_ONE_ID)
         mock_get_template_statistics.assert_called_once_with(SERVICE_ONE_ID)
+
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        headers = [header.text.strip() for header in page.find_all('h2')]
+        assert 'Test Service' in headers
+        assert 'Sent today' in headers
+        template_usage_headers = [th.text.strip() for th in page.thead.find_all('th')]
+        for th in ['Template', 'Type', 'Date', 'Usage']:
+            assert th in template_usage_headers
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):
