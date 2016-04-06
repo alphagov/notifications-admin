@@ -29,7 +29,7 @@
   {% call mapping_table(caption, field_headings, field_headings_visible, caption_visible) %}
     {% for item in items %}
       {% call row() %}
-        {{ parent_caller(item) }}
+        {{ parent_caller(item, loop.index + 1) }}
       {% endcall %}
     {% endfor %}
     {% if not items %}
@@ -52,6 +52,12 @@
 {% macro field(align='left', status='') -%}
   <td class="table-field{% if align == 'right' %}-right-aligned{% endif %}">
     <span class="{{ 'table-field-status-' + status if status }}">{{ caller() }}</span>
+  </td>
+{%- endmacro %}
+
+{% macro index_field(text) -%}
+  <td class="table-field-index">
+    <span>{{ text }}</span>
   </td>
 {%- endmacro %}
 

@@ -29,7 +29,7 @@
     {{ current_service.id }}
   </p>
 
-  {% call(item) list_table(
+  {% call(item, row_number) list_table(
     keys,
     empty_message="You haven’t created any API keys yet",
     caption="API keys",

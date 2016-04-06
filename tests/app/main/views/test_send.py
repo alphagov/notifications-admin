@@ -60,7 +60,7 @@ def test_send_test_sms_message_to_self(
     mock_get_users_by_service
 ):
 
-    expected_data = {'data': 'phone number\r\n07700 900762\r\n', 'file_name': 'Test run'}
+    expected_data = {'data': 'phone number\r\n07700 900 762\r\n', 'file_name': 'Test run'}
     mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
 
     with app_.test_request_context():
@@ -139,7 +139,7 @@ def test_download_example_csv(
                 follow_redirects=True
             )
         assert response.status_code == 200
-        assert response.get_data(as_text=True) == 'phone number\r\n07700 900762\r\n07700 900762\r\n'
+        assert response.get_data(as_text=True) == 'phone number\r\n07700 900 762\r\n07700 900 762\r\n'
         assert 'text/csv' in response.headers['Content-Type']
 
 

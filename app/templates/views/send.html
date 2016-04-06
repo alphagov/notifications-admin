@@ -3,7 +3,7 @@
 {% from "components/email-message.html" import email_message %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
-{% from "components/table.html" import list_table, text_field %}
+{% from "components/table.html" import list_table, text_field, index_field, index_field_heading %}
 
 {% block page_title %}
   Send text messages – GOV.UK Notify
@@ -39,12 +39,13 @@
     in your file, like this:
   </p>
 
-  {% call(item) list_table(
+  {% call(item, row_number) list_table(
     example,
     caption="Example",
     caption_visible=False,
-    field_headings=[recipient_column] + template.placeholders|list
+    field_headings=['1'] + [recipient_column] + template.placeholders|list
   ) %}
+    {{ index_field(row_number) }}
     {% for column in item %}
       {{ text_field(column) }}
     {% endfor %}

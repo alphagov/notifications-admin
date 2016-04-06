@@ -37,16 +37,16 @@ class Config(object):
     WTF_CSRF_ENABLED = True
 
     EMAIL_DOMAIN_REGEXES = [
-        "gov.uk",
-        "mod.uk",
-        "mil.uk",
-        "ddc-mod.org",
-        "slc.co.uk"
-        "gov.scot",
-        "parliament.uk",
-        "nhs.uk",
-        "nhs.net",
-        "police.uk"]
+        "gov\.uk",
+        "mod\.uk",
+        "mil\.uk",
+        "ddc-mod\.org",
+        "slc\.co\.uk",
+        "gov\.scot",
+        "parliament\.uk",
+        "nhs\.uk",
+        "nhs\.net",
+        "police\.uk"]
 
 
 class Development(Config):
