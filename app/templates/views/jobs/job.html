@@ -25,8 +25,8 @@
       {{ email_message(
         template.subject,
         template.formatted_as_markup,
-        from_address='{}@notifications.service.gov.uk'.format(service.email_from),
-        from_name=service.name
+        from_address='{}@notifications.service.gov.uk'.format(current_service.email_from),
+        from_name=current_service.name
       )}}
     {% endif %}
 
