@@ -91,8 +91,6 @@ def job_json():
         'service': 1,
         'template': 1,
         'original_file_name': 'thisisatest.csv',
-        'bucket_name': 'service-1-{}-notify'.format(job_id),
-        'file_name': '{}.csv'.format(job_id),
         'created_at': created_at,
         'notification_count': 1,
         'notifications_sent': 1,

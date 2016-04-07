@@ -35,6 +35,8 @@ class Config(object):
     SHOW_STYLEGUIDE = True
     TOKEN_MAX_AGE_SECONDS = 3600
     WTF_CSRF_ENABLED = True
+    CSV_UPLOAD_BUCKET_NAME = '{}-notifications-csv-upload'.format(
+        os.environ['NOTIFY_ADMIN_ENVIRONMENT'].split('config.')[1].lower())
 
     EMAIL_DOMAIN_REGEXES = [
         "gov\.uk",
