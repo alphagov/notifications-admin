@@ -15,7 +15,7 @@ from wtforms import (
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp)
 
-from app.main.validators import (Blacklist, CsvFileValidator, ValidEmailDomainRegex)
+from app.main.validators import (Blacklist, CsvFileValidator, ValidEmailDomainRegex, NoCommasInPlaceHolders)
 
 
 def email_address(label='Email address'):
@@ -203,7 +203,11 @@ class SMSTemplateForm(Form):
 
     template_content = TextAreaField(
         u'Message content',
-        validators=[DataRequired(message="Can’t be empty")])
+        validators=[
+            DataRequired(message="Can’t be empty"),
+            NoCommasInPlaceHolders()
+        ]
+    )
 
 
 class EmailTemplateForm(SMSTemplateForm):
