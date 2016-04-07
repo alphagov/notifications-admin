@@ -10,3 +10,4 @@ class Live(Config):
     ADMIN_CLIENT_SECRET = os.environ['LIVE_ADMIN_CLIENT_SECRET']
     SECRET_KEY = os.environ['LIVE_SECRET_KEY']
     DANGEROUS_SALT = os.environ['LIVE_DANGEROUS_SALT']
+    CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
