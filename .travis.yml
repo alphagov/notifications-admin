@@ -11,6 +11,7 @@ install:
 - npm rebuild node-sass
 - pip install -r requirements_for_test.txt
 after_success:
+- coveralls
 - ./scripts/trigger-dependent-build.sh
 script:
 - npm run build
