@@ -12,13 +12,13 @@ Create an account – GOV.UK Notify
   <div class="column-two-thirds">
     <h1 class="heading-large">Create an account</h1>
 
-    <p>If you’ve used GOV.UK Notify before, <a href="{{ url_for('.sign_in') }}">sign in to your account</a>.</p>
+    <p>If you’ve used GOV.UK Notify before, <a href="{{ url_for('.sign_in') }}">sign in to your account</a></p>
 
     <form method="post" autocomplete="nope">
       {{ textbox(form.name, width='3-4') }}
-      {{ textbox(form.email_address, hint="You must use an email address from a central government organisation", width='3-4', safe_error_message=True) }}
-      {{ textbox(form.mobile_number, width='3-4') }}
-      {{ textbox(form.password, hint="Your password must have at least 10 characters", width='3-4') }}
+      {{ textbox(form.email_address, hint="Must be from a central government organisation", width='3-4', safe_error_message=True) }}
+      {{ textbox(form.mobile_number, width='3-4', hint='You’ll need this phone to hand') }}
+      {{ textbox(form.password, hint="At least 10 characters", width='3-4') }}
       {{ page_footer("Continue") }}
     </form>
   </div>
