@@ -97,7 +97,15 @@
 
   {% if count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
-      {{ count_of_recipients - count_of_displayed_recipients }} {{ "row" if 1 == (count_of_recipients - count_of_displayed_recipients) else "rows"}} not shown
+      {% if rows_have_errors %}
+        Only showing the first {{ count_of_displayed_recipients }} rows with errors
+      {% else %}
+        Only showing the first {{ count_of_displayed_recipients }} rows
+      {% endif %}
+    </p>
+  {% elif rows_have_errors %}
+    <p class="table-show-more-link">
+      Only showing rows with errors
     </p>
   {% endif %}
 
