@@ -34,6 +34,9 @@ Manage users – GOV.UK Notify
   ) %}
     {% call field() %}
       {{ item.name }}
+      {%- if item.email_address == current_user.email_address -%}
+        &ensp;<span class="hint">(you)</span>
+      {% endif %}
     {% endcall %}
     {{ boolean_field(item.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters'])) }}
     {{ boolean_field(item.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings'])) }}

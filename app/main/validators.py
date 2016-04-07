@@ -36,5 +36,5 @@ class ValidEmailDomainRegex(object):
                 "https://docs.google.com/forms/d/1AL8U-xJX_HAFEiQiJszGQw0PcEaEUnYATSntEghNDGo/viewform")
         valid_domains = current_app.config.get('EMAIL_DOMAIN_REGEXES', [])
         email_regex = "[^\@^\s]+@([^@^\\.^\\s]+\.)*({})$".format("|".join(valid_domains))
-        if not re.match(email_regex, field.data):
+        if not re.match(email_regex, field.data.lower()):
             raise ValidationError(message)
