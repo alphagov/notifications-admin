@@ -46,9 +46,10 @@
 
       this.initialHeight = this.$textbox.height();
 
-      this.$backgroundMaskForeground.width(
-        this.$textbox.width()
-      );
+      this.$backgroundMaskForeground.css({
+        'width': this.$textbox.width(),
+        'border-width': this.$textbox.css('border-width')
+      });
 
       this.$textbox
         .trigger("input");
