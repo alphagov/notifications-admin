@@ -128,3 +128,7 @@ a[rel="external"] {
     @include external-link-19;
   }
 }
+
+.hint {
+  color: $secondary-text-colour;
+}
