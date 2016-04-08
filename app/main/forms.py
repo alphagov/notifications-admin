@@ -36,11 +36,11 @@ class UKMobileNumber(TelField):
 
 
 def mobile_number():
-    return UKMobileNumber('Mobile phone number',
+    return UKMobileNumber('Mobile number',
                           validators=[DataRequired(message='Can’t be empty')])
 
 
-def password(label='Create a password'):
+def password(label='Password'):
     return PasswordField(label,
                          validators=[DataRequired(message='Can’t be empty'),
                                      Length(10, 255, message='Must be at least 10 characters'),
