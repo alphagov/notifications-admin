@@ -1,7 +1,7 @@
 %big-number,
 .big-number {
 
-  @include bold-48($tabular-numbers: true);
+  @include bold-48;
 
   &-label {
     @include core-19;
