@@ -227,8 +227,8 @@ def check_messages(service_id, template_type, upload_id):
         contents,
         template_type=template.template_type,
         placeholders=template.placeholders,
-        max_initial_rows_shown=15,
-        max_errors_shown=15,
+        max_initial_rows_shown=50,
+        max_errors_shown=50,
         whitelist=itertools.chain.from_iterable(
             [user.mobile_number, user.email_address] for user in users
         ) if current_service['restricted'] else None
