@@ -74,7 +74,7 @@
   {% call(item, row_number) list_table(
     recipients.initial_annotated_rows_with_errors if rows_have_errors else recipients.initial_annotated_rows,
     caption=original_file_name,
-    field_headings=['1'] + recipients.column_headers_with_placeholders_highlighted
+    field_headings=['1'] + recipients.column_headers
   ) %}
     {{ index_field(item.index + 2) }}
     {% for column in recipients.column_headers %}

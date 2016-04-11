@@ -43,7 +43,7 @@
     example,
     caption="Example",
     caption_visible=False,
-    field_headings=['1'] + [recipient_column] + template.placeholders|list
+    field_headings=['1'] + [recipient_column] + template.placeholders_as_markup|list
   ) %}
     {{ index_field(row_number) }}
     {% for column in item %}
