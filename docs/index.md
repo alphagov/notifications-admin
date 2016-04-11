@@ -59,7 +59,7 @@ There are two ways to integrate the API into your service:
 * use a client library provided by Notify - there is currently 1 python library but more will be added in different languages
 * develop your own integration to produce requests in the correct format
 
-GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into our pre-built client library. If you don't use the GOV.UK Notify client library, you must manually create the token yourself. 
+GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into the GOV.UK Notify client library. If you don't use this library, you must manually create the token yourself. 
 
 A JWT token contains, in encrypted format:
 * your service ID - identifies your service
@@ -70,6 +70,39 @@ A JWT token contains, in encrypted format:
 Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
 
 **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories.
+
+[Information below needs to be expanded]
+
+JWT tokens have a series of standard and application-specific claims.
+
+GOV.UK Notify standard claims:
+```
+{
+  "typ": "JWT",
+  "alg": "HS256"
+}
+```
+
+GOV.UK Notify application-specific claims:
+```
+{
+  iss: 'string', // service id
+  iat: 0, // creation time in  epoch seconds (UTC)
+  req: 'string', // signed request
+  pay: 'string', // signed payload (POST requests only)
+}
+```
+
+Notify API tokens sign both the request being made, and for POST requests, the payload.
+
+The signing algorithm is HMAC signature, using provided key SHA256 hashing algorithm.
+
+Request signing is of the form HTTP METHOD PATH.
+```
+GET /notification/1234
+```
+
+Payload signing requires the actual payload to be signed, NOT the JSON object. Serialize the object first then sign the serialized object.
 
 
 API endpoints
@@ -152,8 +185,8 @@ GET /notifications/{id}
 ```
 where 
 * ‘status’ is the the status of the notification.
-* 'status' can be 'sending', 'delivered',  'failed'
-* 'method' is sms or email
+* 'status' can be 'sending', 'delivered',  'failed' [change status in message above?]
+* 'method' is 'sms' or 'email'
 * 'job_id' is the unique identifier for the process of sending the notification
 * 'message' is the content of message
 * 'sender' may be the provider [?]
