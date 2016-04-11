@@ -30,7 +30,7 @@ To get started:
 1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. You will need your mobile phone for 2-factor authentication.
 2. Add a new service.
 
-  At first your service will be in trial mode. In trial mode you will only be able to send test sms and email notifications to your own mobile number or email address. When you’re fully integrated and ready to go live, send a request to the GOV.UK Notify team.
+At first your service will be in trial mode. In trial mode you will only be able to send test sms and email notifications to your own mobile number or email address. When you’re fully integrated and ready to go live, send a request to the GOV.UK Notify team.
 
 3. Add a template so you can send sms and email notifications. You can personalise the template using double brackets for replaceables. For example:
 
@@ -48,33 +48,28 @@ To get started:
 Integrate the GOV.UK API into your service
 ============================================
 
-GOV.UK.Notify provides an API that allows you to create text and email[?] notifications and get the status of notifications you have sent.
+GOV.UK.Notify provides an API that allows you to create text and email notifications and get the status of notifications you have sent.
+
+API integration
+------------------
 
 ![Notfy](Notify.png)
 
 There are two ways to integrate the API into your service:
 * use a client library provided by Notify - there is currently 1 python library but more will be added in different languages
-* develop your own client [?]
+* develop your own integration to produce requests in the correct format
 
-GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into our pre-built clients. [you just have to do get service, it returns id]
-If you don't use a pre-built client you must manually create the token which uses the service ID and API key [is it the token that uses the service ID and API key]?
+GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into our pre-built clients. If you don't use a pre-built client you must manually create the token which uses the service ID and API key.
 
-To create a JWT token you need:
-* the service ID (in JWT token terms this is called the client ID) - identifies your service; you can find the service ID under API keys on the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application 
-* an API key - used to create an individual request for an API resource;  create this in the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application; it is a secret key so save it somewhere safe - do not commit API keys to public source code repositories
+A JWT token contains, in encrypted format:
+* your service ID - identifies your service
+* your API key (in JWT token terms this is called the client ID) - used to create an individual request for an API resource
+* an indication of what you're trying to do (GET, POST, etc)
+* the endpoint you're trying to access
 
-A client (on github) will make calls to GOV.UK Notify on your behalf.
+Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
 
-The token takes the payload, serializes the JSON, shares the secret (service ID), and then puts them in order and encrypts. [from Rosalie's notes]
-
-
-
-essentially it creates urls
- if using a language that we don't have a library for you have to de
-
-
-API integration
-------------------
+**Important:** API keys are secret keys so save them somewhere safe - do not commit API keys to public source code repositories.
 
 
 API endpoints
@@ -149,7 +144,7 @@ GET /notifications/{id}
          'sentAt':'2016-01-01T09:01:00.999999Z',
          'id':1,
          'message':'...',
-         'jobId':1,
+         'job_id':1,
          'sender':'sms-partner'
       }
    }
@@ -157,11 +152,11 @@ GET /notifications/{id}
 ```
 where 
 * ‘status’ is the the status of the notification.
-* 'status' can be 'sent', 'delivered',  'failed', 'complaint', 'bounce'
+* 'status' can be 'sending', 'delivered',  'failed'
 * 'method' is sms or email
-* 'jobId' is unique identifier for the process of sending the notification.
+* 'job_id' is the unique identifier for the process of sending the notification
 * 'message' - contents of message
-* 'sender' - ??? may be provider???
+* 'sender' - may be provider [?]
 
 The above fields are populated once the message has been processed, initially you just get back the response above)
 CATH - send email with status responses
@@ -226,7 +221,7 @@ Privacy
 
 
 
-
+[you just have to do get service, it returns id]
 
 
 
