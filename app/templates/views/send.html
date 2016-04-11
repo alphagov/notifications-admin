@@ -28,7 +28,7 @@
     ) }}
   {% endif %}
 
-  <p>
+  <h2 class="heading-medium">
     You need
     {{ template.placeholders|length + 1 }}
     {% if template.placeholders %}
@@ -37,7 +37,7 @@
       column
     {% endif %}
     in your file, like this:
-  </p>
+  </h2>
 
   {% call(item, row_number) list_table(
     example,
