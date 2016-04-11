@@ -50,6 +50,8 @@ Integrate the GOV.UK API into your service
 
 GOV.UK.Notify provides an API that allows you to create text and email[?] notifications and get the status of notifications you have sent.
 
+![Notfy](Notify.png)
+
 There are two ways to integrate the API into your service:
 * use a client library provided by Notify - there is currently 1 python library but more will be added in different languages
 * develop your own client [?]
