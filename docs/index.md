@@ -48,25 +48,24 @@ To get started:
 Integrate the GOV.UK API into your service
 ============================================
 
+GOV.UK.Notify provides an API that allows you to create text and email[?] notifications and get the status of notifications you have sent.
+
+There are two ways to integrate the API into your service:
+* use a client library provided by Notify - there is currently 1 python library but more will be added in different languages
+* develop your own client [?]
+
+GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into our pre-built clients. [you just have to do get service, it returns id]
+If you don't use a pre-built client you must manually create the token which uses the service ID and API key [is it the token that uses the service ID and API key]?
+
+To create a JWT token you need:
+* the service ID (in JWT token terms this is called the client ID) - identifies your service; you can find the service ID under API keys on the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application 
+* an API key - used to create an individual request for an API resource;  create this in the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application; it is a secret key so save it somewhere safe - do not commit API keys to public source code repositories
+
 A client (on github) will make calls to GOV.UK Notify on your behalf.
 
-To make an API call to a client you need:
-* the service ID - this is aviailable under API keys on the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application
-* an API key - this is a secret key so save it somewhere safe; do not commit API keys to public source code repositories
+The token takes the payload, serializes the JSON, shares the secret (service ID), and then puts them in order and encrypts. [from Rosalie's notes]
 
-We use JWT tokens for authentication and identification. These are built into our  prebuilt clients. you just have to do get service, it returns id
-if you dont use a prebuilt client you have to manually create the token which uses the service ID and API key 
 
-To implement API calls you can :
-* use a client library provided by Notify - there is currently 1 python library but more will be added in different languages
-* develop your own API implementation - 
-
-These are used to create a JWT token:
-* service id (in JWT token terms this is called the client ID) - identifies who you are
-* API keys are used to create an individual request for an API resource. 
-
-If you use the client, the client creates that toekn
-If you not using the client, you have to create the tokebn. 
 
 essentially it creates urls
  if using a language that we don't have a library for you have to de
