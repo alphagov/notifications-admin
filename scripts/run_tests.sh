@@ -34,6 +34,6 @@ display_result $? 2 "Front end code style check"
 py.test --cov=app --cov-report=term-missing tests/
 display_result $? 3 "Code coverage"
 
-export NOTIFY_ADMIN_ENVIRONMENT='config.Test'
-py.test -v
-display_result $? 4 "Unit tests"
+#export NOTIFY_ADMIN_ENVIRONMENT='config.Test'
+#py.test -v
+#display_result $? 4 "Unit tests"
