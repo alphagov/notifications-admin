@@ -34,7 +34,7 @@
 }
 
 .sms-message-name {
-  @include bold-19;
+  @include bold-24;
   margin: 20px 0 10px 0;
 }
 
@@ -55,6 +55,12 @@
   a {
     display: block;
     margin-bottom: 5px;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+    
   }
 
 }

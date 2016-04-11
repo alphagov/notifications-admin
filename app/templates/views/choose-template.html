@@ -42,7 +42,7 @@
         <div class="column-two-thirds">
           {% if 'email' == template_type %}
             {{ email_message(
-              template.subject,
+              None,
               template.formatted_as_markup,
               name=template.name,
             ) }}
