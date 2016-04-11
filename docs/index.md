@@ -59,17 +59,17 @@ There are two ways to integrate the API into your service:
 * use a client library provided by Notify - there is currently 1 python library but more will be added in different languages
 * develop your own integration to produce requests in the correct format
 
-GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into our pre-built clients. If you don't use a pre-built client you must manually create the token which uses the service ID and API key.
+GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into our pre-built client library. If you don't use the GOV.UK Notify client library, you must manually create the token yourself. 
 
 A JWT token contains, in encrypted format:
 * your service ID - identifies your service
 * your API key (in JWT token terms this is called the client ID) - used to create an individual request for an API resource
-* an indication of what you're trying to do (GET, POST, etc)
+* an indication of what you're trying to do - GET, POST, etc.
 * the endpoint you're trying to access
 
 Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
 
-**Important:** API keys are secret keys so save them somewhere safe - do not commit API keys to public source code repositories.
+**Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories.
 
 
 API endpoints
@@ -95,23 +95,6 @@ POST /notifications/sms
   }
 }
 ```
-where:
-* ‘to’ is the phone number (required)
-* ‘template’ is the template ID to send (required)
-* personalisation (optional) specifies the replaceables [where do these come from, the csv file?]
-
-
-The response will be:
-```
-{
-   'data':{
-      'notification': {
-         'id':1
-      }
-   }
-}
-```
-
 To send an email notification:
 ```
 POST /notifications/email
@@ -125,6 +108,23 @@ POST /notifications/email
     'name': 'myname',
     'date': '2016'
   }
+}
+```
+
+where:
+* ‘to’ is the phone number (required)
+* ‘template’ is the template ID to send (required)
+* ‘personalisation‘ (optional) specifies the replaceables [where do these come from, the csv file?]
+
+
+The response will be:
+```
+{
+   'data':{
+      'notification': {
+         'id':1
+      }
+   }
 }
 ```
 
@@ -155,11 +155,10 @@ where
 * 'status' can be 'sending', 'delivered',  'failed'
 * 'method' is sms or email
 * 'job_id' is the unique identifier for the process of sending the notification
-* 'message' - contents of message
-* 'sender' - may be provider [?]
+* 'message' is the content of message
+* 'sender' may be the provider [?]
 
-The above fields are populated once the message has been processed, initially you just get back the response above)
-CATH - send email with status responses
+The above fields are populated once the message has been processed; initially you get back the response indicated above.
 
 To get the status of all notifications: 
 ```
@@ -196,13 +195,11 @@ GET /notifications
    }...]
 }
 ```
-This list will be split into pages. To scroll through the pages run:
+This list is split into pages. To scroll through the pages run:
 
 ```
 GET /notifications?&page=2
 ```
-
-
 
 
 
