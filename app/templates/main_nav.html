@@ -2,35 +2,25 @@
   <h2 class="navigation-service-name">
     <a href="{{ url_for('.service_dashboard', service_id=current_service.id) }}">{{ current_service.name }}</a>
   </h2>
-  {% if current_user.has_permissions(['view_activity'], admin_override=True) %}
   <ul>
+  {% if current_user.has_permissions(['view_activity'], admin_override=True) %}
     <li><a href="{{ url_for('.view_notifications', service_id=current_service.id, page=1) }}">Activity</a></li>
-  </ul>
   {% endif %}
   {% if current_user.has_permissions(['view_activity', 'manage_templates', 'manage_api_keys'], admin_override=True, any_=True) %}
-  <ul>
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='sms') }}">Text message templates</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='email') }}">Email templates</a></li>
-  </ul>
   {% endif %}
   {% if current_user.has_permissions(['manage_users', 'manage_settings'], admin_override=True) %}
-  <ul>
     <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>
     <li><a href="{{ url_for('.service_settings', service_id=current_service.id) }}">Settings</a></li>
-  </ul>
   {% elif current_user.has_permissions(['view_activity']) %}
-  <ul>
     <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>
-  </ul>
   {% endif %}
   {% if current_user.has_permissions(['manage_api_keys']) %}
-  <ul>
     <li><a href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a></li>
-  </ul>
   {% endif %}
   {% if current_user.has_permissions(admin_override=True) %}
-    <ul>
-      <li><a href="{{ url_for('.show_all_services') }}"> List all services </a></li>
-    </ul>
+    <li><a href="{{ url_for('.show_all_services') }}"> List all services </a></li>
   {% endif %}
+  </ul>
 </nav>
