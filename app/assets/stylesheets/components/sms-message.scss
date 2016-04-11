@@ -1,5 +1,6 @@
 %sms-message-wrapper,
 .sms-message-wrapper {
+
   width: 100%;
   box-sizing: border-box;
   padding: $gutter-half;
@@ -9,6 +10,15 @@
   white-space: normal;
   margin: 0 0 $gutter 0;
   clear: both;
+
+  p {
+    margin: 0;
+  }
+
+  p + p {
+    margin-top: 20px;
+  }
+
 }
 
 .sms-message-wrapper-with-radio {
