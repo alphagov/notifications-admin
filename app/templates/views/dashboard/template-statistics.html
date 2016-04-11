@@ -1,9 +1,9 @@
-{% from "components/table.html" import list_table, field, right_aligned_field_heading %}
+{% from "components/table.html" import list_table, field, hidden_field_heading, right_aligned_field_heading %}
 {% call(item, row_number) list_table(
   template_statistics,
-  caption="Recent templates – last 7 days",
-  empty_message='You haven’t sent any batch messages yet',
-  field_headings=['Template', 'Type', right_aligned_field_heading('Usage')]
+  caption="In the last 7 days",
+  empty_message='You haven’t set up any templates yet',
+  field_headings=['Template', hidden_field_heading('Type'), right_aligned_field_heading('Messages sent')]
 ) %}
   {% call field() %}
     <a href="{{ url_for('.edit_service_template', service_id=current_service.id, template_id=item.template.id) }}">
@@ -11,7 +11,7 @@
     </a>
   {% endcall %}
   {% call field() %}
-    {{item.template.template_type}}
+    {{'Text message' if 'sms' == item.template.template_type else 'Email'}}
   {% endcall %}
   {% call field(align='right') %}
     {{ item.usage_count }}

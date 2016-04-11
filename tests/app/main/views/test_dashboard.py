@@ -85,7 +85,7 @@ def test_should_show_recent_templates_on_dashboard(app_,
         assert 'Test Service' in headers
         assert 'Sent today' in headers
         template_usage_headers = [th.text.strip() for th in page.thead.find_all('th')]
-        for th in ['Template', 'Type', 'Usage']:
+        for th in ['Template', 'Type', 'Messages sent']:
             assert th in template_usage_headers
         table_rows = page.tbody.find_all('tr')
 
