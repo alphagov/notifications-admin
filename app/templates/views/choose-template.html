@@ -45,22 +45,12 @@
               template.subject,
               template.formatted_as_markup,
               name=template.name,
-              edit_link=(
-                url_for(".edit_service_template", service_id=current_service.id, template_id=template.id)
-                if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) else
-                None
-              )
             ) }}
           {% elif 'sms' == template_type %}
             {{ sms_message(
-                template.formatted_as_markup,
-                name=template.name,
-                edit_link=(
-                  url_for(".edit_service_template", service_id=current_service.id, template_id=template.id)
-                  if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) else
-                  None
-                )
-              ) }}
+              template.formatted_as_markup,
+              name=template.name
+            ) }}
           {% endif %}
         </div>
         <div class="column-one-third">
@@ -71,6 +61,9 @@
             {% endif %}
             {% if current_user.has_permissions(permissions=['manage_api_keys']) %}
               <a href="{{ url_for(".send_from_api", service_id=current_service.id, template_id=template.id) }}">API integration</a>
+            {% endif %}
+            {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
+              <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}">Edit template</a>
             {% endif %}
           </div>
         </div>
