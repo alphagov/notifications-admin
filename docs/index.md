@@ -1,6 +1,6 @@
 About this document
 ==========================
-This document is for developers, technical architects, and service managers who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
+This document is for public sector [?] developers, technical architects, and service managers who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
 About GOV.UK Notify
 ====================
@@ -63,7 +63,7 @@ GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identifi
 
 A JWT token contains, in encrypted format:
 * your service ID - identifies your service
-* your API key (in JWT token terms this is called the client ID) - used to create an individual request for an API resource [change to: used to sign tokens during requests for API resources??]
+* your API key (in JWT token terms this is called the client ID) - used to sign tokens during requests for API resources
 * an indication of what you're trying to do - GET, POST, etc.
 * the endpoint you're trying to access
 
@@ -80,8 +80,8 @@ GOV.UK Notify supports a python client library:
 
 This provides example code for calling the API and for constructing the API tokens [are they not built in?].
 
-
 [Information below needs to be expanded]
+-----------------------------------------
 
 JWT tokens have a series of standard and application-specific claims.
 
@@ -246,11 +246,11 @@ GET /notifications?&page=2
 
 
 GOV.UK Notify API code
+------------------------
 
-Notify API code is open sourced at:
+The GOV.UK Notify API code is open sourced at:
 
 [GOV.UK Notify API](https://github.com/alphagov/notifications-api) 
-
 
 
 
