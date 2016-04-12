@@ -9,7 +9,7 @@ GOV.UK Notify is a cross-government platform, currently in beta, that lets gover
 There are two ways to send notifications:
 
 * use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application
-* integrate your web applications or back office systems with the GOV.UK Notify API
+* [integrate your web applications or back office systems](#integrateNotify)  with the GOV.UK Notify API
 
 To find out more about GOV.UK Notify, see the [Government as a Platform](https://governmentasaplatform.blog.gov.uk/) blog.
 
@@ -44,7 +44,7 @@ At first your service will be in trial mode. In trial mode you will only be able
 
   You can provide all your developers with test keys so they can experiment in the Sandbox environment. But keep the number of keys for real integrations to a minimum number of people on your team.
 
-
+<a id="integrateNotify"></a>
 Integrate the GOV.UK API into your service
 ============================================
 
@@ -63,7 +63,7 @@ GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identifi
 
 A JWT token contains, in encrypted format:
 * your service ID - identifies your service
-* your API key (in JWT token terms this is called the client ID) - used to create an individual request for an API resource
+* your API key (in JWT token terms this is called the client ID) - used to create an individual request for an API resource [change to: used to sign tokens during requests for API resources??]
 * an indication of what you're trying to do - GET, POST, etc.
 * the endpoint you're trying to access
 
@@ -187,7 +187,7 @@ where
 * ‘status’ is the the status of the notification.
 * 'status' can be 'sending', 'delivered',  'failed' [change status in message above?]
 * 'method' is 'sms' or 'email'
-* 'job_id' is the unique identifier for the process of sending the notification
+* 'job_id' is the unique identifier for the process of sending [change to retrieving?] the notification
 * 'message' is the content of message
 * 'sender' may be the provider [?]
 
