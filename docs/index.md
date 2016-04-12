@@ -107,7 +107,7 @@ Request signing is of the form HTTP METHOD PATH:
 GET /notification/1234
 ```
 
-Payload signing requires the actual payload to be signed, not the JSON object. Serialize the object first, then sign the serialized object.
+Payload signing requires the actual payload to be signed, not the JSON object. Make sure you serialize the object first, then sign the serialized object.
 
 API client libraries
 ---------------------
@@ -200,7 +200,7 @@ GET /notifications/{id}
 }
 ```
 where:
-* `status` is the the status of the notification; this can be `sending`, `delivered`, `failed` [change status in message above?]
+* `status` is the the status of the notification; this can be `sending`, `delivered`, `failed` 
 * `template_type` is `sms` or `email`
 * `job_id` is the unique identifier for the process of sending and retreiving the notification
 * `message` is the content of message
