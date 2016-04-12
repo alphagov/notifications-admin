@@ -56,7 +56,7 @@ API integration
 ![Notfy](Notify.png)
 
 There are two ways to integrate the API into your service:
-* use a client library provided by GOV.UK Notify - there is currently a [python library](https://github.com/alphagov/notifications-python-client) but more will be added in different languages
+* use a client library provided by GOV.UK Notify - there is currently a [python library](https://github.com/alphagov/notifications-python-client) and more will be added in different languages
 * develop your own integration to produce requests in the correct format
 
 GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into the GOV.UK Notify client library. If you don't use this library, you must manually create tokens yourself. 
@@ -118,7 +118,7 @@ Payload signing requires the actual payload to be signed, NOT the JSON object. S
 API endpoints
 ----------------
 
-You can use the API to:
+You can use the GOV.UK Notify API to:
 * send a notification
 * retrieve one notification
 * retrieve all notifications
@@ -159,7 +159,7 @@ where:
 * ‘template’ is the template ID to send (required)
 * ‘personalisation‘ (optional) specifies the replaceables [where do these come from, the csv file?]
 
-
+<a id="coderesponse"></a>
 The response will be:
 ```
 {
@@ -193,15 +193,14 @@ GET /notifications/{id}
    }
 }
 ```
-where 
-* ‘status’ is the the status of the notification.
-* 'status' can be 'sending', 'delivered',  'failed' [change status in message above?]
+where:
+* ‘status’ is the the status of the notification; this can be 'sending', 'delivered',  'failed' [change status in message above?]
 * 'method' is 'sms' or 'email'
 * 'job_id' is the unique identifier for the process of sending [change to retrieving?] the notification
 * 'message' is the content of message
 * 'sender' may be the provider [?]
 
-The above fields are populated once the message has been processed; initially you get back the response indicated above.
+The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse)  indicated above.
 
 To get the status of all notifications: 
 ```
