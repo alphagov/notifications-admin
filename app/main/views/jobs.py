@@ -21,7 +21,8 @@ from app.main import main
 from app.utils import (
     get_page_from_request,
     generate_previous_next_dict,
-    user_has_permissions)
+    user_has_permissions,
+    generate_notifications_csv)
 
 
 def _parse_filter_args(filter_dict):
@@ -132,6 +133,12 @@ def view_notifications(service_id):
             page + 1,
             'Next page',
             'page {}'.format(page + 1))
+    if 'download' in request.args and request.args['download'] == 'csv':
+        csv_content = generate_notifications_csv(notifications['notifications'])
+        return csv_content, 200, {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': 'inline; filename="notifications.csv"'
+        }
     return render_template(
         'views/notifications.html',
         notifications=notifications['notifications'],
