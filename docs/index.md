@@ -32,13 +32,13 @@ To get started:
 
  At first your service will be in trial mode. In trial mode you will only be able to send test sms and email notifications to your own mobile number or email address. When you’re fully integrated and ready to go live, send a request to the GOV.UK Notify team.
 
-3. Add a template so you can send sms and email notifications. You can personalise the template using double brackets for replaceables. For example:
+3. Add a template so you can send sms and email notifications. You can personalise the template using double brackets for variables. For example:
 
   Dear ((name))
 
   Your ((item)) will expire on ((date)).
 
-4. Upload a csv file containing a header row with the replaceables in your template, and data rows with values for the replaceables.
+4. Upload a csv file containing a header row matching the variables in your template, and data rows with values to use for the variables.
 5. Send an sms or email notification.
 6. Create a new API key. This will be used to connect to the API.
 
@@ -59,7 +59,7 @@ There are two ways to integrate the API into your service:
 * use a client library provided by GOV.UK Notify - there is currently a [python library](https://github.com/alphagov/notifications-python-client) and more will be added in different languages
 * develop your own integration to produce requests in the correct format
 
-GOV.UK Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into the GOV.UK Notify client library. If you don't use this library, you must manually create tokens yourself. 
+GOV.UK Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. GOV.UK Notify client library encodes and decodes JWT tokens when making requests to the GOV.UK Notify API.  If you don't use this library, you must manually create tokens yourself. 
 
 A JWT token contains, in encrypted format:
 * your service ID - identifies your service
@@ -69,23 +69,17 @@ A JWT token contains, in encrypted format:
 
 Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
 
+See [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library for sample code to encode and decode JWT tokens.
+
+
 **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories.
 
-API client libraries
-------------------
-
-GOV.UK Notify supports a python client library:
-
-[GOV.UK Notify Python client](https://github.com/alphagov/notifications-python-client)
-
-This provides example code for calling the API and for constructing the API tokens [are they not built in?].
-
-[Information below needs to be expanded]
+JWT tokens
 -----------------------------------------
 
 JWT tokens have a series of standard and application-specific claims.
 
-GOV.UK Notify standard claims:
+JWT standard claims:
 ```
 {
   "typ": "JWT",
@@ -103,16 +97,29 @@ GOV.UK Notify application-specific claims:
 }
 ```
 
-GOV.UK Notify API tokens sign both the request being made, and for POST requests, the payload.
+GOV.UK Notify API tokens sign the:
+* request being made
+* payload (for POST requests)
 
-The signing algorithm is HMAC signature, using provided key SHA256 hashing algorithm.
+The signing algorithm is the HMAC signature, using the provided key SHA256 hashing algorithm.
 
-Request signing is of the form HTTP METHOD PATH.
+Request signing is of the form HTTP METHOD PATH:
 ```
 GET /notification/1234
 ```
 
-Payload signing requires the actual payload to be signed, NOT the JSON object. Serialize the object first then sign the serialized object.
+Payload signing requires the actual payload to be signed, not the JSON object. Serialize the object first, then sign the serialized object.
+
+API client libraries
+---------------------
+
+GOV.UK Notify supports a python client library:
+
+[GOV.UK Notify Python client](https://github.com/alphagov/notifications-python-client)
+
+This provides example code for calling the API and for constructing the API tokens.
+
+
 
 
 API endpoints
@@ -157,7 +164,7 @@ POST /notifications/email
 where:
 * `to` is the phone number (required)
 * `template` is the template ID to send (required)
-* `personalisation` (optional) specifies the replaceables [where do these come from, the csv file?]
+* `personalisation` (optional) specifies the values to be used in your templates
 
 <a id="coderesponse"></a>
 The response will be:
@@ -180,11 +187,11 @@ GET /notifications/{id}
 {
    'data':{
       'notification': {
-         'status':'sent',
-         'createdAt':'2016-01-01T09:00:00.999999Z',
+         'status':'delivered',
+         'created_at':'2016-01-01T09:00:00.999999Z',
          'to':'+447827992607',
-         'method':'sms',
-         'sentAt':'2016-01-01T09:01:00.999999Z',
+         'template_type':'sms',
+         'sent_at':'2016-01-01T09:01:00.999999Z',
          'id':1,
          'message':'...',
          'job_id':1,
@@ -195,10 +202,10 @@ GET /notifications/{id}
 ```
 where:
 * `status` is the the status of the notification; this can be `sending`, `delivered`, `failed` [change status in message above?]
-* `method` is `sms` or `email`
-* `job_id` is the unique identifier for the process of sending [change to retrieving?] the notification
+* `template_type` is `sms` or `email`
+* `job_id` is the unique identifier for the process of sending and retreiving the notification
 * `message` is the content of message
-* `sender` may be the provider [?]
+* `sender` may be the provider [Do we want to say who is sending it?]
 
 The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse)  indicated above.
 
@@ -211,27 +218,27 @@ GET /notifications
 {
    'data':[{
       'notification': {
-         'status':'sent',
-         'createdAt':'2016-01-01T09:00:00.999999Z',
+         'status':'delivered',
+         'created_at':'2016-01-01T09:00:00.999999Z',
          'to':'+447827992607',
-         'method':'sms',
-         'sentAt':'2016-01-01T09:01:00.999999Z',
+         'template_type':'sms',
+         'sent_at':'2016-01-01T09:01:00.999999Z',
          'id':1,
          'message':'...',
-         'jobId':1,
+         'job-id':1,
          'sender':'sms-partner'
       }
    },
    {
          'notification': {
-         'status':'sent',
-         'createdAt':'2016-01-01T09:00:00.999999Z',
+         'status':'delivered',
+         'created_at':'2016-01-01T09:00:00.999999Z',
          'to':'+447827992607',
-         'method':'email',
-         'sentAt':'2016-01-01T09:01:00.999999Z',
+         'template_type':'email',
+         'sent_at':'2016-01-01T09:01:00.999999Z',
          'id':1,
          'message':'...',
-         'jobId':1,
+         'job_id':1,
          'sender':'email-partner'
       }
    }...]
