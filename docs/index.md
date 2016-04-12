@@ -59,7 +59,9 @@ There are two ways to integrate the API into your service:
 * use a client library provided by GOV.UK Notify - there is currently a [python library](https://github.com/alphagov/notifications-python-client) and more will be added in different languages
 * develop your own integration to produce requests in the correct format
 
-GOV.UK Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. GOV.UK Notify client library encodes and decodes JWT tokens when making requests to the GOV.UK Notify API.  If you don't use this library, you must manually create tokens yourself. 
+GOV.UK Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. The GOV.UK Notify client library encodes and decodes JWT tokens when making requests to the GOV.UK Notify API.  If you don't use this library, you must manually create tokens yourself. 
+
+For examples of how to encode and decode JWT tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library.
 
 A JWT token contains, in encrypted format:
 * your service ID - identifies your service
@@ -70,10 +72,6 @@ A JWT token contains, in encrypted format:
 Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
 
 **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories.
-
-For examples of how to encode and decode JWT tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library.
-
-
 
 JWT tokens
 ------------
