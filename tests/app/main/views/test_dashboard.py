@@ -1,3 +1,4 @@
+import copy
 from flask import url_for
 
 from bs4 import BeautifulSoup
@@ -6,34 +7,98 @@ from tests import validate_route_permission
 from tests.conftest import SERVICE_ONE_ID
 
 
+stub_template_stats = [
+    {
+        'template': {
+            'name': 'Brine Shrimp',
+            'template_type': 'sms',
+            'id': 1
+        },
+        'id': '6005e192-4738-4962-beec-ebd982d0b03f',
+        'day': '2016-04-06',
+        'usage_count': 6,
+        'service': '1491b86f-c950-48f5-bed1-2a55df027ecb'
+    },
+    {
+        'template': {
+            'name': 'Pickle feet',
+            'template_type': 'sms',
+            'id': 2
+        },
+        'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
+        'day': '2016-04-06',
+        'usage_count': 6,
+        'service': '1491b86f-c950-48f5-bed1-2a55df027ecb'
+        },
+    {
+        'template': {
+            'name': 'Brine Shrimp',
+            'template_type': 'sms',
+            'id': 1
+        },
+        'id': '24531628-ffff-4082-a443-9f6db5af83d9',
+        'day': '2016-04-05',
+        'usage_count': 7,
+        'service': '1491b86f-c950-48f5-bed1-2a55df027ecb'
+        },
+    {
+        'template': {
+            'name': 'Pickle feet',
+            'template_type': 'sms',
+            'id': 2
+        },
+        'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
+        'day': '2016-03-06',
+        'usage_count': 200,
+        'service': '1491b86f-c950-48f5-bed1-2a55df027ecb'
+    },
+]
+
+
 def test_should_show_recent_templates_on_dashboard(app_,
+                                                   mocker,
                                                    api_user_active,
                                                    mock_get_service,
                                                    mock_get_service_templates,
                                                    mock_get_service_statistics,
-                                                   mock_get_template_statistics,
                                                    mock_get_user,
                                                    mock_get_user_by_email,
                                                    mock_login,
                                                    mock_get_jobs,
                                                    mock_has_permissions):
+
+    mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
+                                       return_value=copy.deepcopy(stub_template_stats))
+
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
         assert response.status_code == 200
-        text = response.get_data(as_text=True)
+        response.get_data(as_text=True)
         mock_get_service_statistics.assert_called_once_with(SERVICE_ONE_ID)
-        mock_get_template_statistics.assert_called_once_with(SERVICE_ONE_ID)
+        mock_template_stats.assert_called_once_with(SERVICE_ONE_ID)
 
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         headers = [header.text.strip() for header in page.find_all('h2')]
         assert 'Test Service' in headers
         assert 'Sent today' in headers
         template_usage_headers = [th.text.strip() for th in page.thead.find_all('th')]
-        for th in ['Template', 'Type', 'Date', 'Usage']:
+        for th in ['Template', 'Type', 'Messages sent']:
             assert th in template_usage_headers
+        table_rows = page.tbody.find_all('tr')
+
+        assert len(table_rows) == 2
+        first_row = page.tbody.find_all('tr')[0]
+        table_data = first_row.find_all('td')
+        assert len(table_data) == 3
+        assert table_data[2].text.strip() == '13'
+
+        second_row = page.tbody.find_all('tr')[1]
+        table_data = second_row.find_all('td')
+        assert len(table_data) == 3
+        assert table_data[2].text.strip() == '206'
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):
@@ -197,3 +262,15 @@ def test_route_for_service_permissions(mocker,
                 ['view_activity'],
                 api_user_active,
                 service_one)
+
+
+def test_aggregate_template_stats():
+    from app.main.views.dashboard import aggregate_usage
+    expected = aggregate_usage(copy.deepcopy(stub_template_stats))
+
+    assert len(expected) == 2
+    for item in expected:
+        if item['template']['id'] == 1:
+            assert item['usage_count'] == 13
+        elif item['template']['id'] == 2:
+            assert item['usage_count'] == 206

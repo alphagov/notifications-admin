@@ -28,7 +28,7 @@
     ) }}
   {% endif %}
 
-  <p>
+  <h2 class="heading-medium">
     You need
     {{ template.placeholders|length + 1 }}
     {% if template.placeholders %}
@@ -37,13 +37,13 @@
       column
     {% endif %}
     in your file, like this:
-  </p>
+  </h2>
 
   {% call(item, row_number) list_table(
     example,
     caption="Example",
     caption_visible=False,
-    field_headings=['1'] + [recipient_column] + template.placeholders|list
+    field_headings=['1'] + [recipient_column] + template.placeholders_as_markup|list
   ) %}
     {{ index_field(row_number) }}
     {% for column in item %}
@@ -51,7 +51,7 @@
     {% endfor %}
   {% endcall %}
 
-  <p class="bottom-gutter">
+  <p class="table-show-more-link">
     <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
   </p>
 

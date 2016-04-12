@@ -9,3 +9,4 @@ class Staging(Config):
     ADMIN_CLIENT_SECRET = os.environ['STAGING_ADMIN_CLIENT_SECRET']
     SECRET_KEY = os.environ['STAGING_SECRET_KEY']
     DANGEROUS_SALT = os.environ['STAGING_DANGEROUS_SALT']
+    CSV_UPLOAD_BUCKET_NAME = 'staging-notifications-csv-upload'

@@ -13,4 +13,4 @@ class StatusApiClient(BaseAPIClient):
         self.secret = app.config['ADMIN_CLIENT_SECRET']
 
     def get_status(self, *params):
-        return self.get(url='/status/_status', *params)
+        return self.get(url='/_status', *params)

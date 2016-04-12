@@ -21,7 +21,13 @@
         you can only send messages to yourself
       </li>
       <li>
-        you can add people to your team, then you can send messages to them too
+        you can add people to
+        {% if current_service %}
+          <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">your team</a>,
+        {% else %}
+          your team,
+        {% endif %}
+        then you can send messages to them too
       </li>
       <li>
         you can only send 50 messages per day
@@ -29,7 +35,13 @@
     </ul>
 
     <p>
-      When you’re ready we can remove these restrictions.
+      When you’re ready we can
+      {% if current_service %}
+        <a href="{{ url_for('main.service_request_to_go_live', service_id=current_service.id) }}">remove these restrictions</a>.
+      {% else %}
+        remove these restrictions.
+      {% endif %}
+
     </p>
 
   </div>

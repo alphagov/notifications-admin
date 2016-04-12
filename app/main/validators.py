@@ -2,6 +2,7 @@ import re
 from wtforms import ValidationError
 from datetime import datetime
 from app.main.encryption import check_hash
+from utils.template import Template
 
 
 class Blacklist(object):
@@ -38,3 +39,13 @@ class ValidEmailDomainRegex(object):
         email_regex = "[^\@^\s]+@([^@^\\.^\\s]+\.)*({})$".format("|".join(valid_domains))
         if not re.match(email_regex, field.data.lower()):
             raise ValidationError(message)
+
+
+class NoCommasInPlaceHolders():
+
+    def __init__(self, message='You can’t have commas in your fields'):
+        self.message = message
+
+    def __call__(self, form, field):
+        if ',' in ''.join(Template({'content': field.data}).placeholders):
+            raise ValidationError(self.message)

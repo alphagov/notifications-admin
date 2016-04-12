@@ -35,7 +35,7 @@ def service_dashboard(service_id):
         return redirect(url_for("main.tour", service_id=service_id, page=1))
 
     statistics = statistics_api_client.get_statistics_for_service(service_id)['data']
-    template_statistics = template_statistics_client.get_template_statistics_for_service(service_id)
+    template_statistics = aggregate_usage(template_statistics_client.get_template_statistics_for_service(service_id))
 
     return render_template(
         'views/dashboard/dashboard.html',
@@ -53,7 +53,7 @@ def service_dashboard(service_id):
 def service_dashboard_updates(service_id):
 
     statistics = statistics_api_client.get_statistics_for_service(service_id)['data']
-    template_statistics = template_statistics_client.get_template_statistics_for_service(service_id)
+    template_statistics = aggregate_usage(template_statistics_client.get_template_statistics_for_service(service_id))
 
     return jsonify(**{
         'today': render_template(
@@ -87,3 +87,15 @@ def add_rates_to(delivery_statistics):
     })
 
     return latest_stats
+
+
+def aggregate_usage(template_statistics):
+    import collections
+    stats = collections.OrderedDict()
+    for item in template_statistics:
+        stat = stats.get(item['template']['id'])
+        if stat:
+            stat['usage_count'] = stat['usage_count'] + item['usage_count']
+        else:
+            stats[item['template']['id']] = item
+    return stats.values()

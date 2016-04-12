@@ -27,7 +27,14 @@ def accept_invite(token):
     invited_user = invite_api_client.check_token(token)
 
     if not current_user.is_anonymous() and current_user.email_address != invited_user.email_address:
-        flash("You can't accept an invite for another person.")
+        flash("""
+            You’re signed in as {}.
+            This invite is for another email address.
+            <a href='{}'>Sign out</a> and click the link again to accept this invite.
+        """.format(
+            current_user.email_address,
+            url_for("main.sign_out")
+        ))
         abort(403)
 
     if invited_user.status == 'cancelled':

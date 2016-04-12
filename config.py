@@ -35,6 +35,7 @@ class Config(object):
     SHOW_STYLEGUIDE = True
     TOKEN_MAX_AGE_SECONDS = 3600
     WTF_CSRF_ENABLED = True
+    CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
 
     EMAIL_DOMAIN_REGEXES = [
         "gov\.uk",
@@ -54,15 +55,18 @@ class Development(Config):
     REMEMBER_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
     WTF_CSRF_ENABLED = False
+    CSV_UPLOAD_BUCKET_NAME = 'development-notifications-csv-upload'
 
 
 class Test(Development):
     DEBUG = True
+    CSV_UPLOAD_BUCKET_NAME = 'test-notifications-csv-upload'
 
 
 class Preview(Config):
     HTTP_PROTOCOL = 'https'
     HEADER_COLOUR = '#F47738'  # $orange
+    CSV_UPLOAD_BUCKET_NAME = 'preview-notifications-csv-upload'
 
 
 configs = {

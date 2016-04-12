@@ -2,6 +2,8 @@
 pep8==1.5.7
 pytest==2.8.1
 pytest-mock==0.8.1
+pytest-cov==2.2.1
+coveralls==1.1
 moto==0.4.19
 httpretty==0.8.10
 beautifulsoup4==4.4.1

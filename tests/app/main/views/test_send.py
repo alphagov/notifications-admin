@@ -157,27 +157,9 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
 
     mocker.patch(
         'app.main.views.send.s3download',
-        return_value="""
-            phone number
-            07700 900701
-            07700 900702
-            07700 900703
-            07700 900704
-            07700 900705
-            07700 900706
-            07700 900707
-            07700 900708
-            07700 900709
-            07700 900710
-            07700 900711
-            07700 900712
-            07700 900713
-            07700 900714
-            07700 900715
-            07700 900799
-            07700 900799
-            07700 900799
-        """
+        return_value='\n'.join(['phone number'] + [
+            '07700 9007{0:02d}'.format(final_two) for final_two in range(0, 53)
+        ])
     )
 
     with app_.test_request_context():
@@ -192,14 +174,14 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
             with client.session_transaction() as sess:
                 assert int(sess['upload_data']['template_id']) == 54321
                 assert sess['upload_data']['original_file_name'] == 'valid.csv'
-                assert sess['upload_data']['notification_count'] == 18
+                assert sess['upload_data']['notification_count'] == 53
 
             content = response.get_data(as_text=True)
             assert response.status_code == 200
             assert '07700 900701' in content
-            assert '07700 900715' in content
-            assert '07700 900716' not in content
-            assert '3 rows not shown' in content
+            assert '07700 900749' in content
+            assert '07700 900750' not in content
+            assert 'Only showing the first 50 rows with errors' in content
 
 
 def test_create_job_should_call_api(
