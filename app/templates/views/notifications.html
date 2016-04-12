@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import list_table, field, right_aligned_field_heading %}
+{% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading %}
 {% from "components/previous-next-navigation.html" import previous_next_navigation %}
 
 {% block page_title %}
@@ -21,37 +21,40 @@
       <a href="{{ url_for(".view_notifications", service_id=current_service.id, status=['failed'], page=1) }}">Failed messages</a>
     </p>
 
-    {% call(item, row_number) list_table(
-      notifications,
-      caption="Recent activity",
-      caption_visible=False,
-      empty_message='You haven’t sent any notifications yet',
-      field_headings=['Recipient', 'Template', 'Type', 'Job', 'Status', 'Time'])
-    %}
-      {% call field() %}
+  {% call(item, row_number) list_table(
+    notifications,
+    caption="Recent activity",
+    caption_visible=False,
+    empty_message='No messages found',
+    field_headings=['Recipient', 'Status', 'Started'],
+    field_headings_visible=False
+  ) %}
+
+    {% call field() %}
+      <p>
         {{ item.to }}
-      {% endcall %}
-      {% call field() %}
+      </p>
+      <p class="hint">
         <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">{{ item.template.name }}</a>
-      {% endcall %}
-      {% call field() %}
-        {{ item.template.template_type }}
-      {% endcall %}
-      {% call field() %}
+        sent from
         {% if item.job %}
           <a href="{{ url_for(".view_job", service_id=current_service.id, job_id=item.job.id) }}">{{ item.job.original_file_name }}</a>
+        {% else %}
+          an API call
         {% endif %}
-      {% endcall %}
-      {% call field() %}
-        {{ item.status }}
-      {% endcall %}
-      {% call field() %}
-        {{ item.created_at | format_datetime }}
-      {% endcall %}
+      </p>
     {% endcall %}
-    <p class="table-show-more-link">
-      <a href="{{ request.url }}&download=csv">Download csv</a>
-    </p>
-    {{ previous_next_navigation(prev_page, next_page) }}
+
+    {{ text_field(item.status|title) }}
+
+    {% call field(align='right') %}
+      {{ item.created_at|format_delta }}
+    {% endcall %}
+
+  {% endcall %}
+  <p class="table-show-more-link">
+    <a href="{{ request.url }}&download=csv">Download csv</a>
+  </p>
+  {{ previous_next_navigation(prev_page, next_page) }}
 
 {% endblock %}
