@@ -12,7 +12,9 @@ from . import (
     api_key_json,
     job_json,
     notification_json,
-    invite_json
+    invite_json,
+    sample_uuid,
+    generate_uuid
 )
 from app.notify_client.models import (
     User,
@@ -48,10 +50,15 @@ def mock_send_sms(request, mocker):
 
 
 @pytest.fixture(scope='function')
+def fake_uuid():
+    return sample_uuid()
+
+
+@pytest.fixture(scope='function')
 def mock_get_service(mocker, api_user_active):
     def _get(service_id):
         service = service_json(
-            service_id, "Test Service", [api_user_active.id], limit=1000,
+            service_id, "Test Service", [api_user_active.id], message_limit=1000,
             active=False, restricted=True)
         return {'data': service}
 
@@ -60,9 +67,9 @@ def mock_get_service(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_create_service(mocker):
-    def _create(service_name, active, limit, restricted, user_id, email_from):
+    def _create(service_name, active, message_limit, restricted, user_id, email_from):
         service = service_json(
-            101, service_name, [user_id], limit=limit,
+            101, service_name, [user_id], message_limit=message_limit,
             active=active, restricted=restricted, email_from=email_from)
         return service['id']
 
@@ -75,12 +82,12 @@ def mock_update_service(mocker):
     def _update(service_id,
                 service_name,
                 active,
-                limit,
+                message_limit,
                 restricted,
                 users,
                 email_from):
         service = service_json(
-            service_id, service_name, users, limit=limit,
+            service_id, service_name, users, message_limit=message_limit,
             active=active, restricted=restricted, email_from=email_from)
         return {'data': service}
 
@@ -111,9 +118,9 @@ SERVICE_TWO_ID = "147ad62a-2951-4fa1-9ca0-093cd1a52c52"
 
 
 @pytest.fixture(scope='function')
-def mock_get_services(mocker, user=None):
+def mock_get_services(mocker, fake_uuid, user=None):
     if user is None:
-        user = active_user_with_permissions()
+        user = active_user_with_permissions(fake_uuid)
 
     def _create(user_id=None):
         service_one = service_json(
@@ -127,9 +134,9 @@ def mock_get_services(mocker, user=None):
 
 
 @pytest.fixture(scope='function')
-def mock_get_services_with_one_service(mocker, user=None):
+def mock_get_services_with_one_service(mocker, fake_uuid, user=None):
     if user is None:
-        user = api_user_active()
+        user = api_user_active(fake_uuid)
 
     def _create(user_id=None):
         return {'data': [service_json(
@@ -181,10 +188,10 @@ def mock_get_service_email_template(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_create_service_template(mocker):
+def mock_create_service_template(mocker, fake_uuid):
     def _create(name, type_, content, service):
         template = template_json(
-            101, name, type_, content, service)
+            fake_uuid, name, type_, content, service)
         return {'data': template}
 
     return mocker.patch(
@@ -196,7 +203,7 @@ def mock_create_service_template(mocker):
 def mock_update_service_template(mocker):
     def _update(id_, name, type_, content, service):
         template = template_json(
-            id_, name, type_, content, service)
+            service, id_, name, type_, content)
         return {'data': template}
 
     return mocker.patch(
@@ -206,19 +213,24 @@ def mock_update_service_template(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_templates(mocker):
+    uuid1 = str(generate_uuid())
+    uuid2 = str(generate_uuid())
+    uuid3 = str(generate_uuid())
+    uuid4 = str(generate_uuid())
+
     def _create(service_id):
         return {'data': [
             template_json(
-                service_id, 1, "sms_template_one", "sms", "sms template one content"
+                service_id, uuid1, "sms_template_one", "sms", "sms template one content"
             ),
             template_json(
-                service_id, 2, "sms_template_two", "sms", "sms template two content"
+                service_id, uuid2, "sms_template_two", "sms", "sms template two content"
             ),
             template_json(
-                service_id, 3, "email_template_one", "email", "email template one content"
+                service_id, uuid3, "email_template_one", "email", "email template one content"
             ),
             template_json(
-                service_id, 4, "email_template_two", "email", "email template two content"
+                service_id, uuid4, "email_template_two", "email", "email template two content"
             )
         ]}
 
@@ -239,9 +251,9 @@ def mock_delete_service_template(mocker):
 
 
 @pytest.fixture(scope='function')
-def api_user_pending():
+def api_user_pending(fake_uuid):
     from app.notify_client.user_api_client import User
-    user_data = {'id': 111,
+    user_data = {'id': fake_uuid,
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
@@ -255,9 +267,9 @@ def api_user_pending():
 
 
 @pytest.fixture(scope='function')
-def platform_admin_user():
+def platform_admin_user(fake_uuid):
     from app.notify_client.user_api_client import User
-    user_data = {'id': 222,
+    user_data = {'id': fake_uuid,
                  'name': 'Platform admin user',
                  'password': 'somepassword',
                  'email_address': 'platform@admin.gov.uk',
@@ -272,9 +284,9 @@ def platform_admin_user():
 
 
 @pytest.fixture(scope='function')
-def api_user_active():
+def api_user_active(fake_uuid):
     from app.notify_client.user_api_client import User
-    user_data = {'id': 222,
+    user_data = {'id': fake_uuid,
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
@@ -289,10 +301,10 @@ def api_user_active():
 
 
 @pytest.fixture(scope='function')
-def active_user_with_permissions():
+def active_user_with_permissions(fake_uuid):
     from app.notify_client.user_api_client import User
 
-    user_data = {'id': 222,
+    user_data = {'id': fake_uuid,
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
@@ -314,9 +326,9 @@ def active_user_with_permissions():
 
 
 @pytest.fixture(scope='function')
-def api_user_locked():
+def api_user_locked(fake_uuid):
     from app.notify_client.user_api_client import User
-    user_data = {'id': 333,
+    user_data = {'id': fake_uuid,
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
@@ -330,9 +342,9 @@ def api_user_locked():
 
 
 @pytest.fixture(scope='function')
-def api_user_request_password_reset():
+def api_user_request_password_reset(fake_uuid):
     from app.notify_client.user_api_client import User
-    user_data = {'id': 555,
+    user_data = {'id': fake_uuid,
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
@@ -347,9 +359,9 @@ def api_user_request_password_reset():
 
 
 @pytest.fixture(scope='function')
-def api_user_changed_password():
+def api_user_changed_password(fake_uuid):
     from app.notify_client.user_api_client import User
-    user_data = {'id': 555,
+    user_data = {'id': fake_uuid,
                  'name': 'Test User',
                  'password': 'somepassword',
                  'email_address': 'test@user.gov.uk',
@@ -377,8 +389,8 @@ def mock_register_user(mocker, api_user_pending):
 
 @pytest.fixture(scope='function')
 def mock_get_user(mocker, api_user_active):
-    def _get_user(id):
-        api_user_active.id = id
+    def _get_user(id_):
+        api_user_active.id = id_
         return api_user_active
     return mocker.patch(
         'app.user_api_client.get_user', side_effect=_get_user)
@@ -507,7 +519,7 @@ def mock_create_api_key(mocker):
 
     def _create(service_id, key_name):
         import uuid
-        return {'data': str(uuid.uuid4())}
+        return {'data': str(generate_uuid())}
 
     return mocker.patch('app.api_key_api_client.create_api_key', side_effect=_create)
 
@@ -525,8 +537,8 @@ def mock_revoke_api_key(mocker):
 @pytest.fixture(scope='function')
 def mock_get_api_keys(mocker):
     def _get_keys(service_id, key_id=None):
-        keys = {'apiKeys': [api_key_json(1, 'some key name'),
-                            api_key_json(2, 'another key name', expiry_date=str(date.fromtimestamp(0)))]}
+        keys = {'apiKeys': [api_key_json(service_id, 'some key name'),
+                            api_key_json(service_id, 'another key name', expiry_date=str(date.fromtimestamp(0)))]}
         return keys
 
     return mocker.patch('app.api_key_api_client.get_api_keys', side_effect=_get_keys)
@@ -629,11 +641,10 @@ def mock_get_job(mocker, job_data):
 @pytest.fixture(scope='function')
 def mock_get_jobs(mocker):
     def _get_jobs(service_id):
-        import uuid
         data = []
         for i in range(5):
             job_data = job_json()
-            job_data['id'] = str(uuid.uuid4())
+            job_data['id'] = str(generate_uuid())
             job_data['service'] = service_id
             data.append(job_data)
         return {"data": data}
@@ -709,14 +720,13 @@ def mock_s3_upload(mocker):
 
 @pytest.fixture(scope='function')
 def sample_invite(mocker, service_one, status='pending'):
-    import datetime
-    id = str(uuid.uuid4())
+    id_ = str(generate_uuid())
     from_user = service_one['users'][0]
     email_address = 'invited_user@test.gov.uk'
     service_id = service_one['id']
     permissions = 'send_messages,manage_service,manage_api_keys'
-    created_at = str(datetime.datetime.now())
-    return invite_json(id, from_user, service_id, email_address, permissions, created_at, status)
+    created_at = str(datetime.now())
+    return invite_json(id_, from_user, service_id, email_address, permissions, created_at, status)
 
 
 @pytest.fixture(scope='function')
@@ -783,10 +793,8 @@ def mock_remove_user_from_service(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_template_statistics(mocker, service_one):
-
-    import uuid
-    template = template_json(service_one['id'], 1, "Test template", "sms", "Something very interesting")
+def mock_get_template_statistics(mocker, service_one, fake_uuid):
+    template = template_json(service_one['id'], fake_uuid, "Test template", "sms", "Something very interesting")
     data = {
         "usage_count": 1,
         "template": {
@@ -795,7 +803,7 @@ def mock_get_template_statistics(mocker, service_one):
             "id": template['id']
         },
         "service": template['service'],
-        "id": str(uuid.uuid4()),
+        "id": str(generate_uuid()),
         "day": "2016-04-04"
     }
 

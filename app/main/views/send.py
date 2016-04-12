@@ -92,7 +92,7 @@ def choose_template(service_id, template_type):
     )
 
 
-@main.route("/services/<service_id>/send/<int:template_id>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/send/<template_id>/csv", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_messages(service_id, template_id):

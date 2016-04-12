@@ -1,6 +1,7 @@
 from flask import url_for
 from bs4 import BeautifulSoup
 import json
+from app.utils import generate_notifications_csv
 
 
 def test_should_return_list_of_all_jobs(app_,
@@ -179,3 +180,26 @@ def test_should_show_notifications_for_a_service_with_next_previous(app_,
         assert url_for('main.view_notifications', service_id=service_one['id'], page=1) in content
         assert 'Previous page' in content
         assert 'Next page' in content
+
+
+def test_should_download_notifications_for_a_service(app_,
+                                                     service_one,
+                                                     api_user_active,
+                                                     mock_login,
+                                                     mock_get_user,
+                                                     mock_get_user_by_email,
+                                                     mock_get_service,
+                                                     mock_get_notifications,
+                                                     mock_has_permissions):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(url_for(
+                'main.view_notifications',
+                service_id=service_one['id'],
+                download='csv'))
+        csv_content = generate_notifications_csv(
+            mock_get_notifications(service_one['id'])['notifications'])
+        assert response.status_code == 200
+        assert response.get_data(as_text=True) == csv_content
+        assert 'text/csv' in response.headers['Content-Type']

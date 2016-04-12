@@ -1,5 +1,6 @@
 import re
-
+import csv
+from io import StringIO
 from functools import wraps
 from flask import (abort, session, request, url_for)
 
@@ -83,6 +84,25 @@ def get_errors_for_csv(recipients, template_type):
             errors.append("fill in {} empty cells".format(number_of_rows_with_missing_data))
 
     return errors
+
+
+def generate_notifications_csv(json_list):
+    from app import format_datetime
+    content = StringIO()
+    retval = None
+    with content as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(['Recipient', 'Template', 'Type', 'Job', 'Status', 'Time'])
+        for x in json_list:
+            csvwriter.writerow([
+                x['to'],
+                x['template']['name'],
+                x['template']['template_type'],
+                x['job']['original_file_name'],
+                x['status'],
+                format_datetime(x['created_at'])])
+        retval = content.getvalue()
+    return retval
 
 
 def get_page_from_request():

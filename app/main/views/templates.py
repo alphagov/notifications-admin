@@ -48,7 +48,7 @@ def add_service_template(service_id, template_type):
     )
 
 
-@main.route("/services/<service_id>/templates/<int:template_id>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/<template_id>", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
 def edit_service_template(service_id, template_id):
@@ -76,7 +76,7 @@ def edit_service_template(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/templates/<int:template_id>/delete", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/<template_id>/delete", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
 def delete_service_template(service_id, template_id):
