@@ -45,8 +45,8 @@ To get started:
   You can provide all your developers with test keys so they can experiment in the Sandbox environment. But keep the number of keys for real integrations to a minimum number of people on your team.
 
 <a id="integrateNotify"></a>
-Integrate the GOV.UK API into your service
-============================================
+Integrate the GOV.UK Notify API into your service
+===================================================
 
 GOV.UK.Notify provides an API that allows you to create text and email notifications and get the status of notifications you have sent.
 
@@ -59,7 +59,7 @@ There are two ways to integrate the API into your service:
 * use a client library provided by GOV.UK Notify - there is currently a [python library](https://github.com/alphagov/notifications-python-client) but more will be added in different languages
 * develop your own integration to produce requests in the correct format
 
-GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into the GOV.UK Notify client library. If you don't use this library, you must manually create the token yourself. 
+GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into the GOV.UK Notify client library. If you don't use this library, you must manually create tokens yourself. 
 
 A JWT token contains, in encrypted format:
 * your service ID - identifies your service
@@ -266,10 +266,6 @@ Security
 Privacy
 --------
 
-
-
-
-[you just have to do get service, it returns id]
 
 
 
