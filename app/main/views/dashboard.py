@@ -1,4 +1,6 @@
 from datetime import date
+from collections import namedtuple
+from itertools import groupby
 
 from flask import (
     render_template,
@@ -90,12 +92,30 @@ def add_rates_to(delivery_statistics):
 
 
 def aggregate_usage(template_statistics):
-    import collections
-    stats = collections.OrderedDict()
-    for item in template_statistics:
-        stat = stats.get(item['template']['id'])
-        if stat:
-            stat['usage_count'] = stat['usage_count'] + item['usage_count']
-        else:
-            stats[item['template']['id']] = item
-    return stats.values()
+
+    immutable_template = namedtuple('Template', ['template_type', 'name', 'id'])
+
+    # grouby requires the list to be sorted by template first
+    statistics_sorted_by_template = sorted(
+        (
+            (
+                immutable_template(**row['template']),
+                row['usage_count']
+            )
+            for row in template_statistics
+        ),
+        key=lambda items: items[0]
+    )
+
+    # then group and sort the result by usage
+    return sorted(
+        (
+            {
+                'usage_count': sum(usage[1] for usage in usages),
+                'template': template
+            }
+            for template, usages in groupby(statistics_sorted_by_template, lambda items: items[0])
+        ),
+        key=lambda row: row['usage_count'],
+        reverse=True
+    )
