@@ -44,7 +44,7 @@ To get started:
 
   You can provide all your developers with test keys so they can experiment in the Sandbox environment. But keep the number of keys for real integrations to a minimum number of people on your team.
 
-<a id="integrateNotify"></a>
+<a name="integrateNotify"></a>
 Integrate the GOV.UK Notify API into your service
 ===================================================
 
