@@ -11,12 +11,9 @@
         `)
         .addClass('collapsed');
 
-      this.$toggle = this.$component.find('.toggle');
-
-      this.$toggle
+      this.$toggle = this.$component.find('.toggle')
         .on(
           "click",
-          ".toggle",
           this.change
         )
         .on("keydown", this.filterKeyPresses([32, 13], this.change));
@@ -34,7 +31,7 @@
 
     this.change = () => this.toggleCollapsed() && this.$toggle.remove();
 
-    this.toggleCollapsed = () => this.$component.toggleClass('collapsed');
+    this.toggleCollapsed = () => this.$component.removeClass('collapsed');
 
   };
 
