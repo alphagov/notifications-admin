@@ -108,6 +108,7 @@
   @include core-16;
   color: $secondary-text-colour;
   margin-top: -20px;
+  margin-bottom: $gutter * 1.5;
   border-bottom: 1px solid $border-colour;
   padding-bottom: 10px;
   text-align: center;

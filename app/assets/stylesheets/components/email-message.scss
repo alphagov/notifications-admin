@@ -3,7 +3,7 @@
   margin-bottom: $gutter;
 
   &-name {
-    @include bold-19;
+    @include bold-24;
     margin: 20px 0 10px 0;
   }
 
@@ -36,13 +36,64 @@
   }
 
   &-body {
+    
     width: 100%;
     box-sizing: border-box;
     padding: $gutter-half 0 0 0;
-    margin: 0 0 $gutter 0;
+    margin: 0 0 $gutter * 1.5 0;
     clear: both;
     border-top: 1px solid $border-colour;
     border-bottom: 1px solid $border-colour;
+    position: relative;
+
+    &-wrapper {
+
+      .collapsed & {
+        max-height: 92px;
+        overflow: hidden;
+      }
+
+    }
+
+    .toggle {
+
+      position: absolute;
+      left: 50%;
+      bottom: -18px;
+      height: 25px;
+      display: inline-block;
+      padding: 0;
+      margin: 0 0 0 -30px;
+      line-height: 12px;
+      font-size: 30px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-align: center;
+      cursor: pointer;
+      width: 60px;
+      text-decoration: none;
+      background: $grey-1;
+      color: $white;
+      border-style: solid;
+      border-width: 3px;
+      border-colour: $white;
+      border-radius: 6px;
+      box-shadow: 0 0 0 1px rgba($white, 0.5);
+
+      &:hover {
+        background: $link-hover-colour;
+      }
+
+      &:focus,
+      &:active {
+        background: $yellow;
+        border-color: $white;
+        color: $text-colour;
+        outline: none;
+      }
+
+    }
+
   }
 
 }
