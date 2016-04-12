@@ -1,10 +1,12 @@
 from flask import request, render_template, redirect, url_for, flash, abort
 from flask_login import login_required
 
+from utils.template import Template
+
 from app.main import main
 from app.utils import user_has_permissions
 from app.main.forms import SMSTemplateForm, EmailTemplateForm
-from app import service_api_client
+from app import service_api_client, current_service
 
 
 form_objects = {
@@ -16,6 +18,26 @@ page_headings = {
     'email': 'email',
     'sms': 'text message'
 }
+
+
+@main.route("/services/<service_id>/templates/<template_id>", methods=['GET'])
+@login_required
+@user_has_permissions(
+    'view_activity',
+    'send_texts',
+    'send_emails',
+    'manage_templates',
+    'manage_api_keys',
+    admin_override=True, any_=True
+)
+def view_template(service_id, template_id):
+    return render_template(
+        'views/templates/template.html',
+        template=Template(
+            service_api_client.get_service_template(service_id, template_id)['data'],
+            prefix=current_service['name']
+        )
+    )
 
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
@@ -48,7 +70,7 @@ def add_service_template(service_id, template_type):
     )
 
 
-@main.route("/services/<service_id>/templates/<template_id>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/<template_id>/edit", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
 def edit_service_template(service_id, template_id):

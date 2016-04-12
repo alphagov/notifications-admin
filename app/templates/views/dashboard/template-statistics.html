@@ -6,7 +6,7 @@
   field_headings=['Template', hidden_field_heading('Type'), right_aligned_field_heading('Messages sent')]
 ) %}
   {% call field() %}
-    <a href="{{ url_for('.edit_service_template', service_id=current_service.id, template_id=item.template.id) }}">
+    <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">
       {{ item.template.name }}
     </a>
   {% endcall %}
