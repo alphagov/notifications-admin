@@ -16,8 +16,9 @@
 
     {% if current_user.has_permissions(permissions=['manage_templates'], any_=True) %}
        <p class="bottom-gutter">
-         You need a template before you can send
-         {{ 'emails' if 'email' == template_type else 'text messages' }}
+         There are no
+         {{ 'email' if 'email' == template_type else 'text message' }}
+         templates
        </p>
       <a href="{{ url_for('.add_service_template', service_id=current_service.id, template_type=template_type) }}" class="button">Add a new template</a>
     {% else %}
