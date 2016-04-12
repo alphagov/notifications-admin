@@ -69,13 +69,14 @@ A JWT token contains, in encrypted format:
 
 Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
 
-See [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library for sample code to encode and decode JWT tokens.
-
-
 **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories.
 
+For examples of how to encode and decode JWT tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library.
+
+
+
 JWT tokens
------------------------------------------
+------------
 
 JWT tokens have a series of standard and application-specific claims.
 
@@ -97,7 +98,7 @@ GOV.UK Notify application-specific claims:
 }
 ```
 
-GOV.UK Notify API tokens sign the:
+The GOV.UK Notify API tokens sign the:
 * request being made
 * payload (for POST requests)
 
