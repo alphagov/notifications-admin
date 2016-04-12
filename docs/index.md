@@ -56,7 +56,7 @@ API integration
 ![Notfy](Notify.png)
 
 There are two ways to integrate the API into your service:
-* use a client library provided by Notify - there is currently 1 python library but more will be added in different languages
+* use a client library provided by GOV.UK Notify - there is currently a [python library](https://github.com/alphagov/notifications-python-client) but more will be added in different languages
 * develop your own integration to produce requests in the correct format
 
 GOV.UK.Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. JWT tokens are built into the GOV.UK Notify client library. If you don't use this library, you must manually create the token yourself. 
@@ -70,6 +70,16 @@ A JWT token contains, in encrypted format:
 Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
 
 **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories.
+
+API client libraries
+------------------
+
+GOV.UK Notify supports a python client library:
+
+[GOV.UK Notify Python client](https://github.com/alphagov/notifications-python-client)
+
+This provides example code for calling the API and for constructing the API tokens [are they not built in?].
+
 
 [Information below needs to be expanded]
 
@@ -93,7 +103,7 @@ GOV.UK Notify application-specific claims:
 }
 ```
 
-Notify API tokens sign both the request being made, and for POST requests, the payload.
+GOV.UK Notify API tokens sign both the request being made, and for POST requests, the payload.
 
 The signing algorithm is HMAC signature, using provided key SHA256 hashing algorithm.
 
@@ -145,7 +155,7 @@ POST /notifications/email
 ```
 
 where:
-* ‘to’ is the phone number (required)
+* 'to' is the phone number (required)
 * ‘template’ is the template ID to send (required)
 * ‘personalisation‘ (optional) specifies the replaceables [where do these come from, the csv file?]
 
@@ -233,6 +243,14 @@ This list is split into pages. To scroll through the pages run:
 ```
 GET /notifications?&page=2
 ```
+
+
+GOV.UK Notify API code
+
+Notify API code is open sourced at:
+
+[GOV.UK Notify API](https://github.com/alphagov/notifications-api) 
+
 
 
 
