@@ -45,8 +45,12 @@
         {{ item.status }}
       {% endcall %}
       {% call field() %}
-        {{ item.created_at | format_datetime}}
+        {{ item.created_at | format_datetime }}
       {% endcall %}
     {% endcall %}
+    <p class="table-show-more-link">
+      <a href="{{ request.url }}&download=csv">Download csv</a>
+    </p>
     {{ previous_next_navigation(prev_page, next_page) }}
+
 {% endblock %}

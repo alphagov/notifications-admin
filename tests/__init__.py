@@ -126,7 +126,10 @@ def notification_json(service_id,
     data = {
         'notifications': [{
             'to': to,
-            'template': {'id': template['id'], 'name': template['name']},
+            'template': {
+                'id': template['id'],
+                'name': template['name'],
+                'template_type': template['template_type']},
             'job': {'id': job['id'], 'original_file_name': job['original_file_name']},
             'sent_at': sent_at,
             'status': status,
