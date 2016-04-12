@@ -31,8 +31,8 @@ npm test
 display_result $? 2 "Front end code style check"
 
 ## Code coverage
-#py.test --cov=app tests/
-#display_result $? 3 "Code coverage"
+py.test --cov=app --cov-report=term-missing tests/
+display_result $? 3 "Code coverage"
 
 export NOTIFY_ADMIN_ENVIRONMENT='config.Test'
 py.test -v

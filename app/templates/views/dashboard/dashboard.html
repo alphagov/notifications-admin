@@ -8,10 +8,14 @@
 
     {% if not templates and current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
       {% include 'views/dashboard/get-started.html' %}
-    {% elif current_service.restricted %}
-      <div class="dashboard">
+    {% elif current_user.has_permissions([
+      'manage_templates', 'manage_api_keys', 'manage_users', 'manage_settings
+    '], any_=True, admin_override=True) %}
+      {% if current_service.restricted %}
         {% include 'views/dashboard/trial-mode-banner.html' %}
-      </div>
+      {% endif %}
+    {% else %}
+      {% include 'views/dashboard/no-permissions-banner.html' %}
     {% endif %}
 
       <div

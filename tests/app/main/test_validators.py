@@ -1,6 +1,6 @@
 import pytest
 from app.main.forms import RegisterUserForm
-from app.main.validators import ValidEmailDomainRegex
+from app.main.validators import ValidEmailDomainRegex, NoCommasInPlaceHolders
 from wtforms import ValidationError
 from unittest.mock import Mock
 
@@ -112,3 +112,11 @@ def test_invalid_list_of_white_list_email_domains(app_, email):
         email_domain_validators = ValidEmailDomainRegex()
         with pytest.raises(ValidationError):
             email_domain_validators(None, _gen_mock_field(email))
+
+
+def test_for_commas_in_placeholders(app_):
+    with app_.test_request_context():
+        with pytest.raises(ValidationError) as error:
+            NoCommasInPlaceHolders()(None, _gen_mock_field('Hello ((name,date))'))
+        assert str(error.value) == 'You can’t have commas in your fields'
+        NoCommasInPlaceHolders()(None, _gen_mock_field('Hello ((name))'))

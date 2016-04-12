@@ -31,8 +31,10 @@
         </tbody>
       </table>
     {% endif %}
-    <div class="email-message-body">
+    <div class="email-message-body" data-module="expand-collapse">
+      <div class="email-message-body-wrapper collapsed">
       {{ body|nl2br }}
+      </div>
     </div>
   </div>
 {% endmacro %}
