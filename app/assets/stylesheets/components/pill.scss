@@ -1,0 +1,41 @@
+.pill {
+
+  display: flex;
+
+  a, span {
+    display: block;
+    padding: 10px;  
+    flex-grow: 1;
+    text-align: center;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+  }
+
+  a {
+    background: $panel-colour;
+    color: $link-colour;
+    border: 1px solid $panel-colour;
+    position: relative;
+
+    &:hover {
+      color: $text-colour;
+    }
+
+    &:active,
+    &:focus {
+      z-index: 10;
+    }
+  }
+
+  span {
+    border: 1px solid $grey-1;
+    color: $text-colour;
+  }
+}

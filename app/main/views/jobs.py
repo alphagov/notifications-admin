@@ -7,7 +7,8 @@ from flask import (
     render_template,
     abort,
     jsonify,
-    request
+    request,
+    url_for
 )
 from flask_login import login_required
 from werkzeug.datastructures import MultiDict
@@ -150,7 +151,31 @@ def view_notifications(service_id):
         page=page,
         prev_page=prev_page,
         next_page=next_page,
-        request_args=request.args
+        request_args=request.args,
+        type_filters=[
+            [item[0], item[1], url_for(
+                '.view_notifications',
+                service_id=current_service['id'],
+                template_type=item[1],
+                status=request.args.get('status', '')
+            )] for item in [
+                ['Emails', 'email'],
+                ['Text messages', 'sms'],
+                ['Both', '']
+            ]
+        ],
+        status_filters=[
+            [item[0], item[1], url_for(
+                '.view_notifications',
+                service_id=current_service['id'],
+                template_type=request.args.get('template_type', ''),
+                status=item[1]
+            )] for item in [
+                ['Successful', 'sent,delivered'],
+                ['Failed', 'failed,complaint,bounce'],
+                ['Both', '']
+            ]
+        ]
     )
 
 
