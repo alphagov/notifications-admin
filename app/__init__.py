@@ -2,6 +2,7 @@ import os
 import re
 
 import dateutil
+import datetime
 import urllib
 from flask import (
     Flask,
@@ -20,6 +21,7 @@ from pygments import highlight
 from pygments.lexers import JavascriptLexer
 from pygments.formatters import HtmlFormatter
 from werkzeug.exceptions import abort
+from babel.dates import format_timedelta
 
 from app.notify_client.api_client import ServiceAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
@@ -100,6 +102,7 @@ def create_app():
     application.add_template_filter(valid_phone_number)
     application.add_template_filter(linkable_name)
     application.add_template_filter(format_date)
+    application.add_template_filter(format_delta)
 
     application.after_request(useful_headers_after_request)
     application.after_request(save_service_after_request)
@@ -183,6 +186,17 @@ def format_time(date):
 def format_date(date):
     date = dateutil.parser.parse(date)
     return date.strftime('%A %d %B %Y')
+
+
+def format_delta(date):
+    date = dateutil.parser.parse(date)
+    native = date.replace(tzinfo=None)
+    difference = native - datetime.datetime.now()
+    return format_timedelta(
+        datetime.timedelta(seconds=difference.total_seconds()),
+        add_direction=True,
+        format='short'
+    )
 
 
 def valid_phone_number(phone_number):
