@@ -5,7 +5,11 @@
 
     this.start = function(component) {
 
-      this.$component = $(component)
+      this.$component = $(component);
+
+      if (this.$component.height() < this.$component.data('max-height')) return;
+
+      this.$component      
         .append(`
           <div class='toggle' tabindex='0'>...<span class='visually-hidden'>show full email</span></div>
         `)
