@@ -63,6 +63,12 @@
     </div>
   </div>
 
+  {% if notifications %}
+    <p class="heading-small bottom-gutter">
+      <a href="{{ request.url }}&amp;download=csv" download>Download as a CSV file</a>
+    </p>
+  {% endif %}
+
   {% call(item, row_number) list_table(
     notifications,
     caption="Recent activity",
@@ -92,11 +98,8 @@
     {% call field(align='right') %}
       {{ item.created_at|format_delta }}
     {% endcall %}
-
   {% endcall %}
-  <p class="table-show-more-link">
-    <a href="{{ request.url }}&download=csv">Download csv</a>
-  </p>
+
   {{ previous_next_navigation(prev_page, next_page) }}
 
 {% endblock %}
