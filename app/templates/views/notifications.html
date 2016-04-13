@@ -20,6 +20,7 @@
       <a href="{{ url_for(".view_notifications", service_id=current_service.id, status=['delivered'], page=1) }}">Successful messages</a>&emsp;
       <a href="{{ url_for(".view_notifications", service_id=current_service.id, status=['failed'], page=1) }}">Failed messages</a>
     </p>
+
     {% call(item, row_number) list_table(
       notifications,
       caption="Recent activity",
@@ -31,7 +32,7 @@
         {{ item.to }}
       {% endcall %}
       {% call field() %}
-        <a href="{{ url_for(".choose_template", service_id=current_service.id, template_type=item.template.template_type, _anchor=item.template.name|linkable_name) }}">{{ item.template.name }}</a>
+        <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">{{ item.template.name }}</a>
       {% endcall %}
       {% call field() %}
         {{ item.template.template_type }}

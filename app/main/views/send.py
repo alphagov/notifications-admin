@@ -79,7 +79,7 @@ def choose_template(service_id, template_type):
         abort(404)
 
     return render_template(
-        'views/choose-template.html',
+        'views/templates/choose.html',
         templates=[
             Template(
                 template,
