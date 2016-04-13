@@ -119,7 +119,7 @@ def view_notifications(service_id):
         service_id=service_id,
         page=page,
         template_type=filter_args.getlist('template_type') if 'template_type' in filter_args else None,
-        status=filter_args.getlist('status') if 'status' in filter_args else None)
+        status=filter_args.getlist('status') if 'status' in filter_args else ['delivered', 'failed'])
     view_dict = MultiDict(request.args)
     prev_page = None
     if notifications['links'].get('prev', None):
@@ -157,7 +157,7 @@ def view_notifications(service_id):
                 '.view_notifications',
                 service_id=current_service['id'],
                 template_type=item[1],
-                status=request.args.get('status', '')
+                status=request.args.get('status', 'delivered,failed')
             )] for item in [
                 ['Emails', 'email'],
                 ['Text messages', 'sms'],
@@ -171,9 +171,9 @@ def view_notifications(service_id):
                 template_type=request.args.get('template_type', ''),
                 status=item[1]
             )] for item in [
-                ['Successful', 'sent,delivered'],
-                ['Failed', 'failed,complaint,bounce'],
-                ['Both', '']
+                ['Successful', 'delivered'],
+                ['Failed', 'failed'],
+                ['Both', 'delivered,failed']
             ]
         ]
     )
