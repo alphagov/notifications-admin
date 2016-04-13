@@ -108,7 +108,11 @@ gulp.task('watchForChanges', function() {
 });
 
 gulp.task('lint:sass', () => gulp
-  .src(paths.src + 'stylesheets/**/*.scss')
+  .src([
+    paths.src + 'stylesheets/*.scss',
+    paths.src + 'stylesheets/components/*.scss',
+    paths.src + 'stylesheets/views/*.scss',
+  ])
     .pipe(plugins.sassLint())
     .pipe(plugins.sassLint.format(stylish))
     .pipe(plugins.sassLint.failOnError())

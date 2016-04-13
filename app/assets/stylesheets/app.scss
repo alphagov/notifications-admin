@@ -121,7 +121,7 @@ td {
   margin-bottom: 5px;
 }
 
-a[rel="external"] {
+a[rel='external'] {
   @include external-link-default;
   @include external-link-16;
   @include media(tablet) {

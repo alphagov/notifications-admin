@@ -1,3 +1,5 @@
+$white-50-opaque: rgba($white, 0.5);
+
 .email-message {
 
   margin-bottom: $gutter;
@@ -76,9 +78,9 @@
       color: $white;
       border-style: solid;
       border-width: 3px;
-      border-colour: $white;
+      border-color: $white;
       border-radius: 6px;
-      box-shadow: 0 0 0 1px rgba($white, 0.5);
+      box-shadow: 0 0 0 1px $white-50-opaque;
 
       &:hover {
         background: $link-hover-colour;
