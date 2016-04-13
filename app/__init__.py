@@ -213,14 +213,14 @@ def load_user(user_id):
 
 
 def load_service_before_request():
-    service_id = request.view_args.get('service_id', None) if request.view_args else None
-    if service_id:
-        from flask.globals import _request_ctx_stack
-        if _request_ctx_stack.top is not None:
-            setattr(
-                _request_ctx_stack.top,
-                'service',
-                service_api_client.get_service(service_id)['data'])
+    service_id = request.view_args.get('service_id', session.get('service_id')) if request.view_args \
+        else session.get('service_id')
+    from flask.globals import _request_ctx_stack
+    if _request_ctx_stack.top is not None:
+        setattr(
+            _request_ctx_stack.top,
+            'service',
+            service_api_client.get_service(service_id)['data'] if service_id else None)
 
 
 def save_service_after_request(response):
