@@ -47,6 +47,7 @@ $white-50-opaque: rgba($white, 0.5);
     border-top: 1px solid $border-colour;
     border-bottom: 1px solid $border-colour;
     position: relative;
+    word-wrap: break-word;
 
     &-wrapper {
 
