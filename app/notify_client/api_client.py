@@ -18,14 +18,14 @@ class ServiceAPIClient(NotificationsAPIClient):
         self.client_id = application.config['ADMIN_CLIENT_USER_NAME']
         self.secret = application.config['ADMIN_CLIENT_SECRET']
 
-    def create_service(self, service_name, active, limit, restricted, user_id, email_from):
+    def create_service(self, service_name, active, message_limit, restricted, user_id, email_from):
         """
         Create a service and return the json.
         """
         data = {
             "name": service_name,
             "active": active,
-            "limit": limit,
+            "message_limit": message_limit,
             "user_id": user_id,
             "restricted": restricted,
             "email_from": email_from
@@ -56,7 +56,7 @@ class ServiceAPIClient(NotificationsAPIClient):
                        service_id,
                        service_name,
                        active,
-                       limit,
+                       message_limit,
                        restricted,
                        users,
                        email_from):
@@ -67,7 +67,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             "id": service_id,
             "name": service_name,
             "active": active,
-            "limit": limit,
+            "message_limit": message_limit,
             "restricted": restricted,
             "users": users,
             "email_from": email_from

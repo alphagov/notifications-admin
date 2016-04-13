@@ -1,6 +1,7 @@
 import pytest
-
+import re
 from io import BytesIO
+from bs4 import BeautifulSoup
 from flask import url_for
 from unittest.mock import ANY
 from tests import validate_route_permission
@@ -17,7 +18,8 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     mock_get_service_template,
     mock_s3_upload,
     mock_has_permissions,
-    mock_get_users_by_service
+    mock_get_users_by_service,
+    fake_uuid
 ):
 
     contents = u'phone number,name\n+44 123,test1\n+44 456,test2'
@@ -27,13 +29,13 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         with app_.test_client() as client:
             client.login(api_user_active)
             initial_upload = client.post(
-                url_for('main.send_messages', service_id=12345, template_id=54321),
+                url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
                 data={'file': (BytesIO(contents.encode('utf-8')), 'invalid.csv')},
                 content_type='multipart/form-data',
                 follow_redirects=True
             )
             reupload = client.post(
-                url_for('main.check_messages', service_id=12345, template_type='sms', upload_id='abc123'),
+                url_for('main.check_messages', service_id=fake_uuid, template_type='sms', upload_id='abc123'),
                 data={'file': (BytesIO(contents.encode('utf-8')), 'invalid.csv')},
                 content_type='multipart/form-data',
                 follow_redirects=True
@@ -57,7 +59,8 @@ def test_send_test_sms_message_to_self(
     mock_get_service_template,
     mock_s3_upload,
     mock_has_permissions,
-    mock_get_users_by_service
+    mock_get_users_by_service,
+    fake_uuid
 ):
 
     expected_data = {'data': 'phone number\r\n07700 900 762\r\n', 'file_name': 'Test run'}
@@ -67,11 +70,11 @@ def test_send_test_sms_message_to_self(
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.get(
-                url_for('main.send_message_to_self', service_id=12345, template_id=54321),
+                url_for('main.send_message_to_self', service_id=fake_uuid, template_id=fake_uuid),
                 follow_redirects=True
             )
         assert response.status_code == 200
-        mock_s3_upload.assert_called_with(ANY, '12345', expected_data, 'eu-west-1')
+        mock_s3_upload.assert_called_with(ANY, fake_uuid, expected_data, 'eu-west-1')
 
 
 def test_send_test_email_message_to_self(
@@ -83,7 +86,8 @@ def test_send_test_email_message_to_self(
     mock_get_service_email_template,
     mock_s3_upload,
     mock_has_permissions,
-    mock_get_users_by_service
+    mock_get_users_by_service,
+    fake_uuid
 ):
 
     expected_data = {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'Test run'}
@@ -93,11 +97,11 @@ def test_send_test_email_message_to_self(
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.get(
-                url_for('main.send_message_to_self', service_id=12345, template_id=54321),
+                url_for('main.send_message_to_self', service_id=fake_uuid, template_id=fake_uuid),
                 follow_redirects=True
             )
         assert response.status_code == 200
-        mock_s3_upload.assert_called_with(ANY, '12345', expected_data, 'eu-west-1')
+        mock_s3_upload.assert_called_with(ANY, fake_uuid, expected_data, 'eu-west-1')
 
 
 def test_send_test_message_from_api_page(
@@ -108,13 +112,14 @@ def test_send_test_message_from_api_page(
     mock_get_service,
     mock_get_service_email_template,
     mock_s3_upload,
-    mock_has_permissions
+    mock_has_permissions,
+    fake_uuid
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.get(
-                url_for('main.send_from_api', service_id=12345, template_id=54321),
+                url_for('main.send_from_api', service_id=fake_uuid, template_id=fake_uuid),
                 follow_redirects=True
             )
         assert response.status_code == 200
@@ -128,14 +133,15 @@ def test_download_example_csv(
     mock_login,
     mock_get_service,
     mock_get_service_template,
-    mock_has_permissions
+    mock_has_permissions,
+    fake_uuid
 ):
 
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.get(
-                url_for('main.get_example_csv', service_id=12345, template_id=54321),
+                url_for('main.get_example_csv', service_id=fake_uuid, template_id=fake_uuid),
                 follow_redirects=True
             )
         assert response.status_code == 200
@@ -152,7 +158,8 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_get_service_template,
     mock_s3_upload,
     mock_has_permissions,
-    mock_get_users_by_service
+    mock_get_users_by_service,
+    fake_uuid
 ):
 
     mocker.patch(
@@ -166,13 +173,13 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.post(
-                url_for('main.send_messages', service_id=12345, template_id=54321),
+                url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
                 data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
                 content_type='multipart/form-data',
                 follow_redirects=True
             )
             with client.session_transaction() as sess:
-                assert int(sess['upload_data']['template_id']) == 54321
+                assert sess['upload_data']['template_id'] == fake_uuid
                 assert sess['upload_data']['original_file_name'] == 'valid.csv'
                 assert sess['upload_data']['notification_count'] == 53
 
@@ -272,7 +279,8 @@ def test_route_permissions(mocker,
                            mock_get_jobs,
                            mock_get_notifications,
                            mock_create_job,
-                           mock_s3_upload):
+                           mock_s3_upload,
+                           fake_uuid):
     routes = [
         'main.choose_template',
         'main.send_messages',
@@ -288,7 +296,7 @@ def test_route_permissions(mocker,
                     route,
                     service_id=service_one['id'],
                     template_type='sms',
-                    template_id=123),
+                    template_id=fake_uuid),
                 ['send_texts', 'send_emails', 'send_letters'],
                 api_user_active,
                 service_one)
@@ -303,7 +311,7 @@ def test_route_permissions(mocker,
                 'main.send_message_to_self',
                 service_id=service_one['id'],
                 template_type='sms',
-                template_id=123),
+                template_id=fake_uuid),
             ['send_texts', 'send_emails', 'send_letters'],
             api_user_active,
             service_one)
@@ -317,7 +325,8 @@ def test_route_invalid_permissions(mocker,
                                    mock_get_service_templates,
                                    mock_get_jobs,
                                    mock_get_notifications,
-                                   mock_create_job):
+                                   mock_create_job,
+                                   fake_uuid):
     routes = [
         'main.choose_template',
         'main.send_messages',
@@ -334,7 +343,7 @@ def test_route_invalid_permissions(mocker,
                     route,
                     service_id=service_one['id'],
                     template_type='sms',
-                    template_id=123),
+                    template_id=fake_uuid),
                 ['blah'],
                 api_user_active,
                 service_one)
@@ -388,7 +397,11 @@ def test_route_choose_template_send_messages_permissions(mocker,
                                                          mock_get_service_templates,
                                                          mock_get_jobs):
     with app_.test_request_context():
-        template_id = mock_get_service_templates(service_one['id'])['data'][0]['id']
+        template_id = None
+        for temp in mock_get_service_templates(service_one['id'])['data']:
+            if temp['template_type'] == 'sms':
+                template_id = temp['id']
+        assert template_id
         resp = validate_route_permission(
             mocker,
             app_,
@@ -426,7 +439,11 @@ def test_route_choose_template_manage_api_keys_permissions(mocker,
                                                            mock_get_service_templates,
                                                            mock_get_jobs):
     with app_.test_request_context():
-        template_id = mock_get_service_templates(service_one['id'])['data'][0]['id']
+        template_id = None
+        for temp in mock_get_service_templates(service_one['id'])['data']:
+            if temp['template_type'] == 'sms':
+                template_id = temp['id']
+        assert template_id
         resp = validate_route_permission(
             mocker,
             app_,
@@ -441,10 +458,6 @@ def test_route_choose_template_manage_api_keys_permissions(mocker,
             service_one)
         page = resp.get_data(as_text=True)
         assert url_for(
-            "main.send_messages",
-            service_id=service_one['id'],
-            template_id=template_id) in page
-        assert url_for(
             "main.send_message_to_self",
             service_id=service_one['id'],
             template_id=template_id) not in page
@@ -452,3 +465,9 @@ def test_route_choose_template_manage_api_keys_permissions(mocker,
             "main.edit_service_template",
             service_id=service_one['id'],
             template_id=template_id) not in page
+        page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
+        links = page.findAll('a', href=re.compile('^' + url_for(
+            "main.send_from_api",
+            service_id=service_one['id'],
+            template_id=template_id)))
+        assert len(links) == 1

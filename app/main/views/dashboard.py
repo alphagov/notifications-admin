@@ -77,11 +77,11 @@ def add_rates_to(delivery_statistics):
 
     latest_stats.update({
         'emails_failure_rate': (
-            "{0:.1f}".format((float(today['emails_error']) / today['emails_requested'] * 100))
+            "{0:.1f}".format((float(today['emails_failed']) / today['emails_requested'] * 100))
             if today and today['emails_requested'] else 0
         ),
         'sms_failure_rate': (
-            "{0:.1f}".format((float(today['sms_error']) / today['sms_requested'] * 100))
+            "{0:.1f}".format((float(today['sms_failed']) / today['sms_requested'] * 100))
             if today and today['sms_requested'] else 0
         )
     })
