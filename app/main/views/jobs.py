@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import itertools
 
 from flask import (
     render_template,
@@ -26,14 +27,18 @@ from app.utils import (
 
 
 def _parse_filter_args(filter_dict):
+
     if not isinstance(filter_dict, MultiDict):
         filter_dict = MultiDict(filter_dict)
-    out_dict = MultiDict()
-    if 'type' in filter_dict:
-        out_dict.setlist('template_type', filter_dict.getlist('type'))
-    if 'status' in filter_dict:
-        out_dict.setlist('status', filter_dict.getlist('status'))
-    return out_dict
+
+    return MultiDict(
+        (
+            key,
+            (','.join(filter_dict.getlist(key))).split(',')
+        )
+        for key in filter_dict.keys()
+        if ''.join(filter_dict.getlist(key))
+    )
 
 
 @main.route("/services/<service_id>/jobs")
@@ -144,7 +149,8 @@ def view_notifications(service_id):
         notifications=notifications['notifications'],
         page=page,
         prev_page=prev_page,
-        next_page=next_page
+        next_page=next_page,
+        request_args=request.args
     )
 
 
