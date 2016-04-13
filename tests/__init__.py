@@ -1,4 +1,6 @@
 import pytest
+import uuid
+import datetime
 from flask.testing import FlaskClient
 from flask import url_for
 from flask_login import login_user
@@ -23,19 +25,27 @@ class TestClient(FlaskClient):
         self.get(url_for("main.logout"))
 
 
-def service_json(id_, name, users, limit=1000, active=False, restricted=True, email_from=None):
+def sample_uuid():
+    return "6ce466d0-fd6a-11e5-82f5-e0accb9d11a6"
+
+
+def generate_uuid():
+    return uuid.uuid4()
+
+
+def service_json(id_, name, users, message_limit=1000, active=False, restricted=True, email_from=None):
     return {
         'id': id_,
         'name': name,
         'users': users,
-        'limit': limit,
+        'message_limit': message_limit,
         'active': active,
         'restricted': restricted,
         'email_from': email_from
     }
 
 
-def template_json(service_id, id_=1, name="sample template", type_="sms", content="template content"):
+def template_json(service_id, id_, name="sample template", type_="sms", content="template content"):
     return {
         'id': id_,
         'name': name,
@@ -52,8 +62,8 @@ def api_key_json(id_, name, expiry_date=None):
             }
 
 
-def invite_json(id, from_user, service_id, email_address, permissions, created_at, status):
-    return {'id': id,
+def invite_json(id_, from_user, service_id, email_address, permissions, created_at, status):
+    return {'id': id_,
             'from_user': from_user,
             'service': service_id,
             'email_address': email_address,
@@ -81,13 +91,10 @@ def create_test_api_user(state, permissions={}):
 
 
 def job_json():
-    import uuid
-    import datetime
-    uuid.uuid4()
-    job_id = str(uuid.uuid4())
+    job_id = str(generate_uuid())
     created_at = str(datetime.datetime.now().time())
     data = {
-        'id': str(job_id),
+        'id': job_id,
         'service': 1,
         'template': 1,
         'original_file_name': 'thisisatest.csv',
@@ -107,11 +114,10 @@ def notification_json(service_id,
                       sent_at=None,
                       created_at=None,
                       with_links=False):
-    import datetime
     if job is None:
         job = job_json()
     if template is None:
-        template = template_json(service_id)
+        template = template_json(service_id, str(generate_uuid()))
     if sent_at is None:
         sent_at = str(datetime.datetime.now().time())
     if created_at is None:
@@ -126,7 +132,10 @@ def notification_json(service_id,
     data = {
         'notifications': [{
             'to': to,
-            'template': {'id': template['id'], 'name': template['name']},
+            'template': {
+                'id': template['id'],
+                'name': template['name'],
+                'template_type': template['template_type']},
             'job': {'id': job['id'], 'original_file_name': job['original_file_name']},
             'sent_at': sent_at,
             'status': status,

@@ -39,7 +39,7 @@ def create_api_key(service_id):
     )
 
 
-@main.route("/services/<service_id>/api-keys/revoke/<int:key_id>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/api-keys/revoke/<key_id>", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_api_keys')
 def revoke_api_key(service_id, key_id):

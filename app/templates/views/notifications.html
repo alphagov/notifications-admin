@@ -17,8 +17,8 @@
       <a href="{{ url_for(".view_notifications", service_id=current_service.id, type="email", page=1) }}">Email messages</a>
     </p>
     <p>
-      <a href="{{ url_for(".view_notifications", service_id=current_service.id, status=['sent', 'delivered'], page=1) }}">Successful messages</a>&emsp;
-      <a href="{{ url_for(".view_notifications", service_id=current_service.id, status=['failed', 'complaint', 'bounce'], page=1) }}">Failed messages</a>
+      <a href="{{ url_for(".view_notifications", service_id=current_service.id, status=['delivered'], page=1) }}">Successful messages</a>&emsp;
+      <a href="{{ url_for(".view_notifications", service_id=current_service.id, status=['failed'], page=1) }}">Failed messages</a>
     </p>
     {% call(item, row_number) list_table(
       notifications,
@@ -45,8 +45,12 @@
         {{ item.status }}
       {% endcall %}
       {% call field() %}
-        {{ item.created_at | format_datetime}}
+        {{ item.created_at | format_datetime }}
       {% endcall %}
     {% endcall %}
+    <p class="table-show-more-link">
+      <a href="{{ request.url }}&download=csv">Download csv</a>
+    </p>
     {{ previous_next_navigation(prev_page, next_page) }}
+
 {% endblock %}

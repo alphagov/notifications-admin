@@ -26,7 +26,7 @@
     {{ api_key(secret, key_name) }}
 
     {{ page_footer(
-      secondary_link=url_for('.api_keys', service_id=service_id),
+      secondary_link=url_for('.api_keys', service_id=current_service.id),
       secondary_link_text='Back to API keys'
     ) }}
 
