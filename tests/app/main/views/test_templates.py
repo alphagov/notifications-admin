@@ -12,12 +12,13 @@ def test_should_show_page_for_one_templates(app_,
                                             mock_get_service_template,
                                             mock_get_user,
                                             mock_get_user_by_email,
-                                            mock_has_permissions):
+                                            mock_has_permissions,
+                                            fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = str(uuid.uuid4())
-            template_id = 456
+            service_id = fake_uuid
+            template_id = fake_uuid
             response = client.get(url_for(
                 '.edit_service_template',
                 service_id=service_id,
@@ -38,12 +39,13 @@ def test_should_redirect_when_saving_a_template(app_,
                                                 mock_get_user,
                                                 mock_get_service,
                                                 mock_get_user_by_email,
-                                                mock_has_permissions):
+                                                mock_has_permissions,
+                                                fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = str(uuid.uuid4())
-            template_id = 456
+            service_id = fake_uuid
+            template_id = fake_uuid
             name = "new name"
             content = "template content"
             data = {
@@ -72,12 +74,13 @@ def test_should_show_delete_template_page(app_,
                                           mock_get_service_template,
                                           mock_get_user,
                                           mock_get_user_by_email,
-                                          mock_has_permissions):
+                                          mock_has_permissions,
+                                          fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = str(uuid.uuid4())
-            template_id = 456
+            service_id = fake_uuid
+            template_id = fake_uuid
             response = client.get(url_for(
                 '.delete_service_template',
                 service_id=service_id,
@@ -100,17 +103,18 @@ def test_should_redirect_when_deleting_a_template(app_,
                                                   mock_delete_service_template,
                                                   mock_get_user,
                                                   mock_get_user_by_email,
-                                                  mock_has_permissions):
+                                                  mock_has_permissions,
+                                                  fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = str(uuid.uuid4())
-            template_id = 456
+            service_id = fake_uuid
+            template_id = fake_uuid
             name = "new name"
             type_ = "sms"
             content = "template content"
             data = {
-                'id': template_id,
+                'id': str(template_id),
                 'name': name,
                 'template_type': type_,
                 'content': content,
@@ -136,7 +140,8 @@ def test_route_permissions(mocker,
                            app_,
                            api_user_active,
                            service_one,
-                           mock_get_service_template):
+                           mock_get_service_template,
+                           fake_uuid):
     routes = [
         'main.add_service_template',
         'main.edit_service_template',
@@ -152,7 +157,7 @@ def test_route_permissions(mocker,
                     route,
                     service_id=service_one['id'],
                     template_type='sms',
-                    template_id=123),
+                    template_id=fake_uuid),
                 ['manage_templates'],
                 api_user_active,
                 service_one)
@@ -183,7 +188,8 @@ def test_route_invalid_permissions(mocker,
                                    app_,
                                    api_user_active,
                                    service_one,
-                                   mock_get_service_template):
+                                   mock_get_service_template,
+                                   fake_uuid):
     routes = [
         'main.add_service_template',
         'main.edit_service_template',
@@ -199,7 +205,7 @@ def test_route_invalid_permissions(mocker,
                     route,
                     service_id=service_one['id'],
                     template_type='sms',
-                    template_id=123),
+                    template_id=fake_uuid),
                 ['view_activity'],
                 api_user_active,
                 service_one)

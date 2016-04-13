@@ -61,7 +61,7 @@ def service_name_change_confirm(service_id):
                 current_service['id'],
                 current_service['name'],
                 current_service['active'],
-                current_service['limit'],
+                current_service['message_limit'],
                 current_service['restricted'],
                 current_service['users'],
                 current_service['email_from'])
@@ -123,7 +123,7 @@ def service_status_change_confirm(service_id):
             current_service['id'],
             current_service['name'],
             current_service['active'],
-            current_service['limit'],
+            current_service['message_limit'],
             current_service['restricted'],
             current_service['users'],
             current_service['email_from'])

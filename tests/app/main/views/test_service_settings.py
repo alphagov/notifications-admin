@@ -114,7 +114,7 @@ def test_should_redirect_after_service_name_confirmation(app_,
         mock_update_service.assert_called_once_with(service_id,
                                                     service_new_name,
                                                     service_one['active'],
-                                                    service_one['limit'],
+                                                    service_one['message_limit'],
                                                     service_one['restricted'],
                                                     service_one['users'],
                                                     email_safe(service_new_name))

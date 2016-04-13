@@ -8,7 +8,7 @@
     {{ big_number_with_status(
       statistics.get('emails_requested', 0),
       'email' if statistics.get('emails_requested') == 1 else 'emails',
-      statistics.get('emails_error'),
+      statistics.get('emails_failed'),
       statistics.get('emails_failure_rate', 0.0),
       statistics.get('emails_failure_rate', 0)|float > 3
     ) }}
@@ -17,7 +17,7 @@
     {{ big_number_with_status(
       statistics.get('sms_requested', 0),
       'text message' if statistics.get('sms_requested') == 1 else 'text messages',
-      statistics.get('sms_error'),
+      statistics.get('sms_failed'),
       statistics.get('sms_failure_rate', 0.0),
       statistics.get('sms_failure_rate', 0)|float > 3
     ) }}

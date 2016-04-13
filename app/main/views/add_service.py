@@ -38,7 +38,7 @@ def add_service():
         email_from = email_safe(form.name.data)
         service_id = service_api_client.create_service(service_name=form.name.data,
                                                        active=False,
-                                                       limit=current_app.config['DEFAULT_SERVICE_LIMIT'],
+                                                       message_limit=current_app.config['DEFAULT_SERVICE_LIMIT'],
                                                        restricted=True,
                                                        user_id=session['user_id'],
                                                        email_from=email_from)
