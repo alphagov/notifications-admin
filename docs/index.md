@@ -73,7 +73,7 @@ Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web applicati
 
 **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories.
 
-JWT tokens claims
+JWT tokens: claims
 ------------------
 
 JWT tokens have a series of standard and application-specific claims.
