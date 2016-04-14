@@ -21,7 +21,7 @@ from pygments import highlight
 from pygments.lexers import JavascriptLexer
 from pygments.formatters import HtmlFormatter
 from werkzeug.exceptions import abort
-from babel.dates import format_timedelta
+import humanize
 
 from app.notify_client.api_client import ServiceAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
@@ -191,11 +191,9 @@ def format_date(date):
 def format_delta(date):
     date = dateutil.parser.parse(date)
     native = date.replace(tzinfo=None)
-    difference = native - datetime.datetime.now()
-    return format_timedelta(
-        datetime.timedelta(seconds=difference.total_seconds()),
-        add_direction=True,
-        format='short'
+    difference = datetime.datetime.now() - native
+    return humanize.naturaltime(
+        datetime.timedelta(seconds=difference.total_seconds())
     )
 
 
