@@ -45,14 +45,22 @@ def service_json(id_, name, users, message_limit=1000, active=False, restricted=
     }
 
 
-def template_json(service_id, id_, name="sample template", type_="sms", content="template content"):
-    return {
+def template_json(service_id,
+                  id_,
+                  name="sample template",
+                  type_="sms",
+                  content="template content",
+                  subject=None):
+    template = {
         'id': id_,
         'name': name,
         'template_type': type_,
         'content': content,
         'service': service_id
     }
+    if subject is not None:
+        template['subject'] = subject
+    return template
 
 
 def api_key_json(id_, name, expiry_date=None):

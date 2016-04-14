@@ -180,7 +180,11 @@ def mock_get_service_template(mocker):
 def mock_get_service_email_template(mocker):
     def _create(service_id, template_id):
         template = template_json(
-            service_id, template_id, "Two week reminder", "email", "Your vehicle tax is about to expire")
+            service_id,
+            template_id,
+            "Two week reminder",
+            "email",
+            "Your vehicle tax is about to expire", "Subject")
         return {'data': template}
 
     return mocker.patch(
