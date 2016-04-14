@@ -93,10 +93,10 @@
       </p>
     {% endcall %}
 
-    {{ text_field(item.status|title) }}
+    {{ text_field(item.status|capitalize) }}
 
     {% call field(align='right') %}
-      {{ item.created_at|format_delta }}
+      {{ item.created_at|format_delta|capitalize }}
     {% endcall %}
   {% endcall %}
 
