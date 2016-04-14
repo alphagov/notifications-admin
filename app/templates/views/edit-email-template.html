@@ -19,7 +19,7 @@
           {{ textbox(form.subject, width='1-1') }}
         </div>
         <div class="column-two-thirds">
-          {{ textbox(form.template_content, highlight_tags=True, width='1-1') }}
+          {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=8) }}
           {{ page_footer(
             'Save',
             delete_link=url_for('.delete_service_template', service_id=current_service.id, template_id=template_id) if template_id or None,

@@ -8,7 +8,8 @@
   width='2-3',
   suffix=None,
   disabled=False,
-  safe_error_message=False
+  safe_error_message=False,
+  rows=8
 ) %}
   <div class="form-group{% if field.errors %} error{% endif %}" {% if autofocus %}data-module="autofocus"{% endif %}>
     <label class="form-label" for="{{ field.name }}">
@@ -34,11 +35,10 @@
       {% else %}
         {{ field(**{
           'class': 'form-control form-control-{} textbox-highlight-textbox'.format(width) if highlight_tags else 'form-control form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else ''),
-          'data-module': 'highlight-tags' if highlight_tags else ''
+          'data-module': 'highlight-tags' if highlight_tags else '',
+          'rows': rows|string
         }) }}
       {% endif %}
-
-
     {% if suffix %}
       <span>{{ suffix }}</span>
     {% endif %}
