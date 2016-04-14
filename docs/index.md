@@ -61,8 +61,12 @@ API integration
 ![Notfy](Notify.png)
 
 There are two ways to integrate the API into your service:
-* use a client library provided by GOV.UK Notify - there is currently a [python library](https://github.com/alphagov/notifications-python-client) and more will be added in different languages
+* use one of the client libraries provided by GOV.UK Notify:
+  * [python library](https://github.com/alphagov/notifications-python-client) 
+  * [PHP library] (https://github.com/alphagov/notifications-php-client)
+  * [Java library] (https://github.com/alphagov/notifications-java-client)
 * develop your own integration to produce requests in the correct format
+
 
 GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/) for authentication and identification. The GOV.UK Notify client library encodes and decodes JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don't use this library, you must manually create tokens yourself. 
 
@@ -86,11 +90,10 @@ JSON Web Tokens have a series of standard and application-specific claims.
 JSON Web Token standard claims:
 ```
 {
-  "typ": "JWT",
-  "alg": "HS256"
+  "alg": "HS256",
+  "typ": "JWT"
 }
 ```
-[on the JWT website `type` and `alg` are the other way round. Does it matter?]
 
 GOV.UK Notify application-specific claims:
 ```
@@ -167,11 +170,12 @@ POST /notifications/email
 where:
 * `to` is the phone number (required)
 * `template` is the template ID to send (required)
+ 
+ **Note:** Access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application: go to **Text message templates**, click on **Edit template** and recover the template id from the url eg `/templates/<templateID>/edit` 
+
 * `personalisation` (optional) specifies the values for the placeholders in your templates
 
 You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart)
-
-[is the above correct?]
 
 <a id="coderesponse"></a>
 The response will be:
@@ -185,7 +189,7 @@ The response will be:
 }
 ```
 
-where `id` is [???]
+where `id` is the unique identifier for the notification - you will use this id to retrieve the status of a notification.
 
 To retrieve the status of a single text or email notification:
 ```
@@ -211,12 +215,11 @@ GET /notifications/{id}
 ```
 where:
 * `status` is the the status of the notification; this can be `sending`, `delivered`, or `failed` 
-* `created_at` is [???]
 * `template_type` is `sms` or `email`
-* `sent_at` is [???]
-* `job_id` is the unique identifier for the process of sending and retreiving the notification
+* `sent_at` is the full timestamp, in UTC, at which the notification was sent
+* `job_id` is the unique identifier for the process of sending and retreiving one or more notifications
 * `message` is the content of message
-* `sender` may be the provider [Do we want to say who is sending it?]
+* `sender` may be the provider
 
 The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse)  indicated above.
 
