@@ -75,7 +75,7 @@ def test_verify_email_redirects_to_verify_if_token_valid(app_,
                                                          mock_check_verify_code):
     import json
     token_data = {"user_id": api_user_pending.id, "secret_code": 12345}
-    mocker.patch('utils.url_safe_token.check_token', return_value=json.dumps(token_data))
+    mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -93,7 +93,7 @@ def test_verify_email_redirects_to_email_sent_if_token_expired(app_,
                                                                api_user_pending,
                                                                mock_check_verify_code):
     from itsdangerous import SignatureExpired
-    mocker.patch('utils.url_safe_token.check_token', side_effect=SignatureExpired('expired'))
+    mocker.patch('app.main.views.verify.check_token', side_effect=SignatureExpired('expired'))
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -113,7 +113,7 @@ def test_verify_email_redirects_to_email_sent_if_token_used(app_,
                                                             mock_send_verify_code,
                                                             mock_check_verify_code_code_expired):
     from itsdangerous import SignatureExpired
-    mocker.patch('utils.url_safe_token.check_token', side_effect=SignatureExpired('expired'))
+    mocker.patch('app.main.views.verify.check_token', side_effect=SignatureExpired('expired'))
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -134,7 +134,7 @@ def test_verify_email_redirects_to_sign_in_if_user_active(app_,
                                                           mock_check_verify_code):
     import json
     token_data = {"user_id": api_user_active.id, "secret_code": 12345}
-    mocker.patch('utils.url_safe_token.check_token', return_value=json.dumps(token_data))
+    mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
 
     with app_.test_request_context():
         with app_.test_client() as client:

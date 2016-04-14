@@ -93,12 +93,12 @@ def test_should_show_recent_templates_on_dashboard(app_,
         first_row = page.tbody.find_all('tr')[0]
         table_data = first_row.find_all('td')
         assert len(table_data) == 3
-        assert table_data[2].text.strip() == '13'
+        assert table_data[2].text.strip() == '206'
 
         second_row = page.tbody.find_all('tr')[1]
         table_data = second_row.find_all('td')
         assert len(table_data) == 3
-        assert table_data[2].text.strip() == '206'
+        assert table_data[2].text.strip() == '13'
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):
@@ -277,7 +277,7 @@ def test_aggregate_template_stats():
 
     assert len(expected) == 2
     for item in expected:
-        if item['template']['id'] == 1:
+        if item['template'].id == 1:
             assert item['usage_count'] == 13
-        elif item['template']['id'] == 2:
+        elif item['template'].id == 2:
             assert item['usage_count'] == 206

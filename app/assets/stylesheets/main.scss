@@ -47,7 +47,8 @@ $path: '/static/images/';
 @import 'components/browse-list';
 @import 'components/email-message';
 @import 'components/api-key';
-@import 'components/previous-next-navigation';
+@import 'components/vendor/previous-next-navigation';
+@import 'components/pill';
 
 @import 'views/job';
 @import 'views/edit-template';

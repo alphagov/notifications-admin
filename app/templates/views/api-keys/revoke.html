@@ -28,7 +28,7 @@
     <form method="post">
       {{ page_footer(
         'Revoke this API key',
-        back_link=url_for('.api_keys', service_id=service_id),
+        back_link=url_for('.api_keys', service_id=current_service.id),
         back_link_text='Back to API keys',
         destructive=True
       ) }}

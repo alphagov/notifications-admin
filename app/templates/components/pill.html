@@ -1,0 +1,16 @@
+{% macro pill(
+  title,
+  items=[],
+  current_value=None
+) %}
+  <nav role='navigation' class='pill' aria-labelledby="pill_{{title}}">
+    <h2 id="pill_{{title}}" class="visuallyhidden">{{title}}</h2>
+    {% for label, option, link in items %}
+      {% if current_value == option %}
+        <span aria-hidden="true">{{ label }}</span>
+      {% else %}
+        <a href="{{ link }}">{{ label }}</a>
+      {% endif %}
+    {% endfor %}
+  </nav>
+{% endmacro %}

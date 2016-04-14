@@ -11,7 +11,7 @@ from app import user_api_client
 
 @main.route('/new-password/<path:token>', methods=['GET', 'POST'])
 def new_password(token):
-    from utils.url_safe_token import check_token
+    from notifications_utils.url_safe_token import check_token
     try:
         token_data = check_token(token, current_app.config['SECRET_KEY'], current_app.config['DANGEROUS_SALT'],
                                  current_app.config['TOKEN_MAX_AGE_SECONDS'])

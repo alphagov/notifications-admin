@@ -46,7 +46,7 @@
 
   {% if 'email' == template.template_type %}
     {{ email_message(
-      template.subject,
+      template.formatted_subject_as_markup,
       template.formatted_as_markup if errors else template.replaced,
       from_address='{}@notifications.service.gov.uk'.format(current_service.email_from),
       from_name=current_service.name
