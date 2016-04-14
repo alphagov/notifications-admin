@@ -16,7 +16,7 @@
       <div class="grid-row">
         <div class="column-two-thirds">
           {{ textbox(form.name, width='1-1', hint='Your recipients won’t see this', rows=10) }}
-          {{ textbox(form.subject, width='1-1', rows=2) }}
+          {{ textbox(form.subject, width='1-1', highlight_tags=True, rows=2) }}
         </div>
         <div class="column-two-thirds">
           {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=8) }}
