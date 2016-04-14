@@ -34,9 +34,9 @@ To get started:
 
 3. Add a template so you can send sms and email notifications. You can personalise the template using double brackets for variables. For example:
 
-  Dear ((name))
+  Dear ((name)),
 
-  Your ((item)) will expire on ((date)).
+  Your ((item)) is due for renewal on ((date)).
 
 4. Upload a csv file containing a header row matching the variables in your template, and data rows with values to use for the variables.
 5. Send an sms or email notification.
@@ -59,13 +59,13 @@ There are two ways to integrate the API into your service:
 * use a client library provided by GOV.UK Notify - there is currently a [python library](https://github.com/alphagov/notifications-python-client) and more will be added in different languages
 * develop your own integration to produce requests in the correct format
 
-GOV.UK Notify uses [JWT tokens](https://jwt.io/) for authentication and identification. The GOV.UK Notify client library encodes and decodes JWT tokens when making requests to the GOV.UK Notify API.  If you don't use this library, you must manually create tokens yourself. 
+GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/) for authentication and identification. The GOV.UK Notify client library encodes and decodes JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don't use this library, you must manually create tokens yourself. 
 
-For examples of how to encode and decode JWT tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library.
+For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library.
 
-A JWT token contains, in encrypted format:
+A JSON Web Token contains, in encrypted format:
 * your service ID - identifies your service
-* your API key (in JWT token terms this is called the client ID) - used to sign tokens during requests for API resources
+* your API key (in JSON Web Token terms this is called the client ID) - used to sign tokens during requests for API resources
 * an indication of what you're trying to do - GET, POST, etc.
 * the endpoint you're trying to access
 
@@ -73,12 +73,12 @@ Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web applicati
 
 **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories.
 
-JWT tokens: claims
+JSON Web Tokens: claims
 ------------------
 
-JWT tokens have a series of standard and application-specific claims.
+JSON Web Tokens have a series of standard and application-specific claims.
 
-JWT standard claims:
+JSON Web Token standard claims:
 ```
 {
   "typ": "JWT",
@@ -117,8 +117,6 @@ GOV.UK Notify supports a python client library:
 [GOV.UK Notify Python client](https://github.com/alphagov/notifications-python-client)
 
 This provides example code for calling the API and for constructing the API tokens.
-
-
 
 
 API endpoints
@@ -177,6 +175,8 @@ The response will be:
 }
 ```
 
+where `id` is [???]
+
 To retrieve the status of a single text or email notification:
 ```
 GET /notifications/{id}
@@ -200,8 +200,10 @@ GET /notifications/{id}
 }
 ```
 where:
-* `status` is the the status of the notification; this can be `sending`, `delivered`, `failed` 
+* `status` is the the status of the notification; this can be `sending`, `delivered`, or `failed` 
+* `created_at` is [???]
 * `template_type` is `sms` or `email`
+* `sent_at` is [???]
 * `job_id` is the unique identifier for the process of sending and retreiving the notification
 * `message` is the content of message
 * `sender` may be the provider [Do we want to say who is sending it?]
