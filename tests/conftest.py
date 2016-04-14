@@ -205,9 +205,9 @@ def mock_create_service_template(mocker, fake_uuid):
 
 @pytest.fixture(scope='function')
 def mock_update_service_template(mocker):
-    def _update(id_, name, type_, content, service):
+    def _update(id_, name, type_, content, service, subject=None):
         template = template_json(
-            service, id_, name, type_, content)
+            service, id_, name, type_, content, subject)
         return {'data': template}
 
     return mocker.patch(

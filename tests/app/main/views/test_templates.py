@@ -52,7 +52,7 @@ def test_should_redirect_when_saving_a_template(app_,
                 'id': template_id,
                 'name': name,
                 'template_content': content,
-                'type': 'sms',
+                'template_type': 'sms',
                 'service': service_id
             }
             response = client.post(url_for(
@@ -64,7 +64,47 @@ def test_should_redirect_when_saving_a_template(app_,
             assert response.location == url_for(
                 '.choose_template', service_id=service_id, template_type='sms', _external=True)
             mock_update_service_template.assert_called_with(
-                template_id, name, 'sms', content, service_id)
+                template_id, name, 'sms', content, service_id, None)
+
+
+def test_should_redirect_when_saving_a_template_email(app_,
+                                                      api_user_active,
+                                                      mock_login,
+                                                      mock_get_service_email_template,
+                                                      mock_update_service_template,
+                                                      mock_get_user,
+                                                      mock_get_service,
+                                                      mock_get_user_by_email,
+                                                      mock_has_permissions,
+                                                      fake_uuid):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            service_id = fake_uuid
+            template_id = fake_uuid
+            name = "new name"
+            content = "template content"
+            subject = "subject"
+            data = {
+                'id': template_id,
+                'name': name,
+                'template_content': content,
+                'template_type': 'email',
+                'service': service_id,
+                'subject': subject
+            }
+            response = client.post(url_for(
+                '.edit_service_template',
+                service_id=service_id,
+                template_id=template_id), data=data)
+            assert response.status_code == 302
+            assert response.location == url_for(
+                '.choose_template',
+                service_id=service_id,
+                template_type='email',
+                _external=True)
+            mock_update_service_template.assert_called_with(
+                template_id, name, 'email', content, service_id, subject)
 
 
 def test_should_show_delete_template_page(app_,
