@@ -212,7 +212,7 @@ class SMSTemplateForm(Form):
 
 class EmailTemplateForm(SMSTemplateForm):
 
-    subject = StringField(
+    subject = TextAreaField(
         u'Subject',
         validators=[DataRequired(message="Can’t be empty")])
 
