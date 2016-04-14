@@ -80,8 +80,12 @@ def edit_service_template(service_id, template_id):
 
     if form.validate_on_submit():
         service_api_client.update_service_template(
-            template_id, form.name.data, template['template_type'],
-            form.template_content.data, service_id
+            template_id,
+            form.name.data,
+            template['template_type'],
+            form.template_content.data,
+            service_id,
+            form.subject.data if getattr(form, 'subject', None) else None
         )
         return redirect(url_for(
             '.choose_template',
