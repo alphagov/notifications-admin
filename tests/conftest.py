@@ -66,6 +66,20 @@ def mock_get_service(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_live_service(mocker, api_user_active):
+    def _get(service_id):
+        service = service_json(
+            service_id,
+            "Test Service",
+            [api_user_active.id],
+            message_limit=1000,
+            active=False,
+            restricted=False)
+        return {'data': service}
+    return mocker.patch('app.service_api_client.get_service', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
 def mock_create_service(mocker):
     def _create(service_name, active, message_limit, restricted, user_id, email_from):
         service = service_json(
