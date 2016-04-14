@@ -4,6 +4,7 @@ import app
 from app.utils import email_safe
 from tests import validate_route_permission
 from bs4 import BeautifulSoup
+from unittest.mock import ANY
 
 
 def test_should_show_overview(app_,
@@ -37,13 +38,17 @@ def test_should_show_service_name(app_,
 
 
 def test_should_redirect_after_change_service_name(app_,
-                                                   active_user_with_permissions,
                                                    service_one,
-                                                   mocker,
-                                                   mock_get_services):
+                                                   active_user_with_permissions,
+                                                   mock_login,
+                                                   mock_get_user,
+                                                   mock_get_service,
+                                                   mock_update_service,
+                                                   mock_get_services,
+                                                   mock_has_permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
+            client.login(active_user_with_permissions)
             response = client.post(
                 url_for('main.service_name_change', service_id=service_one['id']),
                 data={'name': "new name"})
@@ -53,6 +58,46 @@ def test_should_redirect_after_change_service_name(app_,
             'main.service_name_change_confirm', service_id=service_one['id'], _external=True)
         assert settings_url == response.location
         assert mock_get_services.called
+
+
+def test_switch_service_to_live(app_,
+                                service_one,
+                                mock_login,
+                                mock_get_user,
+                                active_user_with_permissions,
+                                mock_get_service,
+                                mock_update_service,
+                                mock_has_permissions):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user_with_permissions)
+            response = client.get(
+                url_for('main.service_switch_live', service_id=service_one['id']))
+        assert response.status_code == 302
+        assert response.location == url_for(
+            'main.service_settings',
+            service_id=service_one['id'], _external=True)
+        mock_update_service.assert_called_with(ANY, ANY, ANY, 25000, False, ANY, ANY)
+
+
+def test_switch_service_to_restricted(app_,
+                                      service_one,
+                                      mock_login,
+                                      mock_get_user,
+                                      active_user_with_permissions,
+                                      mock_get_live_service,
+                                      mock_update_service,
+                                      mock_has_permissions):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user_with_permissions)
+            response = client.get(
+                url_for('main.service_switch_live', service_id=service_one['id']))
+        assert response.status_code == 302
+        assert response.location == url_for(
+            'main.service_settings',
+            service_id=service_one['id'], _external=True)
+        mock_update_service.assert_called_with(ANY, ANY, ANY, 50, True, ANY, ANY)
 
 
 def test_should_not_allow_duplicate_names(app_,
@@ -127,7 +172,8 @@ def test_should_raise_duplicate_name_handled(app_,
                                              mocker,
                                              mock_get_services,
                                              mock_update_service_raise_httperror_duplicate_name,
-                                             mock_verify_password):
+                                             mock_verify_password,
+                                             fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -151,11 +197,12 @@ def test_should_show_request_to_go_live(app_,
                                         mock_get_user,
                                         mock_get_user_by_email,
                                         mock_login,
-                                        mock_has_permissions):
+                                        mock_has_permissions,
+                                        fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = fake_uuid
             response = client.get(
                 url_for('main.service_request_to_go_live', service_id=service_id))
         service = mock_get_service.side_effect(service_id)['data']
@@ -171,11 +218,12 @@ def test_should_redirect_after_request_to_go_live(app_,
                                                   mock_get_user,
                                                   mock_get_user_by_email,
                                                   mock_login,
-                                                  mock_has_permissions):
+                                                  mock_has_permissions,
+                                                  fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = fake_uuid
             response = client.post(url_for(
                 'main.service_request_to_go_live', service_id=service_id))
 
@@ -187,7 +235,7 @@ def test_should_redirect_after_request_to_go_live(app_,
 
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = fake_uuid
             response = client.post(url_for(
                 'main.service_request_to_go_live', service_id=service_id), follow_redirects=True)
 
@@ -202,11 +250,12 @@ def test_should_show_status_page(app_,
                                  mock_get_user,
                                  mock_get_user_by_email,
                                  mock_login,
-                                 mock_has_permissions):
+                                 mock_has_permissions,
+                                 fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = fake_uuid
             response = client.get(url_for(
                 'main.service_status_change', service_id=service_id))
 
@@ -222,11 +271,12 @@ def test_should_show_redirect_after_status_change(app_,
                                                   mock_get_user,
                                                   mock_get_user_by_email,
                                                   mock_login,
-                                                  mock_has_permissions):
+                                                  mock_has_permissions,
+                                                  fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = fake_uuid
             response = client.post(url_for(
                 'main.service_status_change', service_id=service_id))
 
@@ -243,11 +293,12 @@ def test_should_show_status_confirmation(app_,
                                          mock_get_user,
                                          mock_get_user_by_email,
                                          mock_login,
-                                         mock_has_permissions):
+                                         mock_has_permissions,
+                                         fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = fake_uuid
             response = client.get(url_for(
                 'main.service_status_change_confirm', service_id=service_id))
 
@@ -265,11 +316,12 @@ def test_should_redirect_after_status_confirmation(app_,
                                                    mock_get_user_by_email,
                                                    mock_login,
                                                    mock_verify_password,
-                                                   mock_has_permissions):
+                                                   mock_has_permissions,
+                                                   fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = fake_uuid
             response = client.post(url_for(
                 'main.service_status_change_confirm', service_id=service_id))
 
@@ -287,11 +339,12 @@ def test_should_show_delete_page(app_,
                                  mock_get_service,
                                  mock_get_user,
                                  mock_get_user_by_email,
-                                 mock_has_permissions):
+                                 mock_has_permissions,
+                                 fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = fake_uuid
             response = client.get(url_for(
                 'main.service_delete', service_id=service_id))
 
@@ -306,11 +359,12 @@ def test_should_show_redirect_after_deleting_service(app_,
                                                      mock_get_user,
                                                      mock_get_user_by_email,
                                                      mock_login,
-                                                     mock_has_permissions):
+                                                     mock_has_permissions,
+                                                     fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = fake_uuid
             response = client.post(url_for(
                 'main.service_delete', service_id=service_id))
 
@@ -326,11 +380,12 @@ def test_should_show_delete_confirmation(app_,
                                          mock_get_user,
                                          mock_get_user_by_email,
                                          mock_login,
-                                         mock_has_permissions):
+                                         mock_has_permissions,
+                                         fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = fake_uuid
             response = client.get(url_for(
                 'main.service_delete_confirm', service_id=service_id))
 
@@ -347,11 +402,12 @@ def test_should_redirect_delete_confirmation(app_,
                                              mock_get_user_by_email,
                                              mock_login,
                                              mock_verify_password,
-                                             mock_has_permissions):
+                                             mock_has_permissions,
+                                             fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = 123
+            service_id = fake_uuid
             response = client.post(url_for(
                 'main.service_delete_confirm', service_id=service_id))
 

@@ -96,6 +96,23 @@ def service_request_to_go_live(service_id):
         return redirect(url_for('.service_settings', service_id=service_id))
 
 
+@main.route("/services/<service_id>/service-settings/switch-live")
+@login_required
+@user_has_permissions(admin_override=True)
+def service_switch_live(service_id):
+    service_api_client.update_service(
+        current_service['id'],
+        current_service['name'],
+        current_service['active'],
+        # TODO This limit should be set depending on the agreement signed by
+        # with Notify.
+        25000 if current_service['restricted'] else 50,
+        False if current_service['restricted'] else True,
+        current_service['users'],
+        current_service['email_from'])
+    return redirect(url_for('.service_settings', service_id=service_id))
+
+
 @main.route("/services/<service_id>/service-settings/status", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
