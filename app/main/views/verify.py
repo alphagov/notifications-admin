@@ -15,6 +15,7 @@ from itsdangerous import SignatureExpired
 from flask_login import login_user
 
 from notifications_python_client.errors import HTTPError
+from notifications_utils.url_safe_token import check_token
 
 from app.main import main
 from app.main.forms import TwoFactorForm
@@ -47,7 +48,6 @@ def verify():
 
 @main.route('/verify-email/<token>')
 def verify_email(token):
-    from utils.url_safe_token import check_token
     try:
         token_data = check_token(token,
                                  current_app.config['SECRET_KEY'],

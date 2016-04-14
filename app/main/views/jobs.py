@@ -12,7 +12,7 @@ from flask import (
 )
 from flask_login import login_required
 from werkzeug.datastructures import MultiDict
-from utils.template import Template
+from notifications_utils.template import Template
 
 from app import (
     job_api_client,

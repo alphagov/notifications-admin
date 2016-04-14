@@ -1,7 +1,7 @@
 from flask import request, render_template, redirect, url_for, flash, abort
 from flask_login import login_required
 
-from utils.template import Template
+from notifications_utils.template import Template
 
 from app.main import main
 from app.utils import user_has_permissions

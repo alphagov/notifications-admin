@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from utils.recipients import (
+from notifications_utils.recipients import (
     validate_phone_number,
     InvalidPhoneError
 )
