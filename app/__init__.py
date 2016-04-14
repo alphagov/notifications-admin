@@ -21,7 +21,6 @@ from pygments import highlight
 from pygments.lexers import JavascriptLexer
 from pygments.formatters import HtmlFormatter
 from werkzeug.exceptions import abort
-import humanize
 
 from app.notify_client.api_client import ServiceAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
@@ -97,12 +96,12 @@ def create_app():
 
     application.add_template_filter(nl2br)
     application.add_template_filter(format_datetime)
+    application.add_template_filter(format_datetime_short)
     application.add_template_filter(format_time)
     application.add_template_filter(syntax_highlight_json)
     application.add_template_filter(valid_phone_number)
     application.add_template_filter(linkable_name)
     application.add_template_filter(format_date)
-    application.add_template_filter(format_delta)
 
     application.after_request(useful_headers_after_request)
     application.after_request(save_service_after_request)
@@ -177,6 +176,12 @@ def format_datetime(date):
     return native.strftime('%A %d %B %Y at %H:%M')
 
 
+def format_datetime_short(date):
+    date = dateutil.parser.parse(date)
+    native = date.replace(tzinfo=None)
+    return native.strftime('%d %B at %H:%M')
+
+
 def format_time(date):
     date = dateutil.parser.parse(date)
     native = date.replace(tzinfo=None)
@@ -186,15 +191,6 @@ def format_time(date):
 def format_date(date):
     date = dateutil.parser.parse(date)
     return date.strftime('%A %d %B %Y')
-
-
-def format_delta(date):
-    date = dateutil.parser.parse(date)
-    native = date.replace(tzinfo=None)
-    difference = datetime.datetime.now() - native
-    return humanize.naturaltime(
-        datetime.timedelta(seconds=difference.total_seconds())
-    )
 
 
 def valid_phone_number(phone_number):
