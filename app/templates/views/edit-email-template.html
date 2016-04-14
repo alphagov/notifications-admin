@@ -16,9 +16,9 @@
       <div class="grid-row">
         <div class="column-two-thirds">
           {{ textbox(form.name, width='1-1', hint='Your recipients won’t see this', rows=10) }}
-          {{ textbox(form.subject, width='1-1', highlight_tags=True, rows=2) }}
         </div>
         <div class="column-two-thirds">
+          {{ textbox(form.subject, width='1-1', highlight_tags=True, rows=2) }}
           {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=8) }}
           {{ page_footer(
             'Save',
@@ -29,7 +29,7 @@
         <div class="column-one-third">
           <label for='template_content' class='placeholder-hint banner-mode' data-module='placeholder-hint' data-textboxes-selector='#template_content,#subject' data-target-textbox-selector="#template_content">
             <div class="" id="placeholder-hint" aria-live="polite">
-              <p>Add fields using ((double brackets))</p>
+              <p>Add fields to the subject or message content using ((double brackets))</p>
             </div>
           </label>
         </div>
