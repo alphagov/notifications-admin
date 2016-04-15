@@ -1,5 +1,7 @@
 
 from notifications_python_client.base import BaseAPIClient
+
+from app.notify_client import _attach_current_user
 from app.notify_client.models import InvitedUser
 
 
