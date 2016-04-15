@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from flask import url_for
 from notifications_python_client.notifications import NotificationsAPIClient
 from app.utils import BrowsableItem
+from app.notify_client import _attach_current_user
 
 
 class ServiceAPIClient(NotificationsAPIClient):
@@ -30,6 +31,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             "restricted": restricted,
             "email_from": email_from
         }
+        _attach_current_user(data)
         return self.post("/service", data)['data']['id']
 
     def delete_service(self, service_id):
@@ -37,7 +39,8 @@ class ServiceAPIClient(NotificationsAPIClient):
         Delete a service.
         """
         endpoint = "/service/{0}".format(service_id)
-        return self.delete(endpoint)
+        data = _attach_current_user({})
+        return self.delete(endpoint, data)
 
     def get_service(self, service_id, *params):
         """
@@ -72,6 +75,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             "users": users,
             "email_from": email_from
         }
+        _attach_current_user(data)
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)
 
@@ -82,7 +86,8 @@ class ServiceAPIClient(NotificationsAPIClient):
         endpoint = '/service/{service_id}/users/{user_id}'.format(
             service_id=service_id,
             user_id=user_id)
-        return self.delete(endpoint)
+        data = _attach_current_user({})
+        return self.delete(endpoint, data)
 
     def create_service_template(self, name, type_, content, service_id, subject=None):
         """
@@ -98,6 +103,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             data.update({
                 'subject': subject
             })
+        _attach_current_user(data)
         endpoint = "/service/{0}/template".format(service_id)
         return self.post(endpoint, data)
 
@@ -116,6 +122,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             data.update({
                 'subject': subject
             })
+        _attach_current_user(data)
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
         return self.post(endpoint, data)
 
@@ -141,6 +148,7 @@ class ServiceAPIClient(NotificationsAPIClient):
         Delete a service template.
         """
         endpoint = "/service/{0}/template/{1}".format(service_id, template_id)
+        data = _attach_current_user({})
         return self.delete(endpoint)
 
     def find_all_service_email_from(self, user_id=None):
