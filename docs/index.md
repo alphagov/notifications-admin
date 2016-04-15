@@ -59,7 +59,7 @@ GOV.UK Notify provides an API that allows you to create text and email notificat
 
 ### API integration
 
-![Notfy](Notify.png)
+![Notfy](/static/images/notify-diagram.png)
 
 There are two ways to integrate the API into your service:
 
