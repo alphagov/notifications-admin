@@ -10,7 +10,6 @@
     resize: none;
     z-index: 20;
     background: none;
-    height: 200px;
   }
 
   &-textbox,
@@ -36,7 +35,7 @@
     color: transparent;
     white-space: pre-wrap;
     border: 2px solid transparent;
-    padding-bottom: $gutter;
+    padding-bottom: $gutter-half;
   }
 
   &-background {

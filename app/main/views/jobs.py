@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import time
+import itertools
 
 from flask import (
     render_template,
     abort,
     jsonify,
-    request
+    request,
+    url_for
 )
 from flask_login import login_required
 from werkzeug.datastructures import MultiDict
-from utils.template import Template
+from notifications_utils.template import Template
 
 from app import (
     job_api_client,
@@ -26,14 +28,18 @@ from app.utils import (
 
 
 def _parse_filter_args(filter_dict):
+
     if not isinstance(filter_dict, MultiDict):
         filter_dict = MultiDict(filter_dict)
-    out_dict = MultiDict()
-    if 'type' in filter_dict:
-        out_dict.setlist('template_type', filter_dict.getlist('type'))
-    if 'status' in filter_dict:
-        out_dict.setlist('status', filter_dict.getlist('status'))
-    return out_dict
+
+    return MultiDict(
+        (
+            key,
+            (','.join(filter_dict.getlist(key))).split(',')
+        )
+        for key in filter_dict.keys()
+        if ''.join(filter_dict.getlist(key))
+    )
 
 
 @main.route("/services/<service_id>/jobs")
@@ -113,7 +119,7 @@ def view_notifications(service_id):
         service_id=service_id,
         page=page,
         template_type=filter_args.getlist('template_type') if 'template_type' in filter_args else None,
-        status=filter_args.getlist('status') if 'status' in filter_args else None)
+        status=filter_args.getlist('status') if 'status' in filter_args else ['delivered', 'failed'])
     view_dict = MultiDict(request.args)
     prev_page = None
     if notifications['links'].get('prev', None):
@@ -144,7 +150,32 @@ def view_notifications(service_id):
         notifications=notifications['notifications'],
         page=page,
         prev_page=prev_page,
-        next_page=next_page
+        next_page=next_page,
+        request_args=request.args,
+        type_filters=[
+            [item[0], item[1], url_for(
+                '.view_notifications',
+                service_id=current_service['id'],
+                template_type=item[1],
+                status=request.args.get('status', 'delivered,failed')
+            )] for item in [
+                ['Emails', 'email'],
+                ['Text messages', 'sms'],
+                ['Both', '']
+            ]
+        ],
+        status_filters=[
+            [item[0], item[1], url_for(
+                '.view_notifications',
+                service_id=current_service['id'],
+                template_type=request.args.get('template_type', ''),
+                status=item[1]
+            )] for item in [
+                ['Successful', 'delivered'],
+                ['Failed', 'failed'],
+                ['Both', 'delivered,failed']
+            ]
+        ]
     )
 
 

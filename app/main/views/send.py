@@ -17,8 +17,8 @@ from flask import (
 )
 
 from flask_login import login_required, current_user
-from utils.template import Template
-from utils.recipients import RecipientCSV, first_column_heading, validate_and_format_phone_number
+from notifications_utils.template import Template
+from notifications_utils.recipients import RecipientCSV, first_column_heading, validate_and_format_phone_number
 
 from app.main import main
 from app.main.forms import CsvUploadForm
@@ -79,7 +79,7 @@ def choose_template(service_id, template_type):
         abort(404)
 
     return render_template(
-        'views/choose-template.html',
+        'views/templates/choose.html',
         templates=[
             Template(
                 template,

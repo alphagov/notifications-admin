@@ -2,6 +2,7 @@ import os
 import re
 
 import dateutil
+import datetime
 import urllib
 from flask import (
     Flask,
@@ -33,10 +34,10 @@ from app.notify_client.template_statistics_api_client import TemplateStatisticsA
 
 from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.asset_fingerprinter import AssetFingerprinter
-from utils.recipients import validate_phone_number, InvalidPhoneError
+from notifications_utils.recipients import validate_phone_number, InvalidPhoneError
 import app.proxy_fix
 from config import configs
-from utils import logging
+from notifications_utils import logging
 from werkzeug.local import LocalStack, LocalProxy
 from flask.globals import _lookup_req_object
 from functools import partial
@@ -95,6 +96,7 @@ def create_app():
 
     application.add_template_filter(nl2br)
     application.add_template_filter(format_datetime)
+    application.add_template_filter(format_datetime_short)
     application.add_template_filter(format_time)
     application.add_template_filter(syntax_highlight_json)
     application.add_template_filter(valid_phone_number)
@@ -174,6 +176,12 @@ def format_datetime(date):
     return native.strftime('%A %d %B %Y at %H:%M')
 
 
+def format_datetime_short(date):
+    date = dateutil.parser.parse(date)
+    native = date.replace(tzinfo=None)
+    return native.strftime('%d %B at %H:%M')
+
+
 def format_time(date):
     date = dateutil.parser.parse(date)
     native = date.replace(tzinfo=None)
@@ -199,14 +207,14 @@ def load_user(user_id):
 
 
 def load_service_before_request():
-    service_id = request.view_args.get('service_id', None) if request.view_args else None
-    if service_id:
-        from flask.globals import _request_ctx_stack
-        if _request_ctx_stack.top is not None:
-            setattr(
-                _request_ctx_stack.top,
-                'service',
-                service_api_client.get_service(service_id)['data'])
+    service_id = request.view_args.get('service_id', session.get('service_id')) if request.view_args \
+        else session.get('service_id')
+    from flask.globals import _request_ctx_stack
+    if _request_ctx_stack.top is not None:
+        setattr(
+            _request_ctx_stack.top,
+            'service',
+            service_api_client.get_service(service_id)['data'] if service_id else None)
 
 
 def save_service_after_request(response):

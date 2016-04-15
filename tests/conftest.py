@@ -66,6 +66,20 @@ def mock_get_service(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_live_service(mocker, api_user_active):
+    def _get(service_id):
+        service = service_json(
+            service_id,
+            "Test Service",
+            [api_user_active.id],
+            message_limit=1000,
+            active=False,
+            restricted=False)
+        return {'data': service}
+    return mocker.patch('app.service_api_client.get_service', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
 def mock_create_service(mocker):
     def _create(service_name, active, message_limit, restricted, user_id, email_from):
         service = service_json(
@@ -180,7 +194,11 @@ def mock_get_service_template(mocker):
 def mock_get_service_email_template(mocker):
     def _create(service_id, template_id):
         template = template_json(
-            service_id, template_id, "Two week reminder", "email", "Your vehicle tax is about to expire")
+            service_id,
+            template_id,
+            "Two week reminder",
+            "email",
+            "Your vehicle tax is about to expire", "Subject")
         return {'data': template}
 
     return mocker.patch(
@@ -201,9 +219,9 @@ def mock_create_service_template(mocker, fake_uuid):
 
 @pytest.fixture(scope='function')
 def mock_update_service_template(mocker):
-    def _update(id_, name, type_, content, service):
+    def _update(id_, name, type_, content, service, subject=None):
         template = template_json(
-            service, id_, name, type_, content)
+            service, id_, name, type_, content, subject)
         return {'data': template}
 
     return mocker.patch(

@@ -59,6 +59,7 @@ gulp.task('javascripts', () => gulp
     paths.src + 'javascripts/fileUpload.js',
     paths.src + 'javascripts/updateContent.js',
     paths.src + 'javascripts/expandCollapse.js',
+    paths.src + 'javascripts/placeholderHint.js',
     paths.src + 'javascripts/main.js'
   ])
   .pipe(plugins.babel({
@@ -108,7 +109,11 @@ gulp.task('watchForChanges', function() {
 });
 
 gulp.task('lint:sass', () => gulp
-  .src(paths.src + 'stylesheets/**/*.scss')
+  .src([
+    paths.src + 'stylesheets/*.scss',
+    paths.src + 'stylesheets/components/*.scss',
+    paths.src + 'stylesheets/views/*.scss',
+  ])
     .pipe(plugins.sassLint())
     .pipe(plugins.sassLint.format(stylish))
     .pipe(plugins.sassLint.failOnError())

@@ -18,7 +18,7 @@
         'title': 'Request to go live and turn off sending restrictions',
         'link': url_for('.service_request_to_go_live', service_id=current_service.id),
         'hint': 'A live service can send notifications to any phone number or email address',
-      } if not current_service.live else {
+      } if current_service.restricted else {
       },
       {
         'title': 'Temporarily suspend API keys',
@@ -27,7 +27,15 @@
       } if not current_service.active else {
         'title': 'Reactivate API keys',
         'link': url_for('.service_status_change', service_id=current_service.id)
-      }
+      },
+      {
+        'title': 'Make service live',
+        'link': url_for('.service_switch_live', service_id=current_service.id)
+      } if current_service.restricted and current_user.has_permissions([], admin_override=True) else {
+        'title': 'Revert service to trial',
+        'link': url_for('.service_switch_live', service_id=current_service.id)
+      } if not current_service.restricted and current_user.has_permissions([], admin_override=True) else {
+      },
     ]) }}
 
 {% endblock %}

@@ -1,6 +1,8 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import list_table, field, right_aligned_field_heading %}
+{% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading %}
 {% from "components/previous-next-navigation.html" import previous_next_navigation %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/pill.html" import pill %}
 
 {% block page_title %}
   Activity – GOV.UK Notify
@@ -8,49 +10,96 @@
 
 {% block maincolumn_content %}
 
-    <h1 class="heading-large">Activity</h1>
-    <p>
-      <a href="{{ url_for(".view_notifications", service_id=current_service.id, page=1) }}">All messages</a>
+  <h1 class="heading-large">
+
+    {%- if (request_args.get('template_type', '') == '') and (request_args.get('status', 'delivered,failed') == 'delivered,failed') -%}
+
+      Activity
+
+    {%- else -%}
+
+      {% if request_args.get('status') != 'delivered,failed' %}
+        {% for label, option, _ in status_filters %}
+          {% if request_args.get('status') == option %}
+            {{ label }}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      {% if request_args.get('template_type') == '' %}
+        emails and text messages
+      {% else %}
+
+        {% for template_label, template_option, _ in type_filters %}
+          {% if request_args.get('template_type') == template_option %}
+            {% if request_args.get('status', 'delivered,failed') == 'delivered,failed' %}
+              {{ template_label }}
+            {% else %}
+              {{ template_label | lower }}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+      {% endif %}
+
+    {%- endif -%}
+
+  </h1>
+  
+  <div class='grid-row bottom-gutter'>
+    <div class='column-half'>
+      {{ pill(
+        'Type',
+        type_filters,
+        request_args.get('template_type', '')
+      ) }}
+    </div>
+    <div class='column-half'>
+      {{ pill(
+        'Status',
+        status_filters,
+        request_args.get('status', '')
+      ) }}
+    </div>
+  </div>
+
+  {% if notifications %}
+    <p class="heading-small bottom-gutter">
+      <a href="{{ request.url }}&amp;download=csv" download>Download as a CSV file</a>
     </p>
-    <p>
-      <a href="{{ url_for(".view_notifications", service_id=current_service.id, type="sms", page=1) }}">Text messages</a>&emsp;
-      <a href="{{ url_for(".view_notifications", service_id=current_service.id, type="email", page=1) }}">Email messages</a>
-    </p>
-    <p>
-      <a href="{{ url_for(".view_notifications", service_id=current_service.id, status=['delivered'], page=1) }}">Successful messages</a>&emsp;
-      <a href="{{ url_for(".view_notifications", service_id=current_service.id, status=['failed'], page=1) }}">Failed messages</a>
-    </p>
-    {% call(item, row_number) list_table(
-      notifications,
-      caption="Recent activity",
-      caption_visible=False,
-      empty_message='You haven’t sent any notifications yet',
-      field_headings=['Recipient', 'Template', 'Type', 'Job', 'Status', 'Time'])
-    %}
-      {% call field() %}
+  {% endif %}
+
+  {% call(item, row_number) list_table(
+    notifications,
+    caption="Recent activity",
+    caption_visible=False,
+    empty_message='No messages found',
+    field_headings=['Recipient', 'Status', 'Started'],
+    field_headings_visible=False
+  ) %}
+
+    {% call field() %}
+      <p>
         {{ item.to }}
-      {% endcall %}
-      {% call field() %}
-        <a href="{{ url_for(".choose_template", service_id=current_service.id, template_type=item.template.template_type, _anchor=item.template.name|linkable_name) }}">{{ item.template.name }}</a>
-      {% endcall %}
-      {% call field() %}
-        {{ item.template.template_type }}
-      {% endcall %}
-      {% call field() %}
+      </p>
+      <p class="hint">
+        <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">{{ item.template.name }}</a>
+        sent from
         {% if item.job %}
           <a href="{{ url_for(".view_job", service_id=current_service.id, job_id=item.job.id) }}">{{ item.job.original_file_name }}</a>
+        {% else %}
+          an API call
         {% endif %}
-      {% endcall %}
-      {% call field() %}
-        {{ item.status }}
-      {% endcall %}
-      {% call field() %}
-        {{ item.created_at | format_datetime }}
-      {% endcall %}
+      </p>
     {% endcall %}
-    <p class="table-show-more-link">
-      <a href="{{ request.url }}&download=csv">Download csv</a>
-    </p>
-    {{ previous_next_navigation(prev_page, next_page) }}
+
+    {{ text_field(item.status|capitalize) }}
+
+    {% call field(align='right') %}
+      {{ item.created_at|format_datetime_short }}
+    {% endcall %}
+  {% endcall %}
+
+  {{ previous_next_navigation(prev_page, next_page) }}
 
 {% endblock %}
