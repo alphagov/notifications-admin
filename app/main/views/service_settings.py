@@ -11,7 +11,7 @@ from flask_login import (
     login_required,
     current_user
 )
-from notifications_python_client import HTTPError
+from notifications_python_client.errors import HTTPError
 
 from app import service_api_client
 from app.main import main
