@@ -1,9 +1,11 @@
-About this document
-==========================
+# API documenation
+
+## About this document
+
 This document is for central government developers, technical architects, and service managers who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
-About GOV.UK Notify
-====================
+## About GOV.UK Notify
+
 GOV.UK Notify is a cross-government platform, currently in beta, that lets government services send notifications by sms or email.
 
 There are two ways to send notifications:
@@ -13,8 +15,7 @@ There are two ways to send notifications:
 
 To find out more about GOV.UK Notify, see the [Government as a Platform](https://governmentasaplatform.blog.gov.uk/) blog.
 
-Before you start
-==================
+## Before you start
 
 To use GOV.UK Notify, you need:
 
@@ -23,44 +24,45 @@ To use GOV.UK Notify, you need:
 
 
 <a name="quickstart"></a>
-Quick start guide to GOV.UK Notify
-===================================
+## Quick start guide to GOV.UK Notify
 
 To get started:
 
-1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. You will need your mobile phone for 2-factor authentication.
-2. Add a new service.
+  1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. You will need your mobile phone for 2-factor authentication.
 
- At first your service will be in trial mode. In trial mode you will only be able to send test sms and email notifications to your own mobile number or email address. When you’re fully integrated and ready to go live, send a request to the GOV.UK Notify team.
+  2. Add a new service.
 
-3. Add a template so you can send sms and email notifications. 
+    At first your service will be in trial mode. In trial mode you will only be able to send test sms and email notifications to your own mobile number or email address. When you’re fully integrated and ready to go live, send a request to the GOV.UK Notify team.
 
- **Note:** A template is required even if you send notifications by integrating with the GOV.UK Notify API.
+  3. Add a template so you can send sms and email notifications. 
+
+    **Note:** A template is required even if you send notifications by integrating with the GOV.UK Notify API.
  
-  You can personalise the template using double brackets for placeholders. For example:
+    You can personalise the template using double brackets for placeholders. For example:
 
-  Dear ((name)),
+    > Dear ((name)),
+    >
+    > Your ((item)) is due for renewal on ((date)).
 
-  Your ((item)) is due for renewal on ((date)).
+  4. You can upload a csv file containing a header row matching the placeholders in your template, and data rows with values to use for the placeholders.
 
-4. You can upload a csv file containing a header row matching the placeholders in your template, and data rows with values to use for the placeholders.
-5. Send an sms or email notification.
-6. If you intend to use the GOV.UK Notify API, create a new API key. This will be used to connect to the GOV.UK Notify API.
+  5. Send an sms or email notification.
 
-  You can provide all your developers with test keys so they can experiment in the Sandbox environment. But keep the number of keys for real integrations to a minimum number of people on your team.
+  6. If you intend to use the GOV.UK Notify API, create a new API key. This will be used to connect to the GOV.UK Notify API.
+
+    You can provide all your developers with test keys so they can experiment in the Sandbox environment. But keep the number of keys for real integrations to a minimum number of people on your team.
 
 <a name="integrateNotify"></a>
-Integrate the GOV.UK Notify API into your service
-===================================================
+## Integrate the GOV.UK Notify API into your service
 
 GOV.UK Notify provides an API that allows you to create text and email notifications and get the status of notifications you have sent.
 
-API integration
-------------------
+### API integration
 
-![Notfy](Notify.png)
+![Notfy](/static/images/notify-diagram.png)
 
 There are two ways to integrate the API into your service:
+
 * use one of the client libraries provided by GOV.UK Notify:
   * [python library](https://github.com/alphagov/notifications-python-client) 
   * [PHP library] (https://github.com/alphagov/notifications-php-client)
@@ -68,22 +70,20 @@ There are two ways to integrate the API into your service:
 * develop your own integration to produce requests in the correct format
 
 
-GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/) for authentication and identification. The GOV.UK Notify client library encodes and decodes JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don't use this library, you must manually create tokens yourself. 
+GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/) for authentication and identification. The GOV.UK Notify client library encodes and decodes JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use this library, you must manually create tokens yourself. 
 
 For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library.
 
 A JSON Web Token contains, in encrypted format:
-* your service ID - identifies your service
-* your API key (in JSON Web Token terms this is called the client ID) - used to sign tokens during requests for API resources
-* an indication of what you're trying to do - GET, POST, etc.
-* the endpoint you're trying to access
+
+* your service ID – identifies your service
+* your API key (in JSON Web Token terms this is called the client ID) – used to sign tokens during requests for API resources
 
 Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
 
 **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories.
 
-JSON Web Tokens: claims
-------------------
+### JSON Web Tokens: claims
 
 JSON Web Tokens have a series of standard and application-specific claims.
 
@@ -100,26 +100,12 @@ GOV.UK Notify application-specific claims:
 {
   iss: 'string', // service id
   iat: 0, // creation time in  epoch seconds (UTC)
-  req: 'string', // signed request
-  pay: 'string', // signed payload (POST requests only)
 }
 ```
 
-The GOV.UK Notify API tokens sign the:
-* request being made
-* payload (for POST requests)
-
 The signing algorithm is the HMAC signature, using the provided key SHA256 hashing algorithm.
 
-Request signing is of the form HTTP METHOD PATH:
-```
-GET /notification/1234
-```
-
-Payload signing requires the actual payload to be signed, not the JSON object. Make sure you serialize the object first, then sign the serialized object.
-
-API client libraries
----------------------
+### API client libraries
 
 GOV.UK Notify supports a python client library:
 
@@ -128,10 +114,10 @@ GOV.UK Notify supports a python client library:
 This provides example code for calling the API and for constructing the API tokens.
 
 
-API endpoints
-----------------
+### API endpoints
 
 You can use the GOV.UK Notify API to:
+
 * send a notification
 * retrieve one notification
 * retrieve all notifications
@@ -168,10 +154,11 @@ POST /notifications/email
 ```
 
 where:
+
 * `to` is the phone number (required)
 * `template` is the template ID to send (required)
  
- **Note:** Access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application: go to **Text message templates**, click on **Edit template** and recover the template id from the url eg `/templates/<templateID>/edit` 
+  **Note:** Access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application: go to **Text message templates**, click on **Edit template** and recover the template id from the url eg `/templates/<templateID>/edit` 
 
 * `personalisation` (optional) specifies the values for the placeholders in your templates
 
@@ -214,6 +201,7 @@ GET /notifications/{id}
 }
 ```
 where:
+
 * `status` is the the status of the notification; this can be `sending`, `delivered`, or `failed` 
 * `template_type` is `sms` or `email`
 * `sent_at` is the full timestamp, in UTC, at which the notification was sent
@@ -221,7 +209,7 @@ where:
 * `message` is the content of message
 * `sender` may be the provider
 
-The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse)  indicated above.
+The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
 
 To get the status of all notifications: 
 ```
@@ -255,7 +243,7 @@ GET /notifications
          'job_id':1,
          'sender':'email-partner'
       }
-   }...]
+   }…]
 }
 ```
 This list is split into pages. To scroll through the pages run:
@@ -265,8 +253,7 @@ GET /notifications?&page=2
 ```
 
 
-GOV.UK Notify API code
-------------------------
+### GOV.UK Notify API code
 
 The GOV.UK Notify API code is open sourced at:
 
