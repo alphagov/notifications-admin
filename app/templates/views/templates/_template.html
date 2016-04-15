@@ -4,7 +4,7 @@
 <div class="column-two-thirds">
   {% if 'email' == template.template_type %}
     {{ email_message(
-      None,
+      template.formatted_subject_as_markup,
       template.formatted_as_markup,
       name=template.name if show_title else None
     ) }}

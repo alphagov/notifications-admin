@@ -1,5 +1,6 @@
 
 from notifications_python_client.base import BaseAPIClient
+from app.notify_client import _attach_current_user
 
 
 class JobApiClient(BaseAPIClient):
@@ -26,6 +27,6 @@ class JobApiClient(BaseAPIClient):
             "original_file_name": original_file_name,
             "notification_count": notification_count
         }
-
+        _attach_current_user(data)
         resp = self.post(url='/service/{}/job'.format(service_id), data=data)
         return resp['data']

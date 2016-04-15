@@ -1,4 +1,5 @@
 from notifications_python_client.base import BaseAPIClient
+from app.notify_client import _attach_current_user
 
 
 class ApiKeyApiClient(BaseAPIClient):
@@ -20,8 +21,12 @@ class ApiKeyApiClient(BaseAPIClient):
 
     def create_api_key(self, service_id, key_name, *params):
         data = {"name": key_name}
+        _attach_current_user(data)
         key = self.post(url='/service/{}/api-key'.format(service_id), data=data)
         return key['data']
 
     def revoke_api_key(self, service_id, key_id, *params):
-        return self.post(url='/service/{0}/api-key/revoke/{1}'.format(service_id, key_id), data=None)
+        data = _attach_current_user({})
+        return self.post(
+            url='/service/{0}/api-key/revoke/{1}'.format(service_id, key_id),
+            data=data)
