@@ -1,11 +1,10 @@
 from app.notify_client.job_api_client import JobApiClient
 
 
-def test_client_creates_job_data_correctly(mocker):
-    import uuid
-    job_id = str(uuid.uuid4())
-    service_id = str(uuid.uuid4())
-    template_id = 1
+def test_client_creates_job_data_correctly(mocker, fake_uuid):
+    job_id = fake_uuid
+    service_id = fake_uuid
+    template_id = fake_uuid
     original_file_name = 'test.csv'
     notification_count = 1
 
@@ -19,6 +18,9 @@ def test_client_creates_job_data_correctly(mocker):
     expected_url = '/service/{}/job'.format(service_id)
 
     client = JobApiClient()
+    mock_attach_user = mocker.patch(
+        'app.notify_client.job_api_client._attach_current_user',
+        return_value={'created_by': fake_uuid})
     mock_post = mocker.patch('app.notify_client.job_api_client.JobApiClient.post')
 
     client.create_job(job_id, service_id, template_id, original_file_name, notification_count)
