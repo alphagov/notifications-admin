@@ -2,7 +2,6 @@ import os
 import re
 
 import dateutil
-import datetime
 import urllib
 from flask import (
     Flask,
@@ -16,10 +15,10 @@ from flask import (
 from flask._compat import string_types
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
-from notifications_python_client import HTTPError
+from notifications_python_client.errors import HTTPError
 from pygments import highlight
-from pygments.lexers import JavascriptLexer
-from pygments.formatters import HtmlFormatter
+from pygments.formatters.html import HtmlFormatter
+from pygments.lexers.javascript import JavascriptLexer
 from werkzeug.exceptions import abort
 
 from app.notify_client.api_client import ServiceAPIClient

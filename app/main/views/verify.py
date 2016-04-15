@@ -14,7 +14,6 @@ from itsdangerous import SignatureExpired
 
 from flask_login import login_user
 
-from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import check_token
 
 from app.main import main

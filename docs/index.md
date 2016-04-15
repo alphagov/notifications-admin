@@ -75,8 +75,6 @@ For examples of how to encode and decode JSON Web Tokens, see [authentication.py
 A JSON Web Token contains, in encrypted format:
 * your service ID - identifies your service
 * your API key (in JSON Web Token terms this is called the client ID) - used to sign tokens during requests for API resources
-* an indication of what you're trying to do - GET, POST, etc.
-* the endpoint you're trying to access
 
 Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
 
@@ -100,23 +98,10 @@ GOV.UK Notify application-specific claims:
 {
   iss: 'string', // service id
   iat: 0, // creation time in  epoch seconds (UTC)
-  req: 'string', // signed request
-  pay: 'string', // signed payload (POST requests only)
 }
 ```
 
-The GOV.UK Notify API tokens sign the:
-* request being made
-* payload (for POST requests)
-
 The signing algorithm is the HMAC signature, using the provided key SHA256 hashing algorithm.
-
-Request signing is of the form HTTP METHOD PATH:
-```
-GET /notification/1234
-```
-
-Payload signing requires the actual payload to be signed, not the JSON object. Make sure you serialize the object first, then sign the serialized object.
 
 API client libraries
 ---------------------

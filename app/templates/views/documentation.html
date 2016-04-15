@@ -48,26 +48,10 @@
 {
   iss: 'string', // service id
   iat: 0, // creation time in  epoch seconds (UTC)
-  req: 'string', // signed request
-  pay: 'string', // signed payload (POST requests only)
 }
         """|syntax_highlight_json}}
 <div class="grid-row">
     <div class="column-three-quarters">
-        <p>Notify API tokens sign both the request being made, and for POST requests, the payload.</p>
-
-        <p>
-            The signing algorithm is HMAC signature, using provided key SHA256 hashing algorithm.
-        </p>
-
-        <p>Request signing is of the form HTTP METHOD PATH.</p>
-
-        {{ "GET /notification/1234"|syntax_highlight_json }}
-
-        <p></p>
-
-        <p>Payload signing requires the actual payload to be signed, NOT the JSON object. Serialize the object first
-            then sign the serialized object.</p>
 
         <h3 class="heading-medium">
             API endpoints
