@@ -1,8 +1,10 @@
-from flask import render_template, url_for, redirect, jsonify
+import markdown
+from flask import render_template, url_for, redirect, Markup
 from app.main import main
 from flask_login import login_required
 
 from flask.ext.login import current_user
+from mdx_gfm import GithubFlavoredMarkdownExtension
 
 
 @main.route('/')
@@ -36,3 +38,15 @@ def pricing():
 @main.route('/terms')
 def terms():
     return render_template('views/terms-of-use.html')
+
+
+@main.route('/documentation')
+def documentation():
+    with open('docs/index.md') as source:
+        return render_template(
+            'views/documentation.html',
+            body=Markup(markdown.markdown(
+                source.read(),
+                extensions=[GithubFlavoredMarkdownExtension()]
+            ))
+        )
