@@ -1,7 +1,7 @@
 --- 
 files: 
   - 
-    destination: /home/notify-app/notifications-admin
+    destination: /home/ubuntu/notifications-admin
     source: /
 hooks: 
   AfterInstall: 
