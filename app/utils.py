@@ -79,9 +79,9 @@ def get_errors_for_csv(recipients, template_type):
     if recipients.rows_with_missing_data:
         number_of_rows_with_missing_data = len(list(recipients.rows_with_missing_data))
         if 1 == number_of_rows_with_missing_data:
-            errors.append("fill in 1 empty cell")
+            errors.append("enter missing data in 1 row")
         else:
-            errors.append("fill in {} empty cells".format(number_of_rows_with_missing_data))
+            errors.append("enter missing data in {} rows".format(number_of_rows_with_missing_data))
 
     return errors
 
