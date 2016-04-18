@@ -52,6 +52,7 @@
 .sms-message-use-links {
 
   @include copy-19;
+  margin-top: -5px;
 
   a {
     display: block;
@@ -68,7 +69,7 @@
 
 .sms-message-use-links-with-title {
   @extend %sms-message-use-links;
-  margin-top: 52px;
+  margin-top: 55px;
 }
 
 .sms-message-from {
