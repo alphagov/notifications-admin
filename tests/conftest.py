@@ -674,6 +674,7 @@ def mock_get_notifications(mocker):
     def _get_notifications(service_id,
                            job_id=None,
                            page=1,
+                           page_size=50,
                            template_type=None,
                            status=None):
         return notification_json(service_id)
