@@ -6,12 +6,18 @@
 {% endmacro %}
 
 
-{% macro big_number_with_status(number, label, failures, failure_percentage, danger_zone=False) %}
+{% macro big_number_with_status(number, label, failures, failure_percentage, danger_zone=False, failure_link=None) %}
   <div class="big-number-with-status">
     {{ big_number(number, label) }}
     <div class="big-number-status{% if danger_zone %}-failing{% endif %}">
       {% if failures %}
-        {{ failures }} failed – {{ failure_percentage }}%
+        {% if failure_link %}
+          <a href="{{ failure_link }}">
+            {{ failures }} failed – {{ failure_percentage }}%
+          </a>
+        {% else %}
+          {{ failures }} failed – {{ failure_percentage }}%
+        {% endif %}
       {% else %}
         No failures
       {% endif %}

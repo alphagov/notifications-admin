@@ -83,9 +83,9 @@ def test_should_show_recent_templates_on_dashboard(app_,
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         headers = [header.text.strip() for header in page.find_all('h2')]
         assert 'Test Service' in headers
-        assert 'Sent today' in headers
+        assert 'In the last 7 days' in headers
         template_usage_headers = [th.text.strip() for th in page.thead.find_all('th')]
-        for th in ['Template', 'Type', 'Messages sent']:
+        for th in ['Template', 'Type', 'Messages processed']:
             assert th in template_usage_headers
         table_rows = page.tbody.find_all('tr')
 

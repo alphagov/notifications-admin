@@ -1,16 +1,17 @@
 {% from "components/big-number.html" import big_number_with_status %}
 
 <h2 class="heading-medium">
-  Sent today
+  In the last 7 days
 </h2>
-<div class="grid-row">
+<div class="grid-row bottom-gutter">
   <div class="column-half">
     {{ big_number_with_status(
-      statistics.get('emails_requested', 0),
-      'email' if statistics.get('emails_requested') == 1 else 'emails',
+      statistics.get('emails_delivered', 0),
+      'email' if statistics.get('emails_delivered') == 1 else 'emails',
       statistics.get('emails_failed'),
       statistics.get('emails_failure_rate', 0.0),
-      statistics.get('emails_failure_rate', 0)|float > 3
+      statistics.get('emails_failure_rate', 0)|float > 3,
+      failure_link=url_for(".view_notifications", service_id=current_service.id, template_type='email', status='failed')
     ) }}
   </div>
   <div class="column-half">
@@ -19,10 +20,10 @@
       'text message' if statistics.get('sms_requested') == 1 else 'text messages',
       statistics.get('sms_failed'),
       statistics.get('sms_failure_rate', 0.0),
-      statistics.get('sms_failure_rate', 0)|float > 3
+      statistics.get('sms_failure_rate', 0)|float > 3,
+      failure_link=url_for(".view_notifications", service_id=current_service.id, template_type='sms', status='failed')
     ) }}
   </div>
 </div>
 
 {% include 'views/dashboard/template-statistics.html' %}
-
