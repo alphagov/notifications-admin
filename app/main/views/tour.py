@@ -12,9 +12,8 @@ headings = [
 ]
 
 
-@main.route("/services/<service_id>/tour/<int:page>")
-@login_required
-def tour(service_id, page):
+@main.route("/tour/<int:page>")
+def tour(page):
     return render_template(
         'views/tour/{}.html'.format(page),
         current_page=page,
