@@ -34,6 +34,7 @@ def service_dashboard(service_id):
 
     if session.get('invited_user'):
         session.pop('invited_user', None)
+        session['service_id'] = service_id
         return redirect(url_for("main.tour", page=1))
 
     statistics = statistics_api_client.get_statistics_for_service(service_id)['data']

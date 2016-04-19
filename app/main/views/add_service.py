@@ -42,7 +42,7 @@ def add_service():
                                                        restricted=True,
                                                        user_id=session['user_id'],
                                                        email_from=email_from)
-
+        session['service_id'] = service_id
         return redirect(url_for('main.tour', page=1))
     else:
         return render_template(

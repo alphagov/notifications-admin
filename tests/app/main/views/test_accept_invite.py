@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import url_for, session
 
 from bs4 import BeautifulSoup
 
@@ -372,8 +372,8 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
                 mock_add_user_to_service.assert_called_with(data['service'], new_user_id, expected_permissions)
                 mock_accept_invite.assert_called_with(data['service'], sample_invite['id'])
                 mock_check_verify_code.assert_called_once_with(new_user_id, '12345', 'sms')
+                assert service_one['id'] == session['service_id']
 
             raw_html = response.data.decode('utf-8')
             page = BeautifulSoup(raw_html, 'html.parser')
             element = page.find('h2').text == 'Trial mode'
-            assert service_one['id'] in raw_html
