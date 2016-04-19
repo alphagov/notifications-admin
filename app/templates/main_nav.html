@@ -7,8 +7,8 @@
     <li><a href="{{ url_for('.view_notifications', service_id=current_service.id, status='delivered,failed') }}">Activity</a></li>
   {% endif %}
   {% if current_user.has_permissions(['view_activity', 'manage_templates', 'manage_api_keys'], admin_override=True, any_=True) %}
-    <li><a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='sms') }}">Text message templates</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='email') }}">Email templates</a></li>
+    <li><a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='sms') }}">Text message templates</a></li>
   {% endif %}
   {% if current_user.has_permissions(['manage_users', 'manage_settings'], admin_override=True) %}
     <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>

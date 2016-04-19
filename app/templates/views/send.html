@@ -11,32 +11,34 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Send from a CSV file</h1>
 
-  {% if 'sms' == template.template_type %}
-    <div class="grid-row">
-      <div class="column-two-thirds">
+  <h1 class="heading-large">Send {{ 'text messages' if 'sms' == template.template_type else 'emails' }}</h1>
+
+  <div class="grid-row">
+    <div class="column-two-thirds">
+      {% if 'sms' == template.template_type %}
         {{ sms_message(template.formatted_as_markup) }}
-      </div>
+      {% elif 'email' == template.template_type %}
+        {{ email_message(
+          template.formatted_subject_as_markup,
+          template.formatted_as_markup
+        ) }}
+      {% endif %}
     </div>
-  {% elif 'email' == template.template_type %}
-    {{ email_message(
-      template.formatted_subject_as_markup,
-      template.formatted_as_markup,
-      from_address='{}@notifications.service.gov.uk'.format(current_service.email_from),
-      from_name=current_service.name
-    ) }}
-  {% endif %}
+    <div class="column-one-third">
+      <a href="{{ url_for(".send_message_to_self", service_id=current_service.id, template_id=template.id) }}" class='secondary-button'>Send yourself a test</a>
+    </div>
+  </div>
 
   <h2 class="heading-medium">
-    You need
+    Make a CSV file with
     {{ template.placeholders|length + 1 }}
     {% if template.placeholders %}
-      columns
+      columns,
     {% else %}
-      column
+      column,
     {% endif %}
-    in your file, like this:
+    like this:
   </h2>
 
   {% call(item, row_number) list_table(

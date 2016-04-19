@@ -14,15 +14,14 @@
   <h1 class="heading-large">{{ template.name }}</h1>
 
   <div class="grid-row">
-    {% include 'views/templates/_template.html' %}
+    {% with show_title=False %}
+      {% include 'views/templates/_template.html' %}
+    {% endwith %}
   </div>
 
-  <p>
-    <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type=template.template_type) }}">
-      All
-      {{ 'email' if 'email' == template.template_type else 'text message' }}
-      templates
-    </a>
-  </p>
+  {{ page_footer(
+    secondary_link=url_for('.choose_template', service_id=current_service.id, template_type=template.template_type),
+    secondary_link_text='All {} templates'.format('email' if 'email' == template.template_type else 'text message')
+  ) }}
 
 {% endblock %}
