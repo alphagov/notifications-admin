@@ -1,4 +1,5 @@
 import markdown
+import os
 from flask import render_template, url_for, redirect, Markup
 from app.main import main
 from flask_login import login_required
@@ -42,7 +43,8 @@ def terms():
 
 @main.route('/documentation')
 def documentation():
-    with open('docs/index.md') as source:
+    curr_dir = os.path.dirname(os.path.realpath(__file__))
+    with open(os.path.join(curr_dir, '../../../docs/index.md')) as source:
         return render_template(
             'views/documentation.html',
             body=Markup(markdown.markdown(
