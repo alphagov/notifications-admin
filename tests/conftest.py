@@ -172,7 +172,7 @@ def mock_delete_service(mocker, mock_get_service):
 
 @pytest.fixture(scope='function')
 def mock_get_service_statistics(mocker):
-    def _create(service_id):
+    def _create(service_id, limit_days=None):
         return {'data': [{}]}
 
     return mocker.patch(
