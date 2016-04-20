@@ -180,7 +180,6 @@ def send_message_to_self(service_id, template_id):
 
 @main.route("/services/<service_id>/send/<template_id>/from-api", methods=['GET'])
 @login_required
-@user_has_permissions('manage_api_keys')
 def send_from_api(service_id, template_id):
     template = Template(
         service_api_client.get_service_template(service_id, template_id)['data'],
