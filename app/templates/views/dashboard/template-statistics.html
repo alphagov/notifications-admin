@@ -4,7 +4,7 @@
   caption="By template",
   caption_visible=False,
   empty_message='You haven’t used any templates {}'.format(period),
-  field_headings=['Template', hidden_field_heading('Type'), right_aligned_field_heading('Messages processed')]
+  field_headings=['Template', hidden_field_heading('Type'), right_aligned_field_heading('Messages sent')]
 ) %}
   {% call field() %}
     <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">
