@@ -10,22 +10,21 @@
     ) }}
   {% elif 'sms' == template.template_type %}
     {{ sms_message(
-        template.formatted_as_markup,
-        name=template.name if show_title else None
-      ) }}
+      template.formatted_as_markup,
+      name=template.name if show_title else None
+    ) }}
   {% endif %}
 </div>
 <div class="column-one-third">
   <div class="sms-message-use-links{% if show_title %}-with-title{% endif %}">
     {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
-      <a href="{{ url_for(".send_messages", service_id=current_service.id, template_id=template.id) }}">Send from a CSV file</a>
-      <a href="{{ url_for(".send_message_to_self", service_id=current_service.id, template_id=template.id) }}">Send yourself a test</a>
-    {% endif %}
-    {% if current_user.has_permissions(permissions=['manage_api_keys']) %}
-      <a href="{{ url_for(".send_from_api", service_id=current_service.id, template_id=template.id) }}">API integration</a>
+      <a href="{{ url_for(".send_messages", service_id=current_service.id, template_id=template.id) }}">
+      Send {{ 'text messages' if 'sms' == template.template_type else 'emails' }}
+      </a>
     {% endif %}
     {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
        <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}">Edit template</a>
     {% endif %}
+    <a href="{{ url_for(".send_from_api", service_id=current_service.id, template_id=template.id) }}">API info</a>
   </div>
 </div>

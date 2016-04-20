@@ -49,7 +49,7 @@ MockRecipients = namedtuple(
             [
                 'add a column called ‘name’',
                 'fix 1 phone number',
-                'fill in 1 empty cell'
+                'enter missing data in 1 row'
             ]
         ),
         (
@@ -63,7 +63,7 @@ MockRecipients = namedtuple(
             [
                 'add columns called ‘name’, ‘date’, and ‘time’',
                 'fix 4 phone numbers',
-                'fill in 4 empty cells'
+                'enter missing data in 4 rows'
             ]
         )
     ]

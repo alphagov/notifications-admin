@@ -140,7 +140,14 @@ def view_notifications(service_id):
             'Next page',
             'page {}'.format(page + 1))
     if 'download' in request.args and request.args['download'] == 'csv':
-        csv_content = generate_notifications_csv(notifications['notifications'])
+        csv_content = generate_notifications_csv(
+            notification_api_client.get_notifications_for_service(
+                service_id=service_id,
+                page=page,
+                page_size=notifications['total'],
+                template_type=filter_args.getlist('template_type') if 'template_type' in filter_args else None,
+                status=filter_args.getlist('status')
+                if 'status' in filter_args else ['delivered', 'failed'])['notifications'])
         return csv_content, 200, {
             'Content-Type': 'text/csv; charset=utf-8',
             'Content-Disposition': 'inline; filename="notifications.csv"'

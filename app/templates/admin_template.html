@@ -78,7 +78,7 @@
         <div class="column-one-third">
           <h2>Contact</h2>
           <ul>
-            <li><a href="https://docs.google.com/forms/d/1AL8U-xJX_HAFEiQiJszGQw0PcEaEUnYATSntEghNDGo/viewform">Support and feedback</a></li>
+            <li><a href="{{ url_for('main.feedback') }}">Support and feedback</a></li>
           </ul>
         </div>
         <div class="column-one-third">
@@ -91,8 +91,11 @@
           </ul>
         </div>
         <div class="column-one-third">
-          <h2>Developers</h2>
-          <a href="{{ url_for('main.documentation') }}">API documentation</a>
+          <h2>Documentation</h2>
+          <ul>
+            <li><a href="{{ url_for('main.tour', page=1) }}">Take the tour</a></li>
+            <li><a href="{{ url_for('main.documentation') }}">API documentation</a></li>
+          </ul>
         </div>
       </div>
     </div>

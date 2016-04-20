@@ -112,13 +112,12 @@
   @include core-16;
   color: $secondary-text-colour;
   margin-top: -20px;
-  margin-bottom: $gutter * 1.5;
+  margin-bottom: $gutter * 1.3333;
   border-bottom: 1px solid $border-colour;
   padding-bottom: 10px;
   text-align: center;
 }
 
 a.table-show-more-link {
-  @include bold-16;
   color: $link-colour;
 }

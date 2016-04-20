@@ -11,10 +11,7 @@
     margin-bottom: 10px;
   }
 
-  &-button-show {
-    @include button($grey-3);
-  }
-
+  &-button-show,
   &-button-copy {
     @include button($grey-3);
   }

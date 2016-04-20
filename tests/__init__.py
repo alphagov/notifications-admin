@@ -149,6 +149,8 @@ def notification_json(service_id,
             'status': status,
             'created_at': created_at
         } for i in range(5)],
+        'total': 5,
+        'page_size': 50,
         'links': links
     }
     return data
