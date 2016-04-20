@@ -78,7 +78,7 @@ def test_should_show_recent_templates_on_dashboard(app_,
         assert response.status_code == 200
         response.get_data(as_text=True)
         mock_get_service_statistics.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
-        mock_template_stats.assert_called_once_with(SERVICE_ONE_ID)
+        mock_template_stats.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
 
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         headers = [header.text.strip() for header in page.find_all('h2')]

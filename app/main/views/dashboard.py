@@ -38,13 +38,8 @@ def service_dashboard(service_id):
 
     return render_template(
         'views/dashboard/dashboard.html',
-        statistics=add_rates_to(
-            statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
-        ),
         templates=service_api_client.get_service_templates(service_id)['data'],
-        template_statistics=aggregate_usage(
-            template_statistics_client.get_template_statistics_for_service(service_id)
-        )
+        **get_dashboard_statistics_for_service(service_id)
     )
 
 
@@ -54,12 +49,7 @@ def service_dashboard_updates(service_id):
     return jsonify(**{
         'today': render_template(
             'views/dashboard/today.html',
-            statistics=add_rates_to(
-                statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
-            ),
-            template_statistics=aggregate_usage(
-                template_statistics_client.get_template_statistics_for_service(service_id)
-            )
+            **get_dashboard_statistics_for_service(service_id)
         )
     })
 
@@ -125,3 +115,14 @@ def aggregate_usage(template_statistics):
         key=lambda row: row['usage_count'],
         reverse=True
     )
+
+
+def get_dashboard_statistics_for_service(service_id):
+    return {
+        'statistics': add_rates_to(
+            statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
+        ),
+        'template_statistics': aggregate_usage(
+            template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
+        )
+    }
