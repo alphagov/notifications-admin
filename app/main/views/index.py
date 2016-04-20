@@ -44,7 +44,7 @@ def terms():
 @main.route('/documentation')
 def documentation():
     curr_dir = os.path.dirname(os.path.realpath(__file__))
-    with open(os.path.join(curr_dir, '../../../docs/index.md')) as source:
+    with open(os.path.join(curr_dir, '../../../docs/index.md'), encoding='utf-8') as source:
         return render_template(
             'views/documentation.html',
             body=Markup(markdown.markdown(
