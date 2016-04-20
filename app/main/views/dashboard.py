@@ -54,6 +54,18 @@ def service_dashboard_updates(service_id):
     })
 
 
+@main.route("/services/<service_id>/template-activity")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def template_history(service_id):
+    return render_template(
+        'views/dashboard/all-template-statistics.html',
+        template_statistics=aggregate_usage(
+            template_statistics_client.get_template_statistics_for_service(service_id)
+        )
+    )
+
+
 def add_rates_to(delivery_statistics):
 
     if not delivery_statistics or not delivery_statistics[0]:

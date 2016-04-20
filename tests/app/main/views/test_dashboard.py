@@ -101,6 +101,49 @@ def test_should_show_recent_templates_on_dashboard(app_,
         assert table_data[2].text.strip() == '13'
 
 
+def test_should_show_all_templates_on_template_statistics_page(
+    app_,
+    mocker,
+    api_user_active,
+    mock_get_service,
+    mock_get_service_templates,
+    mock_get_service_statistics,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_login,
+    mock_get_jobs,
+    mock_has_permissions
+):
+
+    mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
+                                       return_value=copy.deepcopy(stub_template_stats))
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(url_for('main.template_history', service_id=SERVICE_ONE_ID))
+
+        assert response.status_code == 200
+        response.get_data(as_text=True)
+        mock_template_stats.assert_called_once_with(SERVICE_ONE_ID)
+
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        headers = [header.text.strip() for header in page.find_all('h2')]
+        table_rows = page.tbody.find_all('tr')
+
+        assert len(table_rows) == 2
+
+        first_row = page.tbody.find_all('tr')[0]
+        table_data = first_row.find_all('td')
+        assert len(table_data) == 3
+        assert table_data[2].text.strip() == '206'
+
+        second_row = page.tbody.find_all('tr')[1]
+        table_data = second_row.find_all('td')
+        assert len(table_data) == 3
+        assert table_data[2].text.strip() == '13'
+
+
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
