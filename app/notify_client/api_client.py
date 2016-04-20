@@ -159,6 +159,9 @@ class ServiceAPIClient(NotificationsAPIClient):
     def get_service_history(self, service_id):
         return self.get('/service/{0}/history'.format(service_id))
 
+    def get_service_usage(self, service_id):
+        return self.get('/service/{0}/fragment/aggregate_statistics'.format(service_id))
+
 
 class ServicesBrowsableItem(BrowsableItem):
 

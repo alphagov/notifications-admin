@@ -1,4 +1,4 @@
-{% from "components/big-number.html" import big_number_with_status %}
+{% from "components/big-number.html" import big_number, big_number_with_status %}
 
 <div
   data-module="update-content"
@@ -38,6 +38,36 @@
     {% include 'views/dashboard/template-statistics.html' %}
   {% endwith %}
   <p class='table-show-more-link'>
-    <a href="{{ url_for('.template_history', service_id=current_service.id) }}">See all templates used this year</a>
+    <a href="{{ url_for('.template_history', service_id=current_service.id) }}">See all templates sent this year</a>
   </p>
+
+  {% if current_user.has_permissions(['manage_settings'], admin_override=True) %}
+    <h2 class='heading-medium' style="margin-top: 30px;">This year</h2>   
+
+    <div class='grid-row'>
+      <div class='column-half'>
+        <div class="keyline-block">
+          {{ big_number("Unlimited", 'free email allowance', right_aligned=True) }}
+        </div>
+      </div>
+      <div class='column-half'>
+        <div class="keyline-block">
+          {% if sms_chargeable %}
+            {{ big_number(
+              (sms_chargeable * sms_rate),
+              'spent on text messages',
+              currency="£",
+              right_aligned=True
+            ) }}
+          {% else %}
+            {{ big_number(sms_allowance_remaining, 'free text messages left', right_aligned=True) }}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="keyline-block-show-more-link">
+      <a href="{{ url_for(".usage", service_id=current_service['id']) }}">See usage</a>
+    </div>
+  {% endif %}
+
 </div>

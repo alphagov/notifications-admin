@@ -1,0 +1,20 @@
+.dashboard {
+  table th {
+    @include bold-19;
+  }
+}
+
+.keyline-block {
+
+  border-top: 1px solid $border-colour;
+  padding-top: $gutter-half;
+
+  &-show-more-link {
+    @include core-16;
+    border-top: 1px solid $border-colour;
+    border-bottom: 1px solid $border-colour;
+    padding: 10px 0;
+    text-align: center;
+  }
+
+}

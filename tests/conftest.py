@@ -899,6 +899,19 @@ def mock_get_template_statistics(mocker, service_one, fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def mock_get_usage(mocker, service_one, fake_uuid):
+
+    def _get_usage(service_id):
+        return {'data': {
+          "sms_count": 123,
+          "email_count": 456
+        }}
+
+    return mocker.patch(
+        'app.service_api_client.get_service_usage', side_effect=_get_usage)
+
+
+@pytest.fixture(scope='function')
 def mock_events(mocker):
 
     def _create_event(event_type, event_data):

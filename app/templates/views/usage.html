@@ -1,0 +1,67 @@
+{% from "components/big-number.html" import big_number %}
+
+{% extends "withnav_template.html" %}
+
+{% block page_title %}
+  Billing – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <div class='grid-row'>
+      <div class='column-half'>
+        <h2 class='heading-large'>Usage</h2>
+      </div>
+      <div class='column-half'>
+        <span class="align-with-heading-copy">1 April 2016 to date</span>
+      </div>
+    </div>
+
+    <div class='grid-row'>
+      <div class='column-half'>
+        <h2 class='heading-small'>Emails</h2>
+        <div class="keyline-block">
+          {{ big_number(emails_sent, 'sent', right_aligned=True) }}
+          {{ big_number("Unlimited", 'free allowance', right_aligned=True) }}
+        </div>
+      </div>
+      <div class='column-half'>
+        <h2 class='heading-small'>Text messages</h2>
+        <div class="keyline-block">
+          {{ big_number(sms_sent, 'sent', right_aligned=True) }}
+          {{ big_number(sms_free_allowance, 'free allowance', right_aligned=True) }}
+          {{ big_number(sms_allowance_remaining, 'free allowance remaining', right_aligned=True) }}
+          {% if sms_chargeable %}
+            {{ big_number(
+              sms_chargeable,
+              'at {:.1f}p per message'.format(sms_rate * 100),
+              right_aligned=True
+            ) }}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class='grid-row'>
+      <div class='column-half'>
+        <div class="keyline-block">
+          &nbsp;
+        </div>
+      </div>
+      <div class='column-half'>
+        <div class="keyline-block bottom-gutter">
+          {{ big_number(
+            (sms_chargeable * sms_rate),
+            'spent',
+            currency="£",
+            right_aligned=True
+          ) }}
+        </div>
+        <p>
+          What counts as 1 text message?<br />
+          See <a href="{{ url_for('.pricing') }}">pricing</a>.
+        </p>
+      </div>
+    </div>
+
+{% endblock %}
