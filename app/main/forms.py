@@ -306,3 +306,10 @@ class CreateKeyForm(Form):
     def validate_key_name(self, key_name):
         if key_name.data.lower() in self.existing_key_names:
             raise ValidationError('A key with this name already exists')
+
+
+class Feedback(Form):
+
+    name = StringField('Name')
+    email_address = StringField('Email address')
+    feedback = TextAreaField(u'', validators=[DataRequired(message="Can’t be empty")])

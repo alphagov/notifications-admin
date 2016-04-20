@@ -1,6 +1,7 @@
 from flask import url_for, session
 
 from bs4 import BeautifulSoup
+from unittest.mock import ANY
 
 import app
 
@@ -255,7 +256,6 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(a
             assert response.status_code == 302
             assert response.location == expected_redirect_location
 
-            from unittest.mock import ANY
             mock_send_verify_code.assert_called_once_with(ANY, 'sms', data['mobile_number'])
 
             mock_register_user.assert_called_with(data['name'],
