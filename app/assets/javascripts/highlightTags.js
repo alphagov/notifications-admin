@@ -25,7 +25,7 @@
       this.initialHeight = this.$textbox.height();
 
       this.$backgroundMaskForeground.css({
-        'width': this.$textbox.width(),
+        'width': this.$textbox.outerWidth(),
         'border-width': this.$textbox.css('border-width')
       });
 

@@ -6,13 +6,13 @@
   Modules.ApiKey = function() {
 
     const states = {
-      'keyVisible': key => `
+      'keyVisible': (key, thing) => `
         <span class="api-key-key">${key}</span>
-        <input type='button' class='api-key-button-copy' value='Copy API key to clipboard' />
+        <input type='button' class='api-key-button-copy' value='Copy ${thing} to clipboard' />
       `,
-      'keyCopied': `
+      'keyCopied': thing => `
         <span class="api-key-key">Copied to clipboard</span>
-        <input type='button' class='api-key-button-show' value='Show API key' />
+        <input type='button' class='api-key-button-show' value='Show ${thing}' />
       `
     };
 
@@ -30,21 +30,22 @@
     this.start = function(component) {
 
       const $component = $(component),
-            key = $component.data('key');
+            key = $component.data('key'),
+            thing = $component.data('thing');
 
       $component
-        .html(states.keyVisible(key))
+        .html(states.keyVisible(key, thing))
         .attr('aria-live', 'polite')
         .on(
           'click', '.api-key-button-copy', () =>
             this.copyKey(
               $('.api-key-key', component)[0], () =>
-                $component.html(states.keyCopied)
+                $component.html(states.keyCopied(thing))
             )
         )
         .on(
           'click', '.api-key-button-show', () =>
-            $component.html(states.keyVisible(key))
+            $component.html(states.keyVisible(key, thing))
         );
 
     };

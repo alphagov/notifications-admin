@@ -172,7 +172,7 @@ def mock_delete_service(mocker, mock_get_service):
 
 @pytest.fixture(scope='function')
 def mock_get_service_statistics(mocker):
-    def _create(service_id):
+    def _create(service_id, limit_days=None):
         return {'data': [{}]}
 
     return mocker.patch(
@@ -674,6 +674,7 @@ def mock_get_notifications(mocker):
     def _get_notifications(service_id,
                            job_id=None,
                            page=1,
+                           page_size=50,
                            template_type=None,
                            status=None):
         return notification_json(service_id)

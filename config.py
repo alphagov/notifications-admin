@@ -36,6 +36,10 @@ class Config(object):
     TOKEN_MAX_AGE_SECONDS = 3600
     WTF_CSRF_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
+    DESKPRO_API_HOST = os.environ['DESKPRO_API_HOST']
+    DESKPRO_API_KEY = os.environ['DESKPRO_API_KEY']
+    DESKPRO_PERSON_EMAIL = os.environ['DESKPRO_PERSON_EMAIL']
+    DESKPRO_TEAM_ID = os.environ['DESKPRO_TEAM_ID']
 
     EMAIL_DOMAIN_REGEXES = [
         "gov\.uk",

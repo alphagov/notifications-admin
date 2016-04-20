@@ -420,10 +420,6 @@ def test_route_choose_template_send_messages_permissions(mocker,
             service_id=service_one['id'],
             template_id=template_id) in page
         assert url_for(
-            "main.send_message_to_self",
-            service_id=service_one['id'],
-            template_id=template_id) in page
-        assert url_for(
             "main.edit_service_template",
             service_id=service_one['id'],
             template_id=template_id) not in page

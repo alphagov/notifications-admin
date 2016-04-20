@@ -1,4 +1,5 @@
 $white-50-opaque: rgba($white, 0.5);
+$button-bottom-border-colour: rgba(0, 0, 0, 0.17);
 
 .email-message {
 
@@ -63,7 +64,7 @@ $white-50-opaque: rgba($white, 0.5);
       position: absolute;
       left: 50%;
       bottom: -18px;
-      height: 25px;
+      height: 27px;
       display: inline-block;
       padding: 0;
       margin: 0 0 0 -30px;
@@ -75,23 +76,20 @@ $white-50-opaque: rgba($white, 0.5);
       cursor: pointer;
       width: 60px;
       text-decoration: none;
-      background: $grey-1;
-      color: $white;
+      background: $grey-3;
+      color: $text-colour;
       border-style: solid;
       border-width: 3px;
       border-color: $white;
-      border-radius: 6px;
-      box-shadow: 0 0 0 1px $white-50-opaque;
+      box-shadow: inset 0 -2px 0 $button-bottom-border-colour, 0 0 0 1px $white-50-opaque;
 
       &:hover {
-        background: $link-hover-colour;
+        background: $grey-2;
       }
 
       &:focus,
       &:active {
-        background: $yellow;
-        border-color: $white;
-        color: $text-colour;
+        border-color: $yellow;
         outline: none;
       }
 

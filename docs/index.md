@@ -158,7 +158,7 @@ where:
 * `to` is the phone number (required)
 * `template` is the template ID to send (required)
  
-  **Note:** Access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application: go to **Text message templates**, click on **Edit template** and recover the template id from the url eg `/templates/<templateID>/edit` 
+  **Note:** Access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application: go to **Text message templates** or **Email templates** and click on **API info**. 
 
 * `personalisation` (optional) specifies the values for the placeholders in your templates
 

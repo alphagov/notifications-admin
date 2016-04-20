@@ -180,22 +180,18 @@ def send_message_to_self(service_id, template_id):
 
 @main.route("/services/<service_id>/send/<template_id>/from-api", methods=['GET'])
 @login_required
-@user_has_permissions('manage_api_keys')
 def send_from_api(service_id, template_id):
     template = Template(
-        service_api_client.get_service_template(service_id, template_id)['data']
+        service_api_client.get_service_template(service_id, template_id)['data'],
+        prefix=current_service['name']
     )
-    payload = {
-        "to": current_user.mobile_number,
-        "template": template.id,
-        "personalisation": {
-            placeholder: "{} 1".format(placeholder) for placeholder in template.placeholders
-        }
+    personalisation = {
+        placeholder: "..." for placeholder in template.placeholders
     }
     return render_template(
         'views/send-from-api.html',
         template=template,
-        payload=json.dumps(payload, indent=4)
+        personalisation=json.dumps(personalisation, indent=4) if personalisation else None
     )
 
 
