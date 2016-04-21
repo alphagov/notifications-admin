@@ -826,7 +826,7 @@ def mock_get_template_statistics(mocker, service_one, fake_uuid):
         "day": "2016-04-04"
     }
 
-    def _get_stats(service_id):
+    def _get_stats(service_id, limit_days=None):
         return [data]
 
     return mocker.patch(

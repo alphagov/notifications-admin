@@ -25,5 +25,9 @@
     ) }}
   </div>
 </div>
-
-{% include 'views/dashboard/template-statistics.html' %}
+{% with period = "in the last 7 days" %}
+  {% include 'views/dashboard/template-statistics.html' %}
+{% endwith %}
+<p class='table-show-more-link'>
+  <a href="{{ url_for('.template_history', service_id=current_service.id) }}">See all templates used this year</a>
+</p>
