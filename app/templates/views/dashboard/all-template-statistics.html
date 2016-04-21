@@ -1,0 +1,17 @@
+{% extends "withnav_template.html" %}
+
+{% block page_title %}
+  {{ current_service.name }} – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+  <h1 class='heading-large'>
+  	Templates used this year
+  </h1>
+  <p>
+	1 April 2016 to date
+  </p>
+  {% with period = "" %}
+	  {% include 'views/dashboard/template-statistics.html' %}
+  {% endwith %}
+{% endblock %}
