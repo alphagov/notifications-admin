@@ -3,8 +3,8 @@
   template_statistics,
   caption="By template",
   caption_visible=False,
-  empty_message='You haven’t set up any templates yet',
-  field_headings=['Template', hidden_field_heading('Type'), right_aligned_field_heading('Messages processed')]
+  empty_message='You haven’t used any templates {}'.format(period),
+  field_headings=['Template', hidden_field_heading('Type'), right_aligned_field_heading('Messages sent')]
 ) %}
   {% call field() %}
     <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">

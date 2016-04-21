@@ -12,7 +12,11 @@ class TemplateStatisticsApiClient(BaseAPIClient):
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
 
-    def get_template_statistics_for_service(self, service_id):
+    def get_template_statistics_for_service(self, service_id, limit_days=None):
+        params = {}
+        if limit_days is not None:
+            params['limit_days'] = limit_days
         return self.get(
             url='/service/{}/template-statistics'.format(service_id),
+            params=params
         )['data']

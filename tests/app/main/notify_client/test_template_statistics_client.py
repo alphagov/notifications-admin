@@ -14,4 +14,4 @@ def test_template_statistics_client_calls_correct_api_endpoint(mocker, api_user_
 
     client.get_template_statistics_for_service(some_service_id)
 
-    mock_get.assert_called_once_with(url=expected_url)
+    mock_get.assert_called_once_with(url=expected_url, params={})
