@@ -26,6 +26,18 @@ from app import (
 from app.utils import user_has_permissions
 
 
+# This is a placeholder view method to be replaced
+# when product team makes decision about how/what/when
+# to view history
+@main.route("/services/<service_id>/history")
+@login_required
+def temp_service_history(service_id):
+    data = service_api_client.get_service_history(service_id)['data']
+    return render_template('views/temp-history.html',
+                            services=data['service_history'],
+                            api_keys=data['api_key_history'])
+
+
 @main.route("/services/<service_id>/dashboard")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
