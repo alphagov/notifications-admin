@@ -1,7 +1,5 @@
 import re
 from wtforms import ValidationError
-from datetime import datetime
-from app.main.encryption import check_hash
 from notifications_utils.template import Template
 
 
