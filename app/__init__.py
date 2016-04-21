@@ -1,8 +1,8 @@
 import os
 import re
-
-import dateutil
 import urllib
+import dateutil
+
 from flask import (
     Flask,
     session,
@@ -13,34 +13,31 @@ from flask import (
     current_app,
     request)
 from flask._compat import string_types
+from flask.globals import _lookup_req_object
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
+from functools import partial
 from notifications_python_client.errors import HTTPError
+from notifications_utils import logging
+from notifications_utils.recipients import validate_phone_number, InvalidPhoneError
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.javascript import JavascriptLexer
 from werkzeug.exceptions import abort
+from werkzeug.local import LocalProxy
 
+import app.proxy_fix
+from app.asset_fingerprinter import AssetFingerprinter
+from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.notify_client.api_client import ServiceAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
-from app.notify_client.user_api_client import UserApiClient
+from app.notify_client.invite_api_client import InviteApiClient
 from app.notify_client.job_api_client import JobApiClient
 from app.notify_client.notification_api_client import NotificationApiClient
-from app.notify_client.status_api_client import StatusApiClient
-from app.notify_client.invite_api_client import InviteApiClient
 from app.notify_client.statistics_api_client import StatisticsApiClient
+from app.notify_client.status_api_client import StatusApiClient
 from app.notify_client.template_statistics_api_client import TemplateStatisticsApiClient
-
-from app.its_dangerous_session import ItsdangerousSessionInterface
-from app.asset_fingerprinter import AssetFingerprinter
-from notifications_utils.recipients import validate_phone_number, InvalidPhoneError
-import app.proxy_fix
-from config import configs
-from notifications_utils import logging
-from werkzeug.local import LocalStack, LocalProxy
-from flask.globals import _lookup_req_object
-from functools import partial
-
+from app.notify_client.user_api_client import UserApiClient
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
@@ -108,6 +105,7 @@ def create_app():
 
     def _attach_current_service():
         return {'current_service': current_service}
+
     application.context_processor(_attach_current_service)
     register_errorhandlers(application)
 
