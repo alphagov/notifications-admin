@@ -56,6 +56,19 @@
     margin-top: 10px;
   }
 
+  a {
+
+    &:link,
+    &:visited {
+      color: $error-colour;
+    }
+
+    &:hover {
+      color: $mellow-red;
+    }
+
+  }
+
 }
 
 .banner-mode {
