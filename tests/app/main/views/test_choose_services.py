@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import url_for, session
 
 
 def test_should_show_choose_services_page(app_,
@@ -52,6 +52,29 @@ def test_redirect_if_multiple_services(
 
         assert response.status_code == 302
         assert response.location == url_for('main.choose_service', _external=True)
+
+
+def test_redirect_if_service_in_session(
+    app_,
+    mock_login,
+    mock_get_user,
+    api_user_active,
+    mock_get_services,
+    mock_get_service
+):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            with client.session_transaction() as session:
+                session['service_id'] = '147ad62a-2951-4fa1-9ca0-093cd1a52c52'
+            response = client.get(url_for('main.show_all_services_or_dashboard'))
+
+        assert response.status_code == 302
+        assert response.location == url_for(
+            'main.service_dashboard',
+            service_id='147ad62a-2951-4fa1-9ca0-093cd1a52c52',
+            _external=True
+        )
 
 
 def test_should_redirect_if_not_logged_in(app_):
