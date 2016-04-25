@@ -1,6 +1,10 @@
 {% macro big_number(number, label) %}
-  <div class="big-number">
-    {{ number }}
+  <div class="big-number{% if right_aligned %}-right-aligned{% endif %}">
+    {% if number is number %}
+      {{ "{:,}".format(number) }}
+    {% else %}
+      {{ number }}
+    {% endif %}
     <span class="big-number-label">{{ label }}</span>
   </div>
 {% endmacro %}
@@ -13,10 +17,10 @@
       {% if failures %}
         {% if failure_link %}
           <a href="{{ failure_link }}">
-            {{ failures }} failed – {{ failure_percentage }}%
+            {{ "{:,}".format(failures) }} failed – {{ failure_percentage }}%
           </a>
         {% else %}
-          {{ failures }} failed – {{ failure_percentage }}%
+          {{ "{:,}".format(failures) }} failed – {{ failure_percentage }}%
         {% endif %}
       {% else %}
         No failures

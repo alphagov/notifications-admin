@@ -18,4 +18,5 @@ class StatisticsApiClient(BaseAPIClient):
             params['limit_days'] = limit_days
         return self.get(
             url='/service/{}/notifications-statistics'.format(service_id),
+            params=params
         )
