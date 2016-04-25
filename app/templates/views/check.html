@@ -13,7 +13,35 @@
 
 {% block maincolumn_content %}
 
-  {% if errors %}
+  {% if count_of_recipients > (current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0)) %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        <h1 class='banner-title'>
+          Too many recipients
+        </h1>
+        {% if statistics.emails_requested or statistics.sms_requested %}
+          <p>
+            You can only send {{ current_service.message_limit }}
+            messages per day
+            {%- if current_service.restricted %}
+              in <a href="{{ url_for('.trial_mode')}}">trial mode</a>
+            {%- endif -%}
+            .
+          </p>
+        {% endif %}
+        <p>
+          You can still send
+          {{ current_service.message_limit - statistics.emails_requested - statistics.sms_requested }}
+          messages today, but
+          ‘{{ original_file_name }}’ contains
+          {{ count_of_recipients }} {{ recipients.recipient_column_header }}
+          {%- if count_of_recipients != 1 -%}
+            {{ 'es' if 'email address' == recipients.recipient_column_header else 's' }}
+          {%- endif -%}.
+        </p>
+      {% endcall %}
+    </div>
+  {% elif errors %}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         {% if errors|length == 1 %}
@@ -61,7 +89,10 @@
     </div>
   {% endif %}
 
-  {% if errors %}
+  {% if (
+    errors or
+    count_of_recipients > (current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0)) 
+  ) %}
     {{file_upload(form.file, button_text='Re-upload your file')}}
   {% else %}
     <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}">
