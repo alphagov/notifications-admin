@@ -26,7 +26,7 @@ from app.main.uploader import (
     s3upload,
     s3download
 )
-from app import job_api_client, service_api_client, current_service, user_api_client
+from app import job_api_client, service_api_client, current_service, user_api_client, statistics_api_client
 from app.utils import user_has_permissions, get_errors_for_csv
 
 
@@ -204,6 +204,8 @@ def check_messages(service_id, template_type, upload_id):
         return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
 
     users = user_api_client.get_users_for_service(service_id=service_id)
+    statistics = statistics_api_client.get_statistics_for_service(service_id, limit_days=1)['data']
+    statistics = statistics[0] if statistics else {}
 
     contents = s3download(service_id, upload_id)
     if not contents:
@@ -252,7 +254,8 @@ def check_messages(service_id, template_type, upload_id):
         original_file_name=session['upload_data'].get('original_file_name'),
         send_button_text=get_send_button_text(template.template_type, session['upload_data']['notification_count']),
         upload_id=upload_id,
-        form=CsvUploadForm()
+        form=CsvUploadForm(),
+        statistics=statistics
     )
 
 

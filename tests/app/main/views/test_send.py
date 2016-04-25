@@ -19,6 +19,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
+    mock_get_service_statistics,
     fake_uuid
 ):
 
@@ -60,6 +61,7 @@ def test_send_test_sms_message_to_self(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
+    mock_get_service_statistics,
     fake_uuid
 ):
 
@@ -87,6 +89,7 @@ def test_send_test_email_message_to_self(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
+    mock_get_service_statistics,
     fake_uuid
 ):
 
@@ -159,6 +162,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
+    mock_get_service_statistics,
     fake_uuid
 ):
 
@@ -239,6 +243,7 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
     mock_s3_upload,
     mocker,
     mock_has_permissions,
+    mock_get_service_statistics,
     mock_get_users_by_service
 ):
 
