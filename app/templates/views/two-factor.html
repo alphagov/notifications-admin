@@ -11,20 +11,20 @@
 
 <div class="grid-row">
   <div class="column-two-thirds">
-    <h1 class="heading-large">Text verification</h1>
+    <h1 class="heading-large">Check your phone</h1>
 
-    <p>We've sent you a text message with a verification code.</p>
+    <p>We’ve sent you a text message with a verification code.</p>
 
     <form autocomplete="off" method="post">
       {{ textbox(
         form.sms_code,
         width='5em',
-        autofocus=True,
-        help_link=url_for('.verification_code_not_received'),
-        help_link_text='I haven’t received a text message'
+        autofocus=True
       ) }}
       {{ page_footer(
-        "Continue"
+        "Continue",
+        secondary_link=url_for('.verification_code_not_received'),
+        secondary_link_text='Not received a text message?'
       ) }}
     </form>
   </div>
