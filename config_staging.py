@@ -10,3 +10,4 @@ class Staging(Config):
     SECRET_KEY = os.environ['STAGING_SECRET_KEY']
     DANGEROUS_SALT = os.environ['STAGING_DANGEROUS_SALT']
     CSV_UPLOAD_BUCKET_NAME = 'staging-notifications-csv-upload'
+    DESKPRO_API_KEY = os.environ['STAGING_DESKPRO_API_KEY']
