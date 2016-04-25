@@ -8,9 +8,16 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    API keys
-  </h1>
+  <div class="grid-row">
+    <div class="column-two-thirds">
+      <h1 class="heading-large">
+        API keys
+      </h1>
+    </div>
+    <div class="column-one-third">
+      <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}" class="button align-with-heading">Create new API key</a>
+    </div>
+  </div>
 
   <p>
     To connect to the API you will need to create an API Key. Each service can have multiple API Keys to allow
@@ -43,10 +50,6 @@
       {% endcall %}
     {% endif %}
   {% endcall %}
-
-  <p class='table-show-more-link'>
-    <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}">Create a new API key</a>
-  </p>
 
   {{ api_key(current_service.id, "Service ID", thing="service ID") }}
 

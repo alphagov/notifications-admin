@@ -33,8 +33,6 @@
             key = $component.data('key'),
             thing = $component.data('thing');
 
-      console.log(thing)
-
       $component
         .html(states.keyVisible(key, thing))
         .attr('aria-live', 'polite')
