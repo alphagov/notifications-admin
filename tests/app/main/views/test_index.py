@@ -47,7 +47,7 @@ def test_post_feedback_with_no_name_email(app_, mocker):
             mock_post.assert_called_with(
                 ANY,
                 data={
-                    'agent_team_id': ANY,
+                    'department_id': ANY,
                     'subject': 'Notify feedback',
                     'message': '\n\nblah',
                     'person_email': ANY},
@@ -68,7 +68,7 @@ def test_post_feedback_with_name_email(app_, mocker):
                 ANY,
                 data={
                     'subject': 'Notify feedback',
-                    'agent_team_id': ANY,
+                    'department_id': ANY,
                     'message': 'Steve Irwin\nrip@gmail.com\nblah',
                     'person_email': ANY},
                 headers=ANY)
@@ -93,7 +93,7 @@ def test_log_error_on_post(app_, mocker):
                 ANY,
                 data={
                     'subject': 'Notify feedback',
-                    'agent_team_id': ANY,
+                    'department_id': ANY,
                     'message': 'Steve Irwin\nrip@gmail.com\nblah',
                     'person_email': ANY},
                 headers=ANY)

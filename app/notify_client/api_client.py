@@ -155,6 +155,10 @@ class ServiceAPIClient(NotificationsAPIClient):
         resp = self.get_services(user_id)
         return [x['email_from'] for x in resp['data']]
 
+    # Temp access of service history data. Includes service and api key history
+    def get_service_history(self, service_id):
+        return self.get('/service/{0}/history'.format(service_id))
+
 
 class ServicesBrowsableItem(BrowsableItem):
 

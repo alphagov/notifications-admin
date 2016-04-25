@@ -32,11 +32,11 @@ To get started:
 
   2. Add a new service.
 
-    At first your service will be in trial mode. In trial mode you will only be able to send test sms and email notifications to your own mobile number or email address. When you’re fully integrated and ready to go live, send a request to the GOV.UK Notify team.
+    At first your service will be in trial mode. In trial mode, you can send up to 50 test notifications per day to yourself and your team members. When you’re fully integrated and ready to go live, send a request to the GOV.UK Notify team.
 
   3. Add a template so you can send sms and email notifications. 
 
-    **Note:** A template is required even if you send notifications by integrating with the GOV.UK Notify API.
+    **Note:** A template is required even if you send notifications with the GOV.UK Notify API.
  
     You can personalise the template using double brackets for placeholders. For example:
 
@@ -50,7 +50,9 @@ To get started:
 
   6. If you intend to use the GOV.UK Notify API, create a new API key. This will be used to connect to the GOV.UK Notify API.
 
-    You can provide all your developers with test keys so they can experiment in the Sandbox environment. But keep the number of keys for real integrations to a minimum number of people on your team.
+    Each service can have multiple API keys. This allows you to integrate a number of systems, each with its own key. You can also have separate keys for your development and test environments.
+    
+    **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories. 
 
 <a name="integrateNotify"></a>
 ## Integrate the GOV.UK Notify API into your service
@@ -64,15 +66,16 @@ GOV.UK Notify provides an API that allows you to create text and email notificat
 There are two ways to integrate the API into your service:
 
 * use one of the client libraries provided by GOV.UK Notify:
-  * [python library](https://github.com/alphagov/notifications-python-client) 
-  * [PHP library] (https://github.com/alphagov/notifications-php-client)
-  * [Java library] (https://github.com/alphagov/notifications-java-client)
+  <ul>
+    <li> [Python library](https://github.com/alphagov/notifications-python-client) </li>
+    <li> [PHP library] (https://github.com/alphagov/notifications-php-client) </li>
+    <li> [Java library] (https://github.com/alphagov/notifications-java-client) </li>
+  </ul>
 * develop your own integration to produce requests in the correct format
 
+GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/) for authentication and identification. The GOV.UK Notify client libraries encode and decode JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use one of these libraries, you must manually create tokens yourself. 
 
-GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/) for authentication and identification. The GOV.UK Notify client library encodes and decodes JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use this library, you must manually create tokens yourself. 
-
-For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library.
+For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library, or the appropriate [PHP] (https://github.com/alphagov/notifications-php-client) or [Java] (https://github.com/alphagov/notifications-java-client) client library.
 
 A JSON Web Token contains, in encrypted format:
 
@@ -80,8 +83,6 @@ A JSON Web Token contains, in encrypted format:
 * your API key (in JSON Web Token terms this is called the client ID) – used to sign tokens during requests for API resources
 
 Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
-
-**Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories.
 
 ### JSON Web Tokens: claims
 
@@ -107,11 +108,13 @@ The signing algorithm is the HMAC signature, using the provided key SHA256 hashi
 
 ### API client libraries
 
-GOV.UK Notify supports a python client library:
+GOV.UK Notify supports the following client libraries:
 
-[GOV.UK Notify Python client](https://github.com/alphagov/notifications-python-client)
+ * [GOV.UK Notify Python library](https://github.com/alphagov/notifications-python-client) 
+ * [GOV.UK Notify PHP library] (https://github.com/alphagov/notifications-php-client)
+ * [GOV.UK Notify Java library] (https://github.com/alphagov/notifications-java-client)
 
-This provides example code for calling the API and for constructing the API tokens.
+These provide example code for calling the API and for constructing the API tokens.
 
 
 ### API endpoints
@@ -155,14 +158,12 @@ POST /notifications/email
 
 where:
 
-* `to` is the phone number (required)
+* `to` is the phone number or email address (required)
 * `template` is the template ID to send (required)
- 
-  **Note:** Access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application: go to **Text message templates** or **Email templates** and click on **API info**. 
-
+   <p><strong>Note:</strong> To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to <strong>Text message templates</strong> or <strong>Email templates</strong> and click on <strong>API info</strong>. 
+   </p>
 * `personalisation` (optional) specifies the values for the placeholders in your templates
-
-You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart)
+  <p><strong>Note:</strong> You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
 
 <a id="coderesponse"></a>
 The response will be:
@@ -203,10 +204,11 @@ GET /notifications/{id}
 where:
 
 * `status` is the the status of the notification; this can be `sending`, `delivered`, or `failed` 
+* `to` is the phone number or email address
 * `template_type` is `sms` or `email`
-* `sent_at` is the full timestamp, in UTC, at which the notification was sent
-* `job_id` is the unique identifier for the process of sending and retreiving one or more notifications
+* `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the notification was sent
 * `message` is the content of message
+* `job_id` is the unique identifier for the process of sending and retreiving one or more notifications
 * `sender` may be the provider
 
 The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
@@ -227,7 +229,7 @@ GET /notifications
          'sent_at':'2016-01-01T09:01:00.999999Z',
          'id':1,
          'message':'...',
-         'job-id':1,
+         'job_id':1,
          'sender':'sms-partner'
       }
    },

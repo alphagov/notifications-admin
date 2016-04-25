@@ -1,7 +1,5 @@
 import re
 from wtforms import ValidationError
-from datetime import datetime
-from app.main.encryption import check_hash
 from notifications_utils.template import Template
 
 
@@ -33,8 +31,7 @@ class ValidEmailDomainRegex(object):
         message = (
             'Enter a central government email address.'
             ' If you think you should have access'
-            ' <a href="{}">contact us</a>').format(
-                "https://docs.google.com/forms/d/1AL8U-xJX_HAFEiQiJszGQw0PcEaEUnYATSntEghNDGo/viewform")
+            ' <a href="{}">contact us</a>').format(url_for('main.feedback'))
         valid_domains = current_app.config.get('EMAIL_DOMAIN_REGEXES', [])
         email_regex = "[^\@^\s]+@([^@^\\.^\\s]+\.)*({})$".format("|".join(valid_domains))
         if not re.match(email_regex, field.data.lower()):
