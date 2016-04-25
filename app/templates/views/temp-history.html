@@ -1,0 +1,82 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/table.html" import list_table, field %}
+
+{% block page_title %}
+History – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    {{ "Service and API key history" }}
+  </h1>
+
+  <div class="grid-row">
+    {% call(item, row_number) list_table(
+        services,
+        caption="Service history",
+        field_headings=['ID','Name','Created at','Updated at','Active','Message limit','Restricted','Created by id']
+    )%}
+      {% call field() %}
+        {{item.id}}
+      {% endcall %}
+      {% call field() %}
+        {{item.name}}
+      {% endcall %}
+      {% call field() %}
+        {{item.created_at}}
+      {% endcall %}
+      {% call field() %}
+        {{item.updated_at}}
+      {% endcall %}
+      {% call field() %}
+        {{item.active}}
+      {% endcall %}
+      {% call field() %}
+        {{item.message_limit}}
+      {% endcall %}
+      {% call field() %}
+        {{item.restricted}}
+      {% endcall %}
+      {% call field() %}
+        {{item.created_by_id}}
+      {% endcall %}
+
+    {% endcall %}
+
+  </div>
+
+
+  <div class="grid-row">
+    {% call(item, row_number) list_table(
+        api_keys,
+        caption="API key history",
+        field_headings=['ID','Name','Service ID','Exiry date','Created at','Updated at','Created by id']
+    )%}
+      {% call field() %}
+        {{item.id}}
+      {% endcall %}
+      {% call field() %}
+        {{item.name}}
+      {% endcall %}
+      {% call field() %}
+        {{item.service_id}}
+      {% endcall %}
+      {% call field() %}
+        {{item.expiry_date}}
+      {% endcall %}
+      {% call field() %}
+        {{item.created_at}}
+      {% endcall %}
+      {% call field() %}
+        {{item.updated_at}}
+      {% endcall %}
+      {% call field() %}
+        {{item.created_by_id}}
+      {% endcall %}
+
+    {% endcall %}
+
+  </div
+{% endblock %}

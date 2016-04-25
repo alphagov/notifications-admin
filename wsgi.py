@@ -12,11 +12,11 @@ if os.path.isfile(default_env_file):
 # on aws get secrets and export to env
 os.environ.update(getAllSecrets(region="eu-west-1"))
 
-from config import configs
+from config import configs  # noqa
 
 os.environ['NOTIFY_ADMIN_ENVIRONMENT'] = configs[environment]
 
-from app import create_app
+from app import create_app  # noqa
 
 application = create_app()
 
