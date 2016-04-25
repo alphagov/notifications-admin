@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/table.html" import list_table, field, hidden_field_heading %}
+{% from "components/api-key.html" import api_key %}
 
 {% block page_title %}
   API keys – GOV.UK Notify
@@ -22,17 +23,11 @@
     developer documentation</a>.
   </p>
 
-  <h2 class="heading-medium">
-    Service ID
-  </h2>
-  <p class="api-key-key">
-    {{ current_service.id }}
-  </p>
-
   {% call(item, row_number) list_table(
     keys,
     empty_message="You haven’t created any API keys yet",
     caption="API keys",
+    caption_visible=False,
     field_headings=['Key name', hidden_field_heading('Action')]
   ) %}
     {% call field() %}
@@ -52,5 +47,7 @@
   <p class='table-show-more-link'>
     <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}">Create a new API key</a>
   </p>
+
+  {{ api_key(current_service.id, "Service ID", thing="service ID") }}
 
 {% endblock %}
