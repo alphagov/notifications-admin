@@ -110,7 +110,7 @@ def send_messages(service_id, template_id):
                 service_id,
                 {
                     'file_name': form.file.data.filename,
-                    'data': form.file.data.getvalue().decode('utf-8')
+                    'data': form.file.data.read().decode('utf-8')
                 },
                 current_app.config['AWS_REGION']
             )
