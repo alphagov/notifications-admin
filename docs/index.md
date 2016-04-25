@@ -64,9 +64,11 @@ GOV.UK Notify provides an API that allows you to create text and email notificat
 There are two ways to integrate the API into your service:
 
 * use one of the client libraries provided by GOV.UK Notify:
+
   * [python library](https://github.com/alphagov/notifications-python-client) 
   * [PHP library] (https://github.com/alphagov/notifications-php-client)
   * [Java library] (https://github.com/alphagov/notifications-java-client)
+  
 * develop your own integration to produce requests in the correct format
 
 
@@ -160,11 +162,11 @@ where:
 * `to` is the phone number (required)
 * `template` is the template ID to send (required)
  
-  **Note:** To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application: go to **Text message templates** or **Email templates** and click on **API info**. 
+   **Note:** To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application: go to **Text message templates** or **Email templates** and click on **API info**. 
 
 * `personalisation` (optional) specifies the values for the placeholders in your templates
 
-You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart)
+   **Note:**You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart)
 
 <a id="coderesponse"></a>
 The response will be:
