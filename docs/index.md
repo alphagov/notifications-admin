@@ -50,7 +50,9 @@ To get started:
 
   6. If you intend to use the GOV.UK Notify API, create a new API key. This will be used to connect to the GOV.UK Notify API.
 
-    You can provide all your developers with keys so they can experiment in the Sandbox environment. But keep the number of keys for real integrations to a minimum number of people on your team.
+    Each service can have multiple API keys. This allows you to integrate a number of systems, each with its own key. You can also have separate keys for your development and test environments.
+    
+    **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories. 
 
 <a name="integrateNotify"></a>
 ## Integrate the GOV.UK Notify API into your service
@@ -65,10 +67,12 @@ There are two ways to integrate the API into your service:
 
 * use one of the client libraries provided by GOV.UK Notify:
 
-  * [Python library](https://github.com/alphagov/notifications-python-client) 
-  * [PHP library] (https://github.com/alphagov/notifications-php-client)
-  * [Java library] (https://github.com/alphagov/notifications-java-client)
-  
+  <ul class="list list-bullet">
+    <li> [Python library](https://github.com/alphagov/notifications-python-client) </li>
+    <li> [PHP library] (https://github.com/alphagov/notifications-php-client) </li>
+    <li> [Java library] (https://github.com/alphagov/notifications-java-client) </li>
+  </ul>
+
 * develop your own integration to produce requests in the correct format
 
 GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/) for authentication and identification. The GOV.UK Notify client libraries encode and decode JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use one of these libraries, you must manually create tokens yourself. 
@@ -81,8 +85,6 @@ A JSON Web Token contains, in encrypted format:
 * your API key (in JSON Web Token terms this is called the client ID) – used to sign tokens during requests for API resources
 
 Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
-
-**Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories.
 
 ### JSON Web Tokens: claims
 
@@ -160,9 +162,13 @@ where:
 
 * `to` is the phone number or email address (required)
 * `template` is the template ID to send (required)
-  **Note:** To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to **Text message templates** or **Email templates** and click on **API info**. 
+  
+  <p><b>Note:</b> To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to <b>Text message templates</b> or <b>Email templates</b> and click on <b>API info</b>. 
+  </p>
+
 * `personalisation` (optional) specifies the values for the placeholders in your templates
-  **Note:** You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
+  
+  <p><b>Note:</b> You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
 
 <a id="coderesponse"></a>
 The response will be:
