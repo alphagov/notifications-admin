@@ -166,7 +166,7 @@ where:
 
 * `personalisation` (optional) specifies the values for the placeholders in your templates
 
-   **Note:**You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart)
+   **Note:** You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart)
 
 <a id="coderesponse"></a>
 The response will be:
