@@ -36,7 +36,7 @@ To get started:
 
   3. Add a template so you can send sms and email notifications. 
 
-    **Note:** A template is required even if you send notifications by integrating with the GOV.UK Notify API.
+    **Note:** A template is required even if you send notifications with the GOV.UK Notify API.
  
     You can personalise the template using double brackets for placeholders. For example:
 
@@ -158,7 +158,7 @@ POST /notifications/email
 
 where:
 
-* `to` is the phone number (required)
+* `to` is the phone number or email address (required)
 * `template` is the template ID to send (required)
  
   **Note:** To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to **Text message templates** or **Email templates** and click on **API info**. 
@@ -206,10 +206,11 @@ GET /notifications/{id}
 where:
 
 * `status` is the the status of the notification; this can be `sending`, `delivered`, or `failed` 
+* `to` is the phone number or email address
 * `template_type` is `sms` or `email`
-* `sent_at` is the full timestamp, in UTC, at which the notification was sent
-* `job_id` is the unique identifier for the process of sending and retreiving one or more notifications
+* `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the notification was sent
 * `message` is the content of message
+* `job_id` is the unique identifier for the process of sending and retreiving one or more notifications
 * `sender` may be the provider
 
 The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
@@ -230,7 +231,7 @@ GET /notifications
          'sent_at':'2016-01-01T09:01:00.999999Z',
          'id':1,
          'message':'...',
-         'job-id':1,
+         'job_id':1,
          'sender':'sms-partner'
       }
    },
