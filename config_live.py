@@ -11,3 +11,4 @@ class Live(Config):
     SECRET_KEY = os.environ['LIVE_SECRET_KEY']
     DANGEROUS_SALT = os.environ['LIVE_DANGEROUS_SALT']
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
+    DESKPRO_API_KEY = os.environ['LIVE_DESKPRO_API_KEY']
