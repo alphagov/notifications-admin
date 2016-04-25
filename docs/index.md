@@ -160,7 +160,7 @@ where:
 
 * `to` is the phone number or email address (required)
 * `template` is the template ID to send (required)
-   <p><strong>Note:</strong> To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to <strong>Text message templates</strong> or <strong>Email templates</b> and click on <strong>API info</strong>. 
+   <p><strong>Note:</strong> To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to <strong>Text message templates</strong> or <strong>Email templates</strong> and click on <strong>API info</strong>. 
    </p>
 * `personalisation` (optional) specifies the values for the placeholders in your templates
   <p><strong>Note:</strong> You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
