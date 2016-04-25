@@ -50,7 +50,7 @@ To get started:
 
   6. If you intend to use the GOV.UK Notify API, create a new API key. This will be used to connect to the GOV.UK Notify API.
 
-    You can provide all your developers with test keys so they can experiment in the Sandbox environment. But keep the number of keys for real integrations to a minimum number of people on your team.
+    You can provide all your developers with keys so they can experiment in the Sandbox environment. But keep the number of keys for real integrations to a minimum number of people on your team.
 
 <a name="integrateNotify"></a>
 ## Integrate the GOV.UK Notify API into your service
@@ -65,16 +65,15 @@ There are two ways to integrate the API into your service:
 
 * use one of the client libraries provided by GOV.UK Notify:
 
-  * [python library](https://github.com/alphagov/notifications-python-client) 
+  * [Python library](https://github.com/alphagov/notifications-python-client) 
   * [PHP library] (https://github.com/alphagov/notifications-php-client)
   * [Java library] (https://github.com/alphagov/notifications-java-client)
   
 * develop your own integration to produce requests in the correct format
 
-
 GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/) for authentication and identification. The GOV.UK Notify client libraries encode and decode JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use one of these libraries, you must manually create tokens yourself. 
 
-For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library.
+For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library or the appropriate [PHP] (https://github.com/alphagov/notifications-php-client) or [Java] (https://github.com/alphagov/notifications-java-client) client library.
 
 A JSON Web Token contains, in encrypted format:
 
