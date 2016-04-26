@@ -119,11 +119,12 @@ These provide example code for calling the API and for constructing the API toke
 
 You can use the GOV.UK Notify API to:
 
-* send a notification
-* retrieve one notification
-* retrieve all notifications
+* send an [sms](#sendsms) or [email](#sendemail) notification 
+* [retrieve the status of one notification](#get_single_notif) 
+* [retrieve the status of all notifications](#get_all_notif)  
 
-To send a text notification:
+<a name="sendsms"></a>
+To send an sms notification:
 ```
 POST /notifications/sms
 ```
@@ -138,6 +139,7 @@ POST /notifications/sms
   }
 }
 ```
+<a name="sendemail"></a>
 To send an email notification:
 ```
 POST /notifications/email
@@ -179,7 +181,8 @@ The response will be:
 
 where `id` is the unique identifier for the notification – you will use this id to retrieve the status of a notification.
 
-To retrieve the status of a single text or email notification:
+<a name="get_single_notif"></a>
+To retrieve the status of a single sms or email notification:
 ```
 GET /notifications/{id}
 ```
@@ -213,7 +216,8 @@ where:
 
 The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
 
-To get the status of all notifications: 
+<a name="get_all_notif"></a>
+To retrieve the status of all notifications: 
 ```
 GET /notifications
 ```
