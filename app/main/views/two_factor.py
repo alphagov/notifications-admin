@@ -34,6 +34,7 @@ def two_factor():
             # Check if coming from new password page
             if 'password' in session['user_details']:
                 user.set_password(session['user_details']['password'])
+                user.reset_failed_login_count()
                 user_api_client.update_user(user)
             login_user(user, remember=True)
         finally:

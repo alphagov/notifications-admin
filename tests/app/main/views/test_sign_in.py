@@ -51,7 +51,7 @@ def test_should_return_locked_out_true_when_user_is_locked(app_,
                 'email_address': 'valid@example.gov.uk',
                 'password': 'whatIsMyPassword!'})
         assert resp.status_code == 200
-        assert 'Username or password is incorrect' in resp.get_data(as_text=True)
+        assert 'The email address or password you entered is incorrect' in resp.get_data(as_text=True)
 
 
 def test_should_return_200_when_user_does_not_exist(app_, mock_get_user_by_email_not_found):
@@ -61,7 +61,7 @@ def test_should_return_200_when_user_does_not_exist(app_, mock_get_user_by_email
                 'email_address': 'notfound@gov.uk',
                 'password': 'doesNotExist!'})
     assert response.status_code == 200
-    assert 'Username or password is incorrect' in response.get_data(as_text=True)
+    assert 'The email address or password you entered is incorrect' in response.get_data(as_text=True)
 
 
 def test_should_return_redirect_when_user_is_pending(app_,
