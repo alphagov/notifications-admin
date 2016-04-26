@@ -5,7 +5,8 @@ from flask import (
     session,
     flash,
     request,
-    abort
+    abort,
+    Markup
 )
 
 from flask.ext.login import (
@@ -69,7 +70,11 @@ def sign_in():
                 else:
                     return redirect(url_for('.two_factor'))
         # Vague error message for login in case of user not known, locked, inactive or password not verified
-        flash('Username or password is incorrect')
+        flash(Markup((
+            "The username or password you entered is incorrect.<br/>"
+            " If you need to, you can <a href={password_reset}>reset "
+            "your password</a>").format(password_reset=url_for('.forgot_password'))
+        ))
 
     return render_template('views/signin.html', form=form)
 
