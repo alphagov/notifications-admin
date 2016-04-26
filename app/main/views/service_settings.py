@@ -1,10 +1,13 @@
+import requests
 from flask import (
     render_template,
     redirect,
     request,
     url_for,
     session,
-    flash
+    flash,
+    abort,
+    current_app
 )
 
 from flask_login import (
@@ -16,7 +19,7 @@ from notifications_python_client.errors import HTTPError
 from app import service_api_client
 from app.main import main
 from app.utils import user_has_permissions, email_safe
-from app.main.forms import ConfirmPasswordForm, ServiceNameForm
+from app.main.forms import ConfirmPasswordForm, ServiceNameForm, RequestToGoLiveForm
 from app import user_api_client
 from app import current_service
 
@@ -86,14 +89,44 @@ def service_name_change_confirm(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_request_to_go_live(service_id):
-    if request.method == 'GET':
-        return render_template(
-            'views/service-settings/request-to-go-live.html'
+
+    form = RequestToGoLiveForm()
+
+    if form.validate_on_submit():
+
+        data = {
+            'person_email': current_app.config.get('DESKPRO_PERSON_EMAIL'),
+            'department_id': current_app.config.get('DESKPRO_TEAM_ID'),
+            'subject': 'Request to go live',
+            'message': "From {} <{}> on behalf of {} ({})\n\nUsage estimate\n---\n\n{}".format(
+                current_user.name,
+                current_user.email_address,
+                current_service['name'],
+                current_service['id'],
+                form.usage.data
+            )
+        }
+        headers = {
+            "X-DeskPRO-API-Key": current_app.config.get('DESKPRO_API_KEY'),
+            'Content-Type': "application/x-www-form-urlencoded"
+        }
+        resp = requests.post(
+            current_app.config.get('DESKPRO_API_HOST') + '/api/tickets',
+            data=data,
+            headers=headers
         )
-    elif request.method == 'POST':
-        flash('Thanks your request to go live is being processed', 'default')
-        # TODO implement whatever this action would do in the real world
+        if resp.status_code != 201:
+            current_app.logger.error(
+                "Deskpro create ticket request failed with {} '{}'".format(
+                    resp.status_code,
+                    resp.json())
+                )
+            abort(500, "Request to go live submission failed")
+
+        flash('We’ve received your request to go live', 'default')
         return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template('views/service-settings/request-to-go-live.html', form=form)
 
 
 @main.route("/services/<service_id>/service-settings/switch-live")

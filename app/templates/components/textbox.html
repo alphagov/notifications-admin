@@ -1,5 +1,6 @@
 {% macro textbox(
   field,
+  label=None,
   hint=False,
   highlight_tags=False,
   autofocus=False,
@@ -12,7 +13,11 @@
 ) %}
   <div class="form-group{% if field.errors %} error{% endif %}" {% if autofocus %}data-module="autofocus"{% endif %}>
     <label class="form-label" for="{{ field.name }}">
-      {{ field.label }}
+      {% if label %}
+        {{ label }}
+      {% else %}
+        {{ field.label }}
+      {% endif %}
       {% if hint %}
         <span class="form-hint">
           {{ hint }}
