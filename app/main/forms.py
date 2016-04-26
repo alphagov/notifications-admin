@@ -313,3 +313,10 @@ class Feedback(Form):
     name = StringField('Name')
     email_address = StringField('Email address')
     feedback = TextAreaField(u'', validators=[DataRequired(message="Can’t be empty")])
+
+
+class RequestToGoLiveForm(Form):
+    usage = TextAreaField(
+        '',
+        validators=[DataRequired(message="Can’t be empty")]
+    )

@@ -15,7 +15,7 @@
         'link': url_for('.service_name_change', service_id=current_service.id)
       },
       {
-        'title': 'Request to go live and turn off sending restrictions',
+        'title': 'Request to go live and turn off trial mode',
         'link': url_for('.service_request_to_go_live', service_id=current_service.id),
         'hint': 'A live service can send notifications to any phone number or email address',
       } if current_service.restricted else {

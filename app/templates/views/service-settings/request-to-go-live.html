@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
@@ -10,17 +11,54 @@
   <div class="grid-row">
     <div class="column-three-quarters">
 
-    <h1 class="heading-large">Request to go live</h1>
+      <h1 class="heading-large">Request to go live</h1>
 
-    <p>GOV.UK Notify is invite-only during the beta.</p>
+      <p>
+        You’ll need to:
+      </p>
+      <ul class="list list-bullet">
+        <li>
+          agree to our <a href="{{ url_for('.terms') }}">terms of use</a>
+        </li>
+        <li>
+          agree to pay for what you use if you send more than 250,000 text messages per year
+          (<a href="{{ url_for("main.pricing") }}">see our pricing</a>)
+        </li>
+      </ul>
 
-    <p><a href="{{ url_for('main.feedback') }}">Contact us</a> to request an invite:</p>
+      <form method="post">
 
-    <ul class="list list-bullet">
-    <li>You’ll need to agree to our terms of use</li>
-    <li>If you plan to send more than 250,000 text messages per year, you’ll need to agree to pay for what you use &ndash; take a look at our <a href="{{ url_for("main.pricing") }}">pricing</a></li>
-    <li>We’ll check your templates to make sure they’re consistent with our design patterns, style guide and information security principles</li>
-    </ul>
+        {{ textbox(
+          form.usage,
+          label='Estimate how many emails and/or text messages you’ll send each month',
+          hint='If your estimate is likely to change, tell us how ',
+          width='1-1',
+          rows=5
+        ) }}
+
+        <p>
+          We will:
+        </p>
+        <ul class="list list-bullet">
+          <li>
+            check that your templates follow our
+            <a href="https://designpatterns.hackpad.com/Notifications-5vuitmNqIjZ" rel="external">design patterns</a>,
+            <a href="https://www.gov.uk/topic/government-digital-guidance/content-publishing" rel="external">style guide</a>
+            and
+            <a href="https://docs.google.com/document/d/15-OjaEqDBy31uDU7nLZCpYIQOnzSCJR63-cp3cQI9G8" rel="external">information security guidelines</a>
+          </li>
+          <li>
+            check that you have more than one
+            <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team member</a>
+            in case you go on holiday
+          </li>
+          <li>
+            make your service live or get back to you within one working day
+          </li>
+        </ul>
+
+        {{ page_footer('Request to go live') }}  
+      </form>
 
     </div>
   </div>
