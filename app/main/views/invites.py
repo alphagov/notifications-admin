@@ -6,6 +6,7 @@ from flask import (
     render_template,
     abort
 )
+from markupsafe import Markup
 
 from app.main import main
 
@@ -24,14 +25,16 @@ def accept_invite(token):
     invited_user = invite_api_client.check_token(token)
 
     if not current_user.is_anonymous() and current_user.email_address != invited_user.email_address:
-        flash("""
+        message = Markup("""
             You’re signed in as {}.
             This invite is for another email address.
             {} and click the link again to accept this invite.
-        """.format(
+            """.format(
             current_user.email_address,
-            url_for("main.sign_out", _external=True)
-        ))
+            url_for("main.sign_out", _external=True)))
+
+        flash(message=message)
+
         abort(403)
 
     if invited_user.status == 'cancelled':
