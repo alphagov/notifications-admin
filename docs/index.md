@@ -66,11 +66,9 @@ GOV.UK Notify provides an API that allows you to create text and email notificat
 There are two ways to integrate the API into your service:
 
 * use one of the client libraries provided by GOV.UK Notify:
-  <ul>
-    <li> [Python library](https://github.com/alphagov/notifications-python-client) </li>
-    <li> [PHP library] (https://github.com/alphagov/notifications-php-client) </li>
-    <li> [Java library] (https://github.com/alphagov/notifications-java-client) </li>
-  </ul>
+    * [Python library](https://github.com/alphagov/notifications-python-client)
+    * [PHP library] (https://github.com/alphagov/notifications-php-client) 
+    * [Java library] (https://github.com/alphagov/notifications-java-client) 
 * develop your own integration to produce requests in the correct format
 
 GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/) for authentication and identification. The GOV.UK Notify client libraries encode and decode JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use one of these libraries, you must manually create tokens yourself. 
@@ -161,11 +159,11 @@ where:
 * `to` is the phone number or email address (required)
 * `template` is the template ID to send (required)
    
-  <p><strong>Note:</strong> To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to <strong>Text message templates</strong> or <strong>Email templates</strong> and click on <strong>API info</strong>. 
-   </p>
+    **Note:** To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to **Text message templates** or **Email templates** and click on **API info**.
 
 * `personalisation` (optional) specifies the values for the placeholders in your templates
-  <p><strong>Note:</strong> You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
+
+    **Note:** You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
 
 <a id="coderesponse"></a>
 The response will be:
@@ -179,7 +177,7 @@ The response will be:
 }
 ```
 
-where `id` is the unique identifier for the notification - you will use this id to retrieve the status of a notification.
+where `id` is the unique identifier for the notification – you will use this id to retrieve the status of a notification.
 
 To retrieve the status of a single text or email notification:
 ```
