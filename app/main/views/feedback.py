@@ -16,10 +16,12 @@ def feedback():
             'person_email': current_app.config.get('DESKPRO_PERSON_EMAIL'),
             'department_id': current_app.config.get('DESKPRO_TEAM_ID'),
             'subject': 'Notify feedback',
-            'message': '{}\n{}\n{}'.format(
+            'message': 'Environment: {}\n\n{}\n{}\n{}'.format(
+                url_for('main.index', _external=True),
                 form.name.data,
                 form.email_address.data,
-                form.feedback.data)
+                form.feedback.data
+            )
         }
         headers = {
             "X-DeskPRO-API-Key": current_app.config.get('DESKPRO_API_KEY'),
