@@ -102,7 +102,7 @@ def service_request_to_go_live(service_id):
                 current_user.name,
                 current_user.email_address,
                 current_service['name'],
-                current_service['id'],
+                url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
                 form.usage.data
             )
         }
