@@ -8,7 +8,7 @@ This document is for central government developers, technical architects, and se
 
 GOV.UK Notify is a cross-government platform, currently in beta, that lets government services send notifications by sms or email.
 
-There are two ways to send notifications:
+There are 2 ways to send notifications:
 
 * use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application
 * [integrate your web applications or back office systems](#integrateNotify) with the GOV.UK Notify API
@@ -63,14 +63,12 @@ GOV.UK Notify provides an API that allows you to create text and email notificat
 
 ![Notfy](/static/images/notify-diagram.png)
 
-There are two ways to integrate the API into your service:
+There are 2 ways to integrate the API into your service:
 
 * use one of the client libraries provided by GOV.UK Notify:
-  <ul>
-    <li> [Python library](https://github.com/alphagov/notifications-python-client) </li>
-    <li> [PHP library] (https://github.com/alphagov/notifications-php-client) </li>
-    <li> [Java library] (https://github.com/alphagov/notifications-java-client) </li>
-  </ul>
+    * [Python library](https://github.com/alphagov/notifications-python-client)
+    * [PHP library] (https://github.com/alphagov/notifications-php-client) 
+    * [Java library] (https://github.com/alphagov/notifications-java-client) 
 * develop your own integration to produce requests in the correct format
 
 GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/) for authentication and identification. The GOV.UK Notify client libraries encode and decode JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use one of these libraries, you must manually create tokens yourself. 
@@ -121,11 +119,12 @@ These provide example code for calling the API and for constructing the API toke
 
 You can use the GOV.UK Notify API to:
 
-* send a notification
-* retrieve one notification
-* retrieve all notifications
+* send an [sms](#sendsms) or [email](#sendemail) notification 
+* [retrieve the status of one notification](#get_single_notif) 
+* [retrieve the status of all notifications](#get_all_notif)  
 
-To send a text notification:
+<a name="sendsms"></a>
+To send an sms notification:
 ```
 POST /notifications/sms
 ```
@@ -140,6 +139,7 @@ POST /notifications/sms
   }
 }
 ```
+<a name="sendemail"></a>
 To send an email notification:
 ```
 POST /notifications/email
@@ -161,11 +161,11 @@ where:
 * `to` is the phone number or email address (required)
 * `template` is the template ID to send (required)
    
-  <p><strong>Note:</strong> To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to <strong>Text message templates</strong> or <strong>Email templates</strong> and click on <strong>API info</strong>. 
-   </p>
+    **Note:** To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to **Text message templates** or **Email templates** and click on **API info**.
 
 * `personalisation` (optional) specifies the values for the placeholders in your templates
-  <p><strong>Note:</strong> You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
+
+    **Note:** You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
 
 <a id="coderesponse"></a>
 The response will be:
@@ -179,9 +179,10 @@ The response will be:
 }
 ```
 
-where `id` is the unique identifier for the notification - you will use this id to retrieve the status of a notification.
+where `id` is the unique identifier for the notification – you will use this id to retrieve the status of a notification.
 
-To retrieve the status of a single text or email notification:
+<a name="get_single_notif"></a>
+To retrieve the status of a single sms or email notification:
 ```
 GET /notifications/{id}
 ```
@@ -215,7 +216,8 @@ where:
 
 The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
 
-To get the status of all notifications: 
+<a name="get_all_notif"></a>
+To retrieve the status of all notifications: 
 ```
 GET /notifications
 ```

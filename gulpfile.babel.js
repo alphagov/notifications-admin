@@ -68,7 +68,8 @@ gulp.task('javascripts', () => gulp
   .pipe(plugins.uglify())
   .pipe(plugins.addSrc.prepend([
     paths.npm + 'jquery/dist/jquery.min.js',
-    paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js'
+    paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
+    paths.npm + 'diff-dom/diffDOM.js'
   ]))
   .pipe(plugins.concat('all.js'))
   .pipe(gulp.dest(paths.dist + 'javascripts/'))

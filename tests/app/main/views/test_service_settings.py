@@ -1,10 +1,12 @@
+import pytest
 from flask import url_for
 
 import app
 from app.utils import email_safe
 from tests import validate_route_permission
 from bs4 import BeautifulSoup
-from unittest.mock import ANY
+from unittest.mock import ANY, Mock
+from werkzeug.exceptions import InternalServerError
 
 
 def test_should_show_overview(app_,
@@ -212,36 +214,74 @@ def test_should_show_request_to_go_live(app_,
         assert mock_get_service.called
 
 
-def test_should_redirect_after_request_to_go_live(app_,
-                                                  api_user_active,
-                                                  mock_get_service,
-                                                  mock_get_user,
-                                                  mock_get_user_by_email,
-                                                  mock_login,
-                                                  mock_has_permissions,
-                                                  fake_uuid):
+def test_should_redirect_after_request_to_go_live(
+    app_,
+    api_user_active,
+    mock_get_user,
+    mock_get_service,
+    mock_has_permissions,
+    mocker
+):
+    mock_post = mocker.patch(
+        'app.main.views.feedback.requests.post',
+        return_value=Mock(status_code=201))
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.post(url_for(
-                'main.service_request_to_go_live', service_id=service_id))
-
-        assert response.status_code == 302
-        settings_url = url_for(
-            'main.service_settings', service_id=service_id, _external=True)
-        assert settings_url == response.location
-        assert mock_get_service.called
-
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.post(url_for(
-                'main.service_request_to_go_live', service_id=service_id), follow_redirects=True)
+            response = client.post(
+                url_for('main.service_request_to_go_live', service_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'),
+                data={'usage': "One million messages"},
+                follow_redirects=True
+            )
+            assert response.status_code == 200
+            mock_post.assert_called_with(
+                ANY,
+                data={
+                    'subject': 'Request to go live',
+                    'department_id': ANY,
+                    'message': 'From Test User <test@user.gov.uk> on behalf of Test Service (http://localhost/services/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6/dashboard)\n\nUsage estimate\n---\n\nOne million messages',  # noqa
+                    'person_email': ANY
+                },
+                headers=ANY
+            )
 
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         flash_banner = page.find('div', class_='banner-default').string.strip()
-        assert flash_banner == 'Thanks your request to go live is being processed'
+        h1 = page.find('h1').string.strip()
+        assert flash_banner == 'We’ve received your request to go live'
+        assert h1 == 'Settings'
+
+
+def test_log_error_on_request_to_go_live(
+    app_,
+    api_user_active,
+    mock_get_user,
+    mock_get_service,
+    mock_has_permissions,
+    mocker
+):
+    mock_post = mocker.patch(
+        'app.main.views.service_settings.requests.post',
+        return_value=Mock(
+            status_code=401,
+            json=lambda: {
+                'error_code': 'invalid_auth',
+                'error_message': 'Please provide a valid API key or token'
+            }
+        )
+    )
+    with app_.test_request_context():
+        mock_logger = mocker.patch.object(app_.logger, 'error')
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            with pytest.raises(InternalServerError):
+                resp = client.post(
+                    url_for('main.service_request_to_go_live', service_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'),
+                    data={'usage': 'blah'}
+                )
+            mock_logger.assert_called_with(
+                "Deskpro create ticket request failed with {} '{}'".format(mock_post().status_code, mock_post().json())
+            )
 
 
 def test_should_show_status_page(app_,

@@ -406,12 +406,20 @@ def mock_register_user(mocker, api_user_pending):
 
 
 @pytest.fixture(scope='function')
-def mock_get_user(mocker, api_user_active):
+def mock_get_user(mocker, user=None):
+    if user is None:
+        user = api_user_active(fake_uuid())
+
     def _get_user(id_):
-        api_user_active.id = id_
-        return api_user_active
+        user.id = id_
+        return user
     return mocker.patch(
         'app.user_api_client.get_user', side_effect=_get_user)
+
+
+@pytest.fixture(scope='function')
+def mock_get_locked_user(mocker, api_user_locked):
+    return mock_get_user(mocker, user=api_user_locked)
 
 
 @pytest.fixture(scope='function')
@@ -427,12 +435,19 @@ def mock_get_user_pending(mocker, api_user_pending):
 
 
 @pytest.fixture(scope='function')
-def mock_get_user_by_email(mocker, api_user_active):
+def mock_get_user_by_email(mocker, user=None):
+    if user is None:
+        user = api_user_active(fake_uuid())
 
     def _get_user(email_address):
-        api_user_active._email_address = email_address
-        return api_user_active
+        user._email_address = email_address
+        return user
     return mocker.patch('app.user_api_client.get_user_by_email', side_effect=_get_user)
+
+
+@pytest.fixture(scope='function')
+def mock_get_locked_user_by_email(mocker, api_user_locked):
+    return mock_get_user_by_email(mocker, user=api_user_locked)
 
 
 @pytest.fixture(scope='function')

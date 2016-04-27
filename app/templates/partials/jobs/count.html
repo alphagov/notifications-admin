@@ -1,13 +1,25 @@
 {% from "components/big-number.html" import big_number %}
-<ul class="grid-row job-totals">
-  <li class="column-one-quarter">
-    {{ big_number(
-      counts.queued, 'queued'
-    )}}
-  </li>
-  <li class="column-one-quarter">
-    {{ big_number(
-      counts.sent, 'processed'
-    )}}
-  </li>
-</ul>
+
+<div
+  {% if not finished_at %}
+    data-module="update-content"
+    data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job_id)}}"
+    data-key="counts"
+    aria-live="polite"
+  {% endif %}
+>
+
+  <ul class="grid-row job-totals">
+    <li class="column-one-quarter">
+      {{ big_number(
+        counts.queued, 'queued'
+      )}}
+    </li>
+    <li class="column-one-quarter">
+      {{ big_number(
+        counts.sent, 'processed'
+      )}}
+    </li>
+  </ul>
+
+</div>
