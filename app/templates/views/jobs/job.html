@@ -30,40 +30,10 @@
       )}}
     {% endif %}
 
-    {% if not finished_at %}
-      <div
-        data-module="update-content"
-        data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job_id)}}"
-        data-key="status"
-      >
-    {% endif %}
-      {% include 'partials/jobs/status.html' %}
-    {% if not finished_at %}
-      </div>
-    {% endif %}
+    {% include 'partials/jobs/status.html' %}
 
-    {% if not finished_at %}
-      <div
-        data-module="update-content"
-        data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job_id)}}"
-        data-key="counts"
-      >
-    {% endif %}
-      {% include 'partials/jobs/count.html' %}
-    {% if not finished_at %}
-      </div>
-    {% endif %}
+    {% include 'partials/jobs/count.html' %}
 
-    {% if not finished_at %}
-      <div
-        data-module="update-content"
-        data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job_id)}}"
-        data-key="notifications"
-      >
-    {% endif %}
-      {% include 'partials/jobs/notifications.html' %}
-    {% if not finished_at %}
-      </div>
-    {% endif %}
+    {% include 'partials/jobs/notifications.html' %}
 
 {% endblock %}

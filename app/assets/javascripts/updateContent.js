@@ -4,6 +4,8 @@
   GOVUK.timeCache = {};
   GOVUK.resultCache = {};
 
+  var dd = new diffDOM();
+
   let getter = function(resource, interval, render) {
 
     if (
@@ -21,8 +23,11 @@
 
   };
 
-  let poller = (resource, key, component, interval) => () => getter(
-    resource, interval, response => component.html(response[key])
+  let poller = (resource, key, $component, interval) => () => getter(
+    resource, interval, response => dd.apply(
+      $component.get(0),
+      dd.diff($component.get(0), $(response[key]).get(0))
+    )
   );
 
   Modules.UpdateContent = function() {

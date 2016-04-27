@@ -1,9 +1,19 @@
-{% if finished_at %}
-  <p class='heading-small'>
-    Finished {{ finished_at|format_datetime }}
-  </p>
-{% else %}
-  <p class='heading-small'>
-    Started {{ uploaded_at|format_datetime }}
-  </p>
-{% endif %}
+<div
+  {% if not finished_at %}
+    data-module="update-content"
+    data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job_id)}}"
+    data-key="status"
+  {% endif %}
+>
+
+  {% if finished_at %}
+    <p class='heading-small'>
+      Finished {{ finished_at|format_datetime }}
+    </p>
+  {% else %}
+    <p class='heading-small'>
+      Started {{ uploaded_at|format_datetime }}
+    </p>
+  {% endif %}
+
+</div>
