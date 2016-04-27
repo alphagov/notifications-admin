@@ -24,5 +24,6 @@ from app.main.views import (
     manage_users,
     invites,
     all_services,
-    tour
+    tour,
+    feedback
 )

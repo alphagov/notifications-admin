@@ -287,7 +287,7 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(app_,
             banner_contents = flash_banners[0].text.strip()
             assert "You’re signed in as test@user.gov.uk." in banner_contents
             assert "This invite is for another email address." in banner_contents
-            assert "<a href='/sign-out'>Sign out</a> and click the link again to accept this invite." in banner_contents
+            assert "Sign out and click the link again to accept this invite." in banner_contents
             assert mock_accept_invite.call_count == 0
 
 

@@ -1,22 +1,35 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading %}
 
-{% call(item, row_number) list_table(
-  notifications,
-  caption=uploaded_file_name,
-  caption_visible=False,
-  empty_message="No messages to show yet",
-  field_headings=[
-    'Recipient',
-    right_aligned_field_heading('Status')
-  ]
-) %}
-  {% call field() %}
-    {{ item.to }}
-  {% endcall %}
-  {% call field(
-    align='right',
-    status='error' if item.status == 'Failed' else 'default'
-  ) %}
-    {{ item.status|title }} at {{ item.sent_at|format_time }}
-  {% endcall %}
-{% endcall %}
+<div
+  {% if not finished_at %}
+    data-module="update-content"
+    data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job_id)}}"
+    data-key="notifications"
+    aria-live="polite"
+  {% endif %}
+>
+
+  <div>
+    {% call(item, row_number) list_table(
+      notifications,
+      caption=uploaded_file_name,
+      caption_visible=False,
+      empty_message="No messages to show yet",
+      field_headings=[
+        'Recipient',
+        right_aligned_field_heading('Status')
+      ]
+    ) %}
+      {% call field() %}
+        {{ item.to }}
+      {% endcall %}
+      {% call field(
+        align='right',
+        status='error' if item.status == 'Failed' else 'default'
+      ) %}
+        {{ item.status|title }} at {{ item.sent_at|format_time }}
+      {% endcall %}
+    {% endcall %}
+  </div>
+
+</div>

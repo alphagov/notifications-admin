@@ -177,3 +177,31 @@ def test_two_factor_should_set_password_when_new_password_exists_in_session(app_
             )
             api_user_active.password = 'changedpassword'
             mock_update_user.assert_called_once_with(api_user_active)
+
+
+def test_two_factor_reset_login_count_called(app_,
+                                             api_user_locked,
+                                             mock_get_locked_user,
+                                             mock_update_user,
+                                             mock_check_verify_code,
+                                             mock_get_services_with_one_service):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                new_password = "1234567890"
+                session['user_details'] = {
+                    'id': api_user_locked.id,
+                    'email': api_user_locked.email_address,
+                    'password': new_password
+                }
+            response = client.post(url_for('main.two_factor'),
+                                   data={'sms_code': '12345'})
+            assert response.status_code == 302
+            assert response.location == url_for(
+                'main.service_dashboard',
+                service_id=SERVICE_ONE_ID,
+                _external=True
+            )
+            api_user_locked.reset_failed_login_count()
+            api_user_locked.password = new_password
+            mock_update_user.assert_called_with(api_user_locked)
