@@ -8,7 +8,7 @@ This document is for central government developers, technical architects, and se
 
 GOV.UK Notify is a cross-government platform, currently in beta, that lets government services send notifications by sms or email.
 
-There are two ways to send notifications:
+There are 2 ways to send notifications:
 
 * use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application
 * [integrate your web applications or back office systems](#integrateNotify) with the GOV.UK Notify API
@@ -63,7 +63,7 @@ GOV.UK Notify provides an API that allows you to create text and email notificat
 
 ![Notfy](/static/images/notify-diagram.png)
 
-There are two ways to integrate the API into your service:
+There are 2 ways to integrate the API into your service:
 
 * use one of the client libraries provided by GOV.UK Notify:
     * [Python library](https://github.com/alphagov/notifications-python-client)
