@@ -11,6 +11,6 @@ from app.main import main
 
 @main.route('/sign-out', methods=(['GET']))
 def sign_out():
-    logout_user()
     session.clear()
+    logout_user()
     return redirect(url_for('main.sign_in'))
