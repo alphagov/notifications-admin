@@ -846,3 +846,12 @@ def mock_get_template_statistics(mocker, service_one, fake_uuid):
 
     return mocker.patch(
         'app.template_statistics_client.get_template_statistics_for_service', side_effect=_get_stats)
+
+
+@pytest.fixture(scope='function')
+def mock_events(mocker):
+
+    def _create_event(event_type, event_data):
+        return {'some': 'data'}
+
+    return mocker.patch('app.events_api_client.create_event', side_effect=_create_event)

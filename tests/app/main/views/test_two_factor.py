@@ -1,6 +1,8 @@
 from flask import url_for
 from tests.conftest import SERVICE_ONE_ID
 
+from unittest.mock import ANY
+
 
 def test_should_render_two_factor_page(app_,
                                        api_user_active,
@@ -23,7 +25,8 @@ def test_should_login_user_and_redirect_to_service_dashboard(app_,
                                                              mock_get_user,
                                                              mock_get_user_by_email,
                                                              mock_check_verify_code,
-                                                             mock_get_services_with_one_service):
+                                                             mock_get_services_with_one_service,
+                                                             mock_events):
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
@@ -38,6 +41,8 @@ def test_should_login_user_and_redirect_to_service_dashboard(app_,
                 service_id=SERVICE_ONE_ID,
                 _external=True
             )
+
+        mock_events.assert_called_with('sucessful_login', ANY)
 
 
 def test_should_login_user_and_should_redirect_to_next_url(app_,
