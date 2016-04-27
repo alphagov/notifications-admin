@@ -5,6 +5,7 @@
     data-module="update-content"
     data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job_id)}}"
     data-key="counts"
+    aria-live="polite"
   {% endif %}
 >
 
