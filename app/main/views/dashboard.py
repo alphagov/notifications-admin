@@ -35,7 +35,8 @@ def temp_service_history(service_id):
     data = service_api_client.get_service_history(service_id)['data']
     return render_template('views/temp-history.html',
                            services=data['service_history'],
-                           api_keys=data['api_key_history'])
+                           api_keys=data['api_key_history'],
+                           events=data['events'])
 
 
 @main.route("/services/<service_id>/dashboard")
