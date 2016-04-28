@@ -691,7 +691,8 @@ def mock_get_notifications(mocker):
                            page=1,
                            page_size=50,
                            template_type=None,
-                           status=None):
+                           status=None,
+                           limit_days=None):
         return notification_json(service_id)
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
@@ -705,7 +706,8 @@ def mock_get_notifications_with_previous_next(mocker):
                            job_id=None,
                            page=1,
                            template_type=None,
-                           status=None):
+                           status=None,
+                           limit_days=None):
         return notification_json(service_id, with_links=True)
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
