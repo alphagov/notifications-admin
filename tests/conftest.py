@@ -148,6 +148,18 @@ def mock_get_services(mocker, fake_uuid, user=None):
 
 
 @pytest.fixture(scope='function')
+def mock_get_services_with_no_services(mocker, fake_uuid, user=None):
+    if user is None:
+        user = active_user_with_permissions(fake_uuid)
+
+    def _create(user_id=None):
+        return {'data': []}
+
+    return mocker.patch(
+        'app.service_api_client.get_services', side_effect=_create)
+
+
+@pytest.fixture(scope='function')
 def mock_get_services_with_one_service(mocker, fake_uuid, user=None):
     if user is None:
         user = api_user_active(fake_uuid)

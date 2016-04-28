@@ -14,11 +14,36 @@ def test_get_should_render_add_service_template(app_,
             assert 'Which service do you want to set up notifications for?' in response.get_data(as_text=True)
 
 
-def test_should_add_service_and_redirect_to_next_page(app_,
-                                                      mocker,
-                                                      mock_create_service,
-                                                      mock_get_services,
-                                                      api_user_active):
+def test_should_add_service_and_redirect_to_tour_when_no_services(app_,
+                                                                  mocker,
+                                                                  mock_create_service,
+                                                                  mock_get_services_with_no_services,
+                                                                  api_user_active):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active, mocker)
+            response = client.post(
+                url_for('main.add_service'),
+                data={'name': 'testing the post'})
+            assert mock_get_services_with_no_services.called
+            mock_create_service.assert_called_once_with(
+                service_name='testing the post',
+                active=False,
+                message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
+                restricted=True,
+                user_id=api_user_active.id,
+                email_from='testing.the.post'
+            )
+            assert session['service_id'] == 101
+            assert response.status_code == 302
+            assert response.location == url_for('main.tour', page=1, _external=True)
+
+
+def test_should_add_service_and_redirect_to_dashboard_when_existing_service(app_,
+                                                                            mocker,
+                                                                            mock_create_service,
+                                                                            mock_get_services,
+                                                                            api_user_active):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active, mocker)
@@ -36,7 +61,7 @@ def test_should_add_service_and_redirect_to_next_page(app_,
             )
             assert session['service_id'] == 101
             assert response.status_code == 302
-            assert response.location == url_for('main.tour', page=1, _external=True)
+            assert response.location == url_for('main.service_dashboard', service_id=101, _external=True)
 
 
 def test_should_return_form_errors_when_service_name_is_empty(app_,
