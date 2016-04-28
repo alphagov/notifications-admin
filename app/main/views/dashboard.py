@@ -99,19 +99,14 @@ def add_rates_to(delivery_statistics):
         delivery_statistics
     )
 
-    sum_of_statistics.update({
-        'emails_sent': sum_of_statistics['emails_failed'] + sum_of_statistics['emails_delivered'],
-        'sms_sent': sum_of_statistics['sms_failed'] + sum_of_statistics['sms_delivered']
-    })
-
     return dict(
         emails_failure_rate=(
-            "{0:.1f}".format((float(sum_of_statistics['emails_failed']) / sum_of_statistics['emails_sent'] * 100))
-            if sum_of_statistics.get('emails_sent') else 0
+            "{0:.1f}".format((float(sum_of_statistics['emails_failed']) / sum_of_statistics['emails_requested'] * 100))
+            if sum_of_statistics['emails_requested'] else 0
         ),
         sms_failure_rate=(
-            "{0:.1f}".format((float(sum_of_statistics['sms_failed']) / sum_of_statistics['sms_sent'] * 100))
-            if sum_of_statistics.get('sms_sent') else 0
+            "{0:.1f}".format((float(sum_of_statistics['sms_failed']) / sum_of_statistics['sms_requested'] * 100))
+            if sum_of_statistics['sms_requested'] else 0
         ),
         **sum_of_statistics
     )

@@ -13,8 +13,8 @@
   <div class="grid-row bottom-gutter">
     <div class="column-half">
       {{ big_number_with_status(
-        statistics.emails_sent,
-        'email' if statistics.emails_sent == 1 else 'emails',
+        statistics.emails_requested,
+        'email' if statistics.emails_requested == 1 else 'emails',
         statistics.emails_failed,
         statistics.get('emails_failure_rate', 0.0),
         statistics.get('emails_failure_rate', 0)|float > 3,
@@ -23,8 +23,8 @@
     </div>
     <div class="column-half">
       {{ big_number_with_status(
-        statistics.sms_sent,
-        'text message' if statistics.sms_sent == 1 else 'text messages',
+        statistics.sms_requested,
+        'text message' if statistics.sms_requested == 1 else 'text messages',
         statistics.sms_failed,
         statistics.get('sms_failure_rate', 0.0),
         statistics.get('sms_failure_rate', 0)|float > 3,
