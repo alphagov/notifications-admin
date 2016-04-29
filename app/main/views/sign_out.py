@@ -1,6 +1,10 @@
-from flask import (render_template, redirect, url_for)
-from flask import session
-from flask_login import (login_required, logout_user)
+from flask import (
+    redirect,
+    url_for,
+    session
+)
+
+from flask.ext.login import logout_user
 
 from app.main import main
 

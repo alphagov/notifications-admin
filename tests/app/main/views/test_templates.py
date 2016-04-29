@@ -67,6 +67,75 @@ def test_should_redirect_when_saving_a_template(app_,
                 template_id, name, 'sms', content, service_id, None)
 
 
+def test_should_not_create_too_big_template(app_,
+                                            api_user_active,
+                                            mock_login,
+                                            mock_get_service_template,
+                                            mock_get_user,
+                                            mock_get_service,
+                                            mock_get_user_by_email,
+                                            mock_create_service_template_content_too_big,
+                                            mock_has_permissions,
+                                            fake_uuid):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            service_id = fake_uuid
+            template_type = 'sms'
+            data = {
+                'name': "new name",
+                'template_content': "template content",
+                'template_type': template_type,
+                'service': service_id
+            }
+            resp = client.post(url_for(
+                '.add_service_template',
+                service_id=service_id,
+                template_type=template_type
+            ), data=data)
+
+            assert resp.status_code == 200
+            assert (
+                "Content has a character count greater"
+                " than the limit of 459"
+            ) in resp.get_data(as_text=True)
+
+
+def test_should_not_update_too_big_template(app_,
+                                            api_user_active,
+                                            mock_login,
+                                            mock_get_service_template,
+                                            mock_get_user,
+                                            mock_get_service,
+                                            mock_get_user_by_email,
+                                            mock_update_service_template_400_content_too_big,
+                                            mock_has_permissions,
+                                            fake_uuid):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            service_id = fake_uuid
+            template_type = 'sms'
+            template_id = fake_uuid
+            data = {
+                'id': fake_uuid,
+                'name': "new name",
+                'template_content': "template content",
+                'service': service_id,
+                'template_type': 'sms'
+            }
+            resp = client.post(url_for(
+                '.edit_service_template',
+                service_id=service_id,
+                template_id=template_id), data=data)
+
+            assert resp.status_code == 200
+            assert (
+                "Content has a character count greater"
+                " than the limit of 459"
+            ) in resp.get_data(as_text=True)
+
+
 def test_should_redirect_when_saving_a_template_email(app_,
                                                       api_user_active,
                                                       mock_login,

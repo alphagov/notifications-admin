@@ -79,4 +79,29 @@ History – GOV.UK Notify
     {% endcall %}
 
   </div
+
+  <div class="grid-row">
+
+     {% call(item, row_number) list_table(
+        events,
+        caption="Events",
+        field_headings=['ID','Event type','User ID','IP Address','Event data']
+    )%}
+      {% call field() %}
+        {{item.id}}
+      {% endcall %}
+      {% call field() %}
+        {{item.event_type}}
+      {% endcall %}
+      {% call field() %}
+        {{item.data.user_id}}
+      {% endcall %}
+      {% call field() %}
+        {{item.data.ip_address}}
+      {% endcall %}
+      {% call field() %}
+        {{item.data}}
+      {% endcall %}
+    {% endcall %}
+  </div>
 {% endblock %}
