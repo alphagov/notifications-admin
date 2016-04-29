@@ -109,19 +109,19 @@
   ) %}
     {{ index_field(item.index + 2) }}
     {% for column in recipients.column_headers %}
-      {% if item[column].error %}
+      {% if item['columns'][column].error %}
         {% call field() %}
           <span class="table-field-error">
-            <span class="table-field-error-label">{{ item[column].error }}</span>
-            {{ item[column].data if item[column].data != None }}
+            <span class="table-field-error-label">{{ item['columns'][column].error }}</span>
+            {{ item['columns'][column].data if item['columns'][column].data != None }}
           </span>
         {% endcall %}
-      {% elif item[column].ignore %}
+      {% elif item['columns'][column].ignore %}
         {% call field(status='default') %}
-          {{ item[column].data if item[column].data != None }}
+          {{ item['columns'][column].data if item['columns'][column].data != None }}
         {% endcall %}
       {% else %}
-        {{ text_field(item[column].data) }}
+        {{ text_field(item['columns'][column].data) }}
       {% endif %}
     {% endfor %}
   {% endcall %}
