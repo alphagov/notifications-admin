@@ -39,7 +39,7 @@ class UserApiClient(BaseAPIClient):
         try:
             return self.get_user_by_email(email_address)
         except HTTPError as e:
-            if HTTPError.status_code == 404:
+            if e.status_code == 404:
                 return None
 
     def get_users(self):

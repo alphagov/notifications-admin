@@ -2,6 +2,7 @@ from flask import request, render_template, redirect, url_for, flash, abort
 from flask_login import login_required
 
 from notifications_utils.template import Template
+from notifications_python_client.errors import HTTPError
 
 from app.main import main
 from app.utils import user_has_permissions
@@ -44,23 +45,31 @@ def view_template(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
 def add_service_template(service_id, template_type):
-
     if template_type not in ['sms', 'email']:
         abort(404)
 
     form = form_objects[template_type]()
-
     if form.validate_on_submit():
-        service_api_client.create_service_template(
-            form.name.data,
-            template_type,
-            form.template_content.data,
-            service_id,
-            form.subject.data if hasattr(form, 'subject') else None
-        )
-        return redirect(
-            url_for('.choose_template', service_id=service_id, template_type=template_type)
-        )
+        try:
+            service_api_client.create_service_template(
+                form.name.data,
+                template_type,
+                form.template_content.data,
+                service_id,
+                form.subject.data if hasattr(form, 'subject') else None
+            )
+        except HTTPError as e:
+            if e.status_code == 400:
+                if 'content' in e.message and any(['character count greater than' in x for x in e.message['content']]):
+                    form.template_content.errors.extend(e.message['content'])
+                else:
+                    raise e
+            else:
+                raise e
+        else:
+            return redirect(
+                url_for('.choose_template', service_id=service_id, template_type=template_type)
+            )
 
     return render_template(
         'views/edit-{}-template.html'.format(template_type),
@@ -79,20 +88,29 @@ def edit_service_template(service_id, template_id):
     form = form_objects[template['template_type']](**template)
 
     if form.validate_on_submit():
-        service_api_client.update_service_template(
-            template_id,
-            form.name.data,
-            template['template_type'],
-            form.template_content.data,
-            service_id,
-            form.subject.data if getattr(form, 'subject', None) else None
-        )
-        return redirect(url_for(
-            '.choose_template',
-            service_id=service_id,
-            template_type=template['template_type']
-        ))
-
+        try:
+            service_api_client.update_service_template(
+                template_id,
+                form.name.data,
+                template['template_type'],
+                form.template_content.data,
+                service_id,
+                form.subject.data if getattr(form, 'subject', None) else None
+            )
+        except HTTPError as e:
+            if e.status_code == 400:
+                if 'content' in e.message and any(['character count greater than' in x for x in e.message['content']]):
+                    form.template_content.errors.extend(e.message['content'])
+                else:
+                    raise e
+            else:
+                raise e
+        else:
+            return redirect(url_for(
+                '.choose_template',
+                service_id=service_id,
+                template_type=template['template_type']
+            ))
     return render_template(
         'views/edit-{}-template.html'.format(template['template_type']),
         form=form,
