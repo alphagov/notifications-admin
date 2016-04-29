@@ -27,7 +27,8 @@ class NotificationApiClient(BaseAPIClient):
                                       template_type=None,
                                       status=None,
                                       page=None,
-                                      page_size=None):
+                                      page_size=None,
+                                      limit_days=None):
         params = {}
         if page is not None:
             params['page'] = page
@@ -43,6 +44,9 @@ class NotificationApiClient(BaseAPIClient):
                 params=params
             )
         else:
+            if limit_days is not None:
+                params['limit_days'] = limit_days
+
             return self.get(
                 url='/service/{}/notifications'.format(service_id),
                 params=params

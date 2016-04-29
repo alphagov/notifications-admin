@@ -40,6 +40,7 @@ class Config(object):
     DESKPRO_API_KEY = os.environ['DESKPRO_API_KEY']
     DESKPRO_PERSON_EMAIL = os.environ['DESKPRO_PERSON_EMAIL']
     DESKPRO_TEAM_ID = os.environ['DESKPRO_TEAM_ID']
+    ACTIVITY_STATS_LIMIT_DAYS = 7
 
     EMAIL_DOMAIN_REGEXES = [
         "gov\.uk",

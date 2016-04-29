@@ -35,7 +35,8 @@ def temp_service_history(service_id):
     data = service_api_client.get_service_history(service_id)['data']
     return render_template('views/temp-history.html',
                            services=data['service_history'],
-                           api_keys=data['api_key_history'])
+                           api_keys=data['api_key_history'],
+                           events=data['events'])
 
 
 @main.route("/services/<service_id>/dashboard")
@@ -102,11 +103,11 @@ def add_rates_to(delivery_statistics):
     return dict(
         emails_failure_rate=(
             "{0:.1f}".format((float(sum_of_statistics['emails_failed']) / sum_of_statistics['emails_requested'] * 100))
-            if sum_of_statistics.get('emails_requested') else 0
+            if sum_of_statistics['emails_requested'] else 0
         ),
         sms_failure_rate=(
             "{0:.1f}".format((float(sum_of_statistics['sms_failed']) / sum_of_statistics['sms_requested'] * 100))
-            if sum_of_statistics.get('sms_requested') else 0
+            if sum_of_statistics['sms_requested'] else 0
         ),
         **sum_of_statistics
     )

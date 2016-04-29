@@ -38,6 +38,7 @@ from app.notify_client.statistics_api_client import StatisticsApiClient
 from app.notify_client.status_api_client import StatusApiClient
 from app.notify_client.template_statistics_api_client import TemplateStatisticsApiClient
 from app.notify_client.user_api_client import UserApiClient
+from app.notify_client.events_api_client import EventsApiClient
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
@@ -51,6 +52,7 @@ status_api_client = StatusApiClient()
 invite_api_client = InviteApiClient()
 statistics_api_client = StatisticsApiClient()
 template_statistics_client = TemplateStatisticsApiClient()
+events_api_client = EventsApiClient()
 asset_fingerprinter = AssetFingerprinter()
 
 # The current service attached to the request stack.
@@ -75,6 +77,7 @@ def create_app():
     invite_api_client.init_app(application)
     statistics_api_client.init_app(application)
     template_statistics_client.init_app(application)
+    events_api_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
@@ -108,6 +111,8 @@ def create_app():
 
     application.context_processor(_attach_current_service)
     register_errorhandlers(application)
+
+    setup_event_handlers()
 
     return application
 
@@ -272,3 +277,11 @@ def register_errorhandlers(application):
         if current_app.config.get('DEBUG', None):
             raise error
         return _error_response(500)
+
+
+def setup_event_handlers():
+    from flask.ext.login import user_logged_in, user_login_confirmed
+    from app.event_handlers import on_user_logged_in, on_user_login_confirmed
+
+    user_logged_in.connect(on_user_logged_in)
+    user_login_confirmed.connect(on_user_login_confirmed)

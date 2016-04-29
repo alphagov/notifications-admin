@@ -237,7 +237,6 @@ def check_messages(service_id, template_type, upload_id):
 
     session['upload_data']['notification_count'] = len(list(recipients.rows))
     session['upload_data']['valid'] = not recipients.has_errors
-
     return render_template(
         'views/check.html',
         recipients=recipients,

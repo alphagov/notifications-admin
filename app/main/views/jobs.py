@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import time
-import itertools
 
 from flask import (
     render_template,
     abort,
     jsonify,
     request,
-    url_for
+    url_for,
+    current_app
 )
 from flask_login import login_required
 from werkzeug.datastructures import MultiDict
@@ -28,7 +28,6 @@ from app.utils import (
 
 
 def _parse_filter_args(filter_dict):
-
     if not isinstance(filter_dict, MultiDict):
         filter_dict = MultiDict(filter_dict)
 
@@ -114,12 +113,15 @@ def view_notifications(service_id):
     page = get_page_from_request()
     if page is None:
         abort(404, "Invalid page argument ({}) reverting to page 1.".format(request.args['page'], None))
+
     filter_args = _parse_filter_args(request.args)
+
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
         page=page,
-        template_type=filter_args.getlist('template_type') if 'template_type' in filter_args else None,
-        status=filter_args.getlist('status') if 'status' in filter_args else ['delivered', 'failed'])
+        template_type=filter_args.get('template_type') if 'template_type' in filter_args else ['email', 'sms'],
+        status=filter_args.get('status') if 'status' in filter_args else ['delivered', 'failed'],
+        limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
     view_dict = MultiDict(request.args)
     prev_page = None
     if notifications['links'].get('prev', None):
@@ -147,7 +149,8 @@ def view_notifications(service_id):
                 page_size=notifications['total'],
                 template_type=filter_args.getlist('template_type') if 'template_type' in filter_args else None,
                 status=filter_args.getlist('status')
-                if 'status' in filter_args else ['delivered', 'failed'])['notifications'])
+                if 'status' in filter_args else ['delivered', 'failed'],
+                limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])['notifications'])
         return csv_content, 200, {
             'Content-Type': 'text/csv; charset=utf-8',
             'Content-Disposition': 'inline; filename="notifications.csv"'
@@ -168,14 +171,14 @@ def view_notifications(service_id):
             )] for item in [
                 ['Emails', 'email'],
                 ['Text messages', 'sms'],
-                ['Both', '']
+                ['Both', 'email,sms']
             ]
         ],
         status_filters=[
             [item[0], item[1], url_for(
                 '.view_notifications',
                 service_id=current_service['id'],
-                template_type=request.args.get('template_type', ''),
+                template_type=request.args.get('template_type', 'email,sms'),
                 status=item[1]
             )] for item in [
                 ['Successful', 'delivered'],

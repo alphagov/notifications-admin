@@ -148,6 +148,18 @@ def mock_get_services(mocker, fake_uuid, user=None):
 
 
 @pytest.fixture(scope='function')
+def mock_get_services_with_no_services(mocker, fake_uuid, user=None):
+    if user is None:
+        user = active_user_with_permissions(fake_uuid)
+
+    def _create(user_id=None):
+        return {'data': []}
+
+    return mocker.patch(
+        'app.service_api_client.get_services', side_effect=_create)
+
+
+@pytest.fixture(scope='function')
 def mock_get_services_with_one_service(mocker, fake_uuid, user=None):
     if user is None:
         user = api_user_active(fake_uuid)
@@ -207,7 +219,7 @@ def mock_get_service_email_template(mocker):
 
 @pytest.fixture(scope='function')
 def mock_create_service_template(mocker, fake_uuid):
-    def _create(name, type_, content, service):
+    def _create(name, type_, content, service, subject=None):
         template = template_json(
             fake_uuid, name, type_, content, service)
         return {'data': template}
@@ -223,6 +235,42 @@ def mock_update_service_template(mocker):
         template = template_json(
             service, id_, name, type_, content, subject)
         return {'data': template}
+
+    return mocker.patch(
+        'app.service_api_client.update_service_template',
+        side_effect=_update)
+
+
+@pytest.fixture(scope='function')
+def mock_create_service_template_content_too_big(mocker):
+    def _create(name, type_, content, service, subject=None):
+        json_mock = Mock(return_value={
+            'message': {'content': ["Content has a character count greater than the limit of 459"]},
+            'result': 'error'
+        })
+        resp_mock = Mock(status_code=400, json=json_mock)
+        http_error = HTTPError(
+            response=resp_mock,
+            message={'content': ["Content has a character count greater than the limit of 459"]})
+        raise http_error
+
+    return mocker.patch(
+        'app.service_api_client.create_service_template',
+        side_effect=_create)
+
+
+@pytest.fixture(scope='function')
+def mock_update_service_template_400_content_too_big(mocker):
+    def _update(id_, name, type_, content, service, subject=None):
+        json_mock = Mock(return_value={
+            'message': {'content': ["Content has a character count greater than the limit of 459"]},
+            'result': 'error'
+        })
+        resp_mock = Mock(status_code=400, json=json_mock)
+        http_error = HTTPError(
+            response=resp_mock,
+            message={'content': ["Content has a character count greater than the limit of 459"]})
+        raise http_error
 
     return mocker.patch(
         'app.service_api_client.update_service_template',
@@ -691,7 +739,8 @@ def mock_get_notifications(mocker):
                            page=1,
                            page_size=50,
                            template_type=None,
-                           status=None):
+                           status=None,
+                           limit_days=None):
         return notification_json(service_id)
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
@@ -705,7 +754,8 @@ def mock_get_notifications_with_previous_next(mocker):
                            job_id=None,
                            page=1,
                            template_type=None,
-                           status=None):
+                           status=None,
+                           limit_days=None):
         return notification_json(service_id, with_links=True)
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
@@ -846,3 +896,12 @@ def mock_get_template_statistics(mocker, service_one, fake_uuid):
 
     return mocker.patch(
         'app.template_statistics_client.get_template_statistics_for_service', side_effect=_get_stats)
+
+
+@pytest.fixture(scope='function')
+def mock_events(mocker):
+
+    def _create_event(event_type, event_data):
+        return {'some': 'data'}
+
+    return mocker.patch('app.events_api_client.create_event', side_effect=_create_event)
