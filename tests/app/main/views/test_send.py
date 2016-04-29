@@ -51,6 +51,32 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
             assert 'Re-upload your file' in content
 
 
+def test_upload_csv_invalid_extension(app_,
+                                      api_user_active,
+                                      mock_login,
+                                      mock_get_service,
+                                      mock_get_service_template,
+                                      mock_s3_upload,
+                                      mock_has_permissions,
+                                      mock_get_users_by_service,
+                                      mock_get_service_statistics,
+                                      fake_uuid):
+    contents = u'phone number,name\n+44 123,test1\n+44 456,test2'
+    with app_.test_request_context():
+        filename = 'invalid.txt'
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            resp = client.post(
+                url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
+                data={'file': (BytesIO(contents.encode('utf-8')), filename)},
+                content_type='multipart/form-data',
+                follow_redirects=True
+            )
+
+        assert resp.status_code == 200
+        assert "{} is not a CSV file".format(filename) in resp.get_data(as_text=True)
+
+
 def test_send_test_sms_message_to_self(
     app_,
     mocker,
