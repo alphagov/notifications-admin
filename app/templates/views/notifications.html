@@ -11,36 +11,32 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-
-    {%- if (request_args.get('template_type', '') == '') and (request_args.get('status', 'delivered,failed') == 'delivered,failed') -%}
+    {%- if (request_args.get('template_type', 'email,sms') == 'email,sms') and (request_args.get('status', 'delivered,failed') == 'delivered,failed') -%}
 
       Activity
 
     {%- else -%}
 
-      {% if request_args.get('status') != 'delivered,failed' %}
-        {% for label, option, _ in status_filters %}
-          {% if request_args.get('status') == option %}
-            {{ label }}
-          {% endif %}
-        {% endfor %}
-      {% endif %}
+      {%- if request_args.get('status') != 'delivered,failed' -%}
+        {%- for label, option, _ in status_filters -%}
+          {%- if request_args.get('status', 'delivered,failed') == option -%}{{label}} {% endif -%}
+        {%- endfor -%}
+      {%- endif -%}
 
-      {% if request_args.get('template_type') == '' %}
-        emails and text messages
-      {% else %}
+      {%- if request_args.get('template_type', 'email,sms') == 'email,sms' %} emails and text messages
+      {%- else -%}
 
-        {% for template_label, template_option, _ in type_filters %}
-          {% if request_args.get('template_type') == template_option %}
-            {% if request_args.get('status', 'delivered,failed') == 'delivered,failed' %}
+        {%- for template_label, template_option, _ in type_filters -%}
+          {%- if request_args.get('template_type') == template_option -%}
+            {%- if request_args.get('status', 'delivered,failed') == 'delivered,failed' -%}
               {{ template_label }}
-            {% else %}
+            {%- else -%}
               {{ template_label | lower }}
-            {% endif %}
-          {% endif %}
-        {% endfor %}
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
 
-      {% endif %}
+      {%- endif -%}
 
     {%- endif -%}
 
