@@ -18,7 +18,8 @@
         statistics.emails_failed,
         statistics.get('emails_failure_rate', 0.0),
         statistics.get('emails_failure_rate', 0)|float > 3,
-        failure_link=url_for(".view_notifications", service_id=current_service.id, template_type='email', status='failed')
+        failure_link=url_for(".view_notifications", service_id=current_service.id, template_type='email', status='failed'),
+        label_link=url_for(".view_notifications", service_id=current_service.id, template_type='email', status='delivered,failed')
       ) }}
     </div>
     <div class="column-half">
@@ -28,7 +29,8 @@
         statistics.sms_failed,
         statistics.get('sms_failure_rate', 0.0),
         statistics.get('sms_failure_rate', 0)|float > 3,
-        failure_link=url_for(".view_notifications", service_id=current_service.id, template_type='sms', status='failed')
+        failure_link=url_for(".view_notifications", service_id=current_service.id, template_type='sms', status='failed'),
+        label_link=url_for(".view_notifications", service_id=current_service.id, template_type='sms', status='delivered,failed')
       ) }}
     </div>
   </div>
