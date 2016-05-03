@@ -15,24 +15,9 @@
       </h1>
     </div>
     <div class="column-one-third">
-      <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}" class="button align-with-heading">Create new API key</a>
+      <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}" class="button align-with-heading">Create an API key</a>
     </div>
   </div>
-
-  <p>
-    To connect to the API you need to create an API Key.
-  </p>
-  <p>
-    Each service can have multiple API Keys. This allows you to integrate a
-    number of systems, each with its own key. You can also have separate
-    keys for your development and test environments.
-  </p>
-
-  <p>
-    API usage is described in
-    <a href="{{ url_for('.documentation', service_id=current_service.id) }}">the
-    developer documentation</a>.
-  </p>
 
   {% call(item, row_number) list_table(
     keys,
@@ -55,6 +40,14 @@
     {% endif %}
   {% endcall %}
 
-  {{ api_key(current_service.id, "Service ID", thing="service ID") }}
+  <div class="bottom-gutter">
+    {{ api_key(current_service.id, "Service ID", thing="service ID") }}
+  </div>
+
+  <p>
+    API usage is described in the
+    <a href="{{ url_for('.documentation', service_id=current_service.id) }}">
+    API documentation</a>.
+  </p>
 
 {% endblock %}
