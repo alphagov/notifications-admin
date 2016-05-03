@@ -8,7 +8,7 @@ This document is for central government developers, technical architects, and se
 <a name="about_Notify"></a>
 ## About GOV.UK Notify
 
-GOV.UK Notify is a cross-government platform that lets government services send notifications by sms or email. It is currently in beta.
+GOV.UK Notify is a cross-government platform that lets government services send notifications by sms or email. It's currently in beta.
 
 There are 2 ways to send notifications:
 
@@ -30,7 +30,7 @@ To use GOV.UK Notify, you need:
 
 To get started:
 
-  1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. You will need your mobile phone for 2-factor authentication.
+  1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. You'll need your mobile phone for 2-factor authentication.
 
   2. Add a new service.
 
@@ -54,7 +54,7 @@ To get started:
 
     Each service can have multiple API keys. This allows you to integrate several systems, each with its own key. You can also have separate keys for your development and test environments.
     
-    **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories. 
+    **Important:** API keys are secret, so save them somewhere safe. Don't commit API keys to public source code repositories. 
 
 <a name="integrate_Notify"></a>
 ## Integrate the GOV.UK Notify API into your service
@@ -184,7 +184,7 @@ The response will be:
 }
 ```
 
-where `id` is the unique identifier for the notification – you will use this id to retrieve the status of a notification.
+where `id` is the unique identifier for the notification – you'll use this id to retrieve the status of a notification.
 
 <a name="get_single_notif"></a>
 To retrieve the status of a single sms or email notification:
