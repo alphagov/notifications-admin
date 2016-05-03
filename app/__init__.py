@@ -173,21 +173,27 @@ def syntax_highlight_json(code):
 
 
 def format_datetime(date):
+    from_zone = dateutil.tz.gettz('UTC')
+    to_zone = dateutil.tz.gettz('Europe/London')
     date = dateutil.parser.parse(date)
-    native = date.replace(tzinfo=None)
-    return native.strftime('%A %d %B %Y at %H:%M')
+    native = date.replace(tzinfo=from_zone)
+    return native.astimezone(to_zone).strftime('%A %d %B %Y at %H:%M')
 
 
 def format_datetime_short(date):
+    from_zone = dateutil.tz.gettz('UTC')
+    to_zone = dateutil.tz.gettz('Europe/London')
     date = dateutil.parser.parse(date)
-    native = date.replace(tzinfo=None)
-    return native.strftime('%d %B at %H:%M')
+    native = date.replace(tzinfo=from_zone)
+    return native.astimezone(to_zone).strftime('%d %B at %H:%M')
 
 
 def format_time(date):
+    from_zone = dateutil.tz.gettz('UTC')
+    to_zone = dateutil.tz.gettz('Europe/London')
     date = dateutil.parser.parse(date)
-    native = date.replace(tzinfo=None)
-    return native.strftime('%H:%M')
+    native = date.replace(tzinfo=from_zone)
+    return native.astimezone(to_zone).strftime('%H:%M')
 
 
 def format_date(date):
