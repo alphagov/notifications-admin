@@ -635,7 +635,7 @@ def mock_get_no_api_keys(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_login(mocker, mock_get_user, mock_update_user):
+def mock_login(mocker, mock_get_user, mock_update_user, mock_events):
     def _verify_code(user_id, code, code_type):
         return True, ''
 
