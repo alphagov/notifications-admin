@@ -163,12 +163,12 @@ POST /notifications/email
 
 where:
 
-* `to` is the phone number or email address (required)
-* `template` is the template ID to send (required)
+* `to` is a required string that indicates the recipient's phone number or email address
+* `template` is a required string that indicates the template ID to send
    
     **Note:** To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to **Text message templates** or **Email templates** and click on **API info**.
 
-* `personalisation` (optional) specifies the values for the placeholders in your templates
+* `personalisation` is an optional array that specifies the values for the placeholders in your templates
 
     **Note:** You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
 
@@ -212,7 +212,7 @@ GET /notifications/{id}
 where:
 
 * `status` is the the status of the notification; this can be `sending`, `delivered`, or `failed` 
-* `to` is the phone number or email address
+* `to` is the recipient's phone number or email address
 * `template_type` is `sms` or `email`
 * `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the notification was sent
 * `message` is the content of message
