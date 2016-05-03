@@ -3,9 +3,6 @@
     <a href="{{ url_for('.service_dashboard', service_id=current_service.id) }}">{{ current_service.name }}</a>
   </h2>
   <ul>
-  {% if current_user.has_permissions(['view_activity'], admin_override=True) %}
-    <li><a href="{{ url_for('.view_notifications', service_id=current_service.id, status='delivered,failed', template_type='email,sms') }}">Activity</a></li>
-  {% endif %}
   {% if current_user.has_permissions(['view_activity', 'manage_templates', 'manage_api_keys'], admin_override=True, any_=True) %}
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='email') }}">Email templates</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='sms') }}">Text message templates</a></li>

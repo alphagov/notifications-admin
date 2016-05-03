@@ -1,18 +1,31 @@
-{% macro big_number(number, label) %}
+{% macro big_number(number, label, label_link=None) %}
   <div class="big-number{% if right_aligned %}-right-aligned{% endif %}">
     {% if number is number %}
       {{ "{:,}".format(number) }}
     {% else %}
       {{ number }}
     {% endif %}
-    <span class="big-number-label">{{ label }}</span>
+    {% if label_link %}
+      <a class="big-number-label" href="{{ label_link }}">{{ label }}</a>
+      <a class="big-number-overlay-link" href="{{ label_link }}" aria-hidden="true"></a>
+    {% else %}
+      <span class="big-number-label">{{ label }}</span>
+    {% endif %}
   </div>
 {% endmacro %}
 
 
-{% macro big_number_with_status(number, label, failures, failure_percentage, danger_zone=False, failure_link=None) %}
+{% macro big_number_with_status(
+  number,
+  label,
+  failures,
+  failure_percentage,
+  danger_zone=False,
+  failure_link=None,
+  label_link=None
+) %}
   <div class="big-number-with-status">
-    {{ big_number(number, label) }}
+    {{ big_number(number, label, label_link) }}
     <div class="big-number-status{% if danger_zone %}-failing{% endif %}">
       {% if failures %}
         {% if failure_link %}

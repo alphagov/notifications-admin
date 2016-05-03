@@ -82,20 +82,24 @@ def template_history(service_id):
 
 def add_rates_to(delivery_statistics):
 
+    keys = [
+        'emails_delivered',
+        'emails_requested',
+        'emails_failed',
+        'sms_requested',
+        'sms_delivered',
+        'sms_failed'
+    ]
+
     if not delivery_statistics or not delivery_statistics[0]:
-        return {}
+        return {
+            key: 0 for key in keys
+        }
 
     sum_of_statistics = reduce(
         lambda x, y: {
             key: x.get(key, 0) + y.get(key, 0)
-            for key in [
-                'emails_delivered',
-                'emails_requested',
-                'emails_failed',
-                'sms_requested',
-                'sms_delivered',
-                'sms_failed'
-            ]
+            for key in keys
         },
         delivery_statistics
     )
