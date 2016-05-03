@@ -8,7 +8,7 @@ This document is for central government developers, technical architects, and se
 <a name="about_Notify"></a>
 ## About GOV.UK Notify
 
-GOV.UK Notify is a cross-government platform, currently in beta, that lets government services send notifications by sms or email.
+GOV.UK Notify is a cross-government platform that lets government services send notifications by sms or email. It is currently in beta.
 
 There are 2 ways to send notifications:
 
@@ -52,7 +52,7 @@ To get started:
 
   6. If you intend to use the GOV.UK Notify API, create a new API key. This will be used to connect to the GOV.UK Notify API.
 
-    Each service can have multiple API keys. This allows you to integrate a number of systems, each with its own key. You can also have separate keys for your development and test environments.
+    Each service can have multiple API keys. This allows you to integrate several systems, each with its own key. You can also have separate keys for your development and test environments.
     
     **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories. 
 
