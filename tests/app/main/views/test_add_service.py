@@ -9,7 +9,9 @@ def test_get_should_render_add_service_template(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active, mocker)
+
             response = client.get(url_for('main.add_service'))
+
             assert response.status_code == 200
             assert 'Which service do you want to set up notifications for?' in response.get_data(as_text=True)
 

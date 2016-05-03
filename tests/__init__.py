@@ -7,11 +7,11 @@ from flask_login import login_user
 
 
 class TestClient(FlaskClient):
-    def login(self, user, mocker=None, service=None):
+    def login(self, user, mocker=None, service=None, fresh=True):
         # Skipping authentication here and just log them in
         with self.session_transaction() as session:
             session['user_id'] = user.id
-            session['_fresh'] = True
+            session['_fresh'] = fresh
         if mocker:
             mocker.patch('app.user_api_client.get_user', return_value=user)
             mocker.patch('app.events_api_client.create_event')
