@@ -53,9 +53,10 @@ def test_should_show_api_keys_page(app_,
             response = client.get(url_for('main.api_keys', service_id=fake_uuid))
 
         assert response.status_code == 200
-        assert 'some key name' in response.get_data(as_text=True)
-        assert 'another key name' in response.get_data(as_text=True)
-        assert 'Revoked Thursday 01 January 1970 at 00:00' in response.get_data(as_text=True)
+        resp_data = response.get_data(as_text=True)
+        assert 'some key name' in resp_data
+        assert 'another key name' in resp_data
+        assert 'Revoked Thursday 01 January 1970 at 01:00' in resp_data
         mock_get_api_keys.assert_called_once_with(service_id=fake_uuid)
 
 
@@ -66,12 +67,13 @@ def test_should_show_name_api_key_page(app_,
                                        mock_get_user_by_email,
                                        mock_get_api_keys,
                                        mock_get_service,
-                                       mock_has_permissions):
+                                       mock_has_permissions,
+                                       fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-            service_id = str(uuid.uuid4())
-            response = client.get(url_for('main.create_api_key', service_id=service_id))
+            service_id = fake_uuid
+            response = client.get(url_for('main.create_api_key', service_id=fake_uuid))
 
         assert response.status_code == 200
 
