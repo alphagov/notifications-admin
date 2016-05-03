@@ -1,7 +1,11 @@
-{% macro big_number(number, label, label_link=None) %}
+{% macro big_number(number, label, label_link=None, currency='', right_aligned=False) %}
   <div class="big-number{% if right_aligned %}-right-aligned{% endif %}">
     {% if number is number %}
-      {{ "{:,}".format(number) }}
+      {% if currency %}
+        {{ "{}{:,.2f}".format(currency, number) }}
+      {% else %}
+        {{ "{}{:,}".format(currency, number) }}
+      {% endif %}
     {% else %}
       {{ number }}
     {% endif %}

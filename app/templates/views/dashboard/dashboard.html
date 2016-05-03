@@ -6,6 +6,8 @@
 
 {% block maincolumn_content %}
 
+  <div class="dashboard">
+
     {% if not templates and current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
       {% include 'views/dashboard/get-started.html' %}
     {% elif current_user.has_permissions([
@@ -19,5 +21,7 @@
     {% endif %}
 
     {% include 'views/dashboard/today.html' %}
+
+  </div>
 
 {% endblock %}

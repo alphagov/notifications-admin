@@ -35,6 +35,11 @@
   padding-right: 2px;
 }
 
+.align-with-heading-copy {
+  display: block;
+  margin-top: 45px;
+}
+
 .global-cookie-message {
   p {
     @extend %site-width-container;

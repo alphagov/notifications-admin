@@ -65,7 +65,8 @@ def test_should_show_recent_templates_on_dashboard(app_,
                                                    mock_get_user_by_email,
                                                    mock_login,
                                                    mock_get_jobs,
-                                                   mock_has_permissions):
+                                                   mock_has_permissions,
+                                                   mock_get_usage):
 
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -164,7 +165,8 @@ def test_menu_send_messages(mocker,
                             service_one,
                             mock_get_service_templates,
                             mock_get_jobs,
-                            mock_get_template_statistics):
+                            mock_get_template_statistics,
+                            mock_get_usage):
 
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -197,7 +199,8 @@ def test_menu_manage_service(mocker,
                              service_one,
                              mock_get_service_templates,
                              mock_get_jobs,
-                             mock_get_template_statistics):
+                             mock_get_template_statistics,
+                             mock_get_usage):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -229,7 +232,8 @@ def test_menu_manage_api_keys(mocker,
                               service_one,
                               mock_get_service_templates,
                               mock_get_jobs,
-                              mock_get_template_statistics):
+                              mock_get_template_statistics,
+                              mock_get_usage):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -260,7 +264,8 @@ def test_menu_all_services_for_platform_admin_user(mocker,
                                                    service_one,
                                                    mock_get_service_templates,
                                                    mock_get_jobs,
-                                                   mock_get_template_statistics):
+                                                   mock_get_template_statistics,
+                                                   mock_get_usage):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -295,7 +300,8 @@ def test_route_for_service_permissions(mocker,
                                        mock_get_service_templates,
                                        mock_get_jobs,
                                        mock_get_service_statistics,
-                                       mock_get_template_statistics):
+                                       mock_get_template_statistics,
+                                       mock_get_usage):
     routes = [
         'main.service_dashboard']
     with app_.test_request_context():
