@@ -78,18 +78,20 @@ def test_should_return_redirect_when_user_is_pending(app_,
         assert flash_banner == "You haven't verified your email or mobile number yet."
 
 
-def test_not_fresh_session_login(app_,
-                                 api_user_active,
-                                 mock_login,
-                                 mock_get_user_by_email,
-                                 mock_verify_password,
-                                 mock_get_services_with_one_service):
+def test_not_fresh_session_login_bypass_two_factor(app_,
+                                                   api_user_active,
+                                                   mock_login,
+                                                   mock_get_user_by_email,
+                                                   mock_verify_password,
+                                                   mock_get_services_with_one_service):
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
             with client.session_transaction() as session:
-                assert session['_fresh']
-                session['_fresh'] = False
+                user_id = str(api_user_active.id)
+                remember_me_cookie = "{}|thisdoesnotmatterindevandtest".format(user_id)
+                session['notify_admin_remember_me'] = remember_me_cookie
+                session['remember'] = 'set'
+
             # This should skip the two factor
             response = client.post(
                 url_for('main.sign_in'), data={

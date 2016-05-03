@@ -19,7 +19,7 @@ class Config(object):
     NOTIFY_APP_NAME = 'admin'
     NOTIFY_LOG_LEVEL = 'DEBUG'
     NOTIFY_LOG_PATH = '/var/log/notify/application.log'
-    PERMANENT_SESSION_LIFETIME = 3600  # seconds
+    PERMANENT_SESSION_LIFETIME = 60  # seconds
     REMEMBER_COOKIE_DURATION = timedelta(days=1)
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_NAME = 'notify_admin_remember_me'
@@ -31,7 +31,7 @@ class Config(object):
     SESSION_COOKIE_NAME = 'notify_admin_session'
     SESSION_COOKIE_PATH = '/admin'
     SESSION_COOKIE_SECURE = True
-    SESSION_REFRESH_EACH_REQUEST = True
+    SESSION_REFRESH_EACH_REQUEST = False
     SHOW_STYLEGUIDE = True
     TOKEN_MAX_AGE_SECONDS = 3600
     WTF_CSRF_ENABLED = True

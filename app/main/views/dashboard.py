@@ -43,7 +43,6 @@ def temp_service_history(service_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def service_dashboard(service_id):
-
     if session.get('invited_user'):
         session.pop('invited_user', None)
         session['service_id'] = service_id

@@ -26,7 +26,7 @@ from app import user_api_client
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user and current_user.is_authenticated():
+    if current_user and current_user.is_authenticated:
         return redirect(url_for('main.choose_service'))
 
     form = RegisterUserForm()

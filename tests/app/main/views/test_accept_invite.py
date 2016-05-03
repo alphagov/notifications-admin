@@ -1,4 +1,4 @@
-from flask import url_for, session
+from flask import url_for
 
 from bs4 import BeautifulSoup
 from unittest.mock import ANY
@@ -296,13 +296,13 @@ def test_signed_out_existing_user_cannot_use_anothers_invite(app_,
                                                              api_user_active,
                                                              sample_invite,
                                                              mock_get_user,
-                                                             mock_get_user_by_email,
                                                              mock_verify_password,
                                                              mock_send_verify_code,
                                                              mock_accept_invite,
                                                              mock_get_service):
     invite = InvitedUser(**sample_invite)
     mocker.patch('app.invite_api_client.check_token', return_value=invite)
+    mocker.patch('app.user_api_client.get_user_by_email_or_none', return_value=api_user_active)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
 
     with app_.test_request_context():
@@ -312,7 +312,7 @@ def test_signed_out_existing_user_cannot_use_anothers_invite(app_,
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == 'Sign in'
             response = client.post(url_for('main.sign_in'),
-                                   data={'email_address': 'test@user.gov.uk', 'password': 'somepassword'},
+                                   data={'email_address': api_user_active.email_address, 'password': 'somepassword'},
                                    follow_redirects=True)
 
             assert response.status_code == 403
@@ -343,7 +343,8 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
                                                         mock_get_service_statistics,
                                                         mock_get_template_statistics,
                                                         mock_get_jobs,
-                                                        mock_has_permissions):
+                                                        mock_has_permissions,
+                                                        mock_events):
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -376,4 +377,4 @@ def test_new_invited_user_verifies_and_added_to_service(app_,
 
             raw_html = response.data.decode('utf-8')
             page = BeautifulSoup(raw_html, 'html.parser')
-            element = page.find('h2').text == 'Trial mode'
+            assert page.find('h2').text == 'Trial mode'

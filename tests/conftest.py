@@ -1,4 +1,3 @@
-import uuid
 from datetime import date, datetime, timedelta
 from unittest.mock import Mock
 import pytest
