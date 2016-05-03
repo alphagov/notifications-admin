@@ -42,7 +42,7 @@
   </p>
 
   {% if current_user.has_permissions(['manage_settings'], admin_override=True) %}
-    <h2 class='heading-medium' style="margin-top: 30px;">This year</h2>   
+    <h2 class='heading-medium'>Usage</h2>   
 
     <div class='grid-row'>
       <div class='column-half'>
@@ -66,7 +66,7 @@
       </div>
     </div>
     <div class="keyline-block-show-more-link">
-      <a href="{{ url_for(".usage", service_id=current_service['id']) }}">See usage</a>
+      <a href="{{ url_for(".usage", service_id=current_service['id']) }}">See breakdown</a>
     </div>
   {% endif %}
 
