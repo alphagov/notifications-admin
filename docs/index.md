@@ -1,9 +1,11 @@
 # API documenation
 
+<a name="about_doc"></a>
 ## About this document
 
 This document is for central government developers, technical architects, and service managers who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
+<a name="about_Notify"></a>
 ## About GOV.UK Notify
 
 GOV.UK Notify is a cross-government platform, currently in beta, that lets government services send notifications by sms or email.
@@ -11,17 +13,17 @@ GOV.UK Notify is a cross-government platform, currently in beta, that lets gover
 There are 2 ways to send notifications:
 
 * use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application
-* [integrate your web applications or back office systems](#integrateNotify) with the GOV.UK Notify API
+* [integrate your web applications or back office systems](#integrate_Notify) with the GOV.UK Notify API
 
 To find out more about GOV.UK Notify, see the [Government as a Platform](https://governmentasaplatform.blog.gov.uk/) blog.
 
+<a name="before_start"></a>
 ## Before you start
 
 To use GOV.UK Notify, you need:
 
 * an email address from a local or central government organisation
 * a mobile number for 2-factor authentication
-
 
 <a name="quickstart"></a>
 ## Quick start guide to GOV.UK Notify
@@ -54,11 +56,12 @@ To get started:
     
     **Important:** API keys are secret, so save them somewhere safe. Do not commit API keys to public source code repositories. 
 
-<a name="integrateNotify"></a>
+<a name="integrate_Notify"></a>
 ## Integrate the GOV.UK Notify API into your service
 
 GOV.UK Notify provides an API that allows you to create text and email notifications and get the status of notifications you have sent.
 
+<a name="API_integration"></a>
 ### API integration
 
 ![Notfy](/static/images/notify-diagram.png)
@@ -82,6 +85,7 @@ A JSON Web Token contains, in encrypted format:
 
 Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
 
+<a name="JWT_claims"></a>
 ### JSON Web Tokens: claims
 
 JSON Web Tokens have a series of standard and application-specific claims.
@@ -104,6 +108,7 @@ GOV.UK Notify application-specific claims:
 
 The signing algorithm is the HMAC signature, using the provided key SHA256 hashing algorithm.
 
+<a name="client_libraries"></a>
 ### API client libraries
 
 GOV.UK Notify supports the following client libraries:
@@ -114,7 +119,7 @@ GOV.UK Notify supports the following client libraries:
 
 These provide example code for calling the API and for constructing the API tokens.
 
-
+<a name="API_endpoints"></a>
 ### API endpoints
 
 You can use the GOV.UK Notify API to:
@@ -258,7 +263,7 @@ This list is split into pages. To scroll through the pages run:
 GET /notifications?&page=2
 ```
 
-
+<a name="Notify_code"></a>
 ### GOV.UK Notify API code
 
 The GOV.UK Notify API code is open sourced at:
