@@ -173,7 +173,7 @@ where:
     **Note:** You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
 
 <a id="coderesponse"></a>
-The response will be:
+The response (status code 201) will be:
 ```
 {
    'data':{
@@ -191,6 +191,7 @@ To retrieve the status of a single sms or email notification:
 ```
 GET /notifications/{id}
 ```
+The response (status code 200) will be:
 
 ```
 {
@@ -226,6 +227,8 @@ To retrieve the status of all notifications:
 ```
 GET /notifications
 ```
+
+The response (status code 200) will be:
 
 ```
 {
