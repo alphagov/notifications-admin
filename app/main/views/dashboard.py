@@ -80,22 +80,36 @@ def template_history(service_id):
     )
 
 
+@main.route("/services/<service_id>/usage")
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def usage(service_id):
+    return render_template(
+        'views/usage.html',
+        **get_dashboard_statistics_for_service(service_id)
+    )
+
+
 def add_rates_to(delivery_statistics):
 
+    keys = [
+        'emails_delivered',
+        'emails_requested',
+        'emails_failed',
+        'sms_requested',
+        'sms_delivered',
+        'sms_failed'
+    ]
+
     if not delivery_statistics or not delivery_statistics[0]:
-        return {}
+        return {
+            key: 0 for key in keys
+        }
 
     sum_of_statistics = reduce(
         lambda x, y: {
             key: x.get(key, 0) + y.get(key, 0)
-            for key in [
-                'emails_delivered',
-                'emails_requested',
-                'emails_failed',
-                'sms_requested',
-                'sms_delivered',
-                'sms_failed'
-            ]
+            for key in keys
         },
         delivery_statistics
     )
@@ -144,11 +158,25 @@ def aggregate_usage(template_statistics):
 
 
 def get_dashboard_statistics_for_service(service_id):
+
+    usage = service_api_client.get_service_usage(service_id)
+    sms_free_allowance = 250000
+    sms_rate = 0.018
+
+    sms_sent = usage['data'].get('sms_count', 0)
+    emails_sent = usage['data'].get('email_count', 0)
+
     return {
         'statistics': add_rates_to(
             statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
         ),
         'template_statistics': aggregate_usage(
             template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
-        )
+        ),
+        'emails_sent': emails_sent,
+        'sms_free_allowance': sms_free_allowance,
+        'sms_sent': sms_sent,
+        'sms_allowance_remaining': max(0, (sms_free_allowance - sms_sent)),
+        'sms_chargeable': max(0, sms_sent - sms_free_allowance),
+        'sms_rate': sms_rate,
     }
