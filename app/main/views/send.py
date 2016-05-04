@@ -51,8 +51,6 @@ def get_page_headings(template_type):
 
 
 def get_example_csv_fields(column_headers, use_example_as_example, submitted_fields):
-    print("="*40)
-    print(list(column_headers))
     if use_example_as_example:
         return ["example" for header in column_headers]
     elif submitted_fields:
@@ -137,7 +135,7 @@ def send_messages(service_id, template_id):
         'views/send.html',
         template=template,
         recipient_column=first_column_heading[template.template_type],
-        example=[get_example_csv_rows(template, use_example_as_example=True)],
+        example=[get_example_csv_rows(template)],
         form=form
     )
 
@@ -253,7 +251,7 @@ def check_messages(service_id, template_type, upload_id):
         ) if current_service['restricted'] else None
     )
 
-    if request.args.get('from_test'):
+    if request.args.get('from_test') and len(template.placeholders):
         back_link = url_for('.send_test', service_id=service_id, template_id=template.id)
     else:
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
