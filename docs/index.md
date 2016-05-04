@@ -62,7 +62,7 @@ To get started:
 GOV.UK Notify provides an API that allows you to create text and email notifications and get the status of notifications you have sent.
 
 <a name="API_integration"></a>
-### API integration
+## API integration
 
 ![Notfy](/static/images/notify-diagram.png)
 
@@ -74,11 +74,13 @@ There are 2 ways to integrate the API into your service:
     * [Java library] (https://github.com/alphagov/notifications-java-client) 
 * develop your own integration to produce requests in the correct format
 
-GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/) for authentication and identification. The GOV.UK Notify client libraries encode and decode JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use one of these libraries, you must manually create tokens yourself. 
+### Authenticating requests
+
+GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/introduction/) for authentication and identification. The GOV.UK Notify client libraries encode and decode JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use one of these libraries, you must manually create tokens yourself. 
 
 For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library, or the appropriate [PHP] (https://github.com/alphagov/notifications-php-client) or [Java] (https://github.com/alphagov/notifications-java-client) client library.
 
-A JSON Web Token contains, in encrypted format:
+To create a JSON Web Token you need:
 
 * your service ID – identifies your service
 * your API key (in JSON Web Token terms this is called the client ID) – used to sign tokens during requests for API resources
@@ -90,7 +92,7 @@ Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web applicati
 
 JSON Web Tokens have a series of standard and application-specific claims.
 
-JSON Web Token standard claims:
+The JSON Web Token standard claims form the JSON Web Token header:
 ```
 {
   "alg": "HS256",
@@ -98,13 +100,15 @@ JSON Web Token standard claims:
 }
 ```
 
-GOV.UK Notify application-specific claims:
+The GOV.UK Notify application-specific claims form the JSON Web Token payload:
 ```
 {
   iss: 'string', // service id
   iat: 0, // creation time in  epoch seconds (UTC)
 }
 ```
+
+The header and the payload are Base64Url encoded. 
 
 The signing algorithm is the HMAC signature, using the provided key SHA256 hashing algorithm.
 
@@ -195,30 +199,43 @@ The response (status code 200) will be:
 
 ```
 {
-   'data':{
-      'notification': {
-         'status':'delivered',
-         'created_at':'2016-01-01T09:00:00.999999Z',
-         'to':'+447827992607',
-         'template_type':'sms',
-         'sent_at':'2016-01-01T09:01:00.999999Z',
-         'id':1,
-         'message':'...',
-         'job_id':1,
-         'sender':'sms-partner'
-      }
-   }
+	'notification': 
+		{	
+		'status': 'delivered', 
+		'to': '07515 349 060', 
+		'template': {'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb', 
+					 'name': 'First template', 
+					 'template_type': 'sms'}, 
+		'created_at': '2016-04-26T15:29:36.891512+00:00', 
+		'updated_at': '2016-04-26T15:29:38.724808+00:00', 
+		'sent_at': '2016-04-26T15:29:37.230976+00:00', 
+		'job': {'id': 'f9043884-acac-46db-b2ea-f08cd8ec6d67', 
+				'original_file_name': 'Test run'}, 
+		'sent_at': '2016-04-26T15:29:37.230976+00:00', 
+		'id': 'f163deaf-2d3f-4ec6-98fc-f23fa511518f', 
+		'content_char_count': 490, 
+		'service': '5cf87313-fddd-4482-a2ea-48e37320efd1', 
+		'reference': None, 
+		'sent_by': 'mmg'
+	    }
 }
 ```
 where:
 
 * `status` is the the status of the notification; this can be `sending`, `delivered`, or `failed` 
 * `to` is the recipient's phone number or email address
+* `name` is the name of the template used
 * `template_type` is `sms` or `email`
+* `created_at` is the full timestamp, in Coordinated Universal Time (UTC), at which GOV.UK Notify created the data object
+* `updated_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the data object was updated
 * `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the notification was sent
-* `message` is the content of message
-* `job_id` is the unique identifier for the process of sending and retreiving one or more notifications
-* `sender` may be the provider
+* `job` is empty if you are using the API; 
+* `id` is the unique identifier for the process of sending and retreiving one or more notifications
+* `original_file_name` is the name of the CSV file, if used
+* `content_char_count` is the only populated for sms notifications; indicates the full character count, including placeholders
+* `service` is the service ID???
+* `reference` is ???
+* `sent_by` is the name of the provider
 
 The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
 
@@ -231,40 +248,89 @@ GET /notifications
 The response (status code 200) will be:
 
 ```
-{
-   'data':[{
-      'notification': {
-         'status':'delivered',
-         'created_at':'2016-01-01T09:00:00.999999Z',
-         'to':'+447827992607',
-         'template_type':'sms',
-         'sent_at':'2016-01-01T09:01:00.999999Z',
-         'id':1,
-         'message':'...',
-         'job_id':1,
-         'sender':'sms-partner'
-      }
-   },
-   {
-         'notification': {
-         'status':'delivered',
-         'created_at':'2016-01-01T09:00:00.999999Z',
-         'to':'+447827992607',
-         'template_type':'email',
-         'sent_at':'2016-01-01T09:01:00.999999Z',
-         'id':1,
-         'message':'...',
-         'job_id':1,
-         'sender':'email-partner'
-      }
-   }…]
-}
+{'notifications': 
+	[{
+		'status': 'delivered', 
+		'to': '07515 349 060', 
+		'template': {'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb', 
+					 'name': 'First template', 
+					 'template_type': 'sms'}, 
+		
+		'job': {'id': '5cc9d7ae-ceb7-4565-8345-4931d71f8c2e', 
+				'original_file_name': 'Test run'}, 
+		'created_at': '2016-04-26T15:30:49.968969+00:00', 
+		'updated_at': '2016-04-26T15:30:50.853844+00:00', 
+		'sent_at': '2016-04-26T15:30:50.383634+00:00', 
+		'id': '04ae9bdc-92aa-4d6c-a0da-48587c03d4c7', 
+		'content_char_count': 446, '
+		'service': '5cf87313-fddd-4482-a2ea-48e37320efd1', 
+		'reference': None, 
+		'sent_by': 'mmg'
+	 }, 
+	 {	
+		'status': 'delivered', 
+		'to': '07515 349 060', 
+		'template': {'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb', 
+					 'name': 'First template', 
+					 'template_type': 'sms'}, 
+		'job': {'id': 'f9043884-acac-46db-b2ea-f08cd8ec6d67', 
+				'original_file_name': 'Test run'}, 
+		'created_at': '2016-04-26T15:29:36.891512+00:00', 
+		'updated_at': '2016-04-26T15:29:38.724808+00:00', 
+		'sent_at': '2016-04-26T15:29:37.230976+00:00', 
+		'id': 'f163deaf-2d3f-4ec6-98fc-f23fa511518f', 
+		'content_char_count': 490, 
+		'service': '5cf87313-fddd-4482-a2ea-48e37320efd1', 
+		'reference': None, 
+		'sent_by': 'mmg'
+	  }, 
+	  ...
+	]
+ 'links': {'last': '/notifications?page=3&template_type=sms&status=delivered', 
+ 			'next': '/notifications?page=2&template_type=sms&status=delivered'}, 
+ 'total': 162, 
+ 'page_size': 50
+ }
 ```
+
+where:
+
+* `reference` is populated only for email notifications - this is the reference number that the email provider gives the to notification; it is used in the notifications API so you can ignore it.
+* `links`: 
+
+    * `last`: is the url of the last page of notifications
+    * `next` is the url of the next page of notifications
+    
+* `page size`: is an optional integer that indicates the number of notifications per page; if not provided, defaults to 50
+ total: total number of notifications for the service of the template type given
+
+
+
 This list is split into pages. To scroll through the pages run:
 
 ```
 GET /notifications?&page=2
 ```
+
+<a name="autherror_code"></a>
+## Authorisation error messages
+
+Error code | Body | Meaning
+--- | --- | ---
+401 | {"result": "error", "message": "Unauthorized, authentication token must be provided"} | Authorization header missing from request
+401 | {"result": "error", "message": "Unauthorized, authentication bearer scheme must be used"} | Authorization header is missing Bearer
+403 | {"result": "error", "message": "Invalid token: signature"} | Unable to decode the signature of the JWT, reasons: missing claims
+403 | {"result": "error", "message": "Invalid credentials"} | Unable to find service id that was sent in the iss claim, no valid api for service id
+403 | {"result": "error", "message": "Invalid token: expired"} | Token is expired, there is a 30 second time limit
+
+## Other error messages
+Error code | Body | Meaning
+--- | --- | ---
+429 | {"result": "error", "message": "Exceeded send limits (50) for today"} | Over message sending limit
+400 | {"result": "error", "message": "id: required field"} | Post body is badly formed
+400 | {"result":"error", "message":{'template': ['Missing personalisation: {tempalte_placeholder_name}']} | Post body is badly formed
+400 | {"result":"error", "message"={'to': ['Invalid {notification_type} for restricted service')]} | If service is in trial mode and to field is to a phone number or email of someone that is not a member of the team
+
 
 <a name="Notify_code"></a>
 ### GOV.UK Notify API code
