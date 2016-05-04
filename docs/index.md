@@ -80,7 +80,7 @@ GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/introduction/) for aut
 
 For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library, or the appropriate [PHP] (https://github.com/alphagov/notifications-php-client) or [Java] (https://github.com/alphagov/notifications-java-client) client library.
 
-To create a JSON Web Token you need:
+To use a JSON Web Token you need:
 
 * your service ID – identifies your service
 * your API key (in JSON Web Token terms this is called the client ID) – used to sign tokens during requests for API resources
@@ -317,19 +317,19 @@ GET /notifications?&page=2
 
 Error code | Body | Meaning
 --- | --- | ---
-401 | {"result": "error", "message": "Unauthorized, authentication token must be provided"} | Authorization header missing from request
-401 | {"result": "error", "message": "Unauthorized, authentication bearer scheme must be used"} | Authorization header is missing Bearer
-403 | {"result": "error", "message": "Invalid token: signature"} | Unable to decode the signature of the JWT, reasons: missing claims
-403 | {"result": "error", "message": "Invalid credentials"} | Unable to find service id that was sent in the iss claim, no valid api for service id
-403 | {"result": "error", "message": "Invalid token: expired"} | Token is expired, there is a 30 second time limit
+401 | {"result": "error", "message": "Unauthorized, authentication token must be provided"} | Authorisation header is missing from request
+401 | {"result": "error", "message": "Unauthorized, authentication bearer scheme must be used"} | Authorisation header is missing bearer
+403 | {"result": "error", "message": "Invalid token: signature"} | Unable to decode the JSON Web Token signature, due to missing claims
+403 | {"result": "error", "message": "Invalid credentials"} | Unable to find Service ID that was sent in the iss claim, no valid API for Service ID
+403 | {"result": "error", "message": "Invalid token: expired"} | Token is expired; there is a 30 second time limit
 
 ## Other error messages
 Error code | Body | Meaning
 --- | --- | ---
-429 | {"result": "error", "message": "Exceeded send limits (50) for today"} | Over message sending limit
-400 | {"result": "error", "message": "id: required field"} | Post body is badly formed
-400 | {"result":"error", "message":{'template': ['Missing personalisation: {tempalte_placeholder_name}']} | Post body is badly formed
-400 | {"result":"error", "message"={'to': ['Invalid {notification_type} for restricted service')]} | If service is in trial mode and to field is to a phone number or email of someone that is not a member of the team
+429 | {"result": "error", "message": "Exceeded send limits (50) for today"} | Exceeded number of messages you can send per day
+400 | {"result": "error", "message": "id: required field"} | Post body is badly formed: missing id field
+400 | {"result":"error", "message":{'template': ['Missing personalisation: {tempalte_placeholder_name}']} | Post body is badly formed: missing personalisation data
+400 | {"result":"error", "message"={'to': ['Invalid {notification_type} for restricted service')]} | Service is in trial mode; you cannot send messages to email addresses or phone numbers not belonging to team members
 
 
 <a name="Notify_code"></a>
