@@ -116,6 +116,8 @@ def view_notifications(service_id):
 
     filter_args = _parse_filter_args(request.args)
 
+    print(filter_args)
+
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
         page=page,
@@ -147,8 +149,8 @@ def view_notifications(service_id):
                 service_id=service_id,
                 page=page,
                 page_size=notifications['total'],
-                template_type=filter_args.getlist('template_type') if 'template_type' in filter_args else None,
-                status=filter_args.getlist('status')
+                template_type=filter_args.get('template_type') if 'template_type' in filter_args else ['email', 'sms'],
+                status=filter_args.get('status')
                 if 'status' in filter_args else ['delivered', 'failed'],
                 limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])['notifications'])
         return csv_content, 200, {

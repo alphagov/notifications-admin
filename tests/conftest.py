@@ -635,7 +635,7 @@ def mock_get_no_api_keys(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_login(mocker, mock_get_user, mock_update_user):
+def mock_login(mocker, mock_get_user, mock_update_user, mock_events):
     def _verify_code(user_id, code, code_type):
         return True, ''
 
@@ -896,6 +896,19 @@ def mock_get_template_statistics(mocker, service_one, fake_uuid):
 
     return mocker.patch(
         'app.template_statistics_client.get_template_statistics_for_service', side_effect=_get_stats)
+
+
+@pytest.fixture(scope='function')
+def mock_get_usage(mocker, service_one, fake_uuid):
+
+    def _get_usage(service_id):
+        return {'data': {
+          "sms_count": 123,
+          "email_count": 456
+        }}
+
+    return mocker.patch(
+        'app.service_api_client.get_service_usage', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')

@@ -11,18 +11,49 @@
 
 }
 
+.big-number-right-aligned {
+  @extend %big-number;
+  @include bold-36($tabular-numbers: true);
+  text-align: right;
+}
+
 .big-number-with-status {
 
   @extend %big-number;
   background: $text-colour;
   color: $white;
+  position: relative;
 
   .big-number {
     padding: 15px;
+    position: relative;
+  }
+
+  .big-number-overlay-link {
+
+    background: transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: transparent;
+    width: 100%;
+    height: 100%;
+
+    &:hover {
+      background: rgba($text-colour, 0.2);
+    }
+
   }
 
   .big-number-label {
+
     padding-bottom: 0;
+
+    &:link,
+    &:visited {
+      color: $white;
+    }
+
   }
 
   %big-number-status,

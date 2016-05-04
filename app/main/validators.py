@@ -20,8 +20,8 @@ class CsvFileValidator(object):
         self.message = message
 
     def __call__(self, form, field):
-        if not form.file.data.mimetype == 'text/csv':
-            raise ValidationError(self.message)
+        if not field.data.filename.lower().endswith('.csv'):
+            raise ValidationError("{} is not a CSV file".format(field.data.filename))
 
 
 class ValidEmailDomainRegex(object):
