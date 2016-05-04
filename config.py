@@ -23,13 +23,11 @@ class Config(object):
     REMEMBER_COOKIE_DURATION = timedelta(days=1)
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_NAME = 'notify_admin_remember_me'
-    REMEMBER_COOKIE_PATH = '/admin'
     REMEMBER_COOKIE_SECURE = True
     SECRET_KEY = os.environ['SECRET_KEY']
     SEND_FILE_MAX_AGE_DEFAULT = 365 * 24 * 60 * 60  # 1 year
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_NAME = 'notify_admin_session'
-    SESSION_COOKIE_PATH = '/admin'
     SESSION_COOKIE_SECURE = True
     SESSION_REFRESH_EACH_REQUEST = True
     SHOW_STYLEGUIDE = True
@@ -60,6 +58,7 @@ class Development(Config):
     REMEMBER_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
     WTF_CSRF_ENABLED = False
+    SESSION_PROTECTION = None
     CSV_UPLOAD_BUCKET_NAME = 'development-notifications-csv-upload'
 
 
