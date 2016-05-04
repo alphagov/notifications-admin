@@ -292,7 +292,6 @@ where:
 * `original_file_name` is the name of the CSV file, if used
 * `content_char_count` is the only populated for sms notifications; indicates the full character count, including placeholders
 * `service` is the service ID???
-* `reference` is ???
 * `reference` is populated only for email notifications - this is the reference number that the email provider gives the to notification; it is used in the notifications API so you can ignore it.
 * `sent_by` is the name of the provider
 * `links`: 
