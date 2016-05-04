@@ -65,6 +65,10 @@
     
   }
 
+  .primary {
+    @include bold-19;
+  }
+
 }
 
 .sms-message-use-links-with-title {
