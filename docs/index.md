@@ -148,6 +148,8 @@ POST /notifications/sms
   }
 }
 ```
+See below for explanations of the fields.
+
 <a name="sendemail"></a>
 To send an email notification:
 ```
@@ -220,24 +222,7 @@ The response (status code 200) will be:
 	    }
 }
 ```
-where:
-
-* `status` is the the status of the notification; this can be `sending`, `delivered`, or `failed` 
-* `to` is the recipient's phone number or email address
-* `name` is the name of the template used
-* `template_type` is `sms` or `email`
-* `created_at` is the full timestamp, in Coordinated Universal Time (UTC), at which GOV.UK Notify created the data object
-* `updated_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the data object was updated
-* `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the notification was sent
-* `job` is empty if you are using the API; 
-* `id` is the unique identifier for the process of sending and retreiving one or more notifications
-* `original_file_name` is the name of the CSV file, if used
-* `content_char_count` is the only populated for sms notifications; indicates the full character count, including placeholders
-* `service` is the service ID???
-* `reference` is ???
-* `sent_by` is the name of the provider
-
-The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
+See below for explanations of the fields.
 
 <a name="get_all_notif"></a>
 To retrieve the status of all notifications: 
@@ -295,16 +280,30 @@ The response (status code 200) will be:
 
 where:
 
+* `status` is the the status of the notification; this can be `sending`, `delivered`, or `failed` 
+* `to` is the recipient's phone number or email address
+* `name` is the name of the template used
+* `template_type` is `sms` or `email`
+* `created_at` is the full timestamp, in Coordinated Universal Time (UTC), at which GOV.UK Notify created the data object
+* `updated_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the data object was updated
+* `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the notification was sent
+* `job` is empty if you are using the API; 
+* `id` is the unique identifier for the process of sending and retreiving one or more notifications
+* `original_file_name` is the name of the CSV file, if used
+* `content_char_count` is the only populated for sms notifications; indicates the full character count, including placeholders
+* `service` is the service ID???
+* `reference` is ???
 * `reference` is populated only for email notifications - this is the reference number that the email provider gives the to notification; it is used in the notifications API so you can ignore it.
+* `sent_by` is the name of the provider
 * `links`: 
 
-    * `last`: is the url of the last page of notifications
+    * `last` is the url of the last page of notifications
     * `next` is the url of the next page of notifications
     
-* `page size`: is an optional integer that indicates the number of notifications per page; if not provided, defaults to 50
- total: total number of notifications for the service of the template type given
+* `total` is total number of notifications for the service of the given template type
+* `page size`: is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
-
+The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
 
 This list is split into pages. To scroll through the pages run:
 
