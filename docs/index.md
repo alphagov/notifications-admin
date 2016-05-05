@@ -78,12 +78,12 @@ GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/introduction/) for aut
 
 For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library, or the appropriate [PHP] (https://github.com/alphagov/notifications-php-client) or [Java] (https://github.com/alphagov/notifications-java-client) client library.
 
-To create a JSON Web Token you need:
+To create JSON Web Tokens you need:
 
 * your service ID – identifies your service
 * your API key (in JSON Web Token terms this is called the client ID) – used to sign tokens during requests for API resources
 
-To find your service ID and create API keys, click on **API keys** in the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application.
+To find your service ID and create or revoke API keys, click on **API keys** in the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application.
 
 <a name="JWT_claims"></a>
 ### JSON Web Tokens: claims
@@ -102,7 +102,7 @@ GOV.UK Notify application-specific claims (these form the JSON Web Token payload
 ```
 {
   iss: 'string', // service id
-  iat: 0, // creation time in  epoch seconds (UTC)
+  iat: 0, // creation time in epoch seconds (UTC)
 }
 ```
 
@@ -128,7 +128,7 @@ You can use the GOV.UK Notify API to:
 
 * send an [sms](#sendsms) or [email](#sendemail) notification 
 * [retrieve the status of one notification](#get_single_notif) 
-* [retrieve the status of all notifications](#get_all_notif)  
+* [retrieve the status of all notifications](#get_all_notif)
 
 <a name="sendnotifications"></a>
 ### Send notifications
@@ -142,7 +142,7 @@ POST /notifications/sms
 ```
 {
   'to': '+447700900404',
-  'template': 1, 
+  'template': f6895ff7-86e0-4d38-80ab-c9525856c3ff, 
   'personalisation': {
     'name': 'myname',
     'date': '2016'
@@ -160,7 +160,7 @@ POST /notifications/email
 ```
 {
   'to': 'email@gov.uk',
-  'template': 1,
+  'template': f6895ff7-86e0-4d38-80ab-c9525856c3ff,
     'personalisation': {
     'name': 'myname',
     'date': '2016'
@@ -191,7 +191,7 @@ The response (status code 201) will be:
 }
 ```
 
-where `id` is the unique identifier for the notification – you'll use this id to retrieve the status of a notification.
+where `id` is the unique identifier for the notification – you'll use this ID to retrieve the status of a notification.
 
 <a name="getnotifications"></a>
 ### Retrieve notifications
@@ -292,13 +292,13 @@ where:
     * `template_type` is `sms` or `email`
 * `created_at` is the full timestamp, in Coordinated Universal Time (UTC), at which GOV.UK Notify created the notification
 * `updated_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the notification was updated
-* `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the GOV.UK Notify sent the notification
-* `job` is empty if you are using the API:
+* `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which GOV.UK Notify sent the notification
+* `job` is empty if you are using the API to send notifications:
     * `id` is the job ID
     * `original_file_name` is the name of the CSV file, if used 
 * `id` is the unique identifier for the process of sending and retrieving one or more notifications
 * `content_char_count` indicates the full character count of the sms notification, including placeholders (populated for sms notifications only)
-* `service` is the service ID ???
+* `service` is the service ID
 * `reference` is used in the Notifications API so you can ignore it (populated for email notifications only)
 * `sent_by` is the name of the provider
 * `links`: 
@@ -332,7 +332,7 @@ Error code | Body | Meaning
 --- | --- | ---
 429 | {"result": "error", "message": "Exceeded send limits (50) for today"} | Exceeded number of messages you can send per day
 400 | {"result": "error", "message": "id: required field"} | Post body is badly formed: missing id field
-400 | {"result":"error", "message":{'template': ['Missing personalisation: {tempalte_placeholder_name}']} | Post body is badly formed: missing personalisation data
+400 | {"result":"error", "message":{'template': ['Missing personalisation: {template_placeholder_name}']} | Post body is badly formed: missing personalisation data
 400 | {"result":"error", "message"={'to': ['Invalid {notification_type} for restricted service')]} | Service is in trial mode; you cannot send messages to email addresses or phone numbers not belonging to team members
 
 
