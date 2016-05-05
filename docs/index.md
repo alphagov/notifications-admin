@@ -284,7 +284,7 @@ The response (status code 200) will be:
 
 where:
 
-* `status` is the the status of the notification; this can be `sending`, `delivered`, or `failed` 
+* `status` is the status of the notification; this can be `sending`, `delivered`, or `failed` 
 * `to` is the recipient's phone number or email address
 * `template`:
     * `id` is the template ID
