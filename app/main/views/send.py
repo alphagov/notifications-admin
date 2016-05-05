@@ -27,7 +27,7 @@ from app.main.uploader import (
     s3download
 )
 from app import job_api_client, service_api_client, current_service, user_api_client, statistics_api_client
-from app.utils import user_has_permissions, get_errors_for_csv
+from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet
 
 
 def get_send_button_text(template_type, number_of_messages):
@@ -107,15 +107,13 @@ def send_messages(service_id, template_id):
 
     form = CsvUploadForm()
     if form.validate_on_submit():
+
         try:
             upload_id = str(uuid.uuid4())
             s3upload(
                 upload_id,
                 service_id,
-                {
-                    'file_name': form.file.data.filename,
-                    'data': form.file.data.read().decode('utf-8')
-                },
+                Spreadsheet.from_file(form.file.data.filename, form.file.data).as_dict,
                 current_app.config['AWS_REGION']
             )
             session['upload_data'] = {
@@ -126,9 +124,10 @@ def send_messages(service_id, template_id):
                                     service_id=service_id,
                                     upload_id=upload_id,
                                     template_type=template.template_type))
-        except ValueError as e:
-            flash('There was a problem uploading: {}'.format(form.file.data.filename))
-            flash(str(e))
+        except Exception as error:
+            flash('There was a problem uploading {} ({})'.format(
+                form.file.data.filename, str(error)
+            ))
             return redirect(url_for('.send_messages', service_id=service_id, template_id=template_id))
 
     return render_template(
