@@ -304,7 +304,7 @@ where:
 * `links`: 
     * `last` is the url of the last page of notifications
     * `next` is the url of the next page of notifications
-* `total` is total number of notifications for the service of the given template type
+* `total` is the total number of notifications sent by the service using the given template type
 * `page size`: is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
 The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
