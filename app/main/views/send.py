@@ -234,12 +234,14 @@ def check_messages(service_id, template_type, upload_id):
 
     with suppress(StopIteration):
         template.values = next(recipients.rows)
+        first_recipient = template.values.get(recipients.recipient_column_header, '')
 
     session['upload_data']['notification_count'] = len(list(recipients.rows))
     session['upload_data']['valid'] = not recipients.has_errors
     return render_template(
         'views/check.html',
         recipients=recipients,
+        first_recipient=first_recipient,
         template=template,
         page_heading=get_page_headings(template.template_type),
         errors=get_errors_for_csv(recipients, template.template_type),
