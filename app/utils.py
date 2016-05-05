@@ -1,8 +1,14 @@
 import re
 import csv
-from io import StringIO
+from io import BytesIO, StringIO
+from os import path
 from functools import wraps
 from flask import (abort, session, request, url_for)
+import pyexcel
+import pyexcel.ext.io
+import pyexcel.ext.xls
+import pyexcel.ext.xlsx
+import pyexcel.ext.ods3
 
 
 class BrowsableItem(object):
@@ -131,3 +137,51 @@ def email_safe(string):
     return "".join([
         character.lower() if character.isalnum() or character == "." else "" for character in re.sub("\s+", ".", string.strip())  # noqa
     ])
+
+
+class Spreadsheet():
+
+    allowed_file_extensions = ['csv', 'xlsx', 'xls', 'ods', 'xlsm', 'tsv']
+
+    def __init__(self, filename, csv_data):
+        self.filename = filename
+        self.as_csv_data = csv_data
+        self.as_dict = {
+            'file_name': self.filename,
+            'data': self.as_csv_data
+        }
+
+    @classmethod
+    def can_handle(cls, filename):
+        return cls.get_extension(filename) in cls.allowed_file_extensions
+
+    @staticmethod
+    def get_extension(filename):
+        return path.splitext(filename)[1].lower().lstrip('.')
+
+    @staticmethod
+    def normalise_newlines(file_content):
+        return '\r\n'.join(file_content.getvalue().decode('utf-8').splitlines())
+
+    @classmethod
+    def from_file(cls, filename, file_content):
+
+        extension = cls.get_extension(filename)
+
+        if extension == 'csv':
+            return cls(filename, Spreadsheet.normalise_newlines(file_content))
+
+        if extension == 'tsv':
+            file_content = StringIO(Spreadsheet.normalise_newlines(file_content))
+
+        with StringIO() as converted:
+
+            output = csv.writer(converted)
+
+            for row in pyexcel.get_sheet(
+                file_type=extension,
+                file_content=file_content.getvalue()
+            ).to_array():
+                output.writerow(row)
+
+            return cls(filename, converted.getvalue())

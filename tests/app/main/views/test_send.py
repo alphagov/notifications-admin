@@ -1,12 +1,51 @@
 import pytest
 import re
 from io import BytesIO
+from os import path
+from glob import glob
 from bs4 import BeautifulSoup
 from flask import url_for
 from unittest.mock import ANY
 from tests import validate_route_permission, job_json_with_created_by
 
 template_types = ['email', 'sms']
+
+# The * ignores hidden files, eg .DS_Store
+test_spreadsheet_files = glob(path.join('tests', 'spreadsheet_files', '*'))
+
+
+def test_that_test_files_exist():
+    assert len(test_spreadsheet_files) == 8
+
+
+@pytest.mark.parametrize("filename", test_spreadsheet_files)
+def test_upload_files_in_different_formats(
+    filename,
+    app_,
+    api_user_active,
+    mocker,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template,
+    mock_s3_upload,
+    mock_has_permissions,
+    fake_uuid
+):
+
+    with app_.test_request_context(), app_.test_client() as client, open(filename, 'rb') as uploaded:
+        client.login(api_user_active)
+        client.post(
+            url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
+            data={'file': (BytesIO(uploaded.read()), filename)},
+            content_type='multipart/form-data'
+        )
+
+    assert mock_s3_upload.call_args[0][2]['data'].strip() == (
+        "phone number,name,favourite colour,fruit\r\n"
+        "07739 468 050,Pete,Coral,tomato\r\n"
+        "07527 125 974,Not Pete,Magenta,Avacado\r\n"
+        "07512 058 823,Still Not Pete,Crimson,Pear"
+    )
 
 
 def test_upload_csvfile_with_errors_shows_check_page_with_errors(
@@ -74,7 +113,7 @@ def test_upload_csv_invalid_extension(app_,
             )
 
         assert resp.status_code == 200
-        assert "{} is not a CSV file".format(filename) in resp.get_data(as_text=True)
+        assert "{} isn’t a spreadsheet that Notify can read".format(filename) in resp.get_data(as_text=True)
 
 
 def test_send_test_sms_message(
