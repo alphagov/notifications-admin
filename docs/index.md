@@ -124,13 +124,16 @@ GOV.UK Notify supports the following client libraries:
 These provide example code for calling the API and for creating API tokens.
 
 <a name="API_endpoints"></a>
-### API endpoints
+## API endpoints
 
 You can use the GOV.UK Notify API to:
 
 * send an [sms](#sendsms) or [email](#sendemail) notification 
 * [retrieve the status of one notification](#get_single_notif) 
 * [retrieve the status of all notifications](#get_all_notif)  
+
+<a name="sendnotifications"></a>
+### Send notifications
 
 <a name="sendsms"></a>
 To send an sms notification:
@@ -191,6 +194,9 @@ The response (status code 201) will be:
 ```
 
 where `id` is the unique identifier for the notification – you'll use this id to retrieve the status of a notification.
+
+<a name="getnotifications"></a>
+### Retrieve notifications
 
 <a name="get_single_notif"></a>
 To retrieve the status of a single sms or email notification:
@@ -312,7 +318,7 @@ GET /notifications?&page=2
 ```
 
 <a name="autherror_code"></a>
-## Authorisation error messages
+### Authorisation error messages
 
 Error code | Body | Meaning
 --- | --- | ---
@@ -322,7 +328,7 @@ Error code | Body | Meaning
 403 | {"result": "error", "message": "Invalid credentials"} | Unable to find Service ID that was sent in the iss claim, no valid API for Service ID
 403 | {"result": "error", "message": "Invalid token: expired"} | Token is expired; there is a 30 second time limit
 
-## Other error messages
+### Other error messages
 
 Error code | Body | Meaning
 --- | --- | ---
@@ -333,7 +339,7 @@ Error code | Body | Meaning
 
 
 <a name="Notify_code"></a>
-### GOV.UK Notify API code
+## GOV.UK Notify API code
 
 The GOV.UK Notify API code is open sourced at:
 
