@@ -321,19 +321,19 @@ GET /notifications?&page=2
 Error code | Body | Meaning
 --- | --- | ---
 401 | {"result": "error", <br> "message": "Unauthorized, authentication token must be provided"} | Authorisation header is missing from request
-401 | {"result": "error", "message": "Unauthorized, authentication bearer scheme must be used"} | Authorisation header is missing bearer
-403 | {"result": "error", "message": "Invalid token: signature"} | Unable to decode the JSON Web Token signature, due to missing claims
-403 | {"result": "error", "message": "Invalid credentials"} | Service ID in the `iss` claim is incorrect, or no valid API key for Service ID
-403 | {"result": "error", "message": "Invalid token: expired"} | Token is expired; there is a 30 second time limit
+401 | {"result": "error", <br> "message": "Unauthorized, authentication bearer scheme must be used"} | Authorisation header is missing bearer
+403 | {"result": "error", <br> "message": "Invalid token: signature"} | Unable to decode the JSON Web Token signature, due to missing claims
+403 | {"result": "error", <br> "message": "Invalid credentials"} | Service ID in the `iss` claim is incorrect, or no valid API key for Service ID
+403 | {"result": "error", <br> "message": "Invalid token: expired"} | Token is expired; there is a 30 second time limit
 
 ### Other error messages
 
 Error code | Body | Meaning
 --- | --- | ---
-429 | {"result": "error", "message": "Exceeded send limits (50) for today"} | Exceeded number of messages you can send per day
-400 | {"result": "error", "message": "id: required field"} | Post body is badly formed: missing `id` field
-400 | {"result":"error", "message":{'template': ['Missing personalisation: {template_placeholder_name}']} | Post body is badly formed: missing personalisation data
-400 | {"result":"error", "message"={'to': ['Invalid {notification_type} for restricted service')]} | Service is in trial mode; you cannot send messages to email addresses or phone numbers not belonging to team members
+429 | {"result": "error", <br> "message": "Exceeded send limits (50) for today"} | Exceeded number of messages you can send per day
+400 | {"result": "error", <br> "message": "id: required field"} | Post body is badly formed: missing `id` field
+400 | {"result":"error", <br> "message":{'template': ['Missing personalisation: {template_placeholder_name}']} | Post body is badly formed: missing personalisation data
+400 | {"result":"error", <br> "message"={'to': ['Invalid {notification_type} for restricted service')]} | Service is in trial mode; you cannot send messages to email addresses or phone numbers not belonging to team members
 
 
 <a name="Notify_code"></a>
