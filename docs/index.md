@@ -78,12 +78,12 @@ GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/introduction/) for aut
 
 For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library, or the appropriate [PHP] (https://github.com/alphagov/notifications-php-client) or [Java] (https://github.com/alphagov/notifications-java-client) client library.
 
-To use a JSON Web Token you need:
+To create a JSON Web Token you need:
 
 * your service ID – identifies your service
 * your API key (in JSON Web Token terms this is called the client ID) – used to sign tokens during requests for API resources
 
-Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application to find your service ID and create API keys. 
+To find your service ID and create API keys, click on **API keys** in the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application.
 
 <a name="JWT_claims"></a>
 ### JSON Web Tokens: claims
@@ -108,7 +108,7 @@ GOV.UK Notify application-specific claims (these form the JSON Web Token payload
 
 The header and payload are Base64Url encoded. 
 
-The signing algorithm is the HMAC signature, using the provided key SHA256 hashing algorithm.
+The verify signature is created using the HMAC SHA256 hashing algorithm.
 
 <a name="client_libraries"></a>
 ### API client libraries
@@ -171,11 +171,11 @@ POST /notifications/email
 where:
 
 * `to` is a required string that indicates the recipient's phone number or email address
-* `template` is a required string that indicates the template ID to send
+* `template` is a required string that indicates the template ID to use
    
     **Note:** To access the template ID from the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application, go to **Text message templates** or **Email templates** and click on **API info**.
 
-* `personalisation` is an optional array that specifies the values for the placeholders in your templates
+* `personalisation` is an optional array that specifies the placeholders and values in your templates
 
     **Note:** You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
 
@@ -208,7 +208,7 @@ The response (status code 200) will be:
 	'notification': 
 		{	
 		'status': 'delivered', 
-		'to': '07515 349 060', 
+		'to': '07515 987 456', 
 		'template': {'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb', 
 					 'name': 'First template', 
 					 'template_type': 'sms'}, 
@@ -251,7 +251,7 @@ The response (status code 200) will be:
 		'updated_at': '2016-04-26T15:30:50.853844+00:00', 
 		'sent_at': '2016-04-26T15:30:50.383634+00:00', 
 		'id': '04ae9bdc-92aa-4d6c-a0da-48587c03d4c7', 
-		'content_char_count': 446, '
+		'content_char_count': 446,
 		'service': '5cf87313-fddd-4482-a2ea-48e37320efd1', 
 		'reference': None, 
 		'sent_by': 'mmg'
@@ -290,14 +290,14 @@ where:
     * `id` is the template ID
     * `name` is the name of the template used
     * `template_type` is `sms` or `email`
-* `created_at` is the full timestamp, in Coordinated Universal Time (UTC), at which GOV.UK Notify created the data object
-* `updated_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the data object was updated
-* `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the notification was sent
+* `created_at` is the full timestamp, in Coordinated Universal Time (UTC), at which GOV.UK Notify created the notification
+* `updated_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the notification was updated
+* `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the GOV.UK Notify sent the notification
 * `job` is empty if you are using the API:
-    * `id` is the ???
+    * `id` is the job ID
     * `original_file_name` is the name of the CSV file, if used 
 * `id` is the unique identifier for the process of sending and retrieving one or more notifications
-* `content_char_count` indicates the full character count of the sms notification, including placeholders (populated only for sms notifications)
+* `content_char_count` indicates the full character count of the sms notification, including placeholders (populated for sms notifications only)
 * `service` is the service ID ???
 * `reference` is used in the Notifications API so you can ignore it (populated for email notifications only)
 * `sent_by` is the name of the provider
@@ -323,7 +323,7 @@ Error code | Body | Meaning
 401 | {"result": "error", "message": "Unauthorized, authentication token must be provided"} | Authorisation header is missing from request
 401 | {"result": "error", "message": "Unauthorized, authentication bearer scheme must be used"} | Authorisation header is missing bearer
 403 | {"result": "error", "message": "Invalid token: signature"} | Unable to decode the JSON Web Token signature, due to missing claims
-403 | {"result": "error", "message": "Invalid credentials"} | Unable to find Service ID that was sent in the iss claim, no valid API for Service ID
+403 | {"result": "error", "message": "Invalid credentials"} | Service ID in the iss claim is incorrect or no valid API key for Service ID
 403 | {"result": "error", "message": "Invalid token: expired"} | Token is expired; there is a 30 second time limit
 
 ### Other error messages
