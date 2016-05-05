@@ -68,10 +68,10 @@ GOV.UK Notify provides an API that allows you to create text and email notificat
 
 There are 2 ways to integrate the API into your service:
 
-* use one of the client libraries provided by GOV.UK Notify:
-    * [Python library](https://github.com/alphagov/notifications-python-client)
-    * [PHP library] (https://github.com/alphagov/notifications-php-client) 
-    * [Java library] (https://github.com/alphagov/notifications-java-client) 
+* use one of the client libraries provided by GOV.UK Notify (see the Usage section in the Readme files):
+      * [Python library](https://github.com/alphagov/notifications-python-client)
+      * [PHP library] (https://github.com/alphagov/notifications-php-client) 
+      * [Java library] (https://github.com/alphagov/notifications-java-client)
 * develop your own integration to produce requests in the correct format
 
 ### Authenticating requests
@@ -92,7 +92,7 @@ Use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web applicati
 
 JSON Web Tokens have a series of standard and application-specific claims.
 
-The JSON Web Token standard claims form the JSON Web Token header:
+JSON Web Token standard claims (these form the JSON Web Token header):
 ```
 {
   "alg": "HS256",
@@ -100,7 +100,7 @@ The JSON Web Token standard claims form the JSON Web Token header:
 }
 ```
 
-The GOV.UK Notify application-specific claims form the JSON Web Token payload:
+GOV.UK Notify application-specific claims (these form the JSON Web Token payload):
 ```
 {
   iss: 'string', // service id
@@ -121,7 +121,7 @@ GOV.UK Notify supports the following client libraries:
  * [GOV.UK Notify PHP library] (https://github.com/alphagov/notifications-php-client)
  * [GOV.UK Notify Java library] (https://github.com/alphagov/notifications-java-client)
 
-These provide example code for calling the API and for constructing the API tokens.
+These provide example code for calling the API and for creating API tokens.
 
 <a name="API_endpoints"></a>
 ### API endpoints
@@ -287,18 +287,17 @@ where:
 * `created_at` is the full timestamp, in Coordinated Universal Time (UTC), at which GOV.UK Notify created the data object
 * `updated_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the data object was updated
 * `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the notification was sent
-* `job` is empty if you are using the API; 
+* `job` is empty if you are using the API:
+    * `id` is the ???
+    * `original_file_name` is the name of the CSV file, if used 
 * `id` is the unique identifier for the process of sending and retreiving one or more notifications
-* `original_file_name` is the name of the CSV file, if used
-* `content_char_count` is the only populated for sms notifications; indicates the full character count, including placeholders
-* `service` is the service ID???
-* `reference` is populated only for email notifications - this is the reference number that the email provider gives the to notification; it is used in the notifications API so you can ignore it.
+* `content_char_count` is populated only for sms notifications; indicates the full character count, including placeholders
+* `service` is the service ID ???
+* `reference` is populated only for email notifications; used in the Notifications API so you can ignore it.
 * `sent_by` is the name of the provider
 * `links`: 
-
     * `last` is the url of the last page of notifications
     * `next` is the url of the next page of notifications
-    
 * `total` is total number of notifications for the service of the given template type
 * `page size`: is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
@@ -322,6 +321,7 @@ Error code | Body | Meaning
 403 | {"result": "error", "message": "Invalid token: expired"} | Token is expired; there is a 30 second time limit
 
 ## Other error messages
+
 Error code | Body | Meaning
 --- | --- | ---
 429 | {"result": "error", "message": "Exceeded send limits (50) for today"} | Exceeded number of messages you can send per day
