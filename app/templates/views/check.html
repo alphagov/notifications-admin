@@ -97,12 +97,16 @@
     errors or
     count_of_recipients > (current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0)) 
   ) %}
-    {{file_upload(form.file, button_text='Re-upload your file')}}
+    {% if request.args.from_test %}
+      <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
+    {% else %}
+      {{file_upload(form.file, button_text='Re-upload your file')}}
+    {% endif %}
   {% else %}
-    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}">
+    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="submit" class="button" value="{{ send_button_text }}" />
-      <a href="{{url_for('.send_messages', service_id=current_service.id, template_id=template.id)}}" class="page-footer-back-link">Back</a>
+      <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
     </form>
   {% endif %}
 

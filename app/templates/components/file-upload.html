@@ -1,4 +1,4 @@
-{% macro file_upload(field, button_text="Choose file") %}
+{% macro file_upload(field, button_text="Choose file", alternate_link=None, alternate_link_text=None) %}
   <form method="post" enctype="multipart/form-data" class="{% if field.errors %}error{% endif %}" data-module="file-upload">
     <label class="file-upload-label" for="{{ field.name }}">
       <span class="visually-hidden">{{ field.label }}</span>
@@ -19,6 +19,11 @@
     <label class="file-upload-button" for="{{ field.name }}">
       {{ button_text }}
     </label>
+    {% if alternate_link and alternate_link_text %}
+      <span class="file-upload-alternate-link">
+        or <a href="{{ alternate_link }}">{{ alternate_link_text }}</a>
+      </span>
+    {% endif %}
     <label class="file-upload-filename" for="{{ field.name }}"></label>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <input type="submit" class="file-upload-submit" value="Submit" />

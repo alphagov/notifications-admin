@@ -77,7 +77,7 @@ def test_upload_csv_invalid_extension(app_,
         assert "{} is not a CSV file".format(filename) in resp.get_data(as_text=True)
 
 
-def test_send_test_sms_message_to_self(
+def test_send_test_sms_message(
     app_,
     mocker,
     api_user_active,
@@ -98,14 +98,14 @@ def test_send_test_sms_message_to_self(
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.get(
-                url_for('main.send_message_to_self', service_id=fake_uuid, template_id=fake_uuid),
+                url_for('main.send_test', service_id=fake_uuid, template_id=fake_uuid),
                 follow_redirects=True
             )
         assert response.status_code == 200
         mock_s3_upload.assert_called_with(ANY, fake_uuid, expected_data, 'eu-west-1')
 
 
-def test_send_test_email_message_to_self(
+def test_send_test_email_message(
     app_,
     mocker,
     api_user_active,
@@ -126,14 +126,50 @@ def test_send_test_email_message_to_self(
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.get(
-                url_for('main.send_message_to_self', service_id=fake_uuid, template_id=fake_uuid),
+                url_for('main.send_test', service_id=fake_uuid, template_id=fake_uuid),
                 follow_redirects=True
             )
         assert response.status_code == 200
         mock_s3_upload.assert_called_with(ANY, fake_uuid, expected_data, 'eu-west-1')
 
 
-def test_send_test_message_from_api_page(
+def test_send_test_sms_message_with_placeholders(
+    app_,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template_with_placeholders,
+    mock_s3_upload,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    fake_uuid
+):
+
+    expected_data = {
+        'data': 'phone number,name\r\n07700 900 762,Jo\r\n',
+        'file_name': 'Test run'
+    }
+    mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.post(
+                url_for(
+                    'main.send_test',
+                    service_id=fake_uuid,
+                    template_id=fake_uuid
+                ),
+                data={'name': 'Jo'},
+                follow_redirects=True
+            )
+        assert response.status_code == 200
+        mock_s3_upload.assert_called_with(ANY, fake_uuid, expected_data, 'eu-west-1')
+
+
+def test_api_info_page(
     app_,
     mocker,
     api_user_active,
@@ -174,7 +210,7 @@ def test_download_example_csv(
                 follow_redirects=True
             )
         assert response.status_code == 200
-        assert response.get_data(as_text=True) == 'phone number\r\n07700 900 762\r\n07700 900 762\r\n'
+        assert response.get_data(as_text=True) == 'phone number\r\n07700 900321\r\n'
         assert 'text/csv' in response.headers['Content-Type']
 
 
@@ -339,7 +375,7 @@ def test_route_permissions(mocker,
             "GET",
             302,
             url_for(
-                'main.send_message_to_self',
+                'main.send_test',
                 service_id=service_one['id'],
                 template_type='sms',
                 template_id=fake_uuid),
@@ -362,7 +398,7 @@ def test_route_invalid_permissions(mocker,
         'main.choose_template',
         'main.send_messages',
         'main.get_example_csv',
-        'main.send_message_to_self']
+        'main.send_test']
     with app_.test_request_context():
         for route in routes:
             validate_route_permission(
@@ -410,7 +446,7 @@ def test_route_choose_template_manage_service_permissions(mocker,
             service_id=service_one['id'],
             template_id=template_id) not in page
         assert url_for(
-            "main.send_message_to_self",
+            "main.send_test",
             service_id=service_one['id'],
             template_id=template_id) not in page
         assert url_for(
@@ -485,7 +521,7 @@ def test_route_choose_template_manage_api_keys_permissions(mocker,
             service_one)
         page = resp.get_data(as_text=True)
         assert url_for(
-            "main.send_message_to_self",
+            "main.send_test",
             service_id=service_one['id'],
             template_id=template_id) not in page
         assert url_for(
