@@ -31,7 +31,7 @@
 .sms-message-recipient {
   @include copy-19;
   color: $secondary-text-colour;
-  margin: -20px 0 $gutter 0;
+  margin: 10px 0 5px 0;
 }
 
 .sms-message-name {
@@ -63,6 +63,10 @@
       text-decoration: underline;
     }
     
+  }
+
+  .primary {
+    @include bold-19;
   }
 
 }
