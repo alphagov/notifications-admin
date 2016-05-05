@@ -47,7 +47,7 @@
     <div class='grid-row'>
       <div class='column-half'>
         <div class="keyline-block">
-          {{ big_number("Unlimited", 'free email allowance', right_aligned=True) }}
+          {{ big_number("Unlimited", 'free email allowance', smaller=True) }}
         </div>
       </div>
       <div class='column-half'>
@@ -57,10 +57,10 @@
               (sms_chargeable * sms_rate),
               'spent on text messages',
               currency="£",
-              right_aligned=True
+              smaller=True
             ) }}
           {% else %}
-            {{ big_number(sms_allowance_remaining, 'free text messages left', right_aligned=True) }}
+            {{ big_number(sms_allowance_remaining, 'free text messages left', smaller=True) }}
           {% endif %}
         </div>
       </div>
