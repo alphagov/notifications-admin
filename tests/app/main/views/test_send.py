@@ -74,7 +74,8 @@ def test_upload_csv_invalid_extension(app_,
             )
 
         assert resp.status_code == 200
-        assert "{} is not a CSV file".format(filename) in resp.get_data(as_text=True)
+        print(resp.get_data(as_text=True))
+        assert "{} is not a spreadsheet file".format(filename) in resp.get_data(as_text=True)
 
 
 def test_send_test_sms_message(

@@ -1,8 +1,10 @@
 import re
 import csv
-from io import StringIO
+from io import BytesIO, StringIO
 from functools import wraps
 from flask import (abort, session, request, url_for)
+import openpyxl
+import xlrd
 
 
 class BrowsableItem(object):
@@ -131,3 +133,38 @@ def email_safe(string):
     return "".join([
         character.lower() if character.isalnum() or character == "." else "" for character in re.sub("\s+", ".", string.strip())  # noqa
     ])
+
+
+class Spreadsheet():
+
+    allowed_file_extensions = ['csv', 'xlsx', 'xls']
+
+    def __init__(self, file_data):
+        self.as_csv = file_data.getvalue()
+
+    @staticmethod
+    def can_handle(filename):
+        return any(
+            filename.lower().endswith('.{}'.format(extension))
+            for extension in Spreadsheet.allowed_file_extensions
+        )
+
+    @classmethod
+    def from_xlsx(cls, file_data):
+        wb = openpyxl.load_workbook(file_data)
+        sh = wb.worksheets[0]
+        with BytesIO() as converted:
+            c = csv.writer(converted)
+            for r in sh.rows:
+                c.writerow([cell.value for cell in r])
+            return Spreadsheet(converted)
+
+    @classmethod
+    def from_xls(cls, file_data):
+        with xlrd.open_workbook(file_contents=file_data.getvalue()) as wb:
+            sh = wb.sheet_by_index(0)
+            with BytesIO() as converted:
+                c = csv.writer(converted)
+                for r in range(sh.nrows):
+                    c.writerow(sh.row_values(r))
+                return Spreadsheet(converted)

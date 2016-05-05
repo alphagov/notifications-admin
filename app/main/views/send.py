@@ -27,7 +27,7 @@ from app.main.uploader import (
     s3download
 )
 from app import job_api_client, service_api_client, current_service, user_api_client, statistics_api_client
-from app.utils import user_has_permissions, get_errors_for_csv
+from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet
 
 
 def get_send_button_text(template_type, number_of_messages):
@@ -107,6 +107,14 @@ def send_messages(service_id, template_id):
 
     form = CsvUploadForm()
     if form.validate_on_submit():
+
+        if form.file.data.filename.lower().endswith('.xlsx'):
+            contents = Spreadsheet.from_xlsx(form.file.data).as_csv
+        elif form.file.data.filename.lower().endswith('.xls'):
+            contents = Spreadsheet.from_xls(form.file.data).as_csv
+        else:
+            contents = Spreadsheet(form.file.data).as_csv
+
         try:
             upload_id = str(uuid.uuid4())
             s3upload(
@@ -114,7 +122,7 @@ def send_messages(service_id, template_id):
                 service_id,
                 {
                     'file_name': form.file.data.filename,
-                    'data': form.file.data.read().decode('utf-8')
+                    'data': contents
                 },
                 current_app.config['AWS_REGION']
             )
