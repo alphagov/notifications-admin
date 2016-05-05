@@ -72,7 +72,7 @@ There are 2 ways to integrate the API into your service:
       * [Java library] (https://github.com/alphagov/notifications-java-client)
 * develop your own integration to produce requests in the correct format
 
-### Authenticating requests
+### Authenticate requests
 
 GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/introduction/) for authentication and identification. The GOV.UK Notify client libraries encode and decode JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use one of these libraries, you must manually create tokens yourself. 
 
