@@ -80,10 +80,10 @@ For examples of how to encode and decode JSON Web Tokens, see [authentication.py
 
 To create JSON Web Tokens you need:
 
-* your service ID – identifies your service
+* your Service ID – identifies your service
 * your API key (in JSON Web Token terms this is called the client ID) – used to sign tokens during requests for API resources
 
-To find your service ID and create or revoke API keys, click on **API keys** in the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application.
+To find your Service ID and create or revoke API keys, click on **API keys** in the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application.
 
 <a name="JWT_claims"></a>
 ### JSON Web Tokens: claims
@@ -101,7 +101,7 @@ JSON Web Token standard claims (these form the JSON Web Token header):
 GOV.UK Notify application-specific claims (these form the JSON Web Token payload):
 ```
 {
-  iss: 'string', // service id
+  iss: 'string', // Service ID
   iat: 0, // creation time in epoch seconds (UTC)
 }
 ```
@@ -298,14 +298,14 @@ where:
     * `original_file_name` is the name of the CSV file, if used 
 * `id` is the unique identifier for the process of sending and retrieving one or more notifications
 * `content_char_count` indicates the full character count of the sms notification, including placeholders (populated for sms notifications only)
-* `service` is the service ID
+* `service` is your Service ID
 * `reference` is used in the Notifications API so you can ignore it (populated for email notifications only)
 * `sent_by` is the name of the provider
 * `links`: 
     * `last` is the url of the last page of notifications
     * `next` is the url of the next page of notifications
 * `total` is the total number of notifications sent by the service using the given template type
-* `page size`: is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
+* `page_size` is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
 The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
 
@@ -323,7 +323,7 @@ Error code | Body | Meaning
 401 | {"result": "error", "message": "Unauthorized, authentication token must be provided"} | Authorisation header is missing from request
 401 | {"result": "error", "message": "Unauthorized, authentication bearer scheme must be used"} | Authorisation header is missing bearer
 403 | {"result": "error", "message": "Invalid token: signature"} | Unable to decode the JSON Web Token signature, due to missing claims
-403 | {"result": "error", "message": "Invalid credentials"} | Service ID in the iss claim is incorrect or no valid API key for Service ID
+403 | {"result": "error", "message": "Invalid credentials"} | Service ID in the `iss` claim is incorrect, or no valid API key for Service ID
 403 | {"result": "error", "message": "Invalid token: expired"} | Token is expired; there is a 30 second time limit
 
 ### Other error messages
@@ -331,7 +331,7 @@ Error code | Body | Meaning
 Error code | Body | Meaning
 --- | --- | ---
 429 | {"result": "error", "message": "Exceeded send limits (50) for today"} | Exceeded number of messages you can send per day
-400 | {"result": "error", "message": "id: required field"} | Post body is badly formed: missing id field
+400 | {"result": "error", "message": "id: required field"} | Post body is badly formed: missing `id` field
 400 | {"result":"error", "message":{'template': ['Missing personalisation: {template_placeholder_name}']} | Post body is badly formed: missing personalisation data
 400 | {"result":"error", "message"={'to': ['Invalid {notification_type} for restricted service')]} | Service is in trial mode; you cannot send messages to email addresses or phone numbers not belonging to team members
 
