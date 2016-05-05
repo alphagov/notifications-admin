@@ -320,7 +320,7 @@ GET /notifications?&page=2
 
 Error code | Body | Meaning
 --- | --- | ---
-401 | {"result": "error", "message": "Unauthorized, authentication token must be provided"} | Authorisation header is missing from request
+401 | {"result": "error", <br> "message": "Unauthorized, authentication token must be provided"} | Authorisation header is missing from request
 401 | {"result": "error", "message": "Unauthorized, authentication bearer scheme must be used"} | Authorisation header is missing bearer
 403 | {"result": "error", "message": "Invalid token: signature"} | Unable to decode the JSON Web Token signature, due to missing claims
 403 | {"result": "error", "message": "Invalid credentials"} | Service ID in the `iss` claim is incorrect, or no valid API key for Service ID
