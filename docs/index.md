@@ -236,7 +236,7 @@ The response (status code 200) will be:
 {'notifications': 
 	[{
 		'status': 'delivered', 
-		'to': '07515 349 060', 
+		'to': '07515 987 456', 
 		'template': {'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb', 
 					 'name': 'First template', 
 					 'template_type': 'sms'}, 
@@ -254,7 +254,7 @@ The response (status code 200) will be:
 	 }, 
 	 {	
 		'status': 'delivered', 
-		'to': '07515 349 060', 
+		'to': '07515 987 456', 
 		'template': {'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb', 
 					 'name': 'First template', 
 					 'template_type': 'sms'}, 
@@ -282,8 +282,10 @@ where:
 
 * `status` is the the status of the notification; this can be `sending`, `delivered`, or `failed` 
 * `to` is the recipient's phone number or email address
-* `name` is the name of the template used
-* `template_type` is `sms` or `email`
+* `template`:
+    * `id` is the template ID
+    * `name` is the name of the template used
+    * `template_type` is `sms` or `email`
 * `created_at` is the full timestamp, in Coordinated Universal Time (UTC), at which GOV.UK Notify created the data object
 * `updated_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the data object was updated
 * `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which the notification was sent
