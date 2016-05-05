@@ -28,8 +28,6 @@ To use GOV.UK Notify, you need:
 <a name="quickstart"></a>
 ## Quick start guide to GOV.UK Notify
 
-To get started:
-
   1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. You'll need your mobile phone for 2-factor authentication.
 
   2. Add a new service.
@@ -46,7 +44,7 @@ To get started:
     >
     > Your ((item)) is due for renewal on ((date)).
 
-  4. You can upload a csv file containing a header row matching the placeholders in your template, and data rows with values to use for the placeholders.
+  4. You can upload a CSV file containing a header row matching the placeholders in your template, and data rows with values to use for the placeholders.
 
   5. Send an sms or email notification.
 
@@ -108,7 +106,7 @@ GOV.UK Notify application-specific claims (these form the JSON Web Token payload
 }
 ```
 
-The header and the payload are Base64Url encoded. 
+The header and payload are Base64Url encoded. 
 
 The signing algorithm is the HMAC signature, using the provided key SHA256 hashing algorithm.
 
@@ -299,9 +297,9 @@ where:
     * `id` is the ???
     * `original_file_name` is the name of the CSV file, if used 
 * `id` is the unique identifier for the process of sending and retreiving one or more notifications
-* `content_char_count` is populated only for sms notifications; indicates the full character count, including placeholders
+* `content_char_count` indicates the full character count of the sms notification, including placeholders (populated only for sms notifications)
 * `service` is the service ID ???
-* `reference` is populated only for email notifications; used in the Notifications API so you can ignore it.
+* `reference` is used in the Notifications API so you can ignore it (populated for email notifications only)
 * `sent_by` is the name of the provider
 * `links`: 
     * `last` is the url of the last page of notifications
