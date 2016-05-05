@@ -1,4 +1,4 @@
-# API documenation
+# API documentation
 
 <a name="about_doc"></a>
 ## About this document
@@ -296,7 +296,7 @@ where:
 * `job` is empty if you are using the API:
     * `id` is the ???
     * `original_file_name` is the name of the CSV file, if used 
-* `id` is the unique identifier for the process of sending and retreiving one or more notifications
+* `id` is the unique identifier for the process of sending and retrieving one or more notifications
 * `content_char_count` indicates the full character count of the sms notification, including placeholders (populated only for sms notifications)
 * `service` is the service ID ???
 * `reference` is used in the Notifications API so you can ignore it (populated for email notifications only)
