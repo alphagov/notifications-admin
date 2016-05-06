@@ -11,10 +11,9 @@
 
 }
 
-.big-number-right-aligned {
+.big-number-smaller {
   @extend %big-number;
   @include bold-36($tabular-numbers: true);
-  text-align: right;
 }
 
 .big-number-with-status {
