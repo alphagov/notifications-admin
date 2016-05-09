@@ -1,21 +1,23 @@
 {% from "components/table.html" import list_table, field, hidden_field_heading, right_aligned_field_heading %}
+
 {% call(item, row_number) list_table(
   template_statistics,
-  caption="By template",
-  caption_visible=False,
+  caption="Templates",
+  caption_visible=True,
   empty_message='You haven’t used any templates {}'.format(period),
-  field_headings=['Template', hidden_field_heading('Type'), right_aligned_field_heading('Messages sent')]
+  field_headings=['Template', hidden_field_heading('Type'), hidden_field_heading('Messages sent')],
+  field_headings_visible=False
 ) %}
   {% call field() %}
     <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">
       {{ item.template.name }}
     </a>
   {% endcall %}
-  {% call field() %}
-    {{'Text message' if 'sms' == item.template.template_type else 'Email'}}
-  {% endcall %}
   {% call field(align='right') %}
     {{ item.usage_count }}
+  {% endcall %}
+  {% call field() %}
+    {{'text messages sent' if 'sms' == item.template.template_type else 'emails sent'}}
   {% endcall %}
 {% endcall %}
 

@@ -101,6 +101,7 @@ def create_app():
     application.add_template_filter(valid_phone_number)
     application.add_template_filter(linkable_name)
     application.add_template_filter(format_date)
+    application.add_template_filter(format_date_short)
 
     application.after_request(useful_headers_after_request)
     application.after_request(save_service_after_request)
@@ -199,6 +200,11 @@ def format_time(date):
 def format_date(date):
     date = dateutil.parser.parse(date)
     return date.strftime('%A %d %B %Y')
+
+
+def format_date_short(date):
+    date = dateutil.parser.parse(date)
+    return date.strftime('%d %B').lstrip('0')
 
 
 def valid_phone_number(phone_number):

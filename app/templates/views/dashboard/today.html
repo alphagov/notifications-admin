@@ -7,10 +7,7 @@
   data-interval-seconds="2"
   aria-live="polite"
 >
-  <h2 class="heading-medium">
-    In the last 7 days
-  </h2>
-  <div class="grid-row bottom-gutter">
+  <div class="grid-row">
     <div class="column-half">
       {{ big_number_with_status(
         statistics.emails_requested,
@@ -32,6 +29,9 @@
         failure_link=url_for(".view_notifications", service_id=current_service.id, template_type='sms', status='failed'),
         label_link=url_for(".view_notifications", service_id=current_service.id, template_type='sms', status='delivered,failed')
       ) }}
+    </div>
+    <div class="column-whole">
+      <a class="big-number-with-status-show-more-link" href="{{ url_for('.weekly', service_id=current_service.id) }}">Compare to previous weeks</a>
     </div>
   </div>
   {% with period = "in the last 7 days" %}

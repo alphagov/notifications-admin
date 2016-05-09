@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import datetime, date, timedelta
+from dateutil import parser
 from collections import namedtuple
 from itertools import groupby
 from functools import reduce
@@ -90,40 +91,72 @@ def usage(service_id):
     )
 
 
-def add_rates_to(delivery_statistics):
+@main.route("/services/<service_id>/weekly")
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def weekly(service_id):
 
-    keys = [
+    earliest_date = date(2016, 4, 1)  # start of tax year
+    while earliest_date.weekday() != 0:  # 0 for monday
+        earliest_date -= timedelta(days=1)
+
+    return render_template(
+        'views/weekly.html',
+        days=(
+            add_rates_to(day) for day in
+            statistics_api_client.get_7_day_aggregate_for_service(
+                service_id,
+                date_from=earliest_date
+            )['data']
+        ),
+        now=datetime.now()
+    )
+
+
+def sum_of_statistics(delivery_statistics):
+
+    statistics_keys = (
         'emails_delivered',
         'emails_requested',
         'emails_failed',
         'sms_requested',
         'sms_delivered',
         'sms_failed'
-    ]
+    )
 
     if not delivery_statistics or not delivery_statistics[0]:
         return {
-            key: 0 for key in keys
+            key: 0 for key in statistics_keys
         }
 
-    sum_of_statistics = reduce(
+    return reduce(
         lambda x, y: {
             key: x.get(key, 0) + y.get(key, 0)
-            for key in keys
+            for key in statistics_keys
         },
         delivery_statistics
     )
 
+
+def add_rates_to(delivery_statistics):
+
     return dict(
         emails_failure_rate=(
-            "{0:.1f}".format((float(sum_of_statistics['emails_failed']) / sum_of_statistics['emails_requested'] * 100))
-            if sum_of_statistics['emails_requested'] else 0
+            "{0:.1f}".format(
+                float(delivery_statistics['emails_failed']) / delivery_statistics['emails_requested'] * 100
+            )
+            if delivery_statistics['emails_requested'] else 0
         ),
         sms_failure_rate=(
-            "{0:.1f}".format((float(sum_of_statistics['sms_failed']) / sum_of_statistics['sms_requested'] * 100))
-            if sum_of_statistics['sms_requested'] else 0
+            "{0:.1f}".format(
+                float(delivery_statistics['sms_failed']) / delivery_statistics['sms_requested'] * 100
+            )
+            if delivery_statistics['sms_requested'] else 0
         ),
-        **sum_of_statistics
+        week_end_datetime=parser.parse(
+            delivery_statistics.get('week_end', str(datetime.now()))
+        ),
+        **delivery_statistics
     )
 
 
@@ -167,9 +200,9 @@ def get_dashboard_statistics_for_service(service_id):
     emails_sent = usage['data'].get('email_count', 0)
 
     return {
-        'statistics': add_rates_to(
+        'statistics': add_rates_to(sum_of_statistics(
             statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
-        ),
+        )),
         'template_statistics': aggregate_usage(
             template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
         ),

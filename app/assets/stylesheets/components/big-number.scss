@@ -23,6 +23,21 @@
   color: $white;
   position: relative;
 
+  &-show-more-link {
+    @include core-16;
+    display: block;
+    padding: 0.75em 0 0.5625em 0;
+    margin-bottom: $gutter-half;
+    text-align: center;
+    border-bottom: 1px solid $border-colour;
+
+    &:focus {
+      outline: none;
+      color: $text-colour;
+      border-bottom: 1px solid $brown;
+    }
+  }
+
   .big-number {
     padding: 15px;
     position: relative;
