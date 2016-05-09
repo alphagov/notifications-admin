@@ -5,7 +5,7 @@ This document is for central government developers and technical architects who 
 * [About GOV.UK Notify](#about_Notify)
 * [Quick start guide to GOV.UK Notify](#quickstart)
 * [Integrate the GOV.UK Notify API into your service](#integrate_Notify)
-    * [Authentication requests](#AuthRequests)
+    * [Authenticate requests](#AuthRequests)
     * [JSON Web Tokens: claims](#JWT_claims)
     * [API client libraries](#client_libraries)
 * [API endpoints](#API_endpoints)
