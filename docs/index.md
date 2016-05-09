@@ -3,7 +3,6 @@
 This document is for central government developers and technical architects who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
 * [About GOV.UK Notify](#about_Notify)
-* [Before you start](#before_start)
 * [Quick start guide to GOV.UK Notify](#before_start)
 * [Integrate the GOV.UK Notify API into your service](#integrate_Notify)
     * [Authentication requests](#AuthRequests)
@@ -29,22 +28,11 @@ There are 2 ways to send notifications:
 
 To find out more about GOV.UK Notify, see the [Government as a Platform](https://governmentasaplatform.blog.gov.uk/) blog.
 
-<h2 id="before_start">Before you start</h2>
-
-To use GOV.UK Notify, you need:
-
-* an email address from a local or central government organisation
-* a mobile number for 2-factor authentication
-
 <h2 id="quickstart">Quick start guide to GOV.UK Notify</h2>
 
-  1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. You'll need your mobile phone for 2-factor authentication.
+  1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. You'll need an email address from a local or central government organisation and your mobile phone for 2-factor authentication.
 
-  2. Add a new service.
-
-    At first your service will be in trial mode. In trial mode, you can send up to 50 test notifications per day to yourself and your team members. When you’re fully integrated and ready to go live, send a request to the GOV.UK Notify team.
-
-  3. Add a template so you can send text and email notifications. 
+  2. Add a template so you can send text and email notifications. 
 
     **Note:** A template is required even if you send notifications with the GOV.UK Notify API.
  
@@ -54,11 +42,7 @@ To use GOV.UK Notify, you need:
     >
     > Your ((item)) is due for renewal on ((date)).
 
-  4. You can upload a CSV file containing a header row matching the placeholders in your template, and data rows with values to use for the placeholders.
-
-  5. Send a text or email notification.
-
-  6. If you intend to use the GOV.UK Notify API, create a new API key. This will be used to connect to the GOV.UK Notify API.
+  3. Create an API key. This will be used to connect to the GOV.UK Notify API.
 
     Each service can have multiple API keys. This allows you to integrate several systems, each with its own key. You can also have separate keys for your development and test environments.
     
