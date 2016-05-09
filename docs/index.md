@@ -30,7 +30,9 @@ To find out more about GOV.UK Notify, see the [Government as a Platform](https:/
 
 <h2 id="quickstart">Quick start guide to GOV.UK Notify</h2>
 
-  1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. You'll need an email address from a local or central government organisation and your mobile phone for 2-factor authentication.
+  1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. 
+  
+    You'll need an email address from a local or central government organisation and your mobile phone for 2-factor authentication.
 
   2. Add a template so you can send text and email notifications. 
 
@@ -115,7 +117,7 @@ You can use the GOV.UK Notify API to:
 * [retrieve the status of one notification](#get_single_notif) 
 * [retrieve the status of all notifications](#get_all_notif)
 
-<h3 id="sendnotifications">Send notifications</h3>
+<h2 id="sendnotifications">Send notifications</h2>
 
 <a name="sendtext"></a>
 To send a text notification:
