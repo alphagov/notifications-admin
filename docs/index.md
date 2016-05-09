@@ -163,7 +163,7 @@ where:
 
 * `personalisation` is an optional array that specifies the placeholders and values in your templates
 
-    **Note:** You must provide all placeholders set up in your template. See [how to create placeholders in a template](#quickstart).
+    **Note:** You must provide all placeholders set up in your template. See [how to create placeholders in a template](#beforestart).
 
 <a id="coderesponse"></a>
 The response (status code 201) will be:
