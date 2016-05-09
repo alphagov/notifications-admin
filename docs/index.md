@@ -1,9 +1,6 @@
 # API documentation
 
-<a name="about_doc"></a>
-## About this document
-
-This document is for central government developers, technical architects, and service managers who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
+This document is for central government developers and technical architects who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
 <a name="about_Notify"></a>
 ## About GOV.UK Notify
