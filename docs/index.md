@@ -2,8 +2,7 @@
 
 This document is for central government developers and technical architects who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
-* auto-gen TOC:
-{:toc}
+{{toc}}
 
 <a name="about_Notify"></a>
 ## About GOV.UK Notify
