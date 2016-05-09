@@ -26,6 +26,8 @@ There are 2 ways to send notifications:
 * use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application
 * [integrate your web applications or back office systems](#integrate_Notify) with the GOV.UK Notify API
 
+The GOV.UK Notify allows you to [send notifications](#sendnotifications) and [get the status of notifications](#getnotifications) you have sent.
+
 To find out more about GOV.UK Notify, see the [Government as a Platform](https://governmentasaplatform.blog.gov.uk/) blog.
 
 <h2 id="beforestart">Before you start</h2>
@@ -51,8 +53,6 @@ To find out more about GOV.UK Notify, see the [Government as a Platform](https:/
     **Important:** API keys are secret, so save them somewhere safe. Don't commit API keys to public source code repositories. 
 
 <h2 id="integrate_Notify">Integrate the GOV.UK Notify API into your service</h2>
-
-GOV.UK Notify provides an API that allows you to create text and email notifications and get the status of notifications you have sent.
 
 There are 2 ways to integrate the API into your service:
 
