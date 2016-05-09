@@ -26,7 +26,7 @@ There are 2 ways to send notifications:
 * use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application
 * [integrate your web applications or back office systems](#integrate_Notify) with the GOV.UK Notify API
 
-The GOV.UK Notify allows you to [send notifications](#sendnotifications) and [get the status of notifications](#getnotifications) you have sent.
+The GOV.UK Notify allows you to [send notifications (POST)](#sendnotifications) and [get the status of notifications (GET)](#getnotifications) you have sent.
 
 To find out more about GOV.UK Notify, see the [Government as a Platform](https://governmentasaplatform.blog.gov.uk/) blog.
 
