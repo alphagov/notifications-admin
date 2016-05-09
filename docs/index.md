@@ -282,7 +282,7 @@ where:
     * `id` is the job ID
     * `original_file_name` is the name of the CSV file, if used 
 * `id` is the unique identifier for the process of sending and retrieving one or more notifications
-* `content_char_count` indicates the full character count of the sms notification, including placeholders (populated for sms notifications only)
+* `content_char_count` indicates the full character count of the text notification, including placeholders (populated for text notifications only)
 * `service` is your Service ID
 * `reference` is used in the Notifications API so you can ignore it (populated for email notifications only)
 * `sent_by` is the name of the provider
