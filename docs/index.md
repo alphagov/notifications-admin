@@ -211,7 +211,7 @@ The response (status code 200) will be:
 	    }
 }
 ```
-See below for explanations of the fields.
+See [below](#fieldsforGET) for explanations of the fields.
 
 <a name="get_all_notif"></a>
 To retrieve the status of all notifications: 
@@ -266,7 +266,7 @@ The response (status code 200) will be:
  'page_size': 50
  }
 ```
-
+<a name="fieldsforGET"></a>
 where:
 
 * `status` is the status of the notification; this can be `sending`, `delivered`, or `failed` 
