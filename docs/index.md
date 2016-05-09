@@ -1,12 +1,24 @@
-# API documentation
+<h1> API documentation</h1>
 
 This document is for central government developers and technical architects who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
-[About GOV.UK Notify](#about_Notify)
-[Before you start](#before_start)
+* [About GOV.UK Notify](#about_Notify)
+* [Before you start](#before_start)
+* [Quick start guide to GOV.UK Notify](#before_start)
+* [Integrate the GOV.UK Notify API into your service](#integrate_Notify)
+    * [Authentication requests](#AuthRequests)
+    * [JSON Web Tokens: claims](#JWT_claims)
+    * [API client libraries](#client_libraries)
+* [API endpoints](#API_endpoints)
+    * [Send notifications](#sendnotifications)
+    * [Retrieve notifications](#getnotifications)
+    * [Authorisation error messages](#autherror_code)
+    * [Other error messages](#othererror_code)
+* [GOV.UK Notify API code](#Notify_code)
 
-<a name="about_Notify"></a>
-## About GOV.UK Notify
+
+
+<h2 id="about_Notify">About GOV.UK Notify</h2>
 
 GOV.UK Notify is a cross-government platform that lets government services send notifications by sms or email. It's currently in beta.
 
@@ -24,8 +36,7 @@ To use GOV.UK Notify, you need:
 * an email address from a local or central government organisation
 * a mobile number for 2-factor authentication
 
-<a name="quickstart"></a>
-## Quick start guide to GOV.UK Notify
+<h2 id="quickstart">Quick start guide to GOV.UK Notify</h2>
 
   1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. You'll need your mobile phone for 2-factor authentication.
 
@@ -53,15 +64,9 @@ To use GOV.UK Notify, you need:
     
     **Important:** API keys are secret, so save them somewhere safe. Don't commit API keys to public source code repositories. 
 
-<a name="integrate_Notify"></a>
-## Integrate the GOV.UK Notify API into your service
+<h2 id="integrate_Notify">Integrate the GOV.UK Notify API into your service</h2>
 
 GOV.UK Notify provides an API that allows you to create text and email notifications and get the status of notifications you have sent.
-
-<a name="API_integration"></a>
-## API integration
-
-![Notfy](/static/images/notify-diagram.png)
 
 There are 2 ways to integrate the API into your service:
 
@@ -71,7 +76,7 @@ There are 2 ways to integrate the API into your service:
       * [Java library] (https://github.com/alphagov/notifications-java-client)
 * develop your own integration to produce requests in the correct format
 
-### Authenticate requests
+<h3 id="AuthRequests">Authenticate requests</h3>
 
 GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/introduction/) for authentication and identification. The GOV.UK Notify client libraries encode and decode JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use one of these libraries, you must manually create tokens yourself. 
 
@@ -84,8 +89,7 @@ To create JSON Web Tokens you need:
 
 To find your Service ID and create or revoke API keys, click on **API keys** in the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application.
 
-<a name="JWT_claims"></a>
-### JSON Web Tokens: claims
+<h3 id="JWT_claims">JSON Web Tokens: claims</h3>
 
 JSON Web Tokens have a series of standard and application-specific claims.
 
@@ -109,8 +113,7 @@ The header and payload are Base64Url encoded.
 
 The verify signature is created using the HMAC SHA256 hashing algorithm.
 
-<a name="client_libraries"></a>
-### API client libraries
+<h3 id="client_libraries">API client libraries</h3>
 
 GOV.UK Notify supports the following client libraries:
 
@@ -120,8 +123,7 @@ GOV.UK Notify supports the following client libraries:
 
 These provide example code for calling the API and for creating API tokens.
 
-<a name="API_endpoints"></a>
-## API endpoints
+<h2 id="API_endpoints">API endpoints</h2>
 
 You can use the GOV.UK Notify API to:
 
@@ -129,11 +131,10 @@ You can use the GOV.UK Notify API to:
 * [retrieve the status of one notification](#get_single_notif) 
 * [retrieve the status of all notifications](#get_all_notif)
 
-<a name="sendnotifications"></a>
-### Send notifications
+<h2 id="sendnotifications">Send notifications</h2>
 
-<a name="sendsms"></a>
-To send an sms notification:
+<a name="sendtext"></a>
+To send a text notification:
 ```
 POST /notifications/sms
 ```
@@ -192,8 +193,7 @@ The response (status code 201) will be:
 
 where `id` is the unique identifier for the notification – you'll use this ID to retrieve the status of a notification.
 
-<a name="getnotifications"></a>
-### Retrieve notifications
+<h3 id="getnotifications">Retrieve notifications</h3>
 
 <a name="get_single_notif"></a>
 To retrieve the status of a single sms or email notification:
@@ -314,8 +314,8 @@ This list is split into pages. To scroll through the pages run:
 GET /notifications?&page=2
 ```
 
-<a name="autherror_code"></a>
-### Authorisation error messages
+<h3 id="autherror_code">Authorisation error messages</h3>
+
 
 Error code | Body | Meaning
 --- | --- | ---
@@ -325,7 +325,9 @@ Error code | Body | Meaning
 403 | {"result": "error", <br> "message": "Invalid credentials"} | Service ID in the `iss` claim is incorrect, or no valid API key for Service ID
 403 | {"result": "error", <br> "message": "Invalid token: expired"} | Token is expired; there is a 30 second time limit
 
-### Other error messages
+
+
+<h3 id="othererror_code">Other error messages</h3>
 
 Error code | Body | Meaning
 --- | --- | ---
@@ -334,9 +336,7 @@ Error code | Body | Meaning
 400 | {"result":"error", <br> "message":{'template': ['Missing personalisation: {template_placeholder_name}']} | Post body is badly formed: missing personalisation data
 400 | {"result":"error", <br> "message"={'to': ['Invalid {notification_type} for restricted service')]} | Service is in trial mode; you cannot send messages to email addresses or phone numbers not belonging to team members
 
-
-<a name="Notify_code"></a>
-## GOV.UK Notify API code
+<h3 id="Notify_code">GOV.UK Notify API code</h3>
 
 The GOV.UK Notify API code is open sourced at:
 
