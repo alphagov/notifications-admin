@@ -3,7 +3,7 @@
 This document is for central government developers and technical architects who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
 * [About GOV.UK Notify](#about_Notify)
-* [Quick start guide to GOV.UK Notify](#before_start)
+* [Quick start guide to GOV.UK Notify](#quickstart)
 * [Integrate the GOV.UK Notify API into your service](#integrate_Notify)
     * [Authentication requests](#AuthRequests)
     * [JSON Web Tokens: claims](#JWT_claims)
@@ -320,7 +320,7 @@ Error code | Body | Meaning
 400 | {"result":"error", <br> "message":{'template': ['Missing personalisation: {template_placeholder_name}']} | Post body is badly formed: missing personalisation data
 400 | {"result":"error", <br> "message"={'to': ['Invalid {notification_type} for restricted service')]} | Service is in trial mode; you cannot send messages to email addresses or phone numbers not belonging to team members
 
-<h3 id="Notify_code">GOV.UK Notify API code</h3>
+<h2 id="Notify_code">GOV.UK Notify API code</h2>
 
 The GOV.UK Notify API code is open sourced at:
 
