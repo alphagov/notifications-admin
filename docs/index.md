@@ -117,7 +117,7 @@ You can use the GOV.UK Notify API to:
 * [retrieve the status of one notification](#get_single_notif) 
 * [retrieve the status of all notifications](#get_all_notif)
 
-<h2 id="sendnotifications">Send notifications</h2>
+<h3 id="sendnotifications">Send notifications</h3>
 
 <a name="sendtext"></a>
 To send a text notification:
