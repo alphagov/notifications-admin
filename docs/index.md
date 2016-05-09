@@ -9,8 +9,8 @@ This document is for central government developers and technical architects who 
     * [JSON Web Tokens: claims](#JWT_claims)
     * [API client libraries](#client_libraries)
 * [API endpoints](#API_endpoints)
-    * [Send notifications](#sendnotifications)
-    * [Retrieve notifications](#getnotifications)
+    * [Send notifications: POST](#sendnotifications)
+    * [Retrieve notifications: GET](#getnotifications)
     * [Authorisation error messages](#autherror_code)
     * [Other error messages](#othererror_code)
 * [GOV.UK Notify API code](#Notify_code)
@@ -117,7 +117,7 @@ You can use the GOV.UK Notify API to:
 * [retrieve the status of one notification](#get_single_notif) 
 * [retrieve the status of all notifications](#get_all_notif)
 
-<h3 id="sendnotifications">Send notifications</h3>
+<h3 id="sendnotifications">Send notifications: POST</h3>
 
 <a name="sendtext"></a>
 To send a text notification:
@@ -179,7 +179,7 @@ The response (status code 201) will be:
 
 where `id` is the unique identifier for the notification – you'll use this ID to retrieve the status of a notification.
 
-<h3 id="getnotifications">Retrieve notifications</h3>
+<h3 id="getnotifications">Retrieve notifications: GET</h3>
 
 <a name="get_single_notif"></a>
 To retrieve the status of a single text or email notification:
