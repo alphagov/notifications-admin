@@ -3,7 +3,7 @@
 This document is for central government developers and technical architects who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
 * [About GOV.UK Notify](#about_Notify)
-* [Quick start guide to GOV.UK Notify](#quickstart)
+* [Before you start](#beforestart)
 * [Integrate the GOV.UK Notify API into your service](#integrate_Notify)
     * [Authenticate requests](#AuthRequests)
     * [JSON Web Tokens: claims](#JWT_claims)
@@ -28,7 +28,7 @@ There are 2 ways to send notifications:
 
 To find out more about GOV.UK Notify, see the [Government as a Platform](https://governmentasaplatform.blog.gov.uk/) blog.
 
-<h2 id="quickstart">Quick start guide to GOV.UK Notify</h2>
+<h2 id="beforestart">Before you start</h2>
 
   1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account. 
   
