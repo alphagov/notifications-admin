@@ -20,7 +20,7 @@ This document is for central government developers and technical architects who 
 
 <h2 id="about_Notify">About GOV.UK Notify</h2>
 
-GOV.UK Notify is a cross-government platform that lets government services send notifications by sms or email. It's currently in beta.
+GOV.UK Notify is a cross-government platform that lets government services send notifications by text or email. It's currently in beta.
 
 There are 2 ways to send notifications:
 
@@ -44,7 +44,7 @@ To use GOV.UK Notify, you need:
 
     At first your service will be in trial mode. In trial mode, you can send up to 50 test notifications per day to yourself and your team members. When you’re fully integrated and ready to go live, send a request to the GOV.UK Notify team.
 
-  3. Add a template so you can send sms and email notifications. 
+  3. Add a template so you can send text and email notifications. 
 
     **Note:** A template is required even if you send notifications with the GOV.UK Notify API.
  
@@ -56,7 +56,7 @@ To use GOV.UK Notify, you need:
 
   4. You can upload a CSV file containing a header row matching the placeholders in your template, and data rows with values to use for the placeholders.
 
-  5. Send an sms or email notification.
+  5. Send a text or email notification.
 
   6. If you intend to use the GOV.UK Notify API, create a new API key. This will be used to connect to the GOV.UK Notify API.
 
@@ -127,7 +127,7 @@ These provide example code for calling the API and for creating API tokens.
 
 You can use the GOV.UK Notify API to:
 
-* send an [sms](#sendsms) or [email](#sendemail) notification 
+* send an [text](#sendtext) or [email](#sendemail) notification 
 * [retrieve the status of one notification](#get_single_notif) 
 * [retrieve the status of all notifications](#get_all_notif)
 
@@ -196,7 +196,7 @@ where `id` is the unique identifier for the notification – you'll use this ID 
 <h3 id="getnotifications">Retrieve notifications</h3>
 
 <a name="get_single_notif"></a>
-To retrieve the status of a single sms or email notification:
+To retrieve the status of a single text or email notification:
 ```
 GET /notifications/{id}
 ```
