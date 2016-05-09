@@ -2,7 +2,7 @@
 
 This document is for central government developers and technical architects who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
-{{toc}}
+[Before your start]("#before_start")
 
 <a name="about_Notify"></a>
 ## About GOV.UK Notify
@@ -16,8 +16,7 @@ There are 2 ways to send notifications:
 
 To find out more about GOV.UK Notify, see the [Government as a Platform](https://governmentasaplatform.blog.gov.uk/) blog.
 
-<a name="before_start"></a>
-## Before you start
+<h2 id="before_start">Before you start</h2>
 
 To use GOV.UK Notify, you need:
 
