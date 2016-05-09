@@ -111,7 +111,7 @@ These provide example code for calling the API and for creating API tokens.
 
 You can use the GOV.UK Notify API to:
 
-* send an [text](#sendtext) or [email](#sendemail) notification 
+* send a [text](#sendtext) or [email](#sendemail) notification 
 * [retrieve the status of one notification](#get_single_notif) 
 * [retrieve the status of all notifications](#get_all_notif)
 
