@@ -135,7 +135,7 @@ POST /notifications/sms
   }
 }
 ```
-See below for explanations of the fields.
+See [below](#fieldsforPOST) for explanations of the fields.
 
 <a name="sendemail"></a>
 To send an email notification:
@@ -153,7 +153,7 @@ POST /notifications/email
   }
 }
 ```
-
+<a name="fieldsforPOST"></a>
 where:
 
 * `to` is a required string that indicates the recipient's phone number or email address
