@@ -5,7 +5,6 @@
   &-back-link {
     @include button($grey-1);
     display: inline-block;
-    margin-left: 10px;
   }
 
   &-delete-link {
@@ -34,6 +33,11 @@
   &-secondary-link {
     display: block;
     margin-top: $gutter;
+  }
+
+  .button,
+  .button-destructive {
+    margin-right: 10px;
   }
 
   .button-destructive {

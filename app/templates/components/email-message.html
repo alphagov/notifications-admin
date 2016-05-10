@@ -1,4 +1,13 @@
-{% macro email_message(subject, body, name=None, edit_link=None, from_name=None, from_address=None) %}
+{% macro email_message(
+  subject,
+  body,
+  name=None,
+  edit_link=None,
+  from_name=None,
+  from_address=None,
+  recipient=None,
+  show_placeholder_for_recipient=False
+) %}
   {% if name %}
     <h3 class="email-message-name">
       {% if edit_link %}
@@ -17,6 +26,20 @@
               <th>From</th>
               <td>
                 {{ from_name }} &lt;{{ from_address }}&gt;
+              </td>
+            </tr>
+          {% endif %}
+          {% if recipient is not none %}
+            <tr>
+              <th>To</th>
+              <td>
+                {% if show_placeholder_for_recipient %}
+                  <span class="placeholder">
+                    email address
+                  </span>
+                {% else %}
+                  {{ recipient }}
+                {% endif %}
               </td>
             </tr>
           {% endif %}

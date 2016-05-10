@@ -18,7 +18,7 @@ def choose_service():
 @main.route("/services-or-dashboard")
 def show_all_services_or_dashboard():
 
-    if not current_user.is_authenticated():
+    if not current_user.is_authenticated:
         return redirect(url_for('.index'))
 
     services = service_api_client.get_services({'user_id': current_user.id})['data']

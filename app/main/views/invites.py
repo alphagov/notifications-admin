@@ -24,7 +24,7 @@ def accept_invite(token):
 
     invited_user = invite_api_client.check_token(token)
 
-    if not current_user.is_anonymous() and current_user.email_address != invited_user.email_address:
+    if not current_user.is_anonymous and current_user.email_address != invited_user.email_address:
         message = Markup("""
             You’re signed in as {}.
             This invite is for another email address.

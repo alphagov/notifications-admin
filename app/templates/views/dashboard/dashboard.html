@@ -16,10 +16,13 @@
       {% if current_service.restricted %}
         {% include 'views/dashboard/trial-mode-banner.html' %}
       {% endif %}
-    {% else %}
+    {% elif not current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
       {% include 'views/dashboard/no-permissions-banner.html' %}
     {% endif %}
 
+    <h1 class="heading-medium">
+      In the last 7 days
+    </h1>
     {% include 'views/dashboard/today.html' %}
 
   </div>

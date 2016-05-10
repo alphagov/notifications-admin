@@ -50,20 +50,24 @@ def get_page_headings(template_type):
     }[template_type]
 
 
-def get_example_csv_rows(template, number_of_rows=2):
+def get_example_csv_fields(column_headers, use_example_as_example, submitted_fields):
+    if use_example_as_example:
+        return ["example" for header in column_headers]
+    elif submitted_fields:
+        return [submitted_fields.get(header) for header in column_headers]
+    else:
+        return list(column_headers)
+
+
+def get_example_csv_rows(template, use_example_as_example=True, submitted_fields=False):
     return [
-        [
-            {
-                'email': current_user.email_address,
-                'sms': validate_and_format_phone_number(
-                    current_user.mobile_number, human_readable=True
-                )
-            }[template.template_type]
-        ] + [
-            "{} {}".format(header, i) for header in template.placeholders
-        ]
-        for i in range(1, number_of_rows + 1)
-    ]
+        {
+            'email': 'test@example.com' if use_example_as_example else current_user.email_address,
+            'sms': '07700 900321' if use_example_as_example else validate_and_format_phone_number(
+                current_user.mobile_number, human_readable=True
+            )
+        }[template.template_type]
+    ] + get_example_csv_fields(template.placeholders, use_example_as_example, submitted_fields)
 
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
@@ -131,7 +135,7 @@ def send_messages(service_id, template_id):
         'views/send.html',
         template=template,
         recipient_column=first_column_heading[template.template_type],
-        example=get_example_csv_rows(template),
+        example=[get_example_csv_rows(template)],
         form=form
     )
 
@@ -139,43 +143,58 @@ def send_messages(service_id, template_id):
 @main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', any_=True)
-def get_example_csv(service_id, template_id, number_of_rows=2):
+def get_example_csv(service_id, template_id):
     template = Template(service_api_client.get_service_template(service_id, template_id)['data'])
     with io.StringIO() as output:
         writer = csv.writer(output)
-        writer.writerows(
-            [
-                [first_column_heading[template.template_type]] +
-                list(template.placeholders)
-            ] +
-            get_example_csv_rows(template, number_of_rows=number_of_rows)
-        )
+        writer.writerows([
+            [first_column_heading[template.template_type]] + list(template.placeholders),
+            get_example_csv_rows(template)
+        ])
         return output.getvalue(), 200, {
             'Content-Type': 'text/csv; charset=utf-8',
             'Content-Disposition': 'inline; filename="{}.csv"'.format(template.name)
         }
 
 
-@main.route("/services/<service_id>/send/<template_id>/to-self", methods=['GET'])
+@main.route("/services/<service_id>/send/<template_id>/test", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
-def send_message_to_self(service_id, template_id):
-    template = Template(service_api_client.get_service_template(service_id, template_id)['data'])
+def send_test(service_id, template_id):
 
-    filedata = {
-        'file_name': 'Test run',
-        'data': get_example_csv(service_id, template_id, number_of_rows=1)[0]
-    }
+    template = Template(
+        service_api_client.get_service_template(service_id, template_id)['data'],
+        prefix=current_service['name']
+    )
 
-    upload_id = str(uuid.uuid4())
+    if len(template.placeholders) == 0 or request.method == 'POST':
+        with io.StringIO() as output:
+            writer = csv.writer(output)
+            writer.writerows([
+                [first_column_heading[template.template_type]] + list(template.placeholders),
+                get_example_csv_rows(template, use_example_as_example=False, submitted_fields=request.form)
+            ])
+            filedata = {
+                'file_name': 'Test run',
+                'data': output.getvalue()
+            }
+            upload_id = str(uuid.uuid4())
+            s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
+            session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
+            return redirect(url_for(
+                '.check_messages',
+                upload_id=upload_id,
+                service_id=service_id,
+                template_type=template.template_type,
+                from_test=True
+            ))
 
-    s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
-    session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
-
-    return redirect(url_for('.check_messages',
-                            upload_id=upload_id,
-                            service_id=service_id,
-                            template_type=template.template_type))
+    return render_template(
+        'views/send-test.html',
+        template=template,
+        recipient_column=first_column_heading[template.template_type],
+        example=[get_example_csv_rows(template, use_example_as_example=False)]
+    )
 
 
 @main.route("/services/<service_id>/send/<template_id>/from-api", methods=['GET'])
@@ -232,14 +251,21 @@ def check_messages(service_id, template_type, upload_id):
         ) if current_service['restricted'] else None
     )
 
+    if request.args.get('from_test') and len(template.placeholders):
+        back_link = url_for('.send_test', service_id=service_id, template_id=template.id)
+    else:
+        back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
+
     with suppress(StopIteration):
         template.values = next(recipients.rows)
+        first_recipient = template.values.get(recipients.recipient_column_header, '')
 
     session['upload_data']['notification_count'] = len(list(recipients.rows))
     session['upload_data']['valid'] = not recipients.has_errors
     return render_template(
         'views/check.html',
         recipients=recipients,
+        first_recipient=first_recipient,
         template=template,
         page_heading=get_page_headings(template.template_type),
         errors=get_errors_for_csv(recipients, template.template_type),
@@ -254,7 +280,8 @@ def check_messages(service_id, template_type, upload_id):
         send_button_text=get_send_button_text(template.template_type, session['upload_data']['notification_count']),
         upload_id=upload_id,
         form=CsvUploadForm(),
-        statistics=statistics
+        statistics=statistics,
+        back_link=back_link
     )
 
 

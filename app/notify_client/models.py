@@ -17,14 +17,16 @@ class User(UserMixin):
     def get_id(self):
         return self.id
 
+    @property
     def is_active(self):
         return self.state == 'active'
 
+    @property
     def is_authenticated(self):
         # To handle remember me token renewal
         if not login_fresh():
             return False
-        return super(User, self).is_authenticated()
+        return super(User, self).is_authenticated
 
     @property
     def id(self):

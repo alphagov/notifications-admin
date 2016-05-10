@@ -1,5 +1,5 @@
-{% macro big_number(number, label, label_link=None, currency='', right_aligned=False) %}
-  <div class="big-number{% if right_aligned %}-right-aligned{% endif %}">
+{% macro big_number(number, label, label_link=None, currency='', smaller=False) %}
+  <div class="big-number{% if smaller %}-smaller{% endif %}">
     {% if number is number %}
       {% if currency %}
         {{ "{}{:,.2f}".format(currency, number) }}
@@ -26,7 +26,9 @@
   failure_percentage,
   danger_zone=False,
   failure_link=None,
-  label_link=None
+  label_link=None,
+  show_more_link=None,
+  show_more_text=''
 ) %}
   <div class="big-number-with-status">
     {{ big_number(number, label, label_link) }}
@@ -44,4 +46,7 @@
       {% endif %}
     </div>
   </div>
+  {% if show_more_link and show_more_text %}
+    <a href="{{ show_more_link }}" class="big-number-with-status-show-more-link">{{ show_more_text }}</a>
+  {% endif %}
 {% endmacro %}

@@ -59,7 +59,7 @@ def verify_email(token):
         if not user:
             abort(404)
 
-        if user.is_active():
+        if user.is_active:
             flash("That verification link has expired.")
             return redirect(url_for('main.sign_in'))
 
