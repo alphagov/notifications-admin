@@ -29,7 +29,7 @@ from app.main.forms import LoginForm
 @main.route('/sign-in', methods=(['GET', 'POST']))
 def sign_in():
 
-    if current_user and current_user.is_authenticated():
+    if current_user and current_user.is_authenticated:
         return redirect(url_for('main.choose_service'))
 
     form = LoginForm()
@@ -52,9 +52,10 @@ def sign_in():
         if user:
             # Remember me login
             if not login_fresh() and \
-               not current_user.is_anonymous() and \
+               not current_user.is_anonymous and \
                current_user.id == user.id and \
-               user.is_active():
+               user.is_active:
+
                 confirm_login()
                 services = service_api_client.get_services({'user_id': str(user.id)}).get('data', [])
                 if (len(services) == 1):
@@ -63,7 +64,7 @@ def sign_in():
                     return redirect(url_for('main.choose_service'))
 
             session['user_details'] = {"email": user.email_address, "id": user.id}
-            if user.is_active():
+            if user.is_active:
                 user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
                 if request.args.get('next'):
                     return redirect(url_for('.two_factor', next=request.args.get('next')))

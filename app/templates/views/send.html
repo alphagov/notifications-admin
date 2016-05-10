@@ -11,41 +11,47 @@
 
 {% block maincolumn_content %}
 
-
   <h1 class="heading-large">Send {{ 'text messages' if 'sms' == template.template_type else 'emails' }}</h1>
 
-  <div class="grid-row">
-    <div class="column-two-thirds">
-      {% if 'sms' == template.template_type %}
-        {{ sms_message(template.formatted_as_markup) }}
-      {% elif 'email' == template.template_type %}
-        {{ email_message(
-          template.formatted_subject_as_markup,
-          template.formatted_as_markup
+  {% if 'sms' == template.template_type %}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ sms_message(
+          template.formatted_as_markup,
+          recipient='',
+          show_placeholder_for_recipient=True
         ) }}
-      {% endif %}
+      </div>
     </div>
-    <div class="column-one-third">
-      <a href="{{ url_for(".send_message_to_self", service_id=current_service.id, template_id=template.id) }}" class='secondary-button'>Send yourself a test</a>
-    </div>
+  {% elif 'email' == template.template_type %}
+    {{ email_message(
+      template.formatted_subject_as_markup,
+      template.formatted_as_markup,
+      recipient='',
+      show_placeholder_for_recipient=True
+    ) }}
+  {% endif %}
+
+  <div class="page-footer bottom-gutter">
+    {{file_upload(
+      form.file,
+      button_text='Upload a .csv file',
+      alternate_link=url_for(".send_test", service_id=current_service.id, template_id=template.id),
+      alternate_link_text='send yourself a test'
+    )}}
   </div>
 
-  <h2 class="heading-medium">
-    Make a CSV file with
-    {{ template.placeholders|length + 1 }}
-    {% if template.placeholders %}
-      columns,
-    {% else %}
-      column,
-    {% endif %}
-    like this:
+  <h2 class="heading-medium" style="margin: 45px 0 15px 0">
+    Example file
   </h2>
 
   {% call(item, row_number) list_table(
     example,
     caption="Example",
     caption_visible=False,
-    field_headings=['1'] + [recipient_column] + template.placeholders_as_markup|list
+    field_headings=['1'] + [
+      '<span class="placeholder">{}</span>'.format(recipient_column)|safe
+    ] + template.placeholders_as_markup|list
   ) %}
     {{ index_field(row_number) }}
     {% for column in item %}
@@ -57,6 +63,16 @@
     <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
   </p>
 
-  {{file_upload(form.file, button_text='Upload your CSV file')}}
+  <h2 class="heading-medium">
+    Formatting
+  </h2>
+  <ul class="list list-bullet">
+    <li>
+      put one recipient per row
+    </li>
+    <li>
+      save or export your data as a .csv (comma separated values) file
+    </li>
+  </ul>
 
 {% endblock %}

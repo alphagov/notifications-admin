@@ -1,6 +1,6 @@
 import markdown
 import os
-from flask import (render_template, url_for, redirect, Markup, current_app, abort)
+from flask import (render_template, url_for, redirect, Markup)
 from app.main import main
 from flask_login import login_required
 
@@ -10,7 +10,7 @@ from mdx_gfm import GithubFlavoredMarkdownExtension
 
 @main.route('/')
 def index():
-    if current_user and current_user.is_authenticated():
+    if current_user and current_user.is_authenticated:
         return redirect(url_for('main.choose_service'))
     return render_template('views/signedout.html')
 

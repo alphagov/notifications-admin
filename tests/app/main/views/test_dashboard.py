@@ -61,6 +61,7 @@ def test_should_show_recent_templates_on_dashboard(app_,
                                                    mock_get_service,
                                                    mock_get_service_templates,
                                                    mock_get_service_statistics,
+                                                   mock_get_aggregate_service_statistics,
                                                    mock_get_user,
                                                    mock_get_user_by_email,
                                                    mock_login,
@@ -82,7 +83,7 @@ def test_should_show_recent_templates_on_dashboard(app_,
         mock_template_stats.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
 
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        headers = [header.text.strip() for header in page.find_all('h2')]
+        headers = [header.text.strip() for header in page.find_all('h2') + page.find_all('h1')]
         assert 'Test Service' in headers
         assert 'In the last 7 days' in headers
         template_usage_headers = [th.text.strip() for th in page.thead.find_all('th')]
@@ -94,12 +95,12 @@ def test_should_show_recent_templates_on_dashboard(app_,
         first_row = page.tbody.find_all('tr')[0]
         table_data = first_row.find_all('td')
         assert len(table_data) == 3
-        assert table_data[2].text.strip() == '206'
+        assert table_data[1].text.strip() == '206'
 
         second_row = page.tbody.find_all('tr')[1]
         table_data = second_row.find_all('td')
         assert len(table_data) == 3
-        assert table_data[2].text.strip() == '13'
+        assert table_data[1].text.strip() == '13'
 
 
 def test_should_show_all_templates_on_template_statistics_page(
@@ -137,12 +138,12 @@ def test_should_show_all_templates_on_template_statistics_page(
         first_row = page.tbody.find_all('tr')[0]
         table_data = first_row.find_all('td')
         assert len(table_data) == 3
-        assert table_data[2].text.strip() == '206'
+        assert table_data[1].text.strip() == '206'
 
         second_row = page.tbody.find_all('tr')[1]
         table_data = second_row.find_all('td')
         assert len(table_data) == 3
-        assert table_data[2].text.strip() == '13'
+        assert table_data[1].text.strip() == '13'
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):

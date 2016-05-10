@@ -39,7 +39,7 @@
       <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
       <nav id="proposition-menu">
         <ul id="proposition-links">
-          {% if current_user.is_authenticated() %}
+          {% if current_user.is_authenticated %}
             <li>
               <a href="{{ url_for('main.user_profile') }}">{{ current_user.name }}</a>
             </li>
