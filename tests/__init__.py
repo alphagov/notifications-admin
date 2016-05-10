@@ -138,6 +138,7 @@ def notification_json(service_id,
                       status='sent',
                       sent_at=None,
                       created_at=None,
+                      updated_at=None,
                       with_links=False):
     if job is None:
         job = job_json()
@@ -147,6 +148,8 @@ def notification_json(service_id,
         sent_at = str(datetime.datetime.utcnow().time())
     if created_at is None:
         created_at = str(datetime.datetime.utcnow().time())
+    if updated_at is None:
+        updated_at = str((datetime.datetime.utcnow() + datetime.timedelta(minutes=1)).time())
     links = {}
     if with_links:
         links = {
@@ -164,7 +167,8 @@ def notification_json(service_id,
             'job': {'id': job['id'], 'original_file_name': job['original_file_name']},
             'sent_at': sent_at,
             'status': status,
-            'created_at': created_at
+            'created_at': created_at,
+            'updated_at': updated_at
         } for i in range(5)],
         'total': 5,
         'page_size': 50,
