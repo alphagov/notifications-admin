@@ -9,7 +9,7 @@ def test_render_sign_in_returns_sign_in_template(app_):
     assert 'Sign in' in response.get_data(as_text=True)
     assert 'Email address' in response.get_data(as_text=True)
     assert 'Password' in response.get_data(as_text=True)
-    assert 'Forgotten password?' in response.get_data(as_text=True)
+    assert 'Forgot your password?' in response.get_data(as_text=True)
 
 
 def test_logged_in_user_redirects_to_choose_service(app_,
