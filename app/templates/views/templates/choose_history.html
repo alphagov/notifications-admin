@@ -1,0 +1,16 @@
+{% extends "withnav_template.html" %}
+
+{% block page_title %}
+  {{ template.name }} – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+    <h1 class="heading-large">{{ template.name }} version history</h1>
+    <div class="grid-row">
+      {% for template in versions %}
+        {% with show_title=True %}
+          {% include 'views/templates/_template_history.html' %}
+        {% endwith %}
+      {% endfor %}
+    </div>
+{% endblock %}

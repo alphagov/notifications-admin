@@ -1,0 +1,36 @@
+{% from "components/email-message.html" import email_message %}
+{% from "components/sms-message.html" import sms_message %}
+
+<div class="column-two-thirds">
+  {% if 'email' == template.template_type %}
+    {{ email_message(
+      template.formatted_subject_as_markup,
+      template.formatted_as_markup,
+      name=template.name if show_title else None,
+      edit_link=url_for(
+        '.view_template_version',
+        service_id=current_service.id,
+        template_id=template.id,
+        version=template.get_raw('version')
+      )
+    ) }}
+  {% elif 'sms' == template.template_type %}
+    {{ sms_message(
+      template.formatted_as_markup,
+      name=template.name if show_title else None,
+      edit_link=url_for(
+        '.view_template_version',
+        service_id=current_service.id,
+        template_id=template.id,
+        version=template.get_raw('version')
+      )
+    ) }}
+  {% endif %}
+</div>
+
+<div class="column-one-third">
+  <div class="sms-message-use-links{% if show_title %}-with-title{% endif %}">
+    <p>Edited by {{ template.get_raw('created_by').name }}</p>
+    <p>Edited on {{ template.get_raw('created_at')|format_datetime }}</p>
+  </div>
+</div>
