@@ -69,7 +69,7 @@ def test_should_show_updates_for_one_job_as_json(
         assert 'Recipient' in content['notifications']
         assert 'Status' in content['notifications']
         assert 'Started' in content['status']
-        assert 'Created by Test User' in content['status']
+        assert 'Uploaded by Test User' in content['status']
 
 
 def test_should_show_notifications_for_a_service(app_,
