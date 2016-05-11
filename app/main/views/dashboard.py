@@ -71,10 +71,14 @@ def service_dashboard_updates(service_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def template_history(service_id):
+    template_statistics = aggregate_usage(
+        template_statistics_client.get_template_statistics_for_service(service_id)
+    )
     return render_template(
         'views/dashboard/all-template-statistics.html',
-        template_statistics=aggregate_usage(
-            template_statistics_client.get_template_statistics_for_service(service_id)
+        template_statistics=template_statistics,
+        most_used_template_count=max(
+            [row['usage_count'] for row in template_statistics] or [0]
         )
     )
 
@@ -197,12 +201,17 @@ def get_dashboard_statistics_for_service(service_id):
     sms_sent = usage['data'].get('sms_count', 0)
     emails_sent = usage['data'].get('email_count', 0)
 
+    template_statistics = aggregate_usage(
+        template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
+    )
+
     return {
         'statistics': add_rates_to(sum_of_statistics(
             statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
         )),
-        'template_statistics': aggregate_usage(
-            template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
+        'template_statistics': template_statistics,
+        'most_used_template_count': max(
+            [row['usage_count'] for row in template_statistics] or [0]
         ),
         'emails_sent': emails_sent,
         'sms_free_allowance': sms_free_allowance,

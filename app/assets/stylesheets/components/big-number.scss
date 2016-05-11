@@ -1,19 +1,29 @@
 %big-number,
 .big-number {
 
-  @include bold-48;
+  display: block;
+
+  &-number {
+    @include bold-48;
+    display: block;
+  }
 
   &-label {
     @include core-19;
-    display: block;
-    padding-bottom: $gutter-half;
+    display: inline-block;
+    padding-bottom: 10px;
   }
 
 }
 
 .big-number-smaller {
+
   @extend %big-number;
-  @include bold-36($tabular-numbers: true);
+
+  .big-number-number {
+    @include bold-36($tabular-numbers: true);
+  }
+
 }
 
 .big-number-with-status {
@@ -22,25 +32,12 @@
   background: $text-colour;
   color: $white;
   position: relative;
-
-  &-show-more-link {
-    @include core-16;
-    display: block;
-    padding: 0.75em 0 0.5625em 0;
-    margin-bottom: $gutter-half;
-    text-align: center;
-    border-bottom: 1px solid $border-colour;
-
-    &:focus {
-      outline: none;
-      color: $text-colour;
-      border-bottom: 1px solid $brown;
-    }
-  }
+  margin-bottom: $gutter-half;
 
   .big-number {
     padding: 15px;
     position: relative;
+    
   }
 
   .big-number-overlay-link {
@@ -66,6 +63,8 @@
     &:link,
     &:visited {
       color: $white;
+      text-decoration: none;
+      border-bottom: 1px solid $white;
     }
 
   }
@@ -85,6 +84,8 @@
       &:active,
       &:hover {
         color: $white;
+        text-decoration: none;
+        border-bottom: 1px solid $white;
       }
 
     }

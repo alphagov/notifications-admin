@@ -5,13 +5,16 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class='heading-large'>
-  	Templates sent this year
-  </h1>
-  <p>
-	1 April 2016 to date
-  </p>
-  {% with period = "" %}
-	  {% include 'views/dashboard/template-statistics.html' %}
-  {% endwith %}
+
+  <div class="grid-row bottom-gutter">
+    <div class="column-half">
+      <h2 class="heading-large">Templates sent</h2>
+    </div>
+    <div class="column-half">
+      <span class="align-with-heading-copy">1 April 2016 to date</span>
+    </div>
+  </div>
+
+  {% include 'views/dashboard/template-statistics.html' %}
+
 {% endblock %}
