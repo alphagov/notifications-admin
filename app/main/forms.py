@@ -4,14 +4,15 @@ from notifications_utils.recipients import (
     InvalidPhoneError
 )
 from wtforms import (
+    validators,
     StringField,
     PasswordField,
     ValidationError,
     TextAreaField,
     FileField,
     BooleanField,
-    HiddenField
-)
+    HiddenField,
+    IntegerField)
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp)
 
@@ -27,7 +28,6 @@ def email_address(label='Email address'):
 
 
 class UKMobileNumber(TelField):
-
     def pre_validate(self, form):
         try:
             validate_phone_number(self.data)
@@ -74,7 +74,6 @@ class LoginForm(Form):
 
 
 class RegisterUserForm(Form):
-
     name = StringField('Full name',
                        validators=[DataRequired(message='Can’t be empty')])
     email_address = email_address()
@@ -92,14 +91,12 @@ class RegisterUserFromInviteForm(Form):
 
 
 class PermissionsForm(Form):
-
     send_messages = BooleanField("Send messages from existing templates")
     manage_service = BooleanField("Modify this service, its team, and its&nbsp;templates")
     manage_api_keys = BooleanField("Create and revoke API keys")
 
 
 class InviteUserForm(PermissionsForm):
-
     email_address = email_address('Email address')
 
     def __init__(self, invalid_email_address, *args, **kwargs):
@@ -184,7 +181,6 @@ class ServiceNameForm(Form):
 
 
 class ConfirmPasswordForm(Form):
-
     def __init__(self, validate_password_func, *args, **kwargs):
         self.validate_password_func = validate_password_func
         super(ConfirmPasswordForm, self).__init__(*args, **kwargs)
@@ -211,7 +207,6 @@ class SMSTemplateForm(Form):
 
 
 class EmailTemplateForm(SMSTemplateForm):
-
     subject = TextAreaField(
         u'Subject',
         validators=[DataRequired(message="Can’t be empty")])
@@ -226,7 +221,6 @@ class NewPasswordForm(Form):
 
 
 class ChangePasswordForm(Form):
-
     def __init__(self, validate_password_func, *args, **kwargs):
         self.validate_password_func = validate_password_func
         super(ChangePasswordForm, self).__init__(*args, **kwargs)
@@ -241,7 +235,7 @@ class ChangePasswordForm(Form):
 
 class CsvUploadForm(Form):
     file = FileField('Add recipients', validators=[DataRequired(
-                     message='Please pick a file'), CsvFileValidator()])
+        message='Please pick a file'), CsvFileValidator()])
 
 
 class ChangeNameForm(Form):
@@ -249,7 +243,6 @@ class ChangeNameForm(Form):
 
 
 class ChangeEmailForm(Form):
-
     def __init__(self, validate_email_func, *args, **kwargs):
         self.validate_email_func = validate_email_func
         super(ChangeEmailForm, self).__init__(*args, **kwargs)
@@ -263,7 +256,6 @@ class ChangeEmailForm(Form):
 
 
 class ConfirmEmailForm(Form):
-
     def __init__(self, validate_code_func, *args, **kwargs):
         self.validate_code_func = validate_code_func
         super(ConfirmEmailForm, self).__init__(*args, **kwargs)
@@ -281,7 +273,6 @@ class ChangeMobileNumberForm(Form):
 
 
 class ConfirmMobileNumberForm(Form):
-
     def __init__(self, validate_code_func, *args, **kwargs):
         self.validate_code_func = validate_code_func
         super(ConfirmMobileNumberForm, self).__init__(*args, **kwargs)
@@ -309,7 +300,6 @@ class CreateKeyForm(Form):
 
 
 class Feedback(Form):
-
     name = StringField('Name')
     email_address = StringField('Email address')
     feedback = TextAreaField(u'', validators=[DataRequired(message="Can’t be empty")])
@@ -320,3 +310,7 @@ class RequestToGoLiveForm(Form):
         '',
         validators=[DataRequired(message="Can’t be empty")]
     )
+
+
+class ProviderForm(Form):
+    priority = IntegerField('Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")])
