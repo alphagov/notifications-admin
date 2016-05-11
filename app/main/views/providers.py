@@ -25,16 +25,11 @@ def view_providers():
 @login_required
 @user_has_permissions(admin_override=True)
 def view_provider(provider_id):
-
     provider = provider_client.get_provider_by_id(provider_id)['provider_details']
-
     form = ProviderForm(active=provider['active'], priority=provider['priority'])
 
-    print(form)
     if form.validate_on_submit():
-        print("HERE")
         provider_client.update_provider(provider_id, form.priority.data)
-
         return redirect(url_for('.view_providers'))
 
     return render_template('views/provider.html', form=form, provider=provider)
