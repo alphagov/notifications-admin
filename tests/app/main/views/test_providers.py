@@ -57,8 +57,6 @@ stub_provider = {
 def test_should_show_all_providers(
         app_,
         platform_admin_user,
-        mock_login,
-        mock_has_permissions,
         mocker
 ):
     mock_providers = mocker.patch(
@@ -68,7 +66,7 @@ def test_should_show_all_providers(
 
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(platform_admin_user)
+            client.login(platform_admin_user, mocker)
             response = client.get(url_for('main.view_providers'))
 
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -124,8 +122,6 @@ def test_should_show_all_providers(
 def test_should_show_provider_detail(
         app_,
         platform_admin_user,
-        mock_login,
-        mock_has_permissions,
         mocker
 ):
     mock_providers = mocker.patch(
@@ -135,7 +131,7 @@ def test_should_show_provider_detail(
 
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(platform_admin_user)
+            client.login(platform_admin_user, mocker)
             response = client.get(url_for('main.view_provider', provider_id='12345'))
 
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -154,8 +150,6 @@ def test_should_show_provider_detail(
 def test_should_show_error_on_bad_provider_priority(
         app_,
         platform_admin_user,
-        mock_login,
-        mock_has_permissions,
         mocker
 ):
     mock_providers = mocker.patch(
@@ -165,7 +159,7 @@ def test_should_show_error_on_bad_provider_priority(
 
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(platform_admin_user)
+            client.login(platform_admin_user, mocker)
             response = client.post(
                 url_for('main.view_provider', provider_id=stub_provider['provider_details']['id']),
                 data={'priority': "not valid"})
@@ -178,8 +172,6 @@ def test_should_show_error_on_bad_provider_priority(
 def test_should_show_error_on_negative_provider_priority(
         app_,
         platform_admin_user,
-        mock_login,
-        mock_has_permissions,
         mocker
 ):
     mock_providers = mocker.patch(
@@ -189,7 +181,7 @@ def test_should_show_error_on_negative_provider_priority(
 
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(platform_admin_user)
+            client.login(platform_admin_user, mocker)
             response = client.post(
                 url_for('main.view_provider', provider_id=stub_provider['provider_details']['id']),
                 data={'priority': -1})
@@ -202,8 +194,6 @@ def test_should_show_error_on_negative_provider_priority(
 def test_should_show_error_on_too_big_provider_priority(
         app_,
         platform_admin_user,
-        mock_login,
-        mock_has_permissions,
         mocker
 ):
     mock_providers = mocker.patch(
@@ -213,7 +203,7 @@ def test_should_show_error_on_too_big_provider_priority(
 
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(platform_admin_user)
+            client.login(platform_admin_user, mocker)
             response = client.post(
                 url_for('main.view_provider', provider_id=stub_provider['provider_details']['id']),
                 data={'priority': 101})
@@ -226,8 +216,6 @@ def test_should_show_error_on_too_big_provider_priority(
 def test_should_show_error_on_too_little_provider_priority(
         app_,
         platform_admin_user,
-        mock_login,
-        mock_has_permissions,
         mocker
 ):
     mock_providers = mocker.patch(
@@ -237,7 +225,7 @@ def test_should_show_error_on_too_little_provider_priority(
 
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(platform_admin_user)
+            client.login(platform_admin_user, mocker)
             response = client.post(
                 url_for('main.view_provider', provider_id=stub_provider['provider_details']['id']),
                 data={'priority': 0})
@@ -250,8 +238,6 @@ def test_should_show_error_on_too_little_provider_priority(
 def test_should_update_provider_priority(
         app_,
         platform_admin_user,
-        mock_login,
-        mock_has_permissions,
         mocker
 ):
 
@@ -267,7 +253,7 @@ def test_should_update_provider_priority(
 
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(platform_admin_user)
+            client.login(platform_admin_user, mocker)
             response = client.post(
                 url_for('main.view_provider', provider_id=stub_provider['provider_details']['id']),
                 data={'priority': 2})
