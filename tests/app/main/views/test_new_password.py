@@ -12,7 +12,7 @@ def test_should_render_new_password_template(app_,
                                              mock_get_user_by_email_request_password_reset):
     with app_.test_request_context():
         with app_.test_client() as client:
-            data = json.dumps({'email': api_user_active.email_address, 'created_at': str(datetime.now())})
+            data = json.dumps({'email': api_user_active.email_address, 'created_at': str(datetime.utcnow())})
             token = generate_token(data, app_.config['SECRET_KEY'],
                                    app_.config['DANGEROUS_SALT'])
         response = client.get(url_for('.new_password', token=token))
@@ -23,7 +23,7 @@ def test_should_render_new_password_template(app_,
 def test_should_return_404_when_email_address_does_not_exist(app_, mock_get_user_by_email_not_found):
     with app_.test_request_context():
         with app_.test_client() as client:
-            data = json.dumps({'email': 'no_user@d.gov.uk', 'created_at': str(datetime.now())})
+            data = json.dumps({'email': 'no_user@d.gov.uk', 'created_at': str(datetime.utcnow())})
             token = generate_token(data, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
         response = client.get(url_for('.new_password', token=token))
         assert response.status_code == 404
@@ -36,7 +36,7 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             user = mock_get_user_by_email_request_password_reset.return_value
-            data = json.dumps({'email': user.email_address, 'created_at': str(datetime.now())})
+            data = json.dumps({'email': user.email_address, 'created_at': str(datetime.utcnow())})
             token = generate_token(data, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
         response = client.post(url_for('.new_password', token=token), data={'new_password': 'a-new_password'})
         assert response.status_code == 302
@@ -51,7 +51,7 @@ def test_should_redirect_index_if_user_has_already_changed_password(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             user = mock_get_user_by_email_user_changed_password.return_value
-            data = json.dumps({'email': user.email_address, 'created_at': str(datetime.now())})
+            data = json.dumps({'email': user.email_address, 'created_at': str(datetime.utcnow())})
             token = generate_token(data, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
         response = client.post(url_for('.new_password', token=token), data={'new_password': 'a-new_password'})
         assert response.status_code == 302

@@ -109,7 +109,7 @@ def weekly(service_id):
                 date_from=earliest_date
             )['data']
         ),
-        now=datetime.now()
+        now=datetime.utcnow()
     )
 
 
@@ -154,7 +154,7 @@ def add_rates_to(delivery_statistics):
             if delivery_statistics['sms_requested'] else 0
         ),
         week_end_datetime=parser.parse(
-            delivery_statistics.get('week_end', str(datetime.now()))
+            delivery_statistics.get('week_end', str(datetime.utcnow()))
         ),
         **delivery_statistics
     )
