@@ -14,8 +14,8 @@ from . import (
     notification_json,
     invite_json,
     sample_uuid,
-    generate_uuid
-)
+    generate_uuid,
+    job_json_with_created_by)
 from app.notify_client.models import (
     User,
     InvitedUser
@@ -456,7 +456,7 @@ def api_user_changed_password(fake_uuid):
                  'state': 'active',
                  'failed_login_count': 5,
                  'permissions': {},
-                 'password_changed_at': str(datetime.now() + timedelta(minutes=1))
+                 'password_changed_at': str(datetime.utcnow() + timedelta(minutes=1))
                  }
     user = User(user_data)
     return user
@@ -745,9 +745,7 @@ def mock_get_jobs(mocker):
     def _get_jobs(service_id):
         data = []
         for i in range(5):
-            job_data = job_json()
-            job_data['id'] = str(generate_uuid())
-            job_data['service'] = service_id
+            job_data = job_json_with_created_by(service_id=service_id)
             data.append(job_data)
         return {"data": data}
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_jobs)
@@ -830,7 +828,7 @@ def sample_invite(mocker, service_one, status='pending'):
     email_address = 'invited_user@test.gov.uk'
     service_id = service_one['id']
     permissions = 'send_messages,manage_service,manage_api_keys'
-    created_at = str(datetime.now())
+    created_at = str(datetime.utcnow())
     return invite_json(id_, from_user, service_id, email_address, permissions, created_at, status)
 
 

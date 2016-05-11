@@ -16,6 +16,7 @@ class TestClient(FlaskClient):
             mocker.patch('app.user_api_client.get_user', return_value=user)
             mocker.patch('app.events_api_client.create_event')
         if mocker and service:
+            session['service_id'] = service['id']
             mocker.patch('app.service_api_client.get_service', return_value={'data': service})
         login_user(user, remember=True)
 
@@ -101,7 +102,7 @@ def create_test_api_user(state, permissions={}):
 
 def job_json():
     job_id = str(generate_uuid())
-    created_at = str(datetime.datetime.now().time())
+    created_at = str(datetime.datetime.utcnow().time())
     data = {
         'id': job_id,
         'service': 1,
@@ -112,6 +113,21 @@ def job_json():
         'notifications_sent': 1,
         'status': ''
         }
+    return data
+
+
+def job_json_with_created_by(service_id=None, job_id=None):
+    data = {
+        'id': job_id if job_id else str(generate_uuid()),
+        'service': service_id if service_id else str(generate_uuid()),
+        'template': 1,
+        'original_file_name': 'thisisatest.csv',
+        'created_at': str(datetime.datetime.now().time()),
+        'notification_count': 1,
+        'notifications_sent': 1,
+        'status': '',
+        'created_by': {'name': 'Test User'}
+    }
     return data
 
 
@@ -128,9 +144,9 @@ def notification_json(service_id,
     if template is None:
         template = template_json(service_id, str(generate_uuid()))
     if sent_at is None:
-        sent_at = str(datetime.datetime.now().time())
+        sent_at = str(datetime.datetime.utcnow().time())
     if created_at is None:
-        created_at = str(datetime.datetime.now().time())
+        created_at = str(datetime.datetime.utcnow().time())
     links = {}
     if with_links:
         links = {
