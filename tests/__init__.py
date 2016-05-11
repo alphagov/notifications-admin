@@ -101,7 +101,7 @@ def create_test_api_user(state, permissions={}):
 
 def job_json():
     job_id = str(generate_uuid())
-    created_at = str(datetime.datetime.now().time())
+    created_at = str(datetime.datetime.utcnow().time())
     data = {
         'id': job_id,
         'service': 1,
@@ -128,9 +128,9 @@ def notification_json(service_id,
     if template is None:
         template = template_json(service_id, str(generate_uuid()))
     if sent_at is None:
-        sent_at = str(datetime.datetime.now().time())
+        sent_at = str(datetime.datetime.utcnow().time())
     if created_at is None:
-        created_at = str(datetime.datetime.now().time())
+        created_at = str(datetime.datetime.utcnow().time())
     links = {}
     if with_links:
         links = {
