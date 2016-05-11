@@ -17,11 +17,9 @@ from flask_login import login_required
 
 from app.main import main
 from app import (
-    job_api_client,
     statistics_api_client,
     service_api_client,
-    template_statistics_client,
-    current_service
+    template_statistics_client
 )
 
 from app.utils import user_has_permissions

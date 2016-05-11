@@ -14,8 +14,8 @@ from . import (
     notification_json,
     invite_json,
     sample_uuid,
-    generate_uuid
-)
+    generate_uuid,
+    job_json_with_created_by)
 from app.notify_client.models import (
     User,
     InvitedUser
@@ -745,9 +745,7 @@ def mock_get_jobs(mocker):
     def _get_jobs(service_id):
         data = []
         for i in range(5):
-            job_data = job_json()
-            job_data['id'] = str(generate_uuid())
-            job_data['service'] = service_id
+            job_data = job_json_with_created_by(service_id=service_id)
             data.append(job_data)
         return {"data": data}
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_jobs)

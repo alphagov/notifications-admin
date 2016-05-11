@@ -4,7 +4,7 @@ from io import BytesIO
 from bs4 import BeautifulSoup
 from flask import url_for
 from unittest.mock import ANY
-from tests import validate_route_permission
+from tests import validate_route_permission, job_json_with_created_by
 
 template_types = ['email', 'sms']
 
@@ -260,32 +260,32 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
 def test_create_job_should_call_api(
     app_,
     service_one,
-    api_user_active,
-    mock_login,
+    active_user_with_permissions,
     job_data,
     mock_create_job,
     mock_get_job,
     mock_get_notifications,
-    mock_get_service,
     mock_get_service_template,
-    mock_has_permissions
+    mocker
 ):
-
     service_id = service_one['id']
     job_id = job_data['id']
     original_file_name = job_data['original_file_name']
     template_id = job_data['template']
     notification_count = job_data['notification_count']
 
+    from tests.conftest import mock_get_job as mock_get_job1
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
+            client.login(active_user_with_permissions, mocker, service_one)
             with client.session_transaction() as session:
                 session['upload_data'] = {'original_file_name': original_file_name,
                                           'template_id': template_id,
                                           'notification_count': notification_count,
                                           'valid': True}
             url = url_for('main.start_job', service_id=service_one['id'], upload_id=job_id)
+            data = job_json_with_created_by(service_id=service_one['id'], job_id=job_data['id'])
+            mock_get_job1(mocker=mocker, job_data=data)
             response = client.post(url, data=job_data, follow_redirects=True)
 
         assert response.status_code == 200
@@ -296,9 +296,7 @@ def test_create_job_should_call_api(
 def test_check_messages_should_revalidate_file_when_uploading_file(
     app_,
     service_one,
-    api_user_active,
-    mock_login,
-    mock_get_service,
+    active_user_with_permissions,
     job_data,
     mock_create_job,
     mock_get_service_template,
@@ -321,7 +319,7 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
     )
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
+            client.login(active_user_with_permissions, mocker, service_one)
             with client.session_transaction() as session:
                 session['upload_data'] = {'original_file_name': 'invalid.csv',
                                           'template_id': job_data['template'],

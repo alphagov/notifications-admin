@@ -24,13 +24,16 @@
       caption="Recent activity",
       caption_visible=False,
       empty_message='You haven’t sent any notifications yet',
-      field_headings=['Job', 'Time', right_aligned_field_heading('Status')]
+      field_headings=['Job', 'Time', 'Uploaded by', right_aligned_field_heading('Status')]
     ) %}
       {% call field() %}
         <a href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
       {% endcall %}
       {% call field() %}
         {{ item.created_at | format_datetime}}
+      {% endcall %}
+      {% call field() %}
+        {{ item.created_by.name }}
       {% endcall %}
       {% call field(align='right') %}
         {{ item.status }}
