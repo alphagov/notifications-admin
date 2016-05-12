@@ -25,6 +25,7 @@
     {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
        <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}">Edit template</a>
     {% endif %}
+    <a href="{{ url_for('.view_template_versions', service_id=current_service.id, template_id=template.id) }}">Template versions</a>
     <a href="{{ url_for(".send_from_api", service_id=current_service.id, template_id=template.id) }}">API info</a>
   </div>
 </div>

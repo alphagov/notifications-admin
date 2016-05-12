@@ -21,7 +21,7 @@ page_headings = {
 }
 
 
-@main.route("/services/<service_id>/templates/<template_id>", methods=['GET'])
+@main.route("/services/<service_id>/templates/<template_id>")
 @login_required
 @user_has_permissions(
     'view_activity',
@@ -36,6 +36,27 @@ def view_template(service_id, template_id):
         'views/templates/template.html',
         template=Template(
             service_api_client.get_service_template(service_id, template_id)['data'],
+            prefix=current_service['name']
+        )
+    )
+
+
+@main.route("/services/<service_id>/templates/<template_id>/version/<int:version>")
+@login_required
+@user_has_permissions(
+    'view_activity',
+    'send_texts',
+    'send_emails',
+    'manage_templates',
+    'manage_api_keys',
+    admin_override=True,
+    any_=True
+)
+def view_template_version(service_id, template_id, version):
+    return render_template(
+        'views/templates/template_history.html',
+        template=Template(
+            service_api_client.get_service_template(service_id, template_id, version)['data'],
             prefix=current_service['name']
         )
     )
@@ -142,3 +163,30 @@ def delete_service_template(service_id, template_id):
         h1='Edit template',
         form=form,
         template_id=template_id)
+
+
+@main.route('/services/<service_id>/templates/<template_id>/versions')
+@login_required
+@user_has_permissions(
+    'view_activity',
+    'send_texts',
+    'send_emails',
+    'manage_templates',
+    'manage_api_keys',
+    admin_override=True,
+    any_=True
+)
+def view_template_versions(service_id, template_id):
+    return render_template(
+        'views/templates/choose_history.html',
+        template=Template(
+            service_api_client.get_service_template(service_id, template_id)['data'],
+            prefix=current_service['name']
+        ),
+        versions=[
+            Template(
+                template,
+                prefix=current_service['name']
+            ) for template in service_api_client.get_service_template_versions(service_id, template_id)['data']
+        ]
+    )
