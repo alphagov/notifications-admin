@@ -190,13 +190,6 @@ The response (status code 200) will be:
 
 ```
 {
-      'notification':
-            
-
-
-
-```
-{
        'notification': 
                {	
                'status': 'delivered', 
