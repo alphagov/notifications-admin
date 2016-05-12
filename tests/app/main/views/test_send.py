@@ -91,7 +91,7 @@ def test_send_test_sms_message(
     fake_uuid
 ):
 
-    expected_data = {'data': 'phone number\r\n07700 900 762\r\n', 'file_name': 'Test run'}
+    expected_data = {'data': 'phone number\r\n07700 900 762\r\n', 'file_name': 'Test message'}
     mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
 
     with app_.test_request_context():
@@ -119,7 +119,7 @@ def test_send_test_email_message(
     fake_uuid
 ):
 
-    expected_data = {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'Test run'}
+    expected_data = {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'Test message'}
     mocker.patch('app.main.views.send.s3download', return_value='email address\r\ntest@user.gov.uk')
 
     with app_.test_request_context():
@@ -149,7 +149,7 @@ def test_send_test_sms_message_with_placeholders(
 
     expected_data = {
         'data': 'phone number,name\r\n07700 900 762,Jo\r\n',
-        'file_name': 'Test run'
+        'file_name': 'Test message'
     }
     mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
 
