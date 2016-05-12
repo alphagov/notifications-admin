@@ -223,43 +223,42 @@ The response (status code 200) will be:
 
 ```
 {'notifications': 
-       [{
-                'status': 'delivered', 
-                'to': '07515 987 456', 
-                'template': {'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb', 
-                                         'name': 'First template', 
-                                         'template_type': 'sms'}, 
-               
-                'job': {'id': '5cc9d7ae-ceb7-4565-8345-4931d71f8c2e', 
-				'original_file_name': 'Test run'}, 
-                'created_at': '2016-04-26T15:30:49.968969+00:00', 
-                'updated_at': '2016-04-26T15:30:50.853844+00:00', 
-                'sent_at': '2016-04-26T15:30:50.383634+00:00', 
-                'id': '04ae9bdc-92aa-4d6c-a0da-48587c03d4c7', 
-                'content_char_count': 446,
-                'service': '5cf87313-fddd-4482-a2ea-48e37320efd1', 
-                'reference': None, 
-                'sent_by': 'mmg'
+       [ {
+             'status': 'delivered', 
+             'to': '07515 987 456', 
+             'template': {'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb', 
+                                      'name': 'First template', 
+                                      'template_type': 'sms'},
+             'job': {'id': '5cc9d7ae-ceb7-4565-8345-4931d71f8c2e', 
+                     'original_file_name': 'Test run'}, 
+             'created_at': '2016-04-26T15:30:49.968969+00:00', 
+             'updated_at': '2016-04-26T15:30:50.853844+00:00', 
+             'sent_at': '2016-04-26T15:30:50.383634+00:00', 
+             'id': '04ae9bdc-92aa-4d6c-a0da-48587c03d4c7', 
+             'content_char_count': 446
+             'service': '5cf87313-fddd-4482-a2ea-48e37320efd1', 
+             'reference': None, 
+             'sent_by': 'mmg'
          }, 
          {	
-                'status': 'delivered', 
-                'to': '07515 987 456', 
-                'template': {'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb', 
-                             'name': 'First template', 
-                             'template_type': 'sms'}, 
-                'job': {'id': 'f9043884-acac-46db-b2ea-f08cd8ec6d67', 
-                        'original_file_name': 'Test run'}, 
-                'created_at': '2016-04-26T15:29:36.891512+00:00', 
-                'updated_at': '2016-04-26T15:29:38.724808+00:00', 
-                'sent_at': '2016-04-26T15:29:37.230976+00:00', 
-                'id': 'f163deaf-2d3f-4ec6-98fc-f23fa511518f', 
-                'content_char_count': 490, 
-                'service': '5cf87313-fddd-4482-a2ea-48e37320efd1', 
-                'reference': None, 
-                'sent_by': 'mmg'
+             'status': 'delivered', 
+             'to': '07515 987 456', 
+             'template': {'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb',
+                          'name': 'First template', 
+                          'template_type': 'sms'}, 
+             'job': {'id': 'f9043884-acac-46db-b2ea-f08cd8ec6d67', 
+                     'original_file_name': 'Test run'}, 
+             'created_at': '2016-04-26T15:29:36.891512+00:00', 
+             'updated_at': '2016-04-26T15:29:38.724808+00:00', 
+             'sent_at': '2016-04-26T15:29:37.230976+00:00', 
+             'id': 'f163deaf-2d3f-4ec6-98fc-f23fa511518f', 
+             'content_char_count': 490, 
+             'service': '5cf87313-fddd-4482-a2ea-48e37320efd1', 
+             'reference': None,
+             'sent_by': 'mmg'
          }, 
          ...
-        ]
+       ]
  'links': {'last': '/notifications?page=3&template_type=sms&status=delivered', 
  			'next': '/notifications?page=2&template_type=sms&status=delivered'}, 
  'total': 162, 
