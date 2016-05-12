@@ -16,6 +16,7 @@ from flask_login import login_required
 
 from app.main import main
 from app import (
+    job_api_client,
     statistics_api_client,
     service_api_client,
     template_statistics_client
@@ -218,4 +219,5 @@ def get_dashboard_statistics_for_service(service_id):
         'sms_allowance_remaining': max(0, (sms_free_allowance - sms_sent)),
         'sms_chargeable': max(0, sms_sent - sms_free_allowance),
         'sms_rate': sms_rate,
+        'jobs': job_api_client.get_job(service_id)['data']
     }

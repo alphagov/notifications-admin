@@ -1,9 +1,9 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading %}
 
 <div
-  {% if not finished_at %}
+  {% if not finished %}
     data-module="update-content"
-    data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job_id)}}"
+    data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job.id)}}"
     data-key="notifications"
     aria-live="polite"
   {% endif %}

@@ -8,9 +8,10 @@
 ) %}
   {% call field() %}
     <a href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
+    {{ item.created_at|format_datetime }}
   {% endcall %}
   {% call field() %}
-    {{ item.created_at|format_datetime }}
+    
   {% endcall %}
   {% call field(align='right') %}
     {{ item.notification_count }}
