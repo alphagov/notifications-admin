@@ -6,16 +6,15 @@
       
       <dt class="column-half">
         <span class="spark-bar-label">
-          <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">
-            {{ item.template.name }}
-          </a>
+          <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">{{ item.template.name }}</a>
         </span>
       </dt>
 
       <dd class="column-half">
         <span class="spark-bar">
-          <span style="width: {{ item.usage_count / most_used_template_count * 66.6 }}%"></span>
-          {{ item.usage_count }} <span class="visuallyhidden">messages sent</span>
+          <span style="width: {{ item.usage_count / most_used_template_count * 100 }}%"></span>
+          {{ item.usage_count }} {{ 'text messages' if item.template.template_type == 'sms' else 'emails' }} sent
+          
         </span>
       </dd>
 

@@ -11,37 +11,39 @@
 
 .spark-bar {
 
+  @include core-16;
   box-sizing: border-box;
   display: block;
   width: 100%;
   text-align: right;
   margin-bottom: $gutter-half;
-  height: 30px;
+  height: $gutter-half;
   color: $govuk-blue;
-  line-height: 30px;
-  padding-right: 5px;
-  font-weight: bold;
+  text-align: left;
   color: $govuk-blue;
 
   span {
+    box-sizing: border-box;
     display: block;
-    float: left;
     background: $govuk-blue;
     color: $white;
-    height: 30px;
+    height: $gutter-half;
     padding-left: 5px;
     padding-right: 5px;
+    margin: 3px 0 5px 0;
+    transition: width 0.6s ease-in-out;
   }
 
   &-label {
+    @include bold-19;
     display: block;
-    line-height: 30px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: $link-colour;
+    color: $govuk-blue;
     max-width: 100%;
     background: $white;
+    margin-bottom: $gutter;
   }
 
 }
