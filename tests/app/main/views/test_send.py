@@ -1,5 +1,6 @@
 import pytest
 import re
+from itertools import repeat
 from io import BytesIO
 from os import path
 from glob import glob
@@ -12,15 +13,26 @@ template_types = ['email', 'sms']
 
 # The * ignores hidden files, eg .DS_Store
 test_spreadsheet_files = glob(path.join('tests', 'spreadsheet_files', '*'))
+test_non_spreadsheet_files = glob(path.join('tests', 'non_spreadsheet_files', '*'))
 
 
 def test_that_test_files_exist():
     assert len(test_spreadsheet_files) == 8
+    assert len(test_non_spreadsheet_files) == 6
 
 
-@pytest.mark.parametrize("filename", test_spreadsheet_files)
+@pytest.mark.parametrize(
+    "filename, acceptable_file",
+    list(zip(
+        test_spreadsheet_files, repeat(True)
+    )) +
+    list(zip(
+        test_non_spreadsheet_files, repeat(False)
+    ))
+)
 def test_upload_files_in_different_formats(
     filename,
+    acceptable_file,
     app_,
     api_user_active,
     mocker,
@@ -34,18 +46,24 @@ def test_upload_files_in_different_formats(
 
     with app_.test_request_context(), app_.test_client() as client, open(filename, 'rb') as uploaded:
         client.login(api_user_active)
-        client.post(
+        response = client.post(
             url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
             data={'file': (BytesIO(uploaded.read()), filename)},
             content_type='multipart/form-data'
         )
 
-    assert mock_s3_upload.call_args[0][2]['data'].strip() == (
-        "phone number,name,favourite colour,fruit\r\n"
-        "07739 468 050,Pete,Coral,tomato\r\n"
-        "07527 125 974,Not Pete,Magenta,Avacado\r\n"
-        "07512 058 823,Still Not Pete,Crimson,Pear"
-    )
+    if acceptable_file:
+        assert mock_s3_upload.call_args[0][2]['data'].strip() == (
+            "phone number,name,favourite colour,fruit\r\n"
+            "07739 468 050,Pete,Coral,tomato\r\n"
+            "07527 125 974,Not Pete,Magenta,Avacado\r\n"
+            "07512 058 823,Still Not Pete,Crimson,Pear"
+        )
+    else:
+        assert not mock_s3_upload.called
+        assert (
+            'Couldn’t read {}. Try using a different file format.'.format(filename)
+        ) in response.get_data(as_text=True)
 
 
 def test_upload_csvfile_with_errors_shows_check_page_with_errors(
@@ -100,20 +118,18 @@ def test_upload_csv_invalid_extension(app_,
                                       mock_get_users_by_service,
                                       mock_get_service_statistics,
                                       fake_uuid):
-    contents = u'phone number,name\n+44 123,test1\n+44 456,test2'
     with app_.test_request_context():
-        filename = 'invalid.txt'
         with app_.test_client() as client:
             client.login(api_user_active)
             resp = client.post(
                 url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
-                data={'file': (BytesIO(contents.encode('utf-8')), filename)},
+                data={'file': (BytesIO('contents'.encode('utf-8')), 'invalid.txt')},
                 content_type='multipart/form-data',
                 follow_redirects=True
             )
 
         assert resp.status_code == 200
-        assert "{} isn’t a spreadsheet that Notify can read".format(filename) in resp.get_data(as_text=True)
+        assert "invalid.txt isn’t a spreadsheet that Notify can read" in resp.get_data(as_text=True)
 
 
 def test_send_test_sms_message(

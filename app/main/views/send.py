@@ -4,6 +4,8 @@ import json
 import uuid
 import itertools
 from contextlib import suppress
+from zipfile import BadZipFile
+from xlrd.biffh import XLRDError
 
 from flask import (
     request,
@@ -123,10 +125,10 @@ def send_messages(service_id, template_id):
                                     service_id=service_id,
                                     upload_id=upload_id,
                                     template_type=template.template_type))
-        except ValueError as e:
-            flash('There was a problem uploading: {}'.format(form.file.data.filename))
-            flash(str(e))
-            return redirect(url_for('.send_messages', service_id=service_id, template_id=template_id))
+        except (UnicodeDecodeError, BadZipFile, XLRDError):
+            flash('Couldn’t read {}. Try using a different file format.'.format(
+                form.file.data.filename
+            ))
 
     return render_template(
         'views/send.html',
