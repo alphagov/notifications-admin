@@ -11,10 +11,14 @@
       </dt>
 
       <dd class="column-half">
+        {% if template_statistics|length > 1 %}
         <span class="spark-bar">
-          <span style="width: {{ item.usage_count / most_used_template_count * 100 }}%"></span>
+          <span style="width: {{ item.usage_count / most_used_template_count * 100 }}%"></span>    
           {{ item.usage_count }} {{ message_count_label(item.usage_count, item.template.template_type) }}
         </span>
+        {% else %}
+          {{ item.usage_count }} {{ message_count_label(item.usage_count, item.template.template_type) }}
+        {% endif %}
       </dd>
 
     </div>

@@ -40,7 +40,7 @@
     </div>
   </div>
   
-  {% if template_statistics|length > 1 %}
+  {% if template_statistics|length %}
     {% include 'views/dashboard/template-statistics.html' %}
     {{ show_more(
       url_for('.template_history', service_id=current_service.id),
