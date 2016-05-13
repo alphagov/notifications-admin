@@ -57,9 +57,19 @@
     margin: 0 0 20px 0;
   }
 
+  pre,
+  code {
+    font-size: 16px;
+  }
+
+  code {
+    background: $highlight-colour;
+    padding: 2px 5px;
+  }
+
   .highlight {
     margin: 0 0 20px 0;
-    background: #F8F8F8;
+    background: $highlight-colour;
   }
 
   strong,

@@ -17,11 +17,9 @@ from flask_login import login_required
 
 from app.main import main
 from app import (
-    job_api_client,
     statistics_api_client,
     service_api_client,
-    template_statistics_client,
-    current_service
+    template_statistics_client
 )
 
 from app.utils import user_has_permissions
@@ -109,7 +107,7 @@ def weekly(service_id):
                 date_from=earliest_date
             )['data']
         ),
-        now=datetime.now()
+        now=datetime.utcnow()
     )
 
 
@@ -154,7 +152,7 @@ def add_rates_to(delivery_statistics):
             if delivery_statistics['sms_requested'] else 0
         ),
         week_end_datetime=parser.parse(
-            delivery_statistics.get('week_end', str(datetime.now()))
+            delivery_statistics.get('week_end', str(datetime.utcnow()))
         ),
         **delivery_statistics
     )

@@ -81,7 +81,7 @@ def _do_registration(form, service=None, send_sms=True, send_email=True):
 
         if send_sms:
             user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
-        session['expiry_date'] = str(datetime.now() + timedelta(hours=1))
+        session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
         session['user_details'] = {"email": user.email_address, "id": user.id}
         return True
     else:

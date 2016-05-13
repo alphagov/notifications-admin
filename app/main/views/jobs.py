@@ -74,7 +74,8 @@ def view_job(service_id, job_id):
             template,
             prefix=current_service['name']
         ),
-        job_id=job_id
+        job_id=job_id,
+        created_by=job['created_by']['name']
     )
 
 
@@ -100,7 +101,8 @@ def view_job_updates(service_id, job_id):
         'status': render_template(
             'partials/jobs/status.html',
             uploaded_at=job['created_at'],
-            finished_at=job['updated_at'] if finished else None
+            finished_at=job['updated_at'] if finished else None,
+            created_by=job['created_by']['name']
         ),
     })
 
@@ -115,8 +117,6 @@ def view_notifications(service_id):
         abort(404, "Invalid page argument ({}) reverting to page 1.".format(request.args['page'], None))
 
     filter_args = _parse_filter_args(request.args)
-
-    print(filter_args)
 
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
