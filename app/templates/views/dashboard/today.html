@@ -1,5 +1,6 @@
 {% from "components/big-number.html" import big_number, big_number_with_status %}
 {% from "components/show-more.html" import show_more %}
+{% from "components/message-count-label.html" import message_count_label %}
 
 <div
   data-module="update-content"
@@ -12,7 +13,7 @@
     <div class="column-half">
       {{ big_number_with_status(
         statistics.emails_requested,
-        'email sent' if statistics.emails_requested == 1 else 'emails sent',
+        message_count_label(statistics.emails_requested, 'email'),
         statistics.emails_failed,
         statistics.get('emails_failure_rate', 0.0),
         statistics.get('emails_failure_rate', 0)|float > 3,
@@ -23,7 +24,7 @@
     <div class="column-half">
       {{ big_number_with_status(
         statistics.sms_requested,
-        'text message sent' if statistics.sms_requested == 1 else 'text messages sent',
+        message_count_label(statistics.sms_requested, 'sms'),
         statistics.sms_failed,
         statistics.get('sms_failure_rate', 0.0),
         statistics.get('sms_failure_rate', 0)|float > 3,
