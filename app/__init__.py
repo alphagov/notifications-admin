@@ -11,12 +11,15 @@ from flask import (
     render_template,
     make_response,
     current_app,
-    request)
+    request,
+    g)
 from flask._compat import string_types
 from flask.globals import _lookup_req_object
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from functools import partial
+
+from monotonic import monotonic
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging
 from notifications_utils.recipients import validate_phone_number, InvalidPhoneError
@@ -141,6 +144,11 @@ def init_csrf(application):
 
 
 def init_app(application):
+
+    @application.before_request
+    def record_start_time():
+        g.start = monotonic()
+
     @application.context_processor
     def inject_global_template_variables():
         return {

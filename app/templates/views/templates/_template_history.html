@@ -31,6 +31,10 @@
 <div class="column-one-third">
   <div class="sms-message-use-links{% if show_title %}-with-title{% endif %}">
     <p>Edited by {{ template.get_raw('created_by').name }}</p>
-    <p>Edited on {{ template.get_raw('created_at')|format_datetime }}</p>
+    <p>Created on {{ template.get_raw('created_at')|format_datetime }}</p>
+    <p>Edited on
+      {% if template.get_raw('updated_at') %}
+        {{ template.get_raw('updated_at')|format_datetime }}</p>
+      {% endif %}
   </div>
 </div>

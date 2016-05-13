@@ -141,7 +141,7 @@ class ServiceAPIClient(NotificationsAPIClient):
         """
         Retrieve a list of versions for a template
         """
-        endpoint = '/service/{service_id}/template/{template_id}/version'.format(
+        endpoint = '/service/{service_id}/template/{template_id}/versions'.format(
             service_id=service_id,
             template_id=template_id
         )

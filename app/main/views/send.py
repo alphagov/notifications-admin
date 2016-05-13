@@ -175,7 +175,7 @@ def send_test(service_id, template_id):
                 get_example_csv_rows(template, use_example_as_example=False, submitted_fields=request.form)
             ])
             filedata = {
-                'file_name': 'Test run',
+                'file_name': 'Test message',
                 'data': output.getvalue()
             }
             upload_id = str(uuid.uuid4())
