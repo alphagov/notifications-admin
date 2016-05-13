@@ -5,6 +5,7 @@ from app.utils import generate_notifications_csv
 from tests import notification_json, job_json_with_created_by
 from tests.conftest import fake_uuid
 from tests.conftest import mock_get_job as mock_get_job1
+from freezegun import freeze_time
 
 
 def test_should_return_list_of_all_jobs(app_,
@@ -24,6 +25,7 @@ def test_should_return_list_of_all_jobs(app_,
         assert len(jobs) == 5
 
 
+@freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_page_for_one_job(
     app_,
     service_one,
@@ -45,6 +47,7 @@ def test_should_show_page_for_one_job(
         content = response.get_data(as_text=True)
         assert "{}: Your vehicle tax is about to expire".format(service_one['name']) in content
         assert file_name in content
+        assert "Sent at 11:10" in content
 
 
 def test_should_show_updates_for_one_job_as_json(

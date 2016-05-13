@@ -11,12 +11,15 @@ from flask import (
     render_template,
     make_response,
     current_app,
-    request)
+    request,
+    g)
 from flask._compat import string_types
 from flask.globals import _lookup_req_object
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from functools import partial
+
+from monotonic import monotonic
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging
 from notifications_utils.recipients import validate_phone_number, InvalidPhoneError
@@ -39,6 +42,7 @@ from app.notify_client.status_api_client import StatusApiClient
 from app.notify_client.template_statistics_api_client import TemplateStatisticsApiClient
 from app.notify_client.user_api_client import UserApiClient
 from app.notify_client.events_api_client import EventsApiClient
+from app.notify_client.provider_client import ProviderClient
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
@@ -53,6 +57,7 @@ invite_api_client = InviteApiClient()
 statistics_api_client = StatisticsApiClient()
 template_statistics_client = TemplateStatisticsApiClient()
 events_api_client = EventsApiClient()
+provider_client = ProviderClient()
 asset_fingerprinter = AssetFingerprinter()
 
 # The current service attached to the request stack.
@@ -78,6 +83,7 @@ def create_app():
     statistics_api_client.init_app(application)
     template_statistics_client.init_app(application)
     events_api_client.init_app(application)
+    provider_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
@@ -138,6 +144,11 @@ def init_csrf(application):
 
 
 def init_app(application):
+
+    @application.before_request
+    def record_start_time():
+        g.start = monotonic()
+
     @application.context_processor
     def inject_global_template_variables():
         return {
