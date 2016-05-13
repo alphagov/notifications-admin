@@ -1,10 +1,14 @@
 import re
 import csv
+from os import path
 from io import BytesIO, StringIO
 from functools import wraps
 from flask import (abort, session, request, url_for)
-import openpyxl
-import xlrd
+import pyexcel
+import pyexcel.ext.io
+import pyexcel.ext.xls
+import pyexcel.ext.xlsx
+import pyexcel.ext.ods3
 
 
 class BrowsableItem(object):
@@ -137,10 +141,10 @@ def email_safe(string):
 
 class Spreadsheet():
 
-    allowed_file_extensions = ['csv', 'xlsx', 'xls']
+    allowed_file_extensions = ['csv', 'xlsx', 'xls', 'ods', 'xlsm', 'tsv', 'tsvz']
 
-    def __init__(self, file_data):
-        self.as_csv = file_data.getvalue()
+    def __init__(self, file_contents):
+        self.as_csv_data = file_contents.getvalue()
 
     @staticmethod
     def can_handle(filename):
@@ -150,21 +154,21 @@ class Spreadsheet():
         )
 
     @classmethod
-    def from_xlsx(cls, file_data):
-        wb = openpyxl.load_workbook(file_data)
-        sh = wb.worksheets[0]
-        with BytesIO() as converted:
-            c = csv.writer(converted)
-            for r in sh.rows:
-                c.writerow([cell.value for cell in r])
-            return Spreadsheet(converted)
+    def from_file(cls, filename, file_content):
 
-    @classmethod
-    def from_xls(cls, file_data):
-        with xlrd.open_workbook(file_contents=file_data.getvalue()) as wb:
-            sh = wb.sheet_by_index(0)
-            with BytesIO() as converted:
-                c = csv.writer(converted)
-                for r in range(sh.nrows):
-                    c.writerow(sh.row_values(r))
-                return Spreadsheet(converted)
+        filename, extension = path.splitext(filename)
+
+        if extension == 'csv':
+            return Spreadsheet(file_contents)
+
+        with StringIO() as converted:
+
+            output = csv.writer(converted)
+
+            for row in pyexcel.get_sheet(
+                file_type=extension.lstrip('.'),
+                file_content=file_content.getvalue()
+            ).to_array():
+                output.writerow(row)
+
+            return Spreadsheet(converted)

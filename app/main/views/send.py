@@ -100,6 +100,7 @@ def choose_template(service_id, template_type):
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_messages(service_id, template_id):
+
     template = Template(
         service_api_client.get_service_template(service_id, template_id)['data'],
         prefix=current_service['name']
@@ -108,13 +109,6 @@ def send_messages(service_id, template_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
 
-        if form.file.data.filename.lower().endswith('.xlsx'):
-            contents = Spreadsheet.from_xlsx(form.file.data).as_csv
-        elif form.file.data.filename.lower().endswith('.xls'):
-            contents = Spreadsheet.from_xls(form.file.data).as_csv
-        else:
-            contents = Spreadsheet(form.file.data).as_csv
-
         try:
             upload_id = str(uuid.uuid4())
             s3upload(
@@ -122,7 +116,7 @@ def send_messages(service_id, template_id):
                 service_id,
                 {
                     'file_name': form.file.data.filename,
-                    'data': contents
+                    'data': Spreadsheet.from_file(form.file.data.filename, form.file.data).as_csv_data
                 },
                 current_app.config['AWS_REGION']
             )
