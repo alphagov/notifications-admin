@@ -107,28 +107,21 @@ def send_messages(service_id, template_id):
 
     form = CsvUploadForm()
     if form.validate_on_submit():
-
-        try:
-            upload_id = str(uuid.uuid4())
-            s3upload(
-                upload_id,
-                service_id,
-                Spreadsheet.from_file(form.file.data.filename, form.file.data).as_dict,
-                current_app.config['AWS_REGION']
-            )
-            session['upload_data'] = {
-                "template_id": template_id,
-                "original_file_name": form.file.data.filename
-            }
-            return redirect(url_for('.check_messages',
-                                    service_id=service_id,
-                                    upload_id=upload_id,
-                                    template_type=template.template_type))
-        except Exception as error:
-            flash('There was a problem uploading {} ({})'.format(
-                form.file.data.filename, str(error)
-            ))
-            return redirect(url_for('.send_messages', service_id=service_id, template_id=template_id))
+        upload_id = str(uuid.uuid4())
+        s3upload(
+            upload_id,
+            service_id,
+            Spreadsheet.from_file(form.file.data.filename, form.file.data).as_dict,
+            current_app.config['AWS_REGION']
+        )
+        session['upload_data'] = {
+            "template_id": template_id,
+            "original_file_name": form.file.data.filename
+        }
+        return redirect(url_for('.check_messages',
+                                service_id=service_id,
+                                upload_id=upload_id,
+                                template_type=template.template_type))
 
     return render_template(
         'views/send.html',
