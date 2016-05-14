@@ -1,6 +1,7 @@
 import re
 from wtforms import ValidationError
 from notifications_utils.template import Template
+from app.utils import Spreadsheet
 
 
 class Blacklist(object):
@@ -20,8 +21,8 @@ class CsvFileValidator(object):
         self.message = message
 
     def __call__(self, form, field):
-        if not field.data.filename.lower().endswith('.csv'):
-            raise ValidationError("{} is not a CSV file".format(field.data.filename))
+        if not Spreadsheet.can_handle(field.data.filename):
+            raise ValidationError("{} is not a spreadsheet file".format(field.data.filename))
 
 
 class ValidEmailDomainRegex(object):

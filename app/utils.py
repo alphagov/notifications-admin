@@ -1,8 +1,14 @@
 import re
 import csv
-from io import StringIO
+from os import path
+from io import BytesIO, StringIO
 from functools import wraps
 from flask import (abort, session, request, url_for)
+import pyexcel
+import pyexcel.ext.io
+import pyexcel.ext.xls
+import pyexcel.ext.xlsx
+import pyexcel.ext.ods3
 
 
 class BrowsableItem(object):
@@ -131,3 +137,38 @@ def email_safe(string):
     return "".join([
         character.lower() if character.isalnum() or character == "." else "" for character in re.sub("\s+", ".", string.strip())  # noqa
     ])
+
+
+class Spreadsheet():
+
+    allowed_file_extensions = ['csv', 'xlsx', 'xls', 'ods', 'xlsm', 'tsv', 'tsvz']
+
+    def __init__(self, file_contents):
+        self.as_csv_data = file_contents.getvalue()
+
+    @staticmethod
+    def can_handle(filename):
+        return any(
+            filename.lower().endswith('.{}'.format(extension))
+            for extension in Spreadsheet.allowed_file_extensions
+        )
+
+    @classmethod
+    def from_file(cls, filename, file_content):
+
+        filename, extension = path.splitext(filename)
+
+        if extension == 'csv':
+            return Spreadsheet(file_contents)
+
+        with StringIO() as converted:
+
+            output = csv.writer(converted)
+
+            for row in pyexcel.get_sheet(
+                file_type=extension.lstrip('.'),
+                file_content=file_content.getvalue()
+            ).to_array():
+                output.writerow(row)
+
+            return Spreadsheet(converted)
