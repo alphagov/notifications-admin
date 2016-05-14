@@ -8,6 +8,11 @@ Pygments==2.0.2
 py-gfm==0.1.2
 blinker==1.4
 monotonic==0.3
+pyexcel==0.2.1
+pyexcel-io==0.1.0
+pyexcel-xls==0.1.0
+pyexcel-xlsx==0.1.0
+pyexcel-ods3==0.1.1
 
 git+https://github.com/alphagov/notifications-python-client.git@1.0.0#egg=notifications-python-client==1.0.0
 
