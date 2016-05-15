@@ -110,9 +110,7 @@ def send_messages(service_id, template_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
-            upload_id = str(uuid.uuid4())
-            s3upload(
-                upload_id,
+            upload_id = s3upload(
                 service_id,
                 Spreadsheet.from_file(form.file.data.filename, form.file.data).as_dict,
                 current_app.config['AWS_REGION']
@@ -161,6 +159,8 @@ def get_example_csv(service_id, template_id):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test(service_id, template_id):
 
+    file_name = 'Test message'
+
     template = Template(
         service_api_client.get_service_template(service_id, template_id)['data'],
         prefix=current_service['name']
@@ -173,13 +173,18 @@ def send_test(service_id, template_id):
                 [first_column_heading[template.template_type]] + list(template.placeholders),
                 get_example_csv_rows(template, use_example_as_example=False, submitted_fields=request.form)
             ])
-            filedata = {
-                'file_name': 'Test message',
-                'data': output.getvalue()
+            upload_id = s3upload(
+                service_id,
+                {
+                    'file_name': file_name,
+                    'data': output.getvalue()
+                },
+                current_app.config['AWS_REGION']
+            )
+            session['upload_data'] = {
+                "template_id": template_id,
+                "original_file_name": file_name
             }
-            upload_id = str(uuid.uuid4())
-            s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
-            session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
             return redirect(url_for(
                 '.check_messages',
                 upload_id=upload_id,

@@ -53,7 +53,7 @@ def test_upload_files_in_different_formats(
         )
 
     if acceptable_file:
-        assert mock_s3_upload.call_args[0][2]['data'].strip() == (
+        assert mock_s3_upload.call_args[0][1]['data'].strip() == (
             "phone number,name,favourite colour,fruit\r\n"
             "07739 468 050,Pete,Coral,tomato\r\n"
             "07527 125 974,Not Pete,Magenta,Avacado\r\n"
@@ -157,7 +157,7 @@ def test_send_test_sms_message(
                 follow_redirects=True
             )
         assert response.status_code == 200
-        mock_s3_upload.assert_called_with(ANY, fake_uuid, expected_data, 'eu-west-1')
+        mock_s3_upload.assert_called_with(fake_uuid, expected_data, 'eu-west-1')
 
 
 def test_send_test_email_message(
@@ -185,7 +185,7 @@ def test_send_test_email_message(
                 follow_redirects=True
             )
         assert response.status_code == 200
-        mock_s3_upload.assert_called_with(ANY, fake_uuid, expected_data, 'eu-west-1')
+        mock_s3_upload.assert_called_with(fake_uuid, expected_data, 'eu-west-1')
 
 
 def test_send_test_sms_message_with_placeholders(
@@ -221,7 +221,7 @@ def test_send_test_sms_message_with_placeholders(
                 follow_redirects=True
             )
         assert response.status_code == 200
-        mock_s3_upload.assert_called_with(ANY, fake_uuid, expected_data, 'eu-west-1')
+        mock_s3_upload.assert_called_with(fake_uuid, expected_data, 'eu-west-1')
 
 
 def test_api_info_page(
