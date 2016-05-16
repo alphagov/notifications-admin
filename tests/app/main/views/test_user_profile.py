@@ -2,100 +2,100 @@ import json
 from flask import url_for
 
 
-# def test_should_show_overview_page(app_,
-#                                    api_user_active,
-#                                    mock_login,
-#                                    mock_get_user):
-#     with app_.test_request_context():
-#         with app_.test_client() as client:
-#             client.login(api_user_active)
-#             response = client.get(url_for('main.user_profile'))
+def test_should_show_overview_page(app_,
+                                   api_user_active,
+                                   mock_login,
+                                   mock_get_user):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(url_for('main.user_profile'))
 
-#         assert 'Your profile' in response.get_data(as_text=True)
-#         assert response.status_code == 200
-
-
-# def test_should_show_name_page(app_,
-#                                api_user_active,
-#                                mock_login,
-#                                mock_get_user):
-#     with app_.test_request_context():
-#         with app_.test_client() as client:
-#             client.login(api_user_active)
-#             response = client.get(url_for('main.user_profile_name'))
-
-#         assert 'Change your name' in response.get_data(as_text=True)
-#         assert response.status_code == 200
+        assert 'Your profile' in response.get_data(as_text=True)
+        assert response.status_code == 200
 
 
-# def test_should_redirect_after_name_change(app_,
-#                                            api_user_active,
-#                                            mock_login,
-#                                            mock_update_user,
-#                                            mock_get_user):
-#     with app_.test_request_context():
-#         with app_.test_client() as client:
-#             client.login(api_user_active)
-#             new_name = 'New Name'
-#             data = {'new_name': new_name}
-#             response = client.post(url_for(
-#                 'main.user_profile_name'), data=data)
+def test_should_show_name_page(app_,
+                               api_user_active,
+                               mock_login,
+                               mock_get_user):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(url_for('main.user_profile_name'))
 
-#         assert response.status_code == 302
-#         assert response.location == url_for(
-#             'main.user_profile', _external=True)
-#         api_user_active.name = new_name
-#         assert mock_update_user.called
+        assert 'Change your name' in response.get_data(as_text=True)
+        assert response.status_code == 200
 
 
-# def test_should_show_email_page(app_,
-#                                 api_user_active,
-#                                 mock_login,
-#                                 mock_get_user):
-#     with app_.test_request_context():
-#         with app_.test_client() as client:
-#             client.login(api_user_active)
-#             response = client.get(url_for(
-#                 'main.user_profile_email'))
+def test_should_redirect_after_name_change(app_,
+                                           api_user_active,
+                                           mock_login,
+                                           mock_update_user,
+                                           mock_get_user):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            new_name = 'New Name'
+            data = {'new_name': new_name}
+            response = client.post(url_for(
+                'main.user_profile_name'), data=data)
 
-#         assert 'Change your email address' in response.get_data(as_text=True)
-#         assert response.status_code == 200
-
-
-# def test_should_redirect_after_email_change(app_,
-#                                             api_user_active,
-#                                             mock_login,
-#                                             mock_get_user,
-#                                             mock_get_user_by_email_not_found,
-#                                             mock_is_email_unique):
-#     with app_.test_request_context():
-#         with app_.test_client() as client:
-#             client.login(api_user_active)
-#         data = {'email_address': 'new_notify@notify.gov.uk'}
-#         response = client.post(
-#             url_for('main.user_profile_email'),
-#             data=data)
-
-#         assert response.status_code == 302
-#         assert response.location == url_for(
-#             'main.user_profile_email_authenticate', _external=True)
+        assert response.status_code == 302
+        assert response.location == url_for(
+            'main.user_profile', _external=True)
+        api_user_active.name = new_name
+        assert mock_update_user.called
 
 
-# def test_should_show_authenticate_after_email_change(app_,
-#                                                      api_user_active,
-#                                                      mock_login,
-#                                                      mock_get_user,
-#                                                      mock_verify_password):
-#     with app_.test_request_context():
-#         with app_.test_client() as client:
-#             client.login(api_user_active)
-#         with client.session_transaction() as session:
-#             session['new-email'] = 'new_notify@notify.gov.uk'
-#         response = client.get(url_for('main.user_profile_email_authenticate'))
+def test_should_show_email_page(app_,
+                                api_user_active,
+                                mock_login,
+                                mock_get_user):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            response = client.get(url_for(
+                'main.user_profile_email'))
 
-#         assert 'Change your email address' in response.get_data(as_text=True)
-#         assert 'Confirm' in response.get_data(as_text=True)
-#         assert response.status_code == 200
+        assert 'Change your email address' in response.get_data(as_text=True)
+        assert response.status_code == 200
+
+
+def test_should_redirect_after_email_change(app_,
+                                            api_user_active,
+                                            mock_login,
+                                            mock_get_user,
+                                            mock_get_user_by_email_not_found,
+                                            mock_is_email_unique):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+        data = {'email_address': 'new_notify@notify.gov.uk'}
+        response = client.post(
+            url_for('main.user_profile_email'),
+            data=data)
+
+        assert response.status_code == 302
+        assert response.location == url_for(
+            'main.user_profile_email_authenticate', _external=True)
+
+
+def test_should_show_authenticate_after_email_change(app_,
+                                                     api_user_active,
+                                                     mock_login,
+                                                     mock_get_user,
+                                                     mock_verify_password):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+        with client.session_transaction() as session:
+            session['new-email'] = 'new_notify@notify.gov.uk'
+        response = client.get(url_for('main.user_profile_email_authenticate'))
+
+        assert 'Change your email address' in response.get_data(as_text=True)
+        assert 'Confirm' in response.get_data(as_text=True)
+        assert response.status_code == 200
 
 
 def test_should_redirect_after_email_change_confirm(app_,
