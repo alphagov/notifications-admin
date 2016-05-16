@@ -314,3 +314,7 @@ class RequestToGoLiveForm(Form):
 
 class ProviderForm(Form):
     priority = IntegerField('Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")])
+
+
+class ServiceReplyToEmailFrom(Form):
+    email_address = email_address()

@@ -526,3 +526,26 @@ def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one
                                       [],
                                       platform_admin_user,
                                       service_one)
+
+
+def test_set_reply_to_email_address(app_,
+                                    active_user_with_permissions,
+                                    mocker,
+                                    mock_update_service,
+                                    service_one):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user_with_permissions, mocker, service_one)
+            data = {"email_address": "test@someservice.gov.uk"}
+            response = client.post(url_for('main.service_set_reply_to_email', service_id=service_one['id']),
+                                   data=data,
+                                   follow_redirects=True)
+        assert response.status_code == 200
+        mock_update_service.assert_called_with(service_one['id'],
+                                               service_one['name'],
+                                               service_one['active'],
+                                               service_one['message_limit'],
+                                               service_one['restricted'],
+                                               ANY,
+                                               service_one['email_from'],
+                                               "test@someservice.gov.uk")

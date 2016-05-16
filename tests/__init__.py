@@ -35,7 +35,7 @@ def generate_uuid():
     return uuid.uuid4()
 
 
-def service_json(id_, name, users, message_limit=1000, active=False, restricted=True, email_from=None):
+def service_json(id_, name, users, message_limit=1000, active=False, restricted=True, email_from=None, reply_to_email_address=None):  # noqa
     return {
         'id': id_,
         'name': name,
@@ -43,7 +43,8 @@ def service_json(id_, name, users, message_limit=1000, active=False, restricted=
         'message_limit': message_limit,
         'active': active,
         'restricted': restricted,
-        'email_from': email_from
+        'email_from': email_from,
+        'reply_to_email_address': reply_to_email_address
     }
 
 

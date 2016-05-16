@@ -19,7 +19,12 @@ from notifications_python_client.errors import HTTPError
 from app import service_api_client
 from app.main import main
 from app.utils import user_has_permissions, email_safe
-from app.main.forms import ConfirmPasswordForm, ServiceNameForm, RequestToGoLiveForm
+from app.main.forms import (
+    ConfirmPasswordForm,
+    ServiceNameForm,
+    RequestToGoLiveForm,
+    ServiceReplyToEmailFrom
+)
 from app import user_api_client
 from app import current_service
 
@@ -216,4 +221,27 @@ def service_delete_confirm(service_id):
         'views/service-settings/confirm.html',
         heading='Delete this service from Notify',
         destructive=True,
+        form=form)
+
+
+@main.route("/services/<service_id>/service-settings/set-reply-to-email", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_set_reply_to_email(service_id):
+    form = ServiceReplyToEmailFrom()
+    if form.validate_on_submit():
+        message = 'Reply to email set to {}'.format(form.email_address.data)
+        service_api_client.update_service(
+            current_service['id'],
+            current_service['name'],
+            current_service['active'],
+            current_service['message_limit'],
+            current_service['restricted'],
+            current_service['users'],
+            current_service['email_from'],
+            reply_to_email_address=form.email_address.data)
+        flash(message, 'default_with_tick')
+        return redirect(url_for('.service_settings', service_id=service_id))
+    return render_template(
+        'views/service-settings/set-reply-to-email.html',
         form=form)

@@ -62,7 +62,8 @@ class ServiceAPIClient(NotificationsAPIClient):
                        message_limit,
                        restricted,
                        users,
-                       email_from):
+                       email_from,
+                       reply_to_email_address=None):
         """
         Update a service.
         """
@@ -73,7 +74,8 @@ class ServiceAPIClient(NotificationsAPIClient):
             "message_limit": message_limit,
             "restricted": restricted,
             "users": users,
-            "email_from": email_from
+            "email_from": email_from,
+            "reply_to_email_address": reply_to_email_address
         }
         _attach_current_user(data)
         endpoint = "/service/{0}".format(service_id)
