@@ -203,9 +203,11 @@ def mock_get_aggregate_service_statistics(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_template(mocker):
-    def _get(service_id, template_id):
+    def _get(service_id, template_id, version=None):
         template = template_json(
             service_id, template_id, "Two week reminder", "sms", "Your vehicle tax is about to expire")
+        if version:
+            template.update({'version': version})
         return {'data': template}
 
     return mocker.patch(

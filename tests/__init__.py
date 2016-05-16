@@ -53,14 +53,14 @@ def template_json(service_id,
                   type_="sms",
                   content="template content",
                   subject=None,
-                  versions=['1']):
+                  versions='1'):
     template = {
         'id': id_,
         'name': name,
         'template_type': type_,
         'content': content,
         'service': service_id,
-        'versions': versions
+        'version': versions
     }
     if subject is not None:
         template['subject'] = subject
@@ -83,7 +83,6 @@ def template_version_json(service_id,
         created_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
     template['created_at'] = created_at
     template['version'] = version
-    del template['versions']
     return template
 
 
@@ -129,6 +128,7 @@ def job_json():
         'id': job_id,
         'service': 1,
         'template': 1,
+        'template_version': 1,
         'original_file_name': 'thisisatest.csv',
         'created_at': created_at,
         'notification_count': 1,
@@ -143,6 +143,7 @@ def job_json_with_created_by(service_id=None, job_id=None):
         'id': job_id if job_id else str(generate_uuid()),
         'service': service_id if service_id else str(generate_uuid()),
         'template': 1,
+        'template_version': 1,
         'original_file_name': 'thisisatest.csv',
         'created_at': str(datetime.now().time()),
         'notification_count': 1,
@@ -190,7 +191,8 @@ def notification_json(service_id,
             'sent_at': sent_at,
             'status': status,
             'created_at': created_at,
-            'updated_at': updated_at
+            'updated_at': updated_at,
+            'template_version': template['version']
         } for i in range(5)],
         'total': 5,
         'page_size': 50,
