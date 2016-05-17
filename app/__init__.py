@@ -2,7 +2,7 @@ import os
 import re
 import urllib
 import dateutil
-
+import pytz
 from flask import (
     Flask,
     session,
@@ -184,38 +184,30 @@ def syntax_highlight_json(code):
     return Markup(highlight(code, JavascriptLexer(), HtmlFormatter(noclasses=True)))
 
 
-def format_datetime(date):
-    from_zone = dateutil.tz.gettz('UTC')
-    to_zone = dateutil.tz.gettz('Europe/London')
+def gmt_timezones(date):
     date = dateutil.parser.parse(date)
-    native = date.replace(tzinfo=from_zone)
-    return native.astimezone(to_zone).strftime('%A %d %B %Y at %H:%M')
+    forced_utc = date.replace(tzinfo=pytz.utc)
+    return forced_utc.astimezone(pytz.timezone('Europe/London'))
+
+
+def format_datetime(date):
+    return gmt_timezones(date).strftime('%A %d %B %Y at %H:%M')
 
 
 def format_datetime_short(date):
-    from_zone = dateutil.tz.gettz('UTC')
-    to_zone = dateutil.tz.gettz('Europe/London')
-    date = dateutil.parser.parse(date)
-    native = date.replace(tzinfo=from_zone)
-    return native.astimezone(to_zone).strftime('%d %B at %H:%M')
+    return gmt_timezones(date).strftime('%d %B at %H:%M')
 
 
 def format_time(date):
-    from_zone = dateutil.tz.gettz('UTC')
-    to_zone = dateutil.tz.gettz('Europe/London')
-    date = dateutil.parser.parse(date)
-    native = date.replace(tzinfo=from_zone)
-    return native.astimezone(to_zone).strftime('%H:%M')
+    return gmt_timezones(date).strftime('%H:%M')
 
 
 def format_date(date):
-    date = dateutil.parser.parse(date)
-    return date.strftime('%A %d %B %Y')
+    return gmt_timezones(date).strftime('%A %d %B %Y')
 
 
 def format_date_short(date):
-    date = dateutil.parser.parse(date)
-    return date.strftime('%d %B').lstrip('0')
+    return gmt_timezones(date).strftime('%d %B').lstrip('0')
 
 
 def valid_phone_number(phone_number):

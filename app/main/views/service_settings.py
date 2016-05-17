@@ -229,6 +229,8 @@ def service_delete_confirm(service_id):
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_reply_to_email(service_id):
     form = ServiceReplyToEmailFrom()
+    if request.method == 'GET':
+        form.email_address.data = current_service.get('reply_to_email_address')
     if form.validate_on_submit():
         message = 'Reply to email set to {}'.format(form.email_address.data)
         service_api_client.update_service(
