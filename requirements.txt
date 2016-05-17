@@ -8,6 +8,7 @@ Pygments==2.0.2
 py-gfm==0.1.2
 blinker==1.4
 monotonic==0.3
+lxml==3.6.0
 pyexcel==0.2.1
 pyexcel-io==0.1.0
 pyexcel-xls==0.1.0
