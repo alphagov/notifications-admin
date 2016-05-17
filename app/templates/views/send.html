@@ -35,44 +35,48 @@
   <div class="page-footer bottom-gutter">
     {{file_upload(
       form.file,
-      button_text='Upload a .csv file',
+      button_text='Upload a file of recipients',
       alternate_link=url_for(".send_test", service_id=current_service.id, template_id=template.id),
       alternate_link_text='send yourself a test'
     )}}
   </div>
 
-  <h2 class="heading-medium" style="margin: 45px 0 15px 0">
-    Example file
-  </h2>
+<details>
+  <summary>How to format your file</summary>
 
-  {% call(item, row_number) list_table(
-    example,
-    caption="Example",
-    caption_visible=False,
-    field_headings=['1'] + [
-      '<span class="placeholder">{}</span>'.format(recipient_column)|safe
-    ] + template.placeholders_as_markup|list
-  ) %}
-    {{ index_field(row_number) }}
-    {% for column in item %}
-      {{ text_field(column) }}
-    {% endfor %}
-  {% endcall %}
+    <ul class="list list-bullet">
+      <li>
+        put one recipient per row
+      </li>
+      <li>
+        save or export your data as a
+        <acronym title="Comma Separated Values">CSV</acronym>,
+        <acronym title="Comma Separated Values">TSV</acronym>,
+        Open Document Spreadsheet (.ods)
+        or Microsoft Excel (.xls, .xlsx, .xlsm) file
+      </li>
+    </ul>
 
-  <p class="table-show-more-link">
-    <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
-  </p>
+    <h2 class="heading-small">
+      Example file
+    </h2>
 
-  <h2 class="heading-medium">
-    Formatting
-  </h2>
-  <ul class="list list-bullet">
-    <li>
-      put one recipient per row
-    </li>
-    <li>
-      save or export your data as a .csv (comma separated values) file
-    </li>
-  </ul>
+    {% call(item, row_number) list_table(
+      example,
+      caption="Example",
+      caption_visible=False,
+      field_headings=['1'] + [
+        '<span class="placeholder">{}</span>'.format(recipient_column)|safe
+      ] + template.placeholders_as_markup|list
+    ) %}
+      {{ index_field(row_number) }}
+      {% for column in item %}
+        {{ text_field(column) }}
+      {% endfor %}
+    {% endcall %}
+    <p class="table-show-more-link">
+      <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
+    </p>
+  </details>
 
 {% endblock %}
