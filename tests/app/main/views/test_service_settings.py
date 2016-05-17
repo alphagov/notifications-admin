@@ -549,3 +549,19 @@ def test_set_reply_to_email_address(app_,
                                                ANY,
                                                service_one['email_from'],
                                                "test@someservice.gov.uk")
+
+
+def test_if_reply_to_email_address_set_then_form_populated(app_,
+                                                           active_user_with_permissions,
+                                                           mocker,
+                                                           service_one):
+
+    service_one['reply_to_email_address'] = 'test@service.gov.uk'
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user_with_permissions, mocker, service_one)
+            response = client.get(url_for('main.service_set_reply_to_email', service_id=service_one['id']))
+
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.find(id='email_address')['value'] == 'test@service.gov.uk'
