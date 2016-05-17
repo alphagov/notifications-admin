@@ -110,11 +110,9 @@ def send_messages(service_id, template_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
-            upload_id = str(uuid.uuid4())
-            s3upload(
-                upload_id,
+            upload_id = s3upload(
                 service_id,
-                Spreadsheet.from_file(form.file.data.filename, form.file.data).as_dict,
+                Spreadsheet.from_file(form.file.data, filename=form.file.data.filename).as_dict,
                 current_app.config['AWS_REGION']
             )
             session['upload_data'] = {
@@ -144,16 +142,13 @@ def send_messages(service_id, template_id):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', any_=True)
 def get_example_csv(service_id, template_id):
     template = Template(service_api_client.get_service_template(service_id, template_id)['data'])
-    with io.StringIO() as output:
-        writer = csv.writer(output)
-        writer.writerows([
-            [first_column_heading[template.template_type]] + list(template.placeholders),
-            get_example_csv_rows(template)
-        ])
-        return output.getvalue(), 200, {
-            'Content-Type': 'text/csv; charset=utf-8',
-            'Content-Disposition': 'inline; filename="{}.csv"'.format(template.name)
-        }
+    return Spreadsheet.from_rows([
+        [first_column_heading[template.template_type]] + list(template.placeholders),
+        get_example_csv_rows(template)
+    ]).as_csv_data, 200, {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': 'inline; filename="{}.csv"'.format(template.name)
+    }
 
 
 @main.route("/services/<service_id>/send/<template_id>/test", methods=['GET', 'POST'])
@@ -161,32 +156,36 @@ def get_example_csv(service_id, template_id):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test(service_id, template_id):
 
+    file_name = 'Test message'
+
     template = Template(
         service_api_client.get_service_template(service_id, template_id)['data'],
         prefix=current_service['name']
     )
 
     if len(template.placeholders) == 0 or request.method == 'POST':
-        with io.StringIO() as output:
-            writer = csv.writer(output)
-            writer.writerows([
-                [first_column_heading[template.template_type]] + list(template.placeholders),
-                get_example_csv_rows(template, use_example_as_example=False, submitted_fields=request.form)
-            ])
-            filedata = {
-                'file_name': 'Test message',
-                'data': output.getvalue()
-            }
-            upload_id = str(uuid.uuid4())
-            s3upload(upload_id, service_id, filedata, current_app.config['AWS_REGION'])
-            session['upload_data'] = {"template_id": template_id, "original_file_name": filedata['file_name']}
-            return redirect(url_for(
-                '.check_messages',
-                upload_id=upload_id,
-                service_id=service_id,
-                template_type=template.template_type,
-                from_test=True
-            ))
+        upload_id = s3upload(
+            service_id,
+            {
+                'file_name': file_name,
+                'data': Spreadsheet.from_rows([
+                    [first_column_heading[template.template_type]] + list(template.placeholders),
+                    get_example_csv_rows(template, use_example_as_example=False, submitted_fields=request.form)
+                ]).as_csv_data
+            },
+            current_app.config['AWS_REGION']
+        )
+        session['upload_data'] = {
+            "template_id": template_id,
+            "original_file_name": file_name
+        }
+        return redirect(url_for(
+            '.check_messages',
+            upload_id=upload_id,
+            service_id=service_id,
+            template_type=template.template_type,
+            from_test=True
+        ))
 
     return render_template(
         'views/send-test.html',

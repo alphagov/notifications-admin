@@ -1,3 +1,4 @@
+import uuid
 import botocore
 from boto3 import resource
 from flask import current_app
@@ -5,7 +6,7 @@ from flask import current_app
 FILE_LOCATION_STRUCTURE = 'service-{}-notify/{}.csv'
 
 
-def s3upload(upload_id, service_id, filedata, region):
+def s3upload(service_id, filedata, region):
     s3 = resource('s3')
     bucket_name = current_app.config['CSV_UPLOAD_BUCKET_NAME']
     contents = filedata['data']
@@ -27,9 +28,12 @@ def s3upload(upload_id, service_id, filedata, region):
         s3.create_bucket(Bucket=bucket_name,
                          CreateBucketConfiguration={'LocationConstraint': region})
 
+    upload_id = str(uuid.uuid4())
     upload_file_name = FILE_LOCATION_STRUCTURE.format(service_id, upload_id)
     key = s3.Object(bucket_name, upload_file_name)
     key.put(Body=contents, ServerSideEncryption='AES256')
+
+    return upload_id
 
 
 def s3download(service_id, upload_id):

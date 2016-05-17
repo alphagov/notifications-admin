@@ -862,8 +862,8 @@ def mock_get_users_by_service(mocker):
 
 @pytest.fixture(scope='function')
 def mock_s3_upload(mocker):
-    def _upload(upload_id, service_id, filedata, region):
-        pass
+    def _upload(service_id, filedata, region):
+        return fake_uuid()
     return mocker.patch('app.main.views.send.s3upload', side_effect=_upload)
 
 
