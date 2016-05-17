@@ -13,31 +13,20 @@
 
 {% block maincolumn_content %}
 
-  {% if count_of_recipients > (current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0)) %}
+  {% if not recipients.allowed_to_send_to and not recipients.missing_column_headers %}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         <h1 class='banner-title'>
-          Too many recipients
-        </h1>
-        {% if statistics.emails_requested or statistics.sms_requested %}
-          <p>
-            You can only send {{ current_service.message_limit }}
-            messages per day
-            {%- if current_service.restricted %}
-              in <a href="{{ url_for('.trial_mode')}}">trial mode</a>
-            {%- endif -%}
-            .
-          </p>
-        {% endif %}
-        <p>
-          You can still send
-          {{ current_service.message_limit - statistics.emails_requested - statistics.sms_requested }}
-          messages today, but
-          ‘{{ original_file_name }}’ contains
-          {{ count_of_recipients }} {{ recipients.recipient_column_header }}
+          You can’t send to
+          {{ 'this' if count_of_recipients == 1 else 'these' }}
+          {{ recipients.recipient_column_header }}
           {%- if count_of_recipients != 1 -%}
             {{ 'es' if 'email address' == recipients.recipient_column_header else 's' }}
-          {%- endif -%}.
+          {%- endif %}
+        </h1>
+        <p>
+          In <a href="{{ url_for('.trial_mode') }}">trial mode</a> you can only
+          send to yourself and members of your team
         </p>
       {% endcall %}
     </div>
@@ -64,6 +53,34 @@
             {% endfor %}
           </ul>
         {% endif %}
+      {% endcall %}
+    </div>
+  {% elif count_of_recipients > (current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0)) %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        <h1 class='banner-title'>
+          Too many recipients
+        </h1>
+        {% if statistics.emails_requested or statistics.sms_requested %}
+          <p>
+            You can only send {{ current_service.message_limit }}
+            messages per day
+            {%- if current_service.restricted %}
+              in <a href="{{ url_for('.trial_mode')}}">trial mode</a>
+            {%- endif -%}
+            .
+          </p>
+        {% endif %}
+        <p>
+          You can still send
+          {{ current_service.message_limit - statistics.emails_requested - statistics.sms_requested }}
+          messages today, but
+          ‘{{ original_file_name }}’ contains
+          {{ count_of_recipients }} {{ recipients.recipient_column_header }}
+          {%- if count_of_recipients != 1 -%}
+            {{ 'es' if 'email address' == recipients.recipient_column_header else 's' }}
+          {%- endif -%}.
+        </p>
       {% endcall %}
     </div>
   {% else %}
@@ -95,7 +112,7 @@
 
   {% if (
     errors or
-    count_of_recipients > (current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0)) 
+    count_of_recipients > (current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0))
   ) %}
     {% if request.args.from_test %}
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
