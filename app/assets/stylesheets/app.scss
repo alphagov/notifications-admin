@@ -61,11 +61,11 @@ a {
   }
 
   > .grid-row  {
-    
+
     .heading-large {
       margin-top: $gutter;
     }
-    
+
   }
 
 }
@@ -104,7 +104,7 @@ td {
 #footer {
 
   .footer-categories {
-    
+
     @extend %site-width-container;
 
     &-wrapper {
@@ -147,4 +147,9 @@ a[rel='external'] {
     list-style: circle;
   }
 
+}
+
+details summary {
+  text-decoration: underline;
+  margin-bottom: $gutter-half;
 }
