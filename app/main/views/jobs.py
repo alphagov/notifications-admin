@@ -57,7 +57,9 @@ def view_jobs(service_id):
 @user_has_permissions('view_activity', admin_override=True)
 def view_job(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
-    template = service_api_client.get_service_template(service_id, job['template'])['data']
+    template = service_api_client.get_service_template(service_id=service_id,
+                                                       template_id=job['template'],
+                                                       version=job['template_version'])['data']
     notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
     finished = job['status'] == 'finished'
     return render_template(

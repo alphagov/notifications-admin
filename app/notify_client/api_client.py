@@ -128,13 +128,25 @@ class ServiceAPIClient(NotificationsAPIClient):
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
         return self.post(endpoint, data)
 
-    def get_service_template(self, service_id, template_id, *params):
+    def get_service_template(self, service_id, template_id, version=None, *params):
         """
         Retrieve a service template.
         """
         endpoint = '/service/{service_id}/template/{template_id}'.format(
             service_id=service_id,
             template_id=template_id)
+        if version:
+            endpoint = '{base}/version/{version}'.format(base=endpoint, version=version)
+        return self.get(endpoint, *params)
+
+    def get_service_template_versions(self, service_id, template_id, *params):
+        """
+        Retrieve a list of versions for a template
+        """
+        endpoint = '/service/{service_id}/template/{template_id}/versions'.format(
+            service_id=service_id,
+            template_id=template_id
+        )
         return self.get(endpoint, *params)
 
     def get_service_templates(self, service_id, *params):
