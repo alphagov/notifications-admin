@@ -1,6 +1,6 @@
 import pytest
 import uuid
-import datetime
+from datetime import datetime, timedelta
 from flask.testing import FlaskClient
 from flask import url_for
 from flask_login import login_user
@@ -35,7 +35,7 @@ def generate_uuid():
     return uuid.uuid4()
 
 
-def service_json(id_, name, users, message_limit=1000, active=False, restricted=True, email_from=None):
+def service_json(id_, name, users, message_limit=1000, active=False, restricted=True, email_from=None, reply_to_email_address=None):  # noqa
     return {
         'id': id_,
         'name': name,
@@ -43,7 +43,8 @@ def service_json(id_, name, users, message_limit=1000, active=False, restricted=
         'message_limit': message_limit,
         'active': active,
         'restricted': restricted,
-        'email_from': email_from
+        'email_from': email_from,
+        'reply_to_email_address': reply_to_email_address
     }
 
 
@@ -52,16 +53,37 @@ def template_json(service_id,
                   name="sample template",
                   type_="sms",
                   content="template content",
-                  subject=None):
+                  subject=None,
+                  versions='1'):
     template = {
         'id': id_,
         'name': name,
         'template_type': type_,
         'content': content,
-        'service': service_id
+        'service': service_id,
+        'version': versions
     }
     if subject is not None:
         template['subject'] = subject
+    return template
+
+
+def template_version_json(service_id,
+                          id_,
+                          created_by,
+                          version=1,
+                          created_at=None,
+                          **kwargs):
+    template = template_json(service_id, id_, **kwargs)
+    template['created_by'] = {
+        'id': created_by.id,
+        'name': created_by.name,
+        'email_address': created_by.email_address
+    }
+    if created_at is None:
+        created_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
+    template['created_at'] = created_at
+    template['version'] = version
     return template
 
 
@@ -102,11 +124,12 @@ def create_test_api_user(state, permissions={}):
 
 def job_json():
     job_id = str(generate_uuid())
-    created_at = str(datetime.datetime.utcnow().time())
+    created_at = str(datetime.utcnow().time())
     data = {
         'id': job_id,
         'service': 1,
         'template': 1,
+        'template_version': 1,
         'original_file_name': 'thisisatest.csv',
         'created_at': created_at,
         'notification_count': 1,
@@ -121,8 +144,9 @@ def job_json_with_created_by(service_id=None, job_id=None):
         'id': job_id if job_id else str(generate_uuid()),
         'service': service_id if service_id else str(generate_uuid()),
         'template': 1,
+        'template_version': 1,
         'original_file_name': 'thisisatest.csv',
-        'created_at': str(datetime.datetime.now().time()),
+        'created_at': str(datetime.now().time()),
         'notification_count': 1,
         'notifications_sent': 1,
         'status': '',
@@ -145,11 +169,11 @@ def notification_json(service_id,
     if template is None:
         template = template_json(service_id, str(generate_uuid()))
     if sent_at is None:
-        sent_at = str(datetime.datetime.utcnow().time())
+        sent_at = str(datetime.utcnow().time())
     if created_at is None:
-        created_at = str(datetime.datetime.utcnow().time())
+        created_at = str(datetime.utcnow().time())
     if updated_at is None:
-        updated_at = str((datetime.datetime.utcnow() + datetime.timedelta(minutes=1)).time())
+        updated_at = str((datetime.utcnow() + timedelta(minutes=1)).time())
     links = {}
     if with_links:
         links = {
@@ -168,7 +192,8 @@ def notification_json(service_id,
             'sent_at': sent_at,
             'status': status,
             'created_at': created_at,
-            'updated_at': updated_at
+            'updated_at': updated_at,
+            'template_version': template['version']
         } for i in range(5)],
         'total': 5,
         'page_size': 50,

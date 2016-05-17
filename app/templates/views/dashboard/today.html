@@ -1,4 +1,6 @@
 {% from "components/big-number.html" import big_number, big_number_with_status %}
+{% from "components/show-more.html" import show_more %}
+{% from "components/message-count-label.html" import message_count_label %}
 
 <div
   data-module="update-content"
@@ -11,7 +13,7 @@
     <div class="column-half">
       {{ big_number_with_status(
         statistics.emails_requested,
-        'email' if statistics.emails_requested == 1 else 'emails',
+        message_count_label(statistics.emails_requested, 'email'),
         statistics.emails_failed,
         statistics.get('emails_failure_rate', 0.0),
         statistics.get('emails_failure_rate', 0)|float > 3,
@@ -22,7 +24,7 @@
     <div class="column-half">
       {{ big_number_with_status(
         statistics.sms_requested,
-        'text message' if statistics.sms_requested == 1 else 'text messages',
+        message_count_label(statistics.sms_requested, 'sms'),
         statistics.sms_failed,
         statistics.get('sms_failure_rate', 0.0),
         statistics.get('sms_failure_rate', 0)|float > 3,
@@ -31,18 +33,23 @@
       ) }}
     </div>
     <div class="column-whole">
-      <a class="big-number-with-status-show-more-link" href="{{ url_for('.weekly', service_id=current_service.id) }}">Compare to previous weeks</a>
+      {{ show_more(
+        url_for('.weekly', service_id=current_service.id),
+        'Compare to previous weeks'
+      ) }}
     </div>
   </div>
-  {% with period = "in the last 7 days" %}
+  
+  {% if template_statistics|length %}
     {% include 'views/dashboard/template-statistics.html' %}
-  {% endwith %}
-  <p class='table-show-more-link'>
-    <a href="{{ url_for('.template_history', service_id=current_service.id) }}">See all templates sent this year</a>
-  </p>
+    {{ show_more(
+      url_for('.template_history', service_id=current_service.id),
+      'See all templates sent this year'
+    ) }}
+  {% endif %}
 
   {% if current_user.has_permissions(['manage_settings'], admin_override=True) %}
-    <h2 class='heading-medium'>Usage</h2>   
+    <h2 class='heading-medium'>This year</h2>   
 
     <div class='grid-row'>
       <div class='column-half'>
@@ -65,9 +72,10 @@
         </div>
       </div>
     </div>
-    <div class="keyline-block-show-more-link">
-      <a href="{{ url_for(".usage", service_id=current_service['id']) }}">See breakdown</a>
-    </div>
+    {{ show_more(
+      url_for(".usage", service_id=current_service['id']),
+      'See usage breakdown'
+    ) }}
   {% endif %}
 
 </div>

@@ -143,7 +143,7 @@ class Spreadsheet():
 
     allowed_file_extensions = ['csv', 'xlsx', 'xls', 'ods', 'xlsm', 'tsv']
 
-    def __init__(self, filename, csv_data):
+    def __init__(self, csv_data, filename=''):
         self.filename = filename
         self.as_csv_data = csv_data
         self.as_dict = {
@@ -164,24 +164,28 @@ class Spreadsheet():
         return '\r\n'.join(file_content.getvalue().decode('utf-8').splitlines())
 
     @classmethod
-    def from_file(cls, filename, file_content):
+    def from_rows(cls, rows, filename=''):
+
+        with StringIO() as converted:
+            output = csv.writer(converted)
+
+            for row in rows:
+                output.writerow(row)
+
+            return cls(converted.getvalue(), filename)
+
+    @classmethod
+    def from_file(cls, file_content, filename=''):
 
         extension = cls.get_extension(filename)
 
         if extension == 'csv':
-            return cls(filename, Spreadsheet.normalise_newlines(file_content))
+            return cls(Spreadsheet.normalise_newlines(file_content), filename)
 
         if extension == 'tsv':
             file_content = StringIO(Spreadsheet.normalise_newlines(file_content))
 
-        with StringIO() as converted:
-
-            output = csv.writer(converted)
-
-            for row in pyexcel.get_sheet(
-                file_type=extension,
-                file_content=file_content.getvalue()
-            ).to_array():
-                output.writerow(row)
-
-            return cls(filename, converted.getvalue())
+        return cls.from_rows(pyexcel.get_sheet(
+            file_type=extension,
+            file_content=file_content.getvalue()
+        ).to_array(), filename)

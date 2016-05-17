@@ -1,14 +1,16 @@
 {% macro big_number(number, label, label_link=None, currency='', smaller=False) %}
   <div class="big-number{% if smaller %}-smaller{% endif %}">
-    {% if number is number %}
-      {% if currency %}
-        {{ "{}{:,.2f}".format(currency, number) }}
+    <div class="big-number-number">
+      {% if number is number %}
+        {% if currency %}
+          {{ "{}{:,.2f}".format(currency, number) }}
+        {% else %}
+          {{ "{}{:,}".format(currency, number) }}
+        {% endif %}
       {% else %}
-        {{ "{}{:,}".format(currency, number) }}
+        {{ number }}
       {% endif %}
-    {% else %}
-      {{ number }}
-    {% endif %}
+    </div>
     {% if label_link %}
       <a class="big-number-label" href="{{ label_link }}">{{ label }}</a>
       <a class="big-number-overlay-link" href="{{ label_link }}" aria-hidden="true"></a>

@@ -9,6 +9,7 @@ from . import (
     service_json,
     TestClient,
     template_json,
+    template_version_json,
     api_key_json,
     job_json,
     notification_json,
@@ -99,10 +100,11 @@ def mock_update_service(mocker):
                 message_limit,
                 restricted,
                 users,
-                email_from):
+                email_from,
+                reply_to_email_address=None):
         service = service_json(
             service_id, service_name, users, message_limit=message_limit,
-            active=active, restricted=restricted, email_from=email_from)
+            active=active, restricted=restricted, email_from=email_from, reply_to_email_address=reply_to_email_address)
         return {'data': service}
 
     return mocker.patch(
@@ -202,13 +204,55 @@ def mock_get_aggregate_service_statistics(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_template(mocker):
-    def _get(service_id, template_id):
+    def _get(service_id, template_id, version=None):
         template = template_json(
             service_id, template_id, "Two week reminder", "sms", "Your vehicle tax is about to expire")
+        if version:
+            template.update({'version': version})
         return {'data': template}
 
     return mocker.patch(
-        'app.service_api_client.get_service_template', side_effect=_get)
+        'app.service_api_client.get_service_template',
+        side_effect=_get
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_template_version(mocker, fake_uuid, user=None):
+    if user is None:
+        user = api_user_active(fake_uuid)
+
+    def _get(service_id, template_id, version):
+        template_version = template_version_json(
+            service_id,
+            template_id,
+            user,
+            version=version
+        )
+        return {'data': template_version}
+    return mocker.patch(
+        'app.service_api_client.get_service_template',
+        side_effect=_get
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_template_versions(mocker, fake_uuid, user=None):
+    if user is None:
+        user = api_user_active(fake_uuid)
+
+    def _get(service_id, template_id):
+        template_version = template_version_json(
+            service_id,
+            template_id,
+            user,
+            version=1
+        )
+        return {'data': [template_version]}
+    return mocker.patch(
+        'app.service_api_client.get_service_template_versions',
+        side_effect=_get
+    )
 
 
 @pytest.fixture(scope='function')
@@ -220,7 +264,9 @@ def mock_get_service_template_with_placeholders(mocker):
         return {'data': template}
 
     return mocker.patch(
-        'app.service_api_client.get_service_template', side_effect=_get)
+        'app.service_api_client.get_service_template',
+        side_effect=_get
+    )
 
 
 @pytest.fixture(scope='function')
@@ -816,8 +862,8 @@ def mock_get_users_by_service(mocker):
 
 @pytest.fixture(scope='function')
 def mock_s3_upload(mocker):
-    def _upload(upload_id, service_id, filedata, region):
-        pass
+    def _upload(service_id, filedata, region):
+        return fake_uuid()
     return mocker.patch('app.main.views.send.s3upload', side_effect=_upload)
 
 
