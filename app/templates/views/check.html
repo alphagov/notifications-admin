@@ -132,6 +132,13 @@
         {{ text_field(item['columns'][column].data) }}
       {% endif %}
     {% endfor %}
+    {% if item['columns'].get(None) %}
+      {% for column in item['columns'][None].data %}
+        {% call field(status='default') %}
+          {{ column }}
+        {% endcall %}
+      {% endfor %}
+    {% endif %}
   {% endcall %}
 
   {% if count_of_displayed_recipients < count_of_recipients %}
