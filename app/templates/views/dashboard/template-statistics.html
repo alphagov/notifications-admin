@@ -1,23 +1,26 @@
-{% from "components/table.html" import list_table, field, hidden_field_heading, right_aligned_field_heading %}
+{% from "components/message-count-label.html" import message_count_label %}
 
-{% call(item, row_number) list_table(
-  template_statistics,
-  caption="Templates",
-  caption_visible=True,
-  empty_message='You haven’t used any templates {}'.format(period),
-  field_headings=['Template', hidden_field_heading('Type'), hidden_field_heading('Messages sent')],
-  field_headings_visible=False
-) %}
-  {% call field() %}
-    <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">
-      {{ item.template.name }}
-    </a>
-  {% endcall %}
-  {% call field(align='right') %}
-    {{ item.usage_count }}
-  {% endcall %}
-  {% call field() %}
-    {{'text messages sent' if 'sms' == item.template.template_type else 'emails sent'}}
-  {% endcall %}
-{% endcall %}
+<dl>
+  {% for item in template_statistics %}
+    <div class="grid-row">
+      
+      <dt class="column-half">
+        <span class="spark-bar-label">
+          <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">{{ item.template.name }}</a>
+        </span>
+      </dt>
 
+      <dd class="column-half">
+        {% if template_statistics|length > 1 %}
+        <span class="spark-bar">
+          <span style="width: {{ item.usage_count / most_used_template_count * 100 }}%"></span>    
+          {{ item.usage_count }} {{ message_count_label(item.usage_count, item.template.template_type) }}
+        </span>
+        {% else %}
+          {{ item.usage_count }} {{ message_count_label(item.usage_count, item.template.template_type) }}
+        {% endif %}
+      </dd>
+
+    </div>
+  {% endfor %}
+</dl>
