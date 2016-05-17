@@ -86,21 +86,16 @@ def test_should_show_recent_templates_on_dashboard(app_,
         headers = [header.text.strip() for header in page.find_all('h2') + page.find_all('h1')]
         assert 'Test Service' in headers
         assert 'In the last 7 days' in headers
-        template_usage_headers = [th.text.strip() for th in page.thead.find_all('th')]
-        for th in ['Template', 'Type', 'Messages sent']:
-            assert th in template_usage_headers
-        table_rows = page.tbody.find_all('tr')
+
+        table_rows = page.find_all('dt')
 
         assert len(table_rows) == 2
-        first_row = page.tbody.find_all('tr')[0]
-        table_data = first_row.find_all('td')
-        assert len(table_data) == 3
-        assert table_data[1].text.strip() == '206'
 
-        second_row = page.tbody.find_all('tr')[1]
-        table_data = second_row.find_all('td')
-        assert len(table_data) == 3
-        assert table_data[1].text.strip() == '13'
+        assert page.find_all('dt')[0].text.strip() == 'Pickle feet'
+        assert page.find_all('dd')[0].text.strip() == '206 text messages sent'
+
+        assert page.find_all('dt')[1].text.strip() == 'Brine Shrimp'
+        assert page.find_all('dd')[1].text.strip() == '13 text messages sent'
 
 
 def test_should_show_all_templates_on_template_statistics_page(
@@ -130,20 +125,15 @@ def test_should_show_all_templates_on_template_statistics_page(
         mock_template_stats.assert_called_once_with(SERVICE_ONE_ID)
 
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        headers = [header.text.strip() for header in page.find_all('h2')]
-        table_rows = page.tbody.find_all('tr')
+        table_rows = page.find_all('dt')
 
         assert len(table_rows) == 2
 
-        first_row = page.tbody.find_all('tr')[0]
-        table_data = first_row.find_all('td')
-        assert len(table_data) == 3
-        assert table_data[1].text.strip() == '206'
+        assert page.find_all('dt')[0].text.strip() == 'Pickle feet'
+        assert page.find_all('dd')[0].text.strip() == '206 text messages sent'
 
-        second_row = page.tbody.find_all('tr')[1]
-        table_data = second_row.find_all('td')
-        assert len(table_data) == 3
-        assert table_data[1].text.strip() == '13'
+        assert page.find_all('dt')[1].text.strip() == 'Brine Shrimp'
+        assert page.find_all('dd')[1].text.strip() == '13 text messages sent'
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):

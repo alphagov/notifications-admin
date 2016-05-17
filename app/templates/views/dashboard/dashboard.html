@@ -8,6 +8,8 @@
 
   <div class="dashboard">
 
+    <h1 class="visuallyhidden">Dashboard</h1>
+
     {% if not templates and current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
       {% include 'views/dashboard/get-started.html' %}
     {% elif current_user.has_permissions([
@@ -20,9 +22,9 @@
       {% include 'views/dashboard/no-permissions-banner.html' %}
     {% endif %}
 
-    <h1 class="heading-medium">
+    <h2 class="heading-medium">
       In the last 7 days
-    </h1>
+    </h2>
     {% include 'views/dashboard/today.html' %}
 
   </div>

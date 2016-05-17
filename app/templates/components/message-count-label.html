@@ -1,0 +1,15 @@
+{% macro message_count_label(count, template_type) -%}
+  {%- if template_type == 'sms' -%}
+    {%- if count == 1 -%}
+      text message
+    {%- else -%}
+      text messages
+    {%- endif -%}
+  {%- elif template_type == 'email' -%}
+    {%- if count == 1 -%}
+      email
+    {%- else -%}
+      emails
+    {%- endif -%}  
+  {%- endif %} sent
+{%- endmacro %}
