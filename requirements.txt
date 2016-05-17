@@ -13,6 +13,7 @@ pyexcel-io==0.1.0
 pyexcel-xls==0.1.0
 pyexcel-xlsx==0.1.0
 pyexcel-ods3==0.1.1
+pytz==2016.4
 
 git+https://github.com/alphagov/notifications-python-client.git@1.0.0#egg=notifications-python-client==1.0.0
 
