@@ -27,7 +27,7 @@
         align='right',
         status='error' if item.status == 'Failed' else 'default'
       ) %}
-        {{ item.status|title }} at {{ item.updated_at|format_time }}
+        {{ item.status|format_notification_status }} at {{ item.updated_at|format_time }}
       {% endcall %}
     {% endcall %}
   </div>
