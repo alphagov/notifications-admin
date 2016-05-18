@@ -1,7 +1,4 @@
-import csv
-import io
 import json
-import uuid
 import itertools
 from contextlib import suppress
 from zipfile import BadZipFile

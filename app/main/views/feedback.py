@@ -1,11 +1,7 @@
-import markdown
 import requests
 from flask import render_template, url_for, redirect, flash, current_app, abort
 from app.main import main
-from flask_login import login_required
 from app.main.forms import Feedback
-
-from flask.ext.login import current_user
 
 
 @main.route('/feedback', methods=['GET', 'POST'])

@@ -1,8 +1,6 @@
 import pytest
 from flask import url_for
 
-import app
-
 
 @pytest.mark.parametrize("page", range(1, 5))
 def test_should_render_tour_pages(
