@@ -95,7 +95,7 @@ def test_should_show_notifications_for_a_service(app_,
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Activity'
 
-        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['delivered', 'failed'], template_type=['email', 'sms'])  # noqa
+        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['email', 'sms'])  # noqa
 
 
 def test_can_view_only_sms_notifications_for_a_service(app_,
@@ -123,7 +123,7 @@ def test_can_view_only_sms_notifications_for_a_service(app_,
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Text messages'
 
-        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['delivered', 'failed'], template_type=['sms'])  # noqa
+        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['sms'])  # noqa
 
 
 def test_can_view_only_email_notifications_for_a_service(app_,
@@ -151,7 +151,7 @@ def test_can_view_only_email_notifications_for_a_service(app_,
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Emails'
 
-        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['delivered', 'failed'], template_type=['email'])  # noqa
+        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['email'])  # noqa
 
 
 def test_can_view_successful_notifications_for_a_service(app_,
@@ -203,7 +203,7 @@ def test_can_view_failed_notifications_for_a_service(app_,
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Failed  emails and text messages'
 
-        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['failed'], template_type=['email', 'sms'])  # noqa
+        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['email', 'sms'])  # noqa
 
 
 def test_can_view_failed_combination_of_notification_type_and_status(
@@ -225,7 +225,7 @@ def test_can_view_failed_combination_of_notification_type_and_status(
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Failed text messages'
 
-        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['failed'], template_type=['sms'])  # noqa
+        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['sms'])  # noqa
 
 
 def test_should_show_notifications_for_a_service_with_next_previous(app_,
