@@ -29,10 +29,8 @@ start_sec=$(/bin/date +%s.%N)
 
 msg "Getting relevant load balancer"
 environment_file="/home/notify-app/environment"
-msg "ENV FILE ${environment_file}"
 environment=$(cat "$environment_file")
-msg "ENV  ${environment}"
-get_elb_list $INSTANCE_ID "${environment}-notify-admin-elb"
+get_elb_list $INSTANCE_ID "staging-notify-admin-elb"
 
 msg "Checking that user set at least one load balancer"
 if test -z "$ELB_LIST"; then
