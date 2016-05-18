@@ -14,7 +14,8 @@ def feedback():
     if form.validate_on_submit():
         data = {
             'person_email': current_app.config.get('DESKPRO_PERSON_EMAIL'),
-            'department_id': current_app.config.get('DESKPRO_TEAM_ID'),
+            'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
+            'assigned_agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
             'subject': 'Notify feedback',
             'message': 'Environment: {}\n\n{}\n{}\n{}'.format(
                 url_for('main.index', _external=True),
