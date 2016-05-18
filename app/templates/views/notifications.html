@@ -91,7 +91,7 @@
       </p>
     {% endcall %}
 
-    {{ text_field(item.status|capitalize|replace('-', ' ')) }}
+    {{ text_field(item.status|format_notification_status) }}
 
     {% call field(align='right') %}
       {{ item.updated_at|format_datetime_short }}

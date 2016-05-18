@@ -47,7 +47,7 @@ def test_should_show_page_for_one_job(
         content = response.get_data(as_text=True)
         assert "{}: Your vehicle tax is about to expire".format(service_one['name']) in content
         assert file_name in content
-        assert "Sent at 11:10" in content
+        assert "Delivered at 11:10" in content
 
 
 def test_should_show_updates_for_one_job_as_json(
