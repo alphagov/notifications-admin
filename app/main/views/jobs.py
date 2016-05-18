@@ -41,6 +41,20 @@ def _parse_filter_args(filter_dict):
     )
 
 
+def _set_status_filters(filter_args):
+    if filter_args.get('status'):
+        if 'failed' in filter_args.get('status'):
+            filter_args['status'].extend(['temporary-failure', 'permanent-failure', 'technical-failure'])
+    else:
+        # default to everything
+        filter_args['status'] = ['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+
+
+def _set_template_filters(filter_args):
+    if not filter_args.get('template_type'):
+        filter_args['template_type'] = ['email', 'sms']
+
+
 @main.route("/services/<service_id>/jobs")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
@@ -119,12 +133,14 @@ def view_notifications(service_id):
         abort(404, "Invalid page argument ({}) reverting to page 1.".format(request.args['page'], None))
 
     filter_args = _parse_filter_args(request.args)
+    _set_status_filters(filter_args)
+    _set_template_filters(filter_args)
 
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
         page=page,
-        template_type=filter_args.get('template_type') if 'template_type' in filter_args else ['email', 'sms'],
-        status=filter_args.get('status') if 'status' in filter_args else ['delivered', 'failed'],
+        template_type=filter_args.get('template_type'),
+        status=filter_args.get('status'),
         limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
     view_dict = MultiDict(request.args)
     prev_page = None
@@ -152,8 +168,7 @@ def view_notifications(service_id):
                 page=page,
                 page_size=notifications['total'],
                 template_type=filter_args.get('template_type') if 'template_type' in filter_args else ['email', 'sms'],
-                status=filter_args.get('status')
-                if 'status' in filter_args else ['delivered', 'failed'],
+                status=filter_args.get('status'),
                 limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])['notifications'])
         return csv_content, 200, {
             'Content-Type': 'text/csv; charset=utf-8',
