@@ -108,6 +108,7 @@ def create_app():
     application.add_template_filter(linkable_name)
     application.add_template_filter(format_date)
     application.add_template_filter(format_date_short)
+    application.add_template_filter(format_notification_status)
 
     application.after_request(useful_headers_after_request)
     application.after_request(save_service_after_request)
@@ -216,6 +217,17 @@ def valid_phone_number(phone_number):
         return True
     except InvalidPhoneError:
         return False
+
+
+def format_notification_status(status):
+    m = {'failed': 'Failed',
+         'technical-failure': 'Technical failure',
+         'temporary-failure': 'Temporarily failed',
+         'permanent-failure': 'Permanently failed',
+         'delivered': 'Delivered',
+         'sending': 'Sending'
+         }
+    return m.get(status, status)
 
 
 @login_manager.user_loader
