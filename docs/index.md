@@ -59,10 +59,9 @@ If you code in one of the languages in the table below, you can use one a client
 
 Lanuguage | Library
 --- | --- 
-Lanuguage | Library
-Python | [Link to coding examples](https://github.com/alphagov/notifications-python-client)
-PHP | [Link to coding examples](https://github.com/alphagov/notifications-php-client)
-Jave | [Link to coding examples](https://github.com/alphagov/notifications-java-client)
+Python | [Link to Python library coding examples](https://github.com/alphagov/notifications-python-client)
+PHP | [Link to PHP library coding examples](https://github.com/alphagov/notifications-php-client)
+Java | [Link to Java library coding examples](https://github.com/alphagov/notifications-java-client)
 
 If you code in a different language you need to develop your own integration to produce requests in the correct format.
 
