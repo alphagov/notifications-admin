@@ -302,8 +302,14 @@ where:
 * `reference` is used in the Notifications API so you can ignore it (populated for email notifications only)
 * `sent_by` is the name of the provider
 * `links`:
-    * `last` is the url of the last page of notifications
-    * `next` is the url of the next page of notifications
+    * `last` is the URL of the last page of notifications
+    * `next` is the URL of the next page of notifications
+  These URLs accept the following query string parameters:
+  * `template_type`
+  * `status`
+  * `page`
+  * `page_size`
+  * `limit_days`
 * `total` is the total number of notifications sent by the service using the given template type
 * `page_size` is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
