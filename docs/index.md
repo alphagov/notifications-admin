@@ -306,7 +306,7 @@ where:
     * `next` is the URL of the next page of notifications
   
     These URLs accept the following query string parameters:
-    * `template_type` - `sms` or `email` (you can enter both)
+    * `template_type` - `sms` or `email` (you can enter `template_type` twice)
     * `status` - `sending`, `delivered`, or `failed`
     * `page` - page number
     * `page_size` - number of notifications per page; defaults to 50
