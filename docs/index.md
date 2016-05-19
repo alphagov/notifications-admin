@@ -305,12 +305,12 @@ where:
     * `last` is the URL of the last page of notifications
     * `next` is the URL of the next page of notifications
   
-  These URLs accept the following query string parameters:
-  * `template_type`
-  * `status`
-  * `page`
-  * `page_size`
-  * `limit_days`
+    These URLs accept the following query string parameters:
+    * `template_type`
+    * `status`
+    * `page`
+    * `page_size`
+    * `limit_days`
 * `total` is the total number of notifications sent by the service using the given template type
 * `page_size` is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
