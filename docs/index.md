@@ -306,11 +306,11 @@ where:
     * `next` is the URL of the next page of notifications
   
     These URLs accept the following query string parameters:
-    * `template_type`
-    * `status`
-    * `page`
+    * `template_type` - `sms` or `email` (you can enter both)
+    * `status` - `sending`, `delivered`, or `failed`
+    * `page` - page number
     * `page_size`
-    * `limit_days`
+    * `limit_days` - defaults to 7
 * `total` is the total number of notifications sent by the service using the given template type
 * `page_size` is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
