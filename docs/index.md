@@ -56,6 +56,9 @@ To find out more about GOV.UK Notify, see the [Government as a Platform](https:/
 
 If you code in one of the languages in the table below, you can use one a client library provided by GOV.UK Notify to intergrate the API into your service:
 
+
+Lanuguage | Library
+--- | --- 
 Lanuguage | Library
 Python | [Link to coding examples](https://github.com/alphagov/notifications-python-client)
 PHP | [Link to coding examples](https://github.com/alphagov/notifications-php-client)
