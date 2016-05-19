@@ -304,6 +304,7 @@ where:
 * `links`:
     * `last` is the URL of the last page of notifications
     * `next` is the URL of the next page of notifications
+  
   These URLs accept the following query string parameters:
   * `template_type`
   * `status`
