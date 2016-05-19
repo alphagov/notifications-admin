@@ -54,7 +54,7 @@ To find out more about GOV.UK Notify, see the [Government as a Platform](https:/
 
 <h2 id="integrate_Notify">Integrate the GOV.UK Notify API into your service</h2>
 
-If you code in one of the languages in the table below, you can use one a client library provided by GOV.UK Notify to intergrate the API into your service:
+If you code in one of the languages listed below, you can use one a client library provided by GOV.UK Notify to intergrate the API into your service:
 
 
 Lanuguage | Library
