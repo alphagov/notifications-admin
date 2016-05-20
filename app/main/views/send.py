@@ -80,7 +80,6 @@ def get_example_csv_rows(template, use_example_as_example=True, submitted_fields
 def choose_template(service_id, template_type):
     if template_type not in ['email', 'sms']:
         abort(404)
-
     return render_template(
         'views/templates/choose.html',
         templates=[

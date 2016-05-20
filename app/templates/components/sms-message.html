@@ -5,7 +5,12 @@
   id=None,
   edit_link=None,
   from=None,
-  show_placeholder_for_recipient=False
+  version=1,
+  created_at=None,
+  updated_at=None,
+  versions_url=None,
+  show_placeholder_for_recipient=False,
+  show_id=False
 ) %}
   {% if name %}
     <h3 class="sms-message-name">
@@ -14,8 +19,16 @@
       {% else %}
         {{ name }}
       {% endif %}
-      {% if created_at %}{{ created_at }}{% endif %}
     </h3>
+  {% endif %}
+  {% if version > 1 %}
+    {% if updated_at %}
+      <p class="sms-message-updated-at">Last updated on {{ updated_at|format_date_normal }} <a href="{{ versions_url }}">see earlier versions</a></p>
+    {% endif %}
+  {% else %}
+    {% if created_at %}
+      <p class="sms-message-updated-at">Created on {{ created_at|format_date_normal }}</p>
+    {% endif %}
   {% endif %}
   {% if recipient is not none %}
     <p class="sms-message-recipient">
@@ -37,7 +50,7 @@
     {% endif %}
     {{ body|nl2br }}
   </div>
-  {% if id %}
+  {% if show_id %}
     <p class="sms-message-recipient">
       Template ID: {{ id }}
     </p>
