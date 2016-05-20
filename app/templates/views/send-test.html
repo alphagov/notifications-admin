@@ -11,8 +11,11 @@
 
 {% block maincolumn_content %}
 
-
-  <h1 class="heading-large">Send a test</h1>
+  {% if request.args['help'] %}
+    <h1 class="heading-large">Example text message</h1>
+  {% else %}
+    <h1 class="heading-large">Send a test</h1>
+  {% endif %}
 
   {% if 'sms' == template.template_type %}
     <div class="grid-row">
@@ -36,7 +39,7 @@
   <form method="post">
     {% call(item, row_number) list_table(
       example,
-      caption="Fill in your {}".format('field' if template.placeholders|length == 1 else 'fields'),
+      caption="Fill in the {}".format('field' if template.placeholders|length == 1 else 'fields'),
       field_headings=[
         '<span class="placeholder">{}</span>'.format(recipient_column)|safe
       ] + template.placeholders_as_markup|list
@@ -53,7 +56,9 @@
       {% endfor %}
     {% endcall %}
 
-    {{ page_footer("Check and confirm", back_link=url_for('.send_messages', service_id=current_service.id, template_id=template.id)) }}
+    {{ page_footer("Check and confirm", back_link=(
+      url_for('.send_messages', service_id=current_service.id, template_id=template.id)) if not request.args['help'] else None
+    ) }}
   </form>
 
 {% endblock %}

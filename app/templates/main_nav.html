@@ -1,3 +1,51 @@
+{% from "components/banner.html" import banner_wrapper %}
+
+{% if request.args['help'] %}
+  {% call banner_wrapper(type='tour') %}
+      <p class="heading-medium">Get started</p>
+      <div class="grid-row bottom-gutter" {% if request.args['help'] != '1' %}style="opacity: 0.6"{% endif %}>
+        <div class="column-one-sixth">
+          <p class="heading-large" style="float: left;">1.</p>
+        </div>
+        <div class="column-five-sixths">
+          <p>
+            Send yourself this example message
+          </p>
+        </div>
+      </div>
+      <div class="grid-row bottom-gutter" {% if request.args['help'] != '2' %}style="opacity: 0.6"{% endif %}>
+        <div class="column-one-sixth">
+          <p class="heading-large">2.</p>
+        </div>
+        <div class="column-five-sixths">
+          <p>
+            The template pulls in the data you provide
+          </p>
+        </div>
+      </div>
+      <div class="grid-row bottom-gutter" {% if request.args['help'] != '3' %}style="opacity: 0.6"{% endif %}>
+        <div class="column-one-sixth">
+          <p class="heading-large">3.</p>
+        </div>
+        <div class="column-five-sixths">
+          <p>
+            Now try it with your own message
+          </p>
+          {% if request.args['help'] == '3' %}
+            {% if first_email_template %}
+              <a href='{{ url_for(".edit_service_template", service_id=current_service.id, template_id=first_email_template.id) }}'>
+                Write an email
+              </a>
+            {% endif %}
+            <a href='{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}'>
+              Write a text message
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+  {% endcall %}
+{% else %}
 <nav class="navigation">
   <h2 class="navigation-service-name">
     <a href="{{ url_for('.service_dashboard', service_id=current_service.id) }}">{{ current_service.name }}</a>
@@ -18,3 +66,4 @@
   {% endif %}
   </ul>
 </nav>
+{% endif %}
