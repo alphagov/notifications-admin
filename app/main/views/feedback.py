@@ -11,7 +11,7 @@ def feedback():
         data = {
             'person_email': current_app.config.get('DESKPRO_PERSON_EMAIL'),
             'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
-            'assigned_agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
+            'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
             'subject': 'Notify feedback',
             'message': 'Environment: {}\n\n{}\n{}\n{}'.format(
                 url_for('main.index', _external=True),
@@ -35,7 +35,7 @@ def feedback():
                     resp.json())
                 )
             abort(500, "Feedback submission failed")
-        flash("Thanks, we've received your feedback", 'default_with_tick')
+        flash("Thanks, we’ve received your feedback", 'default_with_tick')
         return redirect(url_for('.feedback'))
 
     return render_template('views/feedback.html', form=form)
