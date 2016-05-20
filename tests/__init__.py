@@ -54,14 +54,14 @@ def template_json(service_id,
                   type_="sms",
                   content="template content",
                   subject=None,
-                  versions='1'):
+                  version=1):
     template = {
         'id': id_,
         'name': name,
         'template_type': type_,
         'content': content,
         'service': service_id,
-        'version': versions
+        'version': version
     }
     if subject is not None:
         template['subject'] = subject

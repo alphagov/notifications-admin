@@ -101,12 +101,14 @@ def create_app():
 
     application.add_template_filter(nl2br)
     application.add_template_filter(format_datetime)
+    application.add_template_filter(format_datetime_normal)
     application.add_template_filter(format_datetime_short)
     application.add_template_filter(format_time)
     application.add_template_filter(syntax_highlight_json)
     application.add_template_filter(valid_phone_number)
     application.add_template_filter(linkable_name)
     application.add_template_filter(format_date)
+    application.add_template_filter(format_date_normal)
     application.add_template_filter(format_date_short)
     application.add_template_filter(format_notification_status)
 
@@ -195,6 +197,10 @@ def format_datetime(date):
     return gmt_timezones(date).strftime('%A %d %B %Y at %H:%M')
 
 
+def format_datetime_normal(date):
+    return gmt_timezones(date).strftime('%d %B %Y at %H:%M')
+
+
 def format_datetime_short(date):
     return gmt_timezones(date).strftime('%d %B at %H:%M')
 
@@ -205,6 +211,10 @@ def format_time(date):
 
 def format_date(date):
     return gmt_timezones(date).strftime('%A %d %B %Y')
+
+
+def format_date_normal(date):
+    return gmt_timezones(date).strftime('%d %B %Y')
 
 
 def format_date_short(date):
