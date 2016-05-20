@@ -10,7 +10,33 @@
 >
 
   <div>
-    {% call(item, row_number) list_table(
+    {% if notifications|length > 0 and notifications[0].job_row_number is not none %}
+      {% call(item, row_number) list_table(
+        notifications,
+        caption=uploaded_file_name,
+        caption_visible=False,
+        empty_message="No messages to show yet",
+        field_headings=[
+          '1',
+          'Recipient',
+          right_aligned_field_heading('Status')
+        ]
+      ) %}
+        {% call field() %}
+          {{ item.job_row_number + 2 }}
+        {% endcall %}
+        {% call field() %}
+          {{ item.to }}
+        {% endcall %}
+        {% call field(
+          align='right',
+          status='error' if item.status == 'Failed' else 'default'
+        ) %}
+          {{ item.status|format_notification_status }} at {{ item.updated_at|format_time }}
+        {% endcall %}
+      {% endcall %}
+    {% else %}
+      {% call(item, row_number) list_table(
       notifications,
       caption=uploaded_file_name,
       caption_visible=False,
@@ -30,6 +56,7 @@
         {{ item.status|format_notification_status }} at {{ item.updated_at|format_time }}
       {% endcall %}
     {% endcall %}
+    {% endif %}
   </div>
 
 </div>
