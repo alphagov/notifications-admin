@@ -35,7 +35,7 @@ def feedback():
                     resp.json())
                 )
             abort(500, "Feedback submission failed")
-        flash("Your feedback has been submitted")
+        flash("Your feedback has been submitted", 'default_with_tick')
         return redirect(url_for('.feedback'))
 
     return render_template('views/feedback.html', form=form)
