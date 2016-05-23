@@ -1,9 +1,9 @@
 from flask import (
-    render_template, url_for)
-
-from flask_login import (
-    login_required,
+    render_template,
+    url_for
 )
+
+from flask_login import login_required
 from werkzeug.utils import redirect
 from app.main import main
 from app.main.forms import ProviderForm

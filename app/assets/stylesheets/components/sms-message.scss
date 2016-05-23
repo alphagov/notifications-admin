@@ -36,7 +36,24 @@
 
 .sms-message-name {
   @include bold-24;
-  margin: 20px 0 10px 0;
+  margin: 20px 0 5px 0;
+}
+
+.sms-message-updated-at {
+  @include copy-16;
+  color: $secondary-text-colour;
+  margin: 0 0 10px 0;
+}
+
+.sms-message-use-links-history {
+  @include copy-16;
+  color: $secondary-text-colour;
+  margin: 45px 0 0 0;
+
+  .primary {
+    color: $text-colour;
+
+  }
 }
 
 .sms-message-picker {
@@ -52,7 +69,7 @@
 .sms-message-use-links {
 
   @include copy-19;
-  margin-top: -5px;
+  margin-top: 35px;
 
   a {
     display: block;
@@ -73,7 +90,7 @@
 
 .sms-message-use-links-with-title {
   @extend %sms-message-use-links;
-  margin-top: 55px;
+  margin-top: 95px;
 }
 
 .sms-message-from {

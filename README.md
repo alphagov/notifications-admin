@@ -70,7 +70,8 @@ export SECRET_KEY='dev-notify-secret-key'
 export DESKPRO_API_HOST=""
 export DESKPRO_API_KEY=""
 export DESKPRO_PERSON_EMAIL=""
-export DESKPRO_TEAM_ID=""
+export DESKPRO_DEPT_ID=""
+export DESKPRO_ASSIGNED_AGENT_TEAM_ID=""
 "> environment.sh
 ```
 

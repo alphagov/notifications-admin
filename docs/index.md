@@ -66,7 +66,7 @@ There are 2 ways to integrate the API into your service:
 
 GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/introduction/) for authentication and identification. The GOV.UK Notify client libraries encode and decode JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use one of these libraries, you must manually create tokens yourself.
 
-For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library, or the appropriate [PHP] (https://github.com/alphagov/notifications-php-client) or [Java] (https://github.com/alphagov/notifications-java-client) client library.
+For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library, or the appropriate [PHP](https://github.com/alphagov/notifications-php-client) or [Java](https://github.com/alphagov/notifications-java-client) client library.
 
 To create JSON Web Tokens you need:
 
@@ -104,8 +104,8 @@ The verify signature is created using the HMAC SHA256 hashing algorithm.
 GOV.UK Notify supports the following client libraries:
 
  * [GOV.UK Notify Python library](https://github.com/alphagov/notifications-python-client)
- * [GOV.UK Notify PHP library] (https://github.com/alphagov/notifications-php-client)
- * [GOV.UK Notify Java library] (https://github.com/alphagov/notifications-java-client)
+ * [GOV.UK Notify PHP library](https://github.com/alphagov/notifications-php-client)
+ * [GOV.UK Notify Java library](https://github.com/alphagov/notifications-java-client)
 
 These provide example code for calling the API and for creating API tokens.
 
@@ -292,7 +292,7 @@ where:
 * `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which GOV.UK Notify sent the notification
 * `job` is empty if you are using the API to send notifications:
     * `id` is the job ID
-    * `original_file_name` is the name of the CSV file, if used
+    * `original_file_name` is the name of the .csv file, if used
 * `id` is the unique identifier for the process of sending and retrieving one or more notifications
 * `content_char_count` indicates the full character count of the text notification, including placeholders (populated for text notifications only)
 * `service` is your Service ID

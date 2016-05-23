@@ -11,3 +11,5 @@ class Staging(Config):
     DANGEROUS_SALT = os.environ['STAGING_DANGEROUS_SALT']
     CSV_UPLOAD_BUCKET_NAME = 'staging-notifications-csv-upload'
     DESKPRO_API_KEY = os.environ['STAGING_DESKPRO_API_KEY']
+    DESKPRO_DEPT_ID = os.environ['STAGING_DESKPRO_DEPT_ID']
+    DESKPRO_ASSIGNED_AGENT_TEAM_ID = os.environ['STAGING_DESKPRO_ASSIGNED_AGENT_TEAM_ID']
