@@ -306,8 +306,6 @@ where:
 * `total` is the total number of notifications sent by the service using the given template type
 * `page_size` is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
-The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
-
 The ``GET /notifications`` request accepts the following query string parameters:
   * `template_type` - `sms` or `email` (you can enter `template_type` twice)
   * `status` - `sending`, `delivered`, or `failed`
