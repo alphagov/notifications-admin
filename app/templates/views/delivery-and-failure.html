@@ -16,8 +16,8 @@ Delivery and failure – GOV.UK Notify
     <ul class="list list-bullet">
       <li><a href="#sending">Sending</a></li>
       <li><a href="#delivered">Delivered</a></li>
-      <li><a href="#permanent-failure">Failed permanently</a></li>
-      <li><a href="#temporary-failure">Failed temporarily</a></li>
+      <li><a href="#permanent-failure">Permanently failed</a></li>
+      <li><a href="#temporary-failure">Temporarily failed</a></li>
       <li><a href="#technical-failure">Technical failure</a></li>
     </ul>
 
@@ -27,7 +27,7 @@ Delivery and failure – GOV.UK Notify
 
     <p>All new messages start with the state ‘Sending’.</p>
 
-    <p>If we can’t deliver a message straight away, we’ll keep trying for up to 72 hours.</p>
+    <p>This means that we have accepted the message, the message is waiting in a queue to be sent to the client provider.</p>
 
     <h2 id="delivered" class="heading-medium">Delivered</h2>
 
@@ -35,7 +35,7 @@ Delivery and failure – GOV.UK Notify
 
     <p>We can’t tell you if they’ve read it – to do so would require invasive and unreliable tracking techniques.</p>
 
-    <h2 id="permanent-failure" class="heading-medium">Failured permanently</h2>
+    <h2 id="permanent-failure" class="heading-medium">Permanently failed</h2>
 
     <p>This means the email address or mobile number doesn’t exist or is blacklisted – also known as a ‘hard bounce’.</p>
 
@@ -43,11 +43,11 @@ Delivery and failure – GOV.UK Notify
 
     <p><strong>You need to remove this email address or mobile number from your database.</strong></p>
 
-    <h2 id="temporary-failure" class="heading-medium">Failed temporarily</h2>
+    <h2 id="temporary-failure" class="heading-medium">Temporarily failed</h2>
 
     <p>This means the email address or mobile number was full, or the mobile phone was switched off – also known as a ‘soft bounce’.</p>
 
-    <p>We’ll retry emails for up to 15 minutes and text message for up to 72 hours. Messages still being retried are marked as ’Sending’. We mark messages as ‘Failed temporarily’ once we’ve given up.</p>
+    <p>We mark messages as ‘Temporarily failed’.</p>
 
     <p>You’re still billed for these messages.</p>
 
@@ -57,7 +57,7 @@ Delivery and failure – GOV.UK Notify
 
     <p>This means there is a problem with the connection between Notify and our email or text message delivery partners.</p>
 
-    <p>We’ll try to send these messages for up to 72 hours. Messages still being retried are marked as ’Sending’. We mark messages as ‘Temporary failure’ once we’ve given up.</p>
+    <p>Messages still being retried are marked as ’Sending’. We mark messages as ‘Technical failure’ once we’ve given up.</p>
 
     <p>You won’t be billed for these messages.</p>
 
