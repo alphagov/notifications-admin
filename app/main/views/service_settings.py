@@ -102,7 +102,7 @@ def service_request_to_go_live(service_id):
         data = {
             'person_email': current_app.config.get('DESKPRO_PERSON_EMAIL'),
             'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
-            'assigned_agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
+            'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
             'subject': 'Request to go live',
             'message': "From {} <{}> on behalf of {} ({})\n\nUsage estimate\n---\n\n{}".format(
                 current_user.name,
