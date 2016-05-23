@@ -30,6 +30,12 @@
       )}}
     {% endif %}
 
+    <p class="bottom-gutter">
+      <a href="{{ request.url }}?&amp;download=csv" download class="heading-small">Download as a CSV file</a>
+      &emsp;
+      Delivery information is available for 7 days
+    </p>
+
     {% include 'partials/jobs/status.html' %}
 
     {% include 'partials/jobs/count.html' %}
