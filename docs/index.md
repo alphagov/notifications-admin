@@ -57,7 +57,7 @@ To find out more about GOV.UK Notify, see the [Government as a Platform](https:/
 There are 2 ways to integrate the API into your service:
 
 * use one of the client libraries provided by GOV.UK Notify (see the Usage section in the Readme files):
-      * [Python library](https://github.com/alphagov/nnotifications-python-client/blob/master/README.md#usage)
+      * [Python library](https://github.com/alphagov/notifications-python-client/blob/master/README.md#usage)
       * [PHP library](https://github.com/alphagov/notifications-php-client/blob/master/README.md#usage)
       * [Java library](https://github.com/alphagov/notifications-java-client)
 * develop your own integration to produce requests in the correct format
