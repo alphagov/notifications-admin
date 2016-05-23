@@ -303,23 +303,25 @@ where:
 * `links`:
     * `last` is the URL of the last page of notifications
     * `next` is the URL of the next page of notifications
-  
-    These URLs accept the following query string parameters:
-    * `template_type` - `sms` or `email` (you can enter `template_type` twice)
-    * `status` - `sending`, `delivered`, or `failed`
-    * `page` - page number
-    * `page_size` - number of notifications per page; defaults to 50
-    * `limit_days` - number of days; defaults to 7
 * `total` is the total number of notifications sent by the service using the given template type
 * `page_size` is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
 The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
 
-This list is split into pages. To scroll through the pages run:
+You can adapt the ``GET/notifications`` command with the following query string parameters:
+  * `template_type` - `sms` or `email` (you can enter `template_type` twice)
+  * `status` - `sending`, `delivered`, or `failed`
+  * `page` - page number
+  * `page_size` - number of notifications per page; defaults to 50
+  * `limit_days` - number of days; defaults to 7
+
+
+For example, to scroll through the pages in the list, run:
 
 ```
-GET /notifications?&page=2
+GET /notifications?page=2
 ```
+
 
 <h3 id="autherror_code">Authorisation error messages</h3>
 
