@@ -20,7 +20,7 @@ def test_should_return_list_of_all_jobs(app_,
 
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string == 'Notifications activity'
+        assert page.h1.string == 'Uploaded files'
         jobs = page.tbody.find_all('tr')
         assert len(jobs) == 5
 
@@ -50,10 +50,12 @@ def test_should_show_page_for_one_job(
         assert "Delivered at 11:10" in content
 
 
+@freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_updates_for_one_job_as_json(
     app_,
     service_one,
     active_user_with_permissions,
+    mock_get_jobs,
     mock_get_notifications,
     mocker
 ):
@@ -67,12 +69,14 @@ def test_should_show_updates_for_one_job_as_json(
 
         assert response.status_code == 200
         content = json.loads(response.get_data(as_text=True))
-        assert 'processed' in content['counts']
-        assert 'queued' in content['counts']
+        assert 'sending' in content['counts']
+        assert 'delivered' in content['counts']
+        assert 'failed' in content['counts']
         assert 'Recipient' in content['notifications']
+        assert '07123456789' in content['notifications']
         assert 'Status' in content['notifications']
-        assert 'Started' in content['status']
-        assert 'Uploaded by Test User' in content['status']
+        assert 'Delivered at 11:10' in content['notifications']
+        assert 'Uploaded by Test User on 1 January at 11:09' in content['status']
 
 
 def test_should_show_notifications_for_a_service(app_,
@@ -288,4 +292,4 @@ def test_should_download_notifications_for_a_job(app_,
         assert response.status_code == 200
         assert response.get_data(as_text=True) == csv_content
         assert 'text/csv' in response.headers['Content-Type']
-        assert 'sample template - 01 January at 11:09.csv"' in response.headers['Content-Disposition']
+        assert 'sample template - 1 January at 11:09.csv"' in response.headers['Content-Disposition']

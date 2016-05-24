@@ -90,19 +90,18 @@ def view_job(service_id, job_id):
     return render_template(
         'views/jobs/job.html',
         notifications=notifications['notifications'],
-        counts={
-            'queued': 0 if finished else job['notification_count'],
-            'sent': job['notification_count'] if finished else 0
-        },
+        job=job,
         uploaded_at=job['created_at'],
-        finished_at=job['updated_at'] if finished else None,
+        finished=(
+            job.get('notifications_sent', 0) -
+            job.get('notifications_delivered', 0) -
+            job.get('notifications_failed', 0)
+        ) == 0,
         uploaded_file_name=job['original_file_name'],
         template=Template(
             template,
             prefix=current_service['name']
-        ),
-        job_id=job_id,
-        created_by=job['created_by']['name']
+        )
     )
 
 
@@ -112,24 +111,27 @@ def view_job(service_id, job_id):
 def view_job_updates(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
     notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
-    finished = job['status'] == 'finished'
+    finished = (
+        job.get('notifications_sent', 0) -
+        job.get('notifications_delivered', 0) -
+        job.get('notifications_failed', 0)
+    ) == 0
     return jsonify(**{
         'counts': render_template(
             'partials/jobs/count.html',
-            counts={
-                'queued': 0 if finished else job['notification_count'],
-                'sent': job['notification_count'] if finished else 0
-            }
+            job=job,
+            finished=finished
         ),
         'notifications': render_template(
             'partials/jobs/notifications.html',
-            notifications=notifications['notifications']
+            job=job,
+            notifications=notifications['notifications'],
+            finished=finished
         ),
         'status': render_template(
             'partials/jobs/status.html',
-            uploaded_at=job['created_at'],
-            finished_at=job['updated_at'] if finished else None,
-            created_by=job['created_by']['name']
+            job=job,
+            finished=finished
         ),
     })
 
