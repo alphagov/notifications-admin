@@ -79,7 +79,7 @@
     &:hover {
       text-decoration: underline;
     }
-    
+
   }
 
   .primary {
@@ -90,7 +90,7 @@
 
 .sms-message-use-links-with-title {
   @extend %sms-message-use-links;
-  margin-top: 95px;
+  margin-top: 50px;
 }
 
 .sms-message-from {

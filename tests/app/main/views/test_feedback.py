@@ -48,7 +48,7 @@ def test_post_feedback_with_no_name_email(app_, mocker):
                 ANY,
                 data={
                     'department_id': ANY,
-                    'assigned_agent_team_id': ANY,
+                    'agent_team_id': ANY,
                     'subject': 'Notify feedback',
                     'message': 'Environment: http://localhost/\n\n\n\nblah',
                     'person_email': ANY},
@@ -70,7 +70,7 @@ def test_post_feedback_with_name_email(app_, mocker):
                 data={
                     'subject': 'Notify feedback',
                     'department_id': ANY,
-                    'assigned_agent_team_id': ANY,
+                    'agent_team_id': ANY,
                     'message': 'Environment: http://localhost/\n\nSteve Irwin\nrip@gmail.com\nblah',
                     'person_email': ANY},
                 headers=ANY)
@@ -96,7 +96,7 @@ def test_log_error_on_post(app_, mocker):
                 data={
                     'subject': 'Notify feedback',
                     'department_id': ANY,
-                    'assigned_agent_team_id': ANY,
+                    'agent_team_id': ANY,
                     'message': 'Environment: http://localhost/\n\nSteve Irwin\nrip@gmail.com\nblah',
                     'person_email': ANY},
                 headers=ANY)

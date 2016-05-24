@@ -72,7 +72,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     mocker,
     mock_login,
     mock_get_service,
-    mock_get_service_template,
+    mock_get_service_template_with_placeholders,
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
@@ -80,21 +80,27 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     fake_uuid
 ):
 
-    contents = u'phone number,name\n+44 123,test1\n+44 456,test2'
-    mocker.patch('app.main.views.send.s3download', return_value=contents)
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value="""
+            phone number,name
+            +447700900986
+            +447700900986
+        """
+    )
 
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
             initial_upload = client.post(
                 url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
-                data={'file': (BytesIO(contents.encode('utf-8')), 'invalid.csv')},
+                data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
                 content_type='multipart/form-data',
                 follow_redirects=True
             )
             reupload = client.post(
                 url_for('main.check_messages', service_id=fake_uuid, template_type='sms', upload_id='abc123'),
-                data={'file': (BytesIO(contents.encode('utf-8')), 'invalid.csv')},
+                data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
                 content_type='multipart/form-data',
                 follow_redirects=True
             )
@@ -102,9 +108,8 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
             assert response.status_code == 200
             content = response.get_data(as_text=True)
             assert 'There was a problem with invalid.csv' in content
-            assert '+44 123' in content
-            assert '+44 456' in content
-            assert 'Not a UK mobile number' in content
+            assert '+447700900986' in content
+            assert 'Missing' in content
             assert 'Re-upload your file' in content
 
 
@@ -354,7 +359,7 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
     active_user_with_permissions,
     job_data,
     mock_create_job,
-    mock_get_service_template,
+    mock_get_service_template_with_placeholders,
     mock_s3_upload,
     mocker,
     mock_has_permissions,
@@ -368,8 +373,8 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
         'app.main.views.send.s3download',
         return_value="""
             phone number,name,,,
-            123,test1,,,
-            123,test2,,,
+            +447700900986,,,,
+            +447700900986,,,,
         """
     )
     with app_.test_request_context():
