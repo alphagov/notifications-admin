@@ -9,7 +9,6 @@
       template.formatted_as_markup,
       name=template.name if show_title else None,
       id=template.id,
-      created_at=template.get_raw('created_at', None),
       updated_at=template.get_raw('updated_at', None),
       version=template.get_raw('version', 1),
       versions_url=url_for('.view_template_versions', service_id=current_service.id, template_id=template.id)
@@ -19,7 +18,6 @@
       template.formatted_as_markup,
       name=template.name if show_title else None,
       id=template.id,
-      created_at=template.get_raw('created_at', None),
       updated_at=template.get_raw('updated_at', None),
       version=template.get_raw('version', 1),
       versions_url=url_for('.view_template_versions', service_id=current_service.id, template_id=template.id)
