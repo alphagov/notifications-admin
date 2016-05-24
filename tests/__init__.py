@@ -54,14 +54,14 @@ def template_json(service_id,
                   type_="sms",
                   content="template content",
                   subject=None,
-                  versions='1'):
+                  version=1):
     template = {
         'id': id_,
         'name': name,
         'template_type': type_,
         'content': content,
         'service': service_id,
-        'version': versions
+        'version': version
     }
     if subject is not None:
         template['subject'] = subject
@@ -161,6 +161,7 @@ def notification_json(service_id,
                       to='07123456789',
                       status='delivered',
                       sent_at=None,
+                      job_row_number=None,
                       created_at=None,
                       updated_at=None,
                       with_links=False):
@@ -193,6 +194,7 @@ def notification_json(service_id,
             'status': status,
             'created_at': created_at,
             'updated_at': updated_at,
+            'job_row_number': job_row_number,
             'template_version': template['version']
         } for i in range(5)],
         'total': 5,

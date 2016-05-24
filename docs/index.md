@@ -56,17 +56,19 @@ To find out more about GOV.UK Notify, see the [Government as a Platform](https:/
 
 There are 2 ways to integrate the API into your service:
 
-* use one of the client libraries provided by GOV.UK Notify (see the Usage section in the Readme files):
-      * [Python library](https://github.com/alphagov/notifications-python-client)
-      * [PHP library](https://github.com/alphagov/notifications-php-client)
+* use one of the client libraries provided by GOV.UK Notify:
+      
+      * [Python library](https://github.com/alphagov/notifications-python-client/blob/master/README.md#usage)
+      * [PHP library](https://github.com/alphagov/notifications-php-client/blob/master/README.md#usage)
       * [Java library](https://github.com/alphagov/notifications-java-client)
+
 * develop your own integration to produce requests in the correct format
 
 <h3 id="AuthRequests">Authenticate requests</h3>
 
 GOV.UK Notify uses [JSON Web Tokens (JWT)](https://jwt.io/introduction/) for authentication and identification. The GOV.UK Notify client libraries encode and decode JSON Web Tokens when making requests to the GOV.UK Notify API.  If you don’t use one of these libraries, you must manually create tokens yourself.
 
-For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library, or the appropriate [PHP] (https://github.com/alphagov/notifications-php-client) or [Java] (https://github.com/alphagov/notifications-java-client) client library.
+For examples of how to encode and decode JSON Web Tokens, see [authentication.py](https://github.com/alphagov/notifications-python-client/blob/master/notifications_python_client/authentication.py) in the GOV.UK Notify Python client library, or the appropriate [PHP](https://github.com/alphagov/notifications-php-client) or [Java](https://github.com/alphagov/notifications-java-client) client library.
 
 To create JSON Web Tokens you need:
 
@@ -104,8 +106,8 @@ The verify signature is created using the HMAC SHA256 hashing algorithm.
 GOV.UK Notify supports the following client libraries:
 
  * [GOV.UK Notify Python library](https://github.com/alphagov/notifications-python-client)
- * [GOV.UK Notify PHP library] (https://github.com/alphagov/notifications-php-client)
- * [GOV.UK Notify Java library] (https://github.com/alphagov/notifications-java-client)
+ * [GOV.UK Notify PHP library](https://github.com/alphagov/notifications-php-client)
+ * [GOV.UK Notify Java library](https://github.com/alphagov/notifications-java-client)
 
 These provide example code for calling the API and for creating API tokens.
 
@@ -292,25 +294,32 @@ where:
 * `sent_at` is the full timestamp, in Coordinated Universal Time (UTC), at which GOV.UK Notify sent the notification
 * `job` is empty if you are using the API to send notifications:
     * `id` is the job ID
-    * `original_file_name` is the name of the CSV file, if used
+    * `original_file_name` is the name of the .csv file, if used
 * `id` is the unique identifier for the process of sending and retrieving one or more notifications
 * `content_char_count` indicates the full character count of the text notification, including placeholders (populated for text notifications only)
 * `service` is your Service ID
 * `reference` is used in the Notifications API so you can ignore it (populated for email notifications only)
 * `sent_by` is the name of the provider
 * `links`:
-    * `last` is the url of the last page of notifications
-    * `next` is the url of the next page of notifications
+    * `last` is the URL of the last page of notifications
+    * `next` is the URL of the next page of notifications
 * `total` is the total number of notifications sent by the service using the given template type
 * `page_size` is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
-The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
+The ``GET /notifications`` request accepts the following query string parameters:
+  * `template_type` - `sms` or `email` (you can enter `template_type` twice)
+  * `status` - `sending`, `delivered`, or `failed`
+  * `page` - page number
+  * `page_size` - number of notifications per page; defaults to 50
+  * `limit_days` - number of days; defaults to 7
 
-This list is split into pages. To scroll through the pages run:
+
+For example, to scroll through the pages in the list, run:
 
 ```
-GET /notifications?&page=2
+GET /notifications?page=2
 ```
+
 
 <h3 id="autherror_code">Authorisation error messages</h3>
 

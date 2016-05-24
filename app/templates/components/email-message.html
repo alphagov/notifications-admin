@@ -6,7 +6,12 @@
   from_name=None,
   from_address=None,
   recipient=None,
-  show_placeholder_for_recipient=False
+  id=None,
+  updated_at=None,
+  versions_url=None,
+  version=1,
+  show_placeholder_for_recipient=False,
+  show_id=False
 ) %}
   {% if name %}
     <h3 class="email-message-name">
@@ -15,8 +20,12 @@
       {% else %}
         {{ name }}
       {% endif %}
-      {% if created_at %}{{ created_at }}{% endif %}
     </h3>
+  {% endif %}
+  {% if version > 1 %}
+    {% if updated_at %}
+      <p class="email-message-updated-at">Last updated on {{ updated_at|format_date_normal }} <a href="{{ versions_url }}">see earlier versions</a></p>
+    {% endif %}
   {% endif %}
   <div class="email-message">
     {% if from_name or subject %}

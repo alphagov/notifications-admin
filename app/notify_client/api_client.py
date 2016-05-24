@@ -159,11 +159,14 @@ class ServiceAPIClient(NotificationsAPIClient):
 
     def delete_service_template(self, service_id, template_id):
         """
-        Delete a service template.
+        Set a service template's archived flag to True
         """
         endpoint = "/service/{0}/template/{1}".format(service_id, template_id)
-        data = _attach_current_user({})
-        return self.delete(endpoint)
+        data = {
+            'archived': True
+        }
+        _attach_current_user(data)
+        return self.post(endpoint, data=data)
 
     def find_all_service_email_from(self, user_id=None):
         resp = self.get_services(user_id)

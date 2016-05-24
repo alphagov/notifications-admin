@@ -29,12 +29,13 @@
 </div>
 
 <div class="column-one-third">
-  <div class="sms-message-use-links{% if show_title %}-with-title{% endif %}">
-    <p>Edited by {{ template.get_raw('created_by').name }}</p>
-    <p>Created on {{ template.get_raw('created_at')|format_datetime }}</p>
-    <p>Edited on
-      {% if template.get_raw('updated_at') %}
-        {{ template.get_raw('updated_at')|format_datetime }}</p>
-      {% endif %}
+  <div class="sms-message-use-links-history">
+    <p>
+    {% if template.get_raw('version', 1) > 1 %}
+      Updated on<br/>{% if template.get_raw('updated_at', None) %}<span class="primary">{{ template.get_raw('updated_at')|format_datetime_normal }}</span>{% endif %}
+    {% else %}
+      Created on<br/>{% if template.get_raw('created_at', None) %}<span class="primary">{{ template.get_raw('created_at')|format_datetime_normal }}</span>{% endif %}
+    {% endif %}
+    <br/>By {{ template.get_raw('created_by').name }}
   </div>
 </div>

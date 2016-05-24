@@ -793,6 +793,7 @@ def mock_get_job(mocker, job_data):
     def _get_job(service_id, job_id):
         job_data['id'] = job_id
         job_data['service'] = service_id
+        job_data['created_at'] = str(datetime.utcnow())
         return {"data": job_data}
 
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)

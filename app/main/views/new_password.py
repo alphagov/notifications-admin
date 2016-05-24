@@ -1,6 +1,6 @@
 import json
 
-from flask import (render_template, url_for, redirect, flash, session, current_app, abort)
+from flask import (render_template, url_for, redirect, flash, session, current_app)
 from itsdangerous import SignatureExpired
 
 from app.main import main

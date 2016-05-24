@@ -1,11 +1,7 @@
-import markdown
 import requests
 from flask import render_template, url_for, redirect, flash, current_app, abort
 from app.main import main
-from flask_login import login_required
 from app.main.forms import Feedback
-
-from flask.ext.login import current_user
 
 
 @main.route('/feedback', methods=['GET', 'POST'])
@@ -14,7 +10,8 @@ def feedback():
     if form.validate_on_submit():
         data = {
             'person_email': current_app.config.get('DESKPRO_PERSON_EMAIL'),
-            'department_id': current_app.config.get('DESKPRO_TEAM_ID'),
+            'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
+            'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
             'subject': 'Notify feedback',
             'message': 'Environment: {}\n\n{}\n{}\n{}'.format(
                 url_for('main.index', _external=True),
@@ -38,7 +35,7 @@ def feedback():
                     resp.json())
                 )
             abort(500, "Feedback submission failed")
-        flash("Your feedback has been submitted")
+        flash("Thanks, we’ve received your feedback", 'default_with_tick')
         return redirect(url_for('.feedback'))
 
     return render_template('views/feedback.html', form=form)
