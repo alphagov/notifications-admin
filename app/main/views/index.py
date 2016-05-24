@@ -41,6 +41,11 @@ def terms():
     return render_template('views/terms-of-use.html')
 
 
+@main.route('/delivery-and-failure')
+def delivery_and_failure():
+    return render_template('views/delivery-and-failure.html')
+
+
 @main.route('/documentation')
 def documentation():
     curr_dir = os.path.dirname(os.path.realpath(__file__))
