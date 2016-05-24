@@ -248,6 +248,7 @@ def test_should_show_notifications_for_a_service_with_next_previous(app_,
 def test_should_download_notifications_for_a_service(app_,
                                                      service_one,
                                                      active_user_with_permissions,
+                                                     mock_get_service_template,
                                                      mock_get_notifications,
                                                      mocker):
     with app_.test_request_context():
@@ -264,6 +265,7 @@ def test_should_download_notifications_for_a_service(app_,
         assert 'text/csv' in response.headers['Content-Type']
 
 
+@freeze_time("2016-01-01 11:09:00.061258")
 def test_should_download_notifications_for_a_job(app_,
                                                  api_user_active,
                                                  mock_login,
@@ -286,3 +288,4 @@ def test_should_download_notifications_for_a_job(app_,
         assert response.status_code == 200
         assert response.get_data(as_text=True) == csv_content
         assert 'text/csv' in response.headers['Content-Type']
+        assert 'sample template - 01 January at 11:09.csv"' in response.headers['Content-Disposition']

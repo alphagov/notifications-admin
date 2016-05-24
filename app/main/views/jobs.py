@@ -18,7 +18,8 @@ from app import (
     job_api_client,
     notification_api_client,
     service_api_client,
-    current_service)
+    current_service,
+    format_datetime_short)
 from app.main import main
 from app.utils import (
     get_page_from_request,
@@ -81,7 +82,10 @@ def view_job(service_id, job_id):
             notification_api_client.get_notifications_for_service(service_id, job_id)['notifications'])
         return csv_content, 200, {
             'Content-Type': 'text/csv; charset=utf-8',
-            'Content-Disposition': 'inline; filename="job_notifications.csv"'
+            'Content-Disposition': 'inline; filename="{} - {}.csv"'.format(
+                template['name'],
+                format_datetime_short(job['created_at'])
+            )
         }
     return render_template(
         'views/jobs/job.html',
