@@ -307,6 +307,7 @@ where:
 * `page_size` is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
 The ``GET /notifications`` request accepts the following query string parameters:
+
   * `template_type` - `sms` or `email` (you can enter `template_type` twice)
   * `status` - `sending`, `delivered`, or `failed`
   * `page` - page number
