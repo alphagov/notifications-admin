@@ -56,10 +56,12 @@ To find out more about GOV.UK Notify, see the [Government as a Platform](https:/
 
 There are 2 ways to integrate the API into your service:
 
-* use one of the client libraries provided by GOV.UK Notify (see the Usage section in the Readme files):
-      * [Python library](https://github.com/alphagov/notifications-python-client)
-      * [PHP library](https://github.com/alphagov/notifications-php-client)
+* use one of the client libraries provided by GOV.UK Notify:
+      
+      * [Python library](https://github.com/alphagov/notifications-python-client/blob/master/README.md#usage)
+      * [PHP library](https://github.com/alphagov/notifications-php-client/blob/master/README.md#usage)
       * [Java library](https://github.com/alphagov/notifications-java-client)
+
 * develop your own integration to produce requests in the correct format
 
 <h3 id="AuthRequests">Authenticate requests</h3>
@@ -299,18 +301,25 @@ where:
 * `reference` is used in the Notifications API so you can ignore it (populated for email notifications only)
 * `sent_by` is the name of the provider
 * `links`:
-    * `last` is the url of the last page of notifications
-    * `next` is the url of the next page of notifications
+    * `last` is the URL of the last page of notifications
+    * `next` is the URL of the next page of notifications
 * `total` is the total number of notifications sent by the service using the given template type
 * `page_size` is an optional integer indicating the number of notifications per page; if not provided, defaults to 50
 
-The above fields are populated once the message has been processed; initially you get back the [response](#coderesponse) indicated above.
+The ``GET /notifications`` request accepts the following query string parameters:
+  * `template_type` - `sms` or `email` (you can enter `template_type` twice)
+  * `status` - `sending`, `delivered`, or `failed`
+  * `page` - page number
+  * `page_size` - number of notifications per page; defaults to 50
+  * `limit_days` - number of days; defaults to 7
 
-This list is split into pages. To scroll through the pages run:
+
+For example, to scroll through the pages in the list, run:
 
 ```
-GET /notifications?&page=2
+GET /notifications?page=2
 ```
+
 
 <h3 id="autherror_code">Authorisation error messages</h3>
 
