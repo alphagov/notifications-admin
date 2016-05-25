@@ -11,6 +11,15 @@
     Platform admin
   </h1>
 
-  &lt;insert platform admin content here&gt;
+  {{ browse_list([
+    {
+        'title': 'List all services',
+        'link': url_for('.show_all_services')
+    },
+    {
+      'title': 'View providers',
+      'link': url_for('.view_providers')
+    },
+  ]) }}
 
 {% endblock %}

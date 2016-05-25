@@ -32,3 +32,5 @@ def test_should_render_platform_admin_page(app_, platform_admin_user, mocker):
             assert response.status_code == 200
             resp_data = response.get_data(as_text=True)
             assert 'Platform admin' in resp_data
+            assert 'List all services' in resp_data
+            assert 'View providers' in resp_data

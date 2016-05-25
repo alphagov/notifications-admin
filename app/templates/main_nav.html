@@ -16,11 +16,5 @@
   {% if current_user.has_permissions(['manage_api_keys']) %}
     <li><a href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a></li>
   {% endif %}
-  {% if current_user.has_permissions(admin_override=True) %}
-    <li><a href="{{ url_for('.show_all_services') }}"> List all services </a></li>
-  {% endif %}
-  {% if current_user.has_permissions(admin_override=True) %}
-    <li><a href="{{ url_for('.view_providers') }}">View providers</a></li>
-  {% endif %}
   </ul>
 </nav>

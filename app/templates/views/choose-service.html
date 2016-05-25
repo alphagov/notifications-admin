@@ -10,14 +10,6 @@
   <h1 class="heading-large">
     Choose service
   </h1>
-  {% if current_user.has_permissions(admin_override=True) %}
-    {{ browse_list([
-      {
-          'title': 'List all services',
-          'link': url_for('.show_all_services')
-      }
-      ]) }}
-  {% endif %}
 
   {{ browse_list(services) }}
   {{ browse_list([
