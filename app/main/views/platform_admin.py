@@ -7,8 +7,7 @@ from flask_login import login_required
 from app import statistics_api_client
 from app.main import main
 from app.utils import user_has_permissions
-from app.statistics_utils import sum_of_statistics, add_rates_to
-
+from app.statistics_utils import sum_of_statistics, add_rates_togi
 
 @main.route("/platform-admin")
 @login_required
