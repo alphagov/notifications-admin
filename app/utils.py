@@ -104,7 +104,7 @@ def generate_notifications_csv(json_list):
                 x['to'],
                 x['template']['name'],
                 x['template']['template_type'],
-                x['job']['original_file_name'],
+                x['job']['original_file_name'] if x['job'] else '',
                 x['status'],
                 format_datetime(x['created_at'])])
         retval = content.getvalue()

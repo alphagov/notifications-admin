@@ -15,8 +15,7 @@ from . import (
     notification_json,
     invite_json,
     sample_uuid,
-    generate_uuid,
-    job_json_with_created_by)
+    generate_uuid)
 from app.notify_client.models import (
     User,
     InvitedUser
@@ -769,42 +768,36 @@ def mock_check_verify_code_code_expired(mocker):
 
 
 @pytest.fixture(scope='function')
-def job_data():
-    return job_json()
-
-
-@pytest.fixture(scope='function')
-def mock_create_job(mocker, job_data):
+def mock_create_job(mocker, api_user_active):
     def _create(job_id, service_id, template_id, file_name, notification_count):
-        job_data['id'] = job_id
-        job_data['service'] = service_id
-        job_data['template'] = template_id
-        job_data['bucket_name'] = 'service-{}-notify'.format(job_id)
-        job_data['original_file_name'] = file_name
-        job_data['file_name'] = '{}.csv'.format(job_id)
-        job_data['notification_count'] = notification_count
+        job_data = job_json(
+            service_id,
+            api_user_active,
+            job_id=job_id,
+            template_id=template_id,
+            bucket_name='service-{}-notify'.format(job_id),
+            original_file_name='{}.csv'.format(job_id),
+            notification_count=notification_count)
         return job_data
 
     return mocker.patch('app.job_api_client.create_job', side_effect=_create)
 
 
 @pytest.fixture(scope='function')
-def mock_get_job(mocker, job_data):
+def mock_get_job(mocker, api_user_active):
     def _get_job(service_id, job_id):
-        job_data['id'] = job_id
-        job_data['service'] = service_id
-        job_data['created_at'] = str(datetime.utcnow())
+        job_data = job_json(service_id, api_user_active, job_id=job_id)
         return {"data": job_data}
 
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
 
 
 @pytest.fixture(scope='function')
-def mock_get_jobs(mocker):
+def mock_get_jobs(mocker, api_user_active):
     def _get_jobs(service_id):
         data = []
         for i in range(5):
-            job_data = job_json_with_created_by(service_id=service_id)
+            job_data = job_json(service_id, api_user_active)
             data.append(job_data)
         return {"data": data}
 
@@ -812,7 +805,7 @@ def mock_get_jobs(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_notifications(mocker):
+def mock_get_notifications(mocker, api_user_active):
     def _get_notifications(service_id,
                            job_id=None,
                            page=1,
@@ -820,7 +813,10 @@ def mock_get_notifications(mocker):
                            template_type=None,
                            status=None,
                            limit_days=None):
-        return notification_json(service_id)
+        job = None
+        if job_id is not None:
+            job = job_json(service_id, api_user_active, job_id=job_id)
+        return notification_json(service_id, job=job)
 
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
