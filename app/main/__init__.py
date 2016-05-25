@@ -12,7 +12,8 @@ from app.main.views import (
     send,
     add_service,
     code_not_received,
-    jobs, dashboard,
+    jobs,
+    dashboard,
     templates,
     service_settings,
     forgot_password,
@@ -26,5 +27,6 @@ from app.main.views import (
     all_services,
     tour,
     feedback,
-    providers
+    providers,
+    platform_admin
 )

@@ -46,6 +46,11 @@
             <li>
               <a href="{{ url_for('main.choose_service') }}">Switch service</a>
             </li>
+            {% if current_user.has_permissions(admin_override=True) %}
+                <li>
+                  <a href="{{ url_for('main.platform_admin') }}">Platform admin</a>
+                </li>
+            {% endif %}
             <li>
               <a href="{{ url_for('main.sign_out')}}">Sign out</a>
             </li>
@@ -85,9 +90,10 @@
         <div class="column-one-third">
           <h2>Help</h2>
           <ul>
-            <li><a href="{{ url_for('main.tour', page=1) }}">Take the tour</a></li>
+            <li><a href="{{ url_for('main.tour', page=1) }}">Tour</a></li>
             <li><a href="{{ url_for("main.trial_mode") }}">Trial mode</a></li>
             <li><a href="{{ url_for("main.pricing") }}">Pricing</a></li>
+            <li><a href="{{ url_for("main.delivery_and_failure") }}">Delivery and failure</a></li>
           </ul>
         </div>
         <div class="column-one-third">

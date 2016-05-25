@@ -7,7 +7,7 @@ from glob import glob
 from bs4 import BeautifulSoup
 from flask import url_for
 from unittest.mock import ANY
-from tests import validate_route_permission, job_json_with_created_by
+from tests import (validate_route_permission, job_json)
 
 template_types = ['email', 'sms']
 
@@ -321,20 +321,19 @@ def test_create_job_should_call_api(
     app_,
     service_one,
     active_user_with_permissions,
-    job_data,
     mock_create_job,
     mock_get_job,
     mock_get_notifications,
     mock_get_service_template,
-    mocker
+    mocker,
+    fake_uuid
 ):
     service_id = service_one['id']
-    job_id = job_data['id']
-    original_file_name = job_data['original_file_name']
-    template_id = job_data['template']
-    notification_count = job_data['notification_count']
-
-    from tests.conftest import mock_get_job as mock_get_job1
+    data = mock_get_job(service_one['id'], fake_uuid)['data']
+    job_id = data['id']
+    original_file_name = data['original_file_name']
+    template_id = data['template']
+    notification_count = data['notification_count']
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -344,9 +343,7 @@ def test_create_job_should_call_api(
                                           'notification_count': notification_count,
                                           'valid': True}
             url = url_for('main.start_job', service_id=service_one['id'], upload_id=job_id)
-            data = job_json_with_created_by(service_id=service_one['id'], job_id=job_data['id'])
-            mock_get_job1(mocker=mocker, job_data=data)
-            response = client.post(url, data=job_data, follow_redirects=True)
+            response = client.post(url, data={}, follow_redirects=True)
 
         assert response.status_code == 200
         assert original_file_name in response.get_data(as_text=True)
@@ -357,14 +354,15 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
     app_,
     service_one,
     active_user_with_permissions,
-    job_data,
     mock_create_job,
+    mock_get_job,
     mock_get_service_template_with_placeholders,
     mock_s3_upload,
     mocker,
     mock_has_permissions,
     mock_get_service_statistics,
-    mock_get_users_by_service
+    mock_get_users_by_service,
+    fake_uuid
 ):
 
     service_id = service_one['id']
@@ -377,16 +375,17 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
             +447700900986,,,,
         """
     )
+    data = mock_get_job(service_one['id'], fake_uuid)['data']
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
             with client.session_transaction() as session:
                 session['upload_data'] = {'original_file_name': 'invalid.csv',
-                                          'template_id': job_data['template'],
-                                          'notification_count': job_data['notification_count'],
+                                          'template_id': data['template'],
+                                          'notification_count': data['notification_count'],
                                           'valid': True}
             response = client.post(
-                url_for('main.start_job', service_id=service_id, upload_id=job_data['id']),
+                url_for('main.start_job', service_id=service_id, upload_id=data['id']),
                 data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
                 content_type='multipart/form-data',
                 follow_redirects=True
