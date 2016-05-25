@@ -31,3 +31,9 @@ class StatisticsApiClient(BaseAPIClient):
             url='/service/{}/notifications-statistics/seven_day_aggregate'.format(service_id),
             params=params
         )
+
+    def get_statistics_for_all_services_for_day(self, day):
+        params = {
+            'day': day
+        }
+        return self.get(url='/notifications/statistics', params=params)
