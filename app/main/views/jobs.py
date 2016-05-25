@@ -97,6 +97,10 @@ def view_job(service_id, job_id):
         uploaded_at=job['created_at'],
         finished_at=job['updated_at'] if finished else None,
         uploaded_file_name=job['original_file_name'],
+        first_email_template=[
+            template for template in service_api_client.get_service_templates(service_id)['data']
+            if template['template_type'] == 'email'
+        ][0] if request.args.get('help') else None,
         template=Template(
             template,
             prefix=current_service['name']
