@@ -1,6 +1,16 @@
 .dashboard {
-  table th {
-    font-size: 0;
+
+  table {
+    th {
+      @include core-16;
+      padding-top: 0;
+      border: 0;
+    }
+
+    td {
+      @include core-19;
+      border: 0;
+    }
   }
 }
 
@@ -15,11 +25,8 @@
   box-sizing: border-box;
   display: block;
   width: 100%;
-  text-align: right;
   margin-bottom: $gutter-half;
   height: $gutter-half;
-  color: $govuk-blue;
-  text-align: left;
   color: $govuk-blue;
 
   span {
@@ -44,6 +51,20 @@
     max-width: 100%;
     background: $white;
     margin-bottom: $gutter;
+  }
+
+}
+
+.file-list {
+
+  &-filename {
+    @include bold-19;
+  }
+
+  &-hint {
+    @include core-16;
+    display: block;
+    color: $secondary-text-colour;
   }
 
 }
