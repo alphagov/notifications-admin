@@ -283,7 +283,7 @@ The response (status code 200) will be:
 <a name="fieldsforGET"></a>
 where:
 
-* `status` is the status of the notification; this can be `sending`, `delivered`, or `failed`
+* `status` is the status of the notification; this can be `sending`, `delivered`, `permanently failed`, `temporarily failed`, or `technical failure`
 * `to` is the recipient's phone number or email address
 * `template`:
     * `id` is the Template ID
@@ -309,7 +309,7 @@ where:
 The ``GET /notifications`` request accepts the following query string parameters:
 
   * `template_type` - `sms` or `email` (you can enter `template_type` twice)
-  * `status` - `sending`, `delivered`, or `failed`
+  * `status` - `sending`, `delivered`, `permanently failed`, `temporarily failed`, or `technical failure`
   * `page` - page number
   * `page_size` - number of notifications per page; defaults to 50
   * `limit_days` - number of days; defaults to 7
