@@ -2,22 +2,24 @@
 {% from "components/browse-list.html" import browse_list %}
 
 {% block page_title %}
-  Choose service – GOV.UK Notify
+  Platform admin – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    Choose service
+    Platform admin
   </h1>
 
-  {{ browse_list(services) }}
   {{ browse_list([
     {
-      'title': 'Add a new service…',
-      'link': url_for('.add_service')
+        'title': 'List all services',
+        'link': url_for('.show_all_services')
+    },
+    {
+      'title': 'View providers',
+      'link': url_for('.view_providers')
     },
   ]) }}
-
 
 {% endblock %}
