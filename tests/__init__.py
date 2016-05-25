@@ -35,6 +35,10 @@ def generate_uuid():
     return uuid.uuid4()
 
 
+def created_by_json(id_, name='', email_address=''):
+    return {'id': id_, 'name': name, 'email_address': email_address}
+
+
 def service_json(id_, name, users, message_limit=1000, active=False, restricted=True, email_from=None, reply_to_email_address=None):  # noqa
     return {
         'id': id_,
@@ -75,11 +79,11 @@ def template_version_json(service_id,
                           created_at=None,
                           **kwargs):
     template = template_json(service_id, id_, **kwargs)
-    template['created_by'] = {
-        'id': created_by.id,
-        'name': created_by.name,
-        'email_address': created_by.email_address
-    }
+    template['created_by'] = created_by_json(
+        created_by.id,
+        created_by.name,
+        created_by.email_address
+    )
     if created_at is None:
         created_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
     template['created_at'] = created_at
@@ -122,36 +126,38 @@ def create_test_api_user(state, permissions={}):
     return user
 
 
-def job_json():
-    job_id = str(generate_uuid())
-    created_at = str(datetime.utcnow().time())
+def job_json(service_id,
+             created_by,
+             job_id=None,
+             template_id=None,
+             template_version=1,
+             created_at=None,
+             bucket_name='',
+             original_file_name="thisisatest.csv",
+             notification_count=1,
+             notifications_sent=1,
+             status=''):
+    if job_id is None:
+        job_id = str(generate_uuid())
+    if template_id is None:
+        template_id = str(generate_uuid())
+    if created_at is None:
+        created_at = str(datetime.utcnow().time())
     data = {
         'id': job_id,
-        'service': 1,
-        'template': 1,
-        'template_version': 1,
-        'original_file_name': 'thisisatest.csv',
+        'service': service_id,
+        'template': template_id,
+        'template_version': template_version,
+        'original_file_name': original_file_name,
         'created_at': created_at,
-        'notification_count': 1,
-        'notifications_sent': 1,
-        'status': ''
+        'notification_count': notification_count,
+        'notifications_sent': notifications_sent,
+        'status': status,
+        'created_by': created_by_json(
+            created_by.id,
+            created_by.name,
+            created_by.email_address)
         }
-    return data
-
-
-def job_json_with_created_by(service_id=None, job_id=None):
-    data = {
-        'id': job_id if job_id else str(generate_uuid()),
-        'service': service_id if service_id else str(generate_uuid()),
-        'template': 1,
-        'template_version': 1,
-        'original_file_name': 'thisisatest.csv',
-        'created_at': str(datetime.now().time()),
-        'notification_count': 1,
-        'notifications_sent': 1,
-        'status': '',
-        'created_by': {'name': 'Test User'}
-    }
     return data
 
 
@@ -165,8 +171,6 @@ def notification_json(service_id,
                       created_at=None,
                       updated_at=None,
                       with_links=False):
-    if job is None:
-        job = job_json()
     if template is None:
         template = template_json(service_id, str(generate_uuid()))
     if sent_at is None:
@@ -189,7 +193,7 @@ def notification_json(service_id,
                 'id': template['id'],
                 'name': template['name'],
                 'template_type': template['template_type']},
-            'job': {'id': job['id'], 'original_file_name': job['original_file_name']},
+            'job': {'id': job['id'], 'original_file_name': job['original_file_name']} if job else None,
             'sent_at': sent_at,
             'status': status,
             'created_at': created_at,
