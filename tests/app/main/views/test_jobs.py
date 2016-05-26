@@ -20,7 +20,7 @@ def test_should_return_list_of_all_jobs(app_,
 
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string == 'Notifications activity'
+        assert page.h1.string == 'Uploaded files'
         jobs = page.tbody.find_all('tr')
         assert len(jobs) == 5
 
@@ -49,6 +49,7 @@ def test_should_show_page_for_one_job(
         assert "Delivered at 11:10" in content
 
 
+@freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_updates_for_one_job_as_json(
     app_,
     service_one,
@@ -66,12 +67,15 @@ def test_should_show_updates_for_one_job_as_json(
 
         assert response.status_code == 200
         content = json.loads(response.get_data(as_text=True))
-        assert 'processed' in content['counts']
-        assert 'queued' in content['counts']
+        assert 'sending' in content['counts']
+        assert 'delivered' in content['counts']
+        assert 'failed' in content['counts']
         assert 'Recipient' in content['notifications']
+        assert '07123456789' in content['notifications']
         assert 'Status' in content['notifications']
-        assert 'Sent by Test User' in content['status']
         assert job_json['status'] in content['status']
+        assert 'Delivered at 11:10' in content['notifications']
+        assert 'Uploaded by Test User on 1 January at 11:09' in content['status']
 
 
 def test_should_show_notifications_for_a_service(app_,
@@ -90,7 +94,7 @@ def test_should_show_notifications_for_a_service(app_,
         assert notification['to'] in content
         assert notification['status'] in content
         assert notification['template']['name'] in content
-        assert 'Download as a CSV file' in content
+        assert 'csv' in content
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Activity'
 
@@ -118,7 +122,7 @@ def test_can_view_only_sms_notifications_for_a_service(app_,
         assert notification['to'] in content
         assert notification['status'] in content
         assert notification['template']['name'] in content
-        assert 'Download as a CSV file' in content
+        assert 'csv' in content
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Text messages'
 
@@ -146,7 +150,7 @@ def test_can_view_only_email_notifications_for_a_service(app_,
         assert notification['to'] in content
         assert notification['status'] in content
         assert notification['template']['name'] in content
-        assert 'Download as a CSV file' in content
+        assert 'csv' in content
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Emails'
 
@@ -172,7 +176,7 @@ def test_can_view_successful_notifications_for_a_service(app_,
         assert notification['to'] in content
         assert notification['status'] in content
         assert notification['template']['name'] in content
-        assert 'Download as a CSV file' in content
+        assert 'csv' in content
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Successful  emails and text messages'
 
@@ -198,7 +202,7 @@ def test_can_view_failed_notifications_for_a_service(app_,
         assert notification['to'] in content
         assert notification['status'] in content
         assert notification['template']['name'] in content
-        assert 'Download as a CSV file' in content
+        assert 'csv' in content
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'Failed  emails and text messages'
 
@@ -264,30 +268,6 @@ def test_should_download_notifications_for_a_service(app_,
         assert 'text/csv' in response.headers['Content-Type']
 
 
-def test_should_download_api_notifications_for_a_service(app_,
-                                                         api_user_active,
-                                                         mock_login,
-                                                         mock_get_service,
-                                                         mock_get_job,
-                                                         mock_get_notifications,
-                                                         mock_get_template_version,
-                                                         mock_has_permissions,
-                                                         fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            response = client.get(url_for(
-                'main.view_notifications',
-                service_id=fake_uuid,
-                download='csv'))
-        notifications = mock_get_notifications(fake_uuid)['notifications']
-        assert all([x['job'] is None for x in notifications])
-        csv_content = generate_notifications_csv(notifications)
-        assert response.status_code == 200
-        assert response.get_data(as_text=True) == csv_content
-        assert 'text/csv' in response.headers['Content-Type']
-
-
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_download_notifications_for_a_job(app_,
                                                  api_user_active,
@@ -311,4 +291,4 @@ def test_should_download_notifications_for_a_job(app_,
         assert response.status_code == 200
         assert response.get_data(as_text=True) == csv_content
         assert 'text/csv' in response.headers['Content-Type']
-        assert 'sample template - 01 January at 11:09.csv"' in response.headers['Content-Disposition']
+        assert 'sample template - 1 January at 11:09.csv"' in response.headers['Content-Disposition']

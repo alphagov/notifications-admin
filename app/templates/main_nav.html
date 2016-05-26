@@ -1,6 +1,6 @@
 {% from "components/banner.html" import banner_wrapper %}
 
-{% if request.args['help'] %}
+{% if request.args['help'] and request.args['help'] != '0' %}
   {% call banner_wrapper(type='tour') %}
       <p class="heading-medium">Get started</p>
       <div class="grid-row bottom-gutter" {% if request.args['help'] != '1' %}style="opacity: 0.6"{% endif %}>
