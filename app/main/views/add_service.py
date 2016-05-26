@@ -44,11 +44,29 @@ def add_service():
                                                        email_from=email_from)
         session['service_id'] = service_id
 
-        services = service_api_client.get_services({'user_id': session['user_id']}).get('data', [])
-        if (len(services) > 1):
+        if (len(service_api_client.get_services({'user_id': session['user_id']}).get('data', [])) > 1):
             return redirect(url_for('main.service_dashboard', service_id=service_id))
-        else:
-            return redirect(url_for('main.tour', page=1))
+
+        example_sms_template = service_api_client.create_service_template(
+            'Example text message template',
+            'sms',
+            'Hey ((name)), I’m trying out Notify. Today is ((day of week)) and my favourite colour is ((colour)).',
+            service_id
+        )
+        example_email_template = service_api_client.create_service_template(
+            'Example email template',
+            'email',
+            'Hey ((name)),\n\nI’m trying out Notify. Today is ((day of week)) and my favourite colour is ((colour)).',
+            service_id,
+            'Trying out Notify'
+        )
+
+        return redirect(url_for(
+            'main.send_test',
+            service_id=service_id,
+            template_id=example_sms_template['data']['id'],
+            help=1
+        ))
     else:
         return render_template(
             'views/add-service.html',

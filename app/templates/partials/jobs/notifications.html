@@ -17,14 +17,10 @@
         caption_visible=False,
         empty_message="No messages to show yet",
         field_headings=[
-          '1',
           'Recipient',
           right_aligned_field_heading('Status')
         ]
       ) %}
-        {% call field() %}
-          {{ item.job_row_number + 2 }}
-        {% endcall %}
         {% call field() %}
           {{ item.to }}
         {% endcall %}
