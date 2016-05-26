@@ -14,7 +14,7 @@
     {% if label_link %}
       <a class="big-number-label" href="{{ label_link }}">{{ label }}</a>
       <a class="big-number-overlay-link" href="{{ label_link }}" aria-hidden="true"></a>
-    {% else %}
+    {% elif label %}
       <span class="big-number-label">{{ label }}</span>
     {% endif %}
   </div>

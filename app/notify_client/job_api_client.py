@@ -20,8 +20,7 @@ class JobApiClient(BaseAPIClient):
         params = {}
         if limit_days is not None:
             params['limit_days'] = limit_days
-        else:
-            return self.get(url='/service/{}/job'.format(service_id), params=params)
+        return self.get(url='/service/{}/job'.format(service_id), params=params)
 
     def create_job(self, job_id, service_id, template_id, original_file_name, notification_count):
         data = {
