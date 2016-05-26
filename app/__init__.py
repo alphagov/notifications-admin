@@ -202,7 +202,7 @@ def format_datetime_normal(date):
 
 
 def format_datetime_short(date):
-    return gmt_timezones(date).strftime('%d %B at %H:%M')
+    return gmt_timezones(date).strftime('%d %B at %H:%M').lstrip('0')
 
 
 def format_time(date):
