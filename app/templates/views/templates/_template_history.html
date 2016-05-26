@@ -1,41 +1,30 @@
 {% from "components/email-message.html" import email_message %}
 {% from "components/sms-message.html" import sms_message %}
 
+<div class="column-whole">
+  <h2 class="message-name">{{ template.name }}</h2>
+</div>
+
 <div class="column-two-thirds">
   {% if 'email' == template.template_type %}
     {{ email_message(
       template.formatted_subject_as_markup,
       template.formatted_as_markup,
-      name=template.name if show_title else None,
-      edit_link=url_for(
-        '.view_template_version',
-        service_id=current_service.id,
-        template_id=template.id,
-        version=template.get_raw('version')
-      )
     ) }}
   {% elif 'sms' == template.template_type %}
     {{ sms_message(
-      template.formatted_as_markup,
-      name=template.name if show_title else None,
-      edit_link=url_for(
-        '.view_template_version',
-        service_id=current_service.id,
-        template_id=template.id,
-        version=template.get_raw('version')
-      )
+      template.formatted_as_markup
     ) }}
   {% endif %}
 </div>
 
 <div class="column-one-third">
-  <div class="sms-message-use-links-history">
-    <p>
+  <div class="message-use-links">
     {% if template.get_raw('version', 1) > 1 %}
-      Updated on<br/>{% if template.get_raw('updated_at', None) %}<span class="primary">{{ template.get_raw('updated_at')|format_datetime_normal }}</span>{% endif %}
+      {% if template.get_raw('updated_at', None) %}{{ template.get_raw('updated_at')|format_datetime_normal }}{% endif %}
     {% else %}
-      Created on<br/>{% if template.get_raw('created_at', None) %}<span class="primary">{{ template.get_raw('created_at')|format_datetime_normal }}</span>{% endif %}
+      Created<br/>{% if template.get_raw('created_at', None) %}{{ template.get_raw('created_at')|format_datetime_normal }}{% endif %}
     {% endif %}
-    <br/>By {{ template.get_raw('created_by').name }}
+    <br/>by {{ template.get_raw('created_by').name }}
   </div>
 </div>

@@ -118,7 +118,6 @@
     <div class="column-half">
       {{ sms_message(
         'Your vehicle tax for LC12 BFL is due on 1 March 2016. Renew online at www.gov.uk/vehicle-tax',
-        name='Two week reminder',
       ) }}
       {{ sms_message(
         template.formatted_as_markup
@@ -128,9 +127,7 @@
         '+44 7700 900 306'
       ) }}
       {{ sms_message(
-        template.formatted_as_markup,
-        name='Two week reminder',
-        edit_link='#'
+        template.formatted_as_markup
       ) }}
     </div>
   </div>
@@ -145,8 +142,7 @@
         subject="Vehicle tax reminder",
         body="Dear Alice Smith,\n\nYour vehicle tax for LC12 BFL is due on 1 March 2016.\n\nRenew online at www.gov.uk/vehicle-tax",
         from_name="Vehicle tax",
-        from_address="vehicle.tax@notifications.service.gov.uk",
-        name="Two week reminder",
+        from_address="vehicle.tax@notifications.service.gov.uk"
       ) }}
     </div>
   </div>

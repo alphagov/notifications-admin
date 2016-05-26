@@ -2,30 +2,21 @@
 {% from "components/sms-message.html" import sms_message %}
 
 <div class="column-two-thirds">
-{{ template.versions }}
   {% if 'email' == template.template_type %}
     {{ email_message(
       template.formatted_subject_as_markup,
       template.formatted_as_markup,
-      name=template.name if show_title else None,
-      id=template.id,
-      updated_at=template.get_raw('updated_at', None),
-      version=template.get_raw('version', 1),
-      versions_url=url_for('.view_template_versions', service_id=current_service.id, template_id=template.id)
+      id=template.id
     ) }}
   {% elif 'sms' == template.template_type %}
     {{ sms_message(
       template.formatted_as_markup,
-      name=template.name if show_title else None,
-      id=template.id,
-      updated_at=template.get_raw('updated_at', None),
-      version=template.get_raw('version', 1),
-      versions_url=url_for('.view_template_versions', service_id=current_service.id, template_id=template.id)
+      id=template.id
     ) }}
   {% endif %}
 </div>
 <div class="column-one-third">
-  <div class="sms-message-use-links{% if show_title %}-with-title{% endif %}">
+  <div class="message-use-links{% if show_title %}-with-title{% endif %}">
     {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
       <a href="{{ url_for(".send_messages", service_id=current_service.id, template_id=template.id) }}" class="primary">
         Send {{ 'text messages' if 'sms' == template.template_type else 'emails' }}
