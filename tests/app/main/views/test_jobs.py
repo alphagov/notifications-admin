@@ -70,7 +70,7 @@ def test_should_show_updates_for_one_job_as_json(
         assert 'queued' in content['counts']
         assert 'Recipient' in content['notifications']
         assert 'Status' in content['notifications']
-        assert 'Started' in content['status']
+        assert 'Sent by Test User' in content['status']
         assert job_json['status'] in content['status']
 
 

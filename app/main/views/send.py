@@ -180,7 +180,8 @@ def send_test(service_id, template_id):
             upload_id=upload_id,
             service_id=service_id,
             template_type=template.template_type,
-            from_test=True
+            from_test=True,
+            help=2 if request.args.get('help') else 0
         ))
 
     return render_template(
@@ -246,7 +247,9 @@ def check_messages(service_id, template_type, upload_id):
     )
 
     if request.args.get('from_test') and len(template.placeholders):
-        back_link = url_for('.send_test', service_id=service_id, template_id=template.id)
+        back_link = url_for(
+            '.send_test', service_id=service_id, template_id=template.id, help=1 if request.args.get('help') else 0
+        )
     else:
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
 
@@ -312,5 +315,5 @@ def start_job(service_id, upload_id):
     )
 
     return redirect(
-        url_for('main.view_job', job_id=upload_id, service_id=service_id)
+        url_for('main.view_job', job_id=upload_id, service_id=service_id, help=request.form.get('help'))
     )

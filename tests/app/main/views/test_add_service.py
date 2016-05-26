@@ -1,5 +1,5 @@
 from flask import url_for, session
-
+from unittest.mock import ANY
 import app
 
 
@@ -17,6 +17,7 @@ def test_get_should_render_add_service_template(app_,
 def test_should_add_service_and_redirect_to_tour_when_no_services(app_,
                                                                   mocker,
                                                                   mock_create_service,
+                                                                  mock_create_service_template,
                                                                   mock_get_services_with_no_services,
                                                                   api_user_active):
     with app_.test_request_context():
@@ -34,14 +35,22 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(app_,
                 user_id=api_user_active.id,
                 email_from='testing.the.post'
             )
+            assert len(mock_create_service_template.call_args_list) == 2
             assert session['service_id'] == 101
             assert response.status_code == 302
-            assert response.location == url_for('main.tour', page=1, _external=True)
+            assert response.location == url_for(
+                'main.send_test',
+                service_id=101,
+                template_id="Example text message template",
+                help=1,
+                _external=True
+            )
 
 
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(app_,
                                                                             mocker,
                                                                             mock_create_service,
+                                                                            mock_create_service_template,
                                                                             mock_get_services,
                                                                             api_user_active):
     with app_.test_request_context():
@@ -59,6 +68,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(app_
                 user_id=api_user_active.id,
                 email_from='testing.the.post'
             )
+            assert len(mock_create_service_template.call_args_list) == 0
             assert session['service_id'] == 101
             assert response.status_code == 302
             assert response.location == url_for('main.service_dashboard', service_id=101, _external=True)

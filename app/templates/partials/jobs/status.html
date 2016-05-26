@@ -6,15 +6,7 @@
     aria-live="polite"
   {% endif %}
 >
-
-  {% if finished_at %}
-    <p class='heading-small'>
-      Finished {{ finished_at|format_datetime }}
-    </p>
-  {% else %}
-    <p class='heading-small'>
-      Started {{ uploaded_at|format_datetime }}
-    </p>
-  {% endif %}
-  Uploaded by {{ created_by }}
+  <p class='heading-small'>
+    Sent by {{ created_by }} on {{ uploaded_at|format_datetime_short }}
+  </p>
 </div>
