@@ -2,12 +2,14 @@ from datetime import datetime
 
 import pytz
 from flask import render_template
-from flask_login import login_required
+from flask_login import login_required, current_user
 
-from app import statistics_api_client
+from app import statistics_api_client, service_api_client
 from app.main import main
 from app.utils import user_has_permissions
-from app.statistics_utils import sum_of_statistics, add_rates_togi
+from app.statistics_utils import sum_of_statistics, add_rates_to
+from app.notify_client.api_client import ServicesBrowsableItem
+
 
 @main.route("/platform-admin")
 @login_required
@@ -15,7 +17,9 @@ from app.statistics_utils import sum_of_statistics, add_rates_togi
 def platform_admin():
     return render_template(
         'views/platform-admin.html',
-        global_stats=get_global_stats()
+        global_stats=get_global_stats(),
+        services=[ServicesBrowsableItem(x) for x in
+                  service_api_client.get_services({'user_id': current_user.id})['data']]
     )
 
 

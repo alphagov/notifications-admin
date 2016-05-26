@@ -15,10 +15,6 @@
 
   {{ browse_list([
     {
-        'title': 'List all services',
-        'link': url_for('.show_all_services')
-    },
-    {
       'title': 'View providers',
       'link': url_for('.view_providers')
     },
@@ -45,6 +41,10 @@
       ) }}
     </div>
   </div>
+
+  <h2 class='heading-medium'>Services</h2>
+  {{ browse_list(services) }}
+
 
 
 {% endblock %}
