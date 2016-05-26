@@ -315,5 +315,5 @@ def start_job(service_id, upload_id):
     )
 
     return redirect(
-        url_for('main.view_job', job_id=upload_id, service_id=service_id, help=request.form.get('help'))
+        url_for('main.view_job', job_id=upload_id, service_id=service_id, help=request.args.get('help', '0'))
     )
