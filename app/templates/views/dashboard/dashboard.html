@@ -10,9 +10,7 @@
 
     <h1 class="visuallyhidden">Dashboard</h1>
 
-    {% if not templates and current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
-      {% include 'views/dashboard/get-started.html' %}
-    {% elif current_user.has_permissions([
+    {% if current_user.has_permissions([
       'manage_templates', 'manage_api_keys', 'manage_users', 'manage_settings
     '], any_=True, admin_override=True) %}
       {% if current_service.restricted %}
