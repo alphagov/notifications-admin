@@ -205,7 +205,7 @@ def mock_get_aggregate_service_statistics(mocker):
 @pytest.fixture(scope='function')
 def mock_get_all_service_statistics(mocker):
     def _create(day):
-        return {'data': [{}]}
+        return {'data': []}
 
     return mocker.patch(
         'app.statistics_api_client.get_statistics_for_all_services_for_day', side_effect=_create)
