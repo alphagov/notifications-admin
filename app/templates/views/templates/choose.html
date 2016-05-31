@@ -35,9 +35,15 @@
 
     <div class="grid-row">
       {% for template in templates %}
-        {% with show_title=True %}
-          {% include 'views/templates/_template.html' %}
-        {% endwith %}
+        <div class="column-whole">
+          <h2 class="message-name">{{ template.name }}</h2>
+          {% if template.get_raw('updated_at', None) %}
+            <p class="message-updated-at">
+              Edited {{ template.get_raw('updated_at', None)|format_date_short }}&ensp;<a href="{{ url_for('.view_template_versions', service_id=current_service.id, template_id=template.id) }}">see previous versions</a>
+            </p>
+          {% endif %}
+        </div>
+        {% include 'views/templates/_template.html' %}
       {% endfor %}
     </div>
   {% endif %}
