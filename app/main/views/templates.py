@@ -1,4 +1,4 @@
-import string
+from string import ascii_uppercase
 
 from flask import request, render_template, redirect, url_for, flash, abort, session
 from flask_login import login_required
@@ -127,7 +127,7 @@ def edit_service_template(service_id, template_id):
                 'views/templates/breaking-change.html',
                 template_change=template_change,
                 new_template=new_template,
-                column_headings=list(string.ascii_uppercase[:len(new_template.placeholders) + 1]),
+                column_headings=list(ascii_uppercase[:len(new_template.placeholders) + 1]),
                 example_rows=[
                     [first_column_heading[new_template.template_type]] + list(new_template.placeholders),
                     get_example_csv_rows(new_template),
