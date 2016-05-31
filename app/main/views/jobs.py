@@ -79,7 +79,11 @@ def view_job(service_id, job_id):
     finished = job['status'] == 'finished'
     if 'download' in request.args and request.args['download'] == 'csv':
         csv_content = generate_notifications_csv(
-            notification_api_client.get_notifications_for_service(service_id, job_id)['notifications'])
+            notification_api_client.get_notifications_for_service(
+                service_id,
+                job_id,
+                page_size=job['notification_count']
+            )['notifications'])
         return csv_content, 200, {
             'Content-Type': 'text/csv; charset=utf-8',
             'Content-Disposition': 'inline; filename="{} - {}.csv"'.format(
