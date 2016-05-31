@@ -1,32 +1,13 @@
 {% macro email_message(
   subject,
   body,
-  name=None,
-  edit_link=None,
   from_name=None,
   from_address=None,
   recipient=None,
   id=None,
-  updated_at=None,
-  versions_url=None,
-  version=1,
   show_placeholder_for_recipient=False,
   show_id=False
 ) %}
-  {% if name %}
-    <h3 class="email-message-name">
-      {% if edit_link %}
-        <a href="{{ edit_link }}">{{ name }}</a>
-      {% else %}
-        {{ name }}
-      {% endif %}
-    </h3>
-  {% endif %}
-  {% if version > 1 %}
-    {% if updated_at %}
-      <p class="email-message-updated-at">Last updated on {{ updated_at|format_date_normal }} <a href="{{ versions_url }}">see earlier versions</a></p>
-    {% endif %}
-  {% endif %}
   <div class="email-message">
     {% if from_name or subject %}
       <table class="email-message-meta">

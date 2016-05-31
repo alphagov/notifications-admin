@@ -198,7 +198,7 @@ def format_datetime(date):
 
 
 def format_datetime_normal(date):
-    return gmt_timezones(date).strftime('%d %B %Y at %H:%M')
+    return gmt_timezones(date).strftime('%d %B %Y at %H:%M').lstrip('0')
 
 
 def format_datetime_short(date):
@@ -214,7 +214,7 @@ def format_date(date):
 
 
 def format_date_normal(date):
-    return gmt_timezones(date).strftime('%d %B %Y')
+    return gmt_timezones(date).strftime('%d %B %Y').lstrip('0')
 
 
 def format_date_short(date):

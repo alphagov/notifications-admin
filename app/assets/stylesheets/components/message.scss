@@ -1,0 +1,38 @@
+.message {
+
+  &-name {
+    @include bold-24;
+    margin: 20px 0 5px 0;
+  }
+
+  &-updated-at {
+    @include copy-16;
+    color: $secondary-text-colour;
+    margin: 0 0 5px 0;
+  }
+
+  &-use-links {
+
+    @include copy-16;
+    margin-top: -7px;
+    color: $secondary-text-colour;
+
+    a {
+      @include core-19;
+      display: block;
+      margin-bottom: 5px;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+    }
+
+    .primary {
+      @include bold-19;
+    }
+
+  }
+
+}
