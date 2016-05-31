@@ -98,9 +98,10 @@ def generate_notifications_csv(json_list):
     retval = None
     with content as csvfile:
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(['Recipient', 'Template', 'Type', 'Job', 'Status', 'Time'])
+        csvwriter.writerow(['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time'])
         for x in json_list:
             csvwriter.writerow([
+                int(x['job_row_number']) + 2 if 'job_row_number' in x and x['job_row_number'] else '',
                 x['to'],
                 x['template']['name'],
                 x['template']['template_type'],
