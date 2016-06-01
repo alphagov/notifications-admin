@@ -3,7 +3,7 @@ from flask import url_for
 
 import app
 from app.utils import email_safe
-from tests import validate_route_permission
+from tests import validate_route_permission, service_json
 from bs4 import BeautifulSoup
 from unittest.mock import ANY, Mock
 from werkzeug.exceptions import InternalServerError
@@ -215,12 +215,12 @@ def test_should_show_request_to_go_live(app_,
 
 
 def test_should_redirect_after_request_to_go_live(
-    app_,
-    api_user_active,
-    mock_get_user,
-    mock_get_service,
-    mock_has_permissions,
-    mocker
+        app_,
+        api_user_active,
+        mock_get_user,
+        mock_get_service,
+        mock_has_permissions,
+        mocker
 ):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
@@ -241,6 +241,7 @@ def test_should_redirect_after_request_to_go_live(
                     'department_id': ANY,
                     'agent_team_id': ANY,
                     'message': 'From Test User <test@user.gov.uk> on behalf of Test Service (http://localhost/services/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6/dashboard)\n\nUsage estimate\n---\n\nOne million messages',  # noqa
+                # noqa
                     'person_email': ANY
                 },
                 headers=ANY
@@ -254,12 +255,12 @@ def test_should_redirect_after_request_to_go_live(
 
 
 def test_log_error_on_request_to_go_live(
-    app_,
-    api_user_active,
-    mock_get_user,
-    mock_get_service,
-    mock_has_permissions,
-    mocker
+        app_,
+        api_user_active,
+        mock_get_user,
+        mock_get_service,
+        mock_has_permissions,
+        mocker
 ):
     mock_post = mocker.patch(
         'app.main.views.service_settings.requests.post',
@@ -489,6 +490,8 @@ def test_route_invalid_permissions(mocker, app_, api_user_active, service_one):
         'main.service_name_change',
         'main.service_name_change_confirm',
         'main.service_request_to_go_live',
+        'main.service_switch_live',
+        'main.service_switch_research_mode',
         'main.service_status_change',
         'main.service_status_change_confirm',
         'main.service_delete',
@@ -516,7 +519,7 @@ def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one
         'main.service_status_change_confirm',
         'main.service_delete',
         'main.service_delete_confirm'
-        ]
+    ]
     with app_.test_request_context():
         for route in routes:
             validate_route_permission(mocker,
@@ -527,6 +530,24 @@ def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one
                                       [],
                                       platform_admin_user,
                                       service_one)
+
+
+def test_route_for_platform_admin_update_service(mocker, app_, platform_admin_user, service_one):
+    routes = [
+        'main.service_switch_live',
+        'main.service_switch_research_mode'
+    ]
+    with app_.test_request_context():
+        for route in routes:
+            validate_route_permission(mocker,
+                                      app_,
+                                      "GET",
+                                      302,
+                                      url_for(route, service_id=service_one['id']),
+                                      [],
+                                      platform_admin_user,
+                                      service_one)
+
 
 
 def test_set_reply_to_email_address(app_,
@@ -556,7 +577,6 @@ def test_if_reply_to_email_address_set_then_form_populated(app_,
                                                            active_user_with_permissions,
                                                            mocker,
                                                            service_one):
-
     service_one['reply_to_email_address'] = 'test@service.gov.uk'
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -566,3 +586,109 @@ def test_if_reply_to_email_address_set_then_form_populated(app_,
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.find(id='email_address')['value'] == 'test@service.gov.uk'
+
+
+def test_switch_service_to_research_mode(
+        app_,
+        service_one,
+        mock_login,
+        mock_get_user,
+        active_user_with_permissions,
+        mock_get_service,
+        mock_has_permissions,
+        mocker):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+
+            client.login(active_user_with_permissions)
+            response = client.get(url_for('main.service_switch_research_mode', service_id=service_one['id']))
+            assert response.status_code == 302
+            assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+            app.service_api_client.update_service_with_properties.assert_called_with(
+                service_one['id'], {"research_mode": True}
+            )
+
+
+def test_switch_service_from_research_mode_to_normal(
+        app_,
+        service_one,
+        mock_login,
+        mock_get_user,
+        active_user_with_permissions,
+        mock_get_service,
+        mock_has_permissions,
+        mocker):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            service = service_json(
+                "1234",
+                "Test Service",
+                [active_user_with_permissions.id],
+                message_limit=1000,
+                active=False,
+                restricted=True,
+                research_mode=True
+            )
+            mocker.patch('app.service_api_client.get_service', return_value={"data": service})
+            mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+
+            client.login(active_user_with_permissions)
+            response = client.get(url_for('main.service_switch_research_mode', service_id=service_one['id']))
+            assert response.status_code == 302
+            assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+            app.service_api_client.update_service_with_properties.assert_called_with(
+                service_one['id'], {"research_mode": False}
+            )
+
+
+def test_shows_research_mode_indicator(
+        app_,
+        service_one,
+        mock_login,
+        mock_get_user,
+        active_user_with_permissions,
+        mock_get_service,
+        mock_has_permissions,
+        mocker):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            service = service_json(
+                "1234",
+                "Test Service",
+                [active_user_with_permissions.id],
+                message_limit=1000,
+                active=False,
+                restricted=True,
+                research_mode=True
+            )
+            mocker.patch('app.service_api_client.get_service', return_value={"data": service})
+            mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+
+            client.login(active_user_with_permissions)
+            response = client.get(url_for('main.service_settings', service_id=service_one['id']))
+            assert response.status_code == 200
+
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            element = page.find('span', {"id": "research-mode"})
+            assert element.text == 'research mode'
+
+
+def test_does_not_show_research_mode_indicator(
+        app_,
+        service_one,
+        mock_login,
+        mock_get_user,
+        active_user_with_permissions,
+        mock_get_service,
+        mock_has_permissions,
+        mocker):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user_with_permissions)
+            response = client.get(url_for('main.service_settings', service_id=service_one['id']))
+            assert response.status_code == 200
+
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            element = page.find('span', {"id": "research-mode"})
+            assert not element

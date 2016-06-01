@@ -111,6 +111,9 @@
   <nav class="footer-nav">
     Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service">Government Digital Service</a>
     <a href="{{ url_for("main.cookies") }}">Cookies</a>
+    {% if current_service.research_mode %}
+    <span id="research-mode" style="font-weight: bold; display: inline-block; padding: 5px 10px; background: #005EA5; color: #fff; border-radius: 2px;">research mode</span>
+    {% endif %}
   </nav>
 {% endblock %}
 

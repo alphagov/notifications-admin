@@ -55,10 +55,10 @@ def service_name_change(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_name_change_confirm(service_id):
-
     # Validate password for form
     def _check_password(pwd):
         return user_api_client.verify_password(current_user.id, pwd)
+
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
@@ -94,7 +94,6 @@ def service_name_change_confirm(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_request_to_go_live(service_id):
-
     form = RequestToGoLiveForm()
 
     if form.validate_on_submit():
@@ -126,7 +125,7 @@ def service_request_to_go_live(service_id):
                 "Deskpro create ticket request failed with {} '{}'".format(
                     resp.status_code,
                     resp.json())
-                )
+            )
             abort(500, "Request to go live submission failed")
 
         flash('We’ve received your request to go live', 'default')
@@ -152,6 +151,17 @@ def service_switch_live(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
+@main.route("/services/<service_id>/service-settings/research-mode")
+@login_required
+@user_has_permissions(admin_override=True)
+def service_switch_research_mode(service_id):
+    service_api_client.update_service_with_properties(
+        service_id,
+        {"research_mode": False if current_service['research_mode'] else True}
+    )
+    return redirect(url_for('.service_settings', service_id=service_id))
+
+
 @main.route("/services/<service_id>/service-settings/status", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
@@ -171,6 +181,7 @@ def service_status_change_confirm(service_id):
     # Validate password for form
     def _check_password(pwd):
         return user_api_client.verify_password(current_user.id, pwd)
+
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
@@ -195,7 +206,6 @@ def service_status_change_confirm(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_delete(service_id):
-
     if request.method == 'GET':
         return render_template(
             'views/service-settings/delete.html'
@@ -208,10 +218,10 @@ def service_delete(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_delete_confirm(service_id):
-
     # Validate password for form
     def _check_password(pwd):
         return user_api_client.verify_password(current_user.id, pwd)
+
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
