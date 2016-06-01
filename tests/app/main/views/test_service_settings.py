@@ -242,6 +242,7 @@ def test_should_redirect_after_request_to_go_live(
                     'agent_team_id': ANY,
                     'message': 'From Test User <test@user.gov.uk> on behalf of Test Service (http://localhost/services/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6/dashboard)\n\nUsage estimate\n---\n\nOne million messages',  # noqa
                 # noqa
+                    # noqa
                     'person_email': ANY
                 },
                 headers=ANY
@@ -549,12 +550,12 @@ def test_route_for_platform_admin_update_service(mocker, app_, platform_admin_us
                                       service_one)
 
 
-
-def test_set_reply_to_email_address(app_,
-                                    active_user_with_permissions,
-                                    mocker,
-                                    mock_update_service,
-                                    service_one):
+def test_set_reply_to_email_address(
+        app_,
+        active_user_with_permissions,
+        mocker,
+        mock_update_service,
+        service_one):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
