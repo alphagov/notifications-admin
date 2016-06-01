@@ -1,6 +1,6 @@
 import pytest
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from flask.testing import FlaskClient
 from flask import url_for
 from flask_login import login_user
