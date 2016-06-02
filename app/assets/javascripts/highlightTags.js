@@ -15,16 +15,14 @@
         .wrap(`
           <div class='textbox-highlight-wrapper' />
         `)
-        .after(this.$backgroundMaskForeground = $(`
+        .after(this.$background = $(`
           <div class="textbox-highlight-background" aria-hidden="true" />
-          <div class="textbox-highlight-mask" aria-hidden="true" />
-          <div class="textbox-highlight-foreground" aria-hidden="true" />
         `))
         .on("input", this.update);
 
       this.initialHeight = this.$textbox.height();
 
-      this.$backgroundMaskForeground.css({
+      this.$background.css({
         'width': this.$textbox.outerWidth(),
         'border-width': this.$textbox.css('border-width')
       });
@@ -37,15 +35,15 @@
     this.resize = () => this.$textbox.height(
       Math.max(
         this.initialHeight,
-        this.$backgroundMaskForeground.outerHeight()
+        this.$background.outerHeight()
       )
     );
 
     this.escapedMessage = () => $('<div/>').text(this.$textbox.val()).html();
 
-    this.replacePlaceholders = () => this.$backgroundMaskForeground.html(
+    this.replacePlaceholders = () => this.$background.html(
       this.escapedMessage().replace(
-        tagPattern, match => `<span class='tag'>${match}</span>`
+        tagPattern, match => `<span class='placeholder'>${match}</span>`
       )
     );
 

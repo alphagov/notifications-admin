@@ -26,60 +26,24 @@
     line-height: 1.6;
   }
 
-  &-background,
-  &-foreground,
-  &-mask {
+  &-background {
     position: absolute;
     top: 0;
     left: 0;
     pointer-events: none;
     color: transparent;
     white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
     border: 2px solid transparent;
     padding-bottom: $gutter-half;
-  }
-
-  &-background {
-
     z-index: 10;
 
-    .tag {
-      background: $light-blue;
-      border-radius: 3px;
+    .placeholder {
       color: transparent;
-      display: inline;
     }
 
   }
-
-  &-mask {
-
-    z-index: 30;
-
-    .tag {
-      color: $white;
-      text-shadow: 0 1px 0 $light-blue, 0 -1px 0 $light-blue;
-      position: relative;
-      display: inline;
-      overflow: hidden;
-    }
-
-  }
-
-  &-foreground {
-
-    z-index: 40;
-
-    .tag {
-      color: transparent;
-      border-radius: 3px;
-      overflow: hidden;
-      display: inline;
-      box-shadow: inset 0.75em 0 0 0 $tag-background, inset -0.75em 0 0 0 $tag-background;
-    }
-
-  }
-
 
 }
 
