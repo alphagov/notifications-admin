@@ -113,7 +113,7 @@ def edit_service_template(service_id, template_id):
     form = form_objects[template['template_type']](**template)
 
     if form.validate_on_submit():
-        subject = form.subject.data if getattr(form, 'subject', None) else None
+        subject = form.subject.data if hasattr(form, 'subject') else None
         new_template = Template({
             'name': form.name.data,
             'content': form.template_content.data,
