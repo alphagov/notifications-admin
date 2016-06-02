@@ -3,10 +3,10 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/table.html" import list_table, text_field, index_field, index_field_heading %}
 
-{% macro list_of_placeholders(placeholders, oxford_comma=False) %}
+{% macro list_of_placeholders(placeholders) %}
   {% for placeholder in placeholders %}
-    {% if loop.last and loop.length > 1 %}{% if oxford_comma %},{% endif %} and {% endif %}
-    <span class="placeholder">(({{ placeholder }}))</span>{% if not loop.last and loop.length != 2 %},{% endif %}
+    {% if loop.last and loop.length > 1 %} and {% endif %}
+    <span class="placeholder">(({{ placeholder }}))</span>
   {% endfor %}
 {% endmacro %}
 
