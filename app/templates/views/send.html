@@ -63,20 +63,19 @@
       <h2 class="heading-small">
         Example file
       </h2>
-
-      {% call(item, row_number) list_table(
-        example,
-        caption="Example",
-        caption_visible=False,
-        field_headings=['1'] + [
-          '<span class="placeholder">{}</span>'.format(recipient_column)|safe
-        ] + template.placeholders_as_markup|list
-      ) %}
-        {{ index_field(row_number) }}
-        {% for column in item %}
-          {{ text_field(column) }}
-        {% endfor %}
-      {% endcall %}
+      <div class="spreadsheet">
+        {% call(item, row_number) list_table(
+          example,
+          caption="Example",
+          caption_visible=False,
+          field_headings=[''] + column_headings
+        ) %}
+          {{ index_field(row_number - 1) }}
+          {% for column in item %}
+            {{ text_field(column) }}
+          {% endfor %}
+        {% endcall %}
+      </div>
       <p class="table-show-more-link">
         <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
       </p>
