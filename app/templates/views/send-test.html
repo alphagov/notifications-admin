@@ -40,9 +40,7 @@
     {% call(item, row_number) list_table(
       example,
       caption="Fill in the {}".format('field' if template.placeholders|length == 1 else 'fields'),
-      field_headings=[
-        '<span class="placeholder">{}</span>'.format(recipient_column)|safe
-      ] + template.placeholders_as_markup|list
+      field_headings=[recipient_column] + template.placeholders|list
     ) %}
       {% for column in item %}
         {% call field() %}

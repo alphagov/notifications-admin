@@ -153,3 +153,24 @@ details summary {
   text-decoration: underline;
   margin-bottom: $gutter-half;
 }
+
+.spreadsheet {
+
+  th,
+  .table-field-index {
+    background: $grey-4;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  th, td {
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 1px solid $border-colour;
+  }
+
+  td {
+    border-top: 0;
+  }
+
+}
