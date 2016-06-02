@@ -40,6 +40,14 @@
         'link': url_for('.service_switch_live', service_id=current_service.id)
       } if not current_service.restricted and current_user.has_permissions([], admin_override=True) else {
       },
+      {
+        'title': 'Put service into research mode',
+        'link': url_for('.service_switch_research_mode', service_id=current_service.id)
+      } if not current_service.research_mode and current_user.has_permissions([], admin_override=True) else {
+        'title': 'Take service out of research mode',
+        'link': url_for('.service_switch_research_mode', service_id=current_service.id)
+      } if current_service.research_mode and current_user.has_permissions([], admin_override=True) else {
+      },
     ]) }}
 
 {% endblock %}
