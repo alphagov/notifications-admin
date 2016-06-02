@@ -39,7 +39,16 @@ def created_by_json(id_, name='', email_address=''):
     return {'id': id_, 'name': name, 'email_address': email_address}
 
 
-def service_json(id_, name, users, message_limit=1000, active=False, restricted=True, email_from=None, reply_to_email_address=None):  # noqa
+def service_json(
+        id_,
+        name,
+        users,
+        message_limit=1000,
+        active=False,
+        restricted=True,
+        email_from=None,
+        reply_to_email_address=None,
+        research_mode=False):
     return {
         'id': id_,
         'name': name,
@@ -48,7 +57,8 @@ def service_json(id_, name, users, message_limit=1000, active=False, restricted=
         'active': active,
         'restricted': restricted,
         'email_from': email_from,
-        'reply_to_email_address': reply_to_email_address
+        'reply_to_email_address': reply_to_email_address,
+        'research_mode': research_mode
     }
 
 
@@ -223,6 +233,8 @@ def validate_route_permission(mocker,
     mocker.patch(
         'app.service_api_client.get_services',
         return_value={'data': []})
+    mocker.patch('app.service_api_client.update_service', return_value=service)
+    mocker.patch('app.service_api_client.update_service_with_properties', return_value=service)
     mocker.patch('app.user_api_client.get_user', return_value=usr)
     mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
     mocker.patch('app.service_api_client.get_service', return_value={'data': service})
@@ -238,5 +250,6 @@ def validate_route_permission(mocker,
             else:
                 pytest.fail("Invalid method call {}".format(method))
             if resp.status_code != response_code:
+                print(resp.status_code)
                 pytest.fail("Invalid permissions set for endpoint {}".format(route))
     return resp
