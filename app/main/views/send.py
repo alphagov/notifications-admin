@@ -1,5 +1,7 @@
 import json
 import itertools
+from string import ascii_uppercase
+
 from contextlib import suppress
 from zipfile import BadZipFile
 from xlrd.biffh import XLRDError
@@ -127,8 +129,11 @@ def send_messages(service_id, template_id):
     return render_template(
         'views/send.html',
         template=template,
-        recipient_column=first_column_heading[template.template_type],
-        example=[get_example_csv_rows(template)],
+        column_headings=list(ascii_uppercase[:len(template.placeholders) + 1]),
+        example=[
+            [first_column_heading[template.template_type]] + list(template.placeholders),
+            get_example_csv_rows(template)
+        ],
         form=form
     )
 

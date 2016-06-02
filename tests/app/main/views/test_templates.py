@@ -1,5 +1,6 @@
 import json
 import uuid
+from bs4 import BeautifulSoup
 from tests import validate_route_permission
 
 from flask import url_for
@@ -65,6 +66,47 @@ def test_should_redirect_when_saving_a_template(app_,
                 '.choose_template', service_id=service_id, template_type='sms', _external=True)
             mock_update_service_template.assert_called_with(
                 template_id, name, 'sms', content, service_id, None)
+
+
+def test_should_show_interstitial_when_making_breaking_change(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_service_template,
+    mock_update_service_template,
+    mock_get_user,
+    mock_get_service,
+    mock_get_user_by_email,
+    mock_has_permissions,
+    fake_uuid
+):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            service_id = fake_uuid
+            template_id = fake_uuid
+            response = client.post(
+                url_for('.edit_service_template', service_id=service_id, template_id=template_id),
+                data={
+                    'id': template_id,
+                    'name': "new name",
+                    'template_content': "hello ((name))",
+                    'template_type': 'sms',
+                    'service': service_id
+                }
+            )
+
+            assert response.status_code == 200
+            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            assert page.h1.string.strip() == "Confirm changes"
+
+            for key, value in {
+                'name': 'new name',
+                'subject': '',
+                'template_content': 'hello ((name))',
+                'confirm': 'true'
+            }.items():
+                assert page.find('input', {'name': key})['value'] == value
 
 
 def test_should_not_create_too_big_template(app_,

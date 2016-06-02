@@ -1,12 +1,16 @@
-from flask import request, render_template, redirect, url_for, flash, abort
+from string import ascii_uppercase
+
+from flask import request, render_template, redirect, url_for, flash, abort, session
 from flask_login import login_required
 
-from notifications_utils.template import Template
+from notifications_utils.template import Template, TemplateChange
+from notifications_utils.recipients import first_column_heading
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
 from app.utils import user_has_permissions
 from app.main.forms import SMSTemplateForm, EmailTemplateForm
+from app.main.views.send import get_example_csv_rows
 from app import service_api_client, current_service
 
 
@@ -109,6 +113,28 @@ def edit_service_template(service_id, template_id):
     form = form_objects[template['template_type']](**template)
 
     if form.validate_on_submit():
+        subject = form.subject.data if hasattr(form, 'subject') else None
+        new_template = Template({
+            'name': form.name.data,
+            'content': form.template_content.data,
+            'subject': subject,
+            'template_type': template['template_type'],
+            'id': template['id']
+        })
+        template_change = Template(template).compare_to(new_template)
+        if template_change.has_different_placeholders and not request.form.get('confirm'):
+            return render_template(
+                'views/templates/breaking-change.html',
+                template_change=template_change,
+                new_template=new_template,
+                column_headings=list(ascii_uppercase[:len(new_template.placeholders) + 1]),
+                example_rows=[
+                    [first_column_heading[new_template.template_type]] + list(new_template.placeholders),
+                    get_example_csv_rows(new_template),
+                    get_example_csv_rows(new_template)
+                ],
+                form=form
+            )
         try:
             service_api_client.update_service_template(
                 template_id,
@@ -116,7 +142,7 @@ def edit_service_template(service_id, template_id):
                 template['template_type'],
                 form.template_content.data,
                 service_id,
-                form.subject.data if getattr(form, 'subject', None) else None
+                subject
             )
         except HTTPError as e:
             if e.status_code == 400:
