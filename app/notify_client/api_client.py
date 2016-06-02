@@ -6,7 +6,6 @@ from app.notify_client import _attach_current_user
 
 
 class ServiceAPIClient(NotificationsAPIClient):
-
     # Fudge assert in the super __init__ so
     # we can set those variables later.
     def __init__(self):
@@ -80,6 +79,11 @@ class ServiceAPIClient(NotificationsAPIClient):
         _attach_current_user(data)
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)
+
+    def update_service_with_properties(self, service_id, properties):
+        _attach_current_user(properties)
+        endpoint = "/service/{0}".format(service_id)
+        return self.post(endpoint, properties)
 
     def remove_user_from_service(self, service_id, user_id):
         """
@@ -181,7 +185,6 @@ class ServiceAPIClient(NotificationsAPIClient):
 
 
 class ServicesBrowsableItem(BrowsableItem):
-
     @property
     def title(self):
         return self._item['name']

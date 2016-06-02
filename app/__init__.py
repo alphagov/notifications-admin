@@ -285,6 +285,7 @@ def register_errorhandlers(application):
 
     @application.errorhandler(HTTPError)
     def render_http_error(error):
+        application.logger.error("API called failed with status {} message {}".format(error.status_code, error.message))
         error_code = error.status_code
         if error_code not in [401, 404, 403, 500]:
             error_code = 500
