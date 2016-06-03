@@ -7,13 +7,95 @@
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-footer.html" import page_footer %}
 
+{% macro list_of_columns(columns, conjunction='and') %}
+  {% if columns|length == 1 %}
+    ‘{{ (columns|list)[0] }}’
+  {% else %}
+    {{
+      "‘{}’ {} ‘{}’".format(
+        "’, ‘".join((columns|list)[0:-1]),
+        conjunction,
+        (columns|list)[-1]
+      )
+    }}
+  {%- endif %}
+{%- endmacro %}
+
 {% block page_title %}
   {{ page_heading if errors else "Check and confirm" }} – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {% if not recipients.allowed_to_send_to and not recipients.missing_column_headers %}
+  {% if not recipients.has_recipient_column %}
+
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        <h1 class='banner-title'>
+          Your file needs to have a column called ‘{{ recipients.recipient_column_header }}’
+        </h1>
+        <p>
+          Your file has {{ formatted_list(
+            recipients.column_headers,
+            prefix='one column, called',
+            prefix_plural='columns called'
+          ) }}.
+        </p>
+      {% endcall %}
+    </div>
+
+  {% elif recipients.missing_column_headers %}
+
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        <h1 class='banner-title'>
+          The columns in your file need to match the double brackets in
+          your template
+        </h1>
+        <p>
+          Your file has columns called {{ list_of_columns(recipients.column_headers) }}.
+        </p>
+        <p>
+          It doesn’t have
+          {% if recipients.missing_column_headers|length == 1 %}
+            a column
+          {% else %}
+            columns
+          {% endif %}
+          called {{ list_of_columns(recipients.missing_column_headers, 'or') }}.
+        </p>
+      {% endcall %}
+    </div>
+
+  {% elif row_errors %}
+
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% if row_errors|length == 1 %}
+          <h1 class='banner-title'>
+            There is a problem with your data
+          </h1>
+          <p>
+            You need to {{ row_errors[0] }}
+          </p>
+        {% else %}
+          <h1 class='banner-title'>
+            There are some problems with your data
+          </h1>
+          <p>
+            You need to:
+          </p>
+          <ul class="list-bullet">
+            {% for error in row_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endcall %}
+    </div>
+
+  {% elif not recipients.allowed_to_send_to %}
+
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         <h1 class='banner-title'>
@@ -30,32 +112,9 @@
         </p>
       {% endcall %}
     </div>
-  {% elif errors %}
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
-        {% if errors|length == 1 %}
-          <h1 class='banner-title'>
-            There was a problem with {{ original_file_name }}
-          </h1>
-          <p>
-            You need to {{ errors[0] }}
-          </p>
-        {% else %}
-          <h1 class='banner-title'>
-            There were some problems with {{ original_file_name }}
-          </h1>
-          <p>
-            You need to:
-          </p>
-          <ul class="list-bullet">
-            {% for error in errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      {% endcall %}
-    </div>
+
   {% elif count_of_recipients > (current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0)) %}
+
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         <h1 class='banner-title'>
@@ -73,20 +132,23 @@
         {% endif %}
         <p>
           You can still send
-          {{ current_service.message_limit - statistics.emails_requested - statistics.sms_requested }}
+          {{ current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0) }}
           messages today, but
           ‘{{ original_file_name }}’ contains
           {{ count_of_recipients }} {{ recipients.recipient_column_header }}
           {%- if count_of_recipients != 1 -%}
             {{ 'es' if 'email address' == recipients.recipient_column_header else 's' }}
-          {%- endif -%}.
+          {%- endif %}
         </p>
       {% endcall %}
     </div>
+
   {% else %}
+
     <h1 class="heading-large">
       Check and confirm
     </h1>
+
   {% endif %}
 
   {% if 'email' == template.template_type %}
@@ -129,7 +191,7 @@
   {% endif %}
 
   {% call(item, row_number) list_table(
-    recipients.initial_annotated_rows_with_errors if rows_have_errors else recipients.initial_annotated_rows,
+    recipients.initial_annotated_rows_with_errors if row_errors else recipients.initial_annotated_rows,
     caption=original_file_name,
     field_headings=['1'] + recipients.column_headers
   ) %}
@@ -161,13 +223,13 @@
 
   {% if count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
-      {% if rows_have_errors %}
+      {% if row_errors %}
         Only showing the first {{ count_of_displayed_recipients }} rows with errors
       {% else %}
         Only showing the first {{ count_of_displayed_recipients }} rows
       {% endif %}
     </p>
-  {% elif rows_have_errors %}
+  {% elif row_errors %}
     <p class="table-show-more-link">
       Only showing rows with errors
     </p>
