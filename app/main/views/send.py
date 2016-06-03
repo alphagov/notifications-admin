@@ -256,7 +256,6 @@ def check_messages(service_id, template_type, upload_id):
         recipients=recipients,
         first_recipient=first_recipient,
         template=template,
-        page_heading=get_page_headings(template.template_type),
         errors=recipients.has_errors,
         row_errors=get_errors_for_csv(recipients, template.template_type),
         count_of_recipients=session['upload_data']['notification_count'],
