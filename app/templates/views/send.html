@@ -43,26 +43,10 @@
 
   <details role="group">
     <summary role="button" aria-controls="how-to-format-your-file" aria-expanded="false">
-      <span class="summary">How to format your file</span>
+      <span class="summary">See an example</span>
     </summary>
 
     <div id="how-to-format-your-file" aria-hidden="true">
-      <ul class="list list-bullet">
-        <li>
-          put one recipient per row
-        </li>
-        <li>
-          save or export your data as a
-          <acronym title="Comma Separated Values">CSV</acronym>,
-          <acronym title="Comma Separated Values">TSV</acronym>,
-          Open Document Spreadsheet (.ods)
-          or Microsoft Excel (.xls, .xlsx, .xlsm) file
-        </li>
-      </ul>
-
-      <h2 class="heading-small">
-        Example file
-      </h2>
       <div class="spreadsheet">
         {% call(item, row_number) list_table(
           example,
@@ -78,6 +62,13 @@
       </div>
       <p class="table-show-more-link">
         <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
+      </p>
+      <p>Save the file as</p>
+      <ul class="list list-bullet">
+        <li>.<acronym title="Comma Separated Values">csv</acronym></li>
+        <li>.<acronym title="Comma Separated Values">tsv</acronym></li>
+        <li>Open Document Spreadsheet (.ods)</li>
+        <li>or Microsoft Excel (.xls, .xlsx, .xlsm)</li>
       </p>
     </div>
   </details>
