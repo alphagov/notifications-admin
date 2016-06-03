@@ -275,7 +275,7 @@ def check_messages(service_id, template_type, upload_id):
         count_of_recipients=session['upload_data']['notification_count'],
         count_of_displayed_recipients=(
             len(list(recipients.initial_annotated_rows_with_errors))
-            if any(recipients.rows_with_errors) else
+            if any(recipients.rows_with_errors) and not recipients.missing_column_headers else
             len(list(recipients.initial_annotated_rows))
         ),
         original_file_name=session['upload_data'].get('original_file_name'),

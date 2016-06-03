@@ -191,13 +191,13 @@
   {% endif %}
 
   {% call(item, row_number) list_table(
-    recipients.initial_annotated_rows_with_errors if row_errors else recipients.initial_annotated_rows,
+    recipients.initial_annotated_rows_with_errors if row_errors and not recipients.missing_column_headers else recipients.initial_annotated_rows,
     caption=original_file_name,
     field_headings=['1'] + recipients.column_headers
   ) %}
     {{ index_field(item.index + 2) }}
     {% for column in recipients.column_headers %}
-      {% if item['columns'][column].error %}
+      {% if item['columns'][column].error and not recipients.missing_column_headers %}
         {% call field() %}
           <span class="table-field-error">
             <span class="table-field-error-label">{{ item['columns'][column].error }}</span>
@@ -223,13 +223,13 @@
 
   {% if count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
-      {% if row_errors %}
+      {% if row_errors and not recipients.missing_column_headers %}
         Only showing the first {{ count_of_displayed_recipients }} rows with errors
       {% else %}
         Only showing the first {{ count_of_displayed_recipients }} rows
       {% endif %}
     </p>
-  {% elif row_errors %}
+  {% elif row_errors and not recipients.missing_column_headers %}
     <p class="table-show-more-link">
       Only showing rows with errors
     </p>
