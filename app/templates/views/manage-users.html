@@ -22,7 +22,7 @@ Manage users – GOV.UK Notify
         Team members
       </h1>
     </div>
-    {% if current_user.has_permissions(['manage_users']) %}
+    {% if current_user.has_permissions(['manage_users'], admin_override=True) %}
       <div class="column-one-third">
         <a href="{{ url_for('.invite_user', service_id=current_service.id) }}" class="button align-with-heading">Invite team member</a>
       </div>
