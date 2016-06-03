@@ -1,3 +1,6 @@
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/phone.html" import phone %}
+
 {% extends "withoutnav_template.html" %}
 
 {% block page_title %}
@@ -6,23 +9,51 @@
 
 {% block maincolumn_content %}
 
-<div class="grid-row">
-  <div class="column-two-thirds">
-    <h1 class="heading-xlarge">GOV.UK Notify</h1>
-    <p>
-      Making it easy to send text messages and emails to your users.
+  {% call banner_wrapper(type='intro') %}
+    <h1 class="heading-medium">
+      GOV.UK Notify makes it easy to send text messages and emails to
+      your users.
+    </h1>
+    <p class="heading-medium">
+      If you work for a UK government department or agency you can try
+      it now.
     </p>
-    <p>
-      If you work for a UK government department or agency you can try it now.
+    <p class="button-block">
+      <a class="button button-start" href='{{ url_for('.register' )}}'>
+        Create an account
+      </a>
+      or <a href="{{ url_for('.sign_in' )}}">sign in</a> if you’ve used
+      it before
     </p>
-    <p>
-      <a class="button" href="{{ url_for('.register' )}}" role="button">Set up an account</a>
-    </p>
-    <p>
-      If you’ve used GOV.UK Notify before, <a href="{{ url_for('.sign_in' )}}">sign in to your account</a>.
-    </p>
-
-  </div>
-</div>
+    <div class="grid-row phone-container">
+      <div class="column-one-third">
+        {{ phone(
+          "07900911111",
+          """
+            Joshua, we’ve started processing your application.
+            You should hear back from us within two weeks.
+          """
+        ) }}
+      </div>
+      <div class="column-one-third">
+        {{ phone(
+          "07900922222",
+          """
+            Amala, we’ve started processing your application.
+            You should hear back from us within two weeks.
+          """
+        ) }}
+      </div>
+      <div class="column-one-third">
+        {{ phone(
+          "07900933333",
+          """
+            Roman, we’ve started processing your application.
+            You should hear back from us within two weeks.
+          """
+        ) }}
+      </div>
+    </div>
+  {% endcall %}
 
 {% endblock %}
