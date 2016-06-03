@@ -271,7 +271,6 @@ def test_no_permission_manage_users_page(app_,
             client.login(api_user_active, mocker, service_one)
             response = client.get(url_for('main.manage_users', service_id=service_one['id']))
             resp_text = response.get_data(as_text=True)
-            print(resp_text)
             assert url_for('.invite_user', service_id=service_one['id']) not in resp_text
             assert "Edit permission" not in resp_text
             assert "Team members" not in resp_text
