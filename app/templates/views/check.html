@@ -6,20 +6,7 @@
 {% from "components/placeholder.html" import placeholder %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-footer.html" import page_footer %}
-
-{% macro list_of_columns(columns, conjunction='and') %}
-  {% if columns|length == 1 %}
-    ‘{{ (columns|list)[0] }}’
-  {% else %}
-    {{
-      "‘{}’ {} ‘{}’".format(
-        "’, ‘".join((columns|list)[0:-1]),
-        conjunction,
-        (columns|list)[-1]
-      )
-    }}
-  {%- endif %}
-{%- endmacro %}
+{% from "components/list.html" import formatted_list %}
 
 {% block page_title %}
   {{ page_heading if errors else "Check and confirm" }} – GOV.UK Notify
@@ -53,16 +40,19 @@
           your template
         </h1>
         <p>
-          Your file has columns called {{ list_of_columns(recipients.column_headers) }}.
+          Your file has {{ formatted_list(
+            recipients.column_headers,
+            prefix='one column, called',
+            prefix_plural='columns called'
+          ) }}.
         </p>
         <p>
-          It doesn’t have
-          {% if recipients.missing_column_headers|length == 1 %}
-            a column
-          {% else %}
-            columns
-          {% endif %}
-          called {{ list_of_columns(recipients.missing_column_headers, 'or') }}.
+          It doesn’t have {{ formatted_list(
+            recipients.missing_column_headers,
+            conjunction='or',
+            prefix='a column called',
+            prefix_plural='columns called'
+          ) }}.
         </p>
       {% endcall %}
     </div>

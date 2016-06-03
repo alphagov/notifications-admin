@@ -10,6 +10,7 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/api-key.html" import api_key %}
+{% from "components/list.html" import formatted_list %}
 
 {% block page_title %}
   Styleguide – GOV.UK Notify
@@ -229,5 +230,24 @@
   <h2 class="heading-large">API key</h2>
 
   {{ api_key('d30512af92e1386d63b90e5973b49a10') }}
+
+
+  <h2 class="heading-large">Formatted list</h2>
+
+  <p>
+    {{ formatted_list('A', prefix="one item called") }}
+  </p>
+
+  <p>
+    {{ formatted_list('AB', prefix_plural="two items called") }}
+  </p>
+
+  <p>
+    {{ formatted_list('ABC') }}
+  </p>
+
+  <p>
+    {{ formatted_list('ABCD', before_each='<strike>', after_each='</strike>', conjunction='or') }}
+  </p>
 
 {% endblock %}
