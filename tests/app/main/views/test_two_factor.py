@@ -210,3 +210,15 @@ def test_two_factor_reset_login_count_called(app_,
             api_user_locked.reset_failed_login_count()
             api_user_locked.password = new_password
             mock_update_user.assert_called_with(api_user_locked)
+
+
+def test_two_factor_should_redirect_to_sign_in_if_user_not_in_session(app_,
+                                                                      api_user_active,
+                                                                      mock_get_user):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+
+            response = client.post(url_for('main.two_factor'),
+                                   data={'sms_code': '12345'})
+            assert response.status_code == 302
+            assert response.location == url_for('main.sign_in', _external=True)
