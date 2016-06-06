@@ -107,7 +107,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         for response in [initial_upload, reupload]:
             assert response.status_code == 200
             content = response.get_data(as_text=True)
-            assert 'There was a problem with invalid.csv' in content
+            assert 'There is a problem with your data' in content
             assert '+447700900986' in content
             assert 'Missing' in content
             assert 'Re-upload your file' in content
@@ -314,7 +314,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
             assert '07700 900701' in content
             assert '07700 900749' in content
             assert '07700 900750' not in content
-            assert 'Only showing the first 50 rows with errors' in content
+            assert 'Only showing the first 50 rows' in content
 
 
 def test_create_job_should_call_api(
@@ -391,7 +391,7 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
                 follow_redirects=True
             )
             assert response.status_code == 200
-            assert 'There was a problem with invalid.csv' in response.get_data(as_text=True)
+            assert 'There is a problem with your data' in response.get_data(as_text=True)
 
 
 def test_route_permissions(mocker,

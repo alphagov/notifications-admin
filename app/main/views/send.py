@@ -31,19 +31,6 @@ from app import job_api_client, service_api_client, current_service, user_api_cl
 from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet
 
 
-def get_send_button_text(template_type, number_of_messages):
-    if 1 == number_of_messages:
-        return {
-            'email': 'Send 1 email',
-            'sms': 'Send 1 text message'
-        }[template_type]
-    else:
-        return {
-            'email': 'Send {} emails',
-            'sms': 'Send {} text messages'
-        }[template_type].format(number_of_messages)
-
-
 def get_page_headings(template_type):
     return {
         'email': 'Email templates',
@@ -269,17 +256,15 @@ def check_messages(service_id, template_type, upload_id):
         recipients=recipients,
         first_recipient=first_recipient,
         template=template,
-        page_heading=get_page_headings(template.template_type),
-        errors=get_errors_for_csv(recipients, template.template_type),
-        rows_have_errors=any(recipients.rows_with_errors),
+        errors=recipients.has_errors,
+        row_errors=get_errors_for_csv(recipients, template.template_type),
         count_of_recipients=session['upload_data']['notification_count'],
         count_of_displayed_recipients=(
             len(list(recipients.initial_annotated_rows_with_errors))
-            if any(recipients.rows_with_errors) else
+            if any(recipients.rows_with_errors) and not recipients.missing_column_headers else
             len(list(recipients.initial_annotated_rows))
         ),
         original_file_name=session['upload_data'].get('original_file_name'),
-        send_button_text=get_send_button_text(template.template_type, session['upload_data']['notification_count']),
         upload_id=upload_id,
         form=CsvUploadForm(),
         statistics=statistics,

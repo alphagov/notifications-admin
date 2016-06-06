@@ -55,20 +55,6 @@ def get_errors_for_csv(recipients, template_type):
 
     errors = []
 
-    missing_column_headers = list(recipients.missing_column_headers)
-
-    if len(missing_column_headers) == 1:
-        errors.append("add a column called ‘{}’".format("".join(missing_column_headers)))
-    elif len(missing_column_headers) == 2:
-        errors.append("add 2 columns, ‘{}’".format("’ and ‘".join(missing_column_headers)))
-    elif len(missing_column_headers) > 2:
-        errors.append(
-            "add columns called ‘{}’, and ‘{}’".format(
-                "’, ‘".join(missing_column_headers[0:-1]),
-                missing_column_headers[-1]
-            )
-        )
-
     if recipients.rows_with_bad_recipients:
         number_of_bad_recipients = len(list(recipients.rows_with_bad_recipients))
         if 'sms' == template_type:
