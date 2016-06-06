@@ -226,6 +226,7 @@ def test_should_show_delete_template_page(app_,
                                           mock_get_user,
                                           mock_get_user_by_email,
                                           mock_has_permissions,
+                                          mock_get_template_statistics,
                                           fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -292,6 +293,7 @@ def test_route_permissions(mocker,
                            api_user_active,
                            service_one,
                            mock_get_service_template,
+                           mock_get_template_statistics,
                            fake_uuid):
     routes = [
         'main.add_service_template',
