@@ -154,9 +154,9 @@ def edit_service_template(service_id, template_id):
                 raise e
         else:
             return redirect(url_for(
-                '.choose_template',
+                '.view_template',
                 service_id=service_id,
-                template_type=template['template_type']
+                template_id=template_id
             ))
     return render_template(
         'views/edit-{}-template.html'.format(template['template_type']),
