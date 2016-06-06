@@ -19,7 +19,7 @@ def two_factor():
     try:
         user_id = session['user_details']['id']
     except KeyError:
-        return redirect('main.sign_in')
+        return redirect(url_for('main.sign_in'))
 
     def _check_code(code):
         return user_api_client.check_verify_code(user_id, code, "sms")
