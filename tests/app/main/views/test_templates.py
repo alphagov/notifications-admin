@@ -63,7 +63,7 @@ def test_should_redirect_when_saving_a_template(app_,
 
             assert response.status_code == 302
             assert response.location == url_for(
-                '.choose_template', service_id=service_id, template_type='sms', _external=True)
+                '.view_template', service_id=service_id, template_id=template_id, _external=True)
             mock_update_service_template.assert_called_with(
                 template_id, name, 'sms', content, service_id, None)
 
@@ -210,9 +210,9 @@ def test_should_redirect_when_saving_a_template_email(app_,
                 template_id=template_id), data=data)
             assert response.status_code == 302
             assert response.location == url_for(
-                '.choose_template',
+                '.view_template',
                 service_id=service_id,
-                template_type='email',
+                template_id=template_id,
                 _external=True)
             mock_update_service_template.assert_called_with(
                 template_id, name, 'email', content, service_id, subject)
