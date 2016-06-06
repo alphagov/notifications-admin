@@ -3,6 +3,7 @@ from string import ascii_uppercase
 
 from flask import request, render_template, redirect, url_for, flash, abort
 from flask_login import login_required
+from dateutil.parser import parse
 
 from notifications_utils.template import Template
 from notifications_utils.recipients import first_column_heading
@@ -187,7 +188,7 @@ def delete_service_template(service_id, template_id):
 
     template_statistics = template_statistics_client.get_template_statistics_for_service(service_id)
     last_use_message = get_last_use_message(form.name.data, template['id'], template_statistics)
-    flash('{}. Are you sure you want to it?'.format(last_use_message), 'delete')
+    flash('{}. Are you sure you want to delete it?'.format(last_use_message), 'delete')
     return render_template(
         'views/edit-{}-template.html'.format(template['template_type']),
         h1='Edit template',
@@ -225,15 +226,16 @@ def view_template_versions(service_id, template_id):
 def get_last_use_message(template_name, template_id, template_statistics):
     try:
         most_recent_use = max(
-            template_stats['updated_at']
+            parse(template_stats['updated_at']).replace(tzinfo=None)
             for template_stats in template_statistics
-            if template_stats['id'] == template_id
+            if template_stats['template']['id'] == template_id
         )
     except ValueError:
-        return '{} has never been used'
+        return '{} has never been used'.format(template_name)
 
     return '{} was last used {} ago'.format(
-        get_human_readable_delta(most_recent_use, datetime.now())
+        template_name,
+        get_human_readable_delta(most_recent_use, datetime.utcnow())
     )
 
 
@@ -243,10 +245,10 @@ def get_human_readable_delta(from_time, until_time):
         return 'under a minute'
     elif delta < timedelta(hours=1):
         minutes = int(delta.seconds / 60)
-        return '{} minute{}'.format(minutes, 's' if minutes == 1 else '')
+        return '{} minute{}'.format(minutes, '' if minutes == 1 else 's')
     elif delta < timedelta(days=1):
         hours = int(delta.seconds / 3600)
-        return '{} hour{}'.format(hours, 's' if hours == 1 else '')
+        return '{} hour{}'.format(hours, '' if hours == 1 else 's')
     else:
         days = delta.days
-        return '{} day{}'.format(days, 's' if days == 1 else '')
+        return '{} day{}'.format(days, '' if days == 1 else 's')

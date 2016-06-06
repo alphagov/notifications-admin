@@ -981,7 +981,8 @@ def mock_get_template_statistics(mocker, service_one, fake_uuid):
         },
         "service": template['service'],
         "id": str(generate_uuid()),
-        "day": "2016-04-04"
+        "day": "2016-04-04",
+        "updated_at": "2016-04-04T12:00:00.000000+00:00"
     }
 
     def _get_stats(service_id, limit_days=None):
