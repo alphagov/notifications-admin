@@ -2,13 +2,7 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/table.html" import list_table, text_field, index_field, index_field_heading %}
-
-{% macro list_of_placeholders(placeholders) %}
-  {% for placeholder in placeholders %}
-    {% if loop.last and loop.length > 1 %} and {% endif %}
-    <span class="placeholder">(({{ placeholder }}))</span>
-  {% endfor %}
-{% endmacro %}
+{% from "components/list.html" import list_of_placeholders %}
 
 {% block page_title %}
   GOV.UK Notify
@@ -21,8 +15,7 @@
   <div class="bottom-gutter">
     {% if template_change.placeholders_removed %}
       <p>
-        You removed
-        {{ list_of_placeholders(template_change.placeholders_removed) }}
+        You removed {{ list_of_placeholders(template_change.placeholders_removed) }}
       </p>
     {% endif %}
     {% if template_change.placeholders_added %}
