@@ -131,6 +131,12 @@ def test_can_show_notifications(
         assert 'csv' in content
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page_title in page.h1.text.strip()
+        assert url_for(
+            '.view_notifications_csv',
+            service_id=service_one['id'],
+            message_type=message_type,
+            status=status_argument
+        ) == page.findAll("a", {"download": "download"})[0]['href']
 
         mock_get_notifications.assert_called_with(
             limit_days=7,
@@ -141,7 +147,7 @@ def test_can_show_notifications(
         )
 
         csv_response = client.get(url_for(
-            'main.view_notifications',
+            'main.view_notifications_csv',
             service_id=service_one['id'],
             message_type='email',
             download='csv'
@@ -190,12 +196,13 @@ def test_should_download_notifications_for_a_job(app_,
         with app_.test_client() as client:
             client.login(api_user_active)
             response = client.get(url_for(
-                'main.view_job',
+                'main.view_job_csv',
                 service_id=fake_uuid,
                 job_id=fake_uuid,
-                download='csv'))
+            ))
         csv_content = generate_notifications_csv(
-            mock_get_notifications(fake_uuid, job_id=fake_uuid)['notifications'])
+            mock_get_notifications(fake_uuid, job_id=fake_uuid)['notifications']
+        )
         assert response.status_code == 200
         assert response.get_data(as_text=True) == csv_content
         assert 'text/csv' in response.headers['Content-Type']

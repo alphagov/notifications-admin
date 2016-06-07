@@ -72,20 +72,6 @@ def view_job(service_id, job_id):
                                                        version=job['template_version'])['data']
     notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
     finished = job['status'] == 'finished'
-    if 'download' in request.args and request.args['download'] == 'csv':
-        csv_content = generate_notifications_csv(
-            notification_api_client.get_notifications_for_service(
-                service_id,
-                job_id,
-                page_size=job['notification_count']
-            )['notifications'])
-        return csv_content, 200, {
-            'Content-Type': 'text/csv; charset=utf-8',
-            'Content-Disposition': 'inline; filename="{} - {}.csv"'.format(
-                template['name'],
-                format_datetime_short(job['created_at'])
-            )
-        }
     return render_template(
         'views/jobs/job.html',
         notifications=notifications['notifications'],
@@ -105,6 +91,36 @@ def view_job(service_id, job_id):
             template,
             prefix=current_service['name']
         )
+    )
+
+
+@main.route("/services/<service_id>/jobs/<job_id>.csv")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def view_job_csv(service_id, job_id):
+    job = job_api_client.get_job(service_id, job_id)['data']
+    template = service_api_client.get_service_template(
+        service_id=service_id,
+        template_id=job['template'],
+        version=job['template_version']
+    )['data']
+
+    return (
+        generate_notifications_csv(
+            notification_api_client.get_notifications_for_service(
+                service_id,
+                job_id,
+                page_size=job['notification_count']
+            )['notifications']
+        ),
+        200,
+        {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': 'inline; filename="{} - {}.csv"'.format(
+                template['name'],
+                format_datetime_short(job['created_at'])
+            )
+        }
     )
 
 
@@ -140,6 +156,7 @@ def view_job_updates(service_id, job_id):
 
 
 @main.route('/services/<service_id>/notifications/<message_type>')
+@main.route('/services/<service_id>/notifications/<message_type>.csv', endpoint="view_notifications_csv")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_notifications(service_id, message_type):
@@ -181,7 +198,7 @@ def view_notifications(service_id, message_type):
             page + 1,
             'Next page',
             'page {}'.format(page + 1))
-    if 'download' in request.args and request.args['download'] == 'csv':
+    if request.path.endswith('csv'):
         csv_content = generate_notifications_csv(
             notification_api_client.get_notifications_for_service(
                 service_id=service_id,
@@ -202,6 +219,12 @@ def view_notifications(service_id, message_type):
         next_page=next_page,
         request_args=request.args,
         message_type=message_type,
+        download_link=url_for(
+            '.view_notifications_csv',
+            service_id=current_service['id'],
+            message_type=message_type,
+            status=request.args.get('status')
+        ),
         status_filters=[
             [item[0], item[1], url_for(
                 '.view_notifications',
