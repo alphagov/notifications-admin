@@ -43,12 +43,15 @@ def _parse_filter_args(filter_dict):
 
 
 def _set_status_filters(filter_args):
+    all_failure_statuses = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+    all_statuses = ['sending', 'delivered'] + all_failure_statuses
     if filter_args.get('status'):
-        if 'failed' in filter_args.get('status'):
-            filter_args['status'].extend(['temporary-failure', 'permanent-failure', 'technical-failure'])
+        if 'processed' in filter_args.get('status'):
+            filter_args['status'] = all_statuses
+        elif 'failed' in filter_args.get('status'):
+            filter_args['status'].extend(all_failure_statuses[1:])
     else:
-        # default to everything
-        filter_args['status'] = ['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+        filter_args['status'] = all_statuses
 
 
 @main.route("/services/<service_id>/jobs")
@@ -232,9 +235,10 @@ def view_notifications(service_id, message_type):
                 message_type=message_type,
                 status=item[1]
             )] for item in [
-                ['Successful', 'delivered'],
+                ['Processed', 'sending,delivered,failed'],
+                ['Sending', 'sending'],
+                ['Delivered', 'delivered'],
                 ['Failed', 'failed'],
-                ['', 'delivered,failed']
             ]
         ]
     )

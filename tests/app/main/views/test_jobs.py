@@ -88,16 +88,20 @@ def test_should_show_updates_for_one_job_as_json(
 @pytest.mark.parametrize(
     "status_argument, expected_api_call", [
         (
+            'processed',
+            ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+        ),
+        (
+            'sending',
+            ['sending']
+        ),
+        (
             'delivered',
             ['delivered']
         ),
         (
             'failed',
             ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
-        ),
-        (
-            'delivered,failed',
-            ['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
         )
     ]
 )
