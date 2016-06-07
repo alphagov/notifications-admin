@@ -1,3 +1,4 @@
+import pytest
 from flask import url_for
 from bs4 import BeautifulSoup
 import json
@@ -78,12 +79,38 @@ def test_should_show_updates_for_one_job_as_json(
         assert 'Uploaded by Test User on 1 January at 11:09' in content['status']
 
 
+@pytest.mark.parametrize(
+    "message_type,page_title", [
+        ('email', 'Emails'),
+        ('sms', 'Text messages')
+    ]
+)
+@pytest.mark.parametrize(
+    "status_argument, expected_api_call", [
+        (
+            'delivered',
+            ['delivered']
+        ),
+        (
+            'failed',
+            ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+        ),
+        (
+            'delivered,failed',
+            ['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+        )
+    ]
+)
 def test_can_see_sms(
     app_,
     service_one,
     active_user_with_permissions,
     mock_get_notifications,
-    mocker
+    mocker,
+    message_type,
+    page_title,
+    status_argument,
+    expected_api_call
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -91,8 +118,8 @@ def test_can_see_sms(
             response = client.get(url_for(
                 'main.view_notifications',
                 service_id=service_one['id'],
-                message_type='sms',
-                status='delivered,failed'))
+                message_type=message_type,
+                status=status_argument))
         assert response.status_code == 200
         content = response.get_data(as_text=True)
 
@@ -103,9 +130,15 @@ def test_can_see_sms(
         assert notification['template']['name'] in content
         assert 'csv' in content
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.text.strip() == 'Text messages'
+        assert page_title in page.h1.text.strip()
 
-        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['sms'])  # noqa
+        mock_get_notifications.assert_called_with(
+            limit_days=7,
+            page=1,
+            service_id=service_one['id'],
+            status=expected_api_call,
+            template_type=[message_type]
+        )
 
 
 def test_can_see_emails(
