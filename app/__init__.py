@@ -229,15 +229,25 @@ def valid_phone_number(phone_number):
         return False
 
 
-def format_notification_status(status):
-    m = {'failed': 'Failed',
-         'technical-failure': 'Technical failure',
-         'temporary-failure': 'Temporarily failed',
-         'permanent-failure': 'Permanently failed',
-         'delivered': 'Delivered',
-         'sending': 'Sending'
-         }
-    return m.get(status, status)
+def format_notification_status(status, template_type):
+    return {
+        'email': {
+            'failed': 'Failed',
+            'technical-failure': 'Technical failure',
+            'temporary-failure': 'Temporary failure',
+            'permanent-failure': 'Email address does not exist',
+            'delivered': 'Delivered',
+            'sending': 'Sending'
+        },
+        'sms': {
+            'failed': 'Failed',
+            'technical-failure': 'Technical failure',
+            'temporary-failure': 'Temporary failure',
+            'permanent-failure': 'Phone number does not exist',
+            'delivered': 'Delivered',
+            'sending': 'Sending'
+        }
+    }.get(template_type).get(status, status)
 
 
 @login_manager.user_loader
