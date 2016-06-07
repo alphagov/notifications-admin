@@ -186,8 +186,8 @@ def delete_service_template(service_id, template_id):
     template['template_content'] = template['content']
     form = form_objects[template['template_type']](**template)
 
-    template_statistics = template_statistics_client.get_template_statistics_for_service(service_id)
-    last_use_message = get_last_use_message(form.name.data, template['id'], template_statistics)
+    template_statistics = template_statistics_client.get_template_statistics_for_service(service_id, template['id'])
+    last_use_message = get_last_use_message(form.name.data, template_statistics)
     flash('{}. Are you sure you want to delete it?'.format(last_use_message), 'delete')
     return render_template(
         'views/edit-{}-template.html'.format(template['template_type']),
@@ -223,12 +223,11 @@ def view_template_versions(service_id, template_id):
     )
 
 
-def get_last_use_message(template_name, template_id, template_statistics):
+def get_last_use_message(template_name, template_statistics):
     try:
         most_recent_use = max(
             parse(template_stats['updated_at']).replace(tzinfo=None)
             for template_stats in template_statistics
-            if template_stats['template']['id'] == template_id
         )
     except ValueError:
         return '{} has never been used'.format(template_name)

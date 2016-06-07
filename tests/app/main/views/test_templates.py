@@ -230,6 +230,7 @@ def test_should_show_delete_template_page(app_,
                                           mock_get_user_by_email,
                                           mock_has_permissions,
                                           mock_get_template_statistics,
+                                          mock_get_template_statistics_for_template,
                                           fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -297,6 +298,7 @@ def test_route_permissions(mocker,
                            service_one,
                            mock_get_service_template,
                            mock_get_template_statistics,
+                           mock_get_template_statistics_for_template,
                            fake_uuid):
     routes = [
         'main.add_service_template',
@@ -367,31 +369,21 @@ def test_route_invalid_permissions(mocker,
                 service_one)
 
 
-@pytest.mark.parametrize('template_statistics', [
-    [{'template': {'id': 'bar'}, 'updated_at': '2000-01-01T12:00:00.000000+00:00'}],
-    []
-])
-def test_get_last_use_message_returns_no_template_message(template_statistics):
-    assert get_last_use_message('My Template', 'foo', template_statistics) == 'My Template has never been used'
+def test_get_last_use_message_returns_no_template_message():
+    assert get_last_use_message('My Template', []) == 'My Template has never been used'
 
 
 @freeze_time('2000-01-01T15:00')
-def test_get_last_use_message_uses_most_recent_statistics_for_template():
+def test_get_last_use_message_uses_most_recent_statistics():
     template_statistics = [
         {
-            'template': {'id': 'foo'},
             'updated_at': '2000-01-01T12:00:00.000000+00:00'
         },
         {
-            'template': {'id': 'foo'},
             'updated_at': '2000-01-01T09:00:00.000000+00:00'
         },
-        {
-            'template': {'id': 'bar'},
-            'updated_at': '2000-01-01T15:00:00.000000+00:00'
-        },
     ]
-    assert get_last_use_message('My Template', 'foo', template_statistics) == 'My Template was last used 3 hours ago'
+    assert get_last_use_message('My Template', template_statistics) == 'My Template was last used 3 hours ago'
 
 
 @pytest.mark.parametrize('from_time, until_time, message', [
