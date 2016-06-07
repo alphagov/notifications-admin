@@ -1,9 +1,11 @@
+from datetime import datetime, timedelta
 from string import ascii_uppercase
 
-from flask import request, render_template, redirect, url_for, flash, abort, session
+from flask import request, render_template, redirect, url_for, flash, abort
 from flask_login import login_required
+from dateutil.parser import parse
 
-from notifications_utils.template import Template, TemplateChange
+from notifications_utils.template import Template
 from notifications_utils.recipients import first_column_heading
 from notifications_python_client.errors import HTTPError
 
@@ -11,7 +13,7 @@ from app.main import main
 from app.utils import user_has_permissions
 from app.main.forms import SMSTemplateForm, EmailTemplateForm
 from app.main.views.send import get_example_csv_rows
-from app import service_api_client, current_service
+from app import service_api_client, current_service, template_statistics_client
 
 
 form_objects = {
@@ -183,7 +185,10 @@ def delete_service_template(service_id, template_id):
 
     template['template_content'] = template['content']
     form = form_objects[template['template_type']](**template)
-    flash('Are you sure you want to delete ‘{}’?'.format(form.name.data), 'delete')
+
+    template_statistics = template_statistics_client.get_template_statistics_for_service(service_id, template['id'])
+    last_use_message = get_last_use_message(form.name.data, template_statistics)
+    flash('{}. Are you sure you want to delete it?'.format(last_use_message), 'delete')
     return render_template(
         'views/edit-{}-template.html'.format(template['template_type']),
         h1='Edit template',
@@ -216,3 +221,33 @@ def view_template_versions(service_id, template_id):
             ) for template in service_api_client.get_service_template_versions(service_id, template_id)['data']
         ]
     )
+
+
+def get_last_use_message(template_name, template_statistics):
+    try:
+        most_recent_use = max(
+            parse(template_stats['updated_at']).replace(tzinfo=None)
+            for template_stats in template_statistics
+        )
+    except ValueError:
+        return '{} has never been used'.format(template_name)
+
+    return '{} was last used {} ago'.format(
+        template_name,
+        get_human_readable_delta(most_recent_use, datetime.utcnow())
+    )
+
+
+def get_human_readable_delta(from_time, until_time):
+    delta = until_time - from_time
+    if delta < timedelta(seconds=60):
+        return 'under a minute'
+    elif delta < timedelta(hours=1):
+        minutes = int(delta.seconds / 60)
+        return '{} minute{}'.format(minutes, '' if minutes == 1 else 's')
+    elif delta < timedelta(days=1):
+        hours = int(delta.seconds / 3600)
+        return '{} hour{}'.format(hours, '' if hours == 1 else 's')
+    else:
+        days = delta.days
+        return '{} day{}'.format(days, '' if days == 1 else 's')
