@@ -94,7 +94,7 @@
     {{ text_field(item.status|format_notification_status) }}
 
     {% call field(align='right') %}
-      {{ item.updated_at|format_datetime_short }}
+      {{ (item.updated_at or item.created_at)|format_datetime_short }}
     {% endcall %}
   {% endcall %}
 
