@@ -3,60 +3,34 @@
 {% from "components/previous-next-navigation.html" import previous_next_navigation %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/pill.html" import pill %}
+{% from "components/message-count-label.html" import message_count_label %}
 
 {% block page_title %}
-  Activity – GOV.UK Notify
+  {{ message_count_label(99, message_type, suffix='') | capitalize }} – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    {%- if (request_args.get('template_type', 'email,sms') == 'email,sms') and (request_args.get('status', 'delivered,failed') == 'delivered,failed') -%}
 
-      Activity
-
-    {%- else -%}
-
+    <span class="visually-hidden">
       {%- if request_args.get('status') != 'delivered,failed' -%}
         {%- for label, option, _ in status_filters -%}
           {%- if request_args.get('status', 'delivered,failed') == option -%}{{label}} {% endif -%}
         {%- endfor -%}
       {%- endif -%}
+    </span>
 
-      {%- if request_args.get('template_type', 'email,sms') == 'email,sms' %} emails and text messages
-      {%- else -%}
-
-        {%- for template_label, template_option, _ in type_filters -%}
-          {%- if request_args.get('template_type') == template_option -%}
-            {%- if request_args.get('status', 'delivered,failed') == 'delivered,failed' -%}
-              {{ template_label }}
-            {%- else -%}
-              {{ template_label | lower }}
-            {%- endif -%}
-          {%- endif -%}
-        {%- endfor -%}
-
-      {%- endif -%}
-
-    {%- endif -%}
+    {{- message_count_label(99, message_type, suffix='') | capitalize }}
 
   </h1>
 
-  <div class='grid-row bottom-gutter'>
-    <div class='column-half'>
-      {{ pill(
-        'Status',
-        status_filters,
-        request_args.get('status', '')
-      ) }}
-    </div>
-    <div class='column-half'>
-      {{ pill(
-        'Type',
-        type_filters,
-        request_args.get('template_type', '')
-      ) }}
-    </div>
+  <div class='bottom-gutter'>
+    {{ pill(
+      'Status',
+      status_filters,
+      request_args.get('status', '')
+    ) }}
   </div>
 
   {% if notifications %}

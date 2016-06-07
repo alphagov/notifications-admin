@@ -78,41 +78,20 @@ def test_should_show_updates_for_one_job_as_json(
         assert 'Uploaded by Test User on 1 January at 11:09' in content['status']
 
 
-def test_should_show_notifications_for_a_service(app_,
-                                                 service_one,
-                                                 active_user_with_permissions,
-                                                 mock_get_notifications,
-                                                 mocker):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
-            response = client.get(url_for('main.view_notifications', service_id=service_one['id']))
-        assert response.status_code == 200
-        content = response.get_data(as_text=True)
-        notifications = notification_json(service_one['id'])
-        notification = notifications['notifications'][0]
-        assert notification['to'] in content
-        assert notification['status'] in content
-        assert notification['template']['name'] in content
-        assert 'csv' in content
-        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string.strip() == 'Activity'
-
-        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['email', 'sms'])  # noqa
-
-
-def test_can_view_only_sms_notifications_for_a_service(app_,
-                                                       service_one,
-                                                       active_user_with_permissions,
-                                                       mock_get_notifications,
-                                                       mocker):
+def test_can_see_sms(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    mock_get_notifications,
+    mocker
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
             response = client.get(url_for(
                 'main.view_notifications',
                 service_id=service_one['id'],
-                template_type='sms',
+                message_type='sms',
                 status='delivered,failed'))
         assert response.status_code == 200
         content = response.get_data(as_text=True)
@@ -124,16 +103,18 @@ def test_can_view_only_sms_notifications_for_a_service(app_,
         assert notification['template']['name'] in content
         assert 'csv' in content
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string.strip() == 'Text messages'
+        assert page.h1.text.strip() == 'Text messages'
 
         mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['sms'])  # noqa
 
 
-def test_can_view_only_email_notifications_for_a_service(app_,
-                                                         service_one,
-                                                         active_user_with_permissions,
-                                                         mock_get_notifications,
-                                                         mocker):
+def test_can_see_emails(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    mock_get_notifications,
+    mocker
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -141,7 +122,7 @@ def test_can_view_only_email_notifications_for_a_service(app_,
                 'main.view_notifications',
                 service_id=service_one['id'],
                 status='delivered,failed',
-                template_type='email'))
+                message_type='email'))
         assert response.status_code == 200
         content = response.get_data(as_text=True)
 
@@ -152,48 +133,25 @@ def test_can_view_only_email_notifications_for_a_service(app_,
         assert notification['template']['name'] in content
         assert 'csv' in content
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string.strip() == 'Emails'
+        assert page.h1.text.strip() == 'Emails'
 
         mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['email'])  # noqa
 
 
-def test_can_view_successful_notifications_for_a_service(app_,
-                                                         service_one,
-                                                         active_user_with_permissions,
-                                                         mock_get_notifications,
-                                                         mocker):
+def test_can_view_failed_emails(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    mock_get_notifications,
+    mocker
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
             response = client.get(url_for(
                 'main.view_notifications',
                 service_id=service_one['id'],
-                status='delivered'))
-        assert response.status_code == 200
-        content = response.get_data(as_text=True)
-        notifications = notification_json(service_one['id'])
-        notification = notifications['notifications'][0]
-        assert notification['to'] in content
-        assert notification['status'] in content
-        assert notification['template']['name'] in content
-        assert 'csv' in content
-        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string.strip() == 'Successful  emails and text messages'
-
-        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['delivered'], template_type=['email', 'sms'])  # noqa
-
-
-def test_can_view_failed_notifications_for_a_service(app_,
-                                                     service_one,
-                                                     active_user_with_permissions,
-                                                     mock_get_notifications,
-                                                     mocker):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
-            response = client.get(url_for(
-                'main.view_notifications',
-                service_id=service_one['id'],
+                message_type='email',
                 status='failed'))
         assert response.status_code == 200
         content = response.get_data(as_text=True)
@@ -204,12 +162,12 @@ def test_can_view_failed_notifications_for_a_service(app_,
         assert notification['template']['name'] in content
         assert 'csv' in content
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string.strip() == 'Failed  emails and text messages'
+        assert page.h1.text.strip() == 'Failed Emails'
 
-        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['email', 'sms'])  # noqa
+        mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['email'])  # noqa
 
 
-def test_can_view_failed_combination_of_notification_type_and_status(
+def test_can_view_failed_sms_messages(
     app_,
     service_one,
     active_user_with_permissions,
@@ -223,10 +181,10 @@ def test_can_view_failed_combination_of_notification_type_and_status(
                 'main.view_notifications',
                 service_id=service_one['id'],
                 status='failed',
-                template_type='sms'))
+                message_type='sms'))
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string.strip() == 'Failed text messages'
+        assert page.h1.text.strip() == 'Failed Text messages'
 
         mock_get_notifications.assert_called_with(limit_days=7, page=1, service_id=service_one['id'], status=['failed', 'temporary-failure', 'permanent-failure', 'technical-failure'], template_type=['sms'])  # noqa
 
@@ -239,11 +197,16 @@ def test_should_show_notifications_for_a_service_with_next_previous(app_,
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
-            response = client.get(url_for('main.view_notifications', service_id=service_one['id'], page=2))
+            response = client.get(url_for(
+                'main.view_notifications',
+                service_id=service_one['id'],
+                message_type='sms',
+                page=2
+            ))
         assert response.status_code == 200
         content = response.get_data(as_text=True)
-        assert url_for('main.view_notifications', service_id=service_one['id'], page=3) in content
-        assert url_for('main.view_notifications', service_id=service_one['id'], page=1) in content
+        assert url_for('main.view_notifications', service_id=service_one['id'], message_type='sms', page=3) in content
+        assert url_for('main.view_notifications', service_id=service_one['id'], message_type='sms', page=1) in content
         assert 'Previous page' in content
         assert 'Next page' in content
 
@@ -260,6 +223,7 @@ def test_should_download_notifications_for_a_service(app_,
             response = client.get(url_for(
                 'main.view_notifications',
                 service_id=service_one['id'],
+                message_type='email',
                 download='csv'))
         csv_content = generate_notifications_csv(
             mock_get_notifications(service_one['id'])['notifications'])
