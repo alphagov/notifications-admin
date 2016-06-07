@@ -892,6 +892,20 @@ def mock_s3_upload(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_s3_download(mocker, content=None):
+    if not content:
+        content = """
+            phone number,name
+            +447700900986,John
+            +447700900986,Smith
+        """
+
+    def _download(service_id, upload_id):
+        return content
+    return mocker.patch('app.main.views.send.s3download', side_effect=_download)
+
+
+@pytest.fixture(scope='function')
 def sample_invite(mocker, service_one, status='pending'):
     id_ = str(generate_uuid())
     from_user = service_one['users'][0]
