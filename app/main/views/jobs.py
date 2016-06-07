@@ -26,6 +26,7 @@ from app.utils import (
     generate_previous_next_dict,
     user_has_permissions,
     generate_notifications_csv)
+from app.statistics_utils import sum_of_statistics
 
 
 def _parse_filter_args(filter_dict):

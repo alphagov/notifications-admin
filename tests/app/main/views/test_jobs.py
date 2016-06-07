@@ -32,6 +32,7 @@ def test_should_show_page_for_one_job(
     service_one,
     active_user_with_permissions,
     mock_get_service_template,
+    mock_get_service_statistics,
     mock_get_job,
     mocker,
     mock_get_notifications,
@@ -57,6 +58,7 @@ def test_should_show_updates_for_one_job_as_json(
     service_one,
     active_user_with_permissions,
     mock_get_notifications,
+    mock_get_service_statistics,
     mock_get_job,
     mocker,
     fake_uuid
@@ -112,6 +114,7 @@ def test_can_show_notifications(
     service_one,
     active_user_with_permissions,
     mock_get_notifications,
+    mock_get_service_statistics,
     mocker,
     message_type,
     page_title,
@@ -166,11 +169,14 @@ def test_can_show_notifications(
         assert 'text/csv' in csv_response.headers['Content-Type']
 
 
-def test_should_show_notifications_for_a_service_with_next_previous(app_,
-                                                                    service_one,
-                                                                    active_user_with_permissions,
-                                                                    mock_get_notifications_with_previous_next,
-                                                                    mocker):
+def test_should_show_notifications_for_a_service_with_next_previous(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    mock_get_notifications_with_previous_next,
+    mock_get_service_statistics,
+    mocker
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
