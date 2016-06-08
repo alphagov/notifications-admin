@@ -40,6 +40,11 @@ def delivery_and_failure():
     return render_template('views/delivery-and-failure.html')
 
 
+@main.route('/information-security')
+def information_security():
+    return render_template('views/information-security.html')
+
+
 @main.route('/terms')
 def terms():
     return render_template('views/terms-of-use.html')
