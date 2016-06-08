@@ -175,7 +175,6 @@ def test_menu_send_messages(mocker,
             'main.choose_template',
             service_id=service_one['id'],
             template_type='sms')in page
-        assert url_for('main.view_notifications', service_id=service_one['id']) in page
         assert url_for('main.manage_users', service_id=service_one['id']) in page
         assert url_for('main.documentation') in page
 
@@ -209,7 +208,6 @@ def test_menu_manage_service(mocker,
             'main.choose_template',
             service_id=service_one['id'],
             template_type='sms') in page
-        assert url_for('main.view_notifications', service_id=service_one['id']) in page
         assert url_for('main.manage_users', service_id=service_one['id']) in page
         assert url_for('main.service_settings', service_id=service_one['id']) in page
         assert url_for('main.documentation') in page
@@ -242,7 +240,6 @@ def test_menu_manage_api_keys(mocker,
             'main.choose_template',
             service_id=service_one['id'],
             template_type='sms') in page
-        assert url_for('main.view_notifications', service_id=service_one['id']) in page
         assert url_for('main.manage_users', service_id=service_one['id']) in page
         assert url_for('main.service_settings', service_id=service_one['id']) not in page
         assert url_for('main.show_all_services') not in page
@@ -270,7 +267,8 @@ def test_menu_all_services_for_platform_admin_user(mocker,
         assert url_for('main.choose_template', service_id=service_one['id'], template_type='email') in page
         assert url_for('main.manage_users', service_id=service_one['id']) in page
         assert url_for('main.service_settings', service_id=service_one['id']) in page
-        assert url_for('main.view_notifications', service_id=service_one['id']) in page
+        assert url_for('main.view_notifications', service_id=service_one['id'], message_type='email') in page
+        assert url_for('main.view_notifications', service_id=service_one['id'], message_type='sms') in page
         assert url_for('main.api_keys', service_id=service_one['id']) not in page
 
         # Should this be here??

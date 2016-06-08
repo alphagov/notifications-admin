@@ -43,17 +43,15 @@ def _parse_filter_args(filter_dict):
 
 
 def _set_status_filters(filter_args):
+    all_failure_statuses = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+    all_statuses = ['sending', 'delivered'] + all_failure_statuses
     if filter_args.get('status'):
-        if 'failed' in filter_args.get('status'):
-            filter_args['status'].extend(['temporary-failure', 'permanent-failure', 'technical-failure'])
+        if 'processed' in filter_args.get('status'):
+            filter_args['status'] = all_statuses
+        elif 'failed' in filter_args.get('status'):
+            filter_args['status'].extend(all_failure_statuses[1:])
     else:
-        # default to everything
-        filter_args['status'] = ['delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
-
-
-def _set_template_filters(filter_args):
-    if not filter_args.get('template_type'):
-        filter_args['template_type'] = ['email', 'sms']
+        filter_args['status'] = all_statuses
 
 
 @main.route("/services/<service_id>/jobs")
@@ -77,20 +75,6 @@ def view_job(service_id, job_id):
                                                        version=job['template_version'])['data']
     notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
     finished = job['status'] == 'finished'
-    if 'download' in request.args and request.args['download'] == 'csv':
-        csv_content = generate_notifications_csv(
-            notification_api_client.get_notifications_for_service(
-                service_id,
-                job_id,
-                page_size=job['notification_count']
-            )['notifications'])
-        return csv_content, 200, {
-            'Content-Type': 'text/csv; charset=utf-8',
-            'Content-Disposition': 'inline; filename="{} - {}.csv"'.format(
-                template['name'],
-                format_datetime_short(job['created_at'])
-            )
-        }
     return render_template(
         'views/jobs/job.html',
         notifications=notifications['notifications'],
@@ -110,6 +94,36 @@ def view_job(service_id, job_id):
             template,
             prefix=current_service['name']
         )
+    )
+
+
+@main.route("/services/<service_id>/jobs/<job_id>.csv")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def view_job_csv(service_id, job_id):
+    job = job_api_client.get_job(service_id, job_id)['data']
+    template = service_api_client.get_service_template(
+        service_id=service_id,
+        template_id=job['template'],
+        version=job['template_version']
+    )['data']
+
+    return (
+        generate_notifications_csv(
+            notification_api_client.get_notifications_for_service(
+                service_id,
+                job_id,
+                page_size=job['notification_count']
+            )['notifications']
+        ),
+        200,
+        {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': 'inline; filename="{} - {}.csv"'.format(
+                template['name'],
+                format_datetime_short(job['created_at'])
+            )
+        }
     )
 
 
@@ -144,26 +158,31 @@ def view_job_updates(service_id, job_id):
     })
 
 
-@main.route('/services/<service_id>/notifications')
+@main.route('/services/<service_id>/notifications/<message_type>')
+@main.route('/services/<service_id>/notifications/<message_type>.csv', endpoint="view_notifications_csv")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
-def view_notifications(service_id):
+def view_notifications(service_id, message_type):
     # TODO get the api to return count of pages as well.
     page = get_page_from_request()
     if page is None:
         abort(404, "Invalid page argument ({}) reverting to page 1.".format(request.args['page'], None))
+    if message_type not in ['email', 'sms']:
+        abort(404)
 
     filter_args = _parse_filter_args(request.args)
     _set_status_filters(filter_args)
-    _set_template_filters(filter_args)
 
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
         page=page,
-        template_type=filter_args.get('template_type'),
+        template_type=[message_type],
         status=filter_args.get('status'),
         limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
-    view_dict = MultiDict(request.args)
+    view_dict = dict(
+        message_type=message_type,
+        status=request.args.get('status')
+    )
     prev_page = None
     if notifications['links'].get('prev', None):
         prev_page = generate_previous_next_dict(
@@ -182,13 +201,13 @@ def view_notifications(service_id):
             page + 1,
             'Next page',
             'page {}'.format(page + 1))
-    if 'download' in request.args and request.args['download'] == 'csv':
+    if request.path.endswith('csv'):
         csv_content = generate_notifications_csv(
             notification_api_client.get_notifications_for_service(
                 service_id=service_id,
                 page=page,
                 page_size=notifications['total'],
-                template_type=filter_args.get('template_type') if 'template_type' in filter_args else ['email', 'sms'],
+                template_type=[message_type],
                 status=filter_args.get('status'),
                 limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])['notifications'])
         return csv_content, 200, {
@@ -202,28 +221,24 @@ def view_notifications(service_id):
         prev_page=prev_page,
         next_page=next_page,
         request_args=request.args,
-        type_filters=[
-            [item[0], item[1], url_for(
-                '.view_notifications',
-                service_id=current_service['id'],
-                template_type=item[1],
-                status=request.args.get('status', 'delivered,failed')
-            )] for item in [
-                ['Emails', 'email'],
-                ['Text messages', 'sms'],
-                ['Both', 'email,sms']
-            ]
-        ],
+        message_type=message_type,
+        download_link=url_for(
+            '.view_notifications_csv',
+            service_id=current_service['id'],
+            message_type=message_type,
+            status=request.args.get('status')
+        ),
         status_filters=[
             [item[0], item[1], url_for(
                 '.view_notifications',
                 service_id=current_service['id'],
-                template_type=request.args.get('template_type', 'email,sms'),
+                message_type=message_type,
                 status=item[1]
             )] for item in [
-                ['Successful', 'delivered'],
+                ['Processed', 'sending,delivered,failed'],
+                ['Sending', 'sending'],
+                ['Delivered', 'delivered'],
                 ['Failed', 'failed'],
-                ['Both', 'delivered,failed']
             ]
         ]
     )
