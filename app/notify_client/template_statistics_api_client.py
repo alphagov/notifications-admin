@@ -20,3 +20,8 @@ class TemplateStatisticsApiClient(BaseAPIClient):
             url='/service/{}/template-statistics'.format(service_id),
             params=params
         )['data']
+
+    def get_template_statistics_for_template(self, service_id, template_id):
+        return self.get(
+            url='/service/{}/template-statistics/{}'.format(service_id, template_id)
+        )['data']
