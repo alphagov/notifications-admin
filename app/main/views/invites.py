@@ -54,6 +54,7 @@ def accept_invite(token):
     service_users = user_api_client.get_users_for_service(invited_user.service)
 
     if existing_user:
+        invite_api_client.accept_invite(invited_user.service, invited_user.id)
         if existing_user in service_users:
             return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
         else:

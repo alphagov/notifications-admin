@@ -21,7 +21,10 @@ from app.main.forms import (
     RegisterUserFromInviteForm
 )
 
-from app import user_api_client
+from app import (
+    user_api_client,
+    invite_api_client
+)
 
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -53,6 +56,7 @@ def register_from_invite():
             abort(400)
         registered = _do_registration(form, send_email=False)
         if registered:
+            invite_api_client.accept_invite(invited_user['service'], invited_user['id'])
             return redirect(url_for('main.verify'))
         else:
             flash('There was an error registering your account')
