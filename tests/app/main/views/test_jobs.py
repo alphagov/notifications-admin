@@ -26,6 +26,30 @@ def test_should_return_list_of_all_jobs(app_,
         assert len(jobs) == 5
 
 
+@pytest.mark.parametrize(
+    "status_argument, expected_api_call", [
+        (
+            '',
+            ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+        ),
+        (
+            'processed',
+            ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+        ),
+        (
+            'sending',
+            ['sending']
+        ),
+        (
+            'delivered',
+            ['delivered']
+        ),
+        (
+            'failed',
+            ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+        )
+    ]
+)
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_page_for_one_job(
     app_,
@@ -36,13 +60,20 @@ def test_should_show_page_for_one_job(
     mock_get_job,
     mocker,
     mock_get_notifications,
-    fake_uuid
+    fake_uuid,
+    status_argument,
+    expected_api_call
 ):
     file_name = mock_get_job(service_one['id'], fake_uuid)['data']['original_file_name']
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
-            response = client.get(url_for('main.view_job', service_id=service_one['id'], job_id=fake_uuid))
+            response = client.get(url_for(
+                'main.view_job',
+                service_id=service_one['id'],
+                job_id=fake_uuid,
+                status=status_argument
+            ))
 
         assert response.status_code == 200
         content = response.get_data(as_text=True)
@@ -50,6 +81,22 @@ def test_should_show_page_for_one_job(
         assert file_name in content
         assert 'Delivered' in content
         assert '11:10' in content
+        assert url_for(
+            'main.view_job_updates',
+            service_id=service_one['id'],
+            job_id=fake_uuid,
+            status=status_argument,
+        ) in content
+        assert url_for(
+            'main.view_job_csv',
+            service_id=service_one['id'],
+            job_id=fake_uuid
+        ) in content
+        mock_get_notifications.assert_called_with(
+            service_one['id'],
+            fake_uuid,
+            status=expected_api_call
+        )
 
 
 @freeze_time("2016-01-01 11:09:00.061258")

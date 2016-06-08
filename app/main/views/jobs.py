@@ -48,7 +48,7 @@ def _set_status_filters(filter_args):
     all_failure_statuses = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
     all_statuses = ['sending', 'delivered'] + all_failure_statuses
     if filter_args.get('status'):
-        if 'processed' in filter_args.get('status'):
+        if 'processed' in filter_args.get('status') or not filter_args.get('status'):
             filter_args['status'] = all_statuses
         elif 'failed' in filter_args.get('status'):
             filter_args['status'].extend(all_failure_statuses[1:])
@@ -75,7 +75,12 @@ def view_job(service_id, job_id):
     template = service_api_client.get_service_template(service_id=service_id,
                                                        template_id=job['template'],
                                                        version=job['template_version'])['data']
-    notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
+
+    filter_args = _parse_filter_args(request.args)
+    _set_status_filters(filter_args)
+    notifications = notification_api_client.get_notifications_for_service(
+        service_id, job_id, status=filter_args.get('status'),
+    )
     finished = job['status'] == 'finished'
     return render_template(
         'views/jobs/job.html',
@@ -95,7 +100,9 @@ def view_job(service_id, job_id):
         template=Template(
             template,
             prefix=current_service['name']
-        )
+        ),
+        counts=_get_job_counts(job, request.args.get('help', 0)),
+        status=request.args.get('status', '')
     )
 
 
@@ -109,12 +116,15 @@ def view_job_csv(service_id, job_id):
         template_id=job['template'],
         version=job['template_version']
     )['data']
+    filter_args = _parse_filter_args(request.args)
+    _set_status_filters(filter_args)
 
     return (
         generate_notifications_csv(
             notification_api_client.get_notifications_for_service(
                 service_id,
                 job_id,
+                status=filter_args.get('status'),
                 page_size=job['notification_count']
             )['notifications']
         ),
@@ -134,7 +144,11 @@ def view_job_csv(service_id, job_id):
 @user_has_permissions('view_activity', admin_override=True)
 def view_job_updates(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
-    notifications = notification_api_client.get_notifications_for_service(service_id, job_id)
+    filter_args = _parse_filter_args(request.args)
+    _set_status_filters(filter_args)
+    notifications = notification_api_client.get_notifications_for_service(
+        service_id, job_id, status=filter_args.get('status')
+    )
     finished = (
         job.get('notifications_sent', 0) -
         job.get('notifications_delivered', 0) -
@@ -144,13 +158,16 @@ def view_job_updates(service_id, job_id):
         'counts': render_template(
             'partials/jobs/count.html',
             job=job,
-            finished=finished
+            finished=finished,
+            counts=_get_job_counts(job, request.args.get('help', 0)),
+            status=request.args.get('status', '')
         ),
         'notifications': render_template(
             'partials/jobs/notifications.html',
             job=job,
             notifications=notifications['notifications'],
-            finished=finished
+            finished=finished,
+            status=request.args.get('status', '')
         ),
         'status': render_template(
             'partials/jobs/status.html',
@@ -269,3 +286,41 @@ def view_notification(service_id, job_id, notification_id):
         uploaded_at=now,
         job_id=job_id
     )
+
+
+def _get_job_counts(job, help_argument):
+    return [
+        (
+            label,
+            query_param,
+            url_for(
+                ".view_job",
+                service_id=job['service'],
+                job_id=job['id'],
+                status=query_param,
+                help=help_argument
+            ),
+            count
+        ) for label, query_param, count in [
+            [
+              'Processed', '',
+              job.get('notifications_sent', 0)
+            ],
+            [
+              'Sending', 'sending',
+              (
+                  job.get('notifications_sent', 0) -
+                  job.get('notifications_delivered', 0) -
+                  job.get('notifications_failed', 0)
+              )
+            ],
+            [
+              'Delivered', 'delivered',
+              job.get('notifications_delivered', 0)
+            ],
+            [
+              'Failed', 'failed',
+              job.get('notifications_failed')
+            ]
+        ]
+    ]
