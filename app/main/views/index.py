@@ -44,6 +44,11 @@ def delivery_and_failure():
     return render_template('views/delivery-and-failure.html')
 
 
+@main.route('/design-patterns-content-guidance')
+def design_content():
+    return render_template('views/design-patterns-content-guidance.html')
+
+
 @main.route('/information-security')
 def information_security():
     return render_template('views/information-security.html')
