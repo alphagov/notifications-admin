@@ -17,8 +17,8 @@ from flask.ext.login import (
 
 from app import (
     user_api_client,
-    invite_api_client,
-    service_api_client
+    service_api_client,
+    invite_api_client
 )
 
 
