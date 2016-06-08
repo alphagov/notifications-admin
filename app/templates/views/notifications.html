@@ -15,7 +15,7 @@
 
     <span class="visually-hidden">
       {%- if request_args.get('status') != 'delivered,failed' -%}
-        {%- for label, option, _ in status_filters -%}
+        {%- for label, option, _, _ in status_filters -%}
           {%- if request_args.get('status', 'delivered,failed') == option -%}{{label}} {% endif -%}
         {%- endfor -%}
       {%- endif -%}

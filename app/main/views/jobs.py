@@ -18,6 +18,7 @@ from app import (
     job_api_client,
     notification_api_client,
     service_api_client,
+    statistics_api_client,
     current_service,
     format_datetime_short)
 from app.main import main
@@ -26,7 +27,7 @@ from app.utils import (
     generate_previous_next_dict,
     user_has_permissions,
     generate_notifications_csv)
-from app.statistics_utils import sum_of_statistics
+from app.statistics_utils import sum_of_statistics, statistics_by_state
 
 
 def _parse_filter_args(filter_dict):
@@ -180,6 +181,9 @@ def view_notifications(service_id, message_type):
         template_type=[message_type],
         status=filter_args.get('status'),
         limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
+    service_statistics_by_state = statistics_by_state(sum_of_statistics(
+        statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
+    ))
     view_dict = dict(
         message_type=message_type,
         status=request.args.get('status')
@@ -230,16 +234,20 @@ def view_notifications(service_id, message_type):
             status=request.args.get('status')
         ),
         status_filters=[
-            [item[0], item[1], url_for(
-                '.view_notifications',
-                service_id=current_service['id'],
-                message_type=message_type,
-                status=item[1]
-            )] for item in [
-                ['Processed', 'sending,delivered,failed'],
-                ['Sending', 'sending'],
-                ['Delivered', 'delivered'],
-                ['Failed', 'failed'],
+            [
+                item[0], item[1],
+                url_for(
+                    '.view_notifications',
+                    service_id=current_service['id'],
+                    message_type=message_type,
+                    status=item[1]
+                ),
+                service_statistics_by_state[message_type][item[0]]
+            ] for item in [
+                ['processed', 'sending,delivered,failed'],
+                ['sending', 'sending'],
+                ['delivered', 'delivered'],
+                ['failed', 'failed'],
             ]
         ]
     )

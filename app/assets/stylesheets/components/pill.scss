@@ -5,9 +5,9 @@
   a,
   span {
     display: block;
-    padding: 10px;  
+    padding: 10px;
     flex-grow: 1;
-    text-align: center;
+    text-align: left;
 
     &:first-child {
       margin-left: 0;
@@ -24,6 +24,12 @@
     color: $link-colour;
     border: 1px solid $panel-colour;
     position: relative;
+    text-decoration: none;
+    cursor: pointer;
+
+    .pill-label {
+      text-decoration: underline;
+    }
 
     &:hover {
       color: $text-colour;
