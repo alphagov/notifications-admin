@@ -20,9 +20,10 @@
   }
 
   a {
-    background: $panel-colour;
-    color: $link-colour;
-    border: 1px solid $panel-colour;
+    $background: $link-colour;
+    background: $background;
+    color: $white;
+    border: 2px solid $background;
     position: relative;
     text-decoration: none;
     cursor: pointer;
@@ -31,8 +32,13 @@
       text-decoration: underline;
     }
 
+    &:link,
+    &:visited {
+      color: $white;
+    }
+
     &:hover {
-      color: $text-colour;
+      color: $light-blue-25;
     }
 
     &:active,
@@ -42,7 +48,10 @@
   }
 
   span {
-    border: 1px solid $grey-1;
+    border: 2px solid $black;
+    outline: 1px solid rgba($white, 0.1);
+    position: relative;
+    z-index: 1000;
     color: $text-colour;
   }
 }
