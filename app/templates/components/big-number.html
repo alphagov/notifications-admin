@@ -31,9 +31,7 @@
   failure_percentage,
   danger_zone=False,
   failure_link=None,
-  link=None,
-  show_more_link=None,
-  show_more_text=''
+  link=None
 ) %}
   <div class="big-number-with-status">
     {{ big_number(number, label, link=link) }}
@@ -51,7 +49,4 @@
       {% endif %}
     </div>
   </div>
-  {% if show_more_link and show_more_text %}
-    <a href="{{ show_more_link }}" class="big-number-with-status-show-more-link">{{ show_more_text }}</a>
-  {% endif %}
 {% endmacro %}
