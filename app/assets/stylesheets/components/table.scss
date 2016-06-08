@@ -1,5 +1,6 @@
 .table {
   margin-bottom: $gutter;
+  width: 100%;
 }
 
 .table-heading {
@@ -10,6 +11,16 @@
 .table-field-headings {
   th {
     padding: 0 0 5px 0;
+  }
+}
+
+.table-row {
+  th {
+    width: 52.5%;
+
+    a {
+      max-height: 1.25em;
+    }
   }
 }
 
@@ -75,6 +86,10 @@
 
   &-index {
     width: 15px;
+  }
+
+  &-date {
+    white-space: nowrap;
   }
 
   p {

@@ -3,8 +3,7 @@
   table {
     th {
       @include core-16;
-      padding-top: 0;
-      border: 0;
+      border-bottom: 0;
     }
 
     td {
