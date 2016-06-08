@@ -160,11 +160,13 @@ def test_invite_user(
         assert page.h1.string.strip() == 'Team members'
         flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
         assert flash_banner == 'Invite sent to test@example.gov.uk'
-        excpected_permissions = 'manage_api_keys,manage_service,send_messages,view_activity'
+
+        expected_permissions = 'manage_api_keys,manage_settings,manage_templates,manage_users,send_emails,send_letters,send_texts,view_activity'  # noqa
+
         app.invite_api_client.create_invite.assert_called_once_with(sample_invite['from_user'],
                                                                     sample_invite['service'],
                                                                     email_address,
-                                                                    excpected_permissions)
+                                                                    expected_permissions)
 
 
 def test_cancel_invited_user_cancels_user_invitations(app_,

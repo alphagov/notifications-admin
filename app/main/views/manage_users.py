@@ -1,5 +1,4 @@
 from itertools import chain
-from collections import OrderedDict
 from flask import (
     request,
     render_template,
@@ -35,14 +34,14 @@ roles = {
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def manage_users(service_id):
+    users = user_api_client.get_users_for_service(service_id=service_id)
+    invited_users = [invite for invite in invite_api_client.get_invites_for_service(service_id=service_id)
+                     if invite.status != 'accepted']
     return render_template(
         'views/manage-users.html',
-        users=user_api_client.get_users_for_service(service_id=service_id),
+        users=users,
         current_user=current_user,
-        invited_users=[
-            invite for invite in invite_api_client.get_invites_for_service(service_id=service_id)
-            if invite.status != 'accepted'
-        ]
+        invited_users=invited_users
     )
 
 
@@ -58,8 +57,10 @@ def invite_user(service_id):
         # view_activity is a default role to be added to all users.
         # All users will have at minimum view_activity to allow users to see notifications,
         # templates, team members but no update privileges
-        selected_permissions = [role for role in sorted(roles.keys()) if request.form.get(role) == 'y']
+        selected_permissions = [permissions for role, permissions in roles.items() if request.form.get(role) == 'y']
+        selected_permissions = list(chain.from_iterable(selected_permissions))
         selected_permissions.append('view_activity')
+        selected_permissions.sort()
         permissions = ','.join(selected_permissions)
         invited_user = invite_api_client.create_invite(
             current_user.id,

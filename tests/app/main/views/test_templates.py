@@ -1,9 +1,12 @@
-import json
-import uuid
-from bs4 import BeautifulSoup
-from tests import validate_route_permission
+from datetime import datetime
 
+import pytest
+from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
+
+from tests import validate_route_permission
+from app.main.views.templates import get_last_use_message, get_human_readable_delta
 
 
 def test_should_show_page_for_one_templates(app_,
@@ -226,6 +229,8 @@ def test_should_show_delete_template_page(app_,
                                           mock_get_user,
                                           mock_get_user_by_email,
                                           mock_has_permissions,
+                                          mock_get_template_statistics,
+                                          mock_get_template_statistics_for_template,
                                           fake_uuid):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -292,6 +297,8 @@ def test_route_permissions(mocker,
                            api_user_active,
                            service_one,
                            mock_get_service_template,
+                           mock_get_template_statistics,
+                           mock_get_template_statistics_for_template,
                            fake_uuid):
     routes = [
         'main.add_service_template',
@@ -360,3 +367,35 @@ def test_route_invalid_permissions(mocker,
                 ['view_activity'],
                 api_user_active,
                 service_one)
+
+
+def test_get_last_use_message_returns_no_template_message():
+    assert get_last_use_message('My Template', []) == 'My Template has never been used'
+
+
+@freeze_time('2000-01-01T15:00')
+def test_get_last_use_message_uses_most_recent_statistics():
+    template_statistics = [
+        {
+            'updated_at': '2000-01-01T12:00:00.000000+00:00'
+        },
+        {
+            'updated_at': '2000-01-01T09:00:00.000000+00:00'
+        },
+    ]
+    assert get_last_use_message('My Template', template_statistics) == 'My Template was last used 3 hours ago'
+
+
+@pytest.mark.parametrize('from_time, until_time, message', [
+    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 12, 0, 59), 'under a minute'),
+    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 12, 1), '1 minute'),
+    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 12, 2, 35), '2 minutes'),
+    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 12, 59), '59 minutes'),
+    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 13, 0), '1 hour'),
+    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 1, 14, 0), '2 hours'),
+    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 2, 11, 59), '23 hours'),
+    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 2, 12, 0), '1 day'),
+    (datetime(2000, 1, 1, 12, 0), datetime(2000, 1, 3, 14, 0), '2 days'),
+])
+def test_get_human_readable_delta(from_time, until_time, message):
+    assert get_human_readable_delta(from_time, until_time) == message

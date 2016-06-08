@@ -892,6 +892,20 @@ def mock_s3_upload(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_s3_download(mocker, content=None):
+    if not content:
+        content = """
+            phone number,name
+            +447700900986,John
+            +447700900986,Smith
+        """
+
+    def _download(service_id, upload_id):
+        return content
+    return mocker.patch('app.main.views.send.s3download', side_effect=_download)
+
+
+@pytest.fixture(scope='function')
 def sample_invite(mocker, service_one, status='pending'):
     id_ = str(generate_uuid())
     from_user = service_one['users'][0]
@@ -981,11 +995,35 @@ def mock_get_template_statistics(mocker, service_one, fake_uuid):
         },
         "service": template['service'],
         "id": str(generate_uuid()),
-        "day": "2016-04-04"
+        "day": "2016-04-04",
+        "updated_at": "2016-04-04T12:00:00.000000+00:00"
     }
 
     def _get_stats(service_id, limit_days=None):
         return [data]
+
+    return mocker.patch(
+        'app.template_statistics_client.get_template_statistics_for_service', side_effect=_get_stats)
+
+
+@pytest.fixture(scope='function')
+def mock_get_template_statistics_for_template(mocker, service_one):
+    def _get_stats(service_id, template_id):
+        template = template_json(service_id, template_id, "Test template", "sms", "Something very interesting")
+        return [
+            {
+                "usage_count": 1,
+                "template": {
+                    "name": template['name'],
+                    "template_type": template['template_type'],
+                    "id": template['id']
+                },
+                "service": template['service'],
+                "id": str(generate_uuid()),
+                "day": "2016-04-04",
+                "updated_at": "2016-04-04T12:00:00.000000+00:00"
+            }
+        ]
 
     return mocker.patch(
         'app.template_statistics_client.get_template_statistics_for_service', side_effect=_get_stats)
