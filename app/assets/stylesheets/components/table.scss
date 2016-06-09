@@ -1,6 +1,7 @@
 .table {
   margin-bottom: $gutter;
   width: 100%;
+  table-layout: fixed;
 }
 
 .table-heading {
@@ -16,11 +17,14 @@
 
 .table-row {
   th {
+    display: table-cell;
     width: 52.5%;
     font-weight: normal;
 
-    a {
-      max-height: 1.25em;
+    .hint {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
@@ -100,6 +104,10 @@
 }
 
 .table-field-heading {
+
+  &-first {
+    width: 52.5%;
+  }
 
   &:last-child {
     padding-right: 0;

@@ -58,6 +58,10 @@
 
   &-filename {
     @include bold-19;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &-hint {
