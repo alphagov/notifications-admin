@@ -1,7 +1,6 @@
 .table {
   margin-bottom: $gutter;
   width: 100%;
-  table-layout: fixed;
 }
 
 .table-heading {
@@ -9,24 +8,32 @@
   margin: 40px 0 $gutter-half 0;
 }
 
-.table-field-headings {
-  th {
-    padding: 0 0 5px 0;
+.dashboard-table {
+
+  .table {
+    table-layout: fixed;
   }
-}
 
-.table-row {
-  th {
-    display: table-cell;
-    width: 52.5%;
-    font-weight: normal;
-
-    .hint {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+  .table-field-headings {
+    th {
+      padding: 0 0 5px 0;
     }
   }
+
+  .table-row {
+    th {
+      display: table-cell;
+      width: 52.5%;
+      font-weight: normal;
+
+      .hint {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
 }
 
 %table-field,
@@ -105,7 +112,7 @@
 
 .table-field-heading {
 
-  &-first {
+  .dashboard-table &-first {
     width: 52.5%;
   }
 

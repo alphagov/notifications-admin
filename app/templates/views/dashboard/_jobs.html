@@ -1,35 +1,37 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 {% from "components/big-number.html" import big_number %}
 
-{% call(item, row_number) list_table(
-  jobs,
-  caption="Recent batch jobs",
-  caption_visible=False,
-  empty_message='You haven’t sent any batch messages yet',
-  field_headings=[
-    'File',
-    'Sending',
-    'Delivered',
-    'Failed'
-  ],
-  field_headings_visible=True
-) %}
-  {% call row_heading() %}
-    <div class="file-list">
-      <a class="file-list-filename" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
-      <span class="file-list-hint">Uploaded {{ item.created_at|format_datetime_short }}</span>
-    </div
+<div class='dashboard-table'>
+  {% call(item, row_number) list_table(
+    jobs,
+    caption="Recent batch jobs",
+    caption_visible=False,
+    empty_message='You haven’t sent any batch messages yet',
+    field_headings=[
+      'File',
+      'Sending',
+      'Delivered',
+      'Failed'
+    ],
+    field_headings_visible=True
+  ) %}
+    {% call row_heading() %}
+      <div class="file-list">
+        <a class="file-list-filename" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
+        <span class="file-list-hint">Uploaded {{ item.created_at|format_datetime_short }}</span>
+      </div
+    {% endcall %}
+    {% call field() %}
+      {{ big_number(
+        item.get('notifications_sent', 0) - item.get('notifications_delivered', 0) - item.get('notifications_failed', 0),
+        smaller=True
+      ) }}
+    {% endcall %}
+    {% call field() %}
+      {{ big_number(item.get('notifications_delivered', 0), smaller=True) }}
+    {% endcall %}
+    {% call field(status='error' if 0 else '') %}
+      {{ big_number(item.get('notifications_failed', 0), smaller=True) }}
+    {% endcall %}
   {% endcall %}
-  {% call field() %}
-    {{ big_number(
-      item.get('notifications_sent', 0) - item.get('notifications_delivered', 0) - item.get('notifications_failed', 0),
-      smaller=True
-    ) }}
-  {% endcall %}
-  {% call field() %}
-    {{ big_number(item.get('notifications_delivered', 0), smaller=True) }}
-  {% endcall %}
-  {% call field(status='error' if 0 else '') %}
-    {{ big_number(item.get('notifications_failed', 0), smaller=True) }}
-  {% endcall %}
-{% endcall %}
+</div>
