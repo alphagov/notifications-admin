@@ -111,6 +111,7 @@ def create_app():
     application.add_template_filter(format_date_normal)
     application.add_template_filter(format_date_short)
     application.add_template_filter(format_notification_status)
+    application.add_template_filter(format_notification_status_as_field_status)
 
     application.after_request(useful_headers_after_request)
     application.after_request(save_service_after_request)
@@ -229,15 +230,36 @@ def valid_phone_number(phone_number):
         return False
 
 
-def format_notification_status(status):
-    m = {'failed': 'Failed',
-         'technical-failure': 'Technical failure',
-         'temporary-failure': 'Temporarily failed',
-         'permanent-failure': 'Permanently failed',
-         'delivered': 'Delivered',
-         'sending': 'Sending'
-         }
-    return m.get(status, status)
+def format_notification_status(status, template_type):
+    return {
+        'email': {
+            'failed': 'Failed',
+            'technical-failure': 'Technical failure',
+            'temporary-failure': 'Temporary failure',
+            'permanent-failure': 'Email address does not exist',
+            'delivered': 'Delivered',
+            'sending': 'Sending'
+        },
+        'sms': {
+            'failed': 'Failed',
+            'technical-failure': 'Technical failure',
+            'temporary-failure': 'Temporary failure',
+            'permanent-failure': 'Phone number does not exist',
+            'delivered': 'Delivered',
+            'sending': 'Sending'
+        }
+    }.get(template_type).get(status, status)
+
+
+def format_notification_status_as_field_status(status):
+    return {
+        'failed': 'error',
+        'technical-failure': 'error',
+        'temporary-failure': 'error',
+        'permanent-failure': 'error',
+        'delivered': None,
+        'sending': 'default'
+    }.get(status, 'error')
 
 
 @login_manager.user_loader
