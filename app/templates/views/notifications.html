@@ -68,7 +68,7 @@
       (item.updated_at or item.created_at)|format_datetime_short
     ) }}
 
-    {% call field(status='', align='right') %}
+    {% call field(status=item.status|format_notification_status_as_field_status, align='right') %}
       {{ item.status|format_notification_status(item.template.template_type) }}
     {% endcall %}
 
