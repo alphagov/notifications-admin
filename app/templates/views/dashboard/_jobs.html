@@ -24,14 +24,14 @@
     {% call field() %}
       {{ big_number(
         item.get('notifications_sent', 0) - item.get('notifications_delivered', 0) - item.get('notifications_failed', 0),
-        smaller=True
+        smallest=True
       ) }}
     {% endcall %}
     {% call field() %}
-      {{ big_number(item.get('notifications_delivered', 0), smaller=True) }}
+      {{ big_number(item.get('notifications_delivered', 0), smallest=True) }}
     {% endcall %}
     {% call field(status='error' if 0 else '') %}
-      {{ big_number(item.get('notifications_failed', 0), smaller=True) }}
+      {{ big_number(item.get('notifications_failed', 0), smallest=True) }}
     {% endcall %}
   {% endcall %}
 </div>
