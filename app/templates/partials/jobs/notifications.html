@@ -1,4 +1,4 @@
-{% from "components/table.html" import list_table, field, right_aligned_field_heading %}
+{% from "components/table.html" import list_table, field, right_aligned_field_heading, date_field, row_heading %}
 
 <div
   {% if not finished %}
@@ -18,17 +18,22 @@
         empty_message="No messages to show yet",
         field_headings=[
           'Recipient',
+          'Time',
           right_aligned_field_heading('Status')
-        ]
+        ],
+        field_headings_visible=False
       ) %}
-        {% call field() %}
+        {% call row_heading() %}
           {{ item.to }}
         {% endcall %}
+        {{ date_field(
+          (item.updated_at or item.created_at)|format_datetime_short
+        ) }}
         {% call field(
           align='right',
-          status='error' if item.status == 'Failed' else 'default'
+          status=item.status|format_notification_status_as_field_status
         ) %}
-          {{ item.status|format_notification_status }} at {{ (item.updated_at or item.created_at)|format_time }}
+          {{ item.status|format_notification_status(item.template.template_type) }}
         {% endcall %}
       {% endcall %}
     {% else %}
