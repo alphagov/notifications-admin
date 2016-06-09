@@ -1,4 +1,4 @@
-{% from "components/table.html" import list_table, field, right_aligned_field_heading %}
+{% from "components/table.html" import list_table, field, right_aligned_field_heading, date_field, row_heading %}
 
 <div
   {% if not finished %}
@@ -9,50 +9,30 @@
   {% endif %}
 >
 
-  <div>
-    {% if notifications|length > 0 and notifications[0].job_row_number is not none %}
-      {% call(item, row_number) list_table(
-        notifications,
-        caption=uploaded_file_name,
-        caption_visible=False,
-        empty_message="No messages to show yet",
-        field_headings=[
-          'Recipient',
-          right_aligned_field_heading('Status')
-        ]
-      ) %}
-        {% call field() %}
-          {{ item.to }}
-        {% endcall %}
-        {% call field(
-          align='right',
-          status='error' if item.status == 'Failed' else 'default'
-        ) %}
-          {{ item.status|format_notification_status }} at {{ (item.updated_at or item.created_at)|format_time }}
-        {% endcall %}
-      {% endcall %}
-    {% else %}
-      {% call(item, row_number) list_table(
-      notifications,
-      caption=uploaded_file_name,
-      caption_visible=False,
-      empty_message="No messages to show yet",
-      field_headings=[
-        'Recipient',
-        right_aligned_field_heading('Status')
-      ]
-    ) %}
-      {% call field() %}
-        {{ item.to }}
-      {% endcall %}
-      {% call field(
-        align='right',
-        status='error' if item.status == 'Failed' else 'default'
-      ) %}
-        {{ item.status|format_notification_status }} at {{ item.updated_at|format_time }}
-      {% endcall %}
+  {% call(item, row_number) list_table(
+    notifications,
+    caption=uploaded_file_name,
+    caption_visible=False,
+    empty_message="No messages to show yet",
+    field_headings=[
+      'Recipient',
+      'Time',
+      'Status'
+    ],
+    field_headings_visible=False
+  ) %}
+    {% call row_heading() %}
+      {{ item.to }}
     {% endcall %}
-    {% endif %}
-  </div>
+    {{ date_field(
+      (item.updated_at or item.created_at)|format_datetime_short
+    ) }}
+    {% call field(
+      align='right',
+      status=item.status|format_notification_status_as_field_status
+    ) %}
+      {{ item.status|format_notification_status(item.template.template_type) }}
+    {% endcall %}
+  {% endcall %}
 
 </div>
