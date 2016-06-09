@@ -47,7 +47,8 @@ def test_should_show_page_for_one_job(
         content = response.get_data(as_text=True)
         assert "{}: Your vehicle tax is about to expire".format(service_one['name']) in content
         assert file_name in content
-        assert "Delivered at 11:10" in content
+        assert 'Delivered' in content
+        assert '11:10' in content
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
@@ -75,7 +76,8 @@ def test_should_show_updates_for_one_job_as_json(
         assert '07123456789' in content['notifications']
         assert 'Status' in content['notifications']
         assert job_json['status'] in content['status']
-        assert 'Delivered at 11:10' in content['notifications']
+        assert 'Delivered' in content['notifications']
+        assert '11:10' in content['notifications']
         assert 'Uploaded by Test User on 1 January at 11:09' in content['status']
 
 

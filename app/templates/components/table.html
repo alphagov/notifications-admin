@@ -55,11 +55,23 @@
   </td>
 {%- endmacro %}
 
+{% macro row_heading() -%}
+  <th class="table-field">
+    <span>{{ caller() }}</span>
+  </th>
+{%- endmacro %}
+
 {% macro index_field(text) -%}
   <td class="table-field-index">
     <span>{{ text }}</span>
   </td>
 {%- endmacro %}
+
+{% macro date_field(text) -%}
+  <td class="table-field-date">
+    <span>{{ text }}</span>
+  </td>
+{% endmacro %}
 
 {% macro text_field(text) -%}
   {% call field() %}

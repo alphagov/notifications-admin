@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading %}
+{% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading, row_heading, date_field %}
 {% from "components/previous-next-navigation.html" import previous_next_navigation %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/pill.html" import pill %}
@@ -46,30 +46,32 @@
     caption="Recent activity",
     caption_visible=False,
     empty_message='No messages found',
-    field_headings=['Recipient', 'Status', 'Started'],
+    field_headings=['Recipient', 'Started', 'Status'],
     field_headings_visible=False
   ) %}
 
-    {% call field() %}
+    {% call row_heading() %}
       <p>
         {{ item.to }}
       </p>
       <p class="hint">
-        <a href="{{ url_for('.view_template_version', service_id=current_service.id, template_id=item.template.id, version=item.template_version) }}">{{ item.template.name }}</a>
-        sent from
         {% if item.job %}
-          <a href="{{ url_for(".view_job", service_id=current_service.id, job_id=item.job.id) }}">{{ item.job.original_file_name }}</a>
+          From <a href="{{ url_for(".view_job", service_id=current_service.id, job_id=item.job.id) }}">{{ item.job.original_file_name }}</a>
         {% else %}
-          an API call
+          <a href="{{ url_for('.view_template_version', service_id=current_service.id, template_id=item.template.id, version=item.template_version) }}">{{ item.template.name }}</a>
+          from an API call
         {% endif %}
       </p>
     {% endcall %}
 
-    {{ text_field(item.status|format_notification_status) }}
+    {{ date_field(
+      (item.updated_at or item.created_at)|format_datetime_short
+    ) }}
 
-    {% call field(align='right') %}
-      {{ (item.updated_at or item.created_at)|format_datetime_short }}
+    {% call field(status=item.status|format_notification_status_as_field_status, align='right') %}
+      {{ item.status|format_notification_status(item.template.template_type) }}
     {% endcall %}
+
   {% endcall %}
 
   {{ previous_next_navigation(prev_page, next_page) }}
