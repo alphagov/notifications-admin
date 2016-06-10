@@ -4,10 +4,10 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, hidden_field_heading %}
 
 <div
-  data-module="update-content"
+  {#data-module="update-content"
   data-resource="{{url_for(".service_dashboard_updates", service_id=current_service.id)}}"
   data-key="today"
-  data-interval-seconds="2"
+  data-interval-seconds="2"#}
   aria-live="polite"
 >
   <div class="grid-row">
