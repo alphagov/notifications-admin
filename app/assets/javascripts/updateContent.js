@@ -17,11 +17,16 @@
     while(queue.length) queue.shift()(response);
   };
 
+  var clearQueue = queue => (queue.length = 0);
+
   var poll = function(renderer, resource, queue, interval) {
 
-    if (queue.push(renderer) === 1) $.get(
-      resource,
+    if (queue.push(renderer) === 1) $.ajax(
+      resource
+    ).done(
       response => flushQueue(queue, response)
+    ).fail(
+      () => clearQueue(queue)
     );
 
     setTimeout(
