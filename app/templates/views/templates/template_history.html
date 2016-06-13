@@ -19,4 +19,9 @@
     {% endwith %}
   </div>
 
+  {{ page_footer(
+    secondary_link=url_for('.view_template_versions', service_id=current_service.id, template_id=template.id),
+    secondary_link_text='See all versions of this template'
+  ) }}
+
 {% endblock %}
