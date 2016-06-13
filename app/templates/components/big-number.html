@@ -1,11 +1,11 @@
-{% macro big_number(number, label, label_link=None, currency='', smaller=False) %}
-  <div class="big-number{% if smaller %}-smaller{% endif %}">
+{% macro big_number(number, label, label_link=None, currency='', smaller=False, smallest=False) %}
+  <div class="big-number{% if smaller %}-smaller{% endif %}{% if smallest %}-smallest{% endif %}">
     <div class="big-number-number">
       {% if number is number %}
         {% if currency %}
           {{ "{}{:,.2f}".format(currency, number) }}
         {% else %}
-          {{ "{}{:,}".format(currency, number) }}
+          {{ "{:,}".format(number) }}
         {% endif %}
       {% else %}
         {{ number }}
