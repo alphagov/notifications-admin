@@ -17,6 +17,11 @@ def test_view_template_version(app_,
             service_id = fake_uuid
             template_id = fake_uuid
             version = 1
+            all_versions_link = url_for(
+                'main.view_template_versions',
+                service_id=service_id,
+                template_id=template_id
+            )
             resp = client.get(url_for(
                 '.view_template_version',
                 service_id=service_id,
@@ -28,6 +33,7 @@ def test_view_template_version(app_,
     template = mock_get_template_version(service_id, template_id, version)
     assert api_user_active.name in resp_data
     assert template['data']['content'] in resp_data
+    assert all_versions_link in resp_data
     mock_get_template_version.assert_called_with(
         service_id,
         template_id,
