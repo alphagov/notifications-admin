@@ -1,6 +1,7 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, date_field, row_heading %}
 
 <div
+  class='dashboard-table'
   {% if not finished %}
     data-module="update-content"
     data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job.id)}}"
@@ -8,6 +9,14 @@
     aria-live="polite"
   {% endif %}
 >
+
+  {% if notifications %}
+    <p class="bottom-gutter">
+      <a href="{{ request.url }}?&amp;download=csv" download="download" class="heading-small">Download as a CSV file</a>
+      &emsp;
+      Delivery information is available for 7 days
+    </p>
+  {% endif %}
 
   {% call(item, row_number) list_table(
     notifications,
