@@ -2,9 +2,9 @@
 
 <div
   {% if not finished %}
-    {#data-module="update-content"
+    data-module="update-content"
     data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job.id)}}"
-    data-key="counts"#}
+    data-key="counts"
     aria-live="polite"
   {% endif %}
 >

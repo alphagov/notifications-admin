@@ -1,48 +1,49 @@
-(function(GOVUK, Modules) {
+(function(Modules) {
   "use strict";
 
-  GOVUK.timeCache = {};
-  GOVUK.resultCache = {};
-
+  var queues = {};
   var dd = new diffDOM();
 
-  let getter = function(resource, interval, render) {
+  var getRenderer = $component => response => dd.apply(
+    $component.get(0),
+    dd.diff($component.get(0), $(response[$component.data('key')]).get(0))
+  );
 
-    if (
-      GOVUK.resultCache[resource] &&
-      (Date.now() < GOVUK.timeCache[resource])
-    ) {
-      render(GOVUK.resultCache[resource]);
-    } else {
-      GOVUK.timeCache[resource] = Date.now() + interval;
-      $.get(
-        resource,
-        response => render(GOVUK.resultCache[resource] = response)
-      );
-    }
+  var getQueue = resource => (
+    queues[resource] = queues[resource] || []
+  );
 
+  var flushQueue = function(queue, response) {
+    while(queue.length) queue.shift()(response);
   };
 
-  let poller = (resource, key, $component, interval) => () => getter(
-    resource, interval, response => dd.apply(
-      $component.get(0),
-      dd.diff($component.get(0), $(response[key]).get(0))
-    )
-  );
+  var clearQueue = queue => (queue.length = 0);
+
+  var poll = function(renderer, resource, queue, interval) {
+
+    if (queue.push(renderer) === 1) $.ajax(
+      resource
+    ).done(
+      response => flushQueue(queue, response)
+    ).fail(
+      () => clearQueue(queue)
+    );
+
+    setTimeout(
+      () => poll(...arguments), interval
+    );
+
+  };
 
   Modules.UpdateContent = function() {
 
-    this.start = function(component) {
+    this.start = component => poll(
+      getRenderer($(component)),
+      $(component).data('resource'),
+      getQueue($(component).data('resource')),
+      ($(component).data('interval-seconds') || 1.5) * 1000
+    );
 
-      const $component = $(component);
-      interval = ($(component).data("interval-seconds") * 1000) || 1500;
-
-      setInterval(
-        poller($component.data('resource'), $component.data('key'), $component, interval),
-        interval / 5
-      );
-
-    };
   };
 
-})(window.GOVUK, window.GOVUK.Modules);
+})(window.GOVUK.Modules);

@@ -26,6 +26,16 @@
 
 }
 
+.big-number-smallest {
+
+  @extend %big-number;
+
+  .big-number-number {
+    @include bold-24();
+  }
+
+}
+
 .big-number-with-status {
 
   @extend %big-number;
