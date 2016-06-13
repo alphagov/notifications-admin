@@ -41,38 +41,40 @@
     </p>
   {% endif %}
 
-  {% call(item, row_number) list_table(
-    notifications,
-    caption="Recent activity",
-    caption_visible=False,
-    empty_message='No messages found',
-    field_headings=['Recipient', 'Started', 'Status'],
-    field_headings_visible=False
-  ) %}
+  <div class='dashboard-table'>
+    {% call(item, row_number) list_table(
+      notifications,
+      caption="Recent activity",
+      caption_visible=False,
+      empty_message='No messages found',
+      field_headings=['Recipient', 'Started', 'Status'],
+      field_headings_visible=False
+    ) %}
 
-    {% call row_heading() %}
-      <p>
-        {{ item.to }}
-      </p>
-      <p class="hint">
-        {% if item.job %}
-          From <a href="{{ url_for(".view_job", service_id=current_service.id, job_id=item.job.id) }}">{{ item.job.original_file_name }}</a>
-        {% else %}
-          <a href="{{ url_for('.view_template_version', service_id=current_service.id, template_id=item.template.id, version=item.template_version) }}">{{ item.template.name }}</a>
-          from an API call
-        {% endif %}
-      </p>
+      {% call row_heading() %}
+        <p>
+          {{ item.to }}
+        </p>
+        <p class="hint">
+          {% if item.job %}
+            From <a href="{{ url_for(".view_job", service_id=current_service.id, job_id=item.job.id) }}">{{ item.job.original_file_name }}</a>
+          {% else %}
+            <a href="{{ url_for('.view_template_version', service_id=current_service.id, template_id=item.template.id, version=item.template_version) }}">{{ item.template.name }}</a>
+            from an API call
+          {% endif %}
+        </p>
+      {% endcall %}
+
+      {{ date_field(
+        (item.updated_at or item.created_at)|format_datetime_short
+      ) }}
+
+      {% call field(status=item.status|format_notification_status_as_field_status, align='right') %}
+        {{ item.status|format_notification_status(item.template.template_type) }}
+      {% endcall %}
+
     {% endcall %}
-
-    {{ date_field(
-      (item.updated_at or item.created_at)|format_datetime_short
-    ) }}
-
-    {% call field(status=item.status|format_notification_status_as_field_status, align='right') %}
-      {{ item.status|format_notification_status(item.template.template_type) }}
-    {% endcall %}
-
-  {% endcall %}
+  </div>
 
   {{ previous_next_navigation(prev_page, next_page) }}
 
