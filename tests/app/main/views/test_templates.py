@@ -229,7 +229,6 @@ def test_should_show_delete_template_page(app_,
                                           mock_get_user,
                                           mock_get_user_by_email,
                                           mock_has_permissions,
-                                          mock_get_template_statistics,
                                           mock_get_template_statistics_for_template,
                                           fake_uuid):
     with app_.test_request_context():
@@ -247,8 +246,8 @@ def test_should_show_delete_template_page(app_,
     assert 'Are you sure' in content
     assert 'Two week reminder' in content
     assert 'Your vehicle tax is about to expire' in content
-    mock_get_service_template.assert_called_with(
-        service_id, template_id)
+    mock_get_service_template.assert_called_with(service_id, template_id)
+    mock_get_template_statistics_for_template.assert_called_with(service_id, template_id)
 
 
 def test_should_redirect_when_deleting_a_template(app_,
@@ -292,33 +291,33 @@ def test_should_redirect_when_deleting_a_template(app_,
                 service_id, template_id)
 
 
-def test_route_permissions(mocker,
+@pytest.mark.parametrize('route', [
+    'main.add_service_template',
+    'main.edit_service_template',
+    'main.delete_service_template'
+])
+def test_route_permissions(route,
+                           mocker,
                            app_,
                            api_user_active,
                            service_one,
                            mock_get_service_template,
-                           mock_get_template_statistics,
                            mock_get_template_statistics_for_template,
                            fake_uuid):
-    routes = [
-        'main.add_service_template',
-        'main.edit_service_template',
-        'main.delete_service_template']
     with app_.test_request_context():
-        for route in routes:
-            validate_route_permission(
-                mocker,
-                app_,
-                "GET",
-                200,
-                url_for(
-                    route,
-                    service_id=service_one['id'],
-                    template_type='sms',
-                    template_id=fake_uuid),
-                ['manage_templates'],
-                api_user_active,
-                service_one)
+        validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            200,
+            url_for(
+                route,
+                service_id=service_one['id'],
+                template_type='sms',
+                template_id=fake_uuid),
+            ['manage_templates'],
+            api_user_active,
+            service_one)
 
 
 def test_route_permissions_for_choose_template(mocker,
@@ -342,31 +341,33 @@ def test_route_permissions_for_choose_template(mocker,
             service_one)
 
 
-def test_route_invalid_permissions(mocker,
+@pytest.mark.parametrize('route', [
+    'main.add_service_template',
+    'main.edit_service_template',
+    'main.delete_service_template'
+])
+def test_route_invalid_permissions(route,
+                                   mocker,
                                    app_,
                                    api_user_active,
                                    service_one,
                                    mock_get_service_template,
+                                   mock_get_template_statistics_for_template,
                                    fake_uuid):
-    routes = [
-        'main.add_service_template',
-        'main.edit_service_template',
-        'main.delete_service_template']
     with app_.test_request_context():
-        for route in routes:
-            validate_route_permission(
-                mocker,
-                app_,
-                "GET",
-                403,
-                url_for(
-                    route,
-                    service_id=service_one['id'],
-                    template_type='sms',
-                    template_id=fake_uuid),
-                ['view_activity'],
-                api_user_active,
-                service_one)
+        validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            403,
+            url_for(
+                route,
+                service_id=service_one['id'],
+                template_type='sms',
+                template_id=fake_uuid),
+            ['view_activity'],
+            api_user_active,
+            service_one)
 
 
 def test_get_last_use_message_returns_no_template_message():

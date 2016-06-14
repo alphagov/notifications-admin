@@ -186,7 +186,7 @@ def delete_service_template(service_id, template_id):
     template['template_content'] = template['content']
     form = form_objects[template['template_type']](**template)
 
-    template_statistics = template_statistics_client.get_template_statistics_for_service(service_id, template['id'])
+    template_statistics = template_statistics_client.get_template_statistics_for_template(service_id, template['id'])
     last_use_message = get_last_use_message(form.name.data, template_statistics)
     flash('{}. Are you sure you want to delete it?'.format(last_use_message), 'delete')
     return render_template(
