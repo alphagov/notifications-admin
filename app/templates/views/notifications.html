@@ -41,7 +41,10 @@
     </p>
   {% endif %}
 
-  <div class='dashboard-table'>
+
+  {% if notifications %}
+    <div class='dashboard-table'>
+  {% endif %}
     {% call(item, row_number) list_table(
       notifications,
       caption="Recent activity",
@@ -74,7 +77,9 @@
       {% endcall %}
 
     {% endcall %}
-  </div>
+  {% if notifications %}
+    </div>
+  {% endif %}
 
   {{ previous_next_navigation(prev_page, next_page) }}
 
