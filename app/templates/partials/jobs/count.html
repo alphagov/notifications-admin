@@ -1,30 +1,16 @@
-{% from "components/big-number.html" import big_number %}
+{% from "components/pill.html" import pill %}
 
 <div
   {% if not finished %}
     data-module="update-content"
-    data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job.id)}}"
+    data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job.id, status=status, help=request.args.get('help', 0))}}"
     data-key="counts"
     aria-live="polite"
   {% endif %}
 >
 
-  <ul class="grid-row job-totals">
-    <li class="column-one-quarter">
-      {{ big_number(
-        job.get('notifications_sent', 0) - job.get('notifications_delivered', 0) - job.get('notifications_failed', 0), 'sending'
-      )}}
-    </li>
-    <li class="column-one-quarter">
-      {{ big_number(
-        job.get('notifications_delivered', 0), 'delivered'
-      )}}
-    </li>
-    <li class="column-one-quarter">
-      {{ big_number(
-        job.notifications_failed, 'failed'
-      )}}
-    </li>
-  </ul>
+  <div class="bottom-gutter">
+    {{ pill('Status', counts, status) }}
+  </div>
 
 </div>

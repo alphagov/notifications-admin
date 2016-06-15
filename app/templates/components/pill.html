@@ -1,3 +1,5 @@
+{% from 'components/big-number.html' import big_number %}
+
 {% macro pill(
   title,
   items=[],
@@ -5,11 +7,18 @@
 ) %}
   <nav role='navigation' class='pill' aria-labelledby="pill_{{title}}">
     <h2 id="pill_{{title}}" class="visuallyhidden">{{title}}</h2>
-    {% for label, option, link in items %}
+    {% for label, option, link, count in items %}
       {% if current_value == option %}
-        <span aria-hidden="true">{{ label }}</span>
+        <span aria-hidden="true">
       {% else %}
-        <a href="{{ link }}">{{ label }}</a>
+        <a href="{{ link }}">
+      {% endif %}
+          {{ big_number(count, smaller=True) }}
+          <div class="pill-label">{{ label }}</div>
+      {% if current_value == option %}
+        </span>
+      {% else %}
+        </a>
       {% endif %}
     {% endfor %}
   </nav>

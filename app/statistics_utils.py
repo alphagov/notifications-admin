@@ -48,3 +48,24 @@ def add_rates_to(delivery_statistics):
         ),
         **delivery_statistics
     )
+
+
+def statistics_by_state(statistics):
+    return {
+        'sms': {
+            'processed': statistics['sms_requested'],
+            'sending': (
+                statistics['sms_requested'] - statistics['sms_failed'] - statistics['sms_delivered']
+            ),
+            'delivered': statistics['sms_delivered'],
+            'failed': statistics['sms_failed']
+        },
+        'email': {
+            'processed': statistics['emails_requested'],
+            'sending': (
+                statistics['emails_requested'] - statistics['emails_failed'] - statistics['emails_delivered']
+            ),
+            'delivered': statistics['emails_delivered'],
+            'failed': statistics['emails_failed']
+        }
+    }

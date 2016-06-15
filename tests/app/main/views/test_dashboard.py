@@ -91,11 +91,15 @@ def test_should_show_recent_templates_on_dashboard(app_,
 
         assert len(table_rows) == 2
 
-        assert page.find_all('dt')[0].text.strip() == 'Pickle feet'
-        assert page.find_all('dd')[0].text.strip() == '206 text messages sent'
+        assert 'Pickle feet' in page.find_all('dt')[0].text
+        assert 'Text message template' in page.find_all('dt')[0].text
+        assert '206' in page.find_all('dd')[0].text
+        assert 'text messages sent' in page.find_all('dd')[0].text
 
-        assert page.find_all('dt')[1].text.strip() == 'Brine Shrimp'
-        assert page.find_all('dd')[1].text.strip() == '13 text messages sent'
+        assert 'Brine Shrimp' in page.find_all('dt')[1].text
+        assert 'Text message template' in page.find_all('dt')[1].text
+        assert '13' in page.find_all('dd')[1].text
+        assert 'text messages sent' in page.find_all('dd')[1].text
 
 
 def test_should_show_all_templates_on_template_statistics_page(
@@ -129,11 +133,15 @@ def test_should_show_all_templates_on_template_statistics_page(
 
         assert len(table_rows) == 2
 
-        assert page.find_all('dt')[0].text.strip() == 'Pickle feet'
-        assert page.find_all('dd')[0].text.strip() == '206 text messages sent'
+        assert 'Pickle feet' in page.find_all('dt')[0].text
+        assert 'Text message template' in page.find_all('dt')[0].text
+        assert '206' in page.find_all('dd')[0].text
+        assert 'text messages sent' in page.find_all('dd')[0].text
 
-        assert page.find_all('dt')[1].text.strip() == 'Brine Shrimp'
-        assert page.find_all('dd')[1].text.strip() == '13 text messages sent'
+        assert 'Brine Shrimp' in page.find_all('dt')[1].text
+        assert 'Text message template' in page.find_all('dt')[1].text
+        assert '13' in page.find_all('dd')[1].text
+        assert 'text messages sent' in page.find_all('dd')[1].text
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):

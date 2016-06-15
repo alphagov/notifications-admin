@@ -1,6 +1,6 @@
 import pytest
 
-from app.statistics_utils import sum_of_statistics, add_rates_to
+from app.statistics_utils import sum_of_statistics, add_rates_to, statistics_by_state
 
 
 @pytest.mark.parametrize('delivery_statistics', [
@@ -96,3 +96,20 @@ def test_add_rates_keeps_original_raw_data():
     assert resp['emails_requested'] == 2
     assert resp['sms_failed'] == 3
     assert resp['sms_requested'] == 4
+
+
+def test_service_statistics_by_state():
+    resp = statistics_by_state({
+        'emails_requested': 3,
+        'emails_failed': 1,
+        'emails_delivered': 1,
+        'sms_requested': 3,
+        'sms_failed': 1,
+        'sms_delivered': 1
+    })
+
+    for message_type in ['email', 'sms']:
+        assert resp[message_type]['processed'] == 3
+        assert resp[message_type]['sending'] == 1
+        assert resp[message_type]['delivered'] == 1
+        assert resp[message_type]['failed'] == 1
