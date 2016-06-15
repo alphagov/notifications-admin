@@ -47,20 +47,24 @@ $button-bottom-border-colour: rgba(0, 0, 0, 0.17);
 
     &-wrapper {
 
-      .collapsed & {
+      .js-enabled & {
         max-height: 92px;
         overflow: hidden;
+      }
+
+      .js-enabled .expanded & {
+        max-height: none;
       }
 
     }
 
     .toggle {
 
+      display: none;
       position: absolute;
       left: 50%;
       bottom: -18px;
       height: 27px;
-      display: inline-block;
       padding: 0;
       margin: 0 0 0 -30px;
       line-height: 12px;
@@ -92,4 +96,12 @@ $button-bottom-border-colour: rgba(0, 0, 0, 0.17);
 
   }
 
+}
+
+.js-enabled .toggle {
+  display: inline-block;
+}
+
+.js-enabled .expanded .toggle {
+  display: none;
 }
