@@ -2,7 +2,7 @@
 
   table {
     th {
-      @include core-16;
+      @include core-19;
       border-bottom: 0;
     }
 
@@ -26,16 +26,16 @@
   width: 100%;
   margin-bottom: $gutter-half;
   height: $gutter-half;
-  color: $govuk-blue;
+  color: $text-colour;
 
   span {
     box-sizing: border-box;
-    display: block;
-    background: $govuk-blue;
-    color: $white;
-    height: $gutter-half;
-    padding-left: 5px;
-    padding-right: 5px;
+    display: inline-block;
+    overflow: visible;
+    background: $panel-colour;
+    color: $black;
+    padding: 5px 5px 2px 5px;
+    text-indent: -2px;
     margin: 3px 0 5px 0;
     transition: width 0.6s ease-in-out;
   }
@@ -49,7 +49,7 @@
     color: $govuk-blue;
     max-width: 100%;
     background: $white;
-    margin-bottom: $gutter;
+    margin-bottom: $gutter-two-thirds;
   }
 
 }

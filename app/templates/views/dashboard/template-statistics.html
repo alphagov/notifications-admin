@@ -1,23 +1,38 @@
+{% from "components/big-number.html" import big_number %}
 {% from "components/message-count-label.html" import message_count_label %}
+{% from "components/big-number.html" import big_number %}
 
 <dl>
   {% for item in template_statistics %}
     <div class="grid-row">
-      
+
       <dt class="column-half">
         <span class="spark-bar-label">
           <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template.id) }}">{{ item.template.name }}</a>
+          <span class="file-list-hint">
+            {{ message_count_label(1, item.template.template_type, suffix='template')|capitalize }}
+          </span>
         </span>
       </dt>
 
       <dd class="column-half">
         {% if template_statistics|length > 1 %}
-        <span class="spark-bar">
-          <span style="width: {{ item.usage_count / most_used_template_count * 100 }}%"></span>    
-          {{ item.usage_count }} {{ message_count_label(item.usage_count, item.template.template_type) }}
-        </span>
+          <span class="spark-bar">
+            <span style="width: {{ item.usage_count / most_used_template_count * 100 }}%">
+              {{ big_number(
+                item.usage_count,
+                smallest=True
+              ) }}
+              <span class="visually-hidden">
+                {{ message_count_label(item.usage_count, item.template.template_type) }}
+              </span>
+            </span>
+          </span>
         {% else %}
-          {{ item.usage_count }} {{ message_count_label(item.usage_count, item.template.template_type) }}
+          <span class="heading-small">
+            {{ item.usage_count }}
+            {{ message_count_label(item.usage_count, item.template.template_type) }}
+          </span>
         {% endif %}
       </dd>
 

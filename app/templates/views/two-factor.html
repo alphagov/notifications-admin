@@ -23,7 +23,7 @@
       ) }}
       {{ page_footer(
         "Continue",
-        secondary_link=url_for('.verification_code_not_received'),
+        secondary_link=url_for('main.check_and_resend_text_code'),
         secondary_link_text='Not received a text message?'
       ) }}
     </form>

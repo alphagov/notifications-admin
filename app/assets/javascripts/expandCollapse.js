@@ -7,20 +7,16 @@
 
       this.$component = $(component);
 
-      if (this.$component.height() < this.$component.data('max-height')) return;
-
-      this.$component      
-        .append(`
-          <div class='toggle' tabindex='0'>...<span class='visually-hidden'>show full email</span></div>
-        `)
-        .addClass('collapsed');
-
       this.$toggle = this.$component.find('.toggle')
         .on(
           "click",
           this.change
         )
         .on("keydown", this.filterKeyPresses([32, 13], this.change));
+
+      if (this.getNativeHeight() < this.$component.data('max-height')) {
+        this.change();
+      }
 
     };
 
@@ -33,9 +29,29 @@
 
     };
 
+    this.getNativeHeight = function() {
+
+      var $copy = this.$component.clone().css({
+        'position': 'absolute',
+        'left': '9999px',
+        'width': this.$component.width(),
+        'font-size': this.$component.css('font-size'),
+        'line-height': this.$component.css('line-height')
+      }).addClass('expanded');
+
+      $('body').append($copy);
+
+      var nativeHeight = $copy.height();
+
+      $copy.remove();
+
+      return nativeHeight;
+
+    };
+
     this.change = () => this.toggleCollapsed() && this.$toggle.remove();
 
-    this.toggleCollapsed = () => this.$component.removeClass('collapsed');
+    this.toggleCollapsed = () => this.$component.addClass('expanded');
 
   };
 

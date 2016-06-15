@@ -22,18 +22,19 @@ def resend_email_verification():
 def check_and_resend_text_code():
     # TODO there needs to be a way to regenerate a session id
     user = user_api_client.get_user_by_email(session['user_details']['email'])
+
+    if user.state == 'active':
+        # this is a verified user and therefore redirect to page to request resend without edit mobile
+        return render_template('views/verification-not-received.html')
+
     form = TextNotReceivedForm(mobile_number=user.mobile_number)
     if form.validate_on_submit():
         user_api_client.send_verify_code(user.id, 'sms', to=form.mobile_number.data)
         user.mobile_number = form.mobile_number.data
         user_api_client.update_user(user)
         return redirect(url_for('.verify'))
+
     return render_template('views/text-not-received.html', form=form)
-
-
-@main.route('/verification-not-received', methods=['GET'])
-def verification_code_not_received():
-    return render_template('views/verification-not-received.html')
 
 
 @main.route('/send-new-code', methods=['GET'])
