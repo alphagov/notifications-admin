@@ -21,7 +21,7 @@
   @extend %big-number;
 
   .big-number-number {
-    @include bold-36($tabular-numbers: true);
+    @include bold-36();
   }
 
 }
@@ -39,31 +39,13 @@
 .big-number-with-status {
 
   @extend %big-number;
-  background: $text-colour;
-  color: $white;
   position: relative;
   margin-bottom: $gutter-half;
 
   .big-number {
-    padding: 15px;
+    padding: $gutter-half;
     position: relative;
-    
-  }
-
-  .big-number-overlay-link {
-
-    background: transparent;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: transparent;
-    width: 100%;
-    height: 100%;
-
-    &:hover {
-      background: rgba($text-colour, 0.2);
-    }
-
+    cursor: pointer;
   }
 
   .big-number-label {
@@ -72,9 +54,31 @@
 
     &:link,
     &:visited {
-      color: $white;
-      text-decoration: none;
-      border-bottom: 1px solid $white;
+      color: $link-colour;
+    }
+
+  }
+
+  .big-number-link {
+
+    text-decoration: none;
+    background: $link-colour;
+    color: $white;
+    display: block;
+    border: 2px solid $link-colour;
+    margin-bottom: 5px;
+
+    &:hover {
+      color: $light-blue-25;
+    }
+
+    &:active,
+    &:focus {
+      outline: 3px solid $yellow;
+    }
+
+    .big-number-label {
+      text-decoration: underline;
     }
 
   }
@@ -85,6 +89,7 @@
     @include core-19;
     display: block;
     background: $green;
+    color: $white;
     padding: 15px;
 
     a {
@@ -94,8 +99,13 @@
       &:active,
       &:hover {
         color: $white;
-        text-decoration: none;
-        border-bottom: 1px solid $white;
+        text-decoration: underline;
+      }
+
+      &:active,
+      &:focus {
+        color: $black;
+        border-bottom: 1px solid $black;
       }
 
     }

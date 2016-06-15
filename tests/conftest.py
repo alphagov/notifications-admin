@@ -1026,7 +1026,7 @@ def mock_get_template_statistics_for_template(mocker, service_one):
         ]
 
     return mocker.patch(
-        'app.template_statistics_client.get_template_statistics_for_service', side_effect=_get_stats)
+        'app.template_statistics_client.get_template_statistics_for_template', side_effect=_get_stats)
 
 
 @pytest.fixture(scope='function')

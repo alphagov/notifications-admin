@@ -1,19 +1,30 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, date_field, row_heading %}
 
 <div
+  {% if notifications %}
+    class='dashboard-table'
+  {% endif %}
   {% if not finished %}
     data-module="update-content"
-    data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job.id)}}"
+    data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job.id, status=request.args.get('status'), help=request.args.get('help'))}}"
     data-key="notifications"
     aria-live="polite"
   {% endif %}
 >
 
+  {% if notifications %}
+    <p class="bottom-gutter">
+      <a href="{{ url_for('.view_job_csv', service_id=current_service.id, job_id=job.id, status=status) }}" download="download" class="heading-small">Download as a CSV file</a>
+      &emsp;
+      Delivery information is available for 7 days
+    </p>
+  {% endif %}
+
   {% call(item, row_number) list_table(
     notifications,
     caption=uploaded_file_name,
     caption_visible=False,
-    empty_message="No messages to show yet",
+    empty_message="No messages to show",
     field_headings=[
       'Recipient',
       'Time',

@@ -14,9 +14,12 @@ class JobApiClient(BaseAPIClient):
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
 
-    def get_job(self, service_id, job_id=None, limit_days=None):
+    def get_job(self, service_id, job_id=None, limit_days=None, status=None):
         if job_id:
-            return self.get(url='/service/{}/job/{}'.format(service_id, job_id))
+            params = {}
+            if status is not None:
+                params['status'] = status
+            return self.get(url='/service/{}/job/{}'.format(service_id, job_id), params=params)
         params = {}
         if limit_days is not None:
             params['limit_days'] = limit_days
