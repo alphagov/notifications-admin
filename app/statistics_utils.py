@@ -84,6 +84,6 @@ def get_failure_rate_for_job(job):
 
 def add_rate_to_jobs(jobs):
     return [dict(
-        **job,
-        failure_rate=(get_failure_rate_for_job(job)) * 100
+        failure_rate=(get_failure_rate_for_job(job)) * 100,
+        **job
     ) for job in jobs]
