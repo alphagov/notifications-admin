@@ -9,9 +9,16 @@
   width='2-3',
   suffix=None,
   safe_error_message=False,
-  rows=8
+  rows=8,
+  character_count=False,
+  service_name=None
 ) %}
-  <div class="form-group{% if field.errors %} error{% endif %}" {% if autofocus %}data-module="autofocus"{% endif %}>
+  <div
+    class="form-group{% if field.errors %} error{% endif %}"
+    {% if autofocus %}data-module="autofocus"{% endif %}
+    {% if character_count %}data-module="character-count"{% endif %}
+    {% if service_name %}data-service-name="{{ service_name }}"{% endif %}
+  >
     <label class="form-label" for="{{ field.name }}">
       {% if label %}
         {{ label }}

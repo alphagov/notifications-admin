@@ -54,3 +54,9 @@
 .textbox-right-aligned {
   text-align: right;
 }
+
+.textbox-character-count {
+  @include core-19($tabular-numbers: true);
+  margin: 10px 0 0 0;
+  color: $secondary-text-colour;
+}
