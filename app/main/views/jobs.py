@@ -27,7 +27,7 @@ from app.utils import (
     generate_previous_next_dict,
     user_has_permissions,
     generate_notifications_csv)
-from app.statistics_utils import sum_of_statistics, statistics_by_state
+from app.statistics_utils import sum_of_statistics, statistics_by_state, add_rate_to_jobs
 
 
 def _parse_filter_args(filter_dict):
@@ -60,10 +60,9 @@ def _set_status_filters(filter_args):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_jobs(service_id):
-    jobs = job_api_client.get_job(service_id)['data']
     return render_template(
         'views/jobs/jobs.html',
-        jobs=jobs
+        jobs=add_rate_to_jobs(job_api_client.get_job(service_id)['data'])
     )
 
 
