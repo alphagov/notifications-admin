@@ -92,7 +92,7 @@ JSON Web Token standard claims (these form the JSON Web Token header):
 GOV.UK Notify application-specific claims (these form the JSON Web Token payload):
 ```
 {
-  iss: 'string', // Service ID
+  iss: "string", // Service ID
   iat: 0, // creation time in epoch seconds (UTC)
 }
 ```
@@ -129,11 +129,11 @@ POST /notifications/sms
 
 ```
 {
-  'to': '+447700900404',
-  'template': f6895ff7-86e0-4d38-80ab-c9525856c3ff,
-  'personalisation': {
-    'name': 'myname',
-    'date': '2016'
+  "to": "+447700987345",
+  "template": "f6895ff7-86e0-4d38-80ab-c9525856c3ff",
+  "personalisation": {
+    "name": "myname",
+    "date": "2016"
   }
 }
 ```
@@ -147,11 +147,11 @@ POST /notifications/email
 
 ```
 {
-  'to': 'email@gov.uk',
-  'template': f6895ff7-86e0-4d38-80ab-c9525856c3ff,
-    'personalisation': {
-    'name': 'myname',
-    'date': '2016'
+  "to": "email@gov.uk",
+  "template": "f6895ff7-86e0-4d38-80ab-c9525856c3ff",
+    "personalisation": {
+    "name": "myname",
+    "date": "2016"
   }
 }
 ```
@@ -171,15 +171,23 @@ where:
 The response (status code 201) will be:
 ```
 {
-  'data':{
-    'notification': {
-      'id':1
-    }
+  "data":{
+    "notification": {
+      "id":1
+    },
+    "body": "Dear Bill, your licence is due for renewal.",
+    "template_version": 1,
+    "subject": "Licence renewal"
   }
 }
 ```
 
-where `id` is the unique identifier for the notification – you'll use this ID to retrieve the status of a notification.
+where:
+
+* `id` is the unique identifier for the notification – you'll use this ID to retrieve the status of a notification
+* `body` is the content of the message
+* `template_version` is the version number of the template used
+* `subject` is the subject of the email (present for email notifications only)
 
 <h3 id="getnotifications">Retrieve notifications: GET</h3>
 
@@ -192,27 +200,27 @@ The response (status code 200) will be:
 
 ```
 {
-  'notification': {
-    'status': 'delivered',
-    'to': '07515 987 456',
-    'template': {
-      'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb',
-      'name': 'First template',
-      'template_type': 'sms'
+  "notification": {
+    "status": "delivered",
+    "to": "07515 987 456",
+    "template": {
+      "id": "5e427b42-4e98-46f3-a047-32c4a87d26bb",
+      "name": "First template",
+      "template_type": "sms"
     },
-    'created_at': '2016-04-26T15:29:36.891512+00:00',
-    'updated_at': '2016-04-26T15:29:38.724808+00:00',
-    'sent_at': '2016-04-26T15:29:37.230976+00:00',
-    'job': {
-      'id': 'f9043884-acac-46db-b2ea-f08cd8ec6d67',
-      'original_file_name': 'Test run'
+    "created_at": "2016-04-26T15:29:36.891512+00:00",
+    "updated_at": "2016-04-26T15:29:38.724808+00:00",
+    "sent_at": "2016-04-26T15:29:37.230976+00:00",
+    "job": {
+      "id": "f9043884-acac-46db-b2ea-f08cd8ec6d67",
+      "original_file_name": "Test run"
     },
-    'sent_at': '2016-04-26T15:29:37.230976+00:00',
-    'id': 'f163deaf-2d3f-4ec6-98fc-f23fa511518f',
-    'content_char_count': 490,
-    'service': '5cf87313-fddd-4482-a2ea-48e37320efd1',
-    'reference': None,
-    'sent_by': 'mmg'
+    "sent_at": "2016-04-26T15:29:37.230976+00:00",
+    "id": "f163deaf-2d3f-4ec6-98fc-f23fa511518f",
+    "content_char_count": 490,
+    "service": "5cf87313-fddd-4482-a2ea-48e37320efd1",
+    "reference": None,
+    "sent_by": "mmg"
   }
 }
 ```
@@ -227,57 +235,57 @@ GET /notifications
 The response (status code 200) will be:
 
 ```
-{'notifications':
+{"notifications":
   [{
-    'status': 'delivered',
-    'to': '07515 987 456',
-    'template': {
-      'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb',
-      'name': 'First template',
-      'template_type': 'sms'
+    "status": "delivered",
+    "to": "07515 987 456",
+    "template": {
+      "id": "5e427b42-4e98-46f3-a047-32c4a87d26bb",
+      "name": "First template",
+      "template_type": "sms"
     },
-    'job': {
-      'id': '5cc9d7ae-ceb7-4565-8345-4931d71f8c2e',
-      'original_file_name': 'Test run'
+    "job": {
+      "id": "5cc9d7ae-ceb7-4565-8345-4931d71f8c2e",
+      "original_file_name": "Test run"
     },
-    'created_at': '2016-04-26T15:30:49.968969+00:00',
-    'updated_at': '2016-04-26T15:30:50.853844+00:00',
-    'sent_at': '2016-04-26T15:30:50.383634+00:00',
-    'id': '04ae9bdc-92aa-4d6c-a0da-48587c03d4c7',
-    'content_char_count': 446,
-    'service': '5cf87313-fddd-4482-a2ea-48e37320efd1',
-    'reference': None,
-    'sent_by': 'mmg'
+    "created_at": "2016-04-26T15:30:49.968969+00:00",
+    "updated_at": "2016-04-26T15:30:50.853844+00:00",
+    "sent_at": "2016-04-26T15:30:50.383634+00:00",
+    "id": "04ae9bdc-92aa-4d6c-a0da-48587c03d4c7",
+    "content_char_count": 446,
+    "service": "5cf87313-fddd-4482-a2ea-48e37320efd1",
+    "reference": None,
+    "sent_by": "mmg"
     },
     {
-    'status': 'delivered',
-    'to': '07515 987 456',
-    'template': {
-      'id': '5e427b42-4e98-46f3-a047-32c4a87d26bb',
-      'name': 'First template',
-      'template_type': 'sms'
+    "status": "delivered",
+    "to": "07515 987 456",
+    "template": {
+      "id": "5e427b42-4e98-46f3-a047-32c4a87d26bb",
+      "name": "First template",
+      "template_type": "sms"
     },
-    'job': {
-      'id': 'f9043884-acac-46db-b2ea-f08cd8ec6d67',
-      'original_file_name': 'Test run'
+    "job": {
+      "id": "f9043884-acac-46db-b2ea-f08cd8ec6d67",
+      "original_file_name": "Test run"
     },
-    'created_at': '2016-04-26T15:29:36.891512+00:00',
-    'updated_at': '2016-04-26T15:29:38.724808+00:00',
-    'sent_at': '2016-04-26T15:29:37.230976+00:00',
-    'id': 'f163deaf-2d3f-4ec6-98fc-f23fa511518f',
-    'content_char_count': 490,
-    'service': '5cf87313-fddd-4482-a2ea-48e37320efd1',
-    'reference': None,
-    'sent_by': 'mmg'
+    "created_at": "2016-04-26T15:29:36.891512+00:00",
+    "updated_at": "2016-04-26T15:29:38.724808+00:00",
+    "sent_at": "2016-04-26T15:29:37.230976+00:00",
+    "id": "f163deaf-2d3f-4ec6-98fc-f23fa511518f",
+    "content_char_count": 490,
+    "service": "5cf87313-fddd-4482-a2ea-48e37320efd1",
+    "reference": None,
+    "sent_by": "mmg"
     },
     …
   ],
-  'links': {
-    'last': '/notifications?page=3&template_type=sms&status=delivered',
-    'next': '/notifications?page=2&template_type=sms&status=delivered'
+  "links": {
+    "last": "/notifications?page=3&template_type=sms&status=delivered",
+    "next": "/notifications?page=2&template_type=sms&status=delivered"
   },
-  'total': 162,
-  'page_size': 50
+  "total": 162,
+  "page_size": 50
 }
 ```
 <a name="fieldsforGET"></a>
@@ -341,8 +349,8 @@ Error code | Body | Meaning
 --- | --- | ---
 429 | {"result": "error", <br> "message": "Exceeded send limits (50) for today"} | You have reached the maximum number of messages you can send per day
 400 | {"result": "error", <br> "message": "id: required field"} | Post body is badly formed: missing `id` field
-400 | {"result":"error", <br> "message":{'template': ['Missing personalisation: {template_placeholder_name}']} | Post body is badly formed: missing personalisation data
-400 | {"result":"error", <br> "message"={'to': ['Invalid {notification_type} for restricted service')]} | Service is in trial mode; you cannot send messages to email addresses or phone numbers not belonging to team members
+400 | {"result":"error", <br> "message":{"template": ["Missing personalisation: {template_placeholder_name}"]} | Post body is badly formed: missing personalisation data
+400 | {"result":"error", <br> "message"={"to": ["Invalid {notification_type} for restricted service")]} | Service is in trial mode; you cannot send messages to email addresses or phone numbers not belonging to team members
 
 <h2 id="Notify_code">GOV.UK Notify API code</h2>
 
