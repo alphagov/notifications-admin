@@ -19,7 +19,7 @@
       <div class="file-list">
         <a class="file-list-filename" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
         <span class="file-list-hint">Uploaded {{ item.created_at|format_datetime_short }}</span>
-      </div
+      </div>
     {% endcall %}
     {% call field() %}
       {{ big_number(
@@ -30,7 +30,7 @@
     {% call field() %}
       {{ big_number(item.get('notifications_delivered', 0), smallest=True) }}
     {% endcall %}
-    {% call field(status='error' if 0 else '') %}
+    {% call field(status='error' if item.get('failure_rate', 0) > 3 else '') %}
       {{ big_number(item.get('notifications_failed', 0), smallest=True) }}
     {% endcall %}
   {% endcall %}
