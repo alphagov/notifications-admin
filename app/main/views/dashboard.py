@@ -19,7 +19,7 @@ from app import (
     service_api_client,
     template_statistics_client
 )
-from app.statistics_utils import sum_of_statistics, add_rates_to
+from app.statistics_utils import sum_of_statistics, add_rates_to, add_rate_to_jobs
 from app.utils import user_has_permissions
 
 
@@ -169,5 +169,5 @@ def get_dashboard_statistics_for_service(service_id):
         'sms_allowance_remaining': max(0, (sms_free_allowance - sms_sent)),
         'sms_chargeable': max(0, sms_sent - sms_free_allowance),
         'sms_rate': sms_rate,
-        'jobs': job_api_client.get_job(service_id, limit_days=7)['data']
+        'jobs': add_rate_to_jobs(job_api_client.get_job(service_id, limit_days=7)['data'])
     }

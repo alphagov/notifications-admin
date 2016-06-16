@@ -69,3 +69,21 @@ def statistics_by_state(statistics):
             'failed': statistics['emails_failed']
         }
     }
+
+
+def get_failure_rate_for_job(job):
+    if not job.get('notifications_delivered'):
+        if job.get('notifications_failed'):
+            return 1
+        return 0
+    return (
+        job.get('notifications_failed', 0) /
+        (job.get('notifications_failed', 0) + job.get('notifications_delivered', 0))
+    )
+
+
+def add_rate_to_jobs(jobs):
+    return [dict(
+        **job,
+        failure_rate=(get_failure_rate_for_job(job)) * 100
+    ) for job in jobs]

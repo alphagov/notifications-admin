@@ -1,6 +1,6 @@
 import pytest
 
-from app.statistics_utils import sum_of_statistics, add_rates_to, statistics_by_state
+from app.statistics_utils import sum_of_statistics, add_rates_to, add_rate_to_jobs, statistics_by_state
 
 
 @pytest.mark.parametrize('delivery_statistics', [
@@ -113,3 +113,25 @@ def test_service_statistics_by_state():
         assert resp[message_type]['sending'] == 1
         assert resp[message_type]['delivered'] == 1
         assert resp[message_type]['failed'] == 1
+
+
+@pytest.mark.parametrize('failed, delivered, expected_failure_rate', [
+    (0, 0, 0),
+    (0, 1, 0),
+    (1, 0, 100),
+    (1, 4, 20)
+])
+def test_add_rate_to_jobs(failed, delivered, expected_failure_rate):
+    resp = add_rate_to_jobs([
+        {
+            'notifications_failed': failed,
+            'notifications_delivered': delivered
+        },
+        {
+            'notifications_failed': 1,
+            'notifications_delivered': 1
+        }
+    ])
+
+    assert resp[0]['failure_rate'] == expected_failure_rate
+    assert resp[1]['failure_rate'] == 50
