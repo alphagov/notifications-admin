@@ -9,17 +9,14 @@ from flask import (
 from flask_login import login_user, current_user
 from app.main import main
 from app.main.forms import TwoFactorForm
-from app import service_api_client
-from app import user_api_client
+from app import service_api_client, user_api_client
+from app.utils import redirect_to_sign_in
 
 
 @main.route('/two-factor', methods=['GET', 'POST'])
+@redirect_to_sign_in
 def two_factor():
-    # TODO handle user_email not in session
-    try:
-        user_id = session['user_details']['id']
-    except KeyError:
-        return redirect(url_for('main.sign_in'))
+    user_id = session['user_details']['id']
 
     def _check_code(code):
         return user_api_client.check_verify_code(user_id, code, "sms")

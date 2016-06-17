@@ -8,19 +8,20 @@ from flask import (
 from app import user_api_client
 from app.main import main
 from app.main.forms import TextNotReceivedForm
+from app.utils import redirect_to_sign_in
 
 
 @main.route('/resend-email-verification')
+@redirect_to_sign_in
 def resend_email_verification():
-    # TODO there needs to be a way to regenerate a session id
     user = user_api_client.get_user_by_email(session['user_details']['email'])
     user_api_client.send_verify_email(user.id, user.email_address)
     return render_template('views/resend-email-verification.html', email=user.email_address)
 
 
 @main.route('/text-not-received', methods=['GET', 'POST'])
+@redirect_to_sign_in
 def check_and_resend_text_code():
-    # TODO there needs to be a way to regenerate a session id
     user = user_api_client.get_user_by_email(session['user_details']['email'])
 
     if user.state == 'active':
@@ -38,8 +39,8 @@ def check_and_resend_text_code():
 
 
 @main.route('/send-new-code', methods=['GET'])
+@redirect_to_sign_in
 def check_and_resend_verification_code():
-    # TODO there needs to be a way to generate a new session id
     user = user_api_client.get_user_by_email(session['user_details']['email'])
     user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
     if user.state == 'pending':
