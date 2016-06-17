@@ -32,11 +32,9 @@
             Now try it with your own message
           </p>
           {% if request.args['help'] == '3' %}
-            {% if first_email_template %}
-              <a href='{{ url_for(".choose_template", service_id=current_service.id, template_type="email") }}'>
-                Write an email
-              </a>
-            {% endif %}
+            <a href='{{ url_for(".choose_template", service_id=current_service.id, template_type="email") }}'>
+              Write an email
+            </a>
             <a href='{{ url_for(".choose_template", service_id=current_service.id, template_type="sms") }}'>
               Write a text message
             </a>
