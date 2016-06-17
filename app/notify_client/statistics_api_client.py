@@ -1,4 +1,5 @@
 from notifications_python_client.base import BaseAPIClient
+from notifications_python_client.errors import HTTPError
 
 
 class StatisticsApiClient(BaseAPIClient):
@@ -20,6 +21,16 @@ class StatisticsApiClient(BaseAPIClient):
             url='/service/{}/notifications-statistics'.format(service_id),
             params=params
         )
+
+    def get_statistics_for_service_for_day(self, service_id, day):
+        url = '/service/{}/notifications-statistics/day/{}'.format(service_id, day)
+        try:
+            return self.get(url=url)['data']
+        except HTTPError as e:
+            if e.status_code == 404:
+                return None
+            else:
+                raise e
 
     def get_7_day_aggregate_for_service(self, service_id, date_from=None, week_count=None):
         params = {}

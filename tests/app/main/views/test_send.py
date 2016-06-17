@@ -6,8 +6,8 @@ from os import path
 from glob import glob
 from bs4 import BeautifulSoup
 from flask import url_for
-from unittest.mock import ANY
-from tests import (validate_route_permission, job_json)
+from tests import validate_route_permission
+from datetime import datetime
 
 template_types = ['email', 'sms']
 
@@ -76,7 +76,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_service_statistics,
+    mock_get_service_statistics_for_day,
     fake_uuid
 ):
 
@@ -115,14 +115,16 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
 
 def test_upload_csv_invalid_extension(app_,
                                       api_user_active,
+                                      mocker,
                                       mock_login,
                                       mock_get_service,
                                       mock_get_service_template,
                                       mock_s3_upload,
                                       mock_has_permissions,
                                       mock_get_users_by_service,
-                                      mock_get_service_statistics,
+                                      mock_get_service_statistics_for_day,
                                       fake_uuid):
+
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -147,7 +149,7 @@ def test_send_test_sms_message(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_service_statistics,
+    mock_get_service_statistics_for_day,
     fake_uuid
 ):
 
@@ -175,7 +177,7 @@ def test_send_test_email_message(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_service_statistics,
+    mock_get_service_statistics_for_day,
     fake_uuid
 ):
 
@@ -203,7 +205,6 @@ def test_send_test_sms_message_with_placeholders(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_service_statistics,
     fake_uuid
 ):
 
@@ -212,6 +213,7 @@ def test_send_test_sms_message_with_placeholders(
         'file_name': 'Test message'
     }
     mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
+    mocker.patch('app.statistics_api_client.get_statistics_for_service_for_day', return_value=None)
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -284,7 +286,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_service_statistics,
+    mock_get_service_statistics_for_day,
     fake_uuid
 ):
 
@@ -315,6 +317,9 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
             assert '07700 900749' in content
             assert '07700 900750' not in content
             assert 'Only showing the first 50 rows' in content
+
+            today = datetime.today().date().strftime('%Y-%m-%d')
+            mock_get_service_statistics_for_day.assert_called_once_with(fake_uuid, today)
 
 
 def test_create_job_should_call_api(
@@ -360,7 +365,7 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
     mock_s3_upload,
     mocker,
     mock_has_permissions,
-    mock_get_service_statistics,
+    mock_get_service_statistics_for_day,
     mock_get_users_by_service,
     fake_uuid
 ):
@@ -601,7 +606,7 @@ def test_check_messages_back_link_with_help(app_,
                                             mock_get_service,
                                             mock_get_service_template_with_placeholders,
                                             mock_has_permissions,
-                                            mock_get_service_statistics,
+                                            mock_get_service_statistics_for_day,
                                             mock_s3_download,
                                             fake_uuid):
     with app_.test_request_context():
@@ -633,7 +638,7 @@ def test_check_messages_back_link_without_help(app_,
                                                mock_get_service,
                                                mock_get_service_template_with_placeholders,
                                                mock_has_permissions,
-                                               mock_get_service_statistics,
+                                               mock_get_service_statistics_for_day,
                                                mock_s3_download,
                                                fake_uuid):
     with app_.test_request_context():
@@ -654,3 +659,48 @@ def test_check_messages_back_link_without_help(app_,
         assert response.status_code == 200
         content = response.get_data(as_text=True)
         assert url_for('.send_test', service_id=fake_uuid, template_id=fake_uuid) in content
+
+
+def test_send_and_check_page_renders_if_no_statistics(
+    app_,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template,
+    mock_s3_upload,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    fake_uuid
+):
+
+    mock_get_stats = mocker.patch('app.statistics_api_client.get_statistics_for_service_for_day', return_value=None)
+
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value="""
+            phone number
+            +447700900986
+        """
+    )
+
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+            with client.session_transaction() as session:
+                session['upload_data'] = {'original_file_name': 'some.csv',
+                                          'template_id': fake_uuid,
+                                          'notification_count': 0,
+                                          'valid': True}
+            resp = client.post(
+                url_for('main.check_messages', service_id=fake_uuid, template_type='sms', upload_id='abc123'),
+                data={'file': (BytesIO(''.encode('utf-8')), 'some.csv')},
+                content_type='multipart/form-data',
+                follow_redirects=True
+            )
+
+            today = datetime.today().date().strftime('%Y-%m-%d')
+            assert resp.status_code == 200
+            page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
+            assert page.h1.text.strip() == 'Check and confirm'
+            mock_get_stats.assert_called_once_with(fake_uuid, today)
