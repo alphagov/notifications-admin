@@ -1,5 +1,6 @@
 import json
 import itertools
+from datetime import datetime
 from string import ascii_uppercase
 
 from contextlib import suppress
@@ -209,8 +210,9 @@ def check_messages(service_id, template_type, upload_id):
         return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
 
     users = user_api_client.get_users_for_service(service_id=service_id)
-    statistics = statistics_api_client.get_statistics_for_service(service_id, limit_days=1)['data']
-    statistics = statistics[0] if statistics else {}
+    today = datetime.today().date().strftime('%Y-%m-%d')
+    statistics = statistics_api_client.get_statistics_for_service_for_day(service_id, today)
+    statistics = statistics['data'] if statistics else {}
 
     contents = s3download(service_id, upload_id)
     if not contents:
