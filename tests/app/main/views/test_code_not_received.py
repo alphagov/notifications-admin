@@ -1,6 +1,5 @@
-
+import pytest
 from flask import url_for
-
 from bs4 import BeautifulSoup
 
 
@@ -127,3 +126,16 @@ def test_check_and_redirect_to_verify_if_user_pending(app_,
             response = client.get(url_for('main.check_and_resend_verification_code'))
             assert response.status_code == 302
             assert response.location == url_for('main.verify', _external=True)
+
+
+@pytest.mark.parametrize('endpoint', [
+    'main.resend_email_verification',
+    'main.check_and_resend_text_code',
+    'main.check_and_resend_verification_code',
+])
+def test_redirect_to_sign_in_if_not_logged_in(app_, endpoint):
+    with app_.test_request_context(), app_.test_client() as client:
+        response = client.get(url_for(endpoint))
+
+        assert response.location == url_for('main.sign_in', _external=True)
+        assert response.status_code == 302

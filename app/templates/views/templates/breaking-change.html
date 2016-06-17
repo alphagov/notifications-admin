@@ -25,6 +25,18 @@
     {% endif %}
   </div>
 
+  <form method="post">
+    <input type="hidden" name="name" value="{{ new_template.name }}" />
+    <input type="hidden" name="subject" value="{{ new_template.subject or '' }}" />
+    <input type="hidden" name="template_content" value="{{ new_template.content }}" />
+    <input type="hidden" name="confirm" value="true" />
+    {{ page_footer(
+      'Save changes to template',
+      back_link=url_for(".edit_service_template", service_id=current_service.id, template_id=new_template.id),
+      back_link_text="Back"
+    ) }}
+  </form>
+
   <p>
     When you send messages using this template you’ll need
     {{ new_template.placeholders|length + 1 }} columns of data:
@@ -49,17 +61,5 @@
   </div>
 
   <p>Developers, you’ll need to update your API calls</p>
-
-  <form method="post">
-    <input type="hidden" name="name" value="{{ new_template.name }}" />
-    <input type="hidden" name="subject" value="{{ new_template.subject or '' }}" />
-    <input type="hidden" name="template_content" value="{{ new_template.content }}" />
-    <input type="hidden" name="confirm" value="true" />
-    {{ page_footer(
-      'Save changes to template',
-      back_link=url_for(".edit_service_template", service_id=current_service.id, template_id=new_template.id),
-      back_link_text="Back"
-    ) }}
-  </form>
 
 {% endblock %}

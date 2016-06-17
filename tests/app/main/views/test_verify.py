@@ -147,3 +147,11 @@ def test_verify_email_redirects_to_sign_in_if_user_active(app_,
             assert page.h1.text == 'Sign in'
             flash_banner = page.find('div', class_='banner-dangerous').string.strip()
             assert flash_banner == "That verification link has expired."
+
+
+def test_verify_redirects_to_sign_in_if_not_logged_in(app_):
+    with app_.test_request_context(), app_.test_client() as client:
+        response = client.get(url_for('main.verify'))
+
+        assert response.location == url_for('main.sign_in', _external=True)
+        assert response.status_code == 302
