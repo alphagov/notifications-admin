@@ -1,9 +1,9 @@
 import re
 import csv
-from io import BytesIO, StringIO
+from io import StringIO
 from os import path
 from functools import wraps
-from flask import (abort, session, request, url_for)
+from flask import (abort, session, request, redirect, url_for)
 import pyexcel
 import pyexcel.ext.io
 import pyexcel.ext.xls
@@ -49,6 +49,16 @@ def user_has_permissions(*permissions, admin_override=False, any_=False):
                 abort(403)
         return wrap_func
     return wrap
+
+
+def redirect_to_sign_in(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        if 'user_details' not in session:
+            return redirect(url_for('main.sign_in'))
+        else:
+            return f(*args, **kwargs)
+    return wrapped
 
 
 def get_errors_for_csv(recipients, template_type):
