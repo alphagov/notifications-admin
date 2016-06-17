@@ -206,11 +206,13 @@ def send_from_api(service_id, template_id):
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def check_messages(service_id, template_type, upload_id):
+
     if not session.get('upload_data'):
         return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
 
     users = user_api_client.get_users_for_service(service_id=service_id)
     today = datetime.today().date().strftime('%Y-%m-%d')
+
     statistics = statistics_api_client.get_statistics_for_service_for_day(service_id, today)
     statistics = statistics['data'] if statistics else {}
 
