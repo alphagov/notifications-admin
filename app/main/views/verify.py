@@ -18,14 +18,14 @@ from notifications_utils.url_safe_token import check_token
 
 from app.main import main
 from app.main.forms import TwoFactorForm
+from app.utils import redirect_to_sign_in
 
 from app import user_api_client
 
 
 @main.route('/verify', methods=['GET', 'POST'])
+@redirect_to_sign_in
 def verify():
-    # TODO there needs to be a way to regenerate a session id
-    # or handle gracefully.
     user_id = session['user_details']['id']
 
     def _check_code(code):
