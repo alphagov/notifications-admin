@@ -779,7 +779,7 @@ def mock_check_verify_code_code_expired(mocker):
 @pytest.fixture(scope='function')
 def mock_create_job(mocker, api_user_active):
     def _create(job_id, service_id, template_id, file_name, notification_count):
-        job_data = job_json(
+        return job_json(
             service_id,
             api_user_active,
             job_id=job_id,
@@ -787,7 +787,6 @@ def mock_create_job(mocker, api_user_active):
             bucket_name='service-{}-notify'.format(job_id),
             original_file_name='{}.csv'.format(job_id),
             notification_count=notification_count)
-        return job_data
 
     return mocker.patch('app.job_api_client.create_job', side_effect=_create)
 
@@ -795,8 +794,7 @@ def mock_create_job(mocker, api_user_active):
 @pytest.fixture(scope='function')
 def mock_get_job(mocker, api_user_active):
     def _get_job(service_id, job_id):
-        job_data = job_json(service_id, api_user_active, job_id=job_id)
-        return {"data": job_data}
+        return {"data": job_json(service_id, api_user_active, job_id=job_id)}
 
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
 
@@ -804,17 +802,16 @@ def mock_get_job(mocker, api_user_active):
 @pytest.fixture(scope='function')
 def mock_get_jobs(mocker, api_user_active):
     def _get_jobs(service_id, limit_days=None):
-        data = []
-        for filename in [
-            "Test message",
-            "export 1/1/2016.xls",
-            "all email addresses.xlsx",
-            "applicants.ods",
-            "thisisatest.csv",
-        ]:
-            job_data = job_json(service_id, api_user_active, original_file_name=filename)
-            data.append(job_data)
-        return {"data": data}
+        return {"data": [
+            job_json(service_id, api_user_active, original_file_name=filename)
+            for filename in (
+                "Test message",
+                "export 1/1/2016.xls",
+                "all email addresses.xlsx",
+                "applicants.ods",
+                "thisisatest.csv",
+            )
+        ]}
 
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_jobs)
 
