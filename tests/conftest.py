@@ -805,8 +805,14 @@ def mock_get_job(mocker, api_user_active):
 def mock_get_jobs(mocker, api_user_active):
     def _get_jobs(service_id, limit_days=None):
         data = []
-        for i in range(5):
-            job_data = job_json(service_id, api_user_active)
+        for filename in [
+            "Test message",
+            "export 1/1/2016.xls",
+            "all email addresses.xlsx",
+            "applicants.ods",
+            "thisisatest.csv",
+        ]:
+            job_data = job_json(service_id, api_user_active, original_file_name=filename)
             data.append(job_data)
         return {"data": data}
 
