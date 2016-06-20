@@ -2,6 +2,7 @@ import copy
 from flask import url_for
 
 from bs4 import BeautifulSoup
+from freezegun import freeze_time
 
 from tests import validate_route_permission
 from tests.conftest import SERVICE_ONE_ID
@@ -138,6 +139,49 @@ def test_should_show_all_templates_on_template_statistics_page(
         assert 'Brine Shrimp' in table_rows[1].find_all('th')[0].text
         assert 'Text message template' in table_rows[1].find_all('th')[0].text
         assert '13' in table_rows[1].find_all('td')[0].text
+
+
+@freeze_time("2016-01-01 11:09:00.061258")
+def test_should_show_recent_jobs_on_dashboard(
+    app_,
+    mocker,
+    api_user_active,
+    mock_get_service,
+    mock_get_service_templates,
+    mock_get_service_statistics,
+    mock_get_aggregate_service_statistics,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_login,
+    mock_get_template_statistics,
+    mock_get_jobs,
+    mock_has_permissions,
+    mock_get_usage
+):
+
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+
+    mock_get_jobs.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
+    assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    table_rows = page.find_all('tbody')[1].find_all('tr')
+
+    assert "Test message" not in page.text
+    assert len(table_rows) == 4
+
+    for index, filename in enumerate((
+        "export 1/1/2016.xls",
+        "all email addresses.xlsx",
+        "applicants.ods",
+        "thisisatest.csv",
+    )):
+        assert filename in table_rows[index].find_all('th')[0].text
+        assert 'Uploaded 1 January at 11:09' in table_rows[index].find_all('th')[0].text
+        for column_index, count in enumerate((1, 0, 0)):
+            assert table_rows[index].find_all('td')[column_index].text.strip() == str(count)
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):
