@@ -34,8 +34,9 @@ def test_should_show_service_name(app_,
             response = client.get(url_for(
                 'main.service_name_change', service_id=service_one['id']))
         assert response.status_code == 200
-        resp_data = response.get_data(as_text=True)
-        assert 'Change your service name' in resp_data
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.find('h1').text == 'Change your service name'
+        assert page.find('input', attrs={"type": "text"})['value'] == 'service one'
         app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
