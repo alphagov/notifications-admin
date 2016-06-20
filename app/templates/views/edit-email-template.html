@@ -16,9 +16,9 @@
       <div class="grid-row">
         <div class="column-two-thirds">
           {{ textbox(form.name, width='1-1', hint='Your recipients won’t see this', rows=10) }}
+          {{ textbox(form.subject, width='1-1', highlight_tags=True, rows=2) }}
         </div>
         <div class="column-two-thirds">
-          {{ textbox(form.subject, width='1-1', highlight_tags=True, rows=2) }}
           {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=8) }}
           {{ page_footer(
             'Save',
@@ -26,13 +26,11 @@
             delete_link_text='Delete this template'
           ) }}
         </div>
-        <div class="column-one-third">
-          <label for='template_content' class='placeholder-hint banner-mode' data-textboxes-selector='#template_content,#subject' data-target-textbox-selector="#template_content">
-            <div class="" id="placeholder-hint" aria-live="polite">
-              <p>Anything in ((double brackets)) gets replaced when you send this message</p>
-            </div>
-          </label>
-        </div>
+        <aside class="column-one-third">
+          <h2 style="margin: 0 0 5px 0;">Help</h2>
+          {% include "partials/templates/guidance-personalisation.html" %}
+          {% include "partials/templates/guidance-links.html" %}
+        </aside>
       </div>
     </form>
 

@@ -168,7 +168,7 @@ class ServiceNameForm(Form):
         super(ServiceNameForm, self).__init__(*args, **kwargs)
 
     name = StringField(
-        u'New name',
+        u'Service name',
         validators=[
             DataRequired(message='Can’t be empty')
         ])
@@ -198,7 +198,7 @@ class SMSTemplateForm(Form):
         validators=[DataRequired(message="Can’t be empty")])
 
     template_content = TextAreaField(
-        u'Message content',
+        u'Message',
         validators=[
             DataRequired(message="Can’t be empty"),
             NoCommasInPlaceHolders()
