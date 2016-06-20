@@ -18,14 +18,7 @@
           {{ textbox(form.name, width='1-1', hint='Your recipients won’t see this') }}
         </div>
         <div class="column-two-thirds">
-          {{ textbox(
-            form.template_content,
-            highlight_tags=True,
-            character_count=True,
-            width='1-1',
-            service_name=current_service.name,
-            rows=5
-          ) }}
+          {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=5) }}
           {{ page_footer(
             'Save',
             delete_link=url_for('.delete_service_template', service_id=current_service.id, template_id=template_id) if template_id or None,

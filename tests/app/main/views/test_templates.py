@@ -29,14 +29,10 @@ def test_should_show_page_for_one_templates(app_,
                 template_id=template_id))
 
     assert response.status_code == 200
-    content = response.get_data(as_text=True)
-    assert "Two week reminder" in content
-    assert "Your vehicle tax is about to expire" in content
-    assert 'data-module="character-count"' in content
-    assert 'data-service-name="Test Service"' in content
+    assert "Two week reminder" in response.get_data(as_text=True)
+    assert "Your vehicle tax is about to expire" in response.get_data(as_text=True)
     mock_get_service_template.assert_called_with(
-        service_id, template_id
-    )
+        service_id, template_id)
 
 
 def test_should_redirect_when_saving_a_template(app_,
