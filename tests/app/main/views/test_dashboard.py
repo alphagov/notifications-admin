@@ -87,19 +87,17 @@ def test_should_show_recent_templates_on_dashboard(app_,
         assert 'Test Service' in headers
         assert 'In the last 7 days' in headers
 
-        table_rows = page.find_all('dt')
+        table_rows = page.find_all('tbody')[0].find_all('tr')
 
         assert len(table_rows) == 2
 
-        assert 'Pickle feet' in page.find_all('dt')[0].text
-        assert 'Text message template' in page.find_all('dt')[0].text
-        assert '206' in page.find_all('dd')[0].text
-        assert 'text messages sent' in page.find_all('dd')[0].text
+        assert 'Pickle feet' in table_rows[0].find_all('th')[0].text
+        assert 'Text message template' in table_rows[0].find_all('th')[0].text
+        assert '206' in table_rows[0].find_all('td')[0].text
 
-        assert 'Brine Shrimp' in page.find_all('dt')[1].text
-        assert 'Text message template' in page.find_all('dt')[1].text
-        assert '13' in page.find_all('dd')[1].text
-        assert 'text messages sent' in page.find_all('dd')[1].text
+        assert 'Brine Shrimp' in table_rows[1].find_all('th')[0].text
+        assert 'Text message template' in table_rows[1].find_all('th')[0].text
+        assert '13' in table_rows[1].find_all('td')[0].text
 
 
 def test_should_show_all_templates_on_template_statistics_page(
@@ -129,19 +127,17 @@ def test_should_show_all_templates_on_template_statistics_page(
         mock_template_stats.assert_called_once_with(SERVICE_ONE_ID)
 
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        table_rows = page.find_all('dt')
+        table_rows = page.find_all('tbody')[0].find_all('tr')
 
         assert len(table_rows) == 2
 
-        assert 'Pickle feet' in page.find_all('dt')[0].text
-        assert 'Text message template' in page.find_all('dt')[0].text
-        assert '206' in page.find_all('dd')[0].text
-        assert 'text messages sent' in page.find_all('dd')[0].text
+        assert 'Pickle feet' in table_rows[0].find_all('th')[0].text
+        assert 'Text message template' in table_rows[0].find_all('th')[0].text
+        assert '206' in table_rows[0].find_all('td')[0].text
 
-        assert 'Brine Shrimp' in page.find_all('dt')[1].text
-        assert 'Text message template' in page.find_all('dt')[1].text
-        assert '13' in page.find_all('dd')[1].text
-        assert 'text messages sent' in page.find_all('dd')[1].text
+        assert 'Brine Shrimp' in table_rows[1].find_all('th')[0].text
+        assert 'Text message template' in table_rows[1].find_all('th')[0].text
+        assert '13' in table_rows[1].find_all('td')[0].text
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):

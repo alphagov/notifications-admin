@@ -14,9 +14,10 @@
     table-layout: fixed;
   }
 
-  .table-field-headings {
+  .table-field-headings,
+  .table-field-headings-visible {
     th {
-      padding: 0 0 5px 0;
+      padding-bottom: 5px;
     }
   }
 
