@@ -144,7 +144,7 @@ def get_example_csv(service_id, template_id):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test(service_id, template_id):
 
-    file_name = 'Test message'
+    file_name = current_app.config['TEST_MESSAGE_FILENAME']
 
     template = Template(
         service_api_client.get_service_template(service_id, template_id)['data'],

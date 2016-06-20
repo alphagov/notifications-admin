@@ -7,7 +7,8 @@ from flask import (
     redirect,
     url_for,
     session,
-    jsonify
+    jsonify,
+    current_app
 )
 
 from flask_login import login_required
@@ -169,5 +170,8 @@ def get_dashboard_statistics_for_service(service_id):
         'sms_allowance_remaining': max(0, (sms_free_allowance - sms_sent)),
         'sms_chargeable': max(0, sms_sent - sms_free_allowance),
         'sms_rate': sms_rate,
-        'jobs': add_rate_to_jobs(job_api_client.get_job(service_id, limit_days=7)['data'])
+        'jobs': add_rate_to_jobs(filter(
+            lambda job: job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME'],
+            job_api_client.get_job(service_id, limit_days=7)['data']
+        ))
     }

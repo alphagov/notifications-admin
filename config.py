@@ -40,6 +40,7 @@ class Config(object):
     DESKPRO_DEPT_ID = os.environ['DESKPRO_DEPT_ID']
     DESKPRO_ASSIGNED_AGENT_TEAM_ID = os.environ['DESKPRO_ASSIGNED_AGENT_TEAM_ID']
     ACTIVITY_STATS_LIMIT_DAYS = 7
+    TEST_MESSAGE_FILENAME = 'Test message'
 
     EMAIL_DOMAIN_REGEXES = [
         "gov\.uk",
