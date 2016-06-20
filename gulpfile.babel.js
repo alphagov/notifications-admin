@@ -60,7 +60,6 @@ gulp.task('javascripts', () => gulp
     paths.src + 'javascripts/fileUpload.js',
     paths.src + 'javascripts/updateContent.js',
     paths.src + 'javascripts/expandCollapse.js',
-    paths.src + 'javascripts/placeholderHint.js',
     paths.src + 'javascripts/characterCount.js',
     paths.src + 'javascripts/main.js'
   ])
