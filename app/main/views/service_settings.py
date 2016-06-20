@@ -42,6 +42,9 @@ def service_settings(service_id):
 def service_name_change(service_id):
     form = ServiceNameForm(service_api_client.find_all_service_email_from)
 
+    if request.method == 'GET':
+        form.name.data = current_service.get('name')
+
     if form.validate_on_submit():
         session['service_name_change'] = form.name.data
         return redirect(url_for('.service_name_change_confirm', service_id=service_id))
