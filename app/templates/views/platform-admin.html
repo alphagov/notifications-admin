@@ -60,6 +60,9 @@
     {% call field() %}
       <div>
         <a href="{{ url_for('main.service_dashboard', service_id=item['id']) }}" class="browse-list-link">{{ item['name'] }}</a>
+        <span class="file-list-hint">
+          {{ 'Trial' if item['restricted'] else 'Live' }}
+        </span>
       </div>
     {% endcall %}
     {% call field(align='right') %}
