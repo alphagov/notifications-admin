@@ -211,7 +211,7 @@ def check_messages(service_id, template_type, upload_id):
         return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
 
     users = user_api_client.get_users_for_service(service_id=service_id)
-    today = datetime.today().date().strftime('%Y-%m-%d')
+    today = datetime.utcnow().date().strftime('%Y-%m-%d')
 
     statistics = statistics_api_client.get_statistics_for_service_for_day(service_id, today)
     if not statistics:
