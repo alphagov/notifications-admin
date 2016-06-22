@@ -43,7 +43,7 @@ def test_should_render_platform_admin_page(
             assert response.status_code == 200
             resp_data = response.get_data(as_text=True)
             assert 'Platform admin' in resp_data
-            assert 'Today\'s statistics' in resp_data
+            assert 'Today' in resp_data
             assert 'Services' in resp_data
 
 
