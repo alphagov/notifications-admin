@@ -2,20 +2,15 @@
 
   padding: $gutter-two-thirds $gutter-half 0 0;
 
-  ul,
-  h2 {
+  h2,
+  li {
     @include core-19;
-    margin: 10px 20px 15px 0;
+    margin: 10px 20px 0 0;
     list-style-type: none;
   }
 
   h2 {
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-
-  li {
-    margin: 10px 0 0 0;
+    @include bold-19;
   }
 
   a {
