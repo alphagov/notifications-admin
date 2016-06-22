@@ -43,7 +43,7 @@ def test_should_render_platform_admin_page(
             assert response.status_code == 200
             resp_data = response.get_data(as_text=True)
             assert 'Platform admin' in resp_data
-            assert 'Today\'s statistics' in resp_data
+            assert 'Today' in resp_data
             assert 'Services' in resp_data
 
 
@@ -87,8 +87,8 @@ def create_stats(
 
 def test_format_stats_by_service_gets_correct_stats_for_each_service():
     services = [
-        {'name': 'a', 'id': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'},
-        {'name': 'b', 'id': 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'}
+        {'name': 'a', 'id': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'restricted': False},
+        {'name': 'b', 'id': 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'restricted': True}
     ]
     all_stats = [
         create_stats('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', emails_requested=1),
@@ -102,16 +102,18 @@ def test_format_stats_by_service_gets_correct_stats_for_each_service():
     assert ret[0]['sending'] == 1
     assert ret[0]['delivered'] == 0
     assert ret[0]['failed'] == 0
+    assert ret[0]['restricted'] is False
 
     assert ret[1]['name'] == 'b'
     assert ret[1]['sending'] == 2
     assert ret[1]['delivered'] == 0
     assert ret[1]['failed'] == 0
+    assert ret[1]['restricted'] is True
 
 
 def test_format_stats_by_service_sums_values_for_sending():
     services = [
-        {'name': 'a', 'id': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'},
+        {'name': 'a', 'id': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'restricted': False},
     ]
     all_stats = [
         create_stats(
