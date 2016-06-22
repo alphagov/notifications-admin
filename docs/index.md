@@ -132,8 +132,8 @@ POST /notifications/sms
   "to": "+447700987345",
   "template": "f6895ff7-86e0-4d38-80ab-c9525856c3ff",
   "personalisation": {
-    "name": "myname",
-    "date": "2016"
+    "name": "Bill",
+    "date": "3 January 2016"
   }
 }
 ```
@@ -150,8 +150,8 @@ POST /notifications/email
   "to": "email@gov.uk",
   "template": "f6895ff7-86e0-4d38-80ab-c9525856c3ff",
     "personalisation": {
-    "name": "myname",
-    "date": "2016"
+    "name": "Bill",
+    "date": "3 January 2016"
   }
 }
 ```
@@ -175,7 +175,7 @@ The response (status code 201) will be:
     "notification": {
       "id":1
     },
-    "body": "Dear Bill, your licence is due for renewal.",
+    "body": "Dear Bill, your licence is due for renewal on 3 January 2016.",
     "template_version": 1,
     "subject": "Licence renewal"
   }
@@ -220,7 +220,9 @@ The response (status code 200) will be:
     "content_char_count": 490,
     "service": "5cf87313-fddd-4482-a2ea-48e37320efd1",
     "reference": None,
-    "sent_by": "mmg"
+    "sent_by": "mmg",
+    "body": "Dear Bill, your licence is due for renewal on 3 January 2016."
+    "date": "3 January 2016"
   }
 }
 ```

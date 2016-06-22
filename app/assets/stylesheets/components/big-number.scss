@@ -4,7 +4,7 @@
   display: block;
 
   &-number {
-    @include bold-48;
+    @include bold-48($tabular-numbers: true);
     display: block;
   }
 
@@ -21,7 +21,7 @@
   @extend %big-number;
 
   .big-number-number {
-    @include bold-36();
+    @include bold-36($tabular-numbers: true);
   }
 
 }
@@ -31,7 +31,7 @@
   @extend %big-number;
 
   .big-number-number {
-    @include bold-24();
+    @include bold-24($tabular-numbers: true);
   }
 
 }
@@ -45,7 +45,8 @@
   .big-number {
     padding: $gutter-half;
     position: relative;
-    cursor: pointer;
+    background: $black;
+    color: $white;
   }
 
   .big-number-label {
@@ -69,12 +70,22 @@
     margin-bottom: 5px;
 
     &:hover {
+
       color: $light-blue-25;
+
+      .big-number {
+        color: $light-blue-25;
+      }
+
     }
 
     &:active,
     &:focus {
       outline: 3px solid $yellow;
+    }
+
+    .big-number {
+      background: transparent;
     }
 
     .big-number-label {
