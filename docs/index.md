@@ -132,8 +132,8 @@ POST /notifications/sms
   "to": "+447700987345",
   "template": "f6895ff7-86e0-4d38-80ab-c9525856c3ff",
   "personalisation": {
-    "name": "myname",
-    "date": "2016"
+    "name": "Bill",
+    "date": "3 January 2016"
   }
 }
 ```
