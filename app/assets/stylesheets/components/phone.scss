@@ -1,0 +1,40 @@
+.phone {
+
+  background: $black;
+  border-radius: 15px;
+  padding: 15px;
+
+  &-speaker {
+    margin: 5px auto 20px;
+    border-radius: 5px;
+    width: 30px;
+    height: 7px;
+    background: rgba($white, 0.2);
+  }
+
+  &-screen {
+    background: $white;
+    color: $black;
+    min-height: 377px;
+    border-radius: 1px;
+  }
+
+  &-recipient {
+    @include core-16($tabular-numbers: true);
+    margin: 0 0 5px 7px;
+    padding-top: 10px;
+    color: $secondary-text-colour;
+  }
+
+  &-sms {
+    padding: 10px;
+    margin: 10px;
+    background: $panel-colour;
+    border-radius: 5px;
+  }
+
+}
+
+.phone-container {
+  margin-bottom: -200px;
+}

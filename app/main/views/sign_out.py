@@ -13,4 +13,4 @@ from app.main import main
 def sign_out():
     session.clear()
     logout_user()
-    return redirect(url_for('main.sign_in'))
+    return redirect(url_for('main.index'))
