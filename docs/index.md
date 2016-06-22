@@ -221,7 +221,7 @@ The response (status code 200) will be:
     "service": "5cf87313-fddd-4482-a2ea-48e37320efd1",
     "reference": None,
     "sent_by": "mmg",
-    "body": "Dear Bill, your licence is due for renewal on 3 January 2016"
+    "body": "Dear Bill, your licence is due for renewal on 3 January 2016."
     "date": "3 January 2016"
   }
 }
