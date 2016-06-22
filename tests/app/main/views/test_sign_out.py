@@ -7,7 +7,7 @@ def test_render_sign_out_redirects_to_sign_in(app_):
             url_for('main.sign_out'))
         assert response.status_code == 302
         assert response.location == url_for(
-            'main.sign_in', _external=True)
+            'main.index', _external=True)
 
 
 def test_sign_out_user(app_,
@@ -34,6 +34,6 @@ def test_sign_out_user(app_,
             response = client.get(url_for('main.sign_out'))
             assert response.status_code == 302
             assert response.location == url_for(
-                'main.sign_in', _external=True)
+                'main.index', _external=True)
             with client.session_transaction() as session:
                 assert session.get('user_id') is None

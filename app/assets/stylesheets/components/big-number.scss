@@ -45,7 +45,8 @@
   .big-number {
     padding: $gutter-half;
     position: relative;
-    cursor: pointer;
+    background: $black;
+    color: $white;
   }
 
   .big-number-label {
@@ -69,12 +70,22 @@
     margin-bottom: 5px;
 
     &:hover {
+
       color: $light-blue-25;
+
+      .big-number {
+        color: $light-blue-25;
+      }
+
     }
 
     &:active,
     &:focus {
       outline: 3px solid $yellow;
+    }
+
+    .big-number {
+      background: transparent;
     }
 
     .big-number-label {
