@@ -243,7 +243,7 @@ def check_messages(service_id, template_type, upload_id):
     )
 
     if request.args.get('from_test') and len(template.placeholders):
-        extra_args = {'help': 1} if request.args.get('help') else {}
+        extra_args = {'help': 1} if request.args.get('help', '0') != '0' else {}
         back_link = url_for(
             '.send_test', service_id=service_id, template_id=template.id, **extra_args
         )
