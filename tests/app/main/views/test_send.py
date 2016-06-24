@@ -599,38 +599,6 @@ def test_route_choose_template_manage_api_keys_permissions(mocker,
         assert len(links) == 1
 
 
-def test_check_messages_back_link_with_help(app_,
-                                            api_user_active,
-                                            mock_login,
-                                            mock_get_user_by_email,
-                                            mock_get_users_by_service,
-                                            mock_get_service,
-                                            mock_get_service_template_with_placeholders,
-                                            mock_has_permissions,
-                                            mock_get_service_statistics_for_day,
-                                            mock_s3_download,
-                                            fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            with client.session_transaction() as session:
-                session['upload_data'] = {'original_file_name': 'valid.csv',
-                                          'template_id': fake_uuid,
-                                          'notification_count': 1,
-                                          'valid': True}
-            response = client.get(url_for(
-                'main.check_messages',
-                service_id=fake_uuid,
-                upload_id=fake_uuid,
-                template_type='sms',
-                from_test=True,
-                help=2)
-            )
-        assert response.status_code == 200
-        content = response.get_data(as_text=True)
-        assert url_for('.send_test', service_id=fake_uuid, template_id=fake_uuid, help=1) in content
-
-
 @pytest.mark.parametrize(
     'extra_args,expected_url',
     [
