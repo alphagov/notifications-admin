@@ -5,6 +5,7 @@ from io import BytesIO
 from os import path
 from glob import glob
 from bs4 import BeautifulSoup
+from functools import partial
 from flask import url_for
 from tests import validate_route_permission
 from datetime import datetime
@@ -630,6 +631,23 @@ def test_check_messages_back_link_with_help(app_,
         assert url_for('.send_test', service_id=fake_uuid, template_id=fake_uuid, help=1) in content
 
 
+@pytest.mark.parametrize(
+    'extra_args,expected_url',
+    [
+        (
+            dict(),
+            partial(url_for, '.send_test')
+        ),
+        (
+            dict(help='0'),
+            partial(url_for, '.send_test')
+        ),
+        (
+            dict(help='2'),
+            partial(url_for, '.send_test', help='1')
+        )
+    ]
+)
 def test_check_messages_back_link_without_help(app_,
                                                api_user_active,
                                                mock_login,
@@ -640,7 +658,9 @@ def test_check_messages_back_link_without_help(app_,
                                                mock_has_permissions,
                                                mock_get_service_statistics_for_day,
                                                mock_s3_download,
-                                               fake_uuid):
+                                               fake_uuid,
+                                               extra_args,
+                                               expected_url):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -654,11 +674,14 @@ def test_check_messages_back_link_without_help(app_,
                 service_id=fake_uuid,
                 upload_id=fake_uuid,
                 template_type='sms',
-                from_test=True)
-            )
+                from_test=True,
+                **extra_args
+            ))
         assert response.status_code == 200
-        content = response.get_data(as_text=True)
-        assert url_for('.send_test', service_id=fake_uuid, template_id=fake_uuid) in content
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert (
+            page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
+        ) == expected_url(service_id=fake_uuid, template_id=fake_uuid)
 
 
 def test_send_and_check_page_renders_if_no_statistics(
