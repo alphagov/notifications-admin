@@ -701,8 +701,7 @@ def mock_get_all_users_from_api(mocker):
 @pytest.fixture(scope='function')
 def mock_create_api_key(mocker):
     def _create(service_id, key_name):
-        import uuid
-        return {'data': str(generate_uuid())}
+        return str(generate_uuid())
 
     return mocker.patch('app.api_key_api_client.create_api_key', side_effect=_create)
 
