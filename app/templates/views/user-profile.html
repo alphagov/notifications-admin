@@ -14,7 +14,7 @@
       {'label': 'Name', 'value': current_user.name, 'url': url_for('.user_profile_name')},
       {'label': 'Email address', 'value': current_user.email_address, 'url': url_for('.user_profile_email')},
       {'label': 'Mobile number', 'value': current_user.mobile_number, 'url': url_for('.user_profile_mobile_number')},
-      {'label': 'Password', 'value': 'Last changed 1 January 2016, 10:00AM', 'url': url_for('.user_profile_password')},
+      {'label': 'Password', 'value': current_user.password_changed_at |format_datetime_short, 'url': url_for('.user_profile_password')},
     ],
     caption='Account settings',
     field_headings=['Setting', 'Value', 'Link to change'],
