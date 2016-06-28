@@ -1,12 +1,3 @@
-<div
-  {% if not finished %}
-    data-module="update-content"
-    data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job.id, status=status, help=request.args.get('help', 0))}}"
-    data-key="status"
-    aria-live="polite"
-  {% endif %}
->
-  <p class='heading-small bottom-gutter'>
-    Uploaded by {{ job.created_by.name }} on {{ job.created_at|format_datetime_short }}
-  </p>
-</div>
+<p class='heading-small bottom-gutter'>
+  Uploaded by {{ job.created_by.name }} on {{ job.created_at|format_datetime_short }}
+</p>

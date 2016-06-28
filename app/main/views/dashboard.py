@@ -57,11 +57,24 @@ def service_dashboard(service_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def service_dashboard_updates(service_id):
+    dashboard_statistics = get_dashboard_statistics_for_service(service_id)
     return jsonify(**{
-        'today': render_template(
-            'views/dashboard/today.html',
-            **get_dashboard_statistics_for_service(service_id)
-        )
+        'totals': render_template(
+            'views/dashboard/_totals.html',
+            **dashboard_statistics
+        ),
+        'template-statistics': render_template(
+            'views/dashboard/template-statistics.html',
+            **dashboard_statistics
+        ),
+        'jobs': render_template(
+            'views/dashboard/_jobs.html',
+            **dashboard_statistics
+        ),
+        'usage': render_template(
+            'views/dashboard/_usage.html',
+            **dashboard_statistics
+        ),
     })
 
 

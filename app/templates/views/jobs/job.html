@@ -28,10 +28,40 @@
       )}}
     {% endif %}
 
-    {% include 'partials/jobs/status.html' %}
+    <div
+      {% if not finished %}
+        data-module="update-content"
+        data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job.id, status=status, help=request.args.get('help', 0))}}"
+        data-key="status"
+        aria-live="polite"
+      {% endif %}
+    >
+      {% include 'partials/jobs/status.html' %}
+    </div>
 
-    {% include 'partials/jobs/count.html' %}
+    <div
+      {% if not finished %}
+        data-module="update-content"
+        data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job.id, status=status, help=request.args.get('help', 0))}}"
+        data-key="counts"
+        aria-live="polite"
+      {% endif %}
+    >
+      {% include 'partials/jobs/count.html' %}
+    </div>
 
-    {% include 'partials/jobs/notifications.html' %}
+    <div
+      {% if notifications %}
+        class='dashboard-table'
+      {% endif %}
+      {% if not finished %}
+        data-module="update-content"
+        data-resource="{{url_for(".view_job_updates", service_id=current_service.id, job_id=job.id, status=request.args.get('status'), help=request.args.get('help'))}}"
+        data-key="notifications"
+        aria-live="polite"
+      {% endif %}
+    >
+      {% include 'partials/jobs/notifications.html' %}
+    </div>
 
 {% endblock %}

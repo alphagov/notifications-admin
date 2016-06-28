@@ -32,47 +32,64 @@
     <div
       data-module="update-content"
       data-resource="{{url_for(".service_dashboard_updates", service_id=current_service.id)}}"
-      data-key="today"
+      data-key="totals"
       data-interval-seconds="2"
       aria-live="polite"
     >
-      <div class="grid-row">
-        {% include 'views/dashboard/_totals.html' %}
-        <div class="column-whole">
-          {{ show_more(
-            url_for('.weekly', service_id=current_service.id),
-            'Compare to previous weeks'
-          ) }}
-        </div>
-      </div>
-
-      {% if template_statistics|length %}
-        {% include 'views/dashboard/template-statistics.html' %}
-        {{ show_more(
-          url_for('.template_history', service_id=current_service.id),
-          'See all templates used this year'
-        ) }}
-      {% endif %}
-
-      {% if jobs %}
-        {% include 'views/dashboard/_jobs.html' %}
-        {{ show_more(
-          url_for('.view_jobs', service_id=current_service.id),
-          'See all uploaded files'
-        ) }}
-      {% endif %}
-
-      {% if current_user.has_permissions(['manage_settings'], admin_override=True) %}
-        <h2 class='heading-medium'>This year</h2>
-        {% include 'views/dashboard/_jobs.html' %}
-        {{ show_more(
-          url_for(".usage", service_id=current_service['id']),
-          'See usage breakdown'
-        ) }}
-      {% endif %}
-
+      {% include 'views/dashboard/_totals.html' %}
     </div>
+    {{ show_more(
+      url_for('.weekly', service_id=current_service.id),
+      'Compare to previous weeks'
+    ) }}
 
+    {% if template_statistics|length %}
+      <div
+        data-module="update-content"
+        data-resource="{{url_for(".service_dashboard_updates", service_id=current_service.id)}}"
+        data-key="template-statistics"
+        data-interval-seconds="2"
+        aria-live="polite"
+      >
+        {% include 'views/dashboard/template-statistics.html' %}
+      </div>
+      {{ show_more(
+        url_for('.template_history', service_id=current_service.id),
+        'See all templates used this year'
+      ) }}
+    {% endif %}
+
+    {% if jobs %}
+      <div
+        data-module="update-content"
+        data-resource="{{url_for(".service_dashboard_updates", service_id=current_service.id)}}"
+        data-key="jobs"
+        data-interval-seconds="2"
+        aria-live="polite"
+      >
+      {% include 'views/dashboard/_jobs.html' %}
+      {{ show_more(
+        url_for('.view_jobs', service_id=current_service.id),
+        'See all uploaded files'
+      ) }}
+    {% endif %}
+
+    {% if current_user.has_permissions(['manage_settings'], admin_override=True) %}
+      <h2 class='heading-medium'>This year</h2>
+      <div
+        data-module="update-content"
+        data-resource="{{url_for(".service_dashboard_updates", service_id=current_service.id)}}"
+        data-key="usage"
+        data-interval-seconds="2"
+        aria-live="polite"
+      >
+        {% include 'views/dashboard/_usage.html' %}
+      </div>
+      {{ show_more(
+        url_for(".usage", service_id=current_service['id']),
+        'See usage breakdown'
+      ) }}
+    {% endif %}
 
   </div>
 
