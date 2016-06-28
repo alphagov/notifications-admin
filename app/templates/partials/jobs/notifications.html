@@ -1,6 +1,9 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, date_field, row_heading %}
 
-<div class="dashboard-table">
+{% if notifications %}
+  <div class="dashboard-table">
+{% endif %}
+
   {% if notifications %}
     <p class="bottom-gutter">
       <a href="{{ url_for('.view_job_csv', service_id=current_service.id, job_id=job.id, status=status) }}" download="download" class="heading-small">Download as a CSV file</a>
@@ -34,4 +37,7 @@
       {{ item.status|format_notification_status(item.template.template_type) }}
     {% endcall %}
   {% endcall %}
-</div>
+
+{% if notifications %}
+  </div>
+{% endif %}

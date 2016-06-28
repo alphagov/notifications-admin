@@ -49,6 +49,7 @@ def service_dashboard(service_id):
     return render_template(
         'views/dashboard/dashboard.html',
         templates=service_api_client.get_service_templates(service_id)['data'],
+        updates_url=url_for(".service_dashboard_updates", service_id=service_id),
         **get_dashboard_statistics_for_service(service_id)
     )
 

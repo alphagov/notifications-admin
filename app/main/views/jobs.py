@@ -97,7 +97,13 @@ def view_job(service_id, job_id):
             prefix=current_service['name']
         ),
         counts=_get_job_counts(job, request.args.get('help', 0)),
-        status=request.args.get('status', '')
+        status=request.args.get('status', ''),
+        updates_url=url_for(
+            ".view_job_updates",
+            service_id=service_id,
+            job_id=job['id'],
+            status=request.args.get('status', '')
+        )
     )
 
 
