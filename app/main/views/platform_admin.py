@@ -43,7 +43,8 @@ def format_stats_by_service(all_stats, services):
             ),
             'delivered': stats['sms_delivered'] + stats['emails_delivered'],
             'failed': stats['sms_failed'] + stats['emails_failed'],
-            'restricted': services[stats['service']]['restricted']
+            'restricted': services[stats['service']]['restricted'],
+            'research_mode': services[stats['service']]['research_mode']
         }
         for stats in all_stats
     ]
