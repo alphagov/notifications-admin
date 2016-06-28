@@ -87,8 +87,8 @@ def create_stats(
 
 def test_format_stats_by_service_gets_correct_stats_for_each_service():
     services = [
-        {'name': 'a', 'id': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'restricted': False},
-        {'name': 'b', 'id': 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'restricted': True}
+        {'name': 'a', 'id': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'restricted': False, 'research_mode': True},
+        {'name': 'b', 'id': 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'restricted': True, 'research_mode': False}
     ]
     all_stats = [
         create_stats('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', emails_requested=1),
@@ -113,7 +113,7 @@ def test_format_stats_by_service_gets_correct_stats_for_each_service():
 
 def test_format_stats_by_service_sums_values_for_sending():
     services = [
-        {'name': 'a', 'id': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'restricted': False},
+        {'name': 'a', 'id': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'restricted': False, 'research_mode': False},
     ]
     all_stats = [
         create_stats(
