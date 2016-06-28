@@ -1,4 +1,3 @@
-import uuid
 from datetime import date, datetime, timedelta
 from unittest.mock import Mock
 import pytest
@@ -458,7 +457,8 @@ def api_user_active(fake_uuid):
                  'state': 'active',
                  'failed_login_count': 0,
                  'permissions': {},
-                 'platform_admin': False
+                 'platform_admin': False,
+                 'password_changed_at': str(datetime.utcnow())
                  }
     user = User(user_data)
     return user
