@@ -1,6 +1,7 @@
 from datetime import datetime, date, timedelta
 from collections import namedtuple
 from itertools import groupby
+import json
 
 from flask import (
     render_template,
@@ -48,9 +49,8 @@ def service_dashboard(service_id):
 
     return render_template(
         'views/dashboard/dashboard.html',
-        templates=service_api_client.get_service_templates(service_id)['data'],
         updates_url=url_for(".service_dashboard_updates", service_id=service_id),
-        **get_dashboard_statistics_for_service(service_id)
+        partials=get_dashboard_partials(service_id)
     )
 
 
@@ -58,25 +58,7 @@ def service_dashboard(service_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def service_dashboard_updates(service_id):
-    dashboard_statistics = get_dashboard_statistics_for_service(service_id)
-    return jsonify(**{
-        'totals': render_template(
-            'views/dashboard/_totals.html',
-            **dashboard_statistics
-        ),
-        'template-statistics': render_template(
-            'views/dashboard/template-statistics.html',
-            **dashboard_statistics
-        ),
-        'jobs': render_template(
-            'views/dashboard/_jobs.html',
-            **dashboard_statistics
-        ),
-        'usage': render_template(
-            'views/dashboard/_usage.html',
-            **dashboard_statistics
-        ),
-    })
+    return jsonify(**get_dashboard_partials(service_id))
 
 
 @main.route("/services/<service_id>/template-activity")
@@ -101,7 +83,7 @@ def template_history(service_id):
 def usage(service_id):
     return render_template(
         'views/usage.html',
-        **get_dashboard_statistics_for_service(service_id)
+        **calculate_usage(service_api_client.get_service_usage(service_id)['data'])
     )
 
 
@@ -157,35 +139,54 @@ def aggregate_usage(template_statistics):
     )
 
 
-def get_dashboard_statistics_for_service(service_id):
-
-    usage = service_api_client.get_service_usage(service_id)
-    sms_free_allowance = 250000
-    sms_rate = 0.018
-
-    sms_sent = usage['data'].get('sms_count', 0)
-    emails_sent = usage['data'].get('email_count', 0)
+def get_dashboard_partials(service_id):
 
     template_statistics = aggregate_usage(
         template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
     )
 
+    jobs = add_rate_to_jobs(filter(
+        lambda job: job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME'],
+        job_api_client.get_job(service_id, limit_days=7)['data']
+    ))
+
     return {
-        'statistics': add_rates_to(sum_of_statistics(
-            statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
-        )),
-        'template_statistics': template_statistics,
-        'most_used_template_count': max(
-            [row['usage_count'] for row in template_statistics] or [0]
+        'totals': render_template(
+            'views/dashboard/_totals.html',
+            statistics=add_rates_to(sum_of_statistics(
+                statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
+            ))
         ),
+        'template-statistics': render_template(
+            'views/dashboard/template-statistics.html',
+            template_statistics=template_statistics,
+            most_used_template_count=max(
+                [row['usage_count'] for row in template_statistics] or [0]
+            ),
+        ),
+        'has_template_statistics': bool(template_statistics),
+        'jobs': render_template(
+            'views/dashboard/_jobs.html',
+            jobs=jobs
+        ),
+        'has_jobs': bool(jobs),
+        'usage': render_template(
+            'views/dashboard/_usage.html',
+            **calculate_usage(service_api_client.get_service_usage(service_id)['data'])
+        ),
+    }
+
+
+def calculate_usage(usage, sms_free_allowance=250000, sms_rate=0.018):
+
+    sms_sent = usage.get('sms_count', 0)
+    emails_sent = usage.get('email_count', 0)
+
+    return {
         'emails_sent': emails_sent,
         'sms_free_allowance': sms_free_allowance,
         'sms_sent': sms_sent,
         'sms_allowance_remaining': max(0, (sms_free_allowance - sms_sent)),
         'sms_chargeable': max(0, sms_sent - sms_free_allowance),
-        'sms_rate': sms_rate,
-        'jobs': add_rate_to_jobs(filter(
-            lambda job: job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME'],
-            job_api_client.get_job(service_id, limit_days=7)['data']
-        ))
+        'sms_rate': sms_rate
     }

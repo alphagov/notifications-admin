@@ -30,28 +30,22 @@
       In the last 7 days
     </h2>
 
-    {% call ajax_block(updates_url, 'totals') %}
-      {% include 'views/dashboard/_totals.html' %}
-    {% endcall %}
+    {{ ajax_block(partials, updates_url, 'totals') }}
     {{ show_more(
       url_for('.weekly', service_id=current_service.id),
       'Compare to previous weeks'
     ) }}
 
-    {% if template_statistics|length %}
-      {% call ajax_block(updates_url, 'template-statistics') %}
-        {% include 'views/dashboard/template-statistics.html' %}
-      {% endcall %}
+    {% if partials['has_template_statistics'] %}
+      {{ ajax_block(partials, updates_url, 'template-statistics') }}
       {{ show_more(
         url_for('.template_history', service_id=current_service.id),
         'See all templates used this year'
       ) }}
     {% endif %}
 
-    {% if jobs %}
-      {% call ajax_block(updates_url, 'jobs') %}
-        {% include 'views/dashboard/_jobs.html' %}
-      {% endcall %}
+    {% if partials['has_jobs'] %}
+      {{ ajax_block(partials, updates_url, 'jobs') }}
       {{ show_more(
         url_for('.view_jobs', service_id=current_service.id),
         'See all uploaded files'
@@ -60,9 +54,7 @@
 
     {% if current_user.has_permissions(['manage_settings'], admin_override=True) %}
       <h2 class='heading-medium'>This year</h2>
-      {% call ajax_block(updates_url, 'usage') %}
-        {% include 'views/dashboard/_usage.html' %}
-      {% endcall %}
+      {{ ajax_block(partials, updates_url, 'usage') }}
       {{ show_more(
         url_for(".usage", service_id=current_service['id']),
         'See usage breakdown'

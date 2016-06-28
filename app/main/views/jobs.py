@@ -70,22 +70,13 @@ def view_jobs(service_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_job(service_id, job_id):
-    job = job_api_client.get_job(service_id, job_id)['data']
-    template = service_api_client.get_service_template(service_id=service_id,
-                                                       template_id=job['template'],
-                                                       version=job['template_version'])['data']
 
+    job = job_api_client.get_job(service_id, job_id)['data']
     filter_args = _parse_filter_args(request.args)
     _set_status_filters(filter_args)
-    notifications = notification_api_client.get_notifications_for_service(
-        service_id, job_id, status=filter_args.get('status'),
-    )
-    finished = job['status'] == 'finished'
+
     return render_template(
         'views/jobs/job.html',
-        notifications=notifications['notifications'],
-        job=job,
-        uploaded_at=job['created_at'],
         finished=job.get('notifications_sent', 0) and ((
             job.get('notifications_sent', 0) -
             job.get('notifications_delivered', 0) -
@@ -93,17 +84,21 @@ def view_job(service_id, job_id):
         ) == 0),
         uploaded_file_name=job['original_file_name'],
         template=Template(
-            template,
+            service_api_client.get_service_template(
+                service_id=service_id,
+                template_id=job['template'],
+                version=job['template_version']
+            )['data'],
             prefix=current_service['name']
         ),
-        counts=_get_job_counts(job, request.args.get('help', 0)),
         status=request.args.get('status', ''),
         updates_url=url_for(
             ".view_job_updates",
             service_id=service_id,
             job_id=job['id'],
             status=request.args.get('status', '')
-        )
+        ),
+        partials=get_job_partials(job)
     )
 
 
@@ -144,38 +139,9 @@ def view_job_csv(service_id, job_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_job_updates(service_id, job_id):
-    job = job_api_client.get_job(service_id, job_id)['data']
-    filter_args = _parse_filter_args(request.args)
-    _set_status_filters(filter_args)
-    notifications = notification_api_client.get_notifications_for_service(
-        service_id, job_id, status=filter_args.get('status')
-    )
-    finished = (
-        job.get('notifications_sent', 0) -
-        job.get('notifications_delivered', 0) -
-        job.get('notifications_failed', 0)
-    ) == 0
-    return jsonify(**{
-        'counts': render_template(
-            'partials/jobs/count.html',
-            job=job,
-            finished=finished,
-            counts=_get_job_counts(job, request.args.get('help', 0)),
-            status=request.args.get('status', '')
-        ),
-        'notifications': render_template(
-            'partials/jobs/notifications.html',
-            job=job,
-            notifications=notifications['notifications'],
-            finished=finished,
-            status=request.args.get('status', '')
-        ),
-        'status': render_template(
-            'partials/jobs/status.html',
-            job=job,
-            finished=finished
-        ),
-    })
+    return jsonify(**get_job_partials(
+        job_api_client.get_job(service_id, job_id)['data']
+    ))
 
 
 @main.route('/services/<service_id>/notifications/<message_type>')
@@ -325,3 +291,30 @@ def _get_job_counts(job, help_argument):
             ]
         ]
     ]
+
+
+def get_job_partials(job):
+
+    filter_args = _parse_filter_args(request.args)
+    _set_status_filters(filter_args)
+
+    return {
+        'counts': render_template(
+            'partials/jobs/count.html',
+            job=job,
+            counts=_get_job_counts(job, request.args.get('help', 0)),
+            status=request.args.get('status', '')
+        ),
+        'notifications': render_template(
+            'partials/jobs/notifications.html',
+            job=job,
+            notifications=notification_api_client.get_notifications_for_service(
+                job['service'], job['id'], status=filter_args.get('status')
+            )['notifications'],
+            status=request.args.get('status', '')
+        ),
+        'status': render_template(
+            'partials/jobs/status.html',
+            job=job
+        ),
+    }

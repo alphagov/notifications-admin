@@ -29,16 +29,8 @@
       )}}
     {% endif %}
 
-    {% call ajax_block(updates_url, 'status', finished=finished) %}
-      {% include 'partials/jobs/status.html' %}
-    {% endcall %}
-
-    {% call ajax_block(updates_url, 'counts', finished=finished) %}
-      {% include 'partials/jobs/count.html' %}
-    {% endcall %}
-
-    {% call ajax_block(updates_url, 'notifications', finished=finished) %}
-      {% include 'partials/jobs/notifications.html' %}
-    {% endcall %}
+    {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+    {{ ajax_block(partials, updates_url, 'counts', finished=finished) }}
+    {{ ajax_block(partials, updates_url, 'notifications', finished=finished) }}
 
 {% endblock %}

@@ -1,4 +1,4 @@
-{% macro ajax_block(url, key, interval=2, finished=False) %}
+{% macro ajax_block(partials, url, key, interval=2, finished=False) %}
   {% if not finished %}
     <div
       data-module="update-content"
@@ -8,7 +8,7 @@
       aria-live="polite"
     >
   {% endif %}
-    {{ caller() }}
+    {{ partials[key]|safe }}
   {% if not finished %}
     </div>
   {% endif %}
