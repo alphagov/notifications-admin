@@ -423,7 +423,8 @@ def api_user_pending(fake_uuid):
                  'mobile_number': '07700 900762',
                  'state': 'pending',
                  'failed_login_count': 0,
-                 'permissions': {}
+                 'permissions': {},
+                 'password_changed_at': str(datetime.utcnow())
                  }
     user = User(user_data)
     return user
@@ -440,7 +441,8 @@ def platform_admin_user(fake_uuid):
                  'state': 'active',
                  'failed_login_count': 0,
                  'permissions': {},
-                 'platform_admin': True
+                 'platform_admin': True,
+                 'password_changed_at': str(datetime.utcnow())
                  }
     user = User(user_data)
     return user
@@ -483,7 +485,8 @@ def active_user_with_permissions(fake_uuid):
                                                   'manage_settings',
                                                   'manage_api_keys',
                                                   'view_activity']},
-                 'platform_admin': False
+                 'platform_admin': False,
+                 'password_changed_at': str(datetime.utcnow())
                  }
     user = User(user_data)
     return user
@@ -499,7 +502,8 @@ def api_user_locked(fake_uuid):
                  'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 5,
-                 'permissions': {}
+                 'permissions': {},
+                 'password_changed_at': str(datetime.utcnow())
                  }
     user = User(user_data)
     return user
@@ -516,7 +520,7 @@ def api_user_request_password_reset(fake_uuid):
                  'state': 'active',
                  'failed_login_count': 5,
                  'permissions': {},
-                 'password_changed_at': None
+                 'password_changed_at': str(datetime.utcnow())
                  }
     user = User(user_data)
     return user
@@ -546,6 +550,7 @@ def mock_register_user(mocker, api_user_pending):
         api_user_pending.email_address = email_address
         api_user_pending.mobile_number = mobile_number
         api_user_pending.password = password
+
         return api_user_pending
 
     return mocker.patch('app.user_api_client.register_user', side_effect=_register)
@@ -701,7 +706,6 @@ def mock_get_all_users_from_api(mocker):
 @pytest.fixture(scope='function')
 def mock_create_api_key(mocker):
     def _create(service_id, key_name):
-        import uuid
         return {'data': str(generate_uuid())}
 
     return mocker.patch('app.api_key_api_client.create_api_key', side_effect=_create)
