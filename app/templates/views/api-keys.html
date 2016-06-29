@@ -11,7 +11,7 @@
   <div class="grid-row">
     <div class="column-two-thirds">
       <h1 class="heading-large">
-        API keys
+        API integration
       </h1>
     </div>
     <div class="column-one-third">
@@ -23,8 +23,8 @@
     keys,
     empty_message="You haven’t created any API keys yet",
     caption="API keys",
-    caption_visible=False,
-    field_headings=['Key name', hidden_field_heading('Action')]
+    caption_visible=false,
+    field_headings=['API keys', hidden_field_heading('Action')],
   ) %}
     {% call field() %}
       {{ item.name }}
