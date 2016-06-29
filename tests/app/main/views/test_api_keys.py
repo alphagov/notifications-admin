@@ -72,8 +72,13 @@ def test_should_create_api_key_with_type_normal(app_,
 
     with app_.test_request_context(), app_.test_client() as client:
         client.login(api_user_active)
-        response = client.post(url_for('main.create_api_key', service_id=service_id),
-                               data={'key_name': 'some default key name'})
+        response = client.post(
+            url_for('main.create_api_key', service_id=service_id),
+            data={
+                'key_name': 'some default key name',
+                'key_type': 'normal'
+            }
+        )
 
     assert response.status_code == 200
     assert 'some default key name' in response.get_data(as_text=True)

@@ -1,0 +1,23 @@
+{% macro radios(
+  field,
+  hint=None
+) %}
+  <div class="form-group {% if field.errors %} error{% endif %}">
+    <fieldset>
+      <legend class="form-label">
+        {{ field.label }}
+        {% if field.errors %}
+          <span class="error-message">
+            {{ field.errors[0] }}
+          </span>
+        {% endif %}
+      </legend>
+      {% for option in field %}
+        <label class="block-label" for="{{ option.id }}">
+          {{ option }}
+          {{ option.label.text }}
+        </label>
+      {% endfor %}
+    </fieldset>
+  </div>
+{% endmacro %}

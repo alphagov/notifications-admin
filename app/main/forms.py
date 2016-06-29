@@ -12,7 +12,8 @@ from wtforms import (
     FileField,
     BooleanField,
     HiddenField,
-    IntegerField
+    IntegerField,
+    RadioField
 )
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp)
@@ -290,6 +291,18 @@ class CreateKeyForm(Form):
     def __init__(self, existing_key_names=[], *args, **kwargs):
         self.existing_key_names = [x.lower() for x in existing_key_names]
         super(CreateKeyForm, self).__init__(*args, **kwargs)
+
+    key_type = RadioField(
+        'What should Notify do when you use this key?',
+        choices=[
+            ('normal', 'Send messages to anyone'),
+            ('test', 'Simulate sending messages to anyone'),
+            ('team', 'Only send messages to members of your team')
+        ],
+        validators=[
+            DataRequired()
+        ]
+    )
 
     key_name = StringField(u'Description of key', validators=[
         DataRequired(message='You need to give the key a name')

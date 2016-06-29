@@ -30,7 +30,7 @@ def create_api_key(service_id):
                                key_name=form.key_name.data)
     return render_template(
         'views/api-keys/create.html',
-        key_name=form.key_name
+        form=form
     )
 
 
