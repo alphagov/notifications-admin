@@ -100,7 +100,8 @@ def mock_update_service(mocker):
                 restricted,
                 users,
                 email_from,
-                reply_to_email_address=None):
+                reply_to_email_address=None,
+                sms_sender=None):
         service = service_json(
             service_id, service_name, users, message_limit=message_limit,
             active=active, restricted=restricted, email_from=email_from, reply_to_email_address=reply_to_email_address)

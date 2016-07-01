@@ -12,7 +12,8 @@ from wtforms import (
     FileField,
     BooleanField,
     HiddenField,
-    IntegerField)
+    IntegerField
+)
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp)
 
@@ -318,3 +319,13 @@ class ProviderForm(Form):
 
 class ServiceReplyToEmailFrom(Form):
     email_address = email_address()
+
+
+class ServiceSmsSender(Form):
+    sms_sender = StringField('', validators=[Length(max=11,
+                             message="Text message sender can't be longer than 11 characters")])
+
+    def validate_sms_sender(form, field):
+        import re
+        if not re.match('^[a-zA-Z0-9\s]+$', field.data):
+            raise ValidationError('Sms text message sender can only contain alpha-numeric characters')
