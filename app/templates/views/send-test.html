@@ -54,7 +54,7 @@
       {% endfor %}
     {% endcall %}
 
-    {{ page_footer("Check and confirm", back_link=(
+    {{ page_footer("Preview", back_link=(
       url_for('.send_messages', service_id=current_service.id, template_id=template.id)) if not request.args['help'] else None
     ) }}
   </form>
