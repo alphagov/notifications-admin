@@ -131,6 +131,10 @@ def test_sms_sender_form_validation(app_, mock_get_user_by_email):
         form.validate()
         assert not form.errors
 
+        form.sms_sender.data = ''
+        form.validate()
+        assert not form.errors
+
         form.sms_sender.data = 'morethanelevenchars'
         form.validate()
         assert "Text message sender can't be longer than 11 characters" == form.errors['sms_sender'][0]
