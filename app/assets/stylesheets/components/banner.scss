@@ -76,18 +76,14 @@
   @extend %banner;
   background: $govuk-blue;
   color: $white;
-  margin-top: $gutter;
+  margin: 0 0 $gutter 0;
   padding: $gutter-half;
 
   p {
     margin: 0 0 10px 0;
   }
 
-  &-action {
-
-    display: block;
-    text-align: right;
-    float: right;
+  a {
 
     &:link,
     &:visited {
@@ -105,6 +101,12 @@
       color: $govuk-blue;
     }
 
+  }
+
+  &-action {
+    display: block;
+    text-align: right;
+    float: right;
   }
 
 }

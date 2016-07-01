@@ -1,0 +1,16 @@
+{% from "components/banner.html" import banner_wrapper %}
+
+<h2 class="heading-medium">Get started</h2>
+
+  <nav class="grid-row">
+    <div class="column-half">
+      {% call banner_wrapper(type="mode") %}
+        <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='email') }}">Write an email
+      {% endcall %}
+    </div>
+    <div class="column-half">
+      {% call banner_wrapper(type="mode") %}
+        <a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='email') }}">Write a text message</a>
+      {% endcall %}
+    </div>
+  </nav>
