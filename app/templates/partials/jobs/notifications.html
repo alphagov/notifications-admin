@@ -4,7 +4,7 @@
   <div class="dashboard-table">
 {% endif %}
 
-  {% if notifications %}
+  {% if notifications and request.args.get('help', '0') == '0' %}
     <p class="bottom-gutter">
       <a href="{{ url_for('.view_job_csv', service_id=current_service.id, job_id=job.id, status=status) }}" download="download" class="heading-small">Download as a CSV file</a>
       &emsp;
