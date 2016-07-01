@@ -57,10 +57,11 @@
     {{ api_key(current_service.id, "Service ID", thing="service ID") }}
   </div>
 
+  <h2 class="heading-small">Documentation</h2>
   <p>
-    API usage is described in the
-    <a href="{{ url_for('.documentation', service_id=current_service.id) }}">
-    API documentation</a>.
+    See the
+    <a href="{{ url_for('.documentation') }}">
+    API documentation</a> for clients and specfications.
   </p>
 
 {% endblock %}
