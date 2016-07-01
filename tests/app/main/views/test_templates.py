@@ -9,15 +9,17 @@ from tests import validate_route_permission
 from app.main.views.templates import get_last_use_message, get_human_readable_delta
 
 
-def test_should_show_page_for_one_templates(app_,
-                                            api_user_active,
-                                            mock_login,
-                                            mock_get_service,
-                                            mock_get_service_template,
-                                            mock_get_user,
-                                            mock_get_user_by_email,
-                                            mock_has_permissions,
-                                            fake_uuid):
+def test_should_show_page_for_one_template(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_has_permissions,
+    fake_uuid
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -289,6 +291,39 @@ def test_should_redirect_when_deleting_a_template(app_,
                 service_id, template_id)
             mock_delete_service_template.assert_called_with(
                 service_id, template_id)
+
+
+@freeze_time('2016-01-01T15:00')
+def test_should_show_page_for_a_deleted_template(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_deleted_template,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_has_permissions,
+    fake_uuid
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        service_id = fake_uuid
+        template_id = fake_uuid
+        response = client.get(url_for(
+            '.view_template',
+            service_id=service_id,
+            template_id=template_id
+        ))
+
+        assert response.status_code == 200
+
+        content = response.get_data(as_text=True)
+        assert url_for("main.edit_service_template", service_id=fake_uuid, template_id=fake_uuid) not in content
+        assert url_for("main.send_from_api", service_id=fake_uuid, template_id=fake_uuid) not in content
+        assert url_for("main.send_test", service_id=fake_uuid, template_id=fake_uuid) not in content
+        assert "This template was deleted<br/>1 January 2016" in content
+
+        mock_get_deleted_template.assert_called_with(service_id, template_id)
 
 
 @pytest.mark.parametrize('route', [
