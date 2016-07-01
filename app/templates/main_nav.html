@@ -2,14 +2,14 @@
 
 {% if request.args['help'] and request.args['help'] != '0' %}
   {% call banner_wrapper(type='tour') %}
-      <p class="heading-medium">Get started</p>
+      <p class="heading-medium">Try this example</p>
       <div class="grid-row bottom-gutter" {% if request.args['help'] != '1' %}style="opacity: 0.6"{% endif %}>
         <div class="column-one-sixth">
           <p class="heading-large" style="float: left;">1.</p>
         </div>
         <div class="column-five-sixths">
           <p>
-            Send yourself this example message
+            Every message is sent from a template
           </p>
         </div>
       </div>
@@ -29,14 +29,11 @@
         </div>
         <div class="column-five-sixths">
           <p>
-            Now try it with your own message
+            Notify delivers the message
           </p>
           {% if request.args['help'] == '3' %}
-            <a href='{{ url_for(".choose_template", service_id=current_service.id, template_type="email") }}'>
-              Write an email
-            </a>
-            <a href='{{ url_for(".choose_template", service_id=current_service.id, template_type="sms") }}'>
-              Write a text message
+            <a href='{{ url_for(".go_to_dashboard_after_tour", service_id=current_service.id, example_template_id=template.id) }}'>
+              Now go to your dashboard
             </a>
           {% endif %}
         </div>

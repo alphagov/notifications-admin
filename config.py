@@ -52,7 +52,8 @@ class Config(object):
         "parliament\.uk",
         "nhs\.uk",
         "nhs\.net",
-        "police\.uk"]
+        "police\.uk",
+        "salesforce\.com"]
 
 
 class Development(Config):
