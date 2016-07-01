@@ -16,15 +16,21 @@
   {% endif %}
 </div>
 <div class="column-one-third">
-  <div class="message-use-links{% if show_title %}-with-title{% endif %}">
-    {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
-      <a href="{{ url_for(".send_messages", service_id=current_service.id, template_id=template.id) }}" class="primary">
-        Send {{ 'text messages' if 'sms' == template.template_type else 'emails' }}
-      </a>
-    {% endif %}
-    {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
-       <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}">Edit template</a>
-    {% endif %}
-    <a href="{{ url_for(".send_from_api", service_id=current_service.id, template_id=template.id) }}">API info</a>
-  </div>
+  {% if template._template.archived %}
+    <div class="message-updated-at">
+      This template was deleted<br/>{{ template._template.updated_at|format_date_normal }}
+    </div>
+  {% else %}
+    <div class="message-use-links{% if show_title %}-with-title{% endif %}">
+      {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
+        <a href="{{ url_for(".send_messages", service_id=current_service.id, template_id=template.id) }}" class="primary">
+          Send {{ 'text messages' if 'sms' == template.template_type else 'emails' }}
+        </a>
+      {% endif %}
+      {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
+         <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}">Edit template</a>
+      {% endif %}
+      <a href="{{ url_for(".send_from_api", service_id=current_service.id, template_id=template.id) }}">API info</a>
+    </div>
+  {% endif %}
 </div>

@@ -53,13 +53,6 @@ def add_service():
             'Hey ((name)), I’m trying out Notify. Today is ((day of week)) and my favourite colour is ((colour)).',
             service_id
         )
-        example_email_template = service_api_client.create_service_template(
-            'Example email template',
-            'email',
-            'Hey ((name)),\n\nI’m trying out Notify. Today is ((day of week)) and my favourite colour is ((colour)).',
-            service_id,
-            'Trying out Notify'
-        )
 
         return redirect(url_for(
             'main.send_test',

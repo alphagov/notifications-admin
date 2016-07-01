@@ -246,6 +246,27 @@ def mock_get_service_template(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_deleted_template(mocker):
+    def _get(service_id, template_id, version=None):
+        template = template_json(
+            service_id,
+            template_id,
+            "Two week reminder",
+            "sms",
+            "Your vehicle tax is about to expire",
+            archived=True
+        )
+        if version:
+            template.update({'version': version})
+        return {'data': template}
+
+    return mocker.patch(
+        'app.service_api_client.get_service_template',
+        side_effect=_get
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_template_version(mocker, fake_uuid, user=None):
     if user is None:
         user = api_user_active(fake_uuid)

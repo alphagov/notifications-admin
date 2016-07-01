@@ -68,14 +68,17 @@ def template_json(service_id,
                   type_="sms",
                   content="template content",
                   subject=None,
-                  version=1):
+                  version=1,
+                  archived=False):
     template = {
         'id': id_,
         'name': name,
         'template_type': type_,
         'content': content,
         'service': service_id,
-        'version': version
+        'version': version,
+        'updated_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
+        'archived': archived
     }
     if subject is not None:
         template['subject'] = subject

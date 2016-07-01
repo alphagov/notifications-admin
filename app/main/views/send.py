@@ -312,3 +312,15 @@ def start_job(service_id, upload_id):
     return redirect(
         url_for('main.view_job', job_id=upload_id, service_id=service_id, help=request.form.get('help'))
     )
+
+
+@main.route("/services/<service_id>/end-tour/<example_template_id>")
+@login_required
+@user_has_permissions('manage_templates')
+def go_to_dashboard_after_tour(service_id, example_template_id):
+
+    service_api_client.delete_service_template(service_id, example_template_id)
+
+    return redirect(
+        url_for('main.service_dashboard', service_id=service_id)
+    )
