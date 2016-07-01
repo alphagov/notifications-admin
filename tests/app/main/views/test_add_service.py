@@ -35,7 +35,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(app_,
                 user_id=api_user_active.id,
                 email_from='testing.the.post'
             )
-            assert len(mock_create_service_template.call_args_list) == 2
+            assert len(mock_create_service_template.call_args_list) == 1
             assert session['service_id'] == 101
             assert response.status_code == 302
             assert response.location == url_for(
