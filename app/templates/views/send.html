@@ -35,9 +35,7 @@
   <div class="page-footer bottom-gutter">
     {{file_upload(
       form.file,
-      button_text='Upload a file of recipients',
-      alternate_link=url_for(".send_test", service_id=current_service.id, template_id=template.id),
-      alternate_link_text='send yourself a test'
+      button_text='Upload a file of recipients'
     )}}
   </div>
 
