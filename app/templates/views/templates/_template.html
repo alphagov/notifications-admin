@@ -24,7 +24,7 @@
     <div class="message-use-links{% if show_title %}-with-title{% endif %}">
       {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
         <a href="{{ url_for(".send_messages", service_id=current_service.id, template_id=template.id) }}" class="primary">
-          Send {{ 'text messages' if 'sms' == template.template_type else 'emails' }}
+          Upload recipients
         </a>
       <a href="{{ url_for(".send_test", service_id=current_service.id, template_id=template.id) }}">
         Send yourself a test
