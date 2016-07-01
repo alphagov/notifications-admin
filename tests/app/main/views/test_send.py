@@ -696,3 +696,26 @@ def test_send_and_check_page_renders_if_no_statistics(
             page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
             assert page.h1.text.strip() == 'Check and confirm'
             mock_get_stats.assert_called_once_with(fake_uuid, today)
+
+
+def test_go_to_dashboard_after_tour(
+    app_,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_has_permissions,
+    mock_delete_service_template,
+    fake_uuid
+):
+
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+
+        resp = client.get(
+            url_for('main.go_to_dashboard_after_tour', service_id=fake_uuid, example_template_id=fake_uuid)
+        )
+
+        assert resp.status_code == 302
+        assert resp.location == url_for("main.service_dashboard", service_id=fake_uuid, _external=True)
+        mock_delete_service_template.assert_called_once_with(fake_uuid, fake_uuid)
