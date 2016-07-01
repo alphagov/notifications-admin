@@ -10,13 +10,7 @@
 
     <h1 class="visuallyhidden">Dashboard</h1>
 
-    {% if current_user.has_permissions([
-      'manage_templates', 'manage_api_keys', 'manage_users', 'manage_settings
-    '], any_=True, admin_override=True) %}
-      {% if current_service.restricted %}
-        {% include 'views/dashboard/trial-mode-banner.html' %}
-      {% endif %}
-    {% elif not current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
+    {% if not current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
       {% include 'views/dashboard/no-permissions-banner.html' %}
     {% endif %}
 
