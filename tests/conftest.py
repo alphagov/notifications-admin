@@ -425,6 +425,17 @@ def mock_get_service_templates(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_service_templates_when_no_templates_exist(mocker):
+
+    def _create(service_id):
+        return {'data': []}
+
+    return mocker.patch(
+        'app.service_api_client.get_service_templates',
+        side_effect=_create)
+
+
+@pytest.fixture(scope='function')
 def mock_delete_service_template(mocker):
     def _delete(service_id, template_id):
         template = template_json(

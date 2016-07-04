@@ -56,6 +56,63 @@ stub_template_stats = [
 ]
 
 
+def test_get_started(
+    app_,
+    mocker,
+    api_user_active,
+    mock_get_service,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_service_statistics,
+    mock_get_aggregate_service_statistics,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_login,
+    mock_get_jobs,
+    mock_has_permissions,
+    mock_get_usage
+):
+
+    mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
+                                       return_value=copy.deepcopy(stub_template_stats))
+
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+
+    # mock_get_service_templates_when_no_templates_exist.assert_called_once_with(SERVICE_ONE_ID)
+    print(response.get_data(as_text=True))
+    assert response.status_code == 200
+    assert 'Get started' in response.get_data(as_text=True)
+
+
+def test_get_started_is_hidden_once_templates_exist(
+    app_,
+    mocker,
+    api_user_active,
+    mock_get_service,
+    mock_get_service_templates,
+    mock_get_service_statistics,
+    mock_get_aggregate_service_statistics,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_login,
+    mock_get_jobs,
+    mock_has_permissions,
+    mock_get_usage
+):
+
+    mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
+                                       return_value=copy.deepcopy(stub_template_stats))
+
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+
+    # mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
+    assert response.status_code == 200
+    assert 'Get started' not in response.get_data(as_text=True)
+
+
 def test_should_show_recent_templates_on_dashboard(app_,
                                                    mocker,
                                                    api_user_active,
