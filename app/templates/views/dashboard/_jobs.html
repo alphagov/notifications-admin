@@ -1,12 +1,12 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
-{% from "components/big-number.html" import big_number %}
+{% from "components/big-number.html" import big_number -%}
 
 <div class='dashboard-table'>
   {% call(item, row_number) list_table(
     jobs,
-    caption="Recent batch jobs",
+    caption="Recent files uploaded",
     caption_visible=False,
-    empty_message='You haven’t sent any batch messages yet',
+    empty_message='You haven’t uploaded any files recently',
     field_headings=[
       'File',
       'Sending',
