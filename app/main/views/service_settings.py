@@ -272,7 +272,10 @@ def service_set_sms_sender(service_id):
     if request.method == 'GET':
         form.sms_sender.data = current_service.get('sms_sender')
     if form.validate_on_submit():
-        message = 'SMS Sender set to {}'.format(form.sms_sender.data)
+        if form.sms_sender.data:
+            message = 'Text message sender set to {}'.format(form.sms_sender.data)
+        else:
+            message = 'Text message sender removed'
         service_api_client.update_service(
             current_service['id'],
             current_service['name'],
