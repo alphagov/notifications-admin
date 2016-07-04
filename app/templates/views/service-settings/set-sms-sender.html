@@ -1,0 +1,28 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+  Set text message sender name – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="grid-row">
+    <div class="column-three-quarters">
+      <h1 class="heading-large">Set text message sender name</h1>
+      <form method="post">
+        {{ textbox(
+          form.sms_sender,
+          width='1-1',
+          safe_error_message=True
+        ) }}
+        {{ page_footer(
+          'Save',
+          back_link=url_for('.service_settings', service_id=current_service.id)
+      ) }}
+      </form>
+    </div>
+  </div>
+
+{% endblock %}

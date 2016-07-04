@@ -23,7 +23,8 @@ from app.main.forms import (
     ConfirmPasswordForm,
     ServiceNameForm,
     RequestToGoLiveForm,
-    ServiceReplyToEmailFrom
+    ServiceReplyToEmailFrom,
+    ServiceSmsSender
 )
 from app import user_api_client
 from app import current_service
@@ -260,4 +261,30 @@ def service_set_reply_to_email(service_id):
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/set-reply-to-email.html',
+        form=form)
+
+
+@main.route("/services/<service_id>/service-settings/set-sms-sender", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_set_sms_sender(service_id):
+    form = ServiceSmsSender()
+    if request.method == 'GET':
+        form.sms_sender.data = current_service.get('sms_sender')
+    if form.validate_on_submit():
+        message = 'SMS Sender set to {}'.format(form.sms_sender.data)
+        service_api_client.update_service(
+            current_service['id'],
+            current_service['name'],
+            current_service['active'],
+            current_service['message_limit'],
+            current_service['restricted'],
+            current_service['users'],
+            current_service['email_from'],
+            current_service['reply_to_email_address'],
+            sms_sender=form.sms_sender.data if form.sms_sender.data else None)
+        flash(message, 'default_with_tick')
+        return redirect(url_for('.service_settings', service_id=service_id))
+    return render_template(
+        'views/service-settings/set-sms-sender.html',
         form=form)

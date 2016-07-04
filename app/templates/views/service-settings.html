@@ -19,6 +19,10 @@
         'link': url_for('.service_set_reply_to_email', service_id=current_service.id)
       },
       {
+        'title': 'Set text message sender name',
+        'link': url_for('.service_set_sms_sender', service_id=current_service.id)
+      },
+      {
         'title': 'Request to go live and turn off trial mode',
         'link': url_for('.service_request_to_go_live', service_id=current_service.id),
         'hint': 'A live service can send notifications to any phone number or email address',
