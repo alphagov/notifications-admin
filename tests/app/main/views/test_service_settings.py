@@ -694,3 +694,44 @@ def test_does_not_show_research_mode_indicator(
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             element = page.find('span', {"id": "research-mode"})
             assert not element
+
+
+def test_set_text_message_sender(
+        app_,
+        active_user_with_permissions,
+        mocker,
+        mock_update_service,
+        service_one):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user_with_permissions, mocker, service_one)
+            data = {"sms_sender": "elevenchars"}
+            response = client.post(url_for('main.service_set_sms_sender', service_id=service_one['id']),
+                                   data=data,
+                                   follow_redirects=True)
+        assert response.status_code == 200
+
+        mock_update_service.assert_called_with(service_one['id'],
+                                               service_one['name'],
+                                               service_one['active'],
+                                               service_one['message_limit'],
+                                               service_one['restricted'],
+                                               service_one['users'],
+                                               service_one['email_from'],
+                                               service_one['reply_to_email_address'],
+                                               "elevenchars")
+
+
+def test_if_sms_sender_set_then_form_populated(app_,
+                                               active_user_with_permissions,
+                                               mocker,
+                                               service_one):
+    service_one['sms_sender'] = 'elevenchars'
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user_with_permissions, mocker, service_one)
+            response = client.get(url_for('main.service_set_sms_sender', service_id=service_one['id']))
+
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.find(id='sms_sender')['value'] == 'elevenchars'

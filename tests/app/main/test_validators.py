@@ -1,5 +1,5 @@
 import pytest
-from app.main.forms import RegisterUserForm
+from app.main.forms import RegisterUserForm, ServiceSmsSender
 from app.main.validators import ValidEmailDomainRegex, NoCommasInPlaceHolders
 from wtforms import ValidationError
 from unittest.mock import Mock
@@ -121,3 +121,24 @@ def test_for_commas_in_placeholders(app_):
             NoCommasInPlaceHolders()(None, _gen_mock_field('Hello ((name,date))'))
         assert str(error.value) == 'You can’t have commas in your fields'
         NoCommasInPlaceHolders()(None, _gen_mock_field('Hello ((name))'))
+
+
+def test_sms_sender_form_validation(app_, mock_get_user_by_email):
+    with app_.test_request_context():
+        form = ServiceSmsSender()
+
+        form.sms_sender.data = 'elevenchars'
+        form.validate()
+        assert not form.errors
+
+        form.sms_sender.data = ''
+        form.validate()
+        assert not form.errors
+
+        form.sms_sender.data = 'morethanelevenchars'
+        form.validate()
+        assert "Text message sender can't be longer than 11 characters" == form.errors['sms_sender'][0]
+
+        form.sms_sender.data = '###########'
+        form.validate()
+        assert 'Sms text message sender can only contain alpha-numeric characters' == form.errors['sms_sender'][0]
