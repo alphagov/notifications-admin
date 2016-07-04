@@ -2,6 +2,7 @@
 {% from "components/banner.html" import banner %}
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/email-message.html" import email_message %}
+{% from "components/ajax-block.html" import ajax_block %}
 
 {% block page_title %}
   {{ uploaded_file_name }} – GOV.UK Notify
@@ -28,10 +29,8 @@
       )}}
     {% endif %}
 
-    {% include 'partials/jobs/status.html' %}
-
-    {% include 'partials/jobs/count.html' %}
-
-    {% include 'partials/jobs/notifications.html' %}
+    {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+    {{ ajax_block(partials, updates_url, 'counts', finished=finished) }}
+    {{ ajax_block(partials, updates_url, 'notifications', finished=finished) }}
 
 {% endblock %}
