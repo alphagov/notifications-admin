@@ -1,0 +1,15 @@
+{% macro ajax_block(partials, url, key, interval=2, finished=False) %}
+  {% if not finished %}
+    <div
+      data-module="update-content"
+      data-resource="{{ url }}"
+      data-key="{{ key }}"
+      data-interval-seconds="{{ interval }}"
+      aria-live="polite"
+    >
+  {% endif %}
+    {{ partials[key]|safe }}
+  {% if not finished %}
+    </div>
+  {% endif %}
+{% endmacro %}
