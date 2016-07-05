@@ -11,7 +11,7 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Send {{ 'text messages' if 'sms' == template.template_type else 'emails' }}</h1>
+  <h1 class="heading-large">Upload recipients</h1>
 
   {% if 'sms' == template.template_type %}
     <div class="grid-row">
@@ -35,42 +35,34 @@
   <div class="page-footer bottom-gutter">
     {{file_upload(
       form.file,
-      button_text='Upload a file of recipients',
-      alternate_link=url_for(".send_test", service_id=current_service.id, template_id=template.id),
-      alternate_link_text='send yourself a test'
+      button_text='Choose a file'
     )}}
   </div>
 
-  <details role="group">
-    <summary role="button" aria-controls="how-to-format-your-file" aria-expanded="false">
-      <span class="summary">See an example</span>
-    </summary>
+  <h2 class="heading-medium">Your file needs to look like this example</h2>
+  <div class="spreadsheet">
+    {% call(item, row_number) list_table(
+      example,
+      caption="Example",
+      caption_visible=False,
+      field_headings=[''] + column_headings
+    ) %}
+      {{ index_field(row_number - 1) }}
+      {% for column in item %}
+        {{ text_field(column) }}
+      {% endfor %}
+    {% endcall %}
+  </div>
+  <p class="table-show-more-link">
+    <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
+  </p>
 
-    <div id="how-to-format-your-file" aria-hidden="true">
-      <div class="spreadsheet">
-        {% call(item, row_number) list_table(
-          example,
-          caption="Example",
-          caption_visible=False,
-          field_headings=[''] + column_headings
-        ) %}
-          {{ index_field(row_number - 1) }}
-          {% for column in item %}
-            {{ text_field(column) }}
-          {% endfor %}
-        {% endcall %}
-      </div>
-      <p class="table-show-more-link">
-        <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
-      </p>
-      <p>Save the file as</p>
-      <ul class="list list-bullet">
-        <li>.<acronym title="Comma Separated Values">csv</acronym></li>
-        <li>.<acronym title="Comma Separated Values">tsv</acronym></li>
-        <li>Open Document Spreadsheet (.ods)</li>
-        <li>or Microsoft Excel (.xls, .xlsx, .xlsm)</li>
-      </p>
-    </div>
-  </details>
+  <h2 class="heading-medium">Accepted file formats</h2>
+  <ul class="list list-bullet">
+    <li>.<acronym title="Comma Separated Values">csv</acronym></li>
+    <li>.<acronym title="Comma Separated Values">tsv</acronym></li>
+    <li>Open Document Spreadsheet (.ods)</li>
+    <li>Microsoft Excel (.xls, .xlsx, .xlsm)</li>
+  </p>
 
 {% endblock %}

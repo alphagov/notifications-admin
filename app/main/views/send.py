@@ -242,11 +242,16 @@ def check_messages(service_id, template_type, upload_id):
         ) if current_service['restricted'] else None
     )
 
-    if request.args.get('from_test') and len(template.placeholders):
+    if request.args.get('from_test'):
         extra_args = {'help': 1} if request.args.get('help', '0') != '0' else {}
-        back_link = url_for(
-            '.send_test', service_id=service_id, template_id=template.id, **extra_args
-        )
+        if len(template.placeholders):
+            back_link = url_for(
+                '.send_test', service_id=service_id, template_id=template.id, **extra_args
+            )
+        else:
+            back_link = url_for(
+                '.choose_template', service_id=service_id, template_type=template.template_type, **extra_args
+            )
     else:
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
 
