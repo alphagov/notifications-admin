@@ -1,4 +1,4 @@
-export NOTIFY_ADMIN_ENVIRONMENT='config.Test'
+export NOTIFY_ENVIRONMENT='test'
 export ADMIN_CLIENT_SECRET='dev-notify-secret-key'
 export ADMIN_CLIENT_USER_NAME='dev-notify-admin'
 export API_HOST_NAME=''
