@@ -70,7 +70,7 @@ current_service = LocalProxy(partial(_lookup_req_object, 'service'))
 def create_app():
     application = Flask(__name__)
 
-    application.config.from_object(configs[os.environ['NOTIFY_ADMIN_ENVIRONMENT']])
+    application.config.from_object(configs[os.environ['NOTIFY_ENVIRONMENT']])
 
     init_app(application)
     logging.init_app(application)
