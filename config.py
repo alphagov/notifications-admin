@@ -53,7 +53,7 @@ class Config(object):
         "nhs\.uk",
         "nhs\.net",
         "police\.uk",
-        "kainos\com",
+        "kainos\.com",
         "salesforce\.com"]
 
 
