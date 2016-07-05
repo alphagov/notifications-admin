@@ -1,9 +1,9 @@
 {% from "components/banner.html" import banner_wrapper %}
 
-{% if request.args['help'] and request.args['help'] != '0' %}
+{% if help %}
   {% call banner_wrapper(type='tour') %}
       <p class="heading-medium">Try this example</p>
-      <div class="grid-row bottom-gutter" {% if request.args['help'] != '1' %}style="opacity: 0.6"{% endif %}>
+      <div class="grid-row bottom-gutter" {% if help != '1' %}style="opacity: 0.6"{% endif %}>
         <div class="column-one-sixth">
           <p class="heading-large" style="float: left;">1.</p>
         </div>
@@ -13,7 +13,7 @@
           </p>
         </div>
       </div>
-      <div class="grid-row bottom-gutter" {% if request.args['help'] != '2' %}style="opacity: 0.6"{% endif %}>
+      <div class="grid-row bottom-gutter" {% if help != '2' %}style="opacity: 0.6"{% endif %}>
         <div class="column-one-sixth">
           <p class="heading-large">2.</p>
         </div>
@@ -23,7 +23,7 @@
           </p>
         </div>
       </div>
-      <div class="grid-row bottom-gutter" {% if request.args['help'] != '3' %}style="opacity: 0.6"{% endif %}>
+      <div class="grid-row bottom-gutter" {% if help != '3' %}style="opacity: 0.6"{% endif %}>
         <div class="column-one-sixth">
           <p class="heading-large">3.</p>
         </div>
@@ -31,7 +31,7 @@
           <p>
             Notify delivers the message
           </p>
-          {% if request.args['help'] == '3' %}
+          {% if help == '3' %}
             <a href='{{ url_for(".go_to_dashboard_after_tour", service_id=current_service.id, example_template_id=template.id) }}'>
               Now go to your dashboard
             </a>
