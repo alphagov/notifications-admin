@@ -35,6 +35,3 @@ export NOTIFY_ADMIN_ENVIRONMENT='config.Test'
 ## Code coverage
 py.test -n2 --cov=app --cov-report=term-missing tests/
 display_result $? 3 "Code coverage"
-
-#py.test -v
-#display_result $? 4 "Unit tests
