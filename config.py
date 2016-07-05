@@ -3,7 +3,6 @@ from datetime import timedelta
 
 
 class Config(object):
-
     DEBUG = False
     ADMIN_CLIENT_SECRET = os.environ['ADMIN_CLIENT_SECRET']
     ADMIN_CLIENT_USER_NAME = os.environ['ADMIN_CLIENT_USER_NAME']
@@ -92,9 +91,9 @@ class Live(Config):
 
 
 configs = {
-    'development': 'config.Development',
-    'test': 'config.Test',
-    'preview': 'config.Preview',
-    'staging': 'config.Staging',
-    'live': 'config.Live'
+    'development': Development,
+    'test': Test,
+    'preview': Preview,
+    'staging': Staging,
+    'live': Live
 }
