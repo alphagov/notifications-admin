@@ -81,13 +81,14 @@ class Staging(Config):
     SHOW_STYLEGUIDE = False
     HTTP_PROTOCOL = 'https'
     HEADER_COLOUR = '#F47738'  # $orange
+    CSV_UPLOAD_BUCKET_NAME = 'staging-notify-csv-upload'
 
 
 class Live(Config):
     SHOW_STYLEGUIDE = False
     HEADER_COLOUR = '#B10E1E'  # $red
     HTTP_PROTOCOL = 'https'
-    HEADER_COLOUR = '#B10E1E'  # $red
+    CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
 
 
 configs = {
