@@ -14,7 +14,7 @@
   {% if request.args['help'] %}
     <h1 class="heading-large">Example text message</h1>
   {% else %}
-    <h1 class="heading-large">Send a test</h1>
+    <h1 class="heading-large">Send yourself a test</h1>
   {% endif %}
 
   {% if 'sms' == template.template_type %}
@@ -54,8 +54,8 @@
       {% endfor %}
     {% endcall %}
 
-    {{ page_footer("Check and confirm", back_link=(
-      url_for('.send_messages', service_id=current_service.id, template_id=template.id)) if not request.args['help'] else None
+    {{ page_footer("Preview", back_link=(
+      url_for('.choose_template', service_id=current_service.id, template_type=template.template_type)) if not request.args['help'] else None
     ) }}
   </form>
 

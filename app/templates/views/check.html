@@ -9,7 +9,7 @@
 {% from "components/message-count-label.html" import message_count_label %}
 
 {% block page_title %}
-  {{ "Error" if errors else "Check and confirm" }} – GOV.UK Notify
+  {{ "Error" if errors else "Preview" }} – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -136,7 +136,7 @@
   {% else %}
 
     <h1 class="heading-large">
-      Check and confirm
+      Preview
     </h1>
 
   {% endif %}

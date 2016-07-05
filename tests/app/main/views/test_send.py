@@ -694,7 +694,7 @@ def test_send_and_check_page_renders_if_no_statistics(
             today = datetime.today().date().strftime('%Y-%m-%d')
             assert resp.status_code == 200
             page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
-            assert page.h1.text.strip() == 'Check and confirm'
+            assert page.h1.text.strip() == 'Preview'
             mock_get_stats.assert_called_once_with(fake_uuid, today)
 
 
