@@ -25,7 +25,11 @@ def create_api_key(service_id):
     ]
     form = CreateKeyForm(key_names)
     if form.validate_on_submit():
-        secret = api_key_api_client.create_api_key(service_id=service_id, key_name=form.key_name.data)
+        secret = api_key_api_client.create_api_key(
+            service_id=service_id,
+            key_name=form.key_name.data,
+            key_type=form.key_type.data
+        )
         return render_template('views/api-keys/show.html', secret=secret,
                                key_name=form.key_name.data)
     return render_template(

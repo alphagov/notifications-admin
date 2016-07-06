@@ -19,6 +19,7 @@ from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp)
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidEmailDomainRegex, NoCommasInPlaceHolders)
+from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
 
 
 def email_address(label='Email address'):
@@ -295,9 +296,9 @@ class CreateKeyForm(Form):
     key_type = RadioField(
         'What should Notify do when you use this key?',
         choices=[
-            ('normal', 'Send messages to anyone'),
-            ('test', 'Simulate sending messages to anyone'),
-            ('team', 'Only send messages to members of your team')
+            (KEY_TYPE_NORMAL, 'Send messages to anyone'),
+            (KEY_TYPE_TEST, 'Simulate sending messages to anyone'),
+            (KEY_TYPE_TEAM, 'Only send messages to members of your team')
         ],
         validators=[
             DataRequired()
