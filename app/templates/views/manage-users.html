@@ -40,6 +40,8 @@ Manage users – GOV.UK Notify
           {{ user.name }}&ensp;<span class="hint">
             {%- if user.email_address == current_user.email_address -%}
               (you)
+            {% else %}
+              {{ user.email_address }}
             {% endif %}
           </span>
         </h3>
