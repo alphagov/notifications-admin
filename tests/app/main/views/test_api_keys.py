@@ -39,7 +39,7 @@ def test_should_show_api_keys_page(app_,
         resp_data = response.get_data(as_text=True)
         assert 'some key name' in resp_data
         assert 'another key name' in resp_data
-        assert 'Revoked Thursday 01 January 1970 at 01:00' in resp_data
+        assert 'Revoked 1 January at 01:00' in resp_data
         mock_get_api_keys.assert_called_once_with(service_id=fake_uuid)
 
 
@@ -72,8 +72,13 @@ def test_should_create_api_key_with_type_normal(app_,
 
     with app_.test_request_context(), app_.test_client() as client:
         client.login(api_user_active)
-        response = client.post(url_for('main.create_api_key', service_id=service_id),
-                               data={'key_name': 'some default key name'})
+        response = client.post(
+            url_for('main.create_api_key', service_id=service_id),
+            data={
+                'key_name': 'some default key name',
+                'key_type': 'normal'
+            }
+        )
 
     assert response.status_code == 200
     assert 'some default key name' in response.get_data(as_text=True)

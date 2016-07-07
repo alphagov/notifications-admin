@@ -11,7 +11,7 @@
   <div class="grid-row">
     <div class="column-two-thirds">
       <h1 class="heading-large">
-        API keys
+        API integration
       </h1>
     </div>
     <div class="column-one-third">
@@ -23,15 +23,29 @@
     keys,
     empty_message="You haven’t created any API keys yet",
     caption="API keys",
-    caption_visible=False,
-    field_headings=['Key name', hidden_field_heading('Action')]
+    caption_visible=false,
+    field_headings=[
+      'API keys',
+      hidden_field_heading('Action')
+    ],
   ) %}
     {% call field() %}
-      {{ item.name }}
+      <div class="file-list">
+        {{ item.name }}
+        <span class="file-list-hint">
+          {% if item.key_type == 'normal' %}
+            <span class="visually-hidden">Normal</span>
+          {% elif item.key_type == 'team' %}
+            Only sends to team members
+          {% elif item.key_type == 'test' %}
+            Simulates sending messages
+          {% endif %}
+        </span>
+      </div>
     {% endcall %}
     {% if item.expiry_date %}
-      {% call field(align='right', status='default') %}
-        Revoked {{ item.expiry_date|format_datetime }}
+      {% call field(align='right') %}
+        Revoked {{ item.expiry_date|format_datetime_short }}
       {% endcall %}
     {% else %}
       {% call field(align='right', status='error') %}
@@ -44,10 +58,11 @@
     {{ api_key(current_service.id, "Service ID", thing="service ID") }}
   </div>
 
+  <h2 class="heading-small">Documentation</h2>
   <p>
-    API usage is described in the
-    <a href="{{ url_for('.documentation', service_id=current_service.id) }}">
-    API documentation</a>.
+    See the
+    <a href="{{ url_for('.documentation') }}">
+    API documentation</a> for clients and specfications.
   </p>
 
 {% endblock %}

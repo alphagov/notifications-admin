@@ -12,12 +12,14 @@ from wtforms import (
     FileField,
     BooleanField,
     HiddenField,
-    IntegerField
+    IntegerField,
+    RadioField
 )
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp)
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidEmailDomainRegex, NoCommasInPlaceHolders)
+from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
 
 
 def email_address(label='Email address'):
@@ -290,6 +292,18 @@ class CreateKeyForm(Form):
     def __init__(self, existing_key_names=[], *args, **kwargs):
         self.existing_key_names = [x.lower() for x in existing_key_names]
         super(CreateKeyForm, self).__init__(*args, **kwargs)
+
+    key_type = RadioField(
+        'What should Notify do when you use this key?',
+        choices=[
+            (KEY_TYPE_NORMAL, 'Send messages to anyone'),
+            (KEY_TYPE_TEST, 'Simulate sending messages to anyone'),
+            (KEY_TYPE_TEAM, 'Only send messages to members of your team')
+        ],
+        validators=[
+            DataRequired()
+        ]
+    )
 
     key_name = StringField(u'Description of key', validators=[
         DataRequired(message='You need to give the key a name')

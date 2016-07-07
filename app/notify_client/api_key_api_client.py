@@ -5,6 +5,7 @@ from app.notify_client import _attach_current_user
 # must match key types in notifications-api/app/models.py
 KEY_TYPE_NORMAL = 'normal'
 KEY_TYPE_TEAM = 'team'
+KEY_TYPE_TEST = 'test'
 
 
 class ApiKeyApiClient(BaseAPIClient):
@@ -24,10 +25,10 @@ class ApiKeyApiClient(BaseAPIClient):
         else:
             return self.get(url='/service/{}/api-keys'.format(service_id))
 
-    def create_api_key(self, service_id, key_name):
+    def create_api_key(self, service_id, key_name, key_type):
         data = {
             'name': key_name,
-            'key_type': KEY_TYPE_NORMAL
+            'key_type': key_type
         }
         _attach_current_user(data)
         key = self.post(url='/service/{}/api-key'.format(service_id), data=data)

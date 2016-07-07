@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/radios.html" import radios %}
 
 {% block page_title %}
   Add a new API key – GOV.UK Notify
@@ -9,11 +10,12 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    Add a new API key
+    Create an API key
   </h1>
 
   <form method="post">
-    {{ textbox(key_name, hint='eg CRM application') }}
+    {{ radios(form.key_type) }}
+    {{ textbox(form.key_name, label='Name for this key') }}
     {{ page_footer('Continue') }}
   </form>
 
