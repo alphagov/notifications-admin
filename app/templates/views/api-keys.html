@@ -45,7 +45,7 @@
     {% endcall %}
     {% if item.expiry_date %}
       {% call field(align='right') %}
-        Revoked {{ item.expiry_date|format_datetime }}
+        Revoked {{ item.expiry_date|format_datetime_short }}
       {% endcall %}
     {% else %}
       {% call field(align='right', status='error') %}

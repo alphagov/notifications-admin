@@ -39,7 +39,7 @@ def test_should_show_api_keys_page(app_,
         resp_data = response.get_data(as_text=True)
         assert 'some key name' in resp_data
         assert 'another key name' in resp_data
-        assert 'Revoked Thursday 01 January 1970 at 01:00' in resp_data
+        assert 'Revoked 1 January at 01:00' in resp_data
         mock_get_api_keys.assert_called_once_with(service_id=fake_uuid)
 
 
