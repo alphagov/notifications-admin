@@ -111,7 +111,12 @@
 
 }
 
-.table-field-heading {
+.table-field-headings,
+.table-field-headings-visible {
+
+  th {
+    @include bold-19;
+  }
 
   .dashboard-table &-first {
     width: 52.5%;
