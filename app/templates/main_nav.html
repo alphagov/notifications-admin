@@ -58,7 +58,7 @@
     <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>
   {% endif %}
   {% if current_user.has_permissions(['manage_api_keys']) %}
-    <li><a href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a></li>
+    <li><a href="{{ url_for('.api_keys', service_id=current_service.id) }}">API integration</a></li>
   {% endif %}
   </ul>
 </nav>
