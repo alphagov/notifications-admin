@@ -158,7 +158,7 @@ class Spreadsheet():
 
     @staticmethod
     def normalise_newlines(file_content):
-        return '\r\n'.join(file_content.getvalue().decode('utf-8').splitlines())
+        return '\r\n'.join(file_content.read().decode('utf-8').splitlines())
 
     @classmethod
     def from_rows(cls, rows, filename=''):
