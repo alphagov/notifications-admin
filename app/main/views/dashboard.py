@@ -178,7 +178,10 @@ def get_dashboard_partials(service_id):
     }
 
 
-def calculate_usage(usage, sms_free_allowance=250000, sms_rate=0.018):
+def calculate_usage(usage):
+    # TODO: Don't hardcode these - get em from the API
+    sms_free_allowance = 250000
+    sms_rate = 0.0165
 
     sms_sent = usage.get('sms_count', 0)
     emails_sent = usage.get('email_count', 0)
