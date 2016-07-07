@@ -26,24 +26,25 @@
     caption_visible=false,
     field_headings=[
       'API keys',
-      hidden_field_heading('Key type'),
       hidden_field_heading('Action')
     ],
   ) %}
     {% call field() %}
-      {{ item.name }}
-    {% endcall %}
-    {% call field(status='default') %}
-      {% if item.key_type == 'normal' %}
-        <span class="visually-hidden">Normal</span>
-      {% elif item.key_type == 'team' %}
-        Only sends to team members
-      {% elif item.key_type == 'test' %}
-        Simulates sending messages
-      {% endif %}
+      <div class="file-list">
+        {{ item.name }}
+        <span class="file-list-hint">
+          {% if item.key_type == 'normal' %}
+            <span class="visually-hidden">Normal</span>
+          {% elif item.key_type == 'team' %}
+            Only sends to team members
+          {% elif item.key_type == 'test' %}
+            Simulates sending messages
+          {% endif %}
+        </span>
+      </div>
     {% endcall %}
     {% if item.expiry_date %}
-      {% call field(align='right', status='default') %}
+      {% call field(align='right') %}
         Revoked {{ item.expiry_date|format_datetime }}
       {% endcall %}
     {% else %}
