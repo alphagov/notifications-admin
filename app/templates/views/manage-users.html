@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/table.html" import list_table, row, field, boolean_field, hidden_field_heading %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/tick-cross.html" import tick_cross %}
 
 {% set table_options = {
   'field_headings': [
@@ -29,49 +30,82 @@ Manage users – GOV.UK Notify
     {% endif %}
   </div>
 
-  {% call(item, row_number) list_table(
-    users, caption='Active', **table_options
-  ) %}
-    {% call field() %}
-      {{ item.name }}
-      {%- if item.email_address == current_user.email_address -%}
-        &ensp;<span class="hint">(you)</span>
-      {% endif %}
-    {% endcall %}
-    {{ boolean_field(item.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters'])) }}
-    {{ boolean_field(item.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings'])) }}
-    {{ boolean_field(item.has_permissions(permissions=['manage_api_keys'])) }}
-    {% call field(align='right') %}
-      {% if current_user.has_permissions(['manage_users']) %}
-        {% if current_user.id != item.id %}
-          <a href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=item.id)}}">Edit</a>
-        {% endif %}
-      {% endif %}
-    {% endcall %}
-  {% endcall %}
+  <h2 class="heading-medium">
+    Active
+  </h2>
+  <div class="user-list">
+    {% for user in users %}
+      <div class="user-list-item">
+        <h3>
+          {{ user.name }}&ensp;<span class="hint">
+            {%- if user.email_address == current_user.email_address -%}
+              (you)
+            {% endif %}
+          </span>
+        </h3>
+        <ul class="tick-cross-list">
+          <div class="tick-cross-list-permissions">
+            {{ tick_cross(
+              user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']),
+              'Send messages'
+            ) }}
+            {{ tick_cross(
+              user.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings']),
+              'Manage service'
+            ) }}
+            {{ tick_cross(
+              user.has_permissions(permissions=['manage_api_keys']),
+              'Access API keys'
+            ) }}
+          </div>
+          {% if current_user.has_permissions(['manage_users']) %}
+            {% if current_user.id != user.id %}
+              <li class="tick-cross-list-edit-link">
+                <a href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Edit permissions</a>
+              </li>
+            {% endif %}
+          {% endif %}
+        </ul>
+      </div>
+    {% endfor %}
+  </div>
 
   {% if invited_users %}
-    {% call(item, row_number) list_table(
-      invited_users, caption='Invited', **table_options
-    ) %}
-      {% call field() %}
-        {{ item.email_address }}
-      {% endcall %}
-      {{ boolean_field(item.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters'])) }}
-      {{ boolean_field(item.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings'])) }}
-      {{ boolean_field(item.has_permissions(permissions=['manage_api_keys'])) }}
-      {% if item.status == 'pending' %}
-        {% call field(align='right') %}
-          {% if current_user.has_permissions(['manage_users']) %}
-            <a href="{{ url_for('.cancel_invited_user', service_id=current_service.id, invited_user_id=item.id)}}">Cancel invitation</a>
-          {% endif %}
-        {% endcall %}
-      {% else %}
-        {% call field() %}
-          {{ item.status }}
-        {% endcall %}
-      {% endif %}
-    {% endcall %}
+    <h2 class="heading-medium">
+      Invited
+    </h2>
+    <div class="user-list">
+      {% for user in invited_users %}
+        <div class="user-list-item">
+          <h3>
+            {{ user.email_address }}
+          </h3>
+          <ul class="tick-cross-list">
+            <div class="tick-cross-list-permissions">
+              {{ tick_cross(
+                user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']),
+                'Send messages'
+              ) }}
+              {{ tick_cross(
+                user.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings']),
+                'Manage service'
+              ) }}
+              {{ tick_cross(
+                user.has_permissions(permissions=['manage_api_keys']),
+                'Access API keys'
+              ) }}
+            </div>
+            <li class="tick-cross-list-edit-link">
+              {% if user.status == 'pending' and current_user.has_permissions(['manage_users']) %}
+                <a href="{{ url_for('.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Cancel invitation</a>
+              {% else %}
+                {{ user.status|title }}
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
   {% endif %}
 
 {% endblock %}
