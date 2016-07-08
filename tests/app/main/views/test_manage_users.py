@@ -205,10 +205,9 @@ def test_manage_users_shows_invited_user(app_,
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == 'Team members'
-            invites_table = page.find_all('table')[1]
-            cols = invites_table.find_all('td')
-            assert cols[0].text.strip() == 'invited_user@test.gov.uk'
-            assert cols[4].text.strip() == 'Cancel invitation'
+            invited_users_list = page.find_all('div', {'class': 'user-list'})[1]
+            assert invited_users_list.find_all('h3')[0].text.strip() == 'invited_user@test.gov.uk'
+            assert invited_users_list.find_all('a')[0].text.strip() == 'Cancel invitation'
 
 
 def test_manage_users_does_not_show_accepted_invite(app_,
@@ -232,8 +231,8 @@ def test_manage_users_does_not_show_accepted_invite(app_,
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == 'Team members'
-            tables = page.find_all('table')
-            assert len(tables) == 1
+            user_lists = page.find_all('div', {'class': 'user-list'})
+            assert len(user_lists) == 1
             assert not page.find(text='invited_user@test.gov.uk')
 
 

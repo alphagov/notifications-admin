@@ -54,11 +54,13 @@ $path: '/static/images/';
 @import 'components/message';
 @import 'components/phone';
 @import 'components/research-mode';
+@import 'components/tick-cross';
 
 @import 'views/job';
 @import 'views/edit-template';
 @import 'views/documenation';
 @import 'views/dashboard';
+@import 'views/users';
 
 // TODO: break this up
 @import 'app';

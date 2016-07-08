@@ -1,0 +1,16 @@
+.user-list {
+
+  @include core-16;
+
+  &-item {
+
+    padding: $gutter-half 0;
+    border-top: 1px solid $border-colour;
+
+    &:last-child {
+      border-bottom: 1px solid $border-colour;
+    }
+
+  }
+
+}

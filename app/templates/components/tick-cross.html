@@ -1,0 +1,15 @@
+{% macro tick_cross(yes, label) %}
+  <li>
+    {% if yes %}
+      <span class="tick-cross-tick">
+        <span class="visually-hidden">Can</span>
+        {{ label}}
+      </span>
+    {% else %}
+      <span class="tick-cross-cross">
+        <span class="visually-hidden">Can’t</span>
+        {{ label}}
+      </span>
+    {% endif %}
+  </li>
+{% endmacro %}
