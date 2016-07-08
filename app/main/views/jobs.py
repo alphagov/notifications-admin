@@ -28,6 +28,7 @@ from app.utils import (
     user_has_permissions,
     generate_notifications_csv)
 from app.statistics_utils import sum_of_statistics, statistics_by_state, add_rate_to_jobs
+from app.utils import get_help_argument
 
 
 def _parse_filter_args(filter_dict):
@@ -98,7 +99,8 @@ def view_job(service_id, job_id):
             job_id=job['id'],
             status=request.args.get('status', '')
         ),
-        partials=get_job_partials(job)
+        partials=get_job_partials(job),
+        help=get_help_argument()
     )
 
 
@@ -311,7 +313,8 @@ def get_job_partials(job):
             notifications=notification_api_client.get_notifications_for_service(
                 job['service'], job['id'], status=filter_args.get('status')
             )['notifications'],
-            status=request.args.get('status', '')
+            status=request.args.get('status', ''),
+            help=get_help_argument()
         ),
         'status': render_template(
             'partials/jobs/status.html',
