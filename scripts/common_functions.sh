@@ -183,7 +183,7 @@ get_instance_health_elb() {
                 ;;
             *)
                 msg "Instance '$instance_id' not part of ELB '$elb_name'"
-                return 1
+                return 0
         esac
     fi
 }
