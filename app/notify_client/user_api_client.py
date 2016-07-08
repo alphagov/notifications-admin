@@ -75,6 +75,11 @@ class UserApiClient(BaseAPIClient):
         endpoint = '/user/{0}/email-verification'.format(user_id)
         self.post(endpoint, data=data)
 
+    def sent_already_registered_email(self, user_id, to):
+        data = {'email': to}
+        endpoint = '/user/{0}/email-already-registered'.format(user_id)
+        self.post(endpoint, data=data)
+
     def check_verify_code(self, user_id, code, code_type):
         data = {'code_type': code_type, 'code': code}
         endpoint = '/user/{}/verify/code'.format(user_id)
