@@ -29,7 +29,7 @@ from app.main.uploader import (
     s3download
 )
 from app import job_api_client, service_api_client, current_service, user_api_client, statistics_api_client
-from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet
+from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet, get_help_argument
 
 
 def get_page_headings(template_type):
@@ -181,7 +181,8 @@ def send_test(service_id, template_id):
         'views/send-test.html',
         template=template,
         recipient_column=first_column_heading[template.template_type],
-        example=[get_example_csv_rows(template, use_example_as_example=False)]
+        example=[get_example_csv_rows(template, use_example_as_example=False)],
+        help=get_help_argument()
     )
 
 
@@ -278,7 +279,8 @@ def check_messages(service_id, template_type, upload_id):
         upload_id=upload_id,
         form=CsvUploadForm(),
         statistics=statistics,
-        back_link=back_link
+        back_link=back_link,
+        help=get_help_argument()
     )
 
 

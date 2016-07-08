@@ -186,3 +186,7 @@ class Spreadsheet():
             file_type=extension,
             file_content=file_content.getvalue()
         ).to_array(), filename)
+
+
+def get_help_argument():
+    return request.args.get('help') if request.args.get('help') in ('1', '2', '3') else None

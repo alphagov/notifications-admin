@@ -174,7 +174,7 @@
   {% else %}
     <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <input type="hidden" name="help" value="{{ '3' if request.args['help'] == '2' else 0 }}" />
+      <input type="hidden" name="help" value="{{ '3' if help else 0 }}" />
       <input type="submit" class="button" value="Send {{ count_of_recipients }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}" />
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
     </form>
