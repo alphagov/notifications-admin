@@ -8,6 +8,8 @@ This document is for central government developers and technical architects who 
     * [Authenticate requests](#AuthRequests)
     * [JSON Web Tokens: claims](#JWT_claims)
     * [API client libraries](#client_libraries)
+* [test_integ](#Testing your integration with GOV.UK Notify)
+    * [API_keys](#API keys)
 * [API endpoints](#API_endpoints)
     * [Send notifications: POST](#sendnotifications)
     * [Retrieve notifications: GET](#getnotifications)
@@ -110,6 +112,41 @@ GOV.UK Notify supports the following client libraries:
  * [GOV.UK Notify Java library] (https://github.com/alphagov/notifications-java-client)
 
 These provide example code for calling the API and for creating API tokens.
+
+<h2 id="test_integ">Testing your integration with GOV.UK Notify</h2>
+
+Service teams should do all their testing within the GOV.UK Notify production environment (https://api.notifications.service.gov.uk).
+
+You don’t need different service accounts or environments. Instead, there are 3 types of API key that let you do functional and performance integration testing.
+
+<h3 id="API_keys">API keys</h3>
+
+The types of API key that you can create within GOV.UK Notify are:
+
+* normal key
+* team key
+
+<h4 id="normal_keys">Normal keys</h3>
+
+Normal keys have the same permissions as the service:
+
+* when the service is in ‘Trial mode’, you can only send to members of your team and you are restricted to 50 messages per day
+* when the service is live, you can use the key to send messages to anyone
+
+Messages sent with a normal key show up on your dashboard and count against your text message and email allowances.
+
+There is no need to generate a new key when the service moves from trial to live.
+
+Don’t use your normal key for automated testing.
+
+<h4 id="team_keys">Team keys</h3>
+
+Use a team key for end-to-end functional testing.
+
+A team key lets you send real messages to members of your team. You get an error if you try to send messages to anyone else.
+
+Messages sent with a team key show up on your dashboard and count against your text message and email allowances.
+
 
 <h2 id="API_endpoints">API endpoints</h2>
 
