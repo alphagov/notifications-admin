@@ -28,7 +28,7 @@ To send notifications you can:
 * use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application
 * [integrate your web applications or back office systems](#integrate_Notify) with the GOV.UK Notify API
 
-The GOV.UK Notify allows you to [send notifications (POST)](#sendnotifications) and [get the status of notifications (GET)](#getnotifications) you have sent.
+The GOV.UK Notify API allows you to [send notifications (POST)](#sendnotifications) and [get the status of notifications (GET)](#getnotifications) you have sent.
 
 To find out more about GOV.UK Notify, see the [Government as a Platform](https://governmentasaplatform.blog.gov.uk/) blog.
 
@@ -130,7 +130,7 @@ The 3 types of API key that you can create within GOV.UK Notify are:
 Type of key | Sends real messages? | Appears in activity and statistics? | Daily service limit
 --- | --- | --- | ---
 Normal key | Yes | Yes | 50 (trial) Unlimited (live)
-Team key | Yes (only team members) | Yes | 50 (trial) Unlimited (live)
+Team key | Yes (only to team members) | Yes | 50 (trial) Unlimited (live)
 Test key | No | No | Unlimited
 
 <h4 id="normal_keys">Normal keys</h3>
