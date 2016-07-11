@@ -127,6 +127,12 @@ The 3 types of API key that you can create within GOV.UK Notify are:
 * [team keys](#team_keys)
 * [test keys](#test_keys) 
 
+Type of key | Sends real messages? | Appears in activity and statistics? | Daily service limit
+--- | --- | --- | ---
+Normal key | Yes | Yes | 50 (trial) Unlimited (live)
+Team key | Yes (only team members) | Yes | 50 (trial) Unlimited (live)
+Test key | No | No | Unlimited
+
 <h4 id="normal_keys">Normal keys</h3>
 
 Normal keys have the same permissions as the service:
@@ -156,16 +162,6 @@ Use test keys to test the performance of your service and its integration with G
 Test keys don’t send real messages but generate realistic responses. There’s no restriction on who you can send to or how many messages you can send per day.
 
 Messages sent using a test key don’t show up on your dashboard or count against your text message and email allowances.
-
-<h4 id="summary_keys">GOV.UK Notify API keys</h3> 
-
-Type of key | Sends real messages? | Appears in activity and statistics? | Daily service limit
---- | --- | --- | ---
-Normal key | Yes | Yes | 50 (trial) Unlimited (live)
-Team key | Yes (only team members) | Yes | 50 (trial) Unlimited (live)
-Test key | No | No | Unlimited
-
-
 
 <h2 id="API_endpoints">API endpoints</h2>
 
