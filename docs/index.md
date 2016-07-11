@@ -162,10 +162,8 @@ Messages sent using a test key don’t show up on your dashboard or count agains
 Type of key | Sends real messages? | Appears in activity and statistics? | Daily service limit
 --- | --- | --- | ---
 Normal key | Yes | Yes | 50 (trial) 
-
 Unlimited (live)
 Team key | Yes (only team members) | Yes | 50 (trial) 
-
 Unlimited (live)
 Test key | No | No | Unlimited
 
