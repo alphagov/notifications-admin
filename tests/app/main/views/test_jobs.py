@@ -152,7 +152,7 @@ def test_should_show_updates_for_one_job_as_json(
         assert 'Recipient' in content['notifications']
         assert '07123456789' in content['notifications']
         assert 'Status' in content['notifications']
-        assert job_json['status'] in content['status']
+        print(content['notifications'])
         assert 'Delivered' in content['notifications']
         assert '11:10' in content['notifications']
         assert 'Uploaded by Test User on 1 January at 11:09' in content['status']

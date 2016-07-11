@@ -149,13 +149,15 @@ def job_json(service_id,
              original_file_name="thisisatest.csv",
              notification_count=1,
              notifications_sent=1,
-             status=''):
+             status=None):
     if job_id is None:
         job_id = str(generate_uuid())
     if template_id is None:
         template_id = str(generate_uuid())
     if created_at is None:
         created_at = str(datetime.utcnow().time())
+    if status is None:
+        status = 'Delivered'
     data = {
         'id': job_id,
         'service': service_id,
@@ -174,16 +176,19 @@ def job_json(service_id,
     return data
 
 
-def notification_json(service_id,
-                      job=None,
-                      template=None,
-                      to='07123456789',
-                      status='delivered',
-                      sent_at=None,
-                      job_row_number=None,
-                      created_at=None,
-                      updated_at=None,
-                      with_links=False):
+def notification_json(
+    service_id,
+    job=None,
+    template=None,
+    to='07123456789',
+    status=None,
+    sent_at=None,
+    job_row_number=None,
+    created_at=None,
+    updated_at=None,
+    with_links=False,
+    rows=5
+):
     if template is None:
         template = template_json(service_id, str(generate_uuid()))
     if sent_at is None:
@@ -192,6 +197,8 @@ def notification_json(service_id,
         created_at = str(datetime.utcnow().time())
     if updated_at is None:
         updated_at = str((datetime.utcnow() + timedelta(minutes=1)).time())
+    if status is None:
+        status = 'delivered'
     links = {}
     if with_links:
         links = {
@@ -213,7 +220,7 @@ def notification_json(service_id,
             'updated_at': updated_at,
             'job_row_number': job_row_number,
             'template_version': template['version']
-        } for i in range(5)],
+        } for i in range(rows)],
         'total': 5,
         'page_size': 50,
         'links': links
