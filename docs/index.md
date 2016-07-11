@@ -159,7 +159,7 @@ Messages sent using a test key don’t show up on your dashboard or count agains
 
 <h4 id="summary_keys">GOV.UK Notify API keys</h3> 
 
-Sends real messages? | Appears in activity and statistics? | Daily service limit
+Type of key | Sends real messages? | Appears in activity and statistics? | Daily service limit
 --- | --- | --- | ---
 Normal key | Yes | Yes | 50 (trial) Unlimited (live)
 Team key | Yes (only team members) | Yes | 50 (trial) Unlimited (live)
