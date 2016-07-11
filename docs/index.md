@@ -123,9 +123,9 @@ You don’t need different service accounts or environments. Instead, there are 
 
 The 3 types of API key that you can create within GOV.UK Notify are:
 
-* normal key
-* team key
-* team key
+* [normal keys](#normal_keys) 
+* [team keys](#team_keys)
+* [test keys](#test_keys) 
 
 <h4 id="normal_keys">Normal keys</h3>
 
