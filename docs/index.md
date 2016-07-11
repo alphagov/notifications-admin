@@ -48,7 +48,7 @@ To find out more about GOV.UK Notify, see the [Government as a Platform](https:/
     >
     > Your ((item)) is due for renewal on ((date)).
 
-  3. Create an API key. This will be used to connect to the GOV.UK Notify API.
+  3. Create an [API key](#API_keys). This will be used to connect to the GOV.UK Notify API.
 
     Each service can have multiple API keys. This allows you to integrate several systems, each with its own key. You can also have separate keys for your development and test environments.
 
