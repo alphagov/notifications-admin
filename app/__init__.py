@@ -235,16 +235,16 @@ def format_notification_status(status, template_type):
         'email': {
             'failed': 'Failed',
             'technical-failure': 'Technical failure',
-            'temporary-failure': 'Temporary failure',
-            'permanent-failure': 'Email address does not exist',
+            'temporary-failure': 'Inbox not accepting messages right now',
+            'permanent-failure': 'Email address doesn’t exist',
             'delivered': 'Delivered',
             'sending': 'Sending'
         },
         'sms': {
             'failed': 'Failed',
             'technical-failure': 'Technical failure',
-            'temporary-failure': 'Temporary failure',
-            'permanent-failure': 'Phone number does not exist',
+            'temporary-failure': 'Phone not accepting messages right now',
+            'permanent-failure': 'Phone number doesn’t exist',
             'delivered': 'Delivered',
             'sending': 'Sending'
         }
