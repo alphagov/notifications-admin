@@ -129,7 +129,7 @@ The 3 types of API key that you can create within GOV.UK Notify are:
 
 Type of key | Sends real messages? | Appears in activity and statistics? | Daily service limit
 --- | --- | --- | ---
-Normal key | Yes | Yes | 50 (trial), Unlimited (live)
+Normal key | Yes | Yes | Trial: 50; Live: unlimited
 Team key | Yes (only to team members) | Yes | 50 (trial), Unlimited (live)
 Test key | No | No | Unlimited
 
