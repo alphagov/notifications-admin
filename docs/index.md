@@ -159,7 +159,7 @@ Messages sent with a team key show up on your dashboard and count against your t
 
 Use test keys to test the performance of your service and its integration with GOV.UK Notify under load.
 
-Test keys don’t send real messages but generate realistic responses. There’s no restriction on who you can send to or how many messages you can send per day.
+Test keys don’t send real messages but they do generate realistic responses. There’s no restriction on who you can send to or how many messages you can send per day.
 
 Messages sent using a test key don’t show up on your dashboard or count against your text message and email allowances.
 
