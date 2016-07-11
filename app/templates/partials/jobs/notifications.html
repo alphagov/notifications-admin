@@ -34,7 +34,13 @@
       align='right',
       status=item.status|format_notification_status_as_field_status
     ) %}
+      {% if item.status|format_notification_status_as_url %}
+        <a href="{{ item.status|format_notification_status_as_url }}">
+      {% endif %}
       {{ item.status|format_notification_status(item.template.template_type) }}
+      {% if item.status|format_notification_status_as_url %}
+        </a>
+      {% endif %}
     {% endcall %}
   {% endcall %}
 

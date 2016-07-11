@@ -12,7 +12,9 @@ from flask import (
     make_response,
     current_app,
     request,
-    g)
+    g,
+    url_for
+)
 from flask._compat import string_types
 from flask.globals import _lookup_req_object
 from flask_login import LoginManager
@@ -112,6 +114,7 @@ def create_app():
     application.add_template_filter(format_date_short)
     application.add_template_filter(format_notification_status)
     application.add_template_filter(format_notification_status_as_field_status)
+    application.add_template_filter(format_notification_status_as_url)
 
     application.after_request(useful_headers_after_request)
     application.after_request(save_service_after_request)
@@ -260,6 +263,15 @@ def format_notification_status_as_field_status(status):
         'delivered': None,
         'sending': 'default'
     }.get(status, 'error')
+
+
+def format_notification_status_as_url(status):
+    url = partial(url_for, "main.delivery_and_failure")
+    return {
+        'technical-failure': url(_anchor='technical-failure'),
+        'temporary-failure': url(_anchor='not-accepting-messages'),
+        'permanent-failure': url(_anchor='does-not-exist')
+    }.get(status)
 
 
 @login_manager.user_loader
