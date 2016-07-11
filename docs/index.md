@@ -8,7 +8,7 @@ This document is for central government developers and technical architects who 
     * [Authenticate requests](#AuthRequests)
     * [JSON Web Tokens: claims](#JWT_claims)
     * [API client libraries](#client_libraries)
-* [Testing your integration with GOV.UK Notify](#test_integ)
+* [Test your integration with GOV.UK Notify](#test_integ)
     * [API keys](#API_keys)
 * [API endpoints](#API_endpoints)
     * [Send notifications: POST](#sendnotifications)
@@ -113,7 +113,7 @@ GOV.UK Notify supports the following client libraries:
 
 These provide example code for calling the API and for creating API tokens.
 
-<h2 id="test_integ">Testing your integration with GOV.UK Notify</h2>
+<h2 id="test_integ">Test your integration with GOV.UK Notify</h2>
 
 Service teams should do all their testing within the GOV.UK Notify production environment (https://api.notifications.service.gov.uk).
 
@@ -131,7 +131,7 @@ The 3 types of API key that you can create within GOV.UK Notify are:
 
 Normal keys have the same permissions as the service:
 
-* when the service is in ‘Trial mode’, you can only send to members of your team and you are restricted to 50 messages per day
+* when the service is in trial mode, you can send only to members of your team and you are restricted to 50 messages per day
 * when the service is live, you can use the key to send messages to anyone
 
 Messages sent with a normal key show up on your dashboard and count against your text message and email allowances.
@@ -160,7 +160,7 @@ Messages sent using a test key don’t show up on your dashboard or count agains
 <h4 id="summary_keys">GOV.UK Notify API keys</h3> 
 
 Sends real messages? | Appears in activity and statistics? | Daily service limit
---- | --- | ---
+--- | --- | --- | ---
 Normal key | Yes | Yes | 50 (trial) Unlimited (live)
 Team key | Yes (only team members) | Yes | 50 (trial) Unlimited (live)
 Test key | No | No | Unlimited
