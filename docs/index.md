@@ -59,7 +59,7 @@ To find out more about GOV.UK Notify, see the [Government as a Platform](https:/
 There are 2 ways to integrate the API into your service:
 
 * use one of the client libraries provided by GOV.UK Notify:
-      
+
       * [Python library](https://github.com/alphagov/notifications-python-client/blob/master/README.md#usage)
       * [PHP library](https://github.com/alphagov/notifications-php-client/blob/master/README.md#usage)
       * [Java library](https://github.com/alphagov/notifications-java-client)
@@ -123,9 +123,9 @@ You don’t need different service accounts or environments. Instead, there are 
 
 The 3 types of API key that you can create within GOV.UK Notify are:
 
-* [normal keys](#normal_keys) 
+* [normal keys](#normal_keys)
 * [team keys](#team_keys)
-* [test keys](#test_keys) 
+* [test keys](#test_keys)
 
 Type of key | Sends real messages? | Appears in activity and statistics? | Daily service limit
 --- | --- | --- | ---
@@ -133,12 +133,13 @@ Normal key | Yes | Yes | 50 (trial), unlimited (live)
 Team key | Yes (only to team members) | Yes | 50 (trial), unlimited (live)
 Test key | No | No | Unlimited
 
-<h4 id="normal_keys">Normal keys</h3>
+<h4 id="normal_keys">Normal keys</h4>
 
 Normal keys have the same permissions as the service:
 
 * when the service is in trial mode, you can send only to members of your team and you are restricted to 50 messages per day
 * when the service is live, you can use the key to send messages to anyone
+* three
 
 Messages sent with a normal key show up on your dashboard and count against your text message and email allowances.
 
@@ -146,7 +147,7 @@ There is no need to generate a new key when the service moves from trial to live
 
 Don’t use your normal key for automated testing.
 
-<h4 id="team_keys">Team keys</h3>
+<h4 id="team_keys">Team keys</h4>
 
 Use team keys for end-to-end functional testing.
 
@@ -155,7 +156,7 @@ A team key lets you send real messages to members of your team. You get an error
 Messages sent with a team key show up on your dashboard and count against your text message and email allowances.
 
 
-<h4 id="test_keys">Test keys</h3>
+<h4 id="test_keys">Test keys</h4>
 
 Use test keys to test the performance of your service and its integration with GOV.UK Notify under load.
 
