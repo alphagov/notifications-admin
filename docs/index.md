@@ -2,8 +2,6 @@
 
 This document is for central government developers and technical architects who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
-* [About GOV.UK Notify](#about_Notify)
-* [Before you start](#beforestart)
 * [Integrate the GOV.UK Notify API into your service](#integrate_Notify)
     * [Authenticate requests](#AuthRequests)
     * [JSON Web Tokens: claims](#JWT_claims)
@@ -19,40 +17,7 @@ This document is for central government developers and technical architects who 
 
 
 
-<h2 id="about_Notify">About GOV.UK Notify</h2>
 
-GOV.UK Notify is a cross-government platform that lets government services send notifications by text or email. It's currently in beta.
-
-To send notifications you can:
-
-* use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application
-* [integrate your web applications or back office systems](#integrate_Notify) with the GOV.UK Notify API
-
-The GOV.UK Notify API allows you to [send notifications (POST)](#sendnotifications) and [get the status of notifications (GET)](#getnotifications) you have sent.
-
-To find out more about GOV.UK Notify, see the [Government as a Platform](https://governmentasaplatform.blog.gov.uk/) blog.
-
-<h2 id="beforestart">Before you start</h2>
-
-  1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account.
-
-    You'll need an email address from a local or central government organisation and your mobile phone for 2-factor authentication.
-
-  2. Add a template so you can send text and email notifications.
-
-    **Note:** A template is required even if you send notifications with the GOV.UK Notify API.
-
-    You can personalise the template using double brackets for placeholders. For example:
-
-    > Dear ((name)),
-    >
-    > Your ((item)) is due for renewal on ((date)).
-
-  3. Create an [API key](#API_keys). This will be used to connect to the GOV.UK Notify API.
-
-    Each service can have multiple API keys. This allows you to integrate several systems, each with its own key. You can also have separate keys for your development and test environments.
-
-    **Important:** API keys are secret, so save them somewhere safe. Don't commit API keys to public source code repositories.
 
 <h2 id="integrate_Notify">Integrate the GOV.UK Notify API into your service</h2>
 
