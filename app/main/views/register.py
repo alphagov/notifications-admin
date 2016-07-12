@@ -34,12 +34,8 @@ def register():
 
     form = RegisterUserForm()
     if form.validate_on_submit():
-        registered = _do_registration(form, send_sms=False)
-        if registered:
-            return redirect(url_for('main.registration_continue'))
-        else:
-            flash('There was an error registering your account')
-            return render_template('views/register.html', form=form), 400
+        _do_registration(form, send_sms=False)
+        return redirect(url_for('main.registration_continue'))
 
     return render_template('views/register.html', form=form)
 
@@ -54,12 +50,9 @@ def register_from_invite():
     if form.validate_on_submit():
         if form.service.data != invited_user['service'] or form.email_address.data != invited_user['email_address']:
             abort(400)
-        registered = _do_registration(form, send_email=False)
-        if registered:
-            invite_api_client.accept_invite(invited_user['service'], invited_user['id'])
-            return redirect(url_for('main.verify'))
-        else:
-            flash('There was an error registering your account')
+        _do_registration(form, send_email=False)
+        invite_api_client.accept_invite(invited_user['service'], invited_user['id'])
+        return redirect(url_for('main.verify'))
 
     form.service.data = invited_user['service']
     form.email_address.data = invited_user['email_address']
@@ -87,9 +80,12 @@ def _do_registration(form, service=None, send_sms=True, send_email=True):
             user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
         session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
         session['user_details'] = {"email": user.email_address, "id": user.id}
-        return True
     else:
-        return False
+        if send_email:
+            user = user_api_client.get_user_by_email(form.email_address.data)
+            user_api_client.send_already_registered_email(user.id, user.email_address)
+        session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
+        session['user_details'] = {"email": user.email_address, "id": user.id}
 
 
 @main.route('/registration-continue')
