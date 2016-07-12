@@ -99,6 +99,34 @@ def test_should_show_page_for_one_job(
         )
 
 
+def test_should_show_not_show_csv_download_in_tour(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    mock_get_service_template,
+    mock_get_service_statistics,
+    mock_get_job,
+    mocker,
+    mock_get_notifications,
+    fake_uuid
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        response = client.get(url_for(
+            'main.view_job',
+            service_id=service_one['id'],
+            job_id=fake_uuid,
+            help=3
+        ))
+
+        assert response.status_code == 200
+        assert url_for(
+            'main.view_job_csv',
+            service_id=service_one['id'],
+            job_id=fake_uuid
+        ) not in response.get_data(as_text=True)
+
+
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_updates_for_one_job_as_json(
     app_,
@@ -124,7 +152,7 @@ def test_should_show_updates_for_one_job_as_json(
         assert 'Recipient' in content['notifications']
         assert '07123456789' in content['notifications']
         assert 'Status' in content['notifications']
-        assert job_json['status'] in content['status']
+        print(content['notifications'])
         assert 'Delivered' in content['notifications']
         assert '11:10' in content['notifications']
         assert 'Uploaded by Test User on 1 January at 11:09' in content['status']

@@ -89,7 +89,7 @@ def get_errors_for_csv(recipients, template_type):
 
 
 def generate_notifications_csv(json_list):
-    from app import format_datetime
+    from app import format_datetime, format_notification_status
     content = StringIO()
     retval = None
     with content as csvfile:
@@ -102,7 +102,7 @@ def generate_notifications_csv(json_list):
                 x['template']['name'],
                 x['template']['template_type'],
                 x['job']['original_file_name'] if x['job'] else '',
-                x['status'],
+                format_notification_status(x['status'], x['template']['template_type']),
                 format_datetime(x['created_at'])])
         retval = content.getvalue()
     return retval
@@ -186,3 +186,7 @@ class Spreadsheet():
             file_type=extension,
             file_content=file_content.getvalue()
         ).to_array(), filename)
+
+
+def get_help_argument():
+    return request.args.get('help') if request.args.get('help') in ('1', '2', '3') else None

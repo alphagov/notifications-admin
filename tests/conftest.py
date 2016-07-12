@@ -870,17 +870,36 @@ def mock_get_jobs(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_get_notifications(mocker, api_user_active):
-    def _get_notifications(service_id,
-                           job_id=None,
-                           page=1,
-                           page_size=50,
-                           template_type=None,
-                           status=None,
-                           limit_days=None):
+    def _get_notifications(
+        service_id,
+        job_id=None,
+        page=1,
+        page_size=50,
+        template_type=None,
+        status=None,
+        limit_days=None,
+        rows=5,
+        set_template_type=None,
+        set_status=None
+    ):
         job = None
         if job_id is not None:
             job = job_json(service_id, api_user_active, job_id=job_id)
-        return notification_json(service_id, job=job)
+        if set_template_type:
+            return notification_json(
+                service_id,
+                template={'template_type': set_template_type, 'name': 'name', 'id': 'id', 'version': 1},
+                rows=rows,
+                status=set_status,
+                job=job
+            )
+        else:
+            return notification_json(
+                service_id,
+                rows=rows,
+                status=set_status,
+                job=job
+            )
 
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',

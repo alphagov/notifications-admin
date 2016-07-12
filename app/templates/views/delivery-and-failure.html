@@ -16,18 +16,17 @@ Delivery and failure – GOV.UK Notify
     <ul class="list list-bullet">
       <li><a href="#sending">Sending</a></li>
       <li><a href="#delivered">Delivered</a></li>
-      <li><a href="#permanent-failure">Permanently failed</a></li>
-      <li><a href="#temporary-failure">Temporarily failed</a></li>
+      <li><a href="#does-not-exist">Phone number or email address does not exist</a></li>
+      <li><a href="#inbox-not-accepting-messages">Inbox not accepting messages right now</a></li>
+      <li><a href="#phone-not-accepting-messages">Phone not accepting messages right now</a></li>
       <li><a href="#technical-failure">Technical failure</a></li>
     </ul>
 
-    <p>Our delivery states are the same for both email and text message.</p>
-
     <h2 id="sending" class="heading-medium">Sending</h2>
 
-    <p>All new messages start with the state ‘Sending’.</p>
+    <p>All messages start in the ‘Sending’ state.</p>
 
-    <p>This means that we have accepted the message, the message is waiting in a queue to be sent to our email or text message delivery partners.</p>
+    <p>This means that we have accepted the message. It’s waiting in a queue to be sent to our email or text message delivery partners.</p>
 
     <h2 id="delivered" class="heading-medium">Delivered</h2>
 
@@ -35,23 +34,27 @@ Delivery and failure – GOV.UK Notify
 
     <p>We can’t tell you if they’ve read it – to do so would require invasive and unreliable tracking techniques.</p>
 
-    <h2 id="permanent-failure" class="heading-medium">Permanently failed</h2>
+    <h2 id="does-not-exist" class="heading-medium">Phone number or email address does not exist</h2>
 
-    <p>This means the email address or mobile number doesn’t exist or is blacklisted – also known as a ‘hard bounce’.</p>
+    <p>You’re still billed for text messages to non-existant phone numbers.</p>
 
-    <p>You’re still billed for these text messages.</p>
+    <p><strong>You need to remove these email addresses or phone numbers from your database.</strong></p>
 
-    <p><strong>You need to remove this email address or mobile number from your database.</strong></p>
+    <a id="not-accepting-messages"></a>
 
-    <h2 id="temporary-failure" class="heading-medium">Temporarily failed</h2>
+    <h2 id="inbox-not-accepting-messages" class="heading-medium">Inbox not accepting messages right now</h2>
 
-    <p>This means the email address or mobile number was full, or the mobile phone was switched off – also known as a ‘soft bounce’.</p>
+    <p>This can happen for a number of reasons, eg the user’s inbox was full.</p>
 
-    <p>We mark messages as ‘Temporarily failed’.</p>
+    <p><strong>You can choose to retry these messages later or not.</strong></p>
+
+    <h2 id="phone-not-accepting-messages" class="heading-medium">Phone not accepting messages right now</h2>
+
+    <p>This means the user’s phone was full or hasn’t been switched on in the last 72 hours.</p>
 
     <p>You’re still billed for these messages.</p>
 
-    <p><strong>You can choose to retry this message later or not.</strong></p>
+    <p><strong>You can choose to retry these messages later or not.</strong></p>
 
     <h2 id="technical-failure" class="heading-medium">Technical failure</h2>
 
@@ -61,7 +64,7 @@ Delivery and failure – GOV.UK Notify
 
     <p>You won’t be billed for these messages.</p>
 
-    <p><strong>You need to retry this message yourself later.</strong></p>
+    <p><strong>You need to retry these messages yourself later.</strong></p>
 
   </div>
 </div>

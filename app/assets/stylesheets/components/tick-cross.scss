@@ -1,0 +1,46 @@
+%tick-cross {
+  @include core-16;
+  display: inline-block;
+  background-size: 19px 19px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  padding: 1px 0 0 25px;
+}
+
+.tick-cross {
+
+  &-tick {
+    @extend %tick-cross;
+    background-image: file-url('tick.png');
+  }
+
+  &-cross {
+    @extend %tick-cross;
+    background-image: file-url('cross-grey.png');
+    color: $secondary-text-colour;
+  }
+
+  &-list {
+
+    @extend %grid-row;
+    margin-top: 5px;
+
+    &-permissions {
+
+      @include grid-column(3/4);
+
+      li {
+        display: inline-block;
+        margin-right: 0.5em;
+      }
+
+    }
+
+    &-edit-link {
+      @include grid-column(1/4);
+      text-align: right;
+    }
+
+  }
+
+}

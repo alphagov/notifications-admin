@@ -2,12 +2,12 @@
 
 This document is for central government developers and technical architects who want to use the GOV.UK Notify platform to send notifications to users of their digital service.
 
-* [About GOV.UK Notify](#about_Notify)
-* [Before you start](#beforestart)
 * [Integrate the GOV.UK Notify API into your service](#integrate_Notify)
     * [Authenticate requests](#AuthRequests)
     * [JSON Web Tokens: claims](#JWT_claims)
     * [API client libraries](#client_libraries)
+* [Test your integration with GOV.UK Notify](#test_integ)
+    * [API keys](#API_keys)
 * [API endpoints](#API_endpoints)
     * [Send notifications: POST](#sendnotifications)
     * [Retrieve notifications: GET](#getnotifications)
@@ -17,47 +17,14 @@ This document is for central government developers and technical architects who 
 
 
 
-<h2 id="about_Notify">About GOV.UK Notify</h2>
 
-GOV.UK Notify is a cross-government platform that lets government services send notifications by text or email. It's currently in beta.
-
-There are 2 ways to send notifications:
-
-* use the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application
-* [integrate your web applications or back office systems](#integrate_Notify) with the GOV.UK Notify API
-
-The GOV.UK Notify allows you to [send notifications (POST)](#sendnotifications) and [get the status of notifications (GET)](#getnotifications) you have sent.
-
-To find out more about GOV.UK Notify, see the [Government as a Platform](https://governmentasaplatform.blog.gov.uk/) blog.
-
-<h2 id="beforestart">Before you start</h2>
-
-  1. Register for a [GOV.UK Notify](https://www.notifications.service.gov.uk/) account.
-
-    You'll need an email address from a local or central government organisation and your mobile phone for 2-factor authentication.
-
-  2. Add a template so you can send text and email notifications.
-
-    **Note:** A template is required even if you send notifications with the GOV.UK Notify API.
-
-    You can personalise the template using double brackets for placeholders. For example:
-
-    > Dear ((name)),
-    >
-    > Your ((item)) is due for renewal on ((date)).
-
-  3. Create an API key. This will be used to connect to the GOV.UK Notify API.
-
-    Each service can have multiple API keys. This allows you to integrate several systems, each with its own key. You can also have separate keys for your development and test environments.
-
-    **Important:** API keys are secret, so save them somewhere safe. Don't commit API keys to public source code repositories.
 
 <h2 id="integrate_Notify">Integrate the GOV.UK Notify API into your service</h2>
 
 There are 2 ways to integrate the API into your service:
 
 * use one of the client libraries provided by GOV.UK Notify:
-      
+
       * [Python library](https://github.com/alphagov/notifications-python-client/blob/master/README.md#usage)
       * [PHP library](https://github.com/alphagov/notifications-php-client/blob/master/README.md#usage)
       * [Java library](https://github.com/alphagov/notifications-java-client)
@@ -110,6 +77,57 @@ GOV.UK Notify supports the following client libraries:
  * [GOV.UK Notify Java library](https://github.com/alphagov/notifications-java-client)
 
 These provide example code for calling the API and for creating API tokens.
+
+<h2 id="test_integ">Test your integration with GOV.UK Notify</h2>
+
+Service teams should do all their testing within the GOV.UK Notify production environment (https://api.notifications.service.gov.uk).
+
+You don’t need different service accounts or environments. Instead, there are 3 types of API key that let you do functional and performance integration testing.
+
+<h3 id="API_keys">API keys</h3>
+
+The 3 types of API key that you can create within GOV.UK Notify are:
+
+* [normal keys](#normal_keys)
+* [team keys](#team_keys)
+* [test keys](#test_keys)
+
+Type of key | Sends real messages? | Appears in activity and statistics? | Daily service limit
+--- | --- | --- | ---
+Normal key | Yes | Yes | 50 (trial), unlimited (live)
+Team key | Yes (only to team members) | Yes | 50 (trial), unlimited (live)
+Test key | No | No | Unlimited
+
+<h4 id="normal_keys">Normal keys</h4>
+
+Normal keys have the same permissions as the service:
+
+* when the service is in trial mode, you can send only to members of your team and you are restricted to 50 messages per day
+* when the service is live, you can use the key to send messages to anyone
+* three
+
+Messages sent with a normal key show up on your dashboard and count against your text message and email allowances.
+
+There is no need to generate a new key when the service moves from trial to live.
+
+Don’t use your normal key for automated testing.
+
+<h4 id="team_keys">Team keys</h4>
+
+Use team keys for end-to-end functional testing.
+
+A team key lets you send real messages to members of your team. You get an error if you try to send messages to anyone else.
+
+Messages sent with a team key show up on your dashboard and count against your text message and email allowances.
+
+
+<h4 id="test_keys">Test keys</h4>
+
+Use test keys to test the performance of your service and its integration with GOV.UK Notify under load.
+
+Test keys don’t send real messages but they do generate realistic responses. There’s no restriction on who you can send to or how many messages you can send per day.
+
+Messages sent using a test key don’t show up on your dashboard or count against your text message and email allowances.
 
 <h2 id="API_endpoints">API endpoints</h2>
 
