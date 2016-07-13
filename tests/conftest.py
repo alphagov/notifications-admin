@@ -1121,3 +1121,8 @@ def mock_events(mocker):
         return {'some': 'data'}
 
     return mocker.patch('app.events_api_client.create_event', side_effect=_create_event)
+
+
+@pytest.fixture(scope='function')
+def mock_send_already_registered_email(mocker):
+    return mocker.patch('app.user_api_client.send_already_registered_email')

@@ -123,9 +123,10 @@ def test_should_return_200_if_password_is_blacklisted(app_,
     assert 'That password is blacklisted, too common' in response.get_data(as_text=True)
 
 
-def test_register_with_existing_email_returns_error(app_,
-                                                    api_user_active,
-                                                    mock_get_user_by_email):
+def test_register_with_existing_email_sends_emails(app_,
+                                                   api_user_active,
+                                                   mock_get_user_by_email,
+                                                   mock_send_already_registered_email):
     user_data = {
         'name': 'Already Hasaccount',
         'email_address': api_user_active.email_address,
@@ -136,9 +137,5 @@ def test_register_with_existing_email_returns_error(app_,
     with app_.test_request_context():
         response = app_.test_client().post(url_for('main.register'),
                                            data=user_data)
-        assert response.status_code == 400
-        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        element = page.find('h1')
-        assert element.text == 'Create an account'
-        flash_banner = page.find('div', class_='banner-dangerous').string.strip()
-        assert flash_banner == 'There was an error registering your account'
+        assert response.status_code == 302
+        assert response.location == url_for('main.registration_continue', _external=True)
