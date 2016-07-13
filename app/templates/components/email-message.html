@@ -6,7 +6,8 @@
   recipient=None,
   id=None,
   show_placeholder_for_recipient=False,
-  show_id=False
+  show_id=False,
+  expanded=False
 ) %}
   <div class="email-message">
     {% if from_name or subject %}
@@ -45,11 +46,15 @@
         </tbody>
       </table>
     {% endif %}
-    <div class="email-message-body" data-module="expand-collapse" data-max-height="200">
+    <div class="email-message-body" {% if not expanded %}data-module="expand-collapse" data-max-height="200"{% endif %}>
+      {% if not expanded %}
       <div class="email-message-body-wrapper">
-      {{ body|nl2br }}
+      {% endif %}
+        {{ body|nl2br }}
+      {% if not expanded %}
       </div>
       <div class='toggle' tabindex='0'>...<span class='visually-hidden'>show full email</span></div>
+      {% endif %}
     </div>
   </div>
 {% endmacro %}

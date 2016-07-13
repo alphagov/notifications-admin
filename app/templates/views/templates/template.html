@@ -14,7 +14,7 @@
   <h1 class="heading-large">{{ template.name }}</h1>
 
   <div class="grid-row">
-    {% with show_title=False %}
+    {% with show_title=False, expanded=True %}
       {% include 'views/templates/_template.html' %}
     {% endwith %}
   </div>
