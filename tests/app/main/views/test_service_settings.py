@@ -80,7 +80,7 @@ def test_switch_service_to_live(app_,
         assert response.location == url_for(
             'main.service_settings',
             service_id=service_one['id'], _external=True)
-        mock_update_service.assert_called_with(ANY, ANY, ANY, 25000, False, ANY, ANY)
+        mock_update_service.assert_called_with(ANY, ANY, ANY, 250000, False, ANY, ANY)
 
 
 def test_switch_service_to_restricted(app_,

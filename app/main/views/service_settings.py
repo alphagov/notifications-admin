@@ -148,7 +148,7 @@ def service_switch_live(service_id):
         current_service['active'],
         # TODO This limit should be set depending on the agreement signed by
         # with Notify.
-        25000 if current_service['restricted'] else 50,
+        250000 if current_service['restricted'] else 50,
         False if current_service['restricted'] else True,
         current_service['users'],
         current_service['email_from'])
