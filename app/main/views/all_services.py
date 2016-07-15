@@ -4,7 +4,7 @@ from flask_login import login_required
 from app import service_api_client
 from app.main import main
 from app.utils import user_has_permissions
-from app.notify_client.api_client import ServicesBrowsableItem
+from app.notify_client.service_api_client import ServicesBrowsableItem
 
 
 @main.route("/all-services")

@@ -2,7 +2,7 @@ from flask import (render_template, redirect, url_for, session)
 from flask_login import login_required, current_user
 from app.main import main
 from app import service_api_client
-from app.notify_client.api_client import ServicesBrowsableItem
+from app.notify_client.service_api_client import ServicesBrowsableItem
 
 
 @main.route("/services")

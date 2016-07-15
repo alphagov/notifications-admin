@@ -34,7 +34,7 @@ from werkzeug.local import LocalProxy
 import app.proxy_fix
 from app.asset_fingerprinter import AssetFingerprinter
 from app.its_dangerous_session import ItsdangerousSessionInterface
-from app.notify_client.api_client import ServiceAPIClient
+from app.notify_client.service_api_client import ServiceAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.invite_api_client import InviteApiClient
 from app.notify_client.job_api_client import JobApiClient
