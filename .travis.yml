@@ -13,6 +13,7 @@ before_install:
 install:
 - npm install
 - npm rebuild node-sass
+- pip install --upgrade pip setuptools
 - pip install -r requirements_for_test.txt
 after_success:
 - coveralls
