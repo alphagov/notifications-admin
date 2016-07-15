@@ -5,7 +5,7 @@
     !('oninput' in document.createElement('input'))
   ) return;
 
-  const tagPattern = /\(\([^\)\(]+\)\)/g;
+  const tagPattern = /\(\(([^\)\((\?)]+)(\?\?)?([^\)\(]*)\)\)/g;
 
   Modules.HighlightTags = function() {
 
@@ -43,7 +43,9 @@
 
     this.replacePlaceholders = () => this.$background.html(
       this.escapedMessage().replace(
-        tagPattern, match => `<span class='placeholder'>${match}</span>`
+        tagPattern, (match, name, separator, value) => value && separator ?
+          `<span class='placeholder-conditional'>((${name}??</span>${value}))` :
+          `<span class='placeholder'>((${name}${value}))</span>`
       )
     );
 

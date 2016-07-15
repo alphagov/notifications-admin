@@ -6,7 +6,8 @@
     {{ email_message(
       template.formatted_subject_as_markup,
       template.formatted_as_markup,
-      id=template.id
+      id=template.id,
+      expanded=expanded
     ) }}
   {% elif 'sms' == template.template_type %}
     {{ sms_message(

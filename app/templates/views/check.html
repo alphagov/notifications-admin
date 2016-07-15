@@ -144,7 +144,7 @@
   {% if 'email' == template.template_type %}
     {{ email_message(
       template.formatted_subject_as_markup if errors else template.replaced_subject,
-      template.formatted_as_markup if errors else template.replaced,
+      template.formatted_as_markup if errors else template.replaced|safe,
       from_address='{}@notifications.service.gov.uk'.format(current_service.email_from),
       from_name=current_service.name,
       recipient=first_recipient,
@@ -154,7 +154,7 @@
     <div class="grid-row">
       <div class="column-two-thirds">
         {{ sms_message(
-          template.formatted_as_markup if errors else template.replaced,
+          template.formatted_as_markup if errors else template.replaced|safe,
           recipient=first_recipient,
           show_placeholder_for_recipient=errors
         )}}
