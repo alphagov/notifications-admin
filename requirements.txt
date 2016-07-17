@@ -18,4 +18,4 @@ pytz==2016.4
 
 git+https://github.com/alphagov/notifications-python-client.git@1.0.0#egg=notifications-python-client==1.0.0
 
-git+https://github.com/alphagov/notifications-utils.git@8.4.2#egg=notifications-utils==8.4.2
+git+https://github.com/alphagov/notifications-utils.git@8.5.0#egg=notifications-utils==8.5.0
