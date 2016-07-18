@@ -98,6 +98,7 @@ def test_should_show_page_for_one_job(
             status=status_argument
         )
         assert csv_link.text == 'Download this report'
+        assert page.find('span', {'id': 'time-left'}).text == 'Available for 7 days'
         mock_get_notifications.assert_called_with(
             service_one['id'],
             fake_uuid,

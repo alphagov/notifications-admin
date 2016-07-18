@@ -8,7 +8,7 @@
     <p class="bottom-gutter">
       <a href="{{ url_for('.view_job_csv', service_id=current_service.id, job_id=job.id, status=status) }}" download="download" class="heading-small">Download this report</a>
       &emsp;
-      Available for 7 days
+      <span id="time-left">Available for 7 days</span>
     </p>
   {% endif %}
 
