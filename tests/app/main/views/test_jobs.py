@@ -76,22 +76,26 @@ def test_should_show_page_for_one_job(
             ))
 
         assert response.status_code == 200
-        content = response.get_data(as_text=True)
-        assert "{}: Your vehicle tax is about to expire".format(service_one['name']) in content
-        assert file_name in content
-        assert 'Delivered' in content
-        assert '11:10' in content
-        assert url_for(
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.h1.text.strip() == 'thisisatest.csv'
+        assert page.find('div', {'class': 'sms-message-wrapper'}).text.strip() == (
+            '{}: Your vehicle tax is about to expire'.format(service_one['name'])
+        )
+        assert ' '.join(page.find('tbody').find('tr').text.split()) == (
+            '07123456789 1 January at 11:10 Delivered'
+        )
+        assert page.find('div', {'data-key': 'notifications'})['data-resource'] == url_for(
             'main.view_job_updates',
             service_id=service_one['id'],
             job_id=fake_uuid,
             status=status_argument,
-        ) in content
-        assert url_for(
+        )
+        assert page.find('a', {'download': 'download'})['href'] == url_for(
             'main.view_job_csv',
             service_id=service_one['id'],
-            job_id=fake_uuid
-        ) in content
+            job_id=fake_uuid,
+            status=status_argument
+        )
         mock_get_notifications.assert_called_with(
             service_one['id'],
             fake_uuid,
