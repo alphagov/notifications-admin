@@ -65,15 +65,14 @@ def test_should_show_page_for_one_job(
     expected_api_call
 ):
     file_name = mock_get_job(service_one['id'], fake_uuid)['data']['original_file_name']
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
-            response = client.get(url_for(
-                'main.view_job',
-                service_id=service_one['id'],
-                job_id=fake_uuid,
-                status=status_argument
-            ))
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        response = client.get(url_for(
+            'main.view_job',
+            service_id=service_one['id'],
+            job_id=fake_uuid,
+            status=status_argument
+        ))
 
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
