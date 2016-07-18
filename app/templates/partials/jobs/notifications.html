@@ -6,9 +6,9 @@
 
   {% if notifications and not help %}
     <p class="bottom-gutter">
-      <a href="{{ url_for('.view_job_csv', service_id=current_service.id, job_id=job.id, status=status) }}" download="download" class="heading-small">Download as a CSV file</a>
+      <a href="{{ url_for('.view_job_csv', service_id=current_service.id, job_id=job.id, status=status) }}" download="download" class="heading-small">Download this report</a>
       &emsp;
-      Delivery information is available for 7 days
+      Available for 7 days
     </p>
   {% endif %}
 

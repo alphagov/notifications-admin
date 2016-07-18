@@ -90,12 +90,14 @@ def test_should_show_page_for_one_job(
             job_id=fake_uuid,
             status=status_argument,
         )
-        assert page.find('a', {'download': 'download'})['href'] == url_for(
+        csv_link = page.find('a', {'download': 'download'})
+        assert csv_link['href'] == url_for(
             'main.view_job_csv',
             service_id=service_one['id'],
             job_id=fake_uuid,
             status=status_argument
         )
+        assert csv_link.text == 'Download this report'
         mock_get_notifications.assert_called_with(
             service_one['id'],
             fake_uuid,
