@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import time
+import dateutil
+from datetime import datetime, timedelta, timezone
+import ago
 
 from flask import (
     render_template,
@@ -296,7 +299,6 @@ def _get_job_counts(job, help_argument):
 
 
 def get_job_partials(job):
-
     filter_args = _parse_filter_args(request.args)
     _set_status_filters(filter_args)
     return {
@@ -317,7 +319,17 @@ def get_job_partials(job):
                 job_id=job['id'],
                 status=request.args.get('status', '')
             ),
-            help=get_help_argument()
+            help=get_help_argument(),
+            time_left=ago.human(
+                (
+                    datetime.now(timezone.utc).replace(hour=23, minute=59, second=59)
+                ) - (
+                    dateutil.parser.parse(job['created_at']) + timedelta(days=8)
+                ),
+                future_tense='Data available for {}',
+                past_tense='Was available {} ago',  # No-one should ever see this
+                precision=1
+            )
         ),
         'status': render_template(
             'partials/jobs/status.html',
