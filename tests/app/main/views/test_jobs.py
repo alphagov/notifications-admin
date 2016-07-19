@@ -121,6 +121,13 @@ def test_should_show_not_show_csv_download_in_tour(
 
         assert response.status_code == 200
         assert url_for(
+            'main.view_job_updates',
+            service_id=service_one['id'],
+            job_id=fake_uuid,
+            status='',
+            help=3
+        ).replace('&', '&amp;') in response.get_data(as_text=True)
+        assert url_for(
             'main.view_job_csv',
             service_id=service_one['id'],
             job_id=fake_uuid
