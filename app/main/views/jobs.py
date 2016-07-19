@@ -97,7 +97,8 @@ def view_job(service_id, job_id):
             ".view_job_updates",
             service_id=service_id,
             job_id=job['id'],
-            status=request.args.get('status', '')
+            status=request.args.get('status', ''),
+            help=get_help_argument()
         ),
         partials=get_job_partials(job),
         help=get_help_argument()
