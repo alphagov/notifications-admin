@@ -154,9 +154,7 @@ def get_dashboard_partials(service_id):
     return {
         'totals': render_template(
             'views/dashboard/_totals.html',
-            statistics=add_rates_to(sum_of_statistics(
-                statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
-            ))
+            statistics=get_dashboard_totals(service_id)
         ),
         'template-statistics': render_template(
             'views/dashboard/template-statistics.html',
@@ -176,6 +174,12 @@ def get_dashboard_partials(service_id):
             **calculate_usage(service_api_client.get_service_usage(service_id)['data'])
         ),
     }
+
+
+def get_dashboard_totals(service_id):
+    return add_rates_to(sum_of_statistics(
+        statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
+    ))
 
 
 def calculate_usage(usage):

@@ -41,12 +41,14 @@ class ServiceAPIClient(NotificationsAPIClient):
         data = _attach_current_user({})
         return self.delete(endpoint, data)
 
-    def get_service(self, service_id, *params):
+    def get_service(self, service_id, detailed=False):
         """
         Retrieve a service.
         """
+        params = {'detailed': True} if detailed else {}
         return self.get(
-            '/service/{0}'.format(service_id))
+            '/service/{0}'.format(service_id),
+            params=params)
 
     def get_services(self, *params):
         """

@@ -55,10 +55,15 @@ def fake_uuid():
 
 @pytest.fixture(scope='function')
 def mock_get_service(mocker, api_user_active):
-    def _get(service_id):
+    def _get(service_id, detailed=False):
         service = service_json(
             service_id, "Test Service", [api_user_active.id], message_limit=1000,
             active=False, restricted=True)
+        if detailed:
+            service['statistics'] = {
+                'email': {'requested': 0, 'delivered': 0, 'failed': 0},
+                'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+            }
         return {'data': service}
 
     return mocker.patch('app.service_api_client.get_service', side_effect=_get)

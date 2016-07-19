@@ -100,7 +100,6 @@ def test_get_started_is_hidden_once_templates_exist(
     mock_has_permissions,
     mock_get_usage
 ):
-
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
 
@@ -376,14 +375,6 @@ def test_menu_all_services_for_platform_admin_user(mocker,
         assert url_for('main.view_notifications', service_id=service_one['id'], message_type='sms') in page
         assert url_for('main.api_keys', service_id=service_one['id']) not in page
 
-        # Should this be here??
-        # template_json = mock_get_service_templates(service_one['id'])['data'][0]
-
-        # assert url_for(
-        #    'main.edit_service_template',
-        #    service_id=service_one['id'],
-        #    template_id=template_json['id']) in page
-
 
 def test_route_for_service_permissions(mocker,
                                        app_,
@@ -424,3 +415,20 @@ def test_aggregate_template_stats():
             assert item['usage_count'] == 13
         elif item['template'].id == 2:
             assert item['usage_count'] == 206
+
+
+def test_service_dashboard_updates_gets_detailed_service(mocker,
+                                                         app_,
+                                                         active_user_with_permissions,
+                                                         service_one,
+                                                         mock_get_service,
+                                                         mock_get_service_statistics,
+                                                         mock_get_usage,
+                                                         ):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+
+    assert response.status_code == 200
+    # mock_get_service_statistics.assert_not_called()
+    # mock_get_service.assert_called_once_with(service_one.id, detailed=True)
