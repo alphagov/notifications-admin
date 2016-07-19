@@ -5,9 +5,11 @@
 
 // 1. LIBRARIES
 // - - - - - - - - - - - - - - -
-var gulp = require('gulp'),
-    plugins = require('gulp-load-plugins')(),
-    stylish = require('jshint-stylish'),
+import gulp from 'gulp';
+import loadPlugins from 'gulp-load-plugins';
+import stylish from 'jshint-stylish';
+
+const plugins = loadPlugins(),
 
 // 2. CONFIGURATION
 // - - - - - - - - - - - - - - -
