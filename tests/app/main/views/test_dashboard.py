@@ -417,18 +417,19 @@ def test_aggregate_template_stats():
             assert item['usage_count'] == 206
 
 
-def test_service_dashboard_updates_gets_detailed_service(mocker,
+def test_service_dashboard_updates_gets_dashboard_totals(mocker,
                                                          app_,
                                                          active_user_with_permissions,
                                                          service_one,
-                                                         mock_get_service,
                                                          mock_get_service_statistics,
-                                                         mock_get_usage,
-                                                         ):
+                                                         mock_get_usage):
+    dashboard_totals = mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
+        'email': {'requested': 0, 'delivered': 0, 'failed': 0},
+        'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+    })
+
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_one)
         response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
     assert response.status_code == 200
-    # mock_get_service_statistics.assert_not_called()
-    # mock_get_service.assert_called_once_with(service_one.id, detailed=True)

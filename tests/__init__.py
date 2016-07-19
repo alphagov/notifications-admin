@@ -13,11 +13,11 @@ class TestClient(FlaskClient):
             session['user_id'] = user.id
             session['_fresh'] = True
         if mocker:
-            mocker.patch('app.user_api_client.get_user', return_value=user)
-            mocker.patch('app.events_api_client.create_event')
-        if mocker and service:
-            session['service_id'] = service['id']
-            mocker.patch('app.service_api_client.get_service', return_value={'data': service})
+            get_user_mock = mocker.patch('app.user_api_client.get_user', return_value=user)
+            create_event_mock = mocker.patch('app.events_api_client.create_event')
+            if service:
+                session['service_id'] = service['id']
+                get_service_mock = mocker.patch('app.service_api_client.get_service', return_value={'data': service})
         login_user(user, remember=True)
 
     def login_fresh(self):
