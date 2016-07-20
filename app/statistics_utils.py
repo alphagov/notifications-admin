@@ -48,7 +48,7 @@ def get_formatted_percentage(x, tot):
     """
     Return a percentage to one decimal place (respecting )
     """
-    return "{0:.1f}".format((float(x) / tot * 100)) if tot else 0
+    return "{0:.1f}".format((float(x) / tot * 100)) if tot else '0'
 
 
 def statistics_by_state(statistics):

@@ -154,7 +154,7 @@ def get_dashboard_partials(service_id):
         'totals': render_template(
             'views/dashboard/_totals.html',
             service_id=service_id,
-            statistics=get_dashboard_totals(service)
+            statistics=get_dashboard_totals(service['data']['statistics'])
         ),
         'template-statistics': render_template(
             'views/dashboard/template-statistics.html',
@@ -176,11 +176,11 @@ def get_dashboard_partials(service_id):
     }
 
 
-def get_dashboard_totals(service):
-    for msg_type in service['data']['statistics'].values():
+def get_dashboard_totals(statistics):
+    for msg_type in statistics.values():
         msg_type['failed_percentage'] = get_formatted_percentage(msg_type['failed'], msg_type['requested'])
         msg_type['show_warning'] = float(msg_type['failed_percentage']) > 3
-    return service['data']['statistics']
+    return statistics
 
 
 def calculate_usage(usage):

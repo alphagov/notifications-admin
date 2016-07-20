@@ -1,8 +1,11 @@
 import copy
 from flask import url_for
 
+import pytest
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
+
+from app.main.views.dashboard import get_dashboard_totals
 
 from tests import validate_route_permission
 from tests.conftest import SERVICE_ONE_ID
@@ -435,8 +438,8 @@ def test_service_dashboard_updates_gets_dashboard_totals(mocker,
                                                          mock_get_service_statistics,
                                                          mock_get_usage):
     dashboard_totals = mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
-        'email': {'requested': 0, 'delivered': 0, 'failed': 0},
-        'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+        'email': {'requested': 123, 'delivered': 0, 'failed': 0},
+        'sms': {'requested': 456, 'delivered': 0, 'failed': 0}
     })
 
     with app_.test_request_context(), app_.test_client() as client:
@@ -444,3 +447,45 @@ def test_service_dashboard_updates_gets_dashboard_totals(mocker,
         response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
     assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    numbers = [number.text.strip() for number in page.find_all('div', class_='big-number-number')]
+    assert '123' in numbers
+    assert '456' in numbers
+
+    table_rows = page.find_all('tbody')[0].find_all('tr')
+
+
+def test_get_dashboard_totals_adds_percentages():
+    stats = {
+        'sms': {
+            'requested': 3,
+            'delivered': 0,
+            'failed': 2
+        },
+        'email': {
+            'requested': 0,
+            'delivered': 0,
+            'failed': 0
+        }
+    }
+    assert get_dashboard_totals(stats)['sms']['failed_percentage'] == '66.7'
+    assert get_dashboard_totals(stats)['email']['failed_percentage'] == '0'
+
+
+@pytest.mark.parametrize(
+    'failures,expected', [
+        (2, False),
+        (3, False),
+        (4, True)
+    ]
+)
+def test_get_dashboard_totals_adds_warning(failures, expected):
+    stats = {
+        'sms': {
+            'requested': 100,
+            'delivered': 0,
+            'failed': failures
+        }
+    }
+    assert get_dashboard_totals(stats)['sms']['show_warning'] == expected
