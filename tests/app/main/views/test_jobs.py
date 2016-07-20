@@ -1,12 +1,13 @@
+import json
+from urllib.parse import quote
+
 import pytest
 from flask import url_for
 from bs4 import BeautifulSoup
-import json
+
 from app.utils import generate_notifications_csv
-from app.main.views.jobs import get_time_left
-from tests import (notification_json, job_json)
-from tests.conftest import fake_uuid
-from tests.conftest import mock_get_job as mock_get_job1
+from app.main.views.jobs import get_time_left, get_status_filters
+from tests import notification_json
 from freezegun import freeze_time
 
 
@@ -318,3 +319,41 @@ def test_should_download_notifications_for_a_job(app_,
 @freeze_time("2016-01-10 12:00:00.000000")
 def test_time_left(job_created_at, expected_message):
     assert get_time_left(job_created_at) == expected_message
+
+
+STATISTICS = {
+    'sms': {
+        'requested': 6,
+        'failed': 2,
+        'delivered': 1
+    }
+}
+
+
+def test_get_status_filters_calculates_stats(app_):
+    with app_.test_request_context():
+        ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
+
+    assert {label: count for label, _option, _link, count in ret} == {
+        'processed': 6,
+        'sending': 3,
+        'failed': 2,
+        'delivered': 1
+    }
+
+
+def test_get_status_filters_in_right_order(app_):
+    with app_.test_request_context():
+        ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
+
+    assert [label for label, _option, _link, _count in ret] == [
+        'processed', 'sending', 'delivered', 'failed'
+    ]
+
+
+def test_get_status_filters_constructs_links(app_):
+    with app_.test_request_context():
+        ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
+
+    link = ret[0][2]
+    assert link == '/services/foo/notifications/sms?status={}'.format(quote('sending,delivered,failed'))
