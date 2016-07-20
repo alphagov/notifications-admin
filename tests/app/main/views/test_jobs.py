@@ -3,6 +3,7 @@ from flask import url_for
 from bs4 import BeautifulSoup
 import json
 from app.utils import generate_notifications_csv
+from app.main.views.jobs import get_time_left
 from tests import (notification_json, job_json)
 from tests.conftest import fake_uuid
 from tests.conftest import mock_get_job as mock_get_job1
@@ -300,3 +301,16 @@ def test_should_download_notifications_for_a_job(app_,
         assert response.get_data(as_text=True) == csv_content
         assert 'text/csv' in response.headers['Content-Type']
         assert 'sample template - 1 January at 11:09.csv"' in response.headers['Content-Disposition']
+
+
+@pytest.mark.parametrize(
+    "job_created_at, expected_message", [
+        ("2016-01-10 11:09:00.000000+00:00", "Data available for 7 days"),
+        ("2016-01-04 11:09:00.000000+00:00", "Data available for 1 day"),
+        ("2016-01-03 11:09:00.000000+00:00", "Data available for 11 hours"),
+        ("2016-01-02 23:59:59.000000+00:00", "Data no longer available")
+    ]
+)
+@freeze_time("2016-01-10 12:00:00.000000")
+def test_time_left(job_created_at, expected_message):
+    assert get_time_left(job_created_at) == expected_message

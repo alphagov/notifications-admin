@@ -320,19 +320,23 @@ def get_job_partials(job):
                 status=request.args.get('status', '')
             ),
             help=get_help_argument(),
-            time_left=ago.human(
-                (
-                    datetime.now(timezone.utc).replace(hour=23, minute=59, second=59)
-                ) - (
-                    dateutil.parser.parse(job['created_at']) + timedelta(days=8)
-                ),
-                future_tense='Data available for {}',
-                past_tense='Was available {} ago',  # No-one should ever see this
-                precision=1
-            )
+            time_left=get_time_left(job['created_at'])
         ),
         'status': render_template(
             'partials/jobs/status.html',
             job=job
         ),
     }
+
+
+def get_time_left(job_created_at):
+    return ago.human(
+        (
+            datetime.now(timezone.utc).replace(hour=23, minute=59, second=59)
+        ) - (
+            dateutil.parser.parse(job_created_at) + timedelta(days=8)
+        ),
+        future_tense='Data available for {}',
+        past_tense='Data no longer available',  # No-one should ever see this
+        precision=1
+    )
