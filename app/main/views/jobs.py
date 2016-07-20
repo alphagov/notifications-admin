@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import time
+import dateutil
+from datetime import datetime, timedelta, timezone
+import ago
 
 from flask import (
     render_template,
@@ -297,10 +300,8 @@ def _get_job_counts(job, help_argument):
 
 
 def get_job_partials(job):
-
     filter_args = _parse_filter_args(request.args)
     _set_status_filters(filter_args)
-
     return {
         'counts': render_template(
             'partials/jobs/count.html',
@@ -310,15 +311,33 @@ def get_job_partials(job):
         ),
         'notifications': render_template(
             'partials/jobs/notifications.html',
-            job=job,
             notifications=notification_api_client.get_notifications_for_service(
                 job['service'], job['id'], status=filter_args.get('status')
             )['notifications'],
-            status=request.args.get('status', ''),
-            help=get_help_argument()
+            download_link=url_for(
+                '.view_job_csv',
+                service_id=current_service['id'],
+                job_id=job['id'],
+                status=request.args.get('status', '')
+            ),
+            help=get_help_argument(),
+            time_left=get_time_left(job['created_at'])
         ),
         'status': render_template(
             'partials/jobs/status.html',
             job=job
         ),
     }
+
+
+def get_time_left(job_created_at):
+    return ago.human(
+        (
+            datetime.now(timezone.utc).replace(hour=23, minute=59, second=59)
+        ) - (
+            dateutil.parser.parse(job_created_at) + timedelta(days=8)
+        ),
+        future_tense='Data available for {}',
+        past_tense='Data no longer available',  # No-one should ever see this
+        precision=1
+    )

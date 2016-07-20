@@ -1,6 +1,6 @@
 import pytest
 import uuid
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 from flask.testing import FlaskClient
 from flask import url_for
 from flask_login import login_user
@@ -155,7 +155,7 @@ def job_json(service_id,
     if template_id is None:
         template_id = str(generate_uuid())
     if created_at is None:
-        created_at = str(datetime.utcnow().time())
+        created_at = str(datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%f%z'))
     if status is None:
         status = 'Delivered'
     data = {

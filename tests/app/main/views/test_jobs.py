@@ -3,6 +3,7 @@ from flask import url_for
 from bs4 import BeautifulSoup
 import json
 from app.utils import generate_notifications_csv
+from app.main.views.jobs import get_time_left
 from tests import (notification_json, job_json)
 from tests.conftest import fake_uuid
 from tests.conftest import mock_get_job as mock_get_job1
@@ -65,33 +66,39 @@ def test_should_show_page_for_one_job(
     expected_api_call
 ):
     file_name = mock_get_job(service_one['id'], fake_uuid)['data']['original_file_name']
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
-            response = client.get(url_for(
-                'main.view_job',
-                service_id=service_one['id'],
-                job_id=fake_uuid,
-                status=status_argument
-            ))
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        response = client.get(url_for(
+            'main.view_job',
+            service_id=service_one['id'],
+            job_id=fake_uuid,
+            status=status_argument
+        ))
 
         assert response.status_code == 200
-        content = response.get_data(as_text=True)
-        assert "{}: Your vehicle tax is about to expire".format(service_one['name']) in content
-        assert file_name in content
-        assert 'Delivered' in content
-        assert '11:10' in content
-        assert url_for(
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.h1.text.strip() == 'thisisatest.csv'
+        assert page.find('div', {'class': 'sms-message-wrapper'}).text.strip() == (
+            '{}: Your vehicle tax is about to expire'.format(service_one['name'])
+        )
+        assert ' '.join(page.find('tbody').find('tr').text.split()) == (
+            '07123456789 1 January at 11:10 Delivered'
+        )
+        assert page.find('div', {'data-key': 'notifications'})['data-resource'] == url_for(
             'main.view_job_updates',
             service_id=service_one['id'],
             job_id=fake_uuid,
             status=status_argument,
-        ) in content
-        assert url_for(
+        )
+        csv_link = page.find('a', {'download': 'download'})
+        assert csv_link['href'] == url_for(
             'main.view_job_csv',
             service_id=service_one['id'],
-            job_id=fake_uuid
-        ) in content
+            job_id=fake_uuid,
+            status=status_argument
+        )
+        assert csv_link.text == 'Download this report'
+        assert page.find('span', {'id': 'time-left'}).text == 'Data available for 7 days'
         mock_get_notifications.assert_called_with(
             service_one['id'],
             fake_uuid,
@@ -301,3 +308,16 @@ def test_should_download_notifications_for_a_job(app_,
         assert response.get_data(as_text=True) == csv_content
         assert 'text/csv' in response.headers['Content-Type']
         assert 'sample template - 1 January at 11:09.csv"' in response.headers['Content-Disposition']
+
+
+@pytest.mark.parametrize(
+    "job_created_at, expected_message", [
+        ("2016-01-10 11:09:00.000000+00:00", "Data available for 7 days"),
+        ("2016-01-04 11:09:00.000000+00:00", "Data available for 1 day"),
+        ("2016-01-03 11:09:00.000000+00:00", "Data available for 11 hours"),
+        ("2016-01-02 23:59:59.000000+00:00", "Data no longer available")
+    ]
+)
+@freeze_time("2016-01-10 12:00:00.000000")
+def test_time_left(job_created_at, expected_message):
+    assert get_time_left(job_created_at) == expected_message
