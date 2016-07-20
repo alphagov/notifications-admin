@@ -57,7 +57,6 @@ def test_should_show_page_for_one_job(
     service_one,
     active_user_with_permissions,
     mock_get_service_template,
-    mock_get_service_statistics,
     mock_get_job,
     mocker,
     mock_get_notifications,
@@ -111,7 +110,6 @@ def test_should_show_not_show_csv_download_in_tour(
     service_one,
     active_user_with_permissions,
     mock_get_service_template,
-    mock_get_service_statistics,
     mock_get_job,
     mocker,
     mock_get_notifications,
@@ -147,7 +145,6 @@ def test_should_show_updates_for_one_job_as_json(
     service_one,
     active_user_with_permissions,
     mock_get_notifications,
-    mock_get_service_statistics,
     mock_get_job,
     mocker,
     fake_uuid
@@ -203,7 +200,7 @@ def test_can_show_notifications(
     service_one,
     active_user_with_permissions,
     mock_get_notifications,
-    mock_get_service_statistics,
+    mock_get_detailed_service,
     mocker,
     message_type,
     page_title,
@@ -263,7 +260,7 @@ def test_should_show_notifications_for_a_service_with_next_previous(
     service_one,
     active_user_with_permissions,
     mock_get_notifications_with_previous_next,
-    mock_get_service_statistics,
+    mock_get_detailed_service,
     mocker
 ):
     with app_.test_request_context():
