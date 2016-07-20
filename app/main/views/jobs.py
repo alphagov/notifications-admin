@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import time
 import dateutil
 from datetime import datetime, timedelta, timezone
@@ -21,7 +20,6 @@ from app import (
     job_api_client,
     notification_api_client,
     service_api_client,
-    statistics_api_client,
     current_service,
     format_datetime_short)
 from app.main import main
@@ -30,7 +28,7 @@ from app.utils import (
     generate_previous_next_dict,
     user_has_permissions,
     generate_notifications_csv)
-from app.statistics_utils import sum_of_statistics, statistics_by_state, add_rate_to_jobs
+from app.statistics_utils import add_rate_to_jobs
 from app.utils import get_help_argument
 
 
@@ -171,9 +169,6 @@ def view_notifications(service_id, message_type):
         template_type=[message_type],
         status=filter_args.get('status'),
         limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
-    service_statistics_by_state = statistics_by_state(sum_of_statistics(
-        statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
-    ))
     view_dict = dict(
         message_type=message_type,
         status=request.args.get('status')
@@ -223,23 +218,11 @@ def view_notifications(service_id, message_type):
             message_type=message_type,
             status=request.args.get('status')
         ),
-        status_filters=[
-            [
-                item[0], item[1],
-                url_for(
-                    '.view_notifications',
-                    service_id=current_service['id'],
-                    message_type=message_type,
-                    status=item[1]
-                ),
-                service_statistics_by_state[message_type][item[0]]
-            ] for item in [
-                ['processed', 'sending,delivered,failed'],
-                ['sending', 'sending'],
-                ['delivered', 'delivered'],
-                ['failed', 'failed'],
-            ]
-        ]
+        status_filters=get_status_filters(
+            current_service,
+            message_type,
+            service_api_client.get_detailed_service(service_id)['data']['statistics']
+        )
     )
 
 
@@ -259,6 +242,34 @@ def view_notification(service_id, job_id, notification_id):
         uploaded_at=now,
         job_id=job_id
     )
+
+
+def get_status_filters(service, message_type, statistics):
+    stats = statistics[message_type]
+    stats['sending'] = stats['requested'] - stats['delivered'] - stats['failed']
+
+    filters = [
+        # key, label, option
+        ('requested', 'processed', 'sending,delivered,failed'),
+        ('sending', 'sending', 'sending'),
+        ('delivered', 'delivered', 'delivered'),
+        ('failed', 'failed', 'failed'),
+    ]
+    return [
+        # return list containing label, option, link, count
+        (
+            label,
+            option,
+            url_for(
+                '.view_notifications',
+                service_id=service['id'],
+                message_type=message_type,
+                status=option
+            ),
+            stats[key]
+        )
+        for key, label, option in filters
+    ]
 
 
 def _get_job_counts(job, help_argument):
