@@ -69,6 +69,7 @@ def test_get_started(
     mock_login,
     mock_get_jobs,
     mock_has_permissions,
+    mock_get_detailed_service,
     mock_get_usage
 ):
 
@@ -98,11 +99,11 @@ def test_get_started_is_hidden_once_templates_exist(
     mock_login,
     mock_get_jobs,
     mock_has_permissions,
+    mock_get_detailed_service,
     mock_get_usage
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
-
     with app_.test_request_context(), app_.test_client() as client:
         client.login(api_user_active)
         response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
@@ -117,13 +118,13 @@ def test_should_show_recent_templates_on_dashboard(app_,
                                                    api_user_active,
                                                    mock_get_service,
                                                    mock_get_service_templates,
-                                                   mock_get_service_statistics,
                                                    mock_get_aggregate_service_statistics,
                                                    mock_get_user,
                                                    mock_get_user_by_email,
                                                    mock_login,
                                                    mock_get_jobs,
                                                    mock_has_permissions,
+                                                   mock_get_detailed_service,
                                                    mock_get_usage):
 
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
@@ -136,7 +137,6 @@ def test_should_show_recent_templates_on_dashboard(app_,
 
         assert response.status_code == 200
         response.get_data(as_text=True)
-        mock_get_service_statistics.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
         mock_template_stats.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
 
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -210,6 +210,7 @@ def test_should_show_recent_jobs_on_dashboard(
     mock_get_user_by_email,
     mock_login,
     mock_get_template_statistics,
+    mock_get_detailed_service,
     mock_get_jobs,
     mock_has_permissions,
     mock_get_usage
@@ -261,6 +262,7 @@ def test_menu_send_messages(mocker,
                             mock_get_service_templates,
                             mock_get_jobs,
                             mock_get_template_statistics,
+                            mock_get_detailed_service,
                             mock_get_usage):
 
     with app_.test_request_context():
@@ -295,6 +297,7 @@ def test_menu_manage_service(mocker,
                              mock_get_service_templates,
                              mock_get_jobs,
                              mock_get_template_statistics,
+                             mock_get_detailed_service,
                              mock_get_usage):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -327,6 +330,7 @@ def test_menu_manage_api_keys(mocker,
                               mock_get_service_templates,
                               mock_get_jobs,
                               mock_get_template_statistics,
+                              mock_get_detailed_service,
                               mock_get_usage):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -358,6 +362,7 @@ def test_menu_all_services_for_platform_admin_user(mocker,
                                                    mock_get_service_templates,
                                                    mock_get_jobs,
                                                    mock_get_template_statistics,
+                                                   mock_get_detailed_service,
                                                    mock_get_usage):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -386,6 +391,7 @@ def test_route_for_service_permissions(mocker,
                                        mock_get_jobs,
                                        mock_get_service_statistics,
                                        mock_get_template_statistics,
+                                       mock_get_detailed_service,
                                        mock_get_usage):
     routes = [
         'main.service_dashboard']
@@ -424,10 +430,10 @@ def test_service_dashboard_updates_gets_dashboard_totals(mocker,
                                                          mock_get_user,
                                                          mock_get_service_templates,
                                                          mock_get_template_statistics,
+                                                         mock_get_detailed_service,
                                                          mock_get_jobs,
                                                          mock_get_service_statistics,
-                                                         mock_get_usage,
-                                                         mock_get_detailed_service):
+                                                         mock_get_usage):
     dashboard_totals = mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
         'email': {'requested': 0, 'delivered': 0, 'failed': 0},
         'sms': {'requested': 0, 'delivered': 0, 'failed': 0}

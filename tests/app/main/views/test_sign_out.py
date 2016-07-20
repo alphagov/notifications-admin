@@ -21,6 +21,7 @@ def test_sign_out_user(app_,
                        mock_get_jobs,
                        mock_has_permissions,
                        mock_get_template_statistics,
+                       mock_get_detailed_service,
                        mock_get_usage):
     with app_.test_request_context():
         with app_.test_client() as client:
