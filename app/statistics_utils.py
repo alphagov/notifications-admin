@@ -31,9 +31,9 @@ def sum_of_statistics(delivery_statistics):
 def add_rates_to(delivery_statistics):
 
     return dict(
-        email_failure_rate=get_formatted_percentage(
-            delivery_statistics['email_failed'],
-            delivery_statistics['email_requested']),
+        emails_failure_rate=get_formatted_percentage(
+            delivery_statistics['emails_failed'],
+            delivery_statistics['emails_requested']),
         sms_failure_rate=get_formatted_percentage(
             delivery_statistics['sms_failed'],
             delivery_statistics['sms_requested']),

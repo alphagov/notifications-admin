@@ -421,8 +421,13 @@ def test_service_dashboard_updates_gets_dashboard_totals(mocker,
                                                          app_,
                                                          active_user_with_permissions,
                                                          service_one,
+                                                         mock_get_user,
+                                                         mock_get_service_templates,
+                                                         mock_get_template_statistics,
+                                                         mock_get_jobs,
                                                          mock_get_service_statistics,
-                                                         mock_get_usage):
+                                                         mock_get_usage,
+                                                         mock_get_detailed_service):
     dashboard_totals = mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
         'email': {'requested': 0, 'delivered': 0, 'failed': 0},
         'sms': {'requested': 0, 'delivered': 0, 'failed': 0}

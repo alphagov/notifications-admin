@@ -41,7 +41,13 @@ class ServiceAPIClient(NotificationsAPIClient):
         data = _attach_current_user({})
         return self.delete(endpoint, data)
 
-    def get_service(self, service_id, detailed=False):
+    def get_service(self, service_id):
+        return self._get_service(service_id, False)
+
+    def get_detailed_service(self, service_id):
+        return self._get_service(service_id, True)
+
+    def _get_service(self, service_id, detailed):
         """
         Retrieve a service.
         """

@@ -148,8 +148,7 @@ def get_dashboard_partials(service_id):
         lambda job: job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME'],
         job_api_client.get_job(service_id, limit_days=7)['data']
     ))
-
-    service = service_api_client.get_service(service_id, detailed=True)
+    service = service_api_client.get_detailed_service(service_id)
 
     return {
         'totals': render_template(
@@ -178,10 +177,10 @@ def get_dashboard_partials(service_id):
 
 
 def get_dashboard_totals(service):
-    for msg_type in service['statistics']:
+    for msg_type in service['data']['statistics'].values():
         msg_type['failed_percentage'] = get_formatted_percentage(msg_type['failed'], msg_type['requested'])
-        msg_type['show_warning'] = msg_type['failed_percentage'] > 3
-    return service['statistics']
+        msg_type['show_warning'] = float(msg_type['failed_percentage']) > 3
+    return service['data']['statistics']
 
 
 def calculate_usage(usage):

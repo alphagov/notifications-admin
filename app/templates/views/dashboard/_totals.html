@@ -9,8 +9,8 @@
       statistics['email']['failed'],
       statistics['email']['failed_percentage'],
       statistics['email']['show_warning'],
-      failure_link=url_for(".view_notifications", service_id=id, message_type='email', status='failed'),
-      link=url_for(".view_notifications", service_id=id, message_type='email', status='sending,delivered,failed')
+      failure_link=url_for(".view_notifications", service_id=service_id, message_type='email', status='failed'),
+      link=url_for(".view_notifications", service_id=service_id, message_type='email', status='sending,delivered,failed')
     ) }}
   </div>
   <div class="column-half">
