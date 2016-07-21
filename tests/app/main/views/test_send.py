@@ -719,3 +719,54 @@ def test_go_to_dashboard_after_tour(
         assert resp.status_code == 302
         assert resp.location == url_for("main.service_dashboard", service_id=fake_uuid, _external=True)
         mock_delete_service_template.assert_called_once_with(fake_uuid, fake_uuid)
+
+
+@pytest.mark.parametrize('num_already_sent,msg', [
+    (0, '‘valid.csv’ contains 100 phone numbers.'),
+    (1, 'You can still send 49 messages today, but ‘valid.csv’ contains 100 phone numbers.')
+], ids=['none_sent', 'some_sent'])
+def test_check_messages_shows_too_many_messages_errors(
+    mocker,
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_users_by_service,
+    mock_get_service,
+    mock_get_service_template,
+    mock_has_permissions,
+    fake_uuid,
+    num_already_sent,
+    msg
+):
+    # csv with 100 phone numbers
+    mocker.patch('app.main.views.send.s3download', return_value=',\n'.join(
+        ['phone number'] + ([mock_get_users_by_service(None)[0]._mobile_number]*100)
+    ))
+    mocker.patch('app.statistics_api_client.get_statistics_for_service_for_day', return_value={
+        'day': datetime.today().date().strftime('%Y-%m-%d'),
+        'sms_requested': num_already_sent, 'sms_delivered': num_already_sent, 'sms_failed': 0,
+        'emails_requested': 0, 'emails_delivered': 0, 'emails_failed': 0, 'service': fake_uuid, 'id': fake_uuid
+    })
+
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        with client.session_transaction() as session:
+            session['upload_data'] = {'original_file_name': 'valid.csv',
+                                      'template_id': fake_uuid,
+                                      'notification_count': 1,
+                                      'valid': True}
+        response = client.get(url_for(
+            'main.check_messages',
+            service_id=fake_uuid,
+            template_type='sms',
+            upload_id=fake_uuid
+        ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('h1').text.strip() == 'Too many recipients'
+    assert page.find('div', class_='banner-dangerous').find('a').text.strip() == 'trial mode'
+
+    # remove excess whitespace from element
+    details = page.find('div', class_='banner-dangerous').findAll('p')[1]
+    details = ' '.join([line.strip() for line in details.text.split('\n') if line.strip() != ''])
+    assert details == msg
