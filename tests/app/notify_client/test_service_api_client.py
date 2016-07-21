@@ -19,3 +19,19 @@ def test_client_posts_archived_true_when_deleting_template(mocker):
 
     client.delete_service_template(service_id, template_id)
     mock_post.assert_called_once_with(expected_url, data=expected_data)
+
+
+def test_client_gets_service_with_no_params(mocker):
+    client = ServiceAPIClient()
+    mock_post = mocker.patch('app.notify_client.service_api_client.ServiceAPIClient.get')
+
+    client.get_service('foo')
+    mock_post.assert_called_once_with('/service/foo', params={})
+
+
+def test_client_gets_service_with_detailed_params(mocker):
+    client = ServiceAPIClient()
+    mock_post = mocker.patch('app.notify_client.service_api_client.ServiceAPIClient.get')
+
+    client.get_detailed_service('foo')
+    mock_post.assert_called_once_with('/service/foo', params={'detailed': True})

@@ -325,7 +325,7 @@ def register_errorhandlers(application):
     @application.errorhandler(HTTPError)
     def render_http_error(error):
         application.logger.error("API {} failed with status {} message {}".format(
-            error.response.url,
+            error.response.url if error.response else 'unknown',
             error.status_code,
             error.message
         ))
