@@ -1,0 +1,27 @@
+<div class="bottom-gutter">
+  {% call banner_wrapper(type='dangerous') %}
+    <h1 class='banner-title'>
+      Too many recipients
+    </h1>
+    {% if statistics.emails_requested or statistics.sms_requested %}
+      <p>
+        You can only send {{ current_service.message_limit }}
+        messages per day
+        {%- if current_service.restricted %}
+          in <a href="{{ url_for('.trial_mode')}}">trial mode</a>
+        {%- endif -%}
+        .
+      </p>
+    {% endif %}
+    <p>
+      You can still send
+      {{ current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0) }}
+      messages today, but
+      ‘{{ original_file_name }}’ contains
+      {{ count_of_recipients }} {{ recipients.recipient_column_header }}
+      {%- if count_of_recipients != 1 -%}
+        {{ 'es' if 'email address' == recipients.recipient_column_header else 's' }}
+      {%- endif %}
+    </p>
+  {% endcall %}
+</div>
