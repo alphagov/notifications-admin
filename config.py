@@ -54,7 +54,8 @@ class Config(object):
         "nhs\.net",
         "police\.uk",
         "kainos\.com",
-        "salesforce\.com"]
+        "salesforce\.com",
+        "bitzesty\.com"]
 
 
 class Development(Config):
