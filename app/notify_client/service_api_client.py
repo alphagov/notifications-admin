@@ -42,13 +42,13 @@ class ServiceAPIClient(NotificationsAPIClient):
         return self.delete(endpoint, data)
 
     def get_service(self, service_id):
-        return self._get_service(service_id, False, today_only=False)
+        return self._get_service(service_id, detailed=False, today_only=False)
 
     def get_detailed_service(self, service_id):
-        return self._get_service(service_id, True, today_only=False)
+        return self._get_service(service_id, detailed=True, today_only=False)
 
     def get_detailed_service_for_today(self, service_id):
-        return self._get_service(service_id, False, today_only=True)
+        return self._get_service(service_id, detailed=True, today_only=True)
 
     def _get_service(self, service_id, detailed, today_only):
         """
@@ -57,7 +57,12 @@ class ServiceAPIClient(NotificationsAPIClient):
         :param detailed - return additional details, including notification statistics
         :param today_only - return statistics only for today. No effect if detailed not passed in
         """
-        params = {'detailed': True} if detailed else {}
+        params = {}
+        if detailed:
+            params['detailed'] = detailed
+        if today_only:
+            params['today_only'] = today_only
+
         return self.get(
             '/service/{0}'.format(service_id),
             params=params)
