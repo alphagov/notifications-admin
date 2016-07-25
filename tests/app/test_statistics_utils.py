@@ -53,7 +53,7 @@ def test_sum_of_statistics_sums_inputs():
 
 
 @pytest.mark.parametrize('emails_failed,emails_requested,expected_failure_rate', [
-    (0, 0, 0),
+    (0, 0, '0'),
     (0, 1, '0.0'),
     (1, 3, '33.3')
 ])
@@ -69,7 +69,7 @@ def test_add_rates_sets_email_failure_rate(emails_failed, emails_requested, expe
 
 
 @pytest.mark.parametrize('sms_failed,sms_requested,expected_failure_rate', [
-    (0, 0, 0),
+    (0, 0, '0'),
     (0, 1, '0.0'),
     (1, 3, '33.3')
 ])

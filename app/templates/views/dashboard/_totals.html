@@ -4,24 +4,24 @@
 <div class="grid-row">
   <div class="column-half">
     {{ big_number_with_status(
-      statistics.emails_requested,
-      message_count_label(statistics.emails_requested, 'email', suffix=''),
-      statistics.emails_failed,
-      statistics.get('emails_failure_rate', 0.0),
-      statistics.get('emails_failure_rate', 0)|float > 3,
-      failure_link=url_for(".view_notifications", service_id=current_service.id, message_type='email', status='failed'),
-      link=url_for(".view_notifications", service_id=current_service.id, message_type='email', status='sending,delivered,failed')
+      statistics['email']['requested'],
+      message_count_label(statistics['email']['requested'], 'email', suffix=''),
+      statistics['email']['failed'],
+      statistics['email']['failed_percentage'],
+      statistics['email']['show_warning'],
+      failure_link=url_for(".view_notifications", service_id=service_id, message_type='email', status='failed'),
+      link=url_for(".view_notifications", service_id=service_id, message_type='email', status='sending,delivered,failed')
     ) }}
   </div>
   <div class="column-half">
     {{ big_number_with_status(
-      statistics.sms_requested,
-      message_count_label(statistics.sms_requested, 'sms', suffix=''),
-      statistics.sms_failed,
-      statistics.get('sms_failure_rate', 0.0),
-      statistics.get('sms_failure_rate', 0)|float > 3,
-      failure_link=url_for(".view_notifications", service_id=current_service.id, message_type='sms', status='failed'),
-      link=url_for(".view_notifications", service_id=current_service.id, message_type='sms', status='sending,delivered,failed')
+      statistics['sms']['requested'],
+      message_count_label(statistics['sms']['requested'], 'sms', suffix=''),
+      statistics['sms']['failed'],
+      statistics['sms']['failed_percentage'],
+      statistics['sms']['show_warning'],
+      failure_link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='failed'),
+      link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='sending,delivered,failed')
     ) }}
   </div>
 </div>
