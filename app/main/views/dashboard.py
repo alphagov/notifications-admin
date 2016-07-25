@@ -1,11 +1,9 @@
 from datetime import datetime, date, timedelta
 from collections import namedtuple
 from itertools import groupby
-import json
 
 from flask import (
     render_template,
-    redirect,
     url_for,
     session,
     jsonify,
@@ -21,7 +19,7 @@ from app import (
     service_api_client,
     template_statistics_client
 )
-from app.statistics_utils import sum_of_statistics, add_rates_to, add_rate_to_jobs
+from app.statistics_utils import add_rates_to, get_formatted_percentage, add_rate_to_jobs
 from app.utils import user_has_permissions
 
 
@@ -150,13 +148,13 @@ def get_dashboard_partials(service_id):
         lambda job: job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME'],
         job_api_client.get_job(service_id, limit_days=7)['data']
     ))
+    service = service_api_client.get_detailed_service(service_id)
 
     return {
         'totals': render_template(
             'views/dashboard/_totals.html',
-            statistics=add_rates_to(sum_of_statistics(
-                statistics_api_client.get_statistics_for_service(service_id, limit_days=7)['data']
-            ))
+            service_id=service_id,
+            statistics=get_dashboard_totals(service['data']['statistics'])
         ),
         'template-statistics': render_template(
             'views/dashboard/template-statistics.html',
@@ -176,6 +174,13 @@ def get_dashboard_partials(service_id):
             **calculate_usage(service_api_client.get_service_usage(service_id)['data'])
         ),
     }
+
+
+def get_dashboard_totals(statistics):
+    for msg_type in statistics.values():
+        msg_type['failed_percentage'] = get_formatted_percentage(msg_type['failed'], msg_type['requested'])
+        msg_type['show_warning'] = float(msg_type['failed_percentage']) > 3
+    return statistics
 
 
 def calculate_usage(usage):
