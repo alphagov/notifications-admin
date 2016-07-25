@@ -104,7 +104,7 @@
     </div>
 
   {% elif count_of_recipients > (current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0)) %}
-    {% include "partials/check/too_many_messages.html" %}
+    {% include "partials/check/too-many-messages.html" %}
   {% else %}
 
     <h1 class="heading-large">
