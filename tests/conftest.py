@@ -81,6 +81,22 @@ def mock_get_detailed_service(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_detailed_service_for_today(mocker, api_user_active):
+    def _get(service_id):
+        return {
+            'data': {
+                'id': service_id,
+                'statistics': {
+                    'email': {'requested': 0, 'delivered': 0, 'failed': 0},
+                    'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+                }
+            }
+        }
+
+    return mocker.patch('app.service_api_client.get_detailed_service_for_today', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
 def mock_get_live_service(mocker, api_user_active):
     def _get(service_id):
         service = service_json(

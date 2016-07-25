@@ -77,7 +77,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_service_statistics_for_day,
+    mock_get_detailed_service_for_today,
     fake_uuid
 ):
 
@@ -123,7 +123,7 @@ def test_upload_csv_invalid_extension(app_,
                                       mock_s3_upload,
                                       mock_has_permissions,
                                       mock_get_users_by_service,
-                                      mock_get_service_statistics_for_day,
+                                      mock_get_detailed_service_for_today,
                                       fake_uuid):
 
     with app_.test_request_context():
@@ -150,7 +150,7 @@ def test_send_test_sms_message(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_service_statistics_for_day,
+    mock_get_detailed_service_for_today,
     fake_uuid
 ):
 
@@ -178,7 +178,7 @@ def test_send_test_email_message(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_service_statistics_for_day,
+    mock_get_detailed_service_for_today,
     fake_uuid
 ):
 
@@ -206,6 +206,7 @@ def test_send_test_sms_message_with_placeholders(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
     fake_uuid
 ):
 
@@ -214,7 +215,6 @@ def test_send_test_sms_message_with_placeholders(
         'file_name': 'Test message'
     }
     mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
-    mocker.patch('app.statistics_api_client.get_statistics_for_service_for_day', return_value=None)
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -287,7 +287,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_service_statistics_for_day,
+    mock_get_detailed_service_for_today,
     fake_uuid
 ):
 
@@ -319,8 +319,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
             assert '07700 900750' not in content
             assert 'Only showing the first 50 rows' in content
 
-            today = datetime.today().date().strftime('%Y-%m-%d')
-            mock_get_service_statistics_for_day.assert_called_once_with(fake_uuid, today)
+            mock_get_detailed_service_for_today.assert_called_once_with(fake_uuid)
 
 
 def test_create_job_should_call_api(
@@ -366,7 +365,7 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
     mock_s3_upload,
     mocker,
     mock_has_permissions,
-    mock_get_service_statistics_for_day,
+    mock_get_detailed_service_for_today,
     mock_get_users_by_service,
     fake_uuid
 ):
@@ -625,7 +624,7 @@ def test_check_messages_back_link(
     mock_get_service,
     mock_get_service_template_with_placeholders,
     mock_has_permissions,
-    mock_get_service_statistics_for_day,
+    mock_get_detailed_service_for_today,
     mock_s3_download,
     fake_uuid,
     extra_args,
@@ -653,51 +652,6 @@ def test_check_messages_back_link(
         ) == expected_url(service_id=fake_uuid, template_id=fake_uuid)
 
 
-def test_send_and_check_page_renders_if_no_statistics(
-    app_,
-    mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
-    mock_get_service_template,
-    mock_s3_upload,
-    mock_has_permissions,
-    mock_get_users_by_service,
-    fake_uuid
-):
-
-    mock_get_stats = mocker.patch('app.statistics_api_client.get_statistics_for_service_for_day', return_value=None)
-
-    mocker.patch(
-        'app.main.views.send.s3download',
-        return_value="""
-            phone number
-            +447700900986
-        """
-    )
-
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            with client.session_transaction() as session:
-                session['upload_data'] = {'original_file_name': 'some.csv',
-                                          'template_id': fake_uuid,
-                                          'notification_count': 0,
-                                          'valid': True}
-            resp = client.post(
-                url_for('main.check_messages', service_id=fake_uuid, template_type='sms', upload_id='abc123'),
-                data={'file': (BytesIO(''.encode('utf-8')), 'some.csv')},
-                content_type='multipart/form-data',
-                follow_redirects=True
-            )
-
-            today = datetime.today().date().strftime('%Y-%m-%d')
-            assert resp.status_code == 200
-            page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
-            assert page.h1.text.strip() == 'Preview'
-            mock_get_stats.assert_called_once_with(fake_uuid, today)
-
-
 def test_go_to_dashboard_after_tour(
     app_,
     mocker,
@@ -721,7 +675,7 @@ def test_go_to_dashboard_after_tour(
         mock_delete_service_template.assert_called_once_with(fake_uuid, fake_uuid)
 
 
-@pytest.mark.parametrize('num_already_sent,msg', [
+@pytest.mark.parametrize('num_requested,msg', [
     (0, '‘valid.csv’ contains 100 phone numbers.'),
     (1, 'You can still send 49 messages today, but ‘valid.csv’ contains 100 phone numbers.')
 ], ids=['none_sent', 'some_sent'])
@@ -735,17 +689,20 @@ def test_check_messages_shows_too_many_messages_errors(
     mock_get_service_template,
     mock_has_permissions,
     fake_uuid,
-    num_already_sent,
+    num_requested,
     msg
 ):
     # csv with 100 phone numbers
     mocker.patch('app.main.views.send.s3download', return_value=',\n'.join(
         ['phone number'] + ([mock_get_users_by_service(None)[0]._mobile_number]*100)
     ))
-    mocker.patch('app.statistics_api_client.get_statistics_for_service_for_day', return_value={
-        'day': datetime.today().date().strftime('%Y-%m-%d'),
-        'sms_requested': num_already_sent, 'sms_delivered': num_already_sent, 'sms_failed': 0,
-        'emails_requested': 0, 'emails_delivered': 0, 'emails_failed': 0, 'service': fake_uuid, 'id': fake_uuid
+    mocker.patch('app.service_api_client.get_detailed_service_for_today', return_value={
+        'data': {
+            'statistics': {
+                'sms': {'requested': num_requested, 'delivered': 0, 'failed': 0},
+                'email': {'requested': 0, 'delivered': 0, 'failed': 0}
+            }
+        }
     })
 
     with app_.test_request_context(), app_.test_client() as client:

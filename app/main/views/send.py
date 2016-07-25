@@ -212,11 +212,9 @@ def check_messages(service_id, template_type, upload_id):
         return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
 
     users = user_api_client.get_users_for_service(service_id=service_id)
-    today = datetime.utcnow().date().strftime('%Y-%m-%d')
 
-    statistics = statistics_api_client.get_statistics_for_service_for_day(service_id, today)
-    if not statistics:
-        statistics = {}
+    statistics = service_api_client.get_detailed_service_for_today(service_id)['data']['statistics']
+    remaining_messages = (current_service['message_limit'] - sum(stat['requested'] for stat in statistics.values()))
 
     contents = s3download(service_id, upload_id)
     if not contents:
@@ -240,7 +238,8 @@ def check_messages(service_id, template_type, upload_id):
         max_errors_shown=50,
         whitelist=itertools.chain.from_iterable(
             [user.mobile_number, user.email_address] for user in users
-        ) if current_service['restricted'] else None
+        ) if current_service['restricted'] else None,
+        remaining_messages=remaining_messages
     )
 
     if request.args.get('from_test'):
@@ -278,7 +277,7 @@ def check_messages(service_id, template_type, upload_id):
         original_file_name=session['upload_data'].get('original_file_name'),
         upload_id=upload_id,
         form=CsvUploadForm(),
-        statistics=statistics,
+        remaining_messages=remaining_messages,
         back_link=back_link,
         help=get_help_argument()
     )

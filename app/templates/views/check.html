@@ -103,7 +103,7 @@
       {% endcall %}
     </div>
 
-  {% elif count_of_recipients > (current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0)) %}
+  {% elif recipients.more_rows_than_can_send %}
     {% include "partials/check/too-many-messages.html" %}
   {% else %}
 
@@ -134,10 +134,7 @@
     </div>
   {% endif %}
 
-  {% if (
-    errors or
-    count_of_recipients > (current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0))
-  ) %}
+  {% if errors %}
     {% if request.args.from_test %}
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
     {% else %}
