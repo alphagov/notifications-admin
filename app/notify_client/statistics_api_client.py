@@ -13,15 +13,6 @@ class StatisticsApiClient(BaseAPIClient):
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
 
-    def get_statistics_for_service(self, service_id, limit_days=None):
-        params = {}
-        if limit_days is not None:
-            params['limit_days'] = limit_days
-        return self.get(
-            url='/service/{}/notifications-statistics'.format(service_id),
-            params=params
-        )
-
     def get_statistics_for_service_for_day(self, service_id, day):
         url = '/service/{}/notifications-statistics/day/{}'.format(service_id, day)
         try:

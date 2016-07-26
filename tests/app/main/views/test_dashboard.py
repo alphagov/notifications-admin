@@ -65,7 +65,6 @@ def test_get_started(
     api_user_active,
     mock_get_service,
     mock_get_service_templates_when_no_templates_exist,
-    mock_get_service_statistics,
     mock_get_aggregate_service_statistics,
     mock_get_user,
     mock_get_user_by_email,
@@ -95,7 +94,6 @@ def test_get_started_is_hidden_once_templates_exist(
     api_user_active,
     mock_get_service,
     mock_get_service_templates,
-    mock_get_service_statistics,
     mock_get_aggregate_service_statistics,
     mock_get_user,
     mock_get_user_by_email,
@@ -166,7 +164,6 @@ def test_should_show_all_templates_on_template_statistics_page(
     api_user_active,
     mock_get_service,
     mock_get_service_templates,
-    mock_get_service_statistics,
     mock_get_user,
     mock_get_user_by_email,
     mock_login,
@@ -207,7 +204,6 @@ def test_should_show_recent_jobs_on_dashboard(
     api_user_active,
     mock_get_service,
     mock_get_service_templates,
-    mock_get_service_statistics,
     mock_get_aggregate_service_statistics,
     mock_get_user,
     mock_get_user_by_email,
@@ -253,7 +249,6 @@ def _test_dashboard_menu(mocker, app_, usr, service, permissions):
             mocker.patch('app.user_api_client.get_user', return_value=usr)
             mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
             mocker.patch('app.service_api_client.get_service', return_value={'data': service})
-            mocker.patch('app.statistics_api_client.get_statistics_for_service', return_value={'data': [{}]})
             client.login(usr)
             return client.get(url_for('main.service_dashboard', service_id=service['id']))
 
@@ -392,7 +387,6 @@ def test_route_for_service_permissions(mocker,
                                        mock_get_user,
                                        mock_get_service_templates,
                                        mock_get_jobs,
-                                       mock_get_service_statistics,
                                        mock_get_template_statistics,
                                        mock_get_detailed_service,
                                        mock_get_usage):
@@ -435,7 +429,6 @@ def test_service_dashboard_updates_gets_dashboard_totals(mocker,
                                                          mock_get_template_statistics,
                                                          mock_get_detailed_service,
                                                          mock_get_jobs,
-                                                         mock_get_service_statistics,
                                                          mock_get_usage):
     dashboard_totals = mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
         'email': {'requested': 123, 'delivered': 0, 'failed': 0},
