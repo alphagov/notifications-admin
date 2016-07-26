@@ -57,7 +57,7 @@ def fake_uuid():
 def mock_get_service(mocker, api_user_active):
     def _get(service_id):
         service = service_json(
-            service_id, "Test Service", [api_user_active.id], message_limit=1000,
+            service_id, "Test Service", [api_user_active.id], message_limit=50,
             active=False, restricted=True)
         return {'data': service}
 
