@@ -64,7 +64,7 @@ def email_template():
         'It has '
         'survived not only'
         '\n'
-        '*five centuries'
+        '* five centuries'
         '\n'
         '* but also the leap into electronic typesetting'
         '\n\n'
