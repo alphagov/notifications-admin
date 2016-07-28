@@ -57,7 +57,7 @@ def fake_uuid():
 def mock_get_service(mocker, api_user_active):
     def _get(service_id):
         service = service_json(
-            service_id, "Test Service", [api_user_active.id], message_limit=1000,
+            service_id, "Test Service", [api_user_active.id], message_limit=50,
             active=False, restricted=True)
         return {'data': service}
 
@@ -198,15 +198,6 @@ def mock_delete_service(mocker, mock_get_service):
 
     return mocker.patch(
         'app.service_api_client.delete_service', side_effect=_delete)
-
-
-@pytest.fixture(scope='function')
-def mock_get_service_statistics(mocker):
-    def _create(service_id, limit_days=None):
-        return {'data': [{}]}
-
-    return mocker.patch(
-        'app.statistics_api_client.get_statistics_for_service', side_effect=_create)
 
 
 @pytest.fixture(scope='function')
