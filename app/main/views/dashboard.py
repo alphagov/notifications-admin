@@ -1,4 +1,4 @@
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 from collections import namedtuple
 from itertools import groupby
 
@@ -93,7 +93,7 @@ def weekly(service_id):
     stats = statistics_api_client.get_weekly_notification_stats(service_id)['data']
     return render_template(
         'views/weekly.html',
-        days=format_stats_to_list(stats),
+        days=format_weekly_stats_to_list(stats),
         now=datetime.utcnow()
     )
 
@@ -191,7 +191,7 @@ def calculate_usage(usage):
     }
 
 
-def format_stats_to_list(historical_stats):
+def format_weekly_stats_to_list(historical_stats):
     out = []
     for week, weekly_stats in historical_stats.items():
         for stats in weekly_stats.values():
@@ -199,12 +199,11 @@ def format_stats_to_list(historical_stats):
 
         week_start = dateutil.parser.parse(week)
         week_end = week_start + timedelta(days=6)
-        item = {
-            'week_start': week_start.isoformat(),
-            'week_end': week_end.isoformat(),
+        weekly_stats.update({
+            'week_start': week,
+            'week_end': week_end.date().isoformat(),
             'week_end_datetime': week_end,
-        }
-        item.update(weekly_stats)
-        out.append(item)
+        })
+        out.append(weekly_stats)
 
     return sorted(out, key=lambda x: x['week_start'], reverse=True)
