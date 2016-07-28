@@ -1,7 +1,7 @@
 // Extra CSS overlaying elements
 
 #global-header-bar {
-  background-color: $red;
+  background-color: $govuk-blue;
 }
 
 #global-header {
@@ -173,4 +173,9 @@ details summary {
     border-top: 0;
   }
 
+}
+
+.phase-banner-beta {
+  border: 0;
+  margin-bottom: -$gutter + 2px;
 }
