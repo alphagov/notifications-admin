@@ -23,16 +23,8 @@ class StatisticsApiClient(BaseAPIClient):
             else:
                 raise e
 
-    def get_7_day_aggregate_for_service(self, service_id, date_from=None, week_count=None):
-        params = {}
-        if date_from is not None:
-            params['date_from'] = date_from
-        if week_count is not None:
-            params['week_count'] = week_count
-        return self.get(
-            url='/service/{}/notifications-statistics/seven_day_aggregate'.format(service_id),
-            params=params
-        )
+    def get_weekly_notification_stats(self, service_id):
+        return self.get(url='/service/{}/notifications/weekly'.format(service_id))
 
     def get_statistics_for_all_services_for_day(self, day):
         params = {
