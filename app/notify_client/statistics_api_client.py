@@ -23,9 +23,6 @@ class StatisticsApiClient(BaseAPIClient):
             else:
                 raise e
 
-    def get_weekly_notification_stats(self, service_id):
-        return self.get(url='/service/{}/notifications/weekly'.format(service_id))
-
     def get_statistics_for_all_services_for_day(self, day):
         params = {
             'day': day

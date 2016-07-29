@@ -15,7 +15,6 @@ from flask_login import login_required
 from app.main import main
 from app import (
     job_api_client,
-    statistics_api_client,
     service_api_client,
     template_statistics_client
 )
@@ -90,7 +89,7 @@ def usage(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def weekly(service_id):
-    stats = statistics_api_client.get_weekly_notification_stats(service_id)['data']
+    stats = service_api_client.get_weekly_notification_stats(service_id)['data']
     return render_template(
         'views/weekly.html',
         days=format_weekly_stats_to_list(stats),
