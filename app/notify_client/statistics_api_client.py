@@ -1,5 +1,4 @@
 from notifications_python_client.base import BaseAPIClient
-from notifications_python_client.errors import HTTPError
 
 
 class StatisticsApiClient(BaseAPIClient):
@@ -12,15 +11,6 @@ class StatisticsApiClient(BaseAPIClient):
         self.base_url = app.config['API_HOST_NAME']
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
-
-    def get_statistics_for_service(self, service_id, limit_days=None):
-        params = {}
-        if limit_days is not None:
-            params['limit_days'] = limit_days
-        return self.get(
-            url='/service/{}/notifications-statistics'.format(service_id),
-            params=params
-        )
 
     def get_7_day_aggregate_for_service(self, service_id, date_from=None, week_count=None):
         params = {}
