@@ -293,7 +293,7 @@ def _get_job_counts(job, help_argument):
             [
               'Sending', 'sending',
               (
-                  job.get('notifications_sent', 0) -
+                  job.get('notification_count', 0) -
                   job.get('notifications_delivered', 0) -
                   job.get('notifications_failed', 0)
               )
