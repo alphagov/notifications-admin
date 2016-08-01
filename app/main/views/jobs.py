@@ -50,7 +50,7 @@ def _set_status_filters(filter_args):
     all_failure_statuses = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
     all_statuses = ['sending', 'delivered'] + all_failure_statuses
     if filter_args.get('status'):
-        if 'processed' in filter_args.get('status') or not filter_args.get('status'):
+        if 'processed' in filter_args.get('status'):
             filter_args['status'] = all_statuses
         elif 'failed' in filter_args.get('status'):
             filter_args['status'].extend(all_failure_statuses[1:])
