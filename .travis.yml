@@ -42,7 +42,7 @@ deploy:
   bucket: staging-notify.works-notifications-admin-codedeploy
   key: notifications-admin-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
   bundle_type: zip
-  application: notifications-admin
+  application: admin
   deployment_group: notifications_admin_deployment_group
   region: eu-west-1
   on: *2
