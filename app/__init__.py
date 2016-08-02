@@ -13,8 +13,8 @@ from flask import (
     current_app,
     request,
     g,
-    url_for
-)
+    url_for)
+
 from flask._compat import string_types
 from flask.globals import _lookup_req_object
 from flask_login import LoginManager
@@ -67,9 +67,11 @@ current_service = LocalProxy(partial(_lookup_req_object, 'service'))
 
 
 def create_app():
+    from config import configs
+
     application = Flask(__name__)
 
-    application.config.from_object(os.environ['NOTIFY_ADMIN_ENVIRONMENT'])
+    application.config.from_object(configs[os.environ['NOTIFY_ENVIRONMENT']])
 
     init_app(application)
     logging.init_app(application)
