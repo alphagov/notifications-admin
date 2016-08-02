@@ -102,6 +102,29 @@ def test_should_show_page_for_one_job(
         )
 
 
+def test_should_show_job_in_progress(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    mock_get_service_template,
+    mock_get_job_in_progress,
+    mocker,
+    mock_get_notifications,
+    fake_uuid
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        response = client.get(url_for(
+            'main.view_job',
+            service_id=service_one['id'],
+            job_id=fake_uuid
+        ))
+
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.find('p', {'class': 'hint'}).text.strip() == 'Report is 50% complete…'
+
+
 def test_should_show_not_show_csv_download_in_tour(
     app_,
     service_one,

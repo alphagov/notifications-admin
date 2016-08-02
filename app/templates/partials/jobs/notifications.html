@@ -4,12 +4,18 @@
   <div class="dashboard-table">
 {% endif %}
 
-  {% if notifications and not help %}
-    <p class="bottom-gutter">
-      <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
-      &emsp;
-      <span id="time-left">{{ time_left }}</span>
-    </p>
+  {% if not help %}
+    {% if percentage_complete < 100 %}
+      <p class="bottom-gutter hint">
+        Report is {{ "{:.0f}%".format(percentage_complete) }} complete…
+      </p>
+    {% elif notifications %}
+      <p class="bottom-gutter">
+        <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
+        &emsp;
+        <span id="time-left">{{ time_left }}</span>
+      </p>
+    {% endif %}
   {% endif %}
 
   {% call(item, row_number) list_table(
