@@ -910,14 +910,16 @@ def mock_get_notifications(mocker, api_user_active):
                 template={'template_type': set_template_type, 'name': 'name', 'id': 'id', 'version': 1},
                 rows=rows,
                 status=set_status,
-                job=job
+                job=job,
+                with_links=True
             )
         else:
             return notification_json(
                 service_id,
                 rows=rows,
                 status=set_status,
-                job=job
+                job=job,
+                with_links=True
             )
 
     return mocker.patch(
