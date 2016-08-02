@@ -297,11 +297,11 @@ def _get_job_counts(job, help_argument):
               job.get('notifications_failed', 0)
             ],
             [
-              'Delivered', 'delivered',
+              'delivered', 'delivered',
               job.get('notifications_delivered', 0)
             ],
             [
-              'Failed', 'failed',
+              'failed', 'failed',
               job.get('notifications_failed', 0)
             ]
         ]
