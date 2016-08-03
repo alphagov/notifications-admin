@@ -32,15 +32,11 @@ def test_should_return_list_of_all_jobs(app_,
     "status_argument, expected_api_call", [
         (
             '',
-            ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
-        ),
-        (
-            'processed',
-            ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+            ['created', 'sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
         ),
         (
             'sending',
-            ['sending']
+            ['sending', 'created']
         ),
         (
             'delivered',
@@ -180,11 +176,11 @@ def test_should_show_updates_for_one_job_as_json(
     "status_argument, expected_api_call", [
         (
             '',
-            ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+            ['created', 'sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
         ),
         (
             'sending',
-            ['sending']
+            ['sending', 'created']
         ),
         (
             'delivered',

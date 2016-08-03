@@ -48,10 +48,11 @@ def _parse_filter_args(filter_dict):
 
 def _set_status_filters(filter_args):
     all_failure_statuses = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
-    all_statuses = ['sending', 'delivered'] + all_failure_statuses
+    all_sending_statuses = ['created', 'sending']
+    all_statuses = all_sending_statuses + ['delivered'] + all_failure_statuses
     if filter_args.get('status'):
-        if 'processed' in filter_args.get('status'):
-            filter_args['status'] = all_statuses
+        if 'sending' in filter_args.get('status'):
+            filter_args['status'].extend(all_sending_statuses[:1])
         elif 'failed' in filter_args.get('status'):
             filter_args['status'].extend(all_failure_statuses[1:])
     else:
@@ -291,12 +292,10 @@ def _get_job_counts(job, help_argument):
               job.get('notification_count', 0)
             ],
             [
-              'Sending', 'sending',
-              (
-                  job.get('notification_count', 0) -
-                  job.get('notifications_delivered', 0) -
-                  job.get('notifications_failed', 0)
-              )
+              'sending', 'sending',
+              job.get('notification_count', 0) -
+              job.get('notifications_delivered', 0) -
+              job.get('notifications_failed', 0)
             ],
             [
               'delivered', 'delivered',
