@@ -35,8 +35,8 @@ def test_should_return_list_of_all_jobs(app_,
             ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
         ),
         (
-            'processed',
-            ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+            'created',
+            ['created']
         ),
         (
             'sending',
@@ -99,6 +99,7 @@ def test_should_show_page_for_one_job(
         )
         assert csv_link.text == 'Download this report'
         assert page.find('span', {'id': 'time-left'}).text == 'Data available for 7 days'
+        assert page.find('p', {'class': 'table-show-more-link'}).text.strip() == 'Only showing the first 50 rows'
         mock_get_notifications.assert_called_with(
             service_one['id'],
             fake_uuid,
@@ -179,7 +180,7 @@ def test_should_show_updates_for_one_job_as_json(
 @pytest.mark.parametrize(
     "status_argument, expected_api_call", [
         (
-            'processed',
+            '',
             ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
         ),
         (
@@ -335,7 +336,6 @@ def test_get_status_filters_calculates_stats(app_):
         ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
 
     assert {label: count for label, _option, _link, count in ret} == {
-        'processed': 6,
         'sending': 3,
         'failed': 2,
         'delivered': 1
@@ -347,7 +347,7 @@ def test_get_status_filters_in_right_order(app_):
         ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
 
     assert [label for label, _option, _link, _count in ret] == [
-        'processed', 'sending', 'delivered', 'failed'
+        'sending', 'delivered', 'failed'
     ]
 
 
@@ -356,4 +356,4 @@ def test_get_status_filters_constructs_links(app_):
         ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
 
     link = ret[0][2]
-    assert link == '/services/foo/notifications/sms?status={}'.format(quote('sending,delivered,failed'))
+    assert link == '/services/foo/notifications/sms?status={}'.format(quote('sending'))
