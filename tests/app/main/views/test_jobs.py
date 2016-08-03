@@ -179,7 +179,7 @@ def test_should_show_updates_for_one_job_as_json(
 @pytest.mark.parametrize(
     "status_argument, expected_api_call", [
         (
-            'processed',
+            '',
             ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
         ),
         (
@@ -335,7 +335,7 @@ def test_get_status_filters_calculates_stats(app_):
         ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
 
     assert {label: count for label, _option, _link, count in ret} == {
-        'processed': 6,
+        'total': 6,
         'sending': 3,
         'failed': 2,
         'delivered': 1
@@ -347,7 +347,7 @@ def test_get_status_filters_in_right_order(app_):
         ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
 
     assert [label for label, _option, _link, _count in ret] == [
-        'processed', 'sending', 'delivered', 'failed'
+        'total', 'sending', 'delivered', 'failed'
     ]
 
 

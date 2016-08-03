@@ -250,7 +250,7 @@ def get_status_filters(service, message_type, statistics):
 
     filters = [
         # key, label, option
-        ('requested', 'processed', 'sending,delivered,failed'),
+        ('requested', 'total', 'sending,delivered,failed'),
         ('sending', 'sending', 'sending'),
         ('delivered', 'delivered', 'delivered'),
         ('failed', 'failed', 'failed'),
@@ -287,8 +287,8 @@ def _get_job_counts(job, help_argument):
             count
         ) for label, query_param, count in [
             [
-              'Processed', '',
-              job.get('notifications_sent', 0)
+              'total', '',
+              job.get('notification_count', 0)
             ],
             [
               'Sending', 'sending',
@@ -299,12 +299,12 @@ def _get_job_counts(job, help_argument):
               )
             ],
             [
-              'Delivered', 'delivered',
+              'delivered', 'delivered',
               job.get('notifications_delivered', 0)
             ],
             [
-              'Failed', 'failed',
-              job.get('notifications_failed')
+              'failed', 'failed',
+              job.get('notifications_failed', 0)
             ]
         ]
     ]
