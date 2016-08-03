@@ -3,11 +3,16 @@
 
   var queues = {};
   var dd = new diffDOM();
+  var timer;
 
-  var getRenderer = $component => response => dd.apply(
-    $component.get(0),
-    dd.diff($component.get(0), $(response[$component.data('key')]).get(0))
-  );
+  var getRenderer = $component => response => function() {
+    var component = $component.get(0);
+    var updated = $(response[$component.data('key')]).get(0);
+    var diff = dd.diff(component, updated);
+    dd.apply(
+      component, diff
+    );
+  };
 
   var getQueue = resource => (
     queues[resource] = queues[resource] || []
@@ -29,7 +34,7 @@
       () => clearQueue(queue)
     );
 
-    setTimeout(
+    timer = setTimeout(
       () => poll(...arguments), interval
     );
 
