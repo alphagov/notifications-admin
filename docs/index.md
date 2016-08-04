@@ -42,7 +42,7 @@ To create JSON Web Tokens you need:
 * your Service ID – identifies your service
 * your API key (in JSON Web Token terms this is called the client ID) – used to sign tokens during requests for API resources
 
-To find your Service ID and create or revoke API keys, click on **API keys** in the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application.
+To find your Service ID and create or revoke API keys, click on **API integration** in the [GOV.UK Notify](https://www.notifications.service.gov.uk/) web application.
 
 <h3 id="JWT_claims">JSON Web Tokens: claims</h3>
 
