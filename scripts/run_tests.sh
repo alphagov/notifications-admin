@@ -30,8 +30,6 @@ display_result $? 1 "Code style check"
 npm test
 display_result $? 2 "Front end code style check"
 
-export NOTIFY_ADMIN_ENVIRONMENT='config.Test'
-
 ## Code coverage
 py.test -n2 --cov=app --cov-report=term-missing tests/
 display_result $? 3 "Code coverage"
