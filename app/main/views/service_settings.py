@@ -103,7 +103,8 @@ def service_request_to_go_live(service_id):
     if form.validate_on_submit():
 
         data = {
-            'person_email': current_app.config.get('DESKPRO_PERSON_EMAIL'),
+            'person_email': current_user.email_address,
+            'person_name': current_user.name,
             'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
             'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
             'subject': 'Request to go live',

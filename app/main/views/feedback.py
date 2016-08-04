@@ -9,7 +9,8 @@ def feedback():
     form = Feedback()
     if form.validate_on_submit():
         data = {
-            'person_email': current_app.config.get('DESKPRO_PERSON_EMAIL'),
+            'person_email': form.email_address.data,
+            'person_name': form.name.data,
             'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
             'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
             'subject': 'Notify feedback',
