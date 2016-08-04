@@ -19,7 +19,7 @@
       {% if not templates %}
         {% include 'views/dashboard/write-first-messages.html' %}
       {% endif %}
-    {% elif not current_user.has_permissions(['send_texts', 'send_emails', 'send_letters'], any_=True) %}
+    {% elif not current_user.has_permissions(['send_texts', 'send_emails', 'send_letters', 'manage_api_keys'], any_=True) %}
       {% include 'views/dashboard/no-permissions-banner.html' %}
     {% endif %}
 
