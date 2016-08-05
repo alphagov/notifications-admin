@@ -14,11 +14,11 @@
 
     <form method="post">
       <div class="grid-row">
-        <div class="column-two-thirds">
+        <div class="column-three-quarters">
           {{ textbox(form.name, width='1-1', hint='Your recipients won’t see this', rows=10) }}
           {{ textbox(form.subject, width='1-1', highlight_tags=True, rows=2) }}
         </div>
-        <div class="column-two-thirds">
+        <div class="column-three-quarters">
           {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=8) }}
           {{ page_footer(
             'Save',
@@ -26,8 +26,8 @@
             delete_link_text='Delete this template'
           ) }}
         </div>
-        <aside class="column-one-third">
-          <h2 style="margin: 0 0 5px 0;">Help</h2>
+        <aside class="column-whole">
+          {% include "partials/templates/guidance-formatting.html" %}
           {% include "partials/templates/guidance-personalisation.html" %}
           {% include "partials/templates/guidance-links.html" %}
         </aside>
