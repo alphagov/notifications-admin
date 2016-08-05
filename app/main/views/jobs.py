@@ -2,6 +2,7 @@
 import ago
 import time
 import dateutil
+from orderedset import OrderedSet
 from datetime import datetime, timedelta, timezone
 from itertools import chain
 
@@ -51,12 +52,11 @@ def _set_status_filters(filter_args):
     status_filters = filter_args.get('status', [])
     all_failure_statuses = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
     all_sending_statuses = ['created', 'sending']
-    all_statuses = all_sending_statuses + ['delivered'] + all_failure_statuses
-    return list(chain(
-        (status_filters or all_statuses),
-        all_sending_statuses[:1] if 'sending' in status_filters else [],
-        all_failure_statuses[1:] if 'failed' in status_filters else []
-    ))
+    return list(OrderedSet(chain(
+        (status_filters or all_sending_statuses + ['delivered'] + all_failure_statuses),
+        all_sending_statuses if 'sending' in status_filters else [],
+        all_failure_statuses if 'failed' in status_filters else []
+    )))
 
 
 @main.route("/services/<service_id>/jobs")
