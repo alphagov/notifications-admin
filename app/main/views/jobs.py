@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import ago
 import time
 import dateutil
+from orderedset import OrderedSet
 from datetime import datetime, timedelta, timezone
-import ago
+from itertools import chain
 
 from flask import (
     render_template,
@@ -47,15 +49,14 @@ def _parse_filter_args(filter_dict):
 
 
 def _set_status_filters(filter_args):
+    status_filters = filter_args.get('status', [])
     all_failure_statuses = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
-    all_statuses = ['sending', 'delivered'] + all_failure_statuses
-    if filter_args.get('status'):
-        if 'processed' in filter_args.get('status') or not filter_args.get('status'):
-            filter_args['status'] = all_statuses
-        elif 'failed' in filter_args.get('status'):
-            filter_args['status'].extend(all_failure_statuses[1:])
-    else:
-        filter_args['status'] = all_statuses
+    all_sending_statuses = ['created', 'sending']
+    return list(OrderedSet(chain(
+        (status_filters or all_sending_statuses + ['delivered'] + all_failure_statuses),
+        all_sending_statuses if 'sending' in status_filters else [],
+        all_failure_statuses if 'failed' in status_filters else []
+    )))
 
 
 @main.route("/services/<service_id>/jobs")
@@ -75,7 +76,7 @@ def view_job(service_id, job_id):
 
     job = job_api_client.get_job(service_id, job_id)['data']
     filter_args = _parse_filter_args(request.args)
-    _set_status_filters(filter_args)
+    filter_args['status'] = _set_status_filters(filter_args)
 
     return render_template(
         'views/jobs/job.html',
@@ -117,7 +118,7 @@ def view_job_csv(service_id, job_id):
         version=job['template_version']
     )['data']
     filter_args = _parse_filter_args(request.args)
-    _set_status_filters(filter_args)
+    filter_args['status'] = _set_status_filters(filter_args)
 
     return (
         generate_notifications_csv(
@@ -161,7 +162,7 @@ def view_notifications(service_id, message_type):
         abort(404)
 
     filter_args = _parse_filter_args(request.args)
-    _set_status_filters(filter_args)
+    filter_args['status'] = _set_status_filters(filter_args)
 
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
@@ -210,7 +211,7 @@ def view_notifications(service_id, message_type):
         page=page,
         prev_page=prev_page,
         next_page=next_page,
-        request_args=request.args,
+        status=request.args.get('status'),
         message_type=message_type,
         download_link=url_for(
             '.view_notifications_csv',
@@ -250,7 +251,7 @@ def get_status_filters(service, message_type, statistics):
 
     filters = [
         # key, label, option
-        ('requested', 'processed', 'sending,delivered,failed'),
+        ('requested', 'total', 'sending,delivered,failed'),
         ('sending', 'sending', 'sending'),
         ('delivered', 'delivered', 'delivered'),
         ('failed', 'failed', 'failed'),
@@ -287,24 +288,22 @@ def _get_job_counts(job, help_argument):
             count
         ) for label, query_param, count in [
             [
-              'Processed', '',
-              job.get('notifications_sent', 0)
+              'total', '',
+              job.get('notification_count', 0)
             ],
             [
-              'Sending', 'sending',
-              (
-                  job.get('notifications_sent', 0) -
-                  job.get('notifications_delivered', 0) -
-                  job.get('notifications_failed', 0)
-              )
+              'sending', 'sending',
+              job.get('notification_count', 0) -
+              job.get('notifications_delivered', 0) -
+              job.get('notifications_failed', 0)
             ],
             [
-              'Delivered', 'delivered',
+              'delivered', 'delivered',
               job.get('notifications_delivered', 0)
             ],
             [
-              'Failed', 'failed',
-              job.get('notifications_failed')
+              'failed', 'failed',
+              job.get('notifications_failed', 0)
             ]
         ]
     ]
@@ -312,24 +311,27 @@ def _get_job_counts(job, help_argument):
 
 def get_job_partials(job):
     filter_args = _parse_filter_args(request.args)
-    _set_status_filters(filter_args)
+    filter_args['status'] = _set_status_filters(filter_args)
+    notifications = notification_api_client.get_notifications_for_service(
+        job['service'], job['id'], status=filter_args['status']
+    )
     return {
         'counts': render_template(
             'partials/jobs/count.html',
             job=job,
             counts=_get_job_counts(job, request.args.get('help', 0)),
-            status=request.args.get('status', '')
+            status=filter_args['status']
         ),
         'notifications': render_template(
             'partials/jobs/notifications.html',
-            notifications=notification_api_client.get_notifications_for_service(
-                job['service'], job['id'], status=filter_args.get('status')
-            )['notifications'],
+            notifications=notifications['notifications'],
+            more_than_one_page=bool(notifications.get('links', {}).get('next')),
+            percentage_complete=(job['notifications_sent'] / job['notification_count'] * 100),
             download_link=url_for(
                 '.view_job_csv',
                 service_id=current_service['id'],
                 job_id=job['id'],
-                status=request.args.get('status', '')
+                status=request.args.get('status')
             ),
             help=get_help_argument(),
             time_left=get_time_left(job['created_at'])
