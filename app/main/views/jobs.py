@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+import ago
 import time
 import dateutil
 from datetime import datetime, timedelta, timezone
-import ago
+from itertools import chain
 
 from flask import (
     render_template,
@@ -47,16 +48,15 @@ def _parse_filter_args(filter_dict):
 
 
 def _set_status_filters(filter_args):
+    status_filters = filter_args.get('status', [])
     all_failure_statuses = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
     all_sending_statuses = ['created', 'sending']
     all_statuses = all_sending_statuses + ['delivered'] + all_failure_statuses
-    if filter_args.get('status'):
-        if 'sending' in filter_args.get('status'):
-            filter_args['status'].extend(all_sending_statuses[:1])
-        elif 'failed' in filter_args.get('status'):
-            filter_args['status'].extend(all_failure_statuses[1:])
-    else:
-        filter_args['status'] = all_statuses
+    return list(chain(
+        (status_filters or all_statuses),
+        all_sending_statuses[:1] if 'sending' in status_filters else [],
+        all_failure_statuses[1:] if 'failed' in status_filters else []
+    ))
 
 
 @main.route("/services/<service_id>/jobs")
@@ -76,7 +76,7 @@ def view_job(service_id, job_id):
 
     job = job_api_client.get_job(service_id, job_id)['data']
     filter_args = _parse_filter_args(request.args)
-    _set_status_filters(filter_args)
+    filter_args['status'] = _set_status_filters(filter_args)
 
     return render_template(
         'views/jobs/job.html',
@@ -118,7 +118,7 @@ def view_job_csv(service_id, job_id):
         version=job['template_version']
     )['data']
     filter_args = _parse_filter_args(request.args)
-    _set_status_filters(filter_args)
+    filter_args['status'] = _set_status_filters(filter_args)
 
     return (
         generate_notifications_csv(
@@ -162,7 +162,7 @@ def view_notifications(service_id, message_type):
         abort(404)
 
     filter_args = _parse_filter_args(request.args)
-    _set_status_filters(filter_args)
+    filter_args['status'] = _set_status_filters(filter_args)
 
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
@@ -172,7 +172,7 @@ def view_notifications(service_id, message_type):
         limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
     view_dict = dict(
         message_type=message_type,
-        status=request.args.get('status')
+        status=filter_args['status']
     )
     prev_page = None
     if notifications['links'].get('prev', None):
@@ -211,7 +211,7 @@ def view_notifications(service_id, message_type):
         page=page,
         prev_page=prev_page,
         next_page=next_page,
-        request_args=request.args,
+        status=request.args.get('status'),
         message_type=message_type,
         download_link=url_for(
             '.view_notifications_csv',
@@ -311,16 +311,16 @@ def _get_job_counts(job, help_argument):
 
 def get_job_partials(job):
     filter_args = _parse_filter_args(request.args)
-    _set_status_filters(filter_args)
+    filter_args['status'] = _set_status_filters(filter_args)
     notifications = notification_api_client.get_notifications_for_service(
-        job['service'], job['id'], status=filter_args.get('status')
+        job['service'], job['id'], status=filter_args['status']
     )
     return {
         'counts': render_template(
             'partials/jobs/count.html',
             job=job,
             counts=_get_job_counts(job, request.args.get('help', 0)),
-            status=request.args.get('status', '')
+            status=filter_args['status']
         ),
         'notifications': render_template(
             'partials/jobs/notifications.html',
@@ -331,7 +331,7 @@ def get_job_partials(job):
                 '.view_job_csv',
                 service_id=current_service['id'],
                 job_id=job['id'],
-                status=request.args.get('status', '')
+                status=request.args.get('status')
             ),
             help=get_help_argument(),
             time_left=get_time_left(job['created_at'])
