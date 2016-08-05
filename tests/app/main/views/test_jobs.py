@@ -295,10 +295,21 @@ def test_should_show_notifications_for_a_service_with_next_previous(
             ))
         assert response.status_code == 200
         content = response.get_data(as_text=True)
-        assert url_for('main.view_notifications', service_id=service_one['id'], message_type='sms', page=3) in content
-        assert url_for('main.view_notifications', service_id=service_one['id'], message_type='sms', page=1) in content
-        assert 'Previous page' in content
-        assert 'Next page' in content
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        next_page_link = page.find('a', {'rel': 'next'})
+        prev_page_link = page.find('a', {'rel': 'previous'})
+        assert (
+            url_for('main.view_notifications', service_id=service_one['id'], message_type='sms', page=3) in
+            next_page_link['href']
+        )
+        assert 'Next page' in next_page_link.text.strip()
+        assert 'page 3' in next_page_link.text.strip()
+        assert (
+            url_for('main.view_notifications', service_id=service_one['id'], message_type='sms', page=1) in
+            prev_page_link['href']
+        )
+        assert 'Previous page' in prev_page_link.text.strip()
+        assert 'page 1' in prev_page_link.text.strip()
 
 
 @freeze_time("2016-01-01 11:09:00.061258")

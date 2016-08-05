@@ -172,7 +172,7 @@ def view_notifications(service_id, message_type):
         limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
     view_dict = dict(
         message_type=message_type,
-        status=filter_args['status']
+        status=request.args.get('status')
     )
     prev_page = None
     if notifications['links'].get('prev', None):
