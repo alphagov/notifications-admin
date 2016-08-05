@@ -23,7 +23,7 @@
     {% endcall %}
     {% call field() %}
       {{ big_number(
-        item.get('notifications_sent', 0) - item.get('notifications_delivered', 0) - item.get('notifications_failed', 0),
+        item.get('notification_count', 0) - item.get('notifications_delivered', 0) - item.get('notifications_failed', 0),
         smallest=True
       ) }}
     {% endcall %}
