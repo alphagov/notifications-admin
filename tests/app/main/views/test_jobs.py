@@ -32,15 +32,11 @@ def test_should_return_list_of_all_jobs(app_,
     "status_argument, expected_api_call", [
         (
             '',
-            ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
-        ),
-        (
-            'processed',
-            ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+            ['created', 'sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
         ),
         (
             'sending',
-            ['sending']
+            ['sending', 'created']
         ),
         (
             'delivered',
@@ -99,11 +95,35 @@ def test_should_show_page_for_one_job(
         )
         assert csv_link.text == 'Download this report'
         assert page.find('span', {'id': 'time-left'}).text == 'Data available for 7 days'
+        assert page.find('p', {'class': 'table-show-more-link'}).text.strip() == 'Only showing the first 50 rows'
         mock_get_notifications.assert_called_with(
             service_one['id'],
             fake_uuid,
             status=expected_api_call
         )
+
+
+def test_should_show_job_in_progress(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    mock_get_service_template,
+    mock_get_job_in_progress,
+    mocker,
+    mock_get_notifications,
+    fake_uuid
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        response = client.get(url_for(
+            'main.view_job',
+            service_id=service_one['id'],
+            job_id=fake_uuid
+        ))
+
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.find('p', {'class': 'hint'}).text.strip() == 'Report is 50% complete…'
 
 
 def test_should_show_not_show_csv_download_in_tour(
@@ -179,12 +199,12 @@ def test_should_show_updates_for_one_job_as_json(
 @pytest.mark.parametrize(
     "status_argument, expected_api_call", [
         (
-            'processed',
-            ['sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+            '',
+            ['created', 'sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
         ),
         (
             'sending',
-            ['sending']
+            ['sending', 'created']
         ),
         (
             'delivered',
@@ -275,10 +295,21 @@ def test_should_show_notifications_for_a_service_with_next_previous(
             ))
         assert response.status_code == 200
         content = response.get_data(as_text=True)
-        assert url_for('main.view_notifications', service_id=service_one['id'], message_type='sms', page=3) in content
-        assert url_for('main.view_notifications', service_id=service_one['id'], message_type='sms', page=1) in content
-        assert 'Previous page' in content
-        assert 'Next page' in content
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        next_page_link = page.find('a', {'rel': 'next'})
+        prev_page_link = page.find('a', {'rel': 'previous'})
+        assert (
+            url_for('main.view_notifications', service_id=service_one['id'], message_type='sms', page=3) in
+            next_page_link['href']
+        )
+        assert 'Next page' in next_page_link.text.strip()
+        assert 'page 3' in next_page_link.text.strip()
+        assert (
+            url_for('main.view_notifications', service_id=service_one['id'], message_type='sms', page=1) in
+            prev_page_link['href']
+        )
+        assert 'Previous page' in prev_page_link.text.strip()
+        assert 'page 1' in prev_page_link.text.strip()
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
@@ -335,7 +366,7 @@ def test_get_status_filters_calculates_stats(app_):
         ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
 
     assert {label: count for label, _option, _link, count in ret} == {
-        'processed': 6,
+        'total': 6,
         'sending': 3,
         'failed': 2,
         'delivered': 1
@@ -347,7 +378,7 @@ def test_get_status_filters_in_right_order(app_):
         ret = get_status_filters({'id': 'foo'}, 'sms', STATISTICS)
 
     assert [label for label, _option, _link, _count in ret] == [
-        'processed', 'sending', 'delivered', 'failed'
+        'total', 'sending', 'delivered', 'failed'
     ]
 
 

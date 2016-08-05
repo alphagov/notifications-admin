@@ -243,7 +243,8 @@ def format_notification_status(status, template_type):
             'temporary-failure': 'Inbox not accepting messages right now',
             'permanent-failure': 'Email address doesn’t exist',
             'delivered': 'Delivered',
-            'sending': 'Sending'
+            'sending': 'Sending',
+            'created': 'Sending'
         },
         'sms': {
             'failed': 'Failed',
@@ -251,7 +252,8 @@ def format_notification_status(status, template_type):
             'temporary-failure': 'Phone not accepting messages right now',
             'permanent-failure': 'Phone number doesn’t exist',
             'delivered': 'Delivered',
-            'sending': 'Sending'
+            'sending': 'Sending',
+            'created': 'Sending'
         }
     }.get(template_type).get(status, status)
 
@@ -263,7 +265,8 @@ def format_notification_status_as_field_status(status):
         'temporary-failure': 'error',
         'permanent-failure': 'error',
         'delivered': None,
-        'sending': 'default'
+        'sending': 'default',
+        'created': 'default'
     }.get(status, 'error')
 
 
