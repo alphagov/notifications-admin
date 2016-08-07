@@ -322,6 +322,11 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
             mock_get_detailed_service_for_today.assert_called_once_with(fake_uuid)
 
 
+@pytest.mark.parametrize(
+    'when', [
+        '', '2016-08-25T13:04:21.767198'
+    ]
+)
 def test_create_job_should_call_api(
     app_,
     service_one,
@@ -331,7 +336,8 @@ def test_create_job_should_call_api(
     mock_get_notifications,
     mock_get_service_template,
     mocker,
-    fake_uuid
+    fake_uuid,
+    when
 ):
     service_id = service_one['id']
     data = mock_get_job(service_one['id'], fake_uuid)['data']
@@ -348,11 +354,18 @@ def test_create_job_should_call_api(
                                           'notification_count': notification_count,
                                           'valid': True}
             url = url_for('main.start_job', service_id=service_one['id'], upload_id=job_id)
-            response = client.post(url, data={}, follow_redirects=True)
+            response = client.post(url, data={'scheduled_for': when}, follow_redirects=True)
 
         assert response.status_code == 200
         assert original_file_name in response.get_data(as_text=True)
-        mock_create_job.assert_called_with(job_id, service_id, template_id, original_file_name, notification_count)
+        mock_create_job.assert_called_with(
+            job_id,
+            service_id,
+            template_id,
+            original_file_name,
+            notification_count,
+            scheduled_for=when
+        )
 
 
 def test_check_messages_should_revalidate_file_when_uploading_file(

@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/email-message.html" import email_message %}
+{% from "components/radios.html" import radio_select %}
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
 {% from "components/file-upload.html" import file_upload %}
@@ -144,6 +145,10 @@
     <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="hidden" name="help" value="{{ '3' if help else 0 }}" />
+      {{ radio_select(
+        choose_time_form.scheduled_for,
+        wrapping_class='bottom-gutter-2-3'
+      ) }}
       <input type="submit" class="button" value="Send {{ count_of_recipients }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}" />
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
     </form>
