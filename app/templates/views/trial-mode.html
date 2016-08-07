@@ -10,6 +10,56 @@
   <div class="column-two-thirds">
     <h1 class="heading-large">Trial mode</h1>
 
+
+    <div class="form-group">
+      <fieldset class="inline">
+        <legend class="form-label">
+          Choose a time
+        </legend>
+        <div class="paginated-options" data-module="paginated-options">
+          <label class="block-label inline" for="now">
+            <input type="radio" name="" id="now" />
+            Now
+          </label>
+          {% for option in [
+            '12:00',
+            '13:00',
+            '14:00',
+            '15:00',
+            '16:00',
+            '17:00',
+            '18:00',
+            '19:00',
+            '20:00',
+            '21:00',
+            '22:00',
+            '23:00',
+            '00:00',
+            '01:00',
+            '02:00',
+            '03:00',
+            '04:00',
+            '05:00',
+            '06:00',
+            '07:00',
+            '08:00',
+            '09:00',
+            '10:00',
+            '11:00',
+          ] %}
+            <label class="block-label inline" for="{{ option }}">
+              <input type="radio" name="" id="{{ option }}" />
+              {{ option }}
+            </label>
+          {% endfor %}
+          <input type="button" value="Later" class="tertiary-button" />
+        </div>
+      </fieldset>
+    </div>
+
+
+
+
     <p>
       All new accounts on Notify start off in trial mode.
     </p>

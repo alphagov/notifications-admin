@@ -1,0 +1,25 @@
+.paginated-options {
+
+  .js-enabled & {
+
+    overflow: hidden;
+    max-height: 70px;
+    position: relative;
+
+    label {
+      transition: all 0.5s ease-in-out;
+    }
+
+    .tertiary-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: inline-block;
+      width: auto;
+      padding: 20px 30px 15px 30px;
+      box-shadow: 0 2px 0 #b5babe, 0 0 0 10px $white;
+    }
+
+  }
+
+}

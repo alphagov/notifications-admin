@@ -62,6 +62,7 @@ gulp.task('javascripts', () => gulp
     paths.src + 'javascripts/fileUpload.js',
     paths.src + 'javascripts/updateContent.js',
     paths.src + 'javascripts/expandCollapse.js',
+    paths.src + 'javascripts/paginatedOptions.js',
     paths.src + 'javascripts/main.js'
   ])
   .pipe(plugins.babel({
