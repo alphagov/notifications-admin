@@ -1,23 +1,39 @@
 .paginated-options {
 
-  .js-enabled & {
+  &-column {
 
-    overflow: hidden;
-    max-height: 70px;
-    position: relative;
+    display: inline-block;
+    vertical-align: top;
 
-    label {
-      transition: all 0.5s ease-in-out;
+    .block-label {
+      margin-right: 10px;
     }
 
-    .tertiary-button {
-      position: absolute;
-      top: 0;
-      right: 0;
+  }
+
+  .tertiary-button {
+    display: inline-block;
+    vertical-align: top;
+    width: auto;
+    padding: 20px 30px 15px 30px;
+    box-shadow: 0 2px 0 #b5babe, 0 0 0 10px $white;
+  }
+
+  .js-enabled & {
+
+
+
+
+    .block-label, .tertiary-button {
+      display: none;
+    }
+
+    .js-visible {
+      display: block;
+    }
+
+    .js-visible.tertiary-button {
       display: inline-block;
-      width: auto;
-      padding: 20px 30px 15px 30px;
-      box-shadow: 0 2px 0 #b5babe, 0 0 0 10px $white;
     }
 
   }

@@ -12,47 +12,50 @@
 
 
     <div class="form-group">
-      <fieldset class="inline">
+      <fieldset>
         <legend class="form-label">
           Choose a time
         </legend>
         <div class="paginated-options" data-module="paginated-options">
-          <label class="block-label inline" for="now">
-            <input type="radio" name="" id="now" />
-            Now
-          </label>
-          {% for option in [
-            '12:00',
-            '13:00',
-            '14:00',
-            '15:00',
-            '16:00',
-            '17:00',
-            '18:00',
-            '19:00',
-            '20:00',
-            '21:00',
-            '22:00',
-            '23:00',
-            '00:00',
-            '01:00',
-            '02:00',
-            '03:00',
-            '04:00',
-            '05:00',
-            '06:00',
-            '07:00',
-            '08:00',
-            '09:00',
-            '10:00',
-            '11:00',
-          ] %}
-            <label class="block-label inline" for="{{ option }}">
-              <input type="radio" name="" id="{{ option }}" />
-              {{ option }}
+          <div class="paginated-options-column">
+            <label class="block-label" for="now">
+              <input type="radio" name="when" id="now" checked="checked" />
+              Now
             </label>
-          {% endfor %}
-          <input type="button" value="Later" class="tertiary-button" />
+          </div>
+          <div class="paginated-options-column">
+            {% for option in [
+              '13:00',
+              '14:00',
+              '15:00',
+              '16:00',
+              '17:00',
+              '18:00',
+              '19:00',
+              '20:00',
+              '21:00',
+              '22:00',
+              '23:00',
+              'Midnight',
+              '01:00',
+              '02:00',
+              '03:00',
+              '04:00',
+              '05:00',
+              '06:00',
+              '07:00',
+              '08:00',
+              '09:00',
+              '10:00',
+              '11:00',
+              'Noon'
+            ] %}
+              <label class="block-label" for="option-{{ loop.index }}">
+                <input type="radio" name="when" id="option-{{ loop.index }}" value="{{ option }}" />
+                {{ option }}
+              </label>
+            {% endfor %}
+          </div>
         </div>
       </fieldset>
     </div>
