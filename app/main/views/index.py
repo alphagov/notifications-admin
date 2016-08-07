@@ -11,6 +11,9 @@ from mdx_gfm import GithubFlavoredMarkdownExtension
 from notifications_utils.renderers import HTMLEmail
 
 
+from datetime import datetime, timedelta
+
+
 @main.route('/')
 def index():
     if current_user and current_user.is_authenticated:
@@ -29,9 +32,36 @@ def cookies():
     return render_template('views/cookies.html')
 
 
+def get_time_label_and_value(future_time):
+    return (
+        get_human_time(future_time.strftime('%-H')),
+        future_time.isoformat()
+    )
+
+
+def get_human_time(hour):
+    return {
+        '0': 'Midnight',
+        '12': 'Noon'
+    }.get(
+        hour,
+        '{}:00'.format(hour)
+    )
+
+
+def get_next_hours_from(now, hours=23):
+    return [
+        (now + timedelta(hours=i)).replace(minute=0, second=0)
+        for i in range(1, hours)
+    ]
+
+
 @main.route('/trial-mode')
 def trial_mode():
-    return render_template('views/trial-mode.html')
+    hours = [
+        get_time_label_and_value(hour) for hour in get_next_hours_from(datetime.now())
+    ]
+    return render_template('views/trial-mode.html', hours=hours)
 
 
 @main.route('/pricing')

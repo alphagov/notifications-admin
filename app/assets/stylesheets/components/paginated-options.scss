@@ -22,7 +22,11 @@
   .js-enabled & {
 
 
-
+    .block-label {
+      &:last-child {
+        margin-bottom: 10px;
+      }
+    }
 
     .block-label, .tertiary-button {
       display: none;
