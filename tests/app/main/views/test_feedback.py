@@ -26,17 +26,27 @@ def test_get_feedback_page(app_):
             assert resp.status_code == 200
 
 
-def test_post_feedback_with_no_name_email(app_, mocker):
+def test_post_feedback_with_name_but_no_email(app_, mocker):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
         return_value=Mock(status_code=201))
     with app_.test_request_context():
         with app_.test_client() as client:
-            resp = client.post(url_for('main.feedback'), data={'feedback': "blah"})
+            resp = client.post(url_for('main.feedback'), data={'feedback': "blah", 'name': 'Fred'})
             assert resp.status_code == 302
+            mock_post.assert_called_with(
+                ANY,
+                data={
+                    'department_id': ANY,
+                    'agent_team_id': ANY,
+                    'subject': 'Notify feedback',
+                    'message': 'Environment: http://localhost/\nFred (no email address supplied)\nblah',
+                    'person_email': app_.config['DESKPRO_PERSON_EMAIL'],
+                    'person_name': 'Fred'},
+                headers=ANY)
 
 
-def test_post_feedback_with_no_name_email(app_, mocker):
+def test_post_feedback_with_no_name_or_email(app_, mocker):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
         return_value=Mock(status_code=201))
@@ -50,8 +60,9 @@ def test_post_feedback_with_no_name_email(app_, mocker):
                     'department_id': ANY,
                     'agent_team_id': ANY,
                     'subject': 'Notify feedback',
-                    'message': 'Environment: http://localhost/\n\n\n\nblah',
-                    'person_email': ANY},
+                    'message': 'Environment: http://localhost/\n (no email address supplied)\nblah',
+                    'person_email': app_.config['DESKPRO_PERSON_EMAIL'],
+                    'person_name': None},
                 headers=ANY)
 
 
@@ -71,8 +82,9 @@ def test_post_feedback_with_name_email(app_, mocker):
                     'subject': 'Notify feedback',
                     'department_id': ANY,
                     'agent_team_id': ANY,
-                    'message': 'Environment: http://localhost/\n\nSteve Irwin\nrip@gmail.com\nblah',
-                    'person_email': ANY},
+                    'message': 'Environment: http://localhost/\n\nblah',
+                    'person_name': 'Steve Irwin',
+                    'person_email': 'rip@gmail.com'},
                 headers=ANY)
 
 
@@ -91,14 +103,6 @@ def test_log_error_on_post(app_, mocker):
                 resp = client.post(
                     url_for('main.feedback'),
                     data={'feedback': "blah", 'name': "Steve Irwin", 'email_address': 'rip@gmail.com'})
-            mock_post.assert_called_with(
-                ANY,
-                data={
-                    'subject': 'Notify feedback',
-                    'department_id': ANY,
-                    'agent_team_id': ANY,
-                    'message': 'Environment: http://localhost/\n\nSteve Irwin\nrip@gmail.com\nblah',
-                    'person_email': ANY},
-                headers=ANY)
+            assert mock_post.called
             mock_logger.assert_called_with(
                 "Deskpro create ticket request failed with {} '{}'".format(mock_post().status_code, mock_post().json()))
