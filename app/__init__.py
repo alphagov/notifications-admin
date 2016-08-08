@@ -45,6 +45,7 @@ from app.notify_client.template_statistics_api_client import TemplateStatisticsA
 from app.notify_client.user_api_client import UserApiClient
 from app.notify_client.events_api_client import EventsApiClient
 from app.notify_client.provider_client import ProviderClient
+from app.notify_client.organisations_client import OrganisationsClient
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
@@ -60,6 +61,7 @@ statistics_api_client = StatisticsApiClient()
 template_statistics_client = TemplateStatisticsApiClient()
 events_api_client = EventsApiClient()
 provider_client = ProviderClient()
+organisations_client = OrganisationsClient()
 asset_fingerprinter = AssetFingerprinter()
 
 # The current service attached to the request stack.
@@ -88,6 +90,7 @@ def create_app():
     template_statistics_client.init_app(application)
     events_api_client.init_app(application)
     provider_client.init_app(application)
+    organisations_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'

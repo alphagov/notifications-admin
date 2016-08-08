@@ -49,7 +49,9 @@ def service_json(
     email_from=None,
     reply_to_email_address=None,
     sms_sender=None,
-    research_mode=False
+    research_mode=False,
+    organisation='organisation-name',
+    branding='govuk'
 ):
     return {
         'id': id_,
@@ -61,7 +63,9 @@ def service_json(
         'email_from': email_from,
         'reply_to_email_address': reply_to_email_address,
         'sms_sender': sms_sender,
-        'research_mode': research_mode
+        'research_mode': research_mode,
+        'organisation': organisation,
+        'branding': branding
     }
 
 
