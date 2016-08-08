@@ -35,7 +35,7 @@ class Config(object):
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
     DESKPRO_API_HOST = os.environ['DESKPRO_API_HOST']
     DESKPRO_API_KEY = os.environ['DESKPRO_API_KEY']
-    DESKPRO_PERSON_EMAIL = os.environ['DESKPRO_PERSON_EMAIL']
+    DESKPRO_PERSON_EMAIL = 'donotreply@notifications.service.gov.uk'
     DESKPRO_DEPT_ID = os.environ['DESKPRO_DEPT_ID']
     DESKPRO_ASSIGNED_AGENT_TEAM_ID = os.environ['DESKPRO_ASSIGNED_AGENT_TEAM_ID']
     ACTIVITY_STATS_LIMIT_DAYS = 7
