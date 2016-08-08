@@ -1,4 +1,5 @@
 from flask_wtf import Form
+from datetime import datetime, timedelta
 from notifications_utils.recipients import (
     validate_phone_number,
     InvalidPhoneError
@@ -20,6 +21,30 @@ from wtforms.validators import (DataRequired, Email, Length, Regexp)
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidEmailDomainRegex, NoCommasInPlaceHolders)
 from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
+
+
+def get_time_value_and_label(future_time):
+    return (
+        future_time.isoformat(),
+        get_human_time(future_time)
+    )
+
+
+def get_human_time(time):
+    return {
+        '0': 'Midnight',
+        '12': 'Midday'
+    }.get(
+        time.strftime('%-H'),
+        time.strftime('%-I%p').lower()
+    )
+
+
+def get_next_hours_from(now, hours=23):
+    return [
+        (now + timedelta(hours=i)).replace(minute=0, second=0)
+        for i in range(1, hours)
+    ]
 
 
 def email_address(label='Email address'):
@@ -286,6 +311,20 @@ class ConfirmMobileNumberForm(Form):
         is_valid, msg = self.validate_code_func(field.data)
         if not is_valid:
             raise ValidationError(msg)
+
+
+class ChooseTimeForm(Form):
+
+    hours = RadioField(
+        'When should Notify send these messages?',
+        choices=[('now', 'Now')] + [
+            get_time_value_and_label(hour) for hour in get_next_hours_from(datetime.now())
+        ],
+        default='now',
+        validators=[
+            DataRequired()
+        ]
+    )
 
 
 class CreateKeyForm(Form):

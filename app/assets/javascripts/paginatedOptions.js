@@ -2,6 +2,10 @@
 
   "use strict";
 
+  var render = ($options, $button) => (
+    filterOptionVisibility($options) && setButtonState($options, $button)
+  );
+
   var filterOptionVisibility = $options => $options
     .removeClass('js-visible')
     .filter(
@@ -9,69 +13,70 @@
     )
     .addClass('js-visible');
 
+  var setButtonState = ($options, $button) => $button
+    .addClass('js-visible')
+    .prop(
+      'value',
+      $options.has(':checked').find('input').attr('id') === $options.eq(0).find('input').attr('id') ?
+        'Later' : 'Choose a different time'
+    );
+
+  // Workaround because GOV.UK SelectionButtons doesn’t deselect in this case
+  var deselectUnchecked = $options => $options
+    .filter(
+      (index, element) => $(element).not(':has(:checked)')
+    ).removeClass('selected');
+
+  var refocus = $element => setTimeout(
+    () => $element.blur().trigger('focus'),
+    10
+  );
+
   Modules.PaginatedOptions = function() {
 
     this.start = function(component) {
 
       let $component = $(component);
       let $options = $('label', $component);
-      let $button = $('<input type="button" value="Later" class="tertiary-button js-visible" />');
 
-      $component.append($button);
+      $component.append(
+        $button = $('<input type="button" value="Later" class="tertiary-button" />')
+      );
 
-      filterOptionVisibility($options);
+      render($options, $button);
 
-      $button.on('click', function() {
-        $options.addClass('js-visible').has(':checked').focus();
-        $button.removeClass('js-visible');
-      });
+      $button.on('click', () =>
+        $options.addClass('js-visible').has(':checked').focus() &&
+        $button.removeClass('js-visible')
+      );
 
-      $component.on('change', 'input[type=radio]', function() {
+      $component.on('focusout', () =>
+        setTimeout(
+          () => ($(document.activeElement).attr('type') !== 'radio') && render($options, $button),
+          200
+        )
+      );
 
-        $(this).trigger('focus');
+      $component.on('keydown', 'input[type=radio]', function() {
 
-      });
+        if (event.which !== 13 && event.which !== 32) return true;
 
-      $(document).on('focus', '*', function(event) {
+        event.preventDefault();
 
-        console.log('focus', $(this));
-
-        return;
-
-        console.log('blur', $component.find(':focus'));
-
-        if ($component.find(':focus').length > 0) return true;
-
-        filterOptionVisibility($options);
-
-        $button.addClass('js-visible');
-
-        if ($options.has(':checked').find('input').attr('id') === $options.eq(0).find('input').attr('id')) {
-          $button.prop('value', 'Later');
-        } else {
-          $button.prop('value', 'Choose a different time');
-        }
-
-        return true;
+        render($options, $button);
+        refocus($(this));
 
       });
 
       $component.on('click', 'input[type=radio]', function(event) {
 
-        // Workaround because GOV.UK SelectionButtons doesn’t deselect in this case
-        $options.filter((index, element) => $(element).not(':has(:checked)')).removeClass('selected');
-        console.log('click', event.pageX);
-        if (!event.pageX) return;
+        deselectUnchecked($options);
 
-        filterOptionVisibility($options);
+        // only trigger click on mouse events
+        if (!event.pageX) return true;
 
-        $button.addClass('js-visible');
-
-        if ($options.has(':checked').find('input').attr('id') === $options.eq(0).find('input').attr('id')) {
-          $button.prop('value', 'Later');
-        } else {
-          $button.prop('value', 'Choose a different time');
-        }
+        render($options, $button);
+        refocus($(this));
 
       });
 

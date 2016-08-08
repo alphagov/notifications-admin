@@ -1,6 +1,6 @@
 import json
 import itertools
-from datetime import datetime
+from datetime import datetime, timedelta
 from string import ascii_uppercase
 
 from contextlib import suppress
@@ -23,7 +23,7 @@ from notifications_utils.template import Template
 from notifications_utils.recipients import RecipientCSV, first_column_heading, validate_and_format_phone_number
 
 from app.main import main
-from app.main.forms import CsvUploadForm
+from app.main.forms import CsvUploadForm, ChooseTimeForm
 from app.main.uploader import (
     s3upload,
     s3download
@@ -278,6 +278,7 @@ def check_messages(service_id, template_type, upload_id):
         original_file_name=session['upload_data'].get('original_file_name'),
         upload_id=upload_id,
         form=CsvUploadForm(),
+        choose_time_form=ChooseTimeForm(),
         statistics=statistics,
         back_link=back_link,
         help=get_help_argument()

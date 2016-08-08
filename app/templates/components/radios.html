@@ -21,3 +21,37 @@
     </fieldset>
   </div>
 {% endmacro %}
+
+
+{% macro radio_select(
+  field,
+  hint=None,
+  wrapping_class='form-group'
+) %}
+  <div class="{{ wrapping_class }} {% if field.errors %} error{% endif %}">
+    <fieldset>
+      <legend class="form-label">
+        {{ field.label }}
+        {% if field.errors %}
+          <span class="error-message">
+            {{ field.errors[0] }}
+          </span>
+        {% endif %}
+      </legend>
+      <div class="paginated-options" data-module="paginated-options">
+        <div class="paginated-options-column">
+        {% for option in field %}
+          <label class="block-label" for="{{ option.id }}">
+            {{ option }}
+            {{ option.label.text }}
+          </label>
+          {% if loop.first %}
+        </div>
+        <div class="paginated-options-column">
+          {% endif %}
+        {% endfor %}
+        </div>
+      </div>
+    </fieldset>
+  </div>
+{% endmacro %}

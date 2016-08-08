@@ -9,35 +9,6 @@
 <div class="grid-row">
   <div class="column-two-thirds">
     <h1 class="heading-large">Trial mode</h1>
-
-
-    <div class="form-group">
-      <fieldset>
-        <legend class="form-label">
-          When should Notify send these messages?
-        </legend>
-        <div class="paginated-options" data-module="paginated-options">
-          <div class="paginated-options-column">
-            <label class="block-label" for="now">
-              <input type="radio" name="when" id="now" checked="checked" />
-              Now
-            </label>
-          </div>
-          <div class="paginated-options-column">
-            {% for label, value in hours %}
-              <label class="block-label" for="option-{{ loop.index }}">
-                <input type="radio" name="when" id="option-{{ loop.index }}" value="{{ value }}" tabindex="0" />
-                {{ label }}
-              </label>
-            {% endfor %}
-          </div>
-        </div>
-      </fieldset>
-    </div>
-
-
-
-
     <p>
       All new accounts on Notify start off in trial mode.
     </p>
