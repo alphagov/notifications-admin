@@ -874,13 +874,21 @@ def mock_get_job_in_progress(mocker, api_user_active):
 def mock_get_jobs(mocker, api_user_active):
     def _get_jobs(service_id, limit_days=None):
         return {"data": [
-            job_json(service_id, api_user_active, original_file_name=filename)
-            for filename in (
-                "Test message",
-                "export 1/1/2016.xls",
-                "all email addresses.xlsx",
-                "applicants.ods",
-                "thisisatest.csv",
+            job_json(
+                service_id,
+                api_user_active,
+                original_file_name=filename,
+                scheduled_for=scheduled_for,
+                job_status=job_status
+            )
+            for filename, scheduled_for, job_status in (
+                ("Test message", '', ''),
+                ("Test message", '2016-01-01 11:09:00.061258', 'scheduled'),
+                ("export 1/1/2016.xls", '', ''),
+                ("all email addresses.xlsx", '', 'pending'),
+                ("applicants.ods", '', ''),
+                ("thisisatest.csv", '', ''),
+                ("send_me_later.csv", '2016-01-01 11:09:00.061258', 'scheduled')
             )
         ]}
 

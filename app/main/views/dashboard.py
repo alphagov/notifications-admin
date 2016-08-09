@@ -116,9 +116,21 @@ def get_dashboard_partials(service_id):
         lambda job: job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME'],
         job_api_client.get_job(service_id, limit_days=7)['data']
     ))
+    scheduled_jobs = filter(
+        lambda job: job['job_status'] == 'scheduled',
+        jobs
+    )
+    immediate_jobs = filter(
+        lambda job: job['job_status'] != 'scheduled',
+        jobs
+    )
     service = service_api_client.get_detailed_service(service_id)
 
     return {
+        'upcoming': render_template(
+            'views/dashboard/_upcoming.html',
+            scheduled_jobs=scheduled_jobs
+        ),
         'totals': render_template(
             'views/dashboard/_totals.html',
             service_id=service_id,
@@ -134,7 +146,7 @@ def get_dashboard_partials(service_id):
         'has_template_statistics': bool(template_statistics),
         'jobs': render_template(
             'views/dashboard/_jobs.html',
-            jobs=jobs
+            jobs=immediate_jobs
         ),
         'has_jobs': bool(jobs),
         'usage': render_template(

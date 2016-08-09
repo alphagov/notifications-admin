@@ -158,7 +158,8 @@ def job_json(
     notification_count=1,
     notifications_sent=1,
     notifications_requested=1,
-    job_status='Delivered'
+    job_status='Delivered',
+    scheduled_for=''
 ):
     if job_id is None:
         job_id = str(generate_uuid())
@@ -180,8 +181,10 @@ def job_json(
         'created_by': created_by_json(
             created_by.id,
             created_by.name,
-            created_by.email_address)
-        }
+            created_by.email_address
+        ),
+        'scheduled_for': scheduled_for
+    }
     return data
 
 

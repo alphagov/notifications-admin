@@ -65,7 +65,10 @@ def _set_status_filters(filter_args):
 def view_jobs(service_id):
     return render_template(
         'views/jobs/jobs.html',
-        jobs=add_rate_to_jobs(job_api_client.get_job(service_id)['data'])
+        jobs=filter(
+            lambda job: job['job_status'] != 'scheduled',
+            add_rate_to_jobs(job_api_client.get_job(service_id)['data'])
+        )
     )
 
 
@@ -274,6 +277,11 @@ def get_status_filters(service, message_type, statistics):
 
 
 def _get_job_counts(job, help_argument):
+    sending = 0 if job['job_status'] == 'pending' else (
+        job.get('notification_count', 0) -
+        job.get('notifications_delivered', 0) -
+        job.get('notifications_failed', 0)
+    )
     return [
         (
             label,
@@ -293,9 +301,7 @@ def _get_job_counts(job, help_argument):
             ],
             [
               'sending', 'sending',
-              job.get('notification_count', 0) -
-              job.get('notifications_delivered', 0) -
-              job.get('notifications_failed', 0)
+              sending
             ],
             [
               'delivered', 'delivered',
