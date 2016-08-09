@@ -1,3 +1,4 @@
+from datetime import datetime
 import copy
 from flask import url_for
 
@@ -5,7 +6,7 @@ import pytest
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
 
-from app.main.views.dashboard import get_dashboard_totals
+from app.main.views.dashboard import get_dashboard_totals, format_weekly_stats_to_list
 
 from tests import validate_route_permission
 from tests.conftest import SERVICE_ONE_ID
@@ -65,7 +66,6 @@ def test_get_started(
     api_user_active,
     mock_get_service,
     mock_get_service_templates_when_no_templates_exist,
-    mock_get_aggregate_service_statistics,
     mock_get_user,
     mock_get_user_by_email,
     mock_login,
@@ -94,7 +94,6 @@ def test_get_started_is_hidden_once_templates_exist(
     api_user_active,
     mock_get_service,
     mock_get_service_templates,
-    mock_get_aggregate_service_statistics,
     mock_get_user,
     mock_get_user_by_email,
     mock_login,
@@ -119,7 +118,6 @@ def test_should_show_recent_templates_on_dashboard(app_,
                                                    api_user_active,
                                                    mock_get_service,
                                                    mock_get_service_templates,
-                                                   mock_get_aggregate_service_statistics,
                                                    mock_get_user,
                                                    mock_get_user_by_email,
                                                    mock_login,
@@ -204,7 +202,6 @@ def test_should_show_recent_jobs_on_dashboard(
     api_user_active,
     mock_get_service,
     mock_get_service_templates,
-    mock_get_aggregate_service_statistics,
     mock_get_user,
     mock_get_user_by_email,
     mock_login,
@@ -482,3 +479,46 @@ def test_get_dashboard_totals_adds_warning(failures, expected):
         }
     }
     assert get_dashboard_totals(stats)['sms']['show_warning'] == expected
+
+
+def test_format_weekly_stats_to_list_empty_case():
+    assert format_weekly_stats_to_list({}) == []
+
+
+def test_format_weekly_stats_to_list_sorts_by_week():
+    stats = {
+        '2016-07-04': {},
+        '2016-07-11': {},
+        '2016-07-18': {},
+        '2016-07-25': {}
+    }
+    resp = format_weekly_stats_to_list(stats)
+    assert resp[0]['week_start'] == '2016-07-25'
+    assert resp[1]['week_start'] == '2016-07-18'
+    assert resp[2]['week_start'] == '2016-07-11'
+    assert resp[3]['week_start'] == '2016-07-04'
+
+
+def test_format_weekly_stats_to_list_includes_datetime_for_comparison():
+    stats = {
+        '2016-07-25': {}
+    }
+    resp = format_weekly_stats_to_list(stats)
+    assert resp == [{
+        'week_start': '2016-07-25',
+        'week_end': '2016-07-31',
+        'week_end_datetime': datetime(2016, 7, 31, 0, 0, 0)
+    }]
+
+
+def test_format_weekly_stats_to_list_has_stats_with_failure_rate():
+    stats = {
+        '2016-07-25': {'sms': _stats(3, 1, 2)}
+    }
+    resp = format_weekly_stats_to_list(stats)
+    assert resp[0]['sms']['failure_rate'] == '66.7'
+    assert resp[0]['sms']['requested'] == 3
+
+
+def _stats(requested, delivered, failed):
+    return {'requested': requested, 'delivered': delivered, 'failed': failed}
