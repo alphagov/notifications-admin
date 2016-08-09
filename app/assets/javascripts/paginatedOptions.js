@@ -54,7 +54,12 @@
 
         if (event.which !== 13 && event.which !== 32) {
           setTimeout(
-            () => ($(document.activeElement).attr('type') !== 'radio') && render($options, $button),
+            function() {
+              $focused = $(document.activeElement);
+              if ($(document.activeElement).attr('type') === 'radio') return;
+              render($options, $button);
+              refocus($focused);
+            },
             200
           );
           return true;
