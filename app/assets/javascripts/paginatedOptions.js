@@ -32,6 +32,11 @@
     10
   );
 
+  var renderIfComponentLosesFocus = ($options, $button, $focused) => () =>
+    ($focused.attr('type') !== 'radio') &&
+    render($options, $button) &&
+    refocus($focused); // Make sure that window scrolls to focused element
+
   Modules.PaginatedOptions = function() {
 
     this.start = function(component) {
@@ -43,8 +48,6 @@
         $button = $('<input type="button" value="Later" class="tertiary-button" />')
       );
 
-      render($options, $button);
-
       $button.on('click', () =>
         $options.addClass('js-visible').has(':checked').focus() &&
         $button.removeClass('js-visible')
@@ -52,14 +55,10 @@
 
       $component.on('keydown', 'input[type=radio]', function() {
 
+        // intercept keypresses which aren’t enter or space
         if (event.which !== 13 && event.which !== 32) {
           setTimeout(
-            function() {
-              $focused = $(document.activeElement);
-              if ($(document.activeElement).attr('type') === 'radio') return;
-              render($options, $button);
-              refocus($focused);
-            },
+            renderIfComponentLosesFocus($options, $button, $(document.activeElement)),
             200
           );
           return true;
@@ -76,13 +75,15 @@
 
         deselectUnchecked($options);
 
-        // only trigger click on mouse events
+        // stop click being triggered by keyboard events
         if (!event.pageX) return true;
 
         render($options, $button);
         refocus($(this));
 
       });
+
+      render($options, $button);
 
     };
 
