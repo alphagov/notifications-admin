@@ -50,16 +50,15 @@
         $button.removeClass('js-visible')
       );
 
-      $component.on('focusout', () =>
-        setTimeout(
-          () => ($(document.activeElement).attr('type') !== 'radio') && render($options, $button),
-          200
-        )
-      );
-
       $component.on('keydown', 'input[type=radio]', function() {
 
-        if (event.which !== 13 && event.which !== 32) return true;
+        if (event.which !== 13 && event.which !== 32) {
+          setTimeout(
+            () => ($(document.activeElement).attr('type') !== 'radio') && render($options, $button),
+            200
+          );
+          return true;
+        }
 
         event.preventDefault();
 
