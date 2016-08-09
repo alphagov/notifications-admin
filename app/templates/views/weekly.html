@@ -3,7 +3,7 @@
 {% extends "withnav_template.html" %}
 
 {% block page_title %}
-  Daily – GOV.UK Notify
+  Previous weeks – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -33,16 +33,16 @@
       {% endif %}
     {% endcall %}
     {% call field(align='right') %}
-      {{ item.emails_requested }}
+      {{ item.email.requested }}
     {% endcall %}
     {% call field(align='right') %}
-      {{ item.emails_failure_rate }}%
+      {{ item.email.failure_rate }}%
     {% endcall %}
     {% call field(align='right') %}
-      {{ item.sms_requested }}
+      {{ item.sms.requested }}
     {% endcall %}
     {% call field(align='right') %}
-      {{ item.sms_failure_rate }}%
+      {{ item.sms.failure_rate }}%
     {% endcall %}
   {% endcall %}
 

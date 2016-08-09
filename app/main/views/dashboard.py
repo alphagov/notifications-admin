@@ -1,7 +1,8 @@
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 from collections import namedtuple
 from itertools import groupby
 
+import dateutil
 from flask import (
     render_template,
     url_for,
@@ -9,13 +10,11 @@ from flask import (
     jsonify,
     current_app
 )
-
 from flask_login import login_required
 
 from app.main import main
 from app import (
     job_api_client,
-    statistics_api_client,
     service_api_client,
     template_statistics_client
 )
@@ -90,20 +89,10 @@ def usage(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def weekly(service_id):
-
-    earliest_date = date(2016, 4, 1)  # start of tax year
-    while earliest_date.weekday() != 0:  # 0 for monday
-        earliest_date -= timedelta(days=1)
-
+    stats = service_api_client.get_weekly_notification_stats(service_id)['data']
     return render_template(
         'views/weekly.html',
-        days=(
-            add_rates_to(day) for day in
-            statistics_api_client.get_7_day_aggregate_for_service(
-                service_id,
-                date_from=earliest_date
-            )['data']
-        ),
+        days=format_weekly_stats_to_list(stats),
         now=datetime.utcnow()
     )
 
@@ -199,3 +188,21 @@ def calculate_usage(usage):
         'sms_chargeable': max(0, sms_sent - sms_free_allowance),
         'sms_rate': sms_rate
     }
+
+
+def format_weekly_stats_to_list(historical_stats):
+    out = []
+    for week, weekly_stats in historical_stats.items():
+        for stats in weekly_stats.values():
+            stats['failure_rate'] = get_formatted_percentage(stats['failed'], stats['requested'])
+
+        week_start = dateutil.parser.parse(week)
+        week_end = week_start + timedelta(days=6)
+        weekly_stats.update({
+            'week_start': week,
+            'week_end': week_end.date().isoformat(),
+            'week_end_datetime': week_end,
+        })
+        out.append(weekly_stats)
+
+    return sorted(out, key=lambda x: x['week_start'], reverse=True)

@@ -14,9 +14,9 @@
   <h1 class="heading-large">
 
     <span class="visually-hidden">
-      {%- if request_args.get('status') != 'delivered,failed' -%}
+      {%- if status != 'delivered,failed' -%}
         {%- for label, option, _, _ in status_filters -%}
-          {%- if request_args.get('status', 'delivered,failed') == option -%}{{label}} {% endif -%}
+          {%- if status == option -%}{{label}} {% endif -%}
         {%- endfor -%}
       {%- endif -%}
     </span>
@@ -29,15 +29,15 @@
     {{ pill(
       'Status',
       status_filters,
-      request_args.get('status', '')
+      status
     ) }}
   </div>
 
   {% if notifications %}
-    <p class="bottom-gutter">
-      <a href="{{ download_link }}" download="download" class="heading-small">Download as a CSV file</a>
+    <p class="bottom-gutter-1-2">
+      <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
       &emsp;
-      Delivery information is available for 7 days
+      Data available for 7 days
     </p>
   {% endif %}
 

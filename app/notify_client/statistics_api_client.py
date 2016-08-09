@@ -12,16 +12,15 @@ class StatisticsApiClient(BaseAPIClient):
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
 
-    def get_7_day_aggregate_for_service(self, service_id, date_from=None, week_count=None):
-        params = {}
-        if date_from is not None:
-            params['date_from'] = date_from
-        if week_count is not None:
-            params['week_count'] = week_count
-        return self.get(
-            url='/service/{}/notifications-statistics/seven_day_aggregate'.format(service_id),
-            params=params
-        )
+    def get_statistics_for_service_for_day(self, service_id, day):
+        url = '/service/{}/notifications-statistics/day/{}'.format(service_id, day)
+        try:
+            return self.get(url=url)['data']
+        except HTTPError as e:
+            if e.status_code == 404:
+                return None
+            else:
+                raise e
 
     def get_statistics_for_all_services_for_day(self, day):
         params = {

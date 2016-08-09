@@ -3,7 +3,6 @@ from datetime import timedelta
 
 
 class Config(object):
-
     DEBUG = False
     ADMIN_CLIENT_SECRET = os.environ['ADMIN_CLIENT_SECRET']
     ADMIN_CLIENT_USER_NAME = os.environ['ADMIN_CLIENT_USER_NAME']
@@ -36,7 +35,7 @@ class Config(object):
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
     DESKPRO_API_HOST = os.environ['DESKPRO_API_HOST']
     DESKPRO_API_KEY = os.environ['DESKPRO_API_KEY']
-    DESKPRO_PERSON_EMAIL = os.environ['DESKPRO_PERSON_EMAIL']
+    DESKPRO_PERSON_EMAIL = 'donotreply@notifications.service.gov.uk'
     DESKPRO_DEPT_ID = os.environ['DESKPRO_DEPT_ID']
     DESKPRO_ASSIGNED_AGENT_TEAM_ID = os.environ['DESKPRO_ASSIGNED_AGENT_TEAM_ID']
     ACTIVITY_STATS_LIMIT_DAYS = 7
@@ -78,10 +77,24 @@ class Preview(Config):
     CSV_UPLOAD_BUCKET_NAME = 'preview-notifications-csv-upload'
 
 
+class Staging(Config):
+    SHOW_STYLEGUIDE = False
+    HTTP_PROTOCOL = 'https'
+    HEADER_COLOUR = '#F47738'  # $orange
+    CSV_UPLOAD_BUCKET_NAME = 'staging-notify-csv-upload'
+
+
+class Live(Config):
+    SHOW_STYLEGUIDE = False
+    HEADER_COLOUR = '#B10E1E'  # $red
+    HTTP_PROTOCOL = 'https'
+    CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
+
+
 configs = {
-    'development': 'config.Development',
-    'test': 'config.Test',
-    'preview': 'config.Preview',
-    'staging': 'config_staging.Staging',
-    'live': 'config_live.Live'
+    'development': Development,
+    'test': Test,
+    'preview': Preview,
+    'staging': Staging,
+    'live': Live
 }

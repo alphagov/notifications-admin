@@ -8,17 +8,19 @@ from app.main.forms import Feedback
 def feedback():
     form = Feedback()
     if form.validate_on_submit():
+        user_supplied_email = form.email_address.data != ''
+        feedback_msg = 'Environment: {}\n{}\n{}'.format(
+            url_for('main.index', _external=True),
+            '' if user_supplied_email else '{} (no email address supplied)'.format(form.name.data),
+            form.feedback.data
+        )
         data = {
-            'person_email': current_app.config.get('DESKPRO_PERSON_EMAIL'),
+            'person_email': form.email_address.data or current_app.config.get('DESKPRO_PERSON_EMAIL'),
+            'person_name': form.name.data or None,
             'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
             'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
             'subject': 'Notify feedback',
-            'message': 'Environment: {}\n\n{}\n{}\n{}'.format(
-                url_for('main.index', _external=True),
-                form.name.data,
-                form.email_address.data,
-                form.feedback.data
-            )
+            'message': feedback_msg
         }
         headers = {
             "X-DeskPRO-API-Key": current_app.config.get('DESKPRO_API_KEY'),
