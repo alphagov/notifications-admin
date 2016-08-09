@@ -23,6 +23,8 @@
       {% include 'views/dashboard/no-permissions-banner.html' %}
     {% endif %}
 
+    {{ ajax_block(partials, updates_url, 'upcoming') }}
+
     <h2 class="heading-medium">
       In the last 7 days
     </h2>

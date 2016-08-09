@@ -16,6 +16,12 @@
 
 }
 
+.big-number-inline {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 5px;
+}
+
 .big-number-smaller {
 
   @extend %big-number;
@@ -40,7 +46,7 @@
 
   @extend %big-number;
   position: relative;
-  margin-bottom: $gutter-half;
+  margin-bottom: $gutter-two-thirds;
 
   .big-number {
     padding: $gutter-half;
