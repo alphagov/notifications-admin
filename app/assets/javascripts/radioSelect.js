@@ -37,7 +37,7 @@
     render($options, $button) &&
     refocus($focused); // Make sure that window scrolls to focused element
 
-  Modules.PaginatedOptions = function() {
+  Modules.RadioSelect = function() {
 
     this.start = function(component) {
 

@@ -38,8 +38,8 @@
           </span>
         {% endif %}
       </legend>
-      <div class="paginated-options" data-module="paginated-options">
-        <div class="paginated-options-column">
+      <div class="radio-select" data-module="radio-select">
+        <div class="radio-select-column">
         {% for option in field %}
           <label class="block-label" for="{{ option.id }}">
             {{ option }}
@@ -47,7 +47,7 @@
           </label>
           {% if loop.first %}
         </div>
-        <div class="paginated-options-column">
+        <div class="radio-select-column">
           {% endif %}
         {% endfor %}
         </div>
