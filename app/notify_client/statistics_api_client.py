@@ -1,5 +1,4 @@
 from notifications_python_client.base import BaseAPIClient
-from notifications_python_client.errors import HTTPError
 
 
 class StatisticsApiClient(BaseAPIClient):
