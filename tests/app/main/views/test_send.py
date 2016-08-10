@@ -675,7 +675,7 @@ def test_go_to_dashboard_after_tour(
         mock_delete_service_template.assert_called_once_with(fake_uuid, fake_uuid)
 
 
-@pytest.mark.parametrize('num_requested,msg', [
+@pytest.mark.parametrize('num_requested,expected_msg', [
     (0, '‘valid.csv’ contains 100 phone numbers.'),
     (1, 'You can still send 49 messages today, but ‘valid.csv’ contains 100 phone numbers.')
 ], ids=['none_sent', 'some_sent'])
@@ -690,7 +690,7 @@ def test_check_messages_shows_too_many_messages_errors(
     mock_has_permissions,
     fake_uuid,
     num_requested,
-    msg
+    expected_msg
 ):
     # csv with 100 phone numbers
     mocker.patch('app.main.views.send.s3download', return_value=',\n'.join(
@@ -726,4 +726,4 @@ def test_check_messages_shows_too_many_messages_errors(
     # remove excess whitespace from element
     details = page.find('div', class_='banner-dangerous').findAll('p')[1]
     details = ' '.join([line.strip() for line in details.text.split('\n') if line.strip() != ''])
-    assert details == msg
+    assert details == expected_msg

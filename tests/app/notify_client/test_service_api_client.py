@@ -33,7 +33,7 @@ def test_client_posts_archived_true_when_deleting_template(mocker):
 )
 def test_client_gets_service(mocker, function, params):
     client = ServiceAPIClient()
-    mock_post = mocker.patch.object(client, 'get')
+    mock_get = mocker.patch.object(client, 'get')
 
     function(client, 'foo')
-    mock_post.assert_called_once_with('/service/foo', params=params)
+    mock_get.assert_called_once_with('/service/foo', params=params)
