@@ -11,10 +11,8 @@
       .
     </p>
     <p>
-      {% if statistics.emails_requested or statistics.sms_requested %}
-        You can still send
-        {{ current_service.message_limit - statistics.get('emails_requested', 0) - statistics.get('sms_requested', 0) }}
-        messages today, but
+      {% if current_service.message_limit != remaining_messages %}
+        You can still send {{ remaining_messages }} messages today, but
       {% endif %}
       ‘{{ original_file_name }}’ contains
       {{ count_of_recipients }} {{ recipients.recipient_column_header }}
