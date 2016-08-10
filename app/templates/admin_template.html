@@ -101,7 +101,15 @@
           <h2>Documentation</h2>
           <ul>
             <li><a href="{{ url_for("main.terms") }}">Terms of use</a></li>
-            <li><a href="{{ url_for('main.documentation') }}">API documentation</a></li>
+            {% for language, url in [
+              ('Java', 'https://github.com/alphagov/notifications-java-client'),
+              ('Node JS', 'https://github.com/alphagov/notifications-node-client'),
+              ('PHP', 'https://github.com/alphagov/notifications-php-client'),
+              ('Python', 'https://github.com/alphagov/notifications-python-client'),
+              ('Ruby', 'https://github.com/alphagov/notifications-ruby-client')
+            ] %}
+            <li><a href="{{ url }}">{{ language }} client</a></li>
+            {% endfor %}
           </ul>
         </div>
       </div>
