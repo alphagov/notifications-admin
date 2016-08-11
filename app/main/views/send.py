@@ -193,13 +193,9 @@ def send_from_api(service_id, template_id):
         service_api_client.get_service_template(service_id, template_id)['data'],
         prefix=current_service['name']
     )
-    personalisation = {
-        placeholder: "..." for placeholder in template.placeholders
-    }
     return render_template(
         'views/send-from-api.html',
-        template=template,
-        personalisation=json.dumps(personalisation, indent=4) if personalisation else None
+        template=template
     )
 
 

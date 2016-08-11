@@ -295,11 +295,6 @@ class CreateKeyForm(Form):
 
     key_type = RadioField(
         'What should Notify do when you use this key?',
-        choices=[
-            (KEY_TYPE_NORMAL, 'Send messages to anyone'),
-            (KEY_TYPE_TEST, 'Simulate sending messages to anyone'),
-            (KEY_TYPE_TEAM, 'Only send messages to members of your team')
-        ],
         validators=[
             DataRequired()
         ]

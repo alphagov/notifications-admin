@@ -2,8 +2,9 @@ from flask import request, render_template, redirect, url_for, flash
 from flask_login import login_required
 from app.main import main
 from app.main.forms import CreateKeyForm
-from app import api_key_api_client
+from app import api_key_api_client, current_service
 from app.utils import user_has_permissions
+from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
 
 
 @main.route("/services/<service_id>/api-keys")
@@ -24,6 +25,13 @@ def create_api_key(service_id):
         key['name'] for key in api_key_api_client.get_api_keys(service_id=service_id)['apiKeys']
     ]
     form = CreateKeyForm(key_names)
+    form.key_type.choices = [
+        (KEY_TYPE_NORMAL, 'Send messages to anyone{}'.format(
+            ', once this service is not in trial mode' if current_service['restricted'] else ''
+        )),
+        (KEY_TYPE_TEST, 'Simulate sending messages to anyone'),
+        (KEY_TYPE_TEAM, 'Only send messages to members of your team')
+    ]
     if form.validate_on_submit():
         secret = api_key_api_client.create_api_key(
             service_id=service_id,

@@ -251,7 +251,7 @@ def test_api_info_page(
                 follow_redirects=True
             )
         assert response.status_code == 200
-        assert 'API integration' in response.get_data(as_text=True)
+        assert 'API info' in response.get_data(as_text=True)
 
 
 def test_download_example_csv(
