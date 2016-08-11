@@ -217,26 +217,6 @@ def mock_delete_service(mocker, mock_get_service):
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_statistics_for_day(mocker):
-
-    stats = {'day': datetime.today().date().strftime('%Y-%m-%d'),
-             'emails_delivered': 0,
-             'sms_requested': 0,
-             'sms_delivered': 0,
-             'sms_failed': 0,
-             'emails_requested': 0,
-             'emails_failed': 0,
-             'service': fake_uuid,
-             'id': fake_uuid}
-
-    def _stats(service_id, day):
-        return {'data': stats}
-
-    return mocker.patch(
-        'app.statistics_api_client.get_statistics_for_service_for_day', side_effect=_stats)
-
-
-@pytest.fixture(scope='function')
 def mock_get_all_service_statistics(mocker):
     def _create(day):
         return {'data': []}
