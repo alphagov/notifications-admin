@@ -12,6 +12,7 @@ def test_return_validation_error_when_key_name_exists(app_):
     with app_.test_request_context():
         form = CreateKeyForm(_get_names(),
                              formdata=MultiDict([('key_name', 'Some key')]))
+        form.key_type.choices = [('a', 'a'), ('b', 'b')]
         form.validate()
         assert form.errors['key_name'] == ['A key with this name already exists']
 
@@ -28,5 +29,6 @@ def test_return_validation_error_when_key_type_not_chosen(app_, key_type, expect
         form = CreateKeyForm(
             [],
             formdata=MultiDict([('key_name', 'Some key'), ('key_type', key_type)]))
+        form.key_type.choices = [('a', 'a'), ('b', 'b')]
         form.validate()
         assert form.errors['key_type'] == [expected_error]
