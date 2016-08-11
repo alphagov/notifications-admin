@@ -81,6 +81,21 @@ class ServiceAPIClient(NotificationsAPIClient):
         """
         Update a service.
         """
+        disallowed_attributes = set(kwargs.keys()) - {
+            'name',
+            'users',
+            'message_limit',
+            'active',
+            'restricted',
+            'email_from',
+            'reply_to_email_address',
+            'sms_sender'
+        }
+        if disallowed_attributes:
+            raise TypeError('Not allowed to update service attributes: {}'.format(
+                ", ".join(disallowed_attributes)
+            ))
+
         _attach_current_user(kwargs)
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)

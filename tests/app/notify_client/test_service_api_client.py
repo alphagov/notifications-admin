@@ -37,3 +37,9 @@ def test_client_gets_service(mocker, function, params):
 
     function(client, 'foo')
     mock_get.assert_called_once_with('/service/foo', params=params)
+
+
+def test_client_only_updates_allowed_attributes(mocker):
+    with pytest.raises(TypeError) as error:
+        ServiceAPIClient().update_service('service_id', foo='bar')
+    assert str(error.value) == 'Not allowed to update service attributes: foo'
