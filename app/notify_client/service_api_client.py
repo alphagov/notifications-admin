@@ -84,7 +84,6 @@ class ServiceAPIClient(NotificationsAPIClient):
         data = _attach_current_user(kwargs)
         disallowed_attributes = set(data.keys()) - {
             'name',
-            'users',
             'message_limit',
             'active',
             'restricted',
