@@ -58,11 +58,19 @@
     {{ api_key(current_service.id, "Service ID", thing="service ID") }}
   </div>
 
-  <h2 class="heading-small">Documentation</h2>
-  <p>
-    See the
-    <a href="{{ url_for('.documentation') }}">
-    API documentation</a> for clients and specfications.
-  </p>
+  <h2 class="heading-small">API clients</h2>
+  <ul class="list list-bullet">
+    {% for name, url in [
+      ('Java', 'https://github.com/alphagov/notifications-java-client'),
+      ('Node JS', 'https://github.com/alphagov/notifications-node-client'),
+      ('PHP', 'https://github.com/alphagov/notifications-php-client'),
+      ('Python', 'https://github.com/alphagov/notifications-python-client'),
+      ('Ruby', 'https://github.com/alphagov/notifications-ruby-client')
+    ] %}
+    <li>
+      <a href="{{ url }}">{{ name }}</a>
+    </li>
+    {% endfor %}
+  </ul>
 
 {% endblock %}

@@ -32,13 +32,4 @@
     {{ api_key(template.id, name="Template ID", thing='template ID') }}
   </div>
 
-  {% if personalisation %}
-    <h2 class="heading-small">Personalisation (all fields are required)</h2>
-    {{ personalisation|syntax_highlight_json }}
-  {% endif %}
-
-  <p>
-    <br />See the <a href="{{ url_for(".documentation") }}">developer documentation</a> for full details.
-  </p>
-
 {% endblock %}
