@@ -12,16 +12,6 @@ class StatisticsApiClient(BaseAPIClient):
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
 
-    def get_statistics_for_service_for_day(self, service_id, day):
-        url = '/service/{}/notifications-statistics/day/{}'.format(service_id, day)
-        try:
-            return self.get(url=url)['data']
-        except HTTPError as e:
-            if e.status_code == 404:
-                return None
-            else:
-                raise e
-
     def get_statistics_for_all_services_for_day(self, day):
         params = {
             'day': day

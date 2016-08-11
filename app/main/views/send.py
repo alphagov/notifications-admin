@@ -28,7 +28,7 @@ from app.main.uploader import (
     s3upload,
     s3download
 )
-from app import job_api_client, service_api_client, current_service, user_api_client, statistics_api_client
+from app import job_api_client, service_api_client, current_service, user_api_client
 from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet, get_help_argument
 
 
