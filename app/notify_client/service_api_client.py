@@ -30,7 +30,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             "restricted": restricted,
             "email_from": email_from
         }
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         return self.post("/service", data)['data']['id']
 
     def delete_service(self, service_id):
@@ -81,7 +81,8 @@ class ServiceAPIClient(NotificationsAPIClient):
         """
         Update a service.
         """
-        disallowed_attributes = set(kwargs.keys()) - {
+        data = _attach_current_user(kwargs)
+        disallowed_attributes = set(data.keys()) - {
             'name',
             'users',
             'message_limit',
@@ -89,14 +90,14 @@ class ServiceAPIClient(NotificationsAPIClient):
             'restricted',
             'email_from',
             'reply_to_email_address',
-            'sms_sender'
+            'sms_sender',
+            'created_by'
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(
                 ", ".join(disallowed_attributes)
             ))
 
-        _attach_current_user(kwargs)
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)
 
@@ -127,7 +128,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             data.update({
                 'subject': subject
             })
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         endpoint = "/service/{0}/template".format(service_id)
         return self.post(endpoint, data)
 
@@ -146,7 +147,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             data.update({
                 'subject': subject
             })
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
         return self.post(endpoint, data)
 
@@ -187,7 +188,7 @@ class ServiceAPIClient(NotificationsAPIClient):
         data = {
             'archived': True
         }
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         return self.post(endpoint, data=data)
 
     def find_all_service_email_from(self, user_id=None):

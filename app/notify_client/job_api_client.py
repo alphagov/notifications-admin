@@ -32,6 +32,6 @@ class JobApiClient(BaseAPIClient):
             "original_file_name": original_file_name,
             "notification_count": notification_count
         }
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         resp = self.post(url='/service/{}/job'.format(service_id), data=data)
         return resp['data']
