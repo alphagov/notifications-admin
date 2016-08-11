@@ -40,15 +40,17 @@ def created_by_json(id_, name='', email_address=''):
 
 
 def service_json(
-        id_,
-        name,
-        users,
-        message_limit=1000,
-        active=False,
-        restricted=True,
-        email_from=None,
-        reply_to_email_address=None,
-        research_mode=False):
+    id_,
+    name,
+    users,
+    message_limit=1000,
+    active=False,
+    restricted=True,
+    email_from=None,
+    reply_to_email_address=None,
+    sms_sender=None,
+    research_mode=False
+):
     return {
         'id': id_,
         'name': name,
@@ -58,6 +60,7 @@ def service_json(
         'restricted': restricted,
         'email_from': email_from,
         'reply_to_email_address': reply_to_email_address,
+        'sms_sender': sms_sender,
         'research_mode': research_mode
     }
 

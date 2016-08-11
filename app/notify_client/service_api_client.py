@@ -73,38 +73,20 @@ class ServiceAPIClient(NotificationsAPIClient):
         """
         return self.get('/service', *params)
 
-    def update_service(self,
-                       service_id,
-                       service_name,
-                       active,
-                       message_limit,
-                       restricted,
-                       users,
-                       email_from,
-                       reply_to_email_address=None,
-                       sms_sender=None):
+    def update_service(
+        self,
+        service_id,
+        **kwargs
+    ):
         """
         Update a service.
         """
-        data = {
-            "id": service_id,
-            "name": service_name,
-            "active": active,
-            "message_limit": message_limit,
-            "restricted": restricted,
-            "users": users,
-            "email_from": email_from,
-            "reply_to_email_address": reply_to_email_address,
-            "sms_sender": sms_sender
-        }
-        _attach_current_user(data)
+        _attach_current_user(kwargs)
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)
 
     def update_service_with_properties(self, service_id, properties):
-        _attach_current_user(properties)
-        endpoint = "/service/{0}".format(service_id)
-        return self.post(endpoint, properties)
+        return self.update_service(service_id, **properties)
 
     def remove_user_from_service(self, service_id, user_id):
         """
