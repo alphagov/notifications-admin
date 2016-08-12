@@ -125,18 +125,20 @@ def mock_create_service(mocker):
 
 @pytest.fixture(scope='function')
 def mock_update_service(mocker):
-    def _update(service_id,
-                service_name,
-                active,
-                message_limit,
-                restricted,
-                users,
-                email_from,
-                reply_to_email_address=None,
-                sms_sender=None):
+    def _update(service_id, **kwargs):
         service = service_json(
-            service_id, service_name, users, message_limit=message_limit,
-            active=active, restricted=restricted, email_from=email_from, reply_to_email_address=reply_to_email_address)
+            service_id,
+            **{key: kwargs.get(key) for key in [
+                'name',
+                'users',
+                'message_limit',
+                'active',
+                'restricted',
+                'email_from',
+                'reply_to_email_address',
+                'sms_sender'
+            ]}
+        )
         return {'data': service}
 
     return mocker.patch(
@@ -145,14 +147,11 @@ def mock_update_service(mocker):
 
 @pytest.fixture(scope='function')
 def mock_update_service_raise_httperror_duplicate_name(mocker):
-    def _update(service_id,
-                service_name,
-                active,
-                limit,
-                restricted,
-                users,
-                email_from):
-        json_mock = Mock(return_value={'message': {'name': ["Duplicate service name '{}'".format(service_name)]}})
+    def _update(
+        service_id,
+        **kwargs
+    ):
+        json_mock = Mock(return_value={'message': {'name': ["Duplicate service name '{}'".format(kwargs.get('name'))]}})
         resp_mock = Mock(status_code=400, json=json_mock)
         http_error = HTTPError(response=resp_mock, message="Default message")
         raise http_error
@@ -214,26 +213,6 @@ def mock_delete_service(mocker, mock_get_service):
 
     return mocker.patch(
         'app.service_api_client.delete_service', side_effect=_delete)
-
-
-@pytest.fixture(scope='function')
-def mock_get_service_statistics_for_day(mocker):
-
-    stats = {'day': datetime.today().date().strftime('%Y-%m-%d'),
-             'emails_delivered': 0,
-             'sms_requested': 0,
-             'sms_delivered': 0,
-             'sms_failed': 0,
-             'emails_requested': 0,
-             'emails_failed': 0,
-             'service': fake_uuid,
-             'id': fake_uuid}
-
-    def _stats(service_id, day):
-        return {'data': stats}
-
-    return mocker.patch(
-        'app.statistics_api_client.get_statistics_for_service_for_day', side_effect=_stats)
 
 
 @pytest.fixture(scope='function')

@@ -23,7 +23,7 @@ class InviteApiClient(BaseAPIClient):
             'from_user': invite_from_id,
             'permissions': permissions
         }
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         resp = self.post(url='/service/{}/invite'.format(service_id), data=data)
         return InvitedUser(**resp['data'])
 
@@ -40,7 +40,7 @@ class InviteApiClient(BaseAPIClient):
 
     def cancel_invited_user(self, service_id, invited_user_id):
         data = {'status': 'cancelled'}
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         self.post(url='/service/{0}/invite/{1}'.format(service_id, invited_user_id),
                   data=data)
 

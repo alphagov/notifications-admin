@@ -66,17 +66,12 @@ def service_name_change_confirm(service_id):
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
-        current_service['name'] = session['service_name_change']
-        current_service['email_from'] = email_safe(session['service_name_change'])
         try:
             service_api_client.update_service(
                 current_service['id'],
-                current_service['name'],
-                current_service['active'],
-                current_service['message_limit'],
-                current_service['restricted'],
-                current_service['users'],
-                current_service['email_from'])
+                name=session['service_name_change'],
+                email_from=email_safe(session['service_name_change'])
+            )
         except HTTPError as e:
             error_msg = "Duplicate service name '{}'".format(session['service_name_change'])
             if e.status_code == 400 and error_msg in e.message['name']:
@@ -143,14 +138,11 @@ def service_request_to_go_live(service_id):
 def service_switch_live(service_id):
     service_api_client.update_service(
         current_service['id'],
-        current_service['name'],
-        current_service['active'],
         # TODO This limit should be set depending on the agreement signed by
         # with Notify.
-        250000 if current_service['restricted'] else 50,
-        False if current_service['restricted'] else True,
-        current_service['users'],
-        current_service['email_from'])
+        message_limit=250000 if current_service['restricted'] else 50,
+        restricted=(not current_service['restricted'])
+    )
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
@@ -188,15 +180,10 @@ def service_status_change_confirm(service_id):
     form = ConfirmPasswordForm(_check_password)
 
     if form.validate_on_submit():
-        current_service['active'] = True
         service_api_client.update_service(
             current_service['id'],
-            current_service['name'],
-            current_service['active'],
-            current_service['message_limit'],
-            current_service['restricted'],
-            current_service['users'],
-            current_service['email_from'])
+            active=True
+        )
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/confirm.html',
@@ -249,13 +236,8 @@ def service_set_reply_to_email(service_id):
         message = 'Reply to email set to {}'.format(form.email_address.data)
         service_api_client.update_service(
             current_service['id'],
-            current_service['name'],
-            current_service['active'],
-            current_service['message_limit'],
-            current_service['restricted'],
-            current_service['users'],
-            current_service['email_from'],
-            reply_to_email_address=form.email_address.data)
+            reply_to_email_address=form.email_address.data
+        )
         flash(message, 'default_with_tick')
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
@@ -277,14 +259,8 @@ def service_set_sms_sender(service_id):
             message = 'Text message sender removed'
         service_api_client.update_service(
             current_service['id'],
-            current_service['name'],
-            current_service['active'],
-            current_service['message_limit'],
-            current_service['restricted'],
-            current_service['users'],
-            current_service['email_from'],
-            current_service['reply_to_email_address'],
-            sms_sender=form.sms_sender.data if form.sms_sender.data else None)
+            sms_sender=form.sms_sender.data or None
+        )
         flash(message, 'default_with_tick')
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
