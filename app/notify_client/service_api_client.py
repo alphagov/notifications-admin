@@ -30,7 +30,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             "restricted": restricted,
             "email_from": email_from
         }
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         return self.post("/service", data)['data']['id']
 
     def delete_service(self, service_id):
@@ -73,38 +73,35 @@ class ServiceAPIClient(NotificationsAPIClient):
         """
         return self.get('/service', *params)
 
-    def update_service(self,
-                       service_id,
-                       service_name,
-                       active,
-                       message_limit,
-                       restricted,
-                       users,
-                       email_from,
-                       reply_to_email_address=None,
-                       sms_sender=None):
+    def update_service(
+        self,
+        service_id,
+        **kwargs
+    ):
         """
         Update a service.
         """
-        data = {
-            "id": service_id,
-            "name": service_name,
-            "active": active,
-            "message_limit": message_limit,
-            "restricted": restricted,
-            "users": users,
-            "email_from": email_from,
-            "reply_to_email_address": reply_to_email_address,
-            "sms_sender": sms_sender
+        data = _attach_current_user(kwargs)
+        disallowed_attributes = set(data.keys()) - {
+            'name',
+            'message_limit',
+            'active',
+            'restricted',
+            'email_from',
+            'reply_to_email_address',
+            'sms_sender',
+            'created_by'
         }
-        _attach_current_user(data)
+        if disallowed_attributes:
+            raise TypeError('Not allowed to update service attributes: {}'.format(
+                ", ".join(disallowed_attributes)
+            ))
+
         endpoint = "/service/{0}".format(service_id)
         return self.post(endpoint, data)
 
     def update_service_with_properties(self, service_id, properties):
-        _attach_current_user(properties)
-        endpoint = "/service/{0}".format(service_id)
-        return self.post(endpoint, properties)
+        return self.update_service(service_id, **properties)
 
     def remove_user_from_service(self, service_id, user_id):
         """
@@ -130,7 +127,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             data.update({
                 'subject': subject
             })
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         endpoint = "/service/{0}/template".format(service_id)
         return self.post(endpoint, data)
 
@@ -149,7 +146,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             data.update({
                 'subject': subject
             })
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
         return self.post(endpoint, data)
 
@@ -190,7 +187,7 @@ class ServiceAPIClient(NotificationsAPIClient):
         data = {
             'archived': True
         }
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         return self.post(endpoint, data=data)
 
     def find_all_service_email_from(self, user_id=None):

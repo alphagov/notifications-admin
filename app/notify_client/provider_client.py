@@ -29,5 +29,5 @@ class ProviderClient(BaseAPIClient):
         data = {
             "priority": priority
         }
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         return self.post(url='/provider-details/{}'.format(provider_id), data=data)
