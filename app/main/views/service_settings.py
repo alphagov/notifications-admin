@@ -272,24 +272,19 @@ def service_set_sms_sender(service_id):
 @login_required
 @user_has_permissions(admin_override=True)
 def service_set_branding_and_org(service_id):
-
-    print(">>>"*30)
-    print("fffffuuuuu")
-
     organisations = organisations_client.get_organisations()
 
-    # get current service branding
-    form = ServiceBrandingOrg(
-        branding_type=current_service.get('branding'),
-        organisation=current_service.get('organisation')
-    )
+    form = ServiceBrandingOrg(branding_type=current_service.get('branding'))
+    # dynamically create org choices, including the null option
     form.organisation.choices = [('', 'None')] + get_branding_as_value_and_label(organisations)
+    form.organisation.data = current_service['organisation'] or ''
 
     if form.validate_on_submit():
+        organisation = None if form.organisation.data == '' else form.organisation.data
         service_api_client.update_service(
             service_id,
             branding=form.branding_type.data,
-            organisation=form.organisation.data
+            organisation=organisation
         )
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
