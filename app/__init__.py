@@ -288,6 +288,8 @@ def load_user(user_id):
 
 
 def load_service_before_request():
+    if '/static/' in request.url:
+        return
     service_id = request.view_args.get('service_id', session.get('service_id')) if request.view_args \
         else session.get('service_id')
     from flask.globals import _request_ctx_stack
@@ -296,6 +298,7 @@ def load_service_before_request():
             _request_ctx_stack.top,
             'service',
             service_api_client.get_service(service_id)['data'] if service_id else None)
+        print('before_request', request.url)
 
 
 def save_service_after_request(response):

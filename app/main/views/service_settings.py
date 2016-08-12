@@ -276,17 +276,19 @@ def service_set_branding_and_org(service_id):
 
     form = ServiceBrandingOrg(branding_type=current_service.get('branding'))
     # dynamically create org choices, including the null option
-    form.organisation.choices = [('', 'None')] + get_branding_as_value_and_label(organisations)
-    form.organisation.data = current_service['organisation'] or ''
+    form.organisation.choices = [('nil', 'None')] + get_branding_as_value_and_label(organisations)
 
     if form.validate_on_submit():
-        organisation = None if form.organisation.data == '' else form.organisation.data
+        organisation = None if form.organisation.data == 'nil' else form.organisation.data
         service_api_client.update_service(
             service_id,
             branding=form.branding_type.data,
-            organisation=organisation
+            organisation_id=organisation
         )
         return redirect(url_for('.service_settings', service_id=service_id))
+
+    # only set form.organisation.data on GET (to select correct initial radio button)
+    form.organisation.data = current_service['organisation'] or 'nil'
     return render_template(
         'views/service-settings/set-branding-and-org.html',
         form=form,
