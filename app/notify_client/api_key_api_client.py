@@ -30,7 +30,7 @@ class ApiKeyApiClient(BaseAPIClient):
             'name': key_name,
             'key_type': key_type
         }
-        _attach_current_user(data)
+        data = _attach_current_user(data)
         key = self.post(url='/service/{}/api-key'.format(service_id), data=data)
         return key['data']
 

@@ -80,7 +80,11 @@ def test_switch_service_to_live(app_,
         assert response.location == url_for(
             'main.service_settings',
             service_id=service_one['id'], _external=True)
-        mock_update_service.assert_called_with(ANY, ANY, ANY, 250000, False, ANY, ANY)
+        mock_update_service.assert_called_with(
+            service_one['id'],
+            message_limit=250000,
+            restricted=False
+        )
 
 
 def test_switch_service_to_restricted(app_,
@@ -100,7 +104,11 @@ def test_switch_service_to_restricted(app_,
         assert response.location == url_for(
             'main.service_settings',
             service_id=service_one['id'], _external=True)
-        mock_update_service.assert_called_with(ANY, ANY, ANY, 50, True, ANY, ANY)
+        mock_update_service.assert_called_with(
+            service_one['id'],
+            message_limit=50,
+            restricted=True
+        )
 
 
 def test_should_not_allow_duplicate_names(app_,
@@ -159,13 +167,11 @@ def test_should_redirect_after_service_name_confirmation(app_,
         assert response.status_code == 302
         settings_url = url_for('main.service_settings', service_id=service_id, _external=True)
         assert settings_url == response.location
-        mock_update_service.assert_called_once_with(service_id,
-                                                    service_new_name,
-                                                    service_one['active'],
-                                                    service_one['message_limit'],
-                                                    service_one['restricted'],
-                                                    service_one['users'],
-                                                    email_safe(service_new_name))
+        mock_update_service.assert_called_once_with(
+            service_id,
+            name=service_new_name,
+            email_from=email_safe(service_new_name)
+        )
         assert mock_verify_password.called
 
 
@@ -564,14 +570,10 @@ def test_set_reply_to_email_address(
                                    data=data,
                                    follow_redirects=True)
         assert response.status_code == 200
-        mock_update_service.assert_called_with(service_one['id'],
-                                               service_one['name'],
-                                               service_one['active'],
-                                               service_one['message_limit'],
-                                               service_one['restricted'],
-                                               ANY,
-                                               service_one['email_from'],
-                                               "test@someservice.gov.uk")
+        mock_update_service.assert_called_with(
+            service_one['id'],
+            reply_to_email_address="test@someservice.gov.uk"
+        )
 
 
 def test_if_reply_to_email_address_set_then_form_populated(app_,
@@ -710,15 +712,10 @@ def test_set_text_message_sender(
                                    follow_redirects=True)
         assert response.status_code == 200
 
-        mock_update_service.assert_called_with(service_one['id'],
-                                               service_one['name'],
-                                               service_one['active'],
-                                               service_one['message_limit'],
-                                               service_one['restricted'],
-                                               service_one['users'],
-                                               service_one['email_from'],
-                                               service_one['reply_to_email_address'],
-                                               "elevenchars")
+        mock_update_service.assert_called_with(
+            service_one['id'],
+            sms_sender="elevenchars"
+        )
 
 
 def test_if_sms_sender_set_then_form_populated(app_,
