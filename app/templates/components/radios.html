@@ -44,6 +44,7 @@
             type="radio"
             name="{{ field.name }}"
             id="{{ field.name }}-{{ loop.index }}"
+            value="{{ value }}"
             {% if checked %}checked="checked"{% endif %}
           />
           {% if branding_dict.get(value, {}).get('colour') %}
