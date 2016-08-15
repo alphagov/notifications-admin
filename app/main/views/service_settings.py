@@ -283,7 +283,7 @@ def service_set_branding_and_org(service_id):
         service_api_client.update_service(
             service_id,
             branding=form.branding_type.data,
-            organisation_id=organisation
+            organisation=organisation
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 

@@ -782,9 +782,9 @@ def test_should_show_branding_and_organisations(
             page.find('input', attrs={"id": "branding_type-2"})['checked']
 
         assert page.find('label', attrs={"for": "organisation-1"}).text.strip() == 'None'
-        with pytest.raises(KeyError):
-            page.find('input', attrs={"id": "organisation-1"})['value']
+        assert page.find('input', attrs={"id": "organisation-1"})['value'] == 'None'
         assert page.find('label', attrs={"for": "organisation-2"}).text.strip() == 'Organisation name'
+        assert page.find('input', attrs={"id": "organisation-2"})['value'] == 'organisation-name'
         assert page.find('label', attrs={"for": "organisation-2"}).find('img')['src'] == (
             '/static/images/email-template/crests/example.png'
         )

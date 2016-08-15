@@ -92,7 +92,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             'sms_sender',
             'created_by',
             'branding',
-            'organisation_id'
+            'organisation'
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(
