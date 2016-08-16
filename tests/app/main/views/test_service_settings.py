@@ -761,7 +761,7 @@ def test_set_text_message_sender_flash_messages(
             assert element.text.strip() == expected_flash_message
 
 
-def test_should_show_branding_and_organisations(
+def test_should_show_branding(
     mocker, app_, platform_admin_user, service_one, mock_get_organisations
 ):
     with app_.test_request_context(), app_.test_client() as client:
@@ -773,22 +773,35 @@ def test_should_show_branding_and_organisations(
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
         assert page.find('input', attrs={"id": "branding_type-0"})['value'] == 'govuk'
-        assert page.find('input', attrs={"id": "branding_type-0"})['checked'] == ''
         assert page.find('input', attrs={"id": "branding_type-1"})['value'] == 'both'
-        with pytest.raises(KeyError):
-            page.find('input', attrs={"id": "branding_type-1"})['checked']
         assert page.find('input', attrs={"id": "branding_type-2"})['value'] == 'org'
-        with pytest.raises(KeyError):
-            page.find('input', attrs={"id": "branding_type-2"})['checked']
 
-        assert page.find('label', attrs={"for": "organisation-1"}).text.strip() == 'None'
-        assert page.find('input', attrs={"id": "organisation-1"})['value'] == 'None'
-        assert page.find('label', attrs={"for": "organisation-2"}).text.strip() == 'Organisation name'
-        assert page.find('input', attrs={"id": "organisation-2"})['value'] == 'organisation-name'
-        assert page.find('label', attrs={"for": "organisation-2"}).find('img')['src'] == (
-            '/static/images/email-template/crests/example.png'
-        )
-        assert '#f00' in str(page.find('label', attrs={"for": "organisation-2"}))
+        assert 'checked' in page.find('input', attrs={"id": "branding_type-0"}).attrs
+        assert 'checked' not in page.find('input', attrs={"id": "branding_type-1"}).attrs
+        assert 'checked' not in page.find('input', attrs={"id": "branding_type-2"}).attrs
+
+        app.organisations_client.get_organisations.assert_called_once_with()
+        app.service_api_client.get_service.assert_called_once_with(service_one['id'])
+
+
+def test_should_show_organisations(
+    mocker, app_, platform_admin_user, service_one, mock_get_organisations
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(platform_admin_user, mocker, service_one)
+        response = client.get(url_for(
+            'main.service_set_branding_and_org', service_id=service_one['id']
+        ))
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+        assert page.find('input', attrs={"id": "branding_type-0"})['value'] == 'govuk'
+        assert page.find('input', attrs={"id": "branding_type-1"})['value'] == 'both'
+        assert page.find('input', attrs={"id": "branding_type-2"})['value'] == 'org'
+
+        assert 'checked' in page.find('input', attrs={"id": "branding_type-0"}).attrs
+        assert 'checked' not in page.find('input', attrs={"id": "branding_type-1"}).attrs
+        assert 'checked' not in page.find('input', attrs={"id": "branding_type-2"}).attrs
 
         app.organisations_client.get_organisations.assert_called_once_with()
         app.service_api_client.get_service.assert_called_once_with(service_one['id'])
@@ -805,7 +818,7 @@ def test_should_set_branding_and_organisations(
             ),
             data={
                 'branding_type': 'org',
-                'organisation': 'organisation-name'
+                'organisation': 'organisation-id'
             }
         )
         assert response.status_code == 302
@@ -815,5 +828,5 @@ def test_should_set_branding_and_organisations(
         app.service_api_client.update_service.assert_called_once_with(
             service_one['id'],
             branding='org',
-            organisation='organisation-name'
+            organisation='organisation-id'
         )

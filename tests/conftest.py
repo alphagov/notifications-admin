@@ -1142,7 +1142,7 @@ def mock_get_organisations(mocker):
             {
                 'logo': 'example.png',
                 'name': 'Organisation name',
-                'id': 'organisation-name',
+                'id': 'organisation-id',
                 'colour': '#f00'
             }
         ]

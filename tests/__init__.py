@@ -50,7 +50,7 @@ def service_json(
     reply_to_email_address=None,
     sms_sender=None,
     research_mode=False,
-    organisation='organisation-name',
+    organisation='organisation-id',
     branding='govuk'
 ):
     return {
