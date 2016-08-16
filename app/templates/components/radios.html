@@ -21,3 +21,44 @@
     </fieldset>
   </div>
 {% endmacro %}
+
+
+{% macro branding_radios(
+  field,
+  hint=None,
+  branding_dict={}
+) %}
+  <div class="form-group {% if field.errors %} error{% endif %}">
+    <fieldset>
+      <legend class="form-label">
+        {{ field.label }}
+        {% if field.errors %}
+          <span class="error-message">
+            {{ field.errors[0] }}
+          </span>
+        {% endif %}
+      </legend>
+      {% for value, option, checked in field.iter_choices() %}
+        <label class="block-label" for="{{ field.name }}-{{ loop.index }}">
+          <input
+            type="radio"
+            name="{{ field.name }}"
+            id="{{ field.name }}-{{ loop.index }}"
+            value="{{ value }}"
+            {% if checked %}checked="checked"{% endif %}
+          />
+          {% if branding_dict.get(value, {}).get('colour') %}
+            <span style="background: {{ branding_dict[value].colour }}; display: inline-block; width: 3px; height: 27px"></span>
+          {% endif %}
+          {% if branding_dict.get(value, {}).get('logo') %}
+            <img
+              src="{{ branding_dict[value].logo }}"
+              height="27"
+            />
+          {% endif %}
+          {{option}}
+        </label>
+      {% endfor %}
+    </fieldset>
+  </div>
+{% endmacro %}

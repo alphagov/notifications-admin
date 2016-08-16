@@ -759,3 +759,74 @@ def test_set_text_message_sender_flash_messages(
             element = page.find('div', {"class": "banner-default-with-tick"})
 
             assert element.text.strip() == expected_flash_message
+
+
+def test_should_show_branding(
+    mocker, app_, platform_admin_user, service_one, mock_get_organisations
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(platform_admin_user, mocker, service_one)
+        response = client.get(url_for(
+            'main.service_set_branding_and_org', service_id=service_one['id']
+        ))
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+        assert page.find('input', attrs={"id": "branding_type-0"})['value'] == 'govuk'
+        assert page.find('input', attrs={"id": "branding_type-1"})['value'] == 'both'
+        assert page.find('input', attrs={"id": "branding_type-2"})['value'] == 'org'
+
+        assert 'checked' in page.find('input', attrs={"id": "branding_type-0"}).attrs
+        assert 'checked' not in page.find('input', attrs={"id": "branding_type-1"}).attrs
+        assert 'checked' not in page.find('input', attrs={"id": "branding_type-2"}).attrs
+
+        app.organisations_client.get_organisations.assert_called_once_with()
+        app.service_api_client.get_service.assert_called_once_with(service_one['id'])
+
+
+def test_should_show_organisations(
+    mocker, app_, platform_admin_user, service_one, mock_get_organisations
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(platform_admin_user, mocker, service_one)
+        response = client.get(url_for(
+            'main.service_set_branding_and_org', service_id=service_one['id']
+        ))
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+        assert page.find('input', attrs={"id": "branding_type-0"})['value'] == 'govuk'
+        assert page.find('input', attrs={"id": "branding_type-1"})['value'] == 'both'
+        assert page.find('input', attrs={"id": "branding_type-2"})['value'] == 'org'
+
+        assert 'checked' in page.find('input', attrs={"id": "branding_type-0"}).attrs
+        assert 'checked' not in page.find('input', attrs={"id": "branding_type-1"}).attrs
+        assert 'checked' not in page.find('input', attrs={"id": "branding_type-2"}).attrs
+
+        app.organisations_client.get_organisations.assert_called_once_with()
+        app.service_api_client.get_service.assert_called_once_with(service_one['id'])
+
+
+def test_should_set_branding_and_organisations(
+    mocker, app_, platform_admin_user, service_one, mock_get_organisations, mock_update_service
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(platform_admin_user, mocker, service_one)
+        response = client.post(
+            url_for(
+                'main.service_set_branding_and_org', service_id=service_one['id']
+            ),
+            data={
+                'branding_type': 'org',
+                'organisation': 'organisation-id'
+            }
+        )
+        assert response.status_code == 302
+        assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+
+        app.organisations_client.get_organisations.assert_called_once_with()
+        app.service_api_client.update_service.assert_called_once_with(
+            service_one['id'],
+            branding='org',
+            organisation='organisation-id'
+        )

@@ -24,10 +24,10 @@ from app.main.forms import (
     ServiceNameForm,
     RequestToGoLiveForm,
     ServiceReplyToEmailFrom,
-    ServiceSmsSender
+    ServiceSmsSender,
+    ServiceBrandingOrg
 )
-from app import user_api_client
-from app import current_service
+from app import user_api_client, current_service, organisations_client
 
 
 @main.route("/services/<service_id>/service-settings")
@@ -266,3 +266,47 @@ def service_set_sms_sender(service_id):
     return render_template(
         'views/service-settings/set-sms-sender.html',
         form=form)
+
+
+@main.route("/services/<service_id>/service-settings/set-branding-and-org", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions(admin_override=True)
+def service_set_branding_and_org(service_id):
+    organisations = organisations_client.get_organisations()
+
+    form = ServiceBrandingOrg(branding_type=current_service.get('branding'))
+    # dynamically create org choices, including the null option
+    form.organisation.choices = [('None', 'None')] + get_branding_as_value_and_label(organisations)
+
+    if form.validate_on_submit():
+        organisation = None if form.organisation.data == 'None' else form.organisation.data
+        service_api_client.update_service(
+            service_id,
+            branding=form.branding_type.data,
+            organisation=organisation
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    form.organisation.data = current_service['organisation'] or 'None'
+
+    return render_template(
+        'views/service-settings/set-branding-and-org.html',
+        form=form,
+        branding_dict=get_branding_as_dict(organisations)
+    )
+
+
+def get_branding_as_value_and_label(organisations):
+    return [
+        (organisation['id'], organisation['name'])
+        for organisation in organisations
+    ]
+
+
+def get_branding_as_dict(organisations):
+    return {
+        organisation['id']: {
+            'logo': '/static/images/email-template/crests/{}'.format(organisation['logo']),
+            'colour': organisation['colour']
+        } for organisation in organisations
+    }
