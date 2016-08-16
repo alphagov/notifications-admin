@@ -298,7 +298,6 @@ def load_service_before_request():
             _request_ctx_stack.top,
             'service',
             service_api_client.get_service(service_id)['data'] if service_id else None)
-        print('before_request', request.url)
 
 
 def save_service_after_request(response):
