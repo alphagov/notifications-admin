@@ -19,6 +19,10 @@
         'link': url_for('.service_set_reply_to_email', service_id=current_service.id)
       },
       {
+        'title': 'Set email branding',
+        'link': url_for('.service_set_branding_and_org', service_id=current_service.id)
+      } if current_user.has_permissions([], admin_override=True) else {},
+      {
         'title': 'Set text message sender name',
         'link': url_for('.service_set_sms_sender', service_id=current_service.id)
       },
@@ -51,7 +55,7 @@
         'title': 'Take service out of research mode',
         'link': url_for('.service_switch_research_mode', service_id=current_service.id)
       } if current_service.research_mode and current_user.has_permissions([], admin_override=True) else {
-      },
+      }
     ]) }}
 
 {% endblock %}

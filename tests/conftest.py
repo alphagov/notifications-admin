@@ -1133,3 +1133,20 @@ def mock_events(mocker):
 @pytest.fixture(scope='function')
 def mock_send_already_registered_email(mocker):
     return mocker.patch('app.user_api_client.send_already_registered_email')
+
+
+@pytest.fixture(scope='function')
+def mock_get_organisations(mocker):
+    def _get_organisations():
+        return [
+            {
+                'logo': 'example.png',
+                'name': 'Organisation name',
+                'id': 'organisation-id',
+                'colour': '#f00'
+            }
+        ]
+
+    return mocker.patch(
+        'app.organisations_client.get_organisations', side_effect=_get_organisations
+    )
