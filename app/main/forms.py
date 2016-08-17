@@ -338,3 +338,29 @@ class ServiceSmsSender(Form):
         import re
         if field.data and not re.match('^[a-zA-Z0-9\s]+$', field.data):
             raise ValidationError('Sms text message sender can only contain alpha-numeric characters')
+
+
+class ServiceBrandingOrg(Form):
+
+    def __init__(self, organisations=[], *args, **kwargs):
+        self.organisation.choices = organisations
+        super(ServiceBrandingOrg, self).__init__(*args, **kwargs)
+
+    branding_type = RadioField(
+        'Branding',
+        choices=[
+            ('govuk', 'GOV.UK only'),
+            ('both', 'GOV.UK and organisation'),
+            ('org', 'Organisation only')
+        ],
+        validators=[
+            DataRequired()
+        ]
+    )
+
+    organisation = RadioField(
+        'Organisation',
+        validators=[
+            DataRequired()
+        ]
+    )
