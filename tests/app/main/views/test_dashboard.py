@@ -14,48 +14,39 @@ from tests.conftest import SERVICE_ONE_ID
 
 stub_template_stats = [
     {
-        'template': {
-            'name': 'Brine Shrimp',
-            'template_type': 'sms',
-            'id': 1
-        },
-        'id': '6005e192-4738-4962-beec-ebd982d0b03f',
-        'day': '2016-04-06',
-        'usage_count': 6,
-        'service': '1491b86f-c950-48f5-bed1-2a55df027ecb'
+        'template_type': 'sms',
+        'template_name': 'one',
+        'template_id': 'id-1',
+        'count': 100,
+        'day': '2016-01-01'
     },
     {
-        'template': {
-            'name': 'Pickle feet',
-            'template_type': 'sms',
-            'id': 2
-        },
-        'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
-        'day': '2016-04-06',
-        'usage_count': 6,
-        'service': '1491b86f-c950-48f5-bed1-2a55df027ecb'
-        },
+        'template_type': 'email',
+        'template_name': 'two',
+        'template_id': 'id-2',
+        'count': 200,
+        'day': '2016-01-01'
+    },
     {
-        'template': {
-            'name': 'Brine Shrimp',
-            'template_type': 'sms',
-            'id': 1
-        },
-        'id': '24531628-ffff-4082-a443-9f6db5af83d9',
-        'day': '2016-04-05',
-        'usage_count': 7,
-        'service': '1491b86f-c950-48f5-bed1-2a55df027ecb'
-        },
+        'template_type': 'sms',
+        'template_name': 'one',
+        'template_id': 'id-1',
+        'count': 300,
+        'day': '2016-01-02'
+    },
     {
-        'template': {
-            'name': 'Pickle feet',
-            'template_type': 'sms',
-            'id': 2
-        },
-        'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
-        'day': '2016-03-06',
-        'usage_count': 200,
-        'service': '1491b86f-c950-48f5-bed1-2a55df027ecb'
+        'template_type': 'sms',
+        'template_name': 'one',
+        'template_id': 'id-1',
+        'count': 400,
+        'day': '2016-01-02'
+    },
+    {
+        'template_type': 'email',
+        'template_name': 'two',
+        'template_id': 'id-2',
+        'count': 500,
+        'day': '2016-01-03'
     },
 ]
 
@@ -83,7 +74,6 @@ def test_get_started(
         response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
     # mock_get_service_templates_when_no_templates_exist.assert_called_once_with(SERVICE_ONE_ID)
-    print(response.get_data(as_text=True))
     assert response.status_code == 200
     assert 'Get started' in response.get_data(as_text=True)
 
@@ -147,13 +137,13 @@ def test_should_show_recent_templates_on_dashboard(app_,
 
         assert len(table_rows) == 2
 
-        assert 'Pickle feet' in table_rows[0].find_all('th')[0].text
+        assert 'one' in table_rows[0].find_all('th')[0].text
         assert 'Text message template' in table_rows[0].find_all('th')[0].text
-        assert '206' in table_rows[0].find_all('td')[0].text
+        assert '800' in table_rows[0].find_all('td')[0].text
 
-        assert 'Brine Shrimp' in table_rows[1].find_all('th')[0].text
-        assert 'Text message template' in table_rows[1].find_all('th')[0].text
-        assert '13' in table_rows[1].find_all('td')[0].text
+        assert 'two' in table_rows[1].find_all('th')[0].text
+        assert 'Email template' in table_rows[1].find_all('th')[0].text
+        assert '700' in table_rows[1].find_all('td')[0].text
 
 
 def test_should_show_all_templates_on_template_statistics_page(
@@ -186,13 +176,13 @@ def test_should_show_all_templates_on_template_statistics_page(
 
         assert len(table_rows) == 2
 
-        assert 'Pickle feet' in table_rows[0].find_all('th')[0].text
+        assert 'one' in table_rows[0].find_all('th')[0].text
         assert 'Text message template' in table_rows[0].find_all('th')[0].text
-        assert '206' in table_rows[0].find_all('td')[0].text
+        assert '800' in table_rows[0].find_all('td')[0].text
 
-        assert 'Brine Shrimp' in table_rows[1].find_all('th')[0].text
-        assert 'Text message template' in table_rows[1].find_all('th')[0].text
-        assert '13' in table_rows[1].find_all('td')[0].text
+        assert 'two' in table_rows[1].find_all('th')[0].text
+        assert 'Email template' in table_rows[1].find_all('th')[0].text
+        assert '700' in table_rows[1].find_all('td')[0].text
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
@@ -409,10 +399,14 @@ def test_aggregate_template_stats():
 
     assert len(expected) == 2
     for item in expected:
-        if item['template'].id == 1:
-            assert item['usage_count'] == 13
-        elif item['template'].id == 2:
-            assert item['usage_count'] == 206
+        if item['template_name'] == 'one':
+            assert item['count'] == 800
+            assert item['template_id'] == 'id-1'
+            assert item['template_type'] == 'sms'
+        elif item['template_name'] == 'two':
+            assert item['count'] == 700
+            assert item['template_id'] == 'id-2'
+            assert item['template_type'] == 'email'
 
 
 def test_service_dashboard_updates_gets_dashboard_totals(mocker,
