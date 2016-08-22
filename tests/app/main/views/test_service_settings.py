@@ -321,95 +321,6 @@ def test_log_error_on_request_to_go_live(
             )
 
 
-def test_should_show_status_page(app_,
-                                 api_user_active,
-                                 mock_get_service,
-                                 mock_get_user,
-                                 mock_get_user_by_email,
-                                 mock_login,
-                                 mock_has_permissions,
-                                 fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.get(url_for(
-                'main.service_status_change', service_id=service_id))
-
-        assert response.status_code == 200
-        resp_data = response.get_data(as_text=True)
-        assert 'Suspend API keys' in resp_data
-        assert mock_get_service.called
-
-
-def test_should_show_redirect_after_status_change(app_,
-                                                  api_user_active,
-                                                  mock_get_service,
-                                                  mock_get_user,
-                                                  mock_get_user_by_email,
-                                                  mock_login,
-                                                  mock_has_permissions,
-                                                  fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.post(url_for(
-                'main.service_status_change', service_id=service_id))
-
-        assert response.status_code == 302
-        redirect_url = url_for(
-            'main.service_status_change_confirm', service_id=service_id, _external=True)
-        assert redirect_url == response.location
-        assert mock_get_service.called
-
-
-def test_should_show_status_confirmation(app_,
-                                         api_user_active,
-                                         mock_get_service,
-                                         mock_get_user,
-                                         mock_get_user_by_email,
-                                         mock_login,
-                                         mock_has_permissions,
-                                         fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.get(url_for(
-                'main.service_status_change_confirm', service_id=service_id))
-
-        assert response.status_code == 200
-        resp_data = response.get_data(as_text=True)
-        assert 'Turn off all outgoing notifications' in resp_data
-        assert mock_get_service.called
-
-
-def test_should_redirect_after_status_confirmation(app_,
-                                                   api_user_active,
-                                                   mock_get_service,
-                                                   mock_update_service,
-                                                   mock_get_user,
-                                                   mock_get_user_by_email,
-                                                   mock_login,
-                                                   mock_verify_password,
-                                                   mock_has_permissions,
-                                                   fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.post(url_for(
-                'main.service_status_change_confirm', service_id=service_id))
-
-        assert response.status_code == 302
-        settings_url = url_for(
-            'main.service_settings', service_id=service_id, _external=True)
-        assert settings_url == response.location
-        assert mock_get_service.called
-        assert mock_update_service.called
-
-
 def test_should_show_delete_page(app_,
                                  api_user_active,
                                  mock_login,
@@ -502,8 +413,6 @@ def test_route_permissions(mocker, app_, api_user_active, service_one):
         'main.service_name_change',
         'main.service_name_change_confirm',
         'main.service_request_to_go_live',
-        'main.service_status_change',
-        'main.service_status_change_confirm',
         'main.service_delete',
         'main.service_delete_confirm']
     with app_.test_request_context():
@@ -527,8 +436,6 @@ def test_route_invalid_permissions(mocker, app_, api_user_active, service_one):
         'main.service_request_to_go_live',
         'main.service_switch_live',
         'main.service_switch_research_mode',
-        'main.service_status_change',
-        'main.service_status_change_confirm',
         'main.service_delete',
         'main.service_delete_confirm']
     with app_.test_request_context():
@@ -550,8 +457,6 @@ def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one
         'main.service_name_change',
         'main.service_name_change_confirm',
         'main.service_request_to_go_live',
-        'main.service_status_change',
-        'main.service_status_change_confirm',
         'main.service_delete',
         'main.service_delete_confirm'
     ]

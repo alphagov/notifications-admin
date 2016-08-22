@@ -157,41 +157,6 @@ def service_switch_research_mode(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
-@main.route("/services/<service_id>/service-settings/status", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions('manage_settings', admin_override=True)
-def service_status_change(service_id):
-    if request.method == 'GET':
-        return render_template(
-            'views/service-settings/status.html'
-        )
-    elif request.method == 'POST':
-        return redirect(url_for('.service_status_change_confirm', service_id=service_id))
-
-
-@main.route("/services/<service_id>/service-settings/status/confirm", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions('manage_settings', admin_override=True)
-def service_status_change_confirm(service_id):
-    # Validate password for form
-    def _check_password(pwd):
-        return user_api_client.verify_password(current_user.id, pwd)
-
-    form = ConfirmPasswordForm(_check_password)
-
-    if form.validate_on_submit():
-        service_api_client.update_service(
-            current_service['id'],
-            active=True
-        )
-        return redirect(url_for('.service_settings', service_id=service_id))
-    return render_template(
-        'views/service-settings/confirm.html',
-        heading='Turn off all outgoing notifications',
-        destructive=True,
-        form=form)
-
-
 @main.route("/services/<service_id>/service-settings/delete", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)

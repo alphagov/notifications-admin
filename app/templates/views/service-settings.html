@@ -1,6 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/browse-list.html" import browse_list %}
-{% from "components/table.html" import mapping_table, row, text_field, edit_field %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field %}
 
 {% block page_title %}
   Settings – GOV.UK Notify
@@ -10,46 +10,53 @@
 
     <h1 class="heading-large">Settings</h1>
 
-    {% call mapping_table(
-      caption='Settings',
-      field_headings=['Label', 'Value', 'Action'],
-      field_headings_visible=False,
-      caption_visible=False
-    ) %}
-      {% call row() %}
-        {{ text_field('Service name' )}}
-        {{ text_field(current_service.name) }}
-        {{ edit_field('Change', url_for('.service_name_change', service_id=current_service.id)) }}
+    <div class="dashboard-table">
+
+      {% call mapping_table(
+        caption='Settings',
+        field_headings=['Label', 'Value', 'Action'],
+        field_headings_visible=False,
+        caption_visible=False
+      ) %}
+        {% call row() %}
+          {{ text_field('Service name' )}}
+          {{ text_field(current_service.name) }}
+          {{ edit_field('Change', url_for('.service_name_change', service_id=current_service.id)) }}
+        {% endcall %}
+        {% call row() %}
+          {{ text_field('Email reply to address')}}
+          {{ text_field(
+            current_service.reply_to_email_address,
+            status='' if current_service.reply_to_email_address else 'default'
+          ) }}
+          {{ edit_field('Change', url_for('.service_set_reply_to_email', service_id=current_service.id)) }}
+        {% endcall %}
+        {% call row() %}
+          {{ text_field('Text message sender')}}
+          {{ text_field(current_service.sms_sender or '40604') }}
+          {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id)) }}
+        {% endcall %}
       {% endcall %}
-      {% call row() %}
-        {{ text_field('Email reply to address')}}
-        {{ text_field(
-          current_service.reply_to_email_address,
-          status='' if current_service.reply_to_email_address else 'default'
-        ) }}
-        {{ edit_field('Change', url_for('.service_set_reply_to_email', service_id=current_service.id)) }}
+
+      {% call mapping_table(
+        caption='Restrictions',
+        field_headings=['Label', 'Value', 'Action'],
+        field_headings_visible=False,
+        caption_visible=True
+      ) %}
+        {% call row() %}
+          {% if current_service.restricted %}
+            {{ text_field('Trial mode') }}
+            {{ text_field('On') }}
+            {{ edit_field('Request to go live', url_for('.service_request_to_go_live', service_id=current_service.id)) }}
+          {% else %}
+            {{ text_field('Trial mode') }}
+            {{ text_field('Off')}}
+            {{ edit_field() }}
+          {% endif %}
+        {% endcall %}
       {% endcall %}
-      {% call row() %}
-        {{ text_field('Text message sender')}}
-        {{ text_field(current_service.sms_sender or '40604') }}
-        {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id)) }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Mode')}}
-        {% if current_service.restricted %}
-          {{ text_field('Trial') }}
-          {{ edit_field('Go live', url_for('.service_request_to_go_live', service_id=current_service.id)) }}
-        {% else %}
-          {{ text_field('Live') }}
-          {{ edit_field() }}
-        {% endif %}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Active')}}
-        {{ text_field(current_service.active) }}
-        {{ edit_field('Suspend', url_for('.service_status_change', service_id=current_service.id)) }}
-      {% endcall %}
-    {% endcall %}
+    </div>
 
     {% if current_user.has_permissions([], admin_override=True) %}
 
