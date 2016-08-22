@@ -73,8 +73,8 @@
   </td>
 {% endmacro %}
 
-{% macro text_field(text) -%}
-  {% call field() %}
+{% macro text_field(text, status='') -%}
+  {% call field(status=status) %}
     {{ text }}
   {% endcall %}
 {%- endmacro %}

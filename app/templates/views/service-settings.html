@@ -23,7 +23,10 @@
       {% endcall %}
       {% call row() %}
         {{ text_field('Email reply to address')}}
-        {{ text_field(current_service.reply_to_email_address) }}
+        {{ text_field(
+          current_service.reply_to_email_address,
+          status='' if current_service.reply_to_email_address else 'default'
+        ) }}
         {{ edit_field('Change', url_for('.service_set_reply_to_email', service_id=current_service.id)) }}
       {% endcall %}
       {% call row() %}
