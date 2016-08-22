@@ -19,7 +19,7 @@ GOV.UK Notify admin application.
 ## First-time setup
 
 Languages needed
-- Python 3
+- Python 3.4
 - [Node](http://nodejs.org/) 5.0.0 or greater
 ```shell
     brew install node
@@ -34,18 +34,15 @@ version of Node.
     npm rebuild node-sass
 ```
 
-The app runs within a virtual environment. To [install virtualenv](https://virtualenv.readthedocs.org/en/latest/installation.html), run
+The app runs within a virtual environment. We use mkvirtualenv for easier working with venvs
 ```shell
-    [sudo] pip install virtualenv
-```
-
-Make a virtual environment for this app:
-```shell
+    pip install virtualenvwrapper
     mkvirtualenv -p /usr/local/bin/python3 notifications-admin
 ```
 
 Install dependencies and build the frontend assets:
 ```shell
+    workon notifications-admin
     ./scripts/bootstrap.sh
 ```
 
@@ -73,6 +70,10 @@ export DESKPRO_DEPT_ID=""
 export DESKPRO_ASSIGNED_AGENT_TEAM_ID=""
 "> environment.sh
 ```
+
+## AWS credentials 
+
+Your aws credentials should be stored in a folder located at `~/.aws`. Follow [Amazon's instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files) for storing them correctly
 
 
 ## Running the application
