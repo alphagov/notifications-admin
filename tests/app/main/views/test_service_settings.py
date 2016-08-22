@@ -20,7 +20,7 @@ def test_should_show_overview(app_,
                 'main.service_settings', service_id=service_one['id']))
         assert response.status_code == 200
         resp_data = response.get_data(as_text=True)
-        assert 'Service settings' in resp_data
+        assert 'Settings' in resp_data
         app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
