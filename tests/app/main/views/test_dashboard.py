@@ -11,61 +11,36 @@ from app.main.views.dashboard import get_dashboard_totals, format_weekly_stats_t
 from tests import validate_route_permission
 from tests.conftest import SERVICE_ONE_ID
 
-
 stub_template_stats = [
     {
         'template_type': 'sms',
         'template_name': 'one',
         'template_id': 'id-1',
-        'count': 100,
-        'day': '2016-01-01'
+        'count': 100
     },
     {
         'template_type': 'email',
         'template_name': 'two',
         'template_id': 'id-2',
-        'count': 200,
-        'day': '2016-01-01'
-    },
-    {
-        'template_type': 'sms',
-        'template_name': 'one',
-        'template_id': 'id-1',
-        'count': 300,
-        'day': '2016-01-02'
-    },
-    {
-        'template_type': 'sms',
-        'template_name': 'one',
-        'template_id': 'id-1',
-        'count': 400,
-        'day': '2016-01-02'
-    },
-    {
-        'template_type': 'email',
-        'template_name': 'two',
-        'template_id': 'id-2',
-        'count': 500,
-        'day': '2016-01-03'
-    },
+        'count': 200
+    }
 ]
 
 
 def test_get_started(
-    app_,
-    mocker,
-    api_user_active,
-    mock_get_service,
-    mock_get_service_templates_when_no_templates_exist,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_login,
-    mock_get_jobs,
-    mock_has_permissions,
-    mock_get_detailed_service,
-    mock_get_usage
+        app_,
+        mocker,
+        api_user_active,
+        mock_get_service,
+        mock_get_service_templates_when_no_templates_exist,
+        mock_get_user,
+        mock_get_user_by_email,
+        mock_login,
+        mock_get_jobs,
+        mock_has_permissions,
+        mock_get_detailed_service,
+        mock_get_usage
 ):
-
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
 
@@ -79,18 +54,18 @@ def test_get_started(
 
 
 def test_get_started_is_hidden_once_templates_exist(
-    app_,
-    mocker,
-    api_user_active,
-    mock_get_service,
-    mock_get_service_templates,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_login,
-    mock_get_jobs,
-    mock_has_permissions,
-    mock_get_detailed_service,
-    mock_get_usage
+        app_,
+        mocker,
+        api_user_active,
+        mock_get_service,
+        mock_get_service_templates,
+        mock_get_user,
+        mock_get_user_by_email,
+        mock_login,
+        mock_get_jobs,
+        mock_has_permissions,
+        mock_get_detailed_service,
+        mock_get_usage
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -115,7 +90,6 @@ def test_should_show_recent_templates_on_dashboard(app_,
                                                    mock_has_permissions,
                                                    mock_get_detailed_service,
                                                    mock_get_usage):
-
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
 
@@ -139,26 +113,25 @@ def test_should_show_recent_templates_on_dashboard(app_,
 
         assert 'one' in table_rows[0].find_all('th')[0].text
         assert 'Text message template' in table_rows[0].find_all('th')[0].text
-        assert '800' in table_rows[0].find_all('td')[0].text
+        assert '100' in table_rows[0].find_all('td')[0].text
 
         assert 'two' in table_rows[1].find_all('th')[0].text
         assert 'Email template' in table_rows[1].find_all('th')[0].text
-        assert '700' in table_rows[1].find_all('td')[0].text
+        assert '200' in table_rows[1].find_all('td')[0].text
 
 
 def test_should_show_all_templates_on_template_statistics_page(
-    app_,
-    mocker,
-    api_user_active,
-    mock_get_service,
-    mock_get_service_templates,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_login,
-    mock_get_jobs,
-    mock_has_permissions
+        app_,
+        mocker,
+        api_user_active,
+        mock_get_service,
+        mock_get_service_templates,
+        mock_get_user,
+        mock_get_user_by_email,
+        mock_login,
+        mock_get_jobs,
+        mock_has_permissions
 ):
-
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
 
@@ -178,30 +151,29 @@ def test_should_show_all_templates_on_template_statistics_page(
 
         assert 'one' in table_rows[0].find_all('th')[0].text
         assert 'Text message template' in table_rows[0].find_all('th')[0].text
-        assert '800' in table_rows[0].find_all('td')[0].text
+        assert '100' in table_rows[0].find_all('td')[0].text
 
         assert 'two' in table_rows[1].find_all('th')[0].text
         assert 'Email template' in table_rows[1].find_all('th')[0].text
-        assert '700' in table_rows[1].find_all('td')[0].text
+        assert '200' in table_rows[1].find_all('td')[0].text
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_recent_jobs_on_dashboard(
-    app_,
-    mocker,
-    api_user_active,
-    mock_get_service,
-    mock_get_service_templates,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_login,
-    mock_get_template_statistics,
-    mock_get_detailed_service,
-    mock_get_jobs,
-    mock_has_permissions,
-    mock_get_usage
+        app_,
+        mocker,
+        api_user_active,
+        mock_get_service,
+        mock_get_service_templates,
+        mock_get_user,
+        mock_get_user_by_email,
+        mock_login,
+        mock_get_template_statistics,
+        mock_get_detailed_service,
+        mock_get_jobs,
+        mock_has_permissions,
+        mock_get_usage
 ):
-
     with app_.test_request_context(), app_.test_client() as client:
         client.login(api_user_active)
         response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
@@ -216,10 +188,10 @@ def test_should_show_recent_jobs_on_dashboard(
     assert len(table_rows) == 4
 
     for index, filename in enumerate((
-        "export 1/1/2016.xls",
-        "all email addresses.xlsx",
-        "applicants.ods",
-        "thisisatest.csv",
+            "export 1/1/2016.xls",
+            "all email addresses.xlsx",
+            "applicants.ods",
+            "thisisatest.csv",
     )):
         assert filename in table_rows[index].find_all('th')[0].text
         assert 'Uploaded 1 January at 11:09' in table_rows[index].find_all('th')[0].text
@@ -249,7 +221,6 @@ def test_menu_send_messages(mocker,
                             mock_get_template_statistics,
                             mock_get_detailed_service,
                             mock_get_usage):
-
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -261,11 +232,11 @@ def test_menu_send_messages(mocker,
         assert url_for(
             'main.choose_template',
             service_id=service_one['id'],
-            template_type='email')in page
+            template_type='email') in page
         assert url_for(
             'main.choose_template',
             service_id=service_one['id'],
-            template_type='sms')in page
+            template_type='sms') in page
         assert url_for('main.manage_users', service_id=service_one['id']) in page
 
         assert url_for('main.service_settings', service_id=service_one['id']) not in page
@@ -398,15 +369,14 @@ def test_aggregate_template_stats():
     expected = aggregate_usage(copy.deepcopy(stub_template_stats))
 
     assert len(expected) == 2
-    for item in expected:
-        if item['template_name'] == 'one':
-            assert item['count'] == 800
-            assert item['template_id'] == 'id-1'
-            assert item['template_type'] == 'sms'
-        elif item['template_name'] == 'two':
-            assert item['count'] == 700
-            assert item['template_id'] == 'id-2'
-            assert item['template_type'] == 'email'
+    assert expected[0]['template_name'] == 'one'
+    assert expected[0]['count'] == 100
+    assert expected[0]['template_id'] == 'id-1'
+    assert expected[0]['template_type'] == 'sms'
+    assert expected[1]['template_name'] == 'two'
+    assert expected[1]['count'] == 200
+    assert expected[1]['template_id'] == 'id-2'
+    assert expected[1]['template_type'] == 'email'
 
 
 def test_service_dashboard_updates_gets_dashboard_totals(mocker,

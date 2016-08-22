@@ -99,27 +99,10 @@ def weekly(service_id):
 
 
 def aggregate_usage(template_statistics):
-    # grouby requires the list to be sorted by template first
-    statistics_sorted_by_template = sorted(
+    return sorted(
         template_statistics,
         key=lambda template_statistic: template_statistic['template_name']
     )
-
-    totals = sorted(
-        (
-            {
-                'count': sum(usage['count'] for usage in usages),
-                'template_name': template_name,
-                'template_id': template_id,
-                'template_type': template_type
-            }
-            for (template_name, template_id, template_type), usages in groupby(statistics_sorted_by_template, lambda items: (items['template_name'], items['template_id'], items['template_type']))  # noqa
-        ),
-        key=lambda row: row['count'],
-        reverse=True
-    )
-
-    return totals
 
 
 def get_dashboard_partials(service_id):
