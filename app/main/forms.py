@@ -337,7 +337,7 @@ class ServiceSmsSender(Form):
     def validate_sms_sender(form, field):
         import re
         if field.data and not re.match('^[a-zA-Z0-9\s]+$', field.data):
-            raise ValidationError('Sms text message sender can only contain alpha-numeric characters')
+            raise ValidationError('Text message sender can only contain alpha-numeric characters')
 
 
 class ServiceBrandingOrg(Form):
