@@ -1068,16 +1068,11 @@ def mock_remove_user_from_service(mocker):
 def mock_get_template_statistics(mocker, service_one, fake_uuid):
     template = template_json(service_one['id'], fake_uuid, "Test template", "sms", "Something very interesting")
     data = {
-        "usage_count": 1,
-        "template": {
-            "name": template['name'],
-            "template_type": template['template_type'],
-            "id": template['id']
-        },
-        "service": template['service'],
-        "id": str(generate_uuid()),
-        "day": "2016-04-04",
-        "updated_at": "2016-04-04T12:00:00.000000+00:00"
+        "count": 1,
+        "template_name": template['name'],
+        "template_type": template['template_type'],
+        "template_id": template['id'],
+        "day": "2016-04-04"
     }
 
     def _get_stats(service_id, limit_days=None):
