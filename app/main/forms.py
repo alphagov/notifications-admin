@@ -331,13 +331,17 @@ class ServiceReplyToEmailFrom(Form):
 
 
 class ServiceSmsSender(Form):
-    sms_sender = StringField('', validators=[Length(max=11,
-                             message="Text message sender can't be longer than 11 characters")])
+    sms_sender = StringField(
+        'Text message sender',
+        validators=[
+            Length(max=11, message="Enter fewer than 11 characters")
+        ]
+    )
 
     def validate_sms_sender(form, field):
         import re
         if field.data and not re.match('^[a-zA-Z0-9\s]+$', field.data):
-            raise ValidationError('Text message sender can only contain alpha-numeric characters')
+            raise ValidationError('Use letters and numbers only')
 
 
 class ServiceBrandingOrg(Form):
