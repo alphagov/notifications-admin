@@ -9,19 +9,47 @@ from unittest.mock import ANY, Mock
 from werkzeug.exceptions import InternalServerError
 
 
-def test_should_show_overview(app_,
-                              active_user_with_permissions,
-                              mocker,
-                              service_one):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
-            response = client.get(url_for(
-                'main.service_settings', service_id=service_one['id']))
-        assert response.status_code == 200
-        resp_data = response.get_data(as_text=True)
-        assert 'Settings' in resp_data
-        app.service_api_client.get_service.assert_called_with(service_one['id'])
+def test_should_show_overview(
+    app_,
+    active_user_with_permissions,
+    mocker,
+    service_one
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        response = client.get(url_for(
+            'main.service_settings', service_id=service_one['id']
+        ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('h1').text == 'Settings'
+    for index, row in enumerate([
+        'Service name service one Change',
+        'Email reply to address None Change',
+        'Text message sender 40604 Change'
+    ]):
+        assert row == " ".join(page.find_all('tr')[index + 1].text.split())
+    app.service_api_client.get_service.assert_called_with(service_one['id'])
+
+
+def test_should_show_overview_for_service_with_more_things_set(
+    app_,
+    active_user_with_permissions,
+    mocker,
+    service_with_reply_to_addresses
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_with_reply_to_addresses)
+        response = client.get(url_for(
+            'main.service_settings', service_id=service_with_reply_to_addresses['id']
+        ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    for index, row in enumerate([
+        'Service name service one Change',
+        'Email reply to address test@example.com Change',
+        'Text message sender elevenchars Change'
+    ]):
+        assert row == " ".join(page.find_all('tr')[index + 1].text.split())
 
 
 def test_should_show_service_name(app_,
