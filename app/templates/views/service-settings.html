@@ -19,10 +19,6 @@
         'link': url_for('.service_set_reply_to_email', service_id=current_service.id)
       },
       {
-        'title': 'Set email branding',
-        'link': url_for('.service_set_branding_and_org', service_id=current_service.id)
-      } if current_user.has_permissions([], admin_override=True) else {},
-      {
         'title': 'Set text message sender name',
         'link': url_for('.service_set_sms_sender', service_id=current_service.id)
       },
@@ -39,23 +35,34 @@
       } if not current_service.active else {
         'title': 'Reactivate API keys',
         'link': url_for('.service_status_change', service_id=current_service.id)
-      },
-      {
-        'title': 'Make service live',
-        'link': url_for('.service_switch_live', service_id=current_service.id)
-      } if current_service.restricted and current_user.has_permissions([], admin_override=True) else {
-        'title': 'Revert service to trial',
-        'link': url_for('.service_switch_live', service_id=current_service.id)
-      } if not current_service.restricted and current_user.has_permissions([], admin_override=True) else {
-      },
-      {
-        'title': 'Put service into research mode',
-        'link': url_for('.service_switch_research_mode', service_id=current_service.id)
-      } if not current_service.research_mode and current_user.has_permissions([], admin_override=True) else {
-        'title': 'Take service out of research mode',
-        'link': url_for('.service_switch_research_mode', service_id=current_service.id)
-      } if current_service.research_mode and current_user.has_permissions([], admin_override=True) else {
       }
     ]) }}
+
+    {% if current_user.has_permissions([], admin_override=True) %}
+
+      <h2 class="heading-large">Platform admin settings</h2>
+
+      {{ browse_list([
+        {
+          'title': 'Set email branding',
+          'link': url_for('.service_set_branding_and_org', service_id=current_service.id)
+        },
+        {
+          'title': 'Make service live',
+          'link': url_for('.service_switch_live', service_id=current_service.id)
+        } if current_service.restricted else {
+          'title': 'Revert service to trial',
+          'link': url_for('.service_switch_live', service_id=current_service.id)
+        },
+        {
+          'title': 'Put service into research mode',
+          'link': url_for('.service_switch_research_mode', service_id=current_service.id)
+        } if not current_service.research_mode else {
+          'title': 'Take service out of research mode',
+          'link': url_for('.service_switch_research_mode', service_id=current_service.id)
+        }
+      ]) }}
+
+    {% endif %}
 
 {% endblock %}
