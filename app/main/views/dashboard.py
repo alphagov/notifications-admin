@@ -66,11 +66,12 @@ def template_history(service_id):
     template_statistics = aggregate_usage(
         template_statistics_client.get_template_statistics_for_service(service_id)
     )
+
     return render_template(
         'views/dashboard/all-template-statistics.html',
         template_statistics=template_statistics,
         most_used_template_count=max(
-            [row['usage_count'] for row in template_statistics] or [0]
+            [row['count'] for row in template_statistics] or [0]
         )
     )
 
@@ -98,32 +99,9 @@ def weekly(service_id):
 
 
 def aggregate_usage(template_statistics):
-
-    immutable_template = namedtuple('Template', ['template_type', 'name', 'id'])
-
-    # grouby requires the list to be sorted by template first
-    statistics_sorted_by_template = sorted(
-        (
-            (
-                immutable_template(**row['template']),
-                row['usage_count']
-            )
-            for row in template_statistics
-        ),
-        key=lambda items: items[0]
-    )
-
-    # then group and sort the result by usage
     return sorted(
-        (
-            {
-                'usage_count': sum(usage[1] for usage in usages),
-                'template': template
-            }
-            for template, usages in groupby(statistics_sorted_by_template, lambda items: items[0])
-        ),
-        key=lambda row: row['usage_count'],
-        reverse=True
+        template_statistics,
+        key=lambda template_statistic: template_statistic['template_name']
     )
 
 
@@ -149,7 +127,7 @@ def get_dashboard_partials(service_id):
             'views/dashboard/template-statistics.html',
             template_statistics=template_statistics,
             most_used_template_count=max(
-                [row['usage_count'] for row in template_statistics] or [0]
+                [row['count'] for row in template_statistics] or [0]
             ),
         ),
         'has_template_statistics': bool(template_statistics),
