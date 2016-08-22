@@ -186,9 +186,21 @@ def delete_service_template(service_id, template_id):
     template['template_content'] = template['content']
     form = form_objects[template['template_type']](**template)
 
-    template_statistics = template_statistics_client.get_template_statistics_for_template(service_id, template['id'])
-    last_use_message = get_last_use_message(form.name.data, template_statistics)
-    flash('{}. Are you sure you want to delete it?'.format(last_use_message), 'delete')
+    try:
+        last_used_notification = template_statistics_client.get_template_statistics_for_template(
+            service_id, template['id']
+        )
+        message = '{} was last used {} ago'.format(
+            last_used_notification['template']['name'],
+            get_human_readable_delta(
+                parse(last_used_notification['created_at']).replace(tzinfo=None),
+                datetime.utcnow())
+        )
+    except HTTPError as e:
+        if e.status_code == 404:
+            message = '{} has never been used'.format(template['name'])
+
+    flash('{}. Are you sure you want to delete it?'.format(message), 'delete')
     return render_template(
         'views/edit-{}-template.html'.format(template['template_type']),
         h1='Edit template',
