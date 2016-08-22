@@ -17,7 +17,7 @@ def test_should_render_two_factor_page(app_,
                     'email': api_user_active.email_address}
         response = client.get(url_for('main.two_factor'))
         assert response.status_code == 200
-        assert '''We’ve sent you a text message with a verification code.''' in response.get_data(as_text=True)
+        assert '''We’ve sent you a text message with a security code.''' in response.get_data(as_text=True)
 
 
 def test_should_login_user_and_redirect_to_service_dashboard(app_,
