@@ -10,7 +10,7 @@
 
     <h1 class="heading-large">Settings</h1>
 
-    <div class="dashboard-table bottom-gutter-2">
+    <div class="bottom-gutter-2">
 
       {% call mapping_table(
         caption='Settings',
@@ -39,22 +39,26 @@
       {% endcall %}
     </div>
 
-    <h2 class="heading-medium">Your service is in trial mode</h2>
+    <div class="bottom-gutter-2">
 
-    <ul class='list list-bullet'>
-      <li>you can only send messages to yourself</li>
-      <li>you can add people to your team, then you can send messages to them too</li>
-      <li>you can only send 50 messages per day</li>
-    </ul>
+      <h2 class="heading-medium">Your service is in trial mode</h2>
 
-    <p>
-      To remove these restrictions
-      <a href="{{ url_for('.service_request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
-    </p>
+      <ul class='list list-bullet'>
+        <li>you can only send messages to yourself</li>
+        <li>you can add people to your team, then you can send messages to them too</li>
+        <li>you can only send 50 messages per day</li>
+      </ul>
+
+      <p>
+        To remove these restrictions
+        <a href="{{ url_for('.service_request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
+      </p>
+
+    </div>
 
     {% if false and current_user.has_permissions([], admin_override=True) %}
 
-      <h2 class="heading-large">Platform admin settings</h2>
+      <h2 class="heading-medium">Platform admin settings</h2>
 
       {{ browse_list([
         {
