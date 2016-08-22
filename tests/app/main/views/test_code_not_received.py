@@ -66,7 +66,7 @@ def test_should_render_correct_resend_template_for_pending_user(app_,
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string == 'Check your mobile number'
 
-            expected = 'Check your mobile phone number is correct and then resend the confirmation code.'
+            expected = 'Check your mobile phone number is correct and then resend the security code.'
             message = page.find_all('p')[1].text
             assert message == expected
             assert page.find('form').input['value'] == api_user_pending.mobile_number
