@@ -85,6 +85,12 @@
   {% endcall %}
 {%- endmacro %}
 
+{% macro edit_field(text, link) -%}
+  {% call field(align='right') %}
+    <a href="{{ link }}">{{ text }}</a>
+  {% endcall %}
+{%- endmacro %}
+
 {% macro boolean_field(yes) -%}
   {% call field(status='yes' if yes else 'no') %}
     {{ "Yes" if yes else "No" }}
