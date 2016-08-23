@@ -14,15 +14,41 @@ class JobApiClient(BaseAPIClient):
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
 
+    @staticmethod
+    def __convert_statistics(job):
+        results = {
+            'sending': 0,
+            'delivered': 0,
+            'failed': 0
+        }
+        if 'statistics' in job:
+            for outcome in job['statistics']:
+                if outcome['status'] in ['failed', 'technical-failure', 'temporary-failure', 'permanent-failure']:
+                    results['failed'] += outcome['count']
+                if outcome['status'] in ['sending', 'pending', 'created']:
+                    results['sending'] += outcome['count']
+                if outcome['status'] in ['delivered']:
+                    results['delivered'] += outcome['count']
+        return results
+
     def get_job(self, service_id, job_id=None, limit_days=None, status=None):
         if job_id:
             params = {}
             if status is not None:
                 params['status'] = status
-            return self.get(url='/service/{}/job/{}'.format(service_id, job_id), params=params)
+            job = self.get(url='/service/{}/job/{}'.format(service_id, job_id), params=params)
+
+            if 'notifications_sent' not in job['data']:
+                stats = self.__convert_statistics(job)
+                job['data']['notifications_sent'] = stats['sending']
+                job['data']['notifications_delivered'] = stats['delivered']
+                job['data']['notifications_failed'] = stats['failed']
+            return job
+
         params = {}
         if limit_days is not None:
             params['limit_days'] = limit_days
+
         return self.get(url='/service/{}/job'.format(service_id), params=params)
 
     def create_job(self, job_id, service_id, template_id, original_file_name, notification_count):
@@ -34,4 +60,11 @@ class JobApiClient(BaseAPIClient):
         }
         data = _attach_current_user(data)
         resp = self.post(url='/service/{}/job'.format(service_id), data=data)
-        return resp['data']
+
+        if 'notifications_sent' not in resp['data']:
+            stats = self.__convert_statistics(resp)
+            resp['data']['notifications_sent'] = stats['sending']
+            resp['data']['notifications_delivered'] = stats['delivered']
+            resp['data']['notifications_failed'] = stats['failed']
+
+        return resp
