@@ -64,22 +64,21 @@
         {
           'title': 'Email branding',
           'link': url_for('.service_set_branding_and_org', service_id=current_service.id)
-        },
-        {
-          'title': 'Make service live',
-          'link': url_for('.service_switch_live', service_id=current_service.id)
-        } if current_service.restricted else {
-          'title': 'Revert service to trial',
-          'link': url_for('.service_switch_live', service_id=current_service.id)
-        },
-        {
-          'title': 'Put service into research mode',
-          'link': url_for('.service_switch_research_mode', service_id=current_service.id)
-        } if not current_service.research_mode else {
-          'title': 'Take service out of research mode',
-          'link': url_for('.service_switch_research_mode', service_id=current_service.id)
         }
       ]) }}
+
+      <ul>
+        <li class="bottom-gutter">
+          <a href="{{ url_for('.service_switch_live', service_id=current_service.id) }}" class="button">
+            {{ 'Make service live' if current_service.restricted else 'Revert service to trial mode' }}
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('.service_switch_research_mode', service_id=current_service.id) }}" class="button">
+            {{ 'Take service out of research mode' if current_service.research_mode else 'Put into research mode' }}
+          </a>
+        </li>
+      </ul>
 
     {% endif %}
 
