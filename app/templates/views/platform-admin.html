@@ -26,20 +26,20 @@
   <div class="grid-row bottom-gutter">
     <div class="column-half">
       {{ big_number_with_status(
-        global_stats.emails_delivered,
-        message_count_label(global_stats.emails_delivered, 'email'),
-        global_stats.emails_failed,
-        global_stats.emails_failure_rate,
-        global_stats.emails_failure_rate|float > 3,
+        global_stats.email.delivered,
+        message_count_label(global_stats.email.delivered, 'email'),
+        global_stats.email.failed,
+        global_stats.email.failure_rate,
+        global_stats.email.failure_rate|float > 3,
       ) }}
     </div>
     <div class="column-half">
       {{ big_number_with_status(
-        global_stats.sms_delivered,
-        message_count_label(global_stats.sms_delivered, 'sms'),
-        global_stats.sms_failed,
-        global_stats.sms_failure_rate,
-        global_stats.sms_failure_rate|float > 3,
+        global_stats.sms.delivered,
+        message_count_label(global_stats.sms.delivered, 'sms'),
+        global_stats.sms.failed,
+        global_stats.sms.failure_rate,
+        global_stats.sms.failure_rate|float > 3,
       ) }}
     </div>
   </div>
