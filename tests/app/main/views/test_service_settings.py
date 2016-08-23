@@ -592,29 +592,29 @@ def test_if_reply_to_email_address_set_then_form_populated(app_,
 
 
 def test_switch_service_to_research_mode(
-        app_,
-        service_one,
-        mock_login,
-        mock_get_user,
-        active_user_with_permissions,
-        mock_get_service,
-        mock_has_permissions,
-        mocker):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            mocker.patch('app.service_api_client.post', return_value=service_one)
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_get_service,
+    mock_has_permissions,
+    mocker
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        mocker.patch('app.service_api_client.post', return_value=service_one)
 
-            client.login(active_user_with_permissions)
-            response = client.get(url_for('main.service_switch_research_mode', service_id=service_one['id']))
-            assert response.status_code == 302
-            assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-            app.service_api_client.post.assert_called_with(
-                '/service/{}'.format(service_one['id']),
-                {
-                    'research_mode': True,
-                    'created_by': active_user_with_permissions.id
-                }
-            )
+        client.login(active_user_with_permissions)
+        response = client.get(url_for('main.service_switch_research_mode', service_id=service_one['id']))
+        assert response.status_code == 302
+        assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+        app.service_api_client.post.assert_called_with(
+            '/service/{}'.format(service_one['id']),
+            {
+                'research_mode': True,
+                'created_by': active_user_with_permissions.id
+            }
+        )
 
 
 def test_switch_service_from_research_mode_to_normal(
