@@ -111,13 +111,13 @@ def test_should_show_recent_templates_on_dashboard(app_,
 
         assert len(table_rows) == 2
 
-        assert 'one' in table_rows[0].find_all('th')[0].text
-        assert 'Text message template' in table_rows[0].find_all('th')[0].text
-        assert '100' in table_rows[0].find_all('td')[0].text
+        assert 'two' in table_rows[0].find_all('th')[0].text
+        assert 'Email template' in table_rows[0].find_all('th')[0].text
+        assert '200' in table_rows[0].find_all('td')[0].text
 
-        assert 'two' in table_rows[1].find_all('th')[0].text
-        assert 'Email template' in table_rows[1].find_all('th')[0].text
-        assert '200' in table_rows[1].find_all('td')[0].text
+        assert 'one' in table_rows[1].find_all('th')[0].text
+        assert 'Text message template' in table_rows[1].find_all('th')[0].text
+        assert '100' in table_rows[1].find_all('td')[0].text
 
 
 def test_should_show_all_templates_on_template_statistics_page(
@@ -149,13 +149,13 @@ def test_should_show_all_templates_on_template_statistics_page(
 
         assert len(table_rows) == 2
 
-        assert 'one' in table_rows[0].find_all('th')[0].text
-        assert 'Text message template' in table_rows[0].find_all('th')[0].text
-        assert '100' in table_rows[0].find_all('td')[0].text
+        assert 'two' in table_rows[0].find_all('th')[0].text
+        assert 'Email template' in table_rows[0].find_all('th')[0].text
+        assert '200' in table_rows[0].find_all('td')[0].text
 
-        assert 'two' in table_rows[1].find_all('th')[0].text
-        assert 'Email template' in table_rows[1].find_all('th')[0].text
-        assert '200' in table_rows[1].find_all('td')[0].text
+        assert 'one' in table_rows[1].find_all('th')[0].text
+        assert 'Text message template' in table_rows[1].find_all('th')[0].text
+        assert '100' in table_rows[1].find_all('td')[0].text
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
@@ -369,14 +369,14 @@ def test_aggregate_template_stats():
     expected = aggregate_usage(copy.deepcopy(stub_template_stats))
 
     assert len(expected) == 2
-    assert expected[0]['template_name'] == 'one'
-    assert expected[0]['count'] == 100
-    assert expected[0]['template_id'] == 'id-1'
-    assert expected[0]['template_type'] == 'sms'
-    assert expected[1]['template_name'] == 'two'
-    assert expected[1]['count'] == 200
-    assert expected[1]['template_id'] == 'id-2'
-    assert expected[1]['template_type'] == 'email'
+    assert expected[0]['template_name'] == 'two'
+    assert expected[0]['count'] == 200
+    assert expected[0]['template_id'] == 'id-2'
+    assert expected[0]['template_type'] == 'email'
+    assert expected[1]['template_name'] == 'one'
+    assert expected[1]['count'] == 100
+    assert expected[1]['template_id'] == 'id-1'
+    assert expected[1]['template_type'] == 'sms'
 
 
 def test_service_dashboard_updates_gets_dashboard_totals(mocker,
