@@ -28,8 +28,10 @@ msg "Started $(basename $0) at $(/bin/date "+%F %T")"
 start_sec=$(/bin/date +%s.%N)
 
 msg "Getting relevant load balancer"
-get_elb_list $INSTANCE_ID "notify-admin-elb"
-
+INSTANCE_NAME=$(get_instance_name_from_tags $INSTANCE_ID)
+get_elb_name_for_instance_name $INSTANCE_NAME
+ELB_LIST=$ELB_NAME
+get_elb_list $INSTANCE_ID $ELB_NAME
 
 msg "Checking that user set at least one load balancer"
 if test -z "$ELB_LIST"; then

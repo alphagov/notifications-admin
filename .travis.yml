@@ -18,6 +18,7 @@ after_success:
 - coveralls
 - ./scripts/trigger-dependent-build.sh
 script:
+- make generate-version-file
 - npm run build
 - ./scripts/run_tests.sh
 notifications:
@@ -88,7 +89,6 @@ deploy:
   region: eu-west-1
   on: *2
 before_deploy:
-  - ./scripts/update_version_file.sh
   - rm -rf node_modules bower_components app/assets
   - zip -r  --exclude=*__pycache__* notifications-admin *
   - mkdir -p dpl_cd_upload

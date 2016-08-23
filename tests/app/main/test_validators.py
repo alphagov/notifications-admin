@@ -141,4 +141,4 @@ def test_sms_sender_form_validation(app_, mock_get_user_by_email):
 
         form.sms_sender.data = '###########'
         form.validate()
-        assert 'Sms text message sender can only contain alpha-numeric characters' == form.errors['sms_sender'][0]
+        assert 'Text message sender can only contain alpha-numeric characters' == form.errors['sms_sender'][0]
