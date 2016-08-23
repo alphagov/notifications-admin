@@ -327,7 +327,7 @@ class ProviderForm(Form):
 
 
 class ServiceReplyToEmailFrom(Form):
-    email_address = email_address()
+    email_address = email_address(label='Email reply to address')
 
 
 class ServiceSmsSender(Form):

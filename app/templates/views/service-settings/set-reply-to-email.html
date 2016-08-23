@@ -3,14 +3,31 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
-  Request to go live – GOV.UK Notify
+  Email reply to address – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <div class="grid-row">
     <div class="column-three-quarters">
-      <h1 class="heading-large">Set email reply to address</h1>
+      <h1 class="heading-large">
+        Email reply to address
+      </h1>
+      <p>
+        Your emails will be sent from
+        {{ current_service.email_from }}@notifications.service.gov.uk.
+        This is so they have the best chance of being delivered.
+        This email address can’t receive replies.
+      </p>
+      <p>
+        Set up a separate email address to receive replies from
+        your users, then enter it here.
+      </p>
+      {% if current_service.restricted %}
+        <p>
+          Your service can’t go live until you’ve done this.
+        </p>
+      {% endif %}
       <form method="post">
         {{ textbox(
           form.email_address,
