@@ -75,7 +75,8 @@ def choose_template(service_id, template_type):
         templates=[
             Template(
                 template,
-                prefix=current_service['name']
+                prefix=current_service['name'],
+                sms_sender=current_service['sms_sender']
             ) for template in service_api_client.get_service_templates(service_id)['data']
             if template['template_type'] == template_type
         ],
@@ -90,7 +91,8 @@ def choose_template(service_id, template_type):
 def send_messages(service_id, template_id):
     template = Template(
         service_api_client.get_service_template(service_id, template_id)['data'],
-        prefix=current_service['name']
+        prefix=current_service['name'],
+        sms_sender=current_service['sms_sender']
     )
 
     form = CsvUploadForm()
@@ -149,7 +151,8 @@ def send_test(service_id, template_id):
 
     template = Template(
         service_api_client.get_service_template(service_id, template_id)['data'],
-        prefix=current_service['name']
+        prefix=current_service['name'],
+        sms_sender=current_service['sms_sender']
     )
 
     if len(template.placeholders) == 0 or request.method == 'POST':
@@ -189,13 +192,13 @@ def send_test(service_id, template_id):
 @main.route("/services/<service_id>/send/<template_id>/from-api", methods=['GET'])
 @login_required
 def send_from_api(service_id, template_id):
-    template = Template(
-        service_api_client.get_service_template(service_id, template_id)['data'],
-        prefix=current_service['name']
-    )
     return render_template(
         'views/send-from-api.html',
-        template=template
+        template=Template(
+            service_api_client.get_service_template(service_id, template_id)['data'],
+            prefix=current_service['name'],
+            sms_sender=current_service['sms_sender']
+        )
     )
 
 
@@ -216,14 +219,13 @@ def check_messages(service_id, template_type, upload_id):
     if not contents:
         flash('There was a problem reading your upload file')
 
-    template = service_api_client.get_service_template(
-        service_id,
-        session['upload_data'].get('template_id')
-    )['data']
-
     template = Template(
-        template,
-        prefix=current_service['name']
+        service_api_client.get_service_template(
+            service_id,
+            session['upload_data'].get('template_id')
+        )['data'],
+        prefix=current_service['name'],
+        sms_sender=current_service['sms_sender']
     )
 
     recipients = RecipientCSV(
