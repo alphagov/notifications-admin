@@ -17,17 +17,13 @@ class TemplateStatisticsApiClient(BaseAPIClient):
         if limit_days is not None:
             params['limit_days'] = limit_days
 
-        response = self.get(
+        return self.get(
             url='/service/{}/template-statistics'.format(service_id),
             params=params
         )['data']
 
-        if len(response) > 0 and 'template' in response[0]:
-            return response
-
-        return []
-
     def get_template_statistics_for_template(self, service_id, template_id):
+
         return self.get(
             url='/service/{}/template-statistics/{}'.format(service_id, template_id)
         )['data']
