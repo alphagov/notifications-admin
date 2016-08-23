@@ -765,34 +765,6 @@ def test_if_sms_sender_set_then_form_populated(app_,
         assert page.find(id='sms_sender')['value'] == 'elevenchars'
 
 
-@pytest.mark.parametrize("sender, expected_flash_message", [
-    ("elevenchars", 'Text message sender set to elevenchars'),
-    ('', 'Text message sender removed')
-])
-def test_set_text_message_sender_flash_messages(
-        app_,
-        active_user_with_permissions,
-        mocker,
-        mock_update_service,
-        service_one,
-        sender,
-        expected_flash_message):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
-            data = {"sms_sender": sender}
-            response = client.post(url_for('main.service_set_sms_sender', service_id=service_one['id']),
-                                   data=data,
-                                   follow_redirects=True)
-
-            assert response.status_code == 200
-
-            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-            element = page.find('div', {"class": "banner-default-with-tick"})
-
-            assert element.text.strip() == expected_flash_message
-
-
 def test_should_show_branding(
     mocker, app_, platform_admin_user, service_one, mock_get_organisations
 ):

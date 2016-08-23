@@ -233,12 +233,10 @@ def service_set_reply_to_email(service_id):
     if request.method == 'GET':
         form.email_address.data = current_service.get('reply_to_email_address')
     if form.validate_on_submit():
-        message = 'Reply to email set to {}'.format(form.email_address.data)
         service_api_client.update_service(
             current_service['id'],
             reply_to_email_address=form.email_address.data
         )
-        flash(message, 'default_with_tick')
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/set-reply-to-email.html',
@@ -253,15 +251,10 @@ def service_set_sms_sender(service_id):
     if request.method == 'GET':
         form.sms_sender.data = current_service.get('sms_sender')
     if form.validate_on_submit():
-        if form.sms_sender.data:
-            message = 'Text message sender set to {}'.format(form.sms_sender.data)
-        else:
-            message = 'Text message sender removed'
         service_api_client.update_service(
             current_service['id'],
             sms_sender=form.sms_sender.data or None
         )
-        flash(message, 'default_with_tick')
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/set-sms-sender.html',
