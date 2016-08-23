@@ -183,7 +183,7 @@ get_instance_health_elb() {
                 ;;
             *)
                 msg "Instance '$instance_id' not part of ELB '$elb_name'"
-                return 0
+                return 1
         esac
     fi
 }
@@ -344,4 +344,41 @@ error_exit() {
 get_instance_id() {
     curl -s http://169.254.169.254/latest/meta-data/instance-id
     return $?
+}
+
+# Usage: get_instance_name_from_tags <instance_id>
+#
+# Looks up tags for the given instance, extracting the 'name'
+# returns <name> or error_exit
+get_instance_name_from_tags() {
+    local instance_id=$1
+
+    local instance_name=$($AWS_CLI ec2 describe-tags \
+        --filters "Name=resource-id,Values=${instance_id}"  \
+        --query Tags[0].Value \
+        --output text)
+    if [ $? != 0 ]; then
+        error_exit "Couldn't get instance name for '$instance_id'"
+    fi
+    echo $instance_name
+    return $?
+}
+
+ELB_NAME=""
+
+get_elb_name_for_instance_name() {
+    local instance_name=$1
+
+    declare -A elb_to_instance_mapping
+
+    elb_to_instance_mapping['notify-admin']='notify-admin'
+
+    elb_to_instance_mapping['notify_admin']='notify-admin-elb'
+
+    local elb_name=${elb_to_instance_mapping[${instance_name}]}
+    if [ -z $elb_name ]; then
+        msg "No ELB for instance ${instance_name}"
+    else
+        ELB_NAME=$elb_name
+    fi
 }

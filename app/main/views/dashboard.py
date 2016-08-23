@@ -101,7 +101,8 @@ def weekly(service_id):
 def aggregate_usage(template_statistics):
     return sorted(
         template_statistics,
-        key=lambda template_statistic: template_statistic['template_name']
+        key=lambda template_statistic: template_statistic['count'],
+        reverse=True
     )
 
 
