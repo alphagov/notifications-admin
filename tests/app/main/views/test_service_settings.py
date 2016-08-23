@@ -602,14 +602,18 @@ def test_switch_service_to_research_mode(
         mocker):
     with app_.test_request_context():
         with app_.test_client() as client:
-            mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+            mocker.patch('app.service_api_client.post', return_value=service_one)
 
             client.login(active_user_with_permissions)
             response = client.get(url_for('main.service_switch_research_mode', service_id=service_one['id']))
             assert response.status_code == 302
             assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-            app.service_api_client.update_service_with_properties.assert_called_with(
-                service_one['id'], {"research_mode": True}
+            app.service_api_client.post.assert_called_with(
+                '/service/{}'.format(service_one['id']),
+                {
+                    'research_mode': True,
+                    'created_by': active_user_with_permissions.id
+                }
             )
 
 
