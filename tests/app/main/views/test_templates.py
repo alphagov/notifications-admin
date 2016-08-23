@@ -249,7 +249,6 @@ def test_should_show_delete_template_page(app_,
     assert 'Two week reminder' in content
     assert 'Your vehicle tax is about to expire' in content
     mock_get_service_template.assert_called_with(service_id, template_id)
-    mock_get_template_statistics_for_template.assert_called_with(service_id, template_id)
 
 
 def test_should_redirect_when_deleting_a_template(app_,
