@@ -213,6 +213,10 @@ def notification_json(
             'next': '/service/{}/notifications'.format(service_id),
             'last': '/service/{}/notifications'.format(service_id)
         }
+    job_payload = None
+    if job:
+        job_payload = {'id': job['id'], 'original_file_name': job['original_file_name']}
+
     data = {
         'notifications': [{
             'to': to,
@@ -220,7 +224,7 @@ def notification_json(
                 'id': template['id'],
                 'name': template['name'],
                 'template_type': template['template_type']},
-            'job': {'id': job['id'], 'original_file_name': job['original_file_name']} if job else None,
+            'job': job_payload,
             'sent_at': sent_at,
             'status': status,
             'created_at': created_at,
@@ -228,9 +232,52 @@ def notification_json(
             'job_row_number': job_row_number,
             'template_version': template['version']
         } for i in range(rows)],
-        'total': 5,
+        'total': rows,
         'page_size': 50,
         'links': links
+    }
+    return data
+
+
+def single_notification_json(
+    service_id,
+    job=None,
+    template=None,
+    status=None,
+    sent_at=None,
+    created_at=None,
+    updated_at=None
+):
+    if template is None:
+        template = template_json(service_id, str(generate_uuid()))
+    if sent_at is None:
+        sent_at = str(datetime.utcnow())
+    if created_at is None:
+        created_at = str(datetime.utcnow())
+    if updated_at is None:
+        updated_at = str(datetime.utcnow() + timedelta(minutes=1))
+    if status is None:
+        status = 'delivered'
+    job_payload = None
+    if job:
+        job_payload = {'id': job['id'], 'original_file_name': job['original_file_name']}
+
+    data = {
+        'sent_at': sent_at,
+        'billable_units': 1,
+        'status': status,
+        'created_at': created_at,
+        'reference': None,
+        'updated_at': updated_at,
+        'template_version': 5,
+        'service': service_id,
+        'id': '29441662-17ce-4ffe-9502-fcaed73b2826',
+        'template': template,
+        'job_row_number': 0,
+        'notification_type': 'sms',
+        'api_key': None,
+        'job': job_payload,
+        'sent_by': 'mmg'
     }
     return data
 
