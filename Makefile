@@ -101,6 +101,9 @@ build-with-docker: prepare-docker-build-image ## Build inside a Docker container
 		--name "${DOCKER_CONTAINER_PREFIX}-build" \
 		-v `pwd`:/var/project \
 		-v ${PIP_ACCEL_CACHE}:/var/project/cache/pip-accel \
+		-e GIT_COMMIT=${GIT_COMMIT} \
+		-e BUILD_NUMBER=${BUILD_NUMBER} \
+		-e BUILD_URL=${BUILD_URL} \
 		${DOCKER_BUILDER_IMAGE_NAME} \
 		make build
 
@@ -109,6 +112,9 @@ test-with-docker: prepare-docker-build-image ## Run tests inside a Docker contai
 	docker run -i --rm \
 		--name "${DOCKER_CONTAINER_PREFIX}-test" \
 		-v `pwd`:/var/project \
+		-e GIT_COMMIT=${GIT_COMMIT} \
+		-e BUILD_NUMBER=${BUILD_NUMBER} \
+		-e BUILD_URL=${BUILD_URL} \
 		${DOCKER_BUILDER_IMAGE_NAME} \
 		make test
 
