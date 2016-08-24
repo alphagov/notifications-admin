@@ -14,7 +14,7 @@ from . import (
     notification_json,
     invite_json,
     sample_uuid,
-    generate_uuid)
+    generate_uuid, single_notification_json)
 from app.notify_client.models import (
     User,
     InvitedUser
@@ -1086,20 +1086,8 @@ def mock_get_template_statistics(mocker, service_one, fake_uuid):
 def mock_get_template_statistics_for_template(mocker, service_one):
     def _get_stats(service_id, template_id):
         template = template_json(service_id, template_id, "Test template", "sms", "Something very interesting")
-        return [
-            {
-                "usage_count": 1,
-                "template": {
-                    "name": template['name'],
-                    "template_type": template['template_type'],
-                    "id": template['id']
-                },
-                "service": template['service'],
-                "id": str(generate_uuid()),
-                "day": "2016-04-04",
-                "updated_at": "2016-04-04T12:00:00.000000+00:00"
-            }
-        ]
+        notification = single_notification_json(service_id, template=template)
+        return notification
 
     return mocker.patch(
         'app.template_statistics_client.get_template_statistics_for_template', side_effect=_get_stats)
