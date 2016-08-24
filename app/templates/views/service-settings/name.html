@@ -10,26 +10,22 @@
 
   <h1 class="heading-large">Change your service name</h1>
 
-  <div class="grid-row">
-    <div class="column-three-quarters">
 
-      <div class="form-group">
-        <p>Users will see your service name:</p>
-        <ul class="list-bullet">
-          <li>at the start of every text message, eg ‘Vehicle tax: we received your payment, thank you’</li>
-          <li>as your email sender name</li>
-        </ul>
-      </div>
-
-      <form method="post">
-        {{ textbox(form.name) }}
-        {{ page_footer(
-          'Save',
-          back_link=url_for('.service_settings', service_id=current_service.id),
-          back_link_text='Back to settings'
-        ) }}
-      </form>
-    </div>
+  <div class="form-group">
+    <p>Users will see your service name:</p>
+    <ul class="list-bullet">
+      <li>at the start of every text message, eg ‘Vehicle tax: we received your payment, thank you’</li>
+      <li>as your email sender name</li>
+    </ul>
   </div>
+
+  <form method="post">
+    {{ textbox(form.name) }}
+    {{ page_footer(
+      'Save',
+      back_link=url_for('.service_settings', service_id=current_service.id),
+      back_link_text='Back to settings'
+    ) }}
+  </form>
 
 {% endblock %}
