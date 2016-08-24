@@ -60,12 +60,26 @@
 
       <h2 class="heading-medium">Platform admin settings</h2>
 
-      {{ browse_list([
-        {
-          'title': 'Email branding',
-          'link': url_for('.service_set_branding_and_org', service_id=current_service.id)
-        }
-      ]) }}
+      {% call mapping_table(
+        caption='Settings',
+        field_headings=['Label', 'Value', 'Action'],
+        field_headings_visible=False,
+        caption_visible=False
+      ) %}
+        {% call row() %}
+          {{ text_field('Email branding' )}}
+          {% call field() %}
+            {% if current_service.branding == 'govuk' %}
+              GOV.UK
+            {% elif current_service.branding == 'both' %}
+              GOV.UK and {{ organisation.name if organisation else None }}
+            {% elif current_service.branding == 'org' %}
+              Only {{ organisation.name if organisation else None }}
+            {% endif %}
+          {% endcall %}
+          {{ edit_field('Change', url_for('.service_set_branding_and_org', service_id=current_service.id)) }}
+        {% endcall %}
+      {% endcall %}
 
       <ul>
         <li class="bottom-gutter">

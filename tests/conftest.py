@@ -1144,3 +1144,20 @@ def mock_get_organisations(mocker):
     return mocker.patch(
         'app.organisations_client.get_organisations', side_effect=_get_organisations
     )
+
+
+@pytest.fixture(scope='function')
+def mock_get_organisation(mocker):
+    def _get_organisation(id):
+        return {
+            'organisation': {
+                'logo': 'example.png',
+                'name': 'Organisation name',
+                'id': 'organisation-id',
+                'colour': '#f00'
+            }
+        }
+
+    return mocker.patch(
+        'app.organisations_client.get_organisation', side_effect=_get_organisation
+    )

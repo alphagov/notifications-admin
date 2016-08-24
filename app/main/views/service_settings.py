@@ -34,7 +34,14 @@ from app import user_api_client, current_service, organisations_client
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_settings(service_id):
-    return render_template('views/service-settings.html')
+    if current_service['organisation']:
+        organisation = organisations_client.get_organisation(current_service['organisation'])['organisation']
+    else:
+        organisation = None
+    return render_template(
+        'views/service-settings.html',
+        organisation=organisation
+    )
 
 
 @main.route("/services/<service_id>/service-settings/name", methods=['GET', 'POST'])

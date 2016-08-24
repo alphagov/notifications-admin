@@ -13,7 +13,8 @@ def test_should_show_overview(
     app_,
     active_user_with_permissions,
     mocker,
-    service_one
+    service_one,
+    mock_get_organisation
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_one)
@@ -36,7 +37,8 @@ def test_should_show_overview_for_service_with_more_things_set(
     app_,
     active_user_with_permissions,
     mocker,
-    service_with_reply_to_addresses
+    service_with_reply_to_addresses,
+    mock_get_organisation
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_with_reply_to_addresses)
@@ -91,14 +93,17 @@ def test_should_redirect_after_change_service_name(app_,
         assert mock_get_services.called
 
 
-def test_switch_service_to_live(app_,
-                                service_one,
-                                mock_login,
-                                mock_get_user,
-                                active_user_with_permissions,
-                                mock_get_service,
-                                mock_update_service,
-                                mock_has_permissions):
+def test_switch_service_to_live(
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_get_service,
+    mock_update_service,
+    mock_has_permissions,
+    mock_get_organisation
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions)
@@ -115,14 +120,17 @@ def test_switch_service_to_live(app_,
         )
 
 
-def test_switch_service_to_restricted(app_,
-                                      service_one,
-                                      mock_login,
-                                      mock_get_user,
-                                      active_user_with_permissions,
-                                      mock_get_live_service,
-                                      mock_update_service,
-                                      mock_has_permissions):
+def test_switch_service_to_restricted(
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_get_live_service,
+    mock_update_service,
+    mock_has_permissions,
+    mock_get_organisation
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions)
@@ -176,12 +184,15 @@ def test_should_show_service_name_confirmation(app_,
         app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
-def test_should_redirect_after_service_name_confirmation(app_,
-                                                         active_user_with_permissions,
-                                                         service_one,
-                                                         mocker,
-                                                         mock_update_service,
-                                                         mock_verify_password):
+def test_should_redirect_after_service_name_confirmation(
+    app_,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    mock_update_service,
+    mock_verify_password,
+    mock_get_organisation
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -250,12 +261,13 @@ def test_should_show_request_to_go_live(app_,
 
 
 def test_should_redirect_after_request_to_go_live(
-        app_,
-        api_user_active,
-        mock_get_user,
-        mock_get_service,
-        mock_has_permissions,
-        mocker
+    app_,
+    api_user_active,
+    mock_get_user,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_organisation,
+    mocker
 ):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
@@ -290,12 +302,12 @@ def test_should_redirect_after_request_to_go_live(
 
 
 def test_log_error_on_request_to_go_live(
-        app_,
-        api_user_active,
-        mock_get_user,
-        mock_get_service,
-        mock_has_permissions,
-        mocker
+    app_,
+    api_user_active,
+    mock_get_user,
+    mock_get_service,
+    mock_has_permissions,
+    mocker
 ):
     mock_post = mocker.patch(
         'app.main.views.service_settings.requests.post',
@@ -407,7 +419,7 @@ def test_should_redirect_delete_confirmation(app_,
         assert mock_delete_service.called
 
 
-def test_route_permissions(mocker, app_, api_user_active, service_one):
+def test_route_permissions(mocker, app_, api_user_active, service_one, mock_get_organisation):
     routes = [
         'main.service_settings',
         'main.service_name_change',
@@ -428,7 +440,7 @@ def test_route_permissions(mocker, app_, api_user_active, service_one):
                 service_one)
 
 
-def test_route_invalid_permissions(mocker, app_, api_user_active, service_one):
+def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, mock_get_organisation):
     routes = [
         'main.service_settings',
         'main.service_name_change',
@@ -451,7 +463,7 @@ def test_route_invalid_permissions(mocker, app_, api_user_active, service_one):
                 service_one)
 
 
-def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one):
+def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one, mock_get_organisation):
     routes = [
         'main.service_settings',
         'main.service_name_change',
@@ -490,11 +502,13 @@ def test_route_for_platform_admin_update_service(mocker, app_, platform_admin_us
 
 
 def test_set_reply_to_email_address(
-        app_,
-        active_user_with_permissions,
-        mocker,
-        mock_update_service,
-        service_one):
+    app_,
+    active_user_with_permissions,
+    mocker,
+    mock_update_service,
+    service_one,
+    mock_get_organisation
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -583,14 +597,16 @@ def test_switch_service_from_research_mode_to_normal(
 
 
 def test_shows_research_mode_indicator(
-        app_,
-        service_one,
-        mock_login,
-        mock_get_user,
-        active_user_with_permissions,
-        mock_get_service,
-        mock_has_permissions,
-        mocker):
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_organisation,
+    mocker
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             service = service_json(
@@ -615,14 +631,16 @@ def test_shows_research_mode_indicator(
 
 
 def test_does_not_show_research_mode_indicator(
-        app_,
-        service_one,
-        mock_login,
-        mock_get_user,
-        active_user_with_permissions,
-        mock_get_service,
-        mock_has_permissions,
-        mocker):
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_organisation,
+    mocker
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions)
@@ -635,11 +653,13 @@ def test_does_not_show_research_mode_indicator(
 
 
 def test_set_text_message_sender(
-        app_,
-        active_user_with_permissions,
-        mocker,
-        mock_update_service,
-        service_one):
+    app_,
+    active_user_with_permissions,
+    mocker,
+    mock_update_service,
+    service_one,
+    mock_get_organisation
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
