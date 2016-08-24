@@ -243,21 +243,19 @@ def single_notification_json(
     service_id,
     job=None,
     template=None,
-    to='07123456789',
     status=None,
     sent_at=None,
-    job_row_number=None,
     created_at=None,
     updated_at=None
 ):
     if template is None:
         template = template_json(service_id, str(generate_uuid()))
     if sent_at is None:
-        sent_at = str(datetime.utcnow().time())
+        sent_at = str(datetime.utcnow())
     if created_at is None:
-        created_at = str(datetime.utcnow().time())
+        created_at = str(datetime.utcnow())
     if updated_at is None:
-        updated_at = str((datetime.utcnow() + timedelta(minutes=1)).time())
+        updated_at = str(datetime.utcnow() + timedelta(minutes=1))
     if status is None:
         status = 'delivered'
     job_payload = None

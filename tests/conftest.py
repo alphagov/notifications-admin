@@ -20,7 +20,7 @@ from app.notify_client.models import (
     InvitedUser
 )
 
-from notifications_python_client.errors import HTTPError
+from notify_client.errors import HTTPError
 
 
 @pytest.fixture(scope='session')

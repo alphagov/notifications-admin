@@ -1,24 +1,26 @@
 from datetime import datetime
+from unittest.mock import Mock
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
+from notify_client import HTTPError
 
-from tests import validate_route_permission
+from tests import validate_route_permission, template_json, single_notification_json
 from app.main.views.templates import get_last_use_message, get_human_readable_delta
 
 
 def test_should_show_page_for_one_template(
-    app_,
-    api_user_active,
-    mock_login,
-    mock_get_service,
-    mock_get_service_template,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_has_permissions,
-    fake_uuid
+        app_,
+        api_user_active,
+        mock_login,
+        mock_get_service,
+        mock_get_service_template,
+        mock_get_user,
+        mock_get_user_by_email,
+        mock_has_permissions,
+        fake_uuid
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -74,16 +76,16 @@ def test_should_redirect_when_saving_a_template(app_,
 
 
 def test_should_show_interstitial_when_making_breaking_change(
-    app_,
-    api_user_active,
-    mock_login,
-    mock_get_service_template,
-    mock_update_service_template,
-    mock_get_user,
-    mock_get_service,
-    mock_get_user_by_email,
-    mock_has_permissions,
-    fake_uuid
+        app_,
+        api_user_active,
+        mock_login,
+        mock_get_service_template,
+        mock_update_service_template,
+        mock_get_user,
+        mock_get_service,
+        mock_get_user_by_email,
+        mock_has_permissions,
+        fake_uuid
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -143,9 +145,9 @@ def test_should_not_create_too_big_template(app_,
 
             assert resp.status_code == 200
             assert (
-                "Content has a character count greater"
-                " than the limit of 459"
-            ) in resp.get_data(as_text=True)
+                       "Content has a character count greater"
+                       " than the limit of 459"
+                   ) in resp.get_data(as_text=True)
 
 
 def test_should_not_update_too_big_template(app_,
@@ -178,9 +180,9 @@ def test_should_not_update_too_big_template(app_,
 
             assert resp.status_code == 200
             assert (
-                "Content has a character count greater"
-                " than the limit of 459"
-            ) in resp.get_data(as_text=True)
+                       "Content has a character count greater"
+                       " than the limit of 459"
+                   ) in resp.get_data(as_text=True)
 
 
 def test_should_redirect_when_saving_a_template_email(app_,
@@ -223,18 +225,59 @@ def test_should_redirect_when_saving_a_template_email(app_,
                 template_id, name, 'email', content, service_id, subject)
 
 
-def test_should_show_delete_template_page(app_,
-                                          api_user_active,
-                                          mock_login,
-                                          mock_get_service,
-                                          mock_get_service_template,
-                                          mock_get_user,
-                                          mock_get_user_by_email,
-                                          mock_has_permissions,
-                                          mock_get_template_statistics_for_template,
-                                          fake_uuid):
+def test_should_show_delete_template_page_with_time_block(app_,
+                                                          api_user_active,
+                                                          mock_login,
+                                                          mock_get_service,
+                                                          mock_get_service_template,
+                                                          mock_get_user,
+                                                          mock_get_user_by_email,
+                                                          mock_has_permissions,
+                                                          fake_uuid,
+                                                          mocker):
     with app_.test_request_context():
         with app_.test_client() as client:
+            with freeze_time('2012-01-01 12:00:00'):
+                template = template_json('1234', '1234', "Test template", "sms", "Something very interesting")
+                notification = single_notification_json('1234', template=template)
+
+                mocker.patch('app.template_statistics_client.get_template_statistics_for_template',
+                             return_value=notification)
+
+            with freeze_time('2012-01-01 12:10:00'):
+                client.login(api_user_active)
+                service_id = fake_uuid
+                template_id = fake_uuid
+                response = client.get(url_for(
+                    '.delete_service_template',
+                    service_id=service_id,
+                    template_id=template_id))
+    content = response.get_data(as_text=True)
+    assert response.status_code == 200
+    assert 'Test template was last used 10 minutes ago. Are you sure you want to delete it?' in content
+    assert 'Are you sure' in content
+    assert 'Two week reminder' in content
+    assert 'Your vehicle tax is about to expire' in content
+    mock_get_service_template.assert_called_with(service_id, template_id)
+
+
+def test_should_show_delete_template_page_with_never_used_block(app_,
+                                                                api_user_active,
+                                                                mock_login,
+                                                                mock_get_service,
+                                                                mock_get_service_template,
+                                                                mock_get_user,
+                                                                mock_get_user_by_email,
+                                                                mock_has_permissions,
+                                                                fake_uuid,
+                                                                mocker):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            mocker.patch(
+                'app.template_statistics_client.get_template_statistics_for_template',
+                side_effect=HTTPError(response=Mock(status_code=404), message="Default message")
+            )
+
             client.login(api_user_active)
             service_id = fake_uuid
             template_id = fake_uuid
@@ -243,12 +286,13 @@ def test_should_show_delete_template_page(app_,
                 service_id=service_id,
                 template_id=template_id))
 
-    content = response.get_data(as_text=True)
-    assert response.status_code == 200
-    assert 'Are you sure' in content
-    assert 'Two week reminder' in content
-    assert 'Your vehicle tax is about to expire' in content
-    mock_get_service_template.assert_called_with(service_id, template_id)
+            content = response.get_data(as_text=True)
+            assert response.status_code == 200
+            assert 'Two week reminder has never been used. Are you sure you want to delete it?' in content
+            assert 'Are you sure' in content
+            assert 'Two week reminder' in content
+            assert 'Your vehicle tax is about to expire' in content
+            mock_get_service_template.assert_called_with(service_id, template_id)
 
 
 def test_should_redirect_when_deleting_a_template(app_,
@@ -294,15 +338,15 @@ def test_should_redirect_when_deleting_a_template(app_,
 
 @freeze_time('2016-01-01T15:00')
 def test_should_show_page_for_a_deleted_template(
-    app_,
-    api_user_active,
-    mock_login,
-    mock_get_service,
-    mock_get_deleted_template,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_has_permissions,
-    fake_uuid
+        app_,
+        api_user_active,
+        mock_login,
+        mock_get_service,
+        mock_get_deleted_template,
+        mock_get_user,
+        mock_get_user_by_email,
+        mock_has_permissions,
+        fake_uuid
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(api_user_active)
