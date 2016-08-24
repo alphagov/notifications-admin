@@ -97,6 +97,20 @@ def mock_get_detailed_service_for_today(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_detailed_services(mocker, fake_uuid):
+    service_one = service_json(SERVICE_ONE_ID, "service_one", [fake_uuid], 1000, True, False)
+    service_one['statistics'] = {
+        'email': {'requested': 0, 'delivered': 0, 'failed': 0},
+        'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+    }
+    services = {'data': [service_one]}
+
+    return mocker.patch('app.service_api_client.get_services', return_value=services)
+
+
+
+
+@pytest.fixture(scope='function')
 def mock_get_live_service(mocker, api_user_active):
     def _get(service_id):
         service = service_json(
@@ -213,15 +227,6 @@ def mock_delete_service(mocker, mock_get_service):
 
     return mocker.patch(
         'app.service_api_client.delete_service', side_effect=_delete)
-
-
-@pytest.fixture(scope='function')
-def mock_get_all_service_statistics(mocker):
-    def _create(day):
-        return {'data': []}
-
-    return mocker.patch(
-        'app.statistics_api_client.get_statistics_for_all_services_for_day', side_effect=_create)
 
 
 @pytest.fixture(scope='function')

@@ -31,8 +31,7 @@ def test_should_render_platform_admin_page(
     app_,
     platform_admin_user,
     mocker,
-    mock_get_services,
-    mock_get_all_service_statistics
+    mock_get_detailed_services,
 ):
     with app_.test_request_context():
         with app_.test_client() as client:

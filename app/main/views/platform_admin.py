@@ -5,7 +5,7 @@ import pytz
 from flask import render_template
 from flask_login import login_required
 
-from app import statistics_api_client, service_api_client
+from app import service_api_client
 from app.main import main
 from app.utils import user_has_permissions
 from app.statistics_utils import get_formatted_percentage
