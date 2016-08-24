@@ -15,18 +15,17 @@ from app.statistics_utils import get_formatted_percentage
 @login_required
 @user_has_permissions(admin_override=True)
 def platform_admin():
+    services = service_api_client.get_services({'detailed': True})['data']
     return render_template(
         'views/platform-admin.html',
-        **get_statistics()
+        **get_statistics(services)
     )
 
 
-def get_statistics():
-    services = service_api_client.get_services({'detailed': True})['data']
-    service_stats = format_stats_by_service(services)
+def get_statistics(services):
     return {
         'global_stats': create_global_stats(services),
-        'service_stats': service_stats
+        'service_stats': format_stats_by_service(services)
     }
 
 

@@ -108,8 +108,6 @@ def mock_get_detailed_services(mocker, fake_uuid):
     return mocker.patch('app.service_api_client.get_services', return_value=services)
 
 
-
-
 @pytest.fixture(scope='function')
 def mock_get_live_service(mocker, api_user_active):
     def _get(service_id):
