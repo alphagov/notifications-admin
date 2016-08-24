@@ -21,8 +21,8 @@ class JobApiClient(BaseAPIClient):
             'delivered': 0,
             'failed': 0
         }
-        if 'statistics' in job:
-            for outcome in job['statistics']:
+        if 'statistics' in job['data']:
+            for outcome in job['data']['statistics']:
                 if outcome['status'] in ['failed', 'technical-failure', 'temporary-failure', 'permanent-failure']:
                     results['failed'] += outcome['count']
                 if outcome['status'] in ['sending', 'pending', 'created']:
@@ -37,10 +37,9 @@ class JobApiClient(BaseAPIClient):
             if status is not None:
                 params['status'] = status
             job = self.get(url='/service/{}/job/{}'.format(service_id, job_id), params=params)
-
             if 'notifications_sent' not in job['data']:
                 stats = self.__convert_statistics(job)
-                job['data']['notifications_sent'] = stats['sending']
+                job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
                 job['data']['notifications_delivered'] = stats['delivered']
                 job['data']['notifications_failed'] = stats['failed']
             return job
@@ -59,12 +58,12 @@ class JobApiClient(BaseAPIClient):
             "notification_count": notification_count
         }
         data = _attach_current_user(data)
-        resp = self.post(url='/service/{}/job'.format(service_id), data=data)
+        job = self.post(url='/service/{}/job'.format(service_id), data=data)
 
-        if 'notifications_sent' not in resp['data']:
-            stats = self.__convert_statistics(resp)
-            resp['data']['notifications_sent'] = stats['sending']
-            resp['data']['notifications_delivered'] = stats['delivered']
-            resp['data']['notifications_failed'] = stats['failed']
+        if 'notifications_sent' not in job['data']:
+            stats = self.__convert_statistics(job)
+            job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
+            job['data']['notifications_delivered'] = stats['delivered']
+            job['data']['notifications_failed'] = stats['failed']
 
-        return resp
+        return job
