@@ -345,27 +345,28 @@ def test_create_job_should_call_api(
     original_file_name = data['original_file_name']
     template_id = data['template']
     notification_count = data['notification_count']
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
-            with client.session_transaction() as session:
-                session['upload_data'] = {'original_file_name': original_file_name,
-                                          'template_id': template_id,
-                                          'notification_count': notification_count,
-                                          'valid': True}
-            url = url_for('main.start_job', service_id=service_one['id'], upload_id=job_id)
-            response = client.post(url, data={'scheduled_for': when}, follow_redirects=True)
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        with client.session_transaction() as session:
+            session['upload_data'] = {
+                'original_file_name': original_file_name,
+                'template_id': template_id,
+                'notification_count': notification_count,
+                'valid': True
+            }
+        url = url_for('main.start_job', service_id=service_one['id'], upload_id=job_id)
+        response = client.post(url, data={'scheduled_for': when}, follow_redirects=True)
 
-        assert response.status_code == 200
-        assert original_file_name in response.get_data(as_text=True)
-        mock_create_job.assert_called_with(
-            job_id,
-            service_id,
-            template_id,
-            original_file_name,
-            notification_count,
-            scheduled_for=when
-        )
+    assert response.status_code == 200
+    assert original_file_name in response.get_data(as_text=True)
+    mock_create_job.assert_called_with(
+        job_id,
+        service_id,
+        template_id,
+        original_file_name,
+        notification_count,
+        scheduled_for=when
+    )
 
 
 def test_check_messages_should_revalidate_file_when_uploading_file(
