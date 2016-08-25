@@ -78,13 +78,12 @@ def view_job(service_id, job_id):
     filter_args = _parse_filter_args(request.args)
     filter_args['status'] = _set_status_filters(filter_args)
 
+    total_notifications = job.get('notification_count', 0)
+    processed_notifications = job.get('notifications_delivered', 0) + job.get('notifications_failed', 0)
+
     return render_template(
         'views/jobs/job.html',
-        finished=job.get('notifications_sent', 0) and ((
-            job.get('notifications_sent', 0) -
-            job.get('notifications_delivered', 0) -
-            job.get('notifications_failed', 0)
-        ) == 0),
+        finished=(total_notifications == processed_notifications),
         uploaded_file_name=job['original_file_name'],
         template=Template(
             service_api_client.get_service_template(
