@@ -119,6 +119,23 @@ def get_dashboard_partials(service_id):
     service = service_api_client.get_detailed_service(service_id)
 
     return {
+        'upcoming': render_template(
+            'views/dashboard/_upcoming.html',
+            upcoming_jobs=[
+                {
+                    'original_file_name': '_GAAP_show_tell 2.csv',
+                    'created_at': '2016-08-09T08:57:29.031581+00:00',
+                    'notification_count': 3984,
+                    'sending_at': '5pm'
+                },
+                {
+                    'original_file_name': 'example self.csv',
+                    'created_at': '2016-08-09T10:01:29.031581+00:00',
+                    'notification_count': 1,
+                    'sending_at': '11pm'
+                }
+            ]
+        ),
         'totals': render_template(
             'views/dashboard/_totals.html',
             service_id=service_id,

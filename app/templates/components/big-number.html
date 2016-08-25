@@ -1,8 +1,8 @@
-{% macro big_number(number, label, link=None, currency='', smaller=False, smallest=False) %}
+{% macro big_number(number, label, link=None, currency='', smaller=False, smallest=False, inline=False) %}
   {% if link %}
     <a class="big-number-link" href="{{ link }}">
   {% endif %}
-  <div class="big-number{% if smaller %}-smaller{% endif %}{% if smallest %}-smallest{% endif %}">
+  <div class="big-number{% if smaller %}-smaller{% endif %}{% if smallest %}-smallest{% endif %} {% if inline %}big-number-inline{% endif %}">
     <div class="big-number-number">
       {% if number is number %}
         {% if currency %}
