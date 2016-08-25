@@ -1,61 +1,71 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, date_field, row_heading %}
 
-{% if notifications %}
-  <div class="dashboard-table">
-{% endif %}
+{% if job.job_status == 'scheduled' %}
 
-  {% if not help %}
-    {% if percentage_complete < 100 %}
-      <p class="bottom-gutter-1-2 hint">
-        Report is {{ "{:.0f}%".format(percentage_complete) }} complete…
-      </p>
-    {% elif notifications %}
-      <p class="bottom-gutter">
-        <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
-        &emsp;
-        <span id="time-left">{{ time_left }}</span>
+  <p>
+    Sending will start at {{ job.scheduled_for|format_time }}
+  </p>
+
+{% else %}
+
+  {% if notifications %}
+    <div class="dashboard-table">
+  {% endif %}
+
+    {% if not help %}
+      {% if percentage_complete < 100 %}
+        <p class="bottom-gutter-1-2 hint">
+          Report is {{ "{:.0f}%".format(percentage_complete) }} complete…
+        </p>
+      {% elif notifications %}
+        <p class="bottom-gutter">
+          <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
+          &emsp;
+          <span id="time-left">{{ time_left }}</span>
+        </p>
+      {% endif %}
+    {% endif %}
+
+    {% call(item, row_number) list_table(
+      notifications,
+      caption=uploaded_file_name,
+      caption_visible=False,
+      empty_message="No messages to show",
+      field_headings=[
+        'Recipient',
+        'Time',
+        'Status'
+      ],
+      field_headings_visible=False
+    ) %}
+      {% call row_heading() %}
+        {{ item.to }}
+      {% endcall %}
+      {{ date_field(
+        (item.updated_at or item.created_at)|format_datetime_short
+      ) }}
+      {% call field(
+        align='right',
+        status=item.status|format_notification_status_as_field_status
+      ) %}
+        {% if item.status|format_notification_status_as_url %}
+          <a href="{{ item.status|format_notification_status_as_url }}">
+        {% endif %}
+        {{ item.status|format_notification_status(item.template.template_type) }}
+        {% if item.status|format_notification_status_as_url %}
+          </a>
+        {% endif %}
+      {% endcall %}
+    {% endcall %}
+
+    {% if more_than_one_page %}
+      <p class="table-show-more-link">
+        Only showing the first 50 rows
       </p>
     {% endif %}
+
+  {% if notifications %}
+    </div>
   {% endif %}
 
-  {% call(item, row_number) list_table(
-    notifications,
-    caption=uploaded_file_name,
-    caption_visible=False,
-    empty_message="No messages to show",
-    field_headings=[
-      'Recipient',
-      'Time',
-      'Status'
-    ],
-    field_headings_visible=False
-  ) %}
-    {% call row_heading() %}
-      {{ item.to }}
-    {% endcall %}
-    {{ date_field(
-      (item.updated_at or item.created_at)|format_datetime_short
-    ) }}
-    {% call field(
-      align='right',
-      status=item.status|format_notification_status_as_field_status
-    ) %}
-      {% if item.status|format_notification_status_as_url %}
-        <a href="{{ item.status|format_notification_status_as_url }}">
-      {% endif %}
-      {{ item.status|format_notification_status(item.template.template_type) }}
-      {% if item.status|format_notification_status_as_url %}
-        </a>
-      {% endif %}
-    {% endcall %}
-  {% endcall %}
-
-  {% if more_than_one_page %}
-    <p class="table-show-more-link">
-      Only showing the first 50 rows
-    </p>
-  {% endif %}
-
-{% if notifications %}
-  </div>
 {% endif %}

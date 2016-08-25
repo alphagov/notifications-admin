@@ -859,6 +859,20 @@ def mock_get_job(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_scheduled_job(mocker, api_user_active):
+    def _get_job(service_id, job_id):
+        return {"data": job_json(
+            service_id,
+            api_user_active,
+            job_id=job_id,
+            job_status='scheduled',
+            scheduled_for='2016-01-01T00:00:00.061258'
+        )}
+
+    return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
+
+
+@pytest.fixture(scope='function')
 def mock_get_job_in_progress(mocker, api_user_active):
     def _get_job(service_id, job_id):
         return {"data": job_json(
