@@ -37,11 +37,10 @@ class JobApiClient(BaseAPIClient):
             if status is not None:
                 params['status'] = status
             job = self.get(url='/service/{}/job/{}'.format(service_id, job_id), params=params)
-            if 'notifications_sent' not in job['data']:
-                stats = self.__convert_statistics(job)
-                job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
-                job['data']['notifications_delivered'] = stats['delivered']
-                job['data']['notifications_failed'] = stats['failed']
+            stats = self.__convert_statistics(job)
+            job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
+            job['data']['notifications_delivered'] = stats['delivered']
+            job['data']['notifications_failed'] = stats['failed']
             return job
 
         params = {}
@@ -60,10 +59,9 @@ class JobApiClient(BaseAPIClient):
         data = _attach_current_user(data)
         job = self.post(url='/service/{}/job'.format(service_id), data=data)
 
-        if 'notifications_sent' not in job['data']:
-            stats = self.__convert_statistics(job)
-            job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
-            job['data']['notifications_delivered'] = stats['delivered']
-            job['data']['notifications_failed'] = stats['failed']
+        stats = self.__convert_statistics(job)
+        job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
+        job['data']['notifications_delivered'] = stats['delivered']
+        job['data']['notifications_failed'] = stats['failed']
 
         return job

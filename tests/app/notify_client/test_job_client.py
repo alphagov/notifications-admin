@@ -74,7 +74,7 @@ def test_client_gets_job_by_service_filtered_by_status(mocker):
     mock_get.assert_called_once_with(url=expected_url,  params={'limit_days': 1})
 
 
-def test_client_parses_handles_aggregate_table_job_stats(mocker):
+def test_client_parses_handles_no_statistics_on_job_when_no_rows_processed(mocker):
     mocker.patch('app.notify_client.current_user', id='1')
 
     service_id = 'service_id'
@@ -94,9 +94,6 @@ def test_client_parses_handles_aggregate_table_job_stats(mocker):
         'created_at': '2016-08-24T08:09:56.371073+00:00',
         'template': 'c0309261-9c9e-4530-8fed-5f67b02260d2',
         'notification_count': 30,
-        'notifications_sent': 10,
-        'notifications_failed': 10,
-        'notifications_delivered': 10,
         'processing_started': '2016-08-24T08:09:57.661246+00:00'
     }}
 
@@ -108,9 +105,9 @@ def test_client_parses_handles_aggregate_table_job_stats(mocker):
     result = client.get_job(service_id, job_id)
 
     mock_get.assert_called_once_with(url=expected_url, params={})
-    assert result['data']['notifications_sent'] == 10
+    assert result['data']['notifications_sent'] == 0
     assert result['data']['notification_count'] == 30
-    assert result['data']['notifications_failed'] == 10
+    assert result['data']['notifications_failed'] == 0
 
 
 def test_client_parses_job_stats(mocker):
