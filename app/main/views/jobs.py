@@ -91,7 +91,8 @@ def view_job(service_id, job_id):
                 template_id=job['template'],
                 version=job['template_version']
             )['data'],
-            prefix=current_service['name']
+            prefix=current_service['name'],
+            sms_sender=current_service['sms_sender']
         ),
         status=request.args.get('status', ''),
         updates_url=url_for(
