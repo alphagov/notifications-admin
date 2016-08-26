@@ -44,6 +44,17 @@ def service_one(api_user_active):
 
 
 @pytest.fixture(scope='function')
+def service_with_reply_to_addresses(api_user_active):
+    return service_json(
+        SERVICE_ONE_ID,
+        'service one',
+        [api_user_active.id],
+        reply_to_email_address='test@example.com',
+        sms_sender='elevenchars',
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_send_sms(request, mocker):
     return mocker.patch("app.service_api_client.send_sms")
 
@@ -1135,4 +1146,21 @@ def mock_get_organisations(mocker):
 
     return mocker.patch(
         'app.organisations_client.get_organisations', side_effect=_get_organisations
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_organisation(mocker):
+    def _get_organisation(id):
+        return {
+            'organisation': {
+                'logo': 'example.png',
+                'name': 'Organisation name',
+                'id': 'organisation-id',
+                'colour': '#f00'
+            }
+        }
+
+    return mocker.patch(
+        'app.organisations_client.get_organisation', side_effect=_get_organisation
     )

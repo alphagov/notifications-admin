@@ -8,21 +8,33 @@
 
 {% block maincolumn_content %}
 
-  <div class="grid-row">
-    <div class="column-three-quarters">
-      <h1 class="heading-large">Set text message sender name</h1>
-      <form method="post">
-        {{ textbox(
-          form.sms_sender,
-          width='1-1',
-          safe_error_message=True
-        ) }}
-        {{ page_footer(
-          'Save',
-          back_link=url_for('.service_settings', service_id=current_service.id)
-      ) }}
-      </form>
-    </div>
-  </div>
+  <h1 class="heading-large">Text message sender</h1>
+  <p>
+    This appears instead of a phone number when a user receives a
+    text message from your service.
+  <p>
+    If you leave this blank:
+  </p>
+  <ul class="list list-bullet">
+    <li>
+      your messages will be sent from 40604 (a shortcode that’s
+      reserved for government use)
+    </li>
+    <li>
+      each message will begin with ‘{{ current_service.name }}:’
+    </li>
+  </ul>
+  <form method="post">
+    {{ textbox(
+      form.sms_sender,
+      width='1-4',
+      hint='Up to 11 characters, letters, numbers and spaces only'
+    ) }}
+    {{ page_footer(
+      'Save',
+      back_link=url_for('.service_settings', service_id=current_service.id),
+      back_link_text='Back to settings'
+  ) }}
+  </form>
 
 {% endblock %}

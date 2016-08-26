@@ -73,14 +73,20 @@
   </td>
 {% endmacro %}
 
-{% macro text_field(text) -%}
-  {% call field() %}
+{% macro text_field(text, status='') -%}
+  {% call field(status=status) %}
     {{ text }}
   {% endcall %}
 {%- endmacro %}
 
 {% macro link_field(text, link) -%}
   {% call field() %}
+    <a href="{{ link }}">{{ text }}</a>
+  {% endcall %}
+{%- endmacro %}
+
+{% macro edit_field(text, link) -%}
+  {% call field(align='right') %}
     <a href="{{ link }}">{{ text }}</a>
   {% endcall %}
 {%- endmacro %}

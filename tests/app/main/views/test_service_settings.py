@@ -9,19 +9,49 @@ from unittest.mock import ANY, Mock
 from werkzeug.exceptions import InternalServerError
 
 
-def test_should_show_overview(app_,
-                              active_user_with_permissions,
-                              mocker,
-                              service_one):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
-            response = client.get(url_for(
-                'main.service_settings', service_id=service_one['id']))
-        assert response.status_code == 200
-        resp_data = response.get_data(as_text=True)
-        assert 'Service settings' in resp_data
-        app.service_api_client.get_service.assert_called_with(service_one['id'])
+def test_should_show_overview(
+    app_,
+    active_user_with_permissions,
+    mocker,
+    service_one,
+    mock_get_organisation
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        response = client.get(url_for(
+            'main.service_settings', service_id=service_one['id']
+        ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('h1').text == 'Settings'
+    for index, row in enumerate([
+        'Service name service one Change',
+        'Email reply to address None Change',
+        'Text message sender 40604 Change'
+    ]):
+        assert row == " ".join(page.find_all('tr')[index + 1].text.split())
+    app.service_api_client.get_service.assert_called_with(service_one['id'])
+
+
+def test_should_show_overview_for_service_with_more_things_set(
+    app_,
+    active_user_with_permissions,
+    mocker,
+    service_with_reply_to_addresses,
+    mock_get_organisation
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_with_reply_to_addresses)
+        response = client.get(url_for(
+            'main.service_settings', service_id=service_with_reply_to_addresses['id']
+        ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    for index, row in enumerate([
+        'Service name service one Change',
+        'Email reply to address test@example.com Change',
+        'Text message sender elevenchars Change'
+    ]):
+        assert row == " ".join(page.find_all('tr')[index + 1].text.split())
 
 
 def test_should_show_service_name(app_,
@@ -63,14 +93,17 @@ def test_should_redirect_after_change_service_name(app_,
         assert mock_get_services.called
 
 
-def test_switch_service_to_live(app_,
-                                service_one,
-                                mock_login,
-                                mock_get_user,
-                                active_user_with_permissions,
-                                mock_get_service,
-                                mock_update_service,
-                                mock_has_permissions):
+def test_switch_service_to_live(
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_get_service,
+    mock_update_service,
+    mock_has_permissions,
+    mock_get_organisation
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions)
@@ -87,14 +120,17 @@ def test_switch_service_to_live(app_,
         )
 
 
-def test_switch_service_to_restricted(app_,
-                                      service_one,
-                                      mock_login,
-                                      mock_get_user,
-                                      active_user_with_permissions,
-                                      mock_get_live_service,
-                                      mock_update_service,
-                                      mock_has_permissions):
+def test_switch_service_to_restricted(
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_get_live_service,
+    mock_update_service,
+    mock_has_permissions,
+    mock_get_organisation
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions)
@@ -148,12 +184,15 @@ def test_should_show_service_name_confirmation(app_,
         app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
-def test_should_redirect_after_service_name_confirmation(app_,
-                                                         active_user_with_permissions,
-                                                         service_one,
-                                                         mocker,
-                                                         mock_update_service,
-                                                         mock_verify_password):
+def test_should_redirect_after_service_name_confirmation(
+    app_,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    mock_update_service,
+    mock_verify_password,
+    mock_get_organisation
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -222,12 +261,13 @@ def test_should_show_request_to_go_live(app_,
 
 
 def test_should_redirect_after_request_to_go_live(
-        app_,
-        api_user_active,
-        mock_get_user,
-        mock_get_service,
-        mock_has_permissions,
-        mocker
+    app_,
+    api_user_active,
+    mock_get_user,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_organisation,
+    mocker
 ):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
@@ -262,12 +302,12 @@ def test_should_redirect_after_request_to_go_live(
 
 
 def test_log_error_on_request_to_go_live(
-        app_,
-        api_user_active,
-        mock_get_user,
-        mock_get_service,
-        mock_has_permissions,
-        mocker
+    app_,
+    api_user_active,
+    mock_get_user,
+    mock_get_service,
+    mock_has_permissions,
+    mocker
 ):
     mock_post = mocker.patch(
         'app.main.views.service_settings.requests.post',
@@ -291,95 +331,6 @@ def test_log_error_on_request_to_go_live(
             mock_logger.assert_called_with(
                 "Deskpro create ticket request failed with {} '{}'".format(mock_post().status_code, mock_post().json())
             )
-
-
-def test_should_show_status_page(app_,
-                                 api_user_active,
-                                 mock_get_service,
-                                 mock_get_user,
-                                 mock_get_user_by_email,
-                                 mock_login,
-                                 mock_has_permissions,
-                                 fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.get(url_for(
-                'main.service_status_change', service_id=service_id))
-
-        assert response.status_code == 200
-        resp_data = response.get_data(as_text=True)
-        assert 'Suspend API keys' in resp_data
-        assert mock_get_service.called
-
-
-def test_should_show_redirect_after_status_change(app_,
-                                                  api_user_active,
-                                                  mock_get_service,
-                                                  mock_get_user,
-                                                  mock_get_user_by_email,
-                                                  mock_login,
-                                                  mock_has_permissions,
-                                                  fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.post(url_for(
-                'main.service_status_change', service_id=service_id))
-
-        assert response.status_code == 302
-        redirect_url = url_for(
-            'main.service_status_change_confirm', service_id=service_id, _external=True)
-        assert redirect_url == response.location
-        assert mock_get_service.called
-
-
-def test_should_show_status_confirmation(app_,
-                                         api_user_active,
-                                         mock_get_service,
-                                         mock_get_user,
-                                         mock_get_user_by_email,
-                                         mock_login,
-                                         mock_has_permissions,
-                                         fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.get(url_for(
-                'main.service_status_change_confirm', service_id=service_id))
-
-        assert response.status_code == 200
-        resp_data = response.get_data(as_text=True)
-        assert 'Turn off all outgoing notifications' in resp_data
-        assert mock_get_service.called
-
-
-def test_should_redirect_after_status_confirmation(app_,
-                                                   api_user_active,
-                                                   mock_get_service,
-                                                   mock_update_service,
-                                                   mock_get_user,
-                                                   mock_get_user_by_email,
-                                                   mock_login,
-                                                   mock_verify_password,
-                                                   mock_has_permissions,
-                                                   fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.post(url_for(
-                'main.service_status_change_confirm', service_id=service_id))
-
-        assert response.status_code == 302
-        settings_url = url_for(
-            'main.service_settings', service_id=service_id, _external=True)
-        assert settings_url == response.location
-        assert mock_get_service.called
-        assert mock_update_service.called
 
 
 def test_should_show_delete_page(app_,
@@ -468,14 +419,12 @@ def test_should_redirect_delete_confirmation(app_,
         assert mock_delete_service.called
 
 
-def test_route_permissions(mocker, app_, api_user_active, service_one):
+def test_route_permissions(mocker, app_, api_user_active, service_one, mock_get_organisation):
     routes = [
         'main.service_settings',
         'main.service_name_change',
         'main.service_name_change_confirm',
         'main.service_request_to_go_live',
-        'main.service_status_change',
-        'main.service_status_change_confirm',
         'main.service_delete',
         'main.service_delete_confirm']
     with app_.test_request_context():
@@ -491,7 +440,7 @@ def test_route_permissions(mocker, app_, api_user_active, service_one):
                 service_one)
 
 
-def test_route_invalid_permissions(mocker, app_, api_user_active, service_one):
+def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, mock_get_organisation):
     routes = [
         'main.service_settings',
         'main.service_name_change',
@@ -499,8 +448,6 @@ def test_route_invalid_permissions(mocker, app_, api_user_active, service_one):
         'main.service_request_to_go_live',
         'main.service_switch_live',
         'main.service_switch_research_mode',
-        'main.service_status_change',
-        'main.service_status_change_confirm',
         'main.service_delete',
         'main.service_delete_confirm']
     with app_.test_request_context():
@@ -516,14 +463,12 @@ def test_route_invalid_permissions(mocker, app_, api_user_active, service_one):
                 service_one)
 
 
-def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one):
+def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one, mock_get_organisation):
     routes = [
         'main.service_settings',
         'main.service_name_change',
         'main.service_name_change_confirm',
         'main.service_request_to_go_live',
-        'main.service_status_change',
-        'main.service_status_change_confirm',
         'main.service_delete',
         'main.service_delete_confirm'
     ]
@@ -557,11 +502,13 @@ def test_route_for_platform_admin_update_service(mocker, app_, platform_admin_us
 
 
 def test_set_reply_to_email_address(
-        app_,
-        active_user_with_permissions,
-        mocker,
-        mock_update_service,
-        service_one):
+    app_,
+    active_user_with_permissions,
+    mocker,
+    mock_update_service,
+    service_one,
+    mock_get_organisation
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -650,14 +597,16 @@ def test_switch_service_from_research_mode_to_normal(
 
 
 def test_shows_research_mode_indicator(
-        app_,
-        service_one,
-        mock_login,
-        mock_get_user,
-        active_user_with_permissions,
-        mock_get_service,
-        mock_has_permissions,
-        mocker):
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_organisation,
+    mocker
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             service = service_json(
@@ -682,14 +631,16 @@ def test_shows_research_mode_indicator(
 
 
 def test_does_not_show_research_mode_indicator(
-        app_,
-        service_one,
-        mock_login,
-        mock_get_user,
-        active_user_with_permissions,
-        mock_get_service,
-        mock_has_permissions,
-        mocker):
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_organisation,
+    mocker
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions)
@@ -702,11 +653,13 @@ def test_does_not_show_research_mode_indicator(
 
 
 def test_set_text_message_sender(
-        app_,
-        active_user_with_permissions,
-        mocker,
-        mock_update_service,
-        service_one):
+    app_,
+    active_user_with_permissions,
+    mocker,
+    mock_update_service,
+    service_one,
+    mock_get_organisation
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -735,34 +688,6 @@ def test_if_sms_sender_set_then_form_populated(app_,
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.find(id='sms_sender')['value'] == 'elevenchars'
-
-
-@pytest.mark.parametrize("sender, expected_flash_message", [
-    ("elevenchars", 'Text message sender set to elevenchars'),
-    ('', 'Text message sender removed')
-])
-def test_set_text_message_sender_flash_messages(
-        app_,
-        active_user_with_permissions,
-        mocker,
-        mock_update_service,
-        service_one,
-        sender,
-        expected_flash_message):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
-            data = {"sms_sender": sender}
-            response = client.post(url_for('main.service_set_sms_sender', service_id=service_one['id']),
-                                   data=data,
-                                   follow_redirects=True)
-
-            assert response.status_code == 200
-
-            page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-            element = page.find('div', {"class": "banner-default-with-tick"})
-
-            assert element.text.strip() == expected_flash_message
 
 
 def test_should_show_branding(
