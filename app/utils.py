@@ -89,7 +89,7 @@ def get_errors_for_csv(recipients, template_type):
 
 
 def generate_notifications_csv(json_list):
-    from app import format_datetime, format_notification_status
+    from app import format_datetime_24h, format_notification_status
     content = StringIO()
     retval = None
     with content as csvfile:
@@ -103,7 +103,7 @@ def generate_notifications_csv(json_list):
                 x['template']['template_type'],
                 x['job']['original_file_name'] if x['job'] else '',
                 format_notification_status(x['status'], x['template']['template_type']),
-                format_datetime(x['created_at'])])
+                format_datetime_24h(x['created_at'])])
         retval = content.getvalue()
     return retval
 
