@@ -146,26 +146,26 @@ def create_test_api_user(state, permissions={}):
     return user
 
 
-def job_json(service_id,
-             created_by,
-             job_id=None,
-             template_id=None,
-             template_version=1,
-             created_at=None,
-             bucket_name='',
-             original_file_name="thisisatest.csv",
-             notification_count=1,
-             notifications_sent=1,
-             notifications_requested=1,
-             status=None):
+def job_json(
+    service_id,
+    created_by,
+    job_id=None,
+    template_id=None,
+    template_version=1,
+    created_at=None,
+    bucket_name='',
+    original_file_name="thisisatest.csv",
+    notification_count=1,
+    notifications_sent=1,
+    notifications_requested=1,
+    job_status='Delivered'
+):
     if job_id is None:
         job_id = str(generate_uuid())
     if template_id is None:
         template_id = str(generate_uuid())
     if created_at is None:
         created_at = str(datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%f%z'))
-    if status is None:
-        status = 'Delivered'
     data = {
         'id': job_id,
         'service': service_id,
@@ -176,7 +176,7 @@ def job_json(service_id,
         'notification_count': notification_count,
         'notifications_sent': notifications_sent,
         'notifications_requested': notifications_requested,
-        'status': status,
+        'job_status': job_status,
         'created_by': created_by_json(
             created_by.id,
             created_by.name,
