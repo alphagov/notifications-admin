@@ -19,7 +19,8 @@ class JobApiClient(BaseAPIClient):
         results = {
             'sending': 0,
             'delivered': 0,
-            'failed': 0
+            'failed': 0,
+            'requested': 0
         }
         if 'statistics' in job:
             for outcome in job['statistics']:
@@ -29,6 +30,7 @@ class JobApiClient(BaseAPIClient):
                     results['sending'] += outcome['count']
                 if outcome['status'] in ['delivered']:
                     results['delivered'] += outcome['count']
+                results['requested'] += outcome['count']
         return results
 
     def get_job(self, service_id, job_id=None, limit_days=None, status=None):
@@ -42,6 +44,7 @@ class JobApiClient(BaseAPIClient):
                 job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
                 job['data']['notifications_delivered'] = stats['delivered']
                 job['data']['notifications_failed'] = stats['failed']
+                job['data']['notifications_requested'] = stats['requested']
             return job
 
         params = {}
@@ -55,6 +58,7 @@ class JobApiClient(BaseAPIClient):
                 job['notifications_sent'] = stats['delivered'] + stats['failed']
                 job['notifications_delivered'] = stats['delivered']
                 job['notifications_failed'] = stats['failed']
+                job['notifications_requested'] = stats['requested']
 
         return jobs
 
