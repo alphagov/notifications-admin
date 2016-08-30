@@ -322,6 +322,41 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
             mock_get_detailed_service_for_today.assert_called_once_with(fake_uuid)
 
 
+def test_test_message_can_only_be_sent_now(
+    app_,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template,
+    mock_s3_download,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    fake_uuid
+):
+
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        with client.session_transaction() as session:
+            session['upload_data'] = {
+                'original_file_name': 'Test message',
+                'template_id': fake_uuid,
+                'notification_count': 1,
+                'valid': True
+            }
+        response = client.get(url_for(
+            'main.check_messages',
+            service_id=fake_uuid,
+            upload_id=fake_uuid,
+            template_type='sms',
+            from_test=True
+        ))
+
+        content = response.get_data(as_text=True)
+        assert 'name="scheduled_for"' not in content
+
+
 @pytest.mark.parametrize(
     'when', [
         '', '2016-08-25T13:04:21.767198'

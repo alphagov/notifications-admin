@@ -250,8 +250,10 @@ def check_messages(service_id, template_type, upload_id):
             back_link = url_for(
                 '.choose_template', service_id=service_id, template_type=template.template_type, **extra_args
             )
+        choose_time_form = None
     else:
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
+        choose_time_form = ChooseTimeForm()
 
     with suppress(StopIteration):
         template.values = next(recipients.rows)
@@ -276,7 +278,7 @@ def check_messages(service_id, template_type, upload_id):
         upload_id=upload_id,
         form=CsvUploadForm(),
         remaining_messages=remaining_messages,
-        choose_time_form=ChooseTimeForm(),
+        choose_time_form=choose_time_form,
         back_link=back_link,
         help=get_help_argument()
     )
