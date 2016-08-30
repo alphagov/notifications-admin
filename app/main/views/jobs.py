@@ -326,7 +326,7 @@ def get_job_partials(job):
             'partials/jobs/notifications.html',
             notifications=notifications['notifications'],
             more_than_one_page=bool(notifications.get('links', {}).get('next')),
-            percentage_complete=(job['notifications_sent'] / job['notification_count'] * 100),
+            percentage_complete=(job['notifications_requested'] / job['notification_count'] * 100),
             download_link=url_for(
                 '.view_job_csv',
                 service_id=current_service['id'],
