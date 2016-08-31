@@ -71,9 +71,10 @@ class JobApiClient(BaseAPIClient):
         job = self.post(url='/service/{}/job'.format(service_id), data=data)
 
         if 'notifications_sent' not in job['data']:
-            stats = self.__convert_statistics(job)
+            stats = self.__convert_statistics(job['data'])
             job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
             job['data']['notifications_delivered'] = stats['delivered']
             job['data']['notifications_failed'] = stats['failed']
+            job['data']['notifications_requested'] = stats['requested']
 
         return job

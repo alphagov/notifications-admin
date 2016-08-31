@@ -20,9 +20,17 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
     expected_url = '/service/{}/job'.format(service_id)
 
     client = JobApiClient()
-    mock_post = mocker.patch('app.notify_client.job_api_client.JobApiClient.post')
+    mock_post = mocker.patch(
+        'app.notify_client.job_api_client.JobApiClient.post',
+        return_value={'data': dict(statistics=[], **expected_data)}
+    )
 
-    client.create_job(job_id, service_id, template_id, original_file_name, notification_count)
+    result = client.create_job(job_id, service_id, template_id, original_file_name, notification_count)
+
+    assert result['data']['notifications_requested'] == 0
+    assert result['data']['notifications_sent'] == 0
+    assert result['data']['notification_count'] == 1
+    assert result['data']['notifications_failed'] == 0
 
     mock_post.assert_called_once_with(url=expected_url, data=expected_data)
 
