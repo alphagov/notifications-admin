@@ -154,6 +154,7 @@ def test_client_parses_job_stats(mocker):
     result = client.get_job(service_id, job_id)
 
     mock_get.assert_called_once_with(url=expected_url, params={})
+    assert result['data']['notifications_requested'] == 80
     assert result['data']['notifications_sent'] == 50
     assert result['data']['notification_count'] == 80
     assert result['data']['notifications_failed'] == 40
@@ -191,6 +192,7 @@ def test_client_parses_empty_job_stats(mocker):
     result = client.get_job(service_id, job_id)
 
     mock_get.assert_called_once_with(url=expected_url, params={})
+    assert result['data']['notifications_requested'] == 0
     assert result['data']['notifications_sent'] == 0
     assert result['data']['notification_count'] == 80
     assert result['data']['notifications_failed'] == 0
@@ -265,10 +267,12 @@ def test_client_parses_job_stats_for_service(mocker):
 
     mock_get.assert_called_once_with(url=expected_url, params={})
     assert result['data'][0]['id'] == job_1_id
+    assert result['data'][0]['notifications_requested'] == 80
     assert result['data'][0]['notifications_sent'] == 50
     assert result['data'][0]['notification_count'] == 80
     assert result['data'][0]['notifications_failed'] == 40
     assert result['data'][1]['id'] == job_2_id
+    assert result['data'][1]['notifications_requested'] == 40
     assert result['data'][1]['notifications_sent'] == 25
     assert result['data'][1]['notification_count'] == 40
     assert result['data'][1]['notifications_failed'] == 20
@@ -325,10 +329,12 @@ def test_client_parses_empty_job_stats_for_service(mocker):
 
     mock_get.assert_called_once_with(url=expected_url, params={})
     assert result['data'][0]['id'] == job_1_id
+    assert result['data'][0]['notifications_requested'] == 0
     assert result['data'][0]['notifications_sent'] == 0
     assert result['data'][0]['notification_count'] == 80
     assert result['data'][0]['notifications_failed'] == 0
     assert result['data'][1]['id'] == job_2_id
+    assert result['data'][1]['notifications_requested'] == 0
     assert result['data'][1]['notifications_sent'] == 0
     assert result['data'][1]['notification_count'] == 40
     assert result['data'][1]['notifications_failed'] == 0

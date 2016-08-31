@@ -156,6 +156,7 @@ def job_json(service_id,
              original_file_name="thisisatest.csv",
              notification_count=1,
              notifications_sent=1,
+             notifications_requested=1,
              status=None):
     if job_id is None:
         job_id = str(generate_uuid())
@@ -174,6 +175,7 @@ def job_json(service_id,
         'created_at': created_at,
         'notification_count': notification_count,
         'notifications_sent': notifications_sent,
+        'notifications_requested': notifications_requested,
         'status': status,
         'created_by': created_by_json(
             created_by.id,

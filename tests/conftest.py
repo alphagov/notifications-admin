@@ -864,7 +864,7 @@ def mock_get_job_in_progress(mocker, api_user_active):
         return {"data": job_json(
             service_id, api_user_active, job_id=job_id,
             notification_count=10,
-            notifications_sent=5
+            notifications_requested=5
         )}
 
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
