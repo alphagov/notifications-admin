@@ -116,9 +116,9 @@ def get_dashboard_partials(service_id):
         job for job in job_api_client.get_job(service_id, limit_days=7)['data']
         if job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME']
     ])
-    scheduled_jobs = [
+    scheduled_jobs = sorted([
         job for job in jobs if job['job_status'] == 'scheduled'
-    ]
+    ], key=lambda job: job['scheduled_for'])
     immediate_jobs = [
         job for job in jobs if job['job_status'] != 'scheduled'
     ]

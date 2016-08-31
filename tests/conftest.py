@@ -902,7 +902,8 @@ def mock_get_jobs(mocker, api_user_active):
                 ("all email addresses.xlsx", '', 'pending'),
                 ("applicants.ods", '', ''),
                 ("thisisatest.csv", '', ''),
-                ("send_me_later.csv", '2016-01-01 11:09:00.061258', 'scheduled')
+                ("send_me_later.csv", '2016-01-01 11:09:00.061258', 'scheduled'),
+                ("even_later.csv", '2016-01-01 23:09:00.061258', 'scheduled')
             )
         ]}
 

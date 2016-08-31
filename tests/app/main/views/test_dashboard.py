@@ -184,11 +184,14 @@ def test_should_show_upcoming_jobs_on_dashboard(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     table_rows = page.find_all('tbody')[0].find_all('tr')
-    assert len(table_rows) == 1
+    assert len(table_rows) == 2
 
     assert 'send_me_later.csv' in table_rows[0].find_all('th')[0].text
     assert 'Sending at 11:09am' in table_rows[0].find_all('th')[0].text
     assert table_rows[0].find_all('td')[0].text.strip() == '1'
+    assert 'even_later.csv' in table_rows[1].find_all('th')[0].text
+    assert 'Sending at 11:09pm' in table_rows[1].find_all('th')[0].text
+    assert table_rows[1].find_all('td')[0].text.strip() == '1'
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
