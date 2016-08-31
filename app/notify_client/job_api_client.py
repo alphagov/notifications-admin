@@ -18,14 +18,15 @@ class JobApiClient(BaseAPIClient):
     @staticmethod
     def __convert_statistics(job):
         results = defaultdict(int)
-        for outcome in job['statistics']:
-            if outcome['status'] in ['failed', 'technical-failure', 'temporary-failure', 'permanent-failure']:
-                results['failed'] += outcome['count']
-            if outcome['status'] in ['sending', 'pending', 'created']:
-                results['sending'] += outcome['count']
-            if outcome['status'] in ['delivered']:
-                results['delivered'] += outcome['count']
-            results['requested'] += outcome['count']
+        if 'statistics' in job:
+            for outcome in job['statistics']:
+                if outcome['status'] in ['failed', 'technical-failure', 'temporary-failure', 'permanent-failure']:
+                    results['failed'] += outcome['count']
+                if outcome['status'] in ['sending', 'pending', 'created']:
+                    results['sending'] += outcome['count']
+                if outcome['status'] in ['delivered']:
+                    results['delivered'] += outcome['count']
+                results['requested'] += outcome['count']
         return results
 
     def get_job(self, service_id, job_id=None, limit_days=None, status=None):
