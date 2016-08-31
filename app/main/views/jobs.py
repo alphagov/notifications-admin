@@ -65,10 +65,10 @@ def _set_status_filters(filter_args):
 def view_jobs(service_id):
     return render_template(
         'views/jobs/jobs.html',
-        jobs=filter(
-            lambda job: job['job_status'] != 'scheduled',
-            add_rate_to_jobs(job_api_client.get_job(service_id)['data'])
-        )
+        jobs=add_rate_to_jobs([
+            job for job in job_api_client.get_job(service_id)['data']
+            if job['job_status'] != 'scheduled'
+        ])
     )
 
 
