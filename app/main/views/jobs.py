@@ -65,7 +65,10 @@ def _set_status_filters(filter_args):
 def view_jobs(service_id):
     return render_template(
         'views/jobs/jobs.html',
-        jobs=add_rate_to_jobs(job_api_client.get_job(service_id)['data'])
+        jobs=add_rate_to_jobs([
+            job for job in job_api_client.get_job(service_id)['data']
+            if job['job_status'] != 'scheduled'
+        ])
     )
 
 
@@ -274,6 +277,11 @@ def get_status_filters(service, message_type, statistics):
 
 
 def _get_job_counts(job, help_argument):
+    sending = 0 if job['job_status'] == 'scheduled' else (
+        job.get('notification_count', 0) -
+        job.get('notifications_delivered', 0) -
+        job.get('notifications_failed', 0)
+    )
     return [
         (
             label,
@@ -293,9 +301,7 @@ def _get_job_counts(job, help_argument):
             ],
             [
               'sending', 'sending',
-              job.get('notification_count', 0) -
-              job.get('notifications_delivered', 0) -
-              job.get('notifications_failed', 0)
+              sending
             ],
             [
               'delivered', 'delivered',
@@ -318,7 +324,6 @@ def get_job_partials(job):
     return {
         'counts': render_template(
             'partials/jobs/count.html',
-            job=job,
             counts=_get_job_counts(job, request.args.get('help', 0)),
             status=filter_args['status']
         ),
@@ -334,7 +339,8 @@ def get_job_partials(job):
                 status=request.args.get('status')
             ),
             help=get_help_argument(),
-            time_left=get_time_left(job['created_at'])
+            time_left=get_time_left(job['created_at']),
+            job=job
         ),
         'status': render_template(
             'partials/jobs/status.html',

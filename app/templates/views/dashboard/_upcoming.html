@@ -1,0 +1,38 @@
+{% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
+{% from "components/big-number.html" import big_number %}
+{% from "components/show-more.html" import show_more %}
+
+{% if scheduled_jobs %}
+  <div class='dashboard-table'>
+    <h2 class="heading-medium">
+      In the next 24 hours
+    </h2>
+    {% call(item, row_number) list_table(
+      scheduled_jobs,
+      caption="In the next 24 hours",
+      caption_visible=False,
+      empty_message='Nothing to see here',
+      field_headings=[
+        'File',
+        'Messages to be sent'
+      ],
+      field_headings_visible=True
+    ) %}
+      {% call row_heading() %}
+        <div class="file-list">
+          <a class="file-list-filename" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
+          <span class="file-list-hint">
+            Sending at {{ item.scheduled_for|format_time }}
+          </span>
+        </div>
+      {% endcall %}
+      {% call field() %}
+        {{ big_number(
+          item.notification_count,
+          smallest=True
+        ) }}
+      {% endcall %}
+    {% endcall %}
+    {{ show_more() }}
+  </div>
+{% endif %}

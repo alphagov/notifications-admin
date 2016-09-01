@@ -78,7 +78,7 @@ def test_should_show_page_for_one_job(
             '{}: Your vehicle tax is about to expire'.format(service_one['name'])
         )
         assert ' '.join(page.find('tbody').find('tr').text.split()) == (
-            '07123456789 1 January at 11:10 Delivered'
+            '07123456789 1 January at 11:10am Delivered'
         )
         assert page.find('div', {'data-key': 'notifications'})['data-resource'] == url_for(
             'main.view_job_updates',
@@ -126,6 +126,29 @@ def test_should_show_job_in_progress(
         assert page.find('p', {'class': 'hint'}).text.strip() == 'Report is 50% complete…'
 
 
+def test_should_show_scheduled_job(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    mock_get_service_template,
+    mock_get_scheduled_job,
+    mocker,
+    mock_get_notifications,
+    fake_uuid
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        response = client.get(url_for(
+            'main.view_job',
+            service_id=service_one['id'],
+            job_id=fake_uuid
+        ))
+
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.find('main').find_all('p')[2].text.strip() == 'Sending will start at midnight'
+
+
 def test_should_show_not_show_csv_download_in_tour(
     app_,
     service_one,
@@ -160,7 +183,7 @@ def test_should_show_not_show_csv_download_in_tour(
         ) not in response.get_data(as_text=True)
 
 
-@freeze_time("2016-01-01 11:09:00.061258")
+@freeze_time("2016-01-01 00:00:00.000001")
 def test_should_show_updates_for_one_job_as_json(
     app_,
     service_one,
@@ -185,8 +208,8 @@ def test_should_show_updates_for_one_job_as_json(
         assert '07123456789' in content['notifications']
         assert 'Status' in content['notifications']
         assert 'Delivered' in content['notifications']
-        assert '11:10' in content['notifications']
-        assert 'Uploaded by Test User on 1 January at 11:09' in content['status']
+        assert '12:01am' in content['notifications']
+        assert 'Uploaded by Test User on 1 January at midnight' in content['status']
 
 
 @pytest.mark.parametrize(
@@ -335,7 +358,7 @@ def test_should_download_notifications_for_a_job(app_,
         assert response.status_code == 200
         assert response.get_data(as_text=True) == csv_content
         assert 'text/csv' in response.headers['Content-Type']
-        assert 'sample template - 1 January at 11:09.csv"' in response.headers['Content-Disposition']
+        assert 'sample template - 1 January at 11:09am.csv"' in response.headers['Content-Disposition']
 
 
 @pytest.mark.parametrize(

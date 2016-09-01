@@ -1,6 +1,6 @@
 import json
 import itertools
-from datetime import datetime
+from datetime import datetime, timedelta
 from string import ascii_uppercase
 
 from contextlib import suppress
@@ -23,7 +23,7 @@ from notifications_utils.template import Template
 from notifications_utils.recipients import RecipientCSV, first_column_heading, validate_and_format_phone_number
 
 from app.main import main
-from app.main.forms import CsvUploadForm
+from app.main.forms import CsvUploadForm, ChooseTimeForm
 from app.main.uploader import (
     s3upload,
     s3download
@@ -250,8 +250,10 @@ def check_messages(service_id, template_type, upload_id):
             back_link = url_for(
                 '.choose_template', service_id=service_id, template_type=template.template_type, **extra_args
             )
+        choose_time_form = None
     else:
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
+        choose_time_form = ChooseTimeForm()
 
     with suppress(StopIteration):
         template.values = next(recipients.rows)
@@ -276,6 +278,7 @@ def check_messages(service_id, template_type, upload_id):
         upload_id=upload_id,
         form=CsvUploadForm(),
         remaining_messages=remaining_messages,
+        choose_time_form=choose_time_form,
         back_link=back_link,
         help=get_help_argument()
     )
@@ -310,7 +313,8 @@ def start_job(service_id, upload_id):
         service_id,
         upload_data.get('template_id'),
         upload_data.get('original_file_name'),
-        upload_data.get('notification_count')
+        upload_data.get('notification_count'),
+        scheduled_for=request.form.get('scheduled_for', '')
     )
 
     return redirect(

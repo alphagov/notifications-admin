@@ -27,6 +27,21 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
     mock_post.assert_called_once_with(url=expected_url, data=expected_data)
 
 
+def test_client_schedules_job(mocker, fake_uuid):
+
+    mocker.patch('app.notify_client.current_user', id='1')
+
+    mock_post = mocker.patch('app.notify_client.job_api_client.JobApiClient.post')
+
+    when = '2016-08-25T13:04:21.767198'
+
+    JobApiClient().create_job(
+        fake_uuid, fake_uuid, fake_uuid, fake_uuid, 1, scheduled_for=when
+    )
+
+    assert mock_post.call_args[1]['data']['scheduled_for'] == when
+
+
 def test_client_gets_job_by_service_and_job(mocker):
     mocker.patch('app.notify_client.current_user', id='1')
 
