@@ -67,7 +67,7 @@ def view_jobs(service_id):
         'views/jobs/jobs.html',
         jobs=add_rate_to_jobs([
             job for job in job_api_client.get_job(service_id)['data']
-            if job['job_status'] != 'scheduled'
+            if job['job_status'] not in ['scheduled', 'cancelled']
         ])
     )
 
@@ -78,6 +78,10 @@ def view_jobs(service_id):
 def view_job(service_id, job_id):
 
     job = job_api_client.get_job(service_id, job_id)['data']
+
+    if job['job_status'] == 'cancelled':
+        abort(404)
+
     filter_args = _parse_filter_args(request.args)
     filter_args['status'] = _set_status_filters(filter_args)
 
