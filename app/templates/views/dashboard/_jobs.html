@@ -1,7 +1,7 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 {% from "components/big-number.html" import big_number -%}
 
-<div class='dashboard-table'>
+<div class='dashboard-table ajax-block-container'>
   {% call(item, row_number) list_table(
     jobs,
     caption="Recent files uploaded",
