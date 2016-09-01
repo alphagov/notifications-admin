@@ -12,7 +12,8 @@ from flask import (
     jsonify,
     request,
     url_for,
-    current_app
+    current_app,
+    redirect
 )
 from flask_login import login_required
 from werkzeug.datastructures import MultiDict
@@ -145,6 +146,14 @@ def view_job_csv(service_id, job_id):
             )
         }
     )
+
+
+@main.route("/services/<service_id>/jobs/<job_id>", methods=['POST'])
+@login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters', admin_override=True)
+def cancel_job(service_id, job_id):
+    job_api_client.cancel_job(service_id, job_id)
+    return redirect(url_for('main.service_dashboard', service_id=service_id))
 
 
 @main.route("/services/<service_id>/jobs/<job_id>.json")
