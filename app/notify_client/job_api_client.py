@@ -18,15 +18,14 @@ class JobApiClient(BaseAPIClient):
     @staticmethod
     def __convert_statistics(job):
         results = defaultdict(int)
-        if 'statistics' in job:
-            for outcome in job['statistics']:
-                if outcome['status'] in ['failed', 'technical-failure', 'temporary-failure', 'permanent-failure']:
-                    results['failed'] += outcome['count']
-                if outcome['status'] in ['sending', 'pending', 'created']:
-                    results['sending'] += outcome['count']
-                if outcome['status'] in ['delivered']:
-                    results['delivered'] += outcome['count']
-                results['requested'] += outcome['count']
+        for outcome in job['statistics']:
+            if outcome['status'] in ['failed', 'technical-failure', 'temporary-failure', 'permanent-failure']:
+                results['failed'] += outcome['count']
+            if outcome['status'] in ['sending', 'pending', 'created']:
+                results['sending'] += outcome['count']
+            if outcome['status'] in ['delivered']:
+                results['delivered'] += outcome['count']
+            results['requested'] += outcome['count']
         return results
 
     def get_job(self, service_id, job_id=None, limit_days=None, status=None):
@@ -71,9 +70,10 @@ class JobApiClient(BaseAPIClient):
         job = self.post(url='/service/{}/job'.format(service_id), data=data)
 
         if 'notifications_sent' not in job['data']:
-            stats = self.__convert_statistics(job)
+            stats = self.__convert_statistics(job['data'])
             job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
             job['data']['notifications_delivered'] = stats['delivered']
             job['data']['notifications_failed'] = stats['failed']
+            job['data']['notifications_requested'] = stats['requested']
 
         return job
