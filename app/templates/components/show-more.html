@@ -1,3 +1,7 @@
-{% macro show_more(url, label) %}
-  <a href="{{ url }}" class="show-more"><span>{{ label }}</span></a>
+{% macro show_more(url=None, label=None) %}
+  {% if url and label %}
+    <a href="{{ url }}" class="show-more"><span>{{ label }}</span></a>
+  {% else %}
+    <span class="show-more-empty"></span>
+  {% endif %}
 {% endmacro %}

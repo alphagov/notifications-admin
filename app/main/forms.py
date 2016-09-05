@@ -1,4 +1,6 @@
+import pytz
 from flask_wtf import Form
+from datetime import datetime, timedelta
 from notifications_utils.recipients import (
     validate_phone_number,
     InvalidPhoneError
@@ -20,6 +22,30 @@ from wtforms.validators import (DataRequired, Email, Length, Regexp)
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidEmailDomainRegex, NoCommasInPlaceHolders)
 from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
+
+
+def get_time_value_and_label(future_time):
+    return (
+        future_time.replace(tzinfo=None).isoformat(),
+        get_human_time(future_time.astimezone(pytz.timezone('Europe/London')))
+    )
+
+
+def get_human_time(time):
+    return {
+        '0': 'Midnight',
+        '12': 'Midday'
+    }.get(
+        time.strftime('%-H'),
+        time.strftime('%-I%p').lower()
+    )
+
+
+def get_next_hours_from(now, hours=23):
+    return [
+        (now + timedelta(hours=i)).replace(minute=0, second=0).replace(tzinfo=pytz.utc)
+        for i in range(1, hours + 1)
+    ]
 
 
 def email_address(label='Email address'):
@@ -288,6 +314,23 @@ class ConfirmMobileNumberForm(Form):
             raise ValidationError(msg)
 
 
+class ChooseTimeForm(Form):
+
+    def __init__(self, *args, **kwargs):
+        super(ChooseTimeForm, self).__init__(*args, **kwargs)
+        self.scheduled_for.choices = [('', 'Now')] + [
+            get_time_value_and_label(hour) for hour in get_next_hours_from(datetime.utcnow())
+        ]
+
+    scheduled_for = RadioField(
+        'When should Notify send these messages?',
+        default='',
+        validators=[
+            DataRequired()
+        ]
+    )
+
+
 class CreateKeyForm(Form):
     def __init__(self, existing_key_names=[], *args, **kwargs):
         self.existing_key_names = [x.lower() for x in existing_key_names]
@@ -327,17 +370,21 @@ class ProviderForm(Form):
 
 
 class ServiceReplyToEmailFrom(Form):
-    email_address = email_address()
+    email_address = email_address(label='Email reply to address')
 
 
 class ServiceSmsSender(Form):
-    sms_sender = StringField('', validators=[Length(max=11,
-                             message="Text message sender can't be longer than 11 characters")])
+    sms_sender = StringField(
+        'Text message sender',
+        validators=[
+            Length(max=11, message="Enter fewer than 11 characters")
+        ]
+    )
 
     def validate_sms_sender(form, field):
         import re
         if field.data and not re.match('^[a-zA-Z0-9\s]+$', field.data):
-            raise ValidationError('Text message sender can only contain alpha-numeric characters')
+            raise ValidationError('Use letters and numbers only')
 
 
 class ServiceBrandingOrg(Form):

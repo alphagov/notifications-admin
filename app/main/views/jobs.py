@@ -65,7 +65,10 @@ def _set_status_filters(filter_args):
 def view_jobs(service_id):
     return render_template(
         'views/jobs/jobs.html',
-        jobs=add_rate_to_jobs(job_api_client.get_job(service_id)['data'])
+        jobs=add_rate_to_jobs([
+            job for job in job_api_client.get_job(service_id)['data']
+            if job['job_status'] != 'scheduled'
+        ])
     )
 
 
@@ -90,7 +93,8 @@ def view_job(service_id, job_id):
                 template_id=job['template'],
                 version=job['template_version']
             )['data'],
-            prefix=current_service['name']
+            prefix=current_service['name'],
+            sms_sender=current_service['sms_sender']
         ),
         status=request.args.get('status', ''),
         updates_url=url_for(
@@ -271,6 +275,11 @@ def get_status_filters(service, message_type, statistics):
 
 
 def _get_job_counts(job, help_argument):
+    sending = 0 if job['job_status'] == 'scheduled' else (
+        job.get('notification_count', 0) -
+        job.get('notifications_delivered', 0) -
+        job.get('notifications_failed', 0)
+    )
     return [
         (
             label,
@@ -285,25 +294,23 @@ def _get_job_counts(job, help_argument):
             count
         ) for label, query_param, count in [
             [
-                'total', '',
-                job.get('notification_count', 0)
+              'total', '',
+              job.get('notification_count', 0)
             ],
             [
-                'sending', 'sending',
-                job.get('notification_count', 0) -
-                job.get('notifications_delivered', 0) -
-                job.get('notifications_failed', 0)
+              'sending', 'sending',
+              sending
             ],
             [
-                'delivered', 'delivered',
-                job.get('notifications_delivered', 0)
+              'delivered', 'delivered',
+              job.get('notifications_delivered', 0)
             ],
             [
-                'failed', 'failed',
-                job.get('notifications_failed', 0)
+              'failed', 'failed',
+              job.get('notifications_failed', 0)
             ]
         ]
-        ]
+    ]
 
 
 def get_job_partials(job):
@@ -315,7 +322,6 @@ def get_job_partials(job):
     return {
         'counts': render_template(
             'partials/jobs/count.html',
-            job=job,
             counts=_get_job_counts(job, request.args.get('help', 0)),
             status=filter_args['status']
         ),
@@ -323,7 +329,7 @@ def get_job_partials(job):
             'partials/jobs/notifications.html',
             notifications=notifications['notifications'],
             more_than_one_page=bool(notifications.get('links', {}).get('next')),
-            percentage_complete=(job['notifications_sent'] / job['notification_count'] * 100),
+            percentage_complete=(job['notifications_requested'] / job['notification_count'] * 100),
             download_link=url_for(
                 '.view_job_csv',
                 service_id=current_service['id'],
@@ -331,7 +337,8 @@ def get_job_partials(job):
                 status=request.args.get('status')
             ),
             help=get_help_argument(),
-            time_left=get_time_left(job['created_at'])
+            time_left=get_time_left(job['created_at']),
+            job=job
         ),
         'status': render_template(
             'partials/jobs/status.html',

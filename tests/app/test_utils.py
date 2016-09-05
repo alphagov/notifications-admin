@@ -25,7 +25,7 @@ def test_email_safe_return_dot_separated_email_domain():
         ('permanent-failure', 'sms', 'Phone number doesn’t exist')
     ]
 )
-@freeze_time("2016-01-01 11:09:00.061258")
+@freeze_time("2016-01-01 15:09:00.061258")
 def test_generate_csv_from_notifications(
     app_,
     service_one,
@@ -46,5 +46,5 @@ def test_generate_csv_from_notifications(
         )
 
     for row in DictReader(StringIO(csv_content)):
-        assert row['Time'] == 'Friday 01 January 2016 at 11:09'
+        assert row['Time'] == 'Friday 01 January 2016 at 15:09'
         assert row['Status'] == expected_status

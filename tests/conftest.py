@@ -44,6 +44,17 @@ def service_one(api_user_active):
 
 
 @pytest.fixture(scope='function')
+def service_with_reply_to_addresses(api_user_active):
+    return service_json(
+        SERVICE_ONE_ID,
+        'service one',
+        [api_user_active.id],
+        reply_to_email_address='test@example.com',
+        sms_sender='elevenchars',
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_send_sms(request, mocker):
     return mocker.patch("app.service_api_client.send_sms")
 
@@ -94,6 +105,18 @@ def mock_get_detailed_service_for_today(mocker, api_user_active):
         }
 
     return mocker.patch('app.service_api_client.get_detailed_service_for_today', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def mock_get_detailed_services(mocker, fake_uuid):
+    service_one = service_json(SERVICE_ONE_ID, "service_one", [fake_uuid], 1000, True, False)
+    service_one['statistics'] = {
+        'email': {'requested': 0, 'delivered': 0, 'failed': 0},
+        'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+    }
+    services = {'data': [service_one]}
+
+    return mocker.patch('app.service_api_client.get_services', return_value=services)
 
 
 @pytest.fixture(scope='function')
@@ -213,15 +236,6 @@ def mock_delete_service(mocker, mock_get_service):
 
     return mocker.patch(
         'app.service_api_client.delete_service', side_effect=_delete)
-
-
-@pytest.fixture(scope='function')
-def mock_get_all_service_statistics(mocker):
-    def _create(day):
-        return {'data': []}
-
-    return mocker.patch(
-        'app.statistics_api_client.get_statistics_for_all_services_for_day', side_effect=_create)
 
 
 @pytest.fixture(scope='function')
@@ -823,7 +837,7 @@ def mock_check_verify_code_code_expired(mocker):
 
 @pytest.fixture(scope='function')
 def mock_create_job(mocker, api_user_active):
-    def _create(job_id, service_id, template_id, file_name, notification_count):
+    def _create(job_id, service_id, template_id, file_name, notification_count, scheduled_for=None):
         return job_json(
             service_id,
             api_user_active,
@@ -845,12 +859,26 @@ def mock_get_job(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_scheduled_job(mocker, api_user_active):
+    def _get_job(service_id, job_id):
+        return {"data": job_json(
+            service_id,
+            api_user_active,
+            job_id=job_id,
+            job_status='scheduled',
+            scheduled_for='2016-01-01T00:00:00.061258'
+        )}
+
+    return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
+
+
+@pytest.fixture(scope='function')
 def mock_get_job_in_progress(mocker, api_user_active):
     def _get_job(service_id, job_id):
         return {"data": job_json(
             service_id, api_user_active, job_id=job_id,
             notification_count=10,
-            notifications_sent=5
+            notifications_requested=5
         )}
 
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
@@ -860,13 +888,22 @@ def mock_get_job_in_progress(mocker, api_user_active):
 def mock_get_jobs(mocker, api_user_active):
     def _get_jobs(service_id, limit_days=None):
         return {"data": [
-            job_json(service_id, api_user_active, original_file_name=filename)
-            for filename in (
-                "Test message",
-                "export 1/1/2016.xls",
-                "all email addresses.xlsx",
-                "applicants.ods",
-                "thisisatest.csv",
+            job_json(
+                service_id,
+                api_user_active,
+                original_file_name=filename,
+                scheduled_for=scheduled_for,
+                job_status=job_status
+            )
+            for filename, scheduled_for, job_status in (
+                ("Test message", '', ''),
+                ("Test message", '2016-01-01 11:09:00.061258', 'scheduled'),
+                ("export 1/1/2016.xls", '', ''),
+                ("all email addresses.xlsx", '', 'pending'),
+                ("applicants.ods", '', ''),
+                ("thisisatest.csv", '', ''),
+                ("send_me_later.csv", '2016-01-01 11:09:00.061258', 'scheduled'),
+                ("even_later.csv", '2016-01-01 23:09:00.061258', 'scheduled')
             )
         ]}
 
@@ -1132,4 +1169,21 @@ def mock_get_organisations(mocker):
 
     return mocker.patch(
         'app.organisations_client.get_organisations', side_effect=_get_organisations
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_organisation(mocker):
+    def _get_organisation(id):
+        return {
+            'organisation': {
+                'logo': 'example.png',
+                'name': 'Organisation name',
+                'id': 'organisation-id',
+                'colour': '#f00'
+            }
+        }
+
+    return mocker.patch(
+        'app.organisations_client.get_organisation', side_effect=_get_organisation
     )

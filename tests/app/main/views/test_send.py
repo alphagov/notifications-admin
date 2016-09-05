@@ -322,6 +322,46 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
             mock_get_detailed_service_for_today.assert_called_once_with(fake_uuid)
 
 
+def test_test_message_can_only_be_sent_now(
+    app_,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template,
+    mock_s3_download,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    fake_uuid
+):
+
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        with client.session_transaction() as session:
+            session['upload_data'] = {
+                'original_file_name': 'Test message',
+                'template_id': fake_uuid,
+                'notification_count': 1,
+                'valid': True
+            }
+        response = client.get(url_for(
+            'main.check_messages',
+            service_id=fake_uuid,
+            upload_id=fake_uuid,
+            template_type='sms',
+            from_test=True
+        ))
+
+        content = response.get_data(as_text=True)
+        assert 'name="scheduled_for"' not in content
+
+
+@pytest.mark.parametrize(
+    'when', [
+        '', '2016-08-25T13:04:21.767198'
+    ]
+)
 def test_create_job_should_call_api(
     app_,
     service_one,
@@ -331,7 +371,8 @@ def test_create_job_should_call_api(
     mock_get_notifications,
     mock_get_service_template,
     mocker,
-    fake_uuid
+    fake_uuid,
+    when
 ):
     service_id = service_one['id']
     data = mock_get_job(service_one['id'], fake_uuid)['data']
@@ -339,20 +380,28 @@ def test_create_job_should_call_api(
     original_file_name = data['original_file_name']
     template_id = data['template']
     notification_count = data['notification_count']
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
-            with client.session_transaction() as session:
-                session['upload_data'] = {'original_file_name': original_file_name,
-                                          'template_id': template_id,
-                                          'notification_count': notification_count,
-                                          'valid': True}
-            url = url_for('main.start_job', service_id=service_one['id'], upload_id=job_id)
-            response = client.post(url, data={}, follow_redirects=True)
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        with client.session_transaction() as session:
+            session['upload_data'] = {
+                'original_file_name': original_file_name,
+                'template_id': template_id,
+                'notification_count': notification_count,
+                'valid': True
+            }
+        url = url_for('main.start_job', service_id=service_one['id'], upload_id=job_id)
+        response = client.post(url, data={'scheduled_for': when}, follow_redirects=True)
 
-        assert response.status_code == 200
-        assert original_file_name in response.get_data(as_text=True)
-        mock_create_job.assert_called_with(job_id, service_id, template_id, original_file_name, notification_count)
+    assert response.status_code == 200
+    assert original_file_name in response.get_data(as_text=True)
+    mock_create_job.assert_called_with(
+        job_id,
+        service_id,
+        template_id,
+        original_file_name,
+        notification_count,
+        scheduled_for=when
+    )
 
 
 def test_check_messages_should_revalidate_file_when_uploading_file(

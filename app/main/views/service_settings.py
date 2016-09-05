@@ -34,7 +34,14 @@ from app import user_api_client, current_service, organisations_client
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_settings(service_id):
-    return render_template('views/service-settings.html')
+    if current_service['organisation']:
+        organisation = organisations_client.get_organisation(current_service['organisation'])['organisation']
+    else:
+        organisation = None
+    return render_template(
+        'views/service-settings.html',
+        organisation=organisation
+    )
 
 
 @main.route("/services/<service_id>/service-settings/name", methods=['GET', 'POST'])
@@ -157,41 +164,6 @@ def service_switch_research_mode(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
-@main.route("/services/<service_id>/service-settings/status", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions('manage_settings', admin_override=True)
-def service_status_change(service_id):
-    if request.method == 'GET':
-        return render_template(
-            'views/service-settings/status.html'
-        )
-    elif request.method == 'POST':
-        return redirect(url_for('.service_status_change_confirm', service_id=service_id))
-
-
-@main.route("/services/<service_id>/service-settings/status/confirm", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions('manage_settings', admin_override=True)
-def service_status_change_confirm(service_id):
-    # Validate password for form
-    def _check_password(pwd):
-        return user_api_client.verify_password(current_user.id, pwd)
-
-    form = ConfirmPasswordForm(_check_password)
-
-    if form.validate_on_submit():
-        service_api_client.update_service(
-            current_service['id'],
-            active=True
-        )
-        return redirect(url_for('.service_settings', service_id=service_id))
-    return render_template(
-        'views/service-settings/confirm.html',
-        heading='Turn off all outgoing notifications',
-        destructive=True,
-        form=form)
-
-
 @main.route("/services/<service_id>/service-settings/delete", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
@@ -233,12 +205,10 @@ def service_set_reply_to_email(service_id):
     if request.method == 'GET':
         form.email_address.data = current_service.get('reply_to_email_address')
     if form.validate_on_submit():
-        message = 'Reply to email set to {}'.format(form.email_address.data)
         service_api_client.update_service(
             current_service['id'],
             reply_to_email_address=form.email_address.data
         )
-        flash(message, 'default_with_tick')
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/set-reply-to-email.html',
@@ -253,15 +223,10 @@ def service_set_sms_sender(service_id):
     if request.method == 'GET':
         form.sms_sender.data = current_service.get('sms_sender')
     if form.validate_on_submit():
-        if form.sms_sender.data:
-            message = 'Text message sender set to {}'.format(form.sms_sender.data)
-        else:
-            message = 'Text message sender removed'
         service_api_client.update_service(
             current_service['id'],
             sms_sender=form.sms_sender.data or None
         )
-        flash(message, 'default_with_tick')
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/set-sms-sender.html',

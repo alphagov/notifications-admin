@@ -39,7 +39,6 @@ from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.invite_api_client import InviteApiClient
 from app.notify_client.job_api_client import JobApiClient
 from app.notify_client.notification_api_client import NotificationApiClient
-from app.notify_client.statistics_api_client import StatisticsApiClient
 from app.notify_client.status_api_client import StatusApiClient
 from app.notify_client.template_statistics_api_client import TemplateStatisticsApiClient
 from app.notify_client.user_api_client import UserApiClient
@@ -57,7 +56,6 @@ job_api_client = JobApiClient()
 notification_api_client = NotificationApiClient()
 status_api_client = StatusApiClient()
 invite_api_client = InviteApiClient()
-statistics_api_client = StatisticsApiClient()
 template_statistics_client = TemplateStatisticsApiClient()
 events_api_client = EventsApiClient()
 provider_client = ProviderClient()
@@ -86,7 +84,6 @@ def create_app():
     notification_api_client.init_app(application)
     status_api_client.init_app(application)
     invite_api_client.init_app(application)
-    statistics_api_client.init_app(application)
     template_statistics_client.init_app(application)
     events_api_client.init_app(application)
     provider_client.init_app(application)
@@ -108,6 +105,7 @@ def create_app():
 
     application.add_template_filter(nl2br)
     application.add_template_filter(format_datetime)
+    application.add_template_filter(format_datetime_24h)
     application.add_template_filter(format_datetime_normal)
     application.add_template_filter(format_datetime_short)
     application.add_template_filter(format_time)
@@ -203,19 +201,41 @@ def gmt_timezones(date):
 
 
 def format_datetime(date):
-    return gmt_timezones(date).strftime('%A %d %B %Y at %H:%M')
+    return '{} at {}'.format(
+        format_date(date),
+        format_time(date)
+    )
+
+
+def format_datetime_24h(date):
+    return '{} at {}'.format(
+        format_date(date),
+        gmt_timezones(date).strftime('%H:%M')
+    )
 
 
 def format_datetime_normal(date):
-    return gmt_timezones(date).strftime('%d %B %Y at %H:%M').lstrip('0')
+    return '{} at {}'.format(
+        format_date_normal(date),
+        format_time(date)
+    )
 
 
 def format_datetime_short(date):
-    return gmt_timezones(date).strftime('%d %B at %H:%M').lstrip('0')
+    return '{} at {}'.format(
+        format_date_short(date),
+        format_time(date)
+    )
 
 
 def format_time(date):
-    return gmt_timezones(date).strftime('%H:%M')
+    return {
+        '12:00AM': 'Midnight',
+        '12:00PM': 'Midday'
+    }.get(
+        gmt_timezones(date).strftime('%-I:%M%p'),
+        gmt_timezones(date).strftime('%-I:%M%p')
+    ).lower()
 
 
 def format_date(date):

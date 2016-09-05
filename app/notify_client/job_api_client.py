@@ -1,3 +1,4 @@
+from collections import defaultdict
 
 from notifications_python_client.base import BaseAPIClient
 from app.notify_client import _attach_current_user
@@ -16,19 +17,15 @@ class JobApiClient(BaseAPIClient):
 
     @staticmethod
     def __convert_statistics(job):
-        results = {
-            'sending': 0,
-            'delivered': 0,
-            'failed': 0
-        }
-        if 'statistics' in job['data']:
-            for outcome in job['data']['statistics']:
-                if outcome['status'] in ['failed', 'technical-failure', 'temporary-failure', 'permanent-failure']:
-                    results['failed'] += outcome['count']
-                if outcome['status'] in ['sending', 'pending', 'created']:
-                    results['sending'] += outcome['count']
-                if outcome['status'] in ['delivered']:
-                    results['delivered'] += outcome['count']
+        results = defaultdict(int)
+        for outcome in job['statistics']:
+            if outcome['status'] in ['failed', 'technical-failure', 'temporary-failure', 'permanent-failure']:
+                results['failed'] += outcome['count']
+            if outcome['status'] in ['sending', 'pending', 'created']:
+                results['sending'] += outcome['count']
+            if outcome['status'] in ['delivered']:
+                results['delivered'] += outcome['count']
+            results['requested'] += outcome['count']
         return results
 
     def get_job(self, service_id, job_id=None, limit_days=None, status=None):
@@ -37,17 +34,28 @@ class JobApiClient(BaseAPIClient):
             if status is not None:
                 params['status'] = status
             job = self.get(url='/service/{}/job/{}'.format(service_id, job_id), params=params)
-            stats = self.__convert_statistics(job)
+
+            stats = self.__convert_statistics(job['data'])
             job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
             job['data']['notifications_delivered'] = stats['delivered']
             job['data']['notifications_failed'] = stats['failed']
+            job['data']['notifications_requested'] = stats['requested']
+
             return job
 
         params = {}
         if limit_days is not None:
             params['limit_days'] = limit_days
 
-        return self.get(url='/service/{}/job'.format(service_id), params=params)
+        jobs = self.get(url='/service/{}/job'.format(service_id), params=params)
+        for job in jobs['data']:
+            stats = self.__convert_statistics(job)
+            job['notifications_sent'] = stats['delivered'] + stats['failed']
+            job['notifications_delivered'] = stats['delivered']
+            job['notifications_failed'] = stats['failed']
+            job['notifications_requested'] = stats['requested']
+
+        return jobs
 
     def create_job(self, job_id, service_id, template_id, original_file_name, notification_count, scheduled_for=None):
         data = {
@@ -67,5 +75,16 @@ class JobApiClient(BaseAPIClient):
         job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
         job['data']['notifications_delivered'] = stats['delivered']
         job['data']['notifications_failed'] = stats['failed']
+
+        if scheduled_for:
+            data.update({'scheduled_for': scheduled_for})
+        data = _attach_current_user(data)
+        job = self.post(url='/service/{}/job'.format(service_id), data=data)
+
+        stats = self.__convert_statistics(job['data'])
+        job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
+        job['data']['notifications_delivered'] = stats['delivered']
+        job['data']['notifications_failed'] = stats['failed']
+        job['data']['notifications_requested'] = stats['requested']
 
         return job

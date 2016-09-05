@@ -1,6 +1,6 @@
 import json
 import itertools
-from datetime import datetime
+from datetime import datetime, timedelta
 from string import ascii_uppercase
 
 from contextlib import suppress
@@ -23,7 +23,7 @@ from notifications_utils.template import Template
 from notifications_utils.recipients import RecipientCSV, first_column_heading, validate_and_format_phone_number
 
 from app.main import main
-from app.main.forms import CsvUploadForm
+from app.main.forms import CsvUploadForm, ChooseTimeForm
 from app.main.uploader import (
     s3upload,
     s3download
@@ -75,7 +75,8 @@ def choose_template(service_id, template_type):
         templates=[
             Template(
                 template,
-                prefix=current_service['name']
+                prefix=current_service['name'],
+                sms_sender=current_service['sms_sender']
             ) for template in service_api_client.get_service_templates(service_id)['data']
             if template['template_type'] == template_type
         ],
@@ -90,7 +91,8 @@ def choose_template(service_id, template_type):
 def send_messages(service_id, template_id):
     template = Template(
         service_api_client.get_service_template(service_id, template_id)['data'],
-        prefix=current_service['name']
+        prefix=current_service['name'],
+        sms_sender=current_service['sms_sender']
     )
 
     form = CsvUploadForm()
@@ -149,7 +151,8 @@ def send_test(service_id, template_id):
 
     template = Template(
         service_api_client.get_service_template(service_id, template_id)['data'],
-        prefix=current_service['name']
+        prefix=current_service['name'],
+        sms_sender=current_service['sms_sender']
     )
 
     if len(template.placeholders) == 0 or request.method == 'POST':
@@ -189,13 +192,13 @@ def send_test(service_id, template_id):
 @main.route("/services/<service_id>/send/<template_id>/from-api", methods=['GET'])
 @login_required
 def send_from_api(service_id, template_id):
-    template = Template(
-        service_api_client.get_service_template(service_id, template_id)['data'],
-        prefix=current_service['name']
-    )
     return render_template(
         'views/send-from-api.html',
-        template=template
+        template=Template(
+            service_api_client.get_service_template(service_id, template_id)['data'],
+            prefix=current_service['name'],
+            sms_sender=current_service['sms_sender']
+        )
     )
 
 
@@ -216,14 +219,13 @@ def check_messages(service_id, template_type, upload_id):
     if not contents:
         flash('There was a problem reading your upload file')
 
-    template = service_api_client.get_service_template(
-        service_id,
-        session['upload_data'].get('template_id')
-    )['data']
-
     template = Template(
-        template,
-        prefix=current_service['name']
+        service_api_client.get_service_template(
+            service_id,
+            session['upload_data'].get('template_id')
+        )['data'],
+        prefix=current_service['name'],
+        sms_sender=current_service['sms_sender']
     )
 
     recipients = RecipientCSV(
@@ -248,8 +250,10 @@ def check_messages(service_id, template_type, upload_id):
             back_link = url_for(
                 '.choose_template', service_id=service_id, template_type=template.template_type, **extra_args
             )
+        choose_time_form = None
     else:
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
+        choose_time_form = ChooseTimeForm()
 
     with suppress(StopIteration):
         template.values = next(recipients.rows)
@@ -274,6 +278,7 @@ def check_messages(service_id, template_type, upload_id):
         upload_id=upload_id,
         form=CsvUploadForm(),
         remaining_messages=remaining_messages,
+        choose_time_form=choose_time_form,
         back_link=back_link,
         help=get_help_argument()
     )
@@ -308,7 +313,8 @@ def start_job(service_id, upload_id):
         service_id,
         upload_data.get('template_id'),
         upload_data.get('original_file_name'),
-        upload_data.get('notification_count')
+        upload_data.get('notification_count'),
+        scheduled_for=request.form.get('scheduled_for', '')
     )
 
     return redirect(

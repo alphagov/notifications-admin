@@ -1,61 +1,99 @@
 {% extends "withnav_template.html" %}
 {% from "components/browse-list.html" import browse_list %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field %}
 
 {% block page_title %}
-  Service settings – GOV.UK Notify
+  Settings – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
     <h1 class="heading-large">Settings</h1>
 
-    {{ browse_list([
-      {
-        'title': 'Change your service name',
-        'link': url_for('.service_name_change', service_id=current_service.id)
-      },
-      {
-        'title': 'Set email reply to address',
-        'link': url_for('.service_set_reply_to_email', service_id=current_service.id)
-      },
-      {
-        'title': 'Set email branding',
-        'link': url_for('.service_set_branding_and_org', service_id=current_service.id)
-      } if current_user.has_permissions([], admin_override=True) else {},
-      {
-        'title': 'Set text message sender name',
-        'link': url_for('.service_set_sms_sender', service_id=current_service.id)
-      },
-      {
-        'title': 'Request to go live and turn off trial mode',
-        'link': url_for('.service_request_to_go_live', service_id=current_service.id),
-        'hint': 'A live service can send notifications to any phone number or email address',
-      } if current_service.restricted else {
-      },
-      {
-        'title': 'Temporarily suspend API keys',
-        'link': url_for('.service_status_change', service_id=current_service.id),
-        'destructive': True
-      } if not current_service.active else {
-        'title': 'Reactivate API keys',
-        'link': url_for('.service_status_change', service_id=current_service.id)
-      },
-      {
-        'title': 'Make service live',
-        'link': url_for('.service_switch_live', service_id=current_service.id)
-      } if current_service.restricted and current_user.has_permissions([], admin_override=True) else {
-        'title': 'Revert service to trial',
-        'link': url_for('.service_switch_live', service_id=current_service.id)
-      } if not current_service.restricted and current_user.has_permissions([], admin_override=True) else {
-      },
-      {
-        'title': 'Put service into research mode',
-        'link': url_for('.service_switch_research_mode', service_id=current_service.id)
-      } if not current_service.research_mode and current_user.has_permissions([], admin_override=True) else {
-        'title': 'Take service out of research mode',
-        'link': url_for('.service_switch_research_mode', service_id=current_service.id)
-      } if current_service.research_mode and current_user.has_permissions([], admin_override=True) else {
-      }
-    ]) }}
+    <div class="bottom-gutter-2">
+
+      {% call mapping_table(
+        caption='Settings',
+        field_headings=['Label', 'Value', 'Action'],
+        field_headings_visible=False,
+        caption_visible=False
+      ) %}
+        {% call row() %}
+          {{ text_field('Service name' )}}
+          {{ text_field(current_service.name) }}
+          {{ edit_field('Change', url_for('.service_name_change', service_id=current_service.id)) }}
+        {% endcall %}
+        {% call row() %}
+          {{ text_field('Email reply to address')}}
+          {{ text_field(
+            current_service.reply_to_email_address,
+            status='' if current_service.reply_to_email_address else 'default'
+          ) }}
+          {{ edit_field('Change', url_for('.service_set_reply_to_email', service_id=current_service.id)) }}
+        {% endcall %}
+        {% call row() %}
+          {{ text_field('Text message sender')}}
+          {{ text_field(current_service.sms_sender or '40604') }}
+          {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id)) }}
+        {% endcall %}
+      {% endcall %}
+    </div>
+
+    <div class="bottom-gutter-2">
+
+      <h2 class="heading-medium">Your service is in trial mode</h2>
+
+      <ul class='list list-bullet'>
+        <li>you can only send messages to yourself</li>
+        <li>you can add people to your team, then you can send messages to them too</li>
+        <li>you can only send 50 messages per day</li>
+      </ul>
+
+      <p>
+        To remove these restrictions
+        <a href="{{ url_for('.service_request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
+      </p>
+
+    </div>
+
+    {% if current_user.has_permissions([], admin_override=True) %}
+
+      <h2 class="heading-medium">Platform admin settings</h2>
+
+      {% call mapping_table(
+        caption='Settings',
+        field_headings=['Label', 'Value', 'Action'],
+        field_headings_visible=False,
+        caption_visible=False
+      ) %}
+        {% call row() %}
+          {{ text_field('Email branding' )}}
+          {% call field() %}
+            {% if current_service.branding == 'govuk' %}
+              GOV.UK
+            {% elif current_service.branding == 'both' %}
+              GOV.UK and {{ organisation.name if organisation else None }}
+            {% elif current_service.branding == 'org' %}
+              Only {{ organisation.name if organisation else None }}
+            {% endif %}
+          {% endcall %}
+          {{ edit_field('Change', url_for('.service_set_branding_and_org', service_id=current_service.id)) }}
+        {% endcall %}
+      {% endcall %}
+
+      <ul>
+        <li class="bottom-gutter">
+          <a href="{{ url_for('.service_switch_live', service_id=current_service.id) }}" class="button">
+            {{ 'Make service live' if current_service.restricted else 'Revert service to trial mode' }}
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('.service_switch_research_mode', service_id=current_service.id) }}" class="button">
+            {{ 'Take service out of research mode' if current_service.research_mode else 'Put into research mode' }}
+          </a>
+        </li>
+      </ul>
+
+    {% endif %}
 
 {% endblock %}

@@ -10,11 +10,20 @@
 
 .dashboard-table {
 
+  .heading-medium {
+    margin-bottom: 5px;
+  }
+
   .table {
     table-layout: fixed;
   }
 
-  .table-field-headings,
+  .table-field-headings {
+    th {
+      font-size: 1px;
+    }
+  }
+
   .table-field-headings-visible {
     th {
       padding-bottom: 5px;

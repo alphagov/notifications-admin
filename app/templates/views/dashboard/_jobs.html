@@ -1,7 +1,7 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 {% from "components/big-number.html" import big_number -%}
 
-<div class='dashboard-table'>
+<div class='dashboard-table ajax-block-container'>
   {% call(item, row_number) list_table(
     jobs,
     caption="Recent files uploaded",
@@ -18,7 +18,11 @@
     {% call row_heading() %}
       <div class="file-list">
         <a class="file-list-filename" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
-        <span class="file-list-hint">Uploaded {{ item.created_at|format_datetime_short }}</span>
+        <span class="file-list-hint">
+          Sent {{
+            item.scheduled_for|format_datetime_short if item.scheduled_for else item.created_at|format_datetime_short
+          }}
+        </span>
       </div>
     {% endcall %}
     {% call field() %}

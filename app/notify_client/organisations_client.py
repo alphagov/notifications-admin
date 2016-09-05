@@ -15,5 +15,8 @@ class OrganisationsClient(BaseAPIClient):
         self.client_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.secret = app.config['ADMIN_CLIENT_SECRET']
 
+    def get_organisation(self, id):
+        return self.get(url='/organisation/{}'.format(id))
+
     def get_organisations(self):
         return self.get(url='/organisation')['organisations']

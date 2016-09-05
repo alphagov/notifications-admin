@@ -1,3 +1,4 @@
+%show-more,
 .show-more {
 
   @include core-16;
@@ -8,7 +9,7 @@
   border-top: 1px solid $border-colour;
 
   &:focus {
-    
+
     outline: none;
     color: $text-colour;
     box-shadow: 0 -10px 0 0 $yellow;
@@ -31,4 +32,9 @@
     border-bottom: 1px solid $light-blue;
   }
 
+}
+
+.show-more-empty {
+  @extend %show-more;
+  margin-top: -10px;
 }

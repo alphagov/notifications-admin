@@ -5,7 +5,7 @@ DATE = $(shell date +%Y-%m-%d:%H:%M:%S)
 PIP_ACCEL_CACHE ?= ${CURDIR}/cache/pip-accel
 APP_VERSION_FILE = app/version.py
 
-GIT_BRANCH = $(shell git symbolic-ref --short HEAD 2> /dev/null || echo "detached")
+GIT_BRANCH ?= $(shell git symbolic-ref --short HEAD 2> /dev/null || echo "detached")
 GIT_COMMIT ?= $(shell git rev-parse HEAD)
 
 DOCKER_BUILDER_IMAGE_NAME = govuk/notify-admin-builder
@@ -97,7 +97,7 @@ prepare-docker-build-image: ## Prepare the Docker builder image
 
 .PHONY: build-with-docker
 build-with-docker: prepare-docker-build-image ## Build inside a Docker container
-	docker run -i --rm \
+	@docker run -i --rm \
 		--name "${DOCKER_CONTAINER_PREFIX}-build" \
 		-v `pwd`:/var/project \
 		-v ${PIP_ACCEL_CACHE}:/var/project/cache/pip-accel \
@@ -109,7 +109,7 @@ build-with-docker: prepare-docker-build-image ## Build inside a Docker container
 
 .PHONY: test-with-docker
 test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
-	docker run -i --rm \
+	@docker run -i --rm \
 		--name "${DOCKER_CONTAINER_PREFIX}-test" \
 		-v `pwd`:/var/project \
 		-e GIT_COMMIT=${GIT_COMMIT} \
@@ -118,11 +118,19 @@ test-with-docker: prepare-docker-build-image ## Run tests inside a Docker contai
 		${DOCKER_BUILDER_IMAGE_NAME} \
 		make test
 
+# FIXME: CIRCLECI=1 is an ugly hack because the coveralls-python library sends the PR link only this way
 .PHONY: coverage-with-docker
 coverage-with-docker: prepare-docker-build-image ## Generates coverage report inside a Docker container
-	docker run -i --rm \
+	@docker run -i --rm \
 		--name "${DOCKER_CONTAINER_PREFIX}-coverage" \
 		-v `pwd`:/var/project \
+		-e COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} \
+		-e CIRCLECI=1 \
+		-e CI_NAME=${CI_NAME} \
+		-e CI_BUILD_NUMBER=${BUILD_NUMBER} \
+		-e CI_BUILD_URL=${BUILD_URL} \
+		-e CI_BRANCH=${GIT_BRANCH} \
+		-e CI_PULL_REQUEST=${CI_PULL_REQUEST} \
 		${DOCKER_BUILDER_IMAGE_NAME} \
 		make coverage
 
