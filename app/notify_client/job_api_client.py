@@ -71,16 +71,6 @@ class JobApiClient(BaseAPIClient):
         data = _attach_current_user(data)
         job = self.post(url='/service/{}/job'.format(service_id), data=data)
 
-        stats = self.__convert_statistics(job)
-        job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
-        job['data']['notifications_delivered'] = stats['delivered']
-        job['data']['notifications_failed'] = stats['failed']
-
-        if scheduled_for:
-            data.update({'scheduled_for': scheduled_for})
-        data = _attach_current_user(data)
-        job = self.post(url='/service/{}/job'.format(service_id), data=data)
-
         stats = self.__convert_statistics(job['data'])
         job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
         job['data']['notifications_delivered'] = stats['delivered']
