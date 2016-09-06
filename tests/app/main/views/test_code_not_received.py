@@ -21,7 +21,7 @@ def test_should_render_email_verification_resend_show_email_address_and_resend_v
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
             assert page.h1.string == 'Check your email'
-            expected = "In order to verify your email address we've sent a new confirmation link to {}".format(api_user_active.email_address)  # noqa
+            expected = "A new confirmation email has been sent to {}".format(api_user_active.email_address)
 
             message = page.find_all('p')[1].text
             assert message == expected
