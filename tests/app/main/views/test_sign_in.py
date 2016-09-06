@@ -51,7 +51,8 @@ def test_should_return_locked_out_true_when_user_is_locked(app_,
         assert 'The email address or password you entered is incorrect' in resp.get_data(as_text=True)
 
 
-def test_should_return_200_when_user_does_not_exist(app_, mock_get_user_by_email_not_found):
+def test_should_return_200_when_user_does_not_exist(app_,
+                                                    mock_get_user_by_email_not_found):
     with app_.test_request_context():
         response = app_.test_client().post(
             url_for('main.sign_in'), data={
@@ -69,10 +70,24 @@ def test_should_return_redirect_when_user_is_pending(app_,
             url_for('main.sign_in'), data={
                 'email_address': 'pending_user@example.gov.uk',
                 'password': 'val1dPassw0rd!'}, follow_redirects=True)
+
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string == 'Sign in'
         flash_banner = page.find('div', class_='banner-dangerous').string.strip()
-        assert flash_banner == "You haven't verified your email or mobile number yet."
+        assert flash_banner == "You haven't verified your email or mobile number yet. Check your email for a verification link."  # noqa
+        assert response.status_code == 200
+
+
+def test_should_attempt_redirect_when_user_is_pending(app_,
+                                                      mock_get_user_by_email_pending,
+                                                      mock_verify_password):
+    with app_.test_request_context():
+        response = app_.test_client().post(
+            url_for('main.sign_in'), data={
+                'email_address': 'pending_user@example.gov.uk',
+                'password': 'val1dPassw0rd!'})
+        assert response.location == url_for('main.resend_email_verification', _external=True)
+        assert response.status_code == 302
 
 
 def test_not_fresh_session_login(app_,
