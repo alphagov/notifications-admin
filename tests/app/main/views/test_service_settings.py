@@ -93,6 +93,24 @@ def test_should_redirect_after_change_service_name(app_,
         assert mock_get_services.called
 
 
+def test_show_restricted_service(
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_has_permissions,
+    mock_get_service,
+    mock_get_organisation,
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions)
+        response = client.get(url_for('main.service_settings', service_id=service_one['id']))
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.find('h1').text == 'Settings'
+        assert page.find_all('h2')[1].text == 'Your service is in trial mode'
+
+
 def test_switch_service_to_live(
     app_,
     service_one,
@@ -118,6 +136,24 @@ def test_switch_service_to_live(
             message_limit=250000,
             restricted=False
         )
+
+
+def test_show_live_service(
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_get_live_service,
+    mock_has_permissions,
+    mock_get_organisation,
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions)
+        response = client.get(url_for('main.service_settings', service_id=service_one['id']))
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.find('h1').text.strip() == 'Settings'
+        assert 'Your service is in trial mode' not in page.text
 
 
 def test_switch_service_to_restricted(
