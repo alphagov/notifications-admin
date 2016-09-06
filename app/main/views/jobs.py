@@ -76,7 +76,6 @@ def view_jobs(service_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_job(service_id, job_id):
-
     job = job_api_client.get_job(service_id, job_id)['data']
     filter_args = _parse_filter_args(request.args)
     filter_args['status'] = _set_status_filters(filter_args)
@@ -234,14 +233,13 @@ def view_notifications(service_id, message_type):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_notification(service_id, job_id, notification_id):
-
     now = time.strftime('%H:%M')
 
     return render_template(
         'views/notification.html',
         message=[
             message for message in messages if message['id'] == notification_id
-        ][0],
+            ][0],
         delivered_at=now,
         uploaded_at=now,
         job_id=job_id
@@ -273,7 +271,7 @@ def get_status_filters(service, message_type, statistics):
             stats[key]
         )
         for key, label, option in filters
-    ]
+        ]
 
 
 def _get_job_counts(job, help_argument):
