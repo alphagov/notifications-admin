@@ -78,3 +78,18 @@ class JobApiClient(BaseAPIClient):
         job['data']['notifications_requested'] = stats['requested']
 
         return job
+
+    def cancel_job(self, service_id, job_id):
+
+        job = self.post(
+            url='/service/{}/job/{}/cancel'.format(service_id, job_id),
+            data={}
+        )
+
+        stats = self.__convert_statistics(job['data'])
+        job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
+        job['data']['notifications_delivered'] = stats['delivered']
+        job['data']['notifications_failed'] = stats['failed']
+        job['data']['notifications_requested'] = stats['requested']
+
+        return job

@@ -322,3 +322,15 @@ def test_client_parses_empty_job_stats_for_service(mocker):
     assert result['data'][1]['notifications_sent'] == 0
     assert result['data'][1]['notification_count'] == 40
     assert result['data'][1]['notifications_failed'] == 0
+
+
+def test_cancel_job(mocker):
+
+    mock_post = mocker.patch('app.notify_client.job_api_client.JobApiClient.post')
+
+    JobApiClient().cancel_job('service_id', 'job_id')
+
+    mock_post.assert_called_once_with(
+        url='/service/{}/job/{}/cancel'.format('service_id', 'job_id'),
+        data={}
+    )

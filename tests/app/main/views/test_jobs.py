@@ -147,6 +147,47 @@ def test_should_show_scheduled_job(
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.find('main').find_all('p')[2].text.strip() == 'Sending will start at midnight'
+        assert page.find('input', {'type': 'submit', 'value': 'Cancel sending'})
+
+
+def test_should_cancel_job(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    fake_uuid,
+    mocker
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        mock_cancel = mocker.patch('app.main.jobs.job_api_client.cancel_job')
+        response = client.post(url_for(
+            'main.cancel_job',
+            service_id=service_one['id'],
+            job_id=fake_uuid
+        ))
+
+        mock_cancel.assert_called_once_with(service_one['id'], fake_uuid)
+        assert response.status_code == 302
+        assert response.location == url_for('main.service_dashboard', service_id=service_one['id'], _external=True)
+
+
+def test_should_not_show_cancelled_job(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    mock_get_cancelled_job,
+    mocker,
+    fake_uuid
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(active_user_with_permissions, mocker, service_one)
+        response = client.get(url_for(
+            'main.view_job',
+            service_id=service_one['id'],
+            job_id=fake_uuid
+        ))
+
+        assert response.status_code == 404
 
 
 def test_should_show_not_show_csv_download_in_tour(
