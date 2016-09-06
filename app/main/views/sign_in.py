@@ -38,7 +38,6 @@ def sign_in():
         user = user_api_client.get_user_by_email_or_none(form.email_address.data)
         user = _get_and_verify_user(user, form.password.data)
         if user and user.state == 'pending':
-            flash("You haven't verified your email or mobile number yet. Check your email for a verification link.")
             return redirect(url_for('main.resend_email_verification'))
 
         if user and session.get('invited_user'):

@@ -73,8 +73,6 @@ def test_should_return_redirect_when_user_is_pending(app_,
 
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string == 'Sign in'
-        flash_banner = page.find('div', class_='banner-dangerous').string.strip()
-        assert flash_banner == "You haven't verified your email or mobile number yet. Check your email for a verification link."  # noqa
         assert response.status_code == 200
 
 
