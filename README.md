@@ -18,6 +18,11 @@ GOV.UK Notify admin application.
 
 ## First-time setup
 
+Brew is a package manager for OSX. The following command installs brew:
+```shell
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+
 Languages needed
 - Python 3.4
 - [Node](http://nodejs.org/) 5.0.0 or greater
@@ -71,10 +76,16 @@ export DESKPRO_ASSIGNED_AGENT_TEAM_ID=""
 "> environment.sh
 ```
 
-## AWS credentials 
+## AWS credentials
 
 Your aws credentials should be stored in a folder located at `~/.aws`. Follow [Amazon's instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files) for storing them correctly
 
+
+## Generate the application version file
+
+```shell
+    make generate-version-file
+```
 
 ## Running the application
 
