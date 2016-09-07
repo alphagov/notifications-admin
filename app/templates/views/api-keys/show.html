@@ -8,20 +8,15 @@
 
 {% block maincolumn_content %}
 
-    <div class="grid-row">
-      <div class="column-two-thirds">
 
-        <h1 class="heading-large">
-          New API key
-        </h1>
+    <h1 class="heading-large">
+      New API key
+    </h1>
 
-        <p>
-          Copy your key to somewhere safe. You won’t be able to see it again
-          once you leave this page.
-        </p>
-
-      </div>
-    </div>
+    <p>
+      Copy your key to somewhere safe. You won’t be able to see it again
+      once you leave this page.
+    </p>
 
     {{ api_key(secret, key_name) }}
 

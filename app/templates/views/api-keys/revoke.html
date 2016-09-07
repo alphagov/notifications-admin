@@ -8,22 +8,16 @@
 
 {% block maincolumn_content %}
 
-    <div class="grid-row">
-      <div class="column-two-thirds">
+    <h1 class="heading-large">
+      Revoke API key
+    </h1>
 
-        <h1 class="heading-large">
-          Revoke API key
-        </h1>
-
-        <p>
-          ‘{{ key_name }}’ will no longer let you connect to GOV.UK Notify.
-        </p>
-        <p>
-          You can’t undo this.
-        </p>
-
-      </div>
-    </div>
+    <p>
+      ‘{{ key_name }}’ will no longer let you connect to GOV.UK Notify.
+    </p>
+    <p>
+      You can’t undo this.
+    </p>
 
     <form method="post">
       {{ page_footer(
