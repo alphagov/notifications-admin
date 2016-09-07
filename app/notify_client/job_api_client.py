@@ -34,12 +34,13 @@ class JobApiClient(BaseAPIClient):
             if status is not None:
                 params['status'] = status
             job = self.get(url='/service/{}/job/{}'.format(service_id, job_id), params=params)
-            if 'notifications_sent' not in job['data']:
-                stats = self.__convert_statistics(job['data'])
-                job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
-                job['data']['notifications_delivered'] = stats['delivered']
-                job['data']['notifications_failed'] = stats['failed']
-                job['data']['notifications_requested'] = stats['requested']
+
+            stats = self.__convert_statistics(job['data'])
+            job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
+            job['data']['notifications_delivered'] = stats['delivered']
+            job['data']['notifications_failed'] = stats['failed']
+            job['data']['notifications_requested'] = stats['requested']
+
             return job
 
         params = {}
@@ -48,12 +49,11 @@ class JobApiClient(BaseAPIClient):
 
         jobs = self.get(url='/service/{}/job'.format(service_id), params=params)
         for job in jobs['data']:
-            if 'notifications_sent' not in job:
-                stats = self.__convert_statistics(job)
-                job['notifications_sent'] = stats['delivered'] + stats['failed']
-                job['notifications_delivered'] = stats['delivered']
-                job['notifications_failed'] = stats['failed']
-                job['notifications_requested'] = stats['requested']
+            stats = self.__convert_statistics(job)
+            job['notifications_sent'] = stats['delivered'] + stats['failed']
+            job['notifications_delivered'] = stats['delivered']
+            job['notifications_failed'] = stats['failed']
+            job['notifications_requested'] = stats['requested']
 
         return jobs
 
@@ -64,16 +64,32 @@ class JobApiClient(BaseAPIClient):
             "original_file_name": original_file_name,
             "notification_count": notification_count
         }
+
         if scheduled_for:
             data.update({'scheduled_for': scheduled_for})
+
         data = _attach_current_user(data)
         job = self.post(url='/service/{}/job'.format(service_id), data=data)
 
-        if 'notifications_sent' not in job['data']:
-            stats = self.__convert_statistics(job['data'])
-            job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
-            job['data']['notifications_delivered'] = stats['delivered']
-            job['data']['notifications_failed'] = stats['failed']
-            job['data']['notifications_requested'] = stats['requested']
+        stats = self.__convert_statistics(job['data'])
+        job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
+        job['data']['notifications_delivered'] = stats['delivered']
+        job['data']['notifications_failed'] = stats['failed']
+        job['data']['notifications_requested'] = stats['requested']
+
+        return job
+
+    def cancel_job(self, service_id, job_id):
+
+        job = self.post(
+            url='/service/{}/job/{}/cancel'.format(service_id, job_id),
+            data={}
+        )
+
+        stats = self.__convert_statistics(job['data'])
+        job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
+        job['data']['notifications_delivered'] = stats['delivered']
+        job['data']['notifications_failed'] = stats['failed']
+        job['data']['notifications_requested'] = stats['requested']
 
         return job

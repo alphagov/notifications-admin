@@ -178,6 +178,7 @@ def job_json(
         'notifications_sent': notifications_sent,
         'notifications_requested': notifications_requested,
         'job_status': job_status,
+        'statistics': [],
         'created_by': created_by_json(
             created_by.id,
             created_by.name,

@@ -144,10 +144,7 @@ def test_should_not_create_too_big_template(app_,
             ), data=data)
 
             assert resp.status_code == 200
-            assert (
-                       "Content has a character count greater"
-                       " than the limit of 459"
-                   ) in resp.get_data(as_text=True)
+            assert "Content has a character count greater than the limit of 459" in resp.get_data(as_text=True)
 
 
 def test_should_not_update_too_big_template(app_,
@@ -179,10 +176,7 @@ def test_should_not_update_too_big_template(app_,
                 template_id=template_id), data=data)
 
             assert resp.status_code == 200
-            assert (
-                       "Content has a character count greater"
-                       " than the limit of 459"
-                   ) in resp.get_data(as_text=True)
+            assert "Content has a character count greater than the limit of 459" in resp.get_data(as_text=True)
 
 
 def test_should_redirect_when_saving_a_template_email(app_,

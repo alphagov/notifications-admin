@@ -120,7 +120,7 @@ def get_dashboard_partials(service_id):
         job for job in jobs if job['job_status'] == 'scheduled'
     ], key=lambda job: job['scheduled_for'])
     immediate_jobs = [
-        job for job in jobs if job['job_status'] != 'scheduled'
+        job for job in jobs if job['job_status'] not in ['scheduled', 'cancelled']
     ]
     service = service_api_client.get_detailed_service(service_id)
 
