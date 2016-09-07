@@ -146,7 +146,7 @@ def get_dashboard_partials(service_id):
             'views/dashboard/_jobs.html',
             jobs=immediate_jobs
         ),
-        'has_jobs': bool(jobs),
+        'has_jobs': bool(immediate_jobs),
         'usage': render_template(
             'views/dashboard/_usage.html',
             **calculate_usage(service_api_client.get_service_usage(service_id)['data'])
