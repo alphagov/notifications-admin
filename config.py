@@ -54,7 +54,8 @@ class Config(object):
         "police\.uk",
         "kainos\.com",
         "salesforce\.com",
-        "bitzesty\.com"]
+        "bitzesty\.com",
+        "dclgdatamart\.co\.uk"]
 
 
 class Development(Config):
