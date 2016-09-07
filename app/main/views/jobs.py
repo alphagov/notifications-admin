@@ -66,9 +66,9 @@ def view_jobs(service_id):
     return render_template(
         'views/jobs/jobs.html',
         jobs=add_rate_to_jobs([
-            job for job in job_api_client.get_job(service_id)['data']
-            if job['job_status'] != 'scheduled'
-        ])
+                                  job for job in job_api_client.get_job(service_id)['data']
+                                  if job['job_status'] != 'scheduled'
+                                  ])
     )
 
 
@@ -76,7 +76,6 @@ def view_jobs(service_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_job(service_id, job_id):
-
     job = job_api_client.get_job(service_id, job_id)['data']
     filter_args = _parse_filter_args(request.args)
     filter_args['status'] = _set_status_filters(filter_args)
@@ -234,14 +233,13 @@ def view_notifications(service_id, message_type):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_notification(service_id, job_id, notification_id):
-
     now = time.strftime('%H:%M')
 
     return render_template(
         'views/notification.html',
         message=[
             message for message in messages if message['id'] == notification_id
-        ][0],
+            ][0],
         delivered_at=now,
         uploaded_at=now,
         job_id=job_id
@@ -273,7 +271,7 @@ def get_status_filters(service, message_type, statistics):
             stats[key]
         )
         for key, label, option in filters
-    ]
+        ]
 
 
 def _get_job_counts(job, help_argument):
@@ -296,23 +294,23 @@ def _get_job_counts(job, help_argument):
             count
         ) for label, query_param, count in [
             [
-              'total', '',
-              job.get('notification_count', 0)
+                'total', '',
+                job.get('notification_count', 0)
             ],
             [
-              'sending', 'sending',
-              sending
+                'sending', 'sending',
+                sending
             ],
             [
-              'delivered', 'delivered',
-              job.get('notifications_delivered', 0)
+                'delivered', 'delivered',
+                job.get('notifications_delivered', 0)
             ],
             [
-              'failed', 'failed',
-              job.get('notifications_failed', 0)
+                'failed', 'failed',
+                job.get('notifications_failed', 0)
             ]
         ]
-    ]
+        ]
 
 
 def get_job_partials(job):
