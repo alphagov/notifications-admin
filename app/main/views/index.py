@@ -31,7 +31,7 @@ def cookies():
 
 @main.route('/trial-mode')
 def trial_mode():
-    return render_template('views/trial-mode.html', hours=hours)
+    return render_template('views/trial-mode.html')
 
 
 @main.route('/pricing')
