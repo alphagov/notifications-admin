@@ -15,3 +15,12 @@ def test_logged_in_user_redirects_to_choose_service(app_,
 
             response = client.get(url_for('main.sign_in', follow_redirects=True))
             assert response.location == url_for('main.choose_service', _external=True)
+
+
+@pytest.mark.parametrize('view', [
+    'cookies', 'trial_mode', 'pricing', 'terms', 'delivery_and_failure', 'documentation'
+])
+def test_static_pages(app_, view):
+    with app_.test_request_context(), app_.test_client() as client:
+        response = client.get(url_for('main.{}'.format(view)))
+        assert response.status_code == 200
