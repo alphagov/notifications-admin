@@ -35,7 +35,7 @@
 
     <p>
       When you’re ready we can
-      {% if current_service and current_user.has_permissions(['manage_settings'], admin_override=True) %}
+      {% if current_service %}
         <a href="{{ url_for('main.service_request_to_go_live', service_id=current_service.id) }}">remove these restrictions</a>.
       {% else %}
         remove these restrictions.
