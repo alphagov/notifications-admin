@@ -54,6 +54,7 @@ def user_has_permissions(*permissions, admin_override=False, any_=False):
 def redirect_to_sign_in(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
+        import pdb; pdb.set_trace()
         if 'user_details' not in session:
             return redirect(url_for('main.sign_in'))
         else:

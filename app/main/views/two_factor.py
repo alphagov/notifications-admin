@@ -24,6 +24,7 @@ def two_factor():
     form = TwoFactorForm(_check_code)
 
     if form.validate_on_submit():
+        import pdb; pdb.set_trace()
         try:
             user = user_api_client.get_user(user_id)
             services = service_api_client.get_services({'user_id': str(user_id)}).get('data', [])
@@ -32,7 +33,9 @@ def two_factor():
                 user.set_password(session['user_details']['password'])
                 user.reset_failed_login_count()
                 user_api_client.update_user(user)
-            login_user(user, remember=True)
+
+            activated_user = user_api_client.activate_user(user)
+            login_user(activated_user, remember=True)
         finally:
             del session['user_details']
 
