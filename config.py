@@ -3,13 +3,20 @@ from datetime import timedelta
 
 
 class Config(object):
-    DEBUG = False
     ADMIN_CLIENT_SECRET = os.environ['ADMIN_CLIENT_SECRET']
-    ADMIN_CLIENT_USER_NAME = os.environ['ADMIN_CLIENT_USER_NAME']
     API_HOST_NAME = os.environ['API_HOST_NAME']
+    SECRET_KEY = os.environ['SECRET_KEY']
+    DANGEROUS_SALT = os.environ['DANGEROUS_SALT']
+    DESKPRO_API_HOST = os.environ['DESKPRO_API_HOST']
+    DESKPRO_API_KEY = os.environ['DESKPRO_API_KEY']
+
+    DESKPRO_DEPT_ID = 5
+    DESKPRO_ASSIGNED_AGENT_TEAM_ID = 5
+
+    DEBUG = False
+    ADMIN_CLIENT_USER_NAME = 'notify-admin'
     ASSETS_DEBUG = False
     AWS_REGION = 'eu-west-1'
-    DANGEROUS_SALT = os.environ['DANGEROUS_SALT']
     DEFAULT_SERVICE_LIMIT = 50
     EMAIL_EXPIRY_SECONDS = 3600 * 24 * 7  # one week
     HEADER_COLOUR = '#FFBF47'  # $yellow
@@ -23,7 +30,6 @@ class Config(object):
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_NAME = 'notify_admin_remember_me'
     REMEMBER_COOKIE_SECURE = True
-    SECRET_KEY = os.environ['SECRET_KEY']
     SEND_FILE_MAX_AGE_DEFAULT = 365 * 24 * 60 * 60  # 1 year
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_NAME = 'notify_admin_session'
@@ -33,11 +39,7 @@ class Config(object):
     TOKEN_MAX_AGE_SECONDS = 3600
     WTF_CSRF_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
-    DESKPRO_API_HOST = os.environ['DESKPRO_API_HOST']
-    DESKPRO_API_KEY = os.environ['DESKPRO_API_KEY']
     DESKPRO_PERSON_EMAIL = 'donotreply@notifications.service.gov.uk'
-    DESKPRO_DEPT_ID = os.environ['DESKPRO_DEPT_ID']
-    DESKPRO_ASSIGNED_AGENT_TEAM_ID = os.environ['DESKPRO_ASSIGNED_AGENT_TEAM_ID']
     ACTIVITY_STATS_LIMIT_DAYS = 7
     TEST_MESSAGE_FILENAME = 'Test message'
 

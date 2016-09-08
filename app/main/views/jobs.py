@@ -242,23 +242,6 @@ def view_notifications(service_id, message_type):
     )
 
 
-@main.route("/services/<service_id>/jobs/<job_id>/notification/<string:notification_id>")
-@login_required
-@user_has_permissions('view_activity', admin_override=True)
-def view_notification(service_id, job_id, notification_id):
-    now = time.strftime('%H:%M')
-
-    return render_template(
-        'views/notification.html',
-        message=[
-            message for message in messages if message['id'] == notification_id
-            ][0],
-        delivered_at=now,
-        uploaded_at=now,
-        job_id=job_id
-    )
-
-
 def get_status_filters(service, message_type, statistics):
     stats = statistics[message_type]
     stats['sending'] = stats['requested'] - stats['delivered'] - stats['failed']
@@ -307,20 +290,20 @@ def _get_job_counts(job, help_argument):
             count
         ) for label, query_param, count in [
             [
-              'total', '',
-              job.get('notification_count', 0)
+                'total', '',
+                job.get('notification_count', 0)
             ],
             [
-              'sending', 'sending',
-              sending
+                'sending', 'sending',
+                sending
             ],
             [
-              'delivered', 'delivered',
-              job.get('notifications_delivered', 0)
+                'delivered', 'delivered',
+                job.get('notifications_delivered', 0)
             ],
             [
-              'failed', 'failed',
-              job.get('notifications_failed', 0)
+                'failed', 'failed',
+                job.get('notifications_failed', 0)
             ]
         ]
     ]
