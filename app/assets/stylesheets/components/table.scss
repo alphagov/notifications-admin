@@ -40,7 +40,8 @@
       width: 52.5%;
       font-weight: normal;
 
-      .hint {
+      .hint,
+      p {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

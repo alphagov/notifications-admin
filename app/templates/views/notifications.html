@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading, row_heading, date_field %}
+{% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading, row_heading, notification_status_field %}
 {% from "components/previous-next-navigation.html" import previous_next_navigation %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/pill.html" import pill %}
@@ -50,7 +50,7 @@
       caption="Recent activity",
       caption_visible=False,
       empty_message='No messages found',
-      field_headings=['Recipient', 'Started', 'Status'],
+      field_headings=['Recipient', 'Status'],
       field_headings_visible=False
     ) %}
 
@@ -68,15 +68,17 @@
         </p>
       {% endcall %}
 
-      {{ date_field(
-        (item.updated_at or item.created_at)|format_datetime_short
-      ) }}
-
-      {% call field(status=item.status|format_notification_status_as_field_status, align='right') %}
+      {% call field(
+        align='right',
+        status=item.status|format_notification_status_as_field_status
+      ) %}
         {% if item.status|format_notification_status_as_url %}
           <a href="{{ item.status|format_notification_status_as_url }}">
         {% endif %}
-        {{ item.status|format_notification_status(item.template.template_type) }}
+        {{ item.status|format_notification_status_with_time(
+          item.template.template_type,
+          (item.updated_at or item.created_at)|format_datetime_short
+        ) }}
         {% if item.status|format_notification_status_as_url %}
           </a>
         {% endif %}

@@ -116,6 +116,7 @@ def create_app():
     application.add_template_filter(format_date_normal)
     application.add_template_filter(format_date_short)
     application.add_template_filter(format_notification_status)
+    application.add_template_filter(format_notification_status_with_time)
     application.add_template_filter(format_notification_status_as_field_status)
     application.add_template_filter(format_notification_status_as_url)
 
@@ -279,6 +280,14 @@ def format_notification_status(status, template_type):
             'created': 'Sending'
         }
     }.get(template_type).get(status, status)
+
+
+def format_notification_status_with_time(status, template_type, when):
+    return {
+        'delivered': 'Delivered {}'.format(when),
+        'sending': 'Sending since {}'.format(when),
+        'created': 'Sending since {}'.format(when)
+    }.get(status, format_notification_status(status, template_type))
 
 
 def format_notification_status_as_field_status(status):

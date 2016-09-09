@@ -43,17 +43,13 @@
         empty_message="No messages to show",
         field_headings=[
           'Recipient',
-          'Time',
           'Status'
         ],
         field_headings_visible=False
       ) %}
         {% call row_heading() %}
-          {{ item.to }}
+          <p>{{ item.to }}</p>
         {% endcall %}
-        {{ date_field(
-          (item.updated_at or item.created_at)|format_datetime_short
-        ) }}
         {% call field(
           align='right',
           status=item.status|format_notification_status_as_field_status
@@ -61,7 +57,10 @@
           {% if item.status|format_notification_status_as_url %}
             <a href="{{ item.status|format_notification_status_as_url }}">
           {% endif %}
-          {{ item.status|format_notification_status(item.template.template_type) }}
+          {{ item.status|format_notification_status_with_time(
+            item.template.template_type,
+            (item.updated_at or item.created_at)|format_datetime_short
+          ) }}
           {% if item.status|format_notification_status_as_url %}
             </a>
           {% endif %}

@@ -78,7 +78,7 @@ def test_should_show_page_for_one_job(
             '{}: Your vehicle tax is about to expire'.format(service_one['name'])
         )
         assert ' '.join(page.find('tbody').find('tr').text.split()) == (
-            '07123456789 1 January at 11:10am Delivered'
+            '07123456789 Delivered 1 January at 11:10am'
         )
         assert page.find('div', {'data-key': 'notifications'})['data-resource'] == url_for(
             'main.view_job_updates',
