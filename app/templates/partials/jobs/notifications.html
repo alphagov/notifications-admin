@@ -57,13 +57,17 @@
           {% if item.status|format_notification_status_as_url %}
             <a href="{{ item.status|format_notification_status_as_url }}">
           {% endif %}
-          {{ item.status|format_notification_status_with_time(
-            item.template.template_type,
-            (item.updated_at or item.created_at)|format_datetime_short
+          {{ item.status|format_notification_status(
+            item.template.template_type
           ) }}
           {% if item.status|format_notification_status_as_url %}
             </a>
           {% endif %}
+          <span class="status-hint">
+            {{ item.status|format_notification_status_as_time(
+              (item.updated_at or item.created_at)|format_datetime_short
+            ) }}
+          </span>
         {% endcall %}
       {% endcall %}
 
