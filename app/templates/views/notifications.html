@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading, row_heading, notification_status_field %}
+{% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading, row_heading, date_field, notification_status_field %}
 {% from "components/previous-next-navigation.html" import previous_next_navigation %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/pill.html" import pill %}
@@ -68,26 +68,7 @@
         </p>
       {% endcall %}
 
-      {% call field(
-        align='right',
-        status=item.status|format_notification_status_as_field_status
-      ) %}
-        {% if item.status|format_notification_status_as_url %}
-          <a href="{{ item.status|format_notification_status_as_url }}">
-        {% endif %}
-        {{ item.status|format_notification_status(
-          item.template.template_type
-        ) }}
-        {% if item.status|format_notification_status_as_url %}
-          </a>
-          <br>
-        {% endif %}
-        <span class="status-hint">
-          {{ item.status|format_notification_status_as_time(
-            (item.updated_at or item.created_at)|format_datetime_short
-          ) }}
-        </span>
-      {% endcall %}
+      {{ notification_status_field(item) }}
 
     {% endcall %}
   {% if notifications %}

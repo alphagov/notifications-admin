@@ -104,3 +104,23 @@
 {% macro hidden_field_heading(text) %}
   <span class="visuallyhidden">{{ text }}</span>
 {%- endmacro %}
+
+
+{% macro notification_status_field(notification) %}
+  {% call field(status=notification.status|format_notification_status_as_field_status, align='right') %}
+    {% if notification.status|format_notification_status_as_url %}
+      <a href="{{ notification.status|format_notification_status_as_url }}">
+    {% endif %}
+    {{ notification.status|format_notification_status(
+      notification.template.template_type
+    ) }}
+    {% if notification.status|format_notification_status_as_url %}
+      </a>
+    {% endif %}
+    <span class="status-hint">
+      {{ notification.status|format_notification_status_as_time(
+        (notification.updated_at or notification.created_at)|format_datetime_short
+      ) }}
+    </span>
+  {% endcall %}
+{% endmacro %}

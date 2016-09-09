@@ -1,4 +1,4 @@
-{% from "components/table.html" import list_table, field, right_aligned_field_heading, date_field, row_heading %}
+{% from "components/table.html" import list_table, field, right_aligned_field_heading, date_field, row_heading, notification_status_field %}
 {% from "components/page-footer.html" import page_footer %}
 
 <div class="ajax-block-container">
@@ -50,25 +50,7 @@
         {% call row_heading() %}
           <p>{{ item.to }}</p>
         {% endcall %}
-        {% call field(
-          align='right',
-          status=item.status|format_notification_status_as_field_status
-        ) %}
-          {% if item.status|format_notification_status_as_url %}
-            <a href="{{ item.status|format_notification_status_as_url }}">
-          {% endif %}
-          {{ item.status|format_notification_status(
-            item.template.template_type
-          ) }}
-          {% if item.status|format_notification_status_as_url %}
-            </a>
-          {% endif %}
-          <span class="status-hint">
-            {{ item.status|format_notification_status_as_time(
-              (item.updated_at or item.created_at)|format_datetime_short
-            ) }}
-          </span>
-        {% endcall %}
+        {{ notification_status_field(item) }}
       {% endcall %}
 
       {% if more_than_one_page %}
