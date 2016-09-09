@@ -67,12 +67,6 @@
   </td>
 {%- endmacro %}
 
-{% macro date_field(text) -%}
-  <td class="table-field-date">
-    <span>{{ text }}</span>
-  </td>
-{% endmacro %}
-
 {% macro text_field(text, status='') -%}
   {% call field(status=status) %}
     {{ text }}
