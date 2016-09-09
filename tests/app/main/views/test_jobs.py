@@ -1,4 +1,5 @@
 import json
+import uuid
 from urllib.parse import quote
 
 import pytest
@@ -61,7 +62,6 @@ def test_should_show_page_for_one_job(
     status_argument,
     expected_api_call
 ):
-    file_name = mock_get_job(service_one['id'], fake_uuid)['data']['original_file_name']
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_one)
         response = client.get(url_for(
@@ -451,3 +451,25 @@ def test_get_status_filters_constructs_links(app_):
 
     link = ret[0][2]
     assert link == '/services/foo/notifications/sms?status={}'.format(quote('sending,delivered,failed'))
+
+
+def test_html_contains_notification_id(
+        client,
+        service_one,
+        active_user_with_permissions,
+        mock_get_notifications,
+        mock_get_detailed_service,
+        mocker
+):
+    client.login(active_user_with_permissions, mocker, service_one)
+    response = client.get(url_for(
+        'main.view_notifications',
+        service_id=service_one['id'],
+        message_type='sms',
+        status='')
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    notifications = page.tbody.find_all('tr')
+    for tr in notifications:
+        assert uuid.UUID(tr.attrs['id'])

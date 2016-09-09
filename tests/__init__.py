@@ -225,6 +225,7 @@ def notification_json(
 
     data = {
         'notifications': [{
+            'id': uuid.uuid4(),
             'to': to,
             'template': {
                 'id': template['id'],
