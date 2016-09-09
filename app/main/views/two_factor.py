@@ -26,14 +26,12 @@ def two_factor():
     if form.validate_on_submit():
         try:
             user = user_api_client.get_user(user_id)
-
             services = service_api_client.get_services({'user_id': str(user_id)}).get('data', [])
             # Check if coming from new password page
             if 'password' in session['user_details']:
                 user.set_password(session['user_details']['password'])
                 user.reset_failed_login_count()
                 user_api_client.update_user(user)
-
             activated_user = user_api_client.activate_user(user)
             login_user(activated_user, remember=True)
         finally:
