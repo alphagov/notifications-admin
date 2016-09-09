@@ -282,11 +282,11 @@ def format_notification_status(status, template_type):
     }.get(template_type).get(status, status)
 
 
-def format_notification_status_as_time(status, when):
+def format_notification_status_as_time(status, created, updated):
     return {
-        'sending': ' since {}'.format(when),
-        'created': ' since {}'.format(when)
-    }.get(status, when)
+        'sending': ' since {}'.format(created),
+        'created': ' since {}'.format(created)
+    }.get(status, updated)
 
 
 def format_notification_status_as_field_status(status):
