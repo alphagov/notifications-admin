@@ -222,3 +222,24 @@ def test_two_factor_should_redirect_to_sign_in_if_user_not_in_session(app_,
                                    data={'sms_code': '12345'})
             assert response.status_code == 302
             assert response.location == url_for('main.sign_in', _external=True)
+
+
+def test_two_factor_should_activate_pending_user(app_,
+                                                 mocker,
+                                                 api_user_pending,
+                                                 mock_check_verify_code,
+                                                 mock_update_user
+                                                 ):
+    mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
+    mocker.patch('app.service_api_client.get_services', return_value={'data': []})
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                session['user_details'] = {
+                    'id': api_user_pending.id,
+                    'email_address': api_user_pending.email_address
+                }
+            client.post(url_for('main.two_factor'), data={'sms_code': '12345'})
+
+            assert mock_update_user.called
+            assert api_user_pending.is_active
