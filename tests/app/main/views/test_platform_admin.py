@@ -30,14 +30,15 @@ def test_should_403_if_not_platform_admin(app_, active_user_with_permissions, mo
             assert response.status_code == 403
 
 
-@pytest.mark.parametrize('restricted, research_mode, displayed', [
-    (True, False, ''),
-    (False, False, 'Live'),
-    (False, True, 'research mode'),
-    (True, True, 'research mode')
+@pytest.mark.parametrize('restricted, table_index, research_mode, displayed', [
+    (True, 1, False, ''),
+    (False, 0, False, 'Live'),
+    (False, 0, True, 'research mode'),
+    (True, 1, True, 'research mode')
 ])
 def test_should_show_research_and_restricted_mode(
     restricted,
+    table_index,
     research_mode,
     displayed,
     app_,
@@ -60,7 +61,7 @@ def test_should_show_research_and_restricted_mode(
     mock_get_detailed_services.assert_called_once_with({'detailed': True})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     # get second column, which contains flags as text.
-    assert page.tbody.select('td:nth-of-type(2)')[0].text.strip() == displayed
+    assert page.find_all('tbody')[table_index].find_all('td')[1].text.strip() == displayed
 
 
 def test_should_render_platform_admin_page(
@@ -79,7 +80,8 @@ def test_should_render_platform_admin_page(
     resp_data = response.get_data(as_text=True)
     assert 'Platform admin' in resp_data
     assert 'Today' in resp_data
-    assert 'Services' in resp_data
+    assert 'Live services' in resp_data
+    assert 'Trial mode services' in resp_data
     mock_get_detailed_services.assert_called_once_with({'detailed': True})
 
 

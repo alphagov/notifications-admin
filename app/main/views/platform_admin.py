@@ -25,7 +25,12 @@ def platform_admin():
 def get_statistics(services):
     return {
         'global_stats': create_global_stats(services),
-        'service_stats': format_stats_by_service(services)
+        'live_services': format_stats_by_service([
+            service for service in services if not service['restricted']
+        ]),
+        'trial_mode_services': format_stats_by_service([
+            service for service in services if service['restricted']
+        ]),
     }
 
 

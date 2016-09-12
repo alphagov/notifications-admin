@@ -8,7 +8,7 @@
   {% call(item, row_number) list_table(
     services,
     caption=caption,
-    caption_visible=False,
+    caption_visible=True,
     field_headings=[
       'Service',
       hidden_field_heading('Status'),
@@ -89,8 +89,8 @@
     </div>
   </div>
 
-  <h2 class='heading-medium visually-hidden'>Services</h2>
+  {{ services_table(live_services, 'Live services') }}
 
-  {{ services_table(service_stats, 'All services') }}
+  {{ services_table(trial_mode_services, 'Trial mode services') }}
 
 {% endblock %}
