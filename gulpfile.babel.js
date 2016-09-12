@@ -103,6 +103,10 @@ gulp.task('images', () => gulp
   .pipe(gulp.dest(paths.dist + 'images/'))
 );
 
+gulp.task('copy:govuk_template:error_page', () => gulp.src(paths.src + 'error_pages/**/*')
+  .pipe(gulp.dest(paths.dist + 'error_pages/'))
+);
+
 
 // Watch for changes and re-run tasks
 gulp.task('watchForChanges', function() {
@@ -141,6 +145,7 @@ gulp.task('default',
     'copy:govuk_template:images',
     'copy:govuk_template:css',
     'copy:govuk_template:js',
+    'copy:govuk_template:error_page',
     'javascripts',
     'sass',
     'images'
