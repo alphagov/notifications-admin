@@ -65,7 +65,8 @@ def service_json(
         'sms_sender': sms_sender,
         'research_mode': research_mode,
         'organisation': organisation,
-        'branding': branding
+        'branding': branding,
+        'created_at': str(datetime.utcnow())
     }
 
 

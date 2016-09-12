@@ -18,7 +18,11 @@ def platform_admin():
     services = service_api_client.get_services({'detailed': True})['data']
     return render_template(
         'views/platform-admin.html',
-        **get_statistics(services)
+        **get_statistics(sorted(
+            services,
+            key=lambda service: service['created_at'],
+            reverse=True
+        ))
     )
 
 
@@ -67,5 +71,6 @@ def format_stats_by_service(services):
             'delivered': sum(stat['delivered'] for stat in stats),
             'failed': sum(stat['failed'] for stat in stats),
             'restricted': service['restricted'],
-            'research_mode': service['research_mode']
+            'research_mode': service['research_mode'],
+            'created_at': service['created_at']
         }

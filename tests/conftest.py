@@ -84,7 +84,8 @@ def mock_get_detailed_service(mocker, api_user_active):
                 'statistics': {
                     'email': {'requested': 0, 'delivered': 0, 'failed': 0},
                     'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
-                }
+                },
+                'created_at': str(datetime.utcnow())
             }
         }
 
