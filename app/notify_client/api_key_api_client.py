@@ -10,7 +10,7 @@ KEY_TYPE_TEST = 'test'
 
 class ApiKeyApiClient(BaseAPIClient):
     def __init__(self):
-        super(self.__class__, self).__init__("a", "b", "c")
+        super().__init__("a", "b", "c")
 
     def init_app(self, app):
         self.base_url = app.config['API_HOST_NAME']
