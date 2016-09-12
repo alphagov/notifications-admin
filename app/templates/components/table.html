@@ -28,7 +28,7 @@
 
   {% call mapping_table(caption, field_headings, field_headings_visible, caption_visible) %}
     {% for item in items %}
-      {% call row() %}
+      {% call row(item.id) %}
         {{ parent_caller(item, loop.index + 1) }}
       {% endcall %}
     {% endfor %}
@@ -43,8 +43,8 @@
 
 {%- endmacro %}
 
-{% macro row() -%}
-  <tr class="table-row">
+{% macro row(id=None) -%}
+  <tr class="table-row" {% if id %}id="{{id}}"{% endif %}>
     {{ caller() }}
   </tr>
 {%- endmacro %}

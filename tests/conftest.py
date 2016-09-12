@@ -1202,3 +1202,9 @@ def mock_get_organisation(mocker):
     return mocker.patch(
         'app.organisations_client.get_organisation', side_effect=_get_organisation
     )
+
+
+@pytest.fixture(scope='function')
+def client(app_):
+    with app_.test_request_context(), app_.test_client() as client:
+        yield client
