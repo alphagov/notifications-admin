@@ -39,15 +39,16 @@ def test_should_redirect_to_add_service_when_sms_code_is_correct(app_,
 
 
 def test_should_activate_user_after_verify(app_,
-                                           api_user_active,
-                                           mock_get_user,
+                                           mocker,
+                                           api_user_pending,
                                            mock_send_verify_code,
                                            mock_check_verify_code,
                                            mock_update_user):
+    mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
-                session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+                session['user_details'] = {'email_address': api_user_pending.email_address, 'id': api_user_pending.id}
             client.post(url_for('main.verify'),
                         data={'sms_code': '12345'})
             assert mock_update_user.called

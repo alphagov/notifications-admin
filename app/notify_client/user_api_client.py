@@ -122,5 +122,8 @@ class UserApiClient(BaseAPIClient):
         return True
 
     def activate_user(self, user):
-        user.state = 'active'
-        return self.update_user(user)
+        if user.state == 'pending':
+            user.state = 'active'
+            return self.update_user(user)
+        else:
+            return user
