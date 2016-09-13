@@ -4,6 +4,51 @@
 {% from "components/browse-list.html" import browse_list %}
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, hidden_field_heading, text_field %}
 
+{% macro services_table(services, caption) %}
+  {% call(item, row_number) list_table(
+    services,
+    caption=caption,
+    caption_visible=True,
+    field_headings=[
+      'Service',
+      hidden_field_heading('Status'),
+      right_aligned_field_heading('Sending'),
+      right_aligned_field_heading('Delivered'),
+      right_aligned_field_heading('Failed')
+    ],
+    field_headings_visible=True
+  ) %}
+    {% call field() %}
+      <div>
+        <a href="{{ url_for('main.service_dashboard', service_id=item['id']) }}" class="browse-list-link">{{ item['name'] }}</a>
+      </div>
+    {% endcall %}
+    {% if item['research_mode'] %}
+      {% call field() %}
+        <span class="research-mode">research mode</span>
+      {% endcall %}
+    {% elif not item['restricted'] %}
+      {% call field(status='error') %}
+        <span class="heading-medium">
+          Live
+        </span>
+      {% endcall %}
+    {% else %}
+      {{ text_field('') }}
+    {% endif %}
+    {% call field(align='right') %}
+      {{ big_number(item['sending'], smaller=True) }}
+    {% endcall %}
+    {% call field(align='right') %}
+      {{ big_number(item['delivered'], smaller=True) }}
+    {% endcall %}
+    {% call field(align='right', status='error' if 0 else '') %}
+      {{ big_number(item['failed'], smaller=True) }}
+    {% endcall %}
+  {% endcall %}
+{% endmacro %}
+
+
 {% block page_title %}
   Platform admin – GOV.UK Notify
 {% endblock %}
@@ -44,47 +89,8 @@
     </div>
   </div>
 
-  <h2 class='heading-medium visually-hidden'>Services</h2>
-  {% call(item, row_number) list_table(
-    service_stats,
-    caption="All services",
-    caption_visible=False,
-    field_headings=[
-      'Service',
-      hidden_field_heading('Status'),
-      right_aligned_field_heading('Sending'),
-      right_aligned_field_heading('Delivered'),
-      right_aligned_field_heading('Failed')
-    ],
-    field_headings_visible=True
-  ) %}
-    {% call field() %}
-      <div>
-        <a href="{{ url_for('main.service_dashboard', service_id=item['id']) }}" class="browse-list-link">{{ item['name'] }}</a>
-      </div>
-    {% endcall %}
-    {% if item['research_mode'] %}
-      {% call field() %}
-        <span class="research-mode">research mode</span>
-      {% endcall %}
-    {% elif not item['restricted'] %}
-      {% call field(status='error') %}
-        <span class="heading-medium">
-          Live
-        </span>
-      {% endcall %}
-    {% else %}
-      {{ text_field('') }}
-    {% endif %}
-    {% call field(align='right') %}
-      {{ big_number(item['sending'], smaller=True) }}
-    {% endcall %}
-    {% call field(align='right') %}
-      {{ big_number(item['delivered'], smaller=True) }}
-    {% endcall %}
-    {% call field(align='right', status='error' if 0 else '') %}
-      {{ big_number(item['failed'], smaller=True) }}
-    {% endcall %}
-  {% endcall %}
+  {{ services_table(live_services, 'Live services') }}
+
+  {{ services_table(trial_mode_services, 'Trial mode services') }}
 
 {% endblock %}
