@@ -2,7 +2,6 @@
 [![Requirements Status](https://requires.io/github/alphagov/notifications-admin/requirements.svg?branch=master)](https://requires.io/github/alphagov/notifications-admin/requirements/?branch=master)
 [![Coverage Status](https://coveralls.io/repos/alphagov/notifications-admin/badge.svg?branch=master&service=github)](https://coveralls.io/github/alphagov/notifications-admin?branch=master)
 
-
 [![Deploy to staging](https://notify-build-monitor.herokuapp.com/deploys/notifications-admin/master...staging.svg?prefix=Deploy%20to)](https://github.com/alphagov/notifications-admin/compare/staging...master?expand=1&title=Deploy%20to%20staging) [![Deploy to live](https://notify-build-monitor.herokuapp.com/deploys/notifications-admin/staging...live.svg?prefix=Deploy%20to)](https://github.com/alphagov/notifications-admin/compare/live...staging?expand=1&title=Deploy%20to%20live)
 
 # notifications-admin
