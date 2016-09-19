@@ -4,19 +4,29 @@
 {% from "components/radios.html" import radios %}
 
 {% block page_title %}
-  Add a new API key – GOV.UK Notify
+Add a new API key – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
+<h1 class="heading-large">
     Create an API key
-  </h1>
+</h1>
 
-  <form method="post">
+<div class="column-two-thirds">
+    <h2 class="heading-small">API keys retrieval behaviour:</h2>
+  <ul class="list list-bullet">
+        <li>Keys retrieve <em>only</em> notifications created with a key of that type</li>
+        <li>Keys retrieve notifications created with <em>any</em> key of that type</li>
+        <li>Keys <em>do not</em> retrieve notifications created by uploading files</li>
+    </ul>
+</div>
+
+<form method="post">
     {{ radios(form.key_type) }}
     {{ textbox(form.key_name, label='Name for this key') }}
     {{ page_footer('Continue') }}
-  </form>
+</form>
+
 
 {% endblock %}
