@@ -63,8 +63,8 @@ def email_template():
         '\n\n'
         'It has '
         'survived not only'
-        '\n'
-        '*five centuries'
+        '\n\n'
+        '* five centuries'
         '\n'
         '* but also the leap into electronic typesetting'
         '\n\n'
@@ -81,7 +81,15 @@ def email_template():
         'normal distribution of letters, as opposed to using ‘Content '
         'here, content here’, making it look like readable English.'
         '\n\n\n'
+        '1. One'
+        '\n'
+        '2. Two'
+        '\n'
+        '10. Three'
+        '\n\n'
         'This is an example of an email sent using GOV.UK Notify.'
+        '\n\n'
+        'https://www.notifications.service.gov.uk'
     )
 
 
