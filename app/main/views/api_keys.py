@@ -7,7 +7,7 @@ from app.utils import user_has_permissions
 from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
 
 
-@main.route("/services/<service_id>/api-keys")
+@main.route("/services/<service_id>/api/keys")
 @login_required
 @user_has_permissions('manage_api_keys')
 def api_keys(service_id):
@@ -17,7 +17,7 @@ def api_keys(service_id):
     )
 
 
-@main.route("/services/<service_id>/api-keys/create", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/api/keys/create", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_api_keys')
 def create_api_key(service_id):
@@ -46,7 +46,7 @@ def create_api_key(service_id):
     )
 
 
-@main.route("/services/<service_id>/api-keys/revoke/<key_id>", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/api/keys/revoke/<key_id>", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_api_keys')
 def revoke_api_key(service_id, key_id):
