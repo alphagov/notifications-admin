@@ -12,7 +12,7 @@ from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST,
 @user_has_permissions('manage_api_keys')
 def api_keys(service_id):
     return render_template(
-        'views/api-keys.html',
+        'views/api/keys.html',
         keys=api_key_api_client.get_api_keys(service_id=service_id)['apiKeys']
     )
 
@@ -38,10 +38,10 @@ def create_api_key(service_id):
             key_name=form.key_name.data,
             key_type=form.key_type.data
         )
-        return render_template('views/api-keys/show.html', secret=secret,
+        return render_template('views/api/keys/show.html', secret=secret,
                                key_name=form.key_name.data)
     return render_template(
-        'views/api-keys/create.html',
+        'views/api/keys/create.html',
         form=form
     )
 
@@ -53,7 +53,7 @@ def revoke_api_key(service_id, key_id):
     key_name = api_key_api_client.get_api_keys(service_id=service_id, key_id=key_id)['apiKeys'][0]['name']
     if request.method == 'GET':
         return render_template(
-            'views/api-keys/revoke.html',
+            'views/api/keys/revoke.html',
             key_name=key_name
         )
     elif request.method == 'POST':
