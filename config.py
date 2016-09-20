@@ -58,7 +58,10 @@ class Config(object):
         "salesforce\.com",
         "bitzesty\.com",
         "dclgdatamart\.co\.uk",
-        "valtech\.co\.uk"]
+        "valtech\.co\.uk",
+        "gofreerange\.com",
+        "cgi\.com",
+        "unboxed\.com"]
 
 
 class Development(Config):
