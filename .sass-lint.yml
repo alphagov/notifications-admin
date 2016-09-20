@@ -10,6 +10,7 @@ rules:
     -
       exclude:
         - media
+        - ie-lte
   no-warn: 1
   no-debug: 1
   no-ids: 1

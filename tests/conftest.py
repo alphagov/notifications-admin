@@ -1206,6 +1206,26 @@ def mock_get_organisation(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_whitelist(mocker):
+    def _get_whitelist(service_id):
+        return {
+            'email_addresses': ['test@example.com'],
+            'phone_numbers': ['07900900000']
+        }
+
+    return mocker.patch(
+        'app.service_api_client.get_whitelist', side_effect=_get_whitelist
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_update_whitelist(mocker):
+    return mocker.patch(
+        'app.service_api_client.update_whitelist'
+    )
+
+
+@pytest.fixture(scope='function')
 def client(app_):
     with app_.test_request_context(), app_.test_client() as client:
         yield client

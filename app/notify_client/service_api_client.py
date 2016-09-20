@@ -205,6 +205,12 @@ class ServiceAPIClient(NotificationsAPIClient):
     def get_weekly_notification_stats(self, service_id):
         return self.get(url='/service/{}/notifications/weekly'.format(service_id))
 
+    def get_whitelist(self, service_id):
+        return self.get(url='/service/{}/whitelist'.format(service_id))
+
+    def update_whitelist(self, service_id, data):
+        return self.put(url='/service/{}/whitelist'.format(service_id), data=data)
+
 
 class ServicesBrowsableItem(BrowsableItem):
     @property

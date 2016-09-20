@@ -1,5 +1,6 @@
 import uuid
 
+from collections import OrderedDict
 from flask import url_for
 from bs4 import BeautifulSoup
 
@@ -213,3 +214,47 @@ def test_route_invalid_permissions(mocker,
                 ['view_activity'],
                 api_user_active,
                 service_one)
+
+
+def test_should_show_whitelist_page(
+    client,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_whitelist
+):
+    client.login(api_user_active)
+    response = client.get(url_for('main.whitelist', service_id=str(uuid.uuid4())))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    textboxes = page.find_all('input', {'type': 'text'})
+    for index, value in enumerate(
+        ['test@example.com'] + [''] * 4 + ['07900900000'] + [''] * 4
+    ):
+        assert textboxes[index]['value'] == value
+
+
+def test_should_update_whitelist(
+    client,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_update_whitelist
+):
+    client.login(api_user_active)
+    service_id = str(uuid.uuid4())
+    data = OrderedDict([
+        ('email_addresses-1', 'test@example.com'),
+        ('email_addresses-3', 'test@example.com'),
+        ('phone_numbers-0', '07900900000')
+    ])
+
+    response = client.post(
+        url_for('main.whitelist', service_id=service_id),
+        data=data
+    )
+
+    mock_update_whitelist.assert_called_once_with(service_id, {
+        'email_addresses': ['test@example.com', 'test@example.com'],
+        'phone_numbers': ['07900900000']})

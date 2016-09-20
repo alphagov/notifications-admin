@@ -1,8 +1,8 @@
 from flask import request, render_template, redirect, url_for, flash
 from flask_login import login_required
 from app.main import main
-from app.main.forms import CreateKeyForm
-from app import api_key_api_client, current_service
+from app.main.forms import CreateKeyForm, Whitelist
+from app import api_key_api_client, service_api_client, current_service
 from app.utils import user_has_permissions
 from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
 
@@ -22,6 +22,25 @@ def api_integration(service_id):
 def api_documentation(service_id):
     return render_template(
         'views/api/documentation.html'
+    )
+
+
+@main.route("/services/<service_id>/api/whitelist", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_api_keys')
+def whitelist(service_id):
+    form = Whitelist()
+    if form.validate_on_submit():
+        service_api_client.update_whitelist(service_id, {
+            'email_addresses': list(filter(None, form.email_addresses.data)),
+            'phone_numbers':  list(filter(None, form.phone_numbers.data))
+        })
+        return redirect(url_for('.api_integration', service_id=service_id))
+    if not form.errors:
+        form.populate(**service_api_client.get_whitelist(service_id))
+    return render_template(
+        'views/api/whitelist.html',
+        form=form
     )
 
 

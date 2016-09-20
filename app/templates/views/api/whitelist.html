@@ -1,0 +1,43 @@
+{% extends "withnav_template.html" %}
+{% from "components/table.html" import list_table, field, hidden_field_heading %}
+{% from "components/api-key.html" import api_key %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/list-entry.html" import list_entry %}
+
+{% block page_title %}
+  API integration – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    Whitelist
+  </h1>
+
+  <form method="post">
+
+    <div class="grid-row">
+      <div class="column-two-thirds">
+
+        {{ list_entry(
+          form.email_addresses,
+          item_name='email address',
+        ) }}
+
+        {{ list_entry(
+          form.phone_numbers,
+          item_name='phone number',
+        ) }}
+
+      </div>
+    </div>
+
+    {{ page_footer(
+      'Save',
+      secondary_link=url_for('.api_integration', service_id=current_service.id),
+      secondary_link_text='Back to API integration'
+    ) }}
+
+  </form>
+
+{% endblock %}
