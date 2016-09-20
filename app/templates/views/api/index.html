@@ -8,11 +8,17 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
+  <h1 class="heading-large bottom-gutter">
     API integration
   </h1>
 
-  <a href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
-  <a href="{{ url_for('.api_documentation', service_id=current_service.id) }}">Documentation</a>
+  <nav class="grid-row">
+    <div class="column-half">
+      <a class="pill-separate-item" href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
+    </div>
+    <div class="column-half">
+      <a class="pill-separate-item" href="{{ url_for('.api_documentation', service_id=current_service.id) }}">Documentation</a>
+    </div>
+  </nav>
 
 {% endblock %}
