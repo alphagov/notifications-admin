@@ -21,6 +21,21 @@ def test_should_show_api_page(
         assert page.h1.string.strip() == 'API integration'
 
 
+def test_should_show_api_documentation_page(
+    app_,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        response = client.get(url_for('main.api_documentation', service_id=str(uuid.uuid4())))
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.h1.string.strip() == 'Documentation'
+
+
 def test_should_show_empty_api_keys_page(app_,
                                          api_user_pending,
                                          mock_login,

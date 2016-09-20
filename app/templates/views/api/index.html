@@ -13,20 +13,6 @@
   </h1>
 
   <a href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
-
-  <h2 class="heading-medium">API clients</h2>
-  <ul class="list list-bullet">
-    {% for name, url in [
-      ('Java', 'https://github.com/alphagov/notifications-java-client'),
-      ('Node JS', 'https://github.com/alphagov/notifications-node-client'),
-      ('PHP', 'https://github.com/alphagov/notifications-php-client'),
-      ('Python', 'https://quis.github.io/govuk_documentation_prototype/'),
-      ('Ruby', 'https://github.com/alphagov/notifications-ruby-client')
-    ] %}
-    <li>
-      <a href="{{ url }}">{{ name }}</a>
-    </li>
-    {% endfor %}
-  </ul>
+  <a href="{{ url_for('.api_documentation', service_id=current_service.id) }}">Documentation</a>
 
 {% endblock %}
