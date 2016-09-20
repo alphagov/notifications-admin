@@ -19,6 +19,21 @@ def test_should_show_api_page(
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'API integration'
+        assert 'Your service is in trial mode' in page.find('div', {'class': 'banner-warning'}).text
+
+
+def test_should_show_api_page_for_live_service(
+    app_,
+    mock_login,
+    api_user_active,
+    mock_get_live_service,
+    mock_has_permissions
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        response = client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert 'Your service is in trial mode' not in page.find('main').text
 
 
 def test_should_show_api_documentation_page(
