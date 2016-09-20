@@ -8,7 +8,7 @@ def test_owasp_useful_headers_set(app_):
     assert response.headers['X-XSS-Protection'] == '1; mode=block'
     assert response.headers['Content-Security-Policy'] == (
         "default-src 'self' 'unsafe-inline';"
-        "script-src 'self' *.google-analytics.com 'unsafe-inline' data:;"
+        "script-src 'self' *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
         "object-src 'self';"
         "font-src 'self' data:;"
         "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk data:;"

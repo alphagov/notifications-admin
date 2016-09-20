@@ -1,0 +1,68 @@
+.input-list {
+
+  .list-entry {
+    vertical-align: middle;
+    margin-bottom: 15px;
+    position: relative;
+
+    @include ie-lte(7) {
+      zoom: 1;
+    }
+  }
+
+  .list-entry-remove {
+    @include core-19;
+    display: block;
+    margin-bottom: 15px;
+    margin-top: 5px;
+    position: static;
+
+    @include media(tablet) {
+      @include inline-block;
+      margin: 0 0 0 10px;
+      position: absolute;
+      top: 0;
+      left: 100%;
+    }
+
+    @include ie-lte(7) {
+      top: auto;
+      left: 110%;
+    }
+  }
+
+  .form-control {
+    padding-left: 1.84em;
+    width: 100%;
+    margin-bottom: 0;
+
+    @include ie-lte(8) {
+      width: 95%;
+    }
+
+    @include media(desktop) {
+      @include inline-block;
+    }
+  }
+
+  .text-box-number-label {
+    @include core-19;
+    float: left;
+    width: 1.6em;
+    margin: 6px -1.6em 0 0;
+    position: relative;
+    left: 10px;
+    color: $secondary-text-colour;
+    font-weight: bold;
+    pointer-events: none;
+  }
+
+  .list-entry-add {
+    @include core-19;
+    margin: 0 0 20px 0;
+  }
+}
+
+.button-secondary {
+  @include button($grey-3);
+}
