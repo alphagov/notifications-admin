@@ -16,6 +16,15 @@ def api_integration(service_id):
     )
 
 
+@main.route("/services/<service_id>/api/documentation")
+@login_required
+@user_has_permissions('manage_api_keys')
+def api_documentation(service_id):
+    return render_template(
+        'views/api/documentation.html'
+    )
+
+
 @main.route("/services/<service_id>/api/keys")
 @login_required
 @user_has_permissions('manage_api_keys')
