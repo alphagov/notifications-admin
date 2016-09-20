@@ -7,6 +7,15 @@ from app.utils import user_has_permissions
 from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
 
 
+@main.route("/services/<service_id>/api")
+@login_required
+@user_has_permissions('manage_api_keys')
+def api_integration(service_id):
+    return render_template(
+        'views/api/index.html'
+    )
+
+
 @main.route("/services/<service_id>/api/keys")
 @login_required
 @user_has_permissions('manage_api_keys')

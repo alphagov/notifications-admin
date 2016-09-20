@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/table.html" import list_table, field, hidden_field_heading %}
 {% from "components/api-key.html" import api_key %}
+{% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
   API integration – GOV.UK Notify
@@ -11,7 +12,7 @@
   <div class="grid-row bottom-gutter-1-2">
     <div class="column-two-thirds">
       <h1 class="heading-large">
-        API integration
+        API keys
       </h1>
     </div>
     <div class="column-one-third">
@@ -26,8 +27,9 @@
     caption_visible=false,
     field_headings=[
       'API keys',
-      hidden_field_heading('Action')
+      'Action'
     ],
+    field_headings_visible=False
   ) %}
     {% call field() %}
       <div class="file-list">
@@ -58,19 +60,9 @@
     {{ api_key(current_service.id, "Service ID", thing="service ID") }}
   </div>
 
-  <h2 class="heading-medium">API clients</h2>
-  <ul class="list list-bullet">
-    {% for name, url in [
-      ('Java', 'https://github.com/alphagov/notifications-java-client'),
-      ('Node JS', 'https://github.com/alphagov/notifications-node-client'),
-      ('PHP', 'https://github.com/alphagov/notifications-php-client'),
-      ('Python', 'https://github.com/alphagov/notifications-python-client'),
-      ('Ruby', 'https://github.com/alphagov/notifications-ruby-client')
-    ] %}
-    <li>
-      <a href="{{ url }}">{{ name }}</a>
-    </li>
-    {% endfor %}
-  </ul>
+  {{ page_footer(
+    secondary_link=url_for('.api_integration', service_id=current_service.id),
+    secondary_link_text='Back to API integration'
+  ) }}
 
 {% endblock %}

@@ -342,7 +342,7 @@ def test_menu_manage_api_keys(mocker,
         assert url_for('main.service_settings', service_id=service_one['id']) not in page
         assert url_for('main.show_all_services') not in page
 
-        assert url_for('main.api_keys', service_id=service_one['id']) in page
+        assert url_for('main.api_integration', service_id=service_one['id']) in page
 
 
 def test_menu_all_services_for_platform_admin_user(mocker,
