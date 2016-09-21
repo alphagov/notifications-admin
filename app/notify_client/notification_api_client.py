@@ -19,14 +19,16 @@ class NotificationApiClient(BaseAPIClient):
             params=params
         )
 
-    def get_notifications_for_service(self,
-                                      service_id,
-                                      job_id=None,
-                                      template_type=None,
-                                      status=None,
-                                      page=None,
-                                      page_size=None,
-                                      limit_days=None):
+    def get_notifications_for_service(
+        self,
+        service_id,
+        job_id=None,
+        template_type=None,
+        status=None,
+        page=None,
+        page_size=None,
+        limit_days=None
+    ):
         params = {}
         if page is not None:
             params['page'] = page
