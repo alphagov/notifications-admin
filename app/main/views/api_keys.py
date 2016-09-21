@@ -2,7 +2,7 @@ from flask import request, render_template, redirect, url_for, flash
 from flask_login import login_required
 from app.main import main
 from app.main.forms import CreateKeyForm, Whitelist
-from app import api_key_api_client, service_api_client, current_service
+from app import api_key_api_client, service_api_client, notification_api_client, current_service
 from app.utils import user_has_permissions
 from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
 
@@ -12,7 +12,12 @@ from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST,
 @user_has_permissions('manage_api_keys')
 def api_integration(service_id):
     return render_template(
-        'views/api/index.html'
+        'views/api/index.html',
+        api_notifications=notification_api_client.get_notifications_for_service(
+            service_id=service_id,
+            include_jobs=False,
+            include_from_test_key=True
+        )
     )
 
 

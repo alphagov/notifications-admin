@@ -12,7 +12,8 @@ def test_should_show_api_page(
     mock_login,
     api_user_active,
     mock_get_service,
-    mock_has_permissions
+    mock_has_permissions,
+    mock_get_notifications
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(api_user_active)
@@ -21,6 +22,42 @@ def test_should_show_api_page(
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'API integration'
         assert 'Your service is in trial mode' in page.find('div', {'class': 'banner-warning'}).text
+        rows = page.find_all('details')
+        assert len(rows) == 5
+        for index, row in enumerate(rows):
+            assert row.find('h3').string.strip() == '07123456789'
+
+
+def test_should_show_api_page_with_lots_of_notifications(
+    client,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_notifications_with_previous_next
+):
+    client.login(api_user_active)
+    response = client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    rows = page.find_all('div', {'class': 'api-notifications-item'})
+    assert ' '.join(rows[len(rows) - 1].text.split()) == (
+        'Only showing the first 50 messages. Notify deletes messages after 7 days.'
+    )
+
+
+def test_should_show_api_page_with_no_notifications(
+    client,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_notifications_with_no_notifications
+):
+    client.login(api_user_active)
+    response = client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    rows = page.find_all('div', {'class': 'api-notifications-item'})
+    assert 'When you send messages via the API they’ll appear here.' in rows[len(rows) - 1].text.strip()
 
 
 def test_should_show_api_page_for_live_service(

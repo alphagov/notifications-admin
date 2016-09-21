@@ -52,6 +52,12 @@
   margin-top: 45px;
 }
 
+.align-with-heading-copy-right {
+  display: block;
+  margin-top: 35px;
+  text-align: right;
+}
+
 .global-cookie-message {
   p {
     @extend %site-width-container;
