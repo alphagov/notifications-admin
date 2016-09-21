@@ -27,7 +27,9 @@ class NotificationApiClient(BaseAPIClient):
         status=None,
         page=None,
         page_size=None,
-        limit_days=None
+        limit_days=None,
+        include_jobs=None,
+        include_from_test_key=None
     ):
         params = {}
         if page is not None:
@@ -38,6 +40,10 @@ class NotificationApiClient(BaseAPIClient):
             params['template_type'] = template_type
         if status is not None:
             params['status'] = status
+        if include_jobs is not None:
+            params['include_jobs'] = include_jobs
+        if include_from_test_key is not None:
+            params['include_from_test_key'] = include_from_test_key
         if job_id:
             return self.get(
                 url='/service/{}/job/{}/notifications'.format(service_id, job_id),

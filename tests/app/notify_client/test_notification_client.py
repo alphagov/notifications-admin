@@ -26,6 +26,14 @@ def test_client_gets_notifications_with_page(mocker):
         {'url': '/service/abcd1234/notifications', 'params': {'page': 99}}
     ),
     (
+        {'include_jobs': False},
+        {'url': '/service/abcd1234/notifications', 'params': {'include_jobs': False}}
+    ),
+    (
+        {'include_from_test_key': True},
+        {'url': '/service/abcd1234/notifications', 'params': {'include_from_test_key': True}}
+    ),
+    (
         {'job_id': 'efgh5678'},
         {'url': '/service/abcd1234/job/efgh5678/notifications', 'params': {}}
     ),
