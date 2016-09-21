@@ -938,7 +938,9 @@ def mock_get_notifications(mocker, api_user_active):
         limit_days=None,
         rows=5,
         set_template_type=None,
-        set_status=None
+        set_status=None,
+        include_jobs=None,
+        include_from_test_key=None
     ):
         job = None
         if job_id is not None:
