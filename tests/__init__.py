@@ -208,7 +208,7 @@ def notification_json(
     if sent_at is None:
         sent_at = str(datetime.utcnow().time())
     if created_at is None:
-        created_at = str(datetime.utcnow().time())
+        created_at = datetime.now(timezone.utc).isoformat()
     if updated_at is None:
         updated_at = str((datetime.utcnow() + timedelta(minutes=1)).time())
     if status is None:

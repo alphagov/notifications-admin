@@ -976,8 +976,28 @@ def mock_get_notifications_with_previous_next(mocker):
                            page=1,
                            template_type=None,
                            status=None,
-                           limit_days=None):
+                           limit_days=None,
+                           include_jobs=None,
+                           include_from_test_key=None):
         return notification_json(service_id, with_links=True)
+
+    return mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=_get_notifications
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_notifications_with_no_notifications(mocker):
+    def _get_notifications(service_id,
+                           job_id=None,
+                           page=1,
+                           template_type=None,
+                           status=None,
+                           limit_days=None,
+                           include_jobs=None,
+                           include_from_test_key=None):
+        return notification_json(service_id, rows=0)
 
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',

@@ -22,7 +22,7 @@
     {% endcall %}
   {% endif %}
 
-  <nav class="grid-row">
+  <nav class="grid-row bottom-gutter-3-2">
     <div class="column-one-third">
       <a class="pill-separate-item" href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
     </div>
@@ -33,5 +33,53 @@
       <a class="pill-separate-item" href="{{ url_for('.api_documentation', service_id=current_service.id) }}">Documentation</a>
     </div>
   </nav>
+
+  <h2 class="heading-medium">
+    Message log
+  </h2>
+  <div class="api-notifications">
+    {% if not api_notifications.notifications %}
+      <div class="api-notifications-item">
+        <p class="api-notifications-item-meta">
+          When you send messages via the API they’ll appear here.
+        </p>
+        <p class="api-notifications-item-meta">
+          Notify deletes messages after 7 days.
+        </p>
+      </div>
+    {% endif %}
+    {% for notification in api_notifications.notifications %}
+      <details class="api-notifications-item">
+        <summary class="api-notifications-item-title">
+          <h3 class="api-notifications-item-recipient">
+            {{ notification.to }}
+          </h3>
+          <div class="grid-row api-notifications-item-meta">
+            <div class="column-half api-notifications-item-key">
+              {{notification.key_name}}
+            </div>
+            <div class="column-half api-notifications-item-time">
+              {{ notification.created_at|format_delta }}
+            </div>
+          </div>
+        </summary>
+        <dl id="notification-{{ notification.id }}" class="api-notifications-item-data bottom-gutter-1-2">
+          {% for key in [
+            'id', 'notification_type', 'created_at', 'updated_at', 'sent_at', 'status'
+          ] %}
+            <dt>{{ key }}:</dt>
+            <dd class="api-notifications-item-data-item">{{ notification[key] }}</dd>
+          {% endfor %}
+        </dl>
+      </details>
+    {% endfor %}
+    {% if api_notifications.links %}
+      <div class="api-notifications-item">
+        <p class="api-notifications-item-meta">
+          Only showing the first 50 messages
+        </p>
+      </div>
+    {% endif %}
+  </div>
 
 {% endblock %}
