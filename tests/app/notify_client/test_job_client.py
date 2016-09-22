@@ -66,37 +66,6 @@ def test_client_gets_job_by_service_and_job(mocker):
     mock_get.assert_called_once_with(url=expected_url, params={})
 
 
-def test_client_gets_job_by_service_and_job_filtered_by_status(mocker):
-    mocker.patch('app.notify_client.current_user', id='1')
-
-    service_id = 'service_id'
-    job_id = 'job_id'
-
-    expected_url = '/service/{}/job/{}'.format(service_id, job_id)
-
-    client = JobApiClient()
-    mock_get = mocker.patch('app.notify_client.job_api_client.JobApiClient.get')
-
-    client.get_job(service_id, job_id, limit_days=1, status='failed')
-
-    mock_get.assert_called_once_with(url=expected_url, params={'status': 'failed'})
-
-
-def test_client_gets_job_by_service_filtered_by_status(mocker):
-    mocker.patch('app.notify_client.current_user', id='1')
-
-    service_id = 'service_id'
-
-    expected_url = '/service/{}/job'.format(service_id)
-
-    client = JobApiClient()
-    mock_get = mocker.patch('app.notify_client.job_api_client.JobApiClient.get')
-
-    client.get_job(service_id, limit_days=1, status='failed')
-
-    mock_get.assert_called_once_with(url=expected_url,  params={'limit_days': 1})
-
-
 def test_client_parses_job_stats(mocker):
     mocker.patch('app.notify_client.current_user', id='1')
 
@@ -247,7 +216,7 @@ def test_client_parses_job_stats_for_service(mocker):
     client = JobApiClient()
     mock_get = mocker.patch('app.notify_client.job_api_client.JobApiClient.get', return_value=expected_data)
 
-    result = client.get_job(service_id)
+    result = client.get_jobs(service_id)
 
     mock_get.assert_called_once_with(url=expected_url, params={})
     assert result['data'][0]['id'] == job_1_id
@@ -309,7 +278,7 @@ def test_client_parses_empty_job_stats_for_service(mocker):
     client = JobApiClient()
     mock_get = mocker.patch('app.notify_client.job_api_client.JobApiClient.get', return_value=expected_data)
 
-    result = client.get_job(service_id)
+    result = client.get_jobs(service_id)
 
     mock_get.assert_called_once_with(url=expected_url, params={})
     assert result['data'][0]['id'] == job_1_id

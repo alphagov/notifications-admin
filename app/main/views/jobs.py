@@ -68,7 +68,7 @@ def view_jobs(service_id):
     return render_template(
         'views/jobs/jobs.html',
         jobs=add_rate_to_jobs([
-            job for job in job_api_client.get_job(service_id)['data']
+            job for job in job_api_client.get_jobs(service_id)['data']
             if job['job_status'] not in ['scheduled', 'cancelled']
         ])
     )

@@ -74,9 +74,7 @@ def statistics_by_state(statistics):
 
 def get_failure_rate_for_job(job):
     if not job.get('notifications_delivered'):
-        if job.get('notifications_failed'):
-            return 1
-        return 0
+        return 1 if job.get('notifications_failed') else 0
     return (
         job.get('notifications_failed', 0) /
         (job.get('notifications_failed', 0) + job.get('notifications_delivered', 0))

@@ -123,7 +123,7 @@ def get_dashboard_partials(service_id):
     )
 
     jobs = add_rate_to_jobs([
-        job for job in job_api_client.get_job(service_id, limit_days=7)['data']
+        job for job in job_api_client.get_jobs(service_id, limit_days=7)['data']
         if job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME']
     ])
     scheduled_jobs = sorted([

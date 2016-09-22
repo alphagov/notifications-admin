@@ -923,7 +923,7 @@ def mock_get_jobs(mocker, api_user_active):
             )
         ]}
 
-    return mocker.patch('app.job_api_client.get_job', side_effect=_get_jobs)
+    return mocker.patch('app.job_api_client.get_jobs', side_effect=_get_jobs)
 
 
 @pytest.fixture(scope='function')
