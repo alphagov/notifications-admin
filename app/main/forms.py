@@ -15,10 +15,11 @@ from wtforms import (
     BooleanField,
     HiddenField,
     IntegerField,
-    RadioField
+    RadioField,
+    FieldList
 )
 from wtforms.fields.html5 import EmailField, TelField
-from wtforms.validators import (DataRequired, Email, Length, Regexp)
+from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidEmailDomainRegex, NoCommasInPlaceHolders)
 from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
@@ -410,4 +411,41 @@ class ServiceBrandingOrg(Form):
         validators=[
             DataRequired()
         ]
+    )
+
+
+class Whitelist(Form):
+
+    def populate(self, email_addresses, phone_numbers):
+        for form_field, existing in (
+            (self.email_addresses, email_addresses),
+            (self.phone_numbers, phone_numbers)
+        ):
+            for index, value in enumerate(existing):
+                form_field[index].data = value
+
+    email_addresses = FieldList(
+        EmailField(
+            '', validators=[
+                Optional(),
+                Email(message='Enter valid email addresses')
+            ],
+            default=''
+        ),
+        min_entries=5,
+        max_entries=5,
+        label="Email addresses"
+    )
+
+    phone_numbers = FieldList(
+        UKMobileNumber(
+            '',
+            validators=[
+                Optional()
+            ],
+            default=''
+        ),
+        min_entries=5,
+        max_entries=5,
+        label="Phone numbers"
     )

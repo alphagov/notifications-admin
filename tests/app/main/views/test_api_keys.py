@@ -1,8 +1,92 @@
 import uuid
 
+from collections import OrderedDict
 from flask import url_for
+from bs4 import BeautifulSoup
 
 from tests import validate_route_permission
+
+
+def test_should_show_api_page(
+    app_,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_notifications
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        response = client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.h1.string.strip() == 'API integration'
+        assert 'Your service is in trial mode' in page.find('div', {'class': 'banner-warning'}).text
+        rows = page.find_all('details')
+        assert len(rows) == 5
+        for index, row in enumerate(rows):
+            assert row.find('h3').string.strip() == '07123456789'
+
+
+def test_should_show_api_page_with_lots_of_notifications(
+    client,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_notifications_with_previous_next
+):
+    client.login(api_user_active)
+    response = client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    rows = page.find_all('div', {'class': 'api-notifications-item'})
+    assert rows[len(rows) - 1].text.strip() == (
+        'Only showing the first 50 messages'
+    )
+
+
+def test_should_show_api_page_with_no_notifications(
+    client,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_notifications_with_no_notifications
+):
+    client.login(api_user_active)
+    response = client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    rows = page.find_all('div', {'class': 'api-notifications-item'})
+    assert 'When you send messages via the API they’ll appear here.' in rows[len(rows) - 1].text.strip()
+
+
+def test_should_show_api_page_for_live_service(
+    app_,
+    mock_login,
+    api_user_active,
+    mock_get_live_service,
+    mock_has_permissions
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        response = client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert 'Your service is in trial mode' not in page.find('main').text
+
+
+def test_should_show_api_documentation_page(
+    app_,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions
+):
+    with app_.test_request_context(), app_.test_client() as client:
+        client.login(api_user_active)
+        response = client.get(url_for('main.api_documentation', service_id=str(uuid.uuid4())))
+        assert response.status_code == 200
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        assert page.h1.string.strip() == 'Documentation'
 
 
 def test_should_show_empty_api_keys_page(app_,
@@ -167,3 +251,43 @@ def test_route_invalid_permissions(mocker,
                 ['view_activity'],
                 api_user_active,
                 service_one)
+
+
+def test_should_show_whitelist_page(
+    client,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_whitelist
+):
+    client.login(api_user_active)
+    response = client.get(url_for('main.whitelist', service_id=str(uuid.uuid4())))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    textboxes = page.find_all('input', {'type': 'text'})
+    for index, value in enumerate(
+        ['test@example.com'] + [''] * 4 + ['07900900000'] + [''] * 4
+    ):
+        assert textboxes[index]['value'] == value
+
+
+def test_should_update_whitelist(
+    client,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_update_whitelist
+):
+    client.login(api_user_active)
+    service_id = str(uuid.uuid4())
+    data = OrderedDict([
+        ('email_addresses-1', 'test@example.com'),
+        ('email_addresses-3', 'test@example.com'),
+        ('phone_numbers-0', '07900900000')
+    ])
+    response = client.post(
+        url_for('main.whitelist', service_id=service_id),
+        data=data
+    )
+    mock_update_whitelist.assert_called_once_with(service_id, list(data.values()))
