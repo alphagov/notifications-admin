@@ -72,7 +72,7 @@ def mobile_number():
 def password(label='Password'):
     return PasswordField(label,
                          validators=[DataRequired(message='Can’t be empty'),
-                                     Length(10, 255, message='Must be at least 10 characters'),
+                                     Length(8, 255, message='Must be at least 8 characters'),
                                      Blacklist(message='That password is blacklisted, too common')])
 
 
