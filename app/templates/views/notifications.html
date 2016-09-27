@@ -1,8 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading, row_heading, notification_status_field %}
-{% from "components/previous-next-navigation.html" import previous_next_navigation %}
-{% from "components/page-footer.html" import page_footer %}
-{% from "components/pill.html" import pill %}
+{% from "components/ajax-block.html" import ajax_block %}
 {% from "components/message-count-label.html" import message_count_label, recipient_count_label %}
 
 {% block page_title %}
@@ -12,65 +9,19 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-
-    <span class="visually-hidden">
-      {%- if status != 'delivered,failed' -%}
-        {%- for label, option, _, _ in status_filters -%}
-          {%- if status == option -%}{{label}} {% endif -%}
-        {%- endfor -%}
-      {%- endif -%}
-    </span>
-
-    {{- message_count_label(99, message_type, suffix='') | capitalize }}
-
+    {{ message_count_label(99, message_type, suffix='') | capitalize }}
   </h1>
 
-  <div class='bottom-gutter'>
-    {{ pill(
-      'Status',
-      status_filters,
-      status
-    ) }}
-  </div>
+  {{ ajax_block(
+    partials,
+    url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status),
+    'counts'
+  ) }}
 
-  {% if notifications %}
-    <p class="bottom-gutter">
-      <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
-      &emsp;
-      Data available for 7 days
-    </p>
-    <div class='dashboard-table'>
-  {% endif %}
-    {% call(item, row_number) list_table(
-      notifications,
-      caption="Recent activity",
-      caption_visible=False,
-      empty_message='No messages found',
-      field_headings=['Recipient', 'Status'],
-      field_headings_visible=False
-    ) %}
-
-      {% call row_heading() %}
-        <p>
-          {{ item.to }}
-        </p>
-        <p class="hint">
-          {% if item.job %}
-            From <a href="{{ url_for(".view_job", service_id=current_service.id, job_id=item.job.id) }}">{{ item.job.original_file_name }}</a>
-          {% else %}
-            <a href="{{ url_for('.view_template_version', service_id=current_service.id, template_id=item.template.id, version=item.template_version) }}">{{ item.template.name }}</a>
-            from an API call
-          {% endif %}
-        </p>
-      {% endcall %}
-
-      {{ notification_status_field(item) }}
-
-    {% endcall %}
-  {% if notifications %}
-    </div>
-  {% endif %}
-
-  {{ previous_next_navigation(prev_page, next_page) }}
+  {{ ajax_block(
+    partials,
+    url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status),
+    'notifications'
+  ) }}
 
 {% endblock %}
