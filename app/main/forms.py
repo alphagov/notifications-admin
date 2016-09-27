@@ -73,7 +73,7 @@ def password(label='Password'):
     return PasswordField(label,
                          validators=[DataRequired(message='Can’t be empty'),
                                      Length(8, 255, message='Must be at least 8 characters'),
-                                     Blacklist(message='That password is blacklisted, too common')])
+                                     Blacklist(message='Choose a password that’s harder to guess')])
 
 
 def sms_code():

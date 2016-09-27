@@ -17,7 +17,7 @@ def test_should_raise_validation_error_for_password(app_, mock_get_user_by_email
         form.password.data = password
 
         form.validate()
-        assert 'That password is blacklisted, too common' in form.errors['password']
+        assert 'Choose a password that’s harder to guess' in form.errors['password']
 
 
 def test_valid_email_not_in_valid_domains(app_):
