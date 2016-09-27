@@ -2,6 +2,7 @@
 import ago
 import time
 import dateutil
+import json
 from orderedset import OrderedSet
 from datetime import datetime, timedelta, timezone
 from itertools import chain
@@ -165,10 +166,28 @@ def view_job_updates(service_id, job_id):
 
 
 @main.route('/services/<service_id>/notifications/<message_type>')
-@main.route('/services/<service_id>/notifications/<message_type>.csv', endpoint="view_notifications_csv")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_notifications(service_id, message_type):
+    return render_template(
+        'views/notifications.html',
+        partials=get_notifications(service_id, message_type),
+        message_type=message_type,
+        status=request.args.get('status')
+    )
+
+
+@main.route('/services/<service_id>/notifications/<message_type>.json')
+@user_has_permissions('view_activity', admin_override=True)
+def get_notifications_as_json(service_id, message_type):
+    return jsonify(get_notifications(
+        service_id, message_type, status_override=request.args.get('status')
+    ))
+
+
+@main.route('/services/<service_id>/notifications/<message_type>.csv', endpoint="view_notifications_csv")
+@user_has_permissions('view_activity', admin_override=True)
+def get_notifications(service_id, message_type, status_override=None):
     # TODO get the api to return count of pages as well.
     page = get_page_from_request()
     if page is None:
@@ -220,26 +239,32 @@ def view_notifications(service_id, message_type):
             'Content-Type': 'text/csv; charset=utf-8',
             'Content-Disposition': 'inline; filename="notifications.csv"'
         }
-    return render_template(
-        'views/notifications.html',
-        notifications=notifications['notifications'],
-        page=page,
-        prev_page=prev_page,
-        next_page=next_page,
-        status=request.args.get('status'),
-        message_type=message_type,
-        download_link=url_for(
-            '.view_notifications_csv',
-            service_id=current_service['id'],
-            message_type=message_type,
-            status=request.args.get('status')
+    return {
+        'counts': render_template(
+            'views/activity/counts.html',
+            status=request.args.get('status'),
+            status_filters=get_status_filters(
+                current_service,
+                message_type,
+                service_api_client.get_detailed_service(service_id)['data']['statistics']
+            )
         ),
-        status_filters=get_status_filters(
-            current_service,
-            message_type,
-            service_api_client.get_detailed_service(service_id)['data']['statistics']
-        )
-    )
+        'notifications': render_template(
+            'views/activity/notifications.html',
+            notifications=notifications['notifications'],
+            page=page,
+            prev_page=prev_page,
+            next_page=next_page,
+            status=request.args.get('status'),
+            message_type=message_type,
+            download_link=url_for(
+                '.view_notifications_csv',
+                service_id=current_service['id'],
+                message_type=message_type,
+                status=request.args.get('status')
+            )
+        ),
+    }
 
 
 def get_status_filters(service, message_type, statistics):

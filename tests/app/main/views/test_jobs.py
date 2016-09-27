@@ -338,6 +338,15 @@ def test_can_show_notifications(
         assert csv_response.get_data(as_text=True) == csv_content
         assert 'text/csv' in csv_response.headers['Content-Type']
 
+        json_response = client.get(url_for(
+            'main.get_notifications_as_json',
+            service_id=service_one['id'],
+            message_type=message_type,
+            status=status_argument
+        ))
+        json_content = json.loads(json_response.get_data(as_text=True))
+        assert json_content.keys() == {'counts', 'notifications'}
+
 
 def test_should_show_notifications_for_a_service_with_next_previous(
     app_,

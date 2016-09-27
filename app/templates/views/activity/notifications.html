@@ -1,0 +1,47 @@
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/previous-next-navigation.html" import previous_next_navigation %}
+{% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading, row_heading, notification_status_field %}
+
+<div class="ajax-block-container">
+
+  {% if notifications %}
+    <p class="bottom-gutter">
+      <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
+      &emsp;
+      Data available for 7 days
+    </p>
+    <div class='dashboard-table'>
+  {% endif %}
+    {% call(item, row_number) list_table(
+      notifications,
+      caption="Recent activity",
+      caption_visible=False,
+      empty_message='No messages found',
+      field_headings=['Recipient', 'Status'],
+      field_headings_visible=False
+    ) %}
+
+      {% call row_heading() %}
+        <p>
+          {{ item.to }}
+        </p>
+        <p class="hint">
+          {% if item.job %}
+            From <a href="{{ url_for(".view_job", service_id=current_service.id, job_id=item.job.id) }}">{{ item.job.original_file_name }}</a>
+          {% else %}
+            <a href="{{ url_for('.view_template_version', service_id=current_service.id, template_id=item.template.id, version=item.template_version) }}">{{ item.template.name }}</a>
+            from an API call
+          {% endif %}
+        </p>
+      {% endcall %}
+
+      {{ notification_status_field(item) }}
+
+    {% endcall %}
+  {% if notifications %}
+    </div>
+  {% endif %}
+
+  {{ previous_next_navigation(prev_page, next_page) }}
+
+</div>
