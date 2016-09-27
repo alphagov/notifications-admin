@@ -1,4 +1,10 @@
 blacklisted_passwords = [
+    'govuknotify',
+    'GOVUKnotify',
+    'GOV.UK Notify',
+    'GOV.UK notify',
+    'gov.uk notify'
+] + [
     '11111111',
     '12345678',
     '123456789',

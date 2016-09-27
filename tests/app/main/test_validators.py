@@ -6,7 +6,7 @@ from unittest.mock import Mock
 
 
 @pytest.mark.parametrize('password', [
-    '11111111', 'kittykat', 'evangeli'
+    'govuknotify', '11111111', 'kittykat', 'evangeli'
 ])
 def test_should_raise_validation_error_for_password(app_, mock_get_user_by_email, password):
     with app_.test_request_context():
