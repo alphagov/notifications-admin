@@ -2,6 +2,7 @@ import re
 from wtforms import ValidationError
 from notifications_utils.template import Template
 from app.utils import Spreadsheet
+from ._blacklisted_passwords import blacklisted_passwords
 
 
 class Blacklist(object):
@@ -11,7 +12,7 @@ class Blacklist(object):
         self.message = message
 
     def __call__(self, form, field):
-        if field.data in ['password1234', 'passw0rd1234']:
+        if field.data in blacklisted_passwords:
             raise ValidationError(self.message)
 
 

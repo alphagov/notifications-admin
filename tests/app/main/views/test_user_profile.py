@@ -284,8 +284,8 @@ def test_should_redirect_after_password_change(app_,
         with app_.test_client() as client:
             client.login(api_user_active)
         data = {
-            'new_password': '1234567890',
-            'old_password': '4567676328'}
+            'new_password': 'the new password',
+            'old_password': 'the old password'}
         response = client.post(
             url_for('main.user_profile_password'),
             data=data)

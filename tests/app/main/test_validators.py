@@ -5,13 +5,16 @@ from wtforms import ValidationError
 from unittest.mock import Mock
 
 
-def test_should_raise_validation_error_for_password(app_, mock_get_user_by_email):
+@pytest.mark.parametrize('password', [
+    '11111111', 'kittykat', 'evangeli'
+])
+def test_should_raise_validation_error_for_password(app_, mock_get_user_by_email, password):
     with app_.test_request_context():
         form = RegisterUserForm()
         form.name.data = 'test'
         form.email_address.data = 'teset@example.gov.uk'
         form.mobile_number.data = '441231231231'
-        form.password.data = 'password1234'
+        form.password.data = password
 
         form.validate()
         assert 'That password is blacklisted, too common' in form.errors['password']
@@ -30,7 +33,7 @@ def test_valid_email_in_valid_domains(app_):
             name="test",
             email_address="test@my.gov.uk",
             mobile_number='4407888999111',
-            password='1234567890')
+            password='an uncommon password')
         form.validate()
         assert form.errors == {}
 
