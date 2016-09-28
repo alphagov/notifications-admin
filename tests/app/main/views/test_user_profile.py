@@ -98,13 +98,13 @@ def test_should_show_authenticate_after_email_change(app_,
         assert response.status_code == 200
 
 
-def test_should_redirect_after_email_change_confirm(app_,
-                                                    api_user_active,
-                                                    mock_login,
-                                                    mock_get_user,
-                                                    mock_verify_password,
-                                                    mock_send_verify_code,
-                                                    mock_is_email_unique):
+def test_should_redirect_to_profile_after_email_change_confirm(app_,
+                                                               api_user_active,
+                                                               mock_login,
+                                                               mock_get_user,
+                                                               mock_verify_password,
+                                                               mock_send_verify_code,
+                                                               mock_is_email_unique):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -113,43 +113,6 @@ def test_should_redirect_after_email_change_confirm(app_,
             session['new-email'] = 'new_notify@notify.gov.uk'
         response = client.post(
             url_for('main.user_profile_email_authenticate'),
-            data=data)
-
-        assert response.status_code == 302
-        assert response.location == url_for(
-            'main.user_profile_email_confirm', _external=True)
-
-
-def test_should_show_confirm_after_email_change(app_,
-                                                api_user_active,
-                                                mock_login,
-                                                mock_get_user):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-        with client.session_transaction() as session:
-            session['new-email-password-confirmed'] = True
-        response = client.get(url_for('main.user_profile_email_confirm'))
-
-        assert 'Change your email address' in response.get_data(as_text=True)
-        assert 'Confirm' in response.get_data(as_text=True)
-        assert response.status_code == 200
-
-
-def test_should_redirect_after_email_change_confirm(app_,
-                                                    api_user_active,
-                                                    mock_login,
-                                                    mock_get_user,
-                                                    mock_check_verify_code):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-        with client.session_transaction() as session:
-            session['new-email-password-confirmed'] = True
-            session['new-email'] = 'new_notify@notify.gov.uk'
-        data = {'email_code': '12345'}
-        response = client.post(
-            url_for('main.user_profile_email_confirm'),
             data=data)
 
         assert response.status_code == 302
