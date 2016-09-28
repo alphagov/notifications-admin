@@ -117,10 +117,10 @@ def test_should_return_200_if_password_is_blacklisted(app_,
                                            data={'name': 'Bad Mobile',
                                                  'email_address': 'bad_mobile@example.not.right',
                                                  'mobile_number': '+44123412345',
-                                                 'password': 'password1234'})
+                                                 'password': 'password'})
 
     response.status_code == 200
-    assert 'That password is blacklisted, too common' in response.get_data(as_text=True)
+    assert 'Choose a password that’s harder to guess' in response.get_data(as_text=True)
 
 
 def test_register_with_existing_email_sends_emails(app_,
