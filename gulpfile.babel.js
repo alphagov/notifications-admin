@@ -74,7 +74,8 @@ gulp.task('javascripts', () => gulp
     paths.npm + 'hogan.js/dist/hogan-3.0.2.js',
     paths.npm + 'jquery/dist/jquery.min.js',
     paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
-    paths.npm + 'diff-dom/diffDOM.js'
+    paths.npm + 'diff-dom/diffDOM.js',
+    paths.npm + 'timeago/jquery.timeago.js'
   ]))
   .pipe(plugins.concat('all.js'))
   .pipe(gulp.dest(paths.dist + 'javascripts/'))

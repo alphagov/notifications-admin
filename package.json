@@ -35,7 +35,8 @@
     "gulp-uglify": "1.5.1",
     "hogan": "1.0.2",
     "jquery": "1.11.2",
-    "query-command-supported": "1.0.0"
+    "query-command-supported": "1.0.0",
+    "timeago": "1.5.3"
   },
   "devDependencies": {
     "gulp-css-url-adjuster": "0.2.3",

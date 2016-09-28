@@ -75,7 +75,9 @@
               {{notification.key_name}}
             </div>
             <div class="column-half api-notifications-item-time">
-              {{ notification.created_at|format_delta }}
+              <time class="timeago" datetime="{{ notification.created_at }}">
+                {{ notification.created_at|format_delta }}
+              </time>
             </div>
           </div>
         </summary>
