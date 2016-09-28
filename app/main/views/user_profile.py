@@ -82,41 +82,16 @@ def user_profile_email_authenticate():
         return redirect('main.user_profile_email')
 
     if form.validate_on_submit():
-        session[NEW_EMAIL_PASSWORD_CONFIRMED] = True
-        user_api_client.send_verify_code(current_user.id, 'email', session[NEW_EMAIL])
-        return redirect(url_for('.user_profile_email_confirm'))
+        current_user.email_address = session[NEW_EMAIL]
+        del session[NEW_EMAIL]
+        user_api_client.update_user(current_user)
+        return redirect(url_for('.user_profile'))
 
     return render_template(
         'views/user-profile/authenticate.html',
         thing='email address',
         form=form,
         back_link=url_for('.user_profile_email')
-    )
-
-
-@main.route("/user-profile/email/confirm", methods=['GET', 'POST'])
-@login_required
-def user_profile_email_confirm():
-
-    # Validate verify code for form
-    def _check_code(cde):
-        return user_api_client.check_verify_code(current_user.id, cde, 'email')
-    form = ConfirmEmailForm(_check_code)
-
-    if NEW_EMAIL_PASSWORD_CONFIRMED not in session:
-        return redirect('main.user_profile_email_authenticate')
-
-    if form.validate_on_submit():
-        current_user.email_address = session[NEW_EMAIL]
-        del session[NEW_EMAIL]
-        del session[NEW_EMAIL_PASSWORD_CONFIRMED]
-        user_api_client.update_user(current_user)
-        return redirect(url_for('.user_profile'))
-
-    return render_template(
-        'views/user-profile/confirm.html',
-        form_field=form.email_code,
-        thing='email address'
     )
 
 
