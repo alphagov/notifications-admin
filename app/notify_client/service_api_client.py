@@ -211,6 +211,9 @@ class ServiceAPIClient(NotificationsAPIClient):
     def update_whitelist(self, service_id, data):
         return self.put(url='/service/{}/whitelist'.format(service_id), data=data)
 
+    def get_billable_units(self, service_id, year):
+        return self.get(url='/service/{}/billable-units?year={}'.format(service_id, year))
+
 
 class ServicesBrowsableItem(BrowsableItem):
     @property

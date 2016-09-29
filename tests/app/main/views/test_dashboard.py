@@ -6,7 +6,11 @@ import pytest
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
 
-from app.main.views.dashboard import get_dashboard_totals, format_weekly_stats_to_list
+from app.main.views.dashboard import (
+    get_dashboard_totals,
+    format_weekly_stats_to_list,
+    get_free_paid_breakdown_for_billable_units
+)
 
 from tests import validate_route_permission
 from tests.conftest import SERVICE_ONE_ID
@@ -233,6 +237,57 @@ def test_should_show_recent_jobs_on_dashboard(
         assert 'Sent 1 January at 11:09' in table_rows[index].find_all('th')[0].text
         for column_index, count in enumerate((1, 0, 0)):
             assert table_rows[index].find_all('td')[column_index].text.strip() == str(count)
+
+
+@freeze_time("2016-12-31 11:09:00.061258")
+def test_usage_page(
+    client,
+    api_user_active,
+    mock_get_service,
+    mock_get_user,
+    mock_has_permissions,
+    mock_get_usage,
+    mock_get_billable_units
+):
+    client.login(api_user_active)
+    response = client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2000))
+
+    assert response.status_code == 200
+
+    mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2000)
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    cols = page.find_all('div', {'class': 'column-half'})
+
+    assert cols[1].text.strip() == 'Financial year 2000 to 2001'
+
+    assert '123' in cols[2].text
+    assert 'Emails' in cols[2].text
+
+    assert '456,123' in cols[3].text
+    assert 'Text messages' in cols[3].text
+
+    table = page.find('table').text.strip()
+
+    assert 'April' in table
+    assert 'March' in table
+    assert '123 free text messages' in table
+    assert '£3,403.06' in table
+    assert '249,877 free text messages' in table
+    assert '206,246 text messages at 1.65p' in table
+
+
+@freeze_time("2016-12-31 11:09:00.061258")
+def test_usage_page_for_invalid_year(
+    client,
+    api_user_active,
+    mock_get_service,
+    mock_get_user,
+    mock_has_permissions
+):
+    client.login(api_user_active)
+    assert client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year='abcd')).status_code == 404
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):
@@ -520,3 +575,34 @@ def test_format_weekly_stats_to_list_has_stats_with_failure_rate():
 
 def _stats(requested, delivered, failed):
     return {'requested': requested, 'delivered': delivered, 'failed': failed}
+
+
+@pytest.mark.parametrize(
+    'now, expected_number_of_months', [
+        (freeze_time("2017-12-31 11:09:00.061258"), 12),
+        (freeze_time("2017-01-01 11:09:00.061258"), 10)
+    ]
+)
+def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_months):
+    with now:
+        assert list(get_free_paid_breakdown_for_billable_units(
+            2016, {
+                'April': 100000,
+                'May': 100000,
+                'June': 100000,
+                'February': 1234
+            }
+        )) == [
+            {'name': 'April', 'free': 100000, 'paid': 0},
+            {'name': 'May', 'free': 100000, 'paid': 0},
+            {'name': 'June', 'free': 50000, 'paid': 50000},
+            {'name': 'July', 'free': 0, 'paid': 0},
+            {'name': 'August', 'free': 0, 'paid': 0},
+            {'name': 'September', 'free': 0, 'paid': 0},
+            {'name': 'October', 'free': 0, 'paid': 0},
+            {'name': 'November', 'free': 0, 'paid': 0},
+            {'name': 'December', 'free': 0, 'paid': 0},
+            {'name': 'January', 'free': 0, 'paid': 0},
+            {'name': 'February', 'free': 0, 'paid': 1234},
+            {'name': 'March', 'free': 0, 'paid': 0}
+        ][:expected_number_of_months]

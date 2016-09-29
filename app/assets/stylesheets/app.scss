@@ -179,3 +179,16 @@ details summary {
   border: 0;
   margin-bottom: -$gutter + 2px;
 }
+
+.body-copy-table {
+
+  table th,
+  table td {
+    font-size: 19px;
+  }
+
+}
+
+.tabular-numbers {
+  @include core-19($tabular-numbers: true);
+}
