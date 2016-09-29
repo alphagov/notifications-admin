@@ -1,7 +1,9 @@
+import ago
 import os
 import re
 import urllib
 import dateutil
+from datetime import datetime, timedelta, timezone
 import pytz
 from flask import (
     Flask,
@@ -115,6 +117,7 @@ def create_app():
     application.add_template_filter(format_date)
     application.add_template_filter(format_date_normal)
     application.add_template_filter(format_date_short)
+    application.add_template_filter(format_delta)
     application.add_template_filter(format_notification_status)
     application.add_template_filter(format_notification_status_as_time)
     application.add_template_filter(format_notification_status_as_field_status)
@@ -251,6 +254,19 @@ def format_date_short(date):
     return gmt_timezones(date).strftime('%d %B').lstrip('0')
 
 
+def format_delta(date):
+    return ago.human(
+        (
+            datetime.now(timezone.utc)
+        ) - (
+            dateutil.parser.parse(date)
+        ),
+        future_tense='{} from now',  # No-one should ever see this
+        past_tense='{} ago',
+        precision=1
+    )
+
+
 def valid_phone_number(phone_number):
     try:
         validate_phone_number(phone_number)
@@ -343,7 +359,7 @@ def useful_headers_after_request(response):
     response.headers.add('X-XSS-Protection', '1; mode=block')
     response.headers.add('Content-Security-Policy', (
         "default-src 'self' 'unsafe-inline';"
-        "script-src 'self' *.google-analytics.com 'unsafe-inline' data:;"
+        "script-src 'self' *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
         "object-src 'self';"
         "font-src 'self' data:;"
         "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk data:;"

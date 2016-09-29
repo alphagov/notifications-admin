@@ -1,0 +1,48 @@
+.api-notifications {
+
+  font-family: monospace;
+  border-bottom: 1px solid $border-colour;
+
+  &-item {
+
+    border-top: 1px solid $border-colour;
+    padding: 10px 0 0 0;
+
+    &-title {
+      color: $link-colour;
+      text-decoration: none;
+      display: block;
+    }
+
+    &-recipient {
+      display: inline;
+    }
+
+    &-meta {
+      color: $secondary-text-colour;
+    }
+
+    &-time {
+      text-align: right;
+    }
+
+    &-key {
+      display: inline-block;
+      padding-left: 46px;
+    }
+
+    &-data {
+
+      padding-left: 31px;
+      color: $secondary-text-colour;
+
+      &-item {
+        padding-bottom: 15px;
+        color: $text-colour;
+      }
+
+    }
+
+  }
+
+}

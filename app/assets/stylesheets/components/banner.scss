@@ -221,3 +221,30 @@
   }
 
 }
+
+.banner-warning {
+
+  @extend %banner;
+  @include bold-19;
+  background: $yellow;
+  color: $text-colour;
+  border: 5px solid $text-colour;
+  margin: $gutter 0 $gutter 0;
+  text-align: left;
+  padding: 20px;
+
+  .heading-medium {
+    @include bold-24;
+    margin: 0 0 $gutter-half 0;
+  }
+
+  .list {
+    margin-bottom: 10px;
+  }
+
+  a:link,
+  a:visited {
+    color: $text-colour;
+  }
+
+}

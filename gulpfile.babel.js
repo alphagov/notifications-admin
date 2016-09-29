@@ -63,6 +63,7 @@ gulp.task('javascripts', () => gulp
     paths.src + 'javascripts/expandCollapse.js',
     paths.src + 'javascripts/radioSelect.js',
     paths.src + 'javascripts/updateContent.js',
+    paths.src + 'javascripts/listEntry.js',
     paths.src + 'javascripts/main.js'
   ])
   .pipe(plugins.babel({
@@ -70,9 +71,11 @@ gulp.task('javascripts', () => gulp
   }))
   .pipe(plugins.uglify())
   .pipe(plugins.addSrc.prepend([
+    paths.npm + 'hogan.js/dist/hogan-3.0.2.js',
     paths.npm + 'jquery/dist/jquery.min.js',
     paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
-    paths.npm + 'diff-dom/diffDOM.js'
+    paths.npm + 'diff-dom/diffDOM.js',
+    paths.npm + 'timeago/jquery.timeago.js'
   ]))
   .pipe(plugins.concat('all.js'))
   .pipe(gulp.dest(paths.dist + 'javascripts/'))

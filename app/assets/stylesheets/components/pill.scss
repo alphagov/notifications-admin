@@ -55,3 +55,26 @@
     color: $text-colour;
   }
 }
+
+.pill-separate {
+
+  &-item {
+
+    display: block;
+    text-align: left;
+    padding: 10px $gutter-half;
+
+    &:link,
+    &:visited {
+      background: $link-colour;
+      color: $white;
+      text-decoration: underline;
+    }
+
+    &:hover {
+      color: $light-blue-25;
+    }
+
+  }
+
+}

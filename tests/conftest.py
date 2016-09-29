@@ -938,7 +938,9 @@ def mock_get_notifications(mocker, api_user_active):
         limit_days=None,
         rows=5,
         set_template_type=None,
-        set_status=None
+        set_status=None,
+        include_jobs=None,
+        include_from_test_key=None
     ):
         job = None
         if job_id is not None:
@@ -974,8 +976,28 @@ def mock_get_notifications_with_previous_next(mocker):
                            page=1,
                            template_type=None,
                            status=None,
-                           limit_days=None):
+                           limit_days=None,
+                           include_jobs=None,
+                           include_from_test_key=None):
         return notification_json(service_id, with_links=True)
+
+    return mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=_get_notifications
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_notifications_with_no_notifications(mocker):
+    def _get_notifications(service_id,
+                           job_id=None,
+                           page=1,
+                           template_type=None,
+                           status=None,
+                           limit_days=None,
+                           include_jobs=None,
+                           include_from_test_key=None):
+        return notification_json(service_id, rows=0)
 
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
@@ -1202,6 +1224,26 @@ def mock_get_organisation(mocker):
 
     return mocker.patch(
         'app.organisations_client.get_organisation', side_effect=_get_organisation
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_whitelist(mocker):
+    def _get_whitelist(service_id):
+        return {
+            'email_addresses': ['test@example.com'],
+            'phone_numbers': ['07900900000']
+        }
+
+    return mocker.patch(
+        'app.service_api_client.get_whitelist', side_effect=_get_whitelist
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_update_whitelist(mocker):
+    return mocker.patch(
+        'app.service_api_client.update_whitelist'
     )
 
 
