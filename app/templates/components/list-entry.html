@@ -1,7 +1,8 @@
 {% macro list_entry(
   field,
   item_name,
-  hint=''
+  hint='',
+  autocomplete=True
 ) %}
 
   {% if error %}
@@ -40,6 +41,7 @@
               id="input-{{ field.name }}-{{ index }}"
               class="form-control form-control-1-1"
               value="{{ field.data[index] }}"
+              {% if not autocomplete %}autocomplete="off"{% endif %}
             />
           </div>
         {% endfor %}
