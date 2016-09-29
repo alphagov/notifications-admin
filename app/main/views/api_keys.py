@@ -9,7 +9,7 @@ from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST,
 
 @main.route("/services/<service_id>/api")
 @login_required
-@user_has_permissions('manage_api_keys')
+@user_has_permissions('manage_api_keys', admin_override=True)
 def api_integration(service_id):
     return render_template(
         'views/api/index.html',
@@ -23,7 +23,7 @@ def api_integration(service_id):
 
 @main.route("/services/<service_id>/api/documentation")
 @login_required
-@user_has_permissions('manage_api_keys')
+@user_has_permissions('manage_api_keys', admin_override=True)
 def api_documentation(service_id):
     return render_template(
         'views/api/documentation.html'
@@ -32,7 +32,7 @@ def api_documentation(service_id):
 
 @main.route("/services/<service_id>/api/whitelist", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_api_keys')
+@user_has_permissions('manage_api_keys', admin_override=True)
 def whitelist(service_id):
     form = Whitelist()
     if form.validate_on_submit():
@@ -51,7 +51,7 @@ def whitelist(service_id):
 
 @main.route("/services/<service_id>/api/keys")
 @login_required
-@user_has_permissions('manage_api_keys')
+@user_has_permissions('manage_api_keys', admin_override=True)
 def api_keys(service_id):
     return render_template(
         'views/api/keys.html',
@@ -90,7 +90,7 @@ def create_api_key(service_id):
 
 @main.route("/services/<service_id>/api/keys/revoke/<key_id>", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_api_keys')
+@user_has_permissions('manage_api_keys', admin_override=True)
 def revoke_api_key(service_id, key_id):
     key_name = api_key_api_client.get_api_keys(service_id=service_id, key_id=key_id)['apiKeys'][0]['name']
     if request.method == 'GET':

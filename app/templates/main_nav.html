@@ -57,7 +57,7 @@
   {% elif current_user.has_permissions(['view_activity']) %}
     <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>
   {% endif %}
-  {% if current_user.has_permissions(['manage_api_keys']) %}
+  {% if current_user.has_permissions(['manage_api_keys'], admin_override=True) %}
     <li><a href="{{ url_for('.api_integration', service_id=current_service.id) }}">API integration</a></li>
   {% endif %}
   </ul>
