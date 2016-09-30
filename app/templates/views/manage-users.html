@@ -60,7 +60,7 @@ Manage users – GOV.UK Notify
               'Access API keys'
             ) }}
           </div>
-          {% if current_user.has_permissions(['manage_users']) %}
+          {% if current_user.has_permissions(['manage_users'], admin_override=True) %}
             {% if current_user.id != user.id %}
               <li class="tick-cross-list-edit-link">
                 <a href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Edit permissions</a>
