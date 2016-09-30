@@ -359,10 +359,10 @@ def useful_headers_after_request(response):
     response.headers.add('X-XSS-Protection', '1; mode=block')
     response.headers.add('Content-Security-Policy', (
         "default-src 'self' 'unsafe-inline';"
-        "script-src 'self' *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' data:;"
         "object-src 'self';"
         "font-src 'self' data:;"
-        "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk data:;"
+        "img-src 'self' *.notifications.service.gov.uk data:;"
     ))
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']
