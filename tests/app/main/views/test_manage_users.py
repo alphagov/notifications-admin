@@ -316,6 +316,28 @@ def test_remove_user_from_service(app_,
                                                                   str(active_user_with_permissions.id))
 
 
+def test_can_remove_user_from_service_as_platform_admin(
+        app_,
+        service_one,
+        platform_admin_user,
+        active_user_with_permissions,
+        mock_remove_user_from_service,
+        mocker):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(platform_admin_user, mocker, service_one)
+            response = client.post(
+                url_for(
+                    'main.remove_user_from_service',
+                    service_id=service_one['id'],
+                    user_id=active_user_with_permissions.id))
+            assert response.status_code == 302
+            assert response.location == url_for(
+                'main.manage_users', service_id=service_one['id'], _external=True)
+            mock_remove_user_from_service.assert_called_once_with(service_one['id'],
+                                                                  str(active_user_with_permissions.id))
+
+
 def test_can_invite_user_as_platform_admin(
         app_,
         service_one,
