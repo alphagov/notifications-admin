@@ -173,7 +173,8 @@ def view_notifications(service_id, message_type):
         'views/notifications.html',
         partials=get_notifications(service_id, message_type),
         message_type=message_type,
-        status=request.args.get('status')
+        status=request.args.get('status'),
+        page=request.args.get('page', 1)
     )
 
 

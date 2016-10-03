@@ -279,6 +279,13 @@ def test_should_show_updates_for_one_job_as_json(
         )
     ]
 )
+@pytest.mark.parametrize(
+    "page_argument, expected_page_argument", [
+        (1, 1),
+        (22, 22),
+        (None, 1)
+    ]
+)
 def test_can_show_notifications(
     app_,
     service_one,
@@ -289,7 +296,9 @@ def test_can_show_notifications(
     message_type,
     page_title,
     status_argument,
-    expected_api_call
+    expected_api_call,
+    page_argument,
+    expected_page_argument
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -298,7 +307,8 @@ def test_can_show_notifications(
                 'main.view_notifications',
                 service_id=service_one['id'],
                 message_type=message_type,
-                status=status_argument))
+                status=status_argument,
+                page=page_argument))
         assert response.status_code == 200
         content = response.get_data(as_text=True)
 
@@ -317,9 +327,17 @@ def test_can_show_notifications(
             status=status_argument
         ) == page.findAll("a", {"download": "download"})[0]['href']
 
+        assert url_for(
+            '.get_notifications_as_json',
+            service_id=service_one['id'],
+            message_type=message_type,
+            status=status_argument,
+            page=expected_page_argument
+        ) == page.find("div", {'data-key': 'notifications'})['data-resource']
+
         mock_get_notifications.assert_called_with(
             limit_days=7,
-            page=1,
+            page=expected_page_argument,
             service_id=service_one['id'],
             status=expected_api_call,
             template_type=[message_type]
