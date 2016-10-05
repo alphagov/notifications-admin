@@ -38,10 +38,12 @@ class JobApiClient(BaseAPIClient):
 
         return job
 
-    def get_jobs(self, service_id, limit_days=None):
+    def get_jobs(self, service_id, limit_days=None, statuses=None):
         params = {}
         if limit_days is not None:
             params['limit_days'] = limit_days
+        if statuses is not None:
+            params['statuses'] = ','.join(statuses)
 
         jobs = self.get(url='/service/{}/job'.format(service_id), params=params)
         for job in jobs['data']:
