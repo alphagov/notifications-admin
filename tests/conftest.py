@@ -1172,12 +1172,24 @@ def mock_get_template_statistics_for_template(mocker, service_one):
 def mock_get_usage(mocker, service_one, fake_uuid):
     def _get_usage(service_id):
         return {'data': {
-            "sms_count": 123,
-            "email_count": 456
+            "sms_count": 456123,
+            "email_count": 123
         }}
 
     return mocker.patch(
         'app.service_api_client.get_service_usage', side_effect=_get_usage)
+
+
+@pytest.fixture(scope='function')
+def mock_get_billable_units(mocker):
+    def _get_usage(service_id, year):
+        return {
+            "April": 123,
+            "March": 456123
+        }
+
+    return mocker.patch(
+        'app.service_api_client.get_billable_units', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')

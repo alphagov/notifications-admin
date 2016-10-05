@@ -335,6 +335,17 @@ def test_can_show_notifications(
             page=expected_page_argument
         ) == page.find("div", {'data-key': 'notifications'})['data-resource']
 
+        path_to_json = page.find("div", {'data-key': 'notifications'})['data-resource']
+
+        assert (
+            '/services/{}/notifications/{}.json?status={}&page={}'.format(
+                service_one['id'], message_type, status_argument, expected_page_argument
+            ) in path_to_json or
+            '/services/{}/notifications/{}.json?page={}&status={}'.format(
+                service_one['id'], message_type, expected_page_argument, status_argument
+            ) in path_to_json
+        )
+
         mock_get_notifications.assert_called_with(
             limit_days=7,
             page=expected_page_argument,

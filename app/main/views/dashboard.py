@@ -8,7 +8,9 @@ from flask import (
     url_for,
     session,
     jsonify,
-    current_app
+    current_app,
+    request,
+    abort
 )
 from flask_login import login_required
 
@@ -80,8 +82,16 @@ def template_history(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def usage(service_id):
+    try:
+        year = int(request.args.get('year', 2016))
+    except ValueError:
+        abort(404)
     return render_template(
         'views/usage.html',
+        months=get_free_paid_breakdown_for_billable_units(
+            year, service_api_client.get_billable_units(service_id, year)
+        ),
+        year=year,
         **calculate_usage(service_api_client.get_service_usage(service_id)['data'])
     )
 
@@ -195,3 +205,58 @@ def format_weekly_stats_to_list(historical_stats):
         out.append(weekly_stats)
 
     return sorted(out, key=lambda x: x['week_start'], reverse=True)
+
+
+def get_months_for_financial_year(year):
+    return [
+        month.strftime('%B')
+        for month in (
+            get_months_for_year(4, 13, year) +
+            get_months_for_year(1, 4, year + 1)
+        )
+        if month < datetime.now()
+    ]
+
+
+def get_months_for_year(start, end, year):
+    return [datetime(year, month, 1) for month in range(start, end)]
+
+
+def get_free_paid_breakdown_for_billable_units(year, billable_units):
+    cumulative = 0
+    for month in get_months_for_financial_year(year):
+        previous_cumulative = cumulative
+        monthly_usage = billable_units.get(month, 0)
+        cumulative += monthly_usage
+        breakdown = get_free_paid_breakdown_for_month(
+            cumulative, previous_cumulative, monthly_usage
+        )
+        yield {
+            'name': month,
+            'paid': breakdown['paid'],
+            'free': breakdown['free']
+        }
+
+
+def get_free_paid_breakdown_for_month(
+    cumulative,
+    previous_cumulative,
+    monthly_usage
+):
+    allowance = 250000
+
+    if cumulative < allowance:
+        return {
+            'paid': 0,
+            'free': monthly_usage,
+        }
+    elif previous_cumulative < allowance:
+        return {
+            'paid': monthly_usage - (allowance - previous_cumulative),
+            'free': allowance - previous_cumulative
+        }
+    else:
+        return {
+            'paid': monthly_usage,
+            'free': 0
+        }

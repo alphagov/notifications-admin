@@ -1,4 +1,5 @@
 {% from "components/big-number.html" import big_number %}
+{% from "components/table.html" import list_table, field, hidden_field_heading, row_heading, text_field %}
 
 {% extends "withnav_template.html" %}
 
@@ -13,7 +14,9 @@
         <h2 class='heading-large'>Usage</h2>
       </div>
       <div class='column-half'>
-        <span class="align-with-heading-copy">1 April 2016 to date</span>
+        <div class='align-with-heading-copy'>
+          Financial year {{ year }} to {{ year + 1 }}
+        </div>
       </div>
     </div>
 
@@ -49,7 +52,7 @@
         </div>
       </div>
       <div class='column-half'>
-        <div class="keyline-block bottom-gutter">
+        <div class="keyline-block">
           {{ big_number(
             (sms_chargeable * sms_rate),
             'spent',
@@ -57,7 +60,50 @@
             smaller=True
           ) }}
         </div>
-        <p>
+      </div>
+    </div>
+
+    <div class="dashboard-table body-copy-table">
+      {% call(month, row_index) list_table(
+        months,
+        caption="Total spend",
+        caption_visible=False,
+        empty_message='',
+        field_headings=[
+          'By month',
+          hidden_field_heading('Cost'),
+        ],
+        field_headings_visible=True
+      ) %}
+        {% call row_heading() %}
+          {{ month.name }}
+        {% endcall %}
+        {% call field(align='left') %}
+          {{ big_number(
+            sms_rate * month.paid,
+            currency="£",
+            smallest=True
+          ) }}
+          <ul>
+          {% if month.free %}
+            <li class="tabular-numbers">{{ "{:,}".format(month.free) }} free text messages</li>
+          {% endif %}
+          {% if month.paid %}
+            <li class="tabular-numbers">{{ "{:,}".format(month.paid) }} text messages at
+            {{- ' {:.2f}p'.format(sms_rate * 100) }}</li>
+          {% endif %}
+          {% if not (month.free or month.paid) %}
+            <li aria-hidden="true">–</li>
+          {% endif %}
+          </ul>
+        {% endcall %}
+      {% endcall %}
+    </div>
+
+    <div class="grid-row">
+      <div class="column-half">&nbsp;</div>
+      <div class="column-half">
+        <p class="align-with-heading-copy">
           What counts as 1 text message?<br />
           See <a href="{{ url_for('.pricing') }}">pricing</a>.
         </p>
