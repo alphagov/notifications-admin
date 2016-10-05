@@ -31,8 +31,10 @@ from app.utils import (
     get_page_from_request,
     generate_previous_next_dict,
     user_has_permissions,
-    generate_notifications_csv)
-from app.utils import get_help_argument
+    generate_notifications_csv,
+    get_help_argument
+)
+from app.statistics_utils import add_rate_to_job
 
 
 def _parse_filter_args(filter_dict):
@@ -64,11 +66,18 @@ def _set_status_filters(filter_args):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_jobs(service_id):
+    # all but scheduled and cancelled
+    statuses_to_display = [
+        'pending',
+        'in progress',
+        'finished',
+        'sending limits exceeded',
+    ]
     return render_template(
         'views/jobs/jobs.html',
         jobs=[
-            add_rate_to_job(job) for job in job_api_client.get_jobs(service_id)['data']
-            if job['job_status'] not in ['scheduled', 'cancelled']
+            add_rate_to_job(job) for job in job_api_client.get_jobs(service_id, statuses=statuses_to_display)['data']
+            if job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME']
         ]
     )
 

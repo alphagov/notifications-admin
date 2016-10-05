@@ -159,7 +159,7 @@ def job_json(
     notification_count=1,
     notifications_sent=1,
     notifications_requested=1,
-    job_status='Delivered',
+    job_status='finished',
     scheduled_for=''
 ):
     if job_id is None:

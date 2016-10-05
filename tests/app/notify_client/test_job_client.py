@@ -1,3 +1,6 @@
+import uuid
+from unittest.mock import ANY
+
 from app.notify_client.job_api_client import JobApiClient
 
 
@@ -51,8 +54,6 @@ def test_client_schedules_job(mocker, fake_uuid):
 
 
 def test_client_gets_job_by_service_and_job(mocker):
-    mocker.patch('app.notify_client.current_user', id='1')
-
     service_id = 'service_id'
     job_id = 'job_id'
 
@@ -66,9 +67,15 @@ def test_client_gets_job_by_service_and_job(mocker):
     mock_get.assert_called_once_with(url=expected_url, params={})
 
 
-def test_client_parses_job_stats(mocker):
-    mocker.patch('app.notify_client.current_user', id='1')
+def test_client_gets_jobs_with_status_filter(mocker):
+    mock_get = mocker.patch('app.notify_client.job_api_client.JobApiClient.get')
 
+    JobApiClient().get_jobs(uuid.uuid4(), statuses=['foo', 'bar'])
+
+    mock_get.assert_called_once_with(url=ANY, params={'statuses': 'foo,bar'})
+
+
+def test_client_parses_job_stats(mocker):
     service_id = 'service_id'
     job_id = 'job_id'
     expected_data = {'data': {
@@ -114,8 +121,6 @@ def test_client_parses_job_stats(mocker):
 
 
 def test_client_parses_empty_job_stats(mocker):
-    mocker.patch('app.notify_client.current_user', id='1')
-
     service_id = 'service_id'
     job_id = 'job_id'
     expected_data = {'data': {
@@ -152,8 +157,6 @@ def test_client_parses_empty_job_stats(mocker):
 
 
 def test_client_parses_job_stats_for_service(mocker):
-    mocker.patch('app.notify_client.current_user', id='1')
-
     service_id = 'service_id'
     job_1_id = 'job_id_1'
     job_2_id = 'job_id_2'
@@ -232,8 +235,6 @@ def test_client_parses_job_stats_for_service(mocker):
 
 
 def test_client_parses_empty_job_stats_for_service(mocker):
-    mocker.patch('app.notify_client.current_user', id='1')
-
     service_id = 'service_id'
     job_1_id = 'job_id_1'
     job_2_id = 'job_id_2'
@@ -294,7 +295,6 @@ def test_client_parses_empty_job_stats_for_service(mocker):
 
 
 def test_cancel_job(mocker):
-
     mock_post = mocker.patch('app.notify_client.job_api_client.JobApiClient.post')
 
     JobApiClient().cancel_job('service_id', 'job_id')

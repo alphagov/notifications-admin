@@ -182,7 +182,10 @@ def test_should_show_upcoming_jobs_on_dashboard(
         client.login(api_user_active)
         response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
-    mock_get_jobs.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
+    first_call = mock_get_jobs.call_args_list[0]
+    assert first_call[0] == (SERVICE_ONE_ID,)
+    assert first_call[1]['statuses'] == ['scheduled']
+
     assert response.status_code == 200
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -218,7 +221,10 @@ def test_should_show_recent_jobs_on_dashboard(
         client.login(api_user_active)
         response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
-    mock_get_jobs.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
+    second_call = mock_get_jobs.call_args_list[1]
+    assert second_call[0] == (SERVICE_ONE_ID,)
+    assert 'scheduled' not in second_call[1]['statuses']
+
     assert response.status_code == 200
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')

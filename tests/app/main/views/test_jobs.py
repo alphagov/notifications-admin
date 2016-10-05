@@ -12,11 +12,13 @@ from tests import notification_json
 from freezegun import freeze_time
 
 
-def test_should_return_list_of_all_jobs(app_,
-                                        service_one,
-                                        active_user_with_permissions,
-                                        mock_get_jobs,
-                                        mocker):
+def test_should_return_list_of_all_real_jobs(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    mock_get_jobs,
+    mocker
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -25,8 +27,9 @@ def test_should_return_list_of_all_jobs(app_,
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string == 'Uploaded files'
-        jobs = page.tbody.find_all('tr')
-        assert len(jobs) == 5
+        jobs = [x.text for x in page.tbody.find_all('a', {'class':'file-list-filename'})]
+        assert len(jobs) == 4
+        assert 'Test message' not in jobs
 
 
 @pytest.mark.parametrize(
