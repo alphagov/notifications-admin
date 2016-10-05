@@ -136,7 +136,7 @@
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
     ga('create', 'UA-75215134-1', 'auto');
     // strip UUIDs
-    page = window.location.href.replace(
+    page = (window.location.pathname + window.location.search).replace(
       /[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}/g, '…'
     )
     ga('send', 'pageview', page);
