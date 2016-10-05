@@ -1,6 +1,4 @@
 from datetime import datetime, timedelta
-from collections import namedtuple
-from itertools import groupby
 
 import dateutil
 from flask import (
@@ -20,7 +18,7 @@ from app import (
     service_api_client,
     template_statistics_client
 )
-from app.statistics_utils import add_rates_to, get_formatted_percentage, add_rate_to_jobs
+from app.statistics_utils import get_formatted_percentage, add_rate_to_job
 from app.utils import user_has_permissions
 
 
@@ -117,20 +115,26 @@ def aggregate_usage(template_statistics):
 
 
 def get_dashboard_partials(service_id):
+    # all but scheduled and cancelled
+    statuses_to_display = [
+        'pending',
+        'in progress',
+        'finished',
+        'sending limits exceeded',
+    ]
 
     template_statistics = aggregate_usage(
         template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
     )
 
-    jobs = add_rate_to_jobs([
-        job for job in job_api_client.get_jobs(service_id, limit_days=7)['data']
-        if job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME']
-    ])
-    scheduled_jobs = sorted([
-        job for job in jobs if job['job_status'] == 'scheduled'
-    ], key=lambda job: job['scheduled_for'])
+    scheduled_jobs = sorted(
+        job_api_client.get_jobs(service_id, statuses=['scheduled'])['data'],
+        key=lambda job: job['scheduled_for']
+    )
     immediate_jobs = [
-        job for job in jobs if job['job_status'] not in ['scheduled', 'cancelled']
+        add_rate_to_job(job)
+        for job in job_api_client.get_jobs(service_id, statuses=statuses_to_display)['data']
+        if job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME']
     ]
     service = service_api_client.get_detailed_service(service_id)
 

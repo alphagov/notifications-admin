@@ -901,7 +901,7 @@ def mock_get_job_in_progress(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_get_jobs(mocker, api_user_active):
-    def _get_jobs(service_id, limit_days=None):
+    def _get_jobs(service_id, limit_days=None, statuses=None):
         return {"data": [
             job_json(
                 service_id,

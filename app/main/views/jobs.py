@@ -32,7 +32,6 @@ from app.utils import (
     generate_previous_next_dict,
     user_has_permissions,
     generate_notifications_csv)
-from app.statistics_utils import add_rate_to_jobs
 from app.utils import get_help_argument
 
 
@@ -67,10 +66,10 @@ def _set_status_filters(filter_args):
 def view_jobs(service_id):
     return render_template(
         'views/jobs/jobs.html',
-        jobs=add_rate_to_jobs([
-            job for job in job_api_client.get_jobs(service_id)['data']
+        jobs=[
+            add_rate_to_job(job) for job in job_api_client.get_jobs(service_id)['data']
             if job['job_status'] not in ['scheduled', 'cancelled']
-        ])
+        ]
     )
 
 
