@@ -19,7 +19,6 @@
       <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}" class="button align-with-heading">Create an API key</a>
     </div>
   </div>
-
   {% call(item, row_number) list_table(
     keys,
     empty_message="You haven’t created any API keys yet",
@@ -47,7 +46,7 @@
     {% endcall %}
     {% if item.expiry_date %}
       {% call field(align='right') %}
-        Revoked {{ item.expiry_date|format_datetime_short }}
+        <span class='hint'>Revoked {{ item.expiry_date|format_datetime_short }}</span>
       {% endcall %}
     {% else %}
       {% call field(align='right', status='error') %}
