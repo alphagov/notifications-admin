@@ -3,7 +3,7 @@ from flask_login import login_required
 from app.main import main
 from app.main.forms import CreateKeyForm, Whitelist
 from app import api_key_api_client, service_api_client, notification_api_client, current_service
-from app.utils import user_has_permissions
+from app.utils import user_has_permissions, email_safe
 from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
 
 
@@ -80,8 +80,12 @@ def create_api_key(service_id):
             key_name=form.key_name.data,
             key_type=form.key_type.data
         )
-        return render_template('views/api/keys/show.html', secret=secret,
-                               key_name=form.key_name.data)
+        return render_template(
+            'views/api/keys/show.html',
+            secret=secret,
+            service_id=service_id,
+            key_name=email_safe(form.key_name.data, whitespace='_')
+        )
     return render_template(
         'views/api/keys/create.html',
         form=form

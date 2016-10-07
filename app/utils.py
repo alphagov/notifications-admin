@@ -134,10 +134,10 @@ def generate_previous_next_dict(view, service_id, page, title, url_args):
     }
 
 
-def email_safe(string):
+def email_safe(string, whitespace='.'):
     return "".join([
-        character.lower() if character.isalnum() or character == "." else ""
-        for character in re.sub(r"\s+", ".", string.strip())
+        character.lower() if character.isalnum() or character == whitespace else ""
+        for character in re.sub(r"\s+", whitespace, string.strip())
     ])
 
 
