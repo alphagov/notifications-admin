@@ -40,6 +40,7 @@ def whitelist(service_id):
             'email_addresses': list(filter(None, form.email_addresses.data)),
             'phone_numbers':  list(filter(None, form.phone_numbers.data))
         })
+        flash('Whitelist updated', 'default_with_tick')
         return redirect(url_for('.api_integration', service_id=service_id))
     if not form.errors:
         form.populate(**service_api_client.get_whitelist(service_id))
