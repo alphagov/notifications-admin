@@ -1,6 +1,6 @@
 import json
 import uuid
-from urllib.parse import quote
+from urllib.parse import urlparse, quote, parse_qs
 
 import pytest
 from flask import url_for
@@ -327,24 +327,15 @@ def test_can_show_notifications(
             status=status_argument
         ) == page.findAll("a", {"download": "download"})[0]['href']
 
-        assert url_for(
-            '.get_notifications_as_json',
-            service_id=service_one['id'],
-            message_type=message_type,
-            status=status_argument,
-            page=expected_page_argument
-        ) == page.find("div", {'data-key': 'notifications'})['data-resource']
-
         path_to_json = page.find("div", {'data-key': 'notifications'})['data-resource']
 
-        assert (
-            '/services/{}/notifications/{}.json?status={}&page={}'.format(
-                service_one['id'], message_type, status_argument, expected_page_argument
-            ) in path_to_json or
-            '/services/{}/notifications/{}.json?page={}&status={}'.format(
-                service_one['id'], message_type, expected_page_argument, status_argument
-            ) in path_to_json
-        )
+        url = urlparse(path_to_json)
+        assert url.path == '/services/{}/notifications/{}.json'.format(service_one['id'], message_type)
+        query_dict = parse_qs(url.query)
+        if status_argument:
+            assert query_dict['status'] == [status_argument]
+        if expected_page_argument:
+            assert query_dict['page'] == [str(expected_page_argument)]
 
         mock_get_notifications.assert_called_with(
             limit_days=7,
