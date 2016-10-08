@@ -69,7 +69,6 @@ gulp.task('javascripts', () => gulp
   .pipe(plugins.babel({
     presets: ['es2015']
   }))
-  .pipe(plugins.uglify())
   .pipe(plugins.addSrc.prepend([
     paths.npm + 'hogan.js/dist/hogan-3.0.2.js',
     paths.npm + 'jquery/dist/jquery.min.js',
@@ -77,6 +76,7 @@ gulp.task('javascripts', () => gulp
     paths.npm + 'diff-dom/diffDOM.js',
     paths.npm + 'timeago/jquery.timeago.js'
   ]))
+  .pipe(plugins.uglify())
   .pipe(plugins.concat('all.js'))
   .pipe(gulp.dest(paths.dist + 'javascripts/'))
 );
