@@ -61,7 +61,8 @@ class Config(object):
         "valtech\.co\.uk",
         "gofreerange\.com",
         "cgi\.com",
-        "unboxed\.com"]
+        "unboxed\.com",
+        "capita\.co\.uk"]
 
 
 class Development(Config):
