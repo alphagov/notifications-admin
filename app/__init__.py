@@ -384,9 +384,13 @@ def register_errorhandlers(application):
             error.message
         ))
         error_code = error.status_code
-        if error_code not in [401, 404, 403, 500]:
+        if error_code not in [401, 404, 403, 410, 500]:
             error_code = 500
         return _error_response(error_code)
+
+    @application.errorhandler(410)
+    def handle_gone(error):
+        return _error_response(410)
 
     @application.errorhandler(404)
     def handle_not_found(error):

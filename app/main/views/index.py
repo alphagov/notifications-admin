@@ -1,6 +1,6 @@
 import markdown
 import os
-from flask import (render_template, url_for, redirect, Markup, request)
+from flask import (render_template, url_for, redirect, Markup, request, abort)
 from app.main import main
 from app import convert_to_boolean
 from flask_login import login_required
@@ -95,12 +95,4 @@ def email_template():
 
 @main.route('/documentation')
 def documentation():
-    curr_dir = os.path.dirname(os.path.realpath(__file__))
-    with open(os.path.join(curr_dir, '../../../docs/index.md'), encoding='utf-8') as source:
-        return render_template(
-            'views/documentation.html',
-            body=Markup(markdown.markdown(
-                source.read(),
-                extensions=[GithubFlavoredMarkdownExtension()]
-            ))
-        )
+    abort(410)
