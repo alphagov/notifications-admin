@@ -73,7 +73,7 @@ def create_api_key(service_id):
             ', once this service is not in trial mode' if current_service['restricted'] else ''
         )),
         (KEY_TYPE_TEST, 'Simulate sending messages to anyone'),
-        (KEY_TYPE_TEAM, 'Only send messages to members of your team')
+        (KEY_TYPE_TEAM, 'Only send messages to your team or whitelist')
     ]
     if form.validate_on_submit():
         secret = api_key_api_client.create_api_key(

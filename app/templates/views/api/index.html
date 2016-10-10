@@ -23,24 +23,15 @@
   {% endif %}
 
   <nav class="grid-row bottom-gutter-1-2">
-    {% if current_service.restricted %}
-      <div class="column-one-third">
-        <a class="pill-separate-item" href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
-      </div>
-      <div class="column-one-third">
-        <a class="pill-separate-item" href="{{ url_for('.whitelist', service_id=current_service.id) }}">Whitelist</a>
-      </div>
-      <div class="column-one-third">
-        <a class="pill-separate-item" href="{{ url_for('.api_documentation', service_id=current_service.id) }}">Documentation</a>
-      </div>
-    {% else %}
-      <div class="column-half">
-        <a class="pill-separate-item" href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
-      </div>
-      <div class="column-half">
-        <a class="pill-separate-item" href="{{ url_for('.api_documentation', service_id=current_service.id) }}">Documentation</a>
-      </div>
-    {% endif %}
+    <div class="column-one-third">
+      <a class="pill-separate-item" href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
+    </div>
+    <div class="column-one-third">
+      <a class="pill-separate-item" href="{{ url_for('.whitelist', service_id=current_service.id) }}">Whitelist</a>
+    </div>
+    <div class="column-one-third">
+      <a class="pill-separate-item" href="{{ url_for('.api_documentation', service_id=current_service.id) }}">Documentation</a>
+    </div>
   </nav>
 
   <div class="grid-row">
