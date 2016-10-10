@@ -38,8 +38,8 @@ class JobApiClient(BaseAPIClient):
 
         return job
 
-    def get_jobs(self, service_id, limit_days=None, statuses=None):
-        params = {}
+    def get_jobs(self, service_id, limit_days=None, statuses=None, page=1):
+        params = {'page': page}
         if limit_days is not None:
             params['limit_days'] = limit_days
         if statuses is not None:

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import ago
-import time
 import dateutil
-import json
 from orderedset import OrderedSet
 from datetime import datetime, timedelta, timezone
 from itertools import chain
@@ -29,7 +27,8 @@ from app import (
 from app.main import main
 from app.utils import (
     get_page_from_request,
-    generate_previous_next_dict,
+    generate_next_dict,
+    generate_previous_dict,
     user_has_permissions,
     generate_notifications_csv,
     get_help_argument
@@ -66,6 +65,7 @@ def _set_status_filters(filter_args):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_jobs(service_id):
+    page = int(request.args.get('page', 1))
     # all but scheduled and cancelled
     statuses_to_display = [
         'pending',
@@ -73,12 +73,26 @@ def view_jobs(service_id):
         'finished',
         'sending limits exceeded',
     ]
+    jobs_response = job_api_client.get_jobs(service_id, statuses=statuses_to_display, page=page)
+    jobs = [
+        add_rate_to_job(job) for job in jobs_response['data']
+        if job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME']
+    ]
+
+
+    prev_page = None
+    if jobs_response['links'].get('prev', None):
+        prev_page = generate_previous_dict('main.view_jobs', service_id, page=page - 1)
+    next_page = None
+    if jobs_response['links'].get('next', None):
+        next_page = generate_next_dict('main.view_jobs', service_id, page=page + 1)
+
     return render_template(
         'views/jobs/jobs.html',
-        jobs=[
-            add_rate_to_job(job) for job in job_api_client.get_jobs(service_id, statuses=statuses_to_display)['data']
-            if job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME']
-        ]
+        jobs=jobs,
+        page=page,
+        prev_page=prev_page,
+        next_page=next_page,
     )
 
 
@@ -213,28 +227,18 @@ def get_notifications(service_id, message_type, status_override=None):
         template_type=[message_type],
         status=filter_args.get('status'),
         limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
-    view_dict = dict(
-        message_type=message_type,
-        status=request.args.get('status')
-    )
+
+    url_args = {
+        'message_type': message_type,
+        'status': request.args.get('status')
+    }
     prev_page = None
     if notifications['links'].get('prev', None):
-        prev_page = generate_previous_next_dict(
-            'main.view_notifications',
-            service_id,
-            view_dict,
-            page - 1,
-            'Previous page',
-            'page {}'.format(page - 1))
+        prev_page = generate_previous_dict('main.view_notifications', service_id, page - 1, url_args=url_args)
     next_page = None
     if notifications['links'].get('next', None):
-        next_page = generate_previous_next_dict(
-            'main.view_notifications',
-            service_id,
-            view_dict,
-            page + 1,
-            'Next page',
-            'page {}'.format(page + 1))
+        next_page = generate_next_dict('main.view_notifications', service_id, page + 1, url_args)
+
     if request.path.endswith('csv'):
         csv_content = generate_notifications_csv(
             notification_api_client.get_notifications_for_service(
