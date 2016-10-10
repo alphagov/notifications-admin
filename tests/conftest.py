@@ -901,7 +901,7 @@ def mock_get_job_in_progress(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_get_jobs(mocker, api_user_active):
-    def _get_jobs(service_id, limit_days=None, statuses=None):
+    def _get_jobs(service_id, limit_days=None, statuses=None, page=1):
         if statuses is None:
             statuses = ['', 'scheduled', 'pending', 'cancelled']
 
@@ -914,17 +914,23 @@ def mock_get_jobs(mocker, api_user_active):
                 job_status=job_status
             )
             for filename, scheduled_for, job_status in (
-                ("Test message", '', 'finished'),
-                ("export 1/1/2016.xls", '', 'finished'),
-                ("all email addresses.xlsx", '', 'pending'),
-                ("applicants.ods", '', 'finished'),
-                ("thisisatest.csv", '', 'finished'),
-                ("send_me_later.csv", '2016-01-01 11:09:00.061258', 'scheduled'),
-                ("even_later.csv", '2016-01-01 23:09:00.061258', 'scheduled'),
-                ("full_of_regret.csv", '2016-01-01 23:09:00.061258', 'cancelled')
+                ('Test message', '', 'finished'),
+                ('export 1/1/2016.xls', '', 'finished'),
+                ('all email addresses.xlsx', '', 'pending'),
+                ('applicants.ods', '', 'finished'),
+                ('thisisatest.csv', '', 'finished'),
+                ('send_me_later.csv', '2016-01-01 11:09:00.061258', 'scheduled'),
+                ('even_later.csv', '2016-01-01 23:09:00.061258', 'scheduled'),
+                ('full_of_regret.csv', '2016-01-01 23:09:00.061258', 'cancelled')
             )
         ]
-        return {"data": [job for job in jobs if job['job_status'] in statuses]}
+        return {
+            'data': [job for job in jobs if job['job_status'] in statuses],
+            'links': {
+                'prev': 'services/{}/jobs?page={}'.format(service_id, page - 1),
+                'next': 'services/{}/jobs?page={}'.format(service_id, page + 1)
+            }
+        }
 
     return mocker.patch('app.job_api_client.get_jobs', side_effect=_get_jobs)
 

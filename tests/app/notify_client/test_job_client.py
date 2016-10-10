@@ -72,7 +72,16 @@ def test_client_gets_jobs_with_status_filter(mocker):
 
     JobApiClient().get_jobs(uuid.uuid4(), statuses=['foo', 'bar'])
 
-    mock_get.assert_called_once_with(url=ANY, params={'statuses': 'foo,bar'})
+    mock_get.assert_called_once_with(url=ANY, params={'page': 1, 'statuses': 'foo,bar'})
+
+
+def test_client_gets_jobs_with_page_parameter(mocker):
+    client = JobApiClient()
+    mock_get = mocker.patch('app.notify_client.job_api_client.JobApiClient.get')
+
+    client.get_jobs('foo', page=2)
+
+    mock_get.assert_called_once_with(url=ANY, params={'page': 2})
 
 
 def test_client_parses_job_stats(mocker):
@@ -221,7 +230,7 @@ def test_client_parses_job_stats_for_service(mocker):
 
     result = client.get_jobs(service_id)
 
-    mock_get.assert_called_once_with(url=expected_url, params={})
+    mock_get.assert_called_once_with(url=expected_url, params={'page': 1})
     assert result['data'][0]['id'] == job_1_id
     assert result['data'][0]['notifications_requested'] == 80
     assert result['data'][0]['notifications_sent'] == 50
@@ -281,7 +290,7 @@ def test_client_parses_empty_job_stats_for_service(mocker):
 
     result = client.get_jobs(service_id)
 
-    mock_get.assert_called_once_with(url=expected_url, params={})
+    mock_get.assert_called_once_with(url=expected_url, params={'page': 1})
     assert result['data'][0]['id'] == job_1_id
     assert result['data'][0]['notifications_requested'] == 0
     assert result['data'][0]['notifications_sent'] == 0

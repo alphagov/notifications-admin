@@ -79,13 +79,12 @@ def view_jobs(service_id):
         if job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME']
     ]
 
-
     prev_page = None
     if jobs_response['links'].get('prev', None):
-        prev_page = generate_previous_dict('main.view_jobs', service_id, page=page - 1)
+        prev_page = generate_previous_dict('main.view_jobs', service_id, page)
     next_page = None
     if jobs_response['links'].get('next', None):
-        next_page = generate_next_dict('main.view_jobs', service_id, page=page + 1)
+        next_page = generate_next_dict('main.view_jobs', service_id, page)
 
     return render_template(
         'views/jobs/jobs.html',
@@ -234,10 +233,10 @@ def get_notifications(service_id, message_type, status_override=None):
     }
     prev_page = None
     if notifications['links'].get('prev', None):
-        prev_page = generate_previous_dict('main.view_notifications', service_id, page - 1, url_args=url_args)
+        prev_page = generate_previous_dict('main.view_notifications', service_id, page, url_args=url_args)
     next_page = None
     if notifications['links'].get('next', None):
-        next_page = generate_next_dict('main.view_notifications', service_id, page + 1, url_args)
+        next_page = generate_next_dict('main.view_notifications', service_id, page, url_args)
 
     if request.path.endswith('csv'):
         csv_content = generate_notifications_csv(

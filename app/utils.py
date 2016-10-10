@@ -119,11 +119,11 @@ def get_page_from_request():
 
 
 def generate_previous_dict(view, service_id, page, url_args=None):
-    return generate_previous_next_dict(view, service_id, page, 'Previous page', url_args or {})
+    return generate_previous_next_dict(view, service_id, page - 1, 'Previous page', url_args or {})
 
 
 def generate_next_dict(view, service_id, page, url_args=None):
-    return generate_previous_next_dict(view, service_id, page, 'Next page', url_args or {})
+    return generate_previous_next_dict(view, service_id, page + 1, 'Next page', url_args or {})
 
 
 def generate_previous_next_dict(view, service_id, page, title, url_args):
