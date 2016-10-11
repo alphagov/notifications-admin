@@ -23,6 +23,17 @@
 
   .js-enabled & {
 
+    height: 60px;
+    overflow: visible;
+
+    .block-label {
+      display: none;
+    }
+
+    .js-block-label {
+      display: inline-block;
+    }
+
   }
 
 }

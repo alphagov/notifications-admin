@@ -5,7 +5,7 @@
   let states = {
     'initial': Hogan.compile(`
       <div class="radio-select-column">
-        <label class="block-label" for="{{name}}-0">
+        <label class="block-label js-block-label" for="{{name}}-0">
           <input checked="checked" id="{{name}}-0" name="{{name}}" type="radio" value=""> Now
         </label>
       </div>
@@ -17,13 +17,13 @@
     `),
     'choose': Hogan.compile(`
       <div class="radio-select-column">
-        <label class="block-label" for="{{name}}-0">
+        <label class="block-label js-block-label" for="{{name}}-0">
           <input checked="checked" id="{{name}}-0" name="{{name}}" type="radio" value="" class="js-initial-option"> Now
         </label>
       </div>
       <div class="radio-select-column">
         {{#choices}}
-          <label class="block-label" for="{{id}}">
+          <label class="block-label js-block-label" for="{{id}}">
             <input type="radio" value="{{value}}" id="{{id}}" name="{{name}}" class="js-option" />
             {{label}}
           </label>
@@ -32,13 +32,13 @@
     `),
     'chosen': Hogan.compile(`
       <div class="radio-select-column">
-        <label class="block-label" for="{{name}}-0">
+        <label class="block-label js-block-label" for="{{name}}-0">
           <input id="{{name}}-0" name="{{name}}" type="radio" value="" class="js-initial-option"> Now
         </label>
       </div>
       <div class="radio-select-column">
         {{#choices}}
-          <label class="block-label" for="{{id}}">
+          <label class="block-label js-block-label" for="{{id}}">
             <input checked="checked" type="radio" value="{{value}}" id="{{id}}" name="{{name}}" />
             {{label}}
           </label>
@@ -138,6 +138,8 @@
         'categories': categories,
         'name': name
       });
+
+      $component.css({'height': 'auto'});
 
     };
 
