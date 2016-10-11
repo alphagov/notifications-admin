@@ -147,7 +147,7 @@ def test_should_create_api_key_with_type_normal(app_,
                                                 api_user_active,
                                                 mock_login,
                                                 mock_get_api_keys,
-                                                mock_get_service,
+                                                mock_get_live_service,
                                                 mock_has_permissions,
                                                 fake_uuid,
                                                 mocker):
@@ -171,6 +171,33 @@ def test_should_create_api_key_with_type_normal(app_,
         'key_type': 'normal',
         'created_by': api_user_active.id
     })
+
+
+def test_cant_create_normal_api_key_in_trial_mode(
+    client,
+    api_user_active,
+    mock_login,
+    mock_get_api_keys,
+    mock_get_service,
+    mock_has_permissions,
+    fake_uuid,
+    mocker
+):
+    mock_post = mocker.patch('app.notify_client.api_key_api_client.ApiKeyApiClient.post')
+
+    client.login(api_user_active)
+    response = client.post(
+        url_for('main.create_api_key', service_id=uuid.uuid4()),
+        data={
+            'key_name': 'some default key name',
+            'key_type': 'normal'
+        }
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('span', {'class': 'error-message'}).text.strip() == 'Not a valid choice'
+
+    mock_post.assert_not_called()
 
 
 def test_should_show_confirm_revoke_api_key(app_,
