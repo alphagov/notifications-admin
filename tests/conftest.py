@@ -914,7 +914,6 @@ def mock_get_jobs(mocker, api_user_active):
                 job_status=job_status
             )
             for filename, scheduled_for, job_status in (
-                ('Test message', '', 'finished'),
                 ('export 1/1/2016.xls', '', 'finished'),
                 ('all email addresses.xlsx', '', 'pending'),
                 ('applicants.ods', '', 'finished'),

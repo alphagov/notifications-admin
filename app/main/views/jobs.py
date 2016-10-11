@@ -71,7 +71,6 @@ def view_jobs(service_id):
     jobs_response = job_api_client.get_jobs(service_id, statuses=statuses_to_display, page=page)
     jobs = [
         add_rate_to_job(job) for job in jobs_response['data']
-        if job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME']
     ]
 
     prev_page = None
