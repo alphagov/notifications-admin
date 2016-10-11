@@ -27,24 +27,52 @@ from app.main.validators import (Blacklist, CsvFileValidator, ValidGovEmail, NoC
 def get_time_value_and_label(future_time):
     return (
         future_time.replace(tzinfo=None).isoformat(),
-        get_human_time(future_time.astimezone(pytz.timezone('Europe/London')))
+        '{} at {}'.format(
+            get_human_day(future_time.astimezone(pytz.timezone('Europe/London'))),
+            get_human_time(future_time.astimezone(pytz.timezone('Europe/London')))
+        )
     )
 
 
 def get_human_time(time):
     return {
-        '0': 'Midnight',
-        '12': 'Midday'
+        '0': 'midnight',
+        '12': 'midday'
     }.get(
         time.strftime('%-H'),
         time.strftime('%-I%p').lower()
     )
 
 
-def get_next_hours_from(now, hours=23):
+def get_human_day(time):
+    #  Add 1 hour to get ‘midnight today’ instead of ‘midnight tomorrow’
+    time = (time - timedelta(hours=1)).strftime('%A')
+    if time == datetime.utcnow().strftime('%A'):
+        return 'Today'
+    if time == (datetime.utcnow() + timedelta(days=1)).strftime('%A'):
+        return 'Tomorrow'
+    return time
+
+
+def get_furthest_possible_scheduled_time():
+    return (datetime.utcnow() + timedelta(days=4)).replace(hour=0)
+
+
+def get_next_hours_until(until):
+    now = datetime.utcnow()
+    hours = int((until - now).total_seconds() / (60 * 60))
     return [
         (now + timedelta(hours=i)).replace(minute=0, second=0).replace(tzinfo=pytz.utc)
         for i in range(1, hours + 1)
+    ]
+
+
+def get_next_days_until(until):
+    now = datetime.utcnow()
+    days = int((until - now).total_seconds() / (60 * 60 * 24))
+    return [
+        get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc))
+        for i in range(0, days + 1)
     ]
 
 
@@ -310,7 +338,9 @@ class ChooseTimeForm(Form):
     def __init__(self, *args, **kwargs):
         super(ChooseTimeForm, self).__init__(*args, **kwargs)
         self.scheduled_for.choices = [('', 'Now')] + [
-            get_time_value_and_label(hour) for hour in get_next_hours_from(datetime.utcnow())
+            get_time_value_and_label(hour) for hour in get_next_hours_until(
+                get_furthest_possible_scheduled_time()
+            )
         ]
 
     scheduled_for = RadioField(
