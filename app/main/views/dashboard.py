@@ -116,12 +116,7 @@ def aggregate_usage(template_statistics):
 
 def get_dashboard_partials(service_id):
     # all but scheduled and cancelled
-    statuses_to_display = [
-        'pending',
-        'in progress',
-        'finished',
-        'sending limits exceeded',
-    ]
+    statuses_to_display = job_api_client.JOB_STATUSES - {'scheduled', 'cancelled'}
 
     template_statistics = aggregate_usage(
         template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)

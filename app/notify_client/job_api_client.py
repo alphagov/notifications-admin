@@ -5,6 +5,16 @@ from app.notify_client import _attach_current_user
 
 
 class JobApiClient(BaseAPIClient):
+
+    JOB_STATUSES = {
+        'scheduled',
+        'pending',
+        'in progress',
+        'finished',
+        'cancelled',
+        'sending limits exceeded',
+    }
+
     def __init__(self):
         super().__init__("a", "b", "c")
 
