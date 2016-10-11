@@ -1,3 +1,4 @@
+{% from "components/previous-next-navigation.html" import previous_next_navigation %}
 {% extends "withnav_template.html" %}
 
 {% block page_title %}
@@ -8,5 +9,6 @@
     <h1 class="heading-large">Uploaded files</h1>
     <div class="dashboard">
       {% include 'views/dashboard/_jobs.html' %}
+      {{ previous_next_navigation(prev_page, next_page) }}
     </div>
 {% endblock %}

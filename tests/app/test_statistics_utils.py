@@ -1,6 +1,6 @@
 import pytest
 
-from app.statistics_utils import sum_of_statistics, add_rates_to, add_rate_to_jobs, statistics_by_state
+from app.statistics_utils import sum_of_statistics, add_rates_to, add_rate_to_job, statistics_by_state
 
 
 @pytest.mark.parametrize('delivery_statistics', [
@@ -118,20 +118,29 @@ def test_service_statistics_by_state():
 @pytest.mark.parametrize('failed, delivered, expected_failure_rate', [
     (0, 0, 0),
     (0, 1, 0),
+    (1, 1, 50),
     (1, 0, 100),
     (1, 4, 20)
 ])
-def test_add_rate_to_jobs(failed, delivered, expected_failure_rate):
-    resp = add_rate_to_jobs([
+def test_add_rate_to_job_calculates_rate(failed, delivered, expected_failure_rate):
+    resp = add_rate_to_job(
         {
             'notifications_failed': failed,
-            'notifications_delivered': delivered
-        },
-        {
-            'notifications_failed': 1,
-            'notifications_delivered': 1
+            'notifications_delivered': delivered,
+            'id': 'foo'
         }
-    ])
+    )
 
-    assert resp[0]['failure_rate'] == expected_failure_rate
-    assert resp[1]['failure_rate'] == 50
+    assert resp['failure_rate'] == expected_failure_rate
+
+
+def test_add_rate_to_job_preserves_initial_fields():
+    resp = add_rate_to_job(
+        {
+            'notifications_failed': 0,
+            'notifications_delivered': 0,
+            'id': 'foo'
+        }
+    )
+
+    assert set(resp.keys()) == {'notifications_failed', 'notifications_delivered', 'id', 'failure_rate'}

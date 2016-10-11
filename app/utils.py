@@ -118,21 +118,26 @@ def get_page_from_request():
         return 1
 
 
-def generate_previous_next_dict(view, service_id, view_dict, page, title, label):
-    if 'page' in view_dict:
-        view_dict.pop('page')
-    if 'service_id' in view_dict:
-        view_dict.pop('service_id')
+def generate_previous_dict(view, service_id, page, url_args=None):
+    return generate_previous_next_dict(view, service_id, page - 1, 'Previous page', url_args or {})
+
+
+def generate_next_dict(view, service_id, page, url_args=None):
+    return generate_previous_next_dict(view, service_id, page + 1, 'Next page', url_args or {})
+
+
+def generate_previous_next_dict(view, service_id, page, title, url_args):
     return {
-        'url': url_for(view, service_id=service_id, page=page, **view_dict),
+        'url': url_for(view, service_id=service_id, page=page, **url_args),
         'title': title,
-        'label': label
+        'label': 'page {}'.format(page)
     }
 
 
 def email_safe(string):
     return "".join([
-        character.lower() if character.isalnum() or character == "." else "" for character in re.sub("\s+", ".", string.strip())  # noqa
+        character.lower() if character.isalnum() or character == "." else ""
+        for character in re.sub(r"\s+", ".", string.strip())
     ])
 
 

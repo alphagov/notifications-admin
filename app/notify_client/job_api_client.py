@@ -5,6 +5,16 @@ from app.notify_client import _attach_current_user
 
 
 class JobApiClient(BaseAPIClient):
+
+    JOB_STATUSES = {
+        'scheduled',
+        'pending',
+        'in progress',
+        'finished',
+        'cancelled',
+        'sending limits exceeded',
+    }
+
     def __init__(self):
         super().__init__("a", "b", "c")
 
@@ -26,24 +36,24 @@ class JobApiClient(BaseAPIClient):
             results['requested'] += outcome['count']
         return results
 
-    def get_job(self, service_id, job_id=None, limit_days=None, status=None):
-        if job_id:
-            params = {}
-            if status is not None:
-                params['status'] = status
-            job = self.get(url='/service/{}/job/{}'.format(service_id, job_id), params=params)
-
-            stats = self.__convert_statistics(job['data'])
-            job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
-            job['data']['notifications_delivered'] = stats['delivered']
-            job['data']['notifications_failed'] = stats['failed']
-            job['data']['notifications_requested'] = stats['requested']
-
-            return job
-
+    def get_job(self, service_id, job_id):
         params = {}
+        job = self.get(url='/service/{}/job/{}'.format(service_id, job_id), params=params)
+
+        stats = self.__convert_statistics(job['data'])
+        job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
+        job['data']['notifications_delivered'] = stats['delivered']
+        job['data']['notifications_failed'] = stats['failed']
+        job['data']['notifications_requested'] = stats['requested']
+
+        return job
+
+    def get_jobs(self, service_id, limit_days=None, statuses=None, page=1):
+        params = {'page': page}
         if limit_days is not None:
             params['limit_days'] = limit_days
+        if statuses is not None:
+            params['statuses'] = ','.join(statuses)
 
         jobs = self.get(url='/service/{}/job'.format(service_id), params=params)
         for job in jobs['data']:
