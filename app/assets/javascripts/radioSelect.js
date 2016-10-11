@@ -78,10 +78,11 @@
         .on('click', '.js-category-button', function(event) {
 
           event.preventDefault();
-          let day = $(this).attr('value');
+          let wordsInDay = $(this).attr('value').split(' ');
+          let day = wordsInDay[wordsInDay.length - 1].toLowerCase();
           render('choose', {
             'choices': choices.filter(
-              element => element.label.indexOf(day) > -1
+              element => element.label.toLowerCase().indexOf(day) > -1
             ),
             'name': name
           });

@@ -44,11 +44,11 @@ def get_human_time(time):
     )
 
 
-def get_human_day(time):
+def get_human_day(time, prefix_today_with='T'):
     #  Add 1 hour to get ‘midnight today’ instead of ‘midnight tomorrow’
     time = (time - timedelta(hours=1)).strftime('%A')
     if time == datetime.utcnow().strftime('%A'):
-        return 'Today'
+        return '{}oday'.format(prefix_today_with)
     if time == (datetime.utcnow() + timedelta(days=1)).strftime('%A'):
         return 'Tomorrow'
     return time
@@ -71,7 +71,10 @@ def get_next_days_until(until):
     now = datetime.utcnow()
     days = int((until - now).total_seconds() / (60 * 60 * 24))
     return [
-        get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc))
+        get_human_day(
+            (now + timedelta(days=i)).replace(tzinfo=pytz.utc),
+            prefix_today_with='Later t'
+        )
         for i in range(0, days + 1)
     ]
 

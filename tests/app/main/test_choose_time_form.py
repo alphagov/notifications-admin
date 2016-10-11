@@ -41,5 +41,5 @@ def test_form_defaults_to_now(app_):
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_form_contains_next_three_days(app_):
     assert ChooseTimeForm().scheduled_for.categories == [
-        'Today', 'Tomorrow', 'Sunday', 'Monday'
+        'Later today', 'Tomorrow', 'Sunday', 'Monday'
     ]
