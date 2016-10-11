@@ -2,88 +2,141 @@
 
   "use strict";
 
-  var render = ($options, $button) => (
-    filterOptionVisibility($options) && setButtonState($options, $button)
-  );
+  let states = {
+    'initial': Hogan.compile(`
+      <div class="radio-select-column">
+        <label class="block-label" for="{{name}}-0">
+          <input checked="checked" id="{{name}}-0" name="{{name}}" type="radio" value=""> Now
+        </label>
+      </div>
+      <div class="radio-select-column">
+        {{#categories}}
+          <input type='button' class='button tertiary-button js-category-button' value='{{.}}' />
+        {{/categories}}
+      </div>
+    `),
+    'choose': Hogan.compile(`
+      <div class="radio-select-column">
+        <label class="block-label" for="{{name}}-0">
+          <input checked="checked" id="{{name}}-0" name="{{name}}" type="radio" value="" class="js-initial-option"> Now
+        </label>
+      </div>
+      <div class="radio-select-column">
+        {{#choices}}
+          <label class="block-label" for="{{id}}">
+            <input type="radio" value="{{value}}" id="{{id}}" name="{{name}}" class="js-option" />
+            {{label}}
+          </label>
+        {{/choices}}
+      </div>
+    `),
+    'chosen': Hogan.compile(`
+      <div class="radio-select-column">
+        <label class="block-label" for="{{name}}-0">
+          <input id="{{name}}-0" name="{{name}}" type="radio" value="" class="js-initial-option"> Now
+        </label>
+      </div>
+      <div class="radio-select-column">
+        {{#choices}}
+          <label class="block-label" for="{{id}}">
+            <input checked="checked" type="radio" value="{{value}}" id="{{id}}" name="{{name}}" />
+            {{label}}
+          </label>
+        {{/choices}}
+      </div>
+      <div class="radio-select-column">
+        <input type='button' class='button tertiary-button js-reset-button' value='Choose a different time' />
+      </div>
+    `)
+  };
 
-  var filterOptionVisibility = $options => $options
-    .removeClass('js-visible')
-    .filter(
-      (index, element) => (index === 0 || $(element).has(':checked').length)
-    )
-    .addClass('js-visible');
-
-  var setButtonState = ($options, $button) => $button
-    .addClass('js-visible')
-    .prop(
-      'value',
-      $options.has(':checked').find('input').attr('id') === $options.eq(0).find('input').attr('id') ?
-        'Later' : 'Choose a different time'
+  let focusSelected = function() {
+    setTimeout(
+      () => $('[type=radio]:checked').parent('label').blur().trigger('focus').addClass('selected'),
+      10
     );
-
-  // Workaround because GOV.UK SelectionButtons doesn’t deselect in this case
-  var deselectUnchecked = $options => $options
-    .filter(
-      (index, element) => $(element).not(':has(:checked)')
-    ).removeClass('selected');
-
-  var refocus = $element => setTimeout(
-    () => $element.blur().trigger('focus'),
-    10
-  );
-
-  var renderIfComponentLosesFocus = ($options, $button, $focused) => () =>
-    ($focused.attr('type') !== 'radio') &&
-    render($options, $button) &&
-    refocus($focused); // Make sure that window scrolls to focused element
+  };
 
   Modules.RadioSelect = function() {
 
     this.start = function(component) {
 
       let $component = $(component);
-      let $options = $('label', $component);
-
-      $component.append(
-        $button = $('<input type="button" value="Later" class="tertiary-button" />')
-      );
-
-      $button.on('click', () =>
-        $options.addClass('js-visible').has(':checked').focus() &&
-        $button.removeClass('js-visible')
-      );
-
-      $component.on('keydown', 'input[type=radio]', function() {
-
-        // intercept keypresses which aren’t enter or space
-        if (event.which !== 13 && event.which !== 32) {
-          setTimeout(
-            renderIfComponentLosesFocus($options, $button, $(document.activeElement)),
-            200
-          );
-          return true;
-        }
-
-        event.preventDefault();
-
-        render($options, $button);
-        refocus($(this));
-
+      let render = (state, data) => $component.html(states[state].render(data));
+      let choices = $('label', $component).toArray().map(function(element) {
+        let $element = $(element);
+        return {
+          'id': $element.attr('for'),
+          'label': $.trim($element.text()),
+          'value': $element.find('input').attr('value')
+        };
       });
+      let categories = $component.data('categories').split(',');
+      let name = $component.find('input').eq(0).attr('name');
 
-      $component.on('click', 'input[type=radio]', function(event) {
+      $component
+        .on('click', '.js-category-button', function(event) {
 
-        deselectUnchecked($options);
+          event.preventDefault();
+          let day = $(this).attr('value');
+          render('choose', {
+            'choices': choices.filter(
+              element => element.label.indexOf(day) > -1
+            ),
+            'name': name
+          });
+          $('.js-option').eq(0).parent('label').trigger('focus');
 
-        // stop click being triggered by keyboard events
-        if (!event.pageX) return true;
+        })
+        .on('click', '.js-option', function(event) {
 
-        render($options, $button);
-        refocus($(this));
+          // stop click being triggered by keyboard events
+          if (!event.pageX) return true;
 
+          event.preventDefault();
+          let value = $(this).attr('value');
+          render('chosen', {
+            'choices': choices.filter(
+              element => element.value == value
+            ),
+            'name': name
+          });
+          focusSelected();
+
+        })
+        .on('keydown', 'input[type=radio]', function(event) {
+
+          // intercept keypresses which aren’t enter or space
+          if (event.which !== 13 && event.which !== 32) {
+            return true;
+          }
+
+          event.preventDefault();
+          let value = $(this).attr('value');
+          render('chosen', {
+            'choices': choices.filter(
+              element => element.value == value
+            ),
+            'name': name
+          });
+          focusSelected();
+
+        })
+        .on('click', '.js-reset-button', function(event) {
+
+          event.preventDefault();
+          render('initial', {
+            'categories': categories,
+            'name': name
+          });
+          focusSelected();
+
+        });
+
+      render('initial', {
+        'categories': categories,
+        'name': name
       });
-
-      render($options, $button);
 
     };
 
