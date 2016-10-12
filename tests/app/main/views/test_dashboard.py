@@ -223,6 +223,7 @@ def test_should_show_recent_jobs_on_dashboard(
 
     second_call = mock_get_jobs.call_args_list[1]
     assert second_call[0] == (SERVICE_ONE_ID,)
+    assert second_call[1]['limit_days'] == 7
     assert 'scheduled' not in second_call[1]['statuses']
 
     assert response.status_code == 200
