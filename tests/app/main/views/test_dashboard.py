@@ -231,7 +231,6 @@ def test_should_show_recent_jobs_on_dashboard(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     table_rows = page.find_all('tbody')[2].find_all('tr')
 
-    assert "Test message" not in page.text
     assert len(table_rows) == 4
 
     for index, filename in enumerate((

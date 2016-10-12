@@ -69,7 +69,7 @@ def create_api_key(service_id):
     ]
     form = CreateKeyForm(key_names)
     form.key_type.choices = filter(None, [
-        (KEY_TYPE_NORMAL, 'Send messages to anyone{}')
+        (KEY_TYPE_NORMAL, 'Send messages to anyone')
         if not current_service['restricted'] else None,
         (KEY_TYPE_TEST, 'Simulate sending messages to anyone'),
         (KEY_TYPE_TEAM, 'Only send messages to your team or whitelist')

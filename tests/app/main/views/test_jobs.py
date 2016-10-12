@@ -27,7 +27,6 @@ def test_get_jobs_should_return_list_of_all_real_jobs(
     assert page.h1.string == 'Uploaded files'
     jobs = [x.text for x in page.tbody.find_all('a', {'class': 'file-list-filename'})]
     assert len(jobs) == 4
-    assert 'Test message' not in jobs
 
 
 def test_get_jobs_shows_page_links(
