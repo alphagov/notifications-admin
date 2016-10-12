@@ -128,7 +128,7 @@ def get_dashboard_partials(service_id):
     )
     immediate_jobs = [
         add_rate_to_job(job)
-        for job in job_api_client.get_jobs(service_id, statuses=statuses_to_display)['data']
+        for job in job_api_client.get_jobs(service_id, limit_days=7, statuses=statuses_to_display)['data']
         if job['original_file_name'] != current_app.config['TEST_MESSAGE_FILENAME']
     ]
     service = service_api_client.get_detailed_service(service_id)
