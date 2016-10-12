@@ -117,6 +117,7 @@ def create_app():
     application.add_template_filter(format_date)
     application.add_template_filter(format_date_normal)
     application.add_template_filter(format_date_short)
+    application.add_template_filter(format_datetime_relative)
     application.add_template_filter(format_delta)
     application.add_template_filter(format_notification_status)
     application.add_template_filter(format_notification_status_as_time)
@@ -230,6 +231,23 @@ def format_datetime_short(date):
         format_date_short(date),
         format_time(date)
     )
+
+
+def format_datetime_relative(date):
+    return '{} at {}'.format(
+        get_human_day(date),
+        format_time(date)
+    )
+
+
+def get_human_day(time):
+    #  Add 1 hour to get ‘midnight today’ instead of ‘midnight tomorrow’
+    time = (gmt_timezones(time) - timedelta(hours=1)).strftime('%A')
+    if time == datetime.utcnow().strftime('%A'):
+        return 'today'
+    if time == (datetime.utcnow() + timedelta(days=1)).strftime('%A'):
+        return 'tomorrow'
+    return time
 
 
 def format_time(date):

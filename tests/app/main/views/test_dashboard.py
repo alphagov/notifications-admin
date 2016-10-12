@@ -194,10 +194,10 @@ def test_should_show_upcoming_jobs_on_dashboard(
     assert len(table_rows) == 2
 
     assert 'send_me_later.csv' in table_rows[0].find_all('th')[0].text
-    assert 'Sending at 11:09am' in table_rows[0].find_all('th')[0].text
+    assert 'Sending today at 11:09am' in table_rows[0].find_all('th')[0].text
     assert table_rows[0].find_all('td')[0].text.strip() == '1'
     assert 'even_later.csv' in table_rows[1].find_all('th')[0].text
-    assert 'Sending at 11:09pm' in table_rows[1].find_all('th')[0].text
+    assert 'Sending today at 11:09pm' in table_rows[1].find_all('th')[0].text
     assert table_rows[1].find_all('td')[0].text.strip() == '1'
 
 

@@ -903,7 +903,7 @@ def mock_get_scheduled_job(mocker, api_user_active):
             api_user_active,
             job_id=job_id,
             job_status='scheduled',
-            scheduled_for='2016-01-01T00:00:00.061258'
+            scheduled_for='2016-01-02T00:00:00.061258'
         )}
 
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)

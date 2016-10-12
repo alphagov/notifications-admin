@@ -5,7 +5,7 @@
   {% if job.job_status == 'scheduled' %}
 
     <p>
-      Sending will start at {{ job.scheduled_for|format_time }}
+      Sending will start {{ job.scheduled_for|format_datetime_relative }}
     </p>
     <div class="page-footer">
       <form method="post">
