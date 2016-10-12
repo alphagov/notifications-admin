@@ -267,7 +267,7 @@ def test_should_show_updates_for_one_job_as_json(
         assert 'Status' in content['notifications']
         assert 'Delivered' in content['notifications']
         assert '12:01am' in content['notifications']
-        assert 'Uploaded by Test User on 1 January at midnight' in content['status']
+        assert 'Sent by Test User on 1 January at midnight' in content['status']
 
 
 @pytest.mark.parametrize(
