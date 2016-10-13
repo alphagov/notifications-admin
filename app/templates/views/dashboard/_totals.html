@@ -2,7 +2,7 @@
 {% from "components/message-count-label.html" import message_count_label %}
 
 <div class="grid-row ajax-block-container">
-  <div class="column-half">
+  <div id="total-email" class="column-half">
     {{ big_number_with_status(
       statistics['email']['requested'],
       message_count_label(statistics['email']['requested'], 'email', suffix=''),
@@ -13,7 +13,7 @@
       link=url_for(".view_notifications", service_id=service_id, message_type='email', status='sending,delivered,failed')
     ) }}
   </div>
-  <div class="column-half">
+  <div id="total-sms" class="column-half">
     {{ big_number_with_status(
       statistics['sms']['requested'],
       message_count_label(statistics['sms']['requested'], 'sms', suffix=''),
