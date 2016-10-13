@@ -1,19 +1,21 @@
+import json
+
 from flask import (
     render_template,
     redirect,
     url_for,
-    session
-)
+    session,
+    current_app)
 
-from flask.ext.login import current_user
-from flask_login import login_required
+from flask_login import login_required, current_user
+from notifications_utils.url_safe_token import check_token
+
 from app.main import main
 
 from app.main.forms import (
     ChangePasswordForm,
     ChangeNameForm,
     ChangeEmailForm,
-    ConfirmEmailForm,
     ChangeMobileNumberForm,
     ConfirmMobileNumberForm,
     ConfirmPasswordForm
@@ -82,10 +84,9 @@ def user_profile_email_authenticate():
         return redirect('main.user_profile_email')
 
     if form.validate_on_submit():
-        current_user.email_address = session[NEW_EMAIL]
-        del session[NEW_EMAIL]
-        user_api_client.update_user(current_user)
-        return redirect(url_for('.user_profile'))
+        user_api_client.send_change_email_verification(current_user.id, session[NEW_EMAIL])
+        return render_template('views/change-email-continue.html',
+                               new_email=session[NEW_EMAIL])
 
     return render_template(
         'views/user-profile/authenticate.html',
@@ -93,6 +94,26 @@ def user_profile_email_authenticate():
         form=form,
         back_link=url_for('.user_profile_email')
     )
+
+
+@main.route("/user-profile/email/confirm/<token>", methods=['GET'])
+@login_required
+def user_profile_email_confirm(token):
+
+    token_data = check_token(token,
+                             current_app.config['SECRET_KEY'],
+                             current_app.config['DANGEROUS_SALT'],
+                             current_app.config['EMAIL_EXPIRY_SECONDS'])
+    token_data = json.loads(token_data)
+    user_id = token_data['user_id']
+    new_email = token_data['email']
+    user = user_api_client.get_user(user_id)
+    user.email_address = new_email
+    user_api_client.update_user(user)
+    if session.get(NEW_EMAIL, None):
+        del session[NEW_EMAIL]
+
+    return redirect(url_for('.user_profile'))
 
 
 @main.route("/user-profile/mobile-number", methods=['GET', 'POST'])

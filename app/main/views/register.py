@@ -8,11 +8,10 @@ from flask import (
     redirect,
     session,
     abort,
-    url_for,
-    flash
+    url_for
 )
 
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from app.main import main
 

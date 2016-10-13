@@ -127,3 +127,8 @@ class UserApiClient(BaseAPIClient):
             return self.update_user(user)
         else:
             return user
+
+    def send_change_email_verification(self, user_id, new_email):
+        endpoint = '/user/{}/change-email-verification'.format(user_id)
+        data = {'email': new_email}
+        self.post(endpoint, data)

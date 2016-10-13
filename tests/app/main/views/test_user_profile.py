@@ -1,5 +1,6 @@
 import json
 from flask import url_for
+from notifications_utils.url_safe_token import generate_token
 
 
 def test_should_show_overview_page(app_,
@@ -65,8 +66,6 @@ def test_should_show_email_page(app_,
 def test_should_redirect_after_email_change(app_,
                                             api_user_active,
                                             mock_login,
-                                            mock_get_user,
-                                            mock_get_user_by_email_not_found,
                                             mock_is_email_unique):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -83,9 +82,7 @@ def test_should_redirect_after_email_change(app_,
 
 def test_should_show_authenticate_after_email_change(app_,
                                                      api_user_active,
-                                                     mock_login,
-                                                     mock_get_user,
-                                                     mock_verify_password):
+                                                     mock_login):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -93,31 +90,44 @@ def test_should_show_authenticate_after_email_change(app_,
             session['new-email'] = 'new_notify@notify.gov.uk'
         response = client.get(url_for('main.user_profile_email_authenticate'))
 
+        assert response.status_code == 200
         assert 'Change your email address' in response.get_data(as_text=True)
         assert 'Confirm' in response.get_data(as_text=True)
-        assert response.status_code == 200
 
 
-def test_should_redirect_to_profile_after_email_change_confirm(app_,
-                                                               api_user_active,
-                                                               mock_login,
-                                                               mock_get_user,
-                                                               mock_verify_password,
-                                                               mock_send_verify_code,
-                                                               mock_is_email_unique):
+def test_should_render_change_email_continue_after_authenticate_email(app_,
+                                                                      api_user_active,
+                                                                      mock_login,
+                                                                      mock_verify_password,
+                                                                      mock_send_change_email_verification):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
-        data = {'email-code': '12345'}
+        data = {'password': '12345'}
         with client.session_transaction() as session:
             session['new-email'] = 'new_notify@notify.gov.uk'
         response = client.post(
             url_for('main.user_profile_email_authenticate'),
             data=data)
+        assert response.status_code == 200
+        assert 'Click the link in the email to confirm the change to your email address.' \
+               in response.get_data(as_text=True)
+
+
+def test_should_redirect_to_user_profile_when_user_confirms_email_link(app_,
+                                                                       api_user_active,
+                                                                       mock_login
+                                                                       ):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(api_user_active)
+
+        token = generate_token(payload=json.dumps({'user_id': api_user_active.id, 'email': 'new_email@gov.uk'}),
+                               secret=app_.config['SECRET_KEY'], salt=app_.config['DANGEROUS_SALT'])
+        response = client.get(url_for('main.user_profile_email_confirm', token=token))
 
         assert response.status_code == 302
-        assert response.location == url_for(
-            'main.user_profile', _external=True)
+        assert response.location == url_for('main.user_profile', _external=True)
 
 
 def test_should_show_mobile_number_page(app_,

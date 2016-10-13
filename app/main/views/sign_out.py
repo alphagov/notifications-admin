@@ -4,7 +4,7 @@ from flask import (
     session
 )
 
-from flask.ext.login import logout_user
+from flask_login import logout_user
 
 from app.main import main
 

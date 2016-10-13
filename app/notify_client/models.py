@@ -1,4 +1,4 @@
-from flask.ext.login import (UserMixin, login_fresh)
+from flask_login import (UserMixin, login_fresh)
 
 
 class User(UserMixin):
