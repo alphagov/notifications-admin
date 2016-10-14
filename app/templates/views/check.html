@@ -15,7 +15,22 @@
 
 {% block maincolumn_content %}
 
-  {% if not recipients.has_recipient_column %}
+  {% if recipients.has_too_many_rows %}
+
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        <h1 class='banner-title'>
+          Your file has too many rows
+        </h1>
+        <p>
+          Notify can process up to
+          {{ "{:,}".format(recipients.max_rows) }} rows at once. Your
+          file has {{ "{:,}".format(recipients|length) }} rows.
+        </p>
+      {% endcall %}
+    </div>
+
+  {% elif not recipients.has_recipient_column %}
 
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
@@ -159,7 +174,8 @@
   {% call(item, row_number) list_table(
     recipients.initial_annotated_rows_with_errors if row_errors and not recipients.missing_column_headers else recipients.initial_annotated_rows,
     caption=original_file_name,
-    field_headings=['1'] + recipients.column_headers
+    field_headings=['1'] + recipients.column_headers,
+    empty_message='Can’t show the contents of this file'
   ) %}
     {{ index_field(item.index + 2) }}
     {% for column in recipients.column_headers %}
