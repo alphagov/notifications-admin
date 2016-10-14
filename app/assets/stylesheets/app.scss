@@ -192,3 +192,25 @@ details summary {
 .tabular-numbers {
   @include core-19($tabular-numbers: true);
 }
+
+summary::-moz-details-marker {
+  display: none;
+}
+summary::-ms-details-marker {
+  display: none;
+}
+summary::-o-details-marker {
+  display: none;
+}
+
+summary::details-marker {
+  display: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+details .arrow {
+  font-size: 16px;
+}

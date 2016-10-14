@@ -61,25 +61,27 @@
           <h3 class="api-notifications-item-recipient">
             {{ notification.to }}
           </h3>
-          <div class="grid-row api-notifications-item-meta">
-            <div class="column-half api-notifications-item-key">
+          <span class="grid-row api-notifications-item-meta">
+            <span class="column-half api-notifications-item-key">
               {{notification.key_name}}
-            </div>
-            <div class="column-half api-notifications-item-time">
+            </span>
+            <span class="column-half api-notifications-item-time">
               <time class="timeago" datetime="{{ notification.created_at }}">
                 {{ notification.created_at|format_delta }}
               </time>
-            </div>
-          </div>
+            </span>
+          </span>
         </summary>
-        <dl id="notification-{{ notification.id }}" class="api-notifications-item-data bottom-gutter-1-2">
-          {% for key in [
-            'id', 'notification_type', 'created_at', 'updated_at', 'sent_at', 'status'
-          ] %}
-            <dt>{{ key }}:</dt>
-            <dd class="api-notifications-item-data-item">{{ notification[key] }}</dd>
-          {% endfor %}
-        </dl>
+        <div>
+          <dl id="notification-{{ notification.id }}" class="api-notifications-item-data bottom-gutter-1-2">
+            {% for key in [
+              'id', 'notification_type', 'created_at', 'updated_at', 'sent_at', 'status'
+            ] %}
+              <dt>{{ key }}:</dt>
+              <dd class="api-notifications-item-data-item">{{ notification[key] }}</dd>
+            {% endfor %}
+          </dl>
+        </div>
       </details>
     {% endfor %}
     {% if api_notifications.notifications %}
