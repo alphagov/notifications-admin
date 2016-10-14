@@ -22,7 +22,6 @@ from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidEmailDomainRegex, NoCommasInPlaceHolders)
-from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
 
 
 def get_time_value_and_label(future_time):
@@ -283,19 +282,6 @@ class ChangeEmailForm(Form):
         is_valid = self.validate_email_func(field.data)
         if not is_valid:
             raise ValidationError("The email address is already in use")
-
-
-class ConfirmEmailForm(Form):
-    def __init__(self, validate_code_func, *args, **kwargs):
-        self.validate_code_func = validate_code_func
-        super(ConfirmEmailForm, self).__init__(*args, **kwargs)
-
-    email_code = email_code()
-
-    def validate_email_code(self, field):
-        is_valid, msg = self.validate_code_func(field.data)
-        if not is_valid:
-            raise ValidationError(msg)
 
 
 class ChangeMobileNumberForm(Form):

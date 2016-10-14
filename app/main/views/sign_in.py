@@ -9,7 +9,7 @@ from flask import (
     Markup
 )
 
-from flask.ext.login import (
+from flask_login import (
     current_user,
     login_fresh,
     confirm_login

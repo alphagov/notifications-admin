@@ -581,6 +581,11 @@ def api_user_changed_password(fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def mock_send_change_email_verification(mocker):
+    return mocker.patch('app.user_api_client.send_change_email_verification')
+
+
+@pytest.fixture(scope='function')
 def mock_register_user(mocker, api_user_pending):
     def _register(name, email_address, mobile_number, password):
         api_user_pending.name = name

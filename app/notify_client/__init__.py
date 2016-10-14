@@ -1,4 +1,4 @@
-from flask.ext.login import current_user
+from flask_login import current_user
 
 
 def _attach_current_user(data):

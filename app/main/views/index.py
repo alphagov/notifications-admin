@@ -1,12 +1,8 @@
-import markdown
-import os
-from flask import (render_template, url_for, redirect, Markup, request, abort)
+from flask import (render_template, url_for, redirect, request, abort)
 from app.main import main
 from app import convert_to_boolean
-from flask_login import login_required
+from flask_login import (login_required, current_user)
 
-from flask.ext.login import current_user
-from mdx_gfm import GithubFlavoredMarkdownExtension
 
 from notifications_utils.renderers import HTMLEmail
 
