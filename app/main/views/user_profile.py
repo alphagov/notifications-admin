@@ -25,7 +25,6 @@ from app import user_api_client
 
 NEW_EMAIL = 'new-email'
 NEW_MOBILE = 'new-mob'
-NEW_EMAIL_PASSWORD_CONFIRMED = 'new-email-password-confirmed'
 NEW_MOBILE_PASSWORD_CONFIRMED = 'new-mob-password-confirmed'
 
 
@@ -110,8 +109,7 @@ def user_profile_email_confirm(token):
     user = user_api_client.get_user(user_id)
     user.email_address = new_email
     user_api_client.update_user(user)
-    if session.get(NEW_EMAIL, None):
-        del session[NEW_EMAIL]
+    session.pop(NEW_EMAIL, None)
 
     return redirect(url_for('.user_profile'))
 
