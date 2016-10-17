@@ -15,7 +15,7 @@
 
 {% block maincolumn_content %}
 
-  {% if recipients.has_too_many_rows %}
+  {% if recipients.too_many_rows %}
 
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
@@ -174,8 +174,7 @@
   {% call(item, row_number) list_table(
     recipients.initial_annotated_rows_with_errors if row_errors and not recipients.missing_column_headers else recipients.initial_annotated_rows,
     caption=original_file_name,
-    field_headings=['1'] + recipients.column_headers,
-    empty_message='Can’t show the contents of this file'
+    field_headings=['1'] + recipients.column_headers
   ) %}
     {{ index_field(item.index + 2) }}
     {% for column in recipients.column_headers %}
@@ -203,7 +202,12 @@
     {% endif %}
   {% endcall %}
 
-  {% if count_of_displayed_recipients < count_of_recipients %}
+
+  {% if recipients.too_many_rows %}
+    <p class="table-show-more-link">
+      Can’t show the contents of this file
+    </p>
+  {% elif count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
       {% if row_errors and not recipients.missing_column_headers %}
         Only showing the first {{ count_of_displayed_recipients }} rows with errors

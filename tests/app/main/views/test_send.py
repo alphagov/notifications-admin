@@ -795,7 +795,7 @@ def test_check_messages_shows_over_max_row_error(
     mock_recipients = mocker.patch('app.main.views.send.RecipientCSV').return_value
     mock_recipients.max_rows = 11111
     mock_recipients.__len__.return_value = 99999
-    mock_recipients.has_too_many_rows.return_value = True
+    mock_recipients.too_many_rows.return_value = True
 
     client.login(api_user_active)
     with client.session_transaction() as session:
