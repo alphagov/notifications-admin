@@ -776,3 +776,42 @@ def test_check_messages_shows_too_many_messages_errors(
     details = page.find('div', class_='banner-dangerous').findAll('p')[1]
     details = ' '.join([line.strip() for line in details.text.split('\n') if line.strip() != ''])
     assert details == expected_msg
+
+
+def test_check_messages_shows_over_max_row_error(
+    client,
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_users_by_service,
+    mock_get_service,
+    mock_get_service_template_with_placeholders,
+    mock_has_permissions,
+    mock_get_detailed_service_for_today,
+    mock_s3_download,
+    fake_uuid,
+    mocker
+):
+    mock_recipients = mocker.patch('app.main.views.send.RecipientCSV').return_value
+    mock_recipients.max_rows = 11111
+    mock_recipients.__len__.return_value = 99999
+    mock_recipients.has_too_many_rows.return_value = True
+
+    client.login(api_user_active)
+    with client.session_transaction() as session:
+        session['upload_data'] = {'template_id': fake_uuid}
+    response = client.get(url_for(
+        'main.check_messages',
+        service_id=fake_uuid,
+        template_type='sms',
+        upload_id=fake_uuid
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert ' '.join(
+        page.find('div', class_='banner-dangerous').text.split()
+    ) == (
+        'Your file has too many rows '
+        'Notify can process up to 11,111 rows at once. '
+        'Your file has 99,999 rows.'
+    )
