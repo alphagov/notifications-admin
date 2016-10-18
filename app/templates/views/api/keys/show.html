@@ -18,11 +18,31 @@
       once you leave this page.
     </p>
 
-    {{ api_key(secret, key_name) }}
+    <div class="bottom-gutter-2">
 
-    {{ page_footer(
-      secondary_link=url_for('.api_keys', service_id=current_service.id),
-      secondary_link_text='Back to API keys'
-    ) }}
+      {{ api_key(
+        '{}-{}-{}'.format(key_name, service_id, secret),
+        'API key'
+      ) }}
+
+      {{ page_footer(
+        secondary_link=url_for('.api_keys', service_id=current_service.id),
+        secondary_link_text='Back to API keys'
+      ) }}
+
+    </div>
+
+    <h2 class='heading-medium'>For older API clients</h2>
+
+    <p>
+      If the client you’re using needs a service ID and an API key,
+      use these values:
+    </p>
+
+    <div class="bottom-gutter">
+      {{ api_key(service_id, 'Service ID', thing='service ID') }}
+    </div>
+
+    {{ api_key(secret, 'API key') }}
 
 {% endblock %}
