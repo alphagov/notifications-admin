@@ -80,9 +80,8 @@ def _gen_mock_field(x):
     'test@gov.police.uk',
     'test@GOV.PoliCe.uk',
     'test@valtech.co.uk',
-    'test@gofreerange.com',
     'test@cgi.com',
-    'test@unboxed.com'
+    'test@ucds.email'
 ])
 def test_valid_list_of_white_list_email_domains(app_, email):
     with app_.test_request_context():
@@ -113,7 +112,8 @@ def test_valid_list_of_white_list_email_domains(app_, email):
     'test@nhs.test.net',
     'test@ukpolice.uk',
     'test@police.uk.uk',
-    'test@police.test.uk'
+    'test@police.test.uk',
+    'test@ucds.com'
 ])
 def test_invalid_list_of_white_list_email_domains(app_, email):
     with app_.test_request_context():

@@ -59,10 +59,9 @@ class Config(object):
         "bitzesty\.com",
         "dclgdatamart\.co\.uk",
         "valtech\.co\.uk",
-        "gofreerange\.com",
         "cgi\.com",
-        "unboxed\.com",
-        "capita\.co\.uk"]
+        "capita\.co\.uk",
+        "ucds.email"]
 
 
 class Development(Config):
