@@ -1,10 +1,12 @@
-import ago
 import os
 import re
 import urllib
-import dateutil
 from datetime import datetime, timedelta, timezone
+from time import monotonic
+
+import dateutil
 import pytz
+import ago
 from flask import (
     Flask,
     session,
@@ -16,14 +18,12 @@ from flask import (
     request,
     g,
     url_for)
-
 from flask._compat import string_types
 from flask.globals import _lookup_req_object
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from functools import partial
 
-from time import monotonic
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging
 from notifications_utils.recipients import validate_phone_number, InvalidPhoneError
@@ -373,6 +373,7 @@ def useful_headers_after_request(response):
 
 def register_errorhandlers(application):
     def _error_response(error_code):
+        application.logger.exception('Admin app errored with %s', error_code)
         resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
         return useful_headers_after_request(resp)
 
