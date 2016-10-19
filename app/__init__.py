@@ -23,7 +23,7 @@ from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from functools import partial
 
-from monotonic import monotonic
+from time import monotonic
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging
 from notifications_utils.recipients import validate_phone_number, InvalidPhoneError
