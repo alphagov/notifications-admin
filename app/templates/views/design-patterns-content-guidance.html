@@ -1,3 +1,4 @@
+{% from "components/banner.html" import banner_wrapper %}
 {% extends "withoutnav_template.html" %}
 
 {% block page_title %}
@@ -12,6 +13,12 @@ Design patterns and content guidance – GOV.UK Notify
     <h1 class="heading-large">
       Design patterns and content guidance
     </h1>
+
+    {% call banner_wrapper(type='warning') %}
+      <h2 class="heading-medium">This content is a work in progress</h2>
+
+      <p>It should not be relied upon</p>
+    {% endcall %}
 
     <section id="contents">
       <h2 class="heading-medium" id="contents">Contents</h2>
