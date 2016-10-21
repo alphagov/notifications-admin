@@ -26,7 +26,7 @@
     ).done(
       response => flushQueue(queue, response)
     ).fail(
-      () => clearQueue(queue)
+      () => poll = function(){}
     );
 
     setTimeout(
