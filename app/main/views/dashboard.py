@@ -53,7 +53,6 @@ def service_dashboard(service_id):
 
 
 @main.route("/services/<service_id>/dashboard.json")
-@login_required
 @user_has_permissions('view_activity', admin_override=True)
 def service_dashboard_updates(service_id):
     return jsonify(**get_dashboard_partials(service_id))
