@@ -42,7 +42,6 @@ def user_has_permissions(*permissions, admin_override=False, any_=False):
         @wraps(func)
         def wrap_func(*args, **kwargs):
             from flask_login import current_user
-
             if current_user and current_user.is_authenticated:
                 if current_user.has_permissions(
                     permissions=permissions,
