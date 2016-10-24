@@ -110,10 +110,15 @@ def service_request_to_go_live(service_id):
             'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
             'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
             'subject': 'Request to go live',
-            'message': "On behalf of {} ({})\n\nUsage estimate\n---\n\n{}".format(
+            'message': "On behalf of {} ({})\n\nExpected usage\n---\n\nChannel: {}\nStart date: {}\nStart volume: {}\nPeak volume: {}\nUpload or API: {}".format(
                 current_service['name'],
                 url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
-                form.usage.data
+                form.channel.data,
+                form.start_date.data,
+                form.start_volume.data,
+                form.peak_volume.data,
+                form.upload_or_api.data
+                
             )
         }
         headers = {
