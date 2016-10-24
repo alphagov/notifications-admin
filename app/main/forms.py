@@ -346,17 +346,26 @@ class Feedback(Form):
 
 
 class RequestToGoLiveForm(Form):
-    channel = StringField('Are you sending emails or text messages or both?')
-    start_date = StringField('When will you be ready to start sending messages?')
+    channel = StringField(
+        'Are you sending emails or text messages or both?'
+        , validators=[DataRequired(message='Can’t be empty')]
+    )
+    start_date = StringField(
+        'When will you be ready to start sending messages?'
+        , validators=[DataRequired(message='Can’t be empty')]
+    )
     start_volume = StringField(
         'How many messages do you expect to send per month to start with? Give an estimate in numbers.'
+        , validators=[DataRequired(message='Can’t be empty')]
     )
     peak_volume = StringField(
         'Will the number of messages a month increase and when will that start? Give an estimate.'
+        , validators=[DataRequired(message='Can’t be empty')]
     )
     upload_or_api = StringField(
         'Are you uploading a list of contacts that you’re sending your message to, ' +
         'or are you integrating your system with ours?'
+        , validators=[DataRequired(message='Can’t be empty')]
     )
 
 
