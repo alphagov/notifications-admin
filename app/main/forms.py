@@ -346,11 +346,18 @@ class Feedback(Form):
 
 
 class RequestToGoLiveForm(Form):
-    channel = Stringfield('Are you sending emails or text messages or both?')
-    start_date = Stringfield('When will you be ready to start sending messages?')
-    start_volume = Stringfield('How many messages do you expect to send per month to start with? Give an estimate in numbers.')
-    peak_volume = Stringfield('Will the number of messages a month increase and when will that start? Give an estimate.')
-    upload_or_api = Stringfield('Are you uploading a list of contacts that you’re sending your message to, or are you integrating your system with ours?')  
+    channel = StringField('Are you sending emails or text messages or both?')
+    start_date = StringField('When will you be ready to start sending messages?')
+    start_volume = StringField(
+        'How many messages do you expect to send per month to start with? Give an estimate in numbers.'
+    )
+    peak_volume = StringField(
+        'Will the number of messages a month increase and when will that start? Give an estimate.'
+    )
+    upload_or_api = StringField(
+        'Are you uploading a list of contacts that you’re sending your message to, ' +
+        'or are you integrating your system with ours?'
+    )
 
 
 class ProviderForm(Form):
