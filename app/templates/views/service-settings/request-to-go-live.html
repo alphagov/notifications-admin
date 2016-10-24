@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/banner.html" import banner_wrapper %}
 
 {% block page_title %}
   Request to go live – GOV.UK Notify
@@ -10,49 +11,46 @@
 
       <h1 class="heading-large">Request to go live</h1>
 
+      {% call banner_wrapper(type='warning') %}
+        <h2 class="heading-medium">You must accept the GOV.UK&nbsp;Notify data sharing and financial agreement (Memorandum of Understanding) before we can process data for you.</h2>
+
+        <p>
+          <a href="{{ url_for('main.feedback') }}">Contact the Notify team</a> to get a copy of the agreement or to find out if your organisation has already accepted it.
+        </p>
+      {% endcall %}
+
       <p>
-        You’ll need to:
+        Before you request to go live, make you you’ve:
       </p>
       <ul class="list list-bullet">
+        <li>accepted our data sharing and financial agreement</li>
+        <li>read our <a href="{{ url_for('.terms') }}">terms of use</a></li>
+        <li>added <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a> to your account</li>
         <li>
-          agree to our <a href="{{ url_for('.terms') }}">terms of use</a>
-        </li>
+          specified your reply to email address or text message sender in your
+          <a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">settings</a> page</li>
         <li>
-          agree to pay for what you use if you send more than 250,000 text messages per year
-          (<a href="{{ url_for("main.pricing") }}">see our pricing</a>)
-        </li>
+          added the templates you want to start with, making sure they follow our
+          <a href="https://designpatterns.hackpad.com/Notifications-5vuitmNqIjZ" rel="external">design patterns</a>,
+          <a href="https://www.gov.uk/topic/government-digital-guidance/content-publishing" rel="external">style guide</a>
+          and
+          <a href="https://docs.google.com/document/d/15-OjaEqDBy31uDU7nLZCpYIQOnzSCJR63-cp3cQI9G8" rel="external">information security guidelines</a>
+          </li>
       </ul>
 
       <form method="post">
-
-        {{ textbox(
-          form.usage,
-          label='Estimate how many emails and text messages you’ll send each month',
-          hint='If your estimate is likely to change, tell us how ',
-          width='1-1',
-          rows=5
-        ) }}
+        {{ textbox(form.channel, width='1-1') }}
+        {{ textbox(form.start_date, width='1-1') }}
+        {{ textbox(form.start_volume, width='1-1') }}
+        {{ textbox(form.peak_volume, width='1-1') }}
+        {{ textbox(form.upload_or_api, width='1-1') }}
 
         <p>
-          We will:
+          Once you’ve completed the tasks needed to set up, we’ll make your service live. We’ll do this within one working day.
         </p>
-        <ul class="list list-bullet">
-          <li>
-            check that your templates follow our
-            <a href="https://designpatterns.hackpad.com/Notifications-5vuitmNqIjZ" rel="external">design patterns</a>,
-            <a href="https://www.gov.uk/topic/government-digital-guidance/content-publishing" rel="external">style guide</a>
-            and
-            <a href="https://docs.google.com/document/d/15-OjaEqDBy31uDU7nLZCpYIQOnzSCJR63-cp3cQI9G8" rel="external">information security guidelines</a>
-          </li>
-          <li>
-            check that you have more than one
-            <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team member</a>
-            in case you go on holiday
-          </li>
-          <li>
-            make your service live or get back to you within one working day
-          </li>
-        </ul>
+        <p>
+          By requesting to go live you are agreeing to our terms of use.
+        </p>
 
         {{ page_footer('Request to go live') }}
       </form>

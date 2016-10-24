@@ -313,7 +313,13 @@ def test_should_redirect_after_request_to_go_live(
             client.login(api_user_active)
             response = client.post(
                 url_for('main.service_request_to_go_live', service_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'),
-                data={'usage': "One million messages"},
+                data={
+                    'channel': 'Email',
+                    'start_date': '01/01/2017',
+                    'start_volume': '100,000',
+                    'peak_volume': '2,000,000',
+                    'upload_or_api': 'api'
+                },
                 follow_redirects=True
             )
             assert response.status_code == 200
@@ -323,12 +329,19 @@ def test_should_redirect_after_request_to_go_live(
                     'subject': 'Request to go live',
                     'department_id': ANY,
                     'agent_team_id': ANY,
-                    'message': 'On behalf of Test Service (http://localhost/services/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6/dashboard)\n\nUsage estimate\n---\n\nOne million messages',  # noqa
+                    'message': ANY,
                     'person_name': api_user_active.name,
                     'person_email': api_user_active.email_address
                 },
                 headers=ANY
             )
+
+            returned_message = mock_post.call_args[1]['data']['message']
+            assert 'Email' in returned_message
+            assert '01/01/2017' in returned_message
+            assert '100,000' in returned_message
+            assert '2,000,000' in returned_message
+            assert 'api' in returned_message
 
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         flash_banner = page.find('div', class_='banner-default').string.strip()
@@ -362,7 +375,13 @@ def test_log_error_on_request_to_go_live(
             with pytest.raises(InternalServerError):
                 resp = client.post(
                     url_for('main.service_request_to_go_live', service_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'),
-                    data={'usage': 'blah'}
+                    data={
+                        'channel': 'channel',
+                        'start_date': 'start_date',
+                        'start_volume': 'start_volume',
+                        'peak_volume': 'peak_volume',
+                        'upload_or_api': 'upload_or_api'
+                    }
                 )
             mock_logger.assert_called_with(
                 "Deskpro create ticket request failed with {} '{}'".format(mock_post().status_code, mock_post().json())
