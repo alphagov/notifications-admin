@@ -13,6 +13,15 @@ Terms of use – GOV.UK Notify
       Terms of use
     </h1>
 
+    {% call banner_wrapper(type='warning') %}
+        <h2 class="heading-medium">You must accept the GOV.UK Notify data sharing and financial agreement (Memorandum of Understanding) before we can process data for you.</h2>
+
+        <p>
+          <a href="{{ url_for('main.feedback') }}">Contact the Notify team</a> to get a copy of the agreement or to find out if your organisation has already accepted it.
+        </p>
+    
+    {% endcall %}
+    
     <p>To accept these terms, you must be the service manager for your service. If you’re not the service manager, you’ll need to invite them.</p>
 
     <section id="summary">
