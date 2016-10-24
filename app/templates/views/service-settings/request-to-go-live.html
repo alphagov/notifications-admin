@@ -12,7 +12,7 @@
       <h1 class="heading-large">Request to go live</h1>
 
       {% call banner_wrapper(type='warning') %}
-        <h2 class="heading-medium">You must accept the GOV.UK&nbsp;Notify data sharing and financial agreement (Memorandum&nbsp;of&nbsp;Understanding) before we can process data for you.</h2>
+        <h2 class="heading-medium">You must accept the GOV.UK&nbsp;Notify data sharing and financial agreement (Memorandum of Understanding) before we can process data for you.</h2>
 
         <p>
           <a href="{{ url_for('main.feedback') }}">Contact the Notify team</a> to get a copy of the agreement or to find out if your organisation has already accepted it.
@@ -39,11 +39,11 @@
       </ul>
 
       <form method="post">
-        {{ textbox(form.channel, width='1-2') }}
-        {{ textbox(form.start_date, width='1-2') }}
-        {{ textbox(form.start_volume, width='1-2') }}
-        {{ textbox(form.peak_volume, width='1-2') }}
-        {{ textbox(form.upload_or_api, width='1-2') }}
+        {{ textbox(form.channel, width='1-1') }}
+        {{ textbox(form.start_date, width='1-1') }}
+        {{ textbox(form.start_volume, width='1-1') }}
+        {{ textbox(form.peak_volume, width='1-1') }}
+        {{ textbox(form.upload_or_api, width='1-1') }}
 
         <p>
           Once you’ve completed the tasks needed to set up, we’ll make your service live. We’ll do this within one working day.
