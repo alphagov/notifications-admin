@@ -323,7 +323,7 @@ def test_should_redirect_after_request_to_go_live(
                     'subject': 'Request to go live',
                     'department_id': ANY,
                     'agent_team_id': ANY,
-                    'message': 'On behalf of Test Service (http://localhost/services/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6/dashboard)\n\nUsage estimate\n---\n\nOne million messages',  # noqa
+                    'message': ANY,  # noqa
                     'person_name': api_user_active.name,
                     'person_email': api_user_active.email_address
                 },

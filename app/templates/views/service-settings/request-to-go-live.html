@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/banner.html" import banner_wrapper %}
 
 {% block page_title %}
   Request to go live – GOV.UK Notify
@@ -17,7 +18,7 @@
           <a href="{{ url_for('main.feedback') }}">Contact the Notify team</a> to get a copy of the agreement or to find out if your organisation has already accepted it.
         </p>
       {% endcall %}
-      
+
       <p>
         Before you request to go live, make you you’ve:
       </p>
@@ -26,10 +27,10 @@
         <li>read our <a href="{{ url_for('.terms') }}">terms of use</a></li>
         <li>added <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a> to your account</li>
         <li>
-          specified your reply to email address or text message sender in your 
+          specified your reply to email address or text message sender in your
           <a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">settings</a> page</li>
         <li>
-          added the templates you want to start with, making sure they follow our 
+          added the templates you want to start with, making sure they follow our
           <a href="https://designpatterns.hackpad.com/Notifications-5vuitmNqIjZ" rel="external">design patterns</a>,
           <a href="https://www.gov.uk/topic/government-digital-guidance/content-publishing" rel="external">style guide</a>
           and
@@ -47,10 +48,10 @@
         <p>
           Once you’ve completed the tasks needed to set up, we’ll make your service live. We’ll do this within one working day.
         </p>
-        <p>  
+        <p>
           By requesting to go live you are agreeing to our terms of use.
         </p>
-        
+
         {{ page_footer('Request to go live') }}
       </form>
 
