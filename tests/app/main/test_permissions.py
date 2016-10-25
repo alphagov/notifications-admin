@@ -108,7 +108,7 @@ def test_platform_admin_user_can_not_access_page(app_,
         admin_override=False)
 
 
-def test_user_with_permissions_returns_401_unauthenticated_user(app_):
+def test_no_user_returns_401_unauth(app_):
     from flask_login import current_user
     assert not current_user
     _test_permissions(
