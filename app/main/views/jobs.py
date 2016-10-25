@@ -172,7 +172,6 @@ def cancel_job(service_id, job_id):
 
 
 @main.route("/services/<service_id>/jobs/<job_id>.json")
-@login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_job_updates(service_id, job_id):
     return jsonify(**get_job_partials(

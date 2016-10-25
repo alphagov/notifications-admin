@@ -1,7 +1,7 @@
 import pytest
 from app.utils import user_has_permissions
 from app.main.views.index import index
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, Unauthorized
 from flask import request
 
 
@@ -9,7 +9,8 @@ def _test_permissions(app_, usr, permissions, service_id, will_succeed, any_=Fal
     with app_.test_request_context() as ctx:
         request.view_args.update({'service_id': service_id})
         with app_.test_client() as client:
-            client.login(usr)
+            if usr:
+                client.login(usr)
             decorator = user_has_permissions(*permissions, any_=any_, admin_override=admin_override)
             decorated_index = decorator(index)
             if will_succeed:
@@ -17,8 +18,8 @@ def _test_permissions(app_, usr, permissions, service_id, will_succeed, any_=Fal
             else:
                 try:
                     response = decorated_index()
-                    pytest.fail("Failed to throw a forbidden exception")
-                except Forbidden:
+                    pytest.fail("Failed to throw a forbidden or unauthorised exception")
+                except (Forbidden, Unauthorized):
                     pass
 
 
@@ -105,6 +106,17 @@ def test_platform_admin_user_can_not_access_page(app_,
         '',
         will_succeed=False,
         admin_override=False)
+
+
+def test_no_user_returns_401_unauth(app_):
+    from flask_login import current_user
+    assert not current_user
+    _test_permissions(
+        app_,
+        None,
+        [],
+        '',
+        will_succeed=False)
 
 
 def _user_with_permissions():

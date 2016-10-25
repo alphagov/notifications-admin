@@ -42,11 +42,17 @@ def user_has_permissions(*permissions, admin_override=False, any_=False):
         @wraps(func)
         def wrap_func(*args, **kwargs):
             from flask_login import current_user
-            if current_user and current_user.has_permissions(permissions=permissions,
-                                                             admin_override=admin_override, any_=any_):
-                return func(*args, **kwargs)
+            if current_user and current_user.is_authenticated:
+                if current_user.has_permissions(
+                    permissions=permissions,
+                    admin_override=admin_override,
+                    any_=any_
+                ):
+                    return func(*args, **kwargs)
+                else:
+                    abort(403)
             else:
-                abort(403)
+                abort(401)
         return wrap_func
     return wrap
 
