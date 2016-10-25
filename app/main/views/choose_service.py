@@ -1,8 +1,11 @@
-from flask import (render_template, redirect, url_for, session)
+import re
+
+from flask import (current_app, render_template, redirect, url_for, session)
 from flask_login import login_required, current_user
 from app.main import main
 from app import service_api_client
 from app.notify_client.service_api_client import ServicesBrowsableItem
+from app.utils import user_in_whitelist
 
 
 @main.route("/services")
@@ -11,7 +14,8 @@ def choose_service():
     return render_template(
         'views/choose-service.html',
         services=[ServicesBrowsableItem(x) for x in
-                  service_api_client.get_services({'user_id': current_user.id})['data']]
+                  service_api_client.get_services({'user_id': current_user.id})['data']],
+        can_add_service=user_in_whitelist(current_user.email_address)
     )
 
 
