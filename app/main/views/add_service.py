@@ -1,11 +1,19 @@
+import re
+
 from flask import (
     render_template,
     redirect,
     session,
     url_for,
-    current_app)
+    current_app
+)
 
-from flask_login import login_required
+from flask_login import (
+    current_user,
+    login_required
+)
+
+from werkzeug.exceptions import abort
 
 from app.main import main
 from app.main.forms import AddServiceForm
@@ -16,7 +24,11 @@ from app import (
     user_api_client,
     service_api_client
 )
-from app.utils import email_safe
+
+from app.utils import (
+    email_safe,
+    user_in_whitelist
+)
 
 
 @main.route("/add-service", methods=['GET', 'POST'])
@@ -61,8 +73,11 @@ def add_service():
             help=1
         ))
     else:
-        return render_template(
-            'views/add-service.html',
-            form=form,
-            heading=heading
-        )
+        if not user_in_whitelist(current_user.email_address):
+            abort(403)
+        else:
+            return render_template(
+                'views/add-service.html',
+                form=form,
+                heading=heading
+            )

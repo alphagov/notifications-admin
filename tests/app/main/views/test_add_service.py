@@ -1,6 +1,7 @@
 from flask import url_for, session
 from unittest.mock import ANY
 import app
+from app.utils import user_in_whitelist
 
 
 def test_get_should_render_add_service_template(app_,
@@ -101,3 +102,10 @@ def test_should_return_form_errors_with_duplicate_service_name_regardless_of_cas
             assert 'This service name is already in use' in response.get_data(as_text=True)
             app.service_api_client.find_all_service_email_from.assert_called_once_with()
             assert not mock_create_service.called
+
+
+def test_non_whitelist_user_cannot_add_service(app_, nonwhitelist_user, mocker, client):
+    client.login(nonwhitelist_user, mocker)
+    assert not user_in_whitelist(nonwhitelist_user.email_address)
+    response = client.get(url_for('main.add_service'))
+    assert response.status_code == 403
