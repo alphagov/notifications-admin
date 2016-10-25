@@ -126,7 +126,11 @@ class PermissionsForm(Form):
 
 
 class InviteUserForm(PermissionsForm):
-    email_address = email_address('Email address')
+    email_address = EmailField('Email address', validators=[
+        Length(min=5, max=255),
+        DataRequired(message='Can’t be empty'),
+        Email(message='Enter a valid email address')
+        ])
 
     def __init__(self, invalid_email_address, *args, **kwargs):
         super(InviteUserForm, self).__init__(*args, **kwargs)
