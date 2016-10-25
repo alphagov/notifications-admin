@@ -1,7 +1,9 @@
+import pytest
 from flask import url_for
 from bs4 import BeautifulSoup
 import app
 from app.notify_client.models import InvitedUser
+from app.utils import user_in_whitelist
 from tests.conftest import service_one as service_1
 
 
@@ -129,20 +131,26 @@ def test_should_show_page_for_inviting_user(
         assert response.status_code == 200
 
 
+@pytest.mark.parametrize('email_address, whitelist_user', [
+    ('test@example.gov.uk', True),
+    ('test@nonwhitelist.com', False)
+])
 def test_invite_user(
         app_,
         active_user_with_permissions,
         mocker,
-        sample_invite
+        sample_invite,
+        email_address,
+        whitelist_user
 ):
     service = service_1(active_user_with_permissions)
-    email_address = 'test@example.gov.uk'
     sample_invite['email_address'] = 'test@example.gov.uk'
 
     data = [InvitedUser(**sample_invite)]
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service)
+            assert user_in_whitelist(email_address) == whitelist_user
             mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
             mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
             mocker.patch('app.invite_api_client.create_invite', return_value=InvitedUser(**sample_invite))

@@ -61,7 +61,8 @@ class Config(object):
         "valtech\.co\.uk",
         "cgi\.com",
         "capita\.co\.uk",
-        "ucds.email"]
+        "ucds.email"
+    ]
 
 
 class Development(Config):
