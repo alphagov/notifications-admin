@@ -40,9 +40,9 @@ def created_by_json(id_, name='', email_address=''):
 
 
 def service_json(
-    id_,
-    name,
-    users,
+    id_='1234',
+    name='Test Service',
+    users=None,
     message_limit=1000,
     active=False,
     restricted=True,
@@ -50,9 +50,12 @@ def service_json(
     reply_to_email_address=None,
     sms_sender=None,
     research_mode=False,
-    organisation='organisation-id',
+    can_send_letters=False,
+    organisation=None,
     branding='govuk'
 ):
+    if users is None:
+        users = []
     return {
         'id': id_,
         'name': name,
@@ -64,6 +67,7 @@ def service_json(
         'reply_to_email_address': reply_to_email_address,
         'sms_sender': sms_sender,
         'research_mode': research_mode,
+        'can_send_letters': can_send_letters,
         'organisation': organisation,
         'branding': branding,
         'created_at': str(datetime.utcnow())

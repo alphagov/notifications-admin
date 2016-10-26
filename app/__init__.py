@@ -127,10 +127,10 @@ def create_app():
     application.after_request(save_service_after_request)
     application.before_request(load_service_before_request)
 
+    @application.context_processor
     def _attach_current_service():
         return {'current_service': current_service}
 
-    application.context_processor(_attach_current_service)
     register_errorhandlers(application)
 
     setup_event_handlers()
@@ -338,10 +338,7 @@ def load_service_before_request():
         else session.get('service_id')
     from flask.globals import _request_ctx_stack
     if _request_ctx_stack.top is not None:
-        setattr(
-            _request_ctx_stack.top,
-            'service',
-            service_api_client.get_service(service_id)['data'] if service_id else None)
+        _request_ctx_stack.top.service = service_api_client.get_service(service_id)['data'] if service_id else None
 
 
 def save_service_after_request(response):

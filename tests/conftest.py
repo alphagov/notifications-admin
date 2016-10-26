@@ -1276,3 +1276,16 @@ def mock_update_whitelist(mocker):
 def client(app_):
     with app_.test_request_context(), app_.test_client() as client:
         yield client
+
+
+@pytest.fixture(scope='function')
+def logged_in_client(
+    client,
+    active_user_with_permissions,
+    mock_login,
+    mock_get_user,
+    mock_get_service,
+    mock_has_permissions
+):
+    client.login(active_user_with_permissions)
+    yield client

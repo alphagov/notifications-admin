@@ -1,12 +1,13 @@
+from unittest.mock import call, ANY, Mock
+
 import pytest
 from flask import url_for
+from bs4 import BeautifulSoup
+from werkzeug.exceptions import InternalServerError
 
 import app
 from app.utils import email_safe
 from tests import validate_route_permission, service_json
-from bs4 import BeautifulSoup
-from unittest.mock import ANY, Mock
-from werkzeug.exceptions import InternalServerError
 
 
 def test_should_show_overview(
@@ -814,3 +815,25 @@ def test_should_set_branding_and_organisations(
             branding='org',
             organisation='organisation-id'
         )
+
+
+def test_switch_service_enable_letters(logged_in_client, service_one, mocker):
+    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+
+    response = logged_in_client.get(url_for('main.service_switch_can_send_letters', service_id=service_one['id']))
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_fn.call_args == call(service_one['id'], {'can_send_letters': True})
+
+
+def test_switch_service_disable_letters(logged_in_client, mocker):
+    service = service_json("1234", "Test Service", [], can_send_letters=True)
+    mocker.patch('app.service_api_client.get_service', return_value={"data": service})
+    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service)
+
+    response = logged_in_client.get(url_for('main.service_switch_can_send_letters', service_id=service['id']))
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service['id'], _external=True)
+    assert mocked_fn.call_args == call(service['id'], {"can_send_letters": False})
