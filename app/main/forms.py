@@ -48,12 +48,16 @@ def get_next_hours_from(now, hours=23):
     ]
 
 
-def email_address(label='Email address'):
-    return EmailField(label, validators=[
+def email_address(label='Email address', gov_user=True):
+    validators = [
         Length(min=5, max=255),
         DataRequired(message='Can’t be empty'),
-        Email(message='Enter a valid email address'),
-        ValidEmailDomainRegex()])
+        Email(message='Enter a valid email address')
+    ]
+
+    if gov_user:
+        validators.append(ValidEmailDomainRegex())
+    return EmailField(label, validators)
 
 
 class UKMobileNumber(TelField):
@@ -126,11 +130,7 @@ class PermissionsForm(Form):
 
 
 class InviteUserForm(PermissionsForm):
-    email_address = EmailField('Email address', validators=[
-        Length(min=5, max=255),
-        DataRequired(message='Can’t be empty'),
-        Email(message='Enter a valid email address')
-        ])
+    email_address = email_address(gov_user=False)
 
     def __init__(self, invalid_email_address, *args, **kwargs):
         super(InviteUserForm, self).__init__(*args, **kwargs)
@@ -246,7 +246,8 @@ class EmailTemplateForm(SMSTemplateForm):
 
 
 class ForgotPasswordForm(Form):
-    email_address = email_address()
+    # email_address = email_address()
+    email_address = email_address(gov_user=False)
 
 
 class NewPasswordForm(Form):
