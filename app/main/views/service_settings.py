@@ -168,7 +168,18 @@ def service_switch_live(service_id):
 def service_switch_research_mode(service_id):
     service_api_client.update_service_with_properties(
         service_id,
-        {"research_mode": False if current_service['research_mode'] else True}
+        {"research_mode": not current_service['research_mode']}
+    )
+    return redirect(url_for('.service_settings', service_id=service_id))
+
+
+@main.route("/services/<service_id>/service-settings/can-send-letters")
+@login_required
+@user_has_permissions(admin_override=True)
+def service_switch_can_send_letters(service_id):
+    service_api_client.update_service_with_properties(
+        service_id,
+        {"can_send_letters": not current_service['can_send_letters']}
     )
     return redirect(url_for('.service_settings', service_id=service_id))
 
