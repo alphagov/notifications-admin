@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 from functools import partial
 from flask import url_for
 from tests import validate_route_permission
-from datetime import datetime
 
 template_types = ['email', 'sms']
 
