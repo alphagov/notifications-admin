@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import app
 from app.notify_client.models import InvitedUser
 from app.utils import user_in_whitelist
-from tests.conftest import service_one as service_1
+from tests.conftest import service_one as create_sample_service
 
 
 def test_should_show_overview_page(
@@ -13,7 +13,7 @@ def test_should_show_overview_page(
         mocker,
         mock_get_invites_for_service
 ):
-    service = service_1(active_user_with_permissions)
+    service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service)
@@ -30,7 +30,7 @@ def test_should_show_page_for_one_user(
         active_user_with_permissions,
         mocker
 ):
-    service = service_1(active_user_with_permissions)
+    service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service)
@@ -46,7 +46,7 @@ def test_edit_user_permissions(
         mock_get_invites_for_service,
         mock_set_user_permissions
 ):
-    service = service_1(active_user_with_permissions)
+    service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service)
@@ -85,7 +85,7 @@ def test_edit_some_user_permissions(
         mock_get_invites_for_service,
         mock_set_user_permissions
 ):
-    service = service_1(active_user_with_permissions)
+    service = create_sample_service(active_user_with_permissions)
     data = [InvitedUser(**sample_invite)]
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -121,7 +121,7 @@ def test_should_show_page_for_inviting_user(
         active_user_with_permissions,
         mocker
 ):
-    service = service_1(active_user_with_permissions)
+    service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service)
@@ -143,7 +143,7 @@ def test_invite_user(
         email_address,
         whitelist_user
 ):
-    service = service_1(active_user_with_permissions)
+    service = create_sample_service(active_user_with_permissions)
     sample_invite['email_address'] = 'test@example.gov.uk'
 
     data = [InvitedUser(**sample_invite)]
@@ -186,7 +186,7 @@ def test_cancel_invited_user_cancels_user_invitations(app_,
             mocker.patch('app.invite_api_client.cancel_invited_user')
             import uuid
             invited_user_id = uuid.uuid4()
-            service = service_1(active_user_with_permissions)
+            service = create_sample_service(active_user_with_permissions)
             client.login(active_user_with_permissions, mocker, service)
             response = client.get(url_for('main.cancel_invited_user', service_id=service['id'],
                                           invited_user_id=invited_user_id))
@@ -199,7 +199,7 @@ def test_manage_users_shows_invited_user(app_,
                                          mocker,
                                          active_user_with_permissions,
                                          sample_invite):
-    service = service_1(active_user_with_permissions)
+    service = create_sample_service(active_user_with_permissions)
     data = [InvitedUser(**sample_invite)]
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -227,7 +227,7 @@ def test_manage_users_does_not_show_accepted_invite(app_,
     sample_invite['id'] = invited_user_id
     sample_invite['status'] = 'accepted'
     data = [InvitedUser(**sample_invite)]
-    service = service_1(active_user_with_permissions)
+    service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service)
@@ -250,7 +250,7 @@ def test_user_cant_invite_themselves(
         active_user_with_permissions,
         mock_create_invite
 ):
-    service = service_1(active_user_with_permissions)
+    service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service)

@@ -488,22 +488,6 @@ def platform_admin_user(fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def nonwhitelist_user(fake_uuid):
-    from app.notify_client.user_api_client import User
-    user_data = {'id': fake_uuid,
-                 'name': 'Platform admin user',
-                 'password': 'somepassword',
-                 'email_address': 'someuser@notonwhitelist.com',
-                 'mobile_number': '07700 900762',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {}
-                 }
-    user = User(user_data)
-    return user
-
-
-@pytest.fixture(scope='function')
 def api_user_active(fake_uuid, email_address='test@user.gov.uk'):
     from app.notify_client.user_api_client import User
     user_data = {'id': fake_uuid,
