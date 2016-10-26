@@ -504,12 +504,12 @@ def nonwhitelist_user(fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def api_user_active(fake_uuid):
+def api_user_active(fake_uuid, email_address='test@user.gov.uk'):
     from app.notify_client.user_api_client import User
     user_data = {'id': fake_uuid,
                  'name': 'Test User',
                  'password': 'somepassword',
-                 'email_address': 'test@user.gov.uk',
+                 'email_address': email_address,
                  'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 0,
