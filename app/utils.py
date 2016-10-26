@@ -173,18 +173,15 @@ class Spreadsheet():
 
     @classmethod
     def from_rows(cls, rows, filename=''):
-
         with StringIO() as converted:
             output = csv.writer(converted)
 
             for row in rows:
                 output.writerow(row)
-
             return cls(converted.getvalue(), filename)
 
     @classmethod
     def from_file(cls, file_content, filename=''):
-
         extension = cls.get_extension(filename)
 
         if extension == 'csv':
@@ -195,7 +192,7 @@ class Spreadsheet():
 
         return cls.from_rows(pyexcel.get_sheet(
             file_type=extension,
-            file_content=file_content.getvalue()
+            file_content=file_content.read()
         ).to_array(), filename)
 
 
