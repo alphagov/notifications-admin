@@ -3,8 +3,11 @@ import csv
 from io import StringIO
 from os import path
 from functools import wraps
+import unicodedata
+
 from flask import (abort, current_app, session, request, redirect, url_for)
 from flask_login import current_user
+
 import pyexcel
 import pyexcel.ext.io
 import pyexcel.ext.xls
@@ -141,10 +144,14 @@ def generate_previous_next_dict(view, service_id, page, title, url_args):
 
 
 def email_safe(string, whitespace='.'):
-    return "".join([
-        character.lower() if character.isalnum() or character == whitespace else ""
-        for character in re.sub(r"\s+", whitespace, string.strip())
-    ])
+    # strips accents, diacritics etc
+    string = ''.join(c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn')
+    string = ''.join(
+        word.lower() if word.isalnum() or word == whitespace else ''
+        for word in re.sub(r'\s+', whitespace, string.strip())
+    )
+    string = re.sub(r'\.{2,}', '.', string)
+    return string.strip('.')
 
 
 class Spreadsheet():
