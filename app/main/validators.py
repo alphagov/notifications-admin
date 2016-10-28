@@ -1,7 +1,9 @@
-import re
 from wtforms import ValidationError
 from notifications_utils.template import Template
-from app.utils import Spreadsheet
+from app.utils import (
+    Spreadsheet,
+    is_gov_user
+)
 from ._blacklisted_passwords import blacklisted_passwords
 
 
@@ -26,17 +28,15 @@ class CsvFileValidator(object):
             raise ValidationError("{} isn’t a spreadsheet that Notify can read".format(field.data.filename))
 
 
-class ValidEmailDomainRegex(object):
+class ValidGovEmail(object):
 
     def __call__(self, form, field):
-        from flask import (current_app, url_for)
+        from flask import url_for
         message = (
             'Enter a central government email address.'
             ' If you think you should have access'
             ' <a href="{}">contact us</a>').format(url_for('main.feedback'))
-        valid_domains = current_app.config.get('EMAIL_DOMAIN_REGEXES', [])
-        email_regex = "[^\@^\s]+@([^@^\\.^\\s]+\.)*({})$".format("|".join(valid_domains))
-        if not re.match(email_regex, field.data.lower()):
+        if not is_gov_user(field.data.lower()):
             raise ValidationError(message)
 
 

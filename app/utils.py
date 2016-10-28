@@ -3,7 +3,8 @@ import csv
 from io import StringIO
 from os import path
 from functools import wraps
-from flask import (abort, session, request, redirect, url_for)
+from flask import (abort, current_app, session, request, redirect, url_for)
+from flask_login import current_user
 import pyexcel
 import pyexcel.ext.io
 import pyexcel.ext.xls
@@ -41,7 +42,6 @@ def user_has_permissions(*permissions, admin_override=False, any_=False):
     def wrap(func):
         @wraps(func)
         def wrap_func(*args, **kwargs):
-            from flask_login import current_user
             if current_user and current_user.is_authenticated:
                 if current_user.has_permissions(
                     permissions=permissions,
@@ -198,3 +198,9 @@ class Spreadsheet():
 
 def get_help_argument():
     return request.args.get('help') if request.args.get('help') in ('1', '2', '3') else None
+
+
+def is_gov_user(email_address):
+    valid_domains = current_app.config['EMAIL_DOMAIN_REGEXES']
+    email_regex = (r"[\.|@]({})$".format("|".join(valid_domains)))
+    return bool(re.search(email_regex, email_address.lower()))

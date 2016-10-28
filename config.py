@@ -44,24 +44,25 @@ class Config(object):
     TEST_MESSAGE_FILENAME = 'Test message'
 
     EMAIL_DOMAIN_REGEXES = [
-        "gov\.uk",
-        "mod\.uk",
-        "mil\.uk",
-        "ddc-mod\.org",
-        "slc\.co\.uk",
-        "gov\.scot",
-        "parliament\.uk",
-        "nhs\.uk",
-        "nhs\.net",
-        "police\.uk",
-        "kainos\.com",
-        "salesforce\.com",
-        "bitzesty\.com",
-        "dclgdatamart\.co\.uk",
-        "valtech\.co\.uk",
-        "cgi\.com",
-        "capita\.co\.uk",
-        "ucds.email"]
+        r"gov\.uk",
+        r"mod\.uk",
+        r"mil\.uk",
+        r"ddc-mod\.org",
+        r"slc\.co\.uk",
+        r"gov\.scot",
+        r"parliament\.uk",
+        r"nhs\.uk",
+        r"nhs\.net",
+        r"police\.uk",
+        r"kainos\.com",
+        r"salesforce\.com",
+        r"bitzesty\.com",
+        r"dclgdatamart\.co\.uk",
+        r"valtech\.co\.uk",
+        r"cgi\.com",
+        r"capita\.co\.uk",
+        r"ucds\.email"
+    ]
 
 
 class Development(Config):

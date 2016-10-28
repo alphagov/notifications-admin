@@ -12,12 +12,14 @@
   </h1>
 
   {{ browse_list(services) }}
-  {{ browse_list([
-    {
-      'title': 'Add a new service…',
-      'link': url_for('.add_service')
-    },
-  ]) }}
+  {% if can_add_service %}
+    {{ browse_list([
+      {
+        'title': 'Add a new service…',
+        'link': url_for('.add_service')
+      },
+    ]) }}
+  {% endif %}
 
 
 {% endblock %}

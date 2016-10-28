@@ -266,3 +266,23 @@ def test_should_redirect_after_password_change(app_,
         assert response.status_code == 302
         assert response.location == url_for(
             'main.user_profile', _external=True)
+
+
+def test_non_gov_user_cannot_see_change_email_link(client,
+                                                   api_nongov_user_active,
+                                                   mock_login,
+                                                   mock_get_non_govuser):
+    client.login(api_nongov_user_active)
+    response = client.get(url_for('main.user_profile'))
+    assert '<a href="/user-profile/email">' not in response.get_data(as_text=True)
+    assert 'Your profile' in response.get_data(as_text=True)
+    assert response.status_code == 200
+
+
+def test_non_gov_user_cannot_access_change_email_page(client,
+                                                      api_nongov_user_active,
+                                                      mock_login,
+                                                      mock_get_non_govuser):
+    client.login(api_nongov_user_active)
+    response = client.get(url_for('main.user_profile_email'))
+    assert response.status_code == 403

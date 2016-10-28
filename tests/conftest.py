@@ -488,12 +488,30 @@ def platform_admin_user(fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def api_user_active(fake_uuid):
+def api_user_active(fake_uuid, email_address='test@user.gov.uk'):
     from app.notify_client.user_api_client import User
     user_data = {'id': fake_uuid,
                  'name': 'Test User',
                  'password': 'somepassword',
-                 'email_address': 'test@user.gov.uk',
+                 'email_address': email_address,
+                 'mobile_number': '07700 900762',
+                 'state': 'active',
+                 'failed_login_count': 0,
+                 'permissions': {},
+                 'platform_admin': False,
+                 'password_changed_at': str(datetime.utcnow())
+                 }
+    user = User(user_data)
+    return user
+
+
+@pytest.fixture(scope='function')
+def api_nongov_user_active(fake_uuid):
+    from app.notify_client.user_api_client import User
+    user_data = {'id': fake_uuid,
+                 'name': 'Test User',
+                 'password': 'somepassword',
+                 'email_address': 'someuser@notonwhitelist.com',
                  'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 0,
@@ -595,6 +613,19 @@ def mock_register_user(mocker, api_user_pending):
         return api_user_pending
 
     return mocker.patch('app.user_api_client.register_user', side_effect=_register)
+
+
+@pytest.fixture(scope='function')
+def mock_get_non_govuser(mocker, user=None):
+    if user is None:
+        user = api_user_active(fake_uuid(), email_address='someuser@notonwhitelist.com')
+
+    def _get_user(id_):
+        user.id = id_
+        return user
+
+    return mocker.patch(
+        'app.user_api_client.get_user', side_effect=_get_user)
 
 
 @pytest.fixture(scope='function')
