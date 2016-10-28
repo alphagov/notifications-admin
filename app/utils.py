@@ -203,7 +203,7 @@ def get_help_argument():
     return request.args.get('help') if request.args.get('help') in ('1', '2', '3') else None
 
 
-def user_in_whitelist(email_address):
-    valid_domains = current_app.config.get('EMAIL_DOMAIN_REGEXES', [])
-    email_regex = "[^\@^\s]+@([^@^\\.^\\s]+\.)*({})$".format("|".join(valid_domains))
-    return bool(re.match(email_regex, email_address))
+def is_gov_user(email_address):
+    valid_domains = current_app.config['EMAIL_DOMAIN_REGEXES']
+    email_regex = "[.|@]({})$".format("|".join(valid_domains))
+    return bool(re.search(email_regex, email_address.lower()))

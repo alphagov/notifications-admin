@@ -21,7 +21,7 @@ from wtforms import (
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
 
-from app.main.validators import (Blacklist, CsvFileValidator, ValidEmailDomainRegex, NoCommasInPlaceHolders)
+from app.main.validators import (Blacklist, CsvFileValidator, ValidGovEmail, NoCommasInPlaceHolders)
 
 
 def get_time_value_and_label(future_time):
@@ -56,7 +56,7 @@ def email_address(label='Email address', gov_user=True):
     ]
 
     if gov_user:
-        validators.append(ValidEmailDomainRegex())
+        validators.append(ValidGovEmail())
     return EmailField(label, validators)
 
 
@@ -246,7 +246,6 @@ class EmailTemplateForm(SMSTemplateForm):
 
 
 class ForgotPasswordForm(Form):
-    # email_address = email_address()
     email_address = email_address(gov_user=False)
 
 
