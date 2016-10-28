@@ -1,8 +1,7 @@
 from flask import url_for, session
 from unittest.mock import ANY
 import app
-from app.utils import user_in_whitelist
-from tests.conftest import api_user_active as create_active_user
+from app.utils import is_gov_user
 
 
 def test_get_should_render_add_service_template(app_,
@@ -105,9 +104,23 @@ def test_should_return_form_errors_with_duplicate_service_name_regardless_of_cas
             assert not mock_create_service.called
 
 
-def test_non_whitelist_user_cannot_add_service(app_, mocker, client, fake_uuid):
-    non_whitelist_user = create_active_user(fake_uuid, 'someuser@notonwhitelist.com')
-    client.login(non_whitelist_user, mocker)
-    assert not user_in_whitelist(non_whitelist_user.email_address)
+def test_non_whitelist_user_cannot_access_create_service_page(app_,
+                                                              client,
+                                                              mock_login,
+                                                              mock_get_non_govuser,
+                                                              api_nongov_user_active):
+    client.login(api_nongov_user_active)
+    assert not is_gov_user(api_nongov_user_active.email_address)
     response = client.get(url_for('main.add_service'))
+    assert response.status_code == 403
+
+
+def test_non_whitelist_user_cannot_create_service(app_,
+                                                  client,
+                                                  mock_login,
+                                                  mock_get_non_govuser,
+                                                  api_nongov_user_active):
+    client.login(api_nongov_user_active)
+    assert not is_gov_user(api_nongov_user_active.email_address)
+    response = client.post(url_for('main.add_service'), data={'name': 'SERVICE TWO'})
     assert response.status_code == 403
