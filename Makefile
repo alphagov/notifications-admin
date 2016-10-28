@@ -95,35 +95,18 @@ prepare-docker-build-image: ## Prepare the Docker builder image
 	mkdir -p ${PIP_ACCEL_CACHE}
 	make -C docker build-build-image
 
-.PHONY: build-with-docker
-build-with-docker: prepare-docker-build-image ## Build inside a Docker container
+# FIXME: CIRCLECI=1 is an ugly hack because the coveralls-python library sends the PR link only this way
+define run_test_container
+	mkdir -p cache/pip-accel
 	@docker run -i --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-build" \
+		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
 		-v `pwd`:/var/project \
 		-v ${PIP_ACCEL_CACHE}:/var/project/cache/pip-accel \
+		-e UID=$(shell id -u) \
+		-e GID=$(shell id -g) \
 		-e GIT_COMMIT=${GIT_COMMIT} \
 		-e BUILD_NUMBER=${BUILD_NUMBER} \
 		-e BUILD_URL=${BUILD_URL} \
-		${DOCKER_BUILDER_IMAGE_NAME} \
-		make build
-
-.PHONY: test-with-docker
-test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
-	@docker run -i --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-test" \
-		-v `pwd`:/var/project \
-		-e GIT_COMMIT=${GIT_COMMIT} \
-		-e BUILD_NUMBER=${BUILD_NUMBER} \
-		-e BUILD_URL=${BUILD_URL} \
-		${DOCKER_BUILDER_IMAGE_NAME} \
-		make test
-
-# FIXME: CIRCLECI=1 is an ugly hack because the coveralls-python library sends the PR link only this way
-.PHONY: coverage-with-docker
-coverage-with-docker: prepare-docker-build-image ## Generates coverage report inside a Docker container
-	@docker run -i --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-coverage" \
-		-v `pwd`:/var/project \
 		-e COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} \
 		-e CIRCLECI=1 \
 		-e CI_NAME=${CI_NAME} \
@@ -132,7 +115,20 @@ coverage-with-docker: prepare-docker-build-image ## Generates coverage report in
 		-e CI_BRANCH=${GIT_BRANCH} \
 		-e CI_PULL_REQUEST=${CI_PULL_REQUEST} \
 		${DOCKER_BUILDER_IMAGE_NAME} \
-		make coverage
+		su -c "make ${1}" hostuser
+endef
+
+.PHONY: build-with-docker
+build-with-docker: prepare-docker-build-image ## Build inside a Docker container
+	$(call run_test_container,build)
+
+.PHONY: test-with-docker
+test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
+	$(call run_test_container,test)
+
+.PHONY: coverage-with-docker
+coverage-with-docker: prepare-docker-build-image ## Generates coverage report inside a Docker container
+	$(call run_test_container,coverage)
 
 .PHONY: clean-docker-containers
 clean-docker-containers: ## Clean up any remaining docker containers
