@@ -104,8 +104,7 @@ def test_should_return_form_errors_with_duplicate_service_name_regardless_of_cas
             assert not mock_create_service.called
 
 
-def test_non_whitelist_user_cannot_access_create_service_page(app_,
-                                                              client,
+def test_non_whitelist_user_cannot_access_create_service_page(client,
                                                               mock_login,
                                                               mock_get_non_govuser,
                                                               api_nongov_user_active):
@@ -115,8 +114,7 @@ def test_non_whitelist_user_cannot_access_create_service_page(app_,
     assert response.status_code == 403
 
 
-def test_non_whitelist_user_cannot_create_service(app_,
-                                                  client,
+def test_non_whitelist_user_cannot_create_service(client,
                                                   mock_login,
                                                   mock_get_non_govuser,
                                                   api_nongov_user_active):

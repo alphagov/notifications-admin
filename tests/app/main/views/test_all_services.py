@@ -30,8 +30,7 @@ def test_all_service_returns_403_when_not_a_platform_admin(app_,
             assert response.status_code == 403
 
 
-def test_non_gov_user_cannot_see_add_service_button(app_,
-                                                    client,
+def test_non_gov_user_cannot_see_add_service_button(client,
                                                     mock_login,
                                                     mock_get_non_govuser,
                                                     api_nongov_user_active):

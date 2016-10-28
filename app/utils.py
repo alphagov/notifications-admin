@@ -205,5 +205,5 @@ def get_help_argument():
 
 def is_gov_user(email_address):
     valid_domains = current_app.config['EMAIL_DOMAIN_REGEXES']
-    email_regex = "[.|@]({})$".format("|".join(valid_domains))
+    email_regex = (r"[\.|@]({})$".format("|".join(valid_domains)))
     return bool(re.search(email_regex, email_address.lower()))
