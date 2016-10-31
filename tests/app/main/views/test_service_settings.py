@@ -314,11 +314,11 @@ def test_should_redirect_after_request_to_go_live(
             response = client.post(
                 url_for('main.service_request_to_go_live', service_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'),
                 data={
-                    'channel': 'Email',
+                    'channel': 'emails',
                     'start_date': '01/01/2017',
                     'start_volume': '100,000',
                     'peak_volume': '2,000,000',
-                    'upload_or_api': 'api'
+                    'upload_or_api': 'API'
                 },
                 follow_redirects=True
             )
@@ -337,11 +337,11 @@ def test_should_redirect_after_request_to_go_live(
             )
 
             returned_message = mock_post.call_args[1]['data']['message']
-            assert 'Email' in returned_message
+            assert 'emails' in returned_message
             assert '01/01/2017' in returned_message
             assert '100,000' in returned_message
             assert '2,000,000' in returned_message
-            assert 'api' in returned_message
+            assert 'API' in returned_message
 
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         flash_banner = page.find('div', class_='banner-default').string.strip()
@@ -376,11 +376,11 @@ def test_log_error_on_request_to_go_live(
                 resp = client.post(
                     url_for('main.service_request_to_go_live', service_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'),
                     data={
-                        'channel': 'channel',
+                        'channel': 'emails',
                         'start_date': 'start_date',
                         'start_volume': 'start_volume',
                         'peak_volume': 'peak_volume',
-                        'upload_or_api': 'upload_or_api'
+                        'upload_or_api': 'API'
                     }
                 )
             mock_logger.assert_called_with(

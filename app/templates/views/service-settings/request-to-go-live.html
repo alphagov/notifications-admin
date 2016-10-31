@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/banner.html" import banner_wrapper %}
 
@@ -39,11 +40,11 @@
       </ul>
 
       <form method="post">
-        {{ textbox(form.channel, width='1-1') }}
+        {{ radios(form.channel) }}
         {{ textbox(form.start_date, width='1-1') }}
         {{ textbox(form.start_volume, width='1-1') }}
         {{ textbox(form.peak_volume, width='1-1') }}
-        {{ textbox(form.upload_or_api, width='1-1') }}
+        {{ radios(form.upload_or_api) }}
 
         <p>
           Once you’ve completed the tasks needed to set up, we’ll make your service live. We’ll do this within one working day.

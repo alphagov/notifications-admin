@@ -350,9 +350,14 @@ class Feedback(Form):
 
 
 class RequestToGoLiveForm(Form):
-    channel = StringField(
+    channel = RadioField(
         'Are you sending emails or text messages or both?',
-        validators=[DataRequired(message='Can’t be empty')]
+        choices=[
+            ('emails', 'Emails'),
+            ('text messages', 'Text messages'),
+            ('emails and text messages', 'Both')
+        ],
+        validators=[DataRequired()]
     )
     start_date = StringField(
         'When will you be ready to start sending messages?',
@@ -366,10 +371,15 @@ class RequestToGoLiveForm(Form):
         'Will the number of messages a month increase and when will that start? Give an estimate.',
         validators=[DataRequired(message='Can’t be empty')]
     )
-    upload_or_api = StringField(
+    upload_or_api = RadioField(
         'Are you uploading a list of contacts that you’re sending your message to, ' +
         'or are you integrating your system with ours?',
-        validators=[DataRequired(message='Can’t be empty')]
+        choices=[
+            ('File upload', 'Upload a spreadsheet of recipients'),
+            ('API', 'Integrate with the GOV.UK Notify API'),
+            ('API and file upload', 'Both')
+        ],
+        validators=[DataRequired()]
     )
 
 
