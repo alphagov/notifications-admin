@@ -1,12 +1,13 @@
+from unittest.mock import call, ANY, Mock
+
 import pytest
 from flask import url_for
+from bs4 import BeautifulSoup
+from werkzeug.exceptions import InternalServerError
 
 import app
 from app.utils import email_safe
 from tests import validate_route_permission, service_json
-from bs4 import BeautifulSoup
-from unittest.mock import ANY, Mock
-from werkzeug.exceptions import InternalServerError
 
 
 def test_should_show_overview(
@@ -474,75 +475,76 @@ def test_should_redirect_delete_confirmation(app_,
         assert mock_delete_service.called
 
 
-def test_route_permissions(mocker, app_, api_user_active, service_one, mock_get_organisation):
-    routes = [
-        'main.service_settings',
-        'main.service_name_change',
-        'main.service_name_change_confirm',
-        'main.service_request_to_go_live',
-        'main.service_delete',
-        'main.service_delete_confirm']
+@pytest.mark.parametrize('route', [
+    'main.service_settings',
+    'main.service_name_change',
+    'main.service_name_change_confirm',
+    'main.service_request_to_go_live',
+    'main.service_delete',
+    'main.service_delete_confirm'
+])
+def test_route_permissions(mocker, app_, api_user_active, service_one, route):
     with app_.test_request_context():
-        for route in routes:
-            validate_route_permission(
-                mocker,
-                app_,
-                "GET",
-                200,
-                url_for(route, service_id=service_one['id']),
-                ['manage_settings'],
-                api_user_active,
-                service_one)
+        validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            200,
+            url_for(route, service_id=service_one['id']),
+            ['manage_settings'],
+            api_user_active,
+            service_one)
 
 
-def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, mock_get_organisation):
-    routes = [
-        'main.service_settings',
-        'main.service_name_change',
-        'main.service_name_change_confirm',
-        'main.service_request_to_go_live',
-        'main.service_switch_live',
-        'main.service_switch_research_mode',
-        'main.service_delete',
-        'main.service_delete_confirm']
+@pytest.mark.parametrize('route', [
+    'main.service_settings',
+    'main.service_name_change',
+    'main.service_name_change_confirm',
+    'main.service_request_to_go_live',
+    'main.service_switch_live',
+    'main.service_switch_research_mode',
+    'main.service_switch_can_send_letters',
+    'main.service_delete',
+    'main.service_delete_confirm'
+])
+def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, route):
     with app_.test_request_context():
-        for route in routes:
-            validate_route_permission(
-                mocker,
-                app_,
-                "GET",
-                403,
-                url_for(route, service_id=service_one['id']),
-                ['blah'],
-                api_user_active,
-                service_one)
+        validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            403,
+            url_for(route, service_id=service_one['id']),
+            ['blah'],
+            api_user_active,
+            service_one)
 
 
-def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one, mock_get_organisation):
-    routes = [
-        'main.service_settings',
-        'main.service_name_change',
-        'main.service_name_change_confirm',
-        'main.service_request_to_go_live',
-        'main.service_delete',
-        'main.service_delete_confirm'
-    ]
+@pytest.mark.parametrize('route', [
+    'main.service_settings',
+    'main.service_name_change',
+    'main.service_name_change_confirm',
+    'main.service_request_to_go_live',
+    'main.service_delete',
+    'main.service_delete_confirm'
+])
+def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one, route):
     with app_.test_request_context():
-        for route in routes:
-            validate_route_permission(mocker,
-                                      app_,
-                                      "GET",
-                                      200,
-                                      url_for(route, service_id=service_one['id']),
-                                      [],
-                                      platform_admin_user,
-                                      service_one)
+        validate_route_permission(mocker,
+                                  app_,
+                                  "GET",
+                                  200,
+                                  url_for(route, service_id=service_one['id']),
+                                  [],
+                                  platform_admin_user,
+                                  service_one)
 
 
 def test_route_for_platform_admin_update_service(mocker, app_, platform_admin_user, service_one):
     routes = [
         'main.service_switch_live',
-        'main.service_switch_research_mode'
+        'main.service_switch_research_mode',
+        'main.service_switch_can_send_letters'
     ]
     with app_.test_request_context():
         for route in routes:
@@ -814,3 +816,27 @@ def test_should_set_branding_and_organisations(
             branding='org',
             organisation='organisation-id'
         )
+
+
+def test_switch_service_enable_letters(client, platform_admin_user, service_one, mocker):
+    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.get(url_for('main.service_switch_can_send_letters', service_id=service_one['id']))
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_fn.call_args == call(service_one['id'], {'can_send_letters': True})
+
+
+def test_switch_service_disable_letters(client, platform_admin_user, mocker):
+    service = service_json("1234", "Test Service", [], can_send_letters=True)
+    mocker.patch('app.service_api_client.get_service', return_value={"data": service})
+    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service)
+
+    client.login(platform_admin_user, mocker, service)
+    response = client.get(url_for('main.service_switch_can_send_letters', service_id=service['id']))
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service['id'], _external=True)
+    assert mocked_fn.call_args == call(service['id'], {"can_send_letters": False})

@@ -88,6 +88,7 @@ class ServiceAPIClient(NotificationsAPIClient):
             'email_from',
             'reply_to_email_address',
             'research_mode',
+            'can_send_letters',
             'sms_sender',
             'created_by',
             'branding',

@@ -88,9 +88,14 @@
             {{ 'Make service live' if current_service.restricted else 'Revert service to trial mode' }}
           </a>
         </li>
-        <li>
+        <li class="bottom-gutter">
           <a href="{{ url_for('.service_switch_research_mode', service_id=current_service.id) }}" class="button">
             {{ 'Take service out of research mode' if current_service.research_mode else 'Put into research mode' }}
+          </a>
+        </li>
+        <li class="bottom-gutter">
+          <a href="{{ url_for('.service_switch_can_send_letters', service_id=current_service.id) }}" class="button">
+            {{ 'Stop sending letters' if current_service.can_send_letters else 'Allow to send letters' }}
           </a>
         </li>
       </ul>
