@@ -351,7 +351,7 @@ class Feedback(Form):
 
 class RequestToGoLiveForm(Form):
     channel = RadioField(
-        'Are you sending emails or text messages or both?',
+        'What kind of messages will you be sending?',
         choices=[
             ('emails', 'Emails'),
             ('text messages', 'Text messages'),
@@ -372,8 +372,7 @@ class RequestToGoLiveForm(Form):
         validators=[DataRequired(message='Can’t be empty')]
     )
     upload_or_api = RadioField(
-        'Are you uploading a list of contacts that you’re sending your message to, ' +
-        'or are you integrating your system with ours?',
+        'How are you going to send messages?',
         choices=[
             ('File upload', 'Upload a spreadsheet of recipients'),
             ('API', 'Integrate with the GOV.UK Notify API'),
