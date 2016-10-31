@@ -8,7 +8,7 @@ from app.utils import user_has_permissions
 
 @main.route("/services/<service_id>/letters")
 @login_required
-@user_has_permissions('manage_templates', admin_override=True)
+@user_has_permissions('manage_templates', 'send_letters', admin_override=True, any_=True)
 def letters(service_id):
     if not current_service['can_send_letters']:
         abort(403)
