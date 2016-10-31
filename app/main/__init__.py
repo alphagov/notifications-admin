@@ -24,7 +24,6 @@ from app.main.views import (
     api_keys,
     manage_users,
     invites,
-    all_services,
     feedback,
     providers,
     platform_admin,

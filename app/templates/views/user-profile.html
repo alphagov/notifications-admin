@@ -28,7 +28,13 @@
       {{ item.value }}
     {% endcall %}
     {% call field(align='right') %}
-      <a href="{{ item.url }}">Change</a>
+      {% if item.label == 'Email address' %}
+        {% if can_see_edit %}
+          <a href="{{ item.url }}">Change</a>
+        {% endif %}
+      {% else %}
+          <a href="{{ item.url }}">Change</a>
+      {% endif %}
     {% endcall %}
   {% endcall %}
 

@@ -3,7 +3,11 @@ import csv
 from io import StringIO
 from os import path
 from functools import wraps
-from flask import (abort, session, request, redirect, url_for)
+import unicodedata
+
+from flask import (abort, current_app, session, request, redirect, url_for)
+from flask_login import current_user
+
 import pyexcel
 import pyexcel.ext.io
 import pyexcel.ext.xls
@@ -41,7 +45,6 @@ def user_has_permissions(*permissions, admin_override=False, any_=False):
     def wrap(func):
         @wraps(func)
         def wrap_func(*args, **kwargs):
-            from flask_login import current_user
             if current_user and current_user.is_authenticated:
                 if current_user.has_permissions(
                     permissions=permissions,
@@ -141,10 +144,14 @@ def generate_previous_next_dict(view, service_id, page, title, url_args):
 
 
 def email_safe(string, whitespace='.'):
-    return "".join([
-        character.lower() if character.isalnum() or character == whitespace else ""
-        for character in re.sub(r"\s+", whitespace, string.strip())
-    ])
+    # strips accents, diacritics etc
+    string = ''.join(c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn')
+    string = ''.join(
+        word.lower() if word.isalnum() or word == whitespace else ''
+        for word in re.sub(r'\s+', whitespace, string.strip())
+    )
+    string = re.sub(r'\.{2,}', '.', string)
+    return string.strip('.')
 
 
 class Spreadsheet():
@@ -173,18 +180,15 @@ class Spreadsheet():
 
     @classmethod
     def from_rows(cls, rows, filename=''):
-
         with StringIO() as converted:
             output = csv.writer(converted)
 
             for row in rows:
                 output.writerow(row)
-
             return cls(converted.getvalue(), filename)
 
     @classmethod
     def from_file(cls, file_content, filename=''):
-
         extension = cls.get_extension(filename)
 
         if extension == 'csv':
@@ -195,9 +199,15 @@ class Spreadsheet():
 
         return cls.from_rows(pyexcel.get_sheet(
             file_type=extension,
-            file_content=file_content.getvalue()
+            file_content=file_content.read()
         ).to_array(), filename)
 
 
 def get_help_argument():
     return request.args.get('help') if request.args.get('help') in ('1', '2', '3') else None
+
+
+def is_gov_user(email_address):
+    valid_domains = current_app.config['EMAIL_DOMAIN_REGEXES']
+    email_regex = (r"[\.|@]({})$".format("|".join(valid_domains)))
+    return bool(re.search(email_regex, email_address.lower()))

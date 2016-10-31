@@ -16,7 +16,7 @@ Manage users – GOV.UK Notify
   <div class="grid-row">
     <form method="post" class="column-three-quarters">
 
-      {{ textbox(form.email_address, hint='Must be from a central government organisation', width='1-1', safe_error_message=True) }}
+      {{ textbox(form.email_address, width='1-1', safe_error_message=True) }}
 
       {% include 'views/manage-users/permissions.html' %}
 

@@ -1,6 +1,7 @@
 import json
 
 from flask import (
+    abort,
     render_template,
     redirect,
     url_for,
@@ -21,6 +22,8 @@ from app.main.forms import (
     ConfirmPasswordForm
 )
 
+from app.utils import is_gov_user
+
 from app import user_api_client
 
 NEW_EMAIL = 'new-email'
@@ -31,7 +34,10 @@ NEW_MOBILE_PASSWORD_CONFIRMED = 'new-mob-password-confirmed'
 @main.route("/user-profile")
 @login_required
 def user_profile():
-    return render_template('views/user-profile.html')
+    return render_template(
+        'views/user-profile.html',
+        can_see_edit=is_gov_user(current_user.email_address)
+    )
 
 
 @main.route("/user-profile/name", methods=['GET', 'POST'])
@@ -55,6 +61,9 @@ def user_profile_name():
 @main.route("/user-profile/email", methods=['GET', 'POST'])
 @login_required
 def user_profile_email():
+
+    if not is_gov_user(current_user.email_address):
+        abort(403)
 
     def _is_email_unique(email):
         return user_api_client.is_email_unique(email)

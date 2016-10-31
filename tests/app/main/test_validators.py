@@ -1,6 +1,6 @@
 import pytest
 from app.main.forms import RegisterUserForm, ServiceSmsSender
-from app.main.validators import ValidEmailDomainRegex, NoCommasInPlaceHolders
+from app.main.validators import ValidGovEmail, NoCommasInPlaceHolders
 from wtforms import ValidationError
 from unittest.mock import Mock
 
@@ -85,7 +85,7 @@ def _gen_mock_field(x):
 ])
 def test_valid_list_of_white_list_email_domains(app_, email):
     with app_.test_request_context():
-        email_domain_validators = ValidEmailDomainRegex()
+        email_domain_validators = ValidGovEmail()
         email_domain_validators(None, _gen_mock_field(email))
 
 
@@ -117,7 +117,7 @@ def test_valid_list_of_white_list_email_domains(app_, email):
 ])
 def test_invalid_list_of_white_list_email_domains(app_, email):
     with app_.test_request_context():
-        email_domain_validators = ValidEmailDomainRegex()
+        email_domain_validators = ValidGovEmail()
         with pytest.raises(ValidationError):
             email_domain_validators(None, _gen_mock_field(email))
 

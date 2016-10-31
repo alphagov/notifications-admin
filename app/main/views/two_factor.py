@@ -42,7 +42,7 @@ def two_factor():
             return redirect(next_url)
 
         if current_user.platform_admin:
-            return redirect(url_for('main.show_all_services'))
+            return redirect(url_for('main.platform_admin'))
         if len(services) == 1:
             return redirect(url_for('main.service_dashboard', service_id=services[0]['id']))
         else:

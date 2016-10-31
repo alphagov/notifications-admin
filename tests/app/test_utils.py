@@ -1,15 +1,27 @@
-import pytest
+from pathlib import Path
 from io import StringIO
-from app.utils import email_safe, generate_notifications_csv, generate_previous_dict, generate_next_dict
 from csv import DictReader
+
+import pytest
 from freezegun import freeze_time
 
+from app.utils import email_safe, generate_notifications_csv, generate_previous_dict, generate_next_dict, Spreadsheet
 
-def test_email_safe_return_dot_separated_email_domain():
-    test_name = 'SOME service  with+stuff+ b123'
-    expected = 'some.service.withstuff.b123'
-    actual = email_safe(test_name)
-    assert actual == expected
+
+@pytest.mark.parametrize('service_name, safe_email', [
+    ('name with spaces', 'name.with.spaces'),
+    ('singleword', 'singleword'),
+    ('UPPER CASE', 'upper.case'),
+    ('Service - with dash', 'service.with.dash'),
+    ('lots      of spaces', 'lots.of.spaces'),
+    ('name.with.dots', 'name.with.dots'),
+    ('name-with-other-delimiters', 'namewithotherdelimiters'),
+    ('.leading', 'leading'),
+    ('trailing.', 'trailing'),
+    ('üńïçödë wördś', 'unicode.words'),
+])
+def test_email_safe_return_dot_separated_email_domain(service_name, safe_email):
+    assert email_safe(service_name) == safe_email
 
 
 @pytest.mark.parametrize(
@@ -67,3 +79,9 @@ def test_generate_next_dict(client):
 def test_generate_previous_next_dict_adds_other_url_args(client):
     ret = generate_next_dict('main.view_notifications', 'foo', 2, {'message_type': 'blah'})
     assert 'notifications/blah' in ret['url']
+
+
+def test_can_create_spreadsheet_from_large_excel_file():
+    with open(str(Path.cwd() / 'tests' / 'spreadsheet_files' / 'excel 2007.xlsx'), 'rb') as xl:
+        ret = Spreadsheet.from_file(xl, filename='xl.xlsx')
+    assert ret.as_csv_data

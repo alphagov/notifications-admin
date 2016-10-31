@@ -1,6 +1,17 @@
 from flask import url_for, session
 from unittest.mock import ANY
 import app
+from app.utils import is_gov_user
+
+
+def test_non_gov_user_cannot_see_add_service_button(client,
+                                                    mock_login,
+                                                    mock_get_non_govuser,
+                                                    api_nongov_user_active):
+    client.login(api_nongov_user_active)
+    response = client.get(url_for('main.choose_service'))
+    assert 'Add a new service' not in response.get_data(as_text=True)
+    assert response.status_code == 200
 
 
 def test_get_should_render_add_service_template(app_,
@@ -101,3 +112,23 @@ def test_should_return_form_errors_with_duplicate_service_name_regardless_of_cas
             assert 'This service name is already in use' in response.get_data(as_text=True)
             app.service_api_client.find_all_service_email_from.assert_called_once_with()
             assert not mock_create_service.called
+
+
+def test_non_whitelist_user_cannot_access_create_service_page(client,
+                                                              mock_login,
+                                                              mock_get_non_govuser,
+                                                              api_nongov_user_active):
+    client.login(api_nongov_user_active)
+    assert not is_gov_user(api_nongov_user_active.email_address)
+    response = client.get(url_for('main.add_service'))
+    assert response.status_code == 403
+
+
+def test_non_whitelist_user_cannot_create_service(client,
+                                                  mock_login,
+                                                  mock_get_non_govuser,
+                                                  api_nongov_user_active):
+    client.login(api_nongov_user_active)
+    assert not is_gov_user(api_nongov_user_active.email_address)
+    response = client.post(url_for('main.add_service'), data={'name': 'SERVICE TWO'})
+    assert response.status_code == 403
