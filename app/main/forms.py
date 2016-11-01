@@ -364,11 +364,11 @@ class RequestToGoLiveForm(Form):
         validators=[DataRequired(message='Can’t be empty')]
     )
     start_volume = StringField(
-        'How many messages do you expect to send per month to start with? Give an estimate in numbers.',
+        'How many messages do you expect to send to start with?',
         validators=[DataRequired(message='Can’t be empty')]
     )
     peak_volume = StringField(
-        'Will the number of messages a month increase and when will that start? Give an estimate.',
+        'Will the number of messages increase and when will that start?',
         validators=[DataRequired(message='Can’t be empty')]
     )
     upload_or_api = RadioField(

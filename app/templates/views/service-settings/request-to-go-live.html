@@ -42,8 +42,8 @@
       <form method="post">
         {{ radios(form.channel) }}
         {{ textbox(form.start_date, width='1-1') }}
-        {{ textbox(form.start_volume, width='1-1') }}
-        {{ textbox(form.peak_volume, width='1-1') }}
+        {{ textbox(form.start_volume, width='1-1', hint='For example, ‘1000 a month’.') }}
+        {{ textbox(form.peak_volume, width='1-1', hint='For example, ‘Messages will increase to 20,000 a month in January’.') }}
         {{ radios(form.upload_or_api) }}
 
         <p>
