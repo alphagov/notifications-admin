@@ -14,6 +14,12 @@
     Whitelist
   </h1>
 
+  <p>
+    You and members of
+    <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">your team</a>
+    are included in the whitelist automatically.
+  </p>
+
   <form method="post">
 
     <div class="grid-row">
