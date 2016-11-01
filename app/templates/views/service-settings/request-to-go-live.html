@@ -31,12 +31,17 @@
       </ul>
 
       <form method="post">
-        {{ radios(form.mou) }}
-        {{ radios(form.channel) }}
-        {{ textbox(form.start_date, width='1-1') }}
-        {{ textbox(form.start_volume, width='1-1') }}
-        {{ textbox(form.peak_volume, width='1-1') }}
-        {{ radios(form.upload_or_api) }}
+        <div class="form-group">
+          <p>We need permission to process your data before we can make your service live.</p>
+          {{ radios(form.mou) }}
+        </div>
+        <div class="form-group">
+          {{ radios(form.channel) }}
+          {{ textbox(form.start_date, width='1-1') }}
+          {{ textbox(form.start_volume, width='1-1', hint='For example, ‘1000 a month’.') }}
+          {{ textbox(form.peak_volume, width='1-1', hint='For example, ‘Messages will increase to 20,000 a month in January’.') }}
+          {{ radios(form.upload_or_api) }}
+        </div>
 
         <p>
           Once you’ve completed the tasks needed to set up, we’ll make your service live. We’ll do this within one working day.
