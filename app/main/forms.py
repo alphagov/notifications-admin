@@ -350,6 +350,18 @@ class Feedback(Form):
 
 
 class RequestToGoLiveForm(Form):
+    mou = RadioField(
+        (
+            'Has your organisation accepted the GOV.UK&nbsp;Notify data sharing and financial '
+            'agreement (Memorandum of Understanding)?'
+        ),
+        choices=[
+            ('yes', 'Yes'),
+            ('no', 'No – we’ll send you a copy'),
+            ('don’t know', 'I don’t know – we’ll check for you')
+        ],
+        validators=[DataRequired()]
+    )
     channel = RadioField(
         'What kind of messages will you be sending?',
         choices=[

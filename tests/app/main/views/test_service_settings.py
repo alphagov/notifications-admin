@@ -314,6 +314,7 @@ def test_should_redirect_after_request_to_go_live(
             response = client.post(
                 url_for('main.service_request_to_go_live', service_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'),
                 data={
+                    'mou': 'yes',
                     'channel': 'emails',
                     'start_date': '01/01/2017',
                     'start_volume': '100,000',
@@ -376,6 +377,7 @@ def test_log_error_on_request_to_go_live(
                 resp = client.post(
                     url_for('main.service_request_to_go_live', service_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'),
                     data={
+                        'mou': 'yes',
                         'channel': 'emails',
                         'start_date': 'start_date',
                         'start_volume': 'start_volume',
