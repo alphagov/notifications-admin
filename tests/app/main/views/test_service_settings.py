@@ -416,6 +416,7 @@ def test_route_permissions(mocker, app_, api_user_active, service_one, route):
     'main.service_switch_live',
     'main.service_switch_research_mode',
     'main.service_switch_can_send_letters',
+    'main.deactivate_service',
 ])
 def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, route):
     with app_.test_request_context():
@@ -448,22 +449,23 @@ def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one
                                   service_one)
 
 
-def test_route_for_platform_admin_update_service(mocker, app_, platform_admin_user, service_one):
-    routes = [
-        'main.service_switch_live',
-        'main.service_switch_research_mode',
-        'main.service_switch_can_send_letters'
-    ]
+@pytest.mark.parametrize('route', [
+    'main.service_switch_live',
+    'main.service_switch_research_mode',
+    'main.service_switch_can_send_letters',
+    'main.deactivate_service',
+])
+def test_route_for_platform_admin_update_service(mocker, app_, platform_admin_user, service_one, route):
+    mocker.patch('app.service_api_client.deactivate_service')
     with app_.test_request_context():
-        for route in routes:
-            validate_route_permission(mocker,
-                                      app_,
-                                      "GET",
-                                      302,
-                                      url_for(route, service_id=service_one['id']),
-                                      [],
-                                      platform_admin_user,
-                                      service_one)
+        validate_route_permission(mocker,
+                                  app_,
+                                  "GET",
+                                  302,
+                                  url_for(route, service_id=service_one['id']),
+                                  [],
+                                  platform_admin_user,
+                                  service_one)
 
 
 def test_set_reply_to_email_address(
@@ -748,3 +750,25 @@ def test_switch_service_disable_letters(client, platform_admin_user, mocker):
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service['id'], _external=True)
     assert mocked_fn.call_args == call(service['id'], {"can_send_letters": False})
+
+
+def test_deactivate_service(client, platform_admin_user, service_one, mocker):
+    mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
+
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.get(url_for('main.deactivate_service', service_id=service_one['id']))
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_fn.call_args == call('/service/{}/deactivate'.format(service_one['id']), data=None)
+
+
+def test_cant_deactivate_inactive_service(client, platform_admin_user, service_one, mocker):
+    service_one['active'] = False
+
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.get(url_for('main.service_settings', service_id=service_one['id']))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert 'Deactivate service' not in {a.text for a in page.find_all('a', class_='button')}

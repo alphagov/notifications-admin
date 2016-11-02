@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 from flask import url_for
-from notifications_python_client.notifications import NotificationsAPIClient
+from notifications_python_client.base import BaseAPIClient
 from app.utils import BrowsableItem
 from app.notify_client import _attach_current_user
 
 
-class ServiceAPIClient(NotificationsAPIClient):
+class ServiceAPIClient(BaseAPIClient):
     # Fudge assert in the super __init__ so
     # we can set those variables later.
     def __init__(self):
@@ -96,6 +96,9 @@ class ServiceAPIClient(NotificationsAPIClient):
 
     def update_service_with_properties(self, service_id, properties):
         return self.update_service(service_id, **properties)
+
+    def deactivate_service(self, service_id):
+        return self.post('/service/{}/deactivate'.format(service_id), data=None)
 
     def remove_user_from_service(self, service_id, user_id):
         """
