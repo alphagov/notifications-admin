@@ -389,99 +389,11 @@ def test_log_error_on_request_to_go_live(
             )
 
 
-def test_should_show_delete_page(app_,
-                                 api_user_active,
-                                 mock_login,
-                                 mock_get_service,
-                                 mock_get_user,
-                                 mock_get_user_by_email,
-                                 mock_has_permissions,
-                                 fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.get(url_for(
-                'main.service_delete', service_id=service_id))
-
-        assert response.status_code == 200
-        assert 'Delete this service from GOV.UK Notify' in response.get_data(as_text=True)
-        assert mock_get_service.called
-
-
-def test_should_show_redirect_after_deleting_service(app_,
-                                                     api_user_active,
-                                                     mock_get_service,
-                                                     mock_get_user,
-                                                     mock_get_user_by_email,
-                                                     mock_login,
-                                                     mock_has_permissions,
-                                                     fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.post(url_for(
-                'main.service_delete', service_id=service_id))
-
-        assert response.status_code == 302
-        delete_url = url_for(
-            'main.service_delete_confirm', service_id=service_id, _external=True)
-        assert delete_url == response.location
-
-
-def test_should_show_delete_confirmation(app_,
-                                         api_user_active,
-                                         mock_get_service,
-                                         mock_get_user,
-                                         mock_get_user_by_email,
-                                         mock_login,
-                                         mock_has_permissions,
-                                         fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.get(url_for(
-                'main.service_delete_confirm', service_id=service_id))
-
-        assert response.status_code == 200
-        assert 'Delete this service from Notify' in response.get_data(as_text=True)
-        assert mock_get_service.called
-
-
-def test_should_redirect_delete_confirmation(app_,
-                                             api_user_active,
-                                             mock_get_service,
-                                             mock_delete_service,
-                                             mock_get_user,
-                                             mock_get_user_by_email,
-                                             mock_login,
-                                             mock_verify_password,
-                                             mock_has_permissions,
-                                             fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.post(url_for(
-                'main.service_delete_confirm', service_id=service_id))
-
-        assert response.status_code == 302
-        choose_url = url_for(
-            'main.choose_service', _external=True)
-        assert choose_url == response.location
-        assert mock_get_service.called
-        assert mock_delete_service.called
-
-
 @pytest.mark.parametrize('route', [
     'main.service_settings',
     'main.service_name_change',
     'main.service_name_change_confirm',
     'main.service_request_to_go_live',
-    'main.service_delete',
-    'main.service_delete_confirm'
 ])
 def test_route_permissions(mocker, app_, api_user_active, service_one, route):
     with app_.test_request_context():
@@ -504,8 +416,6 @@ def test_route_permissions(mocker, app_, api_user_active, service_one, route):
     'main.service_switch_live',
     'main.service_switch_research_mode',
     'main.service_switch_can_send_letters',
-    'main.service_delete',
-    'main.service_delete_confirm'
 ])
 def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, route):
     with app_.test_request_context():
@@ -525,8 +435,6 @@ def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, r
     'main.service_name_change',
     'main.service_name_change_confirm',
     'main.service_request_to_go_live',
-    'main.service_delete',
-    'main.service_delete_confirm'
 ])
 def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one, route):
     with app_.test_request_context():

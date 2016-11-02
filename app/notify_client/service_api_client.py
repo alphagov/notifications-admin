@@ -31,14 +31,6 @@ class ServiceAPIClient(NotificationsAPIClient):
         data = _attach_current_user(data)
         return self.post("/service", data)['data']['id']
 
-    def delete_service(self, service_id):
-        """
-        Delete a service.
-        """
-        endpoint = "/service/{0}".format(service_id)
-        data = _attach_current_user({})
-        return self.delete(endpoint, data)
-
     def get_service(self, service_id):
         return self._get_service(service_id, detailed=False, today_only=False)
 
