@@ -23,7 +23,7 @@ Terms of use – GOV.UK Notify
 
     {% endcall %}
 
-    <p>To accept these terms, you must be the service manager for your service. If you’re not the service manager, you’ll need to invite them.</p>
+    <p>To accept these terms, you must be the service manager for your service.</p>
 
     <section id="summary">
       <h2 class="heading-medium">
@@ -34,25 +34,20 @@ Terms of use – GOV.UK Notify
 
       <ul class="list list-bullet">
         <li><a href="#we-agree-to-send-all-the-messages">send all the messages you pass to us</a></li>
+        <li><a href="#we-agree-to-keep-you-informed">keep you informed about the performance of GOV.UK Notify</a></li>
         <li><a href="#we-agree-to-keep-your-data-secure">keep your data secure</a></li>
-        <li><a href="#we-agree-to-give-you-three-months-notice-if-we-change-these-terms">give you three months’ notice if we change these terms</a></li>
+        <li><a href="#we-agree-to-give-you-one-months-notice">give you one months’ notice if we change these terms</a></li>
       </ul>
 
       <p>You agree:</p>
 
       <ul class="list list-bullet">
         <li><a href="#you-agree-not-to-compromise-our-security">not to compromise the security of GOV.UK Notify</a></li>
-        <li><a href="#you-agree-not-to-send-marketing">not to use GOV.UK Notify to send marketing messages</a></li>
+        <li><a href="#you-agree-not-to-send-unsolicited">not to use GOV.UK Notify to send unsolicited messages</a></li>
         <li><a href="#you-agree-to-send-messages-consistent-with-our-guidelines">to send messages consistent with our design patterns, style guide and information security principles</a></li>
         <li><a href="#you-agree-to-use-delivery-data-to-improve">to use GOV.UK delivery data to continuously improve the quality of your contact data</a></li>
       </ul>
 
-      <p>Before you can send real messages:</p>
-
-      <ul class="list list-bullet">
-        <li><a href="#you-must-tell-us-how-many-text-messages-emails-and-letters-you-plan-to-send">you must tell us approximately how many text messages, emails and letters you plan to send</a></li>
-        <li><a href="#we-will-check-your-templates-before-you-can-go-live">we will check the messages you plan to send to make sure they meet our guidelines</a></li>
-      </ul>
     </section>
 
     <section id="our-side">
@@ -64,37 +59,37 @@ Terms of use – GOV.UK Notify
         We agree to send all the messages you pass to us
       </h3>
 
-      <p>We will send all the messages you pass to us, as long as they meet our guidelines.</p>
+      <p>We’ll send all the messages you pass to us, as long as they meet our guidelines.</p>
 
-      <p>We endeavour to provide continuous uptime for both accepting messages and sending them.</p>
+      <p>We aim to provide a continuous service so you can use GOV.UK Notify 24 hours a day, 365 days a year.</p>
 
-      <p>We’ve made sure that GOV.UK Notify can handle large volumes of messages. For email and text messages we have several delivery providers concurrently integrated. This provides GOV.UK Notify with real-time failover capability.</p>
+      <p>We’ve made sure that GOV.UK Notify can handle large volumes of messages. For text messages we use multiple delivery providers at any one time. If a provider’s service fails, GOV.UK Notify will automatically switch to a different provider.</p>
 
-      <p>GOV.UK Notify is supported 24/7 for high-priority issues. We provide a ticketing system and escalation routes for service teams to address incidents.</p>
+      <h3 class="heading-small" id="we-agree-to-keep-you-informed">
+        We agree to keep you informed about the performance of GOV.UK Notify
+      </h3>
 
-      <p>You’ll be able to see how our service is performing on our <a href="https://status.notifications.service.gov.uk">status page</a>.</p>
+      <p>You’ll be able to see how the service is performing on our <a href="https://status.notifications.service.gov.uk">status page</a>.</p>
+
+      <p>We have a ticketing system and escalation routes to address incidents. We also provide 24 hour support for high-priority issues.</p>
+
+      <p>We also have a <a href="https://ukgovernmentdigital.slack.com/messages/govuk-notify">chat room</a> for talking to the GOV.UK Notify team. We are available to discuss your needs, and to see how Notify is working for you.</p>
 
       <h3 class="heading-small" id="we-agree-to-keep-your-data-secure">
         We agree to keep your data secure
       </h3>
 
-      <p>GOV.UK Notify (as a whole, including subcontractors) currently store personal data for up to 1 year, and non-personal data indefinitely.</p>
-
-      <p>GOV.UK Notify has been through an information assurance process to assess information risks, to determine appropriate treatments for those risks and to obtain risk acceptance from the Cabinet Office Senior Information Risk Officer (SIRO). This work includes the completion of a Privacy Impact Assessment to ensure compliance with the Data Protection Act.</p>
-
-      <p>We do not conduct, or enable, analysis of when the same recipient (mobile number, email or postal address) is contacted by multiple Government organisations. We may do so if required by law enforcement.</p>
-
-      <p>We maintain appropriate technical and organisational measures to protect data. We make sure our subcontractors follow the same procedures.</p>
+      <p>GOV.UK Notify has been through an information assurance process to assess information risks, to determine appropriate treatments for those risks and to obtain risk acceptance from the Cabinet Office Senior Information Risk Officer (SIRO). This work includes the completion of a privacy impact assessment to ensure compliance with the Data Protection Act.</p>
 
       <p>Cabinet Office act as data processor, as parent organisation of GOV.UK Notify. Your organisation remains the data controller.</p>
 
-      <p>We’ll never transfer or store data on servers outside of the European Economic Area.</p>
+      <p><a href="{{ url_for('main.feedback') }}">Contact us</a> if you want more information about our approach to data protection and information risk management.</p>
 
-      <h3 class="heading-small" id="we-agree-to-give-you-three-months-notice-if-we-change-these-terms">
-        We agree to give you three months’ notice if we change these terms
+      <h3 class="heading-small" id="we-agree-to-give-you-one-months-notice">
+        We agree to give you one months’ notice if we change these terms
       </h3>
 
-      <p>We’ll email you if you need to change these terms. We’ll tell you clearly what is changing and when the change will come into effect.</p>
+      <p>We’ll email to tell you what is changing and when the change will come into effect.</p>
 
       <p>This includes when any of our email, text message or postal providers change.</p>
 
@@ -115,37 +110,35 @@ Terms of use – GOV.UK Notify
 
       <p>You must follow industry best practices for keeping your API keys secure.</p>
 
-      <p>You must ensure you have obtained correct levels of consent - both to send messages but also for how data is shared in order to do so.</p>
+      <p>You must ensure you have obtained correct levels of consent - both to send messages but also for how data is shared, stored, and processed in order to do so.</p>
 
-      <p>You must not perform any load testing on GOV.UK Notify, since we’ve already done it.</p>
-
-      <h3 class="heading-small" id="you-agree-not-to-send-marketing">
-        You agree not to use GOV.UK Notify to send marketing messages
+      <h3 class="heading-small" id="you-agree-not-to-send-unsolicited">
+        You agree not to use GOV.UK Notify to send unsolicited messages
       </h3>
 
-      <p>GOV.UK Notify is for sending transactional messages.</p>
+      <p>GOV.UK Notify is for sending transactional messages and subscription based alerts or reminders.</p>
 
       <p>Transactional messages relate directly to something the user did. For example:</p>
 
       <ul class="list list-bullet">
-        <li>The user completed a transaction, you send them a confirmation email</li>
-        <li>The user got an MOT a year ago, you remind them that it’s about to expire</li>
-        <li>The user signed up for email alerts, you send them email alerts</li>
+        <li>they completed a transaction, and you’re sending them a confirmation email</li>
+        <li>they paid for an annual service a year ago, and you're reminding them that it’s about to expire</li>
+        <li>their application has been approved, and you're sending them a text message to let them know</li>
       </ul>
 
-      <p>You don’t need to ask permission to send messages that directly relate to a transaction. By using a transaction, a user is implicitly agreeing to receive messages about that transaction.</p>
+      <p>You don’t need to ask permission to send messages that directly relate to a transaction. By making a transaction and providing their contact details, a user is implicitly agreeing to receive messages about that transaction.</p>
 
-      <p>Marketing messages don’t relate directly to something the user did. For example:</p>
+      <p>Subscription based messages relate to something a user has explicitly asked to be updated with. For example:</p>
 
       <ul class="list list-bullet">
-        <li>Telling users about your webinar</li>
-        <li>Sending users government advice</li>
-        <li>Continuing to update someone about a service they no longer use</li>
+        <li>they subscribed to travel advice alerts</li>
+        <li>they asked to be updated when guidance was updated</li>
+        <li>they opted in for information about new procurement frameworks</li>
       </ul>
 
-      <p>You must agree not to use GOV.UK Notify to send marketing messages.</p>
+      <p>All subscription based messages must, by law, contain a way for users to unsubscribe.</p>
 
-      <p>If you do use GOV.UK Notify to send marketing messages, we may refuse to accept further messages for delivery.</p>
+      <p>If you do use GOV.UK Notify to send unsolicited messages, we may refuse to accept further messages for delivery.</p>
 
       <h3 class="heading-small" id="you-agree-to-send-messages-consistent-with-our-guidelines">
         You agree to send messages consistent with our design patterns, style guide and information security guidelines
@@ -153,50 +146,20 @@ Terms of use – GOV.UK Notify
 
       <p>Your messages must follow our <a href="https://designpatterns.hackpad.com/Notifications-5vuitmNqIjZ" rel="external">design patterns</a>, <a href="https://www.gov.uk/topic/government-digital-guidance/content-publishing" rel="external">style guide</a> and <a href="https://docs.google.com/document/d/15-OjaEqDBy31uDU7nLZCpYIQOnzSCJR63-cp3cQI9G8" rel="external">information security guidelines</a>.</p>
 
-      <p>Your messages must not contain any personal, or otherwise sensitive, information.</p>
+      <p>Your messages must not contain any personally or commercially sensitive information.</p>
 
       <h3 class="heading-small" id="you-agree-to-use-delivery-data-to-improve">
         You agree to use GOV.UK Notify delivery data to continuously improve the quality of your contact data
       </h3>
 
-      <p>When you send messages through GOV.UK Notify, we provide feedback on the status of every text message, email and letter.</p>
+      <p>When you send messages through GOV.UK Notify, we provide feedback on the status of every text message, email and letter you send.</p>
 
-      <p>You agree to use our delivery data to check (and potentially remove) bounced email addresses, mobile numbers and postal addresses from your database.</p>
+      <p>You agree to use our delivery data to check (and potentially remove) bounced email addresses, mobile numbers, and postal addresses from your database.</p>
 
       <p>You agree to ensure your user’s personal data is kept accurate and up to date, in line with Data Protection Act principles.</p>
 
       <p>If you have consistently high bounce rates, we will investigate and may refuse to accept further messages for delivery. This is to protect delivery rates for other services using GOV.UK Notify.</p>
 
-    </section>
-
-    <section id="requesting-to-go-live">
-      <h2 class="heading-medium">
-        Requesting to go live
-      </h2>
-
-      <p>Before you can send real messages:</p>
-
-      <ul class="list list-bullet">
-        <li>you must tell us approximately how many text messages, emails and letters you plan to send</li>
-        <li>you must ensure you have obtained consent to both send messages themselves, but also share data in order to do so</li>
-        <li>your organisation needs to have accepted the GOV.UK Notify data sharing and financial agreement (Memorandum of Understanding)</li>
-        <li>if you plan to send more than 250,000 text messages per year or any number of letters, your organisation must agree to pay any costs you run up using GOV.UK Notify</li>
-        <li>we will check the messages you plan to send to make sure they meet our guidelines</li>
-      </ul>
-
-      <h3 class="heading-small" id="you-must-tell-us-how-many-text-messages-emails-and-letters-you-plan-to-send">
-        You must tell us how many text messages, emails and letters you plan to send
-      </h3>
-
-      <p>You must estimate how many text messages, emails and letters you plan to send each year, including any spikes or seasonal variation.</p>
-
-      <p>We will make sure GOV.UK Notify is easily able to handle your estimated sending volume.</p>
-
-      <h3 class="heading-small" id="we-will-check-your-templates-before-you-can-go-live">
-        We’ll check your templates before you can go live
-      </h3>
-
-      <p>We’ll check your templates to make sure they are transactional, not marketing, and follow our <a href="https://designpatterns.hackpad.com/Notifications-5vuitmNqIjZ" rel="external">design patterns</a>, <a href="https://www.gov.uk/topic/government-digital-guidance/content-publishing" rel="external">style guide</a> and <a href="https://docs.google.com/document/d/15-OjaEqDBy31uDU7nLZCpYIQOnzSCJR63-cp3cQI9G8" rel="external">information security guidelines</a>.</p>
     </section>
 
     <section id="leaving-gov-uk-notify">
@@ -206,7 +169,7 @@ Terms of use – GOV.UK Notify
 
       <p>You can remove your service from GOV.UK Notify at any time. <a href="{{ url_for('main.feedback') }}">Contact us</a> and we’ll delete your account.</p>
 
-      <p>Any data that you have processed through GOV.UK Notify will be deleted as part of the existing data deletion processes.</p>
+      <p>Any data that you have already processed through GOV.UK Notify will be deleted as part of the existing data deletion processes and data retention periods.</p>
 
     </section>
 
