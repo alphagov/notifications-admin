@@ -33,7 +33,10 @@
       <form method="post">
         <div class="form-group">
           <p>We need permission to process your data before we can make your service live.</p>
-          {{ radios(form.mou) }}
+          {{ radios(form.mou, option_hints={
+            'no': 'We’ll send you a copy',
+            'don’t know': 'We’ll check for you',
+          }) }}
         </div>
         <div class="form-group">
           {{ radios(form.channel) }}

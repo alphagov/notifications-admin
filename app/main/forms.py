@@ -391,8 +391,8 @@ class RequestToGoLiveForm(Form):
         ),
         choices=[
             ('yes', 'Yes'),
-            ('no', 'No – we’ll send you a copy'),
-            ('don’t know', 'I don’t know – we’ll check for you')
+            ('no', 'No'),
+            ('don’t know', 'I don’t know')
         ],
         validators=[DataRequired()]
     )
