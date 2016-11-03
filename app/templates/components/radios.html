@@ -38,7 +38,7 @@
          </span>
        {% endif %}
      </legend>
-     <div class="radio-select" data-module="radio-select">
+     <div class="radio-select" data-module="radio-select" data-categories="{{ field.categories|join(',') }}">
        <div class="radio-select-column">
        {% for option in field %}
          <label class="block-label" for="{{ option.id }}">

@@ -142,6 +142,7 @@ def test_should_show_job_in_progress(
         assert page.find('p', {'class': 'hint'}).text.strip() == 'Report is 50% complete…'
 
 
+@freeze_time("2016-01-01T00:00:00.061258")
 def test_should_show_scheduled_job(
     app_,
     service_one,
@@ -162,7 +163,7 @@ def test_should_show_scheduled_job(
 
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.find('main').find_all('p')[2].text.strip() == 'Sending will start at midnight'
+        assert page.find('main').find_all('p')[2].text.strip() == 'Sending will start today at midnight'
         assert page.find('input', {'type': 'submit', 'value': 'Cancel sending'})
 
 
@@ -266,7 +267,7 @@ def test_should_show_updates_for_one_job_as_json(
         assert 'Status' in content['notifications']
         assert 'Delivered' in content['notifications']
         assert '12:01am' in content['notifications']
-        assert 'Uploaded by Test User on 1 January at midnight' in content['status']
+        assert 'Sent by Test User on 1 January at midnight' in content['status']
 
 
 @pytest.mark.parametrize(
