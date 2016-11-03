@@ -47,9 +47,9 @@ class UserApiClient(BaseAPIClient):
             users.append(User(user, max_failed_login_count=self.max_failed_login_count))
         return users
 
-    def update_user(self, user):
-        data = user.serialize()
-        url = "/user/{}".format(user.id)
+    def update_user(self, user_id, **kwargs):
+        data = dict(**kwargs)
+        url = "/user/{}".format(user_id)
         user_data = self.put(url, data=data)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 

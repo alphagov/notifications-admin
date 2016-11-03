@@ -47,8 +47,8 @@ def user_profile_name():
     form = ChangeNameForm(new_name=current_user.name)
 
     if form.validate_on_submit():
-        current_user.name = form.new_name.data
-        user_api_client.update_user(current_user)
+        user_api_client.update_user(current_user.id,
+                                    name=form.new_name.data)
         return redirect(url_for('.user_profile'))
 
     return render_template(
@@ -107,7 +107,6 @@ def user_profile_email_authenticate():
 @main.route("/user-profile/email/confirm/<token>", methods=['GET'])
 @login_required
 def user_profile_email_confirm(token):
-
     token_data = check_token(token,
                              current_app.config['SECRET_KEY'],
                              current_app.config['DANGEROUS_SALT'],
@@ -115,9 +114,8 @@ def user_profile_email_confirm(token):
     token_data = json.loads(token_data)
     user_id = token_data['user_id']
     new_email = token_data['email']
-    user = user_api_client.get_user(user_id)
-    user.email_address = new_email
-    user_api_client.update_user(user)
+    user_api_client.update_user(user_id,
+                                email_address=new_email)
     session.pop(NEW_EMAIL, None)
 
     return redirect(url_for('.user_profile'))
@@ -179,10 +177,11 @@ def user_profile_mobile_number_confirm():
     form = ConfirmMobileNumberForm(_check_code)
 
     if form.validate_on_submit():
-        current_user.mobile_number = session[NEW_MOBILE]
+        mobile_number = session[NEW_MOBILE]
         del session[NEW_MOBILE]
         del session[NEW_MOBILE_PASSWORD_CONFIRMED]
-        user_api_client.update_user(current_user)
+        user_api_client.update_user(current_user.id,
+                                    mobile_number=mobile_number)
         return redirect(url_for('.user_profile'))
 
     return render_template(
@@ -202,8 +201,8 @@ def user_profile_password():
     form = ChangePasswordForm(_check_password)
 
     if form.validate_on_submit():
-        current_user.set_password(form.new_password.data)
-        user_api_client.update_user(current_user)
+        user_api_client.update_user(current_user.id,
+                                    password=form.new_password.data)
         return redirect(url_for('.user_profile'))
 
     return render_template(
