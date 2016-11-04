@@ -384,26 +384,47 @@ class Feedback(Form):
 
 
 class RequestToGoLiveForm(Form):
-    channel = StringField(
-        'Are you sending emails or text messages or both?',
-        validators=[DataRequired(message='Can’t be empty')]
+    mou = RadioField(
+        (
+            'Has your organisation accepted the GOV.UK&nbsp;Notify data sharing and financial '
+            'agreement (Memorandum of Understanding)?'
+        ),
+        choices=[
+            ('yes', 'Yes'),
+            ('no', 'No – we’ll send you a copy'),
+            ('don’t know', 'I don’t know – we’ll check for you')
+        ],
+        validators=[DataRequired()]
+    )
+    channel = RadioField(
+        'What kind of messages will you be sending?',
+        choices=[
+            ('emails', 'Emails'),
+            ('text messages', 'Text messages'),
+            ('emails and text messages', 'Both')
+        ],
+        validators=[DataRequired()]
     )
     start_date = StringField(
         'When will you be ready to start sending messages?',
         validators=[DataRequired(message='Can’t be empty')]
     )
     start_volume = StringField(
-        'How many messages do you expect to send per month to start with? Give an estimate in numbers.',
+        'How many messages do you expect to send to start with?',
         validators=[DataRequired(message='Can’t be empty')]
     )
     peak_volume = StringField(
-        'Will the number of messages a month increase and when will that start? Give an estimate.',
+        'Will the number of messages increase and when will that start?',
         validators=[DataRequired(message='Can’t be empty')]
     )
-    upload_or_api = StringField(
-        'Are you uploading a list of contacts that you’re sending your message to, ' +
-        'or are you integrating your system with ours?',
-        validators=[DataRequired(message='Can’t be empty')]
+    upload_or_api = RadioField(
+        'How are you going to send messages?',
+        choices=[
+            ('File upload', 'Upload a spreadsheet of recipients'),
+            ('API', 'Integrate with the GOV.UK Notify API'),
+            ('API and file upload', 'Both')
+        ],
+        validators=[DataRequired()]
     )
 
 
