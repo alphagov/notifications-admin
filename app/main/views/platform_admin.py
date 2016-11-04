@@ -20,7 +20,7 @@ def platform_admin():
         'views/platform-admin.html',
         **get_statistics(sorted(
             services,
-            key=lambda service: service['created_at'],
+            key=lambda service: (service['active'], service['created_at']),
             reverse=True
         ))
     )
@@ -29,12 +29,12 @@ def platform_admin():
 def get_statistics(services):
     return {
         'global_stats': create_global_stats(services),
-        'live_services': format_stats_by_service([
+        'live_services': format_stats_by_service(
             service for service in services if not service['restricted']
-        ]),
-        'trial_mode_services': format_stats_by_service([
+        ),
+        'trial_mode_services': format_stats_by_service(
             service for service in services if service['restricted']
-        ]),
+        ),
     }
 
 
@@ -72,5 +72,6 @@ def format_stats_by_service(services):
             'failed': sum(stat['failed'] for stat in stats),
             'restricted': service['restricted'],
             'research_mode': service['research_mode'],
-            'created_at': service['created_at']
+            'created_at': service['created_at'],
+            'active': service['active']
         }

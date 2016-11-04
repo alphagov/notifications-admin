@@ -23,7 +23,11 @@
         <a href="{{ url_for('main.service_dashboard', service_id=item['id']) }}" class="browse-list-link">{{ item['name'] }}</a>
       </div>
     {% endcall %}
-    {% if item['research_mode'] %}
+    {% if not item['active'] %}
+      {% call field(status='default') %}
+        <span class="heading-medium">archived</span>
+      {% endcall %}
+    {% elif item['research_mode'] %}
       {% call field() %}
         <span class="research-mode">research mode</span>
       {% endcall %}
