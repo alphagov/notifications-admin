@@ -2,9 +2,10 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/radios.html" import radios %}
+{% from "components/banner.html" import banner_wrapper %}
 
 {% block page_title %}
-  Add a new API key – GOV.UK Notify
+  Create an API key – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -14,8 +15,8 @@
   </h1>
 
   <form method="post">
-    {{ radios(form.key_type) }}
     {{ textbox(form.key_name, label='Name for this key') }}
+    {{ radios(form.key_type, disable=disabled_options, option_hints=option_hints) }}
     {{ page_footer('Continue') }}
   </form>
 

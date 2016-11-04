@@ -214,3 +214,12 @@ summary::-webkit-details-marker {
 details .arrow {
   font-size: 16px;
 }
+
+.block-label-hint {
+  @include core-16;
+  margin-top: 5px;
+}
+
+.block-label input[disabled] {
+  opacity: 0.5;
+}

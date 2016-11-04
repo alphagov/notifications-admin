@@ -13,15 +13,6 @@
     API integration
   </h1>
 
-  {% if current_service.restricted %}
-    {% call banner_wrapper(type='warning') %}
-      <h2 class="heading-medium">Your service is in trial mode</h2>
-      <p>
-        You can only send messages to people in your team or whitelist.
-      </p>
-    {% endcall %}
-  {% endif %}
-
   <nav class="grid-row bottom-gutter-1-2">
     <div class="column-one-third">
       <a class="pill-separate-item" href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
