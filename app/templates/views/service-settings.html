@@ -53,6 +53,19 @@
         To remove these restrictions
         <a href="{{ url_for('.service_request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
       </p>
+    {% else %}
+      <h2 class="heading-medium">Your service is live</h2>
+
+      <p>
+        You can send up to
+        {{ "{:,}".format(current_service.message_limit) }} messages
+        per day.
+      </p>
+      <p>
+        Problems or comments?
+        <a href="{{ url_for('main.feedback') }}">Give feedback</a>.
+      </p>
+
     {% endif %}
 
     {% if current_user.has_permissions([], admin_override=True) %}
