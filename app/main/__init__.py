@@ -26,6 +26,5 @@ from app.main.views import (
     invites,
     feedback,
     providers,
-    platform_admin,
-    letters
+    platform_admin
 )
