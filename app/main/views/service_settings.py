@@ -188,8 +188,12 @@ def service_switch_can_send_letters(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def deactivate_service(service_id):
-    service_api_client.deactivate_service(service_id)
-    return redirect(url_for('.service_settings', service_id=service_id))
+    if request.method == 'POST':
+        service_api_client.deactivate_service(service_id)
+        return redirect(url_for('.service_settings', service_id=service_id))
+    else:
+        flash('There\'s no way to reverse this! Are you sure you want to archive this service?', 'delete')
+        return service_settings(service_id)
 
 
 @main.route("/services/<service_id>/service-settings/set-reply-to-email", methods=['GET', 'POST'])

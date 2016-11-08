@@ -101,7 +101,7 @@
         {% if current_service.active %}
           <li class="bottom-gutter">
             <a href="{{ url_for('.deactivate_service', service_id=current_service.id) }}" class="button">
-              Deactivate service
+              Archive service
             </a>
           </li>
         {% endif %}
