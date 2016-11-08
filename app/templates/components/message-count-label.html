@@ -11,5 +11,11 @@
     {%- else -%}
       emails
     {%- endif -%}
+  {%- elif template_type == 'letter' -%}
+    {%- if count == 1 -%}
+      letter
+    {%- else -%}
+      letters
+    {%- endif -%}
   {%- endif %} {{ suffix }}
 {%- endmacro %}

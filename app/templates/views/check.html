@@ -3,6 +3,7 @@
 {% from "components/email-message.html" import email_message %}
 {% from "components/radios.html" import radio_select %}
 {% from "components/sms-message.html" import sms_message %}
+{% from "components/letter.html" import letter %}
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-footer.html" import page_footer %}
@@ -148,7 +149,9 @@
         )}}
       </div>
     </div>
-  {% endif %}
+    {% elif 'letter' == template.template_type %}
+      {{ letter(template.formatted_as_markup if errors else template.replaced|safe) }}
+    {% endif %}
 
   {% if errors %}
     {% if request.args.from_test %}

@@ -33,7 +33,8 @@ from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet, get
 def get_page_headings(template_type):
     return {
         'email': 'Email templates',
-        'sms': 'Text message templates'
+        'sms': 'Text message templates',
+        'letter': 'Letter templates'
     }[template_type]
 
 
@@ -52,7 +53,8 @@ def get_example_csv_rows(template, use_example_as_example=True, submitted_fields
             'email': 'test@example.com' if use_example_as_example else current_user.email_address,
             'sms': '07700 900321' if use_example_as_example else validate_and_format_phone_number(
                 current_user.mobile_number, human_readable=True
-            )
+            ),
+            'letter': current_user.name
         }[template.template_type]
     ] + get_example_csv_fields(template.placeholders, use_example_as_example, submitted_fields)
 
@@ -66,8 +68,10 @@ def get_example_csv_rows(template, use_example_as_example=True, submitted_fields
                       'manage_api_keys',
                       admin_override=True, any_=True)
 def choose_template(service_id, template_type):
-    if template_type not in ['email', 'sms']:
+    if template_type not in ['email', 'sms', 'letter']:
         abort(404)
+    if not current_service['can_send_letters'] and template_type == 'letter':
+        abort(403)
     return render_template(
         'views/templates/choose.html',
         templates=[
@@ -233,7 +237,7 @@ def check_messages(service_id, template_type, upload_id):
         max_initial_rows_shown=50,
         max_errors_shown=50,
         whitelist=itertools.chain.from_iterable(
-            [user.mobile_number, user.email_address] for user in users
+            [user.name, user.mobile_number, user.email_address] for user in users
         ) if current_service['restricted'] else None,
         remaining_messages=remaining_messages
     )

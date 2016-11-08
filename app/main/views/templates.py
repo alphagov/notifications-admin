@@ -11,14 +11,15 @@ from notifications_python_client.errors import HTTPError
 
 from app.main import main
 from app.utils import user_has_permissions
-from app.main.forms import SMSTemplateForm, EmailTemplateForm
+from app.main.forms import SMSTemplateForm, EmailTemplateForm, LetterTemplateForm
 from app.main.views.send import get_example_csv_rows
 from app import service_api_client, current_service, template_statistics_client
 
 
 form_objects = {
     'email': EmailTemplateForm,
-    'sms': SMSTemplateForm
+    'sms': SMSTemplateForm,
+    'letter': LetterTemplateForm
 }
 
 page_headings = {
@@ -74,8 +75,10 @@ def view_template_version(service_id, template_id, version):
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
 def add_service_template(service_id, template_type):
-    if template_type not in ['sms', 'email']:
+    if template_type not in ['sms', 'email', 'letter']:
         abort(404)
+    if not current_service['can_send_letters'] and template_type == 'letter':
+        abort(403)
 
     form = form_objects[template_type]()
     if form.validate_on_submit():
