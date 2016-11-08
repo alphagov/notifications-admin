@@ -545,11 +545,7 @@ def test_switch_service_from_research_mode_to_normal(
     with app_.test_request_context():
         with app_.test_client() as client:
             service = service_json(
-                "1234",
-                "Test Service",
-                [active_user_with_permissions.id],
-                message_limit=1000,
-                active=False,
+                users=[active_user_with_permissions.id],
                 restricted=True,
                 research_mode=True
             )

@@ -41,7 +41,6 @@ def _add_invited_user_to_service(invited_user):
 
 def _create_service(service_name, email_from):
     service_id = service_api_client.create_service(service_name=service_name,
-                                                   active=False,
                                                    message_limit=current_app.config['DEFAULT_SERVICE_LIMIT'],
                                                    restricted=True,
                                                    user_id=session['user_id'],
