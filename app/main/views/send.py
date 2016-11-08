@@ -310,6 +310,14 @@ def start_job(service_id, upload_id):
 
     session.pop('upload_data')
 
+    template = service_api_client.get_service_template(
+        service_id,
+        upload_data.get('template_id')
+    )['data']
+
+    if template['template_type'] == 'letter':
+        abort(403)
+
     job_api_client.create_job(
         upload_id,
         service_id,
