@@ -3,6 +3,12 @@ from notifications_python_client.errors import HTTPError
 
 from app.notify_client.models import User
 
+ALLOWED_ATTRIBUTES = {
+    'name',
+    'email_address',
+    'mobile_number'
+}
+
 
 class UserApiClient(BaseAPIClient):
     def __init__(self):
@@ -47,9 +53,22 @@ class UserApiClient(BaseAPIClient):
             users.append(User(user, max_failed_login_count=self.max_failed_login_count))
         return users
 
-    def update_user(self, user_id, **kwargs):
+    def update_user(self, user):
+        data = user.serialize()
+        url = "/user/{}".format(user.id)
+        user_data = self.put(url, data=data)
+        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
+
+    def update_user_attribute(self, user_id, **kwargs):
+        data = dict(kwargs)
+        disallowed_attributes = set(data.keys()) - ALLOWED_ATTRIBUTES
+        if disallowed_attributes:
+            raise TypeError('Not allowed to update user attributes: {}'.format(
+                ", ".join(disallowed_attributes)
+            ))
+
         data = dict(**kwargs)
-        url = "/user/{}".format(user_id)
+        url = "/user/{}/update-attribute".format(user_id)
         user_data = self.put(url, data=data)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
