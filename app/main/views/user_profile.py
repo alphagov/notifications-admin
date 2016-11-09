@@ -47,7 +47,7 @@ def user_profile_name():
     form = ChangeNameForm(new_name=current_user.name)
 
     if form.validate_on_submit():
-        user_api_client.update_user(current_user.id,
+        user_api_client.update_user_attribute(current_user.id,
                                     name=form.new_name.data)
         return redirect(url_for('.user_profile'))
 
@@ -114,7 +114,7 @@ def user_profile_email_confirm(token):
     token_data = json.loads(token_data)
     user_id = token_data['user_id']
     new_email = token_data['email']
-    user_api_client.update_user(user_id,
+    user_api_client.update_user_attribute(user_id,
                                 email_address=new_email)
     session.pop(NEW_EMAIL, None)
 
@@ -180,7 +180,7 @@ def user_profile_mobile_number_confirm():
         mobile_number = session[NEW_MOBILE]
         del session[NEW_MOBILE]
         del session[NEW_MOBILE_PASSWORD_CONFIRMED]
-        user_api_client.update_user(current_user.id,
+        user_api_client.update_user_attribute(current_user.id,
                                     mobile_number=mobile_number)
         return redirect(url_for('.user_profile'))
 
@@ -201,8 +201,8 @@ def user_profile_password():
     form = ChangePasswordForm(_check_password)
 
     if form.validate_on_submit():
-        user_api_client.update_user(current_user.id,
-                                    password=form.new_password.data)
+        current_user.set_password(form.new_password.data)
+        user_api_client.update_user(current_user)
         return redirect(url_for('.user_profile'))
 
     return render_template(
