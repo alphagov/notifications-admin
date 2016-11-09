@@ -57,11 +57,18 @@ class ServiceAPIClient(BaseAPIClient):
             '/service/{0}'.format(service_id),
             params=params)
 
-    def get_services(self, *params):
+    def get_services(self, params_dict=None):
         """
         Retrieve a list of services.
         """
-        return self.get('/service', *params)
+        return self.get('/service', params=params_dict)
+
+    def get_active_services(self, params_dict=None):
+        """
+        Retrieve a list of active services.
+        """
+        params_dict['only_active'] = True
+        return self.get_services(params_dict)
 
     def update_service(
         self,

@@ -68,7 +68,7 @@ def add_service():
         service_name = form.name.data
         service_id = _create_service(service_name, email_from)
 
-        if (len(service_api_client.get_services({'user_id': session['user_id']}).get('data', [])) > 1):
+        if (len(service_api_client.get_active_services({'user_id': session['user_id']}).get('data', [])) > 1):
             return redirect(url_for('main.service_dashboard', service_id=service_id))
 
         example_sms_template = service_api_client.create_service_template(
