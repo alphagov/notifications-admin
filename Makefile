@@ -67,6 +67,7 @@ generate-version-file: ## Generates the app version file
 
 .PHONY: build
 build: dependencies generate-version-file ## Build project
+	./venv/bin/pip-accel wheel --wheel-dir=wheelhouse -r requirements.txt
 	npm run build
 
 .PHONY: build-codedeploy-artifact

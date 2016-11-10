@@ -31,6 +31,7 @@ RUN \
 	echo "Install global pip packages" \
 	&& pip install \
 		virtualenv \
-		awscli
+		awscli \
+		wheel
 
 WORKDIR /var/project
