@@ -17,8 +17,9 @@ from flask import (
 )
 
 from flask_login import login_required, current_user
+from notifications_utils.columns import Columns
 from notifications_utils.template import Template
-from notifications_utils.recipients import RecipientCSV, first_column_heading, validate_and_format_phone_number
+from notifications_utils.recipients import RecipientCSV, first_column_headings, validate_and_format_phone_number
 
 from app.main import main
 from app.main.forms import CsvUploadForm, ChooseTimeForm, get_next_days_until, get_furthest_possible_scheduled_time
@@ -48,15 +49,16 @@ def get_example_csv_fields(column_headers, use_example_as_example, submitted_fie
 
 
 def get_example_csv_rows(template, use_example_as_example=True, submitted_fields=False):
-    return [
-        {
-            'email': 'test@example.com' if use_example_as_example else current_user.email_address,
-            'sms': '07700 900321' if use_example_as_example else validate_and_format_phone_number(
-                current_user.mobile_number, human_readable=True
-            ),
-            'letter': current_user.name
-        }[template.template_type]
-    ] + get_example_csv_fields(template.placeholders, use_example_as_example, submitted_fields)
+    return {
+        'email': ['test@example.com'] if use_example_as_example else [current_user.email_address],
+        'sms': ['07700 900321'] if use_example_as_example else [validate_and_format_phone_number(
+            current_user.mobile_number, human_readable=True
+        )],
+        'letter': [current_user.name] + [
+            (submitted_fields or {}).get(key, 'example' if use_example_as_example else key)
+            for key in first_column_headings['letter'][1:]
+        ]
+    }[template.template_type] + get_example_csv_fields(template.placeholders, use_example_as_example, submitted_fields)
 
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
@@ -118,14 +120,13 @@ def send_messages(service_id, template_id):
                 form.file.data.filename
             ))
 
+    column_headings = first_column_headings[template.template_type] + list(template.placeholders)
+
     return render_template(
         'views/send.html',
         template=template,
-        column_headings=list(ascii_uppercase[:len(template.placeholders) + 1]),
-        example=[
-            [first_column_heading[template.template_type]] + list(template.placeholders),
-            get_example_csv_rows(template)
-        ],
+        column_headings=list(ascii_uppercase[:len(column_headings)]),
+        example=[column_headings, get_example_csv_rows(template)],
         form=form
     )
 
@@ -136,7 +137,7 @@ def send_messages(service_id, template_id):
 def get_example_csv(service_id, template_id):
     template = Template(service_api_client.get_service_template(service_id, template_id)['data'])
     return Spreadsheet.from_rows([
-        [first_column_heading[template.template_type]] + list(template.placeholders),
+        first_column_headings[template.template_type] + list(template.placeholders),
         get_example_csv_rows(template)
     ]).as_csv_data, 200, {
         'Content-Type': 'text/csv; charset=utf-8',
@@ -163,7 +164,7 @@ def send_test(service_id, template_id):
             {
                 'file_name': file_name,
                 'data': Spreadsheet.from_rows([
-                    [first_column_heading[template.template_type]] + list(template.placeholders),
+                    first_column_headings[template.template_type] + list(template.placeholders),
                     get_example_csv_rows(template, use_example_as_example=False, submitted_fields=request.form)
                 ]).as_csv_data
             },
@@ -185,7 +186,7 @@ def send_test(service_id, template_id):
     return render_template(
         'views/send-test.html',
         template=template,
-        recipient_column=first_column_heading[template.template_type],
+        recipient_columns=first_column_headings[template.template_type],
         example=[get_example_csv_rows(template, use_example_as_example=False)],
         help=get_help_argument()
     )
@@ -259,7 +260,10 @@ def check_messages(service_id, template_type, upload_id):
 
     with suppress(StopIteration):
         template.values = next(recipients.rows)
-        first_recipient = template.values.get(recipients.recipient_column_header, '')
+        first_recipient = template.values.get(
+            Columns.make_key(recipients.recipient_column_headers[0]),
+            ''
+        )
 
     session['upload_data']['notification_count'] = len(list(recipients.rows))
     session['upload_data']['valid'] = not recipients.has_errors

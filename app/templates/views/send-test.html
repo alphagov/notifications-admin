@@ -46,8 +46,8 @@
   <form method="post">
     {% call(item, row_number) list_table(
       example,
-      caption="Fill in the {}".format('field' if template.placeholders|length == 1 else 'fields'),
-      field_headings=[recipient_column] + template.placeholders|list
+      caption="Fill in the {}".format('field' if (recipient_columns + template.placeholders|list)|length == 2 else 'fields'),
+      field_headings=recipient_columns + template.placeholders|list
     ) %}
       {% for column in item %}
         {% call field() %}

@@ -15,10 +15,24 @@
         You can still send {{ remaining_messages }} messages today, but
       {% endif %}
       ‘{{ original_file_name }}’ contains
-      {{ count_of_recipients }} {{ recipients.recipient_column_header }}
-      {%- if count_of_recipients != 1 -%}
-        {{ 'es' if 'email address' == recipients.recipient_column_header else 's' }}
-      {%- endif %}.
+      {{ count_of_recipients }}
+      {% if count_of_recipients == 1 -%}
+        {%- if template.template_type == 'email' -%}
+          email address
+        {%- elif template.template_type == 'sms' -%}
+          phone number
+        {%- elif template.template_type == 'letter' -%}
+          address
+        {%- endif -%}
+      {%- else -%}
+        {%- if template.template_type == 'email' -%}
+          email addresses
+        {%- elif template.template_type == 'sms' -%}
+          phone numbers
+        {%- elif template.template_type == 'letter' -%}
+          addresses
+        {%- endif -%}
+      {%- endif -%}.
     </p>
   {% endcall %}
 </div>

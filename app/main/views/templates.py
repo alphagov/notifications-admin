@@ -6,7 +6,7 @@ from flask_login import login_required
 from dateutil.parser import parse
 
 from notifications_utils.template import Template
-from notifications_utils.recipients import first_column_heading
+from notifications_utils.recipients import first_column_headings
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
@@ -136,7 +136,7 @@ def edit_service_template(service_id, template_id):
                 new_template=new_template,
                 column_headings=list(ascii_uppercase[:len(new_template.placeholders) + 1]),
                 example_rows=[
-                    [first_column_heading[new_template.template_type]] + list(new_template.placeholders),
+                    first_column_headings[new_template.template_type] + list(new_template.placeholders),
                     get_example_csv_rows(new_template),
                     get_example_csv_rows(new_template)
                 ],

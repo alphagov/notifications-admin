@@ -31,7 +31,7 @@
       {% endcall %}
     </div>
 
-  {% elif not recipients.has_recipient_column %}
+  {% elif not recipients.has_recipient_columns %}
 
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
@@ -193,7 +193,9 @@
           {{ item['columns'][column].data if item['columns'][column].data != None }}
         {% endcall %}
       {% else %}
-        {{ text_field(item['columns'][column].data) }}
+        {% call field() %}
+          {{ item['columns'][column].data if item['columns'][column].data != None }}
+        {% endcall %}
       {% endif %}
     {% endfor %}
     {% if item['columns'].get(None) %}
