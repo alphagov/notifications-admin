@@ -1,6 +1,13 @@
+$outline-width: 5px;
+
 .letter {
   font-family: Helvetica, Arial, sans-serif;
-  box-shadow: 0 2px 2px rgba($text-colour, 0.4);
-  outline: 5px solid rgba($text-colour, 0.1);
+  box-shadow:
+  1px 1px 0 0 $panel-colour,
+  2px 2px 0 0 rgba($panel-colour, 0.5),
+  -1px 1px 0 0 $panel-colour,
+  -2px 2px 0 0 rgba($panel-colour, 0.5);
+  outline: $outline-width solid rgba($text-colour, 0.1);
   padding: 20px;
+  margin: $outline-width $outline-width $gutter;
 }
