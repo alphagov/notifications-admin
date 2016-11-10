@@ -68,8 +68,8 @@ class UserApiClient(BaseAPIClient):
             ))
 
         data = dict(**kwargs)
-        url = "/user/{}/update-attribute".format(user_id)
-        user_data = self.put(url, data=data)
+        url = "/user/{}".format(user_id)
+        user_data = self.post(url, data=data)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
     def verify_password(self, user_id, password):
