@@ -6,7 +6,11 @@
 {% from "components/table.html" import list_table, field, text_field, index_field, index_field_heading %}
 
 {% block page_title %}
-  Send text messages – GOV.UK Notify
+  {% if request.args['help'] %}
+    Example text message
+  {% else %}
+    Send yourself a test
+  {% endif %} – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
