@@ -753,11 +753,19 @@ def mock_verify_password(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_update_user(mocker):
-    def _update(user):
-        return user
+def mock_update_user(mocker, api_user_active):
+    def _update(user_id, **kwargs):
+        return api_user_active
 
     return mocker.patch('app.user_api_client.update_user', side_effect=_update)
+
+
+@pytest.fixture(scope='function')
+def mock_update_user_attribute(mocker, api_user_active):
+    def _update(user_id, **kwargs):
+        return api_user_active
+
+    return mocker.patch('app.user_api_client.update_user_attribute', side_effect=_update)
 
 
 @pytest.fixture(scope='function')

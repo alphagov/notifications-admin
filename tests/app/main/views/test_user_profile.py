@@ -32,8 +32,8 @@ def test_should_show_name_page(app_,
 def test_should_redirect_after_name_change(app_,
                                            api_user_active,
                                            mock_login,
-                                           mock_update_user,
-                                           mock_get_user):
+                                           mock_get_user,
+                                           mock_update_user_attribute):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -46,7 +46,7 @@ def test_should_redirect_after_name_change(app_,
         assert response.location == url_for(
             'main.user_profile', _external=True)
         api_user_active.name = new_name
-        assert mock_update_user.called
+        assert mock_update_user_attribute.called
 
 
 def test_should_show_email_page(app_,
@@ -116,7 +116,8 @@ def test_should_render_change_email_continue_after_authenticate_email(app_,
 
 def test_should_redirect_to_user_profile_when_user_confirms_email_link(app_,
                                                                        api_user_active,
-                                                                       mock_login
+                                                                       mock_login,
+                                                                       mock_update_user_attribute
                                                                        ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -218,6 +219,7 @@ def test_should_redirect_after_mobile_number_confirm(app_,
                                                      api_user_active,
                                                      mock_login,
                                                      mock_get_user,
+                                                     mock_update_user_attribute,
                                                      mock_check_verify_code):
     with app_.test_request_context():
         with app_.test_client() as client:
