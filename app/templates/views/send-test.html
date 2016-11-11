@@ -51,7 +51,7 @@
     ) %}
       {% for column in item %}
         {% call field() %}
-          {% if loop.index > 1 %}
+          {% if loop.index > 1 or template.template_type == 'letter' %}
             <label class="visuallyhidden" for="placeholder-field-{{ loop.index }}">{{ column }}</label>
             <input class="form-control form-control-1-1 " data-module="" name="{{ column }}" rows="8" type="text" value="" id="placeholder-field-{{ loop.index }}">
           {% else %}

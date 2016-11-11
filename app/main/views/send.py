@@ -54,11 +54,22 @@ def get_example_csv_rows(template, use_example_as_example=True, submitted_fields
         'sms': ['07700 900321'] if use_example_as_example else [validate_and_format_phone_number(
             current_user.mobile_number, human_readable=True
         )],
-        'letter': [current_user.name] + [
-            (submitted_fields or {}).get(key, 'example' if use_example_as_example else key)
-            for key in first_column_headings['letter'][1:]
+        'letter': [
+            (submitted_fields or {}).get(
+                key, get_example_letter_address(key) if use_example_as_example else key
+            )
+            for key in first_column_headings['letter']
         ]
     }[template.template_type] + get_example_csv_fields(template.placeholders, use_example_as_example, submitted_fields)
+
+
+def get_example_letter_address(key):
+    return {
+        'address line 1': 'A. Name',
+        'address line 2': '123 Example Street',
+        'address line 3': 'Example town',
+        'postcode': 'XM4 5HQ'
+    }.get(key, '')
 
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
