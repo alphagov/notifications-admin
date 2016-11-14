@@ -2,49 +2,88 @@
 {% from "components/big-number.html" import big_number, big_number_with_status %}
 {% from "components/message-count-label.html" import message_count_label %}
 {% from "components/browse-list.html" import browse_list %}
-{% from "components/table.html" import list_table, field, right_aligned_field_heading, hidden_field_heading, text_field %}
+{% from "components/table.html" import mapping_table, field, row_group, row, right_aligned_field_heading, hidden_field_heading, text_field %}
 
 {% macro services_table(services, caption) %}
-  {% call(item, row_number) list_table(
-    services,
+  {% call(item, row_number) mapping_table(
     caption=caption,
     caption_visible=True,
     field_headings=[
-      'Service',
-      hidden_field_heading('Status'),
-      right_aligned_field_heading('Sending'),
-      right_aligned_field_heading('Delivered'),
-      right_aligned_field_heading('Failed')
+    'Service',
+    hidden_field_heading('Type'),
+    right_aligned_field_heading('Sending'),
+    right_aligned_field_heading('Delivered'),
+    right_aligned_field_heading('Failed')
     ],
     field_headings_visible=True
   ) %}
-    {% call field() %}
-      <div>
-        <a href="{{ url_for('main.service_dashboard', service_id=item['id']) }}" class="browse-list-link">{{ item['name'] }}</a>
-      </div>
-    {% endcall %}
-    {% if item['research_mode'] %}
-      {% call field() %}
-        <span class="research-mode">research mode</span>
+
+    {% for service in services %}
+
+      {% call row_group() %}
+
+        {% call row() %}
+
+          {% call field(border=False) %}
+            <a href="{{ url_for('main.service_dashboard', service_id=service['id']) }}" class="browse-list-link">{{ service['name'] }}</a>
+          {% endcall %}
+
+          {% call field(border=False) %}
+              <span class="heading-medium">Email</span>
+          {% endcall %}
+
+          {% call field(align='right', border=False) %}
+            {{ big_number(service['stats']['email']['requested'], smaller=True) }}
+          {% endcall %}
+
+          {% call field(align='right', border=False) %}
+            {{ big_number(service['stats']['email']['delivered'], smaller=True) }}
+          {% endcall %}
+
+          {% call field(align='right', border=False) %}
+            {{ big_number(service['stats']['email']['failed'], smaller=True) }}
+          {% endcall %}
+
+        {% endcall %}
+
+        {% call row() %}
+
+          {% if service['research_mode'] %}
+            {% call field(border=False) %}
+              <span class="research-mode">research mode</span>
+            {% endcall %}
+          {% elif not service['restricted'] %}
+            {% call field(status='error') %}
+              <span class="heading-medium">
+                Live
+              </span>
+            {% endcall %}
+          {% else %}
+            {{ text_field('') }}
+          {% endif %}
+
+          {% call field(border=False) %}
+              <span class="heading-medium">SMS</span>
+          {% endcall %}
+
+          {% call field(align='right', border=False) %}
+            {{ big_number(service['stats']['sms']['requested'], smaller=True) }}
+          {% endcall %}
+
+          {% call field(align='right', border=False) %}
+            {{ big_number(service['stats']['sms']['delivered'], smaller=True) }}
+          {% endcall %}
+
+          {% call field(align='right', border=False) %}
+            {{ big_number(service['stats']['sms']['failed'], smaller=True) }}
+          {% endcall %}
+
+        {% endcall %}
+
       {% endcall %}
-    {% elif not item['restricted'] %}
-      {% call field(status='error') %}
-        <span class="heading-medium">
-          Live
-        </span>
-      {% endcall %}
-    {% else %}
-      {{ text_field('') }}
-    {% endif %}
-    {% call field(align='right') %}
-      {{ big_number(item['sending'], smaller=True) }}
-    {% endcall %}
-    {% call field(align='right') %}
-      {{ big_number(item['delivered'], smaller=True) }}
-    {% endcall %}
-    {% call field(align='right', status='error' if 0 else '') %}
-      {{ big_number(item['failed'], smaller=True) }}
-    {% endcall %}
+
+    {% endfor %}
+
   {% endcall %}
 {% endmacro %}
 

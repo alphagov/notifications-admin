@@ -118,6 +118,10 @@
 
   }
 
+  &-noborder {
+    border: 0px;
+  }
+
   &-index {
     width: 15px;
   }
@@ -157,6 +161,12 @@
 .table-field-right-aligned {
   @extend %table-field;
   text-align: right;
+}
+
+
+.table-row-group {
+  border-top: 1px solid #BFC1C3;
+  border-bottom: 1px solid #BFC1C3;
 }
 
 .table-empty-message {
