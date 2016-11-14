@@ -52,7 +52,7 @@
 {% macro row_group(id=None) %}
   <tbody class="table-row-group" {% if id %}id="{{id}}"{% endif %}>
     {{ caller() }}
-  </tr>
+  </tbody>
 {%- endmacro %}
 
 {% macro field(align='left', status='', border=True) -%}
