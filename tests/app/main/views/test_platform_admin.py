@@ -60,7 +60,7 @@ def test_should_show_research_and_restricted_mode(
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    # get second column, which contains flags as text.
+    # get first column in second row, which contains flags as text.
     table_body = page.find_all('table')[table_index].find_all('tbody')[0]
     service_mode = table_body.find_all('tbody')[0].find_all('tr')[1].find_all('td')[0].text.strip()
     assert service_mode == displayed
