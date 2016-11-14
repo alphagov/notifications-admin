@@ -1,7 +1,5 @@
 import itertools
-from datetime import datetime
 
-import pytz
 from flask import render_template
 from flask_login import login_required
 
@@ -63,13 +61,10 @@ def create_global_stats(services):
 
 def format_stats_by_service(services):
     for service in services:
-        stats = service['statistics'].values()
         yield {
             'id': service['id'],
             'name': service['name'],
-            'sending': sum((stat['requested'] - stat['delivered'] - stat['failed']) for stat in stats),
-            'delivered': sum(stat['delivered'] for stat in stats),
-            'failed': sum(stat['failed'] for stat in stats),
+            'stats': service['statistics'],
             'restricted': service['restricted'],
             'research_mode': service['research_mode'],
             'created_at': service['created_at']
