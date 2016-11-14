@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/banner.html" import banner_wrapper %}
 
@@ -11,19 +12,10 @@
 
       <h1 class="heading-large">Request to go live</h1>
 
-      {% call banner_wrapper(type='warning') %}
-        <h2 class="heading-medium">You must accept the GOV.UK&nbsp;Notify data sharing and financial agreement (Memorandum of Understanding) before we can process data for you.</h2>
-
-        <p>
-          <a href="{{ url_for('main.feedback') }}">Contact the Notify team</a> to get a copy of the agreement or to find out if your organisation has already accepted it.
-        </p>
-      {% endcall %}
-
       <p>
         Before you request to go live, make sure you’ve:
       </p>
-      <ul class="list list-bullet">
-        <li>accepted our data sharing and financial agreement</li>
+      <ul class="list list-bullet bottom-gutter">
         <li>read our <a href="{{ url_for('.terms') }}">terms of use</a></li>
         <li>added <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a> to your account</li>
         <li>
@@ -39,17 +31,26 @@
       </ul>
 
       <form method="post">
-        {{ textbox(form.channel, width='1-1') }}
-        {{ textbox(form.start_date, width='1-1') }}
-        {{ textbox(form.start_volume, width='1-1') }}
-        {{ textbox(form.peak_volume, width='1-1') }}
-        {{ textbox(form.upload_or_api, width='1-1') }}
+        <div class="form-group">
+          <p>We need permission to process your data before we can make your service live.</p>
+          {{ radios(form.mou, option_hints={
+            'no': 'We’ll send you a copy',
+            'don’t know': 'We’ll check for you',
+          }) }}
+        </div>
+        <div class="form-group">
+          {{ radios(form.channel) }}
+          {{ textbox(form.start_date, width='1-1') }}
+          {{ textbox(form.start_volume, width='1-1', hint='For example, ‘1000 a month’.') }}
+          {{ textbox(form.peak_volume, width='1-1', hint='For example, ‘Messages will increase to 20,000 a month in January’.') }}
+          {{ radios(form.upload_or_api) }}
+        </div>
 
         <p>
           Once you’ve completed the tasks needed to set up, we’ll make your service live. We’ll do this within one working day.
         </p>
         <p>
-          By requesting to go live you are agreeing to our terms of use.
+          By requesting to go live you’re agreeing to our <a href="{{ url_for('.terms') }}">terms of use</a>.
         </p>
 
         {{ page_footer('Request to go live') }}

@@ -744,11 +744,19 @@ def mock_verify_password(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_update_user(mocker):
-    def _update(user):
-        return user
+def mock_update_user(mocker, api_user_active):
+    def _update(user_id, **kwargs):
+        return api_user_active
 
     return mocker.patch('app.user_api_client.update_user', side_effect=_update)
+
+
+@pytest.fixture(scope='function')
+def mock_update_user_attribute(mocker, api_user_active):
+    def _update(user_id, **kwargs):
+        return api_user_active
+
+    return mocker.patch('app.user_api_client.update_user_attribute', side_effect=_update)
 
 
 @pytest.fixture(scope='function')
@@ -894,7 +902,7 @@ def mock_get_scheduled_job(mocker, api_user_active):
             api_user_active,
             job_id=job_id,
             job_status='scheduled',
-            scheduled_for='2016-01-01T00:00:00.061258'
+            scheduled_for='2016-01-02T00:00:00.061258'
         )}
 
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)

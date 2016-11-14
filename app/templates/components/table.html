@@ -49,10 +49,20 @@
   </tr>
 {%- endmacro %}
 
-{% macro field(align='left', status='') -%}
-  <td class="table-field{% if align == 'right' %}-right-aligned{% endif %}">
-    <span class="{{ 'table-field-status-' + status if status }}">{{ caller() }}</span>
-  </td>
+{% macro row_group(id=None) %}
+  <tbody class="table-row-group" {% if id %}id="{{id}}"{% endif %}>
+    {{ caller() }}
+  </tbody>
+{%- endmacro %}
+
+{% macro field(align='left', status='', border=True) -%}
+
+    {% set field_alignment = 'table-field-right-aligned' if align == 'right' else 'table-field-center-aligned' %}
+    {% set border = '' if border else 'table-field-noborder' %}
+
+    <td class="{{ [field_alignment, border]|join(' ') }}">
+      <span class="{{ 'table-field-status-' + status if status }}">{{ caller() }}</span>
+    </td>
 {%- endmacro %}
 
 {% macro row_heading() -%}

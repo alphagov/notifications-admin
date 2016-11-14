@@ -42,7 +42,8 @@ def view_template(service_id, template_id):
         'views/templates/template.html',
         template=Template(
             service_api_client.get_service_template(service_id, template_id)['data'],
-            prefix=current_service['name']
+            prefix=current_service['name'],
+            sms_sender=current_service['sms_sender']
         )
     )
 
@@ -63,7 +64,8 @@ def view_template_version(service_id, template_id, version):
         'views/templates/template_history.html',
         template=Template(
             service_api_client.get_service_template(service_id, template_id, version)['data'],
-            prefix=current_service['name']
+            prefix=current_service['name'],
+            sms_sender=current_service['sms_sender']
         )
     )
 
@@ -231,7 +233,8 @@ def view_template_versions(service_id, template_id):
         versions=[
             Template(
                 template,
-                prefix=current_service['name']
+                prefix=current_service['name'],
+                sms_sender=current_service['sms_sender']
             ) for template in service_api_client.get_service_template_versions(service_id, template_id)['data']
         ]
     )

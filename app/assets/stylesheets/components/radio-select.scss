@@ -6,7 +6,9 @@
     vertical-align: top;
 
     .block-label {
-      margin-right: 10px;
+      margin-right: 5px;
+      padding-right: $gutter - 10px;
+      padding-left: 54px - 10px;
     }
 
   }
@@ -15,31 +17,21 @@
     display: inline-block;
     vertical-align: top;
     width: auto;
-    padding: 20px 30px 15px 30px;
+    padding: 20px $gutter-half 15px $gutter-half;
+    margin-right: 5px;
   }
 
   .js-enabled & {
 
+    height: 60px;
+    overflow: visible;
 
     .block-label {
-      &:last-child {
-        margin-bottom: 10px;
-      }
-    }
-
-    .block-label,
-    .tertiary-button {
       display: none;
     }
 
-    .js-visible {
-
-      display: block;
-
-      &.tertiary-button {
-        display: inline-block;
-      }
-
+    .js-block-label {
+      display: inline-block;
     }
 
   }

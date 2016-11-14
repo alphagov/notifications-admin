@@ -6,7 +6,7 @@
   {% if scheduled_jobs %}
     <div class='dashboard-table'>
       <h2 class="heading-medium">
-        In the next 24 hours
+        In the next few days
       </h2>
       {% call(item, row_number) list_table(
         scheduled_jobs,
@@ -23,7 +23,7 @@
           <div class="file-list">
             <a class="file-list-filename" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
             <span class="file-list-hint">
-              Sending at {{ item.scheduled_for|format_time }}
+              Sending {{ item.scheduled_for|format_datetime_relative }}
             </span>
           </div>
         {% endcall %}

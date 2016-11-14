@@ -1,4 +1,4 @@
-from flask import request, render_template, redirect, url_for, flash
+from flask import request, render_template, redirect, url_for, flash, Markup, abort
 from flask_login import login_required
 from app.main import main
 from app.main.forms import CreateKeyForm, Whitelist
@@ -68,13 +68,22 @@ def create_api_key(service_id):
         key['name'] for key in api_key_api_client.get_api_keys(service_id=service_id)['apiKeys']
     ]
     form = CreateKeyForm(key_names)
-    form.key_type.choices = filter(None, [
-        (KEY_TYPE_NORMAL, 'Send messages to anyone')
-        if not current_service['restricted'] else None,
-        (KEY_TYPE_TEST, 'Simulate sending messages to anyone'),
-        (KEY_TYPE_TEAM, 'Only send messages to your team or whitelist')
-    ])
+    form.key_type.choices = [
+        (KEY_TYPE_NORMAL, 'Send messages to anyone'),
+        (KEY_TYPE_TEAM, 'Send messages to anyone on my whitelist'),
+        (KEY_TYPE_TEST, 'Pretend to send messages to anyone'),
+    ]
+    if current_service['restricted']:
+        disabled_options = [KEY_TYPE_NORMAL]
+        option_hints = {KEY_TYPE_NORMAL: Markup(
+            'This option is not available because your service is in '
+            '<a href="{}">trial mode</a>'.format(url_for(".trial_mode"))
+        )}
+    else:
+        disabled_options, option_hints = [], {}
     if form.validate_on_submit():
+        if form.key_type.data in disabled_options:
+            abort(400)
         secret = api_key_api_client.create_api_key(
             service_id=service_id,
             key_name=form.key_name.data,
@@ -88,7 +97,9 @@ def create_api_key(service_id):
         )
     return render_template(
         'views/api/keys/create.html',
-        form=form
+        form=form,
+        disabled_options=disabled_options,
+        option_hints=option_hints
     )
 
 

@@ -1,6 +1,8 @@
 {% macro radios(
   field,
-  hint=None
+  hint=None,
+  disable=[],
+  option_hints={}
 ) %}
   <div class="form-group {% if field.errors %} error{% endif %}">
     <fieldset>
@@ -14,8 +16,21 @@
       </legend>
       {% for option in field %}
         <label class="block-label" for="{{ option.id }}">
-          {{ option }}
+          <input
+            id="{{ option.id }}" name="{{ option.name }}" type="radio" value="{{ option.data }}"
+            {% if option.data in disable %}
+              disabled
+            {% endif %}
+            {% if option.checked %}
+              checked
+            {% endif %}
+          >
           {{ option.label.text }}
+          {% if option_hints[option.data] %}
+            <div class="block-label-hint">
+              {{ option_hints[option.data] }}
+            </div>
+          {% endif %}
         </label>
       {% endfor %}
     </fieldset>
@@ -38,7 +53,7 @@
          </span>
        {% endif %}
      </legend>
-     <div class="radio-select" data-module="radio-select">
+     <div class="radio-select" data-module="radio-select" data-categories="{{ field.categories|join(',') }}">
        <div class="radio-select-column">
        {% for option in field %}
          <label class="block-label" for="{{ option.id }}">

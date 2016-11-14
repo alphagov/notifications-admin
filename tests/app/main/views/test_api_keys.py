@@ -22,7 +22,6 @@ def test_should_show_api_page(
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         assert page.h1.string.strip() == 'API integration'
-        assert 'Your service is in trial mode' in page.find('div', {'class': 'banner-warning'}).text
         rows = page.find_all('details')
         assert len(rows) == 5
         for index, row in enumerate(rows):
@@ -202,10 +201,7 @@ def test_cant_create_normal_api_key_in_trial_mode(
             'key_type': 'normal'
         }
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.find('span', {'class': 'error-message'}).text.strip() == 'Not a valid choice'
-
+    assert response.status_code == 400
     mock_post.assert_not_called()
 
 
