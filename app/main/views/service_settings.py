@@ -186,37 +186,16 @@ def service_switch_can_send_letters(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
-@main.route("/services/<service_id>/service-settings/delete", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/deactivate", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
-def service_delete(service_id):
-    if request.method == 'GET':
-        return render_template(
-            'views/service-settings/delete.html'
-        )
-    elif request.method == 'POST':
-        return redirect(url_for('.service_delete_confirm', service_id=service_id))
-
-
-@main.route("/services/<service_id>/service-settings/delete/confirm", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions('manage_settings', admin_override=True)
-def service_delete_confirm(service_id):
-    # Validate password for form
-    def _check_password(pwd):
-        return user_api_client.verify_password(current_user.id, pwd)
-
-    form = ConfirmPasswordForm(_check_password)
-
-    if form.validate_on_submit():
-        service_api_client.delete_service(service_id)
-        return redirect(url_for('.choose_service'))
-
-    return render_template(
-        'views/service-settings/confirm.html',
-        heading='Delete this service from Notify',
-        destructive=True,
-        form=form)
+def deactivate_service(service_id):
+    if request.method == 'POST':
+        service_api_client.deactivate_service(service_id)
+        return redirect(url_for('.service_settings', service_id=service_id))
+    else:
+        flash('There\'s no way to reverse this! Are you sure you want to archive this service?', 'delete')
+        return service_settings(service_id)
 
 
 @main.route("/services/<service_id>/service-settings/set-reply-to-email", methods=['GET', 'POST'])

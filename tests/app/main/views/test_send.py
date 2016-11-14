@@ -1,12 +1,14 @@
-import pytest
-import re
-from itertools import repeat
 from io import BytesIO
 from os import path
 from glob import glob
-from bs4 import BeautifulSoup
+import re
+from itertools import repeat
 from functools import partial
+
+import pytest
+from bs4 import BeautifulSoup
 from flask import url_for
+
 from tests import validate_route_permission
 
 template_types = ['email', 'sms']
@@ -447,6 +449,12 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
             assert 'There is a problem with your data' in response.get_data(as_text=True)
 
 
+@pytest.mark.parametrize('route, response_code', [
+    ('main.choose_template', 200),
+    ('main.send_messages', 200),
+    ('main.get_example_csv', 200),
+    ('main.send_test', 302)
+])
 def test_route_permissions(mocker,
                            app_,
                            api_user_active,
@@ -457,35 +465,17 @@ def test_route_permissions(mocker,
                            mock_get_notifications,
                            mock_create_job,
                            mock_s3_upload,
-                           fake_uuid):
-    routes = [
-        'main.choose_template',
-        'main.send_messages',
-        'main.get_example_csv']
-    with app_.test_request_context():
-        for route in routes:
-            validate_route_permission(
-                mocker,
-                app_,
-                "GET",
-                200,
-                url_for(
-                    route,
-                    service_id=service_one['id'],
-                    template_type='sms',
-                    template_id=fake_uuid),
-                ['send_texts', 'send_emails', 'send_letters'],
-                api_user_active,
-                service_one)
-
+                           fake_uuid,
+                           route,
+                           response_code):
     with app_.test_request_context():
         validate_route_permission(
             mocker,
             app_,
             "GET",
-            302,
+            response_code,
             url_for(
-                'main.send_test',
+                route,
                 service_id=service_one['id'],
                 template_type='sms',
                 template_id=fake_uuid),
@@ -494,6 +484,12 @@ def test_route_permissions(mocker,
             service_one)
 
 
+@pytest.mark.parametrize('route', [
+    'main.choose_template',
+    'main.send_messages',
+    'main.get_example_csv',
+    'main.send_test'
+])
 def test_route_invalid_permissions(mocker,
                                    app_,
                                    api_user_active,
@@ -503,27 +499,22 @@ def test_route_invalid_permissions(mocker,
                                    mock_get_jobs,
                                    mock_get_notifications,
                                    mock_create_job,
-                                   fake_uuid):
-    routes = [
-        'main.choose_template',
-        'main.send_messages',
-        'main.get_example_csv',
-        'main.send_test']
+                                   fake_uuid,
+                                   route):
     with app_.test_request_context():
-        for route in routes:
-            validate_route_permission(
-                mocker,
-                app_,
-                "GET",
-                403,
-                url_for(
-                    route,
-                    service_id=service_one['id'],
-                    template_type='sms',
-                    template_id=fake_uuid),
-                ['blah'],
-                api_user_active,
-                service_one)
+        validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            403,
+            url_for(
+                route,
+                service_id=service_one['id'],
+                template_type='sms',
+                template_id=fake_uuid),
+            ['blah'],
+            api_user_active,
+            service_one)
 
 
 def test_route_choose_template_manage_service_permissions(mocker,

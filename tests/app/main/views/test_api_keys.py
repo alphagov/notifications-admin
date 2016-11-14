@@ -1,6 +1,7 @@
 import uuid
-
 from collections import OrderedDict
+
+import pytest
 from flask import url_for
 from bs4 import BeautifulSoup
 
@@ -240,48 +241,50 @@ def test_should_redirect_after_revoking_api_key(app_,
         mock_get_api_keys.assert_called_once_with(service_id=fake_uuid, key_id=fake_uuid)
 
 
+@pytest.mark.parametrize('route', [
+    'main.api_keys',
+    'main.create_api_key',
+    'main.revoke_api_key'
+])
 def test_route_permissions(mocker,
                            app_,
                            api_user_active,
                            service_one,
-                           mock_get_api_keys):
-    routes = [
-        'main.api_keys',
-        'main.create_api_key',
-        'main.revoke_api_key']
+                           mock_get_api_keys,
+                           route):
     with app_.test_request_context():
-        for route in routes:
-            validate_route_permission(
-                mocker,
-                app_,
-                "GET",
-                200,
-                url_for(route, service_id=service_one['id'], key_id=123),
-                ['manage_api_keys'],
-                api_user_active,
-                service_one)
+        validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            200,
+            url_for(route, service_id=service_one['id'], key_id=123),
+            ['manage_api_keys'],
+            api_user_active,
+            service_one)
 
 
+@pytest.mark.parametrize('route', [
+    'main.api_keys',
+    'main.create_api_key',
+    'main.revoke_api_key'
+])
 def test_route_invalid_permissions(mocker,
                                    app_,
                                    api_user_active,
                                    service_one,
-                                   mock_get_api_keys):
-    routes = [
-        'main.api_keys',
-        'main.create_api_key',
-        'main.revoke_api_key']
+                                   mock_get_api_keys,
+                                   route):
     with app_.test_request_context():
-        for route in routes:
-            validate_route_permission(
-                mocker,
-                app_,
-                "GET",
-                403,
-                url_for(route, service_id=service_one['id'], key_id=123),
-                ['view_activity'],
-                api_user_active,
-                service_one)
+        validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            403,
+            url_for(route, service_id=service_one['id'], key_id=123),
+            ['view_activity'],
+            api_user_active,
+            service_one)
 
 
 def test_should_show_whitelist_page(

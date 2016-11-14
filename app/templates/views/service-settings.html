@@ -109,6 +109,13 @@
             {{ 'Stop sending letters' if current_service.can_send_letters else 'Allow to send letters' }}
           </a>
         </li>
+        {% if current_service.active %}
+          <li class="bottom-gutter">
+            <a href="{{ url_for('.deactivate_service', service_id=current_service.id) }}" class="button">
+              Archive service
+            </a>
+          </li>
+        {% endif %}
       </ul>
 
     {% endif %}

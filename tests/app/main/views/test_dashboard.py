@@ -440,22 +440,16 @@ def test_route_for_service_permissions(mocker,
                                        mock_get_template_statistics,
                                        mock_get_detailed_service,
                                        mock_get_usage):
-    routes = [
-        'main.service_dashboard']
     with app_.test_request_context():
-        # Just test that the user is part of the service
-        for route in routes:
-            validate_route_permission(
-                mocker,
-                app_,
-                "GET",
-                200,
-                url_for(
-                    route,
-                    service_id=service_one['id']),
-                ['view_activity'],
-                api_user_active,
-                service_one)
+        validate_route_permission(
+            mocker,
+            app_,
+            "GET",
+            200,
+            url_for('main.service_dashboard', service_id=service_one['id']),
+            ['view_activity'],
+            api_user_active,
+            service_one)
 
 
 def test_aggregate_template_stats():

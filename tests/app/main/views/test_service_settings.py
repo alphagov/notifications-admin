@@ -391,99 +391,12 @@ def test_log_error_on_request_to_go_live(
             )
 
 
-def test_should_show_delete_page(app_,
-                                 api_user_active,
-                                 mock_login,
-                                 mock_get_service,
-                                 mock_get_user,
-                                 mock_get_user_by_email,
-                                 mock_has_permissions,
-                                 fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.get(url_for(
-                'main.service_delete', service_id=service_id))
-
-        assert response.status_code == 200
-        assert 'Delete this service from GOV.UK Notify' in response.get_data(as_text=True)
-        assert mock_get_service.called
-
-
-def test_should_show_redirect_after_deleting_service(app_,
-                                                     api_user_active,
-                                                     mock_get_service,
-                                                     mock_get_user,
-                                                     mock_get_user_by_email,
-                                                     mock_login,
-                                                     mock_has_permissions,
-                                                     fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.post(url_for(
-                'main.service_delete', service_id=service_id))
-
-        assert response.status_code == 302
-        delete_url = url_for(
-            'main.service_delete_confirm', service_id=service_id, _external=True)
-        assert delete_url == response.location
-
-
-def test_should_show_delete_confirmation(app_,
-                                         api_user_active,
-                                         mock_get_service,
-                                         mock_get_user,
-                                         mock_get_user_by_email,
-                                         mock_login,
-                                         mock_has_permissions,
-                                         fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.get(url_for(
-                'main.service_delete_confirm', service_id=service_id))
-
-        assert response.status_code == 200
-        assert 'Delete this service from Notify' in response.get_data(as_text=True)
-        assert mock_get_service.called
-
-
-def test_should_redirect_delete_confirmation(app_,
-                                             api_user_active,
-                                             mock_get_service,
-                                             mock_delete_service,
-                                             mock_get_user,
-                                             mock_get_user_by_email,
-                                             mock_login,
-                                             mock_verify_password,
-                                             mock_has_permissions,
-                                             fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.post(url_for(
-                'main.service_delete_confirm', service_id=service_id))
-
-        assert response.status_code == 302
-        choose_url = url_for(
-            'main.choose_service', _external=True)
-        assert choose_url == response.location
-        assert mock_get_service.called
-        assert mock_delete_service.called
-
-
 @pytest.mark.parametrize('route', [
     'main.service_settings',
     'main.service_name_change',
     'main.service_name_change_confirm',
     'main.service_request_to_go_live',
-    'main.service_delete',
-    'main.service_delete_confirm'
+    'main.deactivate_service'
 ])
 def test_route_permissions(mocker, app_, api_user_active, service_one, route):
     with app_.test_request_context():
@@ -506,8 +419,7 @@ def test_route_permissions(mocker, app_, api_user_active, service_one, route):
     'main.service_switch_live',
     'main.service_switch_research_mode',
     'main.service_switch_can_send_letters',
-    'main.service_delete',
-    'main.service_delete_confirm'
+    'main.deactivate_service',
 ])
 def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, route):
     with app_.test_request_context():
@@ -527,8 +439,6 @@ def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, r
     'main.service_name_change',
     'main.service_name_change_confirm',
     'main.service_request_to_go_live',
-    'main.service_delete',
-    'main.service_delete_confirm'
 ])
 def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one, route):
     with app_.test_request_context():
@@ -542,22 +452,22 @@ def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one
                                   service_one)
 
 
-def test_route_for_platform_admin_update_service(mocker, app_, platform_admin_user, service_one):
-    routes = [
-        'main.service_switch_live',
-        'main.service_switch_research_mode',
-        'main.service_switch_can_send_letters'
-    ]
+@pytest.mark.parametrize('route', [
+    'main.service_switch_live',
+    'main.service_switch_research_mode',
+    'main.service_switch_can_send_letters',
+])
+def test_route_for_platform_admin_update_service(mocker, app_, platform_admin_user, service_one, route):
+    mocker.patch('app.service_api_client.deactivate_service')
     with app_.test_request_context():
-        for route in routes:
-            validate_route_permission(mocker,
-                                      app_,
-                                      "GET",
-                                      302,
-                                      url_for(route, service_id=service_one['id']),
-                                      [],
-                                      platform_admin_user,
-                                      service_one)
+        validate_route_permission(mocker,
+                                  app_,
+                                  "GET",
+                                  302,
+                                  url_for(route, service_id=service_one['id']),
+                                  [],
+                                  platform_admin_user,
+                                  service_one)
 
 
 def test_set_reply_to_email_address(
@@ -842,3 +752,37 @@ def test_switch_service_disable_letters(client, platform_admin_user, mocker):
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service['id'], _external=True)
     assert mocked_fn.call_args == call(service['id'], {"can_send_letters": False})
+
+
+def test_deactivate_service_after_confirm(client, platform_admin_user, service_one, mocker):
+    mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
+
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.post(url_for('main.deactivate_service', service_id=service_one['id']))
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_fn.call_args == call('/service/{}/deactivate'.format(service_one['id']), data=None)
+
+
+def test_deactivate_service_prompts_user(client, platform_admin_user, service_one, mocker):
+    mocked_fn = mocker.patch('app.service_api_client.post')
+
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.get(url_for('main.deactivate_service', service_id=service_one['id']))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert 'Are you sure you want to archive this service?' in page.find('div', class_='banner-dangerous').text
+    assert mocked_fn.called is False
+
+
+def test_cant_deactivate_inactive_service(client, platform_admin_user, service_one, mocker):
+    service_one['active'] = False
+
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.get(url_for('main.service_settings', service_id=service_one['id']))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert 'Deactivate service' not in {a.text for a in page.find_all('a', class_='button')}

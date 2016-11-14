@@ -231,15 +231,6 @@ def mock_get_services_with_one_service(mocker, fake_uuid, user=None):
 
 
 @pytest.fixture(scope='function')
-def mock_delete_service(mocker, mock_get_service):
-    def _delete(service_id):
-        return mock_get_service.side_effect(service_id)
-
-    return mocker.patch(
-        'app.service_api_client.delete_service', side_effect=_delete)
-
-
-@pytest.fixture(scope='function')
 def mock_get_service_template(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
