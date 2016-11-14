@@ -61,7 +61,9 @@ def test_should_show_research_and_restricted_mode(
     mock_get_detailed_services.assert_called_once_with({'detailed': True})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     # get second column, which contains flags as text.
-    assert page.find_all('tbody')[table_index].find_all('td')[1].text.strip() == displayed
+    table_body = page.find_all('table')[table_index].find_all('tbody')[0]
+    service_mode = table_body.find_all('tbody')[0].find_all('tr')[1].find_all('td')[0].text.strip()
+    assert service_mode == displayed
 
 
 def test_should_render_platform_admin_page(
@@ -141,7 +143,7 @@ def create_stats(
     }
 
 
-def test_format_stats_by_service_sums_values_for_sending(fake_uuid):
+def test_format_stats_by_service_returns_correct_values(fake_uuid):
     services = [service_json(fake_uuid, 'a', [])]
     services[0]['statistics'] = create_stats(
         emails_requested=10,
@@ -153,8 +155,62 @@ def test_format_stats_by_service_sums_values_for_sending(fake_uuid):
     )
 
     ret = list(format_stats_by_service(services))
-
     assert len(ret) == 1
-    assert ret[0]['sending'] == 34
-    assert ret[0]['delivered'] == 10
-    assert ret[0]['failed'] == 16
+    assert ret[0]['stats']['email']['requested'] == 10
+    assert ret[0]['stats']['email']['delivered'] == 3
+    assert ret[0]['stats']['email']['failed'] == 5
+
+    assert ret[0]['stats']['sms']['requested'] == 50
+    assert ret[0]['stats']['sms']['delivered'] == 7
+    assert ret[0]['stats']['sms']['failed'] == 11
+
+
+@pytest.mark.parametrize('restricted, table_index, research_mode', [
+    (True, 1, False),
+    (False, 0, False)
+])
+def test_should_show_email_and_sms_stats_for_all_service_types(
+    restricted,
+    table_index,
+    research_mode,
+    app_,
+    platform_admin_user,
+    mocker,
+    mock_get_detailed_services,
+    fake_uuid
+):
+    services = [service_json(fake_uuid, 'My Service', [], restricted=restricted, research_mode=research_mode)]
+    services[0]['statistics'] = create_stats(
+        emails_requested=10,
+        emails_delivered=3,
+        emails_failed=5,
+        sms_requested=50,
+        sms_delivered=7,
+        sms_failed=11
+    )
+
+    mock_get_detailed_services.return_value = {'data': services}
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            mock_get_user(mocker, user=platform_admin_user)
+            client.login(platform_admin_user)
+            response = client.get(url_for('main.platform_admin'))
+
+    assert response.status_code == 200
+    mock_get_detailed_services.assert_called_once_with({'detailed': True})
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    table_body = page.find_all('table')[table_index].find_all('tbody')[0]
+    service_row_group = table_body.find_all('tbody')[0].find_all('tr')
+    email_stats = service_row_group[0].find_all('td')[2:]
+    sms_stats = service_row_group[1].find_all('td')[2:]
+
+    email_sending, email_delivered, email_failed = [int(stat.text.split()[0]) for stat in email_stats]
+    sms_sending, sms_delivered, sms_failed = [int(stat.text.split()[0]) for stat in sms_stats]
+
+    assert email_sending == 10
+    assert email_delivered == 3
+    assert email_failed == 5
+    assert sms_sending == 50
+    assert sms_delivered == 7
+    assert sms_failed == 11
