@@ -17,8 +17,9 @@ from flask import (
 )
 
 from flask_login import login_required, current_user
+from notifications_utils.columns import Columns
 from notifications_utils.template import Template
-from notifications_utils.recipients import RecipientCSV, first_column_heading, validate_and_format_phone_number
+from notifications_utils.recipients import RecipientCSV, first_column_headings, validate_and_format_phone_number
 
 from app.main import main
 from app.main.forms import CsvUploadForm, ChooseTimeForm, get_next_days_until, get_furthest_possible_scheduled_time
@@ -33,7 +34,8 @@ from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet, get
 def get_page_headings(template_type):
     return {
         'email': 'Email templates',
-        'sms': 'Text message templates'
+        'sms': 'Text message templates',
+        'letter': 'Letter templates'
     }[template_type]
 
 
@@ -47,14 +49,27 @@ def get_example_csv_fields(column_headers, use_example_as_example, submitted_fie
 
 
 def get_example_csv_rows(template, use_example_as_example=True, submitted_fields=False):
-    return [
-        {
-            'email': 'test@example.com' if use_example_as_example else current_user.email_address,
-            'sms': '07700 900321' if use_example_as_example else validate_and_format_phone_number(
-                current_user.mobile_number, human_readable=True
+    return {
+        'email': ['test@example.com'] if use_example_as_example else [current_user.email_address],
+        'sms': ['07700 900321'] if use_example_as_example else [validate_and_format_phone_number(
+            current_user.mobile_number, human_readable=True
+        )],
+        'letter': [
+            (submitted_fields or {}).get(
+                key, get_example_letter_address(key) if use_example_as_example else key
             )
-        }[template.template_type]
-    ] + get_example_csv_fields(template.placeholders, use_example_as_example, submitted_fields)
+            for key in first_column_headings['letter']
+        ]
+    }[template.template_type] + get_example_csv_fields(template.placeholders, use_example_as_example, submitted_fields)
+
+
+def get_example_letter_address(key):
+    return {
+        'address line 1': 'A. Name',
+        'address line 2': '123 Example Street',
+        'address line 3': 'Example town',
+        'postcode': 'XM4 5HQ'
+    }.get(key, '')
 
 
 @main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
@@ -66,8 +81,10 @@ def get_example_csv_rows(template, use_example_as_example=True, submitted_fields
                       'manage_api_keys',
                       admin_override=True, any_=True)
 def choose_template(service_id, template_type):
-    if template_type not in ['email', 'sms']:
+    if template_type not in ['email', 'sms', 'letter']:
         abort(404)
+    if not current_service['can_send_letters'] and template_type == 'letter':
+        abort(403)
     return render_template(
         'views/templates/choose.html',
         templates=[
@@ -114,14 +131,13 @@ def send_messages(service_id, template_id):
                 form.file.data.filename
             ))
 
+    column_headings = first_column_headings[template.template_type] + list(template.placeholders)
+
     return render_template(
         'views/send.html',
         template=template,
-        column_headings=list(ascii_uppercase[:len(template.placeholders) + 1]),
-        example=[
-            [first_column_heading[template.template_type]] + list(template.placeholders),
-            get_example_csv_rows(template)
-        ],
+        column_headings=list(ascii_uppercase[:len(column_headings)]),
+        example=[column_headings, get_example_csv_rows(template)],
         form=form
     )
 
@@ -132,7 +148,7 @@ def send_messages(service_id, template_id):
 def get_example_csv(service_id, template_id):
     template = Template(service_api_client.get_service_template(service_id, template_id)['data'])
     return Spreadsheet.from_rows([
-        [first_column_heading[template.template_type]] + list(template.placeholders),
+        first_column_headings[template.template_type] + list(template.placeholders),
         get_example_csv_rows(template)
     ]).as_csv_data, 200, {
         'Content-Type': 'text/csv; charset=utf-8',
@@ -159,7 +175,7 @@ def send_test(service_id, template_id):
             {
                 'file_name': file_name,
                 'data': Spreadsheet.from_rows([
-                    [first_column_heading[template.template_type]] + list(template.placeholders),
+                    first_column_headings[template.template_type] + list(template.placeholders),
                     get_example_csv_rows(template, use_example_as_example=False, submitted_fields=request.form)
                 ]).as_csv_data
             },
@@ -181,7 +197,7 @@ def send_test(service_id, template_id):
     return render_template(
         'views/send-test.html',
         template=template,
-        recipient_column=first_column_heading[template.template_type],
+        recipient_columns=first_column_headings[template.template_type],
         example=[get_example_csv_rows(template, use_example_as_example=False)],
         help=get_help_argument()
     )
@@ -233,7 +249,7 @@ def check_messages(service_id, template_type, upload_id):
         max_initial_rows_shown=50,
         max_errors_shown=50,
         whitelist=itertools.chain.from_iterable(
-            [user.mobile_number, user.email_address] for user in users
+            [user.name, user.mobile_number, user.email_address] for user in users
         ) if current_service['restricted'] else None,
         remaining_messages=remaining_messages
     )
@@ -255,7 +271,10 @@ def check_messages(service_id, template_type, upload_id):
 
     with suppress(StopIteration):
         template.values = next(recipients.rows)
-        first_recipient = template.values.get(recipients.recipient_column_header, '')
+        first_recipient = template.values.get(
+            Columns.make_key(recipients.recipient_column_headers[0]),
+            ''
+        )
 
     session['upload_data']['notification_count'] = len(list(recipients.rows))
     session['upload_data']['valid'] = not recipients.has_errors
@@ -305,6 +324,14 @@ def start_job(service_id, upload_id):
         return send_messages(service_id, upload_data.get('template_id'))
 
     session.pop('upload_data')
+
+    template = service_api_client.get_service_template(
+        service_id,
+        upload_data.get('template_id')
+    )['data']
+
+    if template['template_type'] == 'letter':
+        abort(403)
 
     job_api_client.create_job(
         upload_id,

@@ -51,7 +51,7 @@
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='email') }}">Email templates</a></li>
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='sms') }}">Text message templates</a></li>
     {% if current_service.can_send_letters %}
-      <li><a href="{{ url_for('.letters', service_id=current_service.id) }}">Letter templates</a></li>
+      <li><a href="{{ url_for('.choose_template', service_id=current_service.id, template_type='letter') }}">Letter templates</a></li>
     {% endif %}
   {% endif %}
   {% if current_user.has_permissions(['manage_users', 'manage_settings'], admin_override=True) %}

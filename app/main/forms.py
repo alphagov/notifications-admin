@@ -276,6 +276,10 @@ class EmailTemplateForm(SMSTemplateForm):
         validators=[DataRequired(message="Can’t be empty")])
 
 
+class LetterTemplateForm(EmailTemplateForm):
+    pass
+
+
 class ForgotPasswordForm(Form):
     email_address = email_address(gov_user=False)
 

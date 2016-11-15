@@ -405,6 +405,33 @@ def test_create_job_should_call_api(
     )
 
 
+def test_cant_start_letters_job(
+    app_,
+    client,
+    service_one,
+    mock_get_service,
+    active_user_with_permissions,
+    mock_create_job,
+    mock_get_service_letter_template,
+    mocker,
+    fake_uuid
+):
+    client.login(active_user_with_permissions, mocker, service_one)
+    with client.session_transaction() as session:
+        session['upload_data'] = {
+            'original_file_name': 'example.csv',
+            'template_id': fake_uuid,
+            'notification_count': 123,
+            'valid': True
+        }
+    response = client.post(
+        url_for('main.start_job', service_id=fake_uuid, upload_id=fake_uuid),
+        data={}
+    )
+    assert response.status_code == 403
+    mock_create_job.assert_not_called()
+
+
 def test_check_messages_should_revalidate_file_when_uploading_file(
     app_,
     service_one,

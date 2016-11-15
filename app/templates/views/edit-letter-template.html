@@ -1,0 +1,36 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+  {{ heading_action }} letter template – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <h1 class="heading-large">
+      {{ heading_action }} letter template
+    </h1>
+
+    <form method="post">
+      <div class="grid-row">
+        <div class="column-three-quarters">
+          {{ textbox(form.name, width='1-1', hint='Your recipients won’t see this', rows=10) }}
+          {{ textbox(form.subject, width='1-1', highlight_tags=True, rows=2) }}
+        </div>
+        <div class="column-three-quarters">
+          {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=8) }}
+          {{ page_footer(
+            'Save',
+            delete_link=url_for('.delete_service_template', service_id=current_service.id, template_id=template_id) if template_id or None,
+            delete_link_text='Delete this template'
+          ) }}
+        </div>
+        <aside class="column-whole">
+          {% include "partials/templates/guidance-formatting-letters.html" %}
+          {% include "partials/templates/guidance-personalisation.html" %}
+        </aside>
+      </div>
+    </form>
+
+{% endblock %}

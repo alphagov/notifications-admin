@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/sms-message.html" import sms_message %}
 {% from "components/email-message.html" import email_message %}
+{% from "components/letter.html" import letter %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/table.html" import list_table, text_field, index_field, index_field_heading %}
@@ -30,6 +31,8 @@
       recipient='',
       show_placeholder_for_recipient=True
     ) }}
+  {% elif 'letter' == template.template_type %}
+    {{ letter(template.formatted_as_markup) }}
   {% endif %}
 
   <div class="page-footer bottom-gutter">

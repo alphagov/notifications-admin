@@ -86,6 +86,11 @@ def get_errors_for_csv(recipients, template_type):
                 errors.append("fix 1 email address")
             else:
                 errors.append("fix {} email addresses".format(number_of_bad_recipients))
+        elif 'letter' == template_type:
+            if 1 == number_of_bad_recipients:
+                errors.append("fix 1 address")
+            else:
+                errors.append("fix {} addresses".format(number_of_bad_recipients))
 
     if recipients.rows_with_missing_data:
         number_of_rows_with_missing_data = len(list(recipients.rows_with_missing_data))

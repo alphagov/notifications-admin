@@ -1,5 +1,6 @@
 {% from "components/email-message.html" import email_message %}
 {% from "components/sms-message.html" import sms_message %}
+{% from "components/letter.html" import letter %}
 
 <div class="column-two-thirds">
   {% if 'email' == template.template_type %}
@@ -14,6 +15,8 @@
       template.formatted_as_markup,
       id=template.id
     ) }}
+  {% elif 'letter' == template.template_type %}
+    {{ letter(template.formatted_as_markup) }}
   {% endif %}
 </div>
 <div class="column-one-third">
