@@ -64,7 +64,14 @@ def format_stats_by_service(services):
         yield {
             'id': service['id'],
             'name': service['name'],
-            'stats': service['statistics'],
+            'stats': {
+                msg_type: {
+                    'sending': stats['requested'] - stats['delivered'] - stats['failed'],
+                    'delivered': stats['delivered'],
+                    'failed': stats['failed'],
+                }
+                for msg_type, stats in service['statistics'].items()
+            },
             'restricted': service['restricted'],
             'research_mode': service['research_mode'],
             'created_at': service['created_at']

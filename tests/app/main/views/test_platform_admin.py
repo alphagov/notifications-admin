@@ -156,11 +156,12 @@ def test_format_stats_by_service_returns_correct_values(fake_uuid):
 
     ret = list(format_stats_by_service(services))
     assert len(ret) == 1
-    assert ret[0]['stats']['email']['requested'] == 10
+
+    assert ret[0]['stats']['email']['sending'] == 2
     assert ret[0]['stats']['email']['delivered'] == 3
     assert ret[0]['stats']['email']['failed'] == 5
 
-    assert ret[0]['stats']['sms']['requested'] == 50
+    assert ret[0]['stats']['sms']['sending'] == 32
     assert ret[0]['stats']['sms']['delivered'] == 7
     assert ret[0]['stats']['sms']['failed'] == 11
 
@@ -202,15 +203,15 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
 
     table_body = page.find_all('table')[table_index].find_all('tbody')[0]
     service_row_group = table_body.find_all('tbody')[0].find_all('tr')
-    email_stats = service_row_group[0].find_all('td')[2:]
-    sms_stats = service_row_group[1].find_all('td')[2:]
+    email_stats = service_row_group[0].find_all('div', class_='big-number-number')
+    sms_stats = service_row_group[1].find_all('div', class_='big-number-number')
 
-    email_sending, email_delivered, email_failed = [int(stat.text.split()[0]) for stat in email_stats]
-    sms_sending, sms_delivered, sms_failed = [int(stat.text.split()[0]) for stat in sms_stats]
+    email_sending, email_delivered, email_failed = [int(x.text.strip()) for x in email_stats]
+    sms_sending, sms_delivered, sms_failed = [int(x.text.strip()) for x in sms_stats]
 
-    assert email_sending == 10
+    assert email_sending == 2
     assert email_delivered == 3
     assert email_failed == 5
-    assert sms_sending == 50
+    assert sms_sending == 32
     assert sms_delivered == 7
     assert sms_failed == 11

@@ -11,7 +11,7 @@
   {% endcall %}
 
   {% call field(align='right', border=False) %}
-    {{ big_number(data[channel]['requested'], smaller=True) }}
+    {{ big_number(data[channel]['sending'], smaller=True) }}
   {% endcall %}
 
   {% call field(align='right', border=False) %}
