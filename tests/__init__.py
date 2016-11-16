@@ -44,7 +44,7 @@ def service_json(
     name='Test Service',
     users=None,
     message_limit=1000,
-    active=False,
+    active=True,
     restricted=True,
     email_from=None,
     reply_to_email_address=None,
@@ -52,7 +52,8 @@ def service_json(
     research_mode=False,
     can_send_letters=False,
     organisation=None,
-    branding='govuk'
+    branding='govuk',
+    created_at=None
 ):
     if users is None:
         users = []
@@ -70,7 +71,7 @@ def service_json(
         'can_send_letters': can_send_letters,
         'organisation': organisation,
         'branding': branding,
-        'created_at': str(datetime.utcnow())
+        'created_at': created_at or str(datetime.utcnow())
     }
 
 

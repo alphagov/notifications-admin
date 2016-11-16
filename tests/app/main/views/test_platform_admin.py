@@ -215,3 +215,68 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     assert sms_sending == 32
     assert sms_delivered == 7
     assert sms_failed == 11
+
+
+@pytest.mark.parametrize('restricted, table_index', [
+    (False, 0),
+    (True, 1)
+], ids=['live', 'trial'])
+def test_should_show_archived_services_last(
+    client,
+    platform_admin_user,
+    mocker,
+    mock_get_detailed_services,
+    restricted,
+    table_index
+):
+    services = [
+        service_json(name='C', restricted=restricted, active=False, created_at='2002-02-02 12:00:00'),
+        service_json(name='B', restricted=restricted, active=True, created_at='2001-01-01 12:00:00'),
+        service_json(name='A', restricted=restricted, active=True, created_at='2003-03-03 12:00:00'),
+    ]
+    services[0]['statistics'] = create_stats()
+    services[1]['statistics'] = create_stats()
+    services[2]['statistics'] = create_stats()
+
+    mock_get_detailed_services.return_value = {'data': services}
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin'))
+
+    assert response.status_code == 200
+    mock_get_detailed_services.assert_called_once_with({'detailed': True})
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    table_body = page.find_all('table')[table_index].find_all('tbody')[0]
+    services = [service.tr for service in table_body.find_all('tbody')]
+    assert len(services) == 3
+    assert services[0].td.text.strip() == 'A'
+    assert services[1].td.text.strip() == 'B'
+    assert services[2].td.text.strip() == 'C'
+
+
+@pytest.mark.parametrize('research_mode', (True, False))
+def test_shows_archived_label_instead_of_live_or_research_mode_label(
+    client,
+    platform_admin_user,
+    mocker,
+    mock_get_detailed_services,
+    research_mode
+):
+    services = [
+        service_json(restricted=False, research_mode=research_mode, active=False)
+    ]
+    services[0]['statistics'] = create_stats()
+
+    mock_get_detailed_services.return_value = {'data': services}
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin'))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    table_body = page.find_all('table')[0].find_all('tbody')[0]
+    service_mode = table_body.find_all('tbody')[0].find_all('tr')[1].td.text.strip()
+    # get second column, which contains flags as text.
+    assert service_mode == 'archived'

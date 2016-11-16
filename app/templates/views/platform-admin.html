@@ -51,15 +51,17 @@
         {% endcall %}
 
         {% call row() %}
-          {% if service['research_mode'] %}
+          {% if not service['active'] %}
+            {% call field(status='default') %}
+              <span class="heading-medium">archived</span>
+            {% endcall %}
+          {% elif service['research_mode'] %}
             {% call field(border=False) %}
               <span class="research-mode">research mode</span>
             {% endcall %}
           {% elif not service['restricted'] %}
             {% call field(status='error') %}
-              <span class="heading-medium">
-                Live
-              </span>
+              <span class="heading-medium">Live</span>
             {% endcall %}
           {% else %}
             {{ text_field('') }}
