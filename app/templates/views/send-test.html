@@ -26,7 +26,7 @@
     <div class="grid-row">
       <div class="column-two-thirds">
         {{ sms_message(
-          template.formatted_as_markup,
+          template.formatted,
           recipient='',
           show_placeholder_for_recipient=True
         ) }}
@@ -34,13 +34,13 @@
     </div>
   {% elif 'email' == template.template_type %}
     {{ email_message(
-      template.formatted_subject_as_markup,
-      template.formatted_as_markup,
+      template.formatted_subject,
+      template.formatted,
       recipient='',
       show_placeholder_for_recipient=True
     ) }}
   {% elif 'letter' == template.template_type %}
-    {{ letter(template.formatted_as_markup) }}
+    {{ letter(template.formatted) }}
   {% endif %}
 
   <form method="post">

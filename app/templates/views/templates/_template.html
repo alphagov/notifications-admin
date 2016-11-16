@@ -5,18 +5,18 @@
 <div class="column-two-thirds">
   {% if 'email' == template.template_type %}
     {{ email_message(
-      template.formatted_subject_as_markup,
-      template.formatted_as_markup,
+      template.formatted_subject,
+      template.formatted,
       id=template.id,
       expanded=expanded
     ) }}
   {% elif 'sms' == template.template_type %}
     {{ sms_message(
-      template.formatted_as_markup,
+      template.formatted,
       id=template.id
     ) }}
   {% elif 'letter' == template.template_type %}
-    {{ letter(template.formatted_as_markup) }}
+    {{ letter(template.formatted) }}
   {% endif %}
 </div>
 <div class="column-one-third">
