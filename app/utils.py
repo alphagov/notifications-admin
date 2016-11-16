@@ -8,7 +8,7 @@ import unicodedata
 from flask import (abort, current_app, session, request, redirect, url_for)
 from flask_login import current_user
 
-from notifications_utils.renderers import SMSPreview, EmailPreview, LetterPreview
+from notifications_utils.renderers import SMSPreview, EmailPreview, LetterPDFLink
 
 import pyexcel
 import pyexcel.ext.io
@@ -233,5 +233,5 @@ def get_renderer(template_type, service, show_recipient, expand_emails=False):
             sender=service['sms_sender'],
             show_recipient=show_recipient
         ),
-        'letter': LetterPreview(),
+        'letter': LetterPDFLink(service['id']),
     }[template_type]
