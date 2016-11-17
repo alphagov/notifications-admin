@@ -14,22 +14,7 @@
       API info
   </h1>
 
-  {% if 'email' == template.template_type %}
-    {{ email_message(
-      template.formatted_subject,
-      template.formatted,
-    ) }}
-  {% elif 'sms' == template.template_type %}
-    <div class="grid-row">
-      <div class="column-two-thirds">
-        {{ sms_message(
-          template.formatted,
-        ) }}
-      </div>
-    </div>
-  {% elif 'letter' == template.template_type %}
-    {{ letter(template.formatted) }}
-  {% endif %}
+  {{ template.rendered }}
 
   <div class="bottom-gutter">
     {{ api_key(template.id, name="Template ID", thing='template ID') }}

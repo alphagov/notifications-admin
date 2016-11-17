@@ -22,26 +22,7 @@
     <h1 class="heading-large">Send yourself a test</h1>
   {% endif %}
 
-  {% if 'sms' == template.template_type %}
-    <div class="grid-row">
-      <div class="column-two-thirds">
-        {{ sms_message(
-          template.formatted,
-          recipient='',
-          show_placeholder_for_recipient=True
-        ) }}
-      </div>
-    </div>
-  {% elif 'email' == template.template_type %}
-    {{ email_message(
-      template.formatted_subject,
-      template.formatted,
-      recipient='',
-      show_placeholder_for_recipient=True
-    ) }}
-  {% elif 'letter' == template.template_type %}
-    {{ letter(template.formatted) }}
-  {% endif %}
+  {{ template.rendered }}
 
   <form method="post">
     {% call(item, row_number) list_table(

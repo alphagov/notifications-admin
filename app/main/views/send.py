@@ -20,6 +20,7 @@ from flask_login import login_required, current_user
 from notifications_utils.columns import Columns
 from notifications_utils.template import Template
 from notifications_utils.recipients import RecipientCSV, first_column_headings, validate_and_format_phone_number
+from notifications_utils.renderers import EmailPreview, SMSPreview, LetterPreview
 
 from app.main import main
 from app.main.forms import CsvUploadForm, ChooseTimeForm, get_next_days_until, get_furthest_possible_scheduled_time
@@ -36,6 +37,23 @@ def get_page_headings(template_type):
         'email': 'Email templates',
         'sms': 'Text message templates',
         'letter': 'Letter templates'
+    }[template_type]
+
+
+def get_renderer(template_type, service, show_recipient):
+    return {
+        'email': EmailPreview(
+            from_name=current_service['name'],
+            from_address='{}@notifications.service.gov.uk'.format(current_service['email_from']),
+            expanded=False,
+            show_recipient=show_recipient
+        ),
+        'sms': SMSPreview(
+            prefix=current_service['name'],
+            sender=current_service['sms_sender'],
+            show_recipient=show_recipient
+        ),
+        'letter': LetterPreview(),
     }[template_type]
 
 
@@ -90,8 +108,7 @@ def choose_template(service_id, template_type):
         templates=[
             Template(
                 template,
-                prefix=current_service['name'],
-                sms_sender=current_service['sms_sender']
+                renderer=get_renderer(template_type, current_service, show_recipient=False)
             ) for template in service_api_client.get_service_templates(service_id)['data']
             if template['template_type'] == template_type
         ],
@@ -105,10 +122,9 @@ def choose_template(service_id, template_type):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_messages(service_id, template_id):
     template = Template(
-        service_api_client.get_service_template(service_id, template_id)['data'],
-        prefix=current_service['name'],
-        sms_sender=current_service['sms_sender']
+        service_api_client.get_service_template(service_id, template_id)['data']
     )
+    template.renderer = get_renderer(template.template_type, current_service, show_recipient=True)
 
     form = CsvUploadForm()
     if form.validate_on_submit():
@@ -237,10 +253,10 @@ def check_messages(service_id, template_type, upload_id):
         service_api_client.get_service_template(
             service_id,
             session['upload_data'].get('template_id')
-        )['data'],
-        prefix=current_service['name'],
-        sms_sender=current_service['sms_sender']
+        )['data']
     )
+
+    template.renderer = get_renderer(template_type, current_service, show_recipient=True)
 
     recipients = RecipientCSV(
         contents,
