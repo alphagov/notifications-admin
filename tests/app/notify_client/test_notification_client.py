@@ -2,20 +2,6 @@ import pytest
 from app.notify_client.notification_api_client import NotificationApiClient
 
 
-def test_client_gets_notifications(mocker):
-
-    mock_get = mocker.patch('app.notify_client.notification_api_client.NotificationApiClient.get')
-    NotificationApiClient().get_all_notifications()
-    mock_get.assert_called_once_with(url='/notifications', params={})
-
-
-def test_client_gets_notifications_with_page(mocker):
-
-    mock_get = mocker.patch('app.notify_client.notification_api_client.NotificationApiClient.get')
-    NotificationApiClient().get_all_notifications(page=99)
-    mock_get.assert_called_once_with(url='/notifications', params={'page': 99})
-
-
 @pytest.mark.parametrize("arguments,expected_call", [
     (
         {},
