@@ -42,9 +42,6 @@
   {% endcall %}
 {% else %}
 <nav class="navigation">
-  <h2 class="navigation-service-name">
-    {{ current_service.name }}
-  </h2>
   <ul>
     <li><a href="{{ url_for('.service_dashboard', service_id=current_service.id) }}">Dashboard</a></li>
   {% if current_user.has_permissions(['view_activity', 'manage_templates', 'manage_api_keys'], admin_override=True, any_=True) %}

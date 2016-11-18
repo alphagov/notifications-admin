@@ -56,14 +56,16 @@ a {
 
 .column-main {
 
-  > .heading-large {
-    margin-top: $gutter;
+  > .heading-large,
+  > .heading-medium {
+    margin: 10px 0 15px 0;
   }
 
-  > .grid-row  {
+  > .grid-row:first-child  {
 
-    .heading-large {
-      margin-top: $gutter;
+    .heading-large,
+    .heading-medium {
+      margin: 10px 0 15px 0;
     }
 
   }
