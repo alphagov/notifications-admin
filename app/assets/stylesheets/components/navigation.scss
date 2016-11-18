@@ -2,15 +2,33 @@
 
   padding: 0 $gutter 0 0;
 
+  &-service {
+
+    padding: 11px 0 9px 0;
+    border-bottom: 1px solid $border-colour;
+    margin: 0 0 10px;
+    position: relative;
+
+    h2 {
+      @include bold-19;
+      margin: 0 0 0 0;
+    }
+
+    &-switch {
+      @include core-16;
+      text-align: right;
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 13px 0 9px 15px;
+    }
+
+  }
+
   li {
     @include core-19;
     margin: 10px 0 0 0;
     list-style-type: none;
-  }
-
-  h2 {
-    @include bold-19;
-    margin: $gutter 0 0 0;
   }
 
   a {
