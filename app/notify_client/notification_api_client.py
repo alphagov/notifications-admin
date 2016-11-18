@@ -10,15 +10,6 @@ class NotificationApiClient(BaseAPIClient):
         self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.api_key = app.config['ADMIN_CLIENT_SECRET']
 
-    def get_all_notifications(self, page=None):
-        params = {}
-        if page is not None:
-            params['page'] = page
-        return self.get(
-            url='/notifications',
-            params=params
-        )
-
     def get_notifications_for_service(
         self,
         service_id,
