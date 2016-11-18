@@ -68,7 +68,7 @@
 {% endblock %}
 
 
-{% set global_header_text = "GOV.UK Notify" %}
+{% set global_header_text = "GOV.UK <span id='product-name'>Notify</span>"|safe %}
 
 {% set homepage_url = url_for('main.show_all_services_or_dashboard') %}
 
