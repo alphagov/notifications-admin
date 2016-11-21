@@ -9,10 +9,16 @@
 {% block maincolumn_content %}
 
     <h1 class="heading-large">
-      Give feedback
+      Support and feedback
     </h1>
     <div class="grid-row">
       <div class="column-two-thirds">
+        <div class="panel panel-border-wide">
+          <p>
+            Check our <a href="https://status.notifications.service.gov.uk">system status</a> 
+            page to see if there are any known issues with GOV.UK Notify.
+          </p>
+        </div>
         <p>What went wrong, if anything? What went well? How could we improve this service?</p>
         <form method="post">
             {{ textbox(form.feedback, width='1-1', hint='', rows=10) }}
