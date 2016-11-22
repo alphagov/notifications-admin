@@ -4,7 +4,8 @@
   background-color: $govuk-blue;
 }
 
-#global-header {
+#global-header,
+#global-header.with-proposition {
 
   #logo {
 
@@ -18,18 +19,38 @@
 
   }
 
+  .header-wrapper {
+    .header-global {
+      .header-logo {
+
+        @include media(desktop) {
+          width: auto;
+        }
+
+        &:after {
+          display: none;
+        }
+
+      }
+    }
+  }
+
   .header-proposition {
     #proposition-links {
       li {
         padding: 0 0 0 15px;
       }
     }
-    #proposition-menu {
-      margin-top: 9px;
-    }
   }
 
 }
+
+.beta-badge {
+  @include phase-tag(beta);
+  background: $govuk-blue;
+  margin: 10px 0 0 0;
+}
+
 
 @include media(desktop) {
   #proposition-menu {
