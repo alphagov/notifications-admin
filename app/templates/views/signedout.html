@@ -25,35 +25,6 @@
       or <a href="{{ url_for('.sign_in' )}}">sign in</a> if you’ve used
       it before
     </p>
-    <div class="grid-row phone-container">
-      <div class="column-one-third">
-        {{ phone(
-          "07900911111",
-          """
-            Joshua, we’ve started processing your application.
-            Your reference number is 300312.
-          """
-        ) }}
-      </div>
-      <div class="column-one-third">
-        {{ phone(
-          "07900922222",
-          """
-            Amala, we’ve started processing your application.
-            Your reference number is 444250.
-          """
-        ) }}
-      </div>
-      <div class="column-one-third">
-        {{ phone(
-          "07900933333",
-          """
-            Roman, we’ve started processing your application.
-            Your reference number is 568821.
-          """
-        ) }}
-      </div>
-    </div>
   {% endcall %}
 
 {% endblock %}
