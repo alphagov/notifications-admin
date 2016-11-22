@@ -9,22 +9,30 @@
 
 {% block maincolumn_content %}
 
-  {% call banner_wrapper(type='intro') %}
-    <h1 class="heading-medium">
-      GOV.UK Notify makes it easy to send text messages and emails to
-      your users.
-    </h1>
-    <p class="heading-medium">
-      If you work for a UK government department or agency you can try
-      it now.
-    </p>
-    <p class="button-block">
-      <a class="button button-start" href='{{ url_for('.register' )}}'>
-        Create an account
-      </a>
-      or <a href="{{ url_for('.sign_in' )}}">sign in</a> if you’ve used
-      it before
-    </p>
-  {% endcall %}
+  <div class="product-page-intro">
+    <div class="product-page-intro-wrapper">
+      <div class="grid-row">
+        <div class="column-two-thirds">
+          <h1>
+            Send text messages and emails to your users
+          </h1>
+          <p>
+            If you work for a UK government department or agency you can try
+            it now.
+          </p>
+          <div class="button-container">
+            <a class="button button-start" href='{{ url_for('.register' )}}'>
+              Create an account
+            </a>
+            or <a href="{{ url_for('.sign_in' )}}">sign in</a> if you’ve used
+            it before
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="product-page-section">
+  </div>
 
 {% endblock %}

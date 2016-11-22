@@ -1,0 +1,66 @@
+.product-page {
+
+  &-intro {
+
+    margin: -10px 0 $gutter * 1.5 0;
+    padding: $gutter 0 $gutter * 1.5 0;
+    background: $govuk-blue;
+    color: $white;
+
+    &-wrapper {
+      @extend %site-width-container;
+    }
+
+    h1 {
+      @include bold-36;
+    }
+
+    p {
+      margin: $gutter-half 0 $gutter;
+    }
+
+    .button-container {
+      line-height: 35px;
+    }
+
+    .button {
+
+      @include button($white);
+      color: $govuk-blue;
+      margin-right: 5px;
+
+      &:link,
+      &:visited,
+      &:hover {
+        color: $govuk-blue;
+      }
+
+      &:hover {
+        background: $light-blue-25;
+        outline: none;
+      }
+
+    }
+
+    a {
+
+      &:link,
+      &:visited {
+        color: $white;
+      }
+
+      &:hover,
+      &:active {
+        color: $light-blue-25;
+      }
+
+    }
+
+  }
+
+  &-section {
+    @extend %site-width-container;
+    margin-bottom: $gutter * 1.5;
+  }
+
+}
