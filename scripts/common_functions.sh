@@ -373,7 +373,7 @@ get_elb_name_for_instance_name() {
 
     elb_to_instance_mapping['notify-admin']='notify-admin'
 
-    elb_to_instance_mapping['notify_admin']='notify-admin-elb'
+    elb_to_instance_mapping['notify-admin-ags']='notify-admin-ags'
 
     local elb_name=${elb_to_instance_mapping[${instance_name}]}
     if [ -z $elb_name ]; then
