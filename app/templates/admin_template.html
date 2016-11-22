@@ -71,9 +71,7 @@
 {% set homepage_url = url_for('main.show_all_services_or_dashboard') %}
 
 {% block content %}
-  <div id="content">
-    {% block fullwidth_content %}{% endblock %}
-  </div>
+  {% block fullwidth_content %}{% endblock %}
 {% endblock %}
 
 {% block footer_top %}
