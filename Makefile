@@ -17,6 +17,9 @@ BUILD_URL ?=
 
 DOCKER_CONTAINER_PREFIX = ${USER}-${BUILD_TAG}
 
+CODEDEPLOY_PREFIX ?= notifications-admin
+CODEDEPLOY_APP_NAME ?= notify-admin
+
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -77,7 +80,7 @@ build-codedeploy-artifact: ## Build the deploy artifact for CodeDeploy
 
 .PHONY: upload-codedeploy-artifact ## Upload the deploy artifact for CodeDeploy
 upload-codedeploy-artifact: check-env-vars
-	aws s3 cp --region eu-west-1 target/notifications-admin.zip s3://${DNS_NAME}-codedeploy/notifications-admin-${DEPLOY_BUILD_NUMBER}.zip
+	aws s3 cp --region eu-west-1 target/notifications-admin.zip s3://${DNS_NAME}-codedeploy/${CODEDEPLOY_PREFIX}-${DEPLOY_BUILD_NUMBER}.zip
 
 .PHONY: test
 test: venv ## Run tests
@@ -85,7 +88,7 @@ test: venv ## Run tests
 
 .PHONY: deploy
 deploy: check-env-vars ## Upload deploy artifacts to S3 and trigger CodeDeploy
-	aws deploy create-deployment --application-name notify-admin --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name notify-admin --s3-location bucket=${DNS_NAME}-codedeploy,key=notifications-admin-${DEPLOY_BUILD_NUMBER}.zip,bundleType=zip --region eu-west-1
+	aws deploy create-deployment --application-name ${CODEDEPLOY_APP_NAME} --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name ${CODEDEPLOY_APP_NAME} --s3-location bucket=${DNS_NAME}-codedeploy,key=${CODEDEPLOY_PREFIX}-${DEPLOY_BUILD_NUMBER}.zip,bundleType=zip --region eu-west-1
 
 .PHONY: coverage
 coverage: venv ## Create coverage report
