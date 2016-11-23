@@ -18,6 +18,9 @@ RUN \
 		zlib1g-dev \
 		zip \
 		rlwrap \
+		python-dev \
+		libffi-dev \
+		libssl-dev \
 
 	&& echo "Install nodejs" \
 	&& cd /tmp \
