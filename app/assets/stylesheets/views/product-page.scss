@@ -12,21 +12,22 @@
     }
 
     h1 {
-      @include bold-36;
+      @include bold-48;
+      margin: 0 0 $gutter 0;
     }
 
     p {
+      @include core-24;
       margin: $gutter-half 0 $gutter;
     }
 
     .button-container {
-      line-height: 35px;
+      line-height: 45px;
     }
 
     .button {
 
-      @include button($white);
-      color: $govuk-blue;
+      background: $white;
       margin-right: 5px;
 
       &:link,
