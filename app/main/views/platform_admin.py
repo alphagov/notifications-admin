@@ -13,6 +13,7 @@ from app.statistics_utils import get_formatted_percentage
 @login_required
 @user_has_permissions(admin_override=True)
 def platform_admin():
+    # specifically DO get inactive services
     services = service_api_client.get_services({'detailed': True})['data']
     return render_template(
         'views/platform-admin.html',

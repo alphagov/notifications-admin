@@ -16,13 +16,13 @@ class ServiceAPIClient(BaseAPIClient):
         self.service_id = application.config['ADMIN_CLIENT_USER_NAME']
         self.api_key = application.config['ADMIN_CLIENT_SECRET']
 
-    def create_service(self, service_name, active, message_limit, restricted, user_id, email_from):
+    def create_service(self, service_name, message_limit, restricted, user_id, email_from):
         """
         Create a service and return the json.
         """
         data = {
             "name": service_name,
-            "active": active,
+            "active": True,
             "message_limit": message_limit,
             "user_id": user_id,
             "restricted": restricted,
@@ -57,11 +57,18 @@ class ServiceAPIClient(BaseAPIClient):
             '/service/{0}'.format(service_id),
             params=params)
 
-    def get_services(self, *params):
+    def get_services(self, params_dict=None):
         """
         Retrieve a list of services.
         """
-        return self.get('/service', *params)
+        return self.get('/service', params=params_dict)
+
+    def get_active_services(self, params_dict=None):
+        """
+        Retrieve a list of active services.
+        """
+        params_dict['only_active'] = True
+        return self.get_services(params_dict)
 
     def update_service(
         self,

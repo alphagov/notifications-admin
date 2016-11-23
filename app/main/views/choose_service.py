@@ -12,7 +12,7 @@ def choose_service():
     return render_template(
         'views/choose-service.html',
         services=[ServicesBrowsableItem(x) for x in
-                  service_api_client.get_services({'user_id': current_user.id})['data']],
+                  service_api_client.get_active_services({'user_id': current_user.id})['data']],
         can_add_service=is_gov_user(current_user.email_address)
     )
 
@@ -23,7 +23,7 @@ def show_all_services_or_dashboard():
     if not current_user.is_authenticated:
         return redirect(url_for('.index'))
 
-    services = service_api_client.get_services({'user_id': current_user.id})['data']
+    services = service_api_client.get_active_services({'user_id': current_user.id})['data']
 
     if 1 == len(services):
         return redirect(url_for('.service_dashboard', service_id=services[0]['id']))

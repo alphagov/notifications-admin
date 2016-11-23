@@ -40,7 +40,6 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(app_,
             assert mock_get_services_with_no_services.called
             mock_create_service.assert_called_once_with(
                 service_name='testing the post',
-                active=False,
                 message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
                 restricted=True,
                 user_id=api_user_active.id,
@@ -73,7 +72,6 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(app_
             assert mock_get_services.called
             mock_create_service.assert_called_once_with(
                 service_name='testing the post',
-                active=False,
                 message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
                 restricted=True,
                 user_id=api_user_active.id,
