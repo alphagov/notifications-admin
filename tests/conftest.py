@@ -67,9 +67,7 @@ def fake_uuid():
 @pytest.fixture(scope='function')
 def mock_get_service(mocker, api_user_active):
     def _get(service_id):
-        service = service_json(
-            service_id, "Test Service", [api_user_active.id], message_limit=50,
-            active=False, restricted=True)
+        service = service_json(service_id, users=[api_user_active.id], message_limit=50)
         return {'data': service}
 
     return mocker.patch('app.service_api_client.get_service', side_effect=_get)
@@ -125,10 +123,7 @@ def mock_get_live_service(mocker, api_user_active):
     def _get(service_id):
         service = service_json(
             service_id,
-            "Test Service",
-            [api_user_active.id],
-            message_limit=1000,
-            active=False,
+            users=[api_user_active.id],
             restricted=False)
         return {'data': service}
 
@@ -137,10 +132,9 @@ def mock_get_live_service(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_create_service(mocker):
-    def _create(service_name, active, message_limit, restricted, user_id, email_from):
+    def _create(service_name, message_limit, restricted, user_id, email_from):
         service = service_json(
-            101, service_name, [user_id], message_limit=message_limit,
-            active=active, restricted=restricted, email_from=email_from)
+            101, service_name, [user_id], message_limit=message_limit, restricted=restricted, email_from=email_from)
         return service['id']
 
     return mocker.patch(
@@ -152,7 +146,7 @@ def mock_update_service(mocker):
     def _update(service_id, **kwargs):
         service = service_json(
             service_id,
-            **{key: kwargs.get(key) for key in [
+            **{key: kwargs[key] for key in kwargs if key in [
                 'name',
                 'users',
                 'message_limit',
@@ -193,7 +187,7 @@ def mock_get_services(mocker, fake_uuid, user=None):
     if user is None:
         user = active_user_with_permissions(fake_uuid)
 
-    def _create(user_id=None):
+    def _get_services(params_dict=None):
         service_one = service_json(
             SERVICE_ONE_ID, "service_one", [user.id], 1000, True, False)
         service_two = service_json(
@@ -201,7 +195,7 @@ def mock_get_services(mocker, fake_uuid, user=None):
         return {'data': [service_one, service_two]}
 
     return mocker.patch(
-        'app.service_api_client.get_services', side_effect=_create)
+        'app.service_api_client.get_services', side_effect=_get_services)
 
 
 @pytest.fixture(scope='function')
@@ -209,11 +203,11 @@ def mock_get_services_with_no_services(mocker, fake_uuid, user=None):
     if user is None:
         user = active_user_with_permissions(fake_uuid)
 
-    def _create(user_id=None):
+    def _get_services(params_dict=None):
         return {'data': []}
 
     return mocker.patch(
-        'app.service_api_client.get_services', side_effect=_create)
+        'app.service_api_client.get_services', side_effect=_get_services)
 
 
 @pytest.fixture(scope='function')
@@ -221,13 +215,13 @@ def mock_get_services_with_one_service(mocker, fake_uuid, user=None):
     if user is None:
         user = api_user_active(fake_uuid)
 
-    def _create(user_id=None):
+    def _get_services(params_dict=None):
         return {'data': [service_json(
             SERVICE_ONE_ID, "service_one", [user.id], 1000, True, False
         )]}
 
     return mocker.patch(
-        'app.service_api_client.get_services', side_effect=_create)
+        'app.service_api_client.get_services', side_effect=_get_services)
 
 
 @pytest.fixture(scope='function')
@@ -831,7 +825,7 @@ def mock_login(mocker, mock_get_user, mock_update_user, mock_events):
     def _verify_code(user_id, code, code_type):
         return True, ''
 
-    def _no_services(user_id=None):
+    def _no_services(params_dict=None):
         return {'data': []}
 
     return (

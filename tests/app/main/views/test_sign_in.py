@@ -12,15 +12,9 @@ def test_render_sign_in_returns_sign_in_template(app_):
     assert 'Forgot your password?' in response.get_data(as_text=True)
 
 
-def test_logged_in_user_redirects_to_choose_service(app_,
-                                                    api_user_active,
-                                                    mock_get_user):
-
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            response = client.get(url_for('main.sign_in'))
-            assert response.location == url_for('main.choose_service', _external=True)
+def test_logged_in_user_redirects_to_choose_service(logged_in_client):
+    response = logged_in_client.get(url_for('main.sign_in'))
+    assert response.location == url_for('main.choose_service', _external=True)
 
 
 def test_process_sign_in_return_2fa_template(app_,
@@ -88,24 +82,44 @@ def test_should_attempt_redirect_when_user_is_pending(app_,
         assert response.status_code == 302
 
 
-def test_not_fresh_session_login(app_,
-                                 api_user_active,
-                                 mock_login,
-                                 mock_get_user_by_email,
-                                 mock_verify_password,
-                                 mock_get_services_with_one_service):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            with client.session_transaction() as session:
-                assert session['_fresh']
-                session['_fresh'] = False
-            # This should skip the two factor
-            response = client.post(
-                url_for('main.sign_in'), data={
-                    'email_address': api_user_active.email_address,
-                    'password': 'val1dPassw0rd!'})
+def test_not_fresh_session_login_redirects_to_dashboard(
+    client,
+    api_user_active,
+    mock_login,
+    mock_get_user_by_email,
+    mock_verify_password,
+    mock_get_services_with_one_service
+):
+    client.login(api_user_active)
+    with client.session_transaction() as session:
+        assert session['_fresh']
+        session['_fresh'] = False
+    # This should skip the two factor
+    response = client.post(
+        url_for('main.sign_in'), data={
+            'email_address': api_user_active.email_address,
+            'password': 'val1dPassw0rd!'})
+    assert response.status_code == 302
+    service_dct = mock_get_services_with_one_service(api_user_active.id)['data'][0]
+    assert response.location == url_for(
+        'main.service_dashboard', service_id=service_dct['id'], _external=True)
+
+    def test_not_fresh_session_login_redirects_to_choose_service(
+        client,
+        api_user_active,
+        mock_login,
+        mock_get_user_by_email,
+        mock_verify_password,
+        mock_get_services
+    ):
+        client.login(api_user_active)
+        with client.session_transaction() as session:
+            assert session['_fresh']
+            session['_fresh'] = False
+        # This should skip the two factor
+        response = client.post(
+            url_for('main.sign_in'), data={
+                'email_address': api_user_active.email_address,
+                'password': 'val1dPassw0rd!'})
         assert response.status_code == 302
-        service_dct = mock_get_services_with_one_service(api_user_active.id)['data'][0]
-        assert response.location == url_for(
-            'main.service_dashboard', service_id=service_dct['id'], _external=True)
+        assert response.location == url_for('main.choose_service', _external=True)

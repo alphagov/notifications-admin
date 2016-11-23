@@ -1,4 +1,4 @@
-from flask import url_for, session
+from flask import url_for
 
 
 def test_should_show_choose_services_page(app_,
@@ -18,13 +18,26 @@ def test_should_show_choose_services_page(app_,
         assert mock_get_services.called
         assert services['data'][0]['name'] in resp_data
         assert services['data'][1]['name'] in resp_data
-        assert 'List all services' not in resp_data
+
+
+def test_should_show_choose_services_page_if_no_services(
+    client,
+    mock_login,
+    api_user_active,
+):
+    # if users last service has been archived there'll be no services
+    # mock_login already patches get_services to return no data
+    client.login(api_user_active)
+    response = client.get(url_for('main.choose_service'))
+    assert response.status_code == 200
+    resp_data = response.get_data(as_text=True)
+    assert 'Choose service' in resp_data
+    assert 'Add a new service' in resp_data
 
 
 def test_redirect_if_only_one_service(
     app_,
     mock_login,
-    mock_get_user,
     api_user_active,
     mock_get_services_with_one_service
 ):
@@ -41,9 +54,7 @@ def test_redirect_if_only_one_service(
 def test_redirect_if_multiple_services(
     app_,
     mock_login,
-    mock_get_user,
     api_user_active,
-    mock_get_services
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -57,7 +68,6 @@ def test_redirect_if_multiple_services(
 def test_redirect_if_service_in_session(
     app_,
     mock_login,
-    mock_get_user,
     api_user_active,
     mock_get_services,
     mock_get_service

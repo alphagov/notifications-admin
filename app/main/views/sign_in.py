@@ -55,7 +55,7 @@ def sign_in():
                user.is_active:
 
                 confirm_login()
-                services = service_api_client.get_services({'user_id': str(user.id)}).get('data', [])
+                services = service_api_client.get_active_services({'user_id': str(user.id)}).get('data', [])
                 if (len(services) == 1):
                     return redirect(url_for('main.service_dashboard', service_id=services[0]['id']))
                 else:
