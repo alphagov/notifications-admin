@@ -60,8 +60,19 @@
   }
 
   &-section {
+
     @extend %site-width-container;
-    margin-bottom: $gutter * 1.5;
+
+    h2 {
+      @include bold-24;
+      margin: $gutter-half 0 10px 0;
+    }
+
+    img {
+      max-width: 100%;
+      margin: 0 0 $gutter * 1.5 0;
+    }
+
   }
 
 }

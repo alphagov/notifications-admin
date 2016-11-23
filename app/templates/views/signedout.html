@@ -1,3 +1,4 @@
+{% from 'components/big-number.html' import big_number %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/phone.html" import phone %}
 
@@ -14,11 +15,11 @@
       <div class="grid-row">
         <div class="column-two-thirds">
           <h1>
-            Send text messages and emails to your users
+            Email and text messaging for government services
           </h1>
           <p>
-            If you work for a UK government department or agency you can try
-            it now.
+            If you work for a UK government department or agency you can
+            try GOV.UK Notify now
           </p>
           <div class="button-container">
             <a class="button button-start" href='{{ url_for('.register' )}}'>
@@ -33,6 +34,58 @@
   </div>
 
   <div class="product-page-section">
+    <div class="grid-row">
+      <div class="column-half">
+        <h2>
+          Get control of your content
+        </h2>
+        <p>
+          Straightforward templating means you don’t need technical
+          knowledge to create emails and text messages.
+        </p>
+      </div>
+      <div class="column-half">
+        <h2>
+          See how your messages are performing
+        </h2>
+        <p>
+          Track how many messages you’ve sent and which ones aren’t
+          getting delivered.
+        </p>
+      </div>
+    </div>
   </div>
+  <div class="product-page-section">
+    <div class="grid-row">
+      <div class="column-half">
+        <img src="/static/images/product/01-templates.svg">
+      </div>
+      <div class="column-half">
+        <img src="/static/images/product/02-reporting.svg">
+      </div>
+    </div>
+  </div>
+  <div class="product-page-section bottom-gutter-2">
+    <h2>
+      Works with your existing systems
+    </h2>
+    <div class="grid-row">
+      <div class="column-half">
+        <p>
+          Use the web interface to upload a spreadsheet of
+          email&nbsp;addresses or phone&nbsp;numbers.
+        </p>
+        <img src="/static/images/product/03-spreadsheet.svg">
+      </div>
+      <div class="column-half">
+        <p>
+          Integrate the GOV.UK Notify API with your web application or
+          back office system.
+        </p>
+        <img src="/static/images/product/04-api.svg">
+      </div>
+    </div>
+  </div>
+
 
 {% endblock %}
