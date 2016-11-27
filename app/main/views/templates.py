@@ -3,10 +3,12 @@ from string import ascii_uppercase
 
 from flask import request, render_template, redirect, url_for, flash, abort
 from flask_login import login_required
+from flask_weasyprint import HTML, render_pdf
 from dateutil.parser import parse
 
 from notifications_utils.template import Template
 from notifications_utils.recipients import first_column_headings
+from notifications_utils.renderers import LetterPreview
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
@@ -49,6 +51,17 @@ def view_template(service_id, template_id):
         'views/templates/template.html',
         template=template
     )
+
+
+@main.route("/services/<service_id>/templates/<template_id>.pdf")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def view_letter_template_as_pdf(service_id, template_id):
+    template = Template(
+        service_api_client.get_service_template(service_id, template_id)['data'],
+        renderer=LetterPreview()
+    )
+    return render_pdf(HTML(string=template.rendered))
 
 
 @main.route("/services/<service_id>/templates/<template_id>/version/<int:version>")

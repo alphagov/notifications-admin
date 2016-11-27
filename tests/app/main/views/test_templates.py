@@ -1,5 +1,6 @@
+from functools import partial
 from datetime import datetime
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 from bs4 import BeautifulSoup
@@ -37,6 +38,38 @@ def test_should_show_page_for_one_template(
     assert "Your vehicle tax is about to expire" in response.get_data(as_text=True)
     mock_get_service_template.assert_called_with(
         service_id, template_id)
+
+
+@pytest.mark.parametrize(
+    'view, expected_content_type',
+    [
+        ('.view_letter_template_as_pdf', 'application/pdf'),
+    ]
+)
+@patch("app.main.views.templates.LetterPreview.__call__")
+def test_should_show_preview_letter_templates(
+    mock_letter_preview,
+    view,
+    expected_content_type,
+    client,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_has_permissions,
+    fake_uuid
+):
+    client.login(api_user_active)
+    service_id = fake_uuid
+    template_id = fake_uuid
+    response = client.get(url_for(view, service_id=service_id, template_id=template_id))
+
+    assert response.status_code == 200
+    assert response.content_type == expected_content_type
+    mock_get_service_template.assert_called_with(service_id, template_id)
+    assert mock_letter_preview.call_args[0][0]['content'] == "Your vehicle tax is about to expire"
 
 
 def test_should_redirect_when_saving_a_template(app_,
