@@ -34,6 +34,8 @@ RUN \
 		zlib1g-dev \
 		libpango1.0-dev \
 		libcairo2-dev \
+		libmagickwand-dev \
+		ghostscript \
 
 	&& echo "Install nodejs" \
 	&& cd /tmp \

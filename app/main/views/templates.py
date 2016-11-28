@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
+from io import BytesIO
 from string import ascii_uppercase
 
-from flask import request, render_template, redirect, url_for, flash, abort
+from flask import request, render_template, redirect, url_for, flash, abort, send_file
 from flask_login import login_required
 from flask_weasyprint import HTML, render_pdf
 from dateutil.parser import parse
+from wand.image import Image
 
 from notifications_utils.template import Template
 from notifications_utils.recipients import first_column_headings
@@ -62,6 +64,20 @@ def view_letter_template_as_pdf(service_id, template_id):
         renderer=LetterPreview()
     )
     return render_pdf(HTML(string=template.rendered))
+
+
+@main.route("/services/<service_id>/templates/<template_id>.png")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def view_letter_template_as_image(service_id, template_id):
+    output = BytesIO()
+    with Image(
+        blob=view_letter_template_as_pdf(service_id, template_id).get_data()
+    ) as image:
+        with image.convert('png') as converted:
+            converted.save(file=output)
+    output.seek(0)
+    return send_file(output, mimetype='image/png')
 
 
 @main.route("/services/<service_id>/templates/<template_id>/version/<int:version>")

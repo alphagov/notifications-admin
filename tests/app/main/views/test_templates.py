@@ -44,6 +44,7 @@ def test_should_show_page_for_one_template(
     'view, expected_content_type',
     [
         ('.view_letter_template_as_pdf', 'application/pdf'),
+        ('.view_letter_template_as_image', 'image/png'),
     ]
 )
 @patch("app.main.views.templates.LetterPreview.__call__")
