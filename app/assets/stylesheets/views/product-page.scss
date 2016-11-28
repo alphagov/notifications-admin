@@ -3,7 +3,7 @@
   &-intro {
 
     margin: -10px 0 $gutter * 1.5 0;
-    padding: $gutter 0 $gutter * 1.5 0;
+    padding: $gutter * 2 0 $gutter * 2 0;
     background: $govuk-blue;
     color: $white;
 
@@ -28,7 +28,7 @@
     .button {
 
       background: $white;
-      margin-right: 5px;
+      margin-right: 15px;
 
       &:link,
       &:visited,
