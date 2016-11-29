@@ -81,20 +81,20 @@ class Test(Development):
 
 class Preview(Config):
     HTTP_PROTOCOL = 'https'
-    HEADER_COLOUR = '#F47738'  # $orange
+    HEADER_COLOUR = '#F499BE'  # $baby-pink
     CSV_UPLOAD_BUCKET_NAME = 'preview-notifications-csv-upload'
 
 
 class Staging(Config):
     SHOW_STYLEGUIDE = False
     HTTP_PROTOCOL = 'https'
-    HEADER_COLOUR = '#F47738'  # $orange
+    HEADER_COLOUR = '#6F72AF'  # $mauve
     CSV_UPLOAD_BUCKET_NAME = 'staging-notify-csv-upload'
 
 
 class Live(Config):
     SHOW_STYLEGUIDE = False
-    HEADER_COLOUR = '#B10E1E'  # $red
+    HEADER_COLOUR = '#005EA5'  # $govuk-blue
     HTTP_PROTOCOL = 'https'
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
 
