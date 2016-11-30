@@ -1,11 +1,10 @@
 from __future__ import unicode_literals
 from flask import url_for
-from notifications_python_client.base import BaseAPIClient
 from app.utils import BrowsableItem
-from app.notify_client import _attach_current_user
+from app.notify_client import _attach_current_user, NotifyAdminAPIClient
 
 
-class ServiceAPIClient(BaseAPIClient):
+class ServiceAPIClient(NotifyAdminAPIClient):
     # Fudge assert in the super __init__ so
     # we can set those variables later.
     def __init__(self):
