@@ -7,4 +7,4 @@ help:
 
 .PHONY: build-build-image
 build-build-image:
-	docker build --pull -f Dockerfile-build -t govuk/notify-admin-builder .
+	docker build --pull -f Dockerfile-build -t govuk/notify-admin-builder --build-arg APT_HTTP_PROXY="${HTTP_PROXY}" .
