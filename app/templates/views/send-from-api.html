@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/email-message.html" import email_message %}
 {% from "components/sms-message.html" import sms_message %}
+{% from "components/letter.html" import letter %}
 {% from "components/api-key.html" import api_key %}
 
 {% block page_title %}
@@ -13,20 +14,7 @@
       API info
   </h1>
 
-  {% if 'email' == template.template_type %}
-    {{ email_message(
-      template.formatted_subject_as_markup,
-      template.formatted_as_markup,
-    ) }}
-  {% elif 'sms' == template.template_type %}
-    <div class="grid-row">
-      <div class="column-two-thirds">
-        {{ sms_message(
-          template.formatted_as_markup,
-        ) }}
-      </div>
-    </div>
-  {% endif %}
+  {{ template.rendered }}
 
   <div class="bottom-gutter">
     {{ api_key(template.id, name="Template ID", thing='template ID') }}
