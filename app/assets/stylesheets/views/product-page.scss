@@ -71,10 +71,21 @@
   &-section {
 
     @extend %site-width-container;
+    margin-bottom: $gutter-half;
 
     h2 {
       @include bold-24;
       margin: $gutter-half 0 10px 0;
+    }
+
+    h2 {
+      @include bold-36;
+      margin: 0 0 $gutter;
+    }
+
+    .with-keyline {
+      border-top: 1px solid $border-colour;
+      padding: $gutter * 1.5 0 0 0;
     }
 
     img {
