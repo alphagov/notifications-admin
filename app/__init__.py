@@ -25,7 +25,7 @@ from flask_wtf import CsrfProtect
 from functools import partial
 
 from notifications_python_client.errors import HTTPError
-from notifications_utils import logging
+from notifications_utils import logging, request_id
 from notifications_utils.recipients import validate_phone_number, InvalidPhoneError
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
@@ -78,6 +78,7 @@ def create_app():
     init_app(application)
     logging.init_app(application)
     init_csrf(application)
+    request_id.init_app(application)
 
     service_api_client.init_app(application)
     user_api_client.init_app(application)
