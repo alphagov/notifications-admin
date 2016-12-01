@@ -26,6 +26,7 @@ from functools import partial
 
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging, request_id
+from notifications_utils.clients.statsd.statsd_client import StatsdClient
 from notifications_utils.recipients import validate_phone_number, InvalidPhoneError
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
@@ -63,6 +64,7 @@ events_api_client = EventsApiClient()
 provider_client = ProviderClient()
 organisations_client = OrganisationsClient()
 asset_fingerprinter = AssetFingerprinter()
+statsd_client = StatsdClient()
 
 # The current service attached to the request stack.
 current_service = LocalProxy(partial(_lookup_req_object, 'service'))
@@ -76,7 +78,8 @@ def create_app():
     application.config.from_object(configs[os.environ['NOTIFY_ENVIRONMENT']])
 
     init_app(application)
-    logging.init_app(application)
+    statsd_client.init_app(application)
+    logging.init_app(application, statsd_client)
     init_csrf(application)
     request_id.init_app(application)
 
@@ -164,6 +167,7 @@ def init_app(application):
     @application.before_request
     def record_start_time():
         g.start = monotonic()
+        g.endpoint = request.endpoint
 
     @application.context_processor
     def inject_global_template_variables():
