@@ -1,7 +1,7 @@
-from notifications_python_client.base import BaseAPIClient
+from app.notify_client import NotifyAdminAPIClient
 
 
-class NotificationApiClient(BaseAPIClient):
+class NotificationApiClient(NotifyAdminAPIClient):
     def __init__(self):
         super().__init__("a", "b", "c")
 

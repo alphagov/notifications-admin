@@ -1,6 +1,6 @@
-from notifications_python_client.notifications import BaseAPIClient
 from notifications_python_client.errors import HTTPError
 
+from app.notify_client import NotifyAdminAPIClient
 from app.notify_client.models import User
 
 ALLOWED_ATTRIBUTES = {
@@ -10,7 +10,7 @@ ALLOWED_ATTRIBUTES = {
 }
 
 
-class UserApiClient(BaseAPIClient):
+class UserApiClient(NotifyAdminAPIClient):
     def __init__(self):
         super().__init__("a", "b", "c")
 
