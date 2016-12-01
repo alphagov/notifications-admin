@@ -78,7 +78,7 @@ class Development(Config):
     SESSION_COOKIE_SECURE = False
     WTF_CSRF_ENABLED = False
     SESSION_PROTECTION = None
-    STATSD_ENABLED = True
+    STATSD_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'development-notifications-csv-upload'
 
 
