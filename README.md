@@ -76,12 +76,6 @@ export DESKPRO_API_KEY="some-key"
 Your aws credentials should be stored in a folder located at `~/.aws`. Follow [Amazon's instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files) for storing them correctly
 
 
-## Generate the application version file
-
-```shell
-    make generate-version-file
-```
-
 ## Running the application
 
 ```shell
