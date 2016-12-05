@@ -28,7 +28,7 @@ from app.main.uploader import (
     s3download
 )
 from app import job_api_client, service_api_client, current_service, user_api_client
-from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet, get_help_argument
+from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet, get_help_argument, get_renderer
 
 
 def get_page_headings(template_type):
@@ -90,8 +90,7 @@ def choose_template(service_id, template_type):
         templates=[
             Template(
                 template,
-                prefix=current_service['name'],
-                sms_sender=current_service['sms_sender']
+                renderer=get_renderer(template_type, current_service, show_recipient=False)
             ) for template in service_api_client.get_service_templates(service_id)['data']
             if template['template_type'] == template_type
         ],
@@ -105,10 +104,9 @@ def choose_template(service_id, template_type):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_messages(service_id, template_id):
     template = Template(
-        service_api_client.get_service_template(service_id, template_id)['data'],
-        prefix=current_service['name'],
-        sms_sender=current_service['sms_sender']
+        service_api_client.get_service_template(service_id, template_id)['data']
     )
+    template.renderer = get_renderer(template.template_type, current_service, show_recipient=True)
 
     form = CsvUploadForm()
     if form.validate_on_submit():
@@ -168,6 +166,8 @@ def send_test(service_id, template_id):
         prefix=current_service['name'],
         sms_sender=current_service['sms_sender']
     )
+
+    template.renderer = get_renderer(template.template_type, current_service, show_recipient=True)
 
     if len(template.placeholders) == 0 or request.method == 'POST':
         upload_id = s3upload(
@@ -237,10 +237,10 @@ def check_messages(service_id, template_type, upload_id):
         service_api_client.get_service_template(
             service_id,
             session['upload_data'].get('template_id')
-        )['data'],
-        prefix=current_service['name'],
-        sms_sender=current_service['sms_sender']
+        )['data']
     )
+
+    template.renderer = get_renderer(template_type, current_service, show_recipient=True)
 
     recipients = RecipientCSV(
         contents,

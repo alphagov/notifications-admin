@@ -4,8 +4,6 @@
 {% from "components/big-number.html" import big_number %}
 {% from "components/browse-list.html" import browse_list %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/sms-message.html" import sms_message %}
-{% from "components/email-message.html" import email_message %}
 {% from "components/table.html" import mapping_table, list_table, row, field, text_field, boolean_field, right_aligned_field_heading %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/file-upload.html" import file_upload %}
@@ -110,43 +108,6 @@
   {{ page_footer(
     button_text='Sign in', secondary_link='http://example.com', secondary_link_text="I’ve forgotten my password"
   ) }}
-
-  <h2 class="heading-large">SMS message</h2>
-
-  <p>Used to show, preview or choose an SMS template.</p>
-
-  <div class="grid-row">
-    <div class="column-half">
-      {{ sms_message(
-        'Your vehicle tax for LC12 BFL is due on 1 March 2016. Renew online at www.gov.uk/vehicle-tax',
-      ) }}
-      {{ sms_message(
-        template.formatted_as_markup
-      ) }}
-      {{ sms_message(
-        'Your vehicle tax for LC12 BFL is due on 1 March 2016. Renew online at www.gov.uk/vehicle-tax',
-        '+44 7700 900 306'
-      ) }}
-      {{ sms_message(
-        template.formatted_as_markup
-      ) }}
-    </div>
-  </div>
-
-  <h2 class="heading-large">Email message</h2>
-
-  <p>Used to show, preview or choose an email template.</p>
-
-  <div class="grid-row">
-    <div class="column-two-thirds">
-      {{ email_message(
-        subject="Vehicle tax reminder",
-        body="Dear Alice Smith,\n\nYour vehicle tax for LC12 BFL is due on 1 March 2016.\n\nRenew online at www.gov.uk/vehicle-tax",
-        from_name="Vehicle tax",
-        from_address="vehicle.tax@notifications.service.gov.uk"
-      ) }}
-    </div>
-  </div>
 
   <h2 class="heading-large">Tables</h2>
   <div class="grid-row">

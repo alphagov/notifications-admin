@@ -10,7 +10,7 @@ from notifications_utils.recipients import first_column_headings
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
-from app.utils import user_has_permissions
+from app.utils import user_has_permissions, get_renderer
 from app.main.forms import SMSTemplateForm, EmailTemplateForm, LetterTemplateForm
 from app.main.views.send import get_example_csv_rows
 from app import service_api_client, current_service, template_statistics_client
@@ -39,13 +39,15 @@ page_headings = {
     admin_override=True, any_=True
 )
 def view_template(service_id, template_id):
+    template = Template(
+        service_api_client.get_service_template(service_id, template_id)['data']
+    )
+    template.renderer = get_renderer(
+        template.template_type, current_service, show_recipient=False, expand_emails=True
+    )
     return render_template(
         'views/templates/template.html',
-        template=Template(
-            service_api_client.get_service_template(service_id, template_id)['data'],
-            prefix=current_service['name'],
-            sms_sender=current_service['sms_sender']
-        )
+        template=template
     )
 
 
@@ -61,13 +63,15 @@ def view_template(service_id, template_id):
     any_=True
 )
 def view_template_version(service_id, template_id, version):
+    template = Template(
+        service_api_client.get_service_template(service_id, template_id, version)['data']
+    )
+    template.renderer = get_renderer(
+        template.template_type, current_service, show_recipient=False, expand_emails=True
+    )
     return render_template(
         'views/templates/template_history.html',
-        template=Template(
-            service_api_client.get_service_template(service_id, template_id, version)['data'],
-            prefix=current_service['name'],
-            sms_sender=current_service['sms_sender']
-        )
+        template=template
     )
 
 
@@ -227,19 +231,18 @@ def delete_service_template(service_id, template_id):
     any_=True
 )
 def view_template_versions(service_id, template_id):
+
+    versions = []
+    for template in service_api_client.get_service_template_versions(service_id, template_id)['data']:
+        template = Template(template)
+        template.renderer = get_renderer(
+            template.template_type, current_service, show_recipient=False, expand_emails=True
+        )
+        versions.append(template)
+
     return render_template(
         'views/templates/choose_history.html',
-        template=Template(
-            service_api_client.get_service_template(service_id, template_id)['data'],
-            prefix=current_service['name']
-        ),
-        versions=[
-            Template(
-                template,
-                prefix=current_service['name'],
-                sms_sender=current_service['sms_sender']
-            ) for template in service_api_client.get_service_template_versions(service_id, template_id)['data']
-        ]
+        versions=versions
     )
 
 
