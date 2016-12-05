@@ -81,7 +81,7 @@ def test_should_render_platform_admin_page(
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
     assert 'Platform admin' in resp_data
-    assert 'Today' in resp_data
+    assert 'Showing stats for today' in resp_data
     assert 'Live services' in resp_data
     assert 'Trial mode services' in resp_data
     mock_get_detailed_services.assert_called_once_with({'detailed': True})

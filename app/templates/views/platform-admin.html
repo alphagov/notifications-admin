@@ -99,6 +99,7 @@
     <div class="column-one-third">
       <nav class="navigation">
         <ul>
+          <li>Showing stats for today</li>
           {% if include_from_test_key %}
             <li>Including test key (<a href="{{ url_for('.platform_admin', include_from_test_key=False) }}">change</a>)</li>
           {% else %}
@@ -108,7 +109,6 @@
       </nav>
     </div>
     <main role="main" class="column-two-thirds column-main">
-      <h2 class='heading-medium'>Today</h2>
       <div class="grid-row bottom-gutter">
         <div class="column-half">
           {{ big_number_with_status(
