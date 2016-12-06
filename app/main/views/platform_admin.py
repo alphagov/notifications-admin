@@ -1,6 +1,9 @@
 import itertools
 
-from flask import render_template
+from flask import (
+    render_template,
+    request
+)
 from flask_login import login_required
 
 from app import service_api_client
@@ -13,10 +16,15 @@ from app.statistics_utils import get_formatted_percentage
 @login_required
 @user_has_permissions(admin_override=True)
 def platform_admin():
+    include_from_test_key = request.args.get('include_from_test_key') != 'False'
     # specifically DO get inactive services
-    services = service_api_client.get_services({'detailed': True})['data']
+    api_args = {'detailed': True}
+    if not include_from_test_key:
+        api_args['include_from_test_key'] = False
+    services = service_api_client.get_services(api_args)['data']
     return render_template(
         'views/platform-admin.html',
+        include_from_test_key=include_from_test_key,
         **get_statistics(sorted(
             services,
             key=lambda service: (service['active'], service['created_at']),
