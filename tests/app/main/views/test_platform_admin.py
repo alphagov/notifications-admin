@@ -88,8 +88,8 @@ def test_should_render_platform_admin_page(
 
 
 @pytest.mark.parametrize('include_from_test_key, expected_text, unexpected_text, api_args', [
-    (True, 'Including test key', 'Excluding test key', {'detailed': True}),
-    (False, 'Excluding test key', 'Including test key', {'detailed': True, 'include_from_test_key': False})
+    (True, 'Including test keys', 'Excluding test keys', {'detailed': True}),
+    (False, 'Excluding test keys', 'Including test keys', {'detailed': True, 'include_from_test_key': False})
 ])
 def test_platform_admin_toggle_including_from_test_key(
     include_from_test_key,
