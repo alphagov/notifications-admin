@@ -1,21 +1,9 @@
-{% from "components/email-message.html" import email_message %}
-{% from "components/sms-message.html" import sms_message %}
-
 <div class="column-whole">
   <h2 class="message-name">{{ template.name }}</h2>
 </div>
 
 <div class="column-two-thirds">
-  {% if 'email' == template.template_type %}
-    {{ email_message(
-      template.formatted_subject_as_markup,
-      template.formatted_as_markup,
-    ) }}
-  {% elif 'sms' == template.template_type %}
-    {{ sms_message(
-      template.formatted_as_markup
-    ) }}
-  {% endif %}
+  {{ template.rendered }}
 </div>
 
 <div class="column-one-third">

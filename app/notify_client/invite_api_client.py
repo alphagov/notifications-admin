@@ -1,11 +1,9 @@
 
-from notifications_python_client.base import BaseAPIClient
-
-from app.notify_client import _attach_current_user
+from app.notify_client import _attach_current_user, NotifyAdminAPIClient
 from app.notify_client.models import InvitedUser
 
 
-class InviteApiClient(BaseAPIClient):
+class InviteApiClient(NotifyAdminAPIClient):
     def __init__(self):
         super().__init__("a", "b", "c")
 
