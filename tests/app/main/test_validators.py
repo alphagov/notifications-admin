@@ -79,8 +79,6 @@ def _gen_mock_field(x):
     'test@police.uk',
     'test@gov.police.uk',
     'test@GOV.PoliCe.uk',
-    'test@valtech.co.uk',
-    'test@cgi.com',
     'test@ucds.email',
     'test@naturalengland.org.uk',
 ])
