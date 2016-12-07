@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from time import monotonic
 
 import dateutil
+import itertools
 import pytz
 import ago
 from flask import (
@@ -37,7 +38,7 @@ from werkzeug.local import LocalProxy
 import app.proxy_fix
 from app.asset_fingerprinter import AssetFingerprinter
 from app.its_dangerous_session import ItsdangerousSessionInterface
-from app.notify_client.service_api_client import ServiceAPIClient
+from app.notify_client.service_api_client import ServiceAPIClient, ServicesBrowsableItem
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.invite_api_client import InviteApiClient
 from app.notify_client.job_api_client import JobApiClient
@@ -405,7 +406,11 @@ def register_errorhandlers(application):
             error.message
         ))
         error_code = error.status_code
-        if error_code not in [401, 404, 403, 410, 500]:
+        if error_code == 400:
+            msg = list(itertools.chain(*[error.message[x] for x in error.message.keys()]))
+            resp = make_response(render_template("error/400.html", message=msg))
+            return useful_headers_after_request(resp)
+        elif error_code not in [401, 404, 403, 410, 500]:
             error_code = 500
         return _error_response(error_code)
 
