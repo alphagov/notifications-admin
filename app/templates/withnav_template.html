@@ -1,19 +1,21 @@
 {% extends "admin_template.html" %}
 
 {% block fullwidth_content %}
-  <div class="navigation-service">
-    <h2 class="navigation-service-name">
-      {{ current_service.name }}
-    </h2>
-    <a href="{{ url_for('main.choose_service') }}" class="navigation-service-switch">Switch service</a>
-  </div>
-  <div class="grid-row">
-    <div class="column-one-third">
-      {% include "main_nav.html" %}
+  <div id="content">
+    <div class="navigation-service">
+      <h2 class="navigation-service-name">
+        {{ current_service.name }}
+      </h2>
+      <a href="{{ url_for('main.choose_service') }}" class="navigation-service-switch">Switch service</a>
     </div>
-    <main role="main" class="column-two-thirds column-main">
-      {% include 'flash_messages.html' %}
-      {% block maincolumn_content %}{% endblock %}
-    </main>
+    <div class="grid-row">
+      <div class="column-one-third">
+        {% include "main_nav.html" %}
+      </div>
+      <main role="main" class="column-two-thirds column-main">
+        {% include 'flash_messages.html' %}
+        {% block maincolumn_content %}{% endblock %}
+      </main>
+    </div>
   </div>
 {% endblock %}

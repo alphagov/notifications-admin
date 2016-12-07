@@ -111,59 +111,6 @@
 
 }
 
-.banner-intro {
-
-  margin: $gutter 0 -90px 0;
-  padding: $gutter-half $gutter;
-  background: $govuk-blue;
-  color: $white;
-  overflow: hidden;
-
-  .heading-medium {
-    @include core-24;
-  }
-
-  a {
-    &:link,
-    &:visited {
-      color: $white;
-    }
-
-    &:hover,
-    &:active {
-      color: $light-blue-25;
-    }
-  }
-
-  .button-block {
-    line-height: 3.68em;
-  }
-
-  .button {
-
-    @include core-19;
-    background: $white;
-    padding: 0.3684210526em 0.8421052632em 0.2105263158em 0.7421052632em;
-    display: inline-block;
-    margin-top: $gutter-half;
-    margin-right: 0.3em;
-    box-shadow: 0 2px 0 mix($govuk-blue, $text-colour);
-
-    &:link,
-    &:visited,
-    &:hover {
-      color: $govuk-blue;
-    }
-
-    &:hover {
-      background: $light-blue-25;
-      outline: none;
-    }
-
-  }
-
-}
-
 .banner-tour {
 
   @extend %banner;

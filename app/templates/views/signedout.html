@@ -1,7 +1,8 @@
+{% from 'components/big-number.html' import big_number %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/phone.html" import phone %}
 
-{% extends "withoutnav_template.html" %}
+{% extends "fullwidth_template.html" %}
 
 {% block page_title %}
   GOV.UK Notify
@@ -9,58 +10,102 @@
 
 {% block maincolumn_content %}
 
-  <div class="phase-banner-beta">
-    <p>
-      <strong class="phase-tag">BETA</strong>
-      <span>This is a new service – your <a href="{{ url_for('main.feedback') }}">feedback</a> will help us to improve it.</span>
-    </p>
-  </div>
-
-  {% call banner_wrapper(type='intro') %}
-    <h1 class="heading-medium">
-      GOV.UK Notify makes it easy to send text messages and emails to
-      your users.
-    </h1>
-    <p class="heading-medium">
-      If you work for a UK government department or agency you can try
-      it now.
-    </p>
-    <p class="button-block">
-      <a class="button button-start" href='{{ url_for('.register' )}}'>
-        Create an account
-      </a>
-      or <a href="{{ url_for('.sign_in' )}}">sign in</a> if you’ve used
-      it before
-    </p>
-    <div class="grid-row phone-container">
-      <div class="column-one-third">
-        {{ phone(
-          "07900911111",
-          """
-            Joshua, we’ve started processing your application.
-            Your reference number is 300312.
-          """
-        ) }}
-      </div>
-      <div class="column-one-third">
-        {{ phone(
-          "07900922222",
-          """
-            Amala, we’ve started processing your application.
-            Your reference number is 444250.
-          """
-        ) }}
-      </div>
-      <div class="column-one-third">
-        {{ phone(
-          "07900933333",
-          """
-            Roman, we’ve started processing your application.
-            Your reference number is 568821.
-          """
-        ) }}
+  <div class="product-page-intro">
+    <div class="product-page-intro-wrapper">
+      <div class="grid-row">
+        <div class="column-two-thirds">
+          <h1>
+            Send emails and text messages to your users
+          </h1>
+          <p>
+            Try GOV.UK Notify now if you work for a UK government
+            department or agency.
+          </p>
+          <div class="button-container">
+            <a class="button button-start" href='{{ url_for('.register' )}}'>
+              Create an account
+            </a>
+            or <a href="{{ url_for('.sign_in' )}}">sign in</a> if you’ve used
+            it before
+          </div>
+        </div>
       </div>
     </div>
-  {% endcall %}
+  </div>
+
+  <div class="product-page-section">
+    <div class="grid-row">
+      <div class="column-half">
+        <h2>
+          Control your content
+        </h2>
+        <p>
+          You don’t need any technical knowledge to create email and
+          text&nbsp;message templates.
+        </p>
+      </div>
+      <div class="column-half">
+        <img src="/static/images/product/01-templates.svg">
+      </div>
+    </div>
+  </div>
+  <div class="product-page-section">
+    <div class="grid-row">
+      <div class="column-half">
+        <h2>
+          See how your messages perform
+        </h2>
+        <p>
+          Track how many messages you’ve sent and
+          find out which ones aren’t getting delivered.
+        </p>
+      </div>
+      <div class="column-half">
+        <img src="/static/images/product/02-reporting.svg">
+      </div>
+    </div>
+  </div>
+  <div class="product-page-section">
+    <h2 class="with-keyline">
+      Send messages manually or automatically
+    </h2>
+    <div class="grid-row">
+      <div class="column-half">
+        <p>
+          Upload a spreadsheet of email&nbsp;addresses or
+          phone&nbsp;numbers and Notify sends the messages.
+        </p>
+        <img src="/static/images/product/03-spreadsheet.svg">
+      </div>
+      <div class="column-half">
+        <p>
+          Integrate the GOV.UK Notify API with your web&nbsp;application or
+          back office system.
+        </p>
+        <img src="/static/images/product/04-api.svg">
+      </div>
+    </div>
+  </div>
+  <div class="product-page-section bottom-gutter-2">
+    <div class="grid-row">
+      <div class="column-half">
+        <h2 class="with-keyline">
+          The team
+        </h2>
+        <p>
+          GOV.UK Notify is built by the Government Digital Service
+          and is supported 24 hours a day, 7 days a week.
+        </p>
+        <p>
+          <a href="{{ url_for('main.feedback') }}">Contact the team</a> if you have a question or want
+          to give feedback.
+        </p>
+      </div>
+      <div class="column-half">
+        <img src="/static/images/product/team.jpg">
+      </div>
+    </div>
+  </div>
+
 
 {% endblock %}

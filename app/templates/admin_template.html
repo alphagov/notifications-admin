@@ -31,6 +31,7 @@
 {% endblock %}
 
 {% block inside_header %}
+  <strong class='beta-badge'>Beta</strong>
 {% endblock %}
 {% block header_class %}with-proposition{% endblock %}
 {% block proposition_header %}
@@ -39,6 +40,7 @@
       <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
       <nav id="proposition-menu">
         <ul id="proposition-links">
+          <li><a href="{{ url_for('main.feedback') }}">Support and feedback</a></li>
           {% if current_user.is_authenticated %}
             <li>
               <a href="{{ url_for('main.user_profile') }}">{{ current_user.name }}</a>
@@ -56,7 +58,7 @@
             </li>
           {% else %}
             <li>
-              <a href="{{ url_for('main.sign_in' )}}">Sign in to your account</a>
+              <a href="{{ url_for('main.sign_in' )}}">Sign in</a>
             </li>
           {% endif %}
         </ul>
@@ -71,9 +73,7 @@
 {% set homepage_url = url_for('main.show_all_services_or_dashboard') %}
 
 {% block content %}
-  <div id="content">
-    {% block fullwidth_content %}{% endblock %}
-  </div>
+  {% block fullwidth_content %}{% endblock %}
 {% endblock %}
 
 {% block footer_top %}

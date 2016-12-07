@@ -1,0 +1,98 @@
+.product-page {
+
+  &-intro {
+
+    margin: -10px 0 $gutter * 1.5 0;
+    padding: $gutter * 2 0 $gutter * 2 0;
+    background: $govuk-blue;
+    color: $white;
+
+    &-wrapper {
+
+      @extend %site-width-container;
+
+      @include media(desktop) {
+        background-image: file-url('product/proposition-illustration.png');
+        background-size: 320px;
+        background-repeat: no-repeat;
+        background-position: right -14px top -10px;
+      }
+
+    }
+
+    h1 {
+      @include bold-48;
+      margin: 0 0 $gutter 0;
+    }
+
+    p {
+      @include core-24;
+      margin: $gutter-half 0 $gutter;
+    }
+
+    .button-container {
+      line-height: 45px;
+    }
+
+    .button {
+
+      background: $white;
+      margin-right: 15px;
+
+      &:link,
+      &:visited,
+      &:hover {
+        color: $govuk-blue;
+      }
+
+      &:hover {
+        background: $light-blue-25;
+        outline: none;
+      }
+
+    }
+
+    a {
+
+      &:link,
+      &:visited {
+        color: $white;
+      }
+
+      &:hover,
+      &:active {
+        color: $light-blue-25;
+      }
+
+    }
+
+  }
+
+  &-section {
+
+    @extend %site-width-container;
+    margin-bottom: $gutter-half;
+
+    h2 {
+      @include bold-24;
+      margin: $gutter-half 0 10px 0;
+    }
+
+    h2 {
+      @include bold-36;
+      margin: 0 0 $gutter;
+    }
+
+    .with-keyline {
+      border-top: 1px solid $border-colour;
+      padding: $gutter * 1.5 0 0 0;
+    }
+
+    img {
+      max-width: 100%;
+      margin: 0 0 $gutter * 1.5 0;
+    }
+
+  }
+
+}
