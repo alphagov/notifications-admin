@@ -1,7 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/big-number.html" import big_number, big_number_with_status %}
 {% from "components/message-count-label.html" import message_count_label %}
-{% from "components/browse-list.html" import browse_list %}
 {% from "components/table.html" import mapping_table, field, stats_fields, row_group, row, right_aligned_field_heading, hidden_field_heading, text_field %}
 
 {% macro stats_fields(channel, data) -%}
@@ -88,15 +87,15 @@
     Platform admin
   </h1>
 
-  {{ browse_list([
-    {
-      'title': 'View providers',
-      'link': url_for('.view_providers')
-    },
-  ]) }}
+  <p class="bottom-gutter-2">
+    Showing stats for today&emsp;
+    {% if include_from_test_key %}
+      Including test keys (<a href="{{ url_for('.platform_admin', include_from_test_key=False) }}">change</a>)
+    {% else %}
+      Excluding test keys (<a href="{{ url_for('.platform_admin') }}">change</a>)
+    {% endif %}
+  </p>
 
-
-  <h2 class='heading-medium'>Today</h2>
   <div class="grid-row bottom-gutter">
     <div class="column-half">
       {{ big_number_with_status(

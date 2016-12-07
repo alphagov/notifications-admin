@@ -81,10 +81,47 @@ def test_should_render_platform_admin_page(
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
     assert 'Platform admin' in resp_data
-    assert 'Today' in resp_data
+    assert 'Showing stats for today' in resp_data
     assert 'Live services' in resp_data
     assert 'Trial mode services' in resp_data
     mock_get_detailed_services.assert_called_once_with({'detailed': True})
+
+
+@pytest.mark.parametrize('include_from_test_key, expected_text, unexpected_text, api_args', [
+    (True, 'Including test keys', 'Excluding test keys', {'detailed': True}),
+    (False, 'Excluding test keys', 'Including test keys', {'detailed': True, 'include_from_test_key': False})
+])
+def test_platform_admin_toggle_including_from_test_key(
+    include_from_test_key,
+    expected_text,
+    unexpected_text,
+    api_args,
+    app_,
+    platform_admin_user,
+    mocker,
+    mock_get_detailed_services
+):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            mock_get_user(mocker, user=platform_admin_user)
+            client.login(platform_admin_user)
+            response = client.get(url_for('main.platform_admin', include_from_test_key=str(include_from_test_key)))
+
+    assert response.status_code == 200
+    resp_data = response.get_data(as_text=True)
+    assert expected_text in resp_data
+    assert unexpected_text not in resp_data
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    change_link = page.find('a', text='change')
+    assert change_link['href']
+    query_param = 'include_from_test_key=False'
+    if include_from_test_key:
+        assert query_param in change_link['href']
+    else:
+        assert query_param not in change_link['href']
+
+    mock_get_detailed_services.assert_called_once_with(api_args)
 
 
 def test_create_global_stats_sets_failure_rates(fake_uuid):
