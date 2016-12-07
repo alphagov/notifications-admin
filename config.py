@@ -61,14 +61,9 @@ class Config(object):
         r"nhs\.uk",
         r"nhs\.net",
         r"police\.uk",
-        r"kainos\.com",
-        r"salesforce\.com",
-        r"bitzesty\.com",
         r"dclgdatamart\.co\.uk",
-        r"valtech\.co\.uk",
-        r"cgi\.com",
-        r"capita\.co\.uk",
-        r"ucds\.email"
+        r"ucds\.email",
+        r"naturalengland\.org\.uk",
     ]
 
 

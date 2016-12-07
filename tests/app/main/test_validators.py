@@ -79,9 +79,8 @@ def _gen_mock_field(x):
     'test@police.uk',
     'test@gov.police.uk',
     'test@GOV.PoliCe.uk',
-    'test@valtech.co.uk',
-    'test@cgi.com',
-    'test@ucds.email'
+    'test@ucds.email',
+    'test@naturalengland.org.uk',
 ])
 def test_valid_list_of_white_list_email_domains(app_, email):
     with app_.test_request_context():
