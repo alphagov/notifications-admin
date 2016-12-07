@@ -68,7 +68,8 @@ class Config(object):
         r"valtech\.co\.uk",
         r"cgi\.com",
         r"capita\.co\.uk",
-        r"ucds\.email"
+        r"ucds\.email",
+        r"naturalengland\.org\.uk",
     ]
 
 
