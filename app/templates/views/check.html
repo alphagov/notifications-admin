@@ -127,7 +127,7 @@
 
   {% endif %}
 
-  {{ template.rendered }}
+  {{ template|string }}
 
   {% if errors %}
     {% if request.args.from_test %}

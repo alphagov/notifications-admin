@@ -18,9 +18,7 @@ from flask import (
 
 from flask_login import login_required, current_user
 from notifications_utils.columns import Columns
-from notifications_utils.template import Template
 from notifications_utils.recipients import RecipientCSV, first_column_headings, validate_and_format_phone_number
-from notifications_utils.renderers import EmailPreview, SMSPreview, LetterPDFLink
 
 from app.main import main
 from app.main.forms import CsvUploadForm, ChooseTimeForm, get_next_days_until, get_furthest_possible_scheduled_time
@@ -29,7 +27,7 @@ from app.main.uploader import (
     s3download
 )
 from app import job_api_client, service_api_client, current_service, user_api_client
-from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet, get_help_argument, get_renderer
+from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet, get_help_argument, get_template
 
 
 def get_page_headings(template_type):
@@ -89,10 +87,8 @@ def choose_template(service_id, template_type):
     return render_template(
         'views/templates/choose.html',
         templates=[
-            Template(
-                template,
-                renderer=get_renderer(template_type, current_service, show_recipient=False)
-            ) for template in service_api_client.get_service_templates(service_id)['data']
+            get_template(template, current_service)
+            for template in service_api_client.get_service_templates(service_id)['data']
             if template['template_type'] == template_type
         ],
         template_type=template_type,
@@ -104,10 +100,12 @@ def choose_template(service_id, template_type):
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_messages(service_id, template_id):
-    template = Template(
-        service_api_client.get_service_template(service_id, template_id)['data']
+
+    template = get_template(
+        service_api_client.get_service_template(service_id, template_id)['data'],
+        current_service,
+        show_recipient=True
     )
-    template.renderer = get_renderer(template.template_type, current_service, show_recipient=True)
 
     form = CsvUploadForm()
     if form.validate_on_submit():
@@ -145,7 +143,9 @@ def send_messages(service_id, template_id):
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', any_=True)
 def get_example_csv(service_id, template_id):
-    template = Template(service_api_client.get_service_template(service_id, template_id)['data'])
+    template = get_template(
+        service_api_client.get_service_template(service_id, template_id)['data'], current_service
+    )
     return Spreadsheet.from_rows([
         first_column_headings[template.template_type] + list(template.placeholders),
         get_example_csv_rows(template)
@@ -162,13 +162,11 @@ def send_test(service_id, template_id):
 
     file_name = current_app.config['TEST_MESSAGE_FILENAME']
 
-    template = Template(
+    template = get_template(
         service_api_client.get_service_template(service_id, template_id)['data'],
-        prefix=current_service['name'],
-        sms_sender=current_service['sms_sender']
+        current_service,
+        show_recipient=True
     )
-
-    template.renderer = get_renderer(template.template_type, current_service, show_recipient=True)
 
     if len(template.placeholders) == 0 or request.method == 'POST':
         upload_id = s3upload(
@@ -209,10 +207,8 @@ def send_test(service_id, template_id):
 def send_from_api(service_id, template_id):
     return render_template(
         'views/send-from-api.html',
-        template=Template(
-            service_api_client.get_service_template(service_id, template_id)['data'],
-            prefix=current_service['name'],
-            sms_sender=current_service['sms_sender']
+        template=get_template(
+            service_api_client.get_service_template(service_id, template_id)['data'], current_service
         )
     )
 
@@ -234,14 +230,14 @@ def check_messages(service_id, template_type, upload_id):
     if not contents:
         flash('There was a problem reading your upload file')
 
-    template = Template(
+    template = get_template(
         service_api_client.get_service_template(
             service_id,
             session['upload_data'].get('template_id')
-        )['data']
+        )['data'],
+        current_service,
+        show_recipient=True
     )
-
-    template.renderer = get_renderer(template_type, current_service, show_recipient=True)
 
     recipients = RecipientCSV(
         contents,

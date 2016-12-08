@@ -19,7 +19,7 @@
     <h1 class="heading-large">Send yourself a test</h1>
   {% endif %}
 
-  {{ template.rendered }}
+  {{ template|string }}
 
   <form method="post">
     {% call(item, row_number) list_table(

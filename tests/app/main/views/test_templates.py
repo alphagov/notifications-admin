@@ -47,7 +47,7 @@ def test_should_show_page_for_one_template(
         ('.view_letter_template_as_image', 'image/png'),
     ]
 )
-@patch("app.main.views.templates.LetterPreview.__call__")
+@patch("app.main.views.templates.LetterPreviewTemplate")
 def test_should_show_preview_letter_templates(
     mock_letter_preview,
     view,
@@ -56,7 +56,7 @@ def test_should_show_preview_letter_templates(
     api_user_active,
     mock_login,
     mock_get_service,
-    mock_get_service_template,
+    mock_get_service_email_template,
     mock_get_user,
     mock_get_user_by_email,
     mock_has_permissions,
@@ -69,7 +69,7 @@ def test_should_show_preview_letter_templates(
 
     assert response.status_code == 200
     assert response.content_type == expected_content_type
-    mock_get_service_template.assert_called_with(service_id, template_id)
+    mock_get_service_email_template.assert_called_with(service_id, template_id)
     assert mock_letter_preview.call_args[0][0]['content'] == "Your vehicle tax is about to expire"
 
 

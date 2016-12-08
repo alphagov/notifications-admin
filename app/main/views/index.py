@@ -3,8 +3,7 @@ from app.main import main
 from app import convert_to_boolean
 from flask_login import (login_required, current_user)
 
-
-from notifications_utils.renderers import HTMLEmail
+from notifications_utils.template import HTMLEmailTemplate
 
 
 @main.route('/')
@@ -57,9 +56,7 @@ def terms():
 
 @main.route('/_email')
 def email_template():
-    return HTMLEmail(
-        govuk_banner=convert_to_boolean(request.args.get('govuk_banner', True))
-    )(
+    return str(HTMLEmailTemplate({'subject': 'foo', 'content': (
         'Lorem Ipsum is simply dummy text of the printing and typesetting '
         'industry.\n\nLorem Ipsum has been the industry’s standard dummy '
         'text ever since the 1500s, when an unknown printer took a galley '
@@ -96,7 +93,8 @@ def email_template():
         'This is an example of an email sent using GOV.UK Notify.'
         '\n\n'
         'https://www.notifications.service.gov.uk'
-    )
+    )}, govuk_banner=convert_to_boolean(request.args.get('govuk_banner', True))
+    ))
 
 
 @main.route('/documentation')

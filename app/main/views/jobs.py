@@ -16,7 +16,6 @@ from flask import (
 )
 from flask_login import login_required
 from werkzeug.datastructures import MultiDict
-from notifications_utils.template import Template
 
 from app import (
     job_api_client,
@@ -31,7 +30,8 @@ from app.utils import (
     generate_previous_dict,
     user_has_permissions,
     generate_notifications_csv,
-    get_help_argument
+    get_help_argument,
+    get_template,
 )
 from app.statistics_utils import add_rate_to_job
 
@@ -108,14 +108,13 @@ def view_job(service_id, job_id):
         'views/jobs/job.html',
         finished=(total_notifications == processed_notifications),
         uploaded_file_name=job['original_file_name'],
-        template=Template(
+        template=get_template(
             service_api_client.get_service_template(
                 service_id=service_id,
                 template_id=job['template'],
                 version=job['template_version']
             )['data'],
-            prefix=current_service['name'],
-            sms_sender=current_service['sms_sender']
+            current_service,
         ),
         status=request.args.get('status', ''),
         updates_url=url_for(

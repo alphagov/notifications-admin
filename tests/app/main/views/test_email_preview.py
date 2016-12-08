@@ -3,21 +3,19 @@ from flask import url_for
 
 
 @pytest.mark.parametrize(
-    "query_args, params", [
-        ({}, {'govuk_banner': True}),
-        ({'govuk_banner': 'false'}, {'govuk_banner': False})
+    "query_args, result", [
+        ({}, True),
+        ({'govuk_banner': 'false'}, 'false')
     ]
 )
-def test_renders(app_, mocker, query_args, params):
+def test_renders(app_, mocker, query_args, result):
     with app_.test_request_context(), app_.test_client() as client:
 
-        mock_html_email = mocker.patch(
-            'app.main.views.index.HTMLEmail',
-            return_value=lambda x: 'rendered'
-        )
+        mock_convert_to_boolean = mocker.patch('app.main.views.index.convert_to_boolean')
+        mocker.patch('app.main.views.index.HTMLEmailTemplate.__str__', return_value='rendered')
 
         response = client.get(url_for('main.email_template', **query_args))
 
         assert response.status_code == 200
         assert response.get_data(as_text=True) == 'rendered'
-        mock_html_email.assert_called_once_with(**params)
+        mock_convert_to_boolean.assert_called_once_with(result)

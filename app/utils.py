@@ -8,7 +8,11 @@ import unicodedata
 from flask import (abort, current_app, session, request, redirect, url_for)
 from flask_login import current_user
 
-from notifications_utils.renderers import SMSPreview, EmailPreview, LetterPDFLink
+from notifications_utils.template import (
+    SMSPreviewTemplate,
+    EmailPreviewTemplate,
+    LetterPDFLinkTemplate,
+)
 
 import pyexcel
 import pyexcel.ext.io
@@ -220,18 +224,24 @@ def is_gov_user(email_address):
     return bool(re.search(email_regex, email_address.lower()))
 
 
-def get_renderer(template_type, service, show_recipient, expand_emails=False):
-    return {
-        'email': EmailPreview(
+def get_template(template, service, show_recipient=False, expand_emails=False):
+    if 'email' == template['template_type']:
+        return EmailPreviewTemplate(
+            template,
             from_name=service['name'],
             from_address='{}@notifications.service.gov.uk'.format(service['email_from']),
             expanded=expand_emails,
             show_recipient=show_recipient
-        ),
-        'sms': SMSPreview(
+        )
+    if 'sms' == template['template_type']:
+        return SMSPreviewTemplate(
+            template,
             prefix=service['name'],
             sender=service['sms_sender'],
             show_recipient=show_recipient
-        ),
-        'letter': LetterPDFLink(service['id']),
-    }[template_type]
+        )
+    if 'letter' == template['template_type']:
+        return LetterPDFLinkTemplate(
+            template,
+            service_id=service['id'],
+        )

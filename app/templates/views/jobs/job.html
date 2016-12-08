@@ -12,7 +12,7 @@
       {{ uploaded_file_name }}
     </h1>
 
-    {{ template.rendered }}
+    {{ template|string }}
 
     {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
     {{ ajax_block(partials, updates_url, 'counts', finished=finished) }}
