@@ -1,0 +1,16 @@
+---
+
+applications:
+  - name: notify-admin
+    buildpack: python_buildpack
+    command: gunicorn -w 5 -b 0.0.0.0:$PORT wsgi
+    services:
+      - notify-aws
+      - notify-config
+      - hosted-graphite
+      - deskpro
+    routes:
+      - route: notify-admin-preview.cloudapps.digital
+      - route: admin-paas.notify.works
+    instances: 1
+    memory: 512M

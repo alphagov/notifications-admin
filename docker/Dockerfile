@@ -36,6 +36,7 @@ RUN \
 		libcairo2-dev \
 		libmagickwand-dev \
 		ghostscript \
+		jq \
 
 	&& echo "Install nodejs" \
 	&& cd /tmp \
@@ -51,5 +52,13 @@ RUN \
 		virtualenv \
 		awscli \
 		wheel
+
+RUN \
+	echo "Install Cloud Foundry CLI" \
+	&& curl -sSL "https://cli.run.pivotal.io/stable?release=debian64&source=github" -o /tmp/cloudfoundry-cli.deb \
+	&& dpkg -i /tmp/cloudfoundry-cli.deb \
+	&& cf install-plugin -r CF-Community -f "autopilot" \
+	&& cf install-plugin -r CF-Community -f "blue-green-deploy" \
+	&& cf install-plugin -r CF-Community -f "antifreeze"
 
 WORKDIR /var/project

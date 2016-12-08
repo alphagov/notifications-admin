@@ -1,6 +1,7 @@
 import os
 import re
 import urllib
+import json
 from datetime import datetime, timedelta, timezone
 from time import monotonic
 
@@ -72,11 +73,17 @@ current_service = LocalProxy(partial(_lookup_req_object, 'service'))
 
 
 def create_app():
-    from config import configs
+    from app.config import configs
 
     application = Flask(__name__)
 
-    application.config.from_object(configs[os.environ['NOTIFY_ENVIRONMENT']])
+    if os.getenv('VCAP_APPLICATION') is not None:
+        vcap_application = json.loads(os.environ.get('VCAP_APPLICATION'))
+        notify_environment = vcap_application['space_name']
+    else:
+        notify_environment = os.environ['NOTIFY_ENVIRONMENT']
+
+    application.config.from_object(configs[notify_environment])
 
     init_app(application)
     statsd_client.init_app(application)

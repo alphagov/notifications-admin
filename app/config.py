@@ -2,6 +2,13 @@ import os
 from datetime import timedelta
 
 
+if os.environ.get('VCAP_SERVICES'):
+    # on cloudfoundry, config is a json blob in VCAP_SERVICES - unpack it, and populate
+    # standard environment variables from it
+    from app.cloudfoundry_config import extract_cloudfoundry_config
+    extract_cloudfoundry_config()
+
+
 class Config(object):
     ADMIN_CLIENT_SECRET = os.environ['ADMIN_CLIENT_SECRET']
     API_HOST_NAME = os.environ['API_HOST_NAME']
@@ -9,13 +16,15 @@ class Config(object):
     DANGEROUS_SALT = os.environ['DANGEROUS_SALT']
     DESKPRO_API_HOST = os.environ['DESKPRO_API_HOST']
     DESKPRO_API_KEY = os.environ['DESKPRO_API_KEY']
+
     # Hosted graphite statsd prefix
     STATSD_PREFIX = os.getenv('STATSD_PREFIX')
+
+    DEBUG = False
 
     DESKPRO_DEPT_ID = 5
     DESKPRO_ASSIGNED_AGENT_TEAM_ID = 5
 
-    DEBUG = False
     ADMIN_CLIENT_USER_NAME = 'notify-admin'
     ASSETS_DEBUG = False
     AWS_REGION = 'eu-west-1'
@@ -112,10 +121,26 @@ class Live(Config):
     NOTIFY_ENVIRONMENT = 'live'
 
 
+class CloudFoundryConfig(Config):
+    # debug on true is a less than ideal hack to enable stdout/stderr logging
+    # TODO: replace this!
+    DEBUG = True
+
+
+# CloudFoundry sandbox
+class Sandbox(CloudFoundryConfig):
+    HTTP_PROTOCOL = 'https'
+    HEADER_COLOUR = '#F499BE'  # $baby-pink
+    STATSD_ENABLED = True
+    CSV_UPLOAD_BUCKET_NAME = 'cf-sandbox-notifications-csv-upload'
+    NOTIFY_ENVIRONMENT = 'sandbox'
+
+
 configs = {
     'development': Development,
     'test': Test,
     'preview': Preview,
     'staging': Staging,
-    'live': Live
+    'live': Live,
+    'sandbox': Sandbox
 }
