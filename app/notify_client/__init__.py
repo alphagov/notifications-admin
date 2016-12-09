@@ -34,12 +34,8 @@ class NotifyAdminAPIClient(BaseAPIClient):
 
         # if the current service is inactive and the user isn't a platform admin, we should block them from making any
         # stateful modifications to that service
-        print('\n\n\n')
-        print(current_service)
-        print(current_user)
         if current_service and not current_service['active'] and not current_user.platform_admin:
             abort(403)
-
 
     def post(self, *args, **kwargs):
         self.check_inactive_service()
