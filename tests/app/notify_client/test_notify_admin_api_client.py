@@ -72,3 +72,25 @@ def test_inactive_service_can_be_modified_by_platform_admin(app_, platform_admin
 
     assert request.called
     assert ret == request.return_value
+
+
+def test_generate_headers_sets_standard_headers():
+    api_client = NotifyAdminAPIClient('api_key', 'base_url', 'service_id')
+
+    # with patch('app.notify_client.has_request_context', return_value=False):
+    headers = api_client.generate_headers('api_token')
+
+    assert set(headers.keys()) == {'Authorization', 'Content-type', 'User-agent'}
+    assert headers['Authorization'] == 'Bearer api_token'
+    assert headers['Content-type'] == 'application/json'
+    assert headers['User-agent'].startswith('NOTIFY-API-PYTHON-CLIENT')
+
+
+def test_generate_headers_sets_request_id_if_in_request_context(app_):
+    api_client = NotifyAdminAPIClient('api_key', 'base_url', 'service_id')
+
+    with app_.test_request_context() as request_context:
+        headers = api_client.generate_headers('api_token')
+
+    assert set(headers.keys()) == {'Authorization', 'Content-type', 'User-agent', 'NotifyRequestID'}
+    assert headers['NotifyRequestID'] == request_context.request.request_id
