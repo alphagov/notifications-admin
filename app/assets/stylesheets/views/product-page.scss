@@ -12,10 +12,16 @@
       @extend %site-width-container;
 
       @include media(desktop) {
+
         background-image: file-url('product/proposition-illustration.png');
         background-size: 320px;
         background-repeat: no-repeat;
         background-position: right -14px top -10px;
+
+        @include ie-lte(8) {
+          background-image: none;
+        }
+
       }
 
     }
