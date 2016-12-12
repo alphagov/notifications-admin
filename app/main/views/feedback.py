@@ -4,7 +4,12 @@ from app.main import main
 from app.main.forms import Feedback
 
 
-@main.route('/feedback', methods=['GET', 'POST'])
+@main.route('/support', methods=['GET', 'POST'])
+def support():
+    return render_template('views/support/index.html')
+
+
+@main.route('/support/feedback', methods=['GET', 'POST'])
 def feedback():
     form = Feedback()
     if form.validate_on_submit():
@@ -38,6 +43,6 @@ def feedback():
                 )
             abort(500, "Feedback submission failed")
         flash("Thanks, we’ve received your feedback", 'default_with_tick')
-        return redirect(url_for('.feedback'))
+        return redirect(url_for('.support'))
 
-    return render_template('views/feedback.html', form=form)
+    return render_template('views/support/feedback.html', form=form)

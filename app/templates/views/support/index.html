@@ -1,0 +1,86 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+  Feedback – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <h1 class="heading-large">
+      Support
+    </h1>
+
+    <div class="grid-row">
+      <div class="column-two-thirds">
+
+    <p>
+      <a href="{{ url_for('.feedback') }}">I have a problem or question</a>
+    </p>
+
+    <div class="grid-row">
+      <div class="column-two-thirds">
+
+        <h2 class="heading-medium">
+          Support process
+        </h2>
+        <p>
+          If you have a problem, first check for known issues on the
+          GOV.UK Notify <a href="https://status.notifications.service.gov.uk">system status page</a>.
+          Subscribe to get alerts on the progress of any listed issue.
+
+        </p>
+
+        <h2 class="heading-small">
+          During office hours
+        </h2>
+        <p>
+          Our office hours are 9.30am to 5.30pm, Monday to Friday.
+        </p>
+        <p>
+          We’ll reply within 30 minutes whether you’re
+          reporting a problem or just asking a question.
+        </p>
+        <p>
+          The team are also available to answer questions on the
+          <a href="https://ukgovernmentdigital.slack.com/messages/govuk-notify">cross-government Slack channel</a>.
+        </p>
+
+        <h2 class="heading-small">
+          Out of hours support
+        </h2>
+        <p>
+          We offer 24 hour online support if you have a GOV.UK Notify
+          account and we’ve made your service live. We have different
+          response times depending on whether the problem you want to
+          report is an emergency.
+        </p>
+        <p>
+          It’s only an emergency if:
+        </p>
+        <ul class="list list-bullet">
+          <li>
+            no one in your team can log in
+          </li>
+          <li>
+            a ‘technical difficulties’ error appears when you try to
+            upload a file
+          </li>
+          <li>
+            a 500 response code appears when you try to send messages
+            using the API
+          </li>
+        </ul>
+        <p>
+          We’ll reply within 30 minutes and give you hourly updates
+          until the problem’s fixed.
+        </p>
+        <p>
+          We’ll reply by the next working day for any other problems.
+        </p>
+      </div>
+    </div>
+
+
+{% endblock %}

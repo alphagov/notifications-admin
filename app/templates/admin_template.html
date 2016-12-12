@@ -40,7 +40,7 @@
       <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
       <nav id="proposition-menu">
         <ul id="proposition-links">
-          <li><a href="{{ url_for('main.feedback') }}">Support and feedback</a></li>
+          <li><a href="{{ url_for('main.support') }}">Support and feedback</a></li>
           {% if current_user.is_authenticated %}
             <li>
               <a href="{{ url_for('main.user_profile') }}">{{ current_user.name }}</a>
@@ -84,7 +84,7 @@
           <h2>Support</h2>
           <ul>
             <li><a href="https://status.notifications.service.gov.uk">System status</a></li>
-            <li><a href="{{ url_for('main.feedback') }}">Support and feedback</a></li>
+            <li><a href="{{ url_for('main.support') }}">Support and feedback</a></li>
             <li><a href="https://ukgovernmentdigital.slack.com/messages/govuk-notify">Chat with the Notify team</a></li>
           </ul>
         </div>

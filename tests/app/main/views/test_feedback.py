@@ -19,6 +19,11 @@ def test_logged_in_user_redirects_to_choose_service(app_,
             assert response.location == url_for('main.choose_service', _external=True)
 
 
+def test_get_support_index_page(client):
+    resp = client.get(url_for('main.support'))
+    assert resp.status_code == 200
+
+
 def test_get_feedback_page(app_):
     with app_.test_request_context():
         with app_.test_client() as client:
