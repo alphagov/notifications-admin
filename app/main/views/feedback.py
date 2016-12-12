@@ -1,5 +1,6 @@
 import requests
 from flask import render_template, url_for, redirect, flash, current_app, abort
+from flask_login import current_user
 from app.main import main
 from app.main.forms import SupportType, Feedback
 
@@ -21,15 +22,20 @@ def feedback(ticket_type):
         abort(404)
     form = Feedback()
     if form.validate_on_submit():
-        user_supplied_email = form.email_address.data != ''
+        if current_user.is_authenticated:
+            user_email = current_user.email_address
+            user_name = current_user.name
+        else:
+            user_email = form.email_address.data
+            user_name = form.name.data or None
         feedback_msg = 'Environment: {}\n{}\n{}'.format(
             url_for('main.index', _external=True),
-            '' if user_supplied_email else '{} (no email address supplied)'.format(form.name.data),
+            '' if user_email else '{} (no email address supplied)'.format(form.name.data),
             form.feedback.data
         )
         data = {
-            'person_email': form.email_address.data or current_app.config.get('DESKPRO_PERSON_EMAIL'),
-            'person_name': form.name.data or None,
+            'person_email': user_email or current_app.config.get('DESKPRO_PERSON_EMAIL'),
+            'person_name': user_name,
             'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
             'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
             'subject': 'Notify feedback',
