@@ -221,7 +221,7 @@ def mock_get_services_with_one_service(mocker, fake_uuid, user=None):
 
     def _get_services(params_dict=None):
         return {'data': [service_json(
-            SERVICE_ONE_ID, "service_one", [user.id], 1000, True, False
+            SERVICE_ONE_ID, "service_one", [user.id], 1000, True, True
         )]}
 
     return mocker.patch(
