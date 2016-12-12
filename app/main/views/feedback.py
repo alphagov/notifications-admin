@@ -96,8 +96,7 @@ def feedback(ticket_type):
                     resp.json())
                 )
             abort(500, "Feedback submission failed")
-        flash("Thanks, we’ve received your feedback", 'default_with_tick')
-        return redirect(url_for('.support', ticket_type=ticket_type))
+        return redirect(url_for('.thanks', urgent=urgent, anonymous=anonymous))
 
     return render_template(
         'views/support/{}.html'.format(ticket_type),
@@ -119,7 +118,9 @@ def bat_phone():
 def thanks():
     return render_template(
         'views/support/thanks.html',
-        ticket_type=request.args.get('ticket_type'),
+        urgent=convert_to_boolean(request.args.get('urgent')),
+        anonymous=convert_to_boolean(request.args.get('anonymous')),
+        logged_in=(current_user and current_user.is_authenticated),
     )
 
 

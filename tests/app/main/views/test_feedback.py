@@ -84,13 +84,14 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
 
 
 @freeze_time("2016-12-12 12:00:00.000000")
-@pytest.mark.parametrize('data, expected_message, expected_person_name, expected_email, logged_in', [
+@pytest.mark.parametrize('data, expected_message, expected_person_name, expected_email, logged_in, is_anonymous', [
     (
         {'feedback': "blah", 'name': 'Fred'},
         'Environment: http://localhost/\nFred (no email address supplied)\nblah',
         'Fred',
         'donotreply@notifications.service.gov.uk',
         False,
+        True,
     ),
     (
         {'feedback': "blah"},
@@ -98,12 +99,14 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
         None,
         'donotreply@notifications.service.gov.uk',
         False,
+        True,
     ),
     (
         {'feedback': "blah", 'name': "Steve Irwin", 'email_address': 'rip@gmail.com'},
         'Environment: http://localhost/\n\nblah',
         'Steve Irwin',
         'rip@gmail.com',
+        False,
         False,
     ),
     (
@@ -112,6 +115,7 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
         'Test User',
         'test@user.gov.uk',
         True,
+        False,
     ),
 ])
 @pytest.mark.parametrize('ticket_type', ['problem', 'question'])
@@ -127,6 +131,7 @@ def test_post_problem_or_question(
     expected_person_name,
     expected_email,
     logged_in,
+    is_anonymous,
 ):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
@@ -139,6 +144,7 @@ def test_post_problem_or_question(
         data=data,
     )
     assert resp.status_code == 302
+    assert resp.location == url_for('main.thanks', urgent=True, anonymous=is_anonymous, _external=True)
     mock_post.assert_called_with(
         ANY,
         data={
@@ -155,21 +161,21 @@ def test_post_problem_or_question(
     )
 
 
-@pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, expected_urgency', [
+@pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, numeric_urgency, is_urgent', [
 
     # business hours, always urgent
-    ('problem', True, True, 10),
-    ('question', True, True, 10),
-    ('problem', False, True, 10),
-    ('question', False, True, 10),
+    ('problem', True, True, 10, True),
+    ('question', True, True, 10, True),
+    ('problem', False, True, 10, True),
+    ('question', False, True, 10, True),
 
     # out of hours, non emergency, never urgent
-    ('problem', False, False, 1),
-    ('question', False, False, 1),
+    ('problem', False, False, 1, False),
+    ('question', False, False, 1, False),
 
     # out of hours, emergency problems are urgent
-    ('problem', True, False, 10),
-    ('question', True, False, 1),
+    ('problem', True, False, 10, True),
+    ('question', True, False, 1, False),
 
 ])
 def test_urgency(
@@ -181,7 +187,8 @@ def test_urgency(
     ticket_type,
     severe,
     is_in_business_hours,
-    expected_urgency,
+    numeric_urgency,
+    is_urgent,
 ):
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=is_in_business_hours)
     mock_post = mocker.patch('app.main.views.feedback.requests.post', return_value=Mock(status_code=201))
@@ -190,7 +197,8 @@ def test_urgency(
         data={'feedback': "blah"},
     )
     assert response.status_code == 302
-    assert mock_post.call_args[1]['data']['urgency'] == expected_urgency
+    assert response.location == url_for('main.thanks', urgent=is_urgent, anonymous=False, _external=True)
+    assert mock_post.call_args[1]['data']['urgency'] == numeric_urgency
 
 
 ids, params = zip(*[
@@ -369,3 +377,31 @@ def test_log_error_on_post(app_, mocker, ticket_type):
             assert mock_post.called
             mock_logger.assert_called_with(
                 "Deskpro create ticket request failed with {} '{}'".format(mock_post().status_code, mock_post().json()))
+
+
+@pytest.mark.parametrize('logged_in', [True, False])
+@pytest.mark.parametrize('urgent, anonymous, message', [
+
+    (True, False, 'We’ll get back to you within 30 minutes.'),
+    (False, False, 'We’ll get back to you by the next working day.'),
+
+    (True, True, 'We’ll look into it within 30 minutes.'),
+    (False, True, 'We’ll look into it by the next working day.'),
+
+])
+def test_thanks(
+    client,
+    mocker,
+    api_user_active,
+    mock_get_user,
+    urgent,
+    anonymous,
+    message,
+    logged_in,
+):
+    if logged_in:
+        client.login(api_user_active)
+    response = client.get(url_for('main.thanks', urgent=urgent, anonymous=anonymous))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert ' '.join(page.find('main').find('p').text.split()) == message
