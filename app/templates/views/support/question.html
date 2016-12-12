@@ -1,0 +1,31 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+  Ask a question or give feedback – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <h1 class="heading-large">
+      Ask a question or give feedback
+    </h1>
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        <form method="post">
+            {{ textbox(form.feedback, width='1-1', hint='', rows=10) }}
+            <h3 class="heading-medium">Do you want a reply?</h3>
+            <p>Leave your details below if you'd like a response.</p>
+            {{ textbox(form.name, width='1-1') }}
+            {{ textbox(form.email_address, width='1-1') }}
+            {{ page_footer(
+              'Send',
+              secondary_link=url_for('.support'),
+              secondary_link_text='Back to support',
+            ) }}
+        </form>
+      </div>
+    </div>
+
+{% endblock %}

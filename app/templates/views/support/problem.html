@@ -3,19 +3,19 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block page_title %}
-  Feedback – GOV.UK Notify
+  Report a problem – GOV.UK Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
     <h1 class="heading-large">
-      Support and feedback
+      Report a problem
     </h1>
     <div class="grid-row">
       <div class="column-two-thirds">
         <div class="panel panel-border-wide">
           <p>
-            Check our <a href="https://status.notifications.service.gov.uk">system status</a> 
+            Check our <a href="https://status.notifications.service.gov.uk">system status</a>
             page to see if there are any known issues with GOV.UK Notify.
           </p>
         </div>
@@ -26,7 +26,11 @@
             <p>Leave your details below if you'd like a response.</p>
             {{ textbox(form.name, width='1-1') }}
             {{ textbox(form.email_address, width='1-1') }}
-            {{ page_footer('Send') }}  
+            {{ page_footer(
+              'Send',
+              secondary_link=url_for('.support'),
+              secondary_link_text='Back to support',
+            ) }}
         </form>
       </div>
     </div>

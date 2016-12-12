@@ -392,10 +392,21 @@ class CreateKeyForm(Form):
             raise ValidationError('A key with this name already exists')
 
 
+class SupportType(Form):
+    support_type = RadioField(
+        'How can we help you?',
+        choices=[
+            ('problem', 'Report a problem'),
+            ('question', 'Ask a question or give feedback'),
+        ],
+        validators=[DataRequired()]
+    )
+
+
 class Feedback(Form):
     name = StringField('Name')
     email_address = StringField('Email address')
-    feedback = TextAreaField(u'', validators=[DataRequired(message="Can’t be empty")])
+    feedback = TextAreaField('Your message', validators=[DataRequired(message="Can’t be empty")])
 
 
 class RequestToGoLiveForm(Form):

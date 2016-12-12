@@ -1,16 +1,24 @@
 import requests
 from flask import render_template, url_for, redirect, flash, current_app, abort
 from app.main import main
-from app.main.forms import Feedback
+from app.main.forms import SupportType, Feedback
 
 
 @main.route('/support', methods=['GET', 'POST'])
 def support():
-    return render_template('views/support/index.html')
+    form = SupportType()
+    if form.validate_on_submit():
+        return redirect(url_for(
+            '.feedback',
+            ticket_type=form.support_type.data,
+        ))
+    return render_template('views/support/index.html', form=form)
 
 
-@main.route('/support/feedback', methods=['GET', 'POST'])
-def feedback():
+@main.route('/support/contact/<ticket_type>', methods=['GET', 'POST'])
+def feedback(ticket_type):
+    if ticket_type not in ['problem', 'question']:
+        abort(404)
     form = Feedback()
     if form.validate_on_submit():
         user_supplied_email = form.email_address.data != ''
@@ -25,7 +33,8 @@ def feedback():
             'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
             'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
             'subject': 'Notify feedback',
-            'message': feedback_msg
+            'message': feedback_msg,
+            'label': ticket_type,
         }
         headers = {
             "X-DeskPRO-API-Key": current_app.config.get('DESKPRO_API_KEY'),
@@ -43,6 +52,10 @@ def feedback():
                 )
             abort(500, "Feedback submission failed")
         flash("Thanks, we’ve received your feedback", 'default_with_tick')
-        return redirect(url_for('.support'))
+        return redirect(url_for('.support', ticket_type=ticket_type))
 
-    return render_template('views/support/feedback.html', form=form)
+    return render_template(
+        'views/support/{}.html'.format(ticket_type),
+        form=form,
+        ticket_type=ticket_type
+    )
