@@ -1,6 +1,6 @@
 import requests
 import pytz
-from flask import render_template, url_for, redirect, flash, current_app, abort, request
+from flask import render_template, url_for, redirect, flash, current_app, abort, request, session
 from flask_login import current_user
 from app import convert_to_boolean, current_service, service_api_client
 from app.main import main
@@ -41,6 +41,9 @@ def feedback(ticket_type):
         abort(404)
 
     form = Support()
+    if not form.feedback.data:
+        form.feedback.data = session.pop('feedback_message', '')
+
     severe = request.args.get('severe')
 
     urgent = any((
@@ -54,6 +57,7 @@ def feedback(ticket_type):
     ))
 
     if needs_triage(ticket_type, severe):
+        session['feedback_message'] = form.feedback.data
         return redirect(url_for('.triage'))
 
     if needs_escalation(ticket_type, severe):

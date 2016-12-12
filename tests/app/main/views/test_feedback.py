@@ -254,6 +254,33 @@ def test_redirects_to_triage(
     assert response.location == expected_redirect(_external=True)
 
 
+def test_doesnt_lose_message_if_post_across_closing(
+    logged_in_client,
+    mocker,
+):
+
+    mocker.patch('app.main.views.feedback.has_live_services', return_value=True)
+    mocker.patch('app.main.views.feedback.in_business_hours', return_value=False)
+
+    response = logged_in_client.post(
+        url_for('main.feedback', ticket_type='problem'),
+        data={'feedback': 'foo'},
+    )
+    with logged_in_client.session_transaction() as session:
+        assert session['feedback_message'] == 'foo'
+    assert response.status_code == 302
+    assert response.location == url_for('.triage', _external=True)
+
+    response = logged_in_client.get(
+        url_for('main.feedback', ticket_type='problem', severe=True)
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    with logged_in_client.session_transaction() as session:
+        assert page.find('textarea', {'name': 'feedback'}).text == 'foo'
+        assert 'feedback_message' not in session
+
+
 @pytest.mark.parametrize('get_services_mock, expected_return_value', [
     (mock_get_services, True),
     (mock_get_services_with_no_services, False),
