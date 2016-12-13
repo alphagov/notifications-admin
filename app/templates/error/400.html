@@ -1,0 +1,11 @@
+{% extends "withoutnav_template.html" %}
+{% block page_title %}Bad Request{% endblock %}
+{% block maincolumn_content %}
+<div class="grid-row">
+    <div class="column-two-thirds">
+      <h1 class="heading-medium">
+            {{ message|join(",")}}
+        </h1>
+    </div>
+</div>
+{% endblock %}

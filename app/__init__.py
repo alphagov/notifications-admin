@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from time import monotonic
 
 import dateutil
+import itertools
 import pytz
 import ago
 from flask import (
@@ -405,7 +406,11 @@ def register_errorhandlers(application):
             error.message
         ))
         error_code = error.status_code
-        if error_code not in [401, 404, 403, 410, 500]:
+        if error_code == 400:
+            msg = list(itertools.chain(*[error.message[x] for x in error.message.keys()]))
+            resp = make_response(render_template("error/400.html", message=msg))
+            return useful_headers_after_request(resp)
+        elif error_code not in [401, 404, 403, 410, 500]:
             error_code = 500
         return _error_response(error_code)
 
