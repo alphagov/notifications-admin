@@ -70,7 +70,7 @@ def test_should_show_preview_letter_templates(
     assert response.status_code == 200
     assert response.content_type == expected_content_type
     mock_get_service_email_template.assert_called_with(service_id, template_id)
-    assert mock_letter_preview.call_args[0][0]['content'] == "Your vehicle tax is about to expire"
+    assert mock_letter_preview.call_args[0][0]['content'] == "Your vehicle tax expires on ((date))"
 
 
 def test_should_redirect_when_saving_a_template(app_,
@@ -113,7 +113,7 @@ def test_should_show_interstitial_when_making_breaking_change(
         app_,
         api_user_active,
         mock_login,
-        mock_get_service_template,
+        mock_get_service_email_template,
         mock_update_service_template,
         mock_get_user,
         mock_get_service,
@@ -131,8 +131,9 @@ def test_should_show_interstitial_when_making_breaking_change(
                 data={
                     'id': template_id,
                     'name': "new name",
-                    'template_content': "hello ((name))",
-                    'template_type': 'sms',
+                    'template_content': "hello",
+                    'template_type': 'email',
+                    'subject': 'reminder',
                     'service': service_id
                 }
             )
@@ -143,8 +144,8 @@ def test_should_show_interstitial_when_making_breaking_change(
 
             for key, value in {
                 'name': 'new name',
-                'subject': '',
-                'template_content': 'hello ((name))',
+                'subject': 'reminder',
+                'template_content': 'hello',
                 'confirm': 'true'
             }.items():
                 assert page.find('input', {'name': key})['value'] == value
@@ -229,7 +230,7 @@ def test_should_redirect_when_saving_a_template_email(app_,
             service_id = fake_uuid
             template_id = fake_uuid
             name = "new name"
-            content = "template content"
+            content = "template content ((thing)) ((date))"
             subject = "subject"
             data = {
                 'id': template_id,
