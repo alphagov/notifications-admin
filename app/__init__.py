@@ -99,6 +99,7 @@ def create_app():
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
     login_manager.login_message_category = 'default'
+    login_manager.session_protection = None
 
     from app.main import main as main_blueprint
     application.register_blueprint(main_blueprint)
