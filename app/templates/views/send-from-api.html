@@ -11,7 +11,7 @@
       API info
   </h1>
 
-  {{ template.rendered }}
+  {{ template|string }}
 
   <div class="bottom-gutter">
     {{ api_key(template.id, name="Template ID", thing='template ID') }}

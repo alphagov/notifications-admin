@@ -175,7 +175,7 @@ def test_send_test_email_message(
     api_user_active,
     mock_login,
     mock_get_service,
-    mock_get_service_email_template,
+    mock_get_service_email_template_without_placeholders,
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,

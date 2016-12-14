@@ -1,16 +1,19 @@
 from datetime import datetime, timedelta
+from io import BytesIO
 from string import ascii_uppercase
 
-from flask import request, render_template, redirect, url_for, flash, abort
+from flask import request, render_template, redirect, url_for, flash, abort, send_file
 from flask_login import login_required
+from flask_weasyprint import HTML, render_pdf
 from dateutil.parser import parse
+from wand.image import Image
 
-from notifications_utils.template import Template
+from notifications_utils.template import LetterPreviewTemplate
 from notifications_utils.recipients import first_column_headings
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
-from app.utils import user_has_permissions, get_renderer
+from app.utils import user_has_permissions, get_template
 from app.main.forms import SMSTemplateForm, EmailTemplateForm, LetterTemplateForm
 from app.main.views.send import get_example_csv_rows
 from app import service_api_client, current_service, template_statistics_client
@@ -39,16 +42,39 @@ page_headings = {
     admin_override=True, any_=True
 )
 def view_template(service_id, template_id):
-    template = Template(
-        service_api_client.get_service_template(service_id, template_id)['data']
-    )
-    template.renderer = get_renderer(
-        template.template_type, current_service, show_recipient=False, expand_emails=True
-    )
     return render_template(
         'views/templates/template.html',
-        template=template
+        template=get_template(
+            service_api_client.get_service_template(service_id, template_id)['data'],
+            current_service,
+            expand_emails=True
+        )
     )
+
+
+@main.route("/services/<service_id>/templates/<template_id>.pdf")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def view_letter_template_as_pdf(service_id, template_id):
+    return render_pdf(HTML(string=str(
+        LetterPreviewTemplate(
+            service_api_client.get_service_template(service_id, template_id)['data'],
+        )
+    )))
+
+
+@main.route("/services/<service_id>/templates/<template_id>.png")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def view_letter_template_as_image(service_id, template_id):
+    output = BytesIO()
+    with Image(
+        blob=view_letter_template_as_pdf(service_id, template_id).get_data()
+    ) as image:
+        with image.convert('png') as converted:
+            converted.save(file=output)
+    output.seek(0)
+    return send_file(output, mimetype='image/png')
 
 
 @main.route("/services/<service_id>/templates/<template_id>/version/<int:version>")
@@ -63,15 +89,13 @@ def view_template(service_id, template_id):
     any_=True
 )
 def view_template_version(service_id, template_id, version):
-    template = Template(
-        service_api_client.get_service_template(service_id, template_id, version)['data']
-    )
-    template.renderer = get_renderer(
-        template.template_type, current_service, show_recipient=False, expand_emails=True
-    )
     return render_template(
         'views/templates/template_history.html',
-        template=template
+        template=get_template(
+            service_api_client.get_service_template(service_id, template_id, version)['data'],
+            current_service,
+            expand_emails=True
+        )
     )
 
 
@@ -125,19 +149,23 @@ def edit_service_template(service_id, template_id):
 
     if form.validate_on_submit():
         subject = form.subject.data if hasattr(form, 'subject') else None
-        new_template = Template({
+        new_template = get_template({
             'name': form.name.data,
             'content': form.template_content.data,
             'subject': subject,
             'template_type': template['template_type'],
             'id': template['id']
-        })
-        template_change = Template(template).compare_to(new_template)
+        }, current_service)
+        template_change = get_template(template, current_service).compare_to(new_template)
         if template_change.has_different_placeholders and not request.form.get('confirm'):
             return render_template(
                 'views/templates/breaking-change.html',
                 template_change=template_change,
-                new_template=new_template,
+                new_template={
+                    'name': form.name.data,
+                    'subject': subject,
+                    'content': form.template_content.data,
+                },
                 column_headings=list(ascii_uppercase[:len(new_template.placeholders) + 1]),
                 example_rows=[
                     first_column_headings[new_template.template_type] + list(new_template.placeholders),
@@ -231,18 +259,12 @@ def delete_service_template(service_id, template_id):
     any_=True
 )
 def view_template_versions(service_id, template_id):
-
-    versions = []
-    for template in service_api_client.get_service_template_versions(service_id, template_id)['data']:
-        template = Template(template)
-        template.renderer = get_renderer(
-            template.template_type, current_service, show_recipient=False, expand_emails=True
-        )
-        versions.append(template)
-
     return render_template(
         'views/templates/choose_history.html',
-        versions=versions
+        versions=[
+            get_template(template, current_service, expand_emails=True)
+            for template in service_api_client.get_service_template_versions(service_id, template_id)['data']
+        ]
     )
 
 

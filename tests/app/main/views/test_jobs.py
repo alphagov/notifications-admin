@@ -163,7 +163,7 @@ def test_should_show_scheduled_job(
 
         assert response.status_code == 200
         page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.find('main').find_all('p')[2].text.strip() == 'Sending will start today at midnight'
+        assert page.find('main').find_all('p')[1].text.strip() == 'Sending will start today at midnight'
         assert page.find('input', {'type': 'submit', 'value': 'Cancel sending'})
 
 

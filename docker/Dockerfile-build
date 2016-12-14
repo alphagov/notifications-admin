@@ -26,6 +26,16 @@ RUN \
 		python-dev \
 		libffi-dev \
 		libssl-dev \
+		libexif-dev \
+		libfreetype6-dev \
+		libjpeg-dev \
+		liblcms2-2 \
+		libtiff5-dev \
+		zlib1g-dev \
+		libpango1.0-dev \
+		libcairo2-dev \
+		libmagickwand-dev \
+		ghostscript \
 
 	&& echo "Install nodejs" \
 	&& cd /tmp \
