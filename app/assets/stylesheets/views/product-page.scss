@@ -42,6 +42,7 @@
 
     .button {
 
+      @include box-shadow(0 2px 0 darken($govuk-blue, 15%));
       background: $white;
       margin-right: 15px;
 
