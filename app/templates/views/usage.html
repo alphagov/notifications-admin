@@ -37,7 +37,7 @@
           {% if sms_chargeable %}
             {{ big_number(
               sms_chargeable,
-              'at {:.2f}p per message'.format(sms_rate * 100),
+              'at {:.2f} pence per message'.format(sms_rate * 100),
               smaller=True
             ) }}
           {% endif %}

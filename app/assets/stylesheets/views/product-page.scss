@@ -81,7 +81,7 @@
     margin-bottom: $gutter-half;
 
     h2 {
-      @include bold-36;
+      @include bold-27;
       margin: 0 0 $gutter;
     }
 
@@ -95,6 +95,11 @@
       margin: 0 0 $gutter * 1.5 0;
     }
 
+  }
+
+  &-big-number {
+    @include bold-48($tabular-numbers: true);
+    margin: 0 0 0 0;
   }
 
 }
