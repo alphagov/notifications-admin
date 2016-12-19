@@ -46,8 +46,7 @@
 }
 
 .beta-badge {
-  @include phase-tag(beta);
-  background: $govuk-blue;
+  @include phase-tag();
   margin: 10px 0 0 0;
 }
 
