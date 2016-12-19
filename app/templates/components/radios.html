@@ -15,7 +15,7 @@
         {% endif %}
       </legend>
       {% for option in field %}
-        <label class="block-label" for="{{ option.id }}">
+        <div class="multiple-choice">
           <input
             id="{{ option.id }}" name="{{ option.name }}" type="radio" value="{{ option.data }}"
             {% if option.data in disable %}
@@ -25,13 +25,15 @@
               checked
             {% endif %}
           >
-          {{ option.label.text }}
-          {% if option_hints[option.data] %}
-            <div class="block-label-hint">
-              {{ option_hints[option.data] }}
-            </div>
-          {% endif %}
-        </label>
+          <label class="block-label" for="{{ option.id }}">
+            {{ option.label.text }}
+            {% if option_hints[option.data] %}
+              <div class="block-label-hint">
+                {{ option_hints[option.data] }}
+              </div>
+            {% endif %}
+          </label>
+        </div>
       {% endfor %}
     </fieldset>
   </div>
@@ -56,10 +58,12 @@
      <div class="radio-select" data-module="radio-select" data-categories="{{ field.categories|join(',') }}">
        <div class="radio-select-column">
        {% for option in field %}
-         <label class="block-label" for="{{ option.id }}">
+         <div class="multiple-choice">
            {{ option }}
-           {{ option.label.text }}
-         </label>
+           <label for="{{ option.id }}">
+             {{ option.label.text }}
+           </label>
+         </div>
          {% if loop.first %}
        </div>
        <div class="radio-select-column">
@@ -88,7 +92,7 @@
         {% endif %}
       </legend>
       {% for value, option, checked in field.iter_choices() %}
-        <label class="block-label" for="{{ field.name }}-{{ loop.index }}">
+        <div class="multiple-choice">
           <input
             type="radio"
             name="{{ field.name }}"
@@ -96,17 +100,19 @@
             value="{{ value }}"
             {% if checked %}checked="checked"{% endif %}
           />
-          {% if branding_dict.get(value, {}).get('colour') %}
-            <span style="background: {{ branding_dict[value].colour }}; display: inline-block; width: 3px; height: 27px"></span>
-          {% endif %}
-          {% if branding_dict.get(value, {}).get('logo') %}
-            <img
-              src="{{ branding_dict[value].logo }}"
-              height="27"
-            />
-          {% endif %}
-          {{option}}
-        </label>
+          <label class="block-label" for="{{ field.name }}-{{ loop.index }}">
+            {% if branding_dict.get(value, {}).get('colour') %}
+              <span style="background: {{ branding_dict[value].colour }}; display: inline-block; width: 3px; height: 27px"></span>
+            {% endif %}
+            {% if branding_dict.get(value, {}).get('logo') %}
+              <img
+                src="{{ branding_dict[value].logo }}"
+                height="27"
+              />
+            {% endif %}
+            {{option}}
+          </label>
+        </div>
       {% endfor %}
     </fieldset>
   </div>
