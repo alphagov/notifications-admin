@@ -111,7 +111,6 @@ def create_app():
 
     application.session_interface = ItsdangerousSessionInterface()
 
-    application.add_template_filter(nl2br)
     application.add_template_filter(format_datetime)
     application.add_template_filter(format_datetime_24h)
     application.add_template_filter(format_datetime_normal)
@@ -188,14 +187,6 @@ def convert_to_boolean(value):
             return False
 
     return value
-
-
-def nl2br(value):
-    _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
-
-    result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', Markup('<br>\n'))
-                          for p in _paragraph_re.split(escape(value)))
-    return Markup(result)
 
 
 def linkable_name(value):
