@@ -12,6 +12,7 @@ from notifications_utils.template import (
     SMSPreviewTemplate,
     EmailPreviewTemplate,
     LetterPDFLinkTemplate,
+    LetterPreviewTemplate,
 )
 
 import pyexcel
@@ -224,7 +225,13 @@ def is_gov_user(email_address):
     return bool(re.search(email_regex, email_address.lower()))
 
 
-def get_template(template, service, show_recipient=False, expand_emails=False):
+def get_template(
+    template,
+    service,
+    show_recipient=False,
+    expand_emails=False,
+    letter_preview_url=None,
+):
     if 'email' == template['template_type']:
         return EmailPreviewTemplate(
             template,
@@ -241,7 +248,12 @@ def get_template(template, service, show_recipient=False, expand_emails=False):
             show_recipient=show_recipient
         )
     if 'letter' == template['template_type']:
-        return LetterPDFLinkTemplate(
-            template,
-            service_id=service['id'],
-        )
+        if letter_preview_url:
+            return LetterPDFLinkTemplate(
+                template,
+                preview_url=letter_preview_url,
+            )
+        else:
+            return LetterPreviewTemplate(
+                template
+            )

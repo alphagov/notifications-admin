@@ -1,9 +1,11 @@
 import itertools
 from string import ascii_uppercase
+from io import BytesIO
 
 from contextlib import suppress
 from zipfile import BadZipFile
 from xlrd.biffh import XLRDError
+from wand.image import Image
 
 from flask import (
     request,
@@ -13,10 +15,13 @@ from flask import (
     flash,
     abort,
     session,
-    current_app
+    current_app,
+    send_file,
 )
 
 from flask_login import login_required, current_user
+from flask_weasyprint import HTML, render_pdf
+
 from notifications_utils.columns import Columns
 from notifications_utils.recipients import RecipientCSV, first_column_headings, validate_and_format_phone_number
 
@@ -87,7 +92,11 @@ def choose_template(service_id, template_type):
     return render_template(
         'views/templates/choose.html',
         templates=[
-            get_template(template, current_service)
+            get_template(
+                template,
+                current_service,
+                letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template['id']),
+            )
             for template in service_api_client.get_service_templates(service_id)['data']
             if template['template_type'] == template_type
         ],
@@ -104,7 +113,8 @@ def send_messages(service_id, template_id):
     template = get_template(
         service_api_client.get_service_template(service_id, template_id)['data'],
         current_service,
-        show_recipient=True
+        show_recipient=True,
+        letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id),
     )
 
     form = CsvUploadForm()
@@ -165,7 +175,8 @@ def send_test(service_id, template_id):
     template = get_template(
         service_api_client.get_service_template(service_id, template_id)['data'],
         current_service,
-        show_recipient=True
+        show_recipient=True,
+        letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id),
     )
 
     if len(template.placeholders) == 0 or request.method == 'POST':
@@ -208,7 +219,9 @@ def send_from_api(service_id, template_id):
     return render_template(
         'views/send-from-api.html',
         template=get_template(
-            service_api_client.get_service_template(service_id, template_id)['data'], current_service
+            service_api_client.get_service_template(service_id, template_id)['data'],
+            current_service,
+            letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id)
         )
     )
 
@@ -233,7 +246,13 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
             session['upload_data'].get('template_id')
         )['data'],
         current_service,
-        show_recipient=True
+        show_recipient=True,
+        letter_preview_url=url_for(
+            '.check_messages',
+            service_id=service_id,
+            template_type=template_type,
+            upload_id=upload_id
+        ) if not letters_as_pdf else None
     )
 
     recipients = RecipientCSV(
@@ -302,6 +321,30 @@ def check_messages(service_id, template_type, upload_id):
         'views/check.html',
         **_check_messages(service_id, template_type, upload_id)
     )
+
+
+@main.route("/services/<service_id>/<template_type>/check/<upload_id>.pdf", methods=['GET'])
+@login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+def check_messages_as_pdf(service_id, template_type, upload_id):
+    template = _check_messages(
+        service_id, template_type, upload_id, letters_as_pdf=True
+    )['template']
+    return render_pdf(HTML(string=str(template)))
+
+
+@main.route("/services/<service_id>/<template_type>/check/<upload_id>.png", methods=['GET'])
+@login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+def check_messages_as_png(service_id, template_type, upload_id):
+    output = BytesIO()
+    with Image(
+        blob=check_messages_as_pdf(service_id, template_type, upload_id).get_data()
+    ) as image:
+        with image.convert('png') as converted:
+            converted.save(file=output)
+    output.seek(0)
+    return send_file(output, mimetype='image/png')
 
 
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['POST'])

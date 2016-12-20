@@ -96,7 +96,7 @@ class UKMobileNumber(TelField):
         try:
             validate_phone_number(self.data)
         except InvalidPhoneError as e:
-            raise ValidationError(e.message)
+            raise ValidationError(str(e))
 
 
 def mobile_number():

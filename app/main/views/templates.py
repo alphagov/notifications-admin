@@ -47,7 +47,8 @@ def view_template(service_id, template_id):
         template=get_template(
             service_api_client.get_service_template(service_id, template_id)['data'],
             current_service,
-            expand_emails=True
+            expand_emails=True,
+            letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id)
         )
     )
 
@@ -66,7 +67,7 @@ def view_letter_template_as_pdf(service_id, template_id):
 @main.route("/services/<service_id>/templates/<template_id>.png")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
-def view_letter_template_as_image(service_id, template_id):
+def view_letter_template_as_png(service_id, template_id):
     output = BytesIO()
     with Image(
         blob=view_letter_template_as_pdf(service_id, template_id).get_data()
@@ -79,9 +80,15 @@ def view_letter_template_as_image(service_id, template_id):
 
 def _view_template_version(service_id, template_id, version, letters_as_pdf=False):
     return dict(template=get_template(
-        service_api_client.get_service_template(service_id, template_id, version)['data'],
+        service_api_client.get_service_template(service_id, template_id, version=version)['data'],
         current_service,
         expand_emails=True,
+        letter_preview_url=url_for(
+            '.view_template_version',
+            service_id=service_id,
+            template_id=template_id,
+            version=version,
+        ) if not letters_as_pdf else None
     ))
 
 
@@ -101,6 +108,47 @@ def view_template_version(service_id, template_id, version):
         'views/templates/template_history.html',
         **_view_template_version(service_id=service_id, template_id=template_id, version=version)
     )
+
+
+@main.route("/services/<service_id>/templates/<template_id>/version/<int:version>.pdf")
+@login_required
+@user_has_permissions(
+    'view_activity',
+    'send_texts',
+    'send_emails',
+    'manage_templates',
+    'manage_api_keys',
+    admin_override=True,
+    any_=True
+)
+def view_template_version_as_pdf(service_id, template_id, version):
+    return render_pdf(HTML(string=str(
+        LetterPreviewTemplate(
+            service_api_client.get_service_template(service_id, template_id, version=version)['data'],
+        )
+    )))
+
+
+@main.route("/services/<service_id>/templates/<template_id>/version/<int:version>.png")
+@login_required
+@user_has_permissions(
+    'view_activity',
+    'send_texts',
+    'send_emails',
+    'manage_templates',
+    'manage_api_keys',
+    admin_override=True,
+    any_=True
+)
+def view_template_version_as_png(service_id, template_id, version):
+    output = BytesIO()
+    with Image(
+        blob=view_template_version_as_pdf(service_id, template_id, version).get_data()
+    ) as image:
+        with image.convert('png') as converted:
+            converted.save(file=output)
+    output.seek(0)
+    return send_file(output, mimetype='image/png')
 
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
@@ -266,7 +314,17 @@ def view_template_versions(service_id, template_id):
     return render_template(
         'views/templates/choose_history.html',
         versions=[
-            get_template(template, current_service, expand_emails=True)
+            get_template(
+                template,
+                current_service,
+                expand_emails=True,
+                letter_preview_url=url_for(
+                    '.view_template_version',
+                    service_id=service_id,
+                    template_id=template_id,
+                    version=template['version'],
+                )
+            )
             for template in service_api_client.get_service_template_versions(service_id, template_id)['data']
         ]
     )
