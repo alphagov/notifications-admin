@@ -213,10 +213,7 @@ def send_from_api(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['GET'])
-@login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
-def check_messages(service_id, template_type, upload_id):
+def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
 
     if not session.get('upload_data'):
         return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
@@ -275,8 +272,7 @@ def check_messages(service_id, template_type, upload_id):
 
     session['upload_data']['notification_count'] = len(list(recipients.rows))
     session['upload_data']['valid'] = not recipients.has_errors
-    return render_template(
-        'views/check.html',
+    return dict(
         recipients=recipients,
         first_recipient=first_recipient,
         template=template,
@@ -295,6 +291,16 @@ def check_messages(service_id, template_type, upload_id):
         choose_time_form=choose_time_form,
         back_link=back_link,
         help=get_help_argument()
+    )
+
+
+@main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['GET'])
+@login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+def check_messages(service_id, template_type, upload_id):
+    return render_template(
+        'views/check.html',
+        **_check_messages(service_id, template_type, upload_id)
     )
 
 

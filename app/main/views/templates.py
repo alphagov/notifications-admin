@@ -77,6 +77,14 @@ def view_letter_template_as_image(service_id, template_id):
     return send_file(output, mimetype='image/png')
 
 
+def _view_template_version(service_id, template_id, version, letters_as_pdf=False):
+    return dict(template=get_template(
+        service_api_client.get_service_template(service_id, template_id, version)['data'],
+        current_service,
+        expand_emails=True,
+    ))
+
+
 @main.route("/services/<service_id>/templates/<template_id>/version/<int:version>")
 @login_required
 @user_has_permissions(
@@ -91,11 +99,7 @@ def view_letter_template_as_image(service_id, template_id):
 def view_template_version(service_id, template_id, version):
     return render_template(
         'views/templates/template_history.html',
-        template=get_template(
-            service_api_client.get_service_template(service_id, template_id, version)['data'],
-            current_service,
-            expand_emails=True
-        )
+        **_view_template_version(service_id=service_id, template_id=template_id, version=version)
     )
 
 
