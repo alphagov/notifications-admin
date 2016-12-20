@@ -4,7 +4,7 @@ Flask-Script==2.0.5
 Flask-WTF==0.11
 Flask-Login==0.3.2
 Flask-WeasyPrint==0.5
-git+https://github.com/quis/WeasyPrint.git@older-html5lib#egg=WeasyPrint==0.33
+git+https://github.com/alphagov/WeasyPrint.git@older-html5lib#egg=WeasyPrint==0.33
 html5lib==1.0b8
 credstash==1.8.0
 boto3==1.3.0
