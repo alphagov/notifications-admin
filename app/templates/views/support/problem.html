@@ -23,8 +23,6 @@
         <form method="post">
             {{ textbox(form.feedback, width='1-1', hint='', rows=10) }}
             {% if not current_user.is_authenticated %}
-              <h3 class="heading-medium">Do you want a reply?</h3>
-              <p>Leave your details below if you'd like a response.</p>
               {{ textbox(form.name, width='1-1') }}
               {{ textbox(form.email_address, width='1-1') }}
             {% else %}

@@ -30,7 +30,7 @@ def test_get_support_index_page(client):
 @pytest.mark.parametrize('logged_in, expected_form_field, expected_contact_details', [
     (True, type(None), 'We’ll reply to test@user.gov.uk'),
     (True, type(None), 'We’ll reply to test@user.gov.uk'),
-    (False, element.Tag, 'Leave your details below if you\'d like a response.'),
+    (False, element.Tag, None),
 ])
 def test_choose_support_type(
     client,
@@ -54,7 +54,8 @@ def test_choose_support_type(
     assert page.h1.string.strip() == expected_h1
     assert isinstance(page.find('input', {'name': 'name'}), expected_form_field)
     assert isinstance(page.find('input', {'name': 'email_address'}), expected_form_field)
-    assert page.find('form').find('p').text.strip() == expected_contact_details
+    if expected_contact_details:
+        assert page.find('form').find('p').text.strip() == expected_contact_details
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
@@ -70,22 +71,6 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
 
 @freeze_time("2016-12-12 12:00:00.000000")
 @pytest.mark.parametrize('data, expected_message, expected_person_name, expected_email, logged_in, is_anonymous', [
-    (
-        {'feedback': "blah", 'name': 'Fred'},
-        'Environment: http://localhost/\nFred (no email address supplied)\nblah',
-        'Fred',
-        'donotreply@notifications.service.gov.uk',
-        False,
-        True,
-    ),
-    (
-        {'feedback': "blah"},
-        'Environment: http://localhost/\n (no email address supplied)\nblah',
-        None,
-        'donotreply@notifications.service.gov.uk',
-        False,
-        True,
-    ),
     (
         {'feedback': "blah", 'name': "Steve Irwin", 'email_address': 'rip@gmail.com'},
         'Environment: http://localhost/\n\nblah',
@@ -104,7 +89,7 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
     ),
 ])
 @pytest.mark.parametrize('ticket_type', ['problem', 'question'])
-def test_post_problem_or_question(
+def test_passes_user_details_through_flow(
     client,
     api_user_active,
     mock_get_user,
@@ -146,6 +131,41 @@ def test_post_problem_or_question(
     )
 
 
+@freeze_time('2016-12-12 12:00:00.000000')
+@pytest.mark.parametrize('data', [
+    {'feedback': 'blah', 'name': 'Fred'},
+    {'feedback': 'blah'},
+])
+@pytest.mark.parametrize('ticket_type, expected_response, expected_redirect, expected_error', [
+    ('problem', 200, no_redirect(), element.Tag),
+    ('question', 302, partial(url_for, 'main.thanks', urgent=True, anonymous=True), type(None)),
+])
+def test_email_address_required_for_problems(
+    client,
+    api_user_active,
+    mock_get_user,
+    mock_get_services,
+    mocker,
+    data,
+    ticket_type,
+    expected_response,
+    expected_redirect,
+    expected_error
+):
+    mock_post = mocker.patch(
+        'app.main.views.feedback.requests.post',
+        return_value=Mock(status_code=201)
+    )
+    response = client.post(
+        url_for('main.feedback', ticket_type=ticket_type),
+        data=data,
+    )
+    assert response.status_code == expected_response
+    assert response.location == expected_redirect(_external=True)
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert isinstance(page.find('span', {'class': 'error-message'}), expected_error)
+
+
 @pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, numeric_urgency, is_urgent', [
 
     # business hours, always urgent
@@ -179,7 +199,7 @@ def test_urgency(
     mock_post = mocker.patch('app.main.views.feedback.requests.post', return_value=Mock(status_code=201))
     response = logged_in_client.post(
         url_for('main.feedback', ticket_type=ticket_type, severe=severe),
-        data={'feedback': "blah"},
+        data={'feedback': 'blah', 'email_address': 'test@example.com'},
     )
     assert response.status_code == 302
     assert response.location == url_for('main.thanks', urgent=is_urgent, anonymous=False, _external=True)

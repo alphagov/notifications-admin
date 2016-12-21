@@ -403,10 +403,14 @@ class SupportType(Form):
     )
 
 
-class Support(Form):
+class Feedback(Form):
     name = StringField('Name')
     email_address = StringField('Email address')
     feedback = TextAreaField('Your message', validators=[DataRequired(message="Can’t be empty")])
+
+
+class Problem(Feedback):
+    email_address = email_address(label='Email address', gov_user=False)
 
 
 class Triage(Form):

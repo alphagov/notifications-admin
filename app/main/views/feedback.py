@@ -4,7 +4,7 @@ from flask import render_template, url_for, redirect, flash, current_app, abort,
 from flask_login import current_user
 from app import convert_to_boolean, current_service, service_api_client
 from app.main import main
-from app.main.forms import SupportType, Support, Triage
+from app.main.forms import SupportType, Feedback, Problem, Triage
 from datetime import datetime
 
 
@@ -37,10 +37,14 @@ def triage():
 @main.route('/support/submit/<ticket_type>', methods=['GET', 'POST'])
 def feedback(ticket_type):
 
-    if ticket_type not in ['question', 'problem']:
+    try:
+        form = {
+            'question': Feedback,
+            'problem': Problem,
+        }[ticket_type]()
+    except KeyError:
         abort(404)
 
-    form = Support()
     if not form.feedback.data:
         form.feedback.data = session.pop('feedback_message', '')
 
@@ -63,13 +67,13 @@ def feedback(ticket_type):
     if needs_escalation(ticket_type, severe):
         return redirect(url_for('.bat_phone'))
 
+    if current_user.is_authenticated:
+        form.email_address.data = current_user.email_address
+        form.name.data = current_user.name
+
     if form.validate_on_submit():
-        if current_user.is_authenticated:
-            user_email = current_user.email_address
-            user_name = current_user.name
-        else:
-            user_email = form.email_address.data
-            user_name = form.name.data or None
+        user_email = form.email_address.data
+        user_name = form.name.data or None
         feedback_msg = 'Environment: {}\n{}\n{}'.format(
             url_for('main.index', _external=True),
             '' if user_email else '{} (no email address supplied)'.format(form.name.data),
