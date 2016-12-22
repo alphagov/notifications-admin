@@ -1,9 +1,11 @@
+from datetime import datetime
+
 from flask import (
     url_for,
     session
 )
 
-from bs4 import BeautifulSoup
+from app.notify_client.models import InvitedUser
 
 
 def test_render_register_returns_template_with_form(app_):
@@ -139,3 +141,53 @@ def test_register_with_existing_email_sends_emails(app_,
                                            data=user_data)
         assert response.status_code == 302
         assert response.location == url_for('main.registration_continue', _external=True)
+
+
+def test_register_from_invite_(app_,
+                               fake_uuid,
+                               mock_is_email_unique,
+                               mock_register_user,
+                               mock_send_verify_code,
+                               mock_accept_invite):
+
+    invited_user = InvitedUser(fake_uuid, fake_uuid, "",
+                               "invited@user.com",
+                               ["manage_users"],
+                               "pending",
+                               datetime.utcnow())
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                session['invited_user'] = invited_user.serialize()
+            response = client.post(url_for('main.register_from_invite'),
+                                   data={'name': 'Registered in another Browser',
+                                         'email_address': invited_user.email_address,
+                                         'mobile_number': '+4407700900460',
+                                         'service': str(invited_user.id),
+                                         'password': 'somreallyhardthingtoguess'})
+            assert response.status_code == 302
+            assert response.location == url_for('main.verify', _external=True)
+
+
+def test_register_from_invite_when_user_registers_in_another_browser(app_,
+                                                                     api_user_active,
+                                                                     mock_is_email_not_unique,
+                                                                     mock_get_user_by_email,
+                                                                     mock_accept_invite):
+    invited_user = InvitedUser(api_user_active.id, api_user_active.id, "",
+                               api_user_active.email_address,
+                               ["manage_users"],
+                               "pending",
+                               datetime.utcnow())
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            with client.session_transaction() as session:
+                session['invited_user'] = invited_user.serialize()
+            response = client.post(url_for('main.register_from_invite'),
+                                   data={'name': 'Registered in another Browser',
+                                         'email_address': api_user_active.email_address,
+                                         'mobile_number': api_user_active.mobile_number,
+                                         'service': str(api_user_active.id),
+                                         'password': 'somreallyhardthingtoguess'})
+            assert response.status_code == 302
+            assert response.location == url_for('main.verify', _external=True)

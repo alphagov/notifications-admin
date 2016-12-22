@@ -80,8 +80,8 @@ def _do_registration(form, service=None, send_sms=True, send_email=True):
         session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
         session['user_details'] = {"email": user.email_address, "id": user.id}
     else:
+        user = user_api_client.get_user_by_email(form.email_address.data)
         if send_email:
-            user = user_api_client.get_user_by_email(form.email_address.data)
             user_api_client.send_already_registered_email(user.id, user.email_address)
         session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
         session['user_details'] = {"email": user.email_address, "id": user.id}
