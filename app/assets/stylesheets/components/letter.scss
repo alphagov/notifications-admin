@@ -11,6 +11,8 @@ $outline-width: 5px;
   outline: $outline-width solid rgba($text-colour, 0.1);
   padding: 0;
   margin: $outline-width $outline-width $gutter;
+  height: 50%;
+  overflow: hidden;
 
   a {
     display: block;
