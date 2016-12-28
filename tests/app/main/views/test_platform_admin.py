@@ -1,14 +1,11 @@
-from datetime import date
-
 from flask import url_for
-from freezegun import freeze_time
 import pytest
 from bs4 import BeautifulSoup
 
 from tests.conftest import mock_get_user
 from tests import service_json
 
-from app.main.views.platform_admin import get_statistics, format_stats_by_service, create_global_stats
+from app.main.views.platform_admin import format_stats_by_service, create_global_stats
 
 
 def test_should_redirect_if_not_logged_in(app_):
