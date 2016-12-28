@@ -264,7 +264,8 @@ def get_template(
 def png_from_pdf(pdf_endpoint):
     output = BytesIO()
     with Image(
-        blob=pdf_endpoint.get_data()
+        blob=pdf_endpoint.get_data(),
+        resolution=96,
     ) as image:
         with image.convert('png') as converted:
             converted.save(file=output)
