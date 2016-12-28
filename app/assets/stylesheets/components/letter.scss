@@ -1,3 +1,5 @@
+// Easing function from: http://easings.net/#easeOutBack
+$transition-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 $iso-paper-ratio: 70.7%;
 
 .letter {
@@ -21,6 +23,15 @@ $iso-paper-ratio: 70.7%;
     transform: skew(-1deg, 0deg) scale(1, 0.99);
     transform-origin: left bottom;
     box-shadow: inset 0 0 0 2px $panel-colour;
+    transition: transform 0.2s $transition-easing;
+  }
+
+  &:hover {
+
+    &:after {
+      transform: skew(-1.5deg, 0deg) scale(1, 0.97);
+      transition: transform 0.1s $transition-easing;
+    }
 
   }
 
