@@ -1,19 +1,17 @@
 from datetime import datetime, timedelta
-from io import BytesIO
 from string import ascii_uppercase
 
 from flask import request, render_template, redirect, url_for, flash, abort, send_file
 from flask_login import login_required
 from flask_weasyprint import HTML, render_pdf
 from dateutil.parser import parse
-from wand.image import Image
 
 from notifications_utils.template import LetterPreviewTemplate
 from notifications_utils.recipients import first_column_headings
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
-from app.utils import user_has_permissions, get_template
+from app.utils import user_has_permissions, get_template, png_from_pdf
 from app.main.forms import SMSTemplateForm, EmailTemplateForm, LetterTemplateForm
 from app.main.views.send import get_example_csv_rows
 from app import service_api_client, current_service, template_statistics_client
@@ -68,14 +66,9 @@ def view_letter_template_as_pdf(service_id, template_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_letter_template_as_png(service_id, template_id):
-    output = BytesIO()
-    with Image(
-        blob=view_letter_template_as_pdf(service_id, template_id).get_data()
-    ) as image:
-        with image.convert('png') as converted:
-            converted.save(file=output)
-    output.seek(0)
-    return send_file(output, mimetype='image/png')
+    return send_file(**png_from_pdf(
+        view_letter_template_as_pdf(service_id, template_id)
+    ))
 
 
 def _view_template_version(service_id, template_id, version, letters_as_pdf=False):
@@ -141,14 +134,9 @@ def view_template_version_as_pdf(service_id, template_id, version):
     any_=True
 )
 def view_template_version_as_png(service_id, template_id, version):
-    output = BytesIO()
-    with Image(
-        blob=view_template_version_as_pdf(service_id, template_id, version).get_data()
-    ) as image:
-        with image.convert('png') as converted:
-            converted.save(file=output)
-    output.seek(0)
-    return send_file(output, mimetype='image/png')
+    return send_file(**png_from_pdf(
+        view_template_version_as_pdf(service_id, template_id, version)
+    ))
 
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])

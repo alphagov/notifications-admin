@@ -5,7 +5,6 @@ from io import BytesIO
 from contextlib import suppress
 from zipfile import BadZipFile
 from xlrd.biffh import XLRDError
-from wand.image import Image
 
 from flask import (
     request,
@@ -32,7 +31,14 @@ from app.main.uploader import (
     s3download
 )
 from app import job_api_client, service_api_client, current_service, user_api_client
-from app.utils import user_has_permissions, get_errors_for_csv, Spreadsheet, get_help_argument, get_template
+from app.utils import (
+    user_has_permissions,
+    get_errors_for_csv,
+    Spreadsheet,
+    get_help_argument,
+    get_template,
+    png_from_pdf,
+)
 
 
 def get_page_headings(template_type):
@@ -337,14 +343,9 @@ def check_messages_as_pdf(service_id, template_type, upload_id):
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def check_messages_as_png(service_id, template_type, upload_id):
-    output = BytesIO()
-    with Image(
-        blob=check_messages_as_pdf(service_id, template_type, upload_id).get_data()
-    ) as image:
-        with image.convert('png') as converted:
-            converted.save(file=output)
-    output.seek(0)
-    return send_file(output, mimetype='image/png')
+    return send_file(**png_from_pdf(
+        check_messages_as_pdf(service_id, template_type, upload_id)
+    ))
 
 
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['POST'])

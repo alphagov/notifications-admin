@@ -1,12 +1,14 @@
 import re
 import csv
-from io import StringIO
+from io import StringIO, BytesIO
 from os import path
 from functools import wraps
 import unicodedata
 
 from flask import (abort, current_app, session, request, redirect, url_for)
 from flask_login import current_user
+
+from wand.image import Image
 
 from notifications_utils.template import (
     SMSPreviewTemplate,
@@ -257,3 +259,17 @@ def get_template(
             return LetterPreviewTemplate(
                 template
             )
+
+
+def png_from_pdf(pdf_endpoint):
+    output = BytesIO()
+    with Image(
+        blob=pdf_endpoint.get_data()
+    ) as image:
+        with image.convert('png') as converted:
+            converted.save(file=output)
+    output.seek(0)
+    return dict(
+        filename_or_fp=output,
+        mimetype='image/png',
+    )
