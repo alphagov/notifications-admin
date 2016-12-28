@@ -5,62 +5,44 @@ from flask import (
     request
 )
 from flask_login import login_required
-from wtforms import ValidationError
 
 from app import service_api_client
 from app.main import main
-from app.main.forms import DateFilterForm
 from app.utils import user_has_permissions
 from app.statistics_utils import get_formatted_percentage
 
 
-@main.route("/platform-admin", methods=['GET', 'POST'])
+@main.route("/platform-admin")
 @login_required
 @user_has_permissions(admin_override=True)
 def platform_admin():
-    form = DateFilterForm()
     include_from_test_key = request.args.get('include_from_test_key') != 'False'
+    start_date = request.args.get('start_date', None)
+    end_date = request.args.get('end_date', None)
     # specifically DO get inactive services
     api_args = {'detailed': True}
     if not include_from_test_key:
         api_args['include_from_test_key'] = False
-    if form.validate_on_submit():
-        start_date = form.start_date.data
-        end_date = form.end_date.data
 
-        if start_date:
-            print(start_date)
-            print(end_date)
-            api_args['start_date'] = start_date
-            if not end_date:
-                raise ValidationError(message='requires end date', field =form.end_date)
-            api_args['end_date'] = end_date
+    if start_date:
+        # For now the start and end date are only set as query params. The previous commit added a form
+        # but I could get the validation right, not did the page look good.
+        # This is just an intermediate pass at returning the data.
+        api_args['start_date'] = start_date
+        api_args['end_date'] = end_date
 
-        services = service_api_client.get_services(api_args)['data']
+    services = service_api_client.get_services(api_args)['data']
 
-        return render_template(
-            'views/platform-admin.html',
-            include_from_test_key=include_from_test_key,
-            form=form,
-            **get_statistics(sorted(
-                services,
-                key=lambda service: (service['active'], service['created_at']),
-                reverse=True
-            ))
-        )
-    else:
-        services = service_api_client.get_services(api_args)['data']
+    return render_template(
+        'views/platform-admin.html',
+        include_from_test_key=include_from_test_key,
+        **get_statistics(sorted(
+            services,
+            key=lambda service: (service['active'], service['created_at']),
+            reverse=True
+        ))
+    )
 
-        return render_template(
-            'views/platform-admin.html',
-            include_from_test_key=include_from_test_key,
-            form=form,
-            **get_statistics(sorted(
-                services,
-                key=lambda service: (service['active'], service['created_at']),
-                reverse=True
-            ))
-        )
 
 def get_statistics(services):
     return {

@@ -121,6 +121,28 @@ def test_platform_admin_toggle_including_from_test_key(
     mock_get_detailed_services.assert_called_once_with(api_args)
 
 
+def test_platform_admin_with_date_filter(
+    app_,
+    platform_admin_user,
+    mocker,
+    mock_get_detailed_services
+):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            mock_get_user(mocker, user=platform_admin_user)
+            client.login(platform_admin_user)
+            response = client.get(url_for('main.platform_admin', start_date='2016-12-20', end_date='2012-12-28'))
+
+    assert response.status_code == 200
+    resp_data = response.get_data(as_text=True)
+    assert 'Platform admin' in resp_data
+    assert 'Showing stats for today' in resp_data
+    assert 'Live services' in resp_data
+    assert 'Trial mode services' in resp_data
+    mock_get_detailed_services.assert_called_once_with({'detailed': True,
+                                                        'start_date': '2016-12-20', 'end_date': '2012-12-28'})
+
+
 def test_create_global_stats_sets_failure_rates(fake_uuid):
     services = [
         service_json(fake_uuid, 'a', []),

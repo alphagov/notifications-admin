@@ -96,11 +96,6 @@
     {% else %}
       Excluding test keys (<a href="{{ url_for('.platform_admin') }}">change</a>)
     {% endif %}
-    <form autocomplete="off" method="post">
-      {{ textbox(form.start_date, hint="Enter start date in format YYYY-MM-DD") }}
-      {{ textbox(form.end_date, hint="Enter end date in format YYYY-MM-DD") }}
-      {{ page_footer('Apply filter') }}
-    </form>
   </p>
 
   <div class="grid-row bottom-gutter">

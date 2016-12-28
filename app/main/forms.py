@@ -516,16 +516,3 @@ class Whitelist(Form):
         max_entries=5,
         label="Mobile numbers"
     )
-
-
-class DateFilterForm(Form):
-    start_date = DateField("Start Date", [validators.optional()])
-    end_date = StringField("End Date", [validators.optional()])
-
-    def validate(self):
-        print("****In validate")
-        if self.start_date.data and not self.end_date.data:
-            print("***** false {}".format(type(self.end_date.errors)))
-            raise ValidationError('Both required')
-        else:
-            return True
