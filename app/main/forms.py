@@ -516,3 +516,8 @@ class Whitelist(Form):
         max_entries=5,
         label="Mobile numbers"
     )
+
+class DateFilterForm(Form):
+    start_date = DateField("Start Date", [validators.optional()])
+    end_date = StringField("End Date", [validators.optional()])
+    include_from_test_key = BooleanField("Include test keys", default='checked')

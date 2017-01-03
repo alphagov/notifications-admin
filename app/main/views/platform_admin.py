@@ -1,5 +1,6 @@
 import itertools
 
+from datetime import datetime
 from flask import (
     render_template,
     request
@@ -8,6 +9,7 @@ from flask_login import login_required
 
 from app import service_api_client
 from app.main import main
+from app.main.forms import DateFilterForm
 from app.utils import user_has_permissions
 from app.statistics_utils import get_formatted_percentage
 
@@ -16,9 +18,10 @@ from app.statistics_utils import get_formatted_percentage
 @login_required
 @user_has_permissions(admin_override=True)
 def platform_admin():
-    include_from_test_key = request.args.get('include_from_test_key') != 'False'
-    start_date = request.args.get('start_date', None)
-    end_date = request.args.get('end_date', None)
+    form = DateFilterForm(request.args)
+    include_from_test_key = form.include_from_test_key.data
+    start_date = form.start_date.data
+    end_date = form.end_date.data
     # specifically DO get inactive services
     api_args = {'detailed': True}
     if not include_from_test_key:
@@ -29,13 +32,14 @@ def platform_admin():
         # but I could get the validation right, not did the page look good.
         # This is just an intermediate pass at returning the data.
         api_args['start_date'] = start_date
-        api_args['end_date'] = end_date
+        api_args['end_date'] = end_date or datetime.utcnow().date()
 
     services = service_api_client.get_services(api_args)['data']
 
     return render_template(
         'views/platform-admin.html',
         include_from_test_key=include_from_test_key,
+        form=form,
         **get_statistics(sorted(
             services,
             key=lambda service: (service['active'], service['created_at']),
