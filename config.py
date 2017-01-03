@@ -64,6 +64,7 @@ class Config(object):
         r"dclgdatamart\.co\.uk",
         r"ucds\.email",
         r"naturalengland\.org\.uk",
+        r"hmcts.net",
     ]
 
 
