@@ -1,10 +1,9 @@
 // Easing function from: http://easings.net/#easeOutBack
 $transition-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-$iso-paper-ratio: 70.7%;
+$iso-paper-ratio: 70.710678118%;
 
 .letter {
 
-  font-family: Helvetica, Arial, sans-serif;
   padding: 0;
   margin: 0 0 $gutter 0;
   position: relative;
@@ -15,22 +14,40 @@ $iso-paper-ratio: 70.7%;
     z-index: 10;
     position: absolute;
     top: 2px;
-    left: 0;
+    left: 5px;
     height: 0;
     padding: $iso-paper-ratio 0 0 0;
     width: 100%;
     background: $highlight-colour;
-    transform: skew(-1deg, 0deg) scale(1, 0.99);
     transform-origin: left bottom;
+    transform: scale(1, 0.99);
     box-shadow: inset 0 0 0 2px $panel-colour;
-    transition: transform 0.2s $transition-easing;
+    transition: all 0.2s $transition-easing;
+  }
+
+  &:before {
+    content: "";
+    z-index: 15;
+    position: absolute;
+    bottom: -3px;
+    right: -5px;
+    width: 5px;
+    height: 6px;
+    background: $white;
+    transform: rotate(45deg);
+    box-shadow: inset 2px 0 0 0 $panel-colour;
   }
 
   &:hover {
 
     &:after {
-      transform: skew(-1.5deg, 0deg) scale(1, 0.97);
-      transition: transform 0.1s $transition-easing;
+      transform: skew(-1.3deg, 0deg) scale(1, 0.96);
+      transition: all 0.1s $transition-easing;
+      background: mix($white, $highlight-colour);
+    }
+
+    &:before {
+      transform: rotate(50deg);
     }
 
   }
@@ -44,7 +61,7 @@ $iso-paper-ratio: 70.7%;
     padding: $iso-paper-ratio 0 0 0;
     position: relative;
     z-index: 20;
-    transition: all 0.1s ease-out;
+    box-shadow: 0 2px 0 0 $panel-colour;
 
     &:focus {
 
