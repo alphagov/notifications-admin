@@ -19,26 +19,19 @@ from app.statistics_utils import get_formatted_percentage
 @user_has_permissions(admin_override=True)
 def platform_admin():
     form = DateFilterForm(request.args)
-    include_from_test_key = form.include_from_test_key.data
-    start_date = form.start_date.data
-    end_date = form.end_date.data
-    # specifically DO get inactive services
-    api_args = {'detailed': True}
-    if not include_from_test_key:
-        api_args['include_from_test_key'] = False
+    api_args = {'detailed': True,  # specifically DO get inactive services
+                'include_from_test_key': form.include_from_test_key.data
+                }
 
-    if start_date:
-        # For now the start and end date are only set as query params. The previous commit added a form
-        # but I could get the validation right, not did the page look good.
-        # This is just an intermediate pass at returning the data.
-        api_args['start_date'] = start_date
-        api_args['end_date'] = end_date or datetime.utcnow().date()
+    if form.start_date.data:
+        api_args['start_date'] = form.start_date.data
+        api_args['end_date'] = form.end_date.data or datetime.utcnow().date()
 
     services = service_api_client.get_services(api_args)['data']
 
     return render_template(
         'views/platform-admin.html',
-        include_from_test_key=include_from_test_key,
+        include_from_test_key=form.include_from_test_key.data,
         form=form,
         **get_statistics(sorted(
             services,
