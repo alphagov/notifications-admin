@@ -1,6 +1,6 @@
 import re
 import csv
-from io import StringIO
+from io import StringIO, BytesIO
 from os import path
 from functools import wraps
 import unicodedata
@@ -8,10 +8,13 @@ import unicodedata
 from flask import (abort, current_app, session, request, redirect, url_for)
 from flask_login import current_user
 
+from wand.image import Image
+
 from notifications_utils.template import (
     SMSPreviewTemplate,
     EmailPreviewTemplate,
     LetterPDFLinkTemplate,
+    LetterPreviewTemplate,
 )
 
 import pyexcel
@@ -224,7 +227,13 @@ def is_gov_user(email_address):
     return bool(re.search(email_regex, email_address.lower()))
 
 
-def get_template(template, service, show_recipient=False, expand_emails=False):
+def get_template(
+    template,
+    service,
+    show_recipient=False,
+    expand_emails=False,
+    letter_preview_url=None,
+):
     if 'email' == template['template_type']:
         return EmailPreviewTemplate(
             template,
@@ -241,7 +250,27 @@ def get_template(template, service, show_recipient=False, expand_emails=False):
             show_recipient=show_recipient
         )
     if 'letter' == template['template_type']:
-        return LetterPDFLinkTemplate(
-            template,
-            service_id=service['id'],
-        )
+        if letter_preview_url:
+            return LetterPDFLinkTemplate(
+                template,
+                preview_url=letter_preview_url,
+            )
+        else:
+            return LetterPreviewTemplate(
+                template
+            )
+
+
+def png_from_pdf(pdf_endpoint):
+    output = BytesIO()
+    with Image(
+        blob=pdf_endpoint.get_data(),
+        resolution=96,
+    ) as image:
+        with image.convert('png') as converted:
+            converted.save(file=output)
+    output.seek(0)
+    return dict(
+        filename_or_fp=output,
+        mimetype='image/png',
+    )

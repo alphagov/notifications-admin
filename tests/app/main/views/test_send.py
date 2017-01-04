@@ -4,10 +4,12 @@ from glob import glob
 import re
 from itertools import repeat
 from functools import partial
+from unittest.mock import Mock, patch
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from notifications_utils.template import LetterPreviewTemplate
 
 from tests import validate_route_permission
 
@@ -430,6 +432,54 @@ def test_cant_start_letters_job(
     )
     assert response.status_code == 403
     mock_create_job.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    'view, expected_content_type',
+    [
+        ('.check_messages_as_pdf', 'application/pdf'),
+        ('.check_messages_as_png', 'image/png'),
+    ]
+)
+@patch('app.utils.LetterPreviewTemplate.jinja_template.render', return_value='')
+def test_should_show_preview_letter_message(
+    mock_letter_preview,
+    view,
+    expected_content_type,
+    logged_in_client,
+    mock_get_service_letter_template,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    fake_uuid,
+    mocker,
+):
+
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value='\n'.join(
+            ['address line 1, postcode'] +
+            ['123 street, abc123']
+        )
+    )
+
+    service_id = fake_uuid
+    template_id = fake_uuid
+    with logged_in_client.session_transaction() as session:
+        session['upload_data'] = {
+            'original_file_name': 'example.csv',
+            'template_id': fake_uuid,
+            'notification_count': 1,
+            'valid': True
+        }
+    response = logged_in_client.get(url_for(view, service_id=service_id, template_type='letter', upload_id=fake_uuid))
+
+    assert response.status_code == 200
+    assert response.content_type == expected_content_type
+    mock_get_service_letter_template.assert_called_with(service_id, template_id)
+    assert mock_letter_preview.call_args[0][0]['message'] == (
+        '<h2>Subject</h2>\n'
+        '<p>Your vehicle tax is about to expire</p>'
+    )
 
 
 def test_check_messages_should_revalidate_file_when_uploading_file(

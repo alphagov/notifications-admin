@@ -1,4 +1,5 @@
 from functools import partial
+from itertools import repeat
 from datetime import datetime
 from unittest.mock import Mock, patch
 
@@ -9,6 +10,10 @@ from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
 from tests import validate_route_permission, template_json, single_notification_json
+from tests.conftest import (
+    mock_get_service_email_template,
+    mock_get_template_version,
+)
 from app.main.views.templates import get_last_use_message, get_human_readable_delta
 
 
@@ -40,17 +45,20 @@ def test_should_show_page_for_one_template(
         service_id, template_id)
 
 
-@pytest.mark.parametrize(
-    'view, expected_content_type',
-    [
-        ('.view_letter_template_as_pdf', 'application/pdf'),
-        ('.view_letter_template_as_image', 'image/png'),
-    ]
-)
-@patch("app.main.views.templates.LetterPreviewTemplate")
+@pytest.mark.parametrize('view_suffix, expected_content_type', [
+    ('as_pdf', 'application/pdf'),
+    ('as_png', 'image/png'),
+])
+@pytest.mark.parametrize('view, extra_view_args', [
+    ('.view_letter_template', {}),
+    ('.view_template_version', {'version': 1}),
+])
+@patch('app.main.views.templates.LetterPreviewTemplate.jinja_template.render', return_value='foo')
 def test_should_show_preview_letter_templates(
     mock_letter_preview,
     view,
+    extra_view_args,
+    view_suffix,
     expected_content_type,
     client,
     api_user_active,
@@ -60,17 +68,27 @@ def test_should_show_preview_letter_templates(
     mock_get_user,
     mock_get_user_by_email,
     mock_has_permissions,
-    fake_uuid
+    fake_uuid,
+    mocker
 ):
     client.login(api_user_active)
-    service_id = fake_uuid
-    template_id = fake_uuid
-    response = client.get(url_for(view, service_id=service_id, template_id=template_id))
+    service_id, template_id = repeat(fake_uuid, 2)
+    response = client.get(url_for(
+        '{}_{}'.format(view, view_suffix),
+        service_id=service_id,
+        template_id=template_id,
+        **extra_view_args
+    ))
 
     assert response.status_code == 200
     assert response.content_type == expected_content_type
-    mock_get_service_email_template.assert_called_with(service_id, template_id)
-    assert mock_letter_preview.call_args[0][0]['content'] == "Your vehicle tax expires on ((date))"
+    mock_get_service_email_template.assert_called_with(service_id, template_id, **extra_view_args)
+    print(mock_letter_preview)
+    print(mock_letter_preview.call_args)
+    assert mock_letter_preview.call_args[0][0]['message'] == (
+        "<h2>Your <span class='placeholder'>((thing))</span> is due soon</h2>\n"
+        "<p>Your vehicle tax expires on <span class='placeholder'>((date))</span></p>"
+    )
 
 
 def test_should_redirect_when_saving_a_template(app_,
