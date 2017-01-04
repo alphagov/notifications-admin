@@ -99,7 +99,6 @@ def test_platform_admin_toggle_including_from_test_key(
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
-            print(include_from_test_key)
             mock_get_user(mocker, user=platform_admin_user)
             client.login(platform_admin_user)
             response = client.get(url_for('main.platform_admin', include_from_test_key=include_from_test_key))

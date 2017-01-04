@@ -60,7 +60,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         Retrieve a list of services.
         """
-        print(params_dict)
         return self.get('/service', params=params_dict)
 
     def get_active_services(self, params_dict=None):
