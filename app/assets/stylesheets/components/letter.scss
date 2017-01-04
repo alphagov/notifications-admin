@@ -1,24 +1,89 @@
-$outline-width: 5px;
+// Easing function from: http://easings.net/#easeOutBack
+$transition-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+$iso-paper-ratio: 70.710678118%;
 
 .letter {
 
-  font-family: Helvetica, Arial, sans-serif;
-  box-shadow:
-  1px 1px 0 0 $panel-colour,
-  2px 2px 0 0 rgba($panel-colour, 0.5),
-  -1px 1px 0 0 $panel-colour,
-  -2px 2px 0 0 rgba($panel-colour, 0.5);
-  outline: $outline-width solid rgba($text-colour, 0.1);
   padding: 0;
-  margin: $outline-width $outline-width $gutter;
+  margin: 0 0 $gutter 0;
+  position: relative;
+
+  &:after {
+    content: "";
+    display: block;
+    z-index: 10;
+    position: absolute;
+    top: 1px;
+    left: 5px;
+    height: 0;
+    padding: $iso-paper-ratio 0 0 0;
+    width: 100%;
+    background: $highlight-colour;
+    transform-origin: left bottom;
+    transform: scale(1, 0.985);
+    box-shadow: inset 0 0 0 1px $border-colour;
+    transition: all 0.2s $transition-easing;
+  }
+
+  &:before {
+    content: "";
+    z-index: 15;
+    position: absolute;
+    bottom: -3px;
+    right: -5px;
+    width: 4px;
+    height: 7px;
+    background: $white;
+    transform: rotate(45deg);
+    box-shadow: inset 1px 0 0 0 $border-colour;
+  }
+
+  &:hover {
+
+    &:after {
+      transform: skew(-1.3deg, 0deg) scale(1, 0.96);
+      transition: all 0.1s $transition-easing;
+      background: mix($highlight-colour, $white);
+    }
+
+    &:before {
+      transform: rotate(50deg);
+    }
+
+  }
 
   a {
+
     display: block;
+    overflow: hidden;
+    width: 100%;
+    height: 0;
+    padding: $iso-paper-ratio 0 0 0;
+    position: relative;
+    z-index: 20;
+    box-shadow: 0 1px 0 0 $border-colour;
+
+    &:focus {
+
+      outline: none;
+      box-shadow: 0 3px 0 0 $yellow;
+
+      img {
+        box-shadow: inset 0 0 0 3px $yellow;
+      }
+
+    }
+
   }
 
   img {
     display: block;
-    max-width: 100%;
+    width: 100%;
+    background: $white;
+    box-shadow: inset 0 0 0 1px $border-colour;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
 }
