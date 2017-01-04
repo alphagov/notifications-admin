@@ -1,14 +1,13 @@
-from datetime import date
+import datetime
 
 from flask import url_for
-from freezegun import freeze_time
 import pytest
 from bs4 import BeautifulSoup
 
 from tests.conftest import mock_get_user
 from tests import service_json
 
-from app.main.views.platform_admin import get_statistics, format_stats_by_service, create_global_stats
+from app.main.views.platform_admin import format_stats_by_service, create_global_stats
 
 
 def test_should_redirect_if_not_logged_in(app_):
@@ -58,7 +57,7 @@ def test_should_show_research_and_restricted_mode(
             response = client.get(url_for('main.platform_admin'))
 
     assert response.status_code == 200
-    mock_get_detailed_services.assert_called_once_with({'detailed': True})
+    mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     # get first column in second row, which contains flags as text.
     table_body = page.find_all('table')[table_index].find_all('tbody')[0]
@@ -81,20 +80,17 @@ def test_should_render_platform_admin_page(
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
     assert 'Platform admin' in resp_data
-    assert 'Showing stats for today' in resp_data
     assert 'Live services' in resp_data
     assert 'Trial mode services' in resp_data
-    mock_get_detailed_services.assert_called_once_with({'detailed': True})
+    mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
 
 
-@pytest.mark.parametrize('include_from_test_key, expected_text, unexpected_text, api_args', [
-    (True, 'Including test keys', 'Excluding test keys', {'detailed': True}),
-    (False, 'Excluding test keys', 'Including test keys', {'detailed': True, 'include_from_test_key': False})
+@pytest.mark.parametrize('include_from_test_key, api_args', [
+    ("Y", {'detailed': True, 'include_from_test_key': True}),
+    ("N", {'detailed': True, 'include_from_test_key': False})
 ])
 def test_platform_admin_toggle_including_from_test_key(
     include_from_test_key,
-    expected_text,
-    unexpected_text,
     api_args,
     app_,
     platform_admin_user,
@@ -105,23 +101,33 @@ def test_platform_admin_toggle_including_from_test_key(
         with app_.test_client() as client:
             mock_get_user(mocker, user=platform_admin_user)
             client.login(platform_admin_user)
-            response = client.get(url_for('main.platform_admin', include_from_test_key=str(include_from_test_key)))
+            response = client.get(url_for('main.platform_admin', include_from_test_key=include_from_test_key))
+
+    assert response.status_code == 200
+    mock_get_detailed_services.assert_called_once_with(api_args)
+
+
+def test_platform_admin_with_date_filter(
+    app_,
+    platform_admin_user,
+    mocker,
+    mock_get_detailed_services
+):
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            mock_get_user(mocker, user=platform_admin_user)
+            client.login(platform_admin_user)
+            response = client.get(url_for('main.platform_admin', start_date='2016-12-20', end_date='2016-12-28'))
 
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
-    assert expected_text in resp_data
-    assert unexpected_text not in resp_data
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    change_link = page.find('a', text='change')
-    assert change_link['href']
-    query_param = 'include_from_test_key=False'
-    if include_from_test_key:
-        assert query_param in change_link['href']
-    else:
-        assert query_param not in change_link['href']
-
-    mock_get_detailed_services.assert_called_once_with(api_args)
+    assert 'Platform admin' in resp_data
+    assert 'Live services' in resp_data
+    assert 'Trial mode services' in resp_data
+    mock_get_detailed_services.assert_called_once_with({'include_from_test_key': False,
+                                                        'start_date': datetime.date(2016, 12, 20),
+                                                        'end_date': datetime.date(2016, 12, 28),
+                                                        'detailed': True})
 
 
 def test_create_global_stats_sets_failure_rates(fake_uuid):
@@ -235,7 +241,7 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
             response = client.get(url_for('main.platform_admin'))
 
     assert response.status_code == 200
-    mock_get_detailed_services.assert_called_once_with({'detailed': True})
+    mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     table_body = page.find_all('table')[table_index].find_all('tbody')[0]
@@ -281,7 +287,7 @@ def test_should_show_archived_services_last(
     response = client.get(url_for('main.platform_admin'))
 
     assert response.status_code == 200
-    mock_get_detailed_services.assert_called_once_with({'detailed': True})
+    mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     table_body = page.find_all('table')[table_index].find_all('tbody')[0]

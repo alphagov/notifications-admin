@@ -1,5 +1,6 @@
 import itertools
 
+from datetime import datetime
 from flask import (
     render_template,
     request
@@ -8,6 +9,7 @@ from flask_login import login_required
 
 from app import service_api_client
 from app.main import main
+from app.main.forms import DateFilterForm
 from app.utils import user_has_permissions
 from app.statistics_utils import get_formatted_percentage
 
@@ -16,15 +18,21 @@ from app.statistics_utils import get_formatted_percentage
 @login_required
 @user_has_permissions(admin_override=True)
 def platform_admin():
-    include_from_test_key = request.args.get('include_from_test_key') != 'False'
-    # specifically DO get inactive services
-    api_args = {'detailed': True}
-    if not include_from_test_key:
-        api_args['include_from_test_key'] = False
+    form = DateFilterForm(request.args)
+    api_args = {'detailed': True,  # specifically DO get inactive services
+                'include_from_test_key': form.include_from_test_key.data
+                }
+
+    if form.start_date.data:
+        api_args['start_date'] = form.start_date.data
+        api_args['end_date'] = form.end_date.data or datetime.utcnow().date()
+
     services = service_api_client.get_services(api_args)['data']
+
     return render_template(
         'views/platform-admin.html',
-        include_from_test_key=include_from_test_key,
+        include_from_test_key=form.include_from_test_key.data,
+        form=form,
         **get_statistics(sorted(
             services,
             key=lambda service: (service['active'], service['created_at']),
@@ -64,7 +72,6 @@ def create_global_stats(services):
 
     for stat in stats.values():
         stat['failure_rate'] = get_formatted_percentage(stat['failed'], stat['requested'])
-
     return stats
 
 

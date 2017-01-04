@@ -16,8 +16,8 @@ from wtforms import (
     HiddenField,
     IntegerField,
     RadioField,
-    FieldList
-)
+    FieldList,
+    DateField)
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
 
@@ -516,3 +516,9 @@ class Whitelist(Form):
         max_entries=5,
         label="Mobile numbers"
     )
+
+
+class DateFilterForm(Form):
+    start_date = DateField("Start Date", [validators.optional()])
+    end_date = DateField("End Date", [validators.optional()])
+    include_from_test_key = BooleanField("Include test keys", default="checked", false_values={"N"})
