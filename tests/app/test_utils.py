@@ -56,8 +56,7 @@ def test_generate_csv_from_notifications(
                 set_status=status
             )['notifications']
         )
-
-    for row in DictReader(StringIO(csv_content)):
+    for row in DictReader(StringIO(next(csv_content))):
         assert row['Time'] == 'Friday 01 January 2016 at 15:09'
         assert row['Status'] == expected_status
 
