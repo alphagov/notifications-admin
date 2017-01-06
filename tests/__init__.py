@@ -1,9 +1,12 @@
+import csv
 import pytest
 import uuid
-from datetime import datetime, timedelta, date, timezone
+
+from datetime import datetime, timedelta, timezone
 from flask.testing import FlaskClient
 from flask import url_for
 from flask_login import login_user
+from io import StringIO
 
 
 class TestClient(FlaskClient):
@@ -293,6 +296,24 @@ def single_notification_json(
         'sent_by': 'mmg'
     }
     return data
+
+
+def csv_notifications(notifications_json):
+    csvfile = StringIO()
+    csvwriter = csv.writer(csvfile)
+    from app import format_datetime_24h, format_notification_status
+    csvwriter.writerow(['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time'])
+    for x in notifications_json:
+        csvwriter.writerow([
+            int(x['job_row_number']) + 2 if 'job_row_number' in x and x['job_row_number'] else '',
+            x['to'],
+            x['template']['name'],
+            x['template']['template_type'],
+            x['job']['original_file_name'] if x['job'] else '',
+            format_notification_status(x['status'], x['template']['template_type']),
+            format_datetime_24h(x['created_at'])
+        ])
+    return csvfile.getvalue()
 
 
 def validate_route_permission(mocker,

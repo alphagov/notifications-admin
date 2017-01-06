@@ -6,7 +6,8 @@ import pytest
 from flask import url_for
 from bs4 import BeautifulSoup
 
-from app.utils import generate_notifications_csv
+from app import utils
+from tests import csv_notifications
 from app.main.views.jobs import get_time_left, get_status_filters
 from tests import notification_json
 from freezegun import freeze_time
@@ -368,9 +369,29 @@ def test_can_show_notifications(
             message_type='email',
             download='csv'
         ))
-        csv_content = generate_notifications_csv(
-            mock_get_notifications(service_one['id'])['notifications']
+
+        notifications_json = mock_get_notifications(service_one['id'])['notifications']
+        notifications_as_csv = csv_notifications(notifications_json)
+
+        mock_notifications_as_csv = mocker.patch('app.utils.generate_notifications_csv',
+                                                 return_value=notifications_as_csv)
+
+        csv_content = utils.generate_notifications_csv(
+            limit_days=7,
+            page=expected_page_argument,
+            service_id=service_one['id'],
+            status=expected_api_call,
+            template_type=[message_type]
         )
+
+        mock_notifications_as_csv.assert_called_with(
+            limit_days=7,
+            page=expected_page_argument,
+            service_id=service_one['id'],
+            status=expected_api_call,
+            template_type=[message_type]
+        )
+
         assert csv_response.status_code == 200
         assert csv_response.get_data(as_text=True) == csv_content
         assert 'text/csv' in csv_response.headers['Content-Type']
@@ -424,6 +445,7 @@ def test_should_show_notifications_for_a_service_with_next_previous(
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_download_notifications_for_a_job(app_,
                                                  api_user_active,
+                                                 mocker,
                                                  mock_login,
                                                  mock_get_service,
                                                  mock_get_job,
@@ -439,9 +461,22 @@ def test_should_download_notifications_for_a_job(app_,
                 service_id=fake_uuid,
                 job_id=fake_uuid,
             ))
-        csv_content = generate_notifications_csv(
-            mock_get_notifications(fake_uuid, job_id=fake_uuid)['notifications']
+
+        notifications_json = mock_get_notifications(fake_uuid, job_id=fake_uuid)['notifications']
+        notifications_as_csv = csv_notifications(notifications_json)
+
+        mock_notifications_as_csv = mocker.patch('app.utils.generate_notifications_csv',
+                                                 return_value=notifications_as_csv)
+        csv_content = utils.generate_notifications_csv(
+            service_id=fake_uuid,
+            job_id=fake_uuid
         )
+
+        mock_notifications_as_csv.assert_called_with(
+            service_id=fake_uuid,
+            job_id=fake_uuid
+        )
+
         assert response.status_code == 200
         assert response.get_data(as_text=True) == csv_content
         assert 'text/csv' in response.headers['Content-Type']
