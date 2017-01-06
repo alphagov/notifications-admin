@@ -5,7 +5,14 @@ from os import path
 from functools import wraps
 import unicodedata
 
-from flask import (abort, current_app, session, request, redirect, url_for)
+from flask import (
+    abort,
+    current_app,
+    redirect,
+    request,
+    session,
+    url_for
+)
 from flask_login import current_user
 
 from notifications_utils.template import (
@@ -108,24 +115,41 @@ def get_errors_for_csv(recipients, template_type):
     return errors
 
 
-def generate_notifications_csv(json_list):
-    from app import format_datetime_24h, format_notification_status
-    content = StringIO()
-    retval = None
-    with content as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time'])
-        for x in json_list:
-            csvwriter.writerow([
-                int(x['job_row_number']) + 2 if 'job_row_number' in x and x['job_row_number'] else '',
-                x['to'],
-                x['template']['name'],
-                x['template']['template_type'],
-                x['job']['original_file_name'] if x['job'] else '',
-                format_notification_status(x['status'], x['template']['template_type']),
-                format_datetime_24h(x['created_at'])])
-        retval = content.getvalue()
-    return retval
+def generate_notifications_csv(*args, **kwargs):
+    csvfile = StringIO()
+    csvwriter = csv.writer(csvfile)
+
+    def read_current_row():
+        csvfile.seek(0)
+        line = csvfile.read()
+        return line
+
+    def clear_file_buffer():
+        csvfile.seek(0)
+        csvfile.truncate()
+
+    # Initiate download quicker by returning the headers first
+    csvwriter.writerow(['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time'])
+    line = read_current_row()
+    clear_file_buffer()
+    yield line
+
+    from app import format_datetime_24h, format_notification_status, notification_api_client
+    json_list = notification_api_client.get_notifications_for_service(**kwargs)['notifications']
+    for x in json_list:
+        csvwriter.writerow([
+            int(x['job_row_number']) + 2 if 'job_row_number' in x and x['job_row_number'] else '',
+            x['to'],
+            x['template']['name'],
+            x['template']['template_type'],
+            x['job']['original_file_name'] if x['job'] else '',
+            format_notification_status(x['status'], x['template']['template_type']),
+            format_datetime_24h(x['created_at'])
+        ])
+
+        line = read_current_row()
+        clear_file_buffer()
+        yield line
 
 
 def get_page_from_request():

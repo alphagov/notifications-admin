@@ -12,7 +12,8 @@ from flask import (
     request,
     url_for,
     current_app,
-    redirect
+    redirect,
+    Response
 )
 from flask_login import login_required
 from werkzeug.datastructures import MultiDict
@@ -142,23 +143,19 @@ def view_job_csv(service_id, job_id):
     filter_args = _parse_filter_args(request.args)
     filter_args['status'] = _set_status_filters(filter_args)
 
-    return (
+    return Response(
         generate_notifications_csv(
-            notification_api_client.get_notifications_for_service(
-                service_id,
-                job_id,
-                status=filter_args.get('status'),
-                page_size=job['notification_count']
-            )['notifications']
+            service_id=service_id,
+            job_id=job_id,
+            status=filter_args.get('status'),
+            page_size=job['notification_count']
         ),
-        200,
-        {
-            'Content-Type': 'text/csv; charset=utf-8',
+        mimetype='text/csv',
+        headers={
             'Content-Disposition': 'inline; filename="{} - {}.csv"'.format(
                 template['name'],
                 format_datetime_short(job['created_at'])
-            )
-        }
+            )}
     )
 
 
@@ -231,18 +228,20 @@ def get_notifications(service_id, message_type, status_override=None):
         next_page = generate_next_dict('main.view_notifications', service_id, page, url_args)
 
     if request.path.endswith('csv'):
-        csv_content = generate_notifications_csv(
-            notification_api_client.get_notifications_for_service(
+        return Response(
+            generate_notifications_csv(
                 service_id=service_id,
                 page=page,
                 page_size=notifications['total'],
                 template_type=[message_type],
                 status=filter_args.get('status'),
-                limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])['notifications'])
-        return csv_content, 200, {
-            'Content-Type': 'text/csv; charset=utf-8',
-            'Content-Disposition': 'inline; filename="notifications.csv"'
-        }
+                limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS']
+            ),
+            mimetype='text/csv',
+            headers={
+                'Content-Disposition': 'inline; filename="notifications.csv"'}
+        )
+
     return {
         'counts': render_template(
             'views/activity/counts.html',
@@ -296,7 +295,7 @@ def get_status_filters(service, message_type, statistics):
             stats[key]
         )
         for key, label, option in filters
-        ]
+    ]
 
 
 def _get_job_counts(job, help_argument):
