@@ -20,7 +20,9 @@ class Config(object):
     # Hosted graphite statsd prefix
     STATSD_PREFIX = os.getenv('STATSD_PREFIX')
 
+    # Logging
     DEBUG = False
+    LOGGING_STDOUT_JSON = os.getenv('LOGGING_STDOUT_JSON') == '1'
 
     DESKPRO_DEPT_ID = 5
     DESKPRO_ASSIGNED_AGENT_TEAM_ID = 5
@@ -122,9 +124,7 @@ class Live(Config):
 
 
 class CloudFoundryConfig(Config):
-    # debug on true is a less than ideal hack to enable stdout/stderr logging
-    # TODO: replace this!
-    DEBUG = True
+    pass
 
 
 # CloudFoundry sandbox

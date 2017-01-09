@@ -77,11 +77,7 @@ def create_app():
 
     application = Flask(__name__)
 
-    if os.getenv('VCAP_APPLICATION') is not None:
-        vcap_application = json.loads(os.environ.get('VCAP_APPLICATION'))
-        notify_environment = vcap_application['space_name']
-    else:
-        notify_environment = os.environ['NOTIFY_ENVIRONMENT']
+    notify_environment = os.environ['NOTIFY_ENVIRONMENT']
 
     application.config.from_object(configs[notify_environment])
 

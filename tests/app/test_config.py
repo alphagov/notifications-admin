@@ -53,6 +53,22 @@ def test_load_config_if_cloudfoundry_not_available(monkeypatch, reload_config):
     assert config.Config.API_HOST_NAME == 'env'
 
 
-def test_cloudfoundry_config_has_different_defaults():
-    # these should always be set on Sandbox
-    assert config.Sandbox.DEBUG is True
+def test_logging_stdout_json_defaults_to_off(reload_config):
+    os.environ.pop('LOGGING_STDOUT_JSON', None)
+    assert config.Config.LOGGING_STDOUT_JSON is False
+
+
+def test_logging_stdout_json_sets_to_off_if_not_recognised(reload_config):
+    os.environ['LOGGING_STDOUT_JSON'] = 'foo'
+
+    importlib.reload(config)
+
+    assert config.Config.LOGGING_STDOUT_JSON is False
+
+
+def test_logging_stdout_json_sets_to_on_if_set_to_1(reload_config):
+    os.environ['LOGGING_STDOUT_JSON'] = '1'
+
+    importlib.reload(config)
+
+    assert config.Config.LOGGING_STDOUT_JSON is True
