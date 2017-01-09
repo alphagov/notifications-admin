@@ -130,8 +130,8 @@ prepare-docker-build-image: ## Prepare the Docker builder image
 define run_docker_container
 	@docker run -i --rm \
 		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
-		-v `pwd`:/var/project \
-		-v ${PIP_ACCEL_CACHE}:/var/project/cache/pip-accel \
+		-v "`pwd`:/var/project" \
+		-v "${PIP_ACCEL_CACHE}:/var/project/cache/pip-accel" \
 		-e GIT_COMMIT=${GIT_COMMIT} \
 		-e BUILD_NUMBER=${BUILD_NUMBER} \
 		-e BUILD_URL=${BUILD_URL} \
