@@ -10,6 +10,7 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD)
 
 DOCKER_IMAGE_TAG := $(shell cat docker/VERSION)
 DOCKER_BUILDER_IMAGE_NAME = govuk/notify-admin-builder:${DOCKER_IMAGE_TAG}
+DOCKER_TTY ?= $(if ${JENKINS_HOME},,t)
 
 BUILD_TAG ?= notifications-admin-manual
 BUILD_NUMBER ?= 0
@@ -128,10 +129,12 @@ prepare-docker-build-image: ## Prepare the Docker builder image
 	make -C docker build
 
 define run_docker_container
-	@docker run -i --rm \
+	@docker run -i${DOCKER_TTY} --rm \
 		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
 		-v "`pwd`:/var/project" \
 		-v "${PIP_ACCEL_CACHE}:/var/project/cache/pip-accel" \
+		-e UID=$(shell id -u) \
+		-e GID=$(shell id -g) \
 		-e GIT_COMMIT=${GIT_COMMIT} \
 		-e BUILD_NUMBER=${BUILD_NUMBER} \
 		-e BUILD_URL=${BUILD_URL} \
@@ -158,16 +161,16 @@ endef
 
 .PHONY: build-with-docker
 build-with-docker: prepare-docker-build-image ## Build inside a Docker container
-	$(call run_docker_container,build,make build)
+	$(call run_docker_container,build,gosu hostuser make build)
 
 .PHONY: test-with-docker
 test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
-	$(call run_docker_container,test,make test)
+	$(call run_docker_container,test,gosu hostuser make test)
 
 # FIXME: CIRCLECI=1 is an ugly hack because the coveralls-python library sends the PR link only this way
 .PHONY: coverage-with-docker
 coverage-with-docker: prepare-docker-build-image ## Generates coverage report inside a Docker container
-	$(call run_docker_container,coverage,make coverage)
+	$(call run_docker_container,coverage,gosu hostuser make coverage)
 
 .PHONY: clean-docker-containers
 clean-docker-containers: ## Clean up any remaining docker containers

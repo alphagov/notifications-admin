@@ -6,7 +6,8 @@ ARG NO_PROXY
 
 ENV PYTHONUNBUFFERED=1 \
 	DEBIAN_FRONTEND=noninteractive \
-	NODEJS_VERSION=6.3.1-1nodesource1~jessie1
+	NODEJS_VERSION=6.3.1-1nodesource1~jessie1 \
+	GOSU_VERSION=1.10
 
 RUN \
 	echo "Install base packages" \
@@ -61,4 +62,21 @@ RUN \
 	&& cf install-plugin -r CF-Community -f "blue-green-deploy" \
 	&& cf install-plugin -r CF-Community -f "antifreeze"
 
+COPY tianon.gpg /tmp/tianon.gpg
+
+RUN \
+	echo "Install gosu" \
+	&& curl -sSL -o /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
+	&& curl -sSL -o /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
+	&& export GNUPGHOME="$(mktemp -d)" \
+	&& gpg --import /tmp/tianon.gpg \
+	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
+	&& rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
+	&& chmod +x /usr/local/bin/gosu \
+	&& gosu nobody true
+
 WORKDIR /var/project
+
+COPY entrypoint.sh /usr/local/bin/docker-entrypoint
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
