@@ -20,7 +20,7 @@ def deploy(cfEnv) {
     } catch(err) {
       echo "Deployment to ${cfEnv} failed: ${err}"
       try {
-        //slackSend channel: '#govuk-notify', message: "Deployment to ${cfEnv} failed. Please retry or abort: <${env.BUILD_URL}|${env.JOB_NAME} - #${env.BUILD_NUMBER}>", color: 'danger'
+        slackSend channel: '#govuk-notify', message: "Deployment to ${cfEnv} failed. Please retry or abort: <${env.BUILD_URL}|${env.JOB_NAME} - #${env.BUILD_NUMBER}>", color: 'danger'
       } catch(err2) {
         echo "Sending Slack message failed: ${err2}"
       }
@@ -34,11 +34,11 @@ try {
   node {
     stage('Build') {
       git url: 'git@github.com:alphagov/notifications-admin.git', branch: 'cloudfoundry', credentialsId: 'github_com_and_gds'
-      //checkout scm
+      checkout scm
 
       milestone 10
       withEnv(["PIP_ACCEL_CACHE=${env.JENKINS_HOME}/cache/pip-accel"]) {
-        sh 'make build-with-docker'
+        sh 'make cf-build-with-docker'
       }
     }
 
@@ -131,11 +131,11 @@ try {
 } catch (err) {
   currentBuild.result = 'FAILURE'
   echo "Pipeline failed: ${err}"
-  //slackSend channel: '#govuk-notify', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} failed (<${env.BUILD_URL}|Open>)", color: 'danger'
+  slackSend channel: '#govuk-notify', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} failed (<${env.BUILD_URL}|Open>)", color: 'danger'
 } finally {
   node {
     try {
-      //step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'notify-support+jenkins@digital.cabinet-office.gov.uk', sendToIndividuals: false])
+      step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'notify-support+jenkins@digital.cabinet-office.gov.uk', sendToIndividuals: false])
     } catch(err) {
       echo "Sending email failed: ${err}"
     }

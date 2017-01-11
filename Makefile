@@ -85,6 +85,10 @@ build: dependencies generate-version-file ## Build project
 	npm run build
 	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel wheel --wheel-dir=wheelhouse -r requirements.txt
 
+.PHONY: cf-build
+cf-build: dependencies generate-version-file ## Build project
+	npm run build
+
 .PHONY: build-codedeploy-artifact
 build-codedeploy-artifact: ## Build the deploy artifact for CodeDeploy
 	mkdir -p target
@@ -162,6 +166,10 @@ endef
 .PHONY: build-with-docker
 build-with-docker: prepare-docker-build-image ## Build inside a Docker container
 	$(call run_docker_container,build,gosu hostuser make build)
+
+.PHONY: cf-build-with-docker
+cf-build-with-docker: prepare-docker-build-image ## Build inside a Docker container
+	$(call run_docker_container,build,gosu hostuser make cf-build)
 
 .PHONY: test-with-docker
 test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
