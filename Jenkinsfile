@@ -30,6 +30,24 @@ def deploy(cfEnv) {
   }
 }
 
+def buildJobWithRetry(jobName) {
+  waitUntil {
+    try {
+      build job: jobName
+      true
+    } catch(err) {
+      echo "${jobName} failed: ${err}"
+      try {
+        slackSend channel: '#govuk-notify', message: "${jobName} failed. Please retry or abort: <${env.BUILD_URL}|${env.JOB_NAME} - #${env.BUILD_NUMBER}>", color: 'danger'
+      } catch(err2) {
+        echo "Sending Slack message failed: ${err2}"
+      }
+      input "${jobName} failed. Retry?"
+      false
+    }
+  }
+}
+
 try {
   node {
     stage('Build') {
@@ -40,6 +58,8 @@ try {
       withEnv(["PIP_ACCEL_CACHE=${env.JENKINS_HOME}/cache/pip-accel"]) {
         sh 'make cf-build-with-docker'
       }
+
+      stash name: 'source', excludes: 'node_modules/**,venv/**,wheelhouse/**', useDefaultExcludes: false
     }
 
     stage('Test') {
@@ -54,9 +74,7 @@ try {
 
       try {
         withCredentials([string(credentialsId: 'coveralls_repo_token_api', variable: 'COVERALLS_REPO_TOKEN')]) {
-          withEnv(["GIT_BRANCH=${env.GIT_BRANCH.replaceAll('origin/', '')}"]) {
-            sh 'make coverage-with-docker'
-          }
+          sh 'make coverage-with-docker'
         }
       } catch(err) {
         echo "Coverage failed: ${err}"
@@ -66,7 +84,7 @@ try {
     stage('Preview') {
       if (deployToPreview == "true") {
         milestone 30
-        deploy('preview')
+        deploy 'preview'
       } else {
         echo 'Preview skipped.'
       }
@@ -74,13 +92,11 @@ try {
 
     stage('Preview tests') {
       if (deployToPreview == "true") {
-        build job: 'notify-functional-tests-preview'
+        buildJobWithRetry 'notify-functional-tests-preview'
       } else {
         echo 'Preview tests skipped.'
       }
     }
-
-    stash name: 'source', excludes: 'node_modules/**,venv/**,wheelhouse/**', useDefaultExcludes: false
   }
 
   stage('Staging') {
@@ -89,7 +105,7 @@ try {
       milestone 40
       node {
         unstash 'source'
-        deploy('staging')
+        deploy 'staging'
       }
     } else {
       echo 'Staging skipped.'
@@ -98,7 +114,7 @@ try {
 
   stage('Staging tests') {
     if (deployToStaging == "true") {
-      build job: 'notify-functional-tests-staging'
+      buildJobWithRetry 'notify-functional-tests-staging'
     } else {
       echo 'Staging tests skipped'
     }
@@ -110,7 +126,7 @@ try {
       milestone 50
       node {
         unstash 'source'
-        deploy('production')
+        deploy 'production'
       }
     } else {
       echo 'Production skipped.'
@@ -119,9 +135,9 @@ try {
 
   stage('Prod tests') {
     if (deployToProduction == "true") {
-      build job: 'notify-functional-admin-tests-production'
-      build job: 'notify-functional-api-email-test-production'
-      build job: 'notify-functional-api-sms-test-production'
+      buildJobWithRetry 'notify-functional-admin-tests-production'
+      buildJobWithRetry 'notify-functional-api-email-test-production'
+      buildJobWithRetry 'notify-functional-api-sms-test-production'
     } else {
       echo 'Production tests skipped.'
     }

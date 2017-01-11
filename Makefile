@@ -197,13 +197,17 @@ cf-login: ## Log in to Cloud Foundry
 	@cf login -a "${CF_API}" -u ${CF_USERNAME} -p "${CF_PASSWORD}" -o "${CF_ORG}" -s "${CF_SPACE}"
 
 .PHONY: cf-deploy
-cf-deploy: cf-login ## Deploys the app to Cloud Foundry
+cf-deploy: ## Deploys the app to Cloud Foundry
 	$(eval export ORIG_INSTANCES=$(shell cf curl /v2/apps/$(shell cf app --guid notify-admin) | jq -r ".entity.instances"))
 	@echo "Original instance count: ${ORIG_INSTANCES}"
 	cf check-manifest notify-admin -f manifest-${CF_SPACE}.yml
 	cf zero-downtime-push notify-admin -f manifest-${CF_SPACE}.yml
 	cf scale -i ${ORIG_INSTANCES} notify-admin
 
+.PHONY: cf-push
+cf-push:
+	cf push notify-admin -f manifest-${CF_SPACE}.yml
+
 .PHONY: cf-deploy-with-docker
 cf-deploy-with-docker: prepare-docker-build-image ## Deploys the app to Cloud Foundry from a new Docker container
-	$(call run_docker_container,cf-deploy,make cf-deploy)
+	$(call run_docker_container,cf-deploy,make cf-login cf-deploy)
