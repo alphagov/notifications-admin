@@ -104,7 +104,6 @@ def view_job(service_id, job_id):
 
     total_notifications = job.get('notification_count', 0)
     processed_notifications = job.get('notifications_delivered', 0) + job.get('notifications_failed', 0)
-
     return render_template(
         'views/jobs/job.html',
         finished=(total_notifications == processed_notifications),
@@ -148,7 +147,8 @@ def view_job_csv(service_id, job_id):
             service_id=service_id,
             job_id=job_id,
             status=filter_args.get('status'),
-            page_size=job['notification_count']
+            page=request.args.get('page', 1),
+            page_size=5000
         ),
         mimetype='text/csv',
         headers={
@@ -205,9 +205,22 @@ def get_notifications(service_id, message_type, status_override=None):
         abort(404, "Invalid page argument ({}) reverting to page 1.".format(request.args['page'], None))
     if message_type not in ['email', 'sms']:
         abort(404)
-
     filter_args = _parse_filter_args(request.args)
     filter_args['status'] = _set_status_filters(filter_args)
+    if request.path.endswith('csv'):
+        return Response(
+            generate_notifications_csv(
+                service_id=service_id,
+                page=page,
+                page_size=5000,
+                template_type=[message_type],
+                status=filter_args.get('status'),
+                limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS']
+            ),
+            mimetype='text/csv',
+            headers={
+                'Content-Disposition': 'inline; filename="notifications.csv"'}
+        )
 
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
@@ -221,26 +234,13 @@ def get_notifications(service_id, message_type, status_override=None):
         'status': request.args.get('status')
     }
     prev_page = None
+
     if notifications['links'].get('prev', None):
         prev_page = generate_previous_dict('main.view_notifications', service_id, page, url_args=url_args)
     next_page = None
+
     if notifications['links'].get('next', None):
         next_page = generate_next_dict('main.view_notifications', service_id, page, url_args)
-
-    if request.path.endswith('csv'):
-        return Response(
-            generate_notifications_csv(
-                service_id=service_id,
-                page=page,
-                page_size=notifications['total'],
-                template_type=[message_type],
-                status=filter_args.get('status'),
-                limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS']
-            ),
-            mimetype='text/csv',
-            headers={
-                'Content-Disposition': 'inline; filename="notifications.csv"'}
-        )
 
     return {
         'counts': render_template(

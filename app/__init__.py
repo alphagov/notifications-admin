@@ -311,7 +311,7 @@ def format_notification_status(status, template_type):
             'sending': 'Sending',
             'created': 'Sending'
         }
-    }.get(template_type).get(status, status)
+    }[template_type].get(status, status)
 
 
 def format_notification_status_as_time(status, created, updated):
