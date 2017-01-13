@@ -422,7 +422,6 @@ def test_can_show_notifications(
             template_type=[message_type]
         )
 
-
         mock_notifications_as_csv.assert_called_with(
             limit_days=7,
             page=expected_page_argument,
