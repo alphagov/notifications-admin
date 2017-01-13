@@ -5,7 +5,16 @@ from csv import DictReader
 import pytest
 from freezegun import freeze_time
 
-from app.utils import email_safe, generate_notifications_csv, generate_previous_dict, generate_next_dict, Spreadsheet
+from app.utils import (
+    email_safe,
+    generate_notifications_csv,
+    generate_previous_dict,
+    generate_next_dict,
+    Spreadsheet,
+    format_notification_for_csv
+)
+
+from tests import notification_json, single_notification_json, template_json
 
 
 @pytest.mark.parametrize('service_name, safe_email', [
@@ -22,43 +31,6 @@ from app.utils import email_safe, generate_notifications_csv, generate_previous_
 ])
 def test_email_safe_return_dot_separated_email_domain(service_name, safe_email):
     assert email_safe(service_name) == safe_email
-
-
-@pytest.mark.parametrize(
-    "status, template_type, expected_status",
-    [
-        ('sending', None, 'Sending'),
-        ('delivered', None, 'Delivered'),
-        ('failed', None, 'Failed'),
-        ('technical-failure', None, 'Technical failure'),
-        ('temporary-failure', 'email', 'Inbox not accepting messages right now'),
-        ('permanent-failure', 'email', 'Email address doesn’t exist'),
-        ('temporary-failure', 'sms', 'Phone not accepting messages right now'),
-        ('permanent-failure', 'sms', 'Phone number doesn’t exist')
-    ]
-)
-@freeze_time("2016-01-01 15:09:00.061258")
-def test_generate_csv_from_notifications(
-    app_,
-    service_one,
-    active_user_with_permissions,
-    mock_get_notifications,
-    status,
-    template_type,
-    expected_status
-):
-    with app_.test_request_context():
-        csv_content = generate_notifications_csv(
-            mock_get_notifications(
-                service_one['id'],
-                rows=1,
-                set_template_type=template_type,
-                set_status=status
-            )['notifications']
-        )
-    for row in DictReader(StringIO(next(csv_content))):
-        assert row['Time'] == 'Friday 01 January 2016 at 15:09'
-        assert row['Status'] == expected_status
 
 
 def test_generate_previous_dict(client):
@@ -84,3 +56,71 @@ def test_can_create_spreadsheet_from_large_excel_file():
     with open(str(Path.cwd() / 'tests' / 'spreadsheet_files' / 'excel 2007.xlsx'), 'rb') as xl:
         ret = Spreadsheet.from_file(xl, filename='xl.xlsx')
     assert ret.as_csv_data
+
+
+@pytest.mark.parametrize(
+    "status, template_type, expected_status",
+    [
+        ('temporary-failure', 'email', 'Inbox not accepting messages right now'),
+        ('permanent-failure', 'email', 'Email address doesn’t exist'),
+        ('temporary-failure', 'sms', 'Phone not accepting messages right now'),
+        ('permanent-failure', 'sms', 'Phone number doesn’t exist')
+    ]
+)
+def test_format_notification_for_csv_formats_status(
+    status,
+    template_type,
+    expected_status
+):
+    json_row = single_notification_json(
+        '1234',
+        template=template_json(service_id='1234', id_='5678', type_=template_type),
+        status=status
+    )
+    csv_line = format_notification_for_csv(json_row)
+
+    assert csv_line['Status'] == expected_status
+
+
+@freeze_time("2016-01-01 15:09:00.061258")
+def test_format_notification_for_csv_formats_time():
+    json_row = single_notification_json('1234')
+
+    csv_line = format_notification_for_csv(json_row)
+
+    assert csv_line['Time'] == 'Friday 01 January 2016 at 15:09'
+
+
+def test_generate_notifications_csv_returns_correct_csv_file(mock_get_notifications):
+    csv_content = generate_notifications_csv(service_id='1234')
+
+    csv_file = DictReader(StringIO('\n'.join(csv_content)))
+    assert csv_file.fieldnames == ['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
+
+
+def test_generate_notifications_csv_only_calls_once_if_no_next_link(mock_get_notifications):
+    list(generate_notifications_csv(service_id='1234'))
+
+    assert mock_get_notifications.call_count == 1
+
+
+def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
+    service_id = '1234'
+    response_with_links = notification_json(service_id, rows=5, with_links=True)
+    response_with_no_links = notification_json(service_id, rows=2, with_links=False)
+    mock_get_notifications = mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=[
+            response_with_links,
+            response_with_no_links,
+        ]
+    )
+
+    csv_content = generate_notifications_csv(service_id=service_id)
+    csv = DictReader(StringIO('\n'.join(csv_content)))
+
+    assert len(list(csv)) == 7
+    assert mock_get_notifications.call_count == 2
+    # mock_calls[0][2] is the kwargs from first call
+    assert mock_get_notifications.mock_calls[0][2]['page'] == 1
+    assert mock_get_notifications.mock_calls[1][2]['page'] == 2

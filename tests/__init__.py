@@ -6,7 +6,6 @@ from datetime import datetime, timedelta, timezone
 from flask.testing import FlaskClient
 from flask import url_for
 from flask_login import login_user
-from io import StringIO
 
 
 class TestClient(FlaskClient):
@@ -222,12 +221,14 @@ def notification_json(
     if status is None:
         status = 'delivered'
     links = {}
+
     if with_links:
         links = {
-            'prev': '/service/{}/notifications'.format(service_id),
-            'next': '/service/{}/notifications'.format(service_id),
-            'last': '/service/{}/notifications'.format(service_id)
+            'prev': '/service/{}/notifications?page=0'.format(service_id),
+            'next': '/service/{}/notifications?page=1'.format(service_id),
+            'last': '/service/{}/notifications?page=2'.format(service_id)
         }
+
     job_payload = None
     if job:
         job_payload = {'id': job['id'], 'original_file_name': job['original_file_name']}
@@ -280,6 +281,7 @@ def single_notification_json(
 
     data = {
         'sent_at': sent_at,
+        'to': '07123456789',
         'billable_units': 1,
         'status': status,
         'created_at': created_at,
@@ -296,24 +298,6 @@ def single_notification_json(
         'sent_by': 'mmg'
     }
     return data
-
-
-def csv_notifications(notifications_json):
-    csvfile = StringIO()
-    csvwriter = csv.writer(csvfile)
-    from app import format_datetime_24h, format_notification_status
-    csvwriter.writerow(['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time'])
-    for x in notifications_json:
-        csvwriter.writerow([
-            int(x['job_row_number']) + 2 if 'job_row_number' in x and x['job_row_number'] else '',
-            x['to'],
-            x['template']['name'],
-            x['template']['template_type'],
-            x['job']['original_file_name'] if x['job'] else '',
-            format_notification_status(x['status'], x['template']['template_type']),
-            format_datetime_24h(x['created_at'])
-        ])
-    return csvfile.getvalue()
 
 
 def validate_route_permission(mocker,

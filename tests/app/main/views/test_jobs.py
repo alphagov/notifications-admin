@@ -1,3 +1,4 @@
+import csv
 import json
 import uuid
 from urllib.parse import urlparse, quote, parse_qs
@@ -7,10 +8,29 @@ from flask import url_for
 from bs4 import BeautifulSoup
 
 from app import utils
-from tests import csv_notifications
+from io import StringIO
 from app.main.views.jobs import get_time_left, get_status_filters
 from tests import notification_json
 from freezegun import freeze_time
+
+
+def _csv_notifications(notifications_json):
+    csvfile = StringIO()
+    csvwriter = csv.writer(csvfile)
+    from app import format_datetime_24h, format_notification_status
+    csvwriter.writerow(['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time'])
+
+    for x in notifications_json:
+        csvwriter.writerow([
+            int(x['job_row_number']) + 2 if 'job_row_number' in x and x['job_row_number'] else '',
+            x['to'],
+            x['template']['name'],
+            x['template']['template_type'],
+            x['job']['original_file_name'] if x['job'] else '',
+            format_notification_status(x['status'], x['template']['template_type']),
+            format_datetime_24h(x['created_at'])
+        ])
+    return csvfile.getvalue()
 
 
 def test_get_jobs_should_return_list_of_all_real_jobs(
@@ -112,12 +132,31 @@ def test_should_show_page_for_one_job(
         )
         assert csv_link.text == 'Download this report'
         assert page.find('span', {'id': 'time-left'}).text == 'Data available for 7 days'
-        assert page.find('p', {'class': 'table-show-more-link'}).text.strip() == 'Only showing the first 50 rows'
         mock_get_notifications.assert_called_with(
             service_one['id'],
             fake_uuid,
             status=expected_api_call
         )
+
+
+def test_get_jobs_should_tell_user_if_more_than_one_page(
+    logged_in_client,
+    fake_uuid,
+    service_one,
+    mock_get_job,
+    mock_get_service_template,
+    mock_get_notifications_with_previous_next
+):
+    response = logged_in_client.get(url_for(
+        'main.view_job',
+        service_id=service_one['id'],
+        job_id=fake_uuid,
+        status=''
+    ))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('p', {'class': 'table-show-more-link'}).text.strip() == 'Only showing the first 50 rows'
 
 
 def test_should_show_job_in_progress(
@@ -318,6 +357,7 @@ def test_can_show_notifications(
     page_argument,
     expected_page_argument
 ):
+    # todo refactor, possibly consider deleting?
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -329,7 +369,6 @@ def test_can_show_notifications(
                 page=page_argument))
         assert response.status_code == 200
         content = response.get_data(as_text=True)
-
         notifications = notification_json(service_one['id'])
         notification = notifications['notifications'][0]
         assert notification['to'] in content
@@ -344,7 +383,6 @@ def test_can_show_notifications(
             message_type=message_type,
             status=status_argument
         ) == page.findAll("a", {"download": "download"})[0]['href']
-
         path_to_json = page.find("div", {'data-key': 'notifications'})['data-resource']
 
         url = urlparse(path_to_json)
@@ -366,12 +404,12 @@ def test_can_show_notifications(
         csv_response = client.get(url_for(
             'main.view_notifications_csv',
             service_id=service_one['id'],
-            message_type='email',
+            message_type=message_type,
             download='csv'
         ))
 
-        notifications_json = mock_get_notifications(service_one['id'])['notifications']
-        notifications_as_csv = csv_notifications(notifications_json)
+        notifications_json = mock_get_notifications(service_one['id'], template_type=[message_type])['notifications']
+        notifications_as_csv = _csv_notifications(notifications_json)
 
         mock_notifications_as_csv = mocker.patch('app.utils.generate_notifications_csv',
                                                  return_value=notifications_as_csv)
@@ -383,6 +421,7 @@ def test_can_show_notifications(
             status=expected_api_call,
             template_type=[message_type]
         )
+
 
         mock_notifications_as_csv.assert_called_with(
             limit_days=7,
@@ -440,47 +479,6 @@ def test_should_show_notifications_for_a_service_with_next_previous(
         )
         assert 'Previous page' in prev_page_link.text.strip()
         assert 'page 1' in prev_page_link.text.strip()
-
-
-@freeze_time("2016-01-01 11:09:00.061258")
-def test_should_download_notifications_for_a_job(app_,
-                                                 api_user_active,
-                                                 mocker,
-                                                 mock_login,
-                                                 mock_get_service,
-                                                 mock_get_job,
-                                                 mock_get_notifications,
-                                                 mock_get_template_version,
-                                                 mock_has_permissions,
-                                                 fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            response = client.get(url_for(
-                'main.view_job_csv',
-                service_id=fake_uuid,
-                job_id=fake_uuid,
-            ))
-
-        notifications_json = mock_get_notifications(fake_uuid, job_id=fake_uuid)['notifications']
-        notifications_as_csv = csv_notifications(notifications_json)
-
-        mock_notifications_as_csv = mocker.patch('app.utils.generate_notifications_csv',
-                                                 return_value=notifications_as_csv)
-        csv_content = utils.generate_notifications_csv(
-            service_id=fake_uuid,
-            job_id=fake_uuid
-        )
-
-        mock_notifications_as_csv.assert_called_with(
-            service_id=fake_uuid,
-            job_id=fake_uuid
-        )
-
-        assert response.status_code == 200
-        assert response.get_data(as_text=True) == csv_content
-        assert 'text/csv' in response.headers['Content-Type']
-        assert 'sample template - 1 January at 11:09am.csv"' in response.headers['Content-Disposition']
 
 
 @pytest.mark.parametrize(
