@@ -64,8 +64,8 @@ class Config(object):
         r"dclgdatamart\.co\.uk",
         r"ucds\.email",
         r"naturalengland\.org\.uk",
-        r"hmcts.net",
-        r"irmsecurity.com",  # temp addition for pen testers to be able to create account
+        r"hmcts\.net",
+        r"irmsecurity\.com",  # temp addition for pen testers to be able to create account
     ]
 
 
