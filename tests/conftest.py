@@ -1008,31 +1008,24 @@ def mock_get_notifications(mocker, api_user_active):
         status=None,
         limit_days=None,
         rows=5,
-        set_template_type=None,
-        set_status=None,
         include_jobs=None,
-        include_from_test_key=None
+        include_from_test_key=None,
     ):
         job = None
         if job_id is not None:
             job = job_json(service_id, api_user_active, job_id=job_id)
-        if set_template_type:
-            return notification_json(
-                service_id,
-                template={'template_type': set_template_type, 'name': 'name', 'id': 'id', 'version': 1},
-                rows=rows,
-                status=set_status,
-                job=job,
-                with_links=True
-            )
+
+        if template_type:
+            template = template_json(service_id, id_=str(generate_uuid()), type_=template_type[0])
         else:
-            return notification_json(
-                service_id,
-                rows=rows,
-                status=set_status,
-                job=job,
-                with_links=True
-            )
+            template = template_json(service_id, id_=str(generate_uuid()))
+
+        return notification_json(
+            service_id,
+            template=template,
+            rows=rows,
+            job=job
+        )
 
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',

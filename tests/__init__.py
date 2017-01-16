@@ -1,6 +1,8 @@
+import csv
 import pytest
 import uuid
-from datetime import datetime, timedelta, date, timezone
+
+from datetime import datetime, timedelta, timezone
 from flask.testing import FlaskClient
 from flask import url_for
 from flask_login import login_user
@@ -219,12 +221,14 @@ def notification_json(
     if status is None:
         status = 'delivered'
     links = {}
+
     if with_links:
         links = {
-            'prev': '/service/{}/notifications'.format(service_id),
-            'next': '/service/{}/notifications'.format(service_id),
-            'last': '/service/{}/notifications'.format(service_id)
+            'prev': '/service/{}/notifications?page=0'.format(service_id),
+            'next': '/service/{}/notifications?page=1'.format(service_id),
+            'last': '/service/{}/notifications?page=2'.format(service_id)
         }
+
     job_payload = None
     if job:
         job_payload = {'id': job['id'], 'original_file_name': job['original_file_name']}
@@ -277,6 +281,7 @@ def single_notification_json(
 
     data = {
         'sent_at': sent_at,
+        'to': '07123456789',
         'billable_units': 1,
         'status': status,
         'created_at': created_at,
