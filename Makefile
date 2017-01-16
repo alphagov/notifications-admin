@@ -95,8 +95,8 @@ check-aws-vars: ## Check if AWS access keys are set
 	$(if ${AWS_ACCESS_KEY_ID},,$(error Must specify AWS_ACCESS_KEY_ID))
 	$(if ${AWS_SECRET_ACCESS_KEY},,$(error Must specify AWS_SECRET_ACCESS_KEY))
 
-.PHONY: deploy-suspend-autoscaling-procecces
-deploy-suspend-autoscaling-procecces: check-aws-vars ## Suspend launch and terminate processes for the auto-scaling group
+.PHONY: deploy-suspend-autoscaling-processes
+deploy-suspend-autoscaling-processes: check-aws-vars ## Suspend launch and terminate processes for the auto-scaling group
 	aws autoscaling suspend-processes --region eu-west-1 --auto-scaling-group-name ${CODEDEPLOY_APP_NAME} --scaling-processes "Launch" "Terminate"
 
 .PHONY: deploy-resume-autoscaling-processes
