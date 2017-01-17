@@ -8,7 +8,9 @@ APP_VERSION_FILE = app/version.py
 GIT_BRANCH ?= $(shell git symbolic-ref --short HEAD 2> /dev/null || echo "detached")
 GIT_COMMIT ?= $(shell git rev-parse HEAD)
 
-DOCKER_BUILDER_IMAGE_NAME = govuk/notify-admin-builder
+DOCKER_IMAGE_TAG := $(shell cat docker/VERSION)
+DOCKER_BUILDER_IMAGE_NAME = govuk/notify-admin-builder:${DOCKER_IMAGE_TAG}
+DOCKER_TTY ?= $(if ${JENKINS_HOME},,t)
 
 BUILD_TAG ?= notifications-admin-manual
 BUILD_NUMBER ?= 0
@@ -20,6 +22,10 @@ DOCKER_CONTAINER_PREFIX = ${USER}-${BUILD_TAG}
 CODEDEPLOY_PREFIX ?= notifications-admin
 CODEDEPLOY_APP_NAME ?= notify-admin
 
+CF_API ?= api.cloud.service.gov.uk
+CF_ORG ?= govuk-notify
+CF_SPACE ?= ${DEPLOY_ENV}
+
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -28,8 +34,8 @@ help:
 venv: venv/bin/activate ## Create virtualenv if it does not exist
 
 venv/bin/activate:
-	test -d venv || virtualenv venv
-	./venv/bin/pip install pip-accel
+	test -d venv || virtualenv venv -p python3
+	. venv/bin/activate && pip install pip-accel
 
 .PHONY: check-env-vars
 check-env-vars: ## Check mandatory environment variables
@@ -37,6 +43,12 @@ check-env-vars: ## Check mandatory environment variables
 	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
 	$(if ${AWS_ACCESS_KEY_ID},,$(error Must specify AWS_ACCESS_KEY_ID))
 	$(if ${AWS_SECRET_ACCESS_KEY},,$(error Must specify AWS_SECRET_ACCESS_KEY))
+
+.PHONY: sandbox
+sandbox: ## Set environment to sandbox
+	$(eval export DEPLOY_ENV=sandbox)
+	$(eval export DNS_NAME="cloudapps.digital")
+	@true
 
 .PHONY: preview
 preview: ## Set environment to preview
@@ -62,7 +74,7 @@ dependencies: venv ## Install build dependencies
 	npm install
 	npm rebuild node-sass
 	mkdir -p ${PIP_ACCEL_CACHE}
-	PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} ./venv/bin/pip-accel install -r requirements_for_test.txt
+	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel install -r requirements_for_test.txt
 
 .PHONY: generate-version-file
 generate-version-file: ## Generates the app version file
@@ -70,7 +82,11 @@ generate-version-file: ## Generates the app version file
 
 .PHONY: build
 build: dependencies generate-version-file ## Build project
-	./venv/bin/pip-accel wheel --wheel-dir=wheelhouse -r requirements.txt
+	npm run build
+	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel wheel --wheel-dir=wheelhouse -r requirements.txt
+
+.PHONY: cf-build
+cf-build: dependencies generate-version-file ## Build project
 	npm run build
 
 .PHONY: build-codedeploy-artifact
@@ -109,19 +125,20 @@ deploy-check-autoscaling-processes: check-aws-vars ## Returns with the number of
 
 .PHONY: coverage
 coverage: venv ## Create coverage report
-	./venv/bin/coveralls
+	. venv/bin/activate && coveralls
 
 .PHONY: prepare-docker-build-image
 prepare-docker-build-image: ## Prepare the Docker builder image
 	mkdir -p ${PIP_ACCEL_CACHE}
-	make -C docker build-build-image
+	make -C docker build
 
-.PHONY: build-with-docker
-build-with-docker: prepare-docker-build-image ## Build inside a Docker container
-	@docker run -i --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-build" \
-		-v `pwd`:/var/project \
-		-v ${PIP_ACCEL_CACHE}:/var/project/cache/pip-accel \
+define run_docker_container
+	@docker run -i${DOCKER_TTY} --rm \
+		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
+		-v "`pwd`:/var/project" \
+		-v "${PIP_ACCEL_CACHE}:/var/project/cache/pip-accel" \
+		-e UID=$(shell id -u) \
+		-e GID=$(shell id -g) \
 		-e GIT_COMMIT=${GIT_COMMIT} \
 		-e BUILD_NUMBER=${BUILD_NUMBER} \
 		-e BUILD_URL=${BUILD_URL} \
@@ -130,31 +147,6 @@ build-with-docker: prepare-docker-build-image ## Build inside a Docker container
 		-e https_proxy="${HTTPS_PROXY}" \
 		-e HTTPS_PROXY="${HTTPS_PROXY}" \
 		-e NO_PROXY="${NO_PROXY}" \
-		${DOCKER_BUILDER_IMAGE_NAME} \
-		make build
-
-.PHONY: test-with-docker
-test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
-	@docker run -i --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-test" \
-		-v `pwd`:/var/project \
-		-e GIT_COMMIT=${GIT_COMMIT} \
-		-e BUILD_NUMBER=${BUILD_NUMBER} \
-		-e BUILD_URL=${BUILD_URL} \
-		-e http_proxy="${HTTP_PROXY}" \
-		-e HTTP_PROXY="${HTTP_PROXY}" \
-		-e https_proxy="${HTTPS_PROXY}" \
-		-e HTTPS_PROXY="${HTTPS_PROXY}" \
-		-e NO_PROXY="${NO_PROXY}" \
-		${DOCKER_BUILDER_IMAGE_NAME} \
-		make test
-
-# FIXME: CIRCLECI=1 is an ugly hack because the coveralls-python library sends the PR link only this way
-.PHONY: coverage-with-docker
-coverage-with-docker: prepare-docker-build-image ## Generates coverage report inside a Docker container
-	@docker run -i --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-coverage" \
-		-v `pwd`:/var/project \
 		-e COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} \
 		-e CIRCLECI=1 \
 		-e CI_NAME=${CI_NAME} \
@@ -162,17 +154,60 @@ coverage-with-docker: prepare-docker-build-image ## Generates coverage report in
 		-e CI_BUILD_URL=${BUILD_URL} \
 		-e CI_BRANCH=${GIT_BRANCH} \
 		-e CI_PULL_REQUEST=${CI_PULL_REQUEST} \
-		-e http_proxy="${HTTP_PROXY}" \
-		-e HTTP_PROXY="${HTTP_PROXY}" \
-		-e https_proxy="${HTTPS_PROXY}" \
-		-e HTTPS_PROXY="${HTTPS_PROXY}" \
-		-e NO_PROXY="${NO_PROXY}" \
+		-e CF_API="${CF_API}" \
+		-e CF_USERNAME="${CF_USERNAME}" \
+		-e CF_PASSWORD="${CF_PASSWORD}" \
+		-e CF_ORG="${CF_ORG}" \
+		-e CF_SPACE="${CF_SPACE}" \
 		${DOCKER_BUILDER_IMAGE_NAME} \
-		make coverage
+		${2}
+endef
+
+.PHONY: build-with-docker
+build-with-docker: prepare-docker-build-image ## Build inside a Docker container
+	$(call run_docker_container,build,gosu hostuser make build)
+
+.PHONY: cf-build-with-docker
+cf-build-with-docker: prepare-docker-build-image ## Build inside a Docker container
+	$(call run_docker_container,build,gosu hostuser make cf-build)
+
+.PHONY: test-with-docker
+test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
+	$(call run_docker_container,test,gosu hostuser make test)
+
+# FIXME: CIRCLECI=1 is an ugly hack because the coveralls-python library sends the PR link only this way
+.PHONY: coverage-with-docker
+coverage-with-docker: prepare-docker-build-image ## Generates coverage report inside a Docker container
+	$(call run_docker_container,coverage,gosu hostuser make coverage)
 
 .PHONY: clean-docker-containers
 clean-docker-containers: ## Clean up any remaining docker containers
 	docker rm -f $(shell docker ps -q -f "name=${DOCKER_CONTAINER_PREFIX}") 2> /dev/null || true
 
+.PHONY: clean
 clean:
-	rm -rf node_modules cache target venv .coverage
+	rm -rf node_modules cache target venv .coverage wheelhouse
+
+.PHONY: cf-login
+cf-login: ## Log in to Cloud Foundry
+	$(if ${CF_USERNAME},,$(error Must specify CF_USERNAME))
+	$(if ${CF_PASSWORD},,$(error Must specify CF_PASSWORD))
+	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
+	@echo "Logging in to Cloud Foundry on ${CF_API}"
+	@cf login -a "${CF_API}" -u ${CF_USERNAME} -p "${CF_PASSWORD}" -o "${CF_ORG}" -s "${CF_SPACE}"
+
+.PHONY: cf-deploy
+cf-deploy: ## Deploys the app to Cloud Foundry
+	$(eval export ORIG_INSTANCES=$(shell cf curl /v2/apps/$(shell cf app --guid notify-admin) | jq -r ".entity.instances"))
+	@echo "Original instance count: ${ORIG_INSTANCES}"
+	cf check-manifest notify-admin -f manifest-${CF_SPACE}.yml
+	cf zero-downtime-push notify-admin -f manifest-${CF_SPACE}.yml
+	cf scale -i ${ORIG_INSTANCES} notify-admin
+
+.PHONY: cf-push
+cf-push:
+	cf push notify-admin -f manifest-${CF_SPACE}.yml
+
+.PHONY: cf-deploy-with-docker
+cf-deploy-with-docker: prepare-docker-build-image ## Deploys the app to Cloud Foundry from a new Docker container
+	$(call run_docker_container,cf-deploy,make cf-login cf-deploy)

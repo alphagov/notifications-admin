@@ -1,8 +1,16 @@
+import os
 from datetime import date, datetime, timedelta
 from unittest.mock import Mock
+
 import pytest
+from notifications_python_client.errors import HTTPError
 
 from app import create_app
+from app.notify_client.models import (
+    User,
+    InvitedUser
+)
+
 
 from . import (
     service_json,
@@ -14,13 +22,9 @@ from . import (
     notification_json,
     invite_json,
     sample_uuid,
-    generate_uuid, single_notification_json)
-from app.notify_client.models import (
-    User,
-    InvitedUser
+    generate_uuid,
+    single_notification_json
 )
-
-from notifications_python_client.errors import HTTPError
 
 
 @pytest.fixture(scope='session')
@@ -1340,3 +1344,15 @@ def logged_in_client(
 ):
     client.login(active_user_with_permissions)
     yield client
+
+
+@pytest.fixture
+def os_environ():
+    """
+    clear os.environ, and restore it after the test runs
+    """
+    # for use whenever you expect code to edit environment variables
+    old_env = os.environ.copy()
+    os.environ = {}
+    yield
+    os.environ = old_env
