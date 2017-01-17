@@ -11,10 +11,6 @@ Providers – GOV.UK Notify
     <div class="column-two-thirds">
         <h1 class="heading-large">Providers</h1>
 
-        <p>
-            Providers on Notify
-        </p>
-
         <h2 class="heading-medium">SMS</h2>
 
         {% call(item, row_number) list_table(
@@ -22,7 +18,7 @@ Providers – GOV.UK Notify
     caption="SMS providers",
     caption_visible=False,
     empty_message='No email providers',
-    field_headings=['Provider', 'Priority', 'Active', ''],
+    field_headings=['Provider', 'Priority', 'Active', 'Last Updated', ''],
     field_headings_visible=True
   ) %}
 
@@ -32,7 +28,14 @@ Providers – GOV.UK Notify
 
     {{ text_field(item.active) }}
 
+    {% if item.updated_at %}
+        {{ text_field(item.updated_at|format_datetime_short) }}
+    {% else %}
+        {{ text_field('None') }}
+    {% endif %}
+
     {{ link_field('change', url_for('main.view_provider', provider_id=item.id)) }}
+
 
   {% endcall %}
 

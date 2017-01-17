@@ -1,7 +1,10 @@
-from bs4 import BeautifulSoup
-from flask import url_for
 import copy
 import re
+from datetime import datetime
+
+from bs4 import BeautifulSoup
+from flask import url_for
+
 import app
 
 stub_providers = {
@@ -12,7 +15,8 @@ stub_providers = {
             'priority': 1,
             'display_name': 'first_sms_provider',
             'identifier': 'first_sms',
-            'notification_type': 'sms'
+            'notification_type': 'sms',
+            'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat()
         },
         {
             'active': True,
@@ -20,7 +24,8 @@ stub_providers = {
             'display_name': 'second_sms_provider',
             'identifier': 'second_sms',
             'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
-            'notification_type': 'sms'
+            'notification_type': 'sms',
+            'updated_at': None
         },
         {
             'id': '6005e192-4738-4962-beec-ebd982d0b03a',
@@ -36,7 +41,7 @@ stub_providers = {
             'display_name': 'second_email_provider',
             'identifier': 'second_email',
             'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b',
-            'notification_type': 'email'
+            'notification_type': 'email',
         }
     ]
 }
@@ -92,7 +97,8 @@ def test_should_show_all_providers(
             assert table_data[0].text.strip() == "first_sms_provider"
             assert table_data[1].text.strip() == "1"
             assert table_data[2].text.strip() == "True"
-            assert table_data[3].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f'
+            assert table_data[3].text.strip() == "16 January at 3:20pm"
+            assert table_data[4].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f'
 
             sms_second_row = sms_table.tbody.find_all('tr')[1]
             table_data = sms_second_row.find_all('td')
@@ -100,7 +106,8 @@ def test_should_show_all_providers(
             assert table_data[0].text.strip() == "second_sms_provider"
             assert table_data[1].text.strip() == "2"
             assert table_data[2].text.strip() == "True"
-            assert table_data[3].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f'
+            assert table_data[3].text.strip() == "None"
+            assert table_data[4].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f'
 
             email_first_row = email_table.tbody.find_all('tr')[0]
             email_table_data = email_first_row.find_all('td')
