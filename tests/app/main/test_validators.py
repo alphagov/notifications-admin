@@ -82,6 +82,7 @@ def _gen_mock_field(x):
     'test@ucds.email',
     'test@naturalengland.org.uk',
     'test@hmcts.net',
+    'test@irmsecurity.com'  # remove once pen test complete
 ])
 def test_valid_list_of_white_list_email_domains(app_, email):
     with app_.test_request_context():
