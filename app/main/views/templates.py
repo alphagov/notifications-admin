@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from string import ascii_uppercase
 
 from flask import request, render_template, redirect, url_for, flash, abort, send_file
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_weasyprint import HTML, render_pdf
 from dateutil.parser import parse
 
@@ -143,6 +143,7 @@ def view_template_version_as_png(service_id, template_id, version):
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
 def add_service_template(service_id, template_type):
+
     if template_type not in ['sms', 'email', 'letter']:
         abort(404)
     if not current_service['can_send_letters'] and template_type == 'letter':
@@ -150,13 +151,16 @@ def add_service_template(service_id, template_type):
 
     form = form_objects[template_type]()
     if form.validate_on_submit():
+        if form.process_type.data == 'priority':
+            abort_403_if_not_admin_user()
         try:
             service_api_client.create_service_template(
                 form.name.data,
                 template_type,
                 form.template_content.data,
                 service_id,
-                form.subject.data if hasattr(form, 'subject') else None
+                form.subject.data if hasattr(form, 'subject') else None,
+                form.process_type.data
             )
         except HTTPError as e:
             if e.status_code == 400:
@@ -179,6 +183,11 @@ def add_service_template(service_id, template_type):
     )
 
 
+def abort_403_if_not_admin_user():
+    if not current_user.has_permissions([], admin_override=True):
+        abort(403)
+
+
 @main.route("/services/<service_id>/templates/<template_id>/edit", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
@@ -188,13 +197,17 @@ def edit_service_template(service_id, template_id):
     form = form_objects[template['template_type']](**template)
 
     if form.validate_on_submit():
+        if form.process_type.data != template['process_type']:
+            abort_403_if_not_admin_user()
+
         subject = form.subject.data if hasattr(form, 'subject') else None
         new_template = get_template({
             'name': form.name.data,
             'content': form.template_content.data,
             'subject': subject,
             'template_type': template['template_type'],
-            'id': template['id']
+            'id': template['id'],
+            'process_type': form.process_type.data
         }, current_service)
         template_change = get_template(template, current_service).compare_to(new_template)
         if template_change.has_different_placeholders and not request.form.get('confirm'):
@@ -221,7 +234,8 @@ def edit_service_template(service_id, template_id):
                 template['template_type'],
                 form.template_content.data,
                 service_id,
-                subject
+                subject,
+                form.process_type.data
             )
         except HTTPError as e:
             if e.status_code == 400:

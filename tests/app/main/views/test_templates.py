@@ -1,4 +1,3 @@
-from functools import partial
 from itertools import repeat
 from datetime import datetime
 from unittest.mock import Mock, patch
@@ -8,30 +7,26 @@ from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
-
+from tests.conftest import service_one as create_sample_service
 from tests import validate_route_permission, template_json, single_notification_json
-from tests.conftest import (
-    mock_get_service_email_template,
-    mock_get_template_version,
-)
+
 from app.main.views.templates import get_last_use_message, get_human_readable_delta
 
 
 def test_should_show_page_for_one_template(
         app_,
-        api_user_active,
-        mock_login,
-        mock_get_service,
+        active_user_with_permissions,
+        mocker,
         mock_get_service_template,
-        mock_get_user,
-        mock_get_user_by_email,
-        mock_has_permissions,
         fake_uuid
 ):
+
+    service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
+            client.login(active_user_with_permissions, mocker, service)
+            mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
+            service_id = service['id']
             template_id = fake_uuid
             response = client.get(url_for(
                 '.edit_service_template',
@@ -41,6 +36,35 @@ def test_should_show_page_for_one_template(
     assert response.status_code == 200
     assert "Two week reminder" in response.get_data(as_text=True)
     assert "Your vehicle tax is about to expire" in response.get_data(as_text=True)
+    assert "Select priority or normal" not in response.get_data(as_text=True)
+    mock_get_service_template.assert_called_with(
+        service_id, template_id)
+
+
+def test_should_show_page_template_with_priority_select_if_platform_admin(
+        app_,
+        platform_admin_user,
+        mocker,
+        mock_get_service_template,
+        fake_uuid
+):
+
+    service = create_sample_service(platform_admin_user)
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(platform_admin_user, mocker, service)
+            mocker.patch('app.user_api_client.get_users_for_service', return_value=[platform_admin_user])
+            service_id = service['id']
+            template_id = fake_uuid
+            response = client.get(url_for(
+                '.edit_service_template',
+                service_id=service_id,
+                template_id=template_id))
+
+    assert response.status_code == 200
+    assert "Two week reminder" in response.get_data(as_text=True)
+    assert "Your vehicle tax is about to expire" in response.get_data(as_text=True)
+    assert "Select priority or normal" in response.get_data(as_text=True)
     mock_get_service_template.assert_called_with(
         service_id, template_id)
 
@@ -92,19 +116,16 @@ def test_should_show_preview_letter_templates(
 
 
 def test_should_redirect_when_saving_a_template(app_,
-                                                api_user_active,
-                                                mock_login,
+                                                active_user_with_permissions,
+                                                mocker,
                                                 mock_get_service_template,
                                                 mock_update_service_template,
-                                                mock_get_user,
-                                                mock_get_service,
-                                                mock_get_user_by_email,
-                                                mock_has_permissions,
                                                 fake_uuid):
+    service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
         with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
+            client.login(active_user_with_permissions, mocker, service)
+            mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
             template_id = fake_uuid
             name = "new name"
             content = "template content"
@@ -113,18 +134,109 @@ def test_should_redirect_when_saving_a_template(app_,
                 'name': name,
                 'template_content': content,
                 'template_type': 'sms',
-                'service': service_id
+                'service': service['id'],
+                'process_type': 'normal'
             }
             response = client.post(url_for(
                 '.edit_service_template',
-                service_id=service_id,
+                service_id=service['id'],
                 template_id=template_id), data=data)
 
             assert response.status_code == 302
             assert response.location == url_for(
-                '.view_template', service_id=service_id, template_id=template_id, _external=True)
+                '.view_template', service_id=service['id'], template_id=template_id, _external=True)
             mock_update_service_template.assert_called_with(
-                template_id, name, 'sms', content, service_id, None)
+                template_id, name, 'sms', content, service['id'], None, 'normal')
+
+
+def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
+        app_,
+        active_user_with_permissions,
+        mocker,
+        mock_get_service_template_with_priority,
+        mock_update_service_template,
+        fake_uuid):
+    service = create_sample_service(active_user_with_permissions)
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user_with_permissions, mocker, service)
+            mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
+            template_id = fake_uuid
+            data = {
+                'id': template_id,
+                'name': "new name",
+                'template_content': "change the content",
+                'template_type': 'sms',
+                'service': service['id'],
+                'process_type': 'priority'
+            }
+            response = client.post(url_for(
+                '.edit_service_template',
+                service_id=service['id'],
+                template_id=template_id), data=data)
+            assert response.status_code == 302
+            assert response.location == url_for(
+                '.view_template', service_id=service['id'], template_id=template_id, _external=True)
+            mock_update_service_template.assert_called_with(
+                template_id, "new name", 'sms', "change the content", service['id'], None, 'priority')
+
+
+def test_should_403_when_edit_template_with_process_type_of_priority_for_non_platform_admin(
+        app_,
+        active_user_with_permissions,
+        mocker,
+        mock_get_service_template,
+        mock_update_service_template,
+        fake_uuid):
+    service = create_sample_service(active_user_with_permissions)
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user_with_permissions, mocker, service)
+            mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
+            template_id = fake_uuid
+            data = {
+                'id': template_id,
+                'name': "new name",
+                'template_content': "template content",
+                'template_type': 'sms',
+                'service': service['id'],
+                'process_type': 'priority'
+            }
+            response = client.post(url_for(
+                '.edit_service_template',
+                service_id=service['id'],
+                template_id=template_id), data=data)
+            assert response.status_code == 403
+            mock_update_service_template.called == 0
+
+
+def test_should_403_when_create_template_with_process_type_of_priority_for_non_platform_admin(
+        app_,
+        active_user_with_permissions,
+        mocker,
+        mock_get_service_template,
+        mock_update_service_template,
+        fake_uuid):
+    service = create_sample_service(active_user_with_permissions)
+    with app_.test_request_context():
+        with app_.test_client() as client:
+            client.login(active_user_with_permissions, mocker, service)
+            mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
+            template_id = fake_uuid
+            data = {
+                'id': template_id,
+                'name': "new name",
+                'template_content': "template content",
+                'template_type': 'sms',
+                'service': service['id'],
+                'process_type': 'priority'
+            }
+            response = client.post(url_for(
+                '.add_service_template',
+                service_id=service['id'],
+                template_type='sms'), data=data)
+            assert response.status_code == 403
+            mock_update_service_template.called == 0
 
 
 def test_should_show_interstitial_when_making_breaking_change(
@@ -152,7 +264,8 @@ def test_should_show_interstitial_when_making_breaking_change(
                     'template_content': "hello",
                     'template_type': 'email',
                     'subject': 'reminder',
-                    'service': service_id
+                    'service': service_id,
+                    'process_type': 'normal'
                 }
             )
 
@@ -188,7 +301,8 @@ def test_should_not_create_too_big_template(app_,
                 'name': "new name",
                 'template_content': "template content",
                 'template_type': template_type,
-                'service': service_id
+                'service': service_id,
+                'process_type': 'normal'
             }
             resp = client.post(url_for(
                 '.add_service_template',
@@ -214,14 +328,14 @@ def test_should_not_update_too_big_template(app_,
         with app_.test_client() as client:
             client.login(api_user_active)
             service_id = fake_uuid
-            template_type = 'sms'
             template_id = fake_uuid
             data = {
                 'id': fake_uuid,
                 'name': "new name",
                 'template_content': "template content",
                 'service': service_id,
-                'template_type': 'sms'
+                'template_type': 'sms',
+                'process_type': 'normal'
             }
             resp = client.post(url_for(
                 '.edit_service_template',
@@ -256,7 +370,8 @@ def test_should_redirect_when_saving_a_template_email(app_,
                 'template_content': content,
                 'template_type': 'email',
                 'service': service_id,
-                'subject': subject
+                'subject': subject,
+                'process_type': 'normal'
             }
             response = client.post(url_for(
                 '.edit_service_template',
@@ -269,7 +384,7 @@ def test_should_redirect_when_saving_a_template_email(app_,
                 template_id=template_id,
                 _external=True)
             mock_update_service_template.assert_called_with(
-                template_id, name, 'email', content, service_id, subject)
+                template_id, name, 'email', content, service_id, subject, 'normal')
 
 
 def test_should_show_delete_template_page_with_time_block(app_,
