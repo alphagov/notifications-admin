@@ -38,6 +38,7 @@ RUN \
 		libmagickwand-dev \
 		ghostscript \
 		jq \
+		libjpeg62 \
 
 	&& echo "Install nodejs" \
 	&& cd /tmp \
