@@ -116,7 +116,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         data = _attach_current_user({})
         return self.delete(endpoint, data)
 
-    def create_service_template(self, name, type_, content, service_id, subject=None):
+    def create_service_template(self, name, type_, content, service_id, subject=None, process_type='normal'):
         """
         Create a service template.
         """
@@ -124,7 +124,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "name": name,
             "template_type": type_,
             "content": content,
-            "service": service_id
+            "service": service_id,
+            "process_type": process_type
         }
         if subject:
             data.update({
@@ -132,9 +133,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             })
         data = _attach_current_user(data)
         endpoint = "/service/{0}/template".format(service_id)
+        print('got here in create_service_template')
         return self.post(endpoint, data)
 
-    def update_service_template(self, id_, name, type_, content, service_id, subject=None):
+    def update_service_template(self, id_, name, type_, content, service_id, subject=None, process_type=None):
         """
         Update a service template.
         """
@@ -148,6 +150,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         if subject:
             data.update({
                 'subject': subject
+            })
+        if process_type:
+            data.update({
+                'process_type': process_type
             })
         data = _attach_current_user(data)
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)

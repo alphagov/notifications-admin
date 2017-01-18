@@ -20,6 +20,9 @@
         </div>
         <div class="column-three-quarters">
           {{ textbox(form.template_content, highlight_tags=True, width='1-1', rows=8) }}
+          {% if current_user.has_permissions([], admin_override=True) %}
+            {{ textbox(form.process_type, width='1-1') }}
+          {% endif %}
           {{ page_footer(
             'Save',
             delete_link=url_for('.delete_service_template', service_id=current_service.id, template_id=template_id) if template_id or None,

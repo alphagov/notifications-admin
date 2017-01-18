@@ -1,4 +1,5 @@
 import pytz
+from flask_login import current_user
 from flask_wtf import Form
 from datetime import datetime, timedelta
 from notifications_utils.recipients import (
@@ -17,7 +18,8 @@ from wtforms import (
     IntegerField,
     RadioField,
     FieldList,
-    DateField)
+    DateField,
+    SelectField)
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
 
@@ -268,6 +270,9 @@ class SMSTemplateForm(Form):
             NoCommasInPlaceHolders()
         ]
     )
+    process_type = SelectField(u'Use priority queue?', choices=[('normal', 'no'),
+                                                                ('priority', 'yes')],
+                               default='normal')
 
 
 class EmailTemplateForm(SMSTemplateForm):
