@@ -270,8 +270,8 @@ class SMSTemplateForm(Form):
             NoCommasInPlaceHolders()
         ]
     )
-    process_type = SelectField(u'Select priority or normal', choices=[('normal', 'normal'),
-                                                                      ('priority', 'priority')],
+    process_type = SelectField(u'Use priority queue?', choices=[('normal', 'no'),
+                                                                ('priority', 'yes')],
                                default='normal')
 
 

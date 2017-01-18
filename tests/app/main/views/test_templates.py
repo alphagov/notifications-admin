@@ -36,7 +36,7 @@ def test_should_show_page_for_one_template(
     assert response.status_code == 200
     assert "Two week reminder" in response.get_data(as_text=True)
     assert "Your vehicle tax is about to expire" in response.get_data(as_text=True)
-    assert "Select priority or normal" not in response.get_data(as_text=True)
+    assert "Use priority queue?" not in response.get_data(as_text=True)
     mock_get_service_template.assert_called_with(
         service_id, template_id)
 
@@ -64,7 +64,7 @@ def test_should_show_page_template_with_priority_select_if_platform_admin(
     assert response.status_code == 200
     assert "Two week reminder" in response.get_data(as_text=True)
     assert "Your vehicle tax is about to expire" in response.get_data(as_text=True)
-    assert "Select priority or normal" in response.get_data(as_text=True)
+    assert "Use priority queue?" in response.get_data(as_text=True)
     mock_get_service_template.assert_called_with(
         service_id, template_id)
 
