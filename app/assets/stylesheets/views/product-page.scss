@@ -3,7 +3,7 @@
   &-intro {
 
     margin: -10px 0 $gutter * 1.5 0;
-    padding: $gutter * 2 0 $gutter * 2 0;
+    padding: 0 0 $gutter * 2 0;
     background: $govuk-blue;
     color: $white;
 
@@ -16,7 +16,7 @@
         background-image: file-url('product/proposition-illustration.png');
         background-size: 320px;
         background-repeat: no-repeat;
-        background-position: right -14px top -10px;
+        background-position: right -14px top 85px;
 
         @include ie-lte(8) {
           background-image: none;
@@ -28,7 +28,7 @@
 
     h1 {
       @include bold-48;
-      margin: 0 0 $gutter 0;
+      margin: 20px 0 $gutter 0;
     }
 
     p {
