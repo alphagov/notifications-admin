@@ -479,7 +479,7 @@ def test_should_show_preview_letter_message(
     mock_get_service_letter_template.assert_called_with(service_id, template_id)
     assert mock_letter_preview.call_args[0][0]['message'] == (
         '<h2>Subject</h2>\n'
-        '<p>Your vehicle tax is about to expire</p>'
+        '<p>Template &lt;em&gt;content&lt;/em&gt; with &amp; entity</p>'
     )
 
 

@@ -232,7 +232,7 @@ def mock_get_services_with_one_service(mocker, fake_uuid, user=None):
 def mock_get_service_template(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
-            service_id, template_id, "Two week reminder", "sms", "Your vehicle tax is about to expire")
+            service_id, template_id, "Two week reminder", "sms", "Template <em>content</em> with & entity")
         if version:
             template.update({'version': version})
         return {'data': template}
@@ -248,7 +248,7 @@ def mock_get_service_template_with_priority(mocker):
     def _get(service_id, template_id, version=None):
 
         template = template_json(
-            service_id, template_id, "Two week reminder", "sms", "Your vehicle tax is about to expire",
+            service_id, template_id, "Two week reminder", "sms", "Template <em>content</em> with & entity",
             process_type='priority')
         if version:
             template.update({'version': version})
@@ -268,7 +268,7 @@ def mock_get_deleted_template(mocker):
             template_id,
             "Two week reminder",
             "sms",
-            "Your vehicle tax is about to expire",
+            "Template <em>content</em> with & entity",
             archived=True
         )
         if version:
@@ -325,7 +325,7 @@ def mock_get_template_versions(mocker, fake_uuid, user=None):
 def mock_get_service_template_with_placeholders(mocker):
     def _get(service_id, template_id):
         template = template_json(
-            service_id, template_id, "Two week reminder", "sms", "((name)), your vehicle tax is about to expire"
+            service_id, template_id, "Two week reminder", "sms", "((name)), Template <em>content</em> with & entity"
         )
         return {'data': template}
 
@@ -377,7 +377,7 @@ def mock_get_service_letter_template(mocker):
             template_id,
             "Two week reminder",
             "letter",
-            "Your vehicle tax is about to expire", "Subject")
+            "Template <em>content</em> with & entity", "Subject")
         return {'data': template}
 
     return mocker.patch(
