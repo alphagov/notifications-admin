@@ -241,7 +241,7 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
         # NOTE: this is a 301 MOVED PERMANENTLY (httpstatus.es/301), so the browser will cache this redirect, and it'll
         # *always* happen for that browser. _check_messages is only used by endpoints that contain `upload_id`, which
         # is a one-time-use id (that ties to a given file in S3 that is already deleted if it's not in the session)
-        raise RequestRedirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
+        raise RequestRedirect(get_check_messages_back_url(service_id, template_type))
 
     users = user_api_client.get_users_for_service(service_id=service_id)
 
@@ -410,3 +410,16 @@ def go_to_dashboard_after_tour(service_id, example_template_id):
     return redirect(
         url_for('main.service_dashboard', service_id=service_id)
     )
+
+
+def get_check_messages_back_url(service_id, template_type):
+    if get_help_argument():
+        # if the user is on the introductory tour, then they should be redirected back to the beginning of the tour -
+        # but to do that we need to find the template_id of the example template. That template *should* be the only
+        # template for that service, but it's possible they've opened another tab and deleted it for example. In that
+        # case we should just redirect back to the main page as they clearly know what they're doing.
+        templates = service_api_client.get_service_templates(service_id)['data']
+        if len(templates) == 1:
+            return url_for('.send_test', service_id=service_id, template_id=templates[0]['id'], help=1)
+
+    return url_for('main.choose_template', service_id=service_id, template_type=template_type)

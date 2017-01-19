@@ -6,13 +6,14 @@ import re
 from itertools import repeat
 from functools import partial
 from unittest.mock import patch
-from urllib.parse import urlparse
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
-from tests import validate_route_permission
+from app.main.views.send import get_check_messages_back_url
+
+from tests import validate_route_permission, template_json
 
 template_types = ['email', 'sms']
 
@@ -885,21 +886,59 @@ def test_check_messages_shows_over_max_row_error(
     )
 
 
-def test_check_messages_goes_to_select_template_if_no_upload_data(logged_in_client):
-    service_id = uuid.uuid4()
-
+def test_check_messages_redirects_if_no_upload_data(logged_in_client, mocker):
+    checker = mocker.patch('app.main.views.send.get_check_messages_back_url', return_value='foo')
     response = logged_in_client.get(url_for(
         'main.check_messages',
-        service_id=service_id,
-        template_type='sms',
-        upload_id=uuid.uuid4(),
+        service_id='0',
+        template_type='bar',
+        upload_id='baz'
     ))
 
-    # permanent redirect
+    checker.assert_called_once_with('0', 'bar')
     assert response.status_code == 301
-    assert response.location == url_for(
+    assert response.location == 'http://localhost/foo'
+
+
+@pytest.mark.parametrize('template_type', ['sms', 'email'])
+def test_get_check_messages_back_url_returns_to_correct_select_template(client, mocker, template_type):
+    mocker.patch('app.main.views.send.get_help_argument', return_value=False)
+
+    assert get_check_messages_back_url('1234', template_type) == url_for(
         'main.choose_template',
-        service_id=service_id,
-        template_type='sms',
-        _external=True
+        service_id='1234',
+        template_type=template_type
+    )
+
+
+def test_check_messages_back_from_help_goes_to_start_of_help(client, mocker):
+    mocker.patch('app.main.views.send.get_help_argument', return_value=True)
+    mocker.patch('app.service_api_client.get_service_templates', lambda service_id: {
+        'data': [template_json('000', '111', type_='sms')]
+    })
+    assert get_check_messages_back_url('000', 'sms') == url_for(
+        'main.send_test',
+        service_id='000',
+        template_id='111',
+        help='1'
+    )
+
+
+@pytest.mark.parametrize('templates', [
+    [],
+    [
+        template_json('000', '111', type_='sms'),
+        template_json('000', '222', type_='sms')
+    ]
+], ids=['no_templates', 'two_templates'])
+def test_check_messages_back_from_help_handles_unexpected_templates(client, mocker, templates):
+    mocker.patch('app.main.views.send.get_help_argument', return_value=True)
+    mocker.patch('app.service_api_client.get_service_templates', lambda service_id: {
+        'data': templates
+    })
+
+    assert get_check_messages_back_url('1234', 'sms') == url_for(
+        'main.choose_template',
+        service_id='1234',
+        template_type='sms'
     )
