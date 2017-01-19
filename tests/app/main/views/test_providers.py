@@ -33,7 +33,8 @@ stub_providers = {
             'priority': 1,
             'display_name': 'first_email_provider',
             'identifier': 'first_email',
-            'notification_type': 'email'
+            'notification_type': 'email',
+            'updated_at': None
         },
         {
             'active': True,
@@ -42,6 +43,7 @@ stub_providers = {
             'identifier': 'second_email',
             'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b',
             'notification_type': 'email',
+            'updated_at': None
         }
     ]
 }
@@ -54,7 +56,8 @@ stub_provider = {
             'priority': 1,
             'display_name': 'first_sms_provider',
             'identifier': 'first_sms',
-            'notification_type': 'sms'
+            'notification_type': 'sms',
+            'updated_at': None
         }
 }
 
