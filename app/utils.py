@@ -166,10 +166,7 @@ def format_notification_for_csv(notification):
     from app import format_datetime_24h, format_notification_status
     #  row_number can be 0 so we need to check for it
     row_num = notification.get('job_row_number')
-    if row_num is not None and row_num >= 0:
-        row_num += 1
-    else:
-        row_num = ''
+    row_num = '' if row_num is None else row_num + 1
 
     return {
         'Row number': row_num,
