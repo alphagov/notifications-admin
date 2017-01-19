@@ -1,15 +1,16 @@
+import uuid
 from io import BytesIO
 from os import path
 from glob import glob
 import re
 from itertools import repeat
 from functools import partial
-from unittest.mock import Mock, patch
+from unittest.mock import patch
+from urllib.parse import urlparse
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
-from notifications_utils.template import LetterPreviewTemplate
 
 from tests import validate_route_permission
 
@@ -881,4 +882,24 @@ def test_check_messages_shows_over_max_row_error(
         'Your file has too many rows '
         'Notify can process up to 11,111 rows at once. '
         'Your file has 99,999 rows.'
+    )
+
+
+def test_check_messages_goes_to_select_template_if_no_upload_data(logged_in_client):
+    service_id = uuid.uuid4()
+
+    response = logged_in_client.get(url_for(
+        'main.check_messages',
+        service_id=service_id,
+        template_type='sms',
+        upload_id=uuid.uuid4(),
+    ))
+
+    # permanent redirect
+    assert response.status_code == 301
+    assert response.location == url_for(
+        'main.choose_template',
+        service_id=service_id,
+        template_type='sms',
+        _external=True
     )
