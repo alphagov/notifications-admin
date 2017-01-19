@@ -270,10 +270,6 @@ class SMSTemplateForm(Form):
             NoCommasInPlaceHolders()
         ]
     )
-    # process_type = SelectField(u'Use priority queue?', choices=[('normal', 'no'),
-    #                                                             ('priority', 'yes')],
-    #                            default='normal')
-
     process_type = RadioField(
         'Use priority queue?',
         choices=[
