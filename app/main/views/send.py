@@ -1,10 +1,10 @@
 import itertools
 from string import ascii_uppercase
-from io import BytesIO
 
 from contextlib import suppress
 from zipfile import BadZipFile
 from xlrd.biffh import XLRDError
+from werkzeug.routing import RequestRedirect
 
 from flask import (
     request,
@@ -25,7 +25,7 @@ from notifications_utils.columns import Columns
 from notifications_utils.recipients import RecipientCSV, first_column_headings, validate_and_format_phone_number
 
 from app.main import main
-from app.main.forms import CsvUploadForm, ChooseTimeForm, get_next_days_until, get_furthest_possible_scheduled_time
+from app.main.forms import CsvUploadForm, ChooseTimeForm, get_furthest_possible_scheduled_time
 from app.main.uploader import (
     s3upload,
     s3download
@@ -235,7 +235,13 @@ def send_from_api(service_id, template_id):
 def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
 
     if not session.get('upload_data'):
-        return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
+        # if we just return a `redirect` (302) object here, we'll get errors when we try and unpack in the
+        # check_messages route - so raise a werkzeug.routing redirect to ensure that doesn't happen.
+
+        # NOTE: this is a 301 MOVED PERMANENTLY (httpstatus.es/301), so the browser will cache this redirect, and it'll
+        # *always* happen for that browser. _check_messages is only used by endpoints that contain `upload_id`, which
+        # is a one-time-use id (that ties to a given file in S3 that is already deleted if it's not in the session)
+        raise RequestRedirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
 
     users = user_api_client.get_users_for_service(service_id=service_id)
 
