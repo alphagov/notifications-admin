@@ -35,7 +35,7 @@ def test_should_show_page_for_one_template(
 
     assert response.status_code == 200
     assert "Two week reminder" in response.get_data(as_text=True)
-    assert "Your vehicle tax is about to expire" in response.get_data(as_text=True)
+    assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in response.get_data(as_text=True)
     assert "Use priority queue?" not in response.get_data(as_text=True)
     mock_get_service_template.assert_called_with(
         service_id, template_id)
@@ -63,7 +63,7 @@ def test_should_show_page_template_with_priority_select_if_platform_admin(
 
     assert response.status_code == 200
     assert "Two week reminder" in response.get_data(as_text=True)
-    assert "Your vehicle tax is about to expire" in response.get_data(as_text=True)
+    assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in response.get_data(as_text=True)
     assert "Use priority queue?" in response.get_data(as_text=True)
     mock_get_service_template.assert_called_with(
         service_id, template_id)
@@ -128,7 +128,7 @@ def test_should_redirect_when_saving_a_template(app_,
             mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
             template_id = fake_uuid
             name = "new name"
-            content = "template content"
+            content = "template <em>content</em> with & entity"
             data = {
                 'id': template_id,
                 'name': name,
@@ -165,7 +165,7 @@ def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
             data = {
                 'id': template_id,
                 'name': "new name",
-                'template_content': "change the content",
+                'template_content': "new template <em>content</em> with & entity",
                 'template_type': 'sms',
                 'service': service['id'],
                 'process_type': 'priority'
@@ -178,7 +178,14 @@ def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
             assert response.location == url_for(
                 '.view_template', service_id=service['id'], template_id=template_id, _external=True)
             mock_update_service_template.assert_called_with(
-                template_id, "new name", 'sms', "change the content", service['id'], None, 'priority')
+                template_id,
+                "new name",
+                'sms',
+                "new template <em>content</em> with & entity",
+                service['id'],
+                None,
+                'priority'
+            )
 
 
 def test_should_403_when_edit_template_with_process_type_of_priority_for_non_platform_admin(
@@ -197,7 +204,7 @@ def test_should_403_when_edit_template_with_process_type_of_priority_for_non_pla
             data = {
                 'id': template_id,
                 'name': "new name",
-                'template_content': "template content",
+                'template_content': "template <em>content</em> with & entity",
                 'template_type': 'sms',
                 'service': service['id'],
                 'process_type': 'priority'
@@ -226,7 +233,7 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
             data = {
                 'id': template_id,
                 'name': "new name",
-                'template_content': "template content",
+                'template_content': "template <em>content</em> with & entity",
                 'template_type': 'sms',
                 'service': service['id'],
                 'process_type': 'priority'
@@ -362,7 +369,7 @@ def test_should_redirect_when_saving_a_template_email(app_,
             service_id = fake_uuid
             template_id = fake_uuid
             name = "new name"
-            content = "template content ((thing)) ((date))"
+            content = "template <em>content</em> with & entity ((thing)) ((date))"
             subject = "subject"
             data = {
                 'id': template_id,
@@ -419,7 +426,7 @@ def test_should_show_delete_template_page_with_time_block(app_,
     assert 'Test template was last used 10 minutes ago. Are you sure you want to delete it?' in content
     assert 'Are you sure' in content
     assert 'Two week reminder' in content
-    assert 'Your vehicle tax is about to expire' in content
+    assert 'Template &lt;em&gt;content&lt;/em&gt; with &amp; entity' in content
     mock_get_service_template.assert_called_with(service_id, template_id)
 
 
@@ -453,7 +460,7 @@ def test_should_show_delete_template_page_with_never_used_block(app_,
             assert 'Two week reminder has never been used. Are you sure you want to delete it?' in content
             assert 'Are you sure' in content
             assert 'Two week reminder' in content
-            assert 'Your vehicle tax is about to expire' in content
+            assert 'Template &lt;em&gt;content&lt;/em&gt; with &amp; entity' in content
             mock_get_service_template.assert_called_with(service_id, template_id)
 
 
