@@ -344,12 +344,10 @@ def test_should_show_updates_for_one_job_as_json(
     ]
 )
 def test_can_show_notifications(
-    app_,
+    logged_in_client,
     service_one,
-    active_user_with_permissions,
     mock_get_notifications,
     mock_get_detailed_service,
-    mocker,
     message_type,
     page_title,
     status_argument,
@@ -357,91 +355,48 @@ def test_can_show_notifications(
     page_argument,
     expected_page_argument
 ):
-    # todo refactor, possibly consider deleting?
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(active_user_with_permissions, mocker, service_one)
-            response = client.get(url_for(
-                'main.view_notifications',
-                service_id=service_one['id'],
-                message_type=message_type,
-                status=status_argument,
-                page=page_argument))
-        assert response.status_code == 200
-        content = response.get_data(as_text=True)
-        notifications = notification_json(service_one['id'])
-        notification = notifications['notifications'][0]
-        assert notification['to'] in content
-        assert notification['status'] in content
-        assert notification['template']['name'] in content
-        assert 'csv' in content
-        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page_title in page.h1.text.strip()
-        assert url_for(
-            '.view_notifications_csv',
-            service_id=service_one['id'],
-            message_type=message_type,
-            status=status_argument
-        ) == page.findAll("a", {"download": "download"})[0]['href']
-        path_to_json = page.find("div", {'data-key': 'notifications'})['data-resource']
+    response = logged_in_client.get(url_for(
+        'main.view_notifications',
+        service_id=service_one['id'],
+        message_type=message_type,
+        status=status_argument,
+        page=page_argument))
+    assert response.status_code == 200
+    content = response.get_data(as_text=True)
+    notifications = notification_json(service_one['id'])
+    notification = notifications['notifications'][0]
+    assert notification['to'] in content
+    assert notification['status'] in content
+    assert notification['template']['name'] in content
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page_title in page.h1.text.strip()
 
-        url = urlparse(path_to_json)
-        assert url.path == '/services/{}/notifications/{}.json'.format(service_one['id'], message_type)
-        query_dict = parse_qs(url.query)
-        if status_argument:
-            assert query_dict['status'] == [status_argument]
-        if expected_page_argument:
-            assert query_dict['page'] == [str(expected_page_argument)]
+    path_to_json = page.find("div", {'data-key': 'notifications'})['data-resource']
 
-        mock_get_notifications.assert_called_with(
-            limit_days=7,
-            page=expected_page_argument,
-            service_id=service_one['id'],
-            status=expected_api_call,
-            template_type=[message_type]
-        )
+    url = urlparse(path_to_json)
+    assert url.path == '/services/{}/notifications/{}.json'.format(service_one['id'], message_type)
+    query_dict = parse_qs(url.query)
+    if status_argument:
+        assert query_dict['status'] == [status_argument]
+    if expected_page_argument:
+        assert query_dict['page'] == [str(expected_page_argument)]
 
-        csv_response = client.get(url_for(
-            'main.view_notifications_csv',
-            service_id=service_one['id'],
-            message_type=message_type,
-            download='csv'
-        ))
+    mock_get_notifications.assert_called_with(
+        limit_days=7,
+        page=expected_page_argument,
+        service_id=service_one['id'],
+        status=expected_api_call,
+        template_type=[message_type]
+    )
 
-        notifications_json = mock_get_notifications(service_one['id'], template_type=[message_type])['notifications']
-        notifications_as_csv = _csv_notifications(notifications_json)
-
-        mock_notifications_as_csv = mocker.patch('app.utils.generate_notifications_csv',
-                                                 return_value=notifications_as_csv)
-
-        csv_content = utils.generate_notifications_csv(
-            limit_days=7,
-            page=expected_page_argument,
-            service_id=service_one['id'],
-            status=expected_api_call,
-            template_type=[message_type]
-        )
-
-        mock_notifications_as_csv.assert_called_with(
-            limit_days=7,
-            page=expected_page_argument,
-            service_id=service_one['id'],
-            status=expected_api_call,
-            template_type=[message_type]
-        )
-
-        assert csv_response.status_code == 200
-        assert csv_response.get_data(as_text=True) == csv_content
-        assert 'text/csv' in csv_response.headers['Content-Type']
-
-        json_response = client.get(url_for(
-            'main.get_notifications_as_json',
-            service_id=service_one['id'],
-            message_type=message_type,
-            status=status_argument
-        ))
-        json_content = json.loads(json_response.get_data(as_text=True))
-        assert json_content.keys() == {'counts', 'notifications'}
+    json_response = logged_in_client.get(url_for(
+        'main.get_notifications_as_json',
+        service_id=service_one['id'],
+        message_type=message_type,
+        status=status_argument
+    ))
+    json_content = json.loads(json_response.get_data(as_text=True))
+    assert json_content.keys() == {'counts', 'notifications'}
 
 
 def test_should_show_notifications_for_a_service_with_next_previous(
