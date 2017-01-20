@@ -18,7 +18,11 @@ def view_providers():
     providers = provider_client.get_all_providers()['provider_details']
     email_providers = [email for email in providers if email['notification_type'] == 'email']
     sms_providers = [sms for sms in providers if sms['notification_type'] == 'sms']
-    return render_template('views/providers.html', email_providers=email_providers, sms_providers=sms_providers)
+    return render_template(
+        'views/providers.html',
+        email_providers=email_providers,
+        sms_providers=sms_providers
+    )
 
 
 @main.route("/provider/<provider_id>", methods=['GET', 'POST'])
