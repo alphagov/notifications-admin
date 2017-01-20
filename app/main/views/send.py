@@ -363,7 +363,6 @@ def recheck_messages(service_id, template_type, upload_id):
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def start_job(service_id, upload_id):
-
     upload_data = session['upload_data']
 
     if request.files or not upload_data.get('valid'):
@@ -371,14 +370,6 @@ def start_job(service_id, upload_id):
         return send_messages(service_id, upload_data.get('template_id'))
 
     session.pop('upload_data')
-
-    template = service_api_client.get_service_template(
-        service_id,
-        upload_data.get('template_id')
-    )['data']
-
-    if template['template_type'] == 'letter':
-        abort(403)
 
     job_api_client.create_job(
         upload_id,
