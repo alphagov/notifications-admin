@@ -164,8 +164,12 @@ def generate_notifications_csv(**kwargs):
 
 def format_notification_for_csv(notification):
     from app import format_datetime_24h, format_notification_status
+    #  row_number can be 0 so we need to check for it
+    row_num = notification.get('job_row_number')
+    row_num = '' if row_num is None else row_num + 1
+
     return {
-        'Row number': int(notification['job_row_number']) + 2 if notification.get('job_row_number') else '',
+        'Row number': row_num,
         'Recipient': notification['to'],
         'Template': notification['template']['name'],
         'Type': notification['template']['template_type'],

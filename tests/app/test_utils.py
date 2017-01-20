@@ -124,3 +124,27 @@ def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
     # mock_calls[0][2] is the kwargs from first call
     assert mock_get_notifications.mock_calls[0][2]['page'] == 1
     assert mock_get_notifications.mock_calls[1][2]['page'] == 2
+
+
+@pytest.mark.parametrize('row_number, expected_result', [
+    (None, ''),
+    (0, '1'),
+    (1, '2'),
+    (300, '301')
+])
+def test_generate_notifications_csv_formats_row_number_correctly(mocker, row_number, expected_result):
+    service_id = '1234'
+    response_with_job_row_zero = notification_json(service_id, rows=1, with_links=True, job_row_number=row_number)
+    mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=[
+            response_with_job_row_zero
+        ]
+    )
+
+    csv_content = generate_notifications_csv(service_id=service_id)
+    csv = DictReader(StringIO('\n'.join(csv_content)))
+    csv_rows = list(csv)
+
+    assert len(csv_rows) == 1
+    assert csv_rows[0].get('Row number') == expected_result
