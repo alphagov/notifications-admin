@@ -1,27 +1,29 @@
 {% from "components/big-number.html" import big_number_with_status %}
 {% from "components/message-count-label.html" import message_count_label %}
 
-<div class="grid-row ajax-block-container">
-  <div id="total-email" class="column-half">
-    {{ big_number_with_status(
-      statistics['email']['requested'],
-      message_count_label(statistics['email']['requested'], 'email', suffix=''),
-      statistics['email']['failed'],
-      statistics['email']['failed_percentage'],
-      statistics['email']['show_warning'],
-      failure_link=url_for(".view_notifications", service_id=service_id, message_type='email', status='failed'),
-      link=url_for(".view_notifications", service_id=service_id, message_type='email', status='sending,delivered,failed')
-    ) }}
-  </div>
-  <div id="total-sms" class="column-half">
-    {{ big_number_with_status(
-      statistics['sms']['requested'],
-      message_count_label(statistics['sms']['requested'], 'sms', suffix=''),
-      statistics['sms']['failed'],
-      statistics['sms']['failed_percentage'],
-      statistics['sms']['show_warning'],
-      failure_link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='failed'),
-      link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='sending,delivered,failed')
-    ) }}
+<div class="ajax-block-container">
+  <div class="grid-row">
+    <div id="total-email" class="column-half">
+      {{ big_number_with_status(
+        statistics['email']['requested'],
+        message_count_label(statistics['email']['requested'], 'email', suffix=''),
+        statistics['email']['failed'],
+        statistics['email']['failed_percentage'],
+        statistics['email']['show_warning'],
+        failure_link=url_for(".view_notifications", service_id=service_id, message_type='email', status='failed'),
+        link=url_for(".view_notifications", service_id=service_id, message_type='email', status='sending,delivered,failed')
+      ) }}
+    </div>
+    <div id="total-sms" class="column-half">
+      {{ big_number_with_status(
+        statistics['sms']['requested'],
+        message_count_label(statistics['sms']['requested'], 'sms', suffix=''),
+        statistics['sms']['failed'],
+        statistics['sms']['failed_percentage'],
+        statistics['sms']['show_warning'],
+        failure_link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='failed'),
+        link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='sending,delivered,failed')
+      ) }}
+    </div>
   </div>
 </div>
