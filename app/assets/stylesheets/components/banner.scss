@@ -30,6 +30,9 @@
 .banner-with-tick {
   padding: $gutter-half ($gutter + $gutter-half);
   background-image: file-url('tick-white.png');
+  @include ie-lte(8) {
+    background-image: file-url('tick-white-16px.png');
+  }
   background-size: 19px;
   background-repeat: no-repeat;
   background-position: $gutter-half $gutter-half;
