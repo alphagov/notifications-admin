@@ -379,6 +379,7 @@ def useful_headers_after_request(response):
         "object-src 'self';"
         "font-src 'self' data:;"
         "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk data:;"
+        "frame-src www.youtube.com;"
     ))
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']

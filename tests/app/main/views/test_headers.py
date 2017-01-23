@@ -12,4 +12,5 @@ def test_owasp_useful_headers_set(app_):
         "object-src 'self';"
         "font-src 'self' data:;"
         "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk data:;"
+        "frame-src www.youtube.com;"
     )
