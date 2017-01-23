@@ -167,6 +167,18 @@
 
   }
 
+  .greyed-out-step {
+
+    $opacity: 0.6;
+
+    opacity: $opacity;
+
+    @include ie-lte(8) {
+      -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=" + ($opacity * 100) + ")";
+    }
+
+  }
+
 }
 
 .banner-warning {

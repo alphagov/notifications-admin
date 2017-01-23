@@ -3,7 +3,7 @@
 {% if help %}
   {% call banner_wrapper(type='tour') %}
       <p class="heading-medium">Try sending yourself this example</p>
-      <div class="grid-row bottom-gutter" {% if help != '1' %}style="opacity: 0.6"{% endif %}>
+      <div class="grid-row bottom-gutter {% if help != '1' %}greyed-out-step{% endif %}">
         <div class="column-one-sixth">
           <p class="heading-large" style="float: left;">1.</p>
         </div>
@@ -13,7 +13,7 @@
           </p>
         </div>
       </div>
-      <div class="grid-row bottom-gutter" {% if help != '2' %}style="opacity: 0.6"{% endif %}>
+      <div class="grid-row bottom-gutter {% if help != '2' %}greyed-out-step{% endif %}">
         <div class="column-one-sixth">
           <p class="heading-large">2.</p>
         </div>
@@ -23,7 +23,7 @@
           </p>
         </div>
       </div>
-      <div class="grid-row bottom-gutter" {% if help != '3' %}style="opacity: 0.6"{% endif %}>
+      <div class="grid-row bottom-gutter {% if help != '3' %}greyed-out-step{% endif %}">
         <div class="column-one-sixth">
           <p class="heading-large">3.</p>
         </div>
