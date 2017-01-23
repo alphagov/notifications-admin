@@ -22,24 +22,30 @@
   @include grid-column(7/8);
 }
 
+%bottom-gutter,
 .bottom-gutter {
+  @extend %contain-floats;
   margin-bottom: $gutter;
   clear: both;
 }
 
 .bottom-gutter-2-3 {
+  @extend %bottom-gutter;
   margin-bottom: $gutter-two-thirds;
 }
 
 .bottom-gutter-1-2 {
+  @extend %bottom-gutter;
   margin-bottom: $gutter-half;
 }
 
 .bottom-gutter-3-2 {
+  @extend %bottom-gutter;
   margin-bottom: $gutter * 3/2;
 }
 
 .bottom-gutter-2 {
+  @extend %bottom-gutter;
   margin-bottom: $gutter * 2;
 }
 
