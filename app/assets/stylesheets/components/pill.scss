@@ -5,6 +5,9 @@
   a,
   span {
     display: block;
+    width: 25%;
+    box-sizing: border-box;
+    float: left;
     padding: 10px;
     flex-grow: 1;
     text-align: left;
