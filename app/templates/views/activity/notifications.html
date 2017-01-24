@@ -5,11 +5,6 @@
 <div class="ajax-block-container">
 
   {% if notifications %}
-    <p class="bottom-gutter">
-      <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
-      &emsp;
-      Data available for 7 days
-    </p>
     <div class='dashboard-table'>
   {% endif %}
     {% call(item, row_number) list_table(
