@@ -847,6 +847,36 @@ def test_check_messages_shows_too_many_messages_errors(
     assert details == expected_msg
 
 
+def test_check_messages_shows_trial_mode_error(
+    logged_in_client,
+    mock_get_users_by_service,
+    mock_get_service,
+    mock_get_service_template,
+    mock_has_permissions,
+    mock_get_detailed_service_for_today,
+    mocker
+):
+    mocker.patch('app.main.views.send.s3download', return_value=(
+        'phone number,\n07900900321'  # Not in team
+    ))
+    with logged_in_client.session_transaction() as session:
+        session['upload_data'] = {'template_id': ''}
+    response = logged_in_client.get(url_for(
+        'main.check_messages',
+        service_id=uuid.uuid4(),
+        template_type='sms',
+        upload_id=uuid.uuid4()
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert ' '.join(
+        page.find('div', class_='banner-dangerous').text.split()
+    ) == (
+        'You can’t send to this phone number '
+        'In trial mode you can only send to yourself and members of your team'
+    )
+
+
 def test_check_messages_shows_over_max_row_error(
     client,
     app_,

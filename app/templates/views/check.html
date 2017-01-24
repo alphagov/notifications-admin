@@ -105,9 +105,9 @@
         <h1 class='banner-title'>
           You can’t send to
           {{ 'this' if count_of_recipients == 1 else 'these' }}
-          {{ recipients.recipient_column_header }}
+          {{ recipients.recipient_column_headers[0] }}
           {%- if count_of_recipients != 1 -%}
-            {{ 'es' if 'email address' == recipients.recipient_column_header else 's' }}
+            {{ 'es' if 'email address' == recipients.recipient_column_headers[0] else 's' }}
           {%- endif %}
         </h1>
         <p>
