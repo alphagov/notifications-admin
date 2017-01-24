@@ -147,7 +147,6 @@ def test_create_global_stats_sets_failure_rates(fake_uuid):
     )
 
     stats = create_global_stats(services)
-
     assert stats == {
         'email': {
             'delivered': 2,
@@ -248,7 +247,6 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     service_row_group = table_body.find_all('tbody')[0].find_all('tr')
     email_stats = service_row_group[0].find_all('div', class_='big-number-number')
     sms_stats = service_row_group[1].find_all('div', class_='big-number-number')
-
     email_sending, email_delivered, email_failed = [int(x.text.strip()) for x in email_stats]
     sms_sending, sms_delivered, sms_failed = [int(x.text.strip()) for x in sms_stats]
 
@@ -323,3 +321,36 @@ def test_shows_archived_label_instead_of_live_or_research_mode_label(
     service_mode = table_body.find_all('tbody')[0].find_all('tr')[1].td.text.strip()
     # get second column, which contains flags as text.
     assert service_mode == 'archived'
+
+
+def test_should_show_correct_sent_totals_for_platform_admin(
+    client,
+    platform_admin_user,
+    mocker,
+    mock_get_detailed_services,
+    fake_uuid
+):
+    services = [service_json(fake_uuid, 'My Service', [])]
+    services[0]['statistics'] = create_stats(
+        emails_requested=100,
+        emails_delivered=20,
+        emails_failed=40,
+        sms_requested=100,
+        sms_delivered=10,
+        sms_failed=30
+    )
+
+    mock_get_detailed_services.return_value = {'data': services}
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin'))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    totals = page.find_all('div', 'big-number-with-status')
+    email_total = int(totals[0].find_all('div', 'big-number-number')[0].text.strip())
+    sms_total = int(totals[1].find_all('div', 'big-number-number')[0].text.strip())
+
+    assert email_total == 60
+    assert sms_total == 40
