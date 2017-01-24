@@ -324,7 +324,7 @@ def test_shows_archived_label_instead_of_live_or_research_mode_label(
 
 
 def test_should_show_correct_sent_totals_for_platform_admin(
-    app_,
+    client,
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
@@ -341,11 +341,9 @@ def test_should_show_correct_sent_totals_for_platform_admin(
     )
 
     mock_get_detailed_services.return_value = {'data': services}
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            mock_get_user(mocker, user=platform_admin_user)
-            client.login(platform_admin_user)
-            response = client.get(url_for('main.platform_admin'))
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin'))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
