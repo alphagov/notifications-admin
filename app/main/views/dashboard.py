@@ -19,7 +19,7 @@ from app import (
     template_statistics_client
 )
 from app.statistics_utils import get_formatted_percentage, add_rate_to_job
-from app.utils import user_has_permissions
+from app.utils import user_has_permissions, get_current_financial_year
 
 
 # This is a placeholder view method to be replaced
@@ -79,17 +79,26 @@ def template_history(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def usage(service_id):
+    current_financial_year = get_current_financial_year()
     try:
-        year = int(request.args.get('year', 2016))
+        year = int(request.args.get('year', current_financial_year))
     except ValueError:
         abort(404)
     return render_template(
         'views/usage.html',
-        months=get_free_paid_breakdown_for_billable_units(
+        months=list(get_free_paid_breakdown_for_billable_units(
             year, service_api_client.get_billable_units(service_id, year)
-        ),
-        year=year,
-        **calculate_usage(service_api_client.get_service_usage(service_id)['data'])
+        )),
+        selected_year=year,
+        years=[
+            (
+                'financial year',
+                year,
+                url_for('.usage', service_id=service_id, year=year),
+                '{} to {}'.format(year, year + 1),
+            ) for year in range(current_financial_year - 1, current_financial_year + 2)
+        ],
+        **calculate_usage(service_api_client.get_service_usage(service_id, year)['data'])
     )
 
 
@@ -156,7 +165,10 @@ def get_dashboard_partials(service_id):
         'has_jobs': bool(immediate_jobs),
         'usage': render_template(
             'views/dashboard/_usage.html',
-            **calculate_usage(service_api_client.get_service_usage(service_id)['data'])
+            **calculate_usage(service_api_client.get_service_usage(
+                service_id,
+                get_current_financial_year(),
+            )['data'])
         ),
     }
 

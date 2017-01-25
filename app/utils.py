@@ -4,6 +4,7 @@ from io import StringIO, BytesIO
 from os import path
 from functools import wraps
 import unicodedata
+from datetime import datetime
 
 from flask import (
     abort,
@@ -322,3 +323,10 @@ def png_from_pdf(pdf_endpoint):
         filename_or_fp=output,
         mimetype='image/png',
     )
+
+
+def get_current_financial_year():
+    now = datetime.utcnow()
+    current_month = int(now.strftime('%-m'))
+    current_year = int(now.strftime('%Y'))
+    return current_year if current_month > 3 else current_year - 1

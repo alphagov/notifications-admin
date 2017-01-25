@@ -148,3 +148,7 @@ def test_generate_notifications_csv_formats_row_number_correctly(mocker, row_num
 
     assert len(csv_rows) == 1
     assert csv_rows[0].get('Row number') == expected_result
+
+
+def normalize_spaces(string):
+    return ' '.join(string.split())

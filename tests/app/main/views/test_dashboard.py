@@ -14,6 +14,7 @@ from app.main.views.dashboard import (
 
 from tests import validate_route_permission
 from tests.conftest import SERVICE_ONE_ID
+from tests.app.test_utils import normalize_spaces
 
 stub_template_stats = [
     {
@@ -233,33 +234,34 @@ def test_should_show_recent_jobs_on_dashboard(
             assert table_rows[index].find_all('td')[column_index].text.strip() == str(count)
 
 
-@freeze_time("2016-12-31 11:09:00.061258")
+@freeze_time("2012-03-31 12:12:12")
 def test_usage_page(
     logged_in_client,
-    api_user_active,
-    mock_get_service,
-    mock_get_user,
-    mock_has_permissions,
     mock_get_usage,
     mock_get_billable_units,
 ):
-    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2000))
+    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID))
 
     assert response.status_code == 200
 
-    mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2000)
+    mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2011)
+    mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     cols = page.find_all('div', {'class': 'column-half'})
+    nav = page.find('nav', {'class': 'pill'})
+    nav_links = nav.find_all('a')
 
-    assert cols[1].text.strip() == 'Financial year 2000 to 2001'
+    assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
+    assert normalize_spaces(nav.find('span').text) == '2011 to 2012 financial year'
+    assert normalize_spaces(nav_links[1].text) == '2012 to 2013 financial year'
 
-    assert '123' in cols[2].text
-    assert 'Emails' in cols[2].text
+    assert '123' in cols[0].text
+    assert 'Emails' in cols[0].text
 
-    assert '456,123' in cols[3].text
-    assert 'Text messages' in cols[3].text
+    assert '456,123' in cols[1].text
+    assert 'Text messages' in cols[1].text
 
     table = page.find('table').text.strip()
 
@@ -271,13 +273,18 @@ def test_usage_page(
     assert '206,246 text messages at 1.65p' in table
 
 
-@freeze_time("2016-12-31 11:09:00.061258")
+def test_usage_page_with_year_argument(
+    logged_in_client,
+    mock_get_usage,
+    mock_get_billable_units
+):
+    assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2000)).status_code == 200
+    mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2000)
+    mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2000)
+
+
 def test_usage_page_for_invalid_year(
     logged_in_client,
-    api_user_active,
-    mock_get_service,
-    mock_get_user,
-    mock_has_permissions,
 ):
     assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year='abcd')).status_code == 404
 

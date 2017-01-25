@@ -1256,7 +1256,7 @@ def mock_get_template_statistics_for_template(mocker, service_one):
 
 @pytest.fixture(scope='function')
 def mock_get_usage(mocker, service_one, fake_uuid):
-    def _get_usage(service_id):
+    def _get_usage(service_id, year=None):
         return {'data': {
             "sms_count": 456123,
             "email_count": 123
