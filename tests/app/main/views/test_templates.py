@@ -279,7 +279,9 @@ def test_should_show_interstitial_when_making_breaking_change(
             assert response.status_code == 200
             page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
             assert page.h1.string.strip() == "Confirm changes"
-
+            assert page.find('a', {'class': 'page-footer-back-link'})['href'] == url_for(".edit_service_template",
+                                                                                         service_id=service_id,
+                                                                                         template_id=template_id)
             for key, value in {
                 'name': 'new name',
                 'subject': 'reminder',

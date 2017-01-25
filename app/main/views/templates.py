@@ -218,6 +218,7 @@ def edit_service_template(service_id, template_id):
                     'name': form.name.data,
                     'subject': subject,
                     'content': form.template_content.data,
+                    'id': new_template.id
                 },
                 column_headings=list(ascii_uppercase[:len(new_template.placeholders) + 1]),
                 example_rows=[
