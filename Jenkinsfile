@@ -51,7 +51,7 @@ def buildJobWithRetry(jobName) {
 try {
   node {
     stage('Build') {
-      git url: 'git@github.com:alphagov/notifications-admin.git', branch: 'cloudfoundry', credentialsId: 'github_com_and_gds'
+      git url: 'git@github.com:alphagov/notifications-admin.git', branch: 'master', credentialsId: 'github_com_and_gds'
       checkout scm
 
       milestone 10
