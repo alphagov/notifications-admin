@@ -100,3 +100,8 @@ def email_template():
 @main.route('/documentation')
 def documentation():
     abort(410)
+
+
+@main.route('/integration_testing')
+def integration_testing():
+    return render_template('views/integration_testing.html')
