@@ -1354,12 +1354,12 @@ def client(app_):
 def logged_in_client(
     client,
     active_user_with_permissions,
+    mocker,
+    service_one,
     mock_login,
-    mock_get_user,
-    mock_get_service,
     mock_has_permissions
 ):
-    client.login(active_user_with_permissions)
+    client.login(active_user_with_permissions, mocker, service_one)
     yield client
 
 
