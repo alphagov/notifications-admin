@@ -19,7 +19,14 @@ from app import (
     template_statistics_client
 )
 from app.statistics_utils import get_formatted_percentage, add_rate_to_job
-from app.utils import user_has_permissions, get_current_financial_year
+from app.utils import (
+    user_has_permissions,
+    get_current_financial_year,
+    FAILURE_STATUSES,
+    SENDING_STATUSES,
+    DELIVERED_STATUSES,
+    REQUESTED_STATUSES,
+)
 
 
 # This is a placeholder view method to be replaced
@@ -79,11 +86,7 @@ def template_history(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def usage(service_id):
-    current_financial_year = get_current_financial_year()
-    try:
-        year = int(request.args.get('year', current_financial_year))
-    except ValueError:
-        abort(404)
+    year, current_financial_year = requested_and_current_financial_year(request)
     return render_template(
         'views/usage.html',
         months=list(get_free_paid_breakdown_for_billable_units(
@@ -102,15 +105,25 @@ def usage(service_id):
     )
 
 
-@main.route("/services/<service_id>/weekly")
+@main.route("/services/<service_id>/monthly")
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
-def weekly(service_id):
-    stats = service_api_client.get_weekly_notification_stats(service_id)['data']
+def monthly(service_id):
+    year, current_financial_year = requested_and_current_financial_year(request)
     return render_template(
-        'views/weekly.html',
-        days=format_weekly_stats_to_list(stats),
-        now=datetime.utcnow()
+        'views/dashboard/monthly.html',
+        months=format_monthly_stats_to_list(
+            service_api_client.get_monthly_notification_stats(service_id, year)['data']
+        ),
+        years=[
+            (
+                'financial year',
+                year,
+                url_for('.monthly', service_id=service_id, year=year),
+                '{} to {}'.format(year, year + 1),
+            ) for year in range(2015, current_financial_year + 1)
+        ],
+        selected_year=year,
     )
 
 
@@ -198,22 +211,27 @@ def calculate_usage(usage):
     }
 
 
-def format_weekly_stats_to_list(historical_stats):
-    out = []
-    for week, weekly_stats in historical_stats.items():
-        for stats in weekly_stats.values():
-            stats['failure_rate'] = get_formatted_percentage(stats['failed'], stats['requested'])
+def format_monthly_stats_to_list(historical_stats):
+    return sorted((
+        dict(
+            date=key,
+            name=datetime(int(key[0:4]), int(key[5:7]), 1).strftime('%B'),
+            **aggregate_status_types(value)
+        ) for key, value in historical_stats.items()
+    ), key=lambda x: x['date'])
 
-        week_start = dateutil.parser.parse(week)
-        week_end = week_start + timedelta(days=6)
-        weekly_stats.update({
-            'week_start': week,
-            'week_end': week_end.date().isoformat(),
-            'week_end_datetime': week_end,
-        })
-        out.append(weekly_stats)
 
-    return sorted(out, key=lambda x: x['week_start'], reverse=True)
+def aggregate_status_types(counts_dict):
+    return get_dashboard_totals({
+        '{}_counts'.format(message_type): {
+            'failed': sum(
+                stats.get(status, 0) for status in FAILURE_STATUSES
+            ),
+            'requested': sum(
+                stats.get(status, 0) for status in REQUESTED_STATUSES
+            )
+        } for message_type, stats in counts_dict.items()
+    })
 
 
 def get_months_for_financial_year(year):
@@ -269,3 +287,13 @@ def get_free_paid_breakdown_for_month(
             'paid': monthly_usage,
             'free': 0
         }
+
+
+def requested_and_current_financial_year(request):
+    try:
+        return (
+            int(request.args.get('year', get_current_financial_year())),
+            get_current_financial_year(),
+        )
+    except ValueError:
+        abort(404)
