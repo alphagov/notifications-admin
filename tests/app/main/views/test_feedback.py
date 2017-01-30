@@ -69,66 +69,85 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
     assert response.status_code == expected_status_code
 
 
-@freeze_time("2016-12-12 12:00:00.000000")
-@pytest.mark.parametrize('data, expected_message, expected_person_name, expected_email, logged_in, is_anonymous', [
-    (
-        {'feedback': "blah", 'name': "Steve Irwin", 'email_address': 'rip@gmail.com'},
-        'Environment: http://localhost/\n\nblah',
-        'Steve Irwin',
-        'rip@gmail.com',
-        False,
-        False,
-    ),
-    (
-        {'feedback': "blah"},
-        'Environment: http://localhost/\n\nblah',
-        'Test User',
-        'test@user.gov.uk',
-        True,
-        False,
-    ),
-])
+@freeze_time('2016-12-12 12:00:00.000000')
 @pytest.mark.parametrize('ticket_type', ['problem', 'question'])
-def test_passes_user_details_through_flow(
-    client,
-    api_user_active,
-    mock_get_user,
-    mock_get_services,
-    mocker,
-    ticket_type,
-    data,
-    expected_message,
-    expected_person_name,
-    expected_email,
-    logged_in,
-    is_anonymous,
-):
+def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_type):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
         return_value=Mock(status_code=201)
     )
-    if logged_in:
-        client.login(api_user_active)
+
     resp = client.post(
         url_for('main.feedback', ticket_type=ticket_type),
-        data=data,
+        data={'feedback': 'blah', 'name': 'Steve Irwin', 'email_address': 'rip@gmail.com'},
     )
+
     assert resp.status_code == 302
-    assert resp.location == url_for('main.thanks', urgent=True, anonymous=is_anonymous, _external=True)
+    assert resp.location == url_for('main.thanks', urgent=True, anonymous=False, _external=True)
     mock_post.assert_called_with(
         ANY,
         data={
             'department_id': ANY,
             'agent_team_id': ANY,
             'subject': 'Notify feedback',
-            'message': expected_message,
-            'person_email': expected_email,
-            'person_name': expected_person_name,
+            'message': 'Environment: http://localhost/\n\nblah',
+            'person_email': 'rip@gmail.com',
+            'person_name': 'Steve Irwin',
             'label': ticket_type,
             'urgency': ANY,
         },
         headers=ANY
     )
+
+
+@freeze_time("2016-12-12 12:00:00.000000")
+@pytest.mark.parametrize('data', [
+    {'feedback': 'blah'},
+    {'feedback': 'blah', 'name': 'Ignored', 'email_address': 'ignored@email.com'}
+])
+@pytest.mark.parametrize('ticket_type', ['problem', 'question'])
+def test_passes_user_details_through_flow(
+    logged_in_client,
+    mocker,
+    ticket_type,
+    data
+):
+    mock_post = mocker.patch(
+        'app.main.views.feedback.requests.post',
+        return_value=Mock(status_code=201)
+    )
+
+    resp = logged_in_client.post(
+        url_for('main.feedback', ticket_type=ticket_type),
+        data=data,
+    )
+
+    assert resp.status_code == 302
+    assert resp.location == url_for('main.thanks', urgent=True, anonymous=False, _external=True)
+    mock_post.assert_called_with(
+        ANY,
+        data={
+            'department_id': ANY,
+            'agent_team_id': ANY,
+            'subject': 'Notify feedback',
+            'message': ANY,
+            'person_email': 'test@user.gov.uk',
+            'person_name': 'Test User',
+            'label': ticket_type,
+            'urgency': ANY,
+        },
+        headers=ANY
+    )
+    assert mock_post.call_args[1]['data']['message'] == '\n'.join([
+        'Environment: http://localhost/',
+        'Service "service one": {}'.format(url_for(
+            'main.service_dashboard',
+            service_id='596364a0-858e-42c8-9062-a8fe822260eb',
+            _external=True
+        )),
+        '',
+        'blah',
+    ])
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
@@ -142,9 +161,6 @@ def test_passes_user_details_through_flow(
 ])
 def test_email_address_required_for_problems(
     client,
-    api_user_active,
-    mock_get_user,
-    mock_get_services,
     mocker,
     data,
     ticket_type,
@@ -152,7 +168,7 @@ def test_email_address_required_for_problems(
     expected_redirect,
     expected_error
 ):
-    mock_post = mocker.patch(
+    mocker.patch(
         'app.main.views.feedback.requests.post',
         return_value=Mock(status_code=201)
     )
@@ -185,9 +201,6 @@ def test_email_address_required_for_problems(
 ])
 def test_urgency(
     logged_in_client,
-    api_user_active,
-    mock_get_user,
-    mock_get_services,
     mocker,
     ticket_type,
     severe,
@@ -327,7 +340,7 @@ def test_in_business_hours(when, is_in_business_hours):
     ('yes', True),
     ('no', False),
 ])
-def test_triage_redirects_to_correct_url(client, mocker, choice, expected_redirect_param):
+def test_triage_redirects_to_correct_url(client, choice, expected_redirect_param):
     response = client.post(url_for('main.triage'), data={'severe': choice})
     assert response.status_code == 302
     assert response.location == url_for(
@@ -377,7 +390,6 @@ def test_bat_email_page(
     mocker,
     service_one,
 ):
-
     bat_phone_page = url_for('main.bat_phone')
 
     response = client.get(bat_phone_page)
@@ -403,7 +415,7 @@ def test_log_error_on_post(app_, mocker, ticket_type):
         mock_logger = mocker.patch.object(app_.logger, 'error')
         with app_.test_client() as client:
             with pytest.raises(InternalServerError):
-                resp = client.post(
+                client.post(
                     url_for('main.feedback', ticket_type=ticket_type),
                     data={'feedback': "blah", 'name': "Steve Irwin", 'email_address': 'rip@gmail.com'})
             assert mock_post.called
