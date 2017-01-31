@@ -186,12 +186,12 @@ def service_switch_can_send_letters(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
-@main.route("/services/<service_id>/service-settings/deactivate", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/archive", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
-def deactivate_service(service_id):
+def archive_service(service_id):
     if request.method == 'POST':
-        service_api_client.deactivate_service(service_id)
+        service_api_client.archive_service(service_id)
         return redirect(url_for('.service_settings', service_id=service_id))
     else:
         flash('There\'s no way to reverse this! Are you sure you want to archive this service?', 'delete')
