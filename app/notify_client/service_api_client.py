@@ -103,8 +103,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def update_service_with_properties(self, service_id, properties):
         return self.update_service(service_id, **properties)
 
-    def deactivate_service(self, service_id):
-        return self.post('/service/{}/deactivate'.format(service_id), data=None)
+    def archive_service(self, service_id):
+        return self.post('/service/{}/archive'.format(service_id), data=None)
 
     def remove_user_from_service(self, service_id, user_id):
         """
