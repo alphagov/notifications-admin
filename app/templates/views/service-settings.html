@@ -115,6 +115,18 @@
               Archive service
             </a>
           </li>
+          <li class="bottom-gutter">
+            <a href="{{ url_for('.suspend_service', service_id=current_service.id) }}" class="button">
+              Suspend service
+            </a>
+          </li>
+        {% endif %}
+        {% if not current_service.active %}
+          <li class="bottom-gutter">
+            <a href="{{ url_for('.resume_service', service_id=current_service.id) }}" class="button">
+              Resume service
+            </a>
+          </li>
         {% endif %}
       </ul>
 

@@ -106,6 +106,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def archive_service(self, service_id):
         return self.post('/service/{}/archive'.format(service_id), data=None)
 
+    def suspend_service(self, service_id):
+        return self.post('/service/{}/suspend'.format(service_id), data=None)
+
+    def resume_service(self, service_id):
+        return self.post('/service/{}/resume'.format(service_id), data=None)
+
     def remove_user_from_service(self, service_id, user_id):
         """
         Remove a user from a service
