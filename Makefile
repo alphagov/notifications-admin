@@ -6,7 +6,7 @@ PIP_ACCEL_CACHE ?= ${CURDIR}/cache/pip-accel
 APP_VERSION_FILE = app/version.py
 
 GIT_BRANCH ?= $(shell git symbolic-ref --short HEAD 2> /dev/null || echo "detached")
-GIT_COMMIT ?= $(shell git rev-parse HEAD)
+GIT_COMMIT ?= $(shell git rev-parse HEAD 2> /dev/null || echo "")
 
 DOCKER_IMAGE_TAG := $(shell cat docker/VERSION)
 DOCKER_BUILDER_IMAGE_NAME = govuk/notify-admin-builder:${DOCKER_IMAGE_TAG}
