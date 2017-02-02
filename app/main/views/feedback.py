@@ -48,11 +48,14 @@ def feedback(ticket_type):
     if not form.feedback.data:
         form.feedback.data = session.pop('feedback_message', '')
 
-    severe = request.args.get('severe')
+    if request.args.get('severe') in ['yes', 'no']:
+        severe = convert_to_boolean(request.args.get('severe'))
+    else:
+        severe = None
 
     urgent = (
         in_business_hours() or
-        (ticket_type == 'problem' and convert_to_boolean(severe))
+        (ticket_type == 'problem' and severe)
     )
 
     anonymous = (
@@ -208,7 +211,7 @@ def needs_triage(ticket_type, severe):
 def needs_escalation(ticket_type, severe):
     return all((
         ticket_type == 'problem',
-        convert_to_boolean(severe),
+        severe,
         not current_user.is_authenticated,
         not in_business_hours(),
     ))

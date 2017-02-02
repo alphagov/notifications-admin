@@ -184,18 +184,18 @@ def test_email_address_required_for_problems(
 @pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, numeric_urgency, is_urgent', [
 
     # business hours, always urgent
-    ('problem', True, True, 10, True),
-    ('question', True, True, 10, True),
-    ('problem', False, True, 10, True),
-    ('question', False, True, 10, True),
+    ('problem', 'yes', True, 10, True),
+    ('question', 'yes', True, 10, True),
+    ('problem', 'no', True, 10, True),
+    ('question', 'no', True, 10, True),
 
     # out of hours, non emergency, never urgent
-    ('problem', False, False, 1, False),
-    ('question', False, False, 1, False),
+    ('problem', 'no', False, 1, False),
+    ('question', 'no', False, 1, False),
 
     # out of hours, emergency problems are urgent
-    ('problem', True, False, 10, True),
-    ('question', True, False, 1, False),
+    ('problem', 'yes', False, 10, True),
+    ('question', 'yes', False, 1, False),
 
 ])
 def test_urgency(
@@ -289,7 +289,7 @@ def test_doesnt_lose_message_if_post_across_closing(
     assert response.location == url_for('.triage', _external=True)
 
     response = logged_in_client.get(
-        url_for('main.feedback', ticket_type='problem', severe=True)
+        url_for('main.feedback', ticket_type='problem', severe='yes')
     )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -350,12 +350,51 @@ def test_triage_redirects_to_correct_url(client, choice, expected_redirect_param
     )
 
 
-@pytest.mark.parametrize('is_in_business_hours, severe, expected_status_code, expected_redirect', [
-    (True, True, 200, no_redirect()),
-    (True, False, 200, no_redirect()),
-    (False, False, 200, no_redirect()),
-    (False, True, 302, partial(url_for, 'main.bat_phone')),
-])
+@pytest.mark.parametrize(
+    (
+        'is_in_business_hours, severe,'
+        'expected_status_code, expected_redirect,'
+        'expected_status_code_when_logged_in, expected_redirect_when_logged_in'
+    ),
+    [
+        (
+            True, 'yes',
+            200, no_redirect(),
+            200, no_redirect()
+        ),
+        (
+            True, 'no',
+            200, no_redirect(),
+            200, no_redirect()
+        ),
+        (
+            False, 'no',
+            200, no_redirect(),
+            200, no_redirect(),
+        ),
+
+        # Treat empty query param as mangled URL – ask question again
+        (
+            False, '',
+            302, partial(url_for, 'main.triage'),
+            302, partial(url_for, 'main.triage'),
+        ),
+
+        # User hasn’t answered the triage question
+        (
+            False, None,
+            302, partial(url_for, 'main.triage'),
+            302, partial(url_for, 'main.triage'),
+        ),
+
+        # Escalation is needed for non-logged-in users
+        (
+            False, 'yes',
+            302, partial(url_for, 'main.bat_phone'),
+            200, no_redirect(),
+        ),
+    ]
+)
 def test_should_be_shown_the_bat_email(
     client,
     active_user_with_permissions,
@@ -366,6 +405,8 @@ def test_should_be_shown_the_bat_email(
     severe,
     expected_status_code,
     expected_redirect,
+    expected_status_code_when_logged_in,
+    expected_redirect_when_logged_in,
 ):
 
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=is_in_business_hours)
@@ -380,7 +421,8 @@ def test_should_be_shown_the_bat_email(
     # logged in users should never be redirected to the bat email page
     client.login(active_user_with_permissions, mocker, service_one)
     logged_in_response = client.get(feedback_page)
-    assert logged_in_response.status_code == 200
+    assert logged_in_response.status_code == expected_status_code_when_logged_in
+    assert logged_in_response.location == expected_redirect_when_logged_in(_external=True)
 
 
 def test_bat_email_page(
