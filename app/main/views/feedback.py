@@ -137,7 +137,7 @@ def thanks():
         'views/support/thanks.html',
         urgent=convert_to_boolean(request.args.get('urgent')),
         anonymous=convert_to_boolean(request.args.get('anonymous')),
-        logged_in=(current_user and current_user.is_authenticated),
+        logged_in=current_user.is_authenticated,
     )
 
 
