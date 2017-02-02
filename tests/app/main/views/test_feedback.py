@@ -157,7 +157,7 @@ def test_passes_user_details_through_flow(
 ])
 @pytest.mark.parametrize('ticket_type, expected_response, expected_redirect, expected_error', [
     ('problem', 200, no_redirect(), element.Tag),
-    ('question', 302, partial(url_for, 'main.thanks', urgent=True, anonymous=True), type(None)),
+    ('question', 302, partial(url_for, 'main.thanks', anonymous=True, urgent=True), type(None)),
 ])
 def test_email_address_required_for_problems(
     client,

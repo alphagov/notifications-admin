@@ -50,15 +50,15 @@ def feedback(ticket_type):
 
     severe = request.args.get('severe')
 
-    urgent = any((
-        in_business_hours(),
+    urgent = (
+        in_business_hours() or
         (ticket_type == 'problem' and convert_to_boolean(severe))
-    ))
+    )
 
-    anonymous = all((
-        (not form.email_address.data),
-        (not current_user.is_authenticated),
-    ))
+    anonymous = (
+        (not form.email_address.data) and
+        (not current_user.is_authenticated)
+    )
 
     if needs_triage(ticket_type, severe):
         session['feedback_message'] = form.feedback.data
