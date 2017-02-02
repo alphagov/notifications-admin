@@ -35,11 +35,11 @@
         {{ item.name }}
         <span class="file-list-hint">
           {% if item.key_type == 'normal' %}
-            <span class="visually-hidden">Normal</span>
+            <span class="visually-hidden">Live – sends to anyone</span>
           {% elif item.key_type == 'team' %}
-            Sends to anyone on your whitelist
+            Team and whitelist – limits who you can send to
           {% elif item.key_type == 'test' %}
-            Pretends to send messages
+            Test – pretends to send messages
           {% endif %}
         </span>
       </div>
