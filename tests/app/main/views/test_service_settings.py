@@ -781,4 +781,74 @@ def test_cant_archive_inactive_service(client, platform_admin_user, service_one,
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert 'Deactivate service' not in {a.text for a in page.find_all('a', class_='button')}
+    assert 'Archive service' not in {a.text for a in page.find_all('a', class_='button')}
+
+
+def test_suspend_service_after_confirm(client, platform_admin_user, service_one, mocker):
+    mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
+
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.post(url_for('main.suspend_service', service_id=service_one['id']))
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_fn.call_args == call('/service/{}/suspend'.format(service_one['id']), data=None)
+
+
+def test_suspend_service_prompts_user(client, platform_admin_user, service_one, mocker):
+    mocked_fn = mocker.patch('app.service_api_client.post')
+
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.get(url_for('main.suspend_service', service_id=service_one['id']))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert 'This will suspend the service and revoke all api keys. Are you sure you want to suspend this service?' in \
+           page.find('div', class_='banner-dangerous').text
+    assert mocked_fn.called is False
+
+
+def test_cant_suspend_inactive_service(client, platform_admin_user, service_one, mocker):
+    service_one['active'] = False
+
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.get(url_for('main.service_settings', service_id=service_one['id']))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert 'Suspend service' not in {a.text for a in page.find_all('a', class_='button')}
+
+
+def test_resume_service_after_confirm(client, platform_admin_user, service_one, mocker):
+    service_one['active'] = False
+    mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
+
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.post(url_for('main.resume_service', service_id=service_one['id']))
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_fn.call_args == call('/service/{}/resume'.format(service_one['id']), data=None)
+
+
+def test_resume_service_prompts_user(client, platform_admin_user, service_one, mocker):
+    service_one['active'] = False
+    mocked_fn = mocker.patch('app.service_api_client.post')
+
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.get(url_for('main.resume_service', service_id=service_one['id']))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert 'This will resume the service. New api key are required for this service to use the API.' in \
+           page.find('div', class_='banner-dangerous').text
+    assert mocked_fn.called is False
+
+
+def test_cant_resume_active_service(client, platform_admin_user, service_one, mocker):
+    client.login(platform_admin_user, mocker, service_one)
+    response = client.get(url_for('main.service_settings', service_id=service_one['id']))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert 'Resume service' not in {a.text for a in page.find_all('a', class_='button')}
