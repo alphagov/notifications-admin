@@ -1,0 +1,32 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+  Thanks for contacting us – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <h1 class="heading-large">
+      Thanks for contacting GOV.UK Notify
+    </h1>
+    <p>
+      {% if anonymous %}
+        We’ll look into it
+      {% else %}
+        We’ll get back to you
+      {% endif %}
+
+      {% if urgent %}
+        within 30 minutes.
+      {% else %}
+        by the next working day.
+      {% endif %}
+    </p>
+    <p>
+      <a href="{{ url_for('.support') }}">Back to support</a>
+    </p>
+
+
+{% endblock %}

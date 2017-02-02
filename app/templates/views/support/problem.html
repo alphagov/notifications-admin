@@ -1,0 +1,40 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/checkbox.html" import checkbox %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+  Report a problem – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <h1 class="heading-large">
+      Report a problem
+    </h1>
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        <div class="panel panel-border-wide">
+          <p>
+            Check our <a href="https://status.notifications.service.gov.uk">system status</a>
+            page to see if there are any known issues with GOV.UK Notify.
+          </p>
+        </div>
+        <form method="post">
+            {{ textbox(form.feedback, width='1-1', hint='', rows=10) }}
+            {% if not current_user.is_authenticated %}
+              {{ textbox(form.name, width='1-1') }}
+              {{ textbox(form.email_address, width='1-1') }}
+            {% else %}
+              <p>We’ll reply to {{ current_user.email_address }}</p>
+            {% endif %}
+            {{ page_footer(
+              'Send',
+              secondary_link=url_for('.support'),
+              secondary_link_text='Back to support',
+            ) }}
+        </form>
+      </div>
+    </div>
+
+{% endblock %}

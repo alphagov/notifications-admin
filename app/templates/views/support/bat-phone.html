@@ -1,0 +1,46 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block page_title %}
+  Out of hours emergencies – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <h1 class="heading-large">
+      Out of hours emergencies
+    </h1>
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        <p>
+          First, check the
+          <a href="https://status.notifications.service.gov.uk">system status page</a>.
+          You don’t need to contact us if
+          the problem you’re having is listed on that page.
+        </p>
+        <p>
+          Otherwise, contact us using the emergency email address we
+          gave you or your service manager when we made your service live.
+        </p>
+        <p>
+          We’ll reply within 30 minutes and give you hourly updates
+          until the problem’s fixed.
+        </p>
+        <p>
+          We don’t offer out of hours support if your service is in
+          trial mode.
+        </p>
+        <h2 class="heading-medium">Any other problems</h2>
+        <p class="bottom-gutter-2">
+          <a href="{{ url_for('main.feedback', ticket_type='problem', severe=False)}}">Fill in this form</a>
+          and we’ll get back to you by the next working day.
+        </p>
+        <p>
+          <a href="{{ url_for('.support') }}">Back to support</a>
+        </p>
+      </div>
+    </div>
+
+
+{% endblock %}

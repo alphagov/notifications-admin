@@ -221,7 +221,7 @@ def mock_get_services_with_one_service(mocker, fake_uuid, user=None):
 
     def _get_services(params_dict=None):
         return {'data': [service_json(
-            SERVICE_ONE_ID, "service_one", [user.id], 1000, True, False
+            SERVICE_ONE_ID, "service_one", [user.id], 1000, True, True
         )]}
 
     return mocker.patch(
@@ -1354,12 +1354,12 @@ def client(app_):
 def logged_in_client(
     client,
     active_user_with_permissions,
+    mocker,
+    service_one,
     mock_login,
-    mock_get_user,
-    mock_get_service,
     mock_has_permissions
 ):
-    client.login(active_user_with_permissions)
+    client.login(active_user_with_permissions, mocker, service_one)
     yield client
 
 

@@ -18,7 +18,8 @@ class TestClient(FlaskClient):
             mocker.patch('app.user_api_client.get_user', return_value=user)
             mocker.patch('app.events_api_client.create_event')
         if mocker and service:
-            session['service_id'] = service['id']
+            with self.session_transaction() as session:
+                session['service_id'] = service['id']
             mocker.patch('app.service_api_client.get_service', return_value={'data': service})
         login_user(user, remember=True)
 
