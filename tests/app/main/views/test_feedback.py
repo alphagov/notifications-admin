@@ -154,9 +154,9 @@ def test_passes_user_details_through_flow(
     {'feedback': 'blah', 'name': 'Fred'},
     {'feedback': 'blah'},
 ])
-@pytest.mark.parametrize('ticket_type, expected_response, expected_redirect, expected_error', [
-    ('problem', 200, no_redirect(), element.Tag),
-    ('question', 302, partial(url_for, 'main.thanks', anonymous=True, urgent=True), type(None)),
+@pytest.mark.parametrize('ticket_type, expected_response, things_expected_in_url, expected_error', [
+    ('problem', 200, [], element.Tag),
+    ('question', 302, ['thanks', 'anonymous=True', 'urgent=True'], type(None)),
 ])
 def test_email_address_required_for_problems(
     client,
@@ -164,7 +164,7 @@ def test_email_address_required_for_problems(
     data,
     ticket_type,
     expected_response,
-    expected_redirect,
+    things_expected_in_url,
     expected_error
 ):
     mocker.patch(
@@ -176,7 +176,9 @@ def test_email_address_required_for_problems(
         data=data,
     )
     assert response.status_code == expected_response
-    assert response.location == expected_redirect(_external=True)
+    # This is to work around non-deterministic query ordering in Flask url_for
+    for thing in things_expected_in_url:
+        assert thing in response.location
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert isinstance(page.find('span', {'class': 'error-message'}), expected_error)
 
