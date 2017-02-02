@@ -29,21 +29,21 @@
 
   <h2 class="heading-medium">Live key</h2>
     <p>
-        Once your service is live you are able to create Live keys. You can then use these key to send messages to anyone.
+        Once your service is live you are able to create Live keys. You can then use these keys to send messages to anyone.
     </p>
     <p>
         Messages sent with a live key show up on your dashboard and count against your text message and email allowances.
     </p>
       <p>
-          You should plan to rotate these keys on a regular basis. You may have more than one active key at a time. To revoke the key click the revoke button on the API Key page.
+          You should plan to rotate these keys on a regular basis. You can have more than one active key at a time. To revoke a key click the revoke button on the API Key page.
       </p>
 
     <h2 class="heading-medium">Team key</h2>
     <p>
-     Use a team key for end-to-end functional testing.
+         Use a team key for end-to-end functional testing.
     </p>
     <p>
-        A team key lets you send real messages to members of your team and addresses/numbers that you have added to your whitelist. You will get an error if you use these keys to send messages to anyone else.
+        A team key lets you send real messages to members of your team and address/numbers that you have added to your whitelist. You will get an error if you use these keys to send messages to anyone else.
     </p>
     <p>
         Messages sent with a team key show up on your dashboard and count against your text message and email allowances.
@@ -57,7 +57,7 @@
           Test keys don’t send real messages but do generates realistic responses. There’s no restriction on who you can send to or how many messages you can send per day.
       </p>
       <p>
-        Messages sent using a test key don’t show up on your dashboard or count against your text message and email allowances.
+          Messages sent using a test key don’t show up on your dashboard or count against your text message and email allowances.
       </p>
       <p>
           By default, all messages sent with a test key will result in a delivered status.
@@ -74,22 +74,20 @@
       <h2 class="heading-medium">Smoke testing your integration</h2>
       <p>
          If you need to smoke test your integration with Notify on a regular basis, you should use the smoke test numbers and addresses below.
-      </p>
-      <p>
-         The smoke test numbers and addresses will immediately return a successful response, but won’t send a real message and won’t produce a delivery receipt.
-      </p>
-      <p>
-          You can use the smoke test numbers and addresses with any type of key.
-      </p>
-      <p>
-         If your smoke tests need to fetch a delivery receipt, then use a test key - and don’t use these numbers and addresses.
-
           <li>“07700900000”</li>
           <li>“07700900111”</li>
           <li>“07700900222”</li>
           <li>“simulate-delivered@notifications.service.gov.uk”</li>
           <li>“simulate-delivered-2@notifications.service.gov.uk”</li>
           <li>“simulate-delivered-3@notifications.service.gov.uk”</li>
+      </p>
+      <p>
+         The smoke test numbers and addresses will immediately return a successful response, but won’t send a real message and won’t produce a delivery receipt.
+          The notification ID is not a real ID, you will not be able to fetch the notification by ID.
+      </p>
+      <p>
+          You can use the smoke test numbers and addresses with any type of key.
+          If your smoke tests need to fetch a delivery receipt, then use a test key - and don’t use these numbers and addresses.
       </p>
 
   </div>
