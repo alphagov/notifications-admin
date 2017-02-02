@@ -29,7 +29,6 @@ def test_get_support_index_page(client):
 ])
 @pytest.mark.parametrize('logged_in, expected_form_field, expected_contact_details', [
     (True, type(None), 'We’ll reply to test@user.gov.uk'),
-    (True, type(None), 'We’ll reply to test@user.gov.uk'),
     (False, element.Tag, None),
 ])
 def test_choose_support_type(
