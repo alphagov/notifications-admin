@@ -315,19 +315,19 @@ def test_has_live_services(
 
 @pytest.mark.parametrize('when, is_in_business_hours', [
 
-    ('2016-06-06 09:29:59', False),  # opening time, summer and winter
-    ('2016-12-12 09:29:59', False),
-    ('2016-06-06 09:30:00', True),
-    ('2016-12-12 09:30:00', True),
+    ('2016-06-06 09:29:59+0100', False),  # opening time, summer and winter
+    ('2016-12-12 09:29:59+0000', False),
+    ('2016-06-06 09:30:00+0100', True),
+    ('2016-12-12 09:30:00+0000', True),
 
-    ('2016-12-12 12:00:00', True),   # middle of the day
+    ('2016-12-12 12:00:00+0000', True),   # middle of the day
 
-    ('2016-12-12 17:29:59', True),   # closing time
-    ('2016-12-12 17:30:00', False),
+    ('2016-12-12 17:29:59+0000', True),   # closing time
+    ('2016-12-12 17:30:00+0000', False),
 
-    ('2016-12-10 12:00:00', False),  # Saturday
-    ('2016-12-11 12:00:00', False),  # Sunday
-    ('2016-01-01 12:00:00', False),  # Bank holiday
+    ('2016-12-10 12:00:00+0000', False),  # Saturday
+    ('2016-12-11 12:00:00+0000', False),  # Sunday
+    ('2016-01-01 12:00:00+0000', False),  # Bank holiday
 
 ])
 def test_in_business_hours(when, is_in_business_hours):

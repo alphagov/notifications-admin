@@ -143,15 +143,18 @@ def thanks():
 
 def in_business_hours():
 
-    now = datetime.now().replace(tzinfo=pytz.timezone('Europe/London'))
+    now = datetime.utcnow().replace(tzinfo=pytz.utc)
 
     if is_weekend(now) or is_bank_holiday(now):
         return False
 
-    opening_time = now.replace(hour=9, minute=30, second=0, tzinfo=pytz.timezone('Europe/London'))
-    closing_time = now.replace(hour=17, minute=30, second=0, tzinfo=pytz.timezone('Europe/London'))
+    return london_time_today_as_utc(9, 30) <= now < london_time_today_as_utc(17, 30)
 
-    return opening_time <= now < closing_time
+
+def london_time_today_as_utc(hour, minute):
+    return pytz.timezone('Europe/London').localize(
+        datetime.now().replace(hour=hour, minute=minute)
+    ).astimezone(pytz.utc)
 
 
 def is_weekend(time):
