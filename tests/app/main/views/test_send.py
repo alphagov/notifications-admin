@@ -444,8 +444,10 @@ def test_should_show_preview_letter_message(
     assert response.status_code == 200
     assert response.content_type == expected_content_type
     mock_get_service_letter_template.assert_called_with(service_id, template_id)
+    assert mock_letter_preview.call_args[0][0]['subject'] == (
+        'Subject'
+    )
     assert mock_letter_preview.call_args[0][0]['message'] == (
-        '<h2>Subject</h2>\n'
         '<p>Template &lt;em&gt;content&lt;/em&gt; with &amp; entity</p>'
     )
 
