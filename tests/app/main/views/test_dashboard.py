@@ -32,7 +32,7 @@ stub_template_stats = [
 
 
 def test_get_started(
-    app_,
+    logged_in_client,
     mocker,
     api_user_active,
     mock_get_service,
@@ -48,9 +48,7 @@ def test_get_started(
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
 
-    with app_.test_request_context(), app_.test_client() as client:
-        client.login(api_user_active)
-        response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
     # mock_get_service_templates_when_no_templates_exist.assert_called_once_with(SERVICE_ONE_ID)
     assert response.status_code == 200
@@ -58,7 +56,7 @@ def test_get_started(
 
 
 def test_get_started_is_hidden_once_templates_exist(
-    app_,
+    logged_in_client,
     mocker,
     api_user_active,
     mock_get_service,
@@ -73,9 +71,7 @@ def test_get_started_is_hidden_once_templates_exist(
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
-    with app_.test_request_context(), app_.test_client() as client:
-        client.login(api_user_active)
-        response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
     # mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
     assert response.status_code == 200
@@ -83,7 +79,7 @@ def test_get_started_is_hidden_once_templates_exist(
 
 
 def test_should_show_recent_templates_on_dashboard(
-    app_,
+    logged_in_client,
     mocker,
     api_user_active,
     mock_get_service,
@@ -99,35 +95,32 @@ def test_should_show_recent_templates_on_dashboard(
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
 
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
-        assert response.status_code == 200
-        response.get_data(as_text=True)
-        mock_template_stats.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
+    assert response.status_code == 200
+    response.get_data(as_text=True)
+    mock_template_stats.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
 
-        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        headers = [header.text.strip() for header in page.find_all('h2') + page.find_all('h1')]
-        assert 'Test Service' in headers
-        assert 'In the last 7 days' in headers
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    headers = [header.text.strip() for header in page.find_all('h2') + page.find_all('h1')]
+    assert 'Test Service' in headers
+    assert 'In the last 7 days' in headers
 
-        table_rows = page.find_all('tbody')[1].find_all('tr')
+    table_rows = page.find_all('tbody')[1].find_all('tr')
 
-        assert len(table_rows) == 2
+    assert len(table_rows) == 2
 
-        assert 'two' in table_rows[0].find_all('th')[0].text
-        assert 'Email template' in table_rows[0].find_all('th')[0].text
-        assert '200' in table_rows[0].find_all('td')[0].text
+    assert 'two' in table_rows[0].find_all('th')[0].text
+    assert 'Email template' in table_rows[0].find_all('th')[0].text
+    assert '200' in table_rows[0].find_all('td')[0].text
 
-        assert 'one' in table_rows[1].find_all('th')[0].text
-        assert 'Text message template' in table_rows[1].find_all('th')[0].text
-        assert '100' in table_rows[1].find_all('td')[0].text
+    assert 'one' in table_rows[1].find_all('th')[0].text
+    assert 'Text message template' in table_rows[1].find_all('th')[0].text
+    assert '100' in table_rows[1].find_all('td')[0].text
 
 
 def test_should_show_all_templates_on_template_statistics_page(
-    app_,
+    logged_in_client,
     mocker,
     api_user_active,
     mock_get_service,
@@ -141,32 +134,29 @@ def test_should_show_all_templates_on_template_statistics_page(
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
 
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            response = client.get(url_for('main.template_history', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(url_for('main.template_history', service_id=SERVICE_ONE_ID))
 
-        assert response.status_code == 200
-        response.get_data(as_text=True)
-        mock_template_stats.assert_called_once_with(SERVICE_ONE_ID)
+    assert response.status_code == 200
+    response.get_data(as_text=True)
+    mock_template_stats.assert_called_once_with(SERVICE_ONE_ID)
 
-        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        table_rows = page.find_all('tbody')[0].find_all('tr')
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    table_rows = page.find_all('tbody')[0].find_all('tr')
 
-        assert len(table_rows) == 2
+    assert len(table_rows) == 2
 
-        assert 'two' in table_rows[0].find_all('th')[0].text
-        assert 'Email template' in table_rows[0].find_all('th')[0].text
-        assert '200' in table_rows[0].find_all('td')[0].text
+    assert 'two' in table_rows[0].find_all('th')[0].text
+    assert 'Email template' in table_rows[0].find_all('th')[0].text
+    assert '200' in table_rows[0].find_all('td')[0].text
 
-        assert 'one' in table_rows[1].find_all('th')[0].text
-        assert 'Text message template' in table_rows[1].find_all('th')[0].text
-        assert '100' in table_rows[1].find_all('td')[0].text
+    assert 'one' in table_rows[1].find_all('th')[0].text
+    assert 'Text message template' in table_rows[1].find_all('th')[0].text
+    assert '100' in table_rows[1].find_all('td')[0].text
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_upcoming_jobs_on_dashboard(
-    app_,
+    logged_in_client,
     mocker,
     api_user_active,
     mock_get_service,
@@ -180,9 +170,7 @@ def test_should_show_upcoming_jobs_on_dashboard(
     mock_has_permissions,
     mock_get_usage,
 ):
-    with app_.test_request_context(), app_.test_client() as client:
-        client.login(api_user_active)
-        response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
     first_call = mock_get_jobs.call_args_list[0]
     assert first_call[0] == (SERVICE_ONE_ID,)
@@ -205,7 +193,7 @@ def test_should_show_upcoming_jobs_on_dashboard(
 
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_recent_jobs_on_dashboard(
-    app_,
+    logged_in_client,
     mocker,
     api_user_active,
     mock_get_service,
@@ -219,9 +207,7 @@ def test_should_show_recent_jobs_on_dashboard(
     mock_has_permissions,
     mock_get_usage,
 ):
-    with app_.test_request_context(), app_.test_client() as client:
-        client.login(api_user_active)
-        response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
     second_call = mock_get_jobs.call_args_list[1]
     assert second_call[0] == (SERVICE_ONE_ID,)
@@ -249,7 +235,7 @@ def test_should_show_recent_jobs_on_dashboard(
 
 @freeze_time("2016-12-31 11:09:00.061258")
 def test_usage_page(
-    client,
+    logged_in_client,
     api_user_active,
     mock_get_service,
     mock_get_user,
@@ -257,8 +243,7 @@ def test_usage_page(
     mock_get_usage,
     mock_get_billable_units,
 ):
-    client.login(api_user_active)
-    response = client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2000))
+    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2000))
 
     assert response.status_code == 200
 
@@ -288,14 +273,13 @@ def test_usage_page(
 
 @freeze_time("2016-12-31 11:09:00.061258")
 def test_usage_page_for_invalid_year(
-    client,
+    logged_in_client,
     api_user_active,
     mock_get_service,
     mock_get_user,
     mock_has_permissions,
 ):
-    client.login(api_user_active)
-    assert client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year='abcd')).status_code == 404
+    assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year='abcd')).status_code == 404
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):
@@ -481,7 +465,7 @@ def test_aggregate_template_stats():
 
 def test_service_dashboard_updates_gets_dashboard_totals(
     mocker,
-    app_,
+    logged_in_client,
     active_user_with_permissions,
     service_one,
     mock_get_user,
@@ -496,9 +480,7 @@ def test_service_dashboard_updates_gets_dashboard_totals(
         'sms': {'requested': 456, 'delivered': 0, 'failed': 0}
     })
 
-    with app_.test_request_context(), app_.test_client() as client:
-        client.login(active_user_with_permissions, mocker, service_one)
-        response = client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
     assert response.status_code == 200
 

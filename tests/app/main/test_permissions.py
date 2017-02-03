@@ -6,7 +6,7 @@ from flask import request
 
 
 def _test_permissions(
-    app_,
+    client,
     usr,
     permissions,
     service_id,
@@ -14,31 +14,29 @@ def _test_permissions(
     any_=False,
     admin_override=False,
 ):
-    with app_.test_request_context() as ctx:
-        request.view_args.update({'service_id': service_id})
-        with app_.test_client() as client:
-            if usr:
-                client.login(usr)
-            decorator = user_has_permissions(*permissions, any_=any_, admin_override=admin_override)
-            decorated_index = decorator(index)
-            if will_succeed:
-                response = decorated_index()
-            else:
-                try:
-                    response = decorated_index()
-                    pytest.fail("Failed to throw a forbidden or unauthorised exception")
-                except (Forbidden, Unauthorized):
-                    pass
+    request.view_args.update({'service_id': service_id})
+    if usr:
+        client.login(usr)
+    decorator = user_has_permissions(*permissions, any_=any_, admin_override=admin_override)
+    decorated_index = decorator(index)
+    if will_succeed:
+        response = decorated_index()
+    else:
+        try:
+            response = decorated_index()
+            pytest.fail("Failed to throw a forbidden or unauthorised exception")
+        except (Forbidden, Unauthorized):
+            pass
 
 
 def test_user_has_permissions_on_endpoint_fail(
-    app_,
+    client,
     mocker,
 ):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
-        app_,
+        client,
         user,
         ['something'],
         '',
@@ -46,13 +44,13 @@ def test_user_has_permissions_on_endpoint_fail(
 
 
 def test_user_has_permissions_success(
-    app_,
+    client,
     mocker,
 ):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
-        app_,
+        client,
         user,
         ['manage_users'],
         '',
@@ -60,13 +58,13 @@ def test_user_has_permissions_success(
 
 
 def test_user_has_permissions_or(
-    app_,
+    client,
     mocker,
 ):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
-        app_,
+        client,
         user,
         ['something', 'manage_users'],
         '',
@@ -75,13 +73,13 @@ def test_user_has_permissions_or(
 
 
 def test_user_has_permissions_multiple(
-    app_,
+    client,
     mocker,
 ):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
-        app_,
+        client,
         user,
         ['manage_templates', 'manage_users'],
         '',
@@ -89,13 +87,13 @@ def test_user_has_permissions_multiple(
 
 
 def test_exact_permissions(
-    app_,
+    client,
     mocker,
 ):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
-        app_,
+        client,
         user,
         ['manage_users', 'manage_templates', 'manage_settings'],
         '',
@@ -103,13 +101,13 @@ def test_exact_permissions(
 
 
 def test_platform_admin_user_can_access_page(
-    app_,
+    client,
     platform_admin_user,
     mocker,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     _test_permissions(
-        app_,
+        client,
         platform_admin_user,
         [],
         '',
@@ -118,13 +116,13 @@ def test_platform_admin_user_can_access_page(
 
 
 def test_platform_admin_user_can_not_access_page(
-    app_,
+    client,
     platform_admin_user,
     mocker,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     _test_permissions(
-        app_,
+        client,
         platform_admin_user,
         [],
         '',
@@ -133,12 +131,12 @@ def test_platform_admin_user_can_not_access_page(
 
 
 def test_no_user_returns_401_unauth(
-    app_
+    client
 ):
     from flask_login import current_user
-    assert not current_user
+    assert not current_user.is_authenticated
     _test_permissions(
-        app_,
+        client,
         None,
         [],
         '',

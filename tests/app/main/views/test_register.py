@@ -15,17 +15,16 @@ def test_render_register_returns_template_with_form(client):
 
 
 def test_logged_in_user_redirects_to_choose_service(
-    client,
+    logged_in_client,
     api_user_active,
     mock_get_user_by_email,
     mock_send_verify_code,
     mock_login,
 ):
-    client.login(api_user_active)
-    response = client.get(url_for('main.register'))
+    response = logged_in_client.get(url_for('main.register'))
     assert response.status_code == 302
 
-    response = client.get(url_for('main.sign_in', follow_redirects=True))
+    response = logged_in_client.get(url_for('main.sign_in', follow_redirects=True))
     assert response.location == url_for('main.choose_service', _external=True)
 
 

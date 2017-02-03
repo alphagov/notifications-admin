@@ -1,7 +1,6 @@
 
-def test_owasp_useful_headers_set(app_):
-    with app_.test_request_context():
-        response = app_.test_client().get('/')
+def test_owasp_useful_headers_set(client):
+    response = client.get('/')
     assert response.status_code == 200
     assert response.headers['X-Frame-Options'] == 'deny'
     assert response.headers['X-Content-Type-Options'] == 'nosniff'

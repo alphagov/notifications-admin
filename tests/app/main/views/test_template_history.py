@@ -3,7 +3,7 @@ from flask import url_for
 
 
 def test_view_template_version(
-    app_,
+    logged_in_client,
     api_user_active,
     mock_login,
     mock_get_service,
@@ -13,22 +13,19 @@ def test_view_template_version(
     mock_has_permissions,
     fake_uuid,
 ):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            template_id = fake_uuid
-            version = 1
-            all_versions_link = url_for(
-                'main.view_template_versions',
-                service_id=service_id,
-                template_id=template_id
-            )
-            resp = client.get(url_for(
-                '.view_template_version',
-                service_id=service_id,
-                template_id=template_id,
-                version=version))
+    service_id = fake_uuid
+    template_id = fake_uuid
+    version = 1
+    all_versions_link = url_for(
+        'main.view_template_versions',
+        service_id=service_id,
+        template_id=template_id
+    )
+    resp = logged_in_client.get(url_for(
+        '.view_template_version',
+        service_id=service_id,
+        template_id=template_id,
+        version=version))
 
     assert resp.status_code == 200
     resp_data = resp.get_data(as_text=True)
@@ -44,7 +41,7 @@ def test_view_template_version(
 
 
 def test_view_template_versions(
-    app_,
+    logged_in_client,
     api_user_active,
     mock_login,
     mock_get_service,
@@ -55,17 +52,14 @@ def test_view_template_versions(
     mock_has_permissions,
     fake_uuid,
 ):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            template_id = fake_uuid
-            version = 1
-            resp = client.get(url_for(
-                '.view_template_versions',
-                service_id=service_id,
-                template_id=template_id
-            ))
+    service_id = fake_uuid
+    template_id = fake_uuid
+    version = 1
+    resp = logged_in_client.get(url_for(
+        '.view_template_versions',
+        service_id=service_id,
+        template_id=template_id
+    ))
 
     assert resp.status_code == 200
     resp_data = resp.get_data(as_text=True)
