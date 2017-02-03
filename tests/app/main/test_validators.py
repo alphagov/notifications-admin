@@ -8,7 +8,11 @@ from unittest.mock import Mock
 @pytest.mark.parametrize('password', [
     'govuknotify', '11111111', 'kittykat', 'evangeli'
 ])
-def test_should_raise_validation_error_for_password(app_, mock_get_user_by_email, password):
+def test_should_raise_validation_error_for_password(
+    app_,
+    mock_get_user_by_email,
+    password,
+):
     with app_.test_request_context():
         form = RegisterUserForm()
         form.name.data = 'test'
@@ -20,14 +24,18 @@ def test_should_raise_validation_error_for_password(app_, mock_get_user_by_email
         assert 'Choose a password that’s harder to guess' in form.errors['password']
 
 
-def test_valid_email_not_in_valid_domains(app_):
+def test_valid_email_not_in_valid_domains(
+    app_
+):
     with app_.test_request_context():
         form = RegisterUserForm(email_address="test@test.com", mobile_number='441231231231')
         assert not form.validate()
         assert "Enter a central government email address" in form.errors['email_address'][0]
 
 
-def test_valid_email_in_valid_domains(app_):
+def test_valid_email_in_valid_domains(
+    app_
+):
     with app_.test_request_context():
         form = RegisterUserForm(
             name="test",
@@ -38,7 +46,9 @@ def test_valid_email_in_valid_domains(app_):
         assert form.errors == {}
 
 
-def test_invalid_email_address_error_message(app_):
+def test_invalid_email_address_error_message(
+    app_
+):
     with app_.test_request_context():
         form = RegisterUserForm(
             name="test",
@@ -83,7 +93,10 @@ def _gen_mock_field(x):
     'test@naturalengland.org.uk',
     'test@hmcts.net',
 ])
-def test_valid_list_of_white_list_email_domains(app_, email):
+def test_valid_list_of_white_list_email_domains(
+    app_,
+    email,
+):
     with app_.test_request_context():
         email_domain_validators = ValidGovEmail()
         email_domain_validators(None, _gen_mock_field(email))
@@ -115,14 +128,19 @@ def test_valid_list_of_white_list_email_domains(app_, email):
     'test@police.test.uk',
     'test@ucds.com'
 ])
-def test_invalid_list_of_white_list_email_domains(app_, email):
+def test_invalid_list_of_white_list_email_domains(
+    app_,
+    email,
+):
     with app_.test_request_context():
         email_domain_validators = ValidGovEmail()
         with pytest.raises(ValidationError):
             email_domain_validators(None, _gen_mock_field(email))
 
 
-def test_for_commas_in_placeholders(app_):
+def test_for_commas_in_placeholders(
+    app_
+):
     with app_.test_request_context():
         with pytest.raises(ValidationError) as error:
             NoCommasInPlaceHolders()(None, _gen_mock_field('Hello ((name,date))'))
@@ -130,7 +148,10 @@ def test_for_commas_in_placeholders(app_):
         NoCommasInPlaceHolders()(None, _gen_mock_field('Hello ((name))'))
 
 
-def test_sms_sender_form_validation(app_, mock_get_user_by_email):
+def test_sms_sender_form_validation(
+    app_,
+    mock_get_user_by_email,
+):
     with app_.test_request_context():
         form = ServiceSmsSender()
 

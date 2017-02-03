@@ -3,9 +3,11 @@ from flask import url_for
 from bs4 import BeautifulSoup
 
 
-def test_should_return_verify_template(app_,
-                                       api_user_active,
-                                       mock_send_verify_code):
+def test_should_return_verify_template(
+    app_,
+    api_user_active,
+    mock_send_verify_code,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             # TODO this lives here until we work out how to
@@ -21,11 +23,13 @@ def test_should_return_verify_template(app_,
             assert message == "We’ve sent you a text message with a security code."
 
 
-def test_should_redirect_to_add_service_when_sms_code_is_correct(app_,
-                                                                 api_user_active,
-                                                                 mock_get_user,
-                                                                 mock_update_user,
-                                                                 mock_check_verify_code):
+def test_should_redirect_to_add_service_when_sms_code_is_correct(
+    app_,
+    api_user_active,
+    mock_get_user,
+    mock_update_user,
+    mock_check_verify_code,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
@@ -38,12 +42,14 @@ def test_should_redirect_to_add_service_when_sms_code_is_correct(app_,
             mock_check_verify_code.assert_called_once_with(api_user_active.id, '12345', 'sms')
 
 
-def test_should_activate_user_after_verify(app_,
-                                           mocker,
-                                           api_user_pending,
-                                           mock_send_verify_code,
-                                           mock_check_verify_code,
-                                           mock_update_user):
+def test_should_activate_user_after_verify(
+    app_,
+    mocker,
+    api_user_pending,
+    mock_send_verify_code,
+    mock_check_verify_code,
+    mock_update_user,
+):
     mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -54,10 +60,12 @@ def test_should_activate_user_after_verify(app_,
             assert mock_update_user.called
 
 
-def test_should_return_200_when_sms_code_is_wrong(app_,
-                                                  api_user_active,
-                                                  mock_get_user,
-                                                  mock_check_verify_code_code_not_found):
+def test_should_return_200_when_sms_code_is_wrong(
+    app_,
+    api_user_active,
+    mock_get_user,
+    mock_check_verify_code_code_not_found,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             with client.session_transaction() as session:
@@ -69,12 +77,14 @@ def test_should_return_200_when_sms_code_is_wrong(app_,
             assert resp_data.count('Code not found') == 1
 
 
-def test_verify_email_redirects_to_verify_if_token_valid(app_,
-                                                         mocker,
-                                                         api_user_pending,
-                                                         mock_get_user_pending,
-                                                         mock_send_verify_code,
-                                                         mock_check_verify_code):
+def test_verify_email_redirects_to_verify_if_token_valid(
+    app_,
+    mocker,
+    api_user_pending,
+    mock_get_user_pending,
+    mock_send_verify_code,
+    mock_check_verify_code,
+):
     import json
     token_data = {"user_id": api_user_pending.id, "secret_code": 12345}
     mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
@@ -90,10 +100,12 @@ def test_verify_email_redirects_to_verify_if_token_valid(app_,
             assert response.location == url_for('main.verify', _external=True)
 
 
-def test_verify_email_redirects_to_email_sent_if_token_expired(app_,
-                                                               mocker,
-                                                               api_user_pending,
-                                                               mock_check_verify_code):
+def test_verify_email_redirects_to_email_sent_if_token_expired(
+    app_,
+    mocker,
+    api_user_pending,
+    mock_check_verify_code,
+):
     from itsdangerous import SignatureExpired
     mocker.patch('app.main.views.verify.check_token', side_effect=SignatureExpired('expired'))
 
@@ -108,12 +120,14 @@ def test_verify_email_redirects_to_email_sent_if_token_expired(app_,
             assert response.location == url_for('main.resend_email_verification', _external=True)
 
 
-def test_verify_email_redirects_to_email_sent_if_token_used(app_,
-                                                            mocker,
-                                                            api_user_pending,
-                                                            mock_get_user_pending,
-                                                            mock_send_verify_code,
-                                                            mock_check_verify_code_code_expired):
+def test_verify_email_redirects_to_email_sent_if_token_used(
+    app_,
+    mocker,
+    api_user_pending,
+    mock_get_user_pending,
+    mock_send_verify_code,
+    mock_check_verify_code_code_expired,
+):
     from itsdangerous import SignatureExpired
     mocker.patch('app.main.views.verify.check_token', side_effect=SignatureExpired('expired'))
 
@@ -128,12 +142,14 @@ def test_verify_email_redirects_to_email_sent_if_token_used(app_,
             assert response.location == url_for('main.resend_email_verification', _external=True)
 
 
-def test_verify_email_redirects_to_sign_in_if_user_active(app_,
-                                                          mocker,
-                                                          api_user_active,
-                                                          mock_get_user,
-                                                          mock_send_verify_code,
-                                                          mock_check_verify_code):
+def test_verify_email_redirects_to_sign_in_if_user_active(
+    app_,
+    mocker,
+    api_user_active,
+    mock_get_user,
+    mock_send_verify_code,
+    mock_check_verify_code,
+):
     import json
     token_data = {"user_id": api_user_active.id, "secret_code": 12345}
     mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
@@ -150,7 +166,9 @@ def test_verify_email_redirects_to_sign_in_if_user_active(app_,
             assert flash_banner == "That verification link has expired."
 
 
-def test_verify_redirects_to_sign_in_if_not_logged_in(app_):
+def test_verify_redirects_to_sign_in_if_not_logged_in(
+    app_
+):
     with app_.test_request_context(), app_.test_client() as client:
         response = client.get(url_for('main.verify'))
 

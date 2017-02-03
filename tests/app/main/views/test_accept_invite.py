@@ -9,16 +9,18 @@ from tests.conftest import sample_invite as create_sample_invite
 from tests.conftest import mock_check_invite_token as mock_check_token_invite
 
 
-def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(app_,
-                                                                          service_one,
-                                                                          api_user_active,
-                                                                          sample_invite,
-                                                                          mock_get_service,
-                                                                          mock_check_invite_token,
-                                                                          mock_get_user_by_email,
-                                                                          mock_get_users_by_service,
-                                                                          mock_accept_invite,
-                                                                          mock_add_user_to_service):
+def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
+    app_,
+    service_one,
+    api_user_active,
+    sample_invite,
+    mock_get_service,
+    mock_check_invite_token,
+    mock_get_user_by_email,
+    mock_get_users_by_service,
+    mock_accept_invite,
+    mock_add_user_to_service,
+):
 
     expected_service = service_one['id']
     expected_redirect_location = 'http://localhost/services/{}/dashboard'.format(expected_service)
@@ -38,16 +40,18 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(app_,
             assert response.location == expected_redirect_location
 
 
-def test_existing_user_with_no_permissions_accept_invite(app_,
-                                                         mocker,
-                                                         service_one,
-                                                         api_user_active,
-                                                         sample_invite,
-                                                         mock_check_invite_token,
-                                                         mock_get_user_by_email,
-                                                         mock_get_users_by_service,
-                                                         mock_add_user_to_service,
-                                                         mock_get_service):
+def test_existing_user_with_no_permissions_accept_invite(
+    app_,
+    mocker,
+    service_one,
+    api_user_active,
+    sample_invite,
+    mock_check_invite_token,
+    mock_get_user_by_email,
+    mock_get_users_by_service,
+    mock_add_user_to_service,
+    mock_get_service,
+):
 
     expected_service = service_one['id']
     sample_invite['permissions'] = ''
@@ -63,10 +67,12 @@ def test_existing_user_with_no_permissions_accept_invite(app_,
             assert response.status_code == 302
 
 
-def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(app_,
-                                                                 mocker,
-                                                                 sample_invite,
-                                                                 mock_get_service):
+def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(
+    app_,
+    mocker,
+    sample_invite,
+    mock_get_service,
+):
 
     sample_invite['status'] = 'accepted'
     invite = InvitedUser(**sample_invite)
@@ -83,13 +89,15 @@ def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(app_,
             assert flash_banners[0].text.strip() == 'Please log in to access this page.'
 
 
-def test_existing_user_of_service_get_redirected_to_signin(app_,
-                                                           mocker,
-                                                           api_user_active,
-                                                           sample_invite,
-                                                           mock_get_service,
-                                                           mock_get_user_by_email,
-                                                           mock_accept_invite):
+def test_existing_user_of_service_get_redirected_to_signin(
+    app_,
+    mocker,
+    api_user_active,
+    sample_invite,
+    mock_get_service,
+    mock_get_user_by_email,
+    mock_accept_invite,
+):
     sample_invite['email_address'] = api_user_active.email_address
     invite = InvitedUser(**sample_invite)
     mocker.patch('app.invite_api_client.check_token', return_value=invite)
@@ -107,16 +115,18 @@ def test_existing_user_of_service_get_redirected_to_signin(app_,
             assert mock_accept_invite.call_count == 1
 
 
-def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
-                                                                     service_one,
-                                                                     api_user_active,
-                                                                     sample_invite,
-                                                                     mock_check_invite_token,
-                                                                     mock_get_user_by_email,
-                                                                     mock_get_users_by_service,
-                                                                     mock_add_user_to_service,
-                                                                     mock_accept_invite,
-                                                                     mock_get_service):
+def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
+    app_,
+    service_one,
+    api_user_active,
+    sample_invite,
+    mock_check_invite_token,
+    mock_get_user_by_email,
+    mock_get_users_by_service,
+    mock_add_user_to_service,
+    mock_accept_invite,
+    mock_get_service,
+):
 
     expected_service = service_one['id']
     expected_permissions = ['send_messages', 'manage_service', 'manage_api_keys']
@@ -138,13 +148,15 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(app_,
             assert flash_banners[0].text.strip() == 'Please log in to access this page.'
 
 
-def test_new_user_accept_invite_calls_api_and_redirects_to_registration(app_,
-                                                                        service_one,
-                                                                        mock_check_invite_token,
-                                                                        mock_dont_get_user_by_email,
-                                                                        mock_add_user_to_service,
-                                                                        mock_get_users_by_service,
-                                                                        mock_get_service):
+def test_new_user_accept_invite_calls_api_and_redirects_to_registration(
+    app_,
+    service_one,
+    mock_check_invite_token,
+    mock_dont_get_user_by_email,
+    mock_add_user_to_service,
+    mock_get_users_by_service,
+    mock_get_service,
+):
 
     expected_redirect_location = 'http://localhost/register-from-invite'
 
@@ -160,13 +172,15 @@ def test_new_user_accept_invite_calls_api_and_redirects_to_registration(app_,
             assert response.location == expected_redirect_location
 
 
-def test_new_user_accept_invite_calls_api_and_views_registration_page(app_,
-                                                                      service_one,
-                                                                      mock_check_invite_token,
-                                                                      mock_dont_get_user_by_email,
-                                                                      mock_add_user_to_service,
-                                                                      mock_get_users_by_service,
-                                                                      mock_get_service):
+def test_new_user_accept_invite_calls_api_and_views_registration_page(
+    app_,
+    service_one,
+    mock_check_invite_token,
+    mock_dont_get_user_by_email,
+    mock_add_user_to_service,
+    mock_get_users_by_service,
+    mock_get_service,
+):
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -197,11 +211,13 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(app_,
             assert service.attrs['value'] == service_one['id']
 
 
-def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation(app_,
-                                                                                 service_one,
-                                                                                 mocker,
-                                                                                 mock_get_user,
-                                                                                 mock_get_service):
+def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation(
+    app_,
+    service_one,
+    mocker,
+    mock_get_user,
+    mock_get_service,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             cancelled_invitation = create_sample_invite(mocker, service_one, status='cancelled')
@@ -214,19 +230,21 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
             assert page.h1.string.strip() == 'The invitation you were sent has been cancelled'
 
 
-def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(app_,
-                                                                               service_one,
-                                                                               sample_invite,
-                                                                               api_user_active,
-                                                                               mock_check_invite_token,
-                                                                               mock_dont_get_user_by_email,
-                                                                               mock_is_email_unique,
-                                                                               mock_register_user,
-                                                                               mock_send_verify_code,
-                                                                               mock_accept_invite,
-                                                                               mock_get_users_by_service,
-                                                                               mock_add_user_to_service,
-                                                                               mock_get_service):
+def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
+    app_,
+    service_one,
+    sample_invite,
+    api_user_active,
+    mock_check_invite_token,
+    mock_dont_get_user_by_email,
+    mock_is_email_unique,
+    mock_register_user,
+    mock_send_verify_code,
+    mock_accept_invite,
+    mock_get_users_by_service,
+    mock_add_user_to_service,
+    mock_get_service,
+):
 
     expected_service = service_one['id']
     expected_email = sample_invite['email_address']
@@ -268,13 +286,15 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(a
             assert mock_accept_invite.call_count == 1
 
 
-def test_signed_in_existing_user_cannot_use_anothers_invite(app_,
-                                                            mocker,
-                                                            api_user_active,
-                                                            sample_invite,
-                                                            mock_get_user,
-                                                            mock_accept_invite,
-                                                            mock_get_service):
+def test_signed_in_existing_user_cannot_use_anothers_invite(
+    app_,
+    mocker,
+    api_user_active,
+    sample_invite,
+    mock_get_user,
+    mock_accept_invite,
+    mock_get_service,
+):
     invite = InvitedUser(**sample_invite)
     mocker.patch('app.invite_api_client.check_token', return_value=invite)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
@@ -295,28 +315,30 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(app_,
             assert mock_accept_invite.call_count == 0
 
 
-def test_new_invited_user_verifies_and_added_to_service(app_,
-                                                        service_one,
-                                                        sample_invite,
-                                                        api_user_active,
-                                                        mock_check_invite_token,
-                                                        mock_dont_get_user_by_email,
-                                                        mock_is_email_unique,
-                                                        mock_register_user,
-                                                        mock_send_verify_code,
-                                                        mock_check_verify_code,
-                                                        mock_get_user,
-                                                        mock_update_user,
-                                                        mock_add_user_to_service,
-                                                        mock_accept_invite,
-                                                        mock_get_service,
-                                                        mock_get_service_templates,
-                                                        mock_get_template_statistics,
-                                                        mock_get_jobs,
-                                                        mock_has_permissions,
-                                                        mock_get_users_by_service,
-                                                        mock_get_detailed_service,
-                                                        mock_get_usage):
+def test_new_invited_user_verifies_and_added_to_service(
+    app_,
+    service_one,
+    sample_invite,
+    api_user_active,
+    mock_check_invite_token,
+    mock_dont_get_user_by_email,
+    mock_is_email_unique,
+    mock_register_user,
+    mock_send_verify_code,
+    mock_check_verify_code,
+    mock_get_user,
+    mock_update_user,
+    mock_add_user_to_service,
+    mock_accept_invite,
+    mock_get_service,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_jobs,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service,
+    mock_get_usage,
+):
 
     with app_.test_request_context():
         with app_.test_client() as client:

@@ -31,7 +31,7 @@ def test_can_see_letters_without_permissions(
     mocker,
     mock_login,
     mock_has_permissions,
-    api_user_active
+    api_user_active,
 ):
     service = service_json(can_send_letters=True)
     mocker.patch('app.service_api_client.get_service', return_value={"data": service})

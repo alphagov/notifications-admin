@@ -47,7 +47,7 @@ def test_upload_files_in_different_formats(
     mock_get_service_template,
     mock_s3_upload,
     mock_has_permissions,
-    fake_uuid
+    fake_uuid,
 ):
 
     with app_.test_request_context(), app_.test_client() as client, open(filename, 'rb') as uploaded:
@@ -83,7 +83,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     mock_has_permissions,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
-    fake_uuid
+    fake_uuid,
 ):
 
     mocker.patch(
@@ -119,17 +119,19 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
             assert 'Re-upload your file' in content
 
 
-def test_upload_csv_invalid_extension(app_,
-                                      api_user_active,
-                                      mocker,
-                                      mock_login,
-                                      mock_get_service,
-                                      mock_get_service_template,
-                                      mock_s3_upload,
-                                      mock_has_permissions,
-                                      mock_get_users_by_service,
-                                      mock_get_detailed_service_for_today,
-                                      fake_uuid):
+def test_upload_csv_invalid_extension(
+    app_,
+    api_user_active,
+    mocker,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template,
+    mock_s3_upload,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    fake_uuid,
+):
 
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -527,19 +529,21 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
     ('main.get_example_csv', 200),
     ('main.send_test', 302)
 ])
-def test_route_permissions(mocker,
-                           app_,
-                           api_user_active,
-                           service_one,
-                           mock_get_service_template,
-                           mock_get_service_templates,
-                           mock_get_jobs,
-                           mock_get_notifications,
-                           mock_create_job,
-                           mock_s3_upload,
-                           fake_uuid,
-                           route,
-                           response_code):
+def test_route_permissions(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_service_template,
+    mock_get_service_templates,
+    mock_get_jobs,
+    mock_get_notifications,
+    mock_create_job,
+    mock_s3_upload,
+    fake_uuid,
+    route,
+    response_code,
+):
     with app_.test_request_context():
         validate_route_permission(
             mocker,
@@ -562,17 +566,19 @@ def test_route_permissions(mocker,
     'main.get_example_csv',
     'main.send_test'
 ])
-def test_route_invalid_permissions(mocker,
-                                   app_,
-                                   api_user_active,
-                                   service_one,
-                                   mock_get_service_template,
-                                   mock_get_service_templates,
-                                   mock_get_jobs,
-                                   mock_get_notifications,
-                                   mock_create_job,
-                                   fake_uuid,
-                                   route):
+def test_route_invalid_permissions(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_service_template,
+    mock_get_service_templates,
+    mock_get_jobs,
+    mock_get_notifications,
+    mock_create_job,
+    fake_uuid,
+    route,
+):
     with app_.test_request_context():
         validate_route_permission(
             mocker,
@@ -589,16 +595,18 @@ def test_route_invalid_permissions(mocker,
             service_one)
 
 
-def test_route_choose_template_manage_service_permissions(mocker,
-                                                          app_,
-                                                          api_user_active,
-                                                          service_one,
-                                                          mock_login,
-                                                          mock_get_user,
-                                                          mock_get_service,
-                                                          mock_check_verify_code,
-                                                          mock_get_service_templates,
-                                                          mock_get_jobs):
+def test_route_choose_template_manage_service_permissions(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_login,
+    mock_get_user,
+    mock_get_service,
+    mock_check_verify_code,
+    mock_get_service_templates,
+    mock_get_jobs,
+):
     with app_.test_request_context():
         template_id = mock_get_service_templates(service_one['id'])['data'][0]['id']
         resp = validate_route_permission(
@@ -628,14 +636,16 @@ def test_route_choose_template_manage_service_permissions(mocker,
             template_id=template_id) in page
 
 
-def test_route_choose_template_send_messages_permissions(mocker,
-                                                         app_,
-                                                         active_user_with_permissions,
-                                                         service_one,
-                                                         mock_get_service,
-                                                         mock_check_verify_code,
-                                                         mock_get_service_templates,
-                                                         mock_get_jobs):
+def test_route_choose_template_send_messages_permissions(
+    mocker,
+    app_,
+    active_user_with_permissions,
+    service_one,
+    mock_get_service,
+    mock_check_verify_code,
+    mock_get_service_templates,
+    mock_get_jobs,
+):
     with app_.test_request_context():
         template_id = None
         for temp in mock_get_service_templates(service_one['id'])['data']:
@@ -665,15 +675,17 @@ def test_route_choose_template_send_messages_permissions(mocker,
             template_id=template_id) not in page
 
 
-def test_route_choose_template_manage_api_keys_permissions(mocker,
-                                                           app_,
-                                                           api_user_active,
-                                                           service_one,
-                                                           mock_get_user,
-                                                           mock_get_service,
-                                                           mock_check_verify_code,
-                                                           mock_get_service_templates,
-                                                           mock_get_jobs):
+def test_route_choose_template_manage_api_keys_permissions(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_user,
+    mock_get_service,
+    mock_check_verify_code,
+    mock_get_service_templates,
+    mock_get_jobs,
+):
     with app_.test_request_context():
         template_id = None
         for temp in mock_get_service_templates(service_one['id'])['data']:

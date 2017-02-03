@@ -63,9 +63,9 @@ stub_provider = {
 
 
 def test_should_show_all_providers(
-        app_,
-        platform_admin_user,
-        mocker
+    app_,
+    platform_admin_user,
+    mocker,
 ):
     mock_providers = mocker.patch(
         'app.provider_client.get_all_providers',
@@ -130,9 +130,9 @@ def test_should_show_all_providers(
 
 
 def test_should_show_provider_detail(
-        app_,
-        platform_admin_user,
-        mocker
+    app_,
+    platform_admin_user,
+    mocker,
 ):
     mock_providers = mocker.patch(
         'app.provider_client.get_provider_by_id',
@@ -158,9 +158,9 @@ def test_should_show_provider_detail(
 
 
 def test_should_show_error_on_bad_provider_priority(
-        app_,
-        platform_admin_user,
-        mocker
+    app_,
+    platform_admin_user,
+    mocker,
 ):
     mock_providers = mocker.patch(
         'app.provider_client.get_provider_by_id',
@@ -180,9 +180,9 @@ def test_should_show_error_on_bad_provider_priority(
 
 
 def test_should_show_error_on_negative_provider_priority(
-        app_,
-        platform_admin_user,
-        mocker
+    app_,
+    platform_admin_user,
+    mocker,
 ):
     mock_providers = mocker.patch(
         'app.provider_client.get_provider_by_id',
@@ -202,9 +202,9 @@ def test_should_show_error_on_negative_provider_priority(
 
 
 def test_should_show_error_on_too_big_provider_priority(
-        app_,
-        platform_admin_user,
-        mocker
+    app_,
+    platform_admin_user,
+    mocker,
 ):
     mock_providers = mocker.patch(
         'app.provider_client.get_provider_by_id',
@@ -224,9 +224,9 @@ def test_should_show_error_on_too_big_provider_priority(
 
 
 def test_should_show_error_on_too_little_provider_priority(
-        app_,
-        platform_admin_user,
-        mocker
+    app_,
+    platform_admin_user,
+    mocker,
 ):
     mock_providers = mocker.patch(
         'app.provider_client.get_provider_by_id',
@@ -246,9 +246,9 @@ def test_should_show_error_on_too_little_provider_priority(
 
 
 def test_should_update_provider_priority(
-        app_,
-        platform_admin_user,
-        mocker
+    app_,
+    platform_admin_user,
+    mocker,
 ):
 
     mock_providers = mocker.patch(

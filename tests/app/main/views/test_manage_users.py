@@ -8,10 +8,10 @@ from tests.conftest import service_one as create_sample_service
 
 
 def test_should_show_overview_page(
-        app_,
-        active_user_with_permissions,
-        mocker,
-        mock_get_invites_for_service
+    app_,
+    active_user_with_permissions,
+    mocker,
+    mock_get_invites_for_service,
 ):
     service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
@@ -26,9 +26,9 @@ def test_should_show_overview_page(
 
 
 def test_should_show_page_for_one_user(
-        app_,
-        active_user_with_permissions,
-        mocker
+    app_,
+    active_user_with_permissions,
+    mocker,
 ):
     service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
@@ -40,11 +40,11 @@ def test_should_show_page_for_one_user(
 
 
 def test_edit_user_permissions(
-        app_,
-        active_user_with_permissions,
-        mocker,
-        mock_get_invites_for_service,
-        mock_set_user_permissions
+    app_,
+    active_user_with_permissions,
+    mocker,
+    mock_get_invites_for_service,
+    mock_set_user_permissions,
 ):
     service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
@@ -78,12 +78,12 @@ def test_edit_user_permissions(
 
 
 def test_edit_some_user_permissions(
-        app_,
-        mocker,
-        active_user_with_permissions,
-        sample_invite,
-        mock_get_invites_for_service,
-        mock_set_user_permissions
+    app_,
+    mocker,
+    active_user_with_permissions,
+    sample_invite,
+    mock_get_invites_for_service,
+    mock_set_user_permissions,
 ):
     service = create_sample_service(active_user_with_permissions)
     data = [InvitedUser(**sample_invite)]
@@ -117,9 +117,9 @@ def test_edit_some_user_permissions(
 
 
 def test_should_show_page_for_inviting_user(
-        app_,
-        active_user_with_permissions,
-        mocker
+    app_,
+    active_user_with_permissions,
+    mocker,
 ):
     service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
@@ -136,12 +136,12 @@ def test_should_show_page_for_inviting_user(
     ('test@nonwhitelist.com', False)
 ])
 def test_invite_user(
-        app_,
-        active_user_with_permissions,
-        mocker,
-        sample_invite,
-        email_address,
-        gov_user
+    app_,
+    active_user_with_permissions,
+    mocker,
+    sample_invite,
+    email_address,
+    gov_user,
 ):
     service = create_sample_service(active_user_with_permissions)
     sample_invite['email_address'] = 'test@example.gov.uk'
@@ -177,10 +177,11 @@ def test_invite_user(
                                                                     expected_permissions)
 
 
-def test_cancel_invited_user_cancels_user_invitations(app_,
-                                                      active_user_with_permissions,
-                                                      mocker
-                                                      ):
+def test_cancel_invited_user_cancels_user_invitations(
+    app_,
+    active_user_with_permissions,
+    mocker,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             mocker.patch('app.invite_api_client.cancel_invited_user')
@@ -195,10 +196,12 @@ def test_cancel_invited_user_cancels_user_invitations(app_,
             assert response.location == url_for('main.manage_users', service_id=service['id'], _external=True)
 
 
-def test_manage_users_shows_invited_user(app_,
-                                         mocker,
-                                         active_user_with_permissions,
-                                         sample_invite):
+def test_manage_users_shows_invited_user(
+    app_,
+    mocker,
+    active_user_with_permissions,
+    sample_invite,
+):
     service = create_sample_service(active_user_with_permissions)
     data = [InvitedUser(**sample_invite)]
     with app_.test_request_context():
@@ -218,10 +221,12 @@ def test_manage_users_shows_invited_user(app_,
             assert invited_users_list.find_all('a')[0].text.strip() == 'Cancel invitation'
 
 
-def test_manage_users_does_not_show_accepted_invite(app_,
-                                                    mocker,
-                                                    active_user_with_permissions,
-                                                    sample_invite):
+def test_manage_users_does_not_show_accepted_invite(
+    app_,
+    mocker,
+    active_user_with_permissions,
+    sample_invite,
+):
     import uuid
     invited_user_id = uuid.uuid4()
     sample_invite['id'] = invited_user_id
@@ -245,10 +250,10 @@ def test_manage_users_does_not_show_accepted_invite(app_,
 
 
 def test_user_cant_invite_themselves(
-        app_,
-        mocker,
-        active_user_with_permissions,
-        mock_create_invite
+    app_,
+    mocker,
+    active_user_with_permissions,
+    mock_create_invite,
 ):
     service = create_sample_service(active_user_with_permissions)
     with app_.test_request_context():
@@ -271,10 +276,12 @@ def test_user_cant_invite_themselves(
         assert not mock_create_invite.called
 
 
-def test_no_permission_manage_users_page(app_,
-                                         service_one,
-                                         api_user_active,
-                                         mocker):
+def test_no_permission_manage_users_page(
+    app_,
+    service_one,
+    api_user_active,
+    mocker,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active, mocker, service_one)
@@ -285,10 +292,12 @@ def test_no_permission_manage_users_page(app_,
             assert "Team members" not in resp_text
 
 
-def test_get_remove_user_from_service(app_,
-                                      active_user_with_permissions,
-                                      service_one,
-                                      mocker):
+def test_get_remove_user_from_service(
+    app_,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -302,13 +311,15 @@ def test_get_remove_user_from_service(app_,
             assert "Remove user from service" in response.get_data(as_text=True)
 
 
-def test_remove_user_from_service(app_,
-                                  active_user_with_permissions,
-                                  service_one,
-                                  mocker,
-                                  mock_get_users_by_service,
-                                  mock_get_user,
-                                  mock_remove_user_from_service):
+def test_remove_user_from_service(
+    app_,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    mock_get_users_by_service,
+    mock_get_user,
+    mock_remove_user_from_service,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -325,12 +336,13 @@ def test_remove_user_from_service(app_,
 
 
 def test_can_remove_user_from_service_as_platform_admin(
-        app_,
-        service_one,
-        platform_admin_user,
-        active_user_with_permissions,
-        mock_remove_user_from_service,
-        mocker):
+    app_,
+    service_one,
+    platform_admin_user,
+    active_user_with_permissions,
+    mock_remove_user_from_service,
+    mocker,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(platform_admin_user, mocker, service_one)
@@ -347,12 +359,13 @@ def test_can_remove_user_from_service_as_platform_admin(
 
 
 def test_can_invite_user_as_platform_admin(
-        app_,
-        service_one,
-        platform_admin_user,
-        active_user_with_permissions,
-        mock_get_invites_for_service,
-        mocker):
+    app_,
+    service_one,
+    platform_admin_user,
+    active_user_with_permissions,
+    mock_get_invites_for_service,
+    mocker,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])

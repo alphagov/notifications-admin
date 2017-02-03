@@ -1,11 +1,13 @@
 from flask import url_for
 
 
-def test_should_show_choose_services_page(app_,
-                                          mock_login,
-                                          mock_get_user,
-                                          api_user_active,
-                                          mock_get_services):
+def test_should_show_choose_services_page(
+    app_,
+    mock_login,
+    mock_get_user,
+    api_user_active,
+    mock_get_services,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -39,7 +41,7 @@ def test_redirect_if_only_one_service(
     app_,
     mock_login,
     api_user_active,
-    mock_get_services_with_one_service
+    mock_get_services_with_one_service,
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -70,7 +72,7 @@ def test_redirect_if_service_in_session(
     mock_login,
     api_user_active,
     mock_get_services,
-    mock_get_service
+    mock_get_service,
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -87,7 +89,9 @@ def test_redirect_if_service_in_session(
         )
 
 
-def test_should_redirect_if_not_logged_in(app_):
+def test_should_redirect_if_not_logged_in(
+    app_
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             response = client.get(url_for('main.show_all_services_or_dashboard'))

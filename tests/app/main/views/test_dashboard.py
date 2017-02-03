@@ -32,18 +32,18 @@ stub_template_stats = [
 
 
 def test_get_started(
-        app_,
-        mocker,
-        api_user_active,
-        mock_get_service,
-        mock_get_service_templates_when_no_templates_exist,
-        mock_get_user,
-        mock_get_user_by_email,
-        mock_login,
-        mock_get_jobs,
-        mock_has_permissions,
-        mock_get_detailed_service,
-        mock_get_usage
+    app_,
+    mocker,
+    api_user_active,
+    mock_get_service,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_login,
+    mock_get_jobs,
+    mock_has_permissions,
+    mock_get_detailed_service,
+    mock_get_usage,
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -58,18 +58,18 @@ def test_get_started(
 
 
 def test_get_started_is_hidden_once_templates_exist(
-        app_,
-        mocker,
-        api_user_active,
-        mock_get_service,
-        mock_get_service_templates,
-        mock_get_user,
-        mock_get_user_by_email,
-        mock_login,
-        mock_get_jobs,
-        mock_has_permissions,
-        mock_get_detailed_service,
-        mock_get_usage
+    app_,
+    mocker,
+    api_user_active,
+    mock_get_service,
+    mock_get_service_templates,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_login,
+    mock_get_jobs,
+    mock_has_permissions,
+    mock_get_detailed_service,
+    mock_get_usage,
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -82,18 +82,20 @@ def test_get_started_is_hidden_once_templates_exist(
     assert 'Get started' not in response.get_data(as_text=True)
 
 
-def test_should_show_recent_templates_on_dashboard(app_,
-                                                   mocker,
-                                                   api_user_active,
-                                                   mock_get_service,
-                                                   mock_get_service_templates,
-                                                   mock_get_user,
-                                                   mock_get_user_by_email,
-                                                   mock_login,
-                                                   mock_get_jobs,
-                                                   mock_has_permissions,
-                                                   mock_get_detailed_service,
-                                                   mock_get_usage):
+def test_should_show_recent_templates_on_dashboard(
+    app_,
+    mocker,
+    api_user_active,
+    mock_get_service,
+    mock_get_service_templates,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_login,
+    mock_get_jobs,
+    mock_has_permissions,
+    mock_get_detailed_service,
+    mock_get_usage,
+):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
 
@@ -125,16 +127,16 @@ def test_should_show_recent_templates_on_dashboard(app_,
 
 
 def test_should_show_all_templates_on_template_statistics_page(
-        app_,
-        mocker,
-        api_user_active,
-        mock_get_service,
-        mock_get_service_templates,
-        mock_get_user,
-        mock_get_user_by_email,
-        mock_login,
-        mock_get_jobs,
-        mock_has_permissions
+    app_,
+    mocker,
+    api_user_active,
+    mock_get_service,
+    mock_get_service_templates,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_login,
+    mock_get_jobs,
+    mock_has_permissions,
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -176,7 +178,7 @@ def test_should_show_upcoming_jobs_on_dashboard(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_has_permissions,
-    mock_get_usage
+    mock_get_usage,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(api_user_active)
@@ -215,7 +217,7 @@ def test_should_show_recent_jobs_on_dashboard(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_has_permissions,
-    mock_get_usage
+    mock_get_usage,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(api_user_active)
@@ -253,7 +255,7 @@ def test_usage_page(
     mock_get_user,
     mock_has_permissions,
     mock_get_usage,
-    mock_get_billable_units
+    mock_get_billable_units,
 ):
     client.login(api_user_active)
     response = client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2000))
@@ -290,7 +292,7 @@ def test_usage_page_for_invalid_year(
     api_user_active,
     mock_get_service,
     mock_get_user,
-    mock_has_permissions
+    mock_has_permissions,
 ):
     client.login(api_user_active)
     assert client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year='abcd')).status_code == 404
@@ -309,15 +311,17 @@ def _test_dashboard_menu(mocker, app_, usr, service, permissions):
             return client.get(url_for('main.service_dashboard', service_id=service['id']))
 
 
-def test_menu_send_messages(mocker,
-                            app_,
-                            api_user_active,
-                            service_one,
-                            mock_get_service_templates,
-                            mock_get_jobs,
-                            mock_get_template_statistics,
-                            mock_get_detailed_service,
-                            mock_get_usage):
+def test_menu_send_messages(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_service_templates,
+    mock_get_jobs,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_usage,
+):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -341,15 +345,17 @@ def test_menu_send_messages(mocker,
         assert url_for('main.view_providers') not in page
 
 
-def test_menu_manage_service(mocker,
-                             app_,
-                             api_user_active,
-                             service_one,
-                             mock_get_service_templates,
-                             mock_get_jobs,
-                             mock_get_template_statistics,
-                             mock_get_detailed_service,
-                             mock_get_usage):
+def test_menu_manage_service(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_service_templates,
+    mock_get_jobs,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_usage,
+):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -372,15 +378,17 @@ def test_menu_manage_service(mocker,
         assert url_for('main.api_keys', service_id=service_one['id']) not in page
 
 
-def test_menu_manage_api_keys(mocker,
-                              app_,
-                              api_user_active,
-                              service_one,
-                              mock_get_service_templates,
-                              mock_get_jobs,
-                              mock_get_template_statistics,
-                              mock_get_detailed_service,
-                              mock_get_usage):
+def test_menu_manage_api_keys(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_service_templates,
+    mock_get_jobs,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_usage,
+):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -403,15 +411,17 @@ def test_menu_manage_api_keys(mocker,
         assert url_for('main.api_integration', service_id=service_one['id']) in page
 
 
-def test_menu_all_services_for_platform_admin_user(mocker,
-                                                   app_,
-                                                   platform_admin_user,
-                                                   service_one,
-                                                   mock_get_service_templates,
-                                                   mock_get_jobs,
-                                                   mock_get_template_statistics,
-                                                   mock_get_detailed_service,
-                                                   mock_get_usage):
+def test_menu_all_services_for_platform_admin_user(
+    mocker,
+    app_,
+    platform_admin_user,
+    service_one,
+    mock_get_service_templates,
+    mock_get_jobs,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_usage,
+):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
             mocker,
@@ -429,17 +439,19 @@ def test_menu_all_services_for_platform_admin_user(mocker,
         assert url_for('main.api_keys', service_id=service_one['id']) not in page
 
 
-def test_route_for_service_permissions(mocker,
-                                       app_,
-                                       api_user_active,
-                                       service_one,
-                                       mock_get_service,
-                                       mock_get_user,
-                                       mock_get_service_templates,
-                                       mock_get_jobs,
-                                       mock_get_template_statistics,
-                                       mock_get_detailed_service,
-                                       mock_get_usage):
+def test_route_for_service_permissions(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_service,
+    mock_get_user,
+    mock_get_service_templates,
+    mock_get_jobs,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_usage,
+):
     with app_.test_request_context():
         validate_route_permission(
             mocker,
@@ -467,16 +479,18 @@ def test_aggregate_template_stats():
     assert expected[1]['template_type'] == 'sms'
 
 
-def test_service_dashboard_updates_gets_dashboard_totals(mocker,
-                                                         app_,
-                                                         active_user_with_permissions,
-                                                         service_one,
-                                                         mock_get_user,
-                                                         mock_get_service_templates,
-                                                         mock_get_template_statistics,
-                                                         mock_get_detailed_service,
-                                                         mock_get_jobs,
-                                                         mock_get_usage):
+def test_service_dashboard_updates_gets_dashboard_totals(
+    mocker,
+    app_,
+    active_user_with_permissions,
+    service_one,
+    mock_get_user,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_jobs,
+    mock_get_usage,
+):
     dashboard_totals = mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
         'email': {'requested': 123, 'delivered': 0, 'failed': 0},
         'sms': {'requested': 456, 'delivered': 0, 'failed': 0}

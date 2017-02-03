@@ -1,7 +1,9 @@
 from flask import url_for
 
 
-def test_render_sign_out_redirects_to_sign_in(app_):
+def test_render_sign_out_redirects_to_sign_in(
+    app_
+):
     with app_.test_request_context():
         response = app_.test_client().get(
             url_for('main.sign_out'))
@@ -10,18 +12,20 @@ def test_render_sign_out_redirects_to_sign_in(app_):
             'main.index', _external=True)
 
 
-def test_sign_out_user(app_,
-                       mock_get_service,
-                       api_user_active,
-                       mock_get_user,
-                       mock_get_user_by_email,
-                       mock_login,
-                       mock_get_service_templates,
-                       mock_get_jobs,
-                       mock_has_permissions,
-                       mock_get_template_statistics,
-                       mock_get_detailed_service,
-                       mock_get_usage):
+def test_sign_out_user(
+    app_,
+    mock_get_service,
+    api_user_active,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_login,
+    mock_get_service_templates,
+    mock_get_jobs,
+    mock_has_permissions,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_usage,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)

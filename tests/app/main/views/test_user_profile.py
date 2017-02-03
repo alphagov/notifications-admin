@@ -3,10 +3,12 @@ from flask import url_for
 from notifications_utils.url_safe_token import generate_token
 
 
-def test_should_show_overview_page(app_,
-                                   api_user_active,
-                                   mock_login,
-                                   mock_get_user):
+def test_should_show_overview_page(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -16,10 +18,12 @@ def test_should_show_overview_page(app_,
         assert response.status_code == 200
 
 
-def test_should_show_name_page(app_,
-                               api_user_active,
-                               mock_login,
-                               mock_get_user):
+def test_should_show_name_page(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -29,11 +33,13 @@ def test_should_show_name_page(app_,
         assert response.status_code == 200
 
 
-def test_should_redirect_after_name_change(app_,
-                                           api_user_active,
-                                           mock_login,
-                                           mock_get_user,
-                                           mock_update_user_attribute):
+def test_should_redirect_after_name_change(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_update_user_attribute,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -49,10 +55,12 @@ def test_should_redirect_after_name_change(app_,
         assert mock_update_user_attribute.called
 
 
-def test_should_show_email_page(app_,
-                                api_user_active,
-                                mock_login,
-                                mock_get_user):
+def test_should_show_email_page(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -63,10 +71,12 @@ def test_should_show_email_page(app_,
         assert response.status_code == 200
 
 
-def test_should_redirect_after_email_change(app_,
-                                            api_user_active,
-                                            mock_login,
-                                            mock_is_email_unique):
+def test_should_redirect_after_email_change(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_is_email_unique,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -80,9 +90,11 @@ def test_should_redirect_after_email_change(app_,
             'main.user_profile_email_authenticate', _external=True)
 
 
-def test_should_show_authenticate_after_email_change(app_,
-                                                     api_user_active,
-                                                     mock_login):
+def test_should_show_authenticate_after_email_change(
+    app_,
+    api_user_active,
+    mock_login,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -95,11 +107,13 @@ def test_should_show_authenticate_after_email_change(app_,
         assert 'Confirm' in response.get_data(as_text=True)
 
 
-def test_should_render_change_email_continue_after_authenticate_email(app_,
-                                                                      api_user_active,
-                                                                      mock_login,
-                                                                      mock_verify_password,
-                                                                      mock_send_change_email_verification):
+def test_should_render_change_email_continue_after_authenticate_email(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_verify_password,
+    mock_send_change_email_verification,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -114,11 +128,12 @@ def test_should_render_change_email_continue_after_authenticate_email(app_,
                in response.get_data(as_text=True)
 
 
-def test_should_redirect_to_user_profile_when_user_confirms_email_link(app_,
-                                                                       api_user_active,
-                                                                       mock_login,
-                                                                       mock_update_user_attribute
-                                                                       ):
+def test_should_redirect_to_user_profile_when_user_confirms_email_link(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_update_user_attribute,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -131,10 +146,12 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(app_,
         assert response.location == url_for('main.user_profile', _external=True)
 
 
-def test_should_show_mobile_number_page(app_,
-                                        api_user_active,
-                                        mock_login,
-                                        mock_get_user):
+def test_should_show_mobile_number_page(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -144,10 +161,12 @@ def test_should_show_mobile_number_page(app_,
         assert response.status_code == 200
 
 
-def test_should_redirect_after_mobile_number_change(app_,
-                                                    api_user_active,
-                                                    mock_login,
-                                                    mock_get_user):
+def test_should_redirect_after_mobile_number_change(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -160,10 +179,12 @@ def test_should_redirect_after_mobile_number_change(app_,
             'main.user_profile_mobile_number_authenticate', _external=True)
 
 
-def test_should_show_authenticate_after_mobile_number_change(app_,
-                                                             api_user_active,
-                                                             mock_login,
-                                                             mock_get_user):
+def test_should_show_authenticate_after_mobile_number_change(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -177,12 +198,14 @@ def test_should_show_authenticate_after_mobile_number_change(app_,
         assert response.status_code == 200
 
 
-def test_should_redirect_after_mobile_number_authenticate(app_,
-                                                          api_user_active,
-                                                          mock_login,
-                                                          mock_get_user,
-                                                          mock_verify_password,
-                                                          mock_send_verify_code):
+def test_should_redirect_after_mobile_number_authenticate(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_verify_password,
+    mock_send_verify_code,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -198,10 +221,12 @@ def test_should_redirect_after_mobile_number_authenticate(app_,
             'main.user_profile_mobile_number_confirm', _external=True)
 
 
-def test_should_show_confirm_after_mobile_number_change(app_,
-                                                        api_user_active,
-                                                        mock_login,
-                                                        mock_get_user):
+def test_should_show_confirm_after_mobile_number_change(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -215,12 +240,14 @@ def test_should_show_confirm_after_mobile_number_change(app_,
         assert response.status_code == 200
 
 
-def test_should_redirect_after_mobile_number_confirm(app_,
-                                                     api_user_active,
-                                                     mock_login,
-                                                     mock_get_user,
-                                                     mock_update_user_attribute,
-                                                     mock_check_verify_code):
+def test_should_redirect_after_mobile_number_confirm(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_update_user_attribute,
+    mock_check_verify_code,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -236,10 +263,12 @@ def test_should_redirect_after_mobile_number_confirm(app_,
             'main.user_profile', _external=True)
 
 
-def test_should_show_password_page(app_,
-                                   api_user_active,
-                                   mock_login,
-                                   mock_get_user):
+def test_should_show_password_page(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -249,12 +278,14 @@ def test_should_show_password_page(app_,
         assert response.status_code == 200
 
 
-def test_should_redirect_after_password_change(app_,
-                                               api_user_active,
-                                               mock_login,
-                                               mock_get_user,
-                                               mock_update_user,
-                                               mock_verify_password):
+def test_should_redirect_after_password_change(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_user,
+    mock_update_user,
+    mock_verify_password,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -270,10 +301,12 @@ def test_should_redirect_after_password_change(app_,
             'main.user_profile', _external=True)
 
 
-def test_non_gov_user_cannot_see_change_email_link(client,
-                                                   api_nongov_user_active,
-                                                   mock_login,
-                                                   mock_get_non_govuser):
+def test_non_gov_user_cannot_see_change_email_link(
+    client,
+    api_nongov_user_active,
+    mock_login,
+    mock_get_non_govuser,
+):
     client.login(api_nongov_user_active)
     response = client.get(url_for('main.user_profile'))
     assert '<a href="/user-profile/email">' not in response.get_data(as_text=True)
@@ -281,10 +314,12 @@ def test_non_gov_user_cannot_see_change_email_link(client,
     assert response.status_code == 200
 
 
-def test_non_gov_user_cannot_access_change_email_page(client,
-                                                      api_nongov_user_active,
-                                                      mock_login,
-                                                      mock_get_non_govuser):
+def test_non_gov_user_cannot_access_change_email_page(
+    client,
+    api_nongov_user_active,
+    mock_login,
+    mock_get_non_govuser,
+):
     client.login(api_nongov_user_active)
     response = client.get(url_for('main.user_profile_email'))
     assert response.status_code == 403

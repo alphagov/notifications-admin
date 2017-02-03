@@ -2,15 +2,17 @@ import json
 from flask import url_for
 
 
-def test_view_template_version(app_,
-                               api_user_active,
-                               mock_login,
-                               mock_get_service,
-                               mock_get_template_version,
-                               mock_get_user,
-                               mock_get_user_by_email,
-                               mock_has_permissions,
-                               fake_uuid):
+def test_view_template_version(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_template_version,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_has_permissions,
+    fake_uuid,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -41,16 +43,18 @@ def test_view_template_version(app_,
     )
 
 
-def test_view_template_versions(app_,
-                                api_user_active,
-                                mock_login,
-                                mock_get_service,
-                                mock_get_template_versions,
-                                mock_get_service_template,
-                                mock_get_user,
-                                mock_get_user_by_email,
-                                mock_has_permissions,
-                                fake_uuid):
+def test_view_template_versions(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_template_versions,
+    mock_get_service_template,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_has_permissions,
+    fake_uuid,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)

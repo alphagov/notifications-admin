@@ -5,7 +5,15 @@ from werkzeug.exceptions import Forbidden, Unauthorized
 from flask import request
 
 
-def _test_permissions(app_, usr, permissions, service_id, will_succeed, any_=False, admin_override=False):
+def _test_permissions(
+    app_,
+    usr,
+    permissions,
+    service_id,
+    will_succeed,
+    any_=False,
+    admin_override=False,
+):
     with app_.test_request_context() as ctx:
         request.view_args.update({'service_id': service_id})
         with app_.test_client() as client:
@@ -23,7 +31,10 @@ def _test_permissions(app_, usr, permissions, service_id, will_succeed, any_=Fal
                     pass
 
 
-def test_user_has_permissions_on_endpoint_fail(app_, mocker):
+def test_user_has_permissions_on_endpoint_fail(
+    app_,
+    mocker,
+):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
@@ -34,8 +45,10 @@ def test_user_has_permissions_on_endpoint_fail(app_, mocker):
         False)
 
 
-def test_user_has_permissions_success(app_,
-                                      mocker):
+def test_user_has_permissions_success(
+    app_,
+    mocker,
+):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
@@ -46,7 +59,10 @@ def test_user_has_permissions_success(app_,
         True)
 
 
-def test_user_has_permissions_or(app_, mocker):
+def test_user_has_permissions_or(
+    app_,
+    mocker,
+):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
@@ -58,8 +74,10 @@ def test_user_has_permissions_or(app_, mocker):
         any_=True)
 
 
-def test_user_has_permissions_multiple(app_,
-                                       mocker):
+def test_user_has_permissions_multiple(
+    app_,
+    mocker,
+):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
@@ -70,8 +88,10 @@ def test_user_has_permissions_multiple(app_,
         will_succeed=True)
 
 
-def test_exact_permissions(app_,
-                           mocker):
+def test_exact_permissions(
+    app_,
+    mocker,
+):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
@@ -82,9 +102,11 @@ def test_exact_permissions(app_,
         True)
 
 
-def test_platform_admin_user_can_access_page(app_,
-                                             platform_admin_user,
-                                             mocker):
+def test_platform_admin_user_can_access_page(
+    app_,
+    platform_admin_user,
+    mocker,
+):
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     _test_permissions(
         app_,
@@ -95,9 +117,11 @@ def test_platform_admin_user_can_access_page(app_,
         admin_override=True)
 
 
-def test_platform_admin_user_can_not_access_page(app_,
-                                                 platform_admin_user,
-                                                 mocker):
+def test_platform_admin_user_can_not_access_page(
+    app_,
+    platform_admin_user,
+    mocker,
+):
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     _test_permissions(
         app_,
@@ -108,7 +132,9 @@ def test_platform_admin_user_can_not_access_page(app_,
         admin_override=False)
 
 
-def test_no_user_returns_401_unauth(app_):
+def test_no_user_returns_401_unauth(
+    app_
+):
     from flask_login import current_user
     assert not current_user
     _test_permissions(

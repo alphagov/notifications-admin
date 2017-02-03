@@ -21,7 +21,7 @@ def test_letters_access_restricted(
     can_send_letters,
     response_code,
     mock_get_service_templates,
-    url
+    url,
 ):
     service = service_json(can_send_letters=can_send_letters)
     mocker.patch('app.service_api_client.get_service', return_value={"data": service})
@@ -39,7 +39,7 @@ def test_letters_lets_in_without_permission(
     mock_has_permissions,
     api_user_active,
     mock_get_service_templates,
-    url
+    url,
 ):
     service = service_json(can_send_letters=True)
     mocker.patch('app.service_api_client.get_service', return_value={"data": service})

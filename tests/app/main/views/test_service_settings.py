@@ -15,7 +15,7 @@ def test_should_show_overview(
     active_user_with_permissions,
     mocker,
     service_one,
-    mock_get_organisation
+    mock_get_organisation,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_one)
@@ -39,7 +39,7 @@ def test_should_show_overview_for_service_with_more_things_set(
     active_user_with_permissions,
     mocker,
     service_with_reply_to_addresses,
-    mock_get_organisation
+    mock_get_organisation,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_with_reply_to_addresses)
@@ -55,10 +55,12 @@ def test_should_show_overview_for_service_with_more_things_set(
         assert row == " ".join(page.find_all('tr')[index + 1].text.split())
 
 
-def test_should_show_service_name(app_,
-                                  active_user_with_permissions,
-                                  mocker,
-                                  service_one):
+def test_should_show_service_name(
+    app_,
+    active_user_with_permissions,
+    mocker,
+    service_one,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -71,15 +73,17 @@ def test_should_show_service_name(app_,
         app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
-def test_should_redirect_after_change_service_name(app_,
-                                                   service_one,
-                                                   active_user_with_permissions,
-                                                   mock_login,
-                                                   mock_get_user,
-                                                   mock_get_service,
-                                                   mock_update_service,
-                                                   mock_get_services,
-                                                   mock_has_permissions):
+def test_should_redirect_after_change_service_name(
+    app_,
+    service_one,
+    active_user_with_permissions,
+    mock_login,
+    mock_get_user,
+    mock_get_service,
+    mock_update_service,
+    mock_get_services,
+    mock_has_permissions,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions)
@@ -121,7 +125,7 @@ def test_switch_service_to_live(
     mock_get_service,
     mock_update_service,
     mock_has_permissions,
-    mock_get_organisation
+    mock_get_organisation,
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -166,7 +170,7 @@ def test_switch_service_to_restricted(
     mock_get_live_service,
     mock_update_service,
     mock_has_permissions,
-    mock_get_organisation
+    mock_get_organisation,
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -184,10 +188,12 @@ def test_switch_service_to_restricted(
         )
 
 
-def test_should_not_allow_duplicate_names(app_,
-                                          active_user_with_permissions,
-                                          mocker,
-                                          service_one):
+def test_should_not_allow_duplicate_names(
+    app_,
+    active_user_with_permissions,
+    mocker,
+    service_one,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -204,10 +210,12 @@ def test_should_not_allow_duplicate_names(app_,
         app.service_api_client.find_all_service_email_from.assert_called_once_with()
 
 
-def test_should_show_service_name_confirmation(app_,
-                                               active_user_with_permissions,
-                                               mocker,
-                                               service_one):
+def test_should_show_service_name_confirmation(
+    app_,
+    active_user_with_permissions,
+    mocker,
+    service_one,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -228,7 +236,7 @@ def test_should_redirect_after_service_name_confirmation(
     mocker,
     mock_update_service,
     mock_verify_password,
-    mock_get_organisation
+    mock_get_organisation,
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -251,14 +259,16 @@ def test_should_redirect_after_service_name_confirmation(
         assert mock_verify_password.called
 
 
-def test_should_raise_duplicate_name_handled(app_,
-                                             active_user_with_permissions,
-                                             service_one,
-                                             mocker,
-                                             mock_get_services,
-                                             mock_update_service_raise_httperror_duplicate_name,
-                                             mock_verify_password,
-                                             fake_uuid):
+def test_should_raise_duplicate_name_handled(
+    app_,
+    active_user_with_permissions,
+    service_one,
+    mocker,
+    mock_get_services,
+    mock_update_service_raise_httperror_duplicate_name,
+    mock_verify_password,
+    fake_uuid,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(active_user_with_permissions, mocker, service_one)
@@ -276,14 +286,16 @@ def test_should_raise_duplicate_name_handled(app_,
         assert mock_verify_password.called
 
 
-def test_should_show_request_to_go_live(app_,
-                                        api_user_active,
-                                        mock_get_service,
-                                        mock_get_user,
-                                        mock_get_user_by_email,
-                                        mock_login,
-                                        mock_has_permissions,
-                                        fake_uuid):
+def test_should_show_request_to_go_live(
+    app_,
+    api_user_active,
+    mock_get_service,
+    mock_get_user,
+    mock_get_user_by_email,
+    mock_login,
+    mock_has_permissions,
+    fake_uuid,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -304,7 +316,7 @@ def test_should_redirect_after_request_to_go_live(
     mock_get_service,
     mock_has_permissions,
     mock_get_organisation,
-    mocker
+    mocker,
 ):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
@@ -358,7 +370,7 @@ def test_log_error_on_request_to_go_live(
     mock_get_user,
     mock_get_service,
     mock_has_permissions,
-    mocker
+    mocker,
 ):
     mock_post = mocker.patch(
         'app.main.views.service_settings.requests.post',
@@ -398,7 +410,13 @@ def test_log_error_on_request_to_go_live(
     'main.service_request_to_go_live',
     'main.archive_service'
 ])
-def test_route_permissions(mocker, app_, api_user_active, service_one, route):
+def test_route_permissions(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    route,
+):
     with app_.test_request_context():
         validate_route_permission(
             mocker,
@@ -421,7 +439,13 @@ def test_route_permissions(mocker, app_, api_user_active, service_one, route):
     'main.service_switch_can_send_letters',
     'main.archive_service',
 ])
-def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, route):
+def test_route_invalid_permissions(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    route,
+):
     with app_.test_request_context():
         validate_route_permission(
             mocker,
@@ -440,7 +464,13 @@ def test_route_invalid_permissions(mocker, app_, api_user_active, service_one, r
     'main.service_name_change_confirm',
     'main.service_request_to_go_live',
 ])
-def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one, route):
+def test_route_for_platform_admin(
+    mocker,
+    app_,
+    platform_admin_user,
+    service_one,
+    route,
+):
     with app_.test_request_context():
         validate_route_permission(mocker,
                                   app_,
@@ -457,7 +487,13 @@ def test_route_for_platform_admin(mocker, app_, platform_admin_user, service_one
     'main.service_switch_research_mode',
     'main.service_switch_can_send_letters',
 ])
-def test_route_for_platform_admin_update_service(mocker, app_, platform_admin_user, service_one, route):
+def test_route_for_platform_admin_update_service(
+    mocker,
+    app_,
+    platform_admin_user,
+    service_one,
+    route,
+):
     mocker.patch('app.service_api_client.archive_service')
     with app_.test_request_context():
         validate_route_permission(mocker,
@@ -476,7 +512,7 @@ def test_set_reply_to_email_address(
     mocker,
     mock_update_service,
     service_one,
-    mock_get_organisation
+    mock_get_organisation,
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -492,10 +528,12 @@ def test_set_reply_to_email_address(
         )
 
 
-def test_if_reply_to_email_address_set_then_form_populated(app_,
-                                                           active_user_with_permissions,
-                                                           mocker,
-                                                           service_one):
+def test_if_reply_to_email_address_set_then_form_populated(
+    app_,
+    active_user_with_permissions,
+    mocker,
+    service_one,
+):
     service_one['reply_to_email_address'] = 'test@service.gov.uk'
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -515,7 +553,7 @@ def test_switch_service_to_research_mode(
     active_user_with_permissions,
     mock_get_service,
     mock_has_permissions,
-    mocker
+    mocker,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         mocker.patch('app.service_api_client.post', return_value=service_one)
@@ -534,14 +572,15 @@ def test_switch_service_to_research_mode(
 
 
 def test_switch_service_from_research_mode_to_normal(
-        app_,
-        service_one,
-        mock_login,
-        mock_get_user,
-        active_user_with_permissions,
-        mock_get_service,
-        mock_has_permissions,
-        mocker):
+    app_,
+    service_one,
+    mock_login,
+    mock_get_user,
+    active_user_with_permissions,
+    mock_get_service,
+    mock_has_permissions,
+    mocker,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             service = service_json(
@@ -570,7 +609,7 @@ def test_shows_research_mode_indicator(
     mock_get_service,
     mock_has_permissions,
     mock_get_organisation,
-    mocker
+    mocker,
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -604,7 +643,7 @@ def test_does_not_show_research_mode_indicator(
     mock_get_service,
     mock_has_permissions,
     mock_get_organisation,
-    mocker
+    mocker,
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -623,7 +662,7 @@ def test_set_text_message_sender(
     mocker,
     mock_update_service,
     service_one,
-    mock_get_organisation
+    mock_get_organisation,
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -640,10 +679,12 @@ def test_set_text_message_sender(
         )
 
 
-def test_if_sms_sender_set_then_form_populated(app_,
-                                               active_user_with_permissions,
-                                               mocker,
-                                               service_one):
+def test_if_sms_sender_set_then_form_populated(
+    app_,
+    active_user_with_permissions,
+    mocker,
+    service_one,
+):
     service_one['sms_sender'] = 'elevenchars'
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -656,7 +697,11 @@ def test_if_sms_sender_set_then_form_populated(app_,
 
 
 def test_should_show_branding(
-    mocker, app_, platform_admin_user, service_one, mock_get_organisations
+    mocker,
+    app_,
+    platform_admin_user,
+    service_one,
+    mock_get_organisations,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(platform_admin_user, mocker, service_one)
@@ -679,7 +724,11 @@ def test_should_show_branding(
 
 
 def test_should_show_organisations(
-    mocker, app_, platform_admin_user, service_one, mock_get_organisations
+    mocker,
+    app_,
+    platform_admin_user,
+    service_one,
+    mock_get_organisations,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(platform_admin_user, mocker, service_one)
@@ -702,7 +751,12 @@ def test_should_show_organisations(
 
 
 def test_should_set_branding_and_organisations(
-    mocker, app_, platform_admin_user, service_one, mock_get_organisations, mock_update_service
+    mocker,
+    app_,
+    platform_admin_user,
+    service_one,
+    mock_get_organisations,
+    mock_update_service,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(platform_admin_user, mocker, service_one)
@@ -726,7 +780,12 @@ def test_should_set_branding_and_organisations(
         )
 
 
-def test_switch_service_enable_letters(client, platform_admin_user, service_one, mocker):
+def test_switch_service_enable_letters(
+    client,
+    platform_admin_user,
+    service_one,
+    mocker,
+):
     mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
 
     client.login(platform_admin_user, mocker, service_one)
@@ -737,7 +796,11 @@ def test_switch_service_enable_letters(client, platform_admin_user, service_one,
     assert mocked_fn.call_args == call(service_one['id'], {'can_send_letters': True})
 
 
-def test_switch_service_disable_letters(client, platform_admin_user, mocker):
+def test_switch_service_disable_letters(
+    client,
+    platform_admin_user,
+    mocker,
+):
     service = service_json("1234", "Test Service", [], can_send_letters=True)
     mocker.patch('app.service_api_client.get_service', return_value={"data": service})
     mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service)
@@ -750,7 +813,12 @@ def test_switch_service_disable_letters(client, platform_admin_user, mocker):
     assert mocked_fn.call_args == call(service['id'], {"can_send_letters": False})
 
 
-def test_archive_service_after_confirm(client, platform_admin_user, service_one, mocker):
+def test_archive_service_after_confirm(
+    client,
+    platform_admin_user,
+    service_one,
+    mocker,
+):
     mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
 
     client.login(platform_admin_user, mocker, service_one)
@@ -761,7 +829,12 @@ def test_archive_service_after_confirm(client, platform_admin_user, service_one,
     assert mocked_fn.call_args == call('/service/{}/archive'.format(service_one['id']), data=None)
 
 
-def test_archive_service_prompts_user(client, platform_admin_user, service_one, mocker):
+def test_archive_service_prompts_user(
+    client,
+    platform_admin_user,
+    service_one,
+    mocker,
+):
     mocked_fn = mocker.patch('app.service_api_client.post')
 
     client.login(platform_admin_user, mocker, service_one)
@@ -773,7 +846,12 @@ def test_archive_service_prompts_user(client, platform_admin_user, service_one, 
     assert mocked_fn.called is False
 
 
-def test_cant_archive_inactive_service(client, platform_admin_user, service_one, mocker):
+def test_cant_archive_inactive_service(
+    client,
+    platform_admin_user,
+    service_one,
+    mocker,
+):
     service_one['active'] = False
 
     client.login(platform_admin_user, mocker, service_one)
@@ -784,7 +862,12 @@ def test_cant_archive_inactive_service(client, platform_admin_user, service_one,
     assert 'Archive service' not in {a.text for a in page.find_all('a', class_='button')}
 
 
-def test_suspend_service_after_confirm(client, platform_admin_user, service_one, mocker):
+def test_suspend_service_after_confirm(
+    client,
+    platform_admin_user,
+    service_one,
+    mocker,
+):
     mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
 
     client.login(platform_admin_user, mocker, service_one)
@@ -795,7 +878,12 @@ def test_suspend_service_after_confirm(client, platform_admin_user, service_one,
     assert mocked_fn.call_args == call('/service/{}/suspend'.format(service_one['id']), data=None)
 
 
-def test_suspend_service_prompts_user(client, platform_admin_user, service_one, mocker):
+def test_suspend_service_prompts_user(
+    client,
+    platform_admin_user,
+    service_one,
+    mocker,
+):
     mocked_fn = mocker.patch('app.service_api_client.post')
 
     client.login(platform_admin_user, mocker, service_one)
@@ -808,7 +896,12 @@ def test_suspend_service_prompts_user(client, platform_admin_user, service_one, 
     assert mocked_fn.called is False
 
 
-def test_cant_suspend_inactive_service(client, platform_admin_user, service_one, mocker):
+def test_cant_suspend_inactive_service(
+    client,
+    platform_admin_user,
+    service_one,
+    mocker,
+):
     service_one['active'] = False
 
     client.login(platform_admin_user, mocker, service_one)
@@ -819,7 +912,12 @@ def test_cant_suspend_inactive_service(client, platform_admin_user, service_one,
     assert 'Suspend service' not in {a.text for a in page.find_all('a', class_='button')}
 
 
-def test_resume_service_after_confirm(client, platform_admin_user, service_one, mocker):
+def test_resume_service_after_confirm(
+    client,
+    platform_admin_user,
+    service_one,
+    mocker,
+):
     service_one['active'] = False
     mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
 
@@ -831,7 +929,12 @@ def test_resume_service_after_confirm(client, platform_admin_user, service_one, 
     assert mocked_fn.call_args == call('/service/{}/resume'.format(service_one['id']), data=None)
 
 
-def test_resume_service_prompts_user(client, platform_admin_user, service_one, mocker):
+def test_resume_service_prompts_user(
+    client,
+    platform_admin_user,
+    service_one,
+    mocker,
+):
     service_one['active'] = False
     mocked_fn = mocker.patch('app.service_api_client.post')
 
@@ -845,7 +948,12 @@ def test_resume_service_prompts_user(client, platform_admin_user, service_one, m
     assert mocked_fn.called is False
 
 
-def test_cant_resume_active_service(client, platform_admin_user, service_one, mocker):
+def test_cant_resume_active_service(
+    client,
+    platform_admin_user,
+    service_one,
+    mocker,
+):
     client.login(platform_admin_user, mocker, service_one)
     response = client.get(url_for('main.service_settings', service_id=service_one['id']))
 

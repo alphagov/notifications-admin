@@ -38,7 +38,7 @@ def test_get_jobs_should_return_list_of_all_real_jobs(
     service_one,
     active_user_with_permissions,
     mock_get_jobs,
-    mocker
+    mocker,
 ):
     client.login(active_user_with_permissions, mocker, service_one)
     response = client.get(url_for('main.view_jobs', service_id=service_one['id']))
@@ -55,7 +55,7 @@ def test_get_jobs_shows_page_links(
     service_one,
     active_user_with_permissions,
     mock_get_jobs,
-    mocker
+    mocker,
 ):
     client.login(active_user_with_permissions, mocker, service_one)
     response = client.get(url_for('main.view_jobs', service_id=service_one['id']))
@@ -97,7 +97,7 @@ def test_should_show_page_for_one_job(
     mock_get_notifications,
     fake_uuid,
     status_argument,
-    expected_api_call
+    expected_api_call,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_one)
@@ -145,7 +145,7 @@ def test_get_jobs_should_tell_user_if_more_than_one_page(
     service_one,
     mock_get_job,
     mock_get_service_template,
-    mock_get_notifications_with_previous_next
+    mock_get_notifications_with_previous_next,
 ):
     response = logged_in_client.get(url_for(
         'main.view_job',
@@ -167,7 +167,7 @@ def test_should_show_job_in_progress(
     mock_get_job_in_progress,
     mocker,
     mock_get_notifications,
-    fake_uuid
+    fake_uuid,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_one)
@@ -191,7 +191,7 @@ def test_should_show_scheduled_job(
     mock_get_scheduled_job,
     mocker,
     mock_get_notifications,
-    fake_uuid
+    fake_uuid,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_one)
@@ -212,7 +212,7 @@ def test_should_cancel_job(
     service_one,
     active_user_with_permissions,
     fake_uuid,
-    mocker
+    mocker,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_one)
@@ -234,7 +234,7 @@ def test_should_not_show_cancelled_job(
     active_user_with_permissions,
     mock_get_cancelled_job,
     mocker,
-    fake_uuid
+    fake_uuid,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_one)
@@ -255,7 +255,7 @@ def test_should_show_not_show_csv_download_in_tour(
     mock_get_job,
     mocker,
     mock_get_notifications,
-    fake_uuid
+    fake_uuid,
 ):
     with app_.test_request_context(), app_.test_client() as client:
         client.login(active_user_with_permissions, mocker, service_one)
@@ -289,7 +289,7 @@ def test_should_show_updates_for_one_job_as_json(
     mock_get_notifications,
     mock_get_job,
     mocker,
-    fake_uuid
+    fake_uuid,
 ):
     job_json = mock_get_job(service_one['id'], fake_uuid)['data']
     with app_.test_request_context():
@@ -353,7 +353,7 @@ def test_can_show_notifications(
     status_argument,
     expected_api_call,
     page_argument,
-    expected_page_argument
+    expected_page_argument,
 ):
     response = logged_in_client.get(url_for(
         'main.view_notifications',
@@ -405,7 +405,7 @@ def test_should_show_notifications_for_a_service_with_next_previous(
     active_user_with_permissions,
     mock_get_notifications_with_previous_next,
     mock_get_detailed_service,
-    mocker
+    mocker,
 ):
     with app_.test_request_context():
         with app_.test_client() as client:
@@ -487,12 +487,12 @@ def test_get_status_filters_constructs_links(app_):
 
 
 def test_html_contains_notification_id(
-        client,
-        service_one,
-        active_user_with_permissions,
-        mock_get_notifications,
-        mock_get_detailed_service,
-        mocker
+    client,
+    service_one,
+    active_user_with_permissions,
+    mock_get_notifications,
+    mock_get_detailed_service,
+    mocker,
 ):
     client.login(active_user_with_permissions, mocker, service_one)
     response = client.get(url_for(

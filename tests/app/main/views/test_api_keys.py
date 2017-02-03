@@ -89,12 +89,14 @@ def test_should_show_api_documentation_page(
         assert page.h1.string.strip() == 'Documentation'
 
 
-def test_should_show_empty_api_keys_page(app_,
-                                         api_user_pending,
-                                         mock_login,
-                                         mock_get_no_api_keys,
-                                         mock_get_service,
-                                         mock_has_permissions):
+def test_should_show_empty_api_keys_page(
+    app_,
+    api_user_pending,
+    mock_login,
+    mock_get_no_api_keys,
+    mock_get_service,
+    mock_has_permissions,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_pending)
@@ -107,13 +109,15 @@ def test_should_show_empty_api_keys_page(app_,
         mock_get_no_api_keys.assert_called_once_with(service_id=service_id)
 
 
-def test_should_show_api_keys_page(app_,
-                                   api_user_active,
-                                   mock_login,
-                                   mock_get_api_keys,
-                                   mock_get_service,
-                                   mock_has_permissions,
-                                   fake_uuid):
+def test_should_show_api_keys_page(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_api_keys,
+    mock_get_service,
+    mock_has_permissions,
+    fake_uuid,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -127,13 +131,15 @@ def test_should_show_api_keys_page(app_,
         mock_get_api_keys.assert_called_once_with(service_id=fake_uuid)
 
 
-def test_should_show_create_api_key_page(app_,
-                                         api_user_active,
-                                         mock_login,
-                                         mock_get_api_keys,
-                                         mock_get_service,
-                                         mock_has_permissions,
-                                         fake_uuid):
+def test_should_show_create_api_key_page(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_api_keys,
+    mock_get_service,
+    mock_has_permissions,
+    fake_uuid,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -143,14 +149,16 @@ def test_should_show_create_api_key_page(app_,
         assert response.status_code == 200
 
 
-def test_should_create_api_key_with_type_normal(app_,
-                                                api_user_active,
-                                                mock_login,
-                                                mock_get_api_keys,
-                                                mock_get_live_service,
-                                                mock_has_permissions,
-                                                fake_uuid,
-                                                mocker):
+def test_should_create_api_key_with_type_normal(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_api_keys,
+    mock_get_live_service,
+    mock_has_permissions,
+    fake_uuid,
+    mocker,
+):
     post = mocker.patch('app.notify_client.api_key_api_client.ApiKeyApiClient.post', return_value={'data': fake_uuid})
     service_id = str(uuid.uuid4())
 
@@ -189,7 +197,7 @@ def test_cant_create_normal_api_key_in_trial_mode(
     mock_get_service,
     mock_has_permissions,
     fake_uuid,
-    mocker
+    mocker,
 ):
     mock_post = mocker.patch('app.notify_client.api_key_api_client.ApiKeyApiClient.post')
 
@@ -205,13 +213,15 @@ def test_cant_create_normal_api_key_in_trial_mode(
     mock_post.assert_not_called()
 
 
-def test_should_show_confirm_revoke_api_key(app_,
-                                            api_user_active,
-                                            mock_login,
-                                            mock_get_api_keys,
-                                            mock_get_service,
-                                            mock_has_permissions,
-                                            fake_uuid):
+def test_should_show_confirm_revoke_api_key(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_get_api_keys,
+    mock_get_service,
+    mock_has_permissions,
+    fake_uuid,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -222,14 +232,16 @@ def test_should_show_confirm_revoke_api_key(app_,
         mock_get_api_keys.assert_called_once_with(service_id=fake_uuid, key_id=fake_uuid)
 
 
-def test_should_redirect_after_revoking_api_key(app_,
-                                                api_user_active,
-                                                mock_login,
-                                                mock_revoke_api_key,
-                                                mock_get_api_keys,
-                                                mock_get_service,
-                                                mock_has_permissions,
-                                                fake_uuid):
+def test_should_redirect_after_revoking_api_key(
+    app_,
+    api_user_active,
+    mock_login,
+    mock_revoke_api_key,
+    mock_get_api_keys,
+    mock_get_service,
+    mock_has_permissions,
+    fake_uuid,
+):
     with app_.test_request_context():
         with app_.test_client() as client:
             client.login(api_user_active)
@@ -246,12 +258,14 @@ def test_should_redirect_after_revoking_api_key(app_,
     'main.create_api_key',
     'main.revoke_api_key'
 ])
-def test_route_permissions(mocker,
-                           app_,
-                           api_user_active,
-                           service_one,
-                           mock_get_api_keys,
-                           route):
+def test_route_permissions(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_api_keys,
+    route,
+):
     with app_.test_request_context():
         validate_route_permission(
             mocker,
@@ -269,12 +283,14 @@ def test_route_permissions(mocker,
     'main.create_api_key',
     'main.revoke_api_key'
 ])
-def test_route_invalid_permissions(mocker,
-                                   app_,
-                                   api_user_active,
-                                   service_one,
-                                   mock_get_api_keys,
-                                   route):
+def test_route_invalid_permissions(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_api_keys,
+    route,
+):
     with app_.test_request_context():
         validate_route_permission(
             mocker,
@@ -293,7 +309,7 @@ def test_should_show_whitelist_page(
     api_user_active,
     mock_get_service,
     mock_has_permissions,
-    mock_get_whitelist
+    mock_get_whitelist,
 ):
     client.login(api_user_active)
     response = client.get(url_for('main.whitelist', service_id=str(uuid.uuid4())))
