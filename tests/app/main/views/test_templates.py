@@ -100,10 +100,10 @@ def test_should_show_preview_letter_templates(
     assert response.status_code == 200
     assert response.content_type == expected_content_type
     mock_get_service_email_template.assert_called_with(service_id, template_id, **extra_view_args)
-    print(mock_letter_preview)
-    print(mock_letter_preview.call_args)
+    assert mock_letter_preview.call_args[0][0]['subject'] == (
+        "Your <span class='placeholder'>((thing))</span> is due soon"
+    )
     assert mock_letter_preview.call_args[0][0]['message'] == (
-        "<h2>Your <span class='placeholder'>((thing))</span> is due soon</h2>\n"
         "<p>Your vehicle tax expires on <span class='placeholder'>((date))</span></p>"
     )
 
