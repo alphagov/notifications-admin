@@ -3,7 +3,8 @@
 {% macro pill(
   title,
   items=[],
-  current_value=None
+  current_value=None,
+  big_number_args={'smaller': True}
 ) %}
   <nav role='navigation' class='pill' aria-labelledby="pill_{{title}}">
     <h2 id="pill_{{title}}" class="visuallyhidden">{{title}}</h2>
@@ -13,8 +14,8 @@
       {% else %}
         <a href="{{ link }}">
       {% endif %}
-          {{ big_number(count, smaller=True) }}
-          <div class="pill-label">{{ label }}</div>
+        {{ big_number(count, **big_number_args) }}
+        <div class="pill-label">{{ label }}</div>
       {% if current_value == option %}
         </span>
       {% else %}
