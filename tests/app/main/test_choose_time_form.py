@@ -5,7 +5,7 @@ from freezegun import freeze_time
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
-def test_form_contains_next_24h(app_):
+def test_form_contains_next_24h():
 
     choices = ChooseTimeForm().scheduled_for.choices
 
@@ -34,12 +34,12 @@ def test_form_contains_next_24h(app_):
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
-def test_form_defaults_to_now(app_):
+def test_form_defaults_to_now():
     assert ChooseTimeForm().scheduled_for.data == ''
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
-def test_form_contains_next_three_days(app_):
+def test_form_contains_next_three_days():
     assert ChooseTimeForm().scheduled_for.categories == [
         'Later today', 'Tomorrow', 'Sunday', 'Monday'
     ]

@@ -9,35 +9,32 @@ from tests import validate_route_permission
 
 
 def test_should_show_api_page(
-    app_,
+    logged_in_client,
     mock_login,
     api_user_active,
     mock_get_service,
     mock_has_permissions,
     mock_get_notifications
 ):
-    with app_.test_request_context(), app_.test_client() as client:
-        client.login(api_user_active)
-        response = client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
-        assert response.status_code == 200
-        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string.strip() == 'API integration'
-        rows = page.find_all('details')
-        assert len(rows) == 5
-        for index, row in enumerate(rows):
-            assert row.find('h3').string.strip() == '07123456789'
+    response = logged_in_client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.string.strip() == 'API integration'
+    rows = page.find_all('details')
+    assert len(rows) == 5
+    for index, row in enumerate(rows):
+        assert row.find('h3').string.strip() == '07123456789'
 
 
 def test_should_show_api_page_with_lots_of_notifications(
-    client,
+    logged_in_client,
     mock_login,
     api_user_active,
     mock_get_service,
     mock_has_permissions,
     mock_get_notifications_with_previous_next
 ):
-    client.login(api_user_active)
-    response = client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
+    response = logged_in_client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     rows = page.find_all('div', {'class': 'api-notifications-item'})
     assert ' '.join(rows[len(rows) - 1].text.split()) == (
@@ -46,123 +43,117 @@ def test_should_show_api_page_with_lots_of_notifications(
 
 
 def test_should_show_api_page_with_no_notifications(
-    client,
+    logged_in_client,
     mock_login,
     api_user_active,
     mock_get_service,
     mock_has_permissions,
     mock_get_notifications_with_no_notifications
 ):
-    client.login(api_user_active)
-    response = client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
+    response = logged_in_client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     rows = page.find_all('div', {'class': 'api-notifications-item'})
     assert 'When you send messages via the API they’ll appear here.' in rows[len(rows) - 1].text.strip()
 
 
 def test_should_show_api_page_for_live_service(
-    app_,
+    logged_in_client,
     mock_login,
     api_user_active,
     mock_get_live_service,
     mock_has_permissions
 ):
-    with app_.test_request_context(), app_.test_client() as client:
-        client.login(api_user_active)
-        response = client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
-        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert 'Your service is in trial mode' not in page.find('main').text
+    response = logged_in_client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert 'Your service is in trial mode' not in page.find('main').text
 
 
 def test_should_show_api_documentation_page(
-    app_,
+    logged_in_client,
     mock_login,
     api_user_active,
     mock_get_service,
     mock_has_permissions
 ):
-    with app_.test_request_context(), app_.test_client() as client:
-        client.login(api_user_active)
-        response = client.get(url_for('main.api_documentation', service_id=str(uuid.uuid4())))
-        assert response.status_code == 200
-        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-        assert page.h1.string.strip() == 'Documentation'
+    response = logged_in_client.get(url_for('main.api_documentation', service_id=str(uuid.uuid4())))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.string.strip() == 'Documentation'
 
 
-def test_should_show_empty_api_keys_page(app_,
-                                         api_user_pending,
-                                         mock_login,
-                                         mock_get_no_api_keys,
-                                         mock_get_service,
-                                         mock_has_permissions):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_pending)
-            service_id = str(uuid.uuid4())
-            response = client.get(url_for('main.api_keys', service_id=service_id))
+def test_should_show_empty_api_keys_page(
+    client,
+    api_user_pending,
+    mock_login,
+    mock_get_no_api_keys,
+    mock_get_service,
+    mock_has_permissions,
+):
+    client.login(api_user_pending)
+    service_id = str(uuid.uuid4())
+    response = client.get(url_for('main.api_keys', service_id=service_id))
 
-        assert response.status_code == 200
-        assert 'You haven’t created any API keys yet' in response.get_data(as_text=True)
-        assert 'Create an API key' in response.get_data(as_text=True)
-        mock_get_no_api_keys.assert_called_once_with(service_id=service_id)
-
-
-def test_should_show_api_keys_page(app_,
-                                   api_user_active,
-                                   mock_login,
-                                   mock_get_api_keys,
-                                   mock_get_service,
-                                   mock_has_permissions,
-                                   fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            response = client.get(url_for('main.api_keys', service_id=fake_uuid))
-
-        assert response.status_code == 200
-        resp_data = response.get_data(as_text=True)
-        assert 'some key name' in resp_data
-        assert 'another key name' in resp_data
-        assert 'Revoked 1 January at 1:00am' in resp_data
-        mock_get_api_keys.assert_called_once_with(service_id=fake_uuid)
+    assert response.status_code == 200
+    assert 'You haven’t created any API keys yet' in response.get_data(as_text=True)
+    assert 'Create an API key' in response.get_data(as_text=True)
+    mock_get_no_api_keys.assert_called_once_with(service_id=service_id)
 
 
-def test_should_show_create_api_key_page(app_,
-                                         api_user_active,
-                                         mock_login,
-                                         mock_get_api_keys,
-                                         mock_get_service,
-                                         mock_has_permissions,
-                                         fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            service_id = fake_uuid
-            response = client.get(url_for('main.create_api_key', service_id=fake_uuid))
+def test_should_show_api_keys_page(
+    logged_in_client,
+    api_user_active,
+    mock_login,
+    mock_get_api_keys,
+    mock_get_service,
+    mock_has_permissions,
+    fake_uuid,
+):
+    response = logged_in_client.get(url_for('main.api_keys', service_id=fake_uuid))
 
-        assert response.status_code == 200
+    assert response.status_code == 200
+    resp_data = response.get_data(as_text=True)
+    assert 'some key name' in resp_data
+    assert 'another key name' in resp_data
+    assert 'Revoked 1 January at 1:00am' in resp_data
+    mock_get_api_keys.assert_called_once_with(service_id=fake_uuid)
 
 
-def test_should_create_api_key_with_type_normal(app_,
-                                                api_user_active,
-                                                mock_login,
-                                                mock_get_api_keys,
-                                                mock_get_live_service,
-                                                mock_has_permissions,
-                                                fake_uuid,
-                                                mocker):
+def test_should_show_create_api_key_page(
+    logged_in_client,
+    api_user_active,
+    mock_login,
+    mock_get_api_keys,
+    mock_get_service,
+    mock_has_permissions,
+    fake_uuid,
+):
+    logged_in_client.login(api_user_active)
+    service_id = fake_uuid
+    response = logged_in_client.get(url_for('main.create_api_key', service_id=fake_uuid))
+
+    assert response.status_code == 200
+
+
+def test_should_create_api_key_with_type_normal(
+    logged_in_client,
+    api_user_active,
+    mock_login,
+    mock_get_api_keys,
+    mock_get_live_service,
+    mock_has_permissions,
+    fake_uuid,
+    mocker,
+):
     post = mocker.patch('app.notify_client.api_key_api_client.ApiKeyApiClient.post', return_value={'data': fake_uuid})
     service_id = str(uuid.uuid4())
 
-    with app_.test_request_context(), app_.test_client() as client:
-        client.login(api_user_active)
-        response = client.post(
-            url_for('main.create_api_key', service_id=service_id),
-            data={
-                'key_name': 'Some default key name 1/2',
-                'key_type': 'normal'
-            }
-        )
+    response = logged_in_client.post(
+        url_for('main.create_api_key', service_id=service_id),
+        data={
+            'key_name': 'Some default key name 1/2',
+            'key_type': 'normal'
+        }
+    )
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -182,19 +173,18 @@ def test_should_create_api_key_with_type_normal(app_,
 
 
 def test_cant_create_normal_api_key_in_trial_mode(
-    client,
+    logged_in_client,
     api_user_active,
     mock_login,
     mock_get_api_keys,
     mock_get_service,
     mock_has_permissions,
     fake_uuid,
-    mocker
+    mocker,
 ):
     mock_post = mocker.patch('app.notify_client.api_key_api_client.ApiKeyApiClient.post')
 
-    client.login(api_user_active)
-    response = client.post(
+    response = logged_in_client.post(
         url_for('main.create_api_key', service_id=uuid.uuid4()),
         data={
             'key_name': 'some default key name',
@@ -205,40 +195,37 @@ def test_cant_create_normal_api_key_in_trial_mode(
     mock_post.assert_not_called()
 
 
-def test_should_show_confirm_revoke_api_key(app_,
-                                            api_user_active,
-                                            mock_login,
-                                            mock_get_api_keys,
-                                            mock_get_service,
-                                            mock_has_permissions,
-                                            fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            response = client.get(url_for('main.revoke_api_key', service_id=fake_uuid, key_id=fake_uuid))
-
-        assert response.status_code == 200
-        assert 'some key name' in response.get_data(as_text=True)
-        mock_get_api_keys.assert_called_once_with(service_id=fake_uuid, key_id=fake_uuid)
+def test_should_show_confirm_revoke_api_key(
+    logged_in_client,
+    api_user_active,
+    mock_login,
+    mock_get_api_keys,
+    mock_get_service,
+    mock_has_permissions,
+    fake_uuid,
+):
+    response = logged_in_client.get(url_for('main.revoke_api_key', service_id=fake_uuid, key_id=fake_uuid))
+    assert response.status_code == 200
+    assert 'some key name' in response.get_data(as_text=True)
+    mock_get_api_keys.assert_called_once_with(service_id=fake_uuid, key_id=fake_uuid)
 
 
-def test_should_redirect_after_revoking_api_key(app_,
-                                                api_user_active,
-                                                mock_login,
-                                                mock_revoke_api_key,
-                                                mock_get_api_keys,
-                                                mock_get_service,
-                                                mock_has_permissions,
-                                                fake_uuid):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            client.login(api_user_active)
-            response = client.post(url_for('main.revoke_api_key', service_id=fake_uuid, key_id=fake_uuid))
+def test_should_redirect_after_revoking_api_key(
+    logged_in_client,
+    api_user_active,
+    mock_login,
+    mock_revoke_api_key,
+    mock_get_api_keys,
+    mock_get_service,
+    mock_has_permissions,
+    fake_uuid,
+):
+    response = logged_in_client.post(url_for('main.revoke_api_key', service_id=fake_uuid, key_id=fake_uuid))
 
-        assert response.status_code == 302
-        assert response.location == url_for('.api_keys', service_id=fake_uuid, _external=True)
-        mock_revoke_api_key.assert_called_once_with(service_id=fake_uuid, key_id=fake_uuid)
-        mock_get_api_keys.assert_called_once_with(service_id=fake_uuid, key_id=fake_uuid)
+    assert response.status_code == 302
+    assert response.location == url_for('.api_keys', service_id=fake_uuid, _external=True)
+    mock_revoke_api_key.assert_called_once_with(service_id=fake_uuid, key_id=fake_uuid)
+    mock_get_api_keys.assert_called_once_with(service_id=fake_uuid, key_id=fake_uuid)
 
 
 @pytest.mark.parametrize('route', [
@@ -246,12 +233,14 @@ def test_should_redirect_after_revoking_api_key(app_,
     'main.create_api_key',
     'main.revoke_api_key'
 ])
-def test_route_permissions(mocker,
-                           app_,
-                           api_user_active,
-                           service_one,
-                           mock_get_api_keys,
-                           route):
+def test_route_permissions(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_api_keys,
+    route,
+):
     with app_.test_request_context():
         validate_route_permission(
             mocker,
@@ -269,12 +258,14 @@ def test_route_permissions(mocker,
     'main.create_api_key',
     'main.revoke_api_key'
 ])
-def test_route_invalid_permissions(mocker,
-                                   app_,
-                                   api_user_active,
-                                   service_one,
-                                   mock_get_api_keys,
-                                   route):
+def test_route_invalid_permissions(
+    mocker,
+    app_,
+    api_user_active,
+    service_one,
+    mock_get_api_keys,
+    route,
+):
     with app_.test_request_context():
         validate_route_permission(
             mocker,
@@ -288,15 +279,14 @@ def test_route_invalid_permissions(mocker,
 
 
 def test_should_show_whitelist_page(
-    client,
+    logged_in_client,
     mock_login,
     api_user_active,
     mock_get_service,
     mock_has_permissions,
-    mock_get_whitelist
+    mock_get_whitelist,
 ):
-    client.login(api_user_active)
-    response = client.get(url_for('main.whitelist', service_id=str(uuid.uuid4())))
+    response = logged_in_client.get(url_for('main.whitelist', service_id=str(uuid.uuid4())))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     textboxes = page.find_all('input', {'type': 'text'})
     for index, value in enumerate(
@@ -306,14 +296,13 @@ def test_should_show_whitelist_page(
 
 
 def test_should_update_whitelist(
-    client,
+    logged_in_client,
     mock_login,
     api_user_active,
     mock_get_service,
     mock_has_permissions,
     mock_update_whitelist
 ):
-    client.login(api_user_active)
     service_id = str(uuid.uuid4())
     data = OrderedDict([
         ('email_addresses-1', 'test@example.com'),
@@ -321,7 +310,7 @@ def test_should_update_whitelist(
         ('phone_numbers-0', '07900900000')
     ])
 
-    response = client.post(
+    response = logged_in_client.post(
         url_for('main.whitelist', service_id=service_id),
         data=data
     )

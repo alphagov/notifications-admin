@@ -10,23 +10,24 @@ from tests import service_json
 from app.main.views.platform_admin import format_stats_by_service, create_global_stats
 
 
-def test_should_redirect_if_not_logged_in(app_):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            response = client.get(url_for('main.platform_admin'))
-            assert response.status_code == 302
-            assert url_for('main.index', _external=True) in response.location
+def test_should_redirect_if_not_logged_in(
+    client
+):
+    response = client.get(url_for('main.platform_admin'))
+    assert response.status_code == 302
+    assert url_for('main.index', _external=True) in response.location
 
 
-def test_should_403_if_not_platform_admin(app_, active_user_with_permissions, mocker):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            mock_get_user(mocker, user=active_user_with_permissions)
-            client.login(active_user_with_permissions)
+def test_should_403_if_not_platform_admin(
+    client,
+    active_user_with_permissions,
+    mocker,
+):
+    mock_get_user(mocker, user=active_user_with_permissions)
+    client.login(active_user_with_permissions)
+    response = client.get(url_for('main.platform_admin'))
 
-            response = client.get(url_for('main.platform_admin'))
-
-            assert response.status_code == 403
+    assert response.status_code == 403
 
 
 @pytest.mark.parametrize('restricted, table_index, research_mode, displayed', [
@@ -40,21 +41,19 @@ def test_should_show_research_and_restricted_mode(
     table_index,
     research_mode,
     displayed,
-    app_,
+    client,
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
-    fake_uuid
+    fake_uuid,
 ):
     services = [service_json(fake_uuid, 'My Service', [], restricted=restricted, research_mode=research_mode)]
     services[0]['statistics'] = create_stats()
 
     mock_get_detailed_services.return_value = {'data': services}
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            mock_get_user(mocker, user=platform_admin_user)
-            client.login(platform_admin_user)
-            response = client.get(url_for('main.platform_admin'))
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin'))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
@@ -66,16 +65,14 @@ def test_should_show_research_and_restricted_mode(
 
 
 def test_should_render_platform_admin_page(
-    app_,
+    client,
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
 ):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            mock_get_user(mocker, user=platform_admin_user)
-            client.login(platform_admin_user)
-            response = client.get(url_for('main.platform_admin'))
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin'))
 
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
@@ -92,42 +89,40 @@ def test_should_render_platform_admin_page(
 def test_platform_admin_toggle_including_from_test_key(
     include_from_test_key,
     api_args,
-    app_,
+    client,
     platform_admin_user,
     mocker,
-    mock_get_detailed_services
+    mock_get_detailed_services,
 ):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            mock_get_user(mocker, user=platform_admin_user)
-            client.login(platform_admin_user)
-            response = client.get(url_for('main.platform_admin', include_from_test_key=include_from_test_key))
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin', include_from_test_key=include_from_test_key))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with(api_args)
 
 
 def test_platform_admin_with_date_filter(
-    app_,
+    client,
     platform_admin_user,
     mocker,
-    mock_get_detailed_services
+    mock_get_detailed_services,
 ):
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            mock_get_user(mocker, user=platform_admin_user)
-            client.login(platform_admin_user)
-            response = client.get(url_for('main.platform_admin', start_date='2016-12-20', end_date='2016-12-28'))
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin', start_date='2016-12-20', end_date='2016-12-28'))
 
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
     assert 'Platform admin' in resp_data
     assert 'Live services' in resp_data
     assert 'Trial mode services' in resp_data
-    mock_get_detailed_services.assert_called_once_with({'include_from_test_key': False,
-                                                        'start_date': datetime.date(2016, 12, 20),
-                                                        'end_date': datetime.date(2016, 12, 28),
-                                                        'detailed': True})
+    mock_get_detailed_services.assert_called_once_with({
+        'include_from_test_key': False,
+        'start_date': datetime.date(2016, 12, 20),
+        'end_date': datetime.date(2016, 12, 28),
+        'detailed': True,
+    })
 
 
 def test_create_global_stats_sets_failure_rates(fake_uuid):
@@ -216,11 +211,11 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     restricted,
     table_index,
     research_mode,
-    app_,
+    client,
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
-    fake_uuid
+    fake_uuid,
 ):
     services = [service_json(fake_uuid, 'My Service', [], restricted=restricted, research_mode=research_mode)]
     services[0]['statistics'] = create_stats(
@@ -233,11 +228,9 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     )
 
     mock_get_detailed_services.return_value = {'data': services}
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            mock_get_user(mocker, user=platform_admin_user)
-            client.login(platform_admin_user)
-            response = client.get(url_for('main.platform_admin'))
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin'))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
@@ -268,7 +261,7 @@ def test_should_show_archived_services_last(
     mocker,
     mock_get_detailed_services,
     restricted,
-    table_index
+    table_index,
 ):
     services = [
         service_json(name='C', restricted=restricted, active=False, created_at='2002-02-02 12:00:00'),
@@ -302,7 +295,7 @@ def test_shows_archived_label_instead_of_live_or_research_mode_label(
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
-    research_mode
+    research_mode,
 ):
     services = [
         service_json(restricted=False, research_mode=research_mode, active=False)
@@ -328,7 +321,7 @@ def test_should_show_correct_sent_totals_for_platform_admin(
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
-    fake_uuid
+    fake_uuid,
 ):
     services = [service_json(fake_uuid, 'My Service', [])]
     services[0]['statistics'] = create_stats(

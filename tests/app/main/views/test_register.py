@@ -14,26 +14,29 @@ def test_render_register_returns_template_with_form(client):
     assert 'Create an account' in response.get_data(as_text=True)
 
 
-def test_logged_in_user_redirects_to_choose_service(client,
-                                                    api_user_active,
-                                                    mock_get_user_by_email,
-                                                    mock_send_verify_code,
-                                                    mock_login):
-    client.login(api_user_active)
-    response = client.get(url_for('main.register'))
+def test_logged_in_user_redirects_to_choose_service(
+    logged_in_client,
+    api_user_active,
+    mock_get_user_by_email,
+    mock_send_verify_code,
+    mock_login,
+):
+    response = logged_in_client.get(url_for('main.register'))
     assert response.status_code == 302
 
-    response = client.get(url_for('main.sign_in', follow_redirects=True))
+    response = logged_in_client.get(url_for('main.sign_in', follow_redirects=True))
     assert response.location == url_for('main.choose_service', _external=True)
 
 
-def test_register_creates_new_user_and_redirects_to_continue_page(client,
-                                                                  mock_send_verify_code,
-                                                                  mock_register_user,
-                                                                  mock_get_user_by_email_not_found,
-                                                                  mock_is_email_unique,
-                                                                  mock_send_verify_email,
-                                                                  mock_login):
+def test_register_creates_new_user_and_redirects_to_continue_page(
+    client,
+    mock_send_verify_code,
+    mock_register_user,
+    mock_get_user_by_email_not_found,
+    mock_is_email_unique,
+    mock_send_verify_email,
+    mock_login,
+):
     user_data = {'name': 'Some One Valid',
                  'email_address': 'notfound@example.gov.uk',
                  'mobile_number': '+4407700900460',
@@ -52,10 +55,12 @@ def test_register_creates_new_user_and_redirects_to_continue_page(client,
                                           user_data['password'])
 
 
-def test_process_register_returns_200_when_mobile_number_is_invalid(client,
-                                                                    mock_send_verify_code,
-                                                                    mock_get_user_by_email_not_found,
-                                                                    mock_login):
+def test_process_register_returns_200_when_mobile_number_is_invalid(
+    client,
+    mock_send_verify_code,
+    mock_get_user_by_email_not_found,
+    mock_login,
+):
     response = client.post(url_for('main.register'),
                            data={'name': 'Bad Mobile',
                                  'email_address': 'bad_mobile@example.gov.uk',
@@ -66,10 +71,12 @@ def test_process_register_returns_200_when_mobile_number_is_invalid(client,
     assert 'Must not contain letters or symbols' in response.get_data(as_text=True)
 
 
-def test_should_return_200_when_email_is_not_gov_uk(client,
-                                                    mock_send_verify_code,
-                                                    mock_get_user_by_email,
-                                                    mock_login):
+def test_should_return_200_when_email_is_not_gov_uk(
+    client,
+    mock_send_verify_code,
+    mock_get_user_by_email,
+    mock_login,
+):
     response = client.post(url_for('main.register'),
                            data={'name': 'Bad Mobile',
                                  'email_address': 'bad_mobile@example.not.right',
@@ -80,14 +87,16 @@ def test_should_return_200_when_email_is_not_gov_uk(client,
     assert 'Enter a central government email address' in response.get_data(as_text=True)
 
 
-def test_should_add_user_details_to_session(client,
-                                            mock_send_verify_code,
-                                            mock_register_user,
-                                            mock_get_user,
-                                            mock_get_user_by_email_not_found,
-                                            mock_is_email_unique,
-                                            mock_send_verify_email,
-                                            mock_login):
+def test_should_add_user_details_to_session(
+    client,
+    mock_send_verify_code,
+    mock_register_user,
+    mock_get_user,
+    mock_get_user_by_email_not_found,
+    mock_is_email_unique,
+    mock_send_verify_email,
+    mock_login,
+):
     user_data = {
         'name': 'Test Codes',
         'email_address': 'notfound@example.gov.uk',
@@ -101,9 +110,11 @@ def test_should_add_user_details_to_session(client,
     assert session['user_details']['email'] == user_data['email_address']
 
 
-def test_should_return_200_if_password_is_blacklisted(client,
-                                                      mock_get_user_by_email,
-                                                      mock_login):
+def test_should_return_200_if_password_is_blacklisted(
+    client,
+    mock_get_user_by_email,
+    mock_login,
+):
     response = client.post(url_for('main.register'),
                            data={'name': 'Bad Mobile',
                                  'email_address': 'bad_mobile@example.not.right',
@@ -114,10 +125,12 @@ def test_should_return_200_if_password_is_blacklisted(client,
     assert 'Choose a password that’s harder to guess' in response.get_data(as_text=True)
 
 
-def test_register_with_existing_email_sends_emails(client,
-                                                   api_user_active,
-                                                   mock_get_user_by_email,
-                                                   mock_send_already_registered_email):
+def test_register_with_existing_email_sends_emails(
+    client,
+    api_user_active,
+    mock_get_user_by_email,
+    mock_send_already_registered_email,
+):
     user_data = {
         'name': 'Already Hasaccount',
         'email_address': api_user_active.email_address,
@@ -131,12 +144,14 @@ def test_register_with_existing_email_sends_emails(client,
     assert response.location == url_for('main.registration_continue', _external=True)
 
 
-def test_register_from_invite_(client,
-                               fake_uuid,
-                               mock_is_email_unique,
-                               mock_register_user,
-                               mock_send_verify_code,
-                               mock_accept_invite):
+def test_register_from_invite_(
+    client,
+    fake_uuid,
+    mock_is_email_unique,
+    mock_register_user,
+    mock_send_verify_code,
+    mock_accept_invite,
+):
     invited_user = InvitedUser(fake_uuid, fake_uuid, "",
                                "invited@user.com",
                                ["manage_users"],
@@ -154,11 +169,13 @@ def test_register_from_invite_(client,
     assert response.location == url_for('main.verify', _external=True)
 
 
-def test_register_from_invite_when_user_registers_in_another_browser(client,
-                                                                     api_user_active,
-                                                                     mock_is_email_not_unique,
-                                                                     mock_get_user_by_email,
-                                                                     mock_accept_invite):
+def test_register_from_invite_when_user_registers_in_another_browser(
+    client,
+    api_user_active,
+    mock_is_email_not_unique,
+    mock_get_user_by_email,
+    mock_accept_invite,
+):
     invited_user = InvitedUser(api_user_active.id, api_user_active.id, "",
                                api_user_active.email_address,
                                ["manage_users"],

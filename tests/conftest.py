@@ -570,6 +570,7 @@ def active_user_with_permissions(fake_uuid):
     user_data = {'id': fake_uuid,
                  'name': 'Test User',
                  'password': 'somepassword',
+                 'password_changed_at': str(datetime.utcnow()),
                  'email_address': 'test@user.gov.uk',
                  'mobile_number': '07700 900762',
                  'state': 'active',
