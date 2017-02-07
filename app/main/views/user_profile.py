@@ -201,8 +201,7 @@ def user_profile_password():
     form = ChangePasswordForm(_check_password)
 
     if form.validate_on_submit():
-        current_user.set_password(form.new_password.data)
-        user_api_client.update_user(current_user)
+        user_api_client.update_password(current_user.id, password=form.new_password.data)
         return redirect(url_for('.user_profile'))
 
     return render_template(

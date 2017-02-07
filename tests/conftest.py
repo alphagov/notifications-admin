@@ -802,6 +802,14 @@ def mock_update_user(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_update_user_password(mocker, api_user_active):
+    def _update(user_id, **kwargs):
+        return api_user_active
+
+    return mocker.patch('app.user_api_client.update_password', side_effect=_update)
+
+
+@pytest.fixture(scope='function')
 def mock_update_user_attribute(mocker, api_user_active):
     def _update(user_id, **kwargs):
         return api_user_active
