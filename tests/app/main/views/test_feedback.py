@@ -88,7 +88,7 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
         data={
             'department_id': ANY,
             'agent_team_id': ANY,
-            'subject': 'Notify feedback',
+            'subject': 'Notify feedback {}'.format(data['name']),
             'message': 'Environment: http://localhost/\n\nblah',
             'person_email': 'rip@gmail.com',
             'person_name': 'Steve Irwin',
