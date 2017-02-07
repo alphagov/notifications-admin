@@ -303,7 +303,7 @@ def test_should_redirect_after_request_to_go_live(
     mock_post.assert_called_with(
         ANY,
         data={
-            'subject': 'Request to go live',
+            'subject': 'Request to go live - Test Service',
             'department_id': ANY,
             'agent_team_id': ANY,
             'message': ANY,

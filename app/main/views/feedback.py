@@ -96,7 +96,7 @@ def feedback(ticket_type):
             'person_name': user_name,
             'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
             'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
-            'subject': 'Notify feedback',
+            'subject': 'Notify feedback {}'.format(user_name),
             'message': feedback_msg,
             'label': ticket_type,
             'urgency': 10 if urgent else 1,

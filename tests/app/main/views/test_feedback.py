@@ -76,9 +76,11 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
         return_value=Mock(status_code=201)
     )
 
+    data = {'feedback': 'blah', 'name': 'Steve Irwin', 'email_address': 'rip@gmail.com'}
+
     resp = client.post(
         url_for('main.feedback', ticket_type=ticket_type),
-        data={'feedback': 'blah', 'name': 'Steve Irwin', 'email_address': 'rip@gmail.com'},
+        data=data
     )
 
     assert resp.status_code == 302
@@ -88,7 +90,7 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
         data={
             'department_id': ANY,
             'agent_team_id': ANY,
-            'subject': 'Notify feedback',
+            'subject': 'Notify feedback {}'.format(data['name']),
             'message': 'Environment: http://localhost/\n\nblah',
             'person_email': 'rip@gmail.com',
             'person_name': 'Steve Irwin',
@@ -128,7 +130,7 @@ def test_passes_user_details_through_flow(
         data={
             'department_id': ANY,
             'agent_team_id': ANY,
-            'subject': 'Notify feedback',
+            'subject': 'Notify feedback Test User',
             'message': ANY,
             'person_email': 'test@user.gov.uk',
             'person_name': 'Test User',
