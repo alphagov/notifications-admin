@@ -109,7 +109,7 @@ def service_request_to_go_live(service_id):
             'person_name': current_user.name,
             'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
             'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
-            'subject': 'Request to go live {}'.format(current_service['name']),
+            'subject': 'Request to go live - {}'.format(current_service['name']),
             'message': (
                 'On behalf of {} ({})\n\nExpected usage\n---'
                 '\nMOU in place: {}'
