@@ -36,28 +36,30 @@
         ],
         field_headings_visible=False
       ) %}
-        {% call row_heading() %}
-          {{ month.name }}
-        {% endcall %}
-        {% for counts, template_type in [
-          (month.email_counts, 'email'),
-          (month.sms_counts, 'sms')
-        ] %}
-          {% call field(align='left') %}
-            {{ big_number(
-              counts.requested,
-              message_count_label(counts.requested, template_type, suffix=''),
-              smallest=True,
-            ) }}
-            {% if counts.requested %}
-              <span class="{{ 'failure-highlight' if counts.show_warning else '' }}">
-                {{ counts.failed }} failed
-              </span>
-            {% else %}
-              –
-            {% endif %}
+        {% if not month.future %}
+          {% call row_heading() %}
+            {{ month.name }}
           {% endcall %}
-        {% endfor %}
+          {% for counts, template_type in [
+            (month.email_counts, 'email'),
+            (month.sms_counts, 'sms')
+          ] %}
+            {% call field(align='left') %}
+              {{ big_number(
+                counts.requested,
+                message_count_label(counts.requested, template_type, suffix=''),
+                smallest=True,
+              ) }}
+              {% if counts.requested %}
+                <span class="{{ 'failure-highlight' if counts.show_warning else '' }}">
+                  {{ counts.failed }} failed
+                </span>
+              {% else %}
+                –
+              {% endif %}
+            {% endcall %}
+          {% endfor %}
+        {% endif %}
       {% endcall %}
     </div>
   {% endif %}
