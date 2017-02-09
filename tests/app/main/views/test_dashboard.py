@@ -8,8 +8,9 @@ from freezegun import freeze_time
 
 from app.main.views.dashboard import (
     get_dashboard_totals,
-    format_weekly_stats_to_list,
-    get_free_paid_breakdown_for_billable_units
+    format_monthly_stats_to_list,
+    get_free_paid_breakdown_for_billable_units,
+    aggregate_status_types,
 )
 
 from tests import validate_route_permission
@@ -534,47 +535,65 @@ def test_get_dashboard_totals_adds_warning(failures, expected):
     assert get_dashboard_totals(stats)['sms']['show_warning'] == expected
 
 
-def test_format_weekly_stats_to_list_empty_case():
-    assert format_weekly_stats_to_list({}) == []
+def test_format_monthly_stats_empty_case():
+    assert format_monthly_stats_to_list({}) == []
 
 
-def test_format_weekly_stats_to_list_sorts_by_week():
-    stats = {
-        '2016-07-04': {},
-        '2016-07-11': {},
-        '2016-07-18': {},
-        '2016-07-25': {}
+def test_format_monthly_stats_labels_month():
+    resp = format_monthly_stats_to_list({'2016-07': {}})
+    assert resp[0]['name'] == 'July'
+
+
+def test_format_monthly_stats_has_stats_with_failure_rate():
+    resp = format_monthly_stats_to_list({
+        '2016-07': {'sms': _stats(3, 1, 2)}
+    })
+    assert resp[0]['sms_counts'] == {
+        'failed': 2,
+        'failed_percentage': '66.7',
+        'requested': 3,
+        'show_warning': True,
     }
-    resp = format_weekly_stats_to_list(stats)
-    assert resp[0]['week_start'] == '2016-07-25'
-    assert resp[1]['week_start'] == '2016-07-18'
-    assert resp[2]['week_start'] == '2016-07-11'
-    assert resp[3]['week_start'] == '2016-07-04'
 
 
-def test_format_weekly_stats_to_list_includes_datetime_for_comparison():
-    stats = {
-        '2016-07-25': {}
-    }
-    resp = format_weekly_stats_to_list(stats)
-    assert resp == [{
-        'week_start': '2016-07-25',
-        'week_end': '2016-07-31',
-        'week_end_datetime': datetime(2016, 7, 31, 0, 0, 0)
-    }]
-
-
-def test_format_weekly_stats_to_list_has_stats_with_failure_rate():
-    stats = {
-        '2016-07-25': {'sms': _stats(3, 1, 2)}
-    }
-    resp = format_weekly_stats_to_list(stats)
-    assert resp[0]['sms']['failure_rate'] == '66.7'
-    assert resp[0]['sms']['requested'] == 3
+def test_format_monthly_stats_works_for_email_letter():
+    resp = format_monthly_stats_to_list({
+        '2016-07': {
+            'sms': {},
+            'email': {},
+            'letter': {},
+        }
+    })
+    assert isinstance(resp[0]['sms_counts'], dict)
+    assert isinstance(resp[0]['email_counts'], dict)
+    assert isinstance(resp[0]['letter_counts'], dict)
 
 
 def _stats(requested, delivered, failed):
     return {'requested': requested, 'delivered': delivered, 'failed': failed}
+
+
+@pytest.mark.parametrize('dict_in, expected_failed, expected_requested', [
+    (
+        {},
+        0,
+        0
+    ),
+    (
+        {'temporary-failure': 1, 'permanent-failure': 1, 'technical-failure': 1},
+        3,
+        3,
+    ),
+    (
+        {'created': 1, 'pending': 1, 'sending': 1, 'delivered': 1},
+        0,
+        4,
+    ),
+])
+def test_aggregate_status_types(dict_in, expected_failed, expected_requested):
+    sms_counts = aggregate_status_types({'sms': dict_in})['sms_counts']
+    assert sms_counts['failed'] == expected_failed
+    assert sms_counts['requested'] == expected_requested
 
 
 @pytest.mark.parametrize(

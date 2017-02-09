@@ -210,7 +210,7 @@ details summary {
 
   table th,
   table td {
-    font-size: 19px;
+    @include core-19;
   }
 
 }

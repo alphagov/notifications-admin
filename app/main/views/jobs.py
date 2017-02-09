@@ -33,6 +33,9 @@ from app.utils import (
     generate_notifications_csv,
     get_help_argument,
     get_template,
+    REQUESTED_STATUSES,
+    FAILURE_STATUSES,
+    SENDING_STATUSES,
 )
 from app.statistics_utils import add_rate_to_job
 
@@ -53,12 +56,10 @@ def _parse_filter_args(filter_dict):
 
 def _set_status_filters(filter_args):
     status_filters = filter_args.get('status', [])
-    all_failure_statuses = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
-    all_sending_statuses = ['created', 'sending']
     return list(OrderedSet(chain(
-        (status_filters or all_sending_statuses + ['delivered'] + all_failure_statuses),
-        all_sending_statuses if 'sending' in status_filters else [],
-        all_failure_statuses if 'failed' in status_filters else []
+        (status_filters or REQUESTED_STATUSES),
+        SENDING_STATUSES if 'sending' in status_filters else [],
+        FAILURE_STATUSES if 'failed' in status_filters else []
     )))
 
 

@@ -219,8 +219,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             params=dict(year=year)
         )
 
-    def get_weekly_notification_stats(self, service_id):
-        return self.get(url='/service/{}/notifications/weekly'.format(service_id))
+    def get_monthly_notification_stats(self, service_id, year):
+        return self.get(url='/service/{}/notifications/monthly?year={}'.format(service_id, year))
 
     def get_whitelist(self, service_id):
         return self.get(url='/service/{}/whitelist'.format(service_id))

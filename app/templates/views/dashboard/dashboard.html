@@ -31,8 +31,8 @@
 
     {{ ajax_block(partials, updates_url, 'totals') }}
     {{ show_more(
-      url_for('.weekly', service_id=current_service.id),
-      'Compare to previous weeks'
+      url_for('.monthly', service_id=current_service.id),
+      'See activity breakdown'
     ) }}
 
     {% if partials['has_template_statistics'] %}

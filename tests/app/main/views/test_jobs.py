@@ -68,11 +68,15 @@ def test_get_jobs_shows_page_links(
     "status_argument, expected_api_call", [
         (
             '',
-            ['created', 'sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+            [
+                'created', 'pending', 'sending',
+                'delivered',
+                'failed', 'temporary-failure', 'permanent-failure', 'technical-failure',
+            ]
         ),
         (
             'sending',
-            ['sending', 'created']
+            ['sending', 'created', 'pending']
         ),
         (
             'delivered',
@@ -304,11 +308,15 @@ def test_should_show_updates_for_one_job_as_json(
     "status_argument, expected_api_call", [
         (
             '',
-            ['created', 'sending', 'delivered', 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+            [
+                'created', 'pending', 'sending',
+                'delivered',
+                'failed', 'temporary-failure', 'permanent-failure', 'technical-failure',
+            ]
         ),
         (
             'sending',
-            ['sending', 'created']
+            ['sending', 'created', 'pending']
         ),
         (
             'delivered',

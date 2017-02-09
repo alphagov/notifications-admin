@@ -75,3 +75,8 @@
   }
 
 }
+
+.failure-highlight {
+  @include bold-19;
+  color: $error-colour;
+}

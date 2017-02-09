@@ -1,0 +1,71 @@
+{% from "components/big-number.html" import big_number_with_status, big_number %}
+{% from "components/pill.html" import pill %}
+{% from "components/table.html" import list_table, field, hidden_field_heading, right_aligned_field_heading, row_heading %}
+{% from "components/message-count-label.html" import message_count_label %}
+
+{% extends "withnav_template.html" %}
+
+{% block page_title %}
+  Previous weeks – GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    Activity breakdown
+  </h1>
+  <div class="bottom-gutter">
+    {{ pill(
+      'financial year',
+      items=years,
+      current_value=selected_year,
+      big_number_args={'smallest': True},
+    ) }}
+  </div>
+  {% if months %}
+    <div class="body-copy-table">
+      {% call(month, row_index) list_table(
+        months,
+        caption="Total spend",
+        caption_visible=False,
+        empty_message='',
+        field_headings=[
+          'Month',
+          'Emails',
+          'Text messages',
+        ],
+        field_headings_visible=False
+      ) %}
+        {% if not month.future %}
+          {% call row_heading() %}
+            {{ month.name }}
+          {% endcall %}
+          {% for counts, template_type in [
+            (month.email_counts, 'email'),
+            (month.sms_counts, 'sms')
+          ] %}
+            {% call field(align='left') %}
+              {{ big_number(
+                counts.requested,
+                message_count_label(counts.requested, template_type, suffix=''),
+                smallest=True,
+              ) }}
+              {% if counts.requested %}
+                <span class="{{ 'failure-highlight' if counts.show_warning else '' }}">
+                  {{ counts.failed }} failed
+                </span>
+              {% else %}
+                –
+              {% endif %}
+            {% endcall %}
+          {% endfor %}
+        {% endif %}
+      {% endcall %}
+    </div>
+  {% endif %}
+
+  <p class="align-with-heading-copy">
+    Financial year ends 31 March.
+  </p>
+
+{% endblock %}
