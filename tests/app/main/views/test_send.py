@@ -207,6 +207,32 @@ def test_upload_csv_invalid_extension(
     assert "invalid.txt isn’t a spreadsheet that Notify can read" in resp.get_data(as_text=True)
 
 
+def test_upload_valid_csv_shows_page_title(
+    logged_in_client,
+    mocker,
+    mock_get_service_template_with_placeholders,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    service_one,
+    fake_uuid,
+):
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        phone number,name\n07700900986,Jo
+    """)
+
+    response = logged_in_client.post(
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
+        data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.text.strip() == 'Preview of Two week reminder'
+
+
 def test_send_test_sms_message(
     logged_in_client,
     mocker,
