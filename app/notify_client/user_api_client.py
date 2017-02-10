@@ -72,6 +72,12 @@ class UserApiClient(NotifyAdminAPIClient):
         user_data = self.post(url, data=data)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
+    def update_password(self, user_id, password):
+        data = {"_password": password}
+        url = "/user/{}/update-password".format(user_id)
+        user_data = self.post(url, data=data)
+        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
+
     def verify_password(self, user_id, password):
         try:
             url = "/user/{}/verify/password".format(user_id)

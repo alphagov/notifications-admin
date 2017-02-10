@@ -239,7 +239,7 @@ def test_should_redirect_after_password_change(
     api_user_active,
     mock_login,
     mock_get_user,
-    mock_update_user,
+    mock_update_user_password,
     mock_verify_password,
 ):
     data = {
