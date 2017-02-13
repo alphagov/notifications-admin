@@ -1366,9 +1366,20 @@ def logged_in_client(
     mocker,
     service_one,
     mock_login,
-    mock_has_permissions
 ):
     client.login(active_user_with_permissions, mocker, service_one)
+    yield client
+
+
+@pytest.fixture(scope='function')
+def logged_in_platform_admin_client(
+    client,
+    platform_admin_user,
+    mocker,
+    service_one,
+    mock_login,
+):
+    client.login(platform_admin_user, mocker, service_one)
     yield client
 
 
