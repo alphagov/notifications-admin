@@ -1,5 +1,11 @@
 {% macro banner(body, type=None, with_tick=False, delete_button=None, subhead=None) %}
-  <div class='banner{% if type %}-{{ type }}{% endif %}{% if with_tick %}-with-tick{% endif %}'>
+  <div
+    class='banner{% if type %}-{{ type }}{% endif %}{% if with_tick %}-with-tick{% endif %}'
+    {% if type == 'dangerous' %}
+    role='group'
+    tabindex='-1'
+    {% endif %}
+  >
     {% if subhead -%}
         {{ subhead }}&ensp;
     {%- endif -%}

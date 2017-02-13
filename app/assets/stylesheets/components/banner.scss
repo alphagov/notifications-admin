@@ -54,6 +54,10 @@
   margin: 15px 0;
   text-align: left;
 
+  &:focus {
+    outline: 3px solid $yellow;
+  }
+
   .button {
     @include button($error-colour);
     margin-top: 10px;
