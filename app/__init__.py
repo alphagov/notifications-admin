@@ -347,24 +347,29 @@ def format_notification_status_as_url(status):
 
 
 def formatted_list(
-  items,
-  conjunction='and',
-  before_each='‘',
-  after_each='’',
-  separator=', ',
-  prefix='',
-  prefix_plural=''
+    items,
+    conjunction='and',
+    before_each='‘',
+    after_each='’',
+    separator=', ',
+    prefix='',
+    prefix_plural=''
 ):
+    if prefix:
+        prefix += ' '
+    if prefix_plural:
+        prefix_plural += ' '
+
     items = list(items)
     if len(items) == 1:
-        return '{prefix} {before_each}{items[0]}{after_each}'.format(**locals())
+        return '{prefix}{before_each}{items[0]}{after_each}'.format(**locals())
     elif items:
         formatted_items = ['{}{}{}'.format(before_each, item, after_each) for item in items]
 
         first_items = separator.join(formatted_items[:-1])
         last_item = formatted_items[-1]
         return (
-            '{prefix_plural} {first_items} {conjunction} {last_item}'
+            '{prefix_plural}{first_items} {conjunction} {last_item}'
         ).format(**locals())
 
 

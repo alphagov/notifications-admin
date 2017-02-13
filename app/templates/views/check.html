@@ -47,8 +47,8 @@
         </h1>
         <p>
           Your file has {{ recipients.column_headers | formatted_list(
-            prefix='one column, called',
-            prefix_plural='columns called'
+            prefix='one column, called ',
+            prefix_plural='columns called '
           ) }}.
         </p>
         {{ skip_to_file_contents() }}
@@ -65,15 +65,15 @@
         </h1>
         <p>
           Your file has {{ recipients.column_headers | formatted_list(
-            prefix='one column, called',
-            prefix_plural='columns called'
+            prefix='one column, called ',
+            prefix_plural='columns called '
           ) }}.
         </p>
         <p>
           It doesn’t have {{ recipients.column_headers | formatted_list(
             conjunction='or',
-            prefix='a column called',
-            prefix_plural='columns called'
+            prefix='a column called ',
+            prefix_plural='columns called '
           ) }}.
         </p>
         {{ skip_to_file_contents() }}

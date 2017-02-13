@@ -1,0 +1,16 @@
+import pytest
+
+from app import formatted_list
+
+
+@pytest.mark.parametrize('items, kwargs, expected_output', [
+    ([1], {}, '‘1’'),
+    ([1, 2], {}, '‘1’ and ‘2’'),
+    ([1, 2, 3], {}, '‘1’, ‘2’ and ‘3’'),
+    ([1, 2, 3], {'prefix': 'foo', 'prefix_plural': 'bar'}, 'bar ‘1’, ‘2’ and ‘3’'),
+    ([1], {'prefix': 'foo', 'prefix_plural': 'bar'}, 'foo ‘1’'),
+    ([1, 2, 3], {'before_each': 'a', 'after_each': 'b'}, 'a1b, a2b and a3b'),
+    ([1, 2, 3], {'conjunction': 'foo'}, '‘1’, ‘2’ foo ‘3’'),
+])
+def test_formatted_list(items, kwargs, expected_output):
+    assert formatted_list(items, **kwargs) == expected_output
