@@ -7,9 +7,9 @@
 {% block fullwidth_content %}
   <div id="content">
     <div class="navigation-service">
-      <h2 class="navigation-service-name">
+      <div class="navigation-service-name">
         {{ current_service.name }}
-      </h2>
+      </div>
       <a href="{{ url_for('main.choose_service') }}" class="navigation-service-switch">Switch service</a>
     </div>
     <div class="grid-row">

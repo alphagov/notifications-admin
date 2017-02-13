@@ -102,7 +102,7 @@ def test_show_restricted_service(
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find('h1').text == 'Settings'
-    assert page.find_all('h2')[1].text == 'Your service is in trial mode'
+    assert page.find_all('h2')[0].text == 'Your service is in trial mode'
 
 
 def test_switch_service_to_live(
