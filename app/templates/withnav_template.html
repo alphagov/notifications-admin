@@ -1,5 +1,9 @@
 {% extends "admin_template.html" %}
 
+{% block per_page_title %}
+  {% block service_page_title %}{% endblock %} – {{ current_service.name }}
+{% endblock %}
+
 {% block fullwidth_content %}
   <div id="content">
     <div class="navigation-service">

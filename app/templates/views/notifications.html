@@ -2,8 +2,8 @@
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/message-count-label.html" import message_count_label, recipient_count_label %}
 
-{% block page_title %}
-  {{ message_count_label(99, message_type, suffix='') | capitalize }} – GOV.UK Notify
+{% block service_page_title %}
+  {{ message_count_label(99, message_type, suffix='') | capitalize }}
 {% endblock %}
 
 {% block maincolumn_content %}
