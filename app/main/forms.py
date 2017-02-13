@@ -23,7 +23,7 @@ from wtforms import (
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
 
-from app.main.validators import (Blacklist, CsvFileValidator, ValidGovEmail, NoCommasInPlaceHolders)
+from app.main.validators import (Blacklist, CsvFileValidator, ValidGovEmail, NoCommasInPlaceHolders, OnlyGSMCharacters)
 
 
 def get_time_value_and_label(future_time):
@@ -260,7 +260,8 @@ class SMSTemplateForm(Form):
         u'Message',
         validators=[
             DataRequired(message="Can’t be empty"),
-            NoCommasInPlaceHolders()
+            NoCommasInPlaceHolders(),
+            OnlyGSMCharacters()
         ]
     )
     process_type = RadioField(

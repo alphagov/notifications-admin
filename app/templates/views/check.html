@@ -4,7 +4,6 @@
 {% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/list.html" import formatted_list %}
 {% from "components/message-count-label.html" import message_count_label %}
 
 {% set file_contents_header_id = 'file-preview' %}
@@ -41,15 +40,13 @@
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         <h1 class='banner-title'>
-          Your file needs to have {{ formatted_list(
-            recipients.recipient_column_headers,
+          Your file needs to have {{ recipients.recipient_column_headers | formatted_list(
             prefix='a column called',
             prefix_plural='columns called'
           ) }}
         </h1>
         <p>
-          Your file has {{ formatted_list(
-            recipients.column_headers,
+          Your file has {{ recipients.column_headers | formatted_list(
             prefix='one column, called',
             prefix_plural='columns called'
           ) }}.
@@ -67,15 +64,13 @@
           your template
         </h1>
         <p>
-          Your file has {{ formatted_list(
-            recipients.column_headers,
+          Your file has {{ recipients.column_headers | formatted_list(
             prefix='one column, called',
             prefix_plural='columns called'
           ) }}.
         </p>
         <p>
-          It doesn’t have {{ formatted_list(
-            recipients.missing_column_headers,
+          It doesn’t have {{ recipients.column_headers | formatted_list(
             conjunction='or',
             prefix='a column called',
             prefix_plural='columns called'

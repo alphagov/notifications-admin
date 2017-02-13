@@ -1,35 +1,5 @@
-{% macro formatted_list(
-  items,
-  conjunction='and',
-  before_each='‘',
-  after_each='’',
-  separator=', ',
-  prefix='',
-  prefix_plural=''
-) %}
-  {% if items|length == 1 %}
-    {{ prefix }} {{ before_each|safe }}{{ (items|list)[0] }}{{ after_each|safe }}
-  {% elif items %}
-    {{ prefix_plural }}
-    {% for item in (items|list)[0:-1] -%}
-      {{ before_each|safe -}}
-      {{ item -}}
-      {{ after_each|safe -}}
-      {% if not loop.last -%}
-        {{ separator -}}
-      {% endif -%}
-    {% endfor %}
-    {{ conjunction }}
-    {{ before_each|safe -}}
-    {{ (items|list)[-1] -}}
-    {{ after_each|safe }}
-  {%- endif %}
-{%- endmacro %}
-
-
 {% macro list_of_placeholders(placeholders) %}
-  {{ formatted_list(
-    placeholders,
+  {{ placeholders | formatted_list(
     before_each="<span class='placeholder'>((",
     after_each='))</span>',
     separator=' '

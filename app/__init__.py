@@ -131,6 +131,7 @@ def create_app():
     application.add_template_filter(format_notification_status_as_time)
     application.add_template_filter(format_notification_status_as_field_status)
     application.add_template_filter(format_notification_status_as_url)
+    application.add_template_filter(formatted_list)
 
     application.after_request(useful_headers_after_request)
     application.after_request(save_service_after_request)
@@ -343,6 +344,28 @@ def format_notification_status_as_url(status):
         'temporary-failure': url(_anchor='not-accepting-messages'),
         'permanent-failure': url(_anchor='does-not-exist')
     }.get(status)
+
+
+def formatted_list(
+  items,
+  conjunction='and',
+  before_each='‘',
+  after_each='’',
+  separator=', ',
+  prefix='',
+  prefix_plural=''
+):
+    items = list(items)
+    if len(items) == 1:
+        return '{prefix} {before_each}{items[0]}{after_each}'.format(**locals())
+    elif items:
+        formatted_items = ['{}{}{}'.format(before_each, item, after_each) for item in items]
+
+        first_items = separator.join(formatted_items[:-1])
+        last_item = formatted_items[-1]
+        return (
+            '{prefix_plural} {first_items} {conjunction} {last_item}'
+        ).format(**locals())
 
 
 @login_manager.user_loader
