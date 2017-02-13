@@ -9,7 +9,7 @@
 ) %}
     <label class="{% if block %}block-label{% endif %}" for="{{ field.name }}">
         {{ field()}}
-        {{ field.label }}
+        {{ field.label.text }}
         {% if hint %}
             <span class="form-hint">
                 {{ hint }}

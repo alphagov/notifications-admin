@@ -7,7 +7,7 @@
   <div class="form-group {% if field.errors %} error{% endif %}">
     <fieldset>
       <legend class="form-label">
-        {{ field.label }}
+        {{ field.label.text }}
         {% if field.errors %}
           <span class="error-message">
             {{ field.errors[0] }}
@@ -46,7 +46,7 @@
  <div class="{{ wrapping_class }} {% if field.errors %} error{% endif %}">
    <fieldset>
      <legend class="form-label">
-       {{ field.label }}
+       {{ field.label.text }}
        {% if field.errors %}
          <span class="error-message">
            {{ field.errors[0] }}
@@ -80,7 +80,7 @@
   <div class="form-group {% if field.errors %} error{% endif %}">
     <fieldset>
       <legend class="form-label">
-        {{ field.label }}
+        {{ field.label.text }}
         {% if field.errors %}
           <span class="error-message">
             {{ field.errors[0] }}
