@@ -3,8 +3,8 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/radios.html" import radios %}
 
-{% block page_title %}
-  {{ heading_action }} email template – GOV.UK Notify
+{% block service_page_title %}
+  {{ heading_action }} email template
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -33,7 +33,7 @@
         <aside class="column-whole">
           {% include "partials/templates/guidance-formatting.html" %}
           {% include "partials/templates/guidance-personalisation.html" %}
-          {% include "partials/templates/guidance-optional-content.html" %}         
+          {% include "partials/templates/guidance-optional-content.html" %}
           {% include "partials/templates/guidance-links.html" %}
         </aside>
       </div>

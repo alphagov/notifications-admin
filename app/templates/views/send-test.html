@@ -3,12 +3,12 @@
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/table.html" import list_table, field, text_field, index_field, index_field_heading %}
 
-{% block page_title %}
+{% block service_page_title %}
   {% if request.args['help'] %}
     Example text message
   {% else %}
     Send yourself a test
-  {% endif %} – GOV.UK Notify
+  {% endif %}
 {% endblock %}
 
 {% block maincolumn_content %}
