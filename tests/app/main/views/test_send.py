@@ -416,20 +416,21 @@ def test_create_job_should_call_api(
 
 
 def test_can_start_letters_job(
-    logged_in_client,
+    logged_in_platform_admin_client,
     mock_create_job,
-    mock_get_service_letter_template,
+    service_one,
     fake_uuid
 ):
-    with logged_in_client.session_transaction() as session:
+
+    with logged_in_platform_admin_client.session_transaction() as session:
         session['upload_data'] = {
             'original_file_name': 'example.csv',
             'template_id': fake_uuid,
             'notification_count': 123,
             'valid': True
         }
-    response = logged_in_client.post(
-        url_for('main.start_job', service_id=fake_uuid, upload_id=fake_uuid),
+    response = logged_in_platform_admin_client.post(
+        url_for('main.start_job', service_id=service_one['id'], upload_id=fake_uuid),
         data={}
     )
     assert response.status_code == 302
@@ -447,13 +448,16 @@ def test_should_show_preview_letter_message(
     mock_letter_preview,
     view,
     expected_content_type,
-    logged_in_client,
+    logged_in_platform_admin_client,
     mock_get_service_letter_template,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
+    service_one,
     fake_uuid,
     mocker,
 ):
+    service_one['can_send_letters'] = True
+    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
 
     mocker.patch(
         'app.main.views.send.s3download',
@@ -463,16 +467,18 @@ def test_should_show_preview_letter_message(
         )
     )
 
-    service_id = fake_uuid
+    service_id = service_one['id']
     template_id = fake_uuid
-    with logged_in_client.session_transaction() as session:
+    with logged_in_platform_admin_client.session_transaction() as session:
         session['upload_data'] = {
             'original_file_name': 'example.csv',
             'template_id': fake_uuid,
             'notification_count': 1,
             'valid': True
         }
-    response = logged_in_client.get(url_for(view, service_id=service_id, template_type='letter', upload_id=fake_uuid))
+    response = logged_in_platform_admin_client.get(
+        url_for(view, service_id=service_id, template_type='letter', upload_id=fake_uuid)
+    )
 
     assert response.status_code == 200
     assert response.content_type == expected_content_type
@@ -917,16 +923,16 @@ def test_check_messages_shows_over_max_row_error(
     )
 
 
-def test_check_messages_redirects_if_no_upload_data(logged_in_client, mocker):
+def test_check_messages_redirects_if_no_upload_data(logged_in_client, service_one, mocker):
     checker = mocker.patch('app.main.views.send.get_check_messages_back_url', return_value='foo')
     response = logged_in_client.get(url_for(
         'main.check_messages',
-        service_id='0',
+        service_id=service_one['id'],
         template_type='bar',
         upload_id='baz'
     ))
 
-    checker.assert_called_once_with('0', 'bar')
+    checker.assert_called_once_with(service_one['id'], 'bar')
     assert response.status_code == 301
     assert response.location == 'http://localhost/foo'
 
@@ -942,14 +948,14 @@ def test_get_check_messages_back_url_returns_to_correct_select_template(client, 
     )
 
 
-def test_check_messages_back_from_help_goes_to_start_of_help(client, mocker):
+def test_check_messages_back_from_help_goes_to_start_of_help(client, service_one, mocker):
     mocker.patch('app.main.views.send.get_help_argument', return_value=True)
     mocker.patch('app.service_api_client.get_service_templates', lambda service_id: {
-        'data': [template_json('000', '111', type_='sms')]
+        'data': [template_json(service_one['id'], '111', type_='sms')]
     })
-    assert get_check_messages_back_url('000', 'sms') == url_for(
+    assert get_check_messages_back_url(service_one['id'], 'sms') == url_for(
         'main.send_test',
-        service_id='000',
+        service_id=service_one['id'],
         template_id='111',
         help='1'
     )

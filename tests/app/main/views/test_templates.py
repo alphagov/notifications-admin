@@ -14,53 +14,43 @@ from app.main.views.templates import get_last_use_message, get_human_readable_de
 
 
 def test_should_show_page_for_one_template(
-    client,
-    active_user_with_permissions,
-    mocker,
+    logged_in_client,
     mock_get_service_template,
+    service_one,
     fake_uuid,
 ):
-
-    service = create_sample_service(active_user_with_permissions)
-    client.login(active_user_with_permissions, mocker, service)
-    service_id = service['id']
     template_id = fake_uuid
-    response = client.get(url_for(
+    response = logged_in_client.get(url_for(
         '.edit_service_template',
-        service_id=service_id,
+        service_id=service_one['id'],
         template_id=template_id))
 
     assert response.status_code == 200
     assert "Two week reminder" in response.get_data(as_text=True)
     assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in response.get_data(as_text=True)
     assert "Use priority queue?" not in response.get_data(as_text=True)
-    mock_get_service_template.assert_called_with(
-        service_id, template_id)
+    mock_get_service_template.assert_called_with(service_one['id'], template_id)
 
 
 def test_should_show_page_template_with_priority_select_if_platform_admin(
-    logged_in_client,
+    logged_in_platform_admin_client,
     platform_admin_user,
     mocker,
     mock_get_service_template,
     fake_uuid,
 ):
-
-    service = create_sample_service(platform_admin_user)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[platform_admin_user])
-    service_id = service['id']
     template_id = fake_uuid
-    response = logged_in_client.get(url_for(
+    response = logged_in_platform_admin_client.get(url_for(
         '.edit_service_template',
-        service_id=service_id,
+        service_id='1234',
         template_id=template_id))
 
     assert response.status_code == 200
     assert "Two week reminder" in response.get_data(as_text=True)
     assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in response.get_data(as_text=True)
     assert "Use priority queue?" in response.get_data(as_text=True)
-    mock_get_service_template.assert_called_with(
-        service_id, template_id)
+    mock_get_service_template.assert_called_with('1234', template_id)
 
 
 @pytest.mark.parametrize('view_suffix, expected_content_type', [
@@ -278,28 +268,22 @@ def test_should_show_interstitial_when_making_breaking_change(
 
 def test_should_not_create_too_big_template(
     logged_in_client,
-    api_user_active,
-    mock_login,
+    service_one,
     mock_get_service_template,
-    mock_get_user,
-    mock_get_service,
-    mock_get_user_by_email,
     mock_create_service_template_content_too_big,
-    mock_has_permissions,
     fake_uuid,
 ):
-    service_id = fake_uuid
     template_type = 'sms'
     data = {
         'name': "new name",
         'template_content': "template content",
         'template_type': template_type,
-        'service': service_id,
+        'service': service_one['id'],
         'process_type': 'normal'
     }
     resp = logged_in_client.post(url_for(
         '.add_service_template',
-        service_id=service_id,
+        service_id=service_one['id'],
         template_type=template_type
     ), data=data)
 
@@ -309,29 +293,23 @@ def test_should_not_create_too_big_template(
 
 def test_should_not_update_too_big_template(
     logged_in_client,
-    api_user_active,
-    mock_login,
+    service_one,
     mock_get_service_template,
-    mock_get_user,
-    mock_get_service,
-    mock_get_user_by_email,
     mock_update_service_template_400_content_too_big,
-    mock_has_permissions,
     fake_uuid,
 ):
-    service_id = fake_uuid
     template_id = fake_uuid
     data = {
         'id': fake_uuid,
         'name': "new name",
         'template_content': "template content",
-        'service': service_id,
+        'service': service_one['id'],
         'template_type': 'sms',
         'process_type': 'normal'
     }
     resp = logged_in_client.post(url_for(
         '.edit_service_template',
-        service_id=service_id,
+        service_id=service_one['id'],
         template_id=template_id), data=data)
 
     assert resp.status_code == 200

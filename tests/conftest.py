@@ -520,7 +520,14 @@ def platform_admin_user(fake_uuid):
                  'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 0,
-                 'permissions': {},
+                 'permissions': {SERVICE_ONE_ID: ['send_texts',
+                                                  'send_emails',
+                                                  'send_letters',
+                                                  'manage_users',
+                                                  'manage_templates',
+                                                  'manage_settings',
+                                                  'manage_api_keys',
+                                                  'view_activity']},
                  'platform_admin': True
                  }
     user = User(user_data)
@@ -583,6 +590,25 @@ def active_user_with_permissions(fake_uuid):
                                                   'manage_settings',
                                                   'manage_api_keys',
                                                   'view_activity']},
+                 'platform_admin': False
+                 }
+    user = User(user_data)
+    return user
+
+
+@pytest.fixture
+def active_user_view_permissions(fake_uuid):
+    from app.notify_client.user_api_client import User
+
+    user_data = {'id': fake_uuid,
+                 'name': 'Test User With Permissions',
+                 'password': 'somepassword',
+                 'password_changed_at': str(datetime.utcnow()),
+                 'email_address': 'test@user.gov.uk',
+                 'mobile_number': '07700 900762',
+                 'state': 'active',
+                 'failed_login_count': 0,
+                 'permissions': {SERVICE_ONE_ID: ['view_activity']},
                  'platform_admin': False
                  }
     user = User(user_data)
@@ -1379,6 +1405,7 @@ def logged_in_platform_admin_client(
     service_one,
     mock_login,
 ):
+    mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user, mocker, service_one)
     yield client
 
