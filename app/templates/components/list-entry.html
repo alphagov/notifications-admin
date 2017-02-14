@@ -11,7 +11,7 @@
     <fieldset class="form-group{% if field.errors %} error{% endif %}" id="{{ field.name }}">
       <legend>
         <span class="form-label">
-          {{ field.label }}
+          {{ field.label.text }}
           {% if hint %}
             <span class="form-hint">
               {{ hint }}
