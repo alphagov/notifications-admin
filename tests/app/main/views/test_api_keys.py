@@ -318,3 +318,33 @@ def test_should_update_whitelist(
     mock_update_whitelist.assert_called_once_with(service_id, {
         'email_addresses': ['test@example.com', 'test@example.com'],
         'phone_numbers': ['07900900000']})
+
+
+def test_should_validate_whitelist_items(
+    logged_in_client,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_update_whitelist
+):
+
+    response = logged_in_client.post(
+        url_for('main.whitelist', service_id=str(uuid.uuid4())),
+        data=OrderedDict([
+            ('email_addresses-1', 'abc'),
+            ('phone_numbers-0', '123')
+        ])
+    )
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.string.strip() == 'There was a problem with your whitelist'
+    jump_links = page.select('.banner-dangerous a')
+
+    assert jump_links[0].string.strip() == 'Enter valid email addresses'
+    assert jump_links[0]['href'] == '#email_addresses'
+
+    assert jump_links[1].string.strip() == 'Enter valid phone numbers'
+    assert jump_links[1]['href'] == '#phone_numbers'
+
+    mock_update_whitelist.assert_not_called()
