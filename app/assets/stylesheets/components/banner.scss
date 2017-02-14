@@ -3,7 +3,7 @@
 .banner-default {
 
   @include core-19;
-  background: $turquoise;
+  background: $govuk-blue;
   color: $white;
   display: block;
   padding: $gutter-half;
@@ -36,7 +36,7 @@
   background-size: 19px;
   background-repeat: no-repeat;
   background-position: $gutter-half $gutter-half;
-  font-weight: bold;
+
 }
 
 .banner-default-with-tick {
