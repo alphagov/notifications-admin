@@ -9,7 +9,7 @@
   }
 
   a,
-  span {
+  &-selected-item {
     display: block;
     float: left;
     box-sizing: border-box;
@@ -45,7 +45,7 @@
     }
   }
 
-  span {
+  &-selected-item {
     border: 2px solid $black;
     outline: 1px solid rgba($white, 0.1);
     position: relative;

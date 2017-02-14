@@ -61,19 +61,19 @@
     {% set border = '' if border else 'table-field-noborder' %}
 
     <td class="{{ [field_alignment, border]|join(' ') }}">
-      <span class="{{ 'table-field-status-' + status if status }}">{{ caller() }}</span>
+      <div class="{{ 'table-field-status-' + status if status }}">{{ caller() }}</div>
     </td>
 {%- endmacro %}
 
 {% macro row_heading() -%}
   <th class="table-field">
-    <span>{{ caller() }}</span>
+    {{ caller() }}
   </th>
 {%- endmacro %}
 
 {% macro index_field(text) -%}
   <td class="table-field-index">
-    <span><span class="visually-hidden">Row </span>{{ text }}</span>
+    <span class="visually-hidden">Row </span>{{ text }}
   </td>
 {%- endmacro %}
 

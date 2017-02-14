@@ -9,15 +9,15 @@
     {% for label, option, link, count in items %}
       {% if current_value == option %}
         <li aria-selected='true' role='tab'>
-          <span tabindex='0'>
+          <div class='pill-selected-item' tabindex='0'>
       {% else %}
         <li aria-selected='false' role='tab'>
           <a href="{{ link }}">
       {% endif %}
-          {{ big_number(count, **big_number_args) }}
-          <div class="pill-label">{{ label }}</div>
+            {{ big_number(count, **big_number_args) }}
+            <div class="pill-label">{{ label }}</div>
       {% if current_value == option %}
-          </span>
+          </div>
       {% else %}
           </a>
       {% endif %}
