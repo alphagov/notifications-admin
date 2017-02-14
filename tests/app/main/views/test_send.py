@@ -841,7 +841,8 @@ def test_check_messages_shows_trial_mode_error(
         page.find('div', class_='banner-dangerous').text.split()
     ) == (
         'You can’t send to this phone number '
-        'In trial mode you can only send to yourself and members of your team'
+        'In trial mode you can only send to yourself and members of your team '
+        'Skip to file contents'
     )
 
 
@@ -878,7 +879,8 @@ def test_check_messages_shows_over_max_row_error(
     ) == (
         'Your file has too many rows '
         'Notify can process up to 11,111 rows at once. '
-        'Your file has 99,999 rows.'
+        'Your file has 99,999 rows. '
+        'Skip to file contents'
     )
 
 
