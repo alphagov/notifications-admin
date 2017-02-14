@@ -1,6 +1,6 @@
 import pytest
 from app.main.forms import RegisterUserForm, ServiceSmsSender
-from app.main.validators import ValidGovEmail, NoCommasInPlaceHolders
+from app.main.validators import ValidGovEmail, NoCommasInPlaceHolders, OnlyGSMCharacters
 from wtforms import ValidationError
 from unittest.mock import Mock
 
@@ -139,6 +139,21 @@ def test_for_commas_in_placeholders(
         NoCommasInPlaceHolders()(None, _gen_mock_field('Hello ((name,date))'))
     assert str(error.value) == 'You can’t have commas in your fields'
     NoCommasInPlaceHolders()(None, _gen_mock_field('Hello ((name))'))
+
+
+@pytest.mark.parametrize('msg', ['The quick brown fox', 'Thé “quick” bröwn fox\u200B'])
+def test_gsm_character_validation(client, msg):
+    OnlyGSMCharacters()(None, _gen_mock_field(msg))
+
+
+def test_non_gsm_character_validation(client):
+    with pytest.raises(ValidationError) as error:
+        OnlyGSMCharacters()(None, _gen_mock_field('∆ abc 📲 def 📵 ghi'))
+
+    assert str(error.value) == (
+        'You can’t use ‘∆’, ‘📲’ or ‘📵’ in text messages. '
+        'They won’t show up properly on everyone’s phones.'
+    )
 
 
 def test_sms_sender_form_validation(

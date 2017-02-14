@@ -1,7 +1,8 @@
 from wtforms import ValidationError
 from notifications_utils.template import Template
-from notifications_utils.gsm import get_non_gsm_characters
+from notifications_utils.gsm import get_non_gsm_compatible_characters
 
+from app import formatted_list
 from app.main._blacklisted_passwords import blacklisted_passwords
 from app.utils import (
     Spreadsheet,
@@ -54,8 +55,10 @@ class NoCommasInPlaceHolders:
 
 class OnlyGSMCharacters:
     def __call__(self, form, field):
-        non_gsm_characters = get_non_gsm_characters(field.data)
+        non_gsm_characters = sorted(list(get_non_gsm_compatible_characters(field.data)))
         if non_gsm_characters:
-            raise ValidationError('The following characters are not allowed in text messages: {}'.format(
-                ', '.join(non_gsm_characters)
-            ))
+            raise ValidationError(
+                'You can’t use {} in text messages. They won’t show up properly on everyone’s phones.'.format(
+                    formatted_list(non_gsm_characters, conjunction='or')
+                )
+            )
