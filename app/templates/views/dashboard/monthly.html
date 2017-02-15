@@ -18,14 +18,13 @@
   </h1>
   <div class="bottom-gutter">
     {{ pill(
-      'financial year',
       items=years,
       current_value=selected_year,
       big_number_args={'smallest': True},
     ) }}
   </div>
   {% if months %}
-    <div class="body-copy-table">
+    <div class="body-copy-table" id='pill-selected-item'>
       {% call(month, row_index) list_table(
         months,
         caption="Total spend",

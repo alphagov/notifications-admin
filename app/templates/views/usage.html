@@ -13,90 +13,91 @@
     <h2 class='heading-large'>Usage</h2>
 
     <div class="bottom-gutter">
-      {{ pill('Year', years, selected_year, big_number_args={'smallest': True}) }}
+      {{ pill(years, selected_year, big_number_args={'smallest': True}) }}
     </div>
-
-    <div class='grid-row'>
-      <div class='column-half'>
-        <h2 class='heading-small'>Emails</h2>
-        <div class="keyline-block">
-          {{ big_number(emails_sent, 'sent', smaller=True) }}
-          {{ big_number("Unlimited", 'free allowance', smaller=True) }}
+    <div id='pill-selected-item'>
+      <div class='grid-row'>
+        <div class='column-half'>
+          <h2 class='heading-small'>Emails</h2>
+          <div class="keyline-block">
+            {{ big_number(emails_sent, 'sent', smaller=True) }}
+            {{ big_number("Unlimited", 'free allowance', smaller=True) }}
+          </div>
+        </div>
+        <div class='column-half'>
+          <h2 class='heading-small'>Text messages</h2>
+          <div class="keyline-block">
+            {{ big_number(sms_sent, 'sent', smaller=True) }}
+            {{ big_number(sms_free_allowance, 'free allowance', smaller=True) }}
+            {{ big_number(sms_allowance_remaining, 'free allowance remaining', smaller=True) }}
+            {% if sms_chargeable %}
+              {{ big_number(
+                sms_chargeable,
+                'at {:.2f} pence per message'.format(sms_rate * 100),
+                smaller=True
+              ) }}
+            {% endif %}
+          </div>
         </div>
       </div>
-      <div class='column-half'>
-        <h2 class='heading-small'>Text messages</h2>
-        <div class="keyline-block">
-          {{ big_number(sms_sent, 'sent', smaller=True) }}
-          {{ big_number(sms_free_allowance, 'free allowance', smaller=True) }}
-          {{ big_number(sms_allowance_remaining, 'free allowance remaining', smaller=True) }}
-          {% if sms_chargeable %}
+
+      <div class='grid-row'>
+        <div class='column-half'>
+          <div class="keyline-block">
+            &nbsp;
+          </div>
+        </div>
+        <div class='column-half'>
+          <div class="keyline-block">
             {{ big_number(
-              sms_chargeable,
-              'at {:.2f} pence per message'.format(sms_rate * 100),
+              (sms_chargeable * sms_rate),
+              'spent',
+              currency="£",
               smaller=True
             ) }}
-          {% endif %}
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class='grid-row'>
-      <div class='column-half'>
-        <div class="keyline-block">
-          &nbsp;
+      {% if months %}
+        <div class="dashboard-table body-copy-table">
+          {% call(month, row_index) list_table(
+            months,
+            caption="Total spend",
+            caption_visible=False,
+            empty_message='',
+            field_headings=[
+              'By month',
+              hidden_field_heading('Cost'),
+            ],
+            field_headings_visible=True
+          ) %}
+            {% call row_heading() %}
+              {{ month.name }}
+            {% endcall %}
+            {% call field(align='left') %}
+              {{ big_number(
+                sms_rate * month.paid,
+                currency="£",
+                smallest=True
+              ) }}
+              <ul>
+              {% if month.free %}
+                <li class="tabular-numbers">{{ "{:,}".format(month.free) }} free text messages</li>
+              {% endif %}
+              {% if month.paid %}
+                <li class="tabular-numbers">{{ "{:,}".format(month.paid) }} text messages at
+                {{- ' {:.2f}p'.format(sms_rate * 100) }}</li>
+              {% endif %}
+              {% if not (month.free or month.paid) %}
+                <li aria-hidden="true">–</li>
+              {% endif %}
+              </ul>
+            {% endcall %}
+          {% endcall %}
         </div>
-      </div>
-      <div class='column-half'>
-        <div class="keyline-block">
-          {{ big_number(
-            (sms_chargeable * sms_rate),
-            'spent',
-            currency="£",
-            smaller=True
-          ) }}
-        </div>
-      </div>
+      {% endif %}
     </div>
-
-    {% if months %}
-      <div class="dashboard-table body-copy-table">
-        {% call(month, row_index) list_table(
-          months,
-          caption="Total spend",
-          caption_visible=False,
-          empty_message='',
-          field_headings=[
-            'By month',
-            hidden_field_heading('Cost'),
-          ],
-          field_headings_visible=True
-        ) %}
-          {% call row_heading() %}
-            {{ month.name }}
-          {% endcall %}
-          {% call field(align='left') %}
-            {{ big_number(
-              sms_rate * month.paid,
-              currency="£",
-              smallest=True
-            ) }}
-            <ul>
-            {% if month.free %}
-              <li class="tabular-numbers">{{ "{:,}".format(month.free) }} free text messages</li>
-            {% endif %}
-            {% if month.paid %}
-              <li class="tabular-numbers">{{ "{:,}".format(month.paid) }} text messages at
-              {{- ' {:.2f}p'.format(sms_rate * 100) }}</li>
-            {% endif %}
-            {% if not (month.free or month.paid) %}
-              <li aria-hidden="true">–</li>
-            {% endif %}
-            </ul>
-          {% endcall %}
-        {% endcall %}
-      </div>
-    {% endif %}
 
     <div class="grid-row">
       <div class="column-half">

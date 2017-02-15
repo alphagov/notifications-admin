@@ -1,26 +1,27 @@
 {% from 'components/big-number.html' import big_number %}
 
 {% macro pill(
-  title,
   items=[],
   current_value=None,
   big_number_args={'smaller': True}
 ) %}
-  <nav role='navigation' class='pill' aria-labelledby="pill_{{title}}">
-    <h2 id="pill_{{title}}" class="visuallyhidden">{{title}}</h2>
+  <ul role='tablist' class='pill'>
     {% for label, option, link, count in items %}
       {% if current_value == option %}
-        <span aria-hidden="true">
+        <li aria-selected='true' role='tab'>
+          <div class='pill-selected-item' tabindex='0'>
       {% else %}
-        <a href="{{ link }}">
+        <li aria-selected='false' role='tab'>
+          <a href="{{ link }}">
       {% endif %}
-        {{ big_number(count, **big_number_args) }}
-        <div class="pill-label">{{ label }}</div>
+            {{ big_number(count, **big_number_args) }}
+            <div class="pill-label">{{ label }}</div>
       {% if current_value == option %}
-        </span>
+          </div>
       {% else %}
-        </a>
+          </a>
       {% endif %}
+        </li>
     {% endfor %}
-  </nav>
+  </ul>
 {% endmacro %}

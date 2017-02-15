@@ -24,8 +24,8 @@
         </span>
       </span>
     {% endcall %}
-    {% call field() %}
-      {% if template_statistics|length > 1 %}
+    {% if template_statistics|length > 1 %}
+      {% call field(align='right') %}
         <span id='{{item.template_id}}' class="spark-bar">
           <span style="width: {{ item.count / most_used_template_count * 100 }}%">
             {{ big_number(
@@ -34,14 +34,16 @@
             ) }}
           </span>
         </span>
-      {% else %}
+      {% endcall %}
+    {% else %}
+      {% call field() %}
         <span id='{{item.template_id}}' class="heading-small">
           {{ big_number(
             item.count,
             smallest=True
           ) }}
         </span>
-      {% endif %}
-    {% endcall %}
+      {% endcall %}
+    {% endif %}
   {% endcall %}
 </div>

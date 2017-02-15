@@ -2,7 +2,7 @@
 {% from "components/previous-next-navigation.html" import previous_next_navigation %}
 {% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading, row_heading, notification_status_field %}
 
-<div class="ajax-block-container">
+<div class="ajax-block-container" id='pill-selected-item'>
 
   {% if notifications %}
     <div class='dashboard-table'>
