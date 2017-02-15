@@ -1,3 +1,5 @@
+import re
+
 import pytz
 from flask_login import current_user
 from flask_wtf import Form
@@ -251,7 +253,7 @@ class ConfirmPasswordForm(Form):
             raise ValidationError('Invalid password')
 
 
-class SMSTemplateForm(Form):
+class BaseTemplateForm(Form):
     name = StringField(
         u'Template name',
         validators=[DataRequired(message="Can’t be empty")])
@@ -260,8 +262,7 @@ class SMSTemplateForm(Form):
         u'Message',
         validators=[
             DataRequired(message="Can’t be empty"),
-            NoCommasInPlaceHolders(),
-            OnlyGSMCharacters()
+            NoCommasInPlaceHolders()
         ]
     )
     process_type = RadioField(
@@ -275,7 +276,12 @@ class SMSTemplateForm(Form):
     )
 
 
-class EmailTemplateForm(SMSTemplateForm):
+class SMSTemplateForm(BaseTemplateForm):
+    def validate_template_content(self, field):
+        OnlyGSMCharacters()(None, field)
+
+
+class EmailTemplateForm(BaseTemplateForm):
     subject = TextAreaField(
         u'Subject',
         validators=[DataRequired(message="Can’t be empty")])
@@ -480,7 +486,6 @@ class ServiceSmsSender(Form):
     )
 
     def validate_sms_sender(form, field):
-        import re
         if field.data and not re.match('^[a-zA-Z0-9\s]+$', field.data):
             raise ValidationError('Use letters and numbers only')
 

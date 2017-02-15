@@ -629,10 +629,31 @@ def test_get_human_readable_delta(from_time, until_time, message):
     assert get_human_readable_delta(from_time, until_time) == message
 
 
+def test_can_create_email_template_with_emoji(
+    logged_in_client,
+    service_one,
+    mock_create_service_template
+):
+    data = {
+        'name': "new name",
+        'subject': "Food incoming!",
+        'template_content': "here's a burrito 🌯",
+        'template_type': 'email',
+        'service': service_one['id'],
+        'process_type': 'normal'
+    }
+    resp = logged_in_client.post(url_for(
+        '.add_service_template',
+        service_id=service_one['id'],
+        template_type='email'
+    ), data=data)
+
+    assert resp.status_code == 302
+
+
 def test_should_not_create_sms_template_with_emoji(
     logged_in_client,
     service_one,
-    mock_get_service_template,
     mock_create_service_template
 ):
     data = {
