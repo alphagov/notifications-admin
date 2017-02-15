@@ -24,7 +24,7 @@
         </span>
       </span>
     {% endcall %}
-    {% call field() %}
+    {% call field(align='right') %}
       {% if template_statistics|length > 1 %}
         <span id='{{item.template_id}}' class="spark-bar">
           <span style="width: {{ item.count / most_used_template_count * 100 }}%">
