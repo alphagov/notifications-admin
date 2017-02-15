@@ -118,14 +118,7 @@ def sms_code():
     return StringField('Text message code',
                        validators=[DataRequired(message='Can’t be empty'),
                                    Regexp(regex=verify_code,
-                                          message='Must be 5 digits')])
-
-
-def email_code():
-    verify_code = '^\d{5}$'
-    return StringField("Email code",
-                       validators=[DataRequired(message='Can’t be empty'),
-                                   Regexp(regex=verify_code, message='Must be 5 digits')])
+                                          message='Code not found')])
 
 
 class LoginForm(Form):

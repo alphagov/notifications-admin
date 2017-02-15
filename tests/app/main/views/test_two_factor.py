@@ -209,7 +209,25 @@ def test_two_factor_reset_login_count_called(
     )
     api_user_locked.reset_failed_login_count()
     api_user_locked.password = new_password
-    mock_update_user.assert_called_with(api_user_locked)
+    mock_update_user.assert_called_once_with(api_user_locked)
+
+
+def test_two_factor_returns_error_when_user_is_locked(
+    client,
+    api_user_locked,
+    mock_get_locked_user,
+    mock_check_verify_code,
+    mock_get_services_with_one_service
+):
+    with client.session_transaction() as session:
+        session['user_details'] = {
+            'id': api_user_locked.id,
+            'email': api_user_locked.email_address,
+        }
+    response = client.post(url_for('main.two_factor'),
+                           data={'sms_code': '12345'})
+    assert response.status_code == 200
+    assert 'Code not found' in response.get_data(as_text=True)
 
 
 def test_two_factor_should_redirect_to_sign_in_if_user_not_in_session(
