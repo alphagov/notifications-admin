@@ -2,24 +2,19 @@
 
   display: flex;
 
-  a,
-  span {
-    display: block;
+  li {
     width: 25%;
-    box-sizing: border-box;
-    float: left;
-    padding: 10px;
     flex-grow: 1;
     text-align: left;
+  }
 
-    &:first-child {
-      margin-left: 0;
-    }
-
-    &:last-child {
-      margin-right: 0;
-    }
-
+  a,
+  &-selected-item {
+    display: block;
+    float: left;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px;
   }
 
   a {
@@ -50,12 +45,18 @@
     }
   }
 
-  span {
+  &-selected-item {
     border: 2px solid $black;
     outline: 1px solid rgba($white, 0.1);
     position: relative;
     z-index: 1000;
     color: $text-colour;
+
+    &:focus {
+      z-index: 10;
+      outline: 3px solid $yellow;
+    }
+
   }
 }
 

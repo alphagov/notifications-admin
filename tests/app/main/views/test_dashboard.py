@@ -250,11 +250,11 @@ def test_usage_page(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     cols = page.find_all('div', {'class': 'column-half'})
-    nav = page.find('nav', {'class': 'pill'})
+    nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
     nav_links = nav.find_all('a')
 
     assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
-    assert normalize_spaces(nav.find('span').text) == '2011 to 2012 financial year'
+    assert normalize_spaces(nav.find('li', {'aria-selected': 'true'}).text) == '2011 to 2012 financial year'
     assert normalize_spaces(nav_links[1].text) == '2012 to 2013 financial year'
 
     assert '123' in cols[0].text
