@@ -58,7 +58,8 @@ class OnlyGSMCharacters:
         non_gsm_characters = sorted(list(get_non_gsm_compatible_characters(field.data)))
         if non_gsm_characters:
             raise ValidationError(
-                'You can’t use {} in text messages. They won’t show up properly on everyone’s phones.'.format(
-                    formatted_list(non_gsm_characters, conjunction='or')
+                'You can’t use {} in text messages. {} won’t show up properly on everyone’s phones.'.format(
+                    formatted_list(non_gsm_characters, conjunction='or', before_each='', after_each=''),
+                    ('It' if len(non_gsm_characters) == 1 else 'They')
                 )
             )

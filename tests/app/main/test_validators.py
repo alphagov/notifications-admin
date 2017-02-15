@@ -146,14 +146,27 @@ def test_gsm_character_validation(client, msg):
     OnlyGSMCharacters()(None, _gen_mock_field(msg))
 
 
-def test_non_gsm_character_validation(client):
+@pytest.mark.parametrize('data, err_msg', [
+    (
+        '∆ abc 📲 def 📵 ghi',
+        (
+            'You can’t use ∆, 📲 or 📵 in text messages. '
+            'They won’t show up properly on everyone’s phones.'
+        )
+    ),
+    (
+        '📵',
+        (
+            'You can’t use 📵 in text messages. '
+            'It won’t show up properly on everyone’s phones.'
+        )
+    ),
+])
+def test_non_gsm_character_validation(data, err_msg, client):
     with pytest.raises(ValidationError) as error:
-        OnlyGSMCharacters()(None, _gen_mock_field('∆ abc 📲 def 📵 ghi'))
+        OnlyGSMCharacters()(None, _gen_mock_field(data))
 
-    assert str(error.value) == (
-        'You can’t use ‘∆’, ‘📲’ or ‘📵’ in text messages. '
-        'They won’t show up properly on everyone’s phones.'
-    )
+    assert str(error.value) == err_msg
 
 
 def test_sms_sender_form_validation(

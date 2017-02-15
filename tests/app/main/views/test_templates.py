@@ -670,7 +670,7 @@ def test_should_not_create_sms_template_with_emoji(
     ), data=data)
 
     assert resp.status_code == 200
-    assert "You can’t use ‘🍜’ in text messages." in resp.get_data(as_text=True)
+    assert "You can’t use 🍜 in text messages." in resp.get_data(as_text=True)
 
 
 def test_should_not_update_sms_template_with_emoji(
@@ -694,7 +694,7 @@ def test_should_not_update_sms_template_with_emoji(
         template_id=fake_uuid), data=data)
 
     assert resp.status_code == 200
-    assert "You can’t use ‘🍔’ in text messages." in resp.get_data(as_text=True)
+    assert "You can’t use 🍔 in text messages." in resp.get_data(as_text=True)
 
 
 def test_should_create_sms_template_without_downgrading_unicode_characters(
