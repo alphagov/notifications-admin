@@ -115,6 +115,39 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         assert 'Re-upload your file' in content
 
 
+def test_upload_csvfile_with_no_recipient_column_shows_error(
+    logged_in_client,
+    mocker,
+    mock_get_service_template_with_placeholders,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    fake_uuid,
+):
+
+    mocker.patch(
+        'app.main.views.send.s3download',
+        return_value="""
+            telephone,name
+            +447700900986
+        """
+    )
+
+    response = logged_in_client.post(
+        url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
+        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert ' '.join(page.select('.banner-dangerous')[0].text.split()) == (
+        'Your file needs to have a column called ‘phone number’ '
+        'Your file has columns called ‘telephone’ and ‘name’. '
+        'Skip to file contents'
+    )
+
+
 def test_upload_csv_invalid_extension(
     logged_in_client,
     api_user_active,
