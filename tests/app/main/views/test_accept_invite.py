@@ -75,10 +75,13 @@ def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.h1.string.strip() == 'Sign in'
-    flash_banners = page.find_all('div', class_='banner-default')
-    assert len(flash_banners) == 1
-    assert flash_banners[0].text.strip() == 'Please log in to access this page.'
+    assert (
+        page.h1.string,
+        page.select('main p')[0].text.strip(),
+    ) == (
+        'You need to sign in again',
+        'We sign you out if you haven’t used Notify for a while.',
+    )
 
 
 def test_existing_user_of_service_get_redirected_to_signin(
@@ -98,10 +101,13 @@ def test_existing_user_of_service_get_redirected_to_signin(
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.h1.string.strip() == 'Sign in'
-    flash_banners = page.find_all('div', class_='banner-default')
-    assert len(flash_banners) == 1
-    assert flash_banners[0].text.strip() == 'Please log in to access this page.'
+    assert (
+        page.h1.string,
+        page.select('main p')[0].text.strip(),
+    ) == (
+        'You need to sign in again',
+        'We sign you out if you haven’t used Notify for a while.',
+    )
     assert mock_accept_invite.call_count == 1
 
 
@@ -130,10 +136,13 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.h1.string.strip() == 'Sign in'
-    flash_banners = page.find_all('div', class_='banner-default')
-    assert len(flash_banners) == 1
-    assert flash_banners[0].text.strip() == 'Please log in to access this page.'
+    assert (
+        page.h1.string,
+        page.select('main p')[0].text.strip(),
+    ) == (
+        'You need to sign in again',
+        'We sign you out if you haven’t used Notify for a while.',
+    )
 
 
 def test_new_user_accept_invite_calls_api_and_redirects_to_registration(

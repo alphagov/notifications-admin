@@ -15,7 +15,7 @@ def test_should_redirect_if_not_logged_in(
 ):
     response = client.get(url_for('main.platform_admin'))
     assert response.status_code == 302
-    assert url_for('main.index', _external=True) in response.location
+    assert response.location == url_for('main.sign_in', next=url_for('main.platform_admin'), _external=True)
 
 
 def test_should_403_if_not_platform_admin(

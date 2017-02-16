@@ -10,9 +10,19 @@
 
 <div class="grid-row">
   <div class="column-two-thirds">
-    <h1 class="heading-large">Sign in</h1>
 
-    <p>If you do not have an account, you can <a href="register">create one now</a>.</p>
+    {% if again %}
+      <h1 class="heading-large">You need to sign in again</h1>
+      <p>
+        We sign you out if you haven’t used Notify for a while.
+      </p>
+    {% else %}
+      <h1 class="heading-large">Sign in</h1>
+      <p>
+        If you do not have an account, you can
+        <a href="{{ url_for('.register') }}">create one now</a>.
+      </p>
+    {% endif %}
 
     <form method="post" autocomplete="nope">
       {{ textbox(form.email_address) }}
