@@ -1,12 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
-import dateutil
 from flask import (
     render_template,
     url_for,
     session,
     jsonify,
-    current_app,
     request,
     abort
 )
@@ -23,8 +21,6 @@ from app.utils import (
     user_has_permissions,
     get_current_financial_year,
     FAILURE_STATUSES,
-    SENDING_STATUSES,
-    DELIVERED_STATUSES,
     REQUESTED_STATUSES,
 )
 

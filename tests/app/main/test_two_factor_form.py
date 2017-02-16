@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 from app.main.forms import TwoFactorForm
 from app import user_api_client
 
@@ -28,7 +26,7 @@ def test_returns_errors_when_code_is_too_short(
         form = TwoFactorForm(_check_code)
         assert form.validate() is False
         assert len(form.errors) == 1
-        assert set(form.errors) == set({'sms_code': ['Code must be 5 digits', 'Code does not match']})
+        assert set(form.errors) == set({'sms_code': ['Code not found', 'Code does not match']})
 
 
 def test_returns_errors_when_code_is_missing(
@@ -56,7 +54,7 @@ def test_returns_errors_when_code_contains_letters(
         form = TwoFactorForm(_check_code)
         assert form.validate() is False
         assert len(form.errors) == 1
-        assert set(form.errors) == set({'sms_code': ['Code must be 5 digits', 'Code does not match']})
+        assert set(form.errors) == set({'sms_code': ['Code not found', 'Code does not match']})
 
 
 def test_should_return_errors_when_code_is_expired(
