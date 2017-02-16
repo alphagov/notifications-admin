@@ -16,6 +16,7 @@ from flask_login import (
 )
 
 from app import (
+    login_manager,
     user_api_client,
     service_api_client,
     invite_api_client
@@ -75,7 +76,14 @@ def sign_in():
             ).format(password_reset=url_for('.forgot_password'))
         ))
 
-    return render_template('views/signin.html', form=form)
+    return render_template('views/signin.html', form=form, again=bool(request.args.get('next')))
+
+
+@login_manager.unauthorized_handler
+def sign_in_again():
+    return redirect(
+        url_for('main.sign_in', next=request.path)
+    )
 
 
 def _get_and_verify_user(user, password):
