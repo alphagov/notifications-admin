@@ -198,15 +198,23 @@ cf-login: ## Log in to Cloud Foundry
 
 .PHONY: cf-deploy
 cf-deploy: ## Deploys the app to Cloud Foundry
-	$(eval export ORIG_INSTANCES=$(shell cf curl /v2/apps/$(shell cf app --guid notify-admin) | jq -r ".entity.instances"))
-	@echo "Original instance count: ${ORIG_INSTANCES}"
-	cf check-manifest notify-admin -f manifest-${CF_SPACE}.yml
-	cf zero-downtime-push notify-admin -f manifest-${CF_SPACE}.yml
-	cf scale -i ${ORIG_INSTANCES} notify-admin
+	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
+	@cf app --guid notify-admin || exit 1
+	cf rename notify-admin notify-admin-rollback
+	cf push -f manifest-${CF_SPACE}.yml
+	cf scale -i $$(cf curl /v2/apps/$$(cf app --guid notify-admin) | jq -r ".entity.instances" 2>/dev/null || echo "1") notify-admin
+	cf stop notify-admin-rollback
+	cf delete -f notify-admin-rollback
+
+.PHONY: cf-rollback
+cf-rollback: ## Rollbacks the app to the previous release
+	@cf app --guid notify-admin-rollback || exit 1
+	cf delete -f notify-admin || true
+	cf rename notify-admin-rollback notify-admin
 
 .PHONY: cf-push
 cf-push:
-	cf push notify-admin -f manifest-${CF_SPACE}.yml
+	cf push -f manifest-${CF_SPACE}.yml
 
 .PHONY: cf-deploy-with-docker
 cf-deploy-with-docker: prepare-docker-build-image ## Deploys the app to Cloud Foundry from a new Docker container
