@@ -1,3 +1,5 @@
+{% from "components/big-number.html" import big_number %}
+
 {% macro mapping_table(caption='', field_headings=[], field_headings_visible=True, caption_visible=True) -%}
   <table class="table">
     <caption class="heading-medium table-heading{{ ' visuallyhidden' if not caption_visible}}">
@@ -126,6 +128,23 @@
         notification.created_at|format_datetime_short,
         (notification.updated_at or notification.created_at)|format_datetime_short
       ) }}
+    </span>
+  {% endcall %}
+{% endmacro %}
+
+
+{% macro spark_bar_field(
+  count,
+  max_count
+) %}
+  {% call field(align='right') %}
+    <span class="spark-bar">
+      <span style="width: {{ count / max_count * 100 }}%">
+        {{ big_number(
+          count,
+          smallest=True
+        ) }}
+      </span>
     </span>
   {% endcall %}
 {% endmacro %}

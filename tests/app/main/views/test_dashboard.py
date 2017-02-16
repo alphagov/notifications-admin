@@ -1,4 +1,5 @@
 from datetime import datetime
+from functools import partial
 import copy
 from flask import url_for
 
@@ -120,39 +121,40 @@ def test_should_show_recent_templates_on_dashboard(
     assert '100' in table_rows[1].find_all('td')[0].text
 
 
-def test_should_show_all_templates_on_template_statistics_page(
+@freeze_time("2016-07-01 12:00")  # 4 months into 2016 financial year
+@pytest.mark.parametrize('partial_url', [
+    partial(url_for),
+    partial(url_for, year='2016'),
+])
+def test_should_show_monthly_breakdown_of_template_usage(
     logged_in_client,
     mocker,
     api_user_active,
     mock_get_service,
-    mock_get_service_templates,
+    mock_get_monthly_template_statistics,
     mock_get_user,
     mock_get_user_by_email,
-    mock_login,
-    mock_get_jobs,
     mock_has_permissions,
+    partial_url,
 ):
-    mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
-                                       return_value=copy.deepcopy(stub_template_stats))
-
-    response = logged_in_client.get(url_for('main.template_history', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(
+        partial_url('main.template_history', service_id=SERVICE_ONE_ID, _external=True)
+    )
 
     assert response.status_code == 200
-    response.get_data(as_text=True)
-    mock_template_stats.assert_called_once_with(SERVICE_ONE_ID)
+    mock_get_monthly_template_statistics.assert_called_once_with(SERVICE_ONE_ID, 2016)
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    table_rows = page.find_all('tbody')[0].find_all('tr')
+    table_rows = page.select('tbody tr')
 
-    assert len(table_rows) == 2
+    assert ' '.join(table_rows[0].text.split()) == (
+        'My first template '
+        'Text message template '
+        '2'
+    )
 
-    assert 'two' in table_rows[0].find_all('th')[0].text
-    assert 'Email template' in table_rows[0].find_all('th')[0].text
-    assert '200' in table_rows[0].find_all('td')[0].text
-
-    assert 'one' in table_rows[1].find_all('th')[0].text
-    assert 'Text message template' in table_rows[1].find_all('th')[0].text
-    assert '100' in table_rows[1].find_all('td')[0].text
+    assert len(table_rows) == len(['April'])
+    assert len(page.select('.table-no-data')) == len(['May', 'June', 'July'])
 
 
 @freeze_time("2016-01-01 11:09:00.061258")

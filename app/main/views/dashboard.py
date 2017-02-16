@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from functools import partial
 from flask import (
     render_template,
     url_for,
@@ -65,16 +65,35 @@ def service_dashboard_updates(service_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def template_history(service_id):
-    template_statistics = aggregate_usage(
-        template_statistics_client.get_template_statistics_for_service(service_id)
-    )
+
+    year, current_financial_year = requested_and_current_financial_year(request)
+    stats = template_statistics_client.get_monthly_template_statistics_for_service(service_id, year)
+
+    months = [
+        {
+            'name': YYYY_MM_to_datetime(month).strftime('%B'),
+            'templates_used': aggregate_usage(
+                format_template_stats_to_list(stats.get(month)), sort_key='requested_count'
+            ),
+        }
+        for month in get_months_for_financial_year(year, time_format='%Y-%m')
+    ]
 
     return render_template(
         'views/dashboard/all-template-statistics.html',
-        template_statistics=template_statistics,
+        months=months,
         most_used_template_count=max(
-            [row['count'] for row in template_statistics] or [0]
-        )
+            max((
+                template['requested_count']
+                for template in month['templates_used']
+            ), default=0)
+            for month in months
+        ),
+        years=get_tuples_of_financial_years(
+            partial(url_for, '.template_history', service_id=service_id),
+            end=current_financial_year,
+        ),
+        selected_year=year,
     )
 
 
@@ -89,14 +108,11 @@ def usage(service_id):
             year, service_api_client.get_billable_units(service_id, year)
         )),
         selected_year=year,
-        years=[
-            (
-                'financial year',
-                year,
-                url_for('.usage', service_id=service_id, year=year),
-                '{} to {}'.format(year, year + 1),
-            ) for year in range(current_financial_year - 1, current_financial_year + 2)
-        ],
+        years=get_tuples_of_financial_years(
+            partial(url_for, '.usage', service_id=service_id),
+            start=current_financial_year - 1,
+            end=current_financial_year + 1,
+        ),
         **calculate_usage(service_api_client.get_service_usage(service_id, year)['data'])
     )
 
@@ -111,22 +127,18 @@ def monthly(service_id):
         months=format_monthly_stats_to_list(
             service_api_client.get_monthly_notification_stats(service_id, year)['data']
         ),
-        years=[
-            (
-                'financial year',
-                year,
-                url_for('.monthly', service_id=service_id, year=year),
-                '{} to {}'.format(year, year + 1),
-            ) for year in range(2015, current_financial_year + 1)
-        ],
+        years=get_tuples_of_financial_years(
+            partial_url=partial(url_for, '.monthly', service_id=service_id),
+            end=current_financial_year,
+        ),
         selected_year=year,
     )
 
 
-def aggregate_usage(template_statistics):
+def aggregate_usage(template_statistics, sort_key='count'):
     return sorted(
         template_statistics,
-        key=lambda template_statistic: template_statistic['count'],
+        key=lambda template_statistic: template_statistic[sort_key],
         reverse=True
     )
 
@@ -235,9 +247,9 @@ def aggregate_status_types(counts_dict):
     })
 
 
-def get_months_for_financial_year(year):
+def get_months_for_financial_year(year, time_format='%B'):
     return [
-        month.strftime('%B')
+        month.strftime(time_format)
         for month in (
             get_months_for_year(4, 13, year) +
             get_months_for_year(1, 4, year + 1)
@@ -298,3 +310,32 @@ def requested_and_current_financial_year(request):
         )
     except ValueError:
         abort(404)
+
+
+def format_template_stats_to_list(stats_dict):
+    if not stats_dict:
+        return []
+    for template_id, template in stats_dict.items():
+        yield dict(
+            requested_count=sum(
+                template['counts'].get(status, 0)
+                for status in REQUESTED_STATUSES
+            ),
+            **template
+        )
+
+
+def get_tuples_of_financial_years(
+    partial_url,
+    start=2015,
+    end=None,
+):
+    return (
+        (
+            'financial year',
+            year,
+            partial_url(year=year),
+            '{} to {}'.format(year, year + 1),
+        )
+        for year in range(start, end + 1)
+    )
