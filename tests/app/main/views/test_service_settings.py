@@ -12,10 +12,7 @@ from tests import validate_route_permission, service_json
 
 def test_should_show_overview(
     logged_in_client,
-    active_user_with_permissions,
-    mocker,
     service_one,
-    mock_get_organisation,
 ):
     response = logged_in_client.get(url_for(
         'main.service_settings', service_id=service_one['id']
@@ -54,8 +51,6 @@ def test_should_show_overview_for_service_with_more_things_set(
 
 def test_should_show_service_name(
     logged_in_client,
-    active_user_with_permissions,
-    mocker,
     service_one,
 ):
     response = logged_in_client.get(url_for(
@@ -70,13 +65,8 @@ def test_should_show_service_name(
 def test_should_redirect_after_change_service_name(
     logged_in_client,
     service_one,
-    active_user_with_permissions,
-    mock_login,
-    mock_get_user,
-    mock_get_service,
     mock_update_service,
     mock_get_services,
-    mock_has_permissions,
 ):
     response = logged_in_client.post(
         url_for('main.service_name_change', service_id=service_one['id']),
@@ -92,12 +82,6 @@ def test_should_redirect_after_change_service_name(
 def test_show_restricted_service(
     logged_in_client,
     service_one,
-    mock_login,
-    mock_get_user,
-    active_user_with_permissions,
-    mock_has_permissions,
-    mock_get_service,
-    mock_get_organisation,
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -106,17 +90,11 @@ def test_show_restricted_service(
 
 
 def test_switch_service_to_live(
-    logged_in_client,
+    logged_in_platform_admin_client,
     service_one,
-    mock_login,
-    mock_get_user,
-    active_user_with_permissions,
-    mock_get_service,
     mock_update_service,
-    mock_has_permissions,
-    mock_get_organisation,
 ):
-    response = logged_in_client.get(
+    response = logged_in_platform_admin_client.get(
         url_for('main.service_switch_live', service_id=service_one['id']))
     assert response.status_code == 302
     assert response.location == url_for(
@@ -132,12 +110,7 @@ def test_switch_service_to_live(
 def test_show_live_service(
     logged_in_client,
     service_one,
-    mock_login,
-    mock_get_user,
-    active_user_with_permissions,
-    mock_get_live_service,
-    mock_has_permissions,
-    mock_get_organisation,
+    mock_get_live_service
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -146,17 +119,12 @@ def test_show_live_service(
 
 
 def test_switch_service_to_restricted(
-    logged_in_client,
+    logged_in_platform_admin_client,
     service_one,
-    mock_login,
-    mock_get_user,
-    active_user_with_permissions,
     mock_get_live_service,
-    mock_update_service,
-    mock_has_permissions,
-    mock_get_organisation,
+    mock_update_service
 ):
-    response = logged_in_client.get(
+    response = logged_in_platform_admin_client.get(
         url_for('main.service_switch_live', service_id=service_one['id']))
     assert response.status_code == 302
     assert response.location == url_for(
@@ -171,7 +139,6 @@ def test_switch_service_to_restricted(
 
 def test_should_not_allow_duplicate_names(
     logged_in_client,
-    active_user_with_permissions,
     mocker,
     service_one,
 ):
@@ -190,8 +157,6 @@ def test_should_not_allow_duplicate_names(
 
 def test_should_show_service_name_confirmation(
     logged_in_client,
-    active_user_with_permissions,
-    mocker,
     service_one,
 ):
     response = logged_in_client.get(url_for(
@@ -205,14 +170,10 @@ def test_should_show_service_name_confirmation(
 
 def test_should_redirect_after_service_name_confirmation(
     logged_in_client,
-    active_user_with_permissions,
     service_one,
-    mocker,
     mock_update_service,
-    mock_verify_password,
-    mock_get_organisation,
+    mock_verify_password
 ):
-    logged_in_client.login(active_user_with_permissions, mocker, service_one)
     service_id = service_one['id']
     service_new_name = 'New Name'
     with logged_in_client.session_transaction() as session:
@@ -233,13 +194,9 @@ def test_should_redirect_after_service_name_confirmation(
 
 def test_should_raise_duplicate_name_handled(
     logged_in_client,
-    active_user_with_permissions,
     service_one,
-    mocker,
-    mock_get_services,
     mock_update_service_raise_httperror_duplicate_name,
-    mock_verify_password,
-    fake_uuid,
+    mock_verify_password
 ):
     service_new_name = 'New Name'
     with logged_in_client.session_transaction() as session:
@@ -257,18 +214,11 @@ def test_should_raise_duplicate_name_handled(
 
 def test_should_show_request_to_go_live(
     logged_in_client,
-    api_user_active,
     mock_get_service,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_login,
-    mock_has_permissions,
-    fake_uuid,
+    service_one
 ):
-    service_id = fake_uuid
     response = logged_in_client.get(
-        url_for('main.service_request_to_go_live', service_id=service_id))
-    service = mock_get_service.side_effect(service_id)['data']
+        url_for('main.service_request_to_go_live', service_id=service_one['id']))
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
     assert 'Request to go live' in resp_data
@@ -277,18 +227,15 @@ def test_should_show_request_to_go_live(
 
 def test_should_redirect_after_request_to_go_live(
     logged_in_client,
-    api_user_active,
-    mock_get_user,
-    mock_get_service,
-    mock_has_permissions,
-    mock_get_organisation,
+    active_user_with_permissions,
+    service_one,
     mocker,
 ):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
         return_value=Mock(status_code=201))
     response = logged_in_client.post(
-        url_for('main.service_request_to_go_live', service_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'),
+        url_for('main.service_request_to_go_live', service_id=service_one['id']),
         data={
             'mou': 'yes',
             'channel': 'emails',
@@ -303,12 +250,12 @@ def test_should_redirect_after_request_to_go_live(
     mock_post.assert_called_with(
         ANY,
         data={
-            'subject': 'Request to go live - Test Service',
+            'subject': 'Request to go live - service one',
             'department_id': ANY,
             'agent_team_id': ANY,
             'message': ANY,
-            'person_name': api_user_active.name,
-            'person_email': api_user_active.email_address
+            'person_name': active_user_with_permissions.name,
+            'person_email': active_user_with_permissions.email_address
         },
         headers=ANY
     )
@@ -330,10 +277,7 @@ def test_should_redirect_after_request_to_go_live(
 def test_log_error_on_request_to_go_live(
     app_,
     logged_in_client,
-    api_user_active,
-    mock_get_user,
-    mock_get_service,
-    mock_has_permissions,
+    service_one,
     mocker,
 ):
     mock_post = mocker.patch(
@@ -348,8 +292,8 @@ def test_log_error_on_request_to_go_live(
     )
     mock_logger = mocker.patch.object(app_.logger, 'error')
     with pytest.raises(InternalServerError):
-        resp = logged_in_client.post(
-            url_for('main.service_request_to_go_live', service_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'),
+        logged_in_client.post(
+            url_for('main.service_request_to_go_live', service_id=service_one['id']),
             data={
                 'mou': 'yes',
                 'channel': 'emails',
@@ -469,11 +413,8 @@ def test_route_for_platform_admin_update_service(
 
 def test_set_reply_to_email_address(
     logged_in_client,
-    active_user_with_permissions,
-    mocker,
     mock_update_service,
     service_one,
-    mock_get_organisation,
 ):
     data = {"email_address": "test@someservice.gov.uk"}
     response = logged_in_client.post(url_for('main.service_set_reply_to_email', service_id=service_one['id']),
@@ -488,8 +429,6 @@ def test_set_reply_to_email_address(
 
 def test_if_reply_to_email_address_set_then_form_populated(
     logged_in_client,
-    active_user_with_permissions,
-    mocker,
     service_one,
 ):
     service_one['reply_to_email_address'] = 'test@service.gov.uk'
@@ -501,75 +440,53 @@ def test_if_reply_to_email_address_set_then_form_populated(
 
 
 def test_switch_service_to_research_mode(
-    logged_in_client,
+    logged_in_platform_admin_client,
+    platform_admin_user,
     service_one,
-    mock_login,
-    mock_get_user,
-    active_user_with_permissions,
-    mock_get_service,
-    mock_has_permissions,
     mocker,
 ):
     mocker.patch('app.service_api_client.post', return_value=service_one)
-    response = logged_in_client.get(url_for('main.service_switch_research_mode', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.get(
+        url_for('main.service_switch_research_mode', service_id=service_one['id'])
+    )
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
     app.service_api_client.post.assert_called_with(
         '/service/{}'.format(service_one['id']),
         {
             'research_mode': True,
-            'created_by': active_user_with_permissions.id
+            'created_by': platform_admin_user.id
         }
     )
 
 
 def test_switch_service_from_research_mode_to_normal(
-    logged_in_client,
-    service_one,
-    mock_login,
-    mock_get_user,
-    active_user_with_permissions,
-    mock_get_service,
-    mock_has_permissions,
+    logged_in_platform_admin_client,
     mocker,
 ):
     service = service_json(
-        users=[active_user_with_permissions.id],
-        restricted=True,
         research_mode=True
     )
     mocker.patch('app.service_api_client.get_service', return_value={"data": service})
-    mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+    update_service_mock = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service)
 
-    response = logged_in_client.get(url_for('main.service_switch_research_mode', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.get(
+        url_for('main.service_switch_research_mode', service_id=service['id'])
+    )
     assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    app.service_api_client.update_service_with_properties.assert_called_with(
-        service_one['id'], {"research_mode": False}
+    assert response.location == url_for('main.service_settings', service_id=service['id'], _external=True)
+    update_service_mock.assert_called_with(
+        service['id'], {"research_mode": False}
     )
 
 
 def test_shows_research_mode_indicator(
     logged_in_client,
     service_one,
-    mock_login,
-    mock_get_user,
-    active_user_with_permissions,
-    mock_get_service,
-    mock_has_permissions,
-    mock_get_organisation,
     mocker,
 ):
-    service = service_json(
-        "1234",
-        "Test Service",
-        [active_user_with_permissions.id],
-        message_limit=1000,
-        active=False,
-        restricted=True,
-        research_mode=True
-    )
-    mocker.patch('app.service_api_client.get_service', return_value={"data": service})
+    service_one['research_mode'] = True
+    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
     mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
 
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
@@ -583,13 +500,6 @@ def test_shows_research_mode_indicator(
 def test_does_not_show_research_mode_indicator(
     logged_in_client,
     service_one,
-    mock_login,
-    mock_get_user,
-    active_user_with_permissions,
-    mock_get_service,
-    mock_has_permissions,
-    mock_get_organisation,
-    mocker,
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     assert response.status_code == 200
@@ -601,11 +511,8 @@ def test_does_not_show_research_mode_indicator(
 
 def test_set_text_message_sender(
     logged_in_client,
-    active_user_with_permissions,
-    mocker,
     mock_update_service,
     service_one,
-    mock_get_organisation,
 ):
     data = {"sms_sender": "elevenchars"}
     response = logged_in_client.post(url_for('main.service_set_sms_sender', service_id=service_one['id']),
@@ -621,8 +528,6 @@ def test_set_text_message_sender(
 
 def test_if_sms_sender_set_then_form_populated(
     logged_in_client,
-    active_user_with_permissions,
-    mocker,
     service_one,
 ):
     service_one['sms_sender'] = 'elevenchars'
@@ -634,13 +539,11 @@ def test_if_sms_sender_set_then_form_populated(
 
 
 def test_should_show_branding(
-    mocker,
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
-    mock_get_organisations,
+    mock_get_organisations
 ):
-    response = logged_in_client.get(url_for(
+    response = logged_in_platform_admin_client.get(url_for(
         'main.service_set_branding_and_org', service_id=service_one['id']
     ))
     assert response.status_code == 200
@@ -659,13 +562,11 @@ def test_should_show_branding(
 
 
 def test_should_show_organisations(
-    mocker,
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
-    mock_get_organisations,
+    mock_get_organisations
 ):
-    response = logged_in_client.get(url_for(
+    response = logged_in_platform_admin_client.get(url_for(
         'main.service_set_branding_and_org', service_id=service_one['id']
     ))
     assert response.status_code == 200
@@ -684,14 +585,12 @@ def test_should_show_organisations(
 
 
 def test_should_set_branding_and_organisations(
-    mocker,
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
     mock_get_organisations,
     mock_update_service,
 ):
-    response = logged_in_client.post(
+    response = logged_in_platform_admin_client.post(
         url_for(
             'main.service_set_branding_and_org', service_id=service_one['id']
         ),
@@ -703,8 +602,8 @@ def test_should_set_branding_and_organisations(
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
 
-    app.organisations_client.get_organisations.assert_called_once_with()
-    app.service_api_client.update_service.assert_called_once_with(
+    mock_get_organisations.assert_called_once_with()
+    mock_update_service.assert_called_once_with(
         service_one['id'],
         branding='org',
         organisation='organisation-id'
@@ -712,14 +611,15 @@ def test_should_set_branding_and_organisations(
 
 
 def test_switch_service_enable_letters(
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
     mocker,
 ):
     mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
 
-    response = logged_in_client.get(url_for('main.service_switch_can_send_letters', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.get(
+        url_for('main.service_switch_can_send_letters', service_id=service_one['id'])
+    )
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
@@ -727,30 +627,31 @@ def test_switch_service_enable_letters(
 
 
 def test_switch_service_disable_letters(
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
+    service_one,
     mocker,
 ):
-    service = service_json("1234", "Test Service", [], can_send_letters=True)
-    mocker.patch('app.service_api_client.get_service', return_value={"data": service})
-    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service)
+    service_one['can_send_letters'] = True
+    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
+    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
 
-    response = logged_in_client.get(url_for('main.service_switch_can_send_letters', service_id=service['id']))
+    response = logged_in_platform_admin_client.get(
+        url_for('main.service_switch_can_send_letters', service_id=service_one['id'])
+    )
 
     assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service['id'], _external=True)
-    assert mocked_fn.call_args == call(service['id'], {"can_send_letters": False})
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_fn.call_args == call(service_one['id'], {"can_send_letters": False})
 
 
 def test_archive_service_after_confirm(
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
     mocker,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
 
-    response = logged_in_client.post(url_for('main.archive_service', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.post(url_for('main.archive_service', service_id=service_one['id']))
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
@@ -758,14 +659,13 @@ def test_archive_service_after_confirm(
 
 
 def test_archive_service_prompts_user(
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
     mocker,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
 
-    response = logged_in_client.get(url_for('main.archive_service', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.get(url_for('main.archive_service', service_id=service_one['id']))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -774,14 +674,12 @@ def test_archive_service_prompts_user(
 
 
 def test_cant_archive_inactive_service(
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
-    mocker,
 ):
     service_one['active'] = False
 
-    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -789,14 +687,13 @@ def test_cant_archive_inactive_service(
 
 
 def test_suspend_service_after_confirm(
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
     mocker,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
 
-    response = logged_in_client.post(url_for('main.suspend_service', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.post(url_for('main.suspend_service', service_id=service_one['id']))
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
@@ -804,14 +701,13 @@ def test_suspend_service_after_confirm(
 
 
 def test_suspend_service_prompts_user(
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
     mocker,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
 
-    response = logged_in_client.get(url_for('main.suspend_service', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.get(url_for('main.suspend_service', service_id=service_one['id']))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -821,14 +717,12 @@ def test_suspend_service_prompts_user(
 
 
 def test_cant_suspend_inactive_service(
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
-    mocker,
 ):
     service_one['active'] = False
 
-    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -836,15 +730,14 @@ def test_cant_suspend_inactive_service(
 
 
 def test_resume_service_after_confirm(
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
     mocker,
 ):
     service_one['active'] = False
     mocked_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
 
-    response = logged_in_client.post(url_for('main.resume_service', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.post(url_for('main.resume_service', service_id=service_one['id']))
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
@@ -852,15 +745,14 @@ def test_resume_service_after_confirm(
 
 
 def test_resume_service_prompts_user(
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
     mocker,
 ):
     service_one['active'] = False
     mocked_fn = mocker.patch('app.service_api_client.post')
 
-    response = logged_in_client.get(url_for('main.resume_service', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.get(url_for('main.resume_service', service_id=service_one['id']))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -870,12 +762,10 @@ def test_resume_service_prompts_user(
 
 
 def test_cant_resume_active_service(
-    logged_in_client,
-    platform_admin_user,
+    logged_in_platform_admin_client,
     service_one,
-    mocker,
 ):
-    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    response = logged_in_platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')

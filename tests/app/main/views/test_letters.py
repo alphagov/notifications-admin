@@ -16,7 +16,7 @@ letters_urls = [
     (False, 403)
 ])
 def test_letters_access_restricted(
-    logged_in_client,
+    logged_in_platform_admin_client,
     mocker,
     can_send_letters,
     response_code,
@@ -26,7 +26,7 @@ def test_letters_access_restricted(
     service = service_json(can_send_letters=can_send_letters)
     mocker.patch('app.service_api_client.get_service', return_value={"data": service})
 
-    response = logged_in_client.get(url(service_id=service['id']))
+    response = logged_in_platform_admin_client.get(url(service_id=service['id']))
 
     assert response.status_code == response_code
 
