@@ -122,6 +122,7 @@ def test_upload_csvfile_with_no_recipient_column_shows_error(
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
+    service_one,
     fake_uuid,
 ):
 
@@ -134,7 +135,7 @@ def test_upload_csvfile_with_no_recipient_column_shows_error(
     )
 
     response = logged_in_client.post(
-        url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
         data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
         follow_redirects=True,
     )
