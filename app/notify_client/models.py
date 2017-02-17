@@ -1,4 +1,5 @@
-from flask_login import (UserMixin, login_fresh)
+from flask_login import UserMixin, AnonymousUserMixin, login_fresh
+from flask import session
 
 
 class User(UserMixin):
@@ -13,9 +14,13 @@ class User(UserMixin):
         self._state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
         self.platform_admin = fields.get('platform_admin')
+        self.current_session_id = fields.get('current_session_id')
 
     def get_id(self):
         return self.id
+
+    def logged_in_elsewhere(self):
+        return session.get('current_session_id') != self.current_session_id
 
     @property
     def is_active(self):
@@ -23,10 +28,11 @@ class User(UserMixin):
 
     @property
     def is_authenticated(self):
-        # To handle remember me token renewal
-        if not login_fresh():
-            return False
-        return super(User, self).is_authenticated
+        return (
+            login_fresh() and
+            not self.logged_in_elsewhere() and
+            super(User, self).is_authenticated
+        )
 
     @property
     def id(self):
@@ -114,15 +120,18 @@ class User(UserMixin):
         return self.failed_login_count >= self.max_failed_login_count
 
     def serialize(self):
-        dct = {"id": self.id,
-               "name": self.name,
-               "email_address": self.email_address,
-               "mobile_number": self.mobile_number,
-               "password_changed_at": self.password_changed_at,
-               "state": self.state,
-               "failed_login_count": self.failed_login_count,
-               "permissions": [x for x in self._permissions]}
-        if getattr(self, '_password', None):
+        dct = {
+            "id": self.id,
+            "name": self.name,
+            "email_address": self.email_address,
+            "mobile_number": self.mobile_number,
+            "password_changed_at": self.password_changed_at,
+            "state": self.state,
+            "failed_login_count": self.failed_login_count,
+            "permissions": [x for x in self._permissions],
+            "current_session_id": self.current_session_id
+        }
+        if hasattr(self, '_password'):
             dct['password'] = self._password
         return dct
 
@@ -174,3 +183,9 @@ class InvitedUser(object):
         else:
             data['permissions'] = self.permissions
         return data
+
+
+class AnonymousUser(AnonymousUserMixin):
+    # set the anonymous user so that if a new browser hits us we don't error http://stackoverflow.com/a/19275188
+    def logged_in_elsewhere(self):
+        return False

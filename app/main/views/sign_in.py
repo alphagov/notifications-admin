@@ -76,7 +76,13 @@ def sign_in():
             ).format(password_reset=url_for('.forgot_password'))
         ))
 
-    return render_template('views/signin.html', form=form, again=bool(request.args.get('next')))
+    other_device = current_user.logged_in_elsewhere()
+    return render_template(
+        'views/signin.html',
+        form=form,
+        again=bool(request.args.get('next')),
+        other_device=other_device
+    )
 
 
 @login_manager.unauthorized_handler
