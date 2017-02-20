@@ -32,13 +32,14 @@ def test_should_show_page_for_one_template(
     mock_get_service_template.assert_called_with(service_one['id'], template_id)
 
 
-def test_should_show_sms_template_without_downgrading_unicode_characters(
+def test_should_show_sms_template_with_downgraded_unicode_characters(
     logged_in_client,
     mocker,
     service_one,
     fake_uuid,
 ):
-    msg = 'here:\tare some “fancy quotes” and non\u200Bbreaking\u200Bspaces'
+    msg = 'here:\tare some “fancy quotes” and zero\u200Bwidth\u200Bspaces'
+    rendered_msg = 'here: are some "fancy quotes" and zerowidthspaces'
 
     mocker.patch(
         'app.service_api_client.get_service_template',
@@ -52,7 +53,7 @@ def test_should_show_sms_template_without_downgrading_unicode_characters(
         template_id=template_id))
 
     assert response.status_code == 200
-    assert msg in response.get_data(as_text=True)
+    assert rendered_msg in response.get_data(as_text=True)
 
 
 def test_should_show_page_template_with_priority_select_if_platform_admin(
