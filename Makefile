@@ -219,3 +219,7 @@ cf-push:
 .PHONY: cf-deploy-with-docker
 cf-deploy-with-docker: prepare-docker-build-image ## Deploys the app to Cloud Foundry from a new Docker container
 	$(call run_docker_container,cf-deploy,make cf-login cf-deploy)
+
+.PHONY: cf-rollback-with-docker
+cf-rollback-with-docker: prepare-docker-build-image ## Rollbacks the app on Cloud Foundry to the previous version
+	$(call run_docker_container,cf-rollback,make cf-login cf-rollback)
