@@ -38,7 +38,7 @@ class Config(object):
     NOTIFY_APP_NAME = 'admin'
     NOTIFY_LOG_LEVEL = 'DEBUG'
     NOTIFY_LOG_PATH = '/var/log/notify/application.log'
-    PERMANENT_SESSION_LIFETIME = 3600  # seconds
+    PERMANENT_SESSION_LIFETIME = 20 * 60 * 60  # 20 hours
     REMEMBER_COOKIE_DURATION = timedelta(days=1)
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_NAME = 'notify_admin_remember_me'
