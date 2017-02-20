@@ -91,8 +91,9 @@ cf-build: dependencies generate-version-file ## Build project
 
 .PHONY: build-codedeploy-artifact
 build-codedeploy-artifact: ## Build the deploy artifact for CodeDeploy
+	rm -rf target
 	mkdir -p target
-	zip -r -x@deploy-exclude.lst target/notifications-admin.zip *
+	zip -y -q -r -x@deploy-exclude.lst target/notifications-admin.zip ./
 
 .PHONY: upload-codedeploy-artifact ## Upload the deploy artifact for CodeDeploy
 upload-codedeploy-artifact: check-env-vars
