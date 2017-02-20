@@ -16,7 +16,7 @@
         background-image: file-url('product/proposition-illustration.png');
         background-size: 320px;
         background-repeat: no-repeat;
-        background-position: right -14px top 85px;
+        background-position: right -6px top 85px;
 
         @include ie-lte(8) {
           background-image: none;
