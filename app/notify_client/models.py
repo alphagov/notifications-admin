@@ -110,9 +110,6 @@ class User(UserMixin):
     def failed_login_count(self, num):
         self._failed_login_count += num
 
-    def reset_failed_login_count(self):
-        self._failed_login_count = 0
-
     def is_locked(self):
         return self.failed_login_count >= self.max_failed_login_count
 
