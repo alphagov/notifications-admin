@@ -163,11 +163,12 @@ def add_service_template(service_id, template_type):
                 form.process_type.data
             )
         except HTTPError as e:
-            if e.status_code == 400:
-                if 'content' in e.message and any(['character count greater than' in x for x in e.message['content']]):
-                    form.template_content.errors.extend(e.message['content'])
-                else:
-                    raise e
+            if (
+                e.status_code == 400 and
+                'content' in e.message and
+                any(['character count greater than' in x for x in e.message['content']])
+            ):
+                form.template_content.errors.extend(e.message['content'])
             else:
                 raise e
         else:

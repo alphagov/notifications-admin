@@ -1,6 +1,6 @@
 from itertools import repeat
 from datetime import datetime
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, ANY
 
 import pytest
 from bs4 import BeautifulSoup
@@ -30,6 +30,30 @@ def test_should_show_page_for_one_template(
     assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in response.get_data(as_text=True)
     assert "Use priority queue?" not in response.get_data(as_text=True)
     mock_get_service_template.assert_called_with(service_one['id'], template_id)
+
+
+def test_should_show_sms_template_with_downgraded_unicode_characters(
+    logged_in_client,
+    mocker,
+    service_one,
+    fake_uuid,
+):
+    msg = 'here:\tare some “fancy quotes” and zero\u200Bwidth\u200Bspaces'
+    rendered_msg = 'here: are some "fancy quotes" and zerowidthspaces'
+
+    mocker.patch(
+        'app.service_api_client.get_service_template',
+        return_value={'data': template_json(service_one['id'], fake_uuid, type_='sms', content=msg)}
+    )
+
+    template_id = fake_uuid
+    response = logged_in_client.get(url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=template_id))
+
+    assert response.status_code == 200
+    assert rendered_msg in response.get_data(as_text=True)
 
 
 def test_should_show_page_template_with_priority_select_if_platform_admin(
@@ -69,17 +93,12 @@ def test_should_show_preview_letter_templates(
     view_suffix,
     expected_content_type,
     logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_service,
     mock_get_service_email_template,
-    mock_get_user,
     mock_get_user_by_email,
-    mock_has_permissions,
-    fake_uuid,
-    mocker,
+    service_one,
+    fake_uuid
 ):
-    service_id, template_id = repeat(fake_uuid, 2)
+    service_id, template_id = service_one['id'], fake_uuid
     response = logged_in_client.get(url_for(
         '{}_{}'.format(view, view_suffix),
         service_id=service_id,
@@ -609,3 +628,102 @@ def test_get_last_use_message_uses_most_recent_statistics():
 ])
 def test_get_human_readable_delta(from_time, until_time, message):
     assert get_human_readable_delta(from_time, until_time) == message
+
+
+def test_can_create_email_template_with_emoji(
+    logged_in_client,
+    service_one,
+    mock_create_service_template
+):
+    data = {
+        'name': "new name",
+        'subject': "Food incoming!",
+        'template_content': "here's a burrito 🌯",
+        'template_type': 'email',
+        'service': service_one['id'],
+        'process_type': 'normal'
+    }
+    resp = logged_in_client.post(url_for(
+        '.add_service_template',
+        service_id=service_one['id'],
+        template_type='email'
+    ), data=data)
+
+    assert resp.status_code == 302
+
+
+def test_should_not_create_sms_template_with_emoji(
+    logged_in_client,
+    service_one,
+    mock_create_service_template
+):
+    data = {
+        'name': "new name",
+        'template_content': "here are some noodles 🍜",
+        'template_type': 'sms',
+        'service': service_one['id'],
+        'process_type': 'normal'
+    }
+    resp = logged_in_client.post(url_for(
+        '.add_service_template',
+        service_id=service_one['id'],
+        template_type='sms'
+    ), data=data)
+
+    assert resp.status_code == 200
+    assert "You can’t use 🍜 in text messages." in resp.get_data(as_text=True)
+
+
+def test_should_not_update_sms_template_with_emoji(
+    logged_in_client,
+    service_one,
+    mock_get_service_template,
+    mock_update_service_template,
+    fake_uuid,
+):
+    data = {
+        'id': fake_uuid,
+        'name': "new name",
+        'template_content': "here's a burger 🍔",
+        'service': service_one['id'],
+        'template_type': 'sms',
+        'process_type': 'normal'
+    }
+    resp = logged_in_client.post(url_for(
+        '.edit_service_template',
+        service_id=service_one['id'],
+        template_id=fake_uuid), data=data)
+
+    assert resp.status_code == 200
+    assert "You can’t use 🍔 in text messages." in resp.get_data(as_text=True)
+
+
+def test_should_create_sms_template_without_downgrading_unicode_characters(
+    logged_in_client,
+    service_one,
+    mock_create_service_template
+):
+    msg = 'here:\tare some “fancy quotes” and non\u200Bbreaking\u200Bspaces'
+
+    data = {
+        'name': "new name",
+        'template_content': msg,
+        'template_type': 'sms',
+        'service': service_one['id'],
+        'process_type': 'normal'
+    }
+    resp = logged_in_client.post(url_for(
+        '.add_service_template',
+        service_id=service_one['id'],
+        template_type='sms'
+    ), data=data)
+
+    mock_create_service_template.assert_called_with(
+        ANY,  # name
+        ANY,  # type
+        msg,  # content
+        ANY,  # service_id
+        ANY,  # subject
+        ANY  # process_type
+    )
+    assert resp.status_code == 302
