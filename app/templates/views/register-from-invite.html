@@ -12,7 +12,7 @@ Create an account
   <div class="column-two-thirds">
     <h1 class="heading-large">Create an account</h1>
     <p>Your account will be created with this email: {{email_address}}</p>
-    <form method="post" autocomplete="nope">
+    <form method="post" autocomplete="off">
       {{ textbox(form.name, width='3-4') }}
       {{ textbox(form.mobile_number, width='3-4', hint='We’ll send you a security code by text message') }}
       {{ textbox(form.password, hint="At least 8 characters", width='3-4') }}
