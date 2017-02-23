@@ -153,7 +153,7 @@ class RegisterUserFromInviteForm(Form):
 
 class PermissionsForm(Form):
     send_messages = BooleanField("Send messages from existing templates")
-    manage_service = BooleanField("Modify this service, its team, and its&nbsp;templates")
+    manage_service = BooleanField("Modify this service, its team, and its templates")
     manage_api_keys = BooleanField("Create and revoke API keys")
 
 
