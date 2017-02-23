@@ -11,7 +11,6 @@ from flask import (
 
 from flask_login import (
     current_user,
-    login_fresh,
     confirm_login
 )
 
@@ -49,19 +48,6 @@ def sign_in():
             else:
                 invite_api_client.accept_invite(invited_user['service'], invited_user['id'])
         if user:
-            # Remember me login
-            if not login_fresh() and \
-               not current_user.is_anonymous and \
-               current_user.id == user.id and \
-               user.is_active:
-
-                confirm_login()
-                services = service_api_client.get_active_services({'user_id': str(user.id)}).get('data', [])
-                if (len(services) == 1):
-                    return redirect(url_for('main.service_dashboard', service_id=services[0]['id']))
-                else:
-                    return redirect(url_for('main.choose_service'))
-
             session['user_details'] = {"email": user.email_address, "id": user.id}
             if user.is_active:
                 user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)

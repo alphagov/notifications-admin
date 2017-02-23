@@ -6,11 +6,6 @@ def on_user_logged_in(sender, user):
     _send_event(sender, event_type='sucessful_login', user=user)
 
 
-# should change the event type? This is a remember me login.
-def on_user_login_confirmed(sender):
-    _send_event(sender, event_type='sucessful_login_remember_me', user=current_user)
-
-
 def _send_event(sender, **kwargs):
     from flask import request
     try:

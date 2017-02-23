@@ -13,7 +13,6 @@ class TestClient(FlaskClient):
         # Skipping authentication here and just log them in
         with self.session_transaction() as session:
             session['user_id'] = user.id
-            session['_fresh'] = True
         if mocker:
             mocker.patch('app.user_api_client.get_user', return_value=user)
             mocker.patch('app.events_api_client.create_event')
@@ -22,9 +21,6 @@ class TestClient(FlaskClient):
                 session['service_id'] = service['id']
             mocker.patch('app.service_api_client.get_service', return_value={'data': service})
         login_user(user, remember=True)
-
-    def login_fresh(self):
-        return True
 
     def logout(self, user):
         self.get(url_for("main.logout"))
