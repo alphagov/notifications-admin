@@ -20,7 +20,8 @@ class User(UserMixin):
         return self.id
 
     def logged_in_elsewhere(self):
-        return session.get('current_session_id') != self.current_session_id
+        # if the current user (ie: db object) has no session, they've never logged in before
+        return self.current_session_id is not None and session.get('current_session_id') != self.current_session_id
 
     @property
     def is_active(self):
