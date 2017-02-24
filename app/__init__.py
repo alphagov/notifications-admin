@@ -50,6 +50,7 @@ from app.notify_client.user_api_client import UserApiClient
 from app.notify_client.events_api_client import EventsApiClient
 from app.notify_client.provider_client import ProviderClient
 from app.notify_client.organisations_client import OrganisationsClient
+from app.notify_client.models import AnonymousUser
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
@@ -103,6 +104,7 @@ def create_app():
     login_manager.login_view = 'main.sign_in'
     login_manager.login_message_category = 'default'
     login_manager.session_protection = None
+    login_manager.anonymous_user = AnonymousUser
 
     from app.main import main as main_blueprint
     application.register_blueprint(main_blueprint)

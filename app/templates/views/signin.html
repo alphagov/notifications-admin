@@ -13,9 +13,15 @@
 
     {% if again %}
       <h1 class="heading-large">You need to sign in again</h1>
-      <p>
-        We sign you out if you haven’t used Notify for a while.
-      </p>
+      {% if other_device %}
+        <p>
+          We signed you out because you logged in to Notify on another device.
+        </p>
+      {% else %}
+        <p>
+          We signed you out because you haven’t used Notify for a while.
+        </p>
+      {% endif %}
     {% else %}
       <h1 class="heading-large">Sign in</h1>
       <p>

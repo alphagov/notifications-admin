@@ -80,7 +80,7 @@ def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(
         page.select('main p')[0].text.strip(),
     ) == (
         'You need to sign in again',
-        'We sign you out if you haven’t used Notify for a while.',
+        'We signed you out because you haven’t used Notify for a while.',
     )
 
 
@@ -106,7 +106,7 @@ def test_existing_user_of_service_get_redirected_to_signin(
         page.select('main p')[0].text.strip(),
     ) == (
         'You need to sign in again',
-        'We sign you out if you haven’t used Notify for a while.',
+        'We signed you out because you haven’t used Notify for a while.',
     )
     assert mock_accept_invite.call_count == 1
 
@@ -141,7 +141,7 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
         page.select('main p')[0].text.strip(),
     ) == (
         'You need to sign in again',
-        'We sign you out if you haven’t used Notify for a while.',
+        'We signed you out because you haven’t used Notify for a while.',
     )
 
 
