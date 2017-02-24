@@ -26,8 +26,7 @@ def two_factor():
     if form.validate_on_submit():
         try:
             user = user_api_client.get_user(user_id)
-            # the user will have a new current_session_id set by the API - store it in the cookie so we can match it in
-            # future requests
+            # the user will have a new current_session_id set by the API - store it in the cookie for future requests
             session['current_session_id'] = user.current_session_id
             services = service_api_client.get_active_services({'user_id': str(user_id)}).get('data', [])
             # Check if coming from new password page

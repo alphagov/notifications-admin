@@ -177,6 +177,9 @@ def user_profile_mobile_number_confirm():
     form = ConfirmMobileNumberForm(_check_code)
 
     if form.validate_on_submit():
+        user = user_api_client.get_user(current_user.id)
+        # the user will have a new current_session_id set by the API - store it in the cookie for future requests
+        session['current_session_id'] = user.current_session_id
         mobile_number = session[NEW_MOBILE]
         del session[NEW_MOBILE]
         del session[NEW_MOBILE_PASSWORD_CONFIRMED]

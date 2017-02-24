@@ -1,5 +1,7 @@
-from flask import url_for
+import uuid
+import json
 
+from flask import url_for
 from bs4 import BeautifulSoup
 
 
@@ -24,16 +26,27 @@ def test_should_return_verify_template(
 def test_should_redirect_to_add_service_when_sms_code_is_correct(
     client,
     api_user_active,
-    mock_get_user,
+    mocker,
     mock_update_user,
     mock_check_verify_code,
+    fake_uuid
 ):
+    api_user_active.current_session_id = str(uuid.UUID(int=1))
+    mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
+
     with client.session_transaction() as session:
         session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
+        # user's only just created their account so no session in the cookie
+        session.pop('current_session_id', None)
+
     response = client.post(url_for('main.verify'),
                            data={'sms_code': '12345'})
     assert response.status_code == 302
     assert response.location == url_for('main.add_service', first='first', _external=True)
+
+    # make sure the current_session_id has changed to what the API returned
+    with client.session_transaction() as session:
+        assert session['current_session_id'] == str(uuid.UUID(int=1))
 
     mock_check_verify_code.assert_called_once_with(api_user_active.id, '12345', 'sms')
 
@@ -57,7 +70,6 @@ def test_should_activate_user_after_verify(
 def test_should_return_200_when_sms_code_is_wrong(
     client,
     api_user_active,
-    mock_get_user,
     mock_check_verify_code_code_not_found,
 ):
     with client.session_transaction() as session:
@@ -77,7 +89,6 @@ def test_verify_email_redirects_to_verify_if_token_valid(
     mock_send_verify_code,
     mock_check_verify_code,
 ):
-    import json
     token_data = {"user_id": api_user_pending.id, "secret_code": 12345}
     mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
 
@@ -136,7 +147,6 @@ def test_verify_email_redirects_to_sign_in_if_user_active(
     mock_send_verify_code,
     mock_check_verify_code,
 ):
-    import json
     token_data = {"user_id": api_user_active.id, "secret_code": 12345}
     mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
 

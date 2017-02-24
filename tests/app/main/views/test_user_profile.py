@@ -1,13 +1,14 @@
+import uuid
 import json
+
 from flask import url_for
 from notifications_utils.url_safe_token import generate_token
+
+from tests.conftest import api_user_active as create_user
 
 
 def test_should_show_overview_page(
     logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_user,
 ):
     response = logged_in_client.get(url_for('main.user_profile'))
 
@@ -16,10 +17,7 @@ def test_should_show_overview_page(
 
 
 def test_should_show_name_page(
-    logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_user,
+    logged_in_client
 ):
     response = logged_in_client.get(url_for('main.user_profile_name'))
 
@@ -30,8 +28,6 @@ def test_should_show_name_page(
 def test_should_redirect_after_name_change(
     logged_in_client,
     api_user_active,
-    mock_login,
-    mock_get_user,
     mock_update_user_attribute,
 ):
     new_name = 'New Name'
@@ -40,17 +36,12 @@ def test_should_redirect_after_name_change(
         'main.user_profile_name'), data=data)
 
     assert response.status_code == 302
-    assert response.location == url_for(
-        'main.user_profile', _external=True)
-    api_user_active.name = new_name
+    assert response.location == url_for('main.user_profile', _external=True)
     assert mock_update_user_attribute.called
 
 
 def test_should_show_email_page(
     logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_user,
 ):
     response = logged_in_client.get(url_for(
         'main.user_profile_email'))
@@ -61,7 +52,6 @@ def test_should_show_email_page(
 
 def test_should_redirect_after_email_change(
     logged_in_client,
-    api_user_active,
     mock_login,
     mock_is_email_unique,
 ):
@@ -77,8 +67,6 @@ def test_should_redirect_after_email_change(
 
 def test_should_show_authenticate_after_email_change(
     logged_in_client,
-    api_user_active,
-    mock_login,
 ):
     with logged_in_client.session_transaction() as session:
         session['new-email'] = 'new_notify@notify.gov.uk'
@@ -91,8 +79,6 @@ def test_should_show_authenticate_after_email_change(
 
 def test_should_render_change_email_continue_after_authenticate_email(
     logged_in_client,
-    api_user_active,
-    mock_login,
     mock_verify_password,
     mock_send_change_email_verification,
 ):
@@ -111,7 +97,6 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(
     app_,
     logged_in_client,
     api_user_active,
-    mock_login,
     mock_update_user_attribute,
 ):
 
@@ -125,9 +110,6 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(
 
 def test_should_show_mobile_number_page(
     logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_user,
 ):
     response = logged_in_client.get(url_for('main.user_profile_mobile_number'))
 
@@ -137,9 +119,6 @@ def test_should_show_mobile_number_page(
 
 def test_should_redirect_after_mobile_number_change(
     logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_user,
 ):
     data = {'mobile_number': '07121231234'}
     response = logged_in_client.post(
@@ -152,9 +131,6 @@ def test_should_redirect_after_mobile_number_change(
 
 def test_should_show_authenticate_after_mobile_number_change(
     logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_user,
 ):
     with logged_in_client.session_transaction() as session:
         session['new-mob'] = '+441234123123'
@@ -168,9 +144,6 @@ def test_should_show_authenticate_after_mobile_number_change(
 
 def test_should_redirect_after_mobile_number_authenticate(
     logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_user,
     mock_verify_password,
     mock_send_verify_code,
 ):
@@ -188,9 +161,6 @@ def test_should_redirect_after_mobile_number_authenticate(
 
 def test_should_show_confirm_after_mobile_number_change(
     logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_user,
 ):
     with logged_in_client.session_transaction() as session:
         session['new-mob-password-confirmed'] = True
@@ -204,29 +174,39 @@ def test_should_show_confirm_after_mobile_number_change(
 
 def test_should_redirect_after_mobile_number_confirm(
     logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_user,
+    mocker,
     mock_update_user_attribute,
     mock_check_verify_code,
+    fake_uuid
 ):
+    user_before = create_user(fake_uuid)
+    user_after = create_user(fake_uuid)
+    user_before.current_session_id = str(uuid.UUID(int=1))
+    user_after.current_session_id = str(uuid.UUID(int=2))
+
+    # first time (login decorator) return normally, second time (after 2FA return with new session id)
+    mocker.patch('app.user_api_client.get_user', side_effect=[user_before, user_after])
+
     with logged_in_client.session_transaction() as session:
         session['new-mob-password-confirmed'] = True
         session['new-mob'] = '+441234123123'
+        session['current_session_id'] = user_before.current_session_id
     data = {'sms_code': '12345'}
     response = logged_in_client.post(
         url_for('main.user_profile_mobile_number_confirm'),
         data=data)
+
     assert response.status_code == 302
     assert response.location == url_for(
         'main.user_profile', _external=True)
 
+    # make sure the current_session_id has changed to what the API returned
+    with logged_in_client.session_transaction() as session:
+        assert session['current_session_id'] == user_after.current_session_id
+
 
 def test_should_show_password_page(
     logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_user,
 ):
     response = logged_in_client.get(url_for('main.user_profile_password'))
 
@@ -236,9 +216,6 @@ def test_should_show_password_page(
 
 def test_should_redirect_after_password_change(
     logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_user,
     mock_update_user_password,
     mock_verify_password,
 ):
@@ -256,8 +233,6 @@ def test_should_redirect_after_password_change(
 
 def test_non_gov_user_cannot_see_change_email_link(
     logged_in_client,
-    api_nongov_user_active,
-    mock_login,
     mock_get_non_govuser,
 ):
     response = logged_in_client.get(url_for('main.user_profile'))
@@ -268,8 +243,6 @@ def test_non_gov_user_cannot_see_change_email_link(
 
 def test_non_gov_user_cannot_access_change_email_page(
     logged_in_client,
-    api_nongov_user_active,
-    mock_login,
     mock_get_non_govuser,
 ):
     response = logged_in_client.get(url_for('main.user_profile_email'))
