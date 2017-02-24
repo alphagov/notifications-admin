@@ -110,7 +110,7 @@ class UserApiClient(NotifyAdminAPIClient):
         data = {'code_type': code_type, 'code': code}
         endpoint = '/user/{}/verify/code'.format(user_id)
         try:
-            resp = self.post(endpoint, data=data)
+            self.post(endpoint, data=data)
             return True, ''
         except HTTPError as e:
             if e.status_code == 400 or e.status_code == 404:
