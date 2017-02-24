@@ -1,3 +1,4 @@
+import requests
 from flask import (render_template, url_for, redirect, request, abort)
 from app.main import main
 from app import convert_to_boolean
@@ -10,7 +11,18 @@ from notifications_utils.template import HTMLEmailTemplate
 def index():
     if current_user and current_user.is_authenticated:
         return redirect(url_for('main.choose_service'))
-    return render_template('views/signedout.html')
+    performance = requests.get((
+        'https://www.performance.service.gov.uk'
+        '/data/govuk-notify/notifications'
+        '?duration=60&collect=count%3Asum&group_by=channel&period=month'
+    )).json()['data']
+    return render_template(
+        'views/signedout.html',
+        performance={
+            item['channel']: int(item['count:sum'])
+            for item in performance
+        }
+    )
 
 
 @main.route("/verify-mobile")
