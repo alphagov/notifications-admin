@@ -185,7 +185,7 @@ def test_sms_sender_form_validation(
 
     form.sms_sender.data = 'morethanelevenchars'
     form.validate()
-    assert "Enter fewer than 11 characters" == form.errors['sms_sender'][0]
+    assert "Enter 11 characters or fewer" == form.errors['sms_sender'][0]
 
     form.sms_sender.data = '###########'
     form.validate()
