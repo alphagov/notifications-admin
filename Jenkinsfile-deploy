@@ -6,15 +6,11 @@ node {
             step([$class: 'WsCleanup'])
 
             echo "Downloading build artifact.."
-            withCredentials([
-                string(credentialsId: "${aws_env}_aws_access_key", variable: 'AWS_ACCESS_KEY_ID'),
-                string(credentialsId: "${aws_env}_aws_secret_key", variable: 'AWS_SECRET_ACCESS_KEY')
-            ]) {
-                sh 'aws s3 cp --region eu-west-1 s3://${dns_name}-codedeploy/notifications-admin-${DEPLOY_BUILD_NUMBER}.zip source.zip'
-            }
+            sh 'aws s3 cp --region eu-west-1 s3://notify.tools-jenkins/build/notifications-admin/${DEPLOY_BUILD_NUMBER}.zip source.zip'
 
             echo "Extracting build artifact.."
             sh 'unzip -q source.zip'
+            sh 'rm -f source.zip'
         }
         stage('Deploy') {
             lock(cf_space) {
