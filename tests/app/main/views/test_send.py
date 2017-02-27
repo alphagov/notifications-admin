@@ -115,7 +115,32 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         assert 'Re-upload your file' in content
 
 
-def test_upload_csvfile_with_no_recipient_column_shows_error(
+@pytest.mark.parametrize('file_contents, expected_error,', [
+    (
+        """
+            telephone,name
+            +447700900986
+        """,
+        (
+            'Your file needs to have a column called ‘phone number’ '
+            'Your file has columns called ‘telephone’ and ‘name’. '
+            'Skip to file contents'
+        )
+    ),
+    (
+        """
+            phone number
+            +447700900986
+        """,
+        (
+            'The columns in your file need to match the double brackets in your template '
+            'Your file has one column, called ‘phone number’. '
+            'It doesn’t have a column called ‘name’. '
+            'Skip to file contents'
+        )
+    )
+])
+def test_upload_csvfile_with_missing_columns_shows_error(
     logged_in_client,
     mocker,
     mock_get_service_template_with_placeholders,
@@ -124,15 +149,11 @@ def test_upload_csvfile_with_no_recipient_column_shows_error(
     mock_get_detailed_service_for_today,
     service_one,
     fake_uuid,
+    file_contents,
+    expected_error,
 ):
 
-    mocker.patch(
-        'app.main.views.send.s3download',
-        return_value="""
-            telephone,name
-            +447700900986
-        """
-    )
+    mocker.patch('app.main.views.send.s3download', return_value=file_contents)
 
     response = logged_in_client.post(
         url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
@@ -142,11 +163,7 @@ def test_upload_csvfile_with_no_recipient_column_shows_error(
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert ' '.join(page.select('.banner-dangerous')[0].text.split()) == (
-        'Your file needs to have a column called ‘phone number’ '
-        'Your file has columns called ‘telephone’ and ‘name’. '
-        'Skip to file contents'
-    )
+    assert ' '.join(page.select('.banner-dangerous')[0].text.split()) == expected_error
 
 
 def test_upload_csv_invalid_extension(
