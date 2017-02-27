@@ -138,7 +138,23 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
             'It doesn’t have a column called ‘name’. '
             'Skip to file contents'
         )
-    )
+    ),
+    (
+        "+447700900986",
+        (
+            'Your file is missing some rows '
+            'It needs at least one row of data, and columns called ‘name’ and ‘phone number’. '
+            'Skip to file contents'
+        )
+    ),
+    (
+        "",
+        (
+            'Your file is missing some rows '
+            'It needs at least one row of data, and columns called ‘name’ and ‘phone number’. '
+            'Skip to file contents'
+        )
+    ),
 ])
 def test_upload_csvfile_with_missing_columns_shows_error(
     logged_in_client,

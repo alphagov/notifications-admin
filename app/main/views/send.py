@@ -249,8 +249,6 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
     remaining_messages = (current_service['message_limit'] - sum(stat['requested'] for stat in statistics.values()))
 
     contents = s3download(service_id, upload_id)
-    if not contents:
-        flash('There was a problem reading your upload file')
 
     template = get_template(
         service_api_client.get_service_template(
@@ -295,6 +293,7 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
         choose_time_form = ChooseTimeForm()
 
     with suppress(StopIteration):
+        first_recipient = None
         template.values = next(recipients.rows)
         first_recipient = template.values.get(
             Columns.make_key(recipients.recipient_column_headers[0]),

@@ -35,6 +35,23 @@
       {% endcall %}
     </div>
 
+  {% elif not count_of_recipients %}
+
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        <h1 class='banner-title'>
+          Your file is missing some rows
+        </h1>
+        <p>
+          It needs at least one row of data, and {{ recipients.missing_column_headers | sort() | formatted_list(
+            prefix='a column called',
+            prefix_plural='columns called'
+          ) }}.
+        </p>
+        {{ skip_to_file_contents() }}
+      {% endcall %}
+    </div>
+
   {% elif not recipients.has_recipient_columns %}
 
     <div class="bottom-gutter">
