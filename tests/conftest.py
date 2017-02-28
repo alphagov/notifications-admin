@@ -1378,6 +1378,11 @@ def mock_update_whitelist(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_reset_failed_login_count(mocker):
+    return mocker.patch('app.user_api_client.reset_failed_login_count')
+
+
+@pytest.fixture(scope='function')
 def client(app_):
     with app_.test_request_context(), app_.test_client() as client:
         yield client

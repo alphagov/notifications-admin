@@ -31,10 +31,7 @@ def two_factor():
             services = service_api_client.get_active_services({'user_id': str(user_id)}).get('data', [])
             # Check if coming from new password page
             if 'password' in session['user_details']:
-                user_api_client.update_password(user.id, password=session['user_details']['password'])
-            if user.is_locked():
-                form.sms_code.errors.append('Code not found')
-                return render_template('views/two-factor.html', form=form)
+                user = user_api_client.update_password(user.id, password=session['user_details']['password'])
             activated_user = user_api_client.activate_user(user)
             login_user(activated_user, remember=True)
         finally:

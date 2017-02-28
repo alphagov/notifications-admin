@@ -187,7 +187,7 @@ def test_two_factor_returns_error_when_user_is_locked(
     client,
     api_user_locked,
     mock_get_locked_user,
-    mock_check_verify_code,
+    mock_check_verify_code_code_not_found,
     mock_get_services_with_one_service
 ):
     with client.session_transaction() as session:
