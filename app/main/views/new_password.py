@@ -30,6 +30,7 @@ def new_password(token):
 
     if form.validate_on_submit():
         user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
+        user_api_client.reset_failed_login_count(user.id)
         session['user_details'] = {
             'id': user.id,
             'email': user.email_address,

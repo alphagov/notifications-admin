@@ -38,6 +38,7 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(
     mock_get_user_by_email_request_password_reset,
     mock_login,
     mock_send_verify_code,
+    mock_reset_failed_login_count
 ):
     user = mock_get_user_by_email_request_password_reset.return_value
     data = json.dumps({'email': user.email_address, 'created_at': str(datetime.utcnow())})
@@ -54,6 +55,7 @@ def test_should_redirect_index_if_user_has_already_changed_password(
     mock_get_user_by_email_user_changed_password,
     mock_login,
     mock_send_verify_code,
+    mock_reset_failed_login_count
 ):
     user = mock_get_user_by_email_user_changed_password.return_value
     data = json.dumps({'email': user.email_address, 'created_at': str(datetime.utcnow())})
