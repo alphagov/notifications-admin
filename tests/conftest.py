@@ -458,10 +458,12 @@ def mock_get_service_templates(mocker):
                 service_id, uuid2, "sms_template_two", "sms", "sms template two content"
             ),
             template_json(
-                service_id, uuid3, "email_template_one", "email", "email template one content"
+                service_id, uuid3, "email_template_one", "email", "email template one content",
+                subject='email template one subject',
             ),
             template_json(
-                service_id, uuid4, "email_template_two", "email", "email template two content"
+                service_id, uuid4, "email_template_two", "email", "email template two content",
+                subject='email template two subject',
             )
         ]}
 

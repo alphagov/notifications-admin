@@ -324,11 +324,7 @@ def test_menu_send_messages(
         assert url_for(
             'main.choose_template',
             service_id=service_one['id'],
-            template_type='email') in page
-        assert url_for(
-            'main.choose_template',
-            service_id=service_one['id'],
-            template_type='sms') in page
+        ) in page
         assert url_for('main.manage_users', service_id=service_one['id']) in page
 
         assert url_for('main.service_settings', service_id=service_one['id']) not in page
@@ -358,11 +354,7 @@ def test_menu_manage_service(
         assert url_for(
             'main.choose_template',
             service_id=service_one['id'],
-            template_type='email') in page
-        assert url_for(
-            'main.choose_template',
-            service_id=service_one['id'],
-            template_type='sms') in page
+        ) in page
         assert url_for('main.manage_users', service_id=service_one['id']) in page
         assert url_for('main.service_settings', service_id=service_one['id']) in page
 
@@ -391,11 +383,7 @@ def test_menu_manage_api_keys(
         assert url_for(
             'main.choose_template',
             service_id=service_one['id'],
-            template_type='email') in page
-        assert url_for(
-            'main.choose_template',
-            service_id=service_one['id'],
-            template_type='sms') in page
+        ) in page
         assert url_for('main.manage_users', service_id=service_one['id']) in page
         assert url_for('main.service_settings', service_id=service_one['id']) not in page
 
@@ -421,8 +409,7 @@ def test_menu_all_services_for_platform_admin_user(
             service_one,
             [])
         page = resp.get_data(as_text=True)
-        assert url_for('main.choose_template', service_id=service_one['id'], template_type='sms') in page
-        assert url_for('main.choose_template', service_id=service_one['id'], template_type='email') in page
+        assert url_for('main.choose_template', service_id=service_one['id']) in page
         assert url_for('main.manage_users', service_id=service_one['id']) in page
         assert url_for('main.service_settings', service_id=service_one['id']) in page
         assert url_for('main.view_notifications', service_id=service_one['id'], message_type='email') in page

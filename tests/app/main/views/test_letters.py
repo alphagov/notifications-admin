@@ -1,11 +1,11 @@
 import pytest
+from bs4 import BeautifulSoup
 from flask import url_for
 from functools import partial
 
 from tests import service_json
 
 letters_urls = [
-    partial(url_for, 'main.choose_template', template_type='letter'),
     partial(url_for, 'main.add_service_template', template_type='letter'),
 ]
 
@@ -49,3 +49,29 @@ def test_letters_lets_in_without_permission(
 
     assert api_user_active.permissions == {}
     assert response.status_code == 200
+
+
+@pytest.mark.parametrize('can_send_letters, choices', [
+    (True, ['Email', 'Text message', 'Letter']),
+    (False, ['Email', 'Text message'])
+])
+def test_given_option_to_add_letters_if_allowed(
+    logged_in_client,
+    service_one,
+    mocker,
+    can_send_letters,
+    choices,
+):
+    service_one['can_send_letters'] = can_send_letters
+    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
+
+    response = logged_in_client.get(url_for('main.add_template_by_type', service_id=service_one['id']))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    radios = page.select('input[type=radio]')
+
+    assert len(radios) == len(choices)
+
+    for index, choice in enumerate(choices):
+        assert radios[index].text.strip() == choice

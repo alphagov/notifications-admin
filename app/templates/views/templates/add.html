@@ -1,0 +1,21 @@
+{% from "components/radios.html" import radios %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Add new template
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <h1 class="heading-large">Add new template</h1>
+
+    <form method="post">
+      {{ radios(form.template_type) }}
+      {{ page_footer(
+        'Next'
+      ) }}
+    </form>
+
+{% endblock %}
