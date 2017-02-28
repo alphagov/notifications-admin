@@ -152,6 +152,7 @@ class UserApiClient(NotifyAdminAPIClient):
     def activate_user(self, user):
         if user.state == 'pending':
             user.state = 'active'
+            user._failed_login_count = 0
             return self.update_user(user)
         else:
             return user
