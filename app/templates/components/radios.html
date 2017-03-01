@@ -7,7 +7,7 @@
   <div class="form-group {% if field.errors %} error{% endif %}">
     <fieldset>
       <legend class="form-label">
-        {{ field.label.text }}
+        {{ field.label.text|safe }}
         {% if field.errors %}
           <span class="error-message">
             {{ field.errors[0] }}
