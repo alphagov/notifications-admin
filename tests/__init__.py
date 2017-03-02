@@ -20,7 +20,7 @@ class TestClient(FlaskClient):
             with self.session_transaction() as session:
                 session['service_id'] = service['id']
             mocker.patch('app.service_api_client.get_service', return_value={'data': service})
-        login_user(user, remember=True)
+        login_user(user)
 
     def logout(self, user):
         self.get(url_for("main.logout"))
