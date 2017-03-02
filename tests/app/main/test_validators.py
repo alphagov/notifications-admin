@@ -88,6 +88,7 @@ def _gen_mock_field(x):
     'test@ucds.email',
     'test@naturalengland.org.uk',
     'test@hmcts.net',
+    'test@scotent.co.uk',
 ])
 def test_valid_list_of_white_list_email_domains(
     client,
