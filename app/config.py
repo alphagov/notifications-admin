@@ -76,6 +76,7 @@ class Config(object):
         r"ucds\.email",
         r"naturalengland\.org\.uk",
         r"hmcts\.net",
+        r"scotent\.co\.uk",
     ]
 
 
