@@ -486,8 +486,18 @@ class ServiceSmsSender(Form):
     )
 
     def validate_sms_sender(form, field):
-        if field.data and not re.match('^[a-zA-Z0-9\s]+$', field.data):
+        if field.data and not re.match(r'^[a-zA-Z0-9\s]+$', field.data):
             raise ValidationError('Use letters and numbers only')
+
+
+class ServiceLetterContactBlock(Form):
+    letter_contact_block = TextAreaField(
+        'How should users contact you?'
+    )
+
+    def validate_letter_contact_block(form, field):
+        if field.data.strip().count('\n') >= 10:
+            raise ValidationError('Can only have 10 lines')
 
 
 class ServiceBrandingOrg(Form):

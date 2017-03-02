@@ -56,7 +56,8 @@ def service_json(
     can_send_letters=False,
     organisation=None,
     branding='govuk',
-    created_at=None
+    created_at=None,
+    letter_contact_block=None
 ):
     if users is None:
         users = []
@@ -74,7 +75,8 @@ def service_json(
         'can_send_letters': can_send_letters,
         'organisation': organisation,
         'branding': branding,
-        'created_at': created_at or str(datetime.utcnow())
+        'created_at': created_at or str(datetime.utcnow()),
+        'letter_contact_block': letter_contact_block
     }
 
 

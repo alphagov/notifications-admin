@@ -20,23 +20,35 @@
         caption_visible=False
       ) %}
         {% call row() %}
-          {{ text_field('Service name' )}}
+          {{ text_field('Service name') }}
           {{ text_field(current_service.name) }}
           {{ edit_field('Change', url_for('.service_name_change', service_id=current_service.id)) }}
         {% endcall %}
+
         {% call row() %}
-          {{ text_field('Email reply to address')}}
+          {{ text_field('Email reply to address') }}
           {{ text_field(
             current_service.reply_to_email_address,
             status='' if current_service.reply_to_email_address else 'default'
           ) }}
           {{ edit_field('Change', url_for('.service_set_reply_to_email', service_id=current_service.id)) }}
         {% endcall %}
+
         {% call row() %}
-          {{ text_field('Text message sender')}}
+          {{ text_field('Text message sender') }}
           {{ text_field(current_service.sms_sender or '40604') }}
           {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id)) }}
         {% endcall %}
+
+        {% if current_service.can_send_letters %}
+          {% call row() %}
+            {{ text_field('Letter contact details') }}
+            {% call field(status='' if current_service.letter_contact_block else 'default') %}
+              {{ current_service.letter_contact_block | escape | nl2br | safe }}
+            {% endcall %}
+            {{ edit_field('Change', url_for('.service_set_letter_contact_block', service_id=current_service.id)) }}
+          {% endcall %}
+        {% endif %}
       {% endcall %}
     </div>
 
