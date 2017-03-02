@@ -16,16 +16,24 @@ stub_providers = {
             'display_name': 'first_sms_provider',
             'identifier': 'first_sms',
             'notification_type': 'sms',
-            'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat()
+            'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
+            'version': 1,
+            'created_by': {
+                'email_address': 'test@foo.bar',
+                'name': 'Test User',
+                'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
+            }
         },
         {
+            'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
             'active': True,
             'priority': 2,
             'display_name': 'second_sms_provider',
             'identifier': 'second_sms',
-            'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
             'notification_type': 'sms',
-            'updated_at': None
+            'updated_at': None,
+            'version': 1,
+            'created_by': None
         },
         {
             'id': '6005e192-4738-4962-beec-ebd982d0b03a',
@@ -34,7 +42,9 @@ stub_providers = {
             'display_name': 'first_email_provider',
             'identifier': 'first_email',
             'notification_type': 'email',
-            'updated_at': None
+            'updated_at': None,
+            'version': 1,
+            'created_by': None
         },
         {
             'active': True,
@@ -43,7 +53,9 @@ stub_providers = {
             'identifier': 'second_email',
             'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b',
             'notification_type': 'email',
-            'updated_at': None
+            'updated_at': None,
+            'version': 1,
+            'created_by': None
         }
     ]
 }
@@ -57,8 +69,41 @@ stub_provider = {
             'display_name': 'first_sms_provider',
             'identifier': 'first_sms',
             'notification_type': 'sms',
-            'updated_at': None
+            'updated_at': None,
+            'version': 1,
+            'created_by': None
         }
+}
+
+stub_provider_history = {
+    'data': [
+        {
+            'id': 'f9af1ec7-58ef-4f7d-a6f4-5fe7e48644cb',
+            'active': True,
+            'priority': 20,
+            'display_name': 'Foo',
+            'identifier': 'foo',
+            'notification_type': 'sms',
+            'updated_at': None,
+            'version': 2,
+            'created_by': {
+                'email_address': 'test@foo.bar',
+                'name': 'Test User',
+                'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
+            }
+        },
+        {
+            'id': 'f9af1ec7-58ef-4f7d-a6f4-5fe7e48644cb',
+            'active': True,
+            'priority': 10,
+            'display_name': 'Bar',
+            'identifier': 'bar',
+            'notification_type': 'sms',
+            'updated_at': None,
+            'version': 1,
+            'created_by': None
+        }
+    ]
 }
 
 
@@ -67,14 +112,10 @@ def test_should_show_all_providers(
     platform_admin_user,
     mocker,
 ):
-    mock_providers = mocker.patch(
-        'app.provider_client.get_all_providers',
-        return_value=copy.deepcopy(stub_providers)
-    )
+    mocker.patch('app.provider_client.get_all_providers', return_value=copy.deepcopy(stub_providers))
 
     client.login(platform_admin_user, mocker)
     response = client.get(url_for('main.view_providers'))
-
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     h1 = [header.text.strip() for header in page.find_all('h1')]
@@ -95,50 +136,57 @@ def test_should_show_all_providers(
     sms_first_row = sms_table.tbody.find_all('tr')[0]
     table_data = sms_first_row.find_all('td')
 
+    assert table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f'
     assert table_data[0].text.strip() == "first_sms_provider"
     assert table_data[1].text.strip() == "1"
     assert table_data[2].text.strip() == "True"
     assert table_data[3].text.strip() == "16 January at 3:20pm"
-    assert table_data[4].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f'
+    assert table_data[4].text.strip() == "Test User"
+    assert table_data[5].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f/edit'
 
     sms_second_row = sms_table.tbody.find_all('tr')[1]
     table_data = sms_second_row.find_all('td')
 
+    assert table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f'
     assert table_data[0].text.strip() == "second_sms_provider"
     assert table_data[1].text.strip() == "2"
     assert table_data[2].text.strip() == "True"
     assert table_data[3].text.strip() == "None"
-    assert table_data[4].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f'
+    assert table_data[4].text.strip() == "None"
+    assert table_data[5].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f/edit'
 
     email_first_row = email_table.tbody.find_all('tr')[0]
     email_table_data = email_first_row.find_all('td')
 
+    assert email_table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03a'
     assert email_table_data[0].text.strip() == "first_email_provider"
     assert email_table_data[1].text.strip() == "1"
     assert email_table_data[2].text.strip() == "True"
-    assert email_table_data[3].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03a'
+    assert email_table_data[3].text.strip() == "None"
+    assert email_table_data[4].text.strip() == "None"
+    assert email_table_data[5].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03a/edit'
 
     email_second_row = email_table.tbody.find_all('tr')[1]
     email_table_data = email_second_row.find_all('td')
 
+    assert email_table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b'
     assert email_table_data[0].text.strip() == "second_email_provider"
     assert email_table_data[1].text.strip() == "2"
     assert email_table_data[2].text.strip() == "True"
-    assert email_table_data[3].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b'
+    assert email_table_data[3].text.strip() == "None"
+    assert email_table_data[4].text.strip() == "None"
+    assert email_table_data[5].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b/edit'
 
 
-def test_should_show_provider_detail(
+def test_should_show_edit_provider_form(
     client,
     platform_admin_user,
     mocker,
 ):
-    mock_providers = mocker.patch(
-        'app.provider_client.get_provider_by_id',
-        return_value=copy.deepcopy(stub_provider)
-    )
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
 
     client.login(platform_admin_user, mocker)
-    response = client.get(url_for('main.view_provider', provider_id='12345'))
+    response = client.get(url_for('main.edit_provider', provider_id='12345'))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
@@ -158,14 +206,11 @@ def test_should_show_error_on_bad_provider_priority(
     platform_admin_user,
     mocker,
 ):
-    mock_providers = mocker.patch(
-        'app.provider_client.get_provider_by_id',
-        return_value=copy.deepcopy(stub_provider)
-    )
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
 
     client.login(platform_admin_user, mocker)
     response = client.post(
-        url_for('main.view_provider', provider_id=stub_provider['provider_details']['id']),
+        url_for('main.edit_provider', provider_id=stub_provider['provider_details']['id']),
         data={'priority': "not valid"})
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -178,14 +223,11 @@ def test_should_show_error_on_negative_provider_priority(
     platform_admin_user,
     mocker,
 ):
-    mock_providers = mocker.patch(
-        'app.provider_client.get_provider_by_id',
-        return_value=copy.deepcopy(stub_provider)
-    )
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
 
     client.login(platform_admin_user, mocker)
     response = client.post(
-        url_for('main.view_provider', provider_id=stub_provider['provider_details']['id']),
+        url_for('main.edit_provider', provider_id=stub_provider['provider_details']['id']),
         data={'priority': -1})
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -198,14 +240,11 @@ def test_should_show_error_on_too_big_provider_priority(
     platform_admin_user,
     mocker,
 ):
-    mock_providers = mocker.patch(
-        'app.provider_client.get_provider_by_id',
-        return_value=copy.deepcopy(stub_provider)
-    )
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
 
     client.login(platform_admin_user, mocker)
     response = client.post(
-        url_for('main.view_provider', provider_id=stub_provider['provider_details']['id']),
+        url_for('main.edit_provider', provider_id=stub_provider['provider_details']['id']),
         data={'priority': 101})
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -218,14 +257,11 @@ def test_should_show_error_on_too_little_provider_priority(
     platform_admin_user,
     mocker,
 ):
-    mock_providers = mocker.patch(
-        'app.provider_client.get_provider_by_id',
-        return_value=copy.deepcopy(stub_provider)
-    )
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
 
     client.login(platform_admin_user, mocker)
     response = client.post(
-        url_for('main.view_provider', provider_id=stub_provider['provider_details']['id']),
+        url_for('main.edit_provider', provider_id=stub_provider['provider_details']['id']),
         data={'priority': 0})
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -238,22 +274,56 @@ def test_should_update_provider_priority(
     platform_admin_user,
     mocker,
 ):
-
-    mock_providers = mocker.patch(
-        'app.provider_client.get_provider_by_id',
-        return_value=copy.deepcopy(stub_provider)
-    )
-
-    mock_updated_providers = mocker.patch(
-        'app.provider_client.update_provider',
-        return_value=copy.deepcopy(stub_provider)
-    )
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.update_provider', return_value=copy.deepcopy(stub_provider))
 
     client.login(platform_admin_user, mocker)
     response = client.post(
-        url_for('main.view_provider', provider_id=stub_provider['provider_details']['id']),
+        url_for('main.edit_provider', provider_id=stub_provider['provider_details']['id']),
         data={'priority': 2})
 
     app.provider_client.update_provider.assert_called_with(stub_provider['provider_details']['id'], 2)
     assert response.status_code == 302
     assert response.location == 'http://localhost/providers'
+
+
+def test_should_show_provider_version_history(
+    client,
+    platform_admin_user,
+    mocker
+):
+    mocker.patch('app.provider_client.get_provider_versions', return_value=copy.deepcopy(stub_provider_history))
+
+    client.login(platform_admin_user, mocker)
+    response = client.get(
+        url_for('main.view_provider', provider_id=stub_provider_history['data'][0]['id']))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    table = page.find('table')
+    table_rows = table.find_all('tr')
+    table_headings = table_rows[0].find_all('th')
+    first_row = table_rows[1].find_all('td')
+    second_row = table_rows[2].find_all('td')
+
+    assert response.status_code == 200
+
+    assert page.find_all('h1')[0].text.strip() == stub_provider_history['data'][0]["display_name"]
+    assert len(table_rows) == 3
+
+    assert table_headings[0].text.strip() == "Version"
+    assert table_headings[1].text.strip() == "Last Updated"
+    assert table_headings[2].text.strip() == "Updated By"
+    assert table_headings[3].text.strip() == "Priority"
+    assert table_headings[4].text.strip() == "Active"
+
+    assert first_row[0].text.strip() == "2"
+    assert first_row[1].text.strip() == "None"
+    assert first_row[2].text.strip() == "Test User"
+    assert first_row[3].text.strip() == "20"
+    assert first_row[4].text.strip() == "True"
+
+    assert second_row[0].text.strip() == "1"
+    assert second_row[1].text.strip() == "None"
+    assert second_row[2].text.strip() == "None"
+    assert second_row[3].text.strip() == "10"
+    assert second_row[4].text.strip() == "True"
