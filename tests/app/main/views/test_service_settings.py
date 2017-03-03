@@ -627,12 +627,12 @@ def test_set_letter_contact_block_has_max_10_lines(
     service_one['can_send_letters'] = True
     response = logged_in_client.post(
         url_for('main.service_set_letter_contact_block', service_id=service_one['id']),
-        data={'letter_contact_block': '\n'.join(map(str, range(0, 12)))}
+        data={'letter_contact_block': '\n'.join(map(str, range(0, 11)))}
     )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     error_message = page.find('span', class_='error-message').text.strip()
-    assert error_message == 'Can only have 10 lines'
+    assert error_message == 'Contains 11 lines, maximum is 10'
 
 
 def test_should_show_branding(

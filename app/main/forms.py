@@ -496,8 +496,11 @@ class ServiceLetterContactBlock(Form):
     )
 
     def validate_letter_contact_block(form, field):
-        if field.data.strip().count('\n') >= 10:
-            raise ValidationError('Can only have 10 lines')
+        line_count = field.data.strip().count('\n')
+        if line_count >= 10:
+            raise ValidationError(
+                'Contains {} lines, maximum is 10'.format(line_count + 1)
+            )
 
 
 class ServiceBrandingOrg(Form):
