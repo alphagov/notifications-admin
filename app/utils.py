@@ -312,7 +312,8 @@ def get_template(
             )
         else:
             return LetterPreviewTemplate(
-                template
+                template,
+                contact_block=service['letter_contact_block'],
             )
 
 
