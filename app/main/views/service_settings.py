@@ -25,6 +25,7 @@ from app.main.forms import (
     RequestToGoLiveForm,
     ServiceReplyToEmailFrom,
     ServiceSmsSender,
+    ServiceLetterContactBlock,
     ServiceBrandingOrg
 )
 from app import user_api_client, current_service, organisations_client
@@ -236,6 +237,7 @@ def service_set_reply_to_email(service_id):
             reply_to_email_address=form.email_address.data
         )
         return redirect(url_for('.service_settings', service_id=service_id))
+
     return render_template(
         'views/service-settings/set-reply-to-email.html',
         form=form)
@@ -257,6 +259,27 @@ def service_set_sms_sender(service_id):
     return render_template(
         'views/service-settings/set-sms-sender.html',
         form=form)
+
+
+@main.route("/services/<service_id>/service-settings/set-letter-contact-block", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_set_letter_contact_block(service_id):
+
+    if not current_service['can_send_letters']:
+        abort(403)
+
+    form = ServiceLetterContactBlock(letter_contact_block=current_service['letter_contact_block'])
+    if form.validate_on_submit():
+        service_api_client.update_service(
+            current_service['id'],
+            letter_contact_block=form.letter_contact_block.data.replace('\r', '') or None
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
+    return render_template(
+        'views/service-settings/set-letter-contact-block.html',
+        form=form
+    )
 
 
 @main.route("/services/<service_id>/service-settings/set-branding-and-org", methods=['GET', 'POST'])

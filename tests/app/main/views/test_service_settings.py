@@ -49,6 +49,49 @@ def test_should_show_overview_for_service_with_more_things_set(
         assert row == " ".join(page.find_all('tr')[index + 1].text.split())
 
 
+def test_if_cant_send_letters_then_cant_see_letter_contact_block(
+    logged_in_client,
+    service_one,
+):
+    response = logged_in_client.get(url_for(
+        'main.service_settings', service_id=service_one['id']
+    ))
+    assert 'Letter contact block' not in response.get_data(as_text=True)
+
+
+def test_letter_contact_block_shows_None_if_not_set(
+    logged_in_client,
+    service_one,
+    mocker
+):
+    service_one['can_send_letters'] = True
+    response = logged_in_client.get(url_for(
+        'main.service_settings', service_id=service_one['id']
+    ))
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    div = page.find_all('tr')[4].find_all('td')[1].div
+    assert div.text.strip() == 'None'
+    assert 'default' in div.attrs['class'][0]
+
+
+def test_escapes_letter_contact_block(
+    logged_in_client,
+    service_one,
+    mocker,
+):
+    service_one['can_send_letters'] = True
+    service_one['letter_contact_block'] = 'foo\nbar<script>alert(1);</script>'
+    response = logged_in_client.get(url_for(
+        'main.service_settings', service_id=service_one['id']
+    ))
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    div = str(page.find_all('tr')[4].find_all('td')[1].div)
+    assert 'foo<br>bar' in div
+    assert '<script>' not in div
+
+
 def test_should_show_service_name(
     logged_in_client,
     service_one,
@@ -486,7 +529,6 @@ def test_shows_research_mode_indicator(
     mocker,
 ):
     service_one['research_mode'] = True
-    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
     mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
 
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
@@ -536,6 +578,61 @@ def test_if_sms_sender_set_then_form_populated(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find(id='sms_sender')['value'] == 'elevenchars'
+
+
+@pytest.mark.parametrize('method', ['get', 'post'])
+def test_cant_set_letter_contact_block_if_service_cant_send_letters(
+    logged_in_client,
+    service_one,
+    method
+):
+    assert not service_one['can_send_letters']
+    response = getattr(logged_in_client, method)(
+        url_for('main.service_set_letter_contact_block', service_id=service_one['id'])
+    )
+    assert response.status_code == 403
+
+
+def test_set_letter_contact_block_prepopulates(
+    logged_in_client,
+    service_one
+):
+    service_one['can_send_letters'] = True
+    service_one['letter_contact_block'] = 'foo bar baz waz'
+    response = logged_in_client.get(url_for('main.service_set_letter_contact_block', service_id=service_one['id']))
+    assert response.status_code == 200
+    assert 'foo bar baz waz' in response.get_data(as_text=True)
+
+
+def test_set_letter_contact_block_saves(
+    logged_in_client,
+    service_one,
+    mock_update_service,
+):
+    service_one['can_send_letters'] = True
+    response = logged_in_client.post(
+        url_for('main.service_set_letter_contact_block', service_id=service_one['id']),
+        data={'letter_contact_block': 'foo bar baz waz'}
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    mock_update_service.assert_called_once_with(service_one['id'], letter_contact_block='foo bar baz waz')
+
+
+def test_set_letter_contact_block_has_max_10_lines(
+    logged_in_client,
+    service_one,
+    mock_update_service,
+):
+    service_one['can_send_letters'] = True
+    response = logged_in_client.post(
+        url_for('main.service_set_letter_contact_block', service_id=service_one['id']),
+        data={'letter_contact_block': '\n'.join(map(str, range(0, 11)))}
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    error_message = page.find('span', class_='error-message').text.strip()
+    assert error_message == 'Contains 11 lines, maximum is 10'
 
 
 def test_should_show_branding(
@@ -632,7 +729,6 @@ def test_switch_service_disable_letters(
     mocker,
 ):
     service_one['can_send_letters'] = True
-    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
     mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
 
     response = logged_in_platform_admin_client.get(

@@ -84,6 +84,7 @@ def view_letter_template_as_pdf(service_id, template_id):
     return render_pdf(HTML(string=str(
         LetterPreviewTemplate(
             service_api_client.get_service_template(service_id, template_id)['data'],
+            contact_block=current_service['letter_contact_block'],
         )
     )))
 
@@ -144,6 +145,7 @@ def view_template_version_as_pdf(service_id, template_id, version):
     return render_pdf(HTML(string=str(
         LetterPreviewTemplate(
             service_api_client.get_service_template(service_id, template_id, version=version)['data'],
+            contact_block=current_service['letter_contact_block'],
         )
     )))
 

@@ -27,7 +27,7 @@ from flask_wtf import CsrfProtect
 from functools import partial
 
 from notifications_python_client.errors import HTTPError
-from notifications_utils import logging, request_id
+from notifications_utils import logging, request_id, formatters
 from notifications_utils.clients.statsd.statsd_client import StatsdClient
 from notifications_utils.recipients import validate_phone_number, InvalidPhoneError
 from pygments import highlight
@@ -134,6 +134,7 @@ def create_app():
     application.add_template_filter(format_notification_status_as_field_status)
     application.add_template_filter(format_notification_status_as_url)
     application.add_template_filter(formatted_list)
+    application.add_template_filter(nl2br)
 
     application.after_request(useful_headers_after_request)
     application.after_request(save_service_after_request)
@@ -373,6 +374,10 @@ def formatted_list(
         return (
             '{prefix_plural}{first_items} {conjunction} {last_item}'
         ).format(**locals())
+
+
+def nl2br(value):
+    return formatters.nl2br(value) if value else ''
 
 
 @login_manager.user_loader
