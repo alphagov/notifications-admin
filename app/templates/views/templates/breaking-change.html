@@ -41,7 +41,8 @@
 
   <p>
     When you send messages using this template you’ll need
-    {{ new_template.placeholders|length + 1 }} columns of data:
+    {{ new_template.placeholders|length + 1 }}
+    column{{ 's' if new_template.placeholders|length > 0 else '' }} of data:
   </p>
 
   <div class="spreadsheet">
