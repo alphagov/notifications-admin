@@ -18,10 +18,8 @@
   </div>
 
   {{ page_footer(
-    secondary_link=url_for('.choose_template', service_id=current_service.id, template_type=template.template_type),
-    secondary_link_text='All {} templates'.format(
-      'email' if 'email' == template.template_type else 'text message' if 'sms' == template.template_type else 'letter'
-    )
+    secondary_link=url_for('.choose_template', service_id=current_service.id),
+    secondary_link_text='All templates'
   ) }}
 
 {% endblock %}

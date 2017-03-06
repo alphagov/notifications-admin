@@ -558,3 +558,23 @@ class DateFilterForm(Form):
     start_date = DateField("Start Date", [validators.optional()])
     end_date = DateField("End Date", [validators.optional()])
     include_from_test_key = BooleanField("Include test keys", default="checked", false_values={"N"})
+
+
+class ChooseTemplateType(Form):
+
+    template_type = RadioField(
+        'What kind of template do you want to add?',
+        validators=[
+            DataRequired()
+        ]
+    )
+
+    def __init__(self, include_letters=False, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.template_type.choices = filter(None, [
+            ('email', 'Email'),
+            ('sms', 'Text message'),
+            ('letter', 'Letter') if include_letters else None
+        ])

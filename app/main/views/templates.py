@@ -12,7 +12,7 @@ from notifications_python_client.errors import HTTPError
 
 from app.main import main
 from app.utils import user_has_permissions, get_template, png_from_pdf
-from app.main.forms import SMSTemplateForm, EmailTemplateForm, LetterTemplateForm
+from app.main.forms import ChooseTemplateType, SMSTemplateForm, EmailTemplateForm, LetterTemplateForm
 from app.main.views.send import get_example_csv_rows
 from app import service_api_client, current_service, template_statistics_client
 
@@ -27,6 +27,32 @@ page_headings = {
     'email': 'email',
     'sms': 'text message'
 }
+
+
+@main.route("/services/<service_id>/templates", methods=['GET'])
+@login_required
+@user_has_permissions(
+    'view_activity',
+    'send_texts',
+    'send_emails',
+    'manage_templates',
+    'manage_api_keys',
+    admin_override=True,
+    any_=True,
+)
+def choose_template(service_id):
+    return render_template(
+        'views/templates/choose.html',
+        templates=[
+            get_template(
+                template,
+                current_service,
+                letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template['id']),
+            )
+            for template in service_api_client.get_service_templates(service_id)['data']
+            if should_show_template(template['template_type'])
+        ],
+    )
 
 
 @main.route("/services/<service_id>/templates/<template_id>")
@@ -139,6 +165,25 @@ def view_template_version_as_png(service_id, template_id, version):
     ))
 
 
+@main.route("/services/<service_id>/templates/add", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_templates', admin_override=True)
+def add_template_by_type(service_id):
+
+    form = ChooseTemplateType(
+        include_letters=current_service['can_send_letters']
+    )
+
+    if form.validate_on_submit():
+        return redirect(url_for(
+            '.add_service_template',
+            service_id=service_id,
+            template_type=form.template_type.data,
+        ))
+
+    return render_template('views/templates/add.html', form=form)
+
+
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
@@ -173,7 +218,7 @@ def add_service_template(service_id, template_type):
                 raise e
         else:
             return redirect(
-                url_for('.choose_template', service_id=service_id, template_type=template_type)
+                url_for('.choose_template', service_id=service_id)
             )
 
     return render_template(
@@ -362,3 +407,10 @@ def get_human_readable_delta(from_time, until_time):
     else:
         days = delta.days
         return '{} day{}'.format(days, '' if days == 1 else 's')
+
+
+def should_show_template(template_type):
+    return (
+        template_type != 'letter' or
+        current_service['can_send_letters']
+    )

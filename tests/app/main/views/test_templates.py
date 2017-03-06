@@ -561,7 +561,7 @@ def test_route_permissions_for_choose_template(
         url_for(
             'main.choose_template',
             service_id=service_one['id'],
-            template_type='sms'),
+        ),
         ['view_activity'],
         api_user_active,
         service_one)

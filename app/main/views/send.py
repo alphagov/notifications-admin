@@ -82,35 +82,6 @@ def get_example_letter_address(key):
     }.get(key, '')
 
 
-@main.route("/services/<service_id>/send/<template_type>", methods=['GET'])
-@login_required
-@user_has_permissions('view_activity',
-                      'send_texts',
-                      'send_emails',
-                      'manage_templates',
-                      'manage_api_keys',
-                      admin_override=True, any_=True)
-def choose_template(service_id, template_type):
-    if template_type not in ['email', 'sms', 'letter']:
-        abort(404)
-    if not current_service['can_send_letters'] and template_type == 'letter':
-        abort(403)
-    return render_template(
-        'views/templates/choose.html',
-        templates=[
-            get_template(
-                template,
-                current_service,
-                letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template['id']),
-            )
-            for template in service_api_client.get_service_templates(service_id)['data']
-            if template['template_type'] == template_type
-        ],
-        template_type=template_type,
-        page_heading=get_page_headings(template_type)
-    )
-
-
 @main.route("/services/<service_id>/send/<template_id>/csv", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
@@ -285,7 +256,7 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
             )
         else:
             back_link = url_for(
-                '.choose_template', service_id=service_id, template_type=template.template_type, **extra_args
+                '.choose_template', service_id=service_id, **extra_args
             )
         choose_time_form = None
     else:
@@ -359,7 +330,7 @@ def check_messages_as_png(service_id, template_type, upload_id):
 def recheck_messages(service_id, template_type, upload_id):
 
     if not session.get('upload_data'):
-        return redirect(url_for('main.choose_template', service_id=service_id, template_type=template_type))
+        return redirect(url_for('main.choose_template', service_id=service_id))
 
     return send_messages(service_id, session['upload_data'].get('template_id'))
 
@@ -412,4 +383,4 @@ def get_check_messages_back_url(service_id, template_type):
         if len(templates) == 1:
             return url_for('.send_test', service_id=service_id, template_id=templates[0]['id'], help=1)
 
-    return url_for('main.choose_template', service_id=service_id, template_type=template_type)
+    return url_for('main.choose_template', service_id=service_id)

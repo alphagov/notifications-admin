@@ -622,8 +622,8 @@ def test_route_permissions(
         url_for(
             route,
             service_id=service_one['id'],
-            template_type='sms',
-            template_id=fake_uuid),
+            template_id=fake_uuid
+        ),
         ['send_texts', 'send_emails', 'send_letters'],
         api_user_active,
         service_one)
@@ -686,7 +686,7 @@ def test_route_choose_template_manage_service_permissions(
         url_for(
             'main.choose_template',
             service_id=service_one['id'],
-            template_type='sms'),
+        ),
         ['manage_users', 'manage_templates', 'manage_settings'],
         api_user_active,
         service_one)
@@ -1003,8 +1003,7 @@ def test_get_check_messages_back_url_returns_to_correct_select_template(client, 
 
     assert get_check_messages_back_url('1234', template_type) == url_for(
         'main.choose_template',
-        service_id='1234',
-        template_type=template_type
+        service_id='1234'
     )
 
 
@@ -1037,5 +1036,4 @@ def test_check_messages_back_from_help_handles_unexpected_templates(client, mock
     assert get_check_messages_back_url('1234', 'sms') == url_for(
         'main.choose_template',
         service_id='1234',
-        template_type='sms'
     )
