@@ -208,9 +208,19 @@ details summary {
 
 .body-copy-table {
 
-  table th,
-  table td {
-    @include core-19;
+  table {
+
+    th,
+    td {
+      @include core-19;
+    }
+
+    thead {
+      th {
+        @include bold-19;
+      }
+    }
+
   }
 
 }
