@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from tests.conftest import service_one as create_sample_service
 from tests import validate_route_permission, template_json, single_notification_json
+from tests.app.test_utils import normalize_spaces
 
 from app.main.views.templates import get_last_use_message, get_human_readable_delta
 
@@ -262,7 +263,7 @@ def test_should_show_interstitial_when_making_breaking_change(
         data={
             'id': template_id,
             'name': "new name",
-            'template_content': "hello",
+            'template_content': "hello ((name)) lets talk about ((thing))",
             'template_type': 'email',
             'subject': 'reminder',
             'service': service_id,
@@ -276,10 +277,17 @@ def test_should_show_interstitial_when_making_breaking_change(
     assert page.find('a', {'class': 'page-footer-back-link'})['href'] == url_for(".edit_service_template",
                                                                                  service_id=service_id,
                                                                                  template_id=template_id)
+    for index, p in enumerate([
+        'You removed ((date))',
+        'You added ((name))',
+        'When you send messages using this template you’ll need 3 columns of data:',
+    ]):
+        assert normalize_spaces(page.select('main p')[index].text) == p
+
     for key, value in {
         'name': 'new name',
         'subject': 'reminder',
-        'template_content': 'hello',
+        'template_content': 'hello ((name)) lets talk about ((thing))',
         'confirm': 'true'
     }.items():
         assert page.find('input', {'name': key})['value'] == value

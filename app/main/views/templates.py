@@ -262,12 +262,7 @@ def edit_service_template(service_id, template_id):
             return render_template(
                 'views/templates/breaking-change.html',
                 template_change=template_change,
-                new_template={
-                    'name': form.name.data,
-                    'subject': subject,
-                    'content': form.template_content.data,
-                    'id': new_template.id
-                },
+                new_template=new_template,
                 column_headings=list(ascii_uppercase[:len(new_template.placeholders) + 1]),
                 example_rows=[
                     first_column_headings[new_template.template_type] + list(new_template.placeholders),
