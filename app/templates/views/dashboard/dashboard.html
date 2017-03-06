@@ -32,14 +32,14 @@
     {{ ajax_block(partials, updates_url, 'totals') }}
     {{ show_more(
       url_for('.monthly', service_id=current_service.id),
-      'See activity breakdown'
+      'See messages sent per month'
     ) }}
 
     {% if partials['has_template_statistics'] %}
       {{ ajax_block(partials, updates_url, 'template-statistics') }}
       {{ show_more(
         url_for('.template_history', service_id=current_service.id),
-        'See all templates used this year'
+        'See templates used by month'
       ) }}
     {% endif %}
 
