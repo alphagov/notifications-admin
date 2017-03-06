@@ -33,7 +33,7 @@ def two_factor():
             if 'password' in session['user_details']:
                 user = user_api_client.update_password(user.id, password=session['user_details']['password'])
             activated_user = user_api_client.activate_user(user)
-            login_user(activated_user, remember=True)
+            login_user(activated_user)
         finally:
             del session['user_details']
 

@@ -39,10 +39,6 @@ class Config(object):
     NOTIFY_LOG_LEVEL = 'DEBUG'
     NOTIFY_LOG_PATH = '/var/log/notify/application.log'
     PERMANENT_SESSION_LIFETIME = 20 * 60 * 60  # 20 hours
-    REMEMBER_COOKIE_DURATION = timedelta(days=1)
-    REMEMBER_COOKIE_HTTPONLY = True
-    REMEMBER_COOKIE_NAME = 'notify_admin_remember_me'
-    REMEMBER_COOKIE_SECURE = True
     SEND_FILE_MAX_AGE_DEFAULT = 365 * 24 * 60 * 60  # 1 year
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_NAME = 'notify_admin_session'
@@ -82,7 +78,6 @@ class Config(object):
 
 class Development(Config):
     DEBUG = True
-    REMEMBER_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
     WTF_CSRF_ENABLED = False
     SESSION_PROTECTION = None

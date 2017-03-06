@@ -141,23 +141,6 @@ def test_should_login_user_when_multiple_valid_codes_exist(
     assert response.status_code == 302
 
 
-def test_remember_me_set(
-    client,
-    api_user_active,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_check_verify_code,
-    mock_get_services_with_one_service,
-):
-    with client.session_transaction() as session:
-        session['user_details'] = {
-            'id': api_user_active.id,
-            'email': api_user_active.email_address}
-    response = client.post(url_for('main.two_factor'),
-                           data={'sms_code': '23456', 'remember_me': True})
-    assert response.status_code == 302
-
-
 def test_two_factor_should_set_password_when_new_password_exists_in_session(
     client,
     api_user_active,

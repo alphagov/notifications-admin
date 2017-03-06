@@ -1,4 +1,4 @@
-from flask_login import UserMixin, AnonymousUserMixin, login_fresh
+from flask_login import UserMixin, AnonymousUserMixin
 from flask import session
 
 
@@ -30,7 +30,6 @@ class User(UserMixin):
     @property
     def is_authenticated(self):
         return (
-            login_fresh() and
             not self.logged_in_elsewhere() and
             super(User, self).is_authenticated
         )
