@@ -263,9 +263,9 @@ def test_should_show_interstitial_when_making_breaking_change(
         data={
             'id': template_id,
             'name': "new name",
-            'template_content': "hello ((name)) lets talk about ((thing))",
+            'template_content': "hello lets talk about ((thing))",
             'template_type': 'email',
-            'subject': 'reminder',
+            'subject': 'reminder & ((name))',
             'service': service_id,
             'process_type': 'normal'
         }
@@ -286,8 +286,8 @@ def test_should_show_interstitial_when_making_breaking_change(
 
     for key, value in {
         'name': 'new name',
-        'subject': 'reminder',
-        'template_content': 'hello ((name)) lets talk about ((thing))',
+        'subject': 'reminder &amp; ((name))',
+        'template_content': 'hello lets talk about ((thing))',
         'confirm': 'true'
     }.items():
         assert page.find('input', {'name': key})['value'] == value

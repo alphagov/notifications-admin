@@ -6,6 +6,7 @@ from flask_login import login_required, current_user
 from flask_weasyprint import HTML, render_pdf
 from dateutil.parser import parse
 
+from notifications_utils.field import escape_html
 from notifications_utils.template import LetterPreviewTemplate
 from notifications_utils.recipients import first_column_headings
 from notifications_python_client.errors import HTTPError
@@ -248,7 +249,7 @@ def edit_service_template(service_id, template_id):
         if form.process_type.data != template['process_type']:
             abort_403_if_not_admin_user()
 
-        subject = form.subject.data if hasattr(form, 'subject') else None
+        subject = escape_html(form.subject.data) if hasattr(form, 'subject') else None
         new_template = get_template({
             'name': form.name.data,
             'content': form.template_content.data,
