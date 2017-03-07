@@ -340,8 +340,8 @@ def test_in_business_hours(when, is_in_business_hours):
 
 
 @pytest.mark.parametrize('choice, expected_redirect_param', [
-    ('yes', True),
-    ('no', False),
+    ('yes', 'yes'),
+    ('no', 'no'),
 ])
 def test_triage_redirects_to_correct_url(client, choice, expected_redirect_param):
     response = client.post(url_for('main.triage'), data={'severe': choice})
