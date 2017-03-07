@@ -26,7 +26,7 @@ def triage():
         return redirect(url_for(
             '.feedback',
             ticket_type='problem',
-            severe=(form.severe.data == 'yes')
+            severe=form.severe.data
         ))
     return render_template(
         'views/support/triage.html',
