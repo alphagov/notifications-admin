@@ -73,6 +73,7 @@ class Config(object):
         r"naturalengland\.org\.uk",
         r"hmcts\.net",
         r"scotent\.co\.uk",
+        r"assembly\.wales",
     ]
 
 
