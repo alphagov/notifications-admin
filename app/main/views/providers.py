@@ -19,16 +19,16 @@ def view_providers():
     email_providers = [email for email in providers if email['notification_type'] == 'email']
     sms_providers = [sms for sms in providers if sms['notification_type'] == 'sms']
     return render_template(
-        'views/providers.html',
+        'views/providers/providers.html',
         email_providers=email_providers,
         sms_providers=sms_providers
     )
 
 
-@main.route("/provider/<provider_id>", methods=['GET', 'POST'])
+@main.route("/provider/<provider_id>/edit", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions(admin_override=True)
-def view_provider(provider_id):
+def edit_provider(provider_id):
     provider = provider_client.get_provider_by_id(provider_id)['provider_details']
     form = ProviderForm(active=provider['active'], priority=provider['priority'])
 
@@ -36,4 +36,12 @@ def view_provider(provider_id):
         provider_client.update_provider(provider_id, form.priority.data)
         return redirect(url_for('.view_providers'))
 
-    return render_template('views/provider.html', form=form, provider=provider)
+    return render_template('views/providers/edit-provider.html', form=form, provider=provider)
+
+
+@main.route("/provider/<provider_id>")
+@login_required
+@user_has_permissions(admin_override=True)
+def view_provider(provider_id):
+    versions = provider_client.get_provider_versions(provider_id)
+    return render_template('views/providers/provider.html', provider_versions=versions['data'])

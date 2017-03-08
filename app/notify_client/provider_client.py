@@ -21,6 +21,11 @@ class ProviderClient(NotifyAdminAPIClient):
             url='/provider-details/{}'.format(provider_id)
         )
 
+    def get_provider_versions(self, provider_id):
+        return self.get(
+            url='/provider-details/{}/versions'.format(provider_id)
+        )
+
     def update_provider(self, provider_id, priority):
         data = {
             "priority": priority
