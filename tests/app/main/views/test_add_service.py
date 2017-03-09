@@ -46,7 +46,16 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         user_id=api_user_active.id,
         email_from='testing.the.post'
     )
-    assert len(mock_create_service_template.call_args_list) == 1
+    mock_create_service_template.assert_called_once_with(
+        'Example text message template',
+        'sms',
+        (
+            'Hey ((name)), I’m trying out Notify. Today is '
+            '((day of week)) and my favourite colour is ((colour)).'
+        ),
+        101,
+        process_type='priority',
+    )
     assert session['service_id'] == 101
     assert response.status_code == 302
     assert response.location == url_for(
