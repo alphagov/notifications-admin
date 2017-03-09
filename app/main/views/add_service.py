@@ -75,7 +75,8 @@ def add_service():
             'Example text message template',
             'sms',
             'Hey ((name)), I’m trying out Notify. Today is ((day of week)) and my favourite colour is ((colour)).',
-            service_id
+            service_id,
+            process_type='priority',
         )
 
         return redirect(url_for(
