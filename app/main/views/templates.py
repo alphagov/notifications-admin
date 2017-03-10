@@ -72,7 +72,8 @@ def view_template(service_id, template_id):
             service_api_client.get_service_template(service_id, template_id)['data'],
             current_service,
             expand_emails=True,
-            letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id)
+            letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id),
+            show_recipient=True,
         )
     )
 
