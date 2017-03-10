@@ -44,15 +44,7 @@ page_headings = {
 def choose_template(service_id):
     return render_template(
         'views/templates/choose.html',
-        templates=[
-            get_template(
-                template,
-                current_service,
-                letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template['id']),
-            )
-            for template in service_api_client.get_service_templates(service_id)['data']
-            if should_show_template(template['template_type'])
-        ],
+        templates=service_api_client.get_service_templates(service_id)['data']
     )
 
 

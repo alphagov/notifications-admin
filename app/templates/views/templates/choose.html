@@ -1,3 +1,5 @@
+{% from "components/message-count-label.html" import message_count_label %}
+
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
@@ -44,19 +46,22 @@
       {% endif %}
     </div>
 
-    <div class="grid-row">
+    <nav class="grid-row">
       {% for template in templates %}
         <div class="column-whole">
-          <h2 class="message-name">{{ template.name }}</h2>
-          {% if template.get_raw('updated_at', None) %}
-            <p class="message-updated-at">
-              Edited {{ template.get_raw('updated_at', None)|format_date_short }}&ensp;<a href="{{ url_for('.view_template_versions', service_id=current_service.id, template_id=template.id) }}">see previous versions</a>
-            </p>
-          {% endif %}
+          <h2 class="message-name">
+            <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">{{ template.name }}</a>
+          </h2>
+          <p class="hint">
+            {{ message_count_label(1, template.template_type, suffix='')|capitalize }} template
+            {% if template.get('updated_at', None) %}
+              &emsp;Last edited {{ template.get('updated_at', None)|format_date_short }}
+              &emsp;<a href="{{ url_for('.view_template_versions', service_id=current_service.id, template_id=template.id) }}">See previous versions</a>
+            {% endif %}
+          </p>
         </div>
-        {% include 'views/templates/_template.html' %}
       {% endfor %}
-    </div>
+    </nav>
   {% endif %}
 
 {% endblock %}
