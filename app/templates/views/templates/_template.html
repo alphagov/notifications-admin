@@ -37,7 +37,7 @@
         </a>
         &emsp;
         <a href="{{ url_for(".send_test", service_id=current_service.id, template_id=template.id) }}" class="heading-medium">
-          Send yourself a test
+          {{ 'Generate preview' if template.template_type == 'letter' else 'Send yourself a test' }}
         </a>
       </p>
     {% endif %}
