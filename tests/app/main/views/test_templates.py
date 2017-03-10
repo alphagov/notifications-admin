@@ -84,6 +84,24 @@ def test_should_be_able_to_view_a_template_with_links(
         )
 
 
+def test_should_show_template_id_on_template_page(
+    logged_in_client,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+
+    response = logged_in_client.get(url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=fake_uuid))
+
+    assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select('.api-key-key')[0].text == fake_uuid
+
+
 def test_should_show_sms_template_with_downgraded_unicode_characters(
     logged_in_client,
     mocker,
@@ -566,7 +584,6 @@ def test_should_show_page_for_a_deleted_template(
     content = response.get_data(as_text=True)
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert url_for("main.edit_service_template", service_id=fake_uuid, template_id=fake_uuid) not in content
-    assert url_for("main.send_from_api", service_id=fake_uuid, template_id=fake_uuid) not in content
     assert url_for("main.send_test", service_id=fake_uuid, template_id=fake_uuid) not in content
     assert page.select('p.hint')[0].text.strip() == 'This template was deleted today at 3:00pm.'
 

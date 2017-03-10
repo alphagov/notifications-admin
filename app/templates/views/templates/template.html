@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/api-key.html" import api_key %}
 
 {% block service_page_title %}
   {{ template.name }}
@@ -15,6 +16,10 @@
     {% with show_title=False, expanded=True %}
       {% include 'views/templates/_template.html' %}
     {% endwith %}
+  </div>
+
+  <div class="bottom-gutter-2">
+    {{ api_key(template.id, name="Template ID", thing='template ID') }}
   </div>
 
   {{ page_footer(

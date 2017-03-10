@@ -316,25 +316,6 @@ def test_send_test_sms_message_with_placeholders(
     mock_s3_upload.assert_called_with(fake_uuid, expected_data, 'eu-west-1')
 
 
-def test_api_info_page(
-    logged_in_client,
-    mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
-    mock_get_service_email_template,
-    mock_s3_upload,
-    mock_has_permissions,
-    fake_uuid
-):
-    response = logged_in_client.get(
-        url_for('main.send_from_api', service_id=fake_uuid, template_id=fake_uuid),
-        follow_redirects=True
-    )
-    assert response.status_code == 200
-    assert 'API info' in response.get_data(as_text=True)
-
-
 def test_download_example_csv(
     logged_in_client,
     mocker,
