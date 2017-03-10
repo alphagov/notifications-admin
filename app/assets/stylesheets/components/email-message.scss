@@ -1,9 +1,11 @@
 $white-50-opaque: rgba($white, 0.5);
 $button-bottom-border-colour: rgba(0, 0, 0, 0.17);
+$email-message-gutter: $gutter * 2;
 
 .email-message {
 
   margin-bottom: $gutter;
+  border: 1px solid $border-colour;
 
   &-meta {
 
@@ -13,35 +15,34 @@ $button-bottom-border-colour: rgba(0, 0, 0, 0.17);
     td,
     th {
       @include core-19;
-      border-bottom: 0;
-      border-top: 1px solid $border-colour;
+      border-top: 0;
+      border-bottom: 1px solid $border-colour;
       vertical-align: top;
     }
 
     th {
       color: $secondary-text-colour;
+      padding-left: $email-message-gutter;
     }
 
     td {
       width: 99%;
+      padding-right: $email-message-gutter;
     }
 
   }
 
   &-from {
     padding-top: 15px;
-    border-top: 1px solid $border-colour;
   }
 
   &-body {
 
     width: 100%;
     box-sizing: border-box;
-    padding: $gutter-half 0 0 0;
-    margin: 0 0 $gutter * 1.5 0;
+    padding: $gutter-half $email-message-gutter 0 $email-message-gutter;
+    margin: 0 0 0 0;
     clear: both;
-    border-top: 1px solid $border-colour;
-    border-bottom: 1px solid $border-colour;
     position: relative;
     word-wrap: break-word;
 
@@ -49,11 +50,13 @@ $button-bottom-border-colour: rgba(0, 0, 0, 0.17);
 
       .js-enabled & {
         max-height: 92px;
+        padding: 0;
         overflow: hidden;
       }
 
       .js-enabled .expanded & {
         max-height: none;
+        padding-bottom: $gutter;
       }
 
     }
