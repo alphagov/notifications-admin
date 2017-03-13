@@ -66,6 +66,7 @@ gulp.task('javascripts', () => gulp
     paths.src + 'javascripts/listEntry.js',
     paths.src + 'javascripts/main.js'
   ])
+  .pipe(plugins.prettyerror())
   .pipe(plugins.babel({
     presets: ['es2015']
   }))
@@ -83,6 +84,7 @@ gulp.task('javascripts', () => gulp
 
 gulp.task('sass', () => gulp
   .src(paths.src + '/stylesheets/main*.scss')
+  .pipe(plugins.prettyerror())
   .pipe(plugins.sass({
     outputStyle: 'compressed',
     includePaths: [
