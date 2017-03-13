@@ -155,6 +155,8 @@ def generate_notifications_csv(**kwargs):
 
     while kwargs['page']:
         notifications_resp = notification_api_client.get_notifications_for_service(**kwargs)
+        current_app.logger.info('Total notifications for csv job: {}'.format(notifications_resp['total']))
+        current_app.logger.info('Notification response links: {}'.format(notifications_resp['links']))
         notifications_list = notifications_resp['notifications']
         for x in notifications_list:
             csvwriter.writerow(format_notification_for_csv(x))
@@ -174,6 +176,7 @@ def format_notification_for_csv(notification):
     #  row_number can be 0 so we need to check for it
     row_num = notification.get('job_row_number')
     row_num = '' if row_num is None else row_num + 1
+    current_app.logger.info('Row number for job: {}'.format(row_num))
 
     return {
         'Row number': row_num,
