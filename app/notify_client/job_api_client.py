@@ -38,6 +38,7 @@ class JobApiClient(NotifyAdminAPIClient):
     def get_job(self, service_id, job_id):
         params = {}
         job = self.get(url='/service/{}/job/{}'.format(service_id, job_id), params=params)
+
         stats = self.__convert_statistics(job['data'])
         job['data']['notifications_sent'] = stats['delivered'] + stats['failed']
         job['data']['notifications_delivered'] = stats['delivered']
