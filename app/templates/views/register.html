@@ -11,10 +11,11 @@ Create an account
 <div class="grid-row">
   <div class="column-two-thirds">
     <h1 class="heading-large">Create an account</h1>
-    <form method="post" autocomplete="off" novalidate>
+    <form method="post" novalidate>
       {{ textbox(form.name, width='3-4') }}
       {{ textbox(form.email_address, hint="Must be from a central government organisation", width='3-4', safe_error_message=True) }}
       {{ textbox(form.mobile_number, width='3-4', hint='We’ll send you a security code by text message') }}
+      <input class="visually-hidden" aria-hidden="true" tabindex="-1" id="defeat-chrome-autocomplete">
       {{ textbox(form.password, hint="At least 8 characters", width='3-4') }}
       {{ page_footer("Continue") }}
     </form>
