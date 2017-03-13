@@ -1,5 +1,4 @@
-// Easing function from: http://easings.net/#easeOutBack
-$transition-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
 $iso-paper-ratio: 141.42135624%;
 
 .letter {
@@ -7,39 +6,9 @@ $iso-paper-ratio: 141.42135624%;
   padding: 0;
   margin: 0 0 $gutter 0;
   position: relative;
-
-  &:after {
-    content: "";
-    display: block;
-    z-index: 10;
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    height: 0;
-    padding: $iso-paper-ratio 0 0 0;
-    width: 100%;
-    background: $highlight-colour;
-    transform-origin: left bottom;
-    box-shadow: inset 0 0 0 1px $border-colour;
-    transition: all 0.2s $transition-easing;
-  }
-
-  &:hover {
-
-    &:after {
-      transform: skew(-1.3deg, 0deg) scale(1, 0.96);
-      transition: all 0.1s $transition-easing;
-      background: mix($highlight-colour, $white);
-    }
-
-    &:before {
-      transform: rotate(50deg);
-    }
-
-  }
+  background: $panel-colour;
 
   a {
-
     display: block;
     overflow: hidden;
     width: 100%;
@@ -47,18 +16,6 @@ $iso-paper-ratio: 141.42135624%;
     padding: $iso-paper-ratio 0 0 0;
     position: relative;
     z-index: 20;
-
-    &:focus {
-
-      outline: none;
-      box-shadow: 0 3px 0 0 $yellow;
-
-      img {
-        box-shadow: inset 0 0 0 3px $yellow;
-      }
-
-    }
-
   }
 
   img {
