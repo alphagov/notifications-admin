@@ -6,4 +6,4 @@ routes:
   - route: notify-admin-staging.cloudapps.digital
   - route: admin-paas.staging-notify.works
 instances: 2
-memory: 2G
+memory: 1G
