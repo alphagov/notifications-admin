@@ -564,10 +564,11 @@ def test_should_show_page_for_a_deleted_template(
     assert response.status_code == 200
 
     content = response.get_data(as_text=True)
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert url_for("main.edit_service_template", service_id=fake_uuid, template_id=fake_uuid) not in content
     assert url_for("main.send_from_api", service_id=fake_uuid, template_id=fake_uuid) not in content
     assert url_for("main.send_test", service_id=fake_uuid, template_id=fake_uuid) not in content
-    assert "This template was deleted<br/>1 January 2016" in content
+    assert page.select('p.hint')[0].text.strip() == 'This template was deleted today at 3:00pm.'
 
     mock_get_deleted_template.assert_called_with(service_id, template_id)
 

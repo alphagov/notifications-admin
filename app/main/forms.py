@@ -288,7 +288,18 @@ class EmailTemplateForm(BaseTemplateForm):
 
 
 class LetterTemplateForm(EmailTemplateForm):
-    pass
+
+    subject = TextAreaField(
+        u'Title',
+        validators=[DataRequired(message="Can’t be empty")])
+
+    template_content = TextAreaField(
+        u'Body',
+        validators=[
+            DataRequired(message="Can’t be empty"),
+            NoCommasInPlaceHolders()
+        ]
+    )
 
 
 class ForgotPasswordForm(Form):

@@ -1,7 +1,7 @@
 <div class="column-whole">
   {% if template._template.archived %}
-    <div class="message-updated-at">
-      This template was deleted<br/>{{ template._template.updated_at|format_date_normal }}
+    <p class="hint">
+      This template was deleted {{ template._template.updated_at|format_datetime_relative }}.
     </p>
   {% else %}
     <div class="bottom-gutter-2-3">
@@ -30,22 +30,13 @@
         {% endif %}
       </div>
     </div>
-    {% if current_user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']) %}
-      <p class="bottom-gutter-1-2">
-        <a href="{{ url_for(".send_messages", service_id=current_service.id, template_id=template.id) }}" class="heading-medium">
-          Upload recipients
-        </a>
-        &emsp;
-        <a href="{{ url_for(".send_test", service_id=current_service.id, template_id=template.id) }}" class="heading-medium">
-          {{ 'Generate preview' if template.template_type == 'letter' else 'Send yourself a test' }}
-        </a>
-      </p>
-    {% endif %}
-    {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
-       <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="edit-template-link">Edit</a>
-    {% endif %}
   {% endif %}
 </div>
-<div class="column-whole">
+<div class="column-whole template-container">
+  {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) and template.template_type == 'letter' %}
+    <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="edit-template-link-letter-body">Edit</a>
+    <a href="{{ url_for(".service_set_letter_contact_block", service_id=current_service.id) }}" class="edit-template-link-letter-contact">Edit</a>
+    <a href="#" class="edit-template-link-letter-address">Edit</a>
+  {% endif %}
   {{ template|string }}
 </div>
