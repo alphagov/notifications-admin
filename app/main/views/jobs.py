@@ -13,7 +13,8 @@ from flask import (
     url_for,
     current_app,
     redirect,
-    Response
+    Response,
+    stream_with_context
 )
 from flask_login import login_required
 from werkzeug.datastructures import MultiDict
@@ -96,7 +97,6 @@ def view_jobs(service_id):
 @user_has_permissions('view_activity', admin_override=True)
 def view_job(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
-
     if job['job_status'] == 'cancelled':
         abort(404)
 
@@ -144,19 +144,22 @@ def view_job_csv(service_id, job_id):
     filter_args['status'] = _set_status_filters(filter_args)
 
     return Response(
-        generate_notifications_csv(
-            service_id=service_id,
-            job_id=job_id,
-            status=filter_args.get('status'),
-            page=request.args.get('page', 1),
-            page_size=5000
+        stream_with_context(
+            generate_notifications_csv(
+                service_id=service_id,
+                job_id=job_id,
+                status=filter_args.get('status'),
+                page=request.args.get('page', 1),
+                page_size=5000
+            )
         ),
         mimetype='text/csv',
         headers={
             'Content-Disposition': 'inline; filename="{} - {}.csv"'.format(
                 template['name'],
                 format_datetime_short(job['created_at'])
-            )}
+            )
+        }
     )
 
 
