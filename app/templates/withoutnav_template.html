@@ -2,6 +2,11 @@
 
 {% block fullwidth_content %}
   <div id="content">
+    {% if current_user.is_authenticated %}
+    <div class="navigation-service">
+      <a href="{{ url_for('main.show_all_services_or_dashboard') }}">Back to service</a>
+    </div>
+    {% endif %}
     <main role="main">
       {% include 'flash_messages.html' %}
       {% block maincolumn_content %}{% endblock %}
