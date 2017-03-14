@@ -140,7 +140,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             })
         data = _attach_current_user(data)
         endpoint = "/service/{0}/template".format(service_id)
-        print('got here in create_service_template')
         return self.post(endpoint, data)
 
     def update_service_template(self, id_, name, type_, content, service_id, subject=None, process_type=None):
