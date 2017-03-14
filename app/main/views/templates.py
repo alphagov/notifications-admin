@@ -202,7 +202,7 @@ def add_service_template(service_id, template_type):
         if form.process_type.data == 'priority':
             abort_403_if_not_admin_user()
         try:
-            service_api_client.create_service_template(
+            new_template = service_api_client.create_service_template(
                 form.name.data,
                 template_type,
                 form.template_content.data,
@@ -221,7 +221,7 @@ def add_service_template(service_id, template_type):
                 raise e
         else:
             return redirect(
-                url_for('.choose_template', service_id=service_id)
+                url_for('.view_template', service_id=service_id, template_id=new_template['data']['id'])
             )
 
     return render_template(
