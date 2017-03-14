@@ -22,7 +22,7 @@ from wtforms import (
     FieldList,
     DateField,
     SelectField)
-from wtforms.fields.html5 import EmailField, TelField
+from wtforms.fields.html5 import EmailField, TelField, SearchField
 from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidGovEmail, NoCommasInPlaceHolders, OnlyGSMCharacters)
@@ -591,3 +591,8 @@ class ChooseTemplateType(Form):
             ('sms', 'Text message'),
             ('letter', 'Letter') if include_letters else None
         ])
+
+
+class SearchTemplatesForm(Form):
+
+    search = SearchField('Search by name')

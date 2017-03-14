@@ -13,7 +13,13 @@ from notifications_python_client.errors import HTTPError
 
 from app.main import main
 from app.utils import user_has_permissions, get_template, png_from_pdf
-from app.main.forms import ChooseTemplateType, SMSTemplateForm, EmailTemplateForm, LetterTemplateForm
+from app.main.forms import (
+    ChooseTemplateType,
+    SMSTemplateForm,
+    EmailTemplateForm,
+    LetterTemplateForm,
+    SearchTemplatesForm,
+)
 from app.main.views.send import get_example_csv_rows
 from app import service_api_client, current_service, template_statistics_client
 
@@ -44,7 +50,8 @@ page_headings = {
 def choose_template(service_id):
     return render_template(
         'views/templates/choose.html',
-        templates=service_api_client.get_service_templates(service_id)['data']
+        templates=service_api_client.get_service_templates(service_id)['data'],
+        search_form=SearchTemplatesForm(),
     )
 
 
