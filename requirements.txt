@@ -19,6 +19,7 @@ pyexcel-xls==0.1.0
 pyexcel-xlsx==0.1.0
 pyexcel-ods3==0.1.1
 pytz==2016.4
+six==1.10.0
 wand==0.4.4
 gunicorn==19.6.0
 whitenoise==1.0.6  #manages static assets
