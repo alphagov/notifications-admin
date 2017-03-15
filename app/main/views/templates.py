@@ -178,6 +178,22 @@ def add_template_by_type(service_id):
     )
 
     if form.validate_on_submit():
+
+        if form.template_type.data == 'letter':
+            blank_letter = service_api_client.create_service_template(
+                'Untitled',
+                'letter',
+                'Content',
+                service_id,
+                'Title',
+                'normal',
+            )
+            return redirect(url_for(
+                '.view_template',
+                service_id=service_id,
+                template_id=blank_letter['data']['id'],
+            ))
+
         return redirect(url_for(
             '.add_service_template',
             service_id=service_id,
