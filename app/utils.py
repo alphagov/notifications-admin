@@ -154,9 +154,9 @@ def generate_notifications_csv(**kwargs):
         kwargs['page'] = 1
 
     while kwargs['page']:
+        current_app.logger.info('Current kwargs: {}'.format(kwargs))
         notifications_resp = notification_api_client.get_notifications_for_service(**kwargs)
         current_app.logger.info('Total notifications for csv job: {}'.format(notifications_resp['total']))
-        current_app.logger.info('Notification response links: {}'.format(notifications_resp['links']))
         notifications_list = notifications_resp['notifications']
         for x in notifications_list:
             csvwriter.writerow(format_notification_for_csv(x))
@@ -166,8 +166,14 @@ def generate_notifications_csv(**kwargs):
             yield line
 
         if notifications_resp['links'].get('next'):
+            current_app.logger.info('Next link exists')
+            current_app.logger.info('Notification response links: {}'.format(notifications_resp['links']))
+            current_app.logger.info('Current page {}'.format(kwargs['page']))
             kwargs['page'] += 1
         else:
+            current_app.logger.info('No next link exists')
+            current_app.logger.info('Notification response links: {}'.format(notifications_resp['links']))
+            current_app.logger.info('Current page {}'.format(kwargs['page']))
             return
 
 
