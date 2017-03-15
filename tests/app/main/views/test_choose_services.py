@@ -1,4 +1,5 @@
 from flask import url_for
+from bs4 import BeautifulSoup
 
 
 def test_should_show_choose_services_page(
@@ -83,3 +84,29 @@ def test_should_redirect_if_not_logged_in(
     response = logged_in_client.get(url_for('main.show_all_services_or_dashboard'))
     assert response.status_code == 302
     assert url_for('main.index', _external=True) in response.location
+
+
+def test_should_show_back_to_service_link(
+    logged_in_client
+):
+    response = logged_in_client.get(url_for('main.choose_service'))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select('.navigation-service a')[0]['href'] == (
+        url_for('main.show_all_services_or_dashboard')
+    )
+
+
+def test_should_not_show_back_to_service_link_if_no_service_in_session(
+    client,
+    api_user_active,
+    mock_get_user,
+    mock_get_services_with_no_services,
+):
+    client.login(api_user_active)
+    response = client.get(url_for('main.choose_service'))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.select('.navigation-service a')) == 0
