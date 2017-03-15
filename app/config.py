@@ -47,6 +47,7 @@ class Config(object):
     SHOW_STYLEGUIDE = True
     TOKEN_MAX_AGE_SECONDS = 3600
     WTF_CSRF_ENABLED = True
+    WTF_CSRF_TIME_LIMIT = None
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
     DESKPRO_PERSON_EMAIL = 'donotreply@notifications.service.gov.uk'
     ACTIVITY_STATS_LIMIT_DAYS = 7
@@ -80,7 +81,6 @@ class Config(object):
 class Development(Config):
     DEBUG = True
     SESSION_COOKIE_SECURE = False
-    WTF_CSRF_ENABLED = False
     SESSION_PROTECTION = None
     STATSD_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'development-notifications-csv-upload'
@@ -89,6 +89,7 @@ class Development(Config):
 class Test(Development):
     DEBUG = True
     STATSD_ENABLED = True
+    WTF_CSRF_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'test-notifications-csv-upload'
     NOTIFY_ENVIRONMENT = 'test'
 
