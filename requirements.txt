@@ -6,10 +6,7 @@ Flask-WTF==0.11
 Flask-Login==0.3.2
 Flask-WeasyPrint==0.5
 
-# Can be removed when https://github.com/mozilla/bleach/issues/229 is fixed
-git+https://github.com/alphagov/WeasyPrint.git@older-html5lib#egg=WeasyPrint==0.33
-
-html5lib==1.0b8
+html5lib==1.0b10
 credstash==1.8.0
 boto3==1.3.0
 Pygments==2.0.2
@@ -33,4 +30,4 @@ notifications-python-client>=3.1,<3.2
 awscli>=1.11,<1.12
 awscli-cwlogs>=1.4,<1.5
 
-git+https://github.com/alphagov/notifications-utils.git@13.9.2#egg=notifications-utils==13.9.2
+git+https://github.com/alphagov/notifications-utils.git@13.9.3#egg=notifications-utils==13.9.3
