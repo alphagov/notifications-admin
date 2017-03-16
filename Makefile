@@ -222,6 +222,7 @@ cf-deploy: ## Deploys the app to Cloud Foundry
 .PHONY: cf-rollback
 cf-rollback: ## Rollbacks the app to the previous release
 	@cf app --guid notify-admin-rollback || exit 1
+	@[ $$(cf curl /v2/apps/`cf app --guid notify-admin-rollback` | jq -r ".entity.state") = "STARTED" ] || (echo "Error: rollback is not possible because notify-admin-rollback is not in a started state" && exit 1)
 	cf delete -f notify-admin || true
 	cf rename notify-admin-rollback notify-admin
 
