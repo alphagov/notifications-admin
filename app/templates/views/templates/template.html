@@ -18,8 +18,17 @@
     {% endwith %}
   </div>
 
-  <div class="bottom-gutter-2">
+  <div class="bottom-gutter">
     {{ api_key(template.id, name="Template ID", thing='template ID') }}
   </div>
+
+  {% if template._template.updated_at %}
+    <div class="bottom-gutter-2">
+      <h2 class="heading-small">Last edited {{ template._template.updated_at|format_datetime_relative }}</h2>
+      <p>
+        <a href="{{ url_for('.view_template_versions', service_id=current_service.id, template_id=template.id) }}">See previous versions</a>
+      </p>
+    </div>
+  {% endif %}
 
 {% endblock %}

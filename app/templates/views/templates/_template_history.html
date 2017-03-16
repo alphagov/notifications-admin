@@ -1,18 +1,16 @@
 <div class="column-whole">
   <h2 class="message-name">{{ template.name }}</h2>
-</div>
-
-<div class="column-two-thirds">
-  {{ template|string }}
-</div>
-
-<div class="column-one-third">
-  <div class="message-use-links">
+  <p class="hint">
     {% if template.get_raw('version', 1) > 1 %}
-      {% if template.get_raw('updated_at', None) %}{{ template.get_raw('updated_at')|format_datetime_normal }}{% endif %}
+      Edit made {% if template.get_raw('updated_at', None) %}{{ template.get_raw('updated_at')|format_datetime_normal }}{% endif %}
     {% else %}
-      Created<br/>{% if template.get_raw('created_at', None) %}{{ template.get_raw('created_at')|format_datetime_normal }}{% endif %}
+      Created
+      {% if template.get_raw('created_at', None) %}{{ template.get_raw('created_at')|format_datetime_normal }}{% endif %}
     {% endif %}
-    <br/>by {{ template.get_raw('created_by').name }}
-  </div>
+    by {{ template.get_raw('created_by').name }}
+  </p>
+</div>
+
+<div class="column-whole">
+  {{ template|string }}
 </div>
