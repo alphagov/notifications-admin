@@ -47,11 +47,13 @@
       {% endif %}
     </div>
 
-    <div class="live-search" data-module="live-search" data-targets="#template-list .column-whole">
-      {{ textbox(
-        search_form.search,
-        width='1-1'
-      ) }}
+    <div data-module="autofocus">
+      <div class="live-search" data-module="live-search" data-targets="#template-list .column-whole">
+        {{ textbox(
+          search_form.search,
+          width='1-1'
+        ) }}
+      </div>
     </div>
 
     <nav class="grid-row" id=template-list>
