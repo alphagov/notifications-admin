@@ -47,14 +47,16 @@
       {% endif %}
     </div>
 
-    <div data-module="autofocus">
-      <div class="live-search" data-module="live-search" data-targets="#template-list .column-whole">
-        {{ textbox(
-          search_form.search,
-          width='1-1'
-        ) }}
+    {% if templates|length > 7 %}
+      <div data-module="autofocus">
+        <div class="live-search" data-module="live-search" data-targets="#template-list .column-whole">
+          {{ textbox(
+            search_form.search,
+            width='1-1'
+          ) }}
+        </div>
       </div>
-    </div>
+    {% endif %}
 
     <nav class="grid-row" id=template-list>
       {% for template in templates %}
