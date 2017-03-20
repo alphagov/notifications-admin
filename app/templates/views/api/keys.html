@@ -19,41 +19,43 @@
       <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}" class="button align-with-heading">Create an API key</a>
     </div>
   </div>
-  {% call(item, row_number) list_table(
-    keys,
-    empty_message="You haven’t created any API keys yet",
-    caption="API keys",
-    caption_visible=false,
-    field_headings=[
-      'API keys',
-      'Action'
-    ],
-    field_headings_visible=False
-  ) %}
-    {% call field() %}
-      <div class="file-list">
-        {{ item.name }}
-        <span class="file-list-hint">
-          {% if item.key_type == 'normal' %}
-            Live – sends to anyone
-          {% elif item.key_type == 'team' %}
-            Team and whitelist – limits who you can send to
-          {% elif item.key_type == 'test' %}
-            Test – pretends to send messages
-          {% endif %}
-        </span>
-      </div>
+  <div class="body-copy-table">
+    {% call(item, row_number) list_table(
+      keys,
+      empty_message="You haven’t created any API keys yet",
+      caption="API keys",
+      caption_visible=false,
+      field_headings=[
+        'API keys',
+        'Action'
+      ],
+      field_headings_visible=False
+    ) %}
+      {% call field() %}
+        <div class="file-list">
+          {{ item.name }}
+          <div class="hint">
+            {% if item.key_type == 'normal' %}
+              Live – sends to anyone
+            {% elif item.key_type == 'team' %}
+              Team and whitelist – limits who you can send to
+            {% elif item.key_type == 'test' %}
+              Test – pretends to send messages
+            {% endif %}
+          </div>
+        </div>
+      {% endcall %}
+      {% if item.expiry_date %}
+        {% call field(align='right') %}
+          <span class='hint'>Revoked {{ item.expiry_date|format_datetime_short }}</span>
+        {% endcall %}
+      {% else %}
+        {% call field(align='right', status='error') %}
+          <a href='{{ url_for('.revoke_api_key', service_id=current_service.id, key_id=item.id) }}'>Revoke</a>
+        {% endcall %}
+      {% endif %}
     {% endcall %}
-    {% if item.expiry_date %}
-      {% call field(align='right') %}
-        <span class='hint'>Revoked {{ item.expiry_date|format_datetime_short }}</span>
-      {% endcall %}
-    {% else %}
-      {% call field(align='right', status='error') %}
-        <a href='{{ url_for('.revoke_api_key', service_id=current_service.id, key_id=item.id) }}'>Revoke</a>
-      {% endcall %}
-    {% endif %}
-  {% endcall %}
+  </div>
 
   {{ page_footer(
     secondary_link=url_for('.api_integration', service_id=current_service.id),

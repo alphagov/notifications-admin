@@ -22,7 +22,7 @@ from wtforms import (
     FieldList,
     DateField,
     SelectField)
-from wtforms.fields.html5 import EmailField, TelField
+from wtforms.fields.html5 import EmailField, TelField, SearchField
 from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidGovEmail, NoCommasInPlaceHolders, OnlyGSMCharacters)
@@ -288,7 +288,18 @@ class EmailTemplateForm(BaseTemplateForm):
 
 
 class LetterTemplateForm(EmailTemplateForm):
-    pass
+
+    subject = TextAreaField(
+        u'Title',
+        validators=[DataRequired(message="Can’t be empty")])
+
+    template_content = TextAreaField(
+        u'Body',
+        validators=[
+            DataRequired(message="Can’t be empty"),
+            NoCommasInPlaceHolders()
+        ]
+    )
 
 
 class ForgotPasswordForm(Form):
@@ -591,3 +602,8 @@ class ChooseTemplateType(Form):
             ('sms', 'Text message'),
             ('letter', 'Letter') if include_letters else None
         ])
+
+
+class SearchTemplatesForm(Form):
+
+    search = SearchField('Search by name')

@@ -2,9 +2,9 @@
 .sms-message-wrapper {
 
   width: 100%;
-  max-width: 410px;
+  max-width: 450px;
   box-sizing: border-box;
-  padding: $gutter-half;
+  padding: $gutter-half $gutter-half $gutter-half $gutter-half;
   background: $panel-colour;
   border: 1px solid $panel-colour;
   border-radius: 5px;

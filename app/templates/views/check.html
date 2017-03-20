@@ -175,7 +175,11 @@
           wrapping_class='bottom-gutter-2-3'
         ) }}
       {% endif %}
+      {% if template.template_type != 'letter' or not request.args.from_test %}
       <input type="submit" class="button" value="Send {{ count_of_recipients }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}" />
+      {% else %}
+        <a href="#" class="heading-medium">Download as PDF</a>
+      {% endif %}
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
     </form>
   {% endif %}

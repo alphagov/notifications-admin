@@ -330,7 +330,7 @@ def png_from_pdf(pdf_endpoint):
     output = BytesIO()
     with Image(
         blob=pdf_endpoint.get_data(),
-        resolution=96,
+        resolution=150,
     ) as image:
         with image.convert('png') as converted:
             converted.save(file=output)

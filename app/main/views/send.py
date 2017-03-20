@@ -190,19 +190,6 @@ def send_test(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/send/<template_id>/from-api", methods=['GET'])
-@login_required
-def send_from_api(service_id, template_id):
-    return render_template(
-        'views/send-from-api.html',
-        template=get_template(
-            service_api_client.get_service_template(service_id, template_id)['data'],
-            current_service,
-            letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id)
-        )
-    )
-
-
 def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
 
     if not session.get('upload_data'):

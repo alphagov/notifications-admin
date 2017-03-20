@@ -13,11 +13,17 @@
 
 {% block maincolumn_content %}
 
+  <h1 class="heading-large">
   {% if request.args['help'] %}
-    <h1 class="heading-large">Example text message</h1>
+    Example text message
   {% else %}
-    <h1 class="heading-large">Send yourself a test</h1>
+    {% if template.template_type == 'letter' %}
+      Generate preview
+    {% else %}
+      Send yourself a test
+    {% endif %}
   {% endif %}
+  </h1>
 
   {{ template|string }}
 

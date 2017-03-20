@@ -1,0 +1,41 @@
+.template-container {
+  position: relative;
+}
+
+%edit-template-link,
+.edit-template-link {
+
+  @include core-19;
+  position: absolute;
+  background: $link-colour;
+  color: $white;
+  padding: 10px $gutter-half;
+  z-index: 10000;
+
+  &:link, &:visited {
+    color: $white;
+  }
+
+  &:hover {
+    color: $light-blue-25;
+  }
+
+}
+
+.edit-template-link-letter-contact {
+  @extend %edit-template-link;
+  right: -25px;
+  top: 13.3%; // align to top of contact block
+}
+
+.edit-template-link-letter-address {
+  @extend %edit-template-link;
+  top: 16.5%; // align bottom edge to bottom of address
+  left: -5px;
+}
+
+.edit-template-link-letter-body {
+  @extend %edit-template-link;
+  top: 33.3%; // aligns to top of subject
+  left: -5px;
+}

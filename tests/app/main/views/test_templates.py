@@ -33,6 +33,75 @@ def test_should_show_page_for_one_template(
     mock_get_service_template.assert_called_with(service_one['id'], template_id)
 
 
+@pytest.mark.parametrize('permissions, links_to_be_shown', [
+    (
+        ['view_activity'],
+        []
+    ),
+    (
+        ['manage_templates'],
+        ['.edit_service_template']
+    ),
+    (
+        ['send_texts', 'send_emails', 'send_letters'],
+        ['.send_messages', '.send_test']
+    ),
+    (
+        ['send_texts', 'send_emails', 'send_letters', 'manage_templates'],
+        ['.send_messages', '.send_test', '.edit_service_template']
+    ),
+])
+def test_should_be_able_to_view_a_template_with_links(
+    client,
+    mock_get_service_template,
+    active_user_with_permissions,
+    mocker,
+    service_one,
+    fake_uuid,
+    permissions,
+    links_to_be_shown,
+):
+    active_user_with_permissions._permissions[service_one['id']] = permissions
+    client.login(active_user_with_permissions, mocker, service_one)
+
+    response = client.get(url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=fake_uuid
+    ))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    links_in_page = page.select('.pill-separate-item')
+
+    assert len(links_in_page) == len(links_to_be_shown)
+
+    for index, link_to_be_shown in enumerate(links_to_be_shown):
+        assert links_in_page[index]['href'] == url_for(
+            link_to_be_shown,
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+        )
+
+
+def test_should_show_template_id_on_template_page(
+    logged_in_client,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+
+    response = logged_in_client.get(url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=fake_uuid))
+
+    assert response.status_code == 200
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select('.api-key-key')[0].text == fake_uuid
+
+
 def test_should_show_sms_template_with_downgraded_unicode_characters(
     logged_in_client,
     mocker,
@@ -513,10 +582,10 @@ def test_should_show_page_for_a_deleted_template(
     assert response.status_code == 200
 
     content = response.get_data(as_text=True)
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert url_for("main.edit_service_template", service_id=fake_uuid, template_id=fake_uuid) not in content
-    assert url_for("main.send_from_api", service_id=fake_uuid, template_id=fake_uuid) not in content
     assert url_for("main.send_test", service_id=fake_uuid, template_id=fake_uuid) not in content
-    assert "This template was deleted<br/>1 January 2016" in content
+    assert page.select('p.hint')[0].text.strip() == 'This template was deleted today at 3:00pm.'
 
     mock_get_deleted_template.assert_called_with(service_id, template_id)
 

@@ -1,0 +1,16 @@
+input[type=search] {
+  // overrides this nasty global from GOV.UK template
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.live-search {
+
+  display: none;
+
+  .js-enabled & {
+    display: block;
+  }
+
+}

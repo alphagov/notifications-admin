@@ -13,7 +13,13 @@ from notifications_python_client.errors import HTTPError
 
 from app.main import main
 from app.utils import user_has_permissions, get_template, png_from_pdf
-from app.main.forms import ChooseTemplateType, SMSTemplateForm, EmailTemplateForm, LetterTemplateForm
+from app.main.forms import (
+    ChooseTemplateType,
+    SMSTemplateForm,
+    EmailTemplateForm,
+    LetterTemplateForm,
+    SearchTemplatesForm,
+)
 from app.main.views.send import get_example_csv_rows
 from app import service_api_client, current_service, template_statistics_client
 
@@ -44,15 +50,8 @@ page_headings = {
 def choose_template(service_id):
     return render_template(
         'views/templates/choose.html',
-        templates=[
-            get_template(
-                template,
-                current_service,
-                letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template['id']),
-            )
-            for template in service_api_client.get_service_templates(service_id)['data']
-            if should_show_template(template['template_type'])
-        ],
+        templates=service_api_client.get_service_templates(service_id)['data'],
+        search_form=SearchTemplatesForm(),
     )
 
 
@@ -73,7 +72,8 @@ def view_template(service_id, template_id):
             service_api_client.get_service_template(service_id, template_id)['data'],
             current_service,
             expand_emails=True,
-            letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id)
+            letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id),
+            show_recipient=True,
         )
     )
 
@@ -178,6 +178,22 @@ def add_template_by_type(service_id):
     )
 
     if form.validate_on_submit():
+
+        if form.template_type.data == 'letter':
+            blank_letter = service_api_client.create_service_template(
+                'Untitled',
+                'letter',
+                'Content',
+                service_id,
+                'Title',
+                'normal',
+            )
+            return redirect(url_for(
+                '.view_template',
+                service_id=service_id,
+                template_id=blank_letter['data']['id'],
+            ))
+
         return redirect(url_for(
             '.add_service_template',
             service_id=service_id,
@@ -202,7 +218,7 @@ def add_service_template(service_id, template_type):
         if form.process_type.data == 'priority':
             abort_403_if_not_admin_user()
         try:
-            service_api_client.create_service_template(
+            new_template = service_api_client.create_service_template(
                 form.name.data,
                 template_type,
                 form.template_content.data,
@@ -221,7 +237,7 @@ def add_service_template(service_id, template_type):
                 raise e
         else:
             return redirect(
-                url_for('.choose_template', service_id=service_id)
+                url_for('.view_template', service_id=service_id, template_id=new_template['data']['id'])
             )
 
     return render_template(
