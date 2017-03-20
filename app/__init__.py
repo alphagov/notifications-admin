@@ -318,6 +318,15 @@ def format_notification_status(status, template_type):
             'delivered': 'Delivered',
             'sending': 'Sending',
             'created': 'Sending'
+        },
+        'letter': {
+            'failed': 'Failed',
+            'technical-failure': 'Technical failure',
+            'temporary-failure': 'Temporary failure',
+            'permanent-failure': 'Permanent failure',
+            'delivered': 'Delivered',
+            'sending': 'Sending',
+            'created': 'Sending'
         }
     }[template_type].get(status, status)
 
