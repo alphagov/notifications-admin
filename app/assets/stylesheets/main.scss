@@ -54,7 +54,6 @@ $path: '/static/images/';
 @import 'components/secondary-button';
 @import 'components/show-more';
 @import 'components/message';
-@import 'components/phone';
 @import 'components/research-mode';
 @import 'components/tick-cross';
 @import 'components/list-entry';
@@ -62,9 +61,6 @@ $path: '/static/images/';
 @import 'components/vendor/breadcrumbs';
 @import 'components/vendor/responsive-embed';
 
-@import 'views/job';
-@import 'views/edit-template';
-@import 'views/documenation';
 @import 'views/dashboard';
 @import 'views/users';
 @import 'views/api';
