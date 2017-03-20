@@ -649,11 +649,13 @@ def test_format_template_stats_to_list():
         'counts': counts,
         'name': 'foo',
         'requested_count': 7,
+        'id': 'template_1_id',
     } in stats_list
     assert {
         'counts': {},
         'name': 'bar',
         'requested_count': 0,
+        'id': 'template_2_id',
     } in stats_list
 
 
