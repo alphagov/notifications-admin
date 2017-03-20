@@ -1,4 +1,5 @@
 from datetime import datetime
+from functools import partial
 import copy
 from flask import url_for
 
@@ -11,6 +12,8 @@ from app.main.views.dashboard import (
     format_monthly_stats_to_list,
     get_free_paid_breakdown_for_billable_units,
     aggregate_status_types,
+    format_template_stats_to_list,
+    get_tuples_of_financial_years,
 )
 
 from tests import validate_route_permission
@@ -120,39 +123,40 @@ def test_should_show_recent_templates_on_dashboard(
     assert '100' in table_rows[1].find_all('td')[0].text
 
 
-def test_should_show_all_templates_on_template_statistics_page(
+@freeze_time("2016-07-01 12:00")  # 4 months into 2016 financial year
+@pytest.mark.parametrize('partial_url', [
+    partial(url_for),
+    partial(url_for, year='2016'),
+])
+def test_should_show_monthly_breakdown_of_template_usage(
     logged_in_client,
     mocker,
     api_user_active,
     mock_get_service,
-    mock_get_service_templates,
+    mock_get_monthly_template_statistics,
     mock_get_user,
     mock_get_user_by_email,
-    mock_login,
-    mock_get_jobs,
     mock_has_permissions,
+    partial_url,
 ):
-    mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
-                                       return_value=copy.deepcopy(stub_template_stats))
-
-    response = logged_in_client.get(url_for('main.template_history', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(
+        partial_url('main.template_history', service_id=SERVICE_ONE_ID, _external=True)
+    )
 
     assert response.status_code == 200
-    response.get_data(as_text=True)
-    mock_template_stats.assert_called_once_with(SERVICE_ONE_ID)
+    mock_get_monthly_template_statistics.assert_called_once_with(SERVICE_ONE_ID, 2016)
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    table_rows = page.find_all('tbody')[0].find_all('tr')
+    table_rows = page.select('tbody tr')
 
-    assert len(table_rows) == 2
+    assert ' '.join(table_rows[0].text.split()) == (
+        'My first template '
+        'Text message template '
+        '2'
+    )
 
-    assert 'two' in table_rows[0].find_all('th')[0].text
-    assert 'Email template' in table_rows[0].find_all('th')[0].text
-    assert '200' in table_rows[0].find_all('td')[0].text
-
-    assert 'one' in table_rows[1].find_all('th')[0].text
-    assert 'Text message template' in table_rows[1].find_all('th')[0].text
-    assert '100' in table_rows[1].find_all('td')[0].text
+    assert len(table_rows) == len(['April'])
+    assert len(page.select('.table-no-data')) == len(['May', 'June', 'July'])
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
@@ -611,3 +615,61 @@ def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_mont
             {'name': 'February', 'free': 0, 'paid': 1234},
             {'name': 'March', 'free': 0, 'paid': 0}
         ][:expected_number_of_months]
+
+
+def test_format_template_stats_to_list_with_no_stats():
+    assert list(format_template_stats_to_list({})) == []
+
+
+def test_format_template_stats_to_list():
+    counts = {
+        'created': 1,
+        'pending': 1,
+        'delivered': 1,
+        'failed': 1,
+        'temporary-failure': 1,
+        'permanent-failure': 1,
+        'technical-failure': 1,
+        'do-not-count': 999,
+    }
+    stats_list = list(format_template_stats_to_list({
+        'template_2_id': {
+            'counts': {},
+            'name': 'bar',
+        },
+        'template_1_id': {
+            'counts': counts,
+            'name': 'foo',
+        },
+    }))
+
+    # we don’t care about the order of this function’s output
+    assert len(stats_list) == 2
+    assert {
+        'counts': counts,
+        'name': 'foo',
+        'requested_count': 7,
+    } in stats_list
+    assert {
+        'counts': {},
+        'name': 'bar',
+        'requested_count': 0,
+    } in stats_list
+
+
+def test_get_tuples_of_financial_years():
+    assert list(get_tuples_of_financial_years(
+        lambda year: 'http://example.com?year={}'.format(year),
+        start=2040,
+        end=2041,
+    )) == [
+        ('financial year', 2040, 'http://example.com?year=2040', '2040 to 2041'),
+        ('financial year', 2041, 'http://example.com?year=2041', '2041 to 2042'),
+    ]
+
+
+def test_get_tuples_of_financial_years_defaults_to_2015():
+    assert 2015 in list(get_tuples_of_financial_years(
+        lambda year: 'http://example.com?year={}'.format(year),
+        end=2040,
+    ))[0]
