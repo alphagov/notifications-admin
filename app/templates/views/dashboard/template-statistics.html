@@ -25,7 +25,7 @@
       </span>
     {% endcall %}
     {% if template_statistics|length > 1 %}
-      {{ spark_bar_field(item.count, most_used_template_count) }}
+      {{ spark_bar_field(item.count, most_used_template_count, id=item.template_id) }}
     {% else %}
       {% call field() %}
         <span id='{{item.template_id}}' class="heading-small">

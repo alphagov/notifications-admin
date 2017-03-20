@@ -135,10 +135,11 @@
 
 {% macro spark_bar_field(
   count,
-  max_count
+  max_count,
+  id=None
 ) %}
   {% call field(align='right') %}
-    <span class="spark-bar">
+    <span {% if id %}id="{{ id }}"{% endif %} class="spark-bar">
       <span style="width: {{ count / max_count * 100 }}%">
         {{ big_number(
           count,
