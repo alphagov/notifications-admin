@@ -139,5 +139,6 @@ configs = {
     'preview': Preview,
     'staging': Staging,
     'live': Live,
+    'production': Live,
     'sandbox': Sandbox
 }
