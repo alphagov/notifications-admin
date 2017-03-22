@@ -321,6 +321,7 @@ def format_template_stats_to_list(stats_dict):
                 template['counts'].get(status, 0)
                 for status in REQUESTED_STATUSES
             ),
+            id=template_id,
             **template
         )
 

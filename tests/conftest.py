@@ -1289,7 +1289,6 @@ def mock_get_monthly_template_statistics(mocker, service_one, fake_uuid):
                     },
                     "name": 'My first template',
                     "type": 'sms',
-                    "id": fake_uuid,
                 }
             }
         }
