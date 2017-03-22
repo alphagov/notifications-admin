@@ -19,12 +19,12 @@
   {% else %}
 
     {% if notifications %}
-      <div class="dashboard-table">
+      <div class="dashboard-table bottom-gutter-3-2">
     {% endif %}
 
       {% if not help %}
         {% if percentage_complete < 100 %}
-          <p class="bottom-gutter-1-2 hint">
+          <p class="bottom-gutter hint">
             Report is {{ "{:.0f}%".format(percentage_complete) }} complete…
           </p>
         {% elif notifications %}
