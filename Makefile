@@ -215,7 +215,7 @@ cf-deploy: ## Deploys the app to Cloud Foundry
 	@cf app --guid notify-admin || exit 1
 	cf rename notify-admin notify-admin-rollback
 	cf push -f manifest-${CF_SPACE}.yml
-	cf scale -i $$(cf curl /v2/apps/$$(cf app --guid notify-admin) | jq -r ".entity.instances" 2>/dev/null || echo "1") notify-admin
+	cf scale -i $$(cf curl /v2/apps/$$(cf app --guid notify-admin-rollback) | jq -r ".entity.instances" 2>/dev/null || echo "1") notify-admin
 	cf stop notify-admin-rollback
 	cf delete -f notify-admin-rollback
 
