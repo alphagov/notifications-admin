@@ -17,7 +17,7 @@ def test_logged_in_user_redirects_to_choose_service(
 
 
 @pytest.mark.parametrize('view', [
-    'cookies', 'trial_mode', 'pricing', 'terms', 'delivery_and_failure', 'integration_testing'
+    'cookies', 'trial_mode', 'pricing', 'terms', 'delivery_and_failure', 'integration_testing', 'roadmap'
 ])
 def test_static_pages(
     client,

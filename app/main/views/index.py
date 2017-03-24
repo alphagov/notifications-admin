@@ -105,3 +105,8 @@ def documentation():
 @main.route('/integration_testing')
 def integration_testing():
     return render_template('views/integration_testing.html')
+
+
+@main.route('/roadmap')
+def roadmap():
+    return render_template('views/roadmap.html')
