@@ -1,7 +1,16 @@
 from datetime import datetime, timedelta
 from string import ascii_uppercase
 
-from flask import request, render_template, redirect, url_for, flash, abort, send_file
+from flask import (
+    request,
+    render_template,
+    redirect,
+    url_for,
+    flash,
+    abort,
+    send_file,
+    current_app
+)
 from flask_login import login_required, current_user
 from flask_weasyprint import HTML, render_pdf
 from dateutil.parser import parse
@@ -86,6 +95,7 @@ def view_letter_template_as_pdf(service_id, template_id):
         LetterPreviewTemplate(
             service_api_client.get_service_template(service_id, template_id)['data'],
             contact_block=current_service['letter_contact_block'],
+            admin_base_url=current_app.config['ADMIN_BASE_URL']
         )
     )))
 
@@ -147,6 +157,7 @@ def view_template_version_as_pdf(service_id, template_id, version):
         LetterPreviewTemplate(
             service_api_client.get_service_template(service_id, template_id, version=version)['data'],
             contact_block=current_service['letter_contact_block'],
+            admin_base_url=current_app.config['ADMIN_BASE_URL']
         )
     )))
 
