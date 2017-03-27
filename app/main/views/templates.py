@@ -15,7 +15,7 @@ from flask_login import login_required, current_user
 from flask_weasyprint import HTML, render_pdf
 from dateutil.parser import parse
 
-from notifications_utils.field import escape_html
+from notifications_utils.formatters import escape_html
 from notifications_utils.template import LetterPreviewTemplate
 from notifications_utils.recipients import first_column_headings
 from notifications_python_client.errors import HTTPError

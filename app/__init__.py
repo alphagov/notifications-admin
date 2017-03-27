@@ -30,7 +30,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils import logging, request_id, formatters
 from notifications_utils.clients.statsd.statsd_client import StatsdClient
 from notifications_utils.recipients import validate_phone_number, InvalidPhoneError
-from notifications_utils.field import escape_html
+from notifications_utils.formatters import formatted_list
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.javascript import JavascriptLexer
@@ -357,33 +357,6 @@ def format_notification_status_as_url(status):
         'temporary-failure': url(_anchor='not-accepting-messages'),
         'permanent-failure': url(_anchor='does-not-exist')
     }.get(status)
-
-
-def formatted_list(
-    items,
-    conjunction='and',
-    before_each='‘',
-    after_each='’',
-    separator=', ',
-    prefix='',
-    prefix_plural=''
-):
-    if prefix:
-        prefix += ' '
-    if prefix_plural:
-        prefix_plural += ' '
-
-    items = list(map(escape_html, items))
-    if len(items) == 1:
-        return Markup('{prefix}{before_each}{items[0]}{after_each}'.format(**locals()))
-    elif items:
-        formatted_items = ['{}{}{}'.format(before_each, item, after_each) for item in items]
-
-        first_items = separator.join(formatted_items[:-1])
-        last_item = formatted_items[-1]
-        return Markup((
-            '{prefix_plural}{first_items} {conjunction} {last_item}'
-        ).format(**locals()))
 
 
 def nl2br(value):
