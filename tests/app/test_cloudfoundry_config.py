@@ -12,6 +12,7 @@ def notify_config():
         'name': 'notify-config',
         'credentials': {
             'api_host_name': 'api host name',
+            'admin_base_url': 'admin base url',
             'admin_client_secret': 'admin client secret',
             'secret_key': 'secret key',
             'dangerous_salt': 'dangerous salt',
@@ -100,6 +101,7 @@ def test_notify_config():
     extract_cloudfoundry_config()
 
     assert os.environ['API_HOST_NAME'] == 'api host name'
+    assert os.environ['ADMIN_BASE_URL'] == 'admin base url'
     assert os.environ['ADMIN_CLIENT_SECRET'] == 'admin client secret'
     assert os.environ['SECRET_KEY'] == 'secret key'
     assert os.environ['DANGEROUS_SALT'] == 'dangerous salt'

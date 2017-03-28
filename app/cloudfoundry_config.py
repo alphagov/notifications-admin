@@ -32,6 +32,7 @@ def set_config_env_vars(vcap_services):
 def extract_notify_config(notify_config):
     os.environ['ADMIN_CLIENT_SECRET'] = notify_config['credentials']['admin_client_secret']
     os.environ['API_HOST_NAME'] = notify_config['credentials']['api_host_name']
+    os.environ['ADMIN_BASE_URL'] = notify_config['credentials']['admin_base_url']
     os.environ['SECRET_KEY'] = notify_config['credentials']['secret_key']
     os.environ['DANGEROUS_SALT'] = notify_config['credentials']['dangerous_salt']
 

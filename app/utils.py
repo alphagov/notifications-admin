@@ -323,6 +323,7 @@ def get_template(
             return LetterPreviewTemplate(
                 template,
                 contact_block=service['letter_contact_block'],
+                admin_base_url=current_app.config['ADMIN_BASE_URL']
             )
 
 
