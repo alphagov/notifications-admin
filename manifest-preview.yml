@@ -5,3 +5,4 @@ inherit: manifest-base.yml
 routes:
   - route: notify-admin-preview.cloudapps.digital
   - route: admin-paas.notify.works
+  - route: www.notify.works
