@@ -502,9 +502,7 @@ class ServiceSmsSender(Form):
 
 
 class ServiceLetterContactBlock(Form):
-    letter_contact_block = TextAreaField(
-        'How should users contact you?'
-    )
+    letter_contact_block = TextAreaField()
 
     def validate_letter_contact_block(form, field):
         line_count = field.data.strip().count('\n')

@@ -1,6 +1,7 @@
 from unittest.mock import call, ANY, Mock
 
 import pytest
+import uuid
 from flask import url_for
 from bs4 import BeautifulSoup
 from werkzeug.exceptions import InternalServerError
@@ -617,6 +618,30 @@ def test_set_letter_contact_block_saves(
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
     mock_update_service.assert_called_once_with(service_one['id'], letter_contact_block='foo bar baz waz')
+
+
+def test_set_letter_contact_block_redirects_to_template(
+    logged_in_client,
+    service_one,
+    mock_update_service,
+):
+    service_one['can_send_letters'] = True
+    fake_template_id = uuid.uuid4()
+    response = logged_in_client.post(
+        url_for(
+            'main.service_set_letter_contact_block',
+            service_id=service_one['id'],
+            from_template=fake_template_id,
+        ),
+        data={'letter_contact_block': ''},
+    )
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.view_template',
+        service_id=service_one['id'],
+        template_id=fake_template_id,
+        _external=True,
+    )
 
 
 def test_set_letter_contact_block_has_max_10_lines(
