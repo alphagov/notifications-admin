@@ -18,7 +18,7 @@ class Config(object):
     DESKPRO_API_KEY = os.environ['DESKPRO_API_KEY']
 
     # if we're not on cloudfoundry, we can get to this app from localhost. but on cloudfoundry its different
-    ADMIN_BASE_URL = os.environ.get('ADMIN_BASE_URL', 'https://localhost:6012')
+    ADMIN_BASE_URL = os.environ.get('ADMIN_BASE_URL', 'http://localhost:6012')
 
     # Hosted graphite statsd prefix
     STATSD_PREFIX = os.getenv('STATSD_PREFIX')
