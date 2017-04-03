@@ -275,6 +275,10 @@ def service_set_letter_contact_block(service_id):
             current_service['id'],
             letter_contact_block=form.letter_contact_block.data.replace('\r', '') or None
         )
+        if request.args.get('from_template'):
+            return redirect(
+                url_for('.view_template', service_id=service_id, template_id=request.args.get('from_template'))
+            )
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/set-letter-contact-block.html',
