@@ -14,6 +14,7 @@ from flask import url_for
 from app.main.views.send import get_check_messages_back_url
 
 from tests import validate_route_permission, template_json
+from tests.app.test_utils import normalize_spaces
 
 template_types = ['email', 'sms']
 
@@ -231,6 +232,47 @@ def test_upload_valid_csv_shows_page_title(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.text.strip() == 'Preview of Two week reminder'
+
+
+def test_upload_valid_csv_shows_file_contents(
+    logged_in_client,
+    mocker,
+    mock_get_service_template_with_placeholders,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    service_one,
+    fake_uuid,
+):
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        phone number,name,thing,thing,thing
+        07700900986, Jo,  foo,  foo,  foo
+    """)
+
+    response = logged_in_client.post(
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
+        data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    for index, cell in enumerate([
+        '<td class="table-field-index"> <span>2</span> </td>',
+        '<td class="table-field-center-aligned "> <div class=""> 07700900986 </div> </td>',
+        '<td class="table-field-center-aligned "> <div class=""> Jo </div> </td>',
+        (
+            '<td class="table-field-center-aligned "> '
+            '<div class="table-field-status-default"> '
+            '<ul class="list list-bullet"> '
+            '<li>foo</li> <li>foo</li> <li>foo</li> '
+            '</ul> '
+            '</div> '
+            '</td>'
+        ),
+    ]):
+        assert normalize_spaces(str(page.select('table tbody td')[index])) == cell
 
 
 def test_send_test_sms_message(

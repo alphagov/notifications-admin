@@ -81,7 +81,15 @@
 
 {% macro text_field(text, status='') -%}
   {% call field(status=status) %}
-    {{ text }}
+    {% if text is iterable and text is not string %}
+      <ul class="list list-bullet">
+        {% for item in text %}
+          <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      {{ text }}
+    {% endif %}
   {% endcall %}
 {%- endmacro %}
 

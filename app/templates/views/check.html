@@ -205,20 +205,14 @@
           </span>
         {% endcall %}
       {% elif item['columns'][column].ignore %}
-        {% call field(status='default') %}
-          {{ item['columns'][column].data if item['columns'][column].data != None }}
-        {% endcall %}
+        {{ text_field(item['columns'][column].data or '', status='default') }}
       {% else %}
-        {% call field() %}
-          {{ item['columns'][column].data if item['columns'][column].data != None }}
-        {% endcall %}
+        {{ text_field(item['columns'][column].data or '') }}
       {% endif %}
     {% endfor %}
     {% if item['columns'].get(None) %}
       {% for column in item['columns'][None].data %}
-        {% call field(status='default') %}
-          {{ column }}
-        {% endcall %}
+        {{ text_field(column, status='default') }}
       {% endfor %}
     {% endif %}
   {% endcall %}
