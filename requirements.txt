@@ -8,7 +8,7 @@ Flask-WeasyPrint==0.5
 
 html5lib==1.0b10
 credstash==1.8.0
-boto3==1.3.0
+boto3==1.4.4
 Pygments==2.0.2
 py-gfm==0.1.2
 blinker==1.4
