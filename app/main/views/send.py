@@ -77,7 +77,6 @@ def get_example_letter_address(key):
     return {
         'address line 1': 'A. Name',
         'address line 2': '123 Example Street',
-        'address line 3': 'Example town',
         'postcode': 'XM4 5HQ'
     }.get(key, '')
 
