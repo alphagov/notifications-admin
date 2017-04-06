@@ -336,15 +336,15 @@ def mock_get_service_template_with_placeholders(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_email_template(mocker):
+def mock_get_service_email_template(mocker, content=None, subject=None):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id,
             template_id,
             "Two week reminder",
             "email",
-            "Your vehicle tax expires on ((date))",
-            "Your ((thing)) is due soon"
+            content or "Your vehicle tax expires on ((date))",
+            subject or "Your ((thing)) is due soon",
         )
         return {'data': template}
 
@@ -354,30 +354,24 @@ def mock_get_service_email_template(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_email_template_without_placeholders(mocker):
-    def _create(service_id, template_id):
-        template = template_json(
-            service_id,
-            template_id,
-            "Two week reminder",
-            "email",
-            "Your vehicle tax expires soon",
-            "Your thing is due soon"
-        )
-        return {'data': template}
-
-    return mocker.patch(
-        'app.service_api_client.get_service_template', side_effect=_create)
+    return mock_get_service_email_template(
+        mocker,
+        content="Your vehicle tax expires soon",
+        subject="Your thing is due soon",
+    )
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_letter_template(mocker):
+def mock_get_service_letter_template(mocker, content=None, subject=None):
     def _create(service_id, template_id):
         template = template_json(
             service_id,
             template_id,
             "Two week reminder",
             "letter",
-            "Template <em>content</em> with & entity", "Subject")
+            content or "Template <em>content</em> with & entity",
+            subject or "Subject",
+        )
         return {'data': template}
 
     return mocker.patch(

@@ -8,6 +8,7 @@ from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from tests.conftest import service_one as create_sample_service
+from tests.conftest import mock_get_service_email_template, mock_get_service_letter_template
 from tests import validate_route_permission, template_json, single_notification_json
 from tests.app.test_utils import normalize_spaces
 
@@ -313,18 +314,43 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
     mock_update_service_template.called == 0
 
 
+@pytest.mark.parametrize('template_mock, expected_paragraphs', [
+    (
+        mock_get_service_email_template,
+        [
+            'You removed ((date))',
+            'You added ((name))',
+            'When you send messages using this template you’ll need 3 columns of data:',
+        ]
+    ),
+    (
+        mock_get_service_letter_template,
+        [
+            'You removed ((date))',
+            'You added ((name))',
+            'When you send messages using this template you’ll need 9 columns of data:',
+        ]
+    ),
+])
 def test_should_show_interstitial_when_making_breaking_change(
     logged_in_client,
     api_user_active,
     mock_login,
-    mock_get_service_email_template,
     mock_update_service_template,
     mock_get_user,
     mock_get_service,
     mock_get_user_by_email,
     mock_has_permissions,
     fake_uuid,
+    mocker,
+    template_mock,
+    expected_paragraphs,
 ):
+    template_mock(
+        mocker,
+        subject="Your ((thing)) is due soon",
+        content="Your vehicle tax expires on ((date))",
+    )
     service_id = fake_uuid
     template_id = fake_uuid
     response = logged_in_client.post(
@@ -346,11 +372,7 @@ def test_should_show_interstitial_when_making_breaking_change(
     assert page.find('a', {'class': 'page-footer-back-link'})['href'] == url_for(".edit_service_template",
                                                                                  service_id=service_id,
                                                                                  template_id=template_id)
-    for index, p in enumerate([
-        'You removed ((date))',
-        'You added ((name))',
-        'When you send messages using this template you’ll need 3 columns of data:',
-    ]):
+    for index, p in enumerate(expected_paragraphs):
         assert normalize_spaces(page.select('main p')[index].text) == p
 
     for key, value in {
