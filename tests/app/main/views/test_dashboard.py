@@ -1,7 +1,8 @@
 from functools import partial
 import copy
-from flask import url_for
+from unittest.mock import call, ANY
 
+from flask import url_for
 import pytest
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
@@ -13,6 +14,7 @@ from app.main.views.dashboard import (
     aggregate_status_types,
     format_template_stats_to_list,
     get_tuples_of_financial_years,
+    get_dashboard_partials
 )
 
 from tests import validate_route_permission
@@ -631,3 +633,28 @@ def test_get_tuples_of_financial_years_defaults_to_2015():
         lambda year: 'http://example.com?year={}'.format(year),
         end=2040,
     ))[0]
+
+
+@freeze_time("2016-01-01 11:09:00.061258")
+def test_should_show_all_jobs_with_valid_statuses(
+    logged_in_client,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_jobs,
+    mock_get_usage,
+):
+    get_dashboard_partials(service_id=SERVICE_ONE_ID)
+
+    first_call = mock_get_jobs.call_args_list[0]
+    # first call - scheduled jobs only
+    assert first_call == call(ANY, statuses=['scheduled'])
+    # second call - everything but scheduled and cancelled
+    second_call = mock_get_jobs.call_args_list[1]
+    assert second_call == call(ANY, limit_days=ANY, statuses={
+        'pending',
+        'in progress',
+        'finished',
+        'sending limits exceeded',
+        'ready to send',
+        'sent to dvla'
+    })
