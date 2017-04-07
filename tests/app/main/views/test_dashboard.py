@@ -1,8 +1,8 @@
-from datetime import datetime
 from functools import partial
 import copy
-from flask import url_for
+from unittest.mock import call, ANY
 
+from flask import url_for
 import pytest
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
@@ -14,6 +14,7 @@ from app.main.views.dashboard import (
     aggregate_status_types,
     format_template_stats_to_list,
     get_tuples_of_financial_years,
+    get_dashboard_partials
 )
 
 from tests import validate_route_permission
@@ -39,14 +40,8 @@ stub_template_stats = [
 def test_get_started(
     logged_in_client,
     mocker,
-    api_user_active,
-    mock_get_service,
     mock_get_service_templates_when_no_templates_exist,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_login,
     mock_get_jobs,
-    mock_has_permissions,
     mock_get_detailed_service,
     mock_get_usage,
 ):
@@ -63,14 +58,8 @@ def test_get_started(
 def test_get_started_is_hidden_once_templates_exist(
     logged_in_client,
     mocker,
-    api_user_active,
-    mock_get_service,
     mock_get_service_templates,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_login,
     mock_get_jobs,
-    mock_has_permissions,
     mock_get_detailed_service,
     mock_get_usage,
 ):
@@ -86,14 +75,8 @@ def test_get_started_is_hidden_once_templates_exist(
 def test_should_show_recent_templates_on_dashboard(
     logged_in_client,
     mocker,
-    api_user_active,
-    mock_get_service,
     mock_get_service_templates,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_login,
     mock_get_jobs,
-    mock_has_permissions,
     mock_get_detailed_service,
     mock_get_usage,
 ):
@@ -130,13 +113,7 @@ def test_should_show_recent_templates_on_dashboard(
 ])
 def test_should_show_monthly_breakdown_of_template_usage(
     logged_in_client,
-    mocker,
-    api_user_active,
-    mock_get_service,
     mock_get_monthly_template_statistics,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_has_permissions,
     partial_url,
 ):
     response = logged_in_client.get(
@@ -162,17 +139,10 @@ def test_should_show_monthly_breakdown_of_template_usage(
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_upcoming_jobs_on_dashboard(
     logged_in_client,
-    mocker,
-    api_user_active,
-    mock_get_service,
     mock_get_service_templates,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_login,
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_jobs,
-    mock_has_permissions,
     mock_get_usage,
 ):
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
@@ -199,17 +169,10 @@ def test_should_show_upcoming_jobs_on_dashboard(
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_recent_jobs_on_dashboard(
     logged_in_client,
-    mocker,
-    api_user_active,
-    mock_get_service,
     mock_get_service_templates,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_login,
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_jobs,
-    mock_has_permissions,
     mock_get_usage,
 ):
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
@@ -464,16 +427,13 @@ def test_aggregate_template_stats():
 def test_service_dashboard_updates_gets_dashboard_totals(
     mocker,
     logged_in_client,
-    active_user_with_permissions,
-    service_one,
-    mock_get_user,
     mock_get_service_templates,
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
 ):
-    dashboard_totals = mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
+    mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
         'email': {'requested': 123, 'delivered': 0, 'failed': 0},
         'sms': {'requested': 456, 'delivered': 0, 'failed': 0}
     })
@@ -486,8 +446,6 @@ def test_service_dashboard_updates_gets_dashboard_totals(
     numbers = [number.text.strip() for number in page.find_all('div', class_='big-number-number')]
     assert '123' in numbers
     assert '456' in numbers
-
-    table_rows = page.find_all('tbody')[0].find_all('tr')
 
 
 def test_get_dashboard_totals_adds_percentages():
@@ -675,3 +633,28 @@ def test_get_tuples_of_financial_years_defaults_to_2015():
         lambda year: 'http://example.com?year={}'.format(year),
         end=2040,
     ))[0]
+
+
+@freeze_time("2016-01-01 11:09:00.061258")
+def test_should_show_all_jobs_with_valid_statuses(
+    logged_in_client,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_jobs,
+    mock_get_usage,
+):
+    get_dashboard_partials(service_id=SERVICE_ONE_ID)
+
+    first_call = mock_get_jobs.call_args_list[0]
+    # first call - scheduled jobs only
+    assert first_call == call(ANY, statuses=['scheduled'])
+    # second call - everything but scheduled and cancelled
+    second_call = mock_get_jobs.call_args_list[1]
+    assert second_call == call(ANY, limit_days=ANY, statuses={
+        'pending',
+        'in progress',
+        'finished',
+        'sending limits exceeded',
+        'ready to send',
+        'sent to dvla'
+    })
