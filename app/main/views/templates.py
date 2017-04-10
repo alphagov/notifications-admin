@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from string import ascii_uppercase
+from io import StringIO
 
 from flask import (
     request,
@@ -14,6 +15,7 @@ from flask import (
 from flask_login import login_required, current_user
 from flask_weasyprint import HTML, render_pdf
 from dateutil.parser import parse
+import requests
 
 from notifications_utils.formatters import escape_html
 from notifications_utils.template import LetterPreviewTemplate
@@ -87,26 +89,36 @@ def view_template(service_id, template_id):
     )
 
 
+def get_template_preview(service_id, template_id, filetype):
+    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+    data = {
+        "letter_contact_block": current_service['letter_contact_block'],
+        "admin_base_url": current_app.config['ADMIN_BASE_URL'],
+        "template": db_template,
+        "values": None
+    }
+    resp = requests.post(
+        '{}/preview.{}'.format(current_app.config['TEMPLATE_PREVIEW_SERVICE_URL'], filetype),
+        json=data,
+        headers={'Authorization': 'Token my-secret-key'}
+    )
+    return resp
+
+
 @main.route("/services/<service_id>/templates/<template_id>.pdf")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_letter_template_as_pdf(service_id, template_id):
-    return render_pdf(HTML(string=str(
-        LetterPreviewTemplate(
-            service_api_client.get_service_template(service_id, template_id)['data'],
-            contact_block=current_service['letter_contact_block'],
-            admin_base_url=current_app.config['ADMIN_BASE_URL']
-        )
-    )))
+    resp = get_template_preview(service_id, template_id, 'pdf')
+    return (resp.content, resp.status_code, resp.headers.items())
 
 
 @main.route("/services/<service_id>/templates/<template_id>.png")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_letter_template_as_png(service_id, template_id):
-    return send_file(**png_from_pdf(
-        view_letter_template_as_pdf(service_id, template_id)
-    ))
+    resp = get_template_preview(service_id, template_id, 'png')
+    return (resp.content, resp.status_code, resp.headers.items())
 
 
 def _view_template_version(service_id, template_id, version, letters_as_pdf=False):

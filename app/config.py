@@ -20,6 +20,8 @@ class Config(object):
     # if we're not on cloudfoundry, we can get to this app from localhost. but on cloudfoundry its different
     ADMIN_BASE_URL = os.environ.get('ADMIN_BASE_URL', 'http://localhost:6012')
 
+    TEMPLATE_PREVIEW_SERVICE_URL = os.environ.get('TEMPLATE_PREVIEW_SERVICE_URL', 'http://localhost:6013')
+
     # Hosted graphite statsd prefix
     STATSD_PREFIX = os.getenv('STATSD_PREFIX')
 
