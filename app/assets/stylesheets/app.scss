@@ -247,10 +247,16 @@ details .arrow {
   margin-top: 5px;
 }
 
-.block-label input[disabled] {
-  opacity: 0.5;
-}
-
 #content.override-elements-content {
   padding-bottom: 0;
+}
+
+.multiple-choice input:disabled+label {
+  opacity: 1;
+  color: $secondary-text-colour;
+  cursor: default;
+}
+
+.multiple-choice input:disabled {
+  opacity: 0.5;
 }
