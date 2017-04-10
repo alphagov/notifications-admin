@@ -11,7 +11,7 @@
   safe_error_message=False,
   rows=8
 ) %}
-  <div class="form-group{% if field.errors %} error{% endif %}" {% if autofocus %}data-module="autofocus"{% endif %}>
+  <div class="form-group{% if field.errors %} form-group-error{% endif %}" {% if autofocus %}data-module="autofocus"{% endif %}>
     <label class="form-label" for="{{ field.name }}">
       {% if label %}
         {{ label }}
@@ -29,10 +29,20 @@
         </span>
       {% endif %}
     </label>
+    {%
+      if highlight_tags
+    %}
+      {% set field_class = 'form-control-{} textbox-highlight-textbox'.format(width) %}
+    {% else %}
+      {% set field_class = 'form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else '') %}
+    {% endif %}
+    {%
+      set field_class = 'form-control ' + field_class + (
+        ' form-control-error' if field.errors else ''
+      )
+    %}
     {{ field(**{
-      'class':
-        'form-control form-control-{} textbox-highlight-textbox'.format(width) if highlight_tags else
-        'form-control form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else ''),
+      'class': field_class,
       'data-module': 'highlight-tags' if highlight_tags else '',
       'rows': rows|string
     }) }}

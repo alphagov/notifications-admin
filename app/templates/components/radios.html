@@ -4,7 +4,7 @@
   disable=[],
   option_hints={}
 ) %}
-  <div class="form-group {% if field.errors %} error{% endif %}">
+  <div class="form-group {% if field.errors %} form-group-error{% endif %}">
     <fieldset>
       <legend class="form-label">
         {{ field.label.text|safe }}
@@ -45,7 +45,7 @@
  hint=None,
  wrapping_class='form-group'
 ) %}
- <div class="{{ wrapping_class }} {% if field.errors %} error{% endif %}">
+ <div class="{{ wrapping_class }} {% if field.errors %} form-group-error{% endif %}">
    <fieldset>
      <legend class="form-label">
        {{ field.label.text }}
@@ -81,7 +81,7 @@
   hint=None,
   branding_dict={}
 ) %}
-  <div class="form-group {% if field.errors %} error{% endif %}">
+  <div class="form-group {% if field.errors %} form-group-error{% endif %}">
     <fieldset>
       <legend class="form-label">
         {{ field.label.text }}
