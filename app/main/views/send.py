@@ -299,6 +299,7 @@ def check_messages_preview(service_id, template_type, upload_id, filetype):
     )['template']
     return TemplatePreview.from_utils_template(template, filetype)
 
+
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['POST'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')

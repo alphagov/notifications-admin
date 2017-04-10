@@ -2,14 +2,13 @@ import uuid
 from io import BytesIO
 from os import path
 from glob import glob
-import re
 from itertools import repeat
 from functools import partial
-from unittest.mock import patch
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from notifications_utils.template import LetterPreviewTemplate
 
 from app.main.views.send import get_check_messages_back_url
 
@@ -524,18 +523,9 @@ def test_can_start_letters_job(
     assert response.status_code == 302
 
 
-@pytest.mark.parametrize(
-    'view, expected_content_type',
-    [
-        ('.check_messages_as_pdf', 'application/pdf'),
-        ('.check_messages_as_png', 'image/png'),
-    ]
-)
-@patch('app.utils.LetterPreviewTemplate.jinja_template.render', return_value='')
+@pytest.mark.parametrize('filetype', ['pdf', 'png'])
 def test_should_show_preview_letter_message(
-    mock_letter_preview,
-    view,
-    expected_content_type,
+    filetype,
     logged_in_platform_admin_client,
     mock_get_service_letter_template,
     mock_get_users_by_service,
@@ -554,6 +544,10 @@ def test_should_show_preview_letter_message(
             ['123 street, abc123']
         )
     )
+    mocked_preview = mocker.patch(
+        'app.main.views.send.TemplatePreview.from_utils_template',
+        return_value='foo'
+    )
 
     service_id = service_one['id']
     template_id = fake_uuid
@@ -565,18 +559,22 @@ def test_should_show_preview_letter_message(
             'valid': True
         }
     response = logged_in_platform_admin_client.get(
-        url_for(view, service_id=service_id, template_type='letter', upload_id=fake_uuid)
+        url_for(
+            'main.check_messages_preview',
+            service_id=service_id,
+            template_type='letter',
+            upload_id=fake_uuid,
+            filetype=filetype
+        )
     )
 
-    assert response.status_code == 200
-    assert response.content_type == expected_content_type
     mock_get_service_letter_template.assert_called_with(service_id, template_id)
-    assert mock_letter_preview.call_args[0][0]['subject'] == (
-        'Subject'
-    )
-    assert mock_letter_preview.call_args[0][0]['message'] == (
-        '<p>Template &lt;em&gt;content&lt;/em&gt; with &amp; entity</p>'
-    )
+
+    assert response.status_code == 200
+    assert response.get_data(as_text=True) == 'foo'
+    assert mocked_preview.call_args[0][0].id == template_id
+    assert type(mocked_preview.call_args[0][0]) == LetterPreviewTemplate
+    assert mocked_preview.call_args[0][1] == filetype
 
 
 def test_check_messages_should_revalidate_file_when_uploading_file(

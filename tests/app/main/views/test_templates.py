@@ -1,6 +1,5 @@
-from itertools import repeat
 from datetime import datetime
-from unittest.mock import Mock, patch, ANY
+from unittest.mock import Mock, ANY
 
 import pytest
 from bs4 import BeautifulSoup
@@ -148,44 +147,42 @@ def test_should_show_page_template_with_priority_select_if_platform_admin(
     mock_get_service_template.assert_called_with('1234', template_id)
 
 
-@pytest.mark.parametrize('view_suffix, expected_content_type', [
-    ('as_pdf', 'application/pdf'),
-    ('as_png', 'image/png'),
-])
+@pytest.mark.parametrize('filetype', ['pdf', 'png'])
 @pytest.mark.parametrize('view, extra_view_args', [
-    ('.view_letter_template', {}),
-    ('.view_template_version', {'version': 1}),
+    ('.view_letter_template_preview', {}),
+    ('.view_template_version_preview', {'version': 1}),
 ])
-@patch('app.main.views.templates.LetterPreviewTemplate.jinja_template.render', return_value='foo')
 def test_should_show_preview_letter_templates(
-    mock_letter_preview,
     view,
     extra_view_args,
-    view_suffix,
-    expected_content_type,
+    filetype,
     logged_in_client,
     mock_get_service_email_template,
-    mock_get_user_by_email,
     service_one,
-    fake_uuid
+    fake_uuid,
+    mocker
 ):
+    mocked_preview = mocker.patch(
+        'app.main.views.templates.TemplatePreview.from_database_object',
+        return_value='foo'
+    )
+
     service_id, template_id = service_one['id'], fake_uuid
+
     response = logged_in_client.get(url_for(
-        '{}_{}'.format(view, view_suffix),
+        view,
         service_id=service_id,
         template_id=template_id,
+        filetype=filetype,
         **extra_view_args
     ))
 
     assert response.status_code == 200
-    assert response.content_type == expected_content_type
+    assert response.get_data(as_text=True) == 'foo'
     mock_get_service_email_template.assert_called_with(service_id, template_id, **extra_view_args)
-    assert mock_letter_preview.call_args[0][0]['subject'] == (
-        "Your <span class='placeholder'>((thing))</span> is due soon"
-    )
-    assert mock_letter_preview.call_args[0][0]['message'] == (
-        "<p>Your vehicle tax expires on <span class='placeholder'>((date))</span></p>"
-    )
+    assert mocked_preview.call_args[0][0]['id'] == template_id
+    assert mocked_preview.call_args[0][0]['service'] == service_id
+    assert mocked_preview.call_args[0][1] == filetype
 
 
 def test_should_redirect_when_saving_a_template(

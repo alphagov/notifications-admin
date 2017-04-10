@@ -15,18 +15,10 @@ GOV.UK Notify admin application.
 
 ## First-time setup
 
-Brew is a package manager for OSX. The following command installs brew:
-```shell
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-```
-
 Languages needed
 - Python 3.4
 - [Node](https://nodejs.org/) 5.0.0 or greater
 - [npm](https://www.npmjs.com/) 3.0.0 or greater
-```shell
-    brew install node imagemagick ghostscript cairo pango
-```
 
 [NPM](npmjs.org) is Node's package management tool. `n` is a tool for managing
 different versions of Node. The following installs `n` and uses the latest

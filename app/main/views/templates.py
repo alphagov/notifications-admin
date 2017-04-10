@@ -87,9 +87,10 @@ def view_template(service_id, template_id):
 @main.route("/services/<service_id>/templates/<template_id>.<filetype>")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
-def view_letter_template_as_filetype(service_id, template_id, filetype):
+def view_letter_template_preview(service_id, template_id, filetype):
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
     return TemplatePreview.from_database_object(db_template, filetype)
+
 
 def _view_template_version(service_id, template_id, version, letters_as_pdf=False):
     return dict(template=get_template(
