@@ -4,9 +4,7 @@ Flask==0.10.1
 Flask-Script==2.0.5
 Flask-WTF==0.11
 Flask-Login==0.3.2
-Flask-WeasyPrint==0.5
 
-html5lib==1.0b10
 credstash==1.8.0
 boto3==1.4.4
 Pygments==2.0.2
@@ -20,7 +18,6 @@ pyexcel-xlsx==0.1.0
 pyexcel-ods3==0.1.1
 pytz==2016.4
 six==1.10.0
-wand==0.4.4
 gunicorn==19.6.0
 whitenoise==1.0.6  #manages static assets
 

@@ -16,8 +16,6 @@ from flask import (
 )
 from flask_login import current_user
 
-from wand.image import Image
-
 from notifications_utils.template import (
     SMSPreviewTemplate,
     EmailPreviewTemplate,
@@ -325,21 +323,6 @@ def get_template(
                 contact_block=service['letter_contact_block'],
                 admin_base_url=current_app.config['ADMIN_BASE_URL']
             )
-
-
-def png_from_pdf(pdf_endpoint):
-    output = BytesIO()
-    with Image(
-        blob=pdf_endpoint.get_data(),
-        resolution=150,
-    ) as image:
-        with image.convert('png') as converted:
-            converted.save(file=output)
-    output.seek(0)
-    return dict(
-        filename_or_fp=output,
-        mimetype='image/png',
-    )
 
 
 def get_current_financial_year():
