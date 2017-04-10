@@ -12,6 +12,8 @@ class JobApiClient(NotifyAdminAPIClient):
         'finished',
         'cancelled',
         'sending limits exceeded',
+        'ready to send',
+        'sent to dvla'
     }
 
     def __init__(self):

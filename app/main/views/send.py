@@ -77,7 +77,6 @@ def get_example_letter_address(key):
     return {
         'address line 1': 'A. Name',
         'address line 2': '123 Example Street',
-        'address line 3': 'Example town',
         'postcode': 'XM4 5HQ'
     }.get(key, '')
 
@@ -237,13 +236,13 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
 
     if request.args.get('from_test'):
         extra_args = {'help': 1} if request.args.get('help', '0') != '0' else {}
-        if len(template.placeholders):
+        if len(template.placeholders) or template.template_type == 'letter':
             back_link = url_for(
                 '.send_test', service_id=service_id, template_id=template.id, **extra_args
             )
         else:
             back_link = url_for(
-                '.choose_template', service_id=service_id, **extra_args
+                '.view_template', service_id=service_id, template_id=template.id, **extra_args
             )
         choose_time_form = None
     else:

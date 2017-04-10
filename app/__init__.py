@@ -279,12 +279,15 @@ def format_date_short(date):
 
 
 def format_delta(date):
+    delta = (
+        datetime.now(timezone.utc)
+    ) - (
+        gmt_timezones(date)
+    )
+    if delta < timedelta(seconds=30):
+        return "just now"
     return ago.human(
-        (
-            datetime.now(timezone.utc)
-        ) - (
-            dateutil.parser.parse(date)
-        ),
+        delta,
         future_tense='{} from now',  # No-one should ever see this
         past_tense='{} ago',
         precision=1

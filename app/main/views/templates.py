@@ -287,13 +287,17 @@ def edit_service_template(service_id, template_id):
         }, current_service)
         template_change = get_template(template, current_service).compare_to(new_template)
         if template_change.has_different_placeholders and not request.form.get('confirm'):
+            example_column_headings = (
+                first_column_headings[new_template.template_type] +
+                list(new_template.placeholders)
+            )
             return render_template(
                 'views/templates/breaking-change.html',
                 template_change=template_change,
                 new_template=new_template,
-                column_headings=list(ascii_uppercase[:len(new_template.placeholders) + 1]),
+                column_headings=list(ascii_uppercase[:len(example_column_headings)]),
                 example_rows=[
-                    first_column_headings[new_template.template_type] + list(new_template.placeholders),
+                    example_column_headings,
                     get_example_csv_rows(new_template),
                     get_example_csv_rows(new_template)
                 ],

@@ -15,6 +15,11 @@ from app.main.views.send import get_check_messages_back_url
 
 from tests import validate_route_permission, template_json
 from tests.app.test_utils import normalize_spaces
+from tests.conftest import (
+    mock_get_service_template,
+    mock_get_service_template_with_placeholders,
+    mock_get_service_letter_template,
+)
 
 template_types = ['email', 'sms']
 
@@ -688,18 +693,41 @@ def test_route_invalid_permissions(
 
 
 @pytest.mark.parametrize(
-    'extra_args,expected_url',
+    'template_mock, extra_args, expected_url',
     [
         (
+            mock_get_service_template,
             dict(),
+            partial(url_for, '.send_messages')
+        ),
+        (
+            mock_get_service_template_with_placeholders,
+            dict(),
+            partial(url_for, '.send_messages')
+        ),
+        (
+            mock_get_service_template,
+            dict(from_test=True),
+            partial(url_for, '.view_template')
+        ),
+        (
+            mock_get_service_letter_template,  # No placeholders
+            dict(from_test=True),
             partial(url_for, '.send_test')
         ),
         (
-            dict(help='0'),
+            mock_get_service_template_with_placeholders,
+            dict(from_test=True),
             partial(url_for, '.send_test')
         ),
         (
-            dict(help='2'),
+            mock_get_service_template_with_placeholders,
+            dict(help='0', from_test=True),
+            partial(url_for, '.send_test')
+        ),
+        (
+            mock_get_service_template_with_placeholders,
+            dict(help='2', from_test=True),
             partial(url_for, '.send_test', help='1')
         )
     ]
@@ -711,14 +739,16 @@ def test_check_messages_back_link(
     mock_get_user_by_email,
     mock_get_users_by_service,
     mock_get_service,
-    mock_get_service_template_with_placeholders,
     mock_has_permissions,
     mock_get_detailed_service_for_today,
     mock_s3_download,
     fake_uuid,
+    mocker,
+    template_mock,
     extra_args,
     expected_url
 ):
+    template_mock(mocker)
     with logged_in_client.session_transaction() as session:
         session['upload_data'] = {'original_file_name': 'valid.csv',
                                   'template_id': fake_uuid,
@@ -729,7 +759,6 @@ def test_check_messages_back_link(
         service_id=fake_uuid,
         upload_id=fake_uuid,
         template_type='sms',
-        from_test=True,
         **extra_args
     ))
     assert response.status_code == 200
