@@ -46,8 +46,7 @@
 }
 
 .beta-badge {
-  @include phase-tag(beta);
-  background: $govuk-blue;
+  @include phase-tag();
   margin: 10px 0 0 0;
 }
 
@@ -151,20 +150,8 @@ td {
   margin-bottom: 5px;
 }
 
-a[rel='external'] {
-  @include external-link-default;
-  @include external-link-16;
-  @include media(tablet) {
-    @include external-link-19;
-  }
-}
-
 .hint {
   color: $secondary-text-colour;
-}
-
-.button {
-  padding: 0.3em 0.6em 0.2em 0.6em;
 }
 
 .list-bullet {
@@ -256,10 +243,16 @@ details .arrow {
   margin-top: 5px;
 }
 
-.block-label input[disabled] {
-  opacity: 0.5;
-}
-
 #content.override-elements-content {
   padding-bottom: 0;
+}
+
+.multiple-choice input:disabled+label {
+  opacity: 1;
+  color: $secondary-text-colour;
+  cursor: default;
+}
+
+.multiple-choice input:disabled {
+  opacity: 0.5;
 }

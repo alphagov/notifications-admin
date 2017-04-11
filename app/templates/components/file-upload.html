@@ -1,5 +1,5 @@
 {% macro file_upload(field, button_text="Choose file", alternate_link=None, alternate_link_text=None) %}
-  <form method="post" enctype="multipart/form-data" class="{% if field.errors %}error{% endif %}" data-module="file-upload">
+  <form method="post" enctype="multipart/form-data" class="{% if field.errors %}form-group-error{% endif %}" data-module="file-upload">
     <label class="file-upload-label" for="{{ field.name }}">
       <span class="visually-hidden">{{ field.label.text }}</span>
       {% if hint %}

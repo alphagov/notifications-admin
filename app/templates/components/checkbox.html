@@ -1,29 +1,22 @@
 {% macro checkbox(
   field,
   hint=False,
-  help_link=None,
-  help_link_text=None,
-  width='2-3',
-  suffix=None,
-  block=False
+  width='2-3'
 ) %}
-    <label class="{% if block %}block-label{% endif %}" for="{{ field.name }}">
-        {{ field()}}
-        {{ field.label.text }}
-        {% if hint %}
-            <span class="form-hint">
-                {{ hint }}
-            </span>
-        {% endif %}
-        {% if field.errors %}
-            <span class="error-message">
-                {{ field.errors[0] }}
-            </span>
-        {% endif %}
-        {% if help_link and help_link_text %}
-            <p class="textbox-help-link">
-                <a href='{{ help_link }}'>{{ help_link_text }}</a>
-            </p>
-        {% endif %}
+  <div class="multiple-choice">
+    <input
+      id="{{ field.id }}" name="{{ field.name }}" type="checkbox" value="{{ field.data }}"
+      {% if field.checked %}
+        checked
+      {% endif %}
+    >
+    <label for="{{ field.id }}">
+      {{ field.label.text }}
+      {% if hint %}
+        <div class="hint">
+          {{ hint }}
+        </div>
+      {% endif %}
     </label>
+  </div>
 {% endmacro %}

@@ -54,7 +54,6 @@ gulp.task('copy:govuk_template:images', () => gulp.src(paths.template + 'assets/
 gulp.task('javascripts', () => gulp
   .src([
     paths.toolkit + 'javascripts/govuk/modules.js',
-    paths.toolkit + 'javascripts/govuk/selection-buttons.js',
     paths.src + 'javascripts/detailsPolyfill.js',
     paths.src + 'javascripts/apiKey.js',
     paths.src + 'javascripts/autofocus.js',
