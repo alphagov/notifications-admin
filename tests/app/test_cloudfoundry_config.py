@@ -144,7 +144,7 @@ def test_deskpro_config():
 
 
 @pytest.mark.usefixtures('os_environ', 'cloudfoundry_environ')
-def test_template-preview_config():
+def test_template_preview_config():
     extract_cloudfoundry_config()
 
     assert os.environ['TEMPLATE_PREVIEW_API_HOST'] == 'template-preview api host'

@@ -53,7 +53,6 @@ def extract_deskpro_config(deskpro_config):
     os.environ['DESKPRO_API_KEY'] = deskpro_config['credentials']['api_key']
 
 
-
 def extract_template_preview_config(template_preview_config):
     os.environ['TEMPLATE_PREVIEW_API_HOST'] = template_preview_config['credentials']['api_host']
     os.environ['TEMPLATE_PREVIEW_API_KEY'] = template_preview_config['credentials']['api_key']
