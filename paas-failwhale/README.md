@@ -12,19 +12,19 @@ It should already be deployed, but if not you can deploy it by running
 
 To direct traffic to it you need to update the routes by running
 
-cf map-route notify-admin-failwhale [ENVIRONMENT-URL] --hostname www
-cf unmap-route notify-admin [ENVIRONMENT-URL] --hostname www
+    cf map-route notify-admin-failwhale [ENVIRONMENT-URL] --hostname www
+    cf unmap-route notify-admin [ENVIRONMENT-URL] --hostname www
 
 To remove admin failwhale:
 
-cf map-route notify-admin [ENVIRONMENT-URL] --hostname www
-cf unmap-route notify-admin-failwhale [ENVIRONMENT-URL] --hostname www
+    cf map-route notify-admin [ENVIRONMENT-URL] --hostname www
+    cf unmap-route notify-admin-failwhale [ENVIRONMENT-URL] --hostname www
 
 
-Where [ENVIRONMENT-URL] would be
+Where [ENVIRONMENT-URL] would be one of:
 
-notify.works for preview
-notify-staging.works for staging
-notifications.service.gov.uk for production
+- notify.works for preview
+- notify-staging.works for staging
+- notifications.service.gov.uk for production
 
-*Make sure you are on the correct environment!*
+**Make sure you are on the correct environment!**
