@@ -52,6 +52,7 @@ from app.notify_client.events_api_client import EventsApiClient
 from app.notify_client.provider_client import ProviderClient
 from app.notify_client.organisations_client import OrganisationsClient
 from app.notify_client.models import AnonymousUser
+from app.notify_client.letter_jobs_client import LetterJobsClient
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
@@ -69,6 +70,7 @@ provider_client = ProviderClient()
 organisations_client = OrganisationsClient()
 asset_fingerprinter = AssetFingerprinter()
 statsd_client = StatsdClient()
+letter_jobs_client = LetterJobsClient()
 
 # The current service attached to the request stack.
 current_service = LocalProxy(partial(_lookup_req_object, 'service'))
@@ -100,6 +102,7 @@ def create_app():
     events_api_client.init_app(application)
     provider_client.init_app(application)
     organisations_client.init_app(application)
+    letter_jobs_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
