@@ -16,6 +16,7 @@
             <tr>
               <th>Service name</th>
               <th>Job ID</th>
+              <th>Count</th>
               <th>Status</th>
               <th colspan="3">Created at</th>
             </tr>
@@ -25,9 +26,10 @@
             <tr>
               <td>{{ job.service_name.name }}</td>
               <td>{{ job.id }}</td>
+              <td>{{ job.notification_count }}</td>
               <td>{{ job.job_status }}</td>
               <td>{{ job.created_at|format_datetime_short }}</td>
-              <td><input name="job_id" value='{{ job.id }}' type="checkbox"{% if job.send %} checked{% endif %}></td>
+              <td><input name="job_id" value='{{ job.id }}' type="checkbox"{% if not (job.job_status == 'ready to send' or job.job_status == 'sent to dvla') %} disabled{% endif %}></td>
               <td>{{ job.sending }}</td>
             </tr>
         {% endfor %}
