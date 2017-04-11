@@ -15,16 +15,22 @@
 
   .js-reset-button,
   .js-category-button {
+
     background: none;
     text-decoration: underline;
     color: $link-colour;
-    //font-weight: bold;
     border: none;
     display: inline-block;
     vertical-align: top;
     width: auto;
     padding: 7px 20px 7px 10px;
     margin-right: 5px;
+    cursor: pointer;
+
+    &:hover {
+      color: $link-hover-colour;
+    }
+
   }
 
   .js-enabled & {
