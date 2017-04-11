@@ -5,19 +5,25 @@
     display: inline-block;
     vertical-align: top;
 
-    .block-label {
+    .multiple-choice {
       margin-right: 5px;
-      padding-right: $gutter - 10px;
+      padding-right: 10px;
       padding-left: 54px - 10px;
     }
 
   }
 
-  .tertiary-button {
+  .js-reset-button,
+  .js-category-button {
+    background: none;
+    text-decoration: underline;
+    color: $link-colour;
+    //font-weight: bold;
+    border: none;
     display: inline-block;
     vertical-align: top;
     width: auto;
-    padding: 20px $gutter-half 15px $gutter-half;
+    padding: 7px 20px 7px 10px;
     margin-right: 5px;
   }
 
@@ -26,12 +32,12 @@
     height: 60px;
     overflow: visible;
 
-    .block-label {
+    .multiple-choice {
       display: none;
     }
 
-    .js-block-label {
-      display: inline-block;
+    .js-multiple-choice {
+      display: block;
     }
 
   }

@@ -8,7 +8,7 @@
   {% if error %}
     <div class="validation-wrapper">
   {% endif %}
-    <fieldset class="form-group{% if field.errors %} error{% endif %}" id="{{ field.name }}">
+    <fieldset class="form-group{% if field.errors %} form-group-error{% endif %}" id="{{ field.name }}">
       <legend>
         <span class="form-label">
           {{ field.label.text }}
