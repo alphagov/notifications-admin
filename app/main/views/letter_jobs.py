@@ -1,45 +1,31 @@
-from flask import (render_template, url_for, redirect, request, abort)
+import datetime
+
+from flask import render_template, request
+from flask_login import login_required
+
+from app import letter_jobs_client, format_datetime_24h
 from app.main import main
-from app import convert_to_boolean
-from flask_login import (login_required, current_user)
+from app.utils import user_has_permissions
 
 
 @main.route("/letter-jobs", methods=['GET', 'POST'])
 @login_required
+@user_has_permissions(admin_override=True)
 def letter_jobs():
-    letter_jobs_list = get_letter_jobs()
-
     msg = ''
-    if request.method == 'POST':
-        send_letters = request.form.getlist('send_letter')
-        for job_id in send_letters:
-            job = [j for j in letter_jobs_list if job_id == j['job_id']][0]
-            job['send'] = True
+    letter_jobs_list = letter_jobs_client.get_letter_jobs()
 
-        msg = 'sending:{}'.format(send_letters)
+    if request.method == 'POST':
+        if len(request.form.getlist('job_id')) > 0:
+            job_ids = request.form.getlist('job_id')
+
+            response = letter_jobs_client.send_letter_jobs(job_ids)
+            msg = response['response']
+
+            for job_id in job_ids:
+                job = [j for j in letter_jobs_list if job_id == j['id']][0]
+                job['sending'] = 'sending'
+        else:
+            msg = 'No jobs selected'
 
     return render_template('views/letter-jobs.html', letter_jobs_list=letter_jobs_list, message=msg)
-
-
-def get_letter_jobs():
-    return [
-        {
-            'service_name': 'test_name',
-            'job_id': 'test_id',
-            'status': 'test_status',
-            'created_at': '2017-04-01'
-        },
-        {
-            'service_name': 'test_name 2',
-            'job_id': 'test_id 2',
-            'status': 'test_status 2',
-            'created_at': '2017-04-02'
-
-        },
-        {
-            'service_name': 'test_name 3',
-            'job_id': 'test_id 3',
-            'status': 'test_status 3',
-            'created_at': '2017-04-03'
-        }
-    ]

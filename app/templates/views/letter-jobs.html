@@ -17,25 +17,31 @@
               <th>Service name</th>
               <th>Job ID</th>
               <th>Status</th>
-              <th colspan="2">Created at</th>
+              <th colspan="3">Created at</th>
             </tr>
           </thead>
+          <tbody>
         {% for job in letter_jobs_list %}
             <tr>
-              <td>{{ job.service_name }}</td>
-              <td>{{ job.job_id }}</td>
-              <td>{{ job.status }}</td>
-              <td>{{ job.created_at }}</td>
-              <td><input name="send_letter" value='{{ job.job_id }}' type="checkbox"{% if job.send %} checked{% endif %}></td>
+              <td>{{ job.service_name.name }}</td>
+              <td>{{ job.id }}</td>
+              <td>{{ job.job_status }}</td>
+              <td>{{ job.created_at|format_datetime_short }}</td>
+              <td><input name="job_id" value='{{ job.id }}' type="checkbox"{% if job.send %} checked{% endif %}></td>
+              <td>{{ job.sending }}</td>
             </tr>
         {% endfor %}
+        </tbody>
         </table>
       </p>
       {{ page_footer('Send') }}
 
       {% if message %}
-      <p>
+      <p id='message'>
         {{ message }}
+        {% if message != 'No jobs selected' %}
+          <div>Refresh page to see status updates</div>
+        {% endif %}
       </p>
       {% endif %}
     </form>
