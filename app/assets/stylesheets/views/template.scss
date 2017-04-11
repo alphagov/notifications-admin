@@ -30,12 +30,12 @@
 
 .edit-template-link-letter-address {
   @extend %edit-template-link;
-  top: 16.5%; // align bottom edge to bottom of address
+  top: 14.65%; // align bottom edge to bottom of address
   left: -5px;
 }
 
 .edit-template-link-letter-body {
   @extend %edit-template-link;
-  top: 33.3%; // aligns to top of subject
+  top: 38.5%; // aligns to top of subject
   left: -5px;
 }

@@ -18,6 +18,10 @@
   @include grid-column(1/8);
 }
 
+.column-five-eighths {
+  @include grid-column(5/8);
+}
+
 .column-seven-eighths {
   @include grid-column(7/8);
 }
