@@ -52,9 +52,7 @@ def test_get_letter_jobs_returns_list_of_all_letter_jobs(logged_in_platform_admi
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string == 'Letter jobs'
 
-    table = page.find('table')
-    table_body = table.find('tbody')
-    rows = table_body.find_all('tr')
+    rows = page.select('table tbody tr')
 
     assert len(rows) == len(valid_letter_jobs)
 
@@ -85,9 +83,7 @@ def test_post_letter_jobs_select_1_letter_job_submits_1_job(logged_in_platform_a
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    table = page.find('table')
-    table_body = table.find('tbody')
-    rows = table_body.find_all('tr')
+    rows = page.select('table tbody tr')
 
     assert len(rows) == len(valid_letter_jobs)
 
