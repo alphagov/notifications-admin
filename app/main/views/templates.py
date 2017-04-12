@@ -88,6 +88,9 @@ def view_template(service_id, template_id):
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_letter_template_preview(service_id, template_id, filetype):
+    if filetype not in ('pdf', 'png'):
+        abort(404)
+
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
     return TemplatePreview.from_database_object(db_template, filetype)
 

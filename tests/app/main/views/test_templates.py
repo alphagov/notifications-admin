@@ -185,6 +185,24 @@ def test_should_show_preview_letter_templates(
     assert mocked_preview.call_args[0][1] == filetype
 
 
+def test_dont_show_preview_letter_templates_for_bad_filetype(
+    logged_in_client,
+    mock_get_service_template,
+    service_one,
+    fake_uuid
+):
+    resp = logged_in_client.get(
+        url_for(
+            '.view_letter_template_preview',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            filetype='blah'
+        )
+    )
+    assert resp.status_code == 404
+    assert mock_get_service_template.called is False
+
+
 def test_should_redirect_when_saving_a_template(
     logged_in_client,
     active_user_with_permissions,
