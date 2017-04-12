@@ -78,46 +78,6 @@
 
 }
 
-.banner-mode {
-
-  @extend %banner;
-  background: $govuk-blue;
-  color: $white;
-  margin: 0 0 $gutter 0;
-  padding: $gutter-half;
-
-  p {
-    margin: 0 0 10px 0;
-  }
-
-  a {
-
-    &:link,
-    &:visited {
-      color: $white;
-    }
-
-    &:hover,
-    &:active {
-      color: $light-blue-25;
-    }
-
-    &:active,
-    &:focus {
-      background-color: $yellow;
-      color: $govuk-blue;
-    }
-
-  }
-
-  &-action {
-    display: block;
-    text-align: right;
-    float: right;
-  }
-
-}
-
 .banner-tour {
 
   @extend %banner;
