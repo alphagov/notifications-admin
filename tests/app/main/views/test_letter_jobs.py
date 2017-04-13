@@ -75,7 +75,8 @@ def test_post_letter_jobs_select_1_letter_job_submits_1_job(logged_in_platform_a
     mock_get_letters = mocker.patch('app.letter_jobs_client.get_letter_jobs', return_value=valid_letter_jobs)
     mock_send_letters = mocker.patch('app.letter_jobs_client.send_letter_jobs', return_value=send_letter_jobs_response)
 
-    response = logged_in_platform_admin_client.post(url_for('main.letter_jobs'), data=letter_jobs_first_selected)
+    response = logged_in_platform_admin_client.post(url_for('main.letter_jobs'), data=letter_jobs_first_selected,
+                                                    follow_redirects=True)
 
     assert mock_get_letters.called
     assert mock_send_letters.called
@@ -103,7 +104,7 @@ def test_post_letter_jobs_none_selected_shows_message(logged_in_platform_admin_c
     mock_get_letters = mocker.patch('app.letter_jobs_client.get_letter_jobs', return_value=valid_letter_jobs)
     mock_send_letters = mocker.patch('app.letter_jobs_client.send_letter_jobs', return_value=send_letter_jobs_response)
 
-    response = logged_in_platform_admin_client.post(url_for('main.letter_jobs'), data={})
+    response = logged_in_platform_admin_client.post(url_for('main.letter_jobs'), data={}, follow_redirects=True)
 
     assert mock_get_letters.called
     assert not mock_send_letters.called
