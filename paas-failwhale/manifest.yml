@@ -1,0 +1,7 @@
+---
+
+applications:
+  - name: notify-admin-failwhale
+    no-route: true
+    buildpack: staticfile_buildpack
+    memory: 256M
