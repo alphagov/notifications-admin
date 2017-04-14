@@ -360,7 +360,7 @@ def test_should_show_interstitial_when_making_breaking_change(
             'name': "new name",
             'template_content': "hello lets talk about ((thing))",
             'template_type': 'email',
-            'subject': 'reminder & ((name))',
+            'subject': 'reminder \'" <span> & ((name))',
             'service': service_id,
             'process_type': 'normal'
         }
@@ -377,11 +377,17 @@ def test_should_show_interstitial_when_making_breaking_change(
 
     for key, value in {
         'name': 'new name',
-        'subject': 'reminder &amp; ((name))',
+        'subject': 'reminder \'" <span> & ((name))',
         'template_content': 'hello lets talk about ((thing))',
         'confirm': 'true'
     }.items():
         assert page.find('input', {'name': key})['value'] == value
+
+    # BeautifulSoup returns the value attribute as unencoded, let’s make
+    # sure that it is properly encoded in the HTML
+    assert str(page.find('input', {'name': 'subject'})) == (
+        """<input name="subject" type="hidden" value="reminder '&quot; &lt;span&gt; &amp; ((name))"/>"""
+    )
 
 
 def test_should_not_create_too_big_template(
@@ -450,7 +456,7 @@ def test_should_redirect_when_saving_a_template_email(
     template_id = fake_uuid
     name = "new name"
     content = "template <em>content</em> with & entity ((thing)) ((date))"
-    subject = "subject"
+    subject = "subject & entity"
     data = {
         'id': template_id,
         'name': name,
