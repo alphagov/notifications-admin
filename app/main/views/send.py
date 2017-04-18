@@ -19,7 +19,6 @@ from flask import (
 )
 
 from flask_login import login_required, current_user
-from flask_weasyprint import HTML, render_pdf
 
 from notifications_utils.columns import Columns
 from notifications_utils.recipients import RecipientCSV, first_column_headings, validate_and_format_phone_number
@@ -36,9 +35,9 @@ from app.utils import (
     get_errors_for_csv,
     Spreadsheet,
     get_help_argument,
-    get_template,
-    png_from_pdf,
+    get_template
 )
+from app.template_previews import TemplatePreview
 
 
 def get_page_headings(template_type):
@@ -291,23 +290,17 @@ def check_messages(service_id, template_type, upload_id):
     )
 
 
-@main.route("/services/<service_id>/<template_type>/check/<upload_id>.pdf", methods=['GET'])
+@main.route("/services/<service_id>/<template_type>/check/<upload_id>.<filetype>", methods=['GET'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
-def check_messages_as_pdf(service_id, template_type, upload_id):
+def check_messages_preview(service_id, template_type, upload_id, filetype):
+    if filetype not in ('pdf', 'png'):
+        abort(404)
+
     template = _check_messages(
         service_id, template_type, upload_id, letters_as_pdf=True
     )['template']
-    return render_pdf(HTML(string=str(template)))
-
-
-@main.route("/services/<service_id>/<template_type>/check/<upload_id>.png", methods=['GET'])
-@login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
-def check_messages_as_png(service_id, template_type, upload_id):
-    return send_file(**png_from_pdf(
-        check_messages_as_pdf(service_id, template_type, upload_id)
-    ))
+    return TemplatePreview.from_utils_template(template, filetype)
 
 
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['POST'])

@@ -53,11 +53,23 @@ def deskpro_config():
 
 
 @pytest.fixture
+def template_preview_config():
+    return {
+        'name': 'notify-template-preview',
+        'credentials': {
+            'api_host': 'template-preview api host',
+            'api_key': 'template-preview api key'
+        }
+    }
+
+
+@pytest.fixture
 def cloudfoundry_config(
         notify_config,
         aws_config,
         hosted_graphite_config,
         deskpro_config,
+        template_preview_config,
 ):
     return {
         'user-provided': [
@@ -65,6 +77,7 @@ def cloudfoundry_config(
             aws_config,
             hosted_graphite_config,
             deskpro_config,
+            template_preview_config,
         ]
     }
 
@@ -128,3 +141,11 @@ def test_deskpro_config():
 
     assert os.environ['DESKPRO_API_HOST'] == 'deskpro api host'
     assert os.environ['DESKPRO_API_KEY'] == 'deskpro api key'
+
+
+@pytest.mark.usefixtures('os_environ', 'cloudfoundry_environ')
+def test_template_preview_config():
+    extract_cloudfoundry_config()
+
+    assert os.environ['TEMPLATE_PREVIEW_API_HOST'] == 'template-preview api host'
+    assert os.environ['TEMPLATE_PREVIEW_API_KEY'] == 'template-preview api key'

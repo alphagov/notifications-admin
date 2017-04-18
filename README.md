@@ -25,8 +25,9 @@ Languages needed
 - [Node](https://nodejs.org/) 5.0.0 or greater
 - [npm](https://www.npmjs.com/) 3.0.0 or greater
 ```shell
-    brew install node imagemagick ghostscript cairo pango
+    brew install node
 ```
+
 
 [NPM](npmjs.org) is Node's package management tool. `n` is a tool for managing
 different versions of Node. The following installs `n` and uses the latest

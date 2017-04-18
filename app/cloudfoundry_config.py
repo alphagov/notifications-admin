@@ -27,6 +27,8 @@ def set_config_env_vars(vcap_services):
             extract_hosted_graphite_config(s)
         elif s['name'] == 'deskpro':
             extract_deskpro_config(s)
+        elif s['name'] == 'notify-template-preview':
+            extract_template_preview_config(s)
 
 
 def extract_notify_config(notify_config):
@@ -49,3 +51,8 @@ def extract_hosted_graphite_config(hosted_graphite_config):
 def extract_deskpro_config(deskpro_config):
     os.environ['DESKPRO_API_HOST'] = deskpro_config['credentials']['api_host']
     os.environ['DESKPRO_API_KEY'] = deskpro_config['credentials']['api_key']
+
+
+def extract_template_preview_config(template_preview_config):
+    os.environ['TEMPLATE_PREVIEW_API_HOST'] = template_preview_config['credentials']['api_host']
+    os.environ['TEMPLATE_PREVIEW_API_KEY'] = template_preview_config['credentials']['api_key']

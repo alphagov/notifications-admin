@@ -8,20 +8,17 @@ from flask import (
     url_for,
     flash,
     abort,
-    send_file,
-    current_app
 )
 from flask_login import login_required, current_user
-from flask_weasyprint import HTML, render_pdf
 from dateutil.parser import parse
 
 from notifications_utils.formatters import escape_html
-from notifications_utils.template import LetterPreviewTemplate
 from notifications_utils.recipients import first_column_headings
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
-from app.utils import user_has_permissions, get_template, png_from_pdf
+from app.utils import user_has_permissions, get_template
+from app.template_previews import TemplatePreview
 from app.main.forms import (
     ChooseTemplateType,
     SMSTemplateForm,
@@ -87,26 +84,15 @@ def view_template(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/templates/<template_id>.pdf")
+@main.route("/services/<service_id>/templates/<template_id>.<filetype>")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
-def view_letter_template_as_pdf(service_id, template_id):
-    return render_pdf(HTML(string=str(
-        LetterPreviewTemplate(
-            service_api_client.get_service_template(service_id, template_id)['data'],
-            contact_block=current_service['letter_contact_block'],
-            admin_base_url=current_app.config['ADMIN_BASE_URL']
-        )
-    )))
+def view_letter_template_preview(service_id, template_id, filetype):
+    if filetype not in ('pdf', 'png'):
+        abort(404)
 
-
-@main.route("/services/<service_id>/templates/<template_id>.png")
-@login_required
-@user_has_permissions('view_activity', admin_override=True)
-def view_letter_template_as_png(service_id, template_id):
-    return send_file(**png_from_pdf(
-        view_letter_template_as_pdf(service_id, template_id)
-    ))
+    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+    return TemplatePreview.from_database_object(db_template, filetype)
 
 
 def _view_template_version(service_id, template_id, version, letters_as_pdf=False):
@@ -141,7 +127,7 @@ def view_template_version(service_id, template_id, version):
     )
 
 
-@main.route("/services/<service_id>/templates/<template_id>/version/<int:version>.pdf")
+@main.route("/services/<service_id>/templates/<template_id>/version/<int:version>.<filetype>")
 @login_required
 @user_has_permissions(
     'view_activity',
@@ -152,31 +138,9 @@ def view_template_version(service_id, template_id, version):
     admin_override=True,
     any_=True
 )
-def view_template_version_as_pdf(service_id, template_id, version):
-    return render_pdf(HTML(string=str(
-        LetterPreviewTemplate(
-            service_api_client.get_service_template(service_id, template_id, version=version)['data'],
-            contact_block=current_service['letter_contact_block'],
-            admin_base_url=current_app.config['ADMIN_BASE_URL']
-        )
-    )))
-
-
-@main.route("/services/<service_id>/templates/<template_id>/version/<int:version>.png")
-@login_required
-@user_has_permissions(
-    'view_activity',
-    'send_texts',
-    'send_emails',
-    'manage_templates',
-    'manage_api_keys',
-    admin_override=True,
-    any_=True
-)
-def view_template_version_as_png(service_id, template_id, version):
-    return send_file(**png_from_pdf(
-        view_template_version_as_pdf(service_id, template_id, version)
-    ))
+def view_template_version_preview(service_id, template_id, version, filetype):
+    db_template = service_api_client.get_service_template(service_id, template_id, version=version)['data']
+    return TemplatePreview.from_database_object(db_template, filetype)
 
 
 @main.route("/services/<service_id>/templates/add", methods=['GET', 'POST'])
