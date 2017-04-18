@@ -23,7 +23,7 @@
   </div>
 
   {% if template._template.updated_at %}
-    <div class="bottom-gutter">
+    <div class="bottom-gutter-1-2">
       <h2 class="heading-small">Last edited {{ template._template.updated_at|format_delta }}</h2>
       <p>
         <a href="{{ url_for('.view_template_versions', service_id=current_service.id, template_id=template.id) }}">See previous versions</a>

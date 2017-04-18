@@ -39,6 +39,10 @@
 
   }
 
+  &-delete-link-without-button {
+    padding-left: 0;
+  }
+
   &-secondary-link {
     display: block;
     margin-top: $gutter;

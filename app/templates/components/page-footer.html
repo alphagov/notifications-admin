@@ -17,7 +17,7 @@
       <a class="page-footer-back-link" href="{{ back_link }}">{{ back_link_text }}</a>
     {% endif %}
     {% if delete_link %}
-      <span class="page-footer-delete-link">
+      <span class="page-footer-delete-link {% if not button_text %}page-footer-delete-link-without-button{% endif %}">
         <a href="{{ delete_link }}">{{ delete_link_text }}</a>
       </span>
     {% endif %}
