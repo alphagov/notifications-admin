@@ -2,12 +2,14 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
-      {{ banner(
-        message,
-        'default' if ((category == 'default') or (category == 'default_with_tick')) else 'dangerous',
-        delete_button="Yes, {}".format(category) if category in ['delete', 'suspend', 'resume', 'remove'] else None,
-        with_tick=True if category == 'default_with_tick' else False
-      )}}
+      <div class="bottom-gutter">
+        {{ banner(
+          message,
+          'default' if ((category == 'default') or (category == 'default_with_tick')) else 'dangerous',
+          delete_button="Yes, {}".format(category) if category in ['delete', 'suspend', 'resume', 'remove'] else None,
+          with_tick=True if category == 'default_with_tick' else False
+        )}}
+      </div>
     {% endfor %}
   {% endif %}
 {% endwith %}
