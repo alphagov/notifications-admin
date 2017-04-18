@@ -350,9 +350,6 @@ def delete_service_template(service_id, template_id):
             template_type=template['template_type']
         ))
 
-    template['template_content'] = template['content']
-    form = form_objects[template['template_type']](**template)
-
     try:
         last_used_notification = template_statistics_client.get_template_statistics_for_template(
             service_id, template['id']
@@ -370,11 +367,17 @@ def delete_service_template(service_id, template_id):
             raise e
 
     flash('{}. Are you sure you want to delete it?'.format(message), 'delete')
+
     return render_template(
-        'views/edit-{}-template.html'.format(template['template_type']),
-        h1='Edit template',
-        form=form,
-        template_id=template_id)
+        'views/templates/template.html',
+        template=get_template(
+            template,
+            current_service,
+            expand_emails=True,
+            letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template['id']),
+            show_recipient=True,
+        )
+    )
 
 
 @main.route('/services/<service_id>/templates/<template_id>/versions')

@@ -24,9 +24,7 @@
             {{ radios(form.process_type) }}
           {% endif %}
           {{ page_footer(
-            'Save',
-            delete_link=url_for('.delete_service_template', service_id=current_service.id, template_id=template_id) if template_id or None,
-            delete_link_text='Delete this template'
+            'Save'
           ) }}
         </div>
         <aside class="column-whole">
