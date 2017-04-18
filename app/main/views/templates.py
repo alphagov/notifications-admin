@@ -276,7 +276,7 @@ def edit_service_template(service_id, template_id):
         if form.process_type.data != template['process_type']:
             abort_403_if_not_admin_user()
 
-        subject = escape_html(form.subject.data) if hasattr(form, 'subject') else None
+        subject = form.subject.data if hasattr(form, 'subject') else None
         new_template = get_template({
             'name': form.name.data,
             'content': form.template_content.data,
