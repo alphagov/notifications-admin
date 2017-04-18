@@ -5,6 +5,7 @@ command: scripts/run_app_paas.sh gunicorn -w 5 -b 0.0.0.0:$PORT wsgi
 services:
   - notify-aws
   - notify-config
+  - notify-template-preview
   - hosted-graphite
   - deskpro
 instances: 1
