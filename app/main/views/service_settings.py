@@ -26,7 +26,8 @@ from app.main.forms import (
     ServiceReplyToEmailFrom,
     ServiceSmsSender,
     ServiceLetterContactBlock,
-    ServiceBrandingOrg
+    ServiceBrandingOrg,
+    LetterBranding,
 )
 from app import user_api_client, current_service, organisations_client
 
@@ -41,7 +42,10 @@ def service_settings(service_id):
         organisation = None
     return render_template(
         'views/service-settings.html',
-        organisation=organisation
+        organisation=organisation,
+        letter_branding=dict(
+            current_app.config['LETTER_BRANDING']
+        ).get(current_service.get('dvla_org_id', '001'))
     )
 
 
@@ -311,6 +315,28 @@ def service_set_branding_and_org(service_id):
         'views/service-settings/set-branding-and-org.html',
         form=form,
         branding_dict=get_branding_as_dict(organisations)
+    )
+
+
+@main.route("/services/<service_id>/service-settings/set-letter-branding", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions(admin_override=True)
+def set_letter_branding(service_id):
+
+    form = LetterBranding(choices=current_app.config['LETTER_BRANDING'])
+
+    if form.validate_on_submit():
+        service_api_client.update_service(
+            service_id,
+            dvla_organisation=form.dvla_org_id.data
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    form.dvla_org_id.data = current_service.get('dvla_organisation', '001')
+
+    return render_template(
+        'views/service-settings/set-letter-branding.html',
+        form=form,
     )
 
 

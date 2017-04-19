@@ -83,6 +83,11 @@ class Config(object):
         r"assembly\.wales",
     ]
 
+    LETTER_BRANDING = [
+        ('001', 'HM Government'),
+        ('500', 'Land Registry'),
+    ]
+
 
 class Development(Config):
     DEBUG = True

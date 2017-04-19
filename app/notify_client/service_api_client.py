@@ -91,7 +91,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'created_by',
             'branding',
             'organisation',
-            'letter_contact_block'
+            'letter_contact_block',
+            'dvla_org_id',
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(

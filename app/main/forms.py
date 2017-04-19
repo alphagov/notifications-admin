@@ -538,6 +538,20 @@ class ServiceBrandingOrg(Form):
     )
 
 
+class LetterBranding(Form):
+
+    def __init__(self, choices=[], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.dvla_org_id.choices = choices
+
+    dvla_org_id = RadioField(
+        'Which logo should this service’s letter have?',
+        validators=[
+            DataRequired()
+        ]
+    )
+
+
 class Whitelist(Form):
 
     def populate(self, email_addresses, phone_numbers):

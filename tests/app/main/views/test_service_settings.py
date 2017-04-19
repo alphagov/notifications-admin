@@ -10,23 +10,45 @@ import app
 from app.utils import email_safe
 from tests import validate_route_permission, service_json
 
+from tests.conftest import active_user_with_permissions, platform_admin_user
 
+
+@pytest.mark.parametrize('user, expected_rows', [
+    (active_user_with_permissions, [
+        'Label Value Action',
+        'Service name service one Change',
+        'Email reply to address None Change',
+        'Text message sender 40604 Change'
+    ]),
+    (platform_admin_user, [
+        'Label Value Action',
+        'Service name service one Change',
+        'Email reply to address None Change',
+        'Text message sender 40604 Change',
+        'Label Value Action',
+        'Email branding GOV.UK Change',
+        'Letter branding HM Government Change',
+    ]),
+])
 def test_should_show_overview(
-    logged_in_client,
+    client,
+    mocker,
     service_one,
+    fake_uuid,
+    user,
+    expected_rows,
 ):
-    response = logged_in_client.get(url_for(
+    client.login(user(fake_uuid), mocker, service_one)
+    response = client.get(url_for(
         'main.service_settings', service_id=service_one['id']
     ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find('h1').text == 'Settings'
-    for index, row in enumerate([
-        'Service name service one Change',
-        'Email reply to address None Change',
-        'Text message sender 40604 Change'
-    ]):
-        assert row == " ".join(page.find_all('tr')[index + 1].text.split())
+    rows = page.find_all('tr')
+    assert len(rows) == len(expected_rows)
+    for index, row in enumerate(expected_rows):
+        assert row == " ".join(rows[index].text.split())
     app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
@@ -658,6 +680,46 @@ def test_set_letter_contact_block_has_max_10_lines(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     error_message = page.find('span', class_='error-message').text.strip()
     assert error_message == 'Contains 11 lines, maximum is 10'
+
+
+def test_set_letter_branding_platform_admin_only(
+    logged_in_client,
+    service_one,
+):
+    response = logged_in_client.get(url_for('main.set_letter_branding', service_id=service_one['id']))
+    assert response.status_code == 403
+
+
+@pytest.mark.parametrize('current_dvla_org_id, expected_selected', [
+    (None, '001'),
+    ('500', '500'),
+])
+def test_set_letter_branding_prepopulates(
+    logged_in_platform_admin_client,
+    service_one,
+    current_dvla_org_id,
+    expected_selected,
+):
+    if current_dvla_org_id:
+        service_one['dvla_organisation'] = current_dvla_org_id
+    response = logged_in_platform_admin_client.get(url_for('main.set_letter_branding', service_id=service_one['id']))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select('input[checked]')[0]['value'] == expected_selected
+
+
+def test_set_letter_contact_block_saves(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_update_service,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for('main.set_letter_branding', service_id=service_one['id']),
+        data={'dvla_org_id': '500'}
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    mock_update_service.assert_called_once_with(service_one['id'], dvla_organisation='500')
 
 
 def test_should_show_branding(
