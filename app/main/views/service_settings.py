@@ -36,6 +36,7 @@ from app import user_api_client, current_service, organisations_client
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_settings(service_id):
+    letter_branding_organisations = organisations_client.get_letter_organisations()
     if current_service['organisation']:
         organisation = organisations_client.get_organisation(current_service['organisation'])['organisation']
     else:
@@ -43,9 +44,9 @@ def service_settings(service_id):
     return render_template(
         'views/service-settings.html',
         organisation=organisation,
-        letter_branding=dict(
-            current_app.config['LETTER_BRANDING']
-        ).get(current_service.get('dvla_org_id', '001'))
+        letter_branding=letter_branding_organisations.get(
+            current_service.get('dvla_org_id', '001')
+        )
     )
 
 
@@ -323,7 +324,7 @@ def service_set_branding_and_org(service_id):
 @user_has_permissions(admin_override=True)
 def set_letter_branding(service_id):
 
-    form = LetterBranding(choices=current_app.config['LETTER_BRANDING'])
+    form = LetterBranding(choices=organisations_client.get_letter_organisations().items())
 
     if form.validate_on_submit():
         service_api_client.update_service(

@@ -16,3 +16,6 @@ class OrganisationsClient(NotifyAdminAPIClient):
 
     def get_organisations(self):
         return self.get(url='/organisation')['organisations']
+
+    def get_letter_organisations(self):
+        return self.get(url='/dvla_organisations')
