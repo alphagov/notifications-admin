@@ -10,7 +10,8 @@ class TemplatePreview:
         data = {
             'letter_contact_block': current_service['letter_contact_block'],
             'template': template,
-            'values': values
+            'values': values,
+            'dvla_org_id': current_service['dvla_organisation'],
         }
         resp = requests.post(
             '{}/preview.{}'.format(current_app.config['TEMPLATE_PREVIEW_API_HOST'], filetype),
