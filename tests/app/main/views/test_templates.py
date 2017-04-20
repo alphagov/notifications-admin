@@ -595,7 +595,7 @@ def test_should_redirect_when_deleting_a_template(
     assert response.status_code == 302
     assert response.location == url_for(
         '.choose_template',
-        service_id=service_id, template_type=type_, _external=True)
+        service_id=service_id, _external=True)
     mock_get_service_template.assert_called_with(
         service_id, template_id)
     mock_delete_service_template.assert_called_with(
