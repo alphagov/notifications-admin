@@ -14,25 +14,6 @@ from tests import notification_json
 from freezegun import freeze_time
 
 
-def _csv_notifications(notifications_json):
-    csvfile = StringIO()
-    csvwriter = csv.writer(csvfile)
-    from app import format_datetime_24h, format_notification_status
-    csvwriter.writerow(['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time'])
-
-    for x in notifications_json:
-        csvwriter.writerow([
-            int(x['job_row_number']) + 2 if 'job_row_number' in x and x['job_row_number'] else '',
-            x['to'],
-            x['template']['name'],
-            x['template']['template_type'],
-            x['job']['original_file_name'] if x['job'] else '',
-            format_notification_status(x['status'], x['template']['template_type']),
-            format_datetime_24h(x['created_at'])
-        ])
-    return csvfile.getvalue()
-
-
 def test_get_jobs_should_return_list_of_all_real_jobs(
     logged_in_client,
     service_one,
