@@ -150,7 +150,8 @@ def view_job_csv(service_id, job_id):
                 job_id=job_id,
                 status=filter_args.get('status'),
                 page=request.args.get('page', 1),
-                page_size=5000
+                page_size=5000,
+                format_for_csv=True
             )
         ),
         mimetype='text/csv',

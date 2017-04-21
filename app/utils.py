@@ -126,71 +126,31 @@ def get_errors_for_csv(recipients, template_type):
 def generate_notifications_csv(**kwargs):
     from app import notification_api_client
 
-    csvfile = StringIO()
-    csvwriter = csv.DictWriter(
-        csvfile,
-        fieldnames=['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
-    )
-
-    def read_current_row():
-        csvfile.seek(0)
-        line = csvfile.read()
-        return line
-
-    def clear_file_buffer():
-        csvfile.seek(0)
-        csvfile.truncate()
-
-    # Initiate download quicker by returning the headers first
-    csvwriter.writeheader()
-    line = read_current_row()
-    clear_file_buffer()
-    yield line
-
-    # get_notifications_for_service is always paginated by the api, so set a page param if not specified
     if 'page' not in kwargs:
         kwargs['page'] = 1
+    fieldnames = ['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
+    yield ','.join(fieldnames) + '\n'
 
     while kwargs['page']:
-        current_app.logger.info('Current kwargs: {}'.format(kwargs))
         notifications_resp = notification_api_client.get_notifications_for_service(**kwargs)
-        current_app.logger.info('Total notifications for csv job: {}'.format(notifications_resp['total']))
-        notifications_list = notifications_resp['notifications']
-        for x in notifications_list:
-            csvwriter.writerow(format_notification_for_csv(x))
-
-            line = read_current_row()
-            clear_file_buffer()
+        notifications = notifications_resp['notifications']
+        for notification in notifications:
+            values = [
+                notification['row_number'],
+                notification['recipient'],
+                notification['template_name'],
+                notification['template_type'],
+                notification['job_name'],
+                notification['status'],
+                notification['created_at']
+            ]
+            line = ','.join([str(i) for i in values]) + '\n'
             yield line
 
         if notifications_resp['links'].get('next'):
-            current_app.logger.info('Next link exists')
-            current_app.logger.info('Notification response links: {}'.format(notifications_resp['links']))
-            current_app.logger.info('Current page {}'.format(kwargs['page']))
             kwargs['page'] += 1
         else:
-            current_app.logger.info('No next link exists')
-            current_app.logger.info('Notification response links: {}'.format(notifications_resp['links']))
-            current_app.logger.info('Current page {}'.format(kwargs['page']))
             return
-
-
-def format_notification_for_csv(notification):
-    from app import format_datetime_24h, format_notification_status
-    #  row_number can be 0 so we need to check for it
-    row_num = notification.get('job_row_number')
-    row_num = '' if row_num is None else row_num + 1
-    current_app.logger.info('Row number for job: {}'.format(row_num))
-
-    return {
-        'Row number': row_num,
-        'Recipient': notification['to'],
-        'Template': notification['template']['name'],
-        'Type': notification['template']['template_type'],
-        'Job': notification['job']['original_file_name'] if notification['job'] else '',
-        'Status': format_notification_status(notification['status'], notification['template']['template_type']),
-        'Time': format_datetime_24h(notification['created_at'])
-    }
 
 
 def get_page_from_request():
