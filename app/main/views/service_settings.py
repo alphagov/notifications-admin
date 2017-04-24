@@ -45,7 +45,7 @@ def service_settings(service_id):
         'views/service-settings.html',
         organisation=organisation,
         letter_branding=letter_branding_organisations.get(
-            current_service.get('dvla_org_id', '001')
+            current_service.get('dvla_organisation', '001')
         )
     )
 
