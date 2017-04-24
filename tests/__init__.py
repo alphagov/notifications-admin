@@ -72,7 +72,8 @@ def service_json(
         'organisation': organisation,
         'branding': branding,
         'created_at': created_at or str(datetime.utcnow()),
-        'letter_contact_block': letter_contact_block
+        'letter_contact_block': letter_contact_block,
+        'dvla_organisation': '001',
     }
 
 

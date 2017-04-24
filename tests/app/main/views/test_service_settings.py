@@ -10,23 +10,46 @@ import app
 from app.utils import email_safe
 from tests import validate_route_permission, service_json
 
+from tests.conftest import active_user_with_permissions, platform_admin_user
 
+
+@pytest.mark.parametrize('user, expected_rows', [
+    (active_user_with_permissions, [
+        'Label Value Action',
+        'Service name service one Change',
+        'Email reply to address None Change',
+        'Text message sender 40604 Change'
+    ]),
+    (platform_admin_user, [
+        'Label Value Action',
+        'Service name service one Change',
+        'Email reply to address None Change',
+        'Text message sender 40604 Change',
+        'Label Value Action',
+        'Email branding GOV.UK Change',
+        'Letter branding HM Government Change',
+    ]),
+])
 def test_should_show_overview(
-    logged_in_client,
+    client,
+    mocker,
     service_one,
+    fake_uuid,
+    mock_get_letter_organisations,
+    user,
+    expected_rows,
 ):
-    response = logged_in_client.get(url_for(
+    client.login(user(fake_uuid), mocker, service_one)
+    response = client.get(url_for(
         'main.service_settings', service_id=service_one['id']
     ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find('h1').text == 'Settings'
-    for index, row in enumerate([
-        'Service name service one Change',
-        'Email reply to address None Change',
-        'Text message sender 40604 Change'
-    ]):
-        assert row == " ".join(page.find_all('tr')[index + 1].text.split())
+    rows = page.find_all('tr')
+    assert len(rows) == len(expected_rows)
+    for index, row in enumerate(expected_rows):
+        assert row == " ".join(rows[index].text.split())
     app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
@@ -36,6 +59,7 @@ def test_should_show_overview_for_service_with_more_things_set(
     mocker,
     service_with_reply_to_addresses,
     mock_get_organisation,
+    mock_get_letter_organisations,
 ):
     client.login(active_user_with_permissions, mocker, service_with_reply_to_addresses)
     response = client.get(url_for(
@@ -53,6 +77,7 @@ def test_should_show_overview_for_service_with_more_things_set(
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
     logged_in_client,
     service_one,
+    mock_get_letter_organisations,
 ):
     response = logged_in_client.get(url_for(
         'main.service_settings', service_id=service_one['id']
@@ -63,7 +88,8 @@ def test_if_cant_send_letters_then_cant_see_letter_contact_block(
 def test_letter_contact_block_shows_None_if_not_set(
     logged_in_client,
     service_one,
-    mocker
+    mocker,
+    mock_get_letter_organisations,
 ):
     service_one['can_send_letters'] = True
     response = logged_in_client.get(url_for(
@@ -80,6 +106,7 @@ def test_escapes_letter_contact_block(
     logged_in_client,
     service_one,
     mocker,
+    mock_get_letter_organisations,
 ):
     service_one['can_send_letters'] = True
     service_one['letter_contact_block'] = 'foo\nbar<script>alert(1);</script>'
@@ -126,6 +153,7 @@ def test_should_redirect_after_change_service_name(
 def test_show_restricted_service(
     logged_in_client,
     service_one,
+    mock_get_letter_organisations,
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -154,7 +182,8 @@ def test_switch_service_to_live(
 def test_show_live_service(
     logged_in_client,
     service_one,
-    mock_get_live_service
+    mock_get_live_service,
+    mock_get_letter_organisations,
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -274,6 +303,7 @@ def test_should_redirect_after_request_to_go_live(
     active_user_with_permissions,
     service_one,
     mocker,
+    mock_get_letter_organisations,
 ):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
@@ -365,6 +395,7 @@ def test_route_permissions(
     client,
     api_user_active,
     service_one,
+    mock_get_letter_organisations,
     route,
 ):
     validate_route_permission(
@@ -419,6 +450,7 @@ def test_route_for_platform_admin(
     client,
     platform_admin_user,
     service_one,
+    mock_get_letter_organisations,
     route,
 ):
     validate_route_permission(mocker,
@@ -442,6 +474,7 @@ def test_route_for_platform_admin_update_service(
     client,
     platform_admin_user,
     service_one,
+    mock_get_letter_organisations,
     route,
 ):
     mocker.patch('app.service_api_client.archive_service')
@@ -459,6 +492,7 @@ def test_set_reply_to_email_address(
     logged_in_client,
     mock_update_service,
     service_one,
+    mock_get_letter_organisations,
 ):
     data = {"email_address": "test@someservice.gov.uk"}
     response = logged_in_client.post(url_for('main.service_set_reply_to_email', service_id=service_one['id']),
@@ -528,6 +562,7 @@ def test_shows_research_mode_indicator(
     logged_in_client,
     service_one,
     mocker,
+    mock_get_letter_organisations,
 ):
     service_one['research_mode'] = True
     mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
@@ -543,6 +578,7 @@ def test_shows_research_mode_indicator(
 def test_does_not_show_research_mode_indicator(
     logged_in_client,
     service_one,
+    mock_get_letter_organisations,
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     assert response.status_code == 200
@@ -556,6 +592,7 @@ def test_set_text_message_sender(
     logged_in_client,
     mock_update_service,
     service_one,
+    mock_get_letter_organisations,
 ):
     data = {"sms_sender": "elevenchars"}
     response = logged_in_client.post(url_for('main.service_set_sms_sender', service_id=service_one['id']),
@@ -660,10 +697,53 @@ def test_set_letter_contact_block_has_max_10_lines(
     assert error_message == 'Contains 11 lines, maximum is 10'
 
 
+def test_set_letter_branding_platform_admin_only(
+    logged_in_client,
+    service_one,
+):
+    response = logged_in_client.get(url_for('main.set_letter_branding', service_id=service_one['id']))
+    assert response.status_code == 403
+
+
+@pytest.mark.parametrize('current_dvla_org_id, expected_selected', [
+    (None, '001'),
+    ('500', '500'),
+])
+def test_set_letter_branding_prepopulates(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_get_letter_organisations,
+    current_dvla_org_id,
+    expected_selected,
+):
+    if current_dvla_org_id:
+        service_one['dvla_organisation'] = current_dvla_org_id
+    response = logged_in_platform_admin_client.get(url_for('main.set_letter_branding', service_id=service_one['id']))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select('input[checked]')[0]['value'] == expected_selected
+
+
+def test_set_letter_contact_block_saves(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_update_service,
+    mock_get_letter_organisations,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for('main.set_letter_branding', service_id=service_one['id']),
+        data={'dvla_org_id': '500'}
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    mock_update_service.assert_called_once_with(service_one['id'], dvla_organisation='500')
+
+
 def test_should_show_branding(
     logged_in_platform_admin_client,
     service_one,
-    mock_get_organisations
+    mock_get_organisations,
+    mock_get_letter_organisations,
 ):
     response = logged_in_platform_admin_client.get(url_for(
         'main.service_set_branding_and_org', service_id=service_one['id']
@@ -783,6 +863,7 @@ def test_archive_service_prompts_user(
     logged_in_platform_admin_client,
     service_one,
     mocker,
+    mock_get_letter_organisations,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
 
@@ -797,6 +878,7 @@ def test_archive_service_prompts_user(
 def test_cant_archive_inactive_service(
     logged_in_platform_admin_client,
     service_one,
+    mock_get_letter_organisations,
 ):
     service_one['active'] = False
 
@@ -825,6 +907,7 @@ def test_suspend_service_prompts_user(
     logged_in_platform_admin_client,
     service_one,
     mocker,
+    mock_get_letter_organisations,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
 
@@ -840,6 +923,7 @@ def test_suspend_service_prompts_user(
 def test_cant_suspend_inactive_service(
     logged_in_platform_admin_client,
     service_one,
+    mock_get_letter_organisations,
 ):
     service_one['active'] = False
 
@@ -869,6 +953,7 @@ def test_resume_service_prompts_user(
     logged_in_platform_admin_client,
     service_one,
     mocker,
+    mock_get_letter_organisations,
 ):
     service_one['active'] = False
     mocked_fn = mocker.patch('app.service_api_client.post')
@@ -885,6 +970,7 @@ def test_resume_service_prompts_user(
 def test_cant_resume_active_service(
     logged_in_platform_admin_client,
     service_one,
+    mock_get_letter_organisations,
 ):
     response = logged_in_platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
 

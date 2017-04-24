@@ -28,7 +28,8 @@ def test_from_database_object_makes_request(mocker, client):
     data = {
         'letter_contact_block': '123',
         'template': 'foo',
-        'values': None
+        'values': None,
+        'dvla_org_id': '123',
     }
     headers = {'Authorization': 'Token my-secret-key'}
 

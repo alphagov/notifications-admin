@@ -1358,6 +1358,19 @@ def mock_get_organisations(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_letter_organisations(mocker):
+    def _get_organisations():
+        return {
+            '001': 'HM Government',
+            '500': 'Land Registry',
+        }
+
+    return mocker.patch(
+        'app.organisations_client.get_letter_organisations', side_effect=_get_organisations
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_organisation(mocker):
     def _get_organisation(id):
         return {

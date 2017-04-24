@@ -103,6 +103,11 @@
           {% endcall %}
           {{ edit_field('Change', url_for('.service_set_branding_and_org', service_id=current_service.id)) }}
         {% endcall %}
+        {% call row() %}
+          {{ text_field('Letter branding')}}
+          {{ text_field(letter_branding) }}
+          {{ edit_field('Change', url_for('.set_letter_branding', service_id=current_service.id)) }}
+        {% endcall %}
       {% endcall %}
 
       <ul>
