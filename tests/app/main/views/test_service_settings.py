@@ -417,6 +417,7 @@ def test_route_permissions(
     'main.service_switch_live',
     'main.service_switch_research_mode',
     'main.service_switch_can_send_letters',
+    'main.service_switch_can_send_international_sms',
     'main.archive_service',
 ])
 def test_route_invalid_permissions(
@@ -467,6 +468,7 @@ def test_route_for_platform_admin(
     'main.service_switch_live',
     'main.service_switch_research_mode',
     'main.service_switch_can_send_letters',
+    'main.service_switch_can_send_international_sms',
 ])
 def test_route_for_platform_admin_update_service(
     mocker,
