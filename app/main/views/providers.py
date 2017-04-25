@@ -16,12 +16,20 @@ from app import provider_client
 @user_has_permissions(admin_override=True)
 def view_providers():
     providers = provider_client.get_all_providers()['provider_details']
-    email_providers = [email for email in providers if email['notification_type'] == 'email']
-    sms_providers = [sms for sms in providers if sms['notification_type'] == 'sms']
+    domestic_email_providers, domestic_sms_providers, intl_sms_providers = [], [], []
+    for provider in providers:
+        if provider['notification_type'] == 'sms':
+            domestic_sms_providers.append(provider)
+            if provider['supports_international']:
+                intl_sms_providers.append(provider)
+        elif provider['notification_type'] == 'email':
+            domestic_email_providers.append(provider)
+
     return render_template(
         'views/providers/providers.html',
-        email_providers=email_providers,
-        sms_providers=sms_providers
+        email_providers=domestic_email_providers,
+        domestic_sms_providers=domestic_sms_providers,
+        intl_sms_providers=intl_sms_providers
     )
 
 

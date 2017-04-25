@@ -13,8 +13,8 @@ stub_providers = {
             'id': '6005e192-4738-4962-beec-ebd982d0b03f',
             'active': True,
             'priority': 1,
-            'display_name': 'first_sms_provider',
-            'identifier': 'first_sms',
+            'display_name': 'Domestic SMS Provider',
+            'identifier': 'first_sms_domestic',
             'notification_type': 'sms',
             'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
             'version': 1,
@@ -22,18 +22,20 @@ stub_providers = {
                 'email_address': 'test@foo.bar',
                 'name': 'Test User',
                 'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
-            }
+            },
+            'supports_international': False
         },
         {
             'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
             'active': True,
             'priority': 2,
-            'display_name': 'second_sms_provider',
-            'identifier': 'second_sms',
+            'display_name': 'Second Domestic SMS Provider',
+            'identifier': 'second_sms_domestic',
             'notification_type': 'sms',
             'updated_at': None,
             'version': 1,
-            'created_by': None
+            'created_by': None,
+            'supports_international': False
         },
         {
             'id': '6005e192-4738-4962-beec-ebd982d0b03a',
@@ -44,7 +46,8 @@ stub_providers = {
             'notification_type': 'email',
             'updated_at': None,
             'version': 1,
-            'created_by': None
+            'created_by': None,
+            'supports_international': False
         },
         {
             'active': True,
@@ -55,8 +58,21 @@ stub_providers = {
             'notification_type': 'email',
             'updated_at': None,
             'version': 1,
-            'created_by': None
-        }
+            'created_by': None,
+            'supports_international': False
+        },
+        {
+            'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
+            'active': False,
+            'priority': 10,
+            'display_name': 'First International SMS Provider',
+            'identifier': 'first_sms_international',
+            'notification_type': 'sms',
+            'updated_at': None,
+            'version': 1,
+            'created_by': None,
+            'supports_international': True
+        },
     ]
 }
 
@@ -66,12 +82,13 @@ stub_provider = {
             'id': '6005e192-4738-4962-beec-ebd982d0b03f',
             'active': True,
             'priority': 1,
-            'display_name': 'first_sms_provider',
-            'identifier': 'first_sms',
+            'display_name': 'Domestic SMS Provider',
+            'identifier': 'first_sms_domestic',
             'notification_type': 'sms',
             'updated_at': None,
             'version': 1,
-            'created_by': None
+            'created_by': None,
+            'supports_international': False
         }
 }
 
@@ -90,7 +107,8 @@ stub_provider_history = {
                 'email_address': 'test@foo.bar',
                 'name': 'Test User',
                 'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
-            }
+            },
+            'supports_international': False
         },
         {
             'id': 'f9af1ec7-58ef-4f7d-a6f4-5fe7e48644cb',
@@ -101,7 +119,8 @@ stub_provider_history = {
             'notification_type': 'sms',
             'updated_at': None,
             'version': 1,
-            'created_by': None
+            'created_by': None,
+            'supports_international': False
         }
     ]
 }
@@ -128,54 +147,68 @@ def test_should_show_all_providers(
     assert 'SMS' in h2
 
     tables = page.find_all('table')
-    assert len(tables) == 2
+    assert len(tables) == 3
 
-    sms_table = tables[0]
-    email_table = tables[1]
+    domestic_sms_table = tables[0]
+    domestic_email_table = tables[1]
+    international_sms_table = tables[2]
 
-    sms_first_row = sms_table.tbody.find_all('tr')[0]
-    table_data = sms_first_row.find_all('td')
+    domestic_sms_first_row = domestic_sms_table.tbody.find_all('tr')[0]
+    table_data = domestic_sms_first_row.find_all('td')
 
     assert table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f'
-    assert table_data[0].text.strip() == "first_sms_provider"
+    assert table_data[0].text.strip() == "Domestic SMS Provider"
     assert table_data[1].text.strip() == "1"
     assert table_data[2].text.strip() == "True"
     assert table_data[3].text.strip() == "16 January at 3:20pm"
     assert table_data[4].text.strip() == "Test User"
     assert table_data[5].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f/edit'
 
-    sms_second_row = sms_table.tbody.find_all('tr')[1]
-    table_data = sms_second_row.find_all('td')
+    domestic_sms_second_row = domestic_sms_table.tbody.find_all('tr')[1]
+    table_data = domestic_sms_second_row.find_all('td')
 
     assert table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f'
-    assert table_data[0].text.strip() == "second_sms_provider"
+    assert table_data[0].text.strip() == "Second Domestic SMS Provider"
     assert table_data[1].text.strip() == "2"
     assert table_data[2].text.strip() == "True"
     assert table_data[3].text.strip() == "None"
     assert table_data[4].text.strip() == "None"
     assert table_data[5].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f/edit'
 
-    email_first_row = email_table.tbody.find_all('tr')[0]
-    email_table_data = email_first_row.find_all('td')
+    domestic_email_first_row = domestic_email_table.tbody.find_all('tr')[0]
+    domestic_email_table_data = domestic_email_first_row.find_all('td')
 
-    assert email_table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03a'
-    assert email_table_data[0].text.strip() == "first_email_provider"
-    assert email_table_data[1].text.strip() == "1"
-    assert email_table_data[2].text.strip() == "True"
-    assert email_table_data[3].text.strip() == "None"
-    assert email_table_data[4].text.strip() == "None"
-    assert email_table_data[5].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03a/edit'
+    assert domestic_email_table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03a'
+    assert domestic_email_table_data[0].text.strip() == "first_email_provider"
+    assert domestic_email_table_data[1].text.strip() == "1"
+    assert domestic_email_table_data[2].text.strip() == "True"
+    assert domestic_email_table_data[3].text.strip() == "None"
+    assert domestic_email_table_data[4].text.strip() == "None"
+    assert domestic_email_table_data[5].find_all("a")[0]['href'] \
+        == '/provider/6005e192-4738-4962-beec-ebd982d0b03a/edit'
 
-    email_second_row = email_table.tbody.find_all('tr')[1]
-    email_table_data = email_second_row.find_all('td')
+    domestic_email_second_row = domestic_email_table.tbody.find_all('tr')[1]
+    domestic_email_table_data = domestic_email_second_row.find_all('td')
 
-    assert email_table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b'
-    assert email_table_data[0].text.strip() == "second_email_provider"
-    assert email_table_data[1].text.strip() == "2"
-    assert email_table_data[2].text.strip() == "True"
-    assert email_table_data[3].text.strip() == "None"
-    assert email_table_data[4].text.strip() == "None"
-    assert email_table_data[5].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b/edit'
+    assert domestic_email_table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b'
+    assert domestic_email_table_data[0].text.strip() == "second_email_provider"
+    assert domestic_email_table_data[1].text.strip() == "2"
+    assert domestic_email_table_data[2].text.strip() == "True"
+    assert domestic_email_table_data[3].text.strip() == "None"
+    assert domestic_email_table_data[4].text.strip() == "None"
+    assert domestic_email_table_data[5].find_all("a")[0]['href'] \
+        == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b/edit'
+
+    international_sms_first_row = international_sms_table.tbody.find_all('tr')[0]
+    table_data = international_sms_first_row.find_all('td')
+
+    assert table_data[0].find_all("a")[0]['href'] == '/provider/67c770f5-918e-4afa-a5ff-880b9beb161d'
+    assert table_data[0].text.strip() == "First International SMS Provider"
+    assert table_data[1].text.strip() == "10"
+    assert table_data[2].text.strip() == "False"
+    assert table_data[3].text.strip() == "None"
+    assert table_data[4].text.strip() == "None"
+    assert table_data[5].find_all("a")[0]['href'] == '/provider/67c770f5-918e-4afa-a5ff-880b9beb161d/edit'
 
 
 def test_should_show_edit_provider_form(
@@ -192,7 +225,7 @@ def test_should_show_edit_provider_form(
 
     h1 = [header.text.strip() for header in page.find_all('h1')]
 
-    assert 'first_sms_provider' in h1
+    assert 'Domestic SMS Provider' in h1
 
     form = [form for form in page.find_all('form')]
 

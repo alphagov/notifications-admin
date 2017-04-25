@@ -15,8 +15,8 @@ Providers
         <h2 class="heading-medium">SMS</h2>
 
         {% call(item, row_number) list_table(
-            sms_providers,
-            caption="SMS providers",
+            domestic_sms_providers,
+            caption="Domestic SMS providers",
             caption_visible=False,
             empty_message='No email providers',
             field_headings=['Provider', 'Priority', 'Active', 'Last Updated', 'Updated By'],
@@ -50,6 +50,39 @@ Providers
         {% call(item, row_number) list_table(
             email_providers,
             caption="Email providers",
+            caption_visible=False,
+            empty_message='No email providers',
+            field_headings=['Provider', 'Priority', 'Active', 'Last Updated', 'Updated By'],
+            field_headings_visible=True
+        ) %}
+
+            {{ link_field(item.display_name, url_for('main.view_provider', provider_id=item.id)) }}
+
+            {{ text_field(item.priority) }}
+
+            {{ text_field(item.active) }}
+
+            {% if item.updated_at %}
+                {{ text_field(item.updated_at|format_datetime_short) }}
+            {% else %}
+                {{ text_field('None') }}
+            {% endif %}
+
+            {% if item.created_by %}
+                {{ text_field(item.created_by.name) }}
+            {% else %}
+                {{ text_field('None') }}
+            {% endif %}
+
+            {{ link_field('change', url_for('main.edit_provider', provider_id=item.id)) }}
+
+        {% endcall %}
+
+        <h1 class="heading-large">International SMS Providers</h1>
+
+        {% call(item, row_number) list_table(
+            intl_sms_providers,
+            caption="International SMS providers",
             caption_visible=False,
             empty_message='No email providers',
             field_headings=['Provider', 'Priority', 'Active', 'Last Updated', 'Updated By'],
