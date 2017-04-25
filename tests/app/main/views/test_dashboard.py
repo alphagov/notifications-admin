@@ -240,6 +240,83 @@ def test_usage_page(
     assert '206,246 text messages at 1.65p' in table
 
 
+@freeze_time("2012-03-31 12:12:12")
+def test_international_usage_page(
+    logged_in_client,
+    mock_get_international_usage,
+    mock_get_billable_international_units,
+):
+    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID))
+
+    assert response.status_code == 200
+
+    mock_get_billable_international_units.assert_called_once_with(SERVICE_ONE_ID, 2011)
+    mock_get_international_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    cols = page.find_all('div', {'class': 'column-half'})
+    nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
+    nav_links = nav.find_all('a')
+
+    assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
+    assert normalize_spaces(nav.find('li', {'aria-selected': 'true'}).text) == '2011 to 2012 financial year'
+    assert normalize_spaces(nav_links[1].text) == '2012 to 2013 financial year'
+
+    assert '0' in cols[0].text
+    assert 'Emails' in cols[0].text
+
+    assert '252,390' in cols[1].text
+    assert 'Text messages' in cols[1].text
+
+    table = page.find('table').text.strip()
+
+    print(table)
+
+    assert '249,900 UK free text messages' in table
+    assert '100 international free text messages' in table
+    assert '900 international text messages at 1.65p' in table
+    assert 'April' in table
+    assert 'March' in table
+    assert '£20.30' in table
+    assert '£19.14' in table
+
+
+@freeze_time("2012-03-31 12:12:12")
+def test_international_usage_page(
+    logged_in_client,
+    mock_get_international_usage,
+    mock_get_billable_international_units,
+):
+    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID))
+
+    assert response.status_code == 200
+
+    mock_get_billable_international_units.assert_called_once_with(SERVICE_ONE_ID, 2011)
+    mock_get_international_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    cols = page.find_all('div', {'class': 'column-half'})
+    nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
+    nav_links = nav.find_all('a')
+
+    assert '252,390' in cols[1].text
+    assert 'Text messages' in cols[1].text
+
+    table = page.find('table').text.strip()
+
+    print(table)
+
+    assert '249,900 UK free text messages' in table
+    assert '100 international free text messages' in table
+    assert '900 international text messages at 1.65p' in table
+    assert 'April' in table
+    assert 'March' in table
+    assert '£20.30' in table
+    assert '£19.14' in table
+
+
 def test_usage_page_with_year_argument(
     logged_in_client,
     mock_get_usage,

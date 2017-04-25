@@ -1337,6 +1337,80 @@ def mock_get_billable_units(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_international_usage(mocker, service_one, fake_uuid):
+    def _get_usage(service_id, year=None):
+        return {'data': {
+            "sms_count": 252390,
+            "email_count": 0
+        }}
+
+    return mocker.patch(
+        'app.service_api_client.get_service_usage', side_effect=_get_usage)
+
+
+@pytest.fixture(scope='function')
+def mock_get_billable_international_units(mocker):
+    def _get_usage(service_id, year):
+        return {
+            "April": [
+                {
+                    "international": False,
+                    "rate": 1.65,
+                    "multiplier": 1,
+                    "units": 249900
+                },
+                {
+                    "international": True,
+                    "rate": 1.65,
+                    "multiplier": 1,
+                    "units": 1000
+                },
+                {
+                    "international": True,
+                    "rate": 1.65,
+                    "multiplier": 2,
+                    "units": 100
+                },
+                {
+                    "international": True,
+                    "rate": 1.65,
+                    "multiplier": 3,
+                    "units": 20
+                },
+            ],
+            "March": [
+                {
+                    "international": False,
+                    "rate": 1.65,
+                    "multiplier": 1,
+                    "units": 1000
+                },
+                {
+                    "international": True,
+                    "rate": 1.65,
+                    "multiplier": 1,
+                    "units": 100
+                },
+                {
+                    "international": True,
+                    "rate": 1.65,
+                    "multiplier": 2,
+                    "units": 50
+                },
+                {
+                    "international": True,
+                    "rate": 1.65,
+                    "multiplier": 3,
+                    "units": 10
+                },
+            ]
+        }
+
+    return mocker.patch(
+        'app.service_api_client.get_billable_units', side_effect=_get_usage)
+
+
+@pytest.fixture(scope='function')
 def mock_events(mocker):
     def _create_event(event_type, event_data):
         return {'some': 'data'}

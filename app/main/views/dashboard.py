@@ -262,20 +262,55 @@ def get_months_for_year(start, end, year):
     return [datetime(year, month, 1) for month in range(start, end)]
 
 
+def get_total_units_for_month(monthly_usage):
+    total = 0
+    for rate_group in monthly_usage:
+        total += rate_group['units'] * rate_group['multiplier']
+    return total
+
+
 def get_free_paid_breakdown_for_billable_units(year, billable_units):
     cumulative = 0
     for month in get_months_for_financial_year(year):
         previous_cumulative = cumulative
-        monthly_usage = billable_units.get(month, 0)
+        monthly_usage = get_total_units_for_month(billable_units.get(month, []))
         cumulative += monthly_usage
         breakdown = get_free_paid_breakdown_for_month(
-            cumulative, previous_cumulative, monthly_usage
+            cumulative, previous_cumulative, billable_units.get(month, [])
         )
         yield {
             'name': month,
             'paid': breakdown['paid'],
-            'free': breakdown['free']
+            'free': breakdown['free'],
+            'rate_groups': breakdown['rate_groups']
         }
+
+
+def get_rate_groups(monthly_usage, free_allowance=0):
+    rate_groups = []
+
+    for rate_group in monthly_usage:
+        free_units = 0
+        units = rate_group["units"]
+        if free_allowance > 0:
+            units = rate_group["units"] * rate_group["multiplier"] - free_allowance
+            if units < 0:
+                free_units = rate_group["units"] * rate_group["multiplier"]
+                free_allowance = abs(units)
+                units = 0
+            else:
+                free_units = free_allowance
+                free_allowance = 0
+
+        rate_group = {
+            "international": rate_group["international"],
+            "free_units": free_units,
+            "units": units,
+            "multiplier": rate_group["multiplier"]
+        }
+        rate_groups.append(rate_group)
+
+    return rate_groups
 
 
 def get_free_paid_breakdown_for_month(
@@ -285,20 +320,25 @@ def get_free_paid_breakdown_for_month(
 ):
     allowance = 250000
 
+    total_monthly_units = get_total_units_for_month(monthly_usage)
+
     if cumulative < allowance:
         return {
             'paid': 0,
-            'free': monthly_usage,
+            'free': total_monthly_units,
         }
     elif previous_cumulative < allowance:
+        remaining_allowance = allowance - previous_cumulative
         return {
-            'paid': monthly_usage - (allowance - previous_cumulative),
-            'free': allowance - previous_cumulative
+            'paid': total_monthly_units - remaining_allowance,
+            'free': remaining_allowance,
+            'rate_groups': get_rate_groups(monthly_usage, remaining_allowance)
         }
     else:
         return {
-            'paid': monthly_usage,
-            'free': 0
+            'paid': total_monthly_units,
+            'free': 0,
+            'rate_groups': get_rate_groups(monthly_usage)
         }
 
 

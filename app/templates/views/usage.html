@@ -82,12 +82,22 @@
                 smallest=True
               ) }}
               <ul>
-              {% if month.free %}
-                <li class="tabular-numbers">{{ "{:,}".format(month.free) }} free text messages</li>
-              {% endif %}
-              {% if month.paid %}
-                <li class="tabular-numbers">{{ "{:,}".format(month.paid) }} text messages at
-                {{- ' {:.2f}p'.format(sms_rate * 100) }}</li>
+              {% if month.rate_groups %}
+                rate_group {{ month.rate_groups|length }}
+                {% for rate in month.rate_groups %}
+                  {% if rate.free_units %}
+                  <li class="tabular-numbers">{{ "{:,}".format(rate.free_units) }} {% if rate.international %}international{% else %}UK{% endif %} free text messages</li>                  
+                  {% endif %}
+                  {% if rate.units %}
+                  <li class="tabular-numbers">{{ "{:,}".format(rate.units) }} {% if rate.international %}international{% else %}UK{% endif %} text messages at
+                  {{- ' {:.2f}p'.format(rate.multiplier * sms_rate * 100) }}</li>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                {% if month.paid %}
+                  <li class="tabular-numbers">{{ "{:,}".format(month.paid) }} text messages at
+                  {{- ' {:.2f}p'.format(sms_rate * 100) }}</li>
+                {% endif %}
               {% endif %}
               {% if not (month.free or month.paid) %}
                 <li aria-hidden="true">–</li>
