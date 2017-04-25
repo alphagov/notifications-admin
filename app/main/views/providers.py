@@ -20,7 +20,7 @@ def view_providers():
     for provider in providers:
         if provider['notification_type'] == 'sms':
             domestic_sms_providers.append(provider)
-            if provider['supports_international']:
+            if provider.get('supports_international', None):
                 intl_sms_providers.append(provider)
         elif provider['notification_type'] == 'email':
             domestic_email_providers.append(provider)

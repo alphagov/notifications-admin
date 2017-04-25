@@ -73,6 +73,17 @@ stub_providers = {
             'created_by': None,
             'supports_international': True
         },
+        {
+            'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
+            'active': False,
+            'priority': 10,
+            'display_name': 'International SMS Provider (no flag)',
+            'identifier': 'second_sms_international',
+            'notification_type': 'sms',
+            'updated_at': None,
+            'version': 1,
+            'created_by': None,
+        }
     ]
 }
 
