@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from tests.conftest import mock_get_user
 from tests import service_json
 
-from app.main.views.platform_admin import format_stats_by_service, create_global_stats
+from app.main.views.platform_admin import format_stats_by_service, create_global_stats, sum_service_usage
 
 
 def test_should_redirect_if_not_logged_in(
@@ -347,3 +347,92 @@ def test_should_show_correct_sent_totals_for_platform_admin(
 
     assert email_total == 60
     assert sms_total == 40
+
+
+@pytest.mark.parametrize('restricted, table_index, research_mode', [
+    (True, 1, False),
+    (False, 0, False)
+])
+def test_should_order_services_by_usage_with_inactive_last(
+    restricted,
+    table_index,
+    research_mode,
+    client,
+    platform_admin_user,
+    mocker,
+    mock_get_detailed_services,
+    fake_uuid,
+):
+    services = [
+        service_json(fake_uuid, 'My Service 1', [], restricted=restricted, research_mode=research_mode),
+        service_json(fake_uuid, 'My Service 2', [], restricted=restricted, research_mode=research_mode),
+        service_json(fake_uuid, 'My Service 3', [], restricted=restricted, research_mode=research_mode, active=False)
+    ]
+    services[0]['statistics'] = create_stats(
+        emails_requested=100,
+        emails_delivered=25,
+        emails_failed=25,
+        sms_requested=100,
+        sms_delivered=25,
+        sms_failed=25
+    )
+
+    services[1]['statistics'] = create_stats(
+        emails_requested=200,
+        emails_delivered=50,
+        emails_failed=50,
+        sms_requested=200,
+        sms_delivered=50,
+        sms_failed=50
+    )
+
+    services[2]['statistics'] = create_stats(
+        emails_requested=200,
+        emails_delivered=50,
+        emails_failed=50,
+        sms_requested=200,
+        sms_delivered=50,
+        sms_failed=50
+    )
+
+    mock_get_detailed_services.return_value = {'data': services}
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin'))
+
+    assert response.status_code == 200
+    mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    table_body = page.find_all('table')[table_index].find_all('tbody')[0]
+    services = [service.tr for service in table_body.find_all('tbody')]
+    assert len(services) == 3
+    assert services[0].td.text.strip() == 'My Service 2'
+    assert services[1].td.text.strip() == 'My Service 1'
+    assert services[2].td.text.strip() == 'My Service 3'
+
+
+def test_sum_service_usage_is_sum_of_all_activity(fake_uuid):
+    service = service_json(fake_uuid, 'My Service 1')
+    service['statistics'] = create_stats(
+        emails_requested=100,
+        emails_delivered=25,
+        emails_failed=25,
+        sms_requested=100,
+        sms_delivered=25,
+        sms_failed=25
+    )
+    assert sum_service_usage(service) == 200
+
+
+def test_sum_service_usage_with_zeros(fake_uuid):
+    service = service_json(fake_uuid, 'My Service 1')
+    service['statistics'] = create_stats(
+        emails_requested=0,
+        emails_delivered=0,
+        emails_failed=25,
+        sms_requested=0,
+        sms_delivered=0,
+        sms_failed=0
+    )
+    assert sum_service_usage(service) == 0

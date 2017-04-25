@@ -35,10 +35,17 @@ def platform_admin():
         form=form,
         **get_statistics(sorted(
             services,
-            key=lambda service: (service['active'], service['created_at']),
+            key=lambda service: (service['active'], sum_service_usage(service), service['created_at']),
             reverse=True
         ))
     )
+
+
+def sum_service_usage(service):
+    total = 0
+    for notification_type in service['statistics'].keys():
+        total += service['statistics'][notification_type]['requested']
+    return total
 
 
 def get_statistics(services):
