@@ -8,6 +8,7 @@ from flask import (
     url_for,
     flash,
     abort,
+    json,
 )
 from flask_login import login_required, current_user
 from dateutil.parser import parse
@@ -72,15 +73,21 @@ def choose_template(service_id):
     admin_override=True, any_=True
 )
 def view_template(service_id, template_id):
+    template = service_api_client.get_service_template(service_id, template_id)['data']
+    page_count = None
+    if template['template_type'] == 'letter':
+        page_count, _, _ = TemplatePreview.from_database_object(template, filetype='json')
+        page_count = json.loads(page_count.decode('utf-8'))['count']
     return render_template(
         'views/templates/template.html',
         template=get_template(
-            service_api_client.get_service_template(service_id, template_id)['data'],
+            template,
             current_service,
             expand_emails=True,
             letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id),
             show_recipient=True,
-        )
+            page_count=page_count,
+        ),
     )
 
 
@@ -92,7 +99,7 @@ def view_letter_template_preview(service_id, template_id, filetype):
         abort(404)
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
-    return TemplatePreview.from_database_object(db_template, filetype)
+    return TemplatePreview.from_database_object(db_template, filetype, page=request.args.get('page'))
 
 
 def _view_template_version(service_id, template_id, version, letters_as_pdf=False):

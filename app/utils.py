@@ -255,6 +255,7 @@ def get_template(
     show_recipient=False,
     expand_emails=False,
     letter_preview_url=None,
+    page_count=1,
 ):
     if 'email' == template['template_type']:
         return EmailPreviewTemplate(
@@ -276,6 +277,7 @@ def get_template(
             return LetterPDFLinkTemplate(
                 template,
                 preview_url=letter_preview_url,
+                page_count=int(page_count),
             )
         else:
             return LetterPreviewTemplate(
