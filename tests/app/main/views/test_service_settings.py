@@ -417,6 +417,7 @@ def test_route_permissions(
     'main.service_switch_live',
     'main.service_switch_research_mode',
     'main.service_switch_can_send_letters',
+    'main.service_switch_can_send_international_sms',
     'main.archive_service',
 ])
 def test_route_invalid_permissions(
@@ -467,6 +468,7 @@ def test_route_for_platform_admin(
     'main.service_switch_live',
     'main.service_switch_research_mode',
     'main.service_switch_can_send_letters',
+    'main.service_switch_can_send_international_sms',
 ])
 def test_route_for_platform_admin_update_service(
     mocker,
@@ -843,6 +845,39 @@ def test_switch_service_disable_letters(
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
     assert mocked_fn.call_args == call(service_one['id'], {"can_send_letters": False})
+
+
+def test_switch_service_enable_international_sms(
+    logged_in_platform_admin_client,
+    service_one,
+    mocker,
+):
+    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+
+    response = logged_in_platform_admin_client.get(
+        url_for('main.service_switch_can_send_international_sms', service_id=service_one['id'])
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_fn.call_args == call(service_one['id'], {'can_send_international_sms': True})
+
+
+def test_switch_service_disable_international_sms(
+    logged_in_platform_admin_client,
+    service_one,
+    mocker,
+):
+    service_one['can_send_international_sms'] = True
+    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+
+    response = logged_in_platform_admin_client.get(
+        url_for('main.service_switch_can_send_international_sms', service_id=service_one['id'])
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_fn.call_args == call(service_one['id'], {"can_send_international_sms": False})
 
 
 def test_archive_service_after_confirm(

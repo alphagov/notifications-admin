@@ -192,6 +192,17 @@ def service_switch_can_send_letters(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
+@main.route("/services/<service_id>/service-settings/can-send-international-sms")
+@login_required
+@user_has_permissions(admin_override=True)
+def service_switch_can_send_international_sms(service_id):
+    service_api_client.update_service_with_properties(
+        service_id,
+        {"can_send_international_sms": not current_service['can_send_international_sms']}
+    )
+    return redirect(url_for('.service_settings', service_id=service_id))
+
+
 @main.route("/services/<service_id>/service-settings/archive", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
