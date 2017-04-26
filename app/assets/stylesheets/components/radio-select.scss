@@ -33,6 +33,13 @@
 
   }
 
+  .js-reset-button-block {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 20px 20px $gutter 57px;
+  }
+
   .js-enabled & {
 
     overflow: visible;
