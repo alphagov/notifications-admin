@@ -9,6 +9,7 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from notifications_utils.template import LetterPreviewTemplate
+from notifications_utils.recipients import RecipientCSV
 
 from app.main.views.send import get_check_messages_back_url
 
@@ -18,6 +19,8 @@ from tests.conftest import (
     mock_get_service_template,
     mock_get_service_template_with_placeholders,
     mock_get_service_letter_template,
+    mock_get_service,
+    mock_get_international_service,
 )
 
 template_types = ['email', 'sms']
@@ -422,6 +425,42 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     assert 'Only showing the first 50 rows' in content
 
     mock_get_detailed_service_for_today.assert_called_once_with(fake_uuid)
+
+
+@pytest.mark.parametrize('service_mock, should_allow_international', [
+    (mock_get_service, False),
+    (mock_get_international_service, True),
+])
+def test_upload_csvfile_with_international_validates(
+    mocker,
+    api_user_active,
+    logged_in_client,
+    mock_get_service_template,
+    mock_s3_upload,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    fake_uuid,
+    service_mock,
+    should_allow_international,
+):
+
+    service_mock(mocker, api_user_active)
+    mocker.patch('app.main.views.send.s3download', return_value='')
+    mock_recipients = mocker.patch(
+        'app.main.views.send.RecipientCSV',
+        return_value=RecipientCSV("", template_type="sms"),
+    )
+
+    response = logged_in_client.post(
+        url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
+        data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
+        content_type='multipart/form-data',
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert mock_recipients.call_args[1]['international_sms'] == should_allow_international
 
 
 def test_test_message_can_only_be_sent_now(
