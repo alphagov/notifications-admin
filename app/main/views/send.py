@@ -60,9 +60,7 @@ def get_example_csv_fields(column_headers, use_example_as_example, submitted_fie
 def get_example_csv_rows(template, use_example_as_example=True, submitted_fields=False):
     return {
         'email': ['test@example.com'] if use_example_as_example else [current_user.email_address],
-        'sms': ['07700 900321'] if use_example_as_example else [validate_and_format_phone_number(
-            current_user.mobile_number, human_readable=True
-        )],
+        'sms': ['07700 900321'] if use_example_as_example else [current_user.mobile_number],
         'letter': [
             (submitted_fields or {}).get(
                 key, get_example_letter_address(key) if use_example_as_example else key
