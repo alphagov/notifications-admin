@@ -102,18 +102,19 @@ def template_history(service_id):
 @user_has_permissions('manage_settings', admin_override=True)
 def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
+    monthly_breakdown = get_free_paid_breakdown_for_billable_units(
+        year, service_api_client.get_billable_units(service_id, year))
     return render_template(
         'views/usage.html',
-        months=list(get_free_paid_breakdown_for_billable_units(
-            year, service_api_client.get_billable_units(service_id, year)
-        )),
+        months=list(monthly_breakdown),
         selected_year=year,
         years=get_tuples_of_financial_years(
             partial(url_for, '.usage', service_id=service_id),
             start=current_financial_year - 1,
             end=current_financial_year + 1,
         ),
-        **calculate_usage(service_api_client.get_service_usage(service_id, year)['data'])
+        # **calculate_usage(dict(monthly_breakdown))
+        **calculate_usage(service_api_client.get_service_usage(service_id, year)['data'], monthly_breakdown)
     )
 
 
@@ -201,21 +202,24 @@ def get_dashboard_totals(statistics):
     return statistics
 
 
-def calculate_usage(usage):
+def calculate_usage(usage, monthly_breakdown):
     # TODO: Don't hardcode these - get em from the API
     sms_free_allowance = 250000
     sms_rate = 0.0165
 
-    sms_sent = usage.get('sms_count', 0)
+    sms_sent = get_sum_units(usage.get('sms_breakdown', []))
     emails_sent = usage.get('email_count', 0)
-
+    sms_breakdown = get_sms_breakdown_adjusted_free_allowance(
+        usage.get('sms_breakdown', []), sms_free_allowance)
     return {
         'emails_sent': emails_sent,
         'sms_free_allowance': sms_free_allowance,
         'sms_sent': sms_sent,
         'sms_allowance_remaining': max(0, (sms_free_allowance - sms_sent)),
         'sms_chargeable': max(0, sms_sent - sms_free_allowance),
-        'sms_rate': sms_rate
+        'sms_rate': sms_rate,
+        'sms_breakdown': sms_breakdown,
+        'sms_free_units_used': usage.get('free_units_used', 0)
     }
 
 
@@ -262,18 +266,23 @@ def get_months_for_year(start, end, year):
     return [datetime(year, month, 1) for month in range(start, end)]
 
 
-def get_total_units_for_month(monthly_usage):
-    total = 0
-    for rate_group in monthly_usage:
-        total += rate_group['units'] * rate_group['multiplier']
-    return total
+def get_sum_billable_units(usage):
+    return sum(rate['units'] * rate['multiplier'] for rate in usage)
+
+
+def get_sum_units(usage):
+    return sum(rate['units'] for rate in usage)
+
+
+def get_sum_free_units(usage):
+    return sum(rate.get('free_units', 0) * rate['multiplier'] for rate in usage)
 
 
 def get_free_paid_breakdown_for_billable_units(year, billable_units):
     cumulative = 0
     for month in get_months_for_financial_year(year):
         previous_cumulative = cumulative
-        monthly_usage = get_total_units_for_month(billable_units.get(month, []))
+        monthly_usage = get_sum_billable_units(billable_units.get(month, []))
         cumulative += monthly_usage
         breakdown = get_free_paid_breakdown_for_month(
             cumulative, previous_cumulative, billable_units.get(month, [])
@@ -282,35 +291,40 @@ def get_free_paid_breakdown_for_billable_units(year, billable_units):
             'name': month,
             'paid': breakdown['paid'],
             'free': breakdown['free'],
-            'rate_groups': breakdown['rate_groups']
+            'sms_breakdown': breakdown.get('sms_breakdown', []),
+            'free_units_used': get_sum_free_units(breakdown.get('sms_breakdown', []))
         }
 
 
-def get_rate_groups(monthly_usage, free_allowance=0):
-    rate_groups = []
+def get_sms_breakdown_adjusted_free_allowance(breakdown_list, free_allowance=0):
+    sms_breakdown = []
 
-    for rate_group in monthly_usage:
+    for breakdown in breakdown_list:
         free_units = 0
-        units = rate_group["units"]
         if free_allowance > 0:
-            units = rate_group["units"] * rate_group["multiplier"] - free_allowance
-            if units < 0:
-                free_units = rate_group["units"] * rate_group["multiplier"]
-                free_allowance = abs(units)
-                units = 0
+            normalised_units = breakdown["units"] * breakdown["multiplier"]
+            billable_units = normalised_units - free_allowance
+
+            if billable_units <= 0:
+                free_units = breakdown["units"]
+                free_allowance = abs(billable_units)
             else:
-                free_units = free_allowance
-                free_allowance = 0
+                free_units = int(free_allowance / breakdown["multiplier"])
 
-        rate_group = {
-            "international": rate_group["international"],
+                if free_allowance < normalised_units:
+                    free_allowance = 0
+                else:
+                    free_allowance -= normalised_units
+
+        adj_breakdown = {
+            "international": breakdown["international"],
             "free_units": free_units,
-            "units": units,
-            "multiplier": rate_group["multiplier"]
+            "units": breakdown["units"] - free_units,
+            "multiplier": breakdown["multiplier"]
         }
-        rate_groups.append(rate_group)
+        sms_breakdown.append(adj_breakdown)
 
-    return rate_groups
+    return sms_breakdown
 
 
 def get_free_paid_breakdown_for_month(
@@ -320,25 +334,25 @@ def get_free_paid_breakdown_for_month(
 ):
     allowance = 250000
 
-    total_monthly_units = get_total_units_for_month(monthly_usage)
+    total_monthly_billable_units = get_sum_billable_units(monthly_usage)
 
     if cumulative < allowance:
         return {
             'paid': 0,
-            'free': total_monthly_units,
+            'free': total_monthly_billable_units,
         }
     elif previous_cumulative < allowance:
         remaining_allowance = allowance - previous_cumulative
         return {
-            'paid': total_monthly_units - remaining_allowance,
+            'paid': total_monthly_billable_units - remaining_allowance,
             'free': remaining_allowance,
-            'rate_groups': get_rate_groups(monthly_usage, remaining_allowance)
+            'sms_breakdown': get_sms_breakdown_adjusted_free_allowance(monthly_usage, remaining_allowance)
         }
     else:
         return {
-            'paid': total_monthly_units,
+            'paid': total_monthly_billable_units,
             'free': 0,
-            'rate_groups': get_rate_groups(monthly_usage)
+            'sms_breakdown': get_sms_breakdown_adjusted_free_allowance(monthly_usage)
         }
 
 

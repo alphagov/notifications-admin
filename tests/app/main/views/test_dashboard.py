@@ -11,6 +11,7 @@ from app.main.views.dashboard import (
     get_dashboard_totals,
     format_monthly_stats_to_list,
     get_free_paid_breakdown_for_billable_units,
+    get_sms_breakdown_adjusted_free_allowance,
     aggregate_status_types,
     format_template_stats_to_list,
     get_tuples_of_financial_years,
@@ -301,20 +302,17 @@ def test_international_usage_page(
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
     nav_links = nav.find_all('a')
 
-    assert '252,390' in cols[1].text
+    assert '252,180' in cols[1].text
     assert 'Text messages' in cols[1].text
 
     table = page.find('table').text.strip()
 
-    print(table)
-
-    assert '249,900 UK free text messages' in table
-    assert '100 international free text messages' in table
-    assert '900 international text messages at 1.65p' in table
+    assert '250000 free allowance used' in table
+    assert '20 international text at 4.95p' in table
     assert 'April' in table
     assert 'March' in table
+    assert '£0.99' in table
     assert '£20.30' in table
-    assert '£19.14' in table
 
 
 def test_usage_page_with_year_argument(
@@ -650,6 +648,89 @@ def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_mont
             {'name': 'February', 'free': 0, 'paid': 1234},
             {'name': 'March', 'free': 0, 'paid': 0}
         ][:expected_number_of_months]
+
+
+@pytest.mark.parametrize(
+    'usage, expected_breakdown', [
+        (
+            [
+                {"international": False, "multiplier": 1, "units": 240000},
+                {"international": True, "multiplier": 2, "units": 20},
+            ],
+            [
+                {'units': 0, 'free_units': 240000, 'international': False, 'multiplier': 1},
+                {'units': 0, 'free_units': 20, 'international': True, 'multiplier': 2}
+            ]
+        ),
+        (
+            [
+                {"international": False, "multiplier": 1, "units": 250000},
+                {"international": True, "multiplier": 2, "units": 20},
+            ],
+            [
+                {'units': 0, 'free_units': 250000, 'international': False, 'multiplier': 1},
+                {'units': 20, 'free_units': 0, 'international': True, 'multiplier': 2}
+            ]
+        ),
+        (
+            [
+                {"international": False, "multiplier": 1, "units": 300000},
+                {"international": True, "multiplier": 2, "units": 20},
+            ],
+            [
+                {'units': 50000, 'free_units': 250000, 'international': False, 'multiplier': 1},
+                {'units': 20, 'free_units': 0, 'international': True, 'multiplier': 2}
+            ]
+        ),
+        (
+            [
+                {"international": False, "rate": 1.65, "multiplier": 1, "units": 249700},
+                {"international": True, "rate": 1.65, "multiplier": 1, "units": 100},
+                {"international": True, "rate": 1.65, "multiplier": 2, "units": 100},
+                {"international": True, "rate": 1.65, "multiplier": 3, "units": 20},
+            ],
+            [
+                {'international': False, 'free_units': 249700, 'units': 0, 'multiplier': 1},
+                {'international': True, 'free_units': 100, 'units': 0, 'multiplier': 1},
+                {'international': True, 'free_units': 100, 'units': 0, 'multiplier': 2},
+                {'international': True, 'free_units': 0, 'units': 20, 'multiplier': 3}
+            ]
+        ),
+        (
+            [
+                {"international": False, "rate": 1.65, "multiplier": 1, "units": 249600},
+                {"international": True, "rate": 1.65, "multiplier": 1, "units": 100},
+                {"international": True, "rate": 1.65, "multiplier": 2, "units": 100},
+                {"international": True, "rate": 1.65,"multiplier": 3, "units": 20},
+            ],
+            [
+                {'units': 0, 'free_units': 249600, 'international': False, 'multiplier': 1},
+                {'units': 0, 'free_units': 100, 'international': True, 'multiplier': 1}, 
+                {'units': 0, 'free_units': 100, 'international': True, 'multiplier': 2},
+                {'units': 0, 'free_units': 20, 'international': True, 'multiplier': 3}
+            ]
+        ),
+        (
+            [
+                {"international": False, "rate": 1.65, "multiplier": 1, "units": 249800},
+                {"international": True, "rate": 1.65, "multiplier": 1, "units": 100},
+                {"international": True, "rate": 1.65, "multiplier": 2, "units": 100},
+                {"international": True, "rate": 1.65,"multiplier": 3, "units": 20},
+            ],
+            [
+                {'units': 0, 'free_units': 249800, 'international': False, 'multiplier': 1},
+                {'units': 0, 'free_units': 100, 'international': True, 'multiplier': 1}, 
+                {'units': 50, 'free_units': 50, 'international': True, 'multiplier': 2},
+                {'units': 20, 'free_units': 0, 'international': True, 'multiplier': 3}
+            ]
+        )
+    ]
+)
+def test_get_sms_breakdown_adjusted_free_allowance(usage, expected_breakdown):
+    free_allowance = 250000
+    breakdown = get_sms_breakdown_adjusted_free_allowance(usage, free_allowance)
+    print(breakdown)
+    assert breakdown == expected_breakdown
 
 
 def test_format_template_stats_to_list_with_no_stats():

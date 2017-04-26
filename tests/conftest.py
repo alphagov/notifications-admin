@@ -1338,9 +1338,40 @@ def mock_get_billable_units(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_international_usage(mocker, service_one, fake_uuid):
+    # def _get_usage(service_id, year=None):
+    #     return {'data': {
+    #         "sms_count": 252390,
+    #         "email_count": 0
+    #     }}
+
     def _get_usage(service_id, year=None):
         return {'data': {
-            "sms_count": 252390,
+            "sms_breakdown": [
+                {
+                    "international": False,
+                    "rate": 1.65,
+                    "multiplier": 1,
+                    "units": 250900
+                },
+                {
+                    "international": True,
+                    "rate": 1.65,
+                    "multiplier": 1,
+                    "units": 1100
+                },
+                {
+                    "international": True,
+                    "rate": 1.65,
+                    "multiplier": 2,
+                    "units": 150
+                },
+                {
+                    "international": True,
+                    "rate": 1.65,
+                    "multiplier": 3,
+                    "units": 30
+                }
+            ],
             "email_count": 0
         }}
 
@@ -1357,13 +1388,13 @@ def mock_get_billable_international_units(mocker):
                     "international": False,
                     "rate": 1.65,
                     "multiplier": 1,
-                    "units": 249900
+                    "units": 249700
                 },
                 {
                     "international": True,
                     "rate": 1.65,
                     "multiplier": 1,
-                    "units": 1000
+                    "units": 100
                 },
                 {
                     "international": True,
