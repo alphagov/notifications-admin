@@ -11,7 +11,6 @@ from app.main.views.dashboard import (
     get_dashboard_totals,
     format_monthly_stats_to_list,
     get_free_paid_breakdown_for_billable_units,
-    get_sms_breakdown_adjusted_free_allowance,
     aggregate_status_types,
     format_template_stats_to_list,
     get_tuples_of_financial_years,
@@ -224,95 +223,22 @@ def test_usage_page(
     assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
     assert normalize_spaces(nav.find('li', {'aria-selected': 'true'}).text) == '2011 to 2012 financial year'
     assert normalize_spaces(nav_links[1].text) == '2012 to 2013 financial year'
-
-    assert '123' in cols[0].text
-    assert 'Emails' in cols[0].text
-
-    assert '456,123' in cols[1].text
+    assert '252,190' in cols[1].text
     assert 'Text messages' in cols[1].text
 
     table = page.find('table').text.strip()
 
+    assert '249,860 free text messages' in table
+    assert '40 free text messages' in table
+    assert '960 text messages at 1.65p' in table
+
     assert 'April' in table
+    assert 'February' in table
     assert 'March' in table
-    assert '123 free text messages' in table
-    assert '£3,403.06' in table
-    assert '249,877 free text messages' in table
-    assert '206,246 text messages at 1.65p' in table
-
-
-@freeze_time("2012-03-31 12:12:12")
-def test_international_usage_page(
-    logged_in_client,
-    mock_get_international_usage,
-    mock_get_billable_international_units,
-):
-    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID))
-
-    assert response.status_code == 200
-
-    mock_get_billable_international_units.assert_called_once_with(SERVICE_ONE_ID, 2011)
-    mock_get_international_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    cols = page.find_all('div', {'class': 'column-half'})
-    nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
-    nav_links = nav.find_all('a')
-
-    assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
-    assert normalize_spaces(nav.find('li', {'aria-selected': 'true'}).text) == '2011 to 2012 financial year'
-    assert normalize_spaces(nav_links[1].text) == '2012 to 2013 financial year'
-
-    assert '0' in cols[0].text
-    assert 'Emails' in cols[0].text
-
-    assert '252,390' in cols[1].text
-    assert 'Text messages' in cols[1].text
-
-    table = page.find('table').text.strip()
-
-    print(table)
-
-    assert '249,900 UK free text messages' in table
-    assert '100 international free text messages' in table
-    assert '900 international text messages at 1.65p' in table
-    assert 'April' in table
-    assert 'March' in table
+    assert '£15.84' in table
+    assert '140 free text messages' in table
     assert '£20.30' in table
-    assert '£19.14' in table
-
-
-@freeze_time("2012-03-31 12:12:12")
-def test_international_usage_page(
-    logged_in_client,
-    mock_get_international_usage,
-    mock_get_billable_international_units,
-):
-    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID))
-
-    assert response.status_code == 200
-
-    mock_get_billable_international_units.assert_called_once_with(SERVICE_ONE_ID, 2011)
-    mock_get_international_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    cols = page.find_all('div', {'class': 'column-half'})
-    nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
-    nav_links = nav.find_all('a')
-
-    assert '252,180' in cols[1].text
-    assert 'Text messages' in cols[1].text
-
-    table = page.find('table').text.strip()
-
-    assert '250000 free allowance used' in table
-    assert '20 international text at 4.95p' in table
-    assert 'April' in table
-    assert 'March' in table
-    assert '£0.99' in table
-    assert '£20.30' in table
+    assert '1,230 text messages at 1.65p' in table
 
 
 def test_usage_page_with_year_argument(
@@ -627,110 +553,40 @@ def test_aggregate_status_types(dict_in, expected_failed, expected_requested):
 )
 def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_months):
     with now:
-        assert list(get_free_paid_breakdown_for_billable_units(
-            2016, {
-                'April': 100000,
-                'May': 100000,
-                'June': 100000,
-                'February': 1234
-            }
-        )) == [
-            {'name': 'April', 'free': 100000, 'paid': 0},
-            {'name': 'May', 'free': 100000, 'paid': 0},
-            {'name': 'June', 'free': 50000, 'paid': 50000},
-            {'name': 'July', 'free': 0, 'paid': 0},
-            {'name': 'August', 'free': 0, 'paid': 0},
-            {'name': 'September', 'free': 0, 'paid': 0},
-            {'name': 'October', 'free': 0, 'paid': 0},
-            {'name': 'November', 'free': 0, 'paid': 0},
-            {'name': 'December', 'free': 0, 'paid': 0},
-            {'name': 'January', 'free': 0, 'paid': 0},
-            {'name': 'February', 'free': 0, 'paid': 1234},
-            {'name': 'March', 'free': 0, 'paid': 0}
-        ][:expected_number_of_months]
-
-
-@pytest.mark.parametrize(
-    'usage, expected_breakdown', [
-        (
-            [
-                {"international": False, "multiplier": 1, "units": 240000},
-                {"international": True, "multiplier": 2, "units": 20},
-            ],
-            [
-                {'units': 0, 'free_units': 240000, 'international': False, 'multiplier': 1},
-                {'units': 0, 'free_units': 20, 'international': True, 'multiplier': 2}
-            ]
-        ),
-        (
-            [
-                {"international": False, "multiplier": 1, "units": 250000},
-                {"international": True, "multiplier": 2, "units": 20},
-            ],
-            [
-                {'units': 0, 'free_units': 250000, 'international': False, 'multiplier': 1},
-                {'units': 20, 'free_units': 0, 'international': True, 'multiplier': 2}
-            ]
-        ),
-        (
-            [
-                {"international": False, "multiplier": 1, "units": 300000},
-                {"international": True, "multiplier": 2, "units": 20},
-            ],
-            [
-                {'units': 50000, 'free_units': 250000, 'international': False, 'multiplier': 1},
-                {'units': 20, 'free_units': 0, 'international': True, 'multiplier': 2}
-            ]
-        ),
-        (
-            [
-                {"international": False, "rate": 1.65, "multiplier": 1, "units": 249700},
-                {"international": True, "rate": 1.65, "multiplier": 1, "units": 100},
-                {"international": True, "rate": 1.65, "multiplier": 2, "units": 100},
-                {"international": True, "rate": 1.65, "multiplier": 3, "units": 20},
-            ],
-            [
-                {'international': False, 'free_units': 249700, 'units': 0, 'multiplier': 1},
-                {'international': True, 'free_units': 100, 'units': 0, 'multiplier': 1},
-                {'international': True, 'free_units': 100, 'units': 0, 'multiplier': 2},
-                {'international': True, 'free_units': 0, 'units': 20, 'multiplier': 3}
-            ]
-        ),
-        (
-            [
-                {"international": False, "rate": 1.65, "multiplier": 1, "units": 249600},
-                {"international": True, "rate": 1.65, "multiplier": 1, "units": 100},
-                {"international": True, "rate": 1.65, "multiplier": 2, "units": 100},
-                {"international": True, "rate": 1.65,"multiplier": 3, "units": 20},
-            ],
-            [
-                {'units': 0, 'free_units': 249600, 'international': False, 'multiplier': 1},
-                {'units': 0, 'free_units': 100, 'international': True, 'multiplier': 1}, 
-                {'units': 0, 'free_units': 100, 'international': True, 'multiplier': 2},
-                {'units': 0, 'free_units': 20, 'international': True, 'multiplier': 3}
-            ]
-        ),
-        (
-            [
-                {"international": False, "rate": 1.65, "multiplier": 1, "units": 249800},
-                {"international": True, "rate": 1.65, "multiplier": 1, "units": 100},
-                {"international": True, "rate": 1.65, "multiplier": 2, "units": 100},
-                {"international": True, "rate": 1.65,"multiplier": 3, "units": 20},
-            ],
-            [
-                {'units': 0, 'free_units': 249800, 'international': False, 'multiplier': 1},
-                {'units': 0, 'free_units': 100, 'international': True, 'multiplier': 1}, 
-                {'units': 50, 'free_units': 50, 'international': True, 'multiplier': 2},
-                {'units': 20, 'free_units': 0, 'international': True, 'multiplier': 3}
+        billing_units = get_free_paid_breakdown_for_billable_units(
+            2016, [
+                {
+                    'month': 'April', 'international': False, 'rate_multiplier': 1,
+                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000
+                },
+                {
+                    'month': 'May', 'international': False, 'rate_multiplier': 1,
+                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000
+                },
+                {
+                    'month': 'June', 'international': False, 'rate_multiplier': 1,
+                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000
+                },
+                {
+                    'month': 'February', 'international': False, 'rate_multiplier': 1,
+                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 2000
+                },
             ]
         )
-    ]
-)
-def test_get_sms_breakdown_adjusted_free_allowance(usage, expected_breakdown):
-    free_allowance = 250000
-    breakdown = get_sms_breakdown_adjusted_free_allowance(usage, free_allowance)
-    print(breakdown)
-    assert breakdown == expected_breakdown
+        assert list(billing_units) == [
+            {'free': 100000, 'name': 'April', 'paid': 0},
+            {'free': 100000, 'name': 'May', 'paid': 0},
+            {'free': 50000, 'name': 'June', 'paid': 50000},
+            {'free': 0, 'name': 'July', 'paid': 0},
+            {'free': 0, 'name': 'August', 'paid': 0},
+            {'free': 0, 'name': 'September', 'paid': 0},
+            {'free': 0, 'name': 'October', 'paid': 0},
+            {'free': 0, 'name': 'November', 'paid': 0},
+            {'free': 0, 'name': 'December', 'paid': 0},
+            {'free': 0, 'name': 'January', 'paid': 0},
+            {'free': 0, 'name': 'February', 'paid': 2000},
+            {'free': 0, 'name': 'March', 'paid': 0}
+        ][:expected_number_of_months]
 
 
 def test_format_template_stats_to_list_with_no_stats():

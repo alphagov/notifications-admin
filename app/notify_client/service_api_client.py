@@ -217,7 +217,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     def get_service_usage(self, service_id, year=None):
         return self.get(
-            '/service/{0}/fragment/aggregate_statistics'.format(service_id),
+            '/service/{0}/yearly-usage'.format(service_id),
             params=dict(year=year)
         )
 
@@ -231,7 +231,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.put(url='/service/{}/whitelist'.format(service_id), data=data)
 
     def get_billable_units(self, service_id, year):
-        return self.get(url='/service/{}/billable-units?year={}'.format(service_id, year))
+        return self.get(
+            '/service/{0}/monthly-usage'.format(service_id),
+            params=dict(year=year)
+        )
 
 
 class ServicesBrowsableItem(BrowsableItem):

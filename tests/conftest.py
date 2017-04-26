@@ -1315,10 +1315,18 @@ def mock_get_template_statistics_for_template(mocker, service_one):
 @pytest.fixture(scope='function')
 def mock_get_usage(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
-        return {'data': {
-            "sms_count": 456123,
-            "email_count": 123
-        }}
+        return [
+            {"international": False, "rate": 0.0165, "rate_multiplier": 1,
+             "notification_type": "sms", "billing_units": 251500},
+            {"international": True, "rate": 0.0165, "rate_multiplier": 1,
+             "notification_type": "sms", "billing_units": 300},
+            {"international": True, "rate": 0.0165, "rate_multiplier": 2,
+             "notification_type": "sms", "billing_units": 150},
+            {"international": True, "rate": 0.0165, "rate_multiplier": 3,
+             "notification_type": "sms", "billing_units": 30},
+            {"international": False, "rate": 0.0165, "notification_type": "email",
+             "rate_multiplier": None, "billing_units": 1000}
+        ]
 
     return mocker.patch(
         'app.service_api_client.get_service_usage', side_effect=_get_usage)
@@ -1327,115 +1335,89 @@ def mock_get_usage(mocker, service_one, fake_uuid):
 @pytest.fixture(scope='function')
 def mock_get_billable_units(mocker):
     def _get_usage(service_id, year):
-        return {
-            "April": 123,
-            "March": 456123
-        }
+        return [
+            {
+                'month': 'April',
+                'international': False,
+                'rate_multiplier': 1,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 249500
+            },
+            {
+                'month': 'April',
+                'international': True,
+                'rate_multiplier': 1,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 100
+            },
+            {
+                'month': 'April',
+                'international': True,
+                'rate_multiplier': 2,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 100
+            },
+            {
+                'month': 'April',
+                'international': True,
+                'rate_multiplier': 3,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 20
+            },
+            {
+                'month': 'March',
+                'international': False,
+                'rate_multiplier': 1,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 1000
+            },
+            {
+                'month': 'March',
+                'international': True,
+                'rate_multiplier': 1,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 100
+            },
+            {
+                'month': 'March',
+                'international': True,
+                'rate_multiplier': 2,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 50
+            },
+            {
+                'month': 'March',
+                'international': True,
+                'rate_multiplier': 3,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 10
+            },
+            {
+                'month': 'February',
+                'international': False,
+                'rate_multiplier': 1,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 1000
+            },
+            {
+                'month': 'February',
+                'international': True,
+                'rate_multiplier': 1,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 100
+            },
 
-    return mocker.patch(
-        'app.service_api_client.get_billable_units', side_effect=_get_usage)
-
-
-@pytest.fixture(scope='function')
-def mock_get_international_usage(mocker, service_one, fake_uuid):
-    # def _get_usage(service_id, year=None):
-    #     return {'data': {
-    #         "sms_count": 252390,
-    #         "email_count": 0
-    #     }}
-
-    def _get_usage(service_id, year=None):
-        return {'data': {
-            "sms_breakdown": [
-                {
-                    "international": False,
-                    "rate": 1.65,
-                    "multiplier": 1,
-                    "units": 250900
-                },
-                {
-                    "international": True,
-                    "rate": 1.65,
-                    "multiplier": 1,
-                    "units": 1100
-                },
-                {
-                    "international": True,
-                    "rate": 1.65,
-                    "multiplier": 2,
-                    "units": 150
-                },
-                {
-                    "international": True,
-                    "rate": 1.65,
-                    "multiplier": 3,
-                    "units": 30
-                }
-            ],
-            "email_count": 0
-        }}
-
-    return mocker.patch(
-        'app.service_api_client.get_service_usage', side_effect=_get_usage)
-
-
-@pytest.fixture(scope='function')
-def mock_get_billable_international_units(mocker):
-    def _get_usage(service_id, year):
-        return {
-            "April": [
-                {
-                    "international": False,
-                    "rate": 1.65,
-                    "multiplier": 1,
-                    "units": 249700
-                },
-                {
-                    "international": True,
-                    "rate": 1.65,
-                    "multiplier": 1,
-                    "units": 100
-                },
-                {
-                    "international": True,
-                    "rate": 1.65,
-                    "multiplier": 2,
-                    "units": 100
-                },
-                {
-                    "international": True,
-                    "rate": 1.65,
-                    "multiplier": 3,
-                    "units": 20
-                },
-            ],
-            "March": [
-                {
-                    "international": False,
-                    "rate": 1.65,
-                    "multiplier": 1,
-                    "units": 1000
-                },
-                {
-                    "international": True,
-                    "rate": 1.65,
-                    "multiplier": 1,
-                    "units": 100
-                },
-                {
-                    "international": True,
-                    "rate": 1.65,
-                    "multiplier": 2,
-                    "units": 50
-                },
-                {
-                    "international": True,
-                    "rate": 1.65,
-                    "multiplier": 3,
-                    "units": 10
-                },
-            ]
-        }
+        ]
 
     return mocker.patch(
         'app.service_api_client.get_billable_units', side_effect=_get_usage)
