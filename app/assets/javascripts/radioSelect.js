@@ -56,7 +56,7 @@
   let focusSelected = function() {
     setTimeout(
       () => $('[type=radio]:checked').next('label').blur().trigger('focus').addClass('selected'),
-      10
+      50
     );
   };
 
@@ -67,7 +67,6 @@
       let $component = $(component);
       let render = (state, data) => {
         $component.html(states[state].render(data));
-        new GOVUK.SelectionButtons('.block-label input');
       };
       let choices = $('label', $component).toArray().map(function(element) {
         let $element = $(element);
@@ -92,7 +91,7 @@
             ),
             'name': name
           });
-          $('.js-option').eq(0).parent('label').trigger('focus');
+          focusSelected();
 
         })
         .on('click', '.js-option', function(event) {
