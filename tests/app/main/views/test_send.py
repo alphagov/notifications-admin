@@ -457,6 +457,36 @@ def test_test_message_can_only_be_sent_now(
     assert 'name="scheduled_for"' not in content
 
 
+def test_letter_can_only_be_sent_now(
+    logged_in_client,
+    mock_get_service,
+    mock_get_service_letter_template,
+    mock_s3_download,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    fake_uuid,
+):
+
+    with logged_in_client.session_transaction() as session:
+        session['upload_data'] = {
+            'original_file_name': 'Test message',
+            'template_id': fake_uuid,
+            'notification_count': 1,
+            'valid': True
+        }
+    response = logged_in_client.get(url_for(
+        'main.check_messages',
+        service_id=fake_uuid,
+        upload_id=fake_uuid,
+        template_type='letter',
+        from_test=True
+    ))
+
+    content = response.get_data(as_text=True)
+    assert 'name="scheduled_for"' not in content
+
+
 @pytest.mark.parametrize(
     'when', [
         '', '2016-08-25T13:04:21.767198'

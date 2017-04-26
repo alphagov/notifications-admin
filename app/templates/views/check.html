@@ -169,7 +169,7 @@
     <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="hidden" name="help" value="{{ '3' if help else 0 }}" />
-      {% if choose_time_form %}
+      {% if choose_time_form and template.template_type != 'letter' %}
         {{ radio_select(
           choose_time_form.scheduled_for,
           wrapping_class='bottom-gutter-2-3'
