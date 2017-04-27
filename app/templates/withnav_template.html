@@ -13,10 +13,18 @@
       <a href="{{ url_for('main.choose_service') }}" class="navigation-service-switch">Switch service</a>
     </div>
     <div class="grid-row">
-      <div class="column-one-quarter">
+      {% if help %}
+        <div class="column-one-third">
+      {% else %}
+        <div class="column-one-quarter">
+      {% endif %}
         {% include "main_nav.html" %}
       </div>
-      <main role="main" class="column-three-quarters column-main">
+      {% if help %}
+        <main role="main" class="column-two-thirds column-main">
+      {% else %}
+        <main role="main" class="column-three-quarters column-main">
+      {% endif %}
         {% include 'flash_messages.html' %}
         {% block maincolumn_content %}{% endblock %}
       </main>
