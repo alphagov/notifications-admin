@@ -1,4 +1,6 @@
 from datetime import datetime
+from bs4 import BeautifulSoup
+from unittest.mock import ANY
 
 from flask import (
     url_for,
@@ -43,16 +45,26 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
                  'password': 'validPassword!'
                  }
 
-    response = client.post(url_for('main.register'), data=user_data)
-    assert response.status_code == 302
-    assert response.location == url_for('main.registration_continue', _external=True)
+    response = client.post(url_for('main.register'), data=user_data, follow_redirects=True)
+    assert response.status_code == 200
 
-    from unittest.mock import ANY
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select('main p')[0].text == 'An email has been sent to notfound@example.gov.uk.'
+
     mock_send_verify_email.assert_called_with(ANY, user_data['email_address'])
     mock_register_user.assert_called_with(user_data['name'],
                                           user_data['email_address'],
                                           user_data['mobile_number'],
                                           user_data['password'])
+
+
+def test_register_continue_handles_missing_session_sensibly(
+    client,
+):
+    # session is not set
+    response = client.get(url_for('main.registration_continue'))
+    assert response.status_code == 302
+    assert response.location == url_for('main.show_all_services_or_dashboard', _external=True)
 
 
 def test_process_register_returns_200_when_mobile_number_is_invalid(
