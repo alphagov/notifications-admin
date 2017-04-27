@@ -31,7 +31,7 @@ import pyexcel.ext.ods3
 
 
 SENDING_STATUSES = ['created', 'pending', 'sending']
-DELIVERED_STATUSES = ['delivered']
+DELIVERED_STATUSES = ['delivered', 'sent']
 FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 

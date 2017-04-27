@@ -51,7 +51,7 @@ def test_get_jobs_shows_page_links(
             '',
             [
                 'created', 'pending', 'sending',
-                'delivered',
+                'delivered', 'sent',
                 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure',
             ]
         ),
@@ -61,7 +61,7 @@ def test_get_jobs_shows_page_links(
         ),
         (
             'delivered',
-            ['delivered']
+            ['delivered', 'sent']
         ),
         (
             'failed',
@@ -188,7 +188,6 @@ def test_should_show_scheduled_job(
 def test_should_cancel_job(
     logged_in_client,
     service_one,
-    active_user_with_permissions,
     fake_uuid,
     mocker,
 ):
@@ -291,7 +290,7 @@ def test_should_show_updates_for_one_job_as_json(
             '',
             [
                 'created', 'pending', 'sending',
-                'delivered',
+                'delivered', 'sent',
                 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure',
             ]
         ),
@@ -301,7 +300,7 @@ def test_should_show_updates_for_one_job_as_json(
         ),
         (
             'delivered',
-            ['delivered']
+            ['delivered', 'sent']
         ),
         (
             'failed',
