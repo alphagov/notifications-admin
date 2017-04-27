@@ -388,7 +388,7 @@ class CreateKeyForm(Form):
         super(CreateKeyForm, self).__init__(*args, **kwargs)
 
     key_type = RadioField(
-        'What should Notify do when you use this key?',
+        'Type of key',
         validators=[
             DataRequired()
         ]
