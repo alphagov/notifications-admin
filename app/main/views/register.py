@@ -89,4 +89,6 @@ def _do_registration(form, service=None, send_sms=True, send_email=True):
 
 @main.route('/registration-continue')
 def registration_continue():
+    if not session.get('user_details'):
+        return redirect(url_for('.show_all_services_or_dashboard'))
     return render_template('views/registration-continue.html')
