@@ -60,9 +60,7 @@ def get_example_csv_fields(column_headers, use_example_as_example, submitted_fie
 def get_example_csv_rows(template, use_example_as_example=True, submitted_fields=False):
     return {
         'email': ['test@example.com'] if use_example_as_example else [current_user.email_address],
-        'sms': ['07700 900321'] if use_example_as_example else [validate_and_format_phone_number(
-            current_user.mobile_number, human_readable=True
-        )],
+        'sms': ['07700 900321'] if use_example_as_example else [current_user.mobile_number],
         'letter': [
             (submitted_fields or {}).get(
                 key, get_example_letter_address(key) if use_example_as_example else key
@@ -220,7 +218,6 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
             upload_id=upload_id
         ) if not letters_as_pdf else None
     )
-
     recipients = RecipientCSV(
         contents,
         template_type=template.template_type,
@@ -230,7 +227,8 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
         whitelist=itertools.chain.from_iterable(
             [user.name, user.mobile_number, user.email_address] for user in users
         ) if current_service['restricted'] else None,
-        remaining_messages=remaining_messages
+        remaining_messages=remaining_messages,
+        international_sms=current_service['can_send_international_sms'],
     )
 
     if request.args.get('from_test'):
