@@ -18,13 +18,15 @@ from tests.conftest import active_user_with_permissions, platform_admin_user
         'Label Value Action',
         'Service name service one Change',
         'Email reply to address None Change',
-        'Text message sender 40604 Change'
+        'Text message sender 40604 Change',
+        'International text messages Off Change',
     ]),
     (platform_admin_user, [
         'Label Value Action',
         'Service name service one Change',
         'Email reply to address None Change',
         'Text message sender 40604 Change',
+        'International text messages Off Change',
         'Label Value Action',
         'Email branding GOV.UK Change',
         'Letter branding HM Government Change',
@@ -69,7 +71,8 @@ def test_should_show_overview_for_service_with_more_things_set(
     for index, row in enumerate([
         'Service name service one Change',
         'Email reply to address test@example.com Change',
-        'Text message sender elevenchars Change'
+        'Text message sender elevenchars Change',
+        'International text messages Off Change',
     ]):
         assert row == " ".join(page.find_all('tr')[index + 1].text.split())
 
@@ -97,7 +100,7 @@ def test_letter_contact_block_shows_None_if_not_set(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = page.find_all('tr')[4].find_all('td')[1].div
+    div = page.find_all('tr')[5].find_all('td')[1].div
     assert div.text.strip() == 'None'
     assert 'default' in div.attrs['class'][0]
 
@@ -115,7 +118,7 @@ def test_escapes_letter_contact_block(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = str(page.find_all('tr')[4].find_all('td')[1].div)
+    div = str(page.find_all('tr')[5].find_all('td')[1].div)
     assert 'foo<br>bar' in div
     assert '<script>' not in div
 

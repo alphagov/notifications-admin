@@ -39,6 +39,11 @@
           {{ text_field(current_service.sms_sender or '40604') }}
           {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id)) }}
         {% endcall %}
+        {% call row() %}
+          {{ text_field('International text messages') }}
+          {{ text_field('On' if current_service.can_send_international_sms else 'Off') }}
+          {{ edit_field('Change', url_for('.service_set_international_sms', service_id=current_service.id)) }}
+        {% endcall %}
 
         {% if current_service.can_send_letters %}
           {% call row() %}
