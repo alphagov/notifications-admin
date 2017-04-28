@@ -87,7 +87,12 @@ def send_messages(service_id, template_id):
         service_api_client.get_service_template(service_id, template_id)['data'],
         current_service,
         show_recipient=True,
-        letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id),
+        letter_preview_url=url_for(
+            '.view_letter_template_preview',
+            service_id=service_id,
+            template_id=template_id,
+            filetype='png',
+        ),
     )
 
     form = CsvUploadForm()
@@ -149,7 +154,12 @@ def send_test(service_id, template_id):
         service_api_client.get_service_template(service_id, template_id)['data'],
         current_service,
         show_recipient=True,
-        letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id),
+        letter_preview_url=url_for(
+            '.view_letter_template_preview',
+            service_id=service_id,
+            template_id=template_id,
+            filetype='png',
+        ),
     )
 
     if len(template.placeholders) == 0 or request.method == 'POST':
@@ -212,10 +222,11 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
         current_service,
         show_recipient=True,
         letter_preview_url=url_for(
-            '.check_messages',
+            '.check_messages_preview',
             service_id=service_id,
             template_type=template_type,
-            upload_id=upload_id
+            upload_id=upload_id,
+            filetype='png',
         ) if not letters_as_pdf else None
     )
     recipients = RecipientCSV(

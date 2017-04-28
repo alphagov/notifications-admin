@@ -19,7 +19,7 @@ from flask_login import current_user
 from notifications_utils.template import (
     SMSPreviewTemplate,
     EmailPreviewTemplate,
-    LetterPDFLinkTemplate,
+    LetterImageTemplate,
     LetterPreviewTemplate,
 )
 
@@ -274,9 +274,9 @@ def get_template(
         )
     if 'letter' == template['template_type']:
         if letter_preview_url:
-            return LetterPDFLinkTemplate(
+            return LetterImageTemplate(
                 template,
-                preview_url=letter_preview_url,
+                image_url=letter_preview_url,
                 page_count=int(page_count),
             )
         else:

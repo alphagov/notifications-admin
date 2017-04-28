@@ -8,7 +8,7 @@ $iso-paper-ratio: 141.42135624%;
 
 .letter {
 
-  padding: 0;
+  padding: $iso-paper-ratio 0 0 0;
   margin: 0 0 $gutter 0;
   position: relative;
   background: $panel-colour;
@@ -26,16 +26,6 @@ $iso-paper-ratio: 141.42135624%;
     animation: ellipsis steps(4,end) 1.3s infinite;
     content: "\2026"; // ellipsis
     width: 0px;
-  }
-
-  a {
-    display: block;
-    overflow: hidden;
-    width: 100%;
-    height: 0;
-    padding: $iso-paper-ratio 0 0 0;
-    position: relative;
-    z-index: 20;
   }
 
   img {
