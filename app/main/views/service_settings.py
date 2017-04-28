@@ -277,6 +277,15 @@ def service_set_sms_sender(service_id):
         form=form)
 
 
+@main.route("/services/<service_id>/service-settings/set-international-sms", methods=['GET'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_set_international_sms(service_id):
+    return render_template(
+        'views/service-settings/set-international-sms.html',
+    )
+
+
 @main.route("/services/<service_id>/service-settings/set-letter-contact-block", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
