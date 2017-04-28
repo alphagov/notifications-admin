@@ -32,7 +32,7 @@ class JobApiClient(NotifyAdminAPIClient):
                 results['failed'] += outcome['count']
             if outcome['status'] in ['sending', 'pending', 'created']:
                 results['sending'] += outcome['count']
-            if outcome['status'] in ['delivered']:
+            if outcome['status'] in ['delivered', 'sent']:
                 results['delivered'] += outcome['count']
             results['requested'] += outcome['count']
         return results

@@ -314,7 +314,8 @@ def format_notification_status(status, template_type):
             'permanent-failure': 'Email address doesn’t exist',
             'delivered': 'Delivered',
             'sending': 'Sending',
-            'created': 'Sending'
+            'created': 'Sending',
+            'sent': 'Delivered'
         },
         'sms': {
             'failed': 'Failed',
@@ -323,7 +324,8 @@ def format_notification_status(status, template_type):
             'permanent-failure': 'Phone number doesn’t exist',
             'delivered': 'Delivered',
             'sending': 'Sending',
-            'created': 'Sending'
+            'created': 'Sending',
+            'sent': 'Sent internationally'
         },
         'letter': {
             'failed': 'Failed',
@@ -332,7 +334,8 @@ def format_notification_status(status, template_type):
             'permanent-failure': 'Permanent failure',
             'delivered': 'Delivered',
             'sending': 'Sending',
-            'created': 'Sending'
+            'created': 'Sending',
+            'sent': 'Delivered'
         }
     }[template_type].get(status, status)
 
@@ -351,6 +354,7 @@ def format_notification_status_as_field_status(status):
         'temporary-failure': 'error',
         'permanent-failure': 'error',
         'delivered': None,
+        'sent': None,
         'sending': 'default',
         'created': 'default'
     }.get(status, 'error')

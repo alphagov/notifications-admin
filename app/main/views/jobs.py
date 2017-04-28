@@ -37,6 +37,7 @@ from app.utils import (
     REQUESTED_STATUSES,
     FAILURE_STATUSES,
     SENDING_STATUSES,
+    DELIVERED_STATUSES,
 )
 from app.statistics_utils import add_rate_to_job
 
@@ -59,6 +60,7 @@ def _set_status_filters(filter_args):
     status_filters = filter_args.get('status', [])
     return list(OrderedSet(chain(
         (status_filters or REQUESTED_STATUSES),
+        DELIVERED_STATUSES if 'delivered' in status_filters else [],
         SENDING_STATUSES if 'sending' in status_filters else [],
         FAILURE_STATUSES if 'failed' in status_filters else []
     )))
