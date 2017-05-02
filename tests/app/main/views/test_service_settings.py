@@ -9,6 +9,7 @@ from werkzeug.exceptions import InternalServerError
 import app
 from app.utils import email_safe
 from tests import validate_route_permission, service_json
+from tests.app.test_utils import normalize_spaces
 
 from tests.conftest import active_user_with_permissions, platform_admin_user
 
@@ -20,6 +21,7 @@ from tests.conftest import active_user_with_permissions, platform_admin_user
         'Email reply to address None Change',
         'Text message sender 40604 Change',
         'International text messages Off Change',
+        'Letters Off Change',
     ]),
     (platform_admin_user, [
         'Label Value Action',
@@ -27,6 +29,7 @@ from tests.conftest import active_user_with_permissions, platform_admin_user
         'Email reply to address None Change',
         'Text message sender 40604 Change',
         'International text messages Off Change',
+        'Letters Off Change',
         'Label Value Action',
         'Email branding GOV.UK Change',
         'Letter branding HM Government Change',
@@ -73,6 +76,7 @@ def test_should_show_overview_for_service_with_more_things_set(
         'Email reply to address test@example.com Change',
         'Text message sender elevenchars Change',
         'International text messages Off Change',
+        'Letters Off Change',
     ]):
         assert row == " ".join(page.find_all('tr')[index + 1].text.split())
 
@@ -100,7 +104,7 @@ def test_letter_contact_block_shows_None_if_not_set(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = page.find_all('tr')[5].find_all('td')[1].div
+    div = page.find_all('tr')[6].find_all('td')[1].div
     assert div.text.strip() == 'None'
     assert 'default' in div.attrs['class'][0]
 
@@ -118,7 +122,7 @@ def test_escapes_letter_contact_block(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = str(page.find_all('tr')[5].find_all('td')[1].div)
+    div = str(page.find_all('tr')[6].find_all('td')[1].div)
     assert 'foo<br>bar' in div
     assert '<script>' not in div
 
@@ -1015,3 +1019,32 @@ def test_cant_resume_active_service(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert 'Resume service' not in {a.text for a in page.find_all('a', class_='button')}
+
+
+@pytest.mark.parametrize('endpoint, expected_p', [
+    (
+        'main.service_set_international_sms',
+        (
+            'Sending text messages to international phone numbers is '
+            'an invitation‑only feature.'
+        )
+    ),
+    (
+        'main.service_set_letters',
+        (
+            'Using GOV.UK Notify to send letters is an invitation‑only '
+            'feature.'
+        )
+    ),
+])
+def test_invitation_pages(
+    logged_in_client,
+    service_one,
+    endpoint,
+    expected_p,
+):
+    response = logged_in_client.get(url_for(endpoint, service_id=service_one['id']))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(page.select('main p')[0].text) == expected_p
