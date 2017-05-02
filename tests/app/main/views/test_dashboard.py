@@ -223,21 +223,22 @@ def test_usage_page(
     assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
     assert normalize_spaces(nav.find('li', {'aria-selected': 'true'}).text) == '2011 to 2012 financial year'
     assert normalize_spaces(nav_links[1].text) == '2012 to 2013 financial year'
-
-    assert '123' in cols[0].text
-    assert 'Emails' in cols[0].text
-
-    assert '456,123' in cols[1].text
+    assert '252,190' in cols[1].text
     assert 'Text messages' in cols[1].text
 
     table = page.find('table').text.strip()
 
+    assert '249,860 free text messages' in table
+    assert '40 free text messages' in table
+    assert '960 text messages at 1.65p' in table
+
     assert 'April' in table
+    assert 'February' in table
     assert 'March' in table
-    assert '123 free text messages' in table
-    assert '£3,403.06' in table
-    assert '249,877 free text messages' in table
-    assert '206,246 text messages at 1.65p' in table
+    assert '£15.84' in table
+    assert '140 free text messages' in table
+    assert '£20.30' in table
+    assert '1,230 text messages at 1.65p' in table
 
 
 def test_usage_page_with_year_argument(
@@ -254,6 +255,18 @@ def test_usage_page_for_invalid_year(
     logged_in_client,
 ):
     assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year='abcd')).status_code == 404
+
+
+@freeze_time("2012-03-31 12:12:12")
+def test_future_usage_page(
+    logged_in_client,
+    mock_get_future_usage,
+    mock_get_future_billable_units,
+):
+    assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2014)).status_code == 200
+
+    mock_get_future_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2014)
+    mock_get_future_usage.assert_called_once_with(SERVICE_ONE_ID, 2014)
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):
@@ -552,26 +565,39 @@ def test_aggregate_status_types(dict_in, expected_failed, expected_requested):
 )
 def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_months):
     with now:
-        assert list(get_free_paid_breakdown_for_billable_units(
-            2016, {
-                'April': 100000,
-                'May': 100000,
-                'June': 100000,
-                'February': 1234
-            }
-        )) == [
-            {'name': 'April', 'free': 100000, 'paid': 0},
-            {'name': 'May', 'free': 100000, 'paid': 0},
-            {'name': 'June', 'free': 50000, 'paid': 50000},
-            {'name': 'July', 'free': 0, 'paid': 0},
-            {'name': 'August', 'free': 0, 'paid': 0},
-            {'name': 'September', 'free': 0, 'paid': 0},
-            {'name': 'October', 'free': 0, 'paid': 0},
-            {'name': 'November', 'free': 0, 'paid': 0},
-            {'name': 'December', 'free': 0, 'paid': 0},
-            {'name': 'January', 'free': 0, 'paid': 0},
-            {'name': 'February', 'free': 0, 'paid': 1234},
-            {'name': 'March', 'free': 0, 'paid': 0}
+        billing_units = get_free_paid_breakdown_for_billable_units(
+            2016, [
+                {
+                    'month': 'April', 'international': False, 'rate_multiplier': 1,
+                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000
+                },
+                {
+                    'month': 'May', 'international': False, 'rate_multiplier': 1,
+                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000
+                },
+                {
+                    'month': 'June', 'international': False, 'rate_multiplier': 1,
+                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000
+                },
+                {
+                    'month': 'February', 'international': False, 'rate_multiplier': 1,
+                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 2000
+                },
+            ]
+        )
+        assert list(billing_units) == [
+            {'free': 100000, 'name': 'April', 'paid': 0},
+            {'free': 100000, 'name': 'May', 'paid': 0},
+            {'free': 50000, 'name': 'June', 'paid': 50000},
+            {'free': 0, 'name': 'July', 'paid': 0},
+            {'free': 0, 'name': 'August', 'paid': 0},
+            {'free': 0, 'name': 'September', 'paid': 0},
+            {'free': 0, 'name': 'October', 'paid': 0},
+            {'free': 0, 'name': 'November', 'paid': 0},
+            {'free': 0, 'name': 'December', 'paid': 0},
+            {'free': 0, 'name': 'January', 'paid': 0},
+            {'free': 0, 'name': 'February', 'paid': 2000},
+            {'free': 0, 'name': 'March', 'paid': 0}
         ][:expected_number_of_months]
 
 

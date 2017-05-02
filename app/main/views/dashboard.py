@@ -113,7 +113,7 @@ def usage(service_id):
             start=current_financial_year - 1,
             end=current_financial_year + 1,
         ),
-        **calculate_usage(service_api_client.get_service_usage(service_id, year)['data'])
+        **calculate_usage(service_api_client.get_service_usage(service_id, year))
     )
 
 
@@ -189,7 +189,7 @@ def get_dashboard_partials(service_id):
             **calculate_usage(service_api_client.get_service_usage(
                 service_id,
                 get_current_financial_year(),
-            )['data'])
+            ))
         ),
     }
 
@@ -204,10 +204,11 @@ def get_dashboard_totals(statistics):
 def calculate_usage(usage):
     # TODO: Don't hardcode these - get em from the API
     sms_free_allowance = 250000
-    sms_rate = 0.0165
 
-    sms_sent = usage.get('sms_count', 0)
-    emails_sent = usage.get('email_count', 0)
+    sms_rate = 0 if len(usage) == 0 else usage[0].get("rate", 0)
+    sms_sent = get_sum_billing_units(breakdown for breakdown in usage if breakdown['notification_type'] == 'sms')
+    emails = [breakdown["billing_units"] for breakdown in usage if breakdown['notification_type'] == 'email']
+    emails_sent = 0 if len(emails) == 0 else emails[0]
 
     return {
         'emails_sent': emails_sent,
@@ -215,7 +216,7 @@ def calculate_usage(usage):
         'sms_sent': sms_sent,
         'sms_allowance_remaining': max(0, (sms_free_allowance - sms_sent)),
         'sms_chargeable': max(0, sms_sent - sms_free_allowance),
-        'sms_rate': sms_rate
+        'sms_rate': sms_rate,
     }
 
 
@@ -262,14 +263,21 @@ def get_months_for_year(start, end, year):
     return [datetime(year, month, 1) for month in range(start, end)]
 
 
-def get_free_paid_breakdown_for_billable_units(year, billable_units):
+def get_sum_billing_units(billing_units, month=None):
+    if month:
+        return sum(b['billing_units'] * b.get('rate_multiplier', 1) for b in billing_units if b['month'] == month)
+    return sum(b['billing_units'] * b.get('rate_multiplier', 1) for b in billing_units)
+
+
+def get_free_paid_breakdown_for_billable_units(year, billing_units):
     cumulative = 0
     for month in get_months_for_financial_year(year):
         previous_cumulative = cumulative
-        monthly_usage = billable_units.get(month, 0)
+        monthly_usage = get_sum_billing_units(billing_units, month)
         cumulative += monthly_usage
         breakdown = get_free_paid_breakdown_for_month(
-            cumulative, previous_cumulative, monthly_usage
+            cumulative, previous_cumulative,
+            [billing_month for billing_month in billing_units if billing_month['month'] == month]
         )
         yield {
             'name': month,
@@ -285,20 +293,23 @@ def get_free_paid_breakdown_for_month(
 ):
     allowance = 250000
 
+    total_monthly_billing_units = get_sum_billing_units(monthly_usage)
+
     if cumulative < allowance:
         return {
             'paid': 0,
-            'free': monthly_usage,
+            'free': total_monthly_billing_units,
         }
     elif previous_cumulative < allowance:
+        remaining_allowance = allowance - previous_cumulative
         return {
-            'paid': monthly_usage - (allowance - previous_cumulative),
-            'free': allowance - previous_cumulative
+            'paid': total_monthly_billing_units - remaining_allowance,
+            'free': remaining_allowance,
         }
     else:
         return {
-            'paid': monthly_usage,
-            'free': 0
+            'paid': total_monthly_billing_units,
+            'free': 0,
         }
 
 
