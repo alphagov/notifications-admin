@@ -204,9 +204,11 @@ def get_dashboard_totals(statistics):
 def calculate_usage(usage):
     # TODO: Don't hardcode these - get em from the API
     sms_free_allowance = 250000
-    sms_rate = usage[0].get("rate", 0)
+
+    sms_rate = 0 if len(usage) == 0 else usage[0].get("rate", 0)
     sms_sent = get_sum_billing_units(breakdown for breakdown in usage if breakdown['notification_type'] == 'sms')
-    emails_sent = [breakdown["billing_units"] for breakdown in usage if breakdown['notification_type'] == 'email'][0]
+    emails = [breakdown["billing_units"] for breakdown in usage if breakdown['notification_type'] == 'email']
+    emails_sent = 0 if len(emails) == 0 else emails[0]
 
     return {
         'emails_sent': emails_sent,

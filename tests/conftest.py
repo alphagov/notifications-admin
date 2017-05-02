@@ -1424,6 +1424,33 @@ def mock_get_billable_units(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_future_usage(mocker, service_one, fake_uuid):
+    def _get_usage(service_id, year=None):
+        return [
+            {
+                'notification_type': 'sms', 'international': False,
+                'credits': 0, 'rate_multiplier': 1, 'rate': 1.58, 'billing_units': 0
+            },
+            {
+                'notification_type': 'email', 'international': False,
+                'credits': 0, 'rate_multiplier': 1, 'rate': 0, 'billing_units': 0
+            }
+        ]
+
+    return mocker.patch(
+        'app.service_api_client.get_service_usage', side_effect=_get_usage)
+
+
+@pytest.fixture(scope='function')
+def mock_get_future_billable_units(mocker):
+    def _get_usage(service_id, year):
+        return []
+
+    return mocker.patch(
+        'app.service_api_client.get_billable_units', side_effect=_get_usage)
+
+
+@pytest.fixture(scope='function')
 def mock_events(mocker):
     def _create_event(event_type, event_data):
         return {'some': 'data'}

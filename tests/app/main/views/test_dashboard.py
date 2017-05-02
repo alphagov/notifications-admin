@@ -257,6 +257,18 @@ def test_usage_page_for_invalid_year(
     assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year='abcd')).status_code == 404
 
 
+@freeze_time("2012-03-31 12:12:12")
+def test_future_usage_page(
+    logged_in_client,
+    mock_get_future_usage,
+    mock_get_future_billable_units,
+):
+    assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2014)).status_code == 200
+
+    mock_get_future_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2014)
+    mock_get_future_usage.assert_called_once_with(SERVICE_ONE_ID, 2014)
+
+
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):
     with app_.test_request_context():
         with app_.test_client() as client:
