@@ -1341,7 +1341,7 @@ def mock_get_billable_units(mocker):
                 'international': False,
                 'rate_multiplier': 1,
                 'notification_type': 'sms',
-                'rate': 1.65,
+                'rate': 0.0165,
                 'billing_units': 249500
             },
             {
@@ -1349,7 +1349,7 @@ def mock_get_billable_units(mocker):
                 'international': True,
                 'rate_multiplier': 1,
                 'notification_type': 'sms',
-                'rate': 1.65,
+                'rate': 0.0165,
                 'billing_units': 100
             },
             {
@@ -1357,7 +1357,7 @@ def mock_get_billable_units(mocker):
                 'international': True,
                 'rate_multiplier': 2,
                 'notification_type': 'sms',
-                'rate': 1.65,
+                'rate': 0.0165,
                 'billing_units': 100
             },
             {
@@ -1365,7 +1365,7 @@ def mock_get_billable_units(mocker):
                 'international': True,
                 'rate_multiplier': 3,
                 'notification_type': 'sms',
-                'rate': 1.65,
+                'rate': 0.0165,
                 'billing_units': 20
             },
             {
@@ -1373,7 +1373,7 @@ def mock_get_billable_units(mocker):
                 'international': False,
                 'rate_multiplier': 1,
                 'notification_type': 'sms',
-                'rate': 1.65,
+                'rate': 0.0165,
                 'billing_units': 1000
             },
             {
@@ -1381,7 +1381,7 @@ def mock_get_billable_units(mocker):
                 'international': True,
                 'rate_multiplier': 1,
                 'notification_type': 'sms',
-                'rate': 1.65,
+                'rate': 0.0165,
                 'billing_units': 100
             },
             {
@@ -1389,7 +1389,7 @@ def mock_get_billable_units(mocker):
                 'international': True,
                 'rate_multiplier': 2,
                 'notification_type': 'sms',
-                'rate': 1.65,
+                'rate': 0.0165,
                 'billing_units': 50
             },
             {
@@ -1397,7 +1397,7 @@ def mock_get_billable_units(mocker):
                 'international': True,
                 'rate_multiplier': 3,
                 'notification_type': 'sms',
-                'rate': 1.65,
+                'rate': 0.0165,
                 'billing_units': 10
             },
             {
@@ -1405,7 +1405,7 @@ def mock_get_billable_units(mocker):
                 'international': False,
                 'rate_multiplier': 1,
                 'notification_type': 'sms',
-                'rate': 1.65,
+                'rate': 0.0165,
                 'billing_units': 1000
             },
             {
@@ -1413,7 +1413,7 @@ def mock_get_billable_units(mocker):
                 'international': True,
                 'rate_multiplier': 1,
                 'notification_type': 'sms',
-                'rate': 1.65,
+                'rate': 0.0165,
                 'billing_units': 100
             },
 
@@ -1429,7 +1429,7 @@ def mock_get_future_usage(mocker, service_one, fake_uuid):
         return [
             {
                 'notification_type': 'sms', 'international': False,
-                'credits': 0, 'rate_multiplier': 1, 'rate': 1.58, 'billing_units': 0
+                'credits': 0, 'rate_multiplier': 1, 'rate': 0.0158, 'billing_units': 0
             },
             {
                 'notification_type': 'email', 'international': False,
