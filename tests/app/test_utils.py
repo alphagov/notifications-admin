@@ -3,7 +3,6 @@ from io import StringIO
 from csv import DictReader
 
 import pytest
-from freezegun import freeze_time
 
 from app.utils import (
     email_safe,
@@ -13,7 +12,7 @@ from app.utils import (
     Spreadsheet
 )
 
-from tests import notification_json, single_notification_json, template_json
+from tests import notification_json, single_notification_json
 
 
 def _get_notifications_csv(

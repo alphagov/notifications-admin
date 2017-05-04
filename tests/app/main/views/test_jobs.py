@@ -1,4 +1,3 @@
-import csv
 import json
 import uuid
 from urllib.parse import urlparse, quote, parse_qs
@@ -7,8 +6,6 @@ import pytest
 from flask import url_for
 from bs4 import BeautifulSoup
 
-from app import utils
-from io import StringIO
 from app.main.views.jobs import get_time_left, get_status_filters
 from tests import notification_json
 from freezegun import freeze_time
@@ -117,7 +114,7 @@ def test_should_show_page_for_one_job(
         service_one['id'],
         fake_uuid,
         status=expected_api_call
-        )
+    )
 
 
 def test_get_jobs_should_tell_user_if_more_than_one_page(
@@ -262,7 +259,6 @@ def test_should_show_updates_for_one_job_as_json(
     mocker,
     fake_uuid,
 ):
-    job_json = mock_get_job(service_one['id'], fake_uuid)['data']
     response = logged_in_client.get(url_for('main.view_job_updates', service_id=service_one['id'], job_id=fake_uuid))
 
     assert response.status_code == 200
@@ -386,7 +382,6 @@ def test_should_show_notifications_for_a_service_with_next_previous(
         page=2
     ))
     assert response.status_code == 200
-    content = response.get_data(as_text=True)
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     next_page_link = page.find('a', {'rel': 'next'})
     prev_page_link = page.find('a', {'rel': 'previous'})

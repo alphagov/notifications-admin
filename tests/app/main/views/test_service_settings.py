@@ -88,7 +88,7 @@ def test_if_cant_send_letters_then_cant_see_letter_contact_block(
     assert 'Letter contact block' not in response.get_data(as_text=True)
 
 
-def test_letter_contact_block_shows_None_if_not_set(
+def test_letter_contact_block_shows_none_if_not_set(
     logged_in_client,
     service_one,
     mocker,

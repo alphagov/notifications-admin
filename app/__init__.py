@@ -21,7 +21,7 @@ from flask import (
     g,
     url_for)
 from flask._compat import string_types
-from flask.globals import _lookup_req_object
+from flask.globals import _lookup_req_object, _request_ctx_stack
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
 from functools import partial
@@ -380,10 +380,10 @@ def load_user(user_id):
 
 def load_service_before_request():
     if '/static/' in request.url:
+        _request_ctx_stack.top.service = None
         return
     service_id = request.view_args.get('service_id', session.get('service_id')) if request.view_args \
         else session.get('service_id')
-    from flask.globals import _request_ctx_stack
     if _request_ctx_stack.top is not None:
         _request_ctx_stack.top.service = service_api_client.get_service(service_id)['data'] if service_id else None
 
