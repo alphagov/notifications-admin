@@ -26,7 +26,7 @@
         <li>Up to 306 characters = 2 text messages</li>
         <li>Up to 459 characters = 3 text messages</li>
       </ul></li>
-      <li>Standard text message rate: 1.65 pence + VAT</li>
+      <li>Standard text message rate: {{ '{:.2f}'.format(sms_rate * 100) }} pence + VAT</li>
     </ul>
 
     <p>
