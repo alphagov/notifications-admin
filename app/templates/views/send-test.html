@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
+{% from "components/textbox.html" import textbox %}
 {% from "components/table.html" import list_table, field, text_field, index_field, index_field_heading %}
 
 {% block service_page_title %}
@@ -28,26 +29,11 @@
   {{ template|string }}
 
   <form method="post">
-    {% call(item, row_number) list_table(
-      example,
-      caption="Fill in the {}".format('field' if (recipient_columns + template.placeholders|list)|length == 2 else 'fields'),
-      field_headings=recipient_columns + template.placeholders|list
-    ) %}
-      {% for column in item %}
-        {% call field() %}
-          {% if loop.index > 1 or template.template_type == 'letter' %}
-            <label class="visuallyhidden" for="placeholder-field-{{ loop.index }}">{{ column }}</label>
-            <input class="form-control form-control-1-1 " data-module="" name="{{ column }}" rows="8" type="text" value="" id="placeholder-field-{{ loop.index }}">
-          {% else %}
-            {{ column }}
-          {% endif %}
-        {% endcall %}
-      {% endfor %}
-    {% endcall %}
-
-    {{ page_footer("Preview", back_link=(
-      url_for('.send_messages', service_id=current_service.id, template_id=template.id)) if not help else None
+    {{ textbox(
+      form.placeholder_value,
+      hint='Optional' if optional_placeholder else None
     ) }}
+    {{ page_footer('Next', back_link=back_link) }}
   </form>
 
 {% endblock %}

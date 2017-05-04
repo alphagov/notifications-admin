@@ -224,6 +224,15 @@ class Spreadsheet():
             return cls(converted.getvalue(), filename)
 
     @classmethod
+    def from_dict(cls, dictionary, filename=''):
+        return cls.from_rows(
+            zip(
+                *sorted(dictionary.items(), key=lambda pair: pair[0])
+            ),
+            filename
+        )
+
+    @classmethod
     def from_file(cls, file_content, filename=''):
         extension = cls.get_extension(filename)
 

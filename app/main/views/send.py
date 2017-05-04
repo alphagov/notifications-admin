@@ -21,10 +21,20 @@ from flask import (
 from flask_login import login_required, current_user
 
 from notifications_utils.columns import Columns
-from notifications_utils.recipients import RecipientCSV, first_column_headings, validate_and_format_phone_number
+from notifications_utils.recipients import (
+    RecipientCSV,
+    first_column_headings,
+    validate_and_format_phone_number,
+    optional_address_columns,
+)
 
 from app.main import main
-from app.main.forms import CsvUploadForm, ChooseTimeForm, get_furthest_possible_scheduled_time
+from app.main.forms import (
+    CsvUploadForm,
+    ChooseTimeForm,
+    get_furthest_possible_scheduled_time,
+    get_placeholder_form_instance
+)
 from app.main.uploader import (
     s3upload,
     s3download
@@ -147,12 +157,24 @@ def get_example_csv(service_id, template_id):
     }
 
 
-@main.route("/services/<service_id>/send/<template_id>/test", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/send/<template_id>/test")
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test(service_id, template_id):
+    session['send_test_values'] = dict()
+    return redirect(url_for(
+        '.send_test_step',
+        service_id=service_id,
+        template_id=template_id,
+        step_index=0,
+        help=get_help_argument(),
+    ))
 
-    file_name = current_app.config['TEST_MESSAGE_FILENAME']
+
+@main.route("/services/<service_id>/send/<template_id>/test/step-<int:step_index>", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+def send_test_step(service_id, template_id, step_index):
 
     template = service_api_client.get_service_template(service_id, template_id)['data']
 
@@ -162,46 +184,98 @@ def send_test(service_id, template_id):
         show_recipient=True,
         expand_emails=True,
         letter_preview_url=url_for(
-            '.view_letter_template_preview',
+            '.send_test_preview',
             service_id=service_id,
             template_id=template_id,
             filetype='png',
-            page_count=get_page_count_for_letter(template),
         ),
+        page_count=get_page_count_for_letter(template),
     )
 
-    if len(template.placeholders) == 0 or request.method == 'POST':
-        upload_id = s3upload(
-            service_id,
-            {
-                'file_name': file_name,
-                'data': Spreadsheet.from_rows([
-                    first_column_headings[template.template_type] + list(template.placeholders),
-                    get_example_csv_rows(template, use_example_as_example=False, submitted_fields=request.form)
-                ]).as_csv_data
-            },
-            current_app.config['AWS_REGION']
-        )
-        session['upload_data'] = {
-            "template_id": template_id,
-            "original_file_name": file_name
-        }
+    placeholders = fields_to_fill_in(template)
+
+    if len(placeholders) == 0:
+        return make_and_upload_csv_file(service_id, template)
+
+    current_placeholder = placeholders[step_index]
+    optional_placeholder = (current_placeholder in optional_address_columns)
+    form = get_placeholder_form_instance(
+        current_placeholder,
+        dict_to_populate_from=get_normalised_send_test_values_from_session(),
+        optional_placeholder=optional_placeholder,
+    )
+
+    if form.validate_on_submit():
+
+        session['send_test_values'][current_placeholder] = form.placeholder_value.data
+
+        if all(
+            get_normalised_send_test_values_from_session().get(placeholder, False) not in (False, None)
+            for placeholder in placeholders
+        ):
+            return make_and_upload_csv_file(service_id, template)
+
         return redirect(url_for(
-            '.check_messages',
-            upload_id=upload_id,
+            '.send_test_step',
             service_id=service_id,
-            template_type=template.template_type,
-            from_test=True,
-            help=2 if request.args.get('help') else 0
+            template_id=template_id,
+            step_index=step_index + 1,
+            help=get_help_argument(),
         ))
+
+    if get_help_argument():
+        back_link = None
+    elif step_index == 0:
+        back_link = url_for(
+            '.view_template',
+            service_id=service_id,
+            template_id=template_id,
+        )
+    else:
+        back_link = url_for(
+            '.send_test_step',
+            service_id=service_id,
+            template_id=template_id,
+            step_index=step_index - 1,
+        )
+
+    template.values = get_normalised_send_test_values_from_session()
 
     return render_template(
         'views/send-test.html',
         template=template,
-        recipient_columns=first_column_headings[template.template_type],
-        example=[get_example_csv_rows(template, use_example_as_example=False)],
-        help=get_help_argument()
+        form=form,
+        optional_placeholder=optional_placeholder,
+        help=get_help_argument(),
+        back_link=back_link,
     )
+
+
+@main.route("/services/<service_id>/send/<template_id>/test.<filetype>", methods=['GET'])
+@login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+def send_test_preview(service_id, template_id, filetype):
+
+    if filetype not in ('pdf', 'png'):
+        abort(404)
+
+    template = service_api_client.get_service_template(service_id, template_id)['data']
+
+    template = get_template(
+        template,
+        current_service,
+        letter_preview_url=url_for(
+            '.send_test_preview',
+            service_id=service_id,
+            template_id=template_id,
+            filetype='png',
+        ),
+        page_count=get_page_count_for_letter(template),
+    )
+
+    template.values = get_normalised_send_test_values_from_session()
+
+    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
 
 
 def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
@@ -380,3 +454,48 @@ def get_check_messages_back_url(service_id, template_type):
             return url_for('.send_test', service_id=service_id, template_id=templates[0]['id'], help=1)
 
     return url_for('main.choose_template', service_id=service_id)
+
+
+def fields_to_fill_in(template):
+
+    recipient_columns = first_column_headings[template.template_type]
+
+    if 'letter' == template.template_type:
+        return recipient_columns + list(template.placeholders)
+
+    session['send_test_values'][recipient_columns[0]] = {
+        'email': current_user.email_address,
+        'sms': current_user.mobile_number,
+    }.get(template.template_type)
+
+    return list(template.placeholders)
+
+
+def get_normalised_send_test_values_from_session():
+    return {
+        key: ''.join(value or [])
+        for key, value in session.get('send_test_values', {}).items()
+    }
+
+
+def make_and_upload_csv_file(service_id, template):
+    upload_id = s3upload(
+        service_id,
+        Spreadsheet.from_dict(
+            session['send_test_values'],
+            filename=current_app.config['TEST_MESSAGE_FILENAME']
+        ).as_dict,
+        current_app.config['AWS_REGION'],
+    )
+    session['upload_data'] = {
+        "template_id": template.id,
+        "original_file_name": current_app.config['TEST_MESSAGE_FILENAME']
+    }
+    return redirect(url_for(
+        '.check_messages',
+        upload_id=upload_id,
+        service_id=service_id,
+        template_type=template.template_type,
+        from_test=True,
+        help=2 if get_help_argument() else 0
+    ))

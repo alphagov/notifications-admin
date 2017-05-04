@@ -8,7 +8,7 @@ from functools import partial
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
-from notifications_utils.template import LetterPreviewTemplate
+from notifications_utils.template import LetterPreviewTemplate, LetterImageTemplate
 from notifications_utils.recipients import RecipientCSV
 
 from app.main.views.send import get_check_messages_back_url
@@ -284,7 +284,7 @@ def test_upload_valid_csv_shows_file_contents(
 def test_send_test_doesnt_show_file_contents(
     logged_in_client,
     mocker,
-    mock_get_service_template_with_placeholders,
+    mock_get_service_template,
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
@@ -293,13 +293,12 @@ def test_send_test_doesnt_show_file_contents(
 ):
 
     mocker.patch('app.main.views.send.s3download', return_value="""
-        phone number,name,thing,thing,thing
-        07700900986, Jo,  foo,  foo,  foo
+        phone number
+        07700 900 986
     """)
 
-    response = logged_in_client.post(
+    response = logged_in_client.get(
         url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid),
-        data={},
         follow_redirects=True,
     )
 
@@ -336,7 +335,33 @@ def test_send_test_sms_message(
     mock_s3_upload.assert_called_with(fake_uuid, expected_data, 'eu-west-1')
 
 
-def test_send_test_email_message(
+def test_send_test_sms_message_redirects_with_help_argument(
+    logged_in_client,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    fake_uuid
+):
+    response = logged_in_client.get(
+        url_for('main.send_test', service_id=fake_uuid, template_id=fake_uuid, help=1)
+    )
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.send_test_step',
+        service_id=fake_uuid,
+        template_id=fake_uuid,
+        step_index=0,
+        help=1,
+        _external=True,
+    )
+
+
+def test_send_test_email_message_without_placeholders(
     logged_in_client,
     mocker,
     api_user_active,
@@ -361,7 +386,139 @@ def test_send_test_email_message(
     mock_s3_upload.assert_called_with(fake_uuid, expected_data, 'eu-west-1')
 
 
-def test_send_test_sms_message_with_placeholders(
+def test_send_test_sms_message_with_placeholders_shows_first_field(
+    logged_in_client,
+    mocker,
+    service_one,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template_with_placeholders,
+    fake_uuid,
+):
+
+    with logged_in_client.session_transaction() as session:
+        assert 'send_test_values' not in session
+
+    response = logged_in_client.get(
+        url_for(
+            'main.send_test',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+        ),
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert page.select('label')[0].text.strip() == 'name'
+    assert page.select('input')[0]['name'] == 'placeholder_value'
+    assert page.select('.page-footer-back-link')[0]['href'] == url_for(
+        'main.view_template',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+    )
+    with logged_in_client.session_transaction() as session:
+        assert session['send_test_values']['phone number'] == '07700 900762'
+
+
+def test_send_test_populates_field_from_session(
+    logged_in_client,
+    mocker,
+    service_one,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template_with_placeholders,
+    fake_uuid,
+):
+
+    with logged_in_client.session_transaction() as session:
+        session['send_test_values'] = {}
+        session['send_test_values']['name'] = 'Jo'
+
+    response = logged_in_client.get(url_for(
+        'main.send_test_step',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        step_index=0,
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert page.select('input')[0]['value'] == 'Jo'
+
+
+def test_send_test_indicates_optional_address_columns(
+    logged_in_client,
+    mocker,
+    service_one,
+    mock_login,
+    mock_get_service,
+    mock_get_service_letter_template,
+    fake_uuid,
+):
+
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
+
+    with logged_in_client.session_transaction() as session:
+        session['send_test_values'] = {}
+
+    response = logged_in_client.get(url_for(
+        'main.send_test_step',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        step_index=3,
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.select('label')[0].text) == (
+        'address line 4 '
+        'Optional'
+    )
+    assert page.select('.page-footer-back-link')[0]['href'] == url_for(
+        'main.send_test_step',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        step_index=2,
+    )
+
+
+def test_send_test_allows_empty_optional_address_columns(
+    logged_in_client,
+    mocker,
+    service_one,
+    mock_login,
+    mock_get_service,
+    mock_get_service_letter_template,
+    fake_uuid,
+):
+
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
+
+    with logged_in_client.session_transaction() as session:
+        session['send_test_values'] = {}
+
+    response = logged_in_client.post(
+        url_for(
+            'main.send_test_step',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            step_index=3,
+        ),
+        # no data here
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.send_test_step',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        step_index=4,
+        _external=True,
+    )
+
+
+def test_send_test_sms_message_puts_submitted_data_in_session_and_file(
     logged_in_client,
     mocker,
     api_user_active,
@@ -375,23 +532,107 @@ def test_send_test_sms_message_with_placeholders(
     fake_uuid
 ):
 
-    expected_data = {
-        'data': 'phone number,name\r\n07700 900762,Jo\r\n',
-        'file_name': 'Test message'
-    }
+    with logged_in_client.session_transaction() as session:
+        session['send_test_values'] = {}
+
     mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
 
     response = logged_in_client.post(
         url_for(
-            'main.send_test',
+            'main.send_test_step',
             service_id=fake_uuid,
-            template_id=fake_uuid
+            template_id=fake_uuid,
+            step_index=0,
         ),
-        data={'name': 'Jo'},
-        follow_redirects=True
+        data={'placeholder_value': 'Jo'},
+        follow_redirects=True,
     )
     assert response.status_code == 200
-    mock_s3_upload.assert_called_with(fake_uuid, expected_data, 'eu-west-1')
+
+    with logged_in_client.session_transaction() as session:
+        assert session['send_test_values']['phone number'] == '07700 900762'
+        assert session['send_test_values']['name'] == 'Jo'
+
+    mock_s3_upload.assert_called_with(
+        fake_uuid,
+        {
+            'data': 'name,phone number\r\nJo,07700 900762\r\n',
+            'file_name': 'Test message'
+        },
+        'eu-west-1'
+    )
+
+
+@pytest.mark.parametrize('filetype', ['pdf', 'png'])
+def test_send_test_works_as_letter_preview(
+    filetype,
+    logged_in_platform_admin_client,
+    mock_get_service_letter_template,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    service_one,
+    fake_uuid,
+    mocker,
+):
+    service_one['can_send_letters'] = True
+    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
+    mocked_preview = mocker.patch(
+        'app.main.views.send.TemplatePreview.from_utils_template',
+        return_value='foo'
+    )
+
+    service_id = service_one['id']
+    template_id = fake_uuid
+    with logged_in_platform_admin_client.session_transaction() as session:
+        session['send_test_values'] = {'address_line_1': 'Jo Lastname'}
+    response = logged_in_platform_admin_client.get(
+        url_for(
+            'main.send_test_preview',
+            service_id=service_id,
+            template_id=template_id,
+            filetype=filetype
+        )
+    )
+
+    mock_get_service_letter_template.assert_called_with(service_id, template_id)
+
+    assert response.status_code == 200
+    assert response.get_data(as_text=True) == 'foo'
+    assert mocked_preview.call_args[0][0].id == template_id
+    assert type(mocked_preview.call_args[0][0]) == LetterImageTemplate
+    assert mocked_preview.call_args[0][0].values == {'address_line_1': 'Jo Lastname'}
+    assert mocked_preview.call_args[0][1] == filetype
+
+
+def test_send_test_clears_session(
+    logged_in_client,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template_with_placeholders,
+    mock_s3_upload,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    fake_uuid
+):
+
+    with logged_in_client.session_transaction() as session:
+        session['send_test_values'] = {'foo': 'bar'}
+
+    response = logged_in_client.get(
+        url_for(
+            'main.send_test',
+            service_id=fake_uuid,
+            template_id=fake_uuid,
+        ),
+    )
+    assert response.status_code == 302
+
+    with logged_in_client.session_transaction() as session:
+        assert session['send_test_values'] == {}
 
 
 def test_download_example_csv(
@@ -527,6 +768,7 @@ def test_test_message_can_only_be_sent_now(
 
 def test_letter_can_only_be_sent_now(
     logged_in_client,
+    mocker,
     mock_get_service,
     mock_get_service_letter_template,
     mock_s3_download,
@@ -536,6 +778,8 @@ def test_letter_can_only_be_sent_now(
     fake_uuid,
 ):
 
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
+
     with logged_in_client.session_transaction() as session:
         session['upload_data'] = {
             'original_file_name': 'Test message',
@@ -543,6 +787,7 @@ def test_letter_can_only_be_sent_now(
             'notification_count': 1,
             'valid': True
         }
+
     response = logged_in_client.get(url_for(
         'main.check_messages',
         service_id=fake_uuid,
@@ -634,6 +879,7 @@ def test_should_show_preview_letter_message(
 ):
     service_one['can_send_letters'] = True
     mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
     mocker.patch(
         'app.main.views.send.s3download',
