@@ -31,7 +31,7 @@ def trial_mode():
 
 @main.route('/pricing')
 def pricing():
-    return render_template('views/pricing.html')
+    return render_template('views/pricing.html', sms_rate=0.0158)
 
 
 @main.route('/delivery-and-failure')
