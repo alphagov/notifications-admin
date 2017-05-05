@@ -1,4 +1,3 @@
-import json
 from flask import url_for
 
 
@@ -54,7 +53,6 @@ def test_view_template_versions(
 ):
     service_id = fake_uuid
     template_id = fake_uuid
-    version = 1
     resp = logged_in_client.get(url_for(
         '.view_template_versions',
         service_id=service_id,
