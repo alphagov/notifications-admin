@@ -84,7 +84,12 @@ def view_template(service_id, template_id):
             template,
             current_service,
             expand_emails=True,
-            letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template_id),
+            letter_preview_url=url_for(
+                '.view_letter_template_preview',
+                service_id=service_id,
+                template_id=template_id,
+                filetype='png',
+            ),
             show_recipient=True,
             page_count=page_count,
         ),
@@ -108,10 +113,11 @@ def _view_template_version(service_id, template_id, version, letters_as_pdf=Fals
         current_service,
         expand_emails=True,
         letter_preview_url=url_for(
-            '.view_template_version',
+            '.view_template_version_preview',
             service_id=service_id,
             template_id=template_id,
             version=version,
+            filetype='png',
         ) if not letters_as_pdf else None
     ))
 
@@ -344,7 +350,12 @@ def delete_service_template(service_id, template_id):
             template,
             current_service,
             expand_emails=True,
-            letter_preview_url=url_for('.view_template', service_id=service_id, template_id=template['id']),
+            letter_preview_url=url_for(
+                '.view_letter_template_preview',
+                service_id=service_id,
+                template_id=template['id'],
+                filetype='png',
+            ),
             show_recipient=True,
         )
     )
@@ -370,10 +381,11 @@ def view_template_versions(service_id, template_id):
                 current_service,
                 expand_emails=True,
                 letter_preview_url=url_for(
-                    '.view_template_version',
+                    '.view_template_version_preview',
                     service_id=service_id,
                     template_id=template_id,
                     version=template['version'],
+                    filetype='png',
                 )
             )
             for template in service_api_client.get_service_template_versions(service_id, template_id)['data']

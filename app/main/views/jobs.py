@@ -118,6 +118,13 @@ def view_job(service_id, job_id):
                 version=job['template_version']
             )['data'],
             current_service,
+            letter_preview_url=url_for(
+                '.view_template_version_preview',
+                service_id=service_id,
+                template_id=job['template'],
+                version=job['template_version'],
+                filetype='png',
+            ),
         ),
         status=request.args.get('status', ''),
         updates_url=url_for(
