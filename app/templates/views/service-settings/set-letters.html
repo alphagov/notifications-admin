@@ -1,0 +1,38 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Text message sender
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <h1 class="heading-large">Letters</h1>
+      {% if current_service.can_send_letters %}
+        <p>
+          Your service can send letters.
+        </p>
+        <p>
+          If you want to stop your sending from sending letters,
+          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
+        </p>
+      {% else %}
+        <p>
+          Using GOV.UK Notify to send letters is an invitation&#8209;only feature.
+        </p>
+        <p>
+          If you want to try it out,
+          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
+        </p>
+      {% endif %}
+      {{ page_footer(
+        back_link=url_for('.service_settings', service_id=current_service.id),
+        back_link_text='Back to settings'
+      ) }}
+    </div>
+  </div>
+
+{% endblock %}
