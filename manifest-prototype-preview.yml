@@ -1,0 +1,6 @@
+---
+
+inherit: manifest-prototype-base.yml
+
+routes:
+  - route: notify-admin-prototype-preview.cloudapps.digital

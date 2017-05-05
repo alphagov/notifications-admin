@@ -219,6 +219,12 @@ cf-deploy: ## Deploys the app to Cloud Foundry
 	cf stop notify-admin-rollback
 	cf delete -f notify-admin-rollback
 
+.PHONY: cf-deploy-prototype
+cf-deploy-prototype: ## Deploys the app to Cloud Foundry
+	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
+	cf target -s ${CF_SPACE}
+	cf push -f manifest-prototype-${CF_SPACE}.yml
+
 .PHONY: cf-rollback
 cf-rollback: ## Rollbacks the app to the previous release
 	@cf app --guid notify-admin-rollback || exit 1
