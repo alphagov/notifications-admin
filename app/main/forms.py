@@ -290,7 +290,7 @@ class EmailTemplateForm(BaseTemplateForm):
 class LetterTemplateForm(EmailTemplateForm):
 
     subject = TextAreaField(
-        u'Title',
+        u'Main heading',
         validators=[DataRequired(message="Can’t be empty")])
 
     template_content = TextAreaField(
