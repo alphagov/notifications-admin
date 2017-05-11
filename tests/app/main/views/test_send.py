@@ -282,6 +282,36 @@ def test_upload_valid_csv_shows_file_contents(
         assert normalize_spaces(str(page.select('table tbody td')[index])) == cell
 
 
+def test_send_test_doesnt_show_file_contents(
+    logged_in_client,
+    mocker,
+    mock_get_service_template_with_placeholders,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    service_one,
+    fake_uuid,
+):
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        phone number,name,thing,thing,thing
+        07700900986, Jo,  foo,  foo,  foo
+    """)
+
+    response = logged_in_client.post(
+        url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid),
+        data={},
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select('h1')[0].text.strip() == 'Preview of Two week reminder'
+    assert len(page.select('table')) == 0
+    assert len(page.select('.banner-dangerous')) == 0
+    assert page.select('input[type=submit]')[0]['value'].strip() == 'Send 1 text message'
+
+
 def test_send_test_sms_message(
     logged_in_client,
     mocker,
