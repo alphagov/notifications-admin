@@ -131,7 +131,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         """,
         (
             'Your file needs a column called ‘phone number’ '
-            'Your file has columns called ‘telephone’ and ‘name’. '
+            'Right now it has columns called ‘telephone’ and ‘name’. '
             'Skip to file contents'
         )
     ),
