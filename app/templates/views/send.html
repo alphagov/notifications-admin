@@ -11,8 +11,6 @@
 
   <h1 class="heading-large">Upload recipients</h1>
 
-  {{ template|string }}
-
   <div class="page-footer bottom-gutter">
     {{file_upload(
       form.file,
@@ -44,5 +42,8 @@
   <p class="table-show-more-link">
     <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
   </p>
+
+  <h2 class="heading-medium">Your file will populate this template ({{ template.name }})</h2>
+  {{ template|string }}
 
 {% endblock %}
