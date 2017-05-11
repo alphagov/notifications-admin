@@ -37,7 +37,7 @@ from app.utils import (
     get_help_argument,
     get_template
 )
-from app.template_previews import TemplatePreview
+from app.template_previews import TemplatePreview, get_page_count_for_letter
 
 
 def get_page_headings(template_type):
@@ -83,15 +83,19 @@ def get_example_letter_address(key):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_messages(service_id, template_id):
 
+    template = service_api_client.get_service_template(service_id, template_id)['data']
+
     template = get_template(
-        service_api_client.get_service_template(service_id, template_id)['data'],
+        template,
         current_service,
         show_recipient=True,
+        expand_emails=True,
         letter_preview_url=url_for(
             '.view_letter_template_preview',
             service_id=service_id,
             template_id=template_id,
             filetype='png',
+            page_count=get_page_count_for_letter(template),
         ),
     )
 
@@ -150,15 +154,19 @@ def send_test(service_id, template_id):
 
     file_name = current_app.config['TEST_MESSAGE_FILENAME']
 
+    template = service_api_client.get_service_template(service_id, template_id)['data']
+
     template = get_template(
-        service_api_client.get_service_template(service_id, template_id)['data'],
+        template,
         current_service,
         show_recipient=True,
+        expand_emails=True,
         letter_preview_url=url_for(
             '.view_letter_template_preview',
             service_id=service_id,
             template_id=template_id,
             filetype='png',
+            page_count=get_page_count_for_letter(template),
         ),
     )
 
