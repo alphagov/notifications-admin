@@ -142,7 +142,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         """,
         (
             'The columns in your file need to match the double brackets in your template '
-            'Your file doesn’t have a column called ‘name’. '
+            'Your file is missing a column called ‘name’. '
             'Skip to file contents'
         )
     ),

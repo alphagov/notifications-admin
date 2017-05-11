@@ -81,8 +81,8 @@
           your template
         </h1>
         <p>
-          Your file doesn’t have {{ recipients.missing_column_headers | formatted_list(
-            conjunction='or',
+          Your file is missing {{ recipients.missing_column_headers | formatted_list(
+            conjunction='and',
             prefix='a column called ',
             prefix_plural='columns called '
           ) }}.
