@@ -57,7 +57,7 @@
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         <h1 class='banner-title'>
-          Your file needs to have {{ recipients.recipient_column_headers | formatted_list(
+          Your file needs {{ recipients.recipient_column_headers | formatted_list(
             prefix='a column called',
             prefix_plural='columns called'
           ) }}
