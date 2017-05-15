@@ -156,14 +156,12 @@ def test_should_create_api_key_with_type_normal(
     )
 
     assert response.status_code == 200
+
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    keys = page.find_all('span', {'class': 'api-key-key'})
-    for index, key in enumerate([
-        'some_default_key_name_12-{}-{}'.format(service_id, fake_uuid),
-        service_id,
-        fake_uuid
-    ]):
-        assert keys[index].text.strip() == key
+
+    assert page.find('span', {'class': 'api-key-key'}).text.strip() == (
+        'some_default_key_name_12-{}-{}'.format(service_id, fake_uuid)
+    )
 
     post.assert_called_once_with(url='/service/{}/api-key'.format(service_id), data={
         'name': 'Some default key name 1/2',
