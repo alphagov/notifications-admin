@@ -162,6 +162,7 @@ def get_example_csv(service_id, template_id):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test(service_id, template_id):
     session['send_test_values'] = dict()
+    session['send_test_letter_page_count'] = None
     return redirect(url_for(
         '.send_test_step',
         service_id=service_id,
@@ -178,6 +179,9 @@ def send_test_step(service_id, template_id, step_index):
 
     template = service_api_client.get_service_template(service_id, template_id)['data']
 
+    if not session.get('send_test_letter_page_count'):
+        session['send_test_letter_page_count'] = get_page_count_for_letter(template)
+
     template = get_template(
         template,
         current_service,
@@ -189,7 +193,7 @@ def send_test_step(service_id, template_id, step_index):
             template_id=template_id,
             filetype='png',
         ),
-        page_count=get_page_count_for_letter(template),
+        page_count=session['send_test_letter_page_count']
     )
 
     placeholders = fields_to_fill_in(template)
@@ -271,7 +275,6 @@ def send_test_preview(service_id, template_id, filetype):
             template_id=template_id,
             filetype='png',
         ),
-        page_count=get_page_count_for_letter(template),
     )
 
     template.values = get_normalised_send_test_values_from_session()

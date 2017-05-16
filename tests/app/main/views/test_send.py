@@ -421,6 +421,30 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
         assert session['send_test_values']['phone number'] == '07700 900762'
 
 
+def test_send_test_letter_clears_previous_page_cache(
+    logged_in_platform_admin_client,
+    mocker,
+    service_one,
+    mock_login,
+    mock_get_service,
+    mock_get_service_letter_template,
+    fake_uuid,
+):
+
+    with logged_in_platform_admin_client.session_transaction() as session:
+        session['send_test_letter_page_count'] = 'WRONG'
+
+    response = logged_in_platform_admin_client.get(url_for(
+        'main.send_test',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+    ))
+    assert response.status_code == 302
+
+    with logged_in_platform_admin_client.session_transaction() as session:
+        assert session['send_test_letter_page_count'] is None
+
+
 def test_send_test_populates_field_from_session(
     logged_in_client,
     mocker,
@@ -445,6 +469,30 @@ def test_send_test_populates_field_from_session(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.select('input')[0]['value'] == 'Jo'
+
+
+def test_send_test_caches_page_count(
+    logged_in_client,
+    mocker,
+    service_one,
+    mock_login,
+    mock_get_service,
+    mock_get_service_letter_template,
+    fake_uuid,
+):
+
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
+
+    response = logged_in_client.get(
+        url_for(
+            'main.send_test',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+        ),
+        follow_redirects=True,
+    )
+    with logged_in_client.session_transaction() as session:
+        assert session['send_test_letter_page_count'] == 99
 
 
 def test_send_test_indicates_optional_address_columns(
