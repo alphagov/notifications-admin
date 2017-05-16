@@ -130,8 +130,8 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
             +447700900986
         """,
         (
-            'Your file needs to have a column called ‘phone number’ '
-            'Your file has columns called ‘telephone’ and ‘name’. '
+            'Your file needs a column called ‘phone number’ '
+            'Right now it has columns called ‘telephone’ and ‘name’. '
             'Skip to file contents'
         )
     ),
@@ -142,8 +142,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         """,
         (
             'The columns in your file need to match the double brackets in your template '
-            'Your file has one column, called ‘phone number’. '
-            'It doesn’t have a column called ‘name’. '
+            'Your file is missing a column called ‘name’. '
             'Skip to file contents'
         )
     ),

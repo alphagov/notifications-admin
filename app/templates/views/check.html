@@ -57,13 +57,13 @@
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         <h1 class='banner-title'>
-          Your file needs to have {{ recipients.recipient_column_headers | formatted_list(
+          Your file needs {{ recipients.recipient_column_headers | formatted_list(
             prefix='a column called',
             prefix_plural='columns called'
           ) }}
         </h1>
         <p>
-          Your file has {{ recipients.column_headers | formatted_list(
+          Right now it has {{ recipients.column_headers | formatted_list(
             prefix='one column, called ',
             prefix_plural='columns called '
           ) }}.
@@ -81,14 +81,8 @@
           your template
         </h1>
         <p>
-          Your file has {{ recipients.column_headers | formatted_list(
-            prefix='one column, called ',
-            prefix_plural='columns called '
-          ) }}.
-        </p>
-        <p>
-          It doesn’t have {{ recipients.missing_column_headers | formatted_list(
-            conjunction='or',
+          Your file is missing {{ recipients.missing_column_headers | formatted_list(
+            conjunction='and',
             prefix='a column called ',
             prefix_plural='columns called '
           ) }}.
