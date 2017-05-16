@@ -19,7 +19,7 @@ from notifications_python_client.errors import HTTPError
 
 from app.main import main
 from app.utils import user_has_permissions, get_template
-from app.template_previews import TemplatePreview
+from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.main.forms import (
     ChooseTemplateType,
     SMSTemplateForm,
@@ -74,10 +74,6 @@ def choose_template(service_id):
 )
 def view_template(service_id, template_id):
     template = service_api_client.get_service_template(service_id, template_id)['data']
-    page_count = None
-    if template['template_type'] == 'letter':
-        page_count, _, _ = TemplatePreview.from_database_object(template, filetype='json')
-        page_count = json.loads(page_count.decode('utf-8'))['count']
     return render_template(
         'views/templates/template.html',
         template=get_template(
@@ -91,7 +87,7 @@ def view_template(service_id, template_id):
                 filetype='png',
             ),
             show_recipient=True,
-            page_count=page_count,
+            page_count=get_page_count_for_letter(template),
         ),
     )
 

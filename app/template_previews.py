@@ -1,4 +1,4 @@
-from flask import current_app
+from flask import current_app, json
 import requests
 
 from app import current_service
@@ -32,3 +32,14 @@ class TemplatePreview:
             template.values,
             page=page,
         )
+
+
+def get_page_count_for_letter(template, values=None):
+
+    if template['template_type'] != 'letter':
+        return None
+
+    page_count, _, _ = TemplatePreview.from_database_object(template, values, filetype='json')
+    page_count = json.loads(page_count.decode('utf-8'))['count']
+
+    return page_count
