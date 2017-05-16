@@ -240,6 +240,7 @@ def send_test_step(service_id, template_id, step_index):
         )
 
     template.values = get_normalised_send_test_values_from_session()
+    template.values[current_placeholder] = None
 
     return render_template(
         'views/send-test.html',
