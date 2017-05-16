@@ -26,7 +26,7 @@
   {% endif %}
   </h1>
 
-  <form method="post" class="js-stick-at-top-when-scrolling">
+  <form method="post" class="js-stick-at-top-when-scrolling" data-module="autofocus">
     {{ textbox(
       form.placeholder_value,
       hint='Optional' if optional_placeholder else None
