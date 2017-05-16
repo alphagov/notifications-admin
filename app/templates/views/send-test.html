@@ -26,14 +26,14 @@
   {% endif %}
   </h1>
 
-  {{ template|string }}
-
-  <form method="post">
+  <form method="post" class="js-stick-at-top-when-scrolling">
     {{ textbox(
       form.placeholder_value,
       hint='Optional' if optional_placeholder else None
     ) }}
     {{ page_footer('Next', back_link=back_link) }}
   </form>
+
+  {{ template|string }}
 
 {% endblock %}
