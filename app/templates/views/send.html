@@ -11,8 +11,6 @@
 
   <h1 class="heading-large">Upload recipients</h1>
 
-  {{ template|string }}
-
   <div class="page-footer bottom-gutter">
     {{file_upload(
       form.file,
@@ -21,6 +19,13 @@
   </div>
 
   <h2 class="heading-medium">Your file needs to look like this example</h2>
+  <p class="hint">
+    Save your file as a
+    <acronym title="Comma Separated Values">CSV</acronym>,
+    <acronym title="Tab Separated Values">TSV</acronym>,
+    <acronym title="Open Document Spreadsheet">ODS</acronym>,
+    or Microsoft Excel spreadsheet
+  </p>
   <div class="spreadsheet">
     {% call(item, row_number) list_table(
       example,
@@ -38,12 +43,7 @@
     <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
   </p>
 
-  <h2 class="heading-medium">Accepted file formats</h2>
-  <ul class="list list-bullet">
-    <li>.<acronym title="Comma Separated Values">csv</acronym></li>
-    <li>.<acronym title="Comma Separated Values">tsv</acronym></li>
-    <li>Open Document Spreadsheet (.ods)</li>
-    <li>Microsoft Excel (.xls, .xlsx, .xlsm)</li>
-  </p>
+  <h2 class="heading-medium">Your file will populate this template ({{ template.name }})</h2>
+  {{ template|string }}
 
 {% endblock %}
