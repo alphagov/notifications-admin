@@ -167,9 +167,9 @@ def add_template_by_type(service_id):
             blank_letter = service_api_client.create_service_template(
                 'Untitled',
                 'letter',
-                'Content',
+                'Body',
                 service_id,
-                'Title',
+                'Main heading',
                 'normal',
             )
             return redirect(url_for(
