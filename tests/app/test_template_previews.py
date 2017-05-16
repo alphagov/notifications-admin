@@ -77,11 +77,11 @@ def test_page_count_returns_none_for_non_letter_templates(template_type):
 @pytest.mark.parametrize('partial_call, expected_template_preview_args', [
     (
         partial(get_page_count_for_letter),
-        ({'template_type': 'letter'}, None)
+        ({'template_type': 'letter'}, 'json', None)
     ),
     (
         partial(get_page_count_for_letter, values={'foo': 'bar'}),
-        ({'template_type': 'letter'}, {'foo': 'bar'})
+        ({'template_type': 'letter'}, 'json', {'foo': 'bar'})
     ),
 ])
 def test_page_count_unpacks_from_json_response(
@@ -93,4 +93,4 @@ def test_page_count_unpacks_from_json_response(
     mock_template_preview.return_value = (b'{"count": 99}', 200, {})
 
     assert partial_call({'template_type': 'letter'}) == 99
-    mock_template_preview.assert_called_once_with(*expected_template_preview_args, filetype='json')
+    mock_template_preview.assert_called_once_with(*expected_template_preview_args)
