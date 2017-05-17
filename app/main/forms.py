@@ -502,7 +502,11 @@ class ServiceSmsSender(Form):
 
 
 class ServiceLetterContactBlock(Form):
-    letter_contact_block = TextAreaField()
+    letter_contact_block = TextAreaField(
+        validators=[
+            NoCommasInPlaceHolders()
+        ]
+    )
 
     def validate_letter_contact_block(form, field):
         line_count = field.data.strip().count('\n')
