@@ -405,6 +405,38 @@ def test_should_show_interstitial_when_making_breaking_change(
     )
 
 
+def test_removing_placeholders_is_not_a_breaking_change(
+    logged_in_client,
+    mock_get_service_email_template,
+    mock_update_service_template,
+    mock_has_permissions,
+    fake_uuid,
+):
+    service_id = fake_uuid
+    template_id = fake_uuid
+    existing_template = mock_get_service_email_template(0, 0)['data']
+    response = logged_in_client.post(
+        url_for(
+            '.edit_service_template',
+            service_id=service_id,
+            template_id=template_id
+        ),
+        data={
+            'name': existing_template['name'],
+            'template_content': "no placeholders",
+            'subject': existing_template['subject'],
+        }
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.view_template',
+        service_id=service_id,
+        template_id=template_id,
+        _external=True,
+    )
+
+
 def test_should_not_create_too_big_template(
     logged_in_client,
     service_one,
