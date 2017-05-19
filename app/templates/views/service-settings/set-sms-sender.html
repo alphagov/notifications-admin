@@ -13,17 +13,9 @@
     This appears instead of a phone number when a user receives a
     text message from your service.
   <p>
-    If you leave this blank:
+    If you set this to ‘GOVUK’ each message will begin with
+    ‘{{ current_service.name }}:’.
   </p>
-  <ul class="list list-bullet">
-    <li>
-      your messages will be sent from 40604 (a shortcode that’s
-      reserved for government use)
-    </li>
-    <li>
-      each message will begin with ‘{{ current_service.name }}:’
-    </li>
-  </ul>
   <form method="post">
     {{ textbox(
       form.sms_sender,
