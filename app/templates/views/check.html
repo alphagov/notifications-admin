@@ -150,7 +150,9 @@
 
   {% endif %}
 
-  {{ template|string }}
+  {% if not errors %}
+    {{ template|string }}
+  {% endif %}
 
   <div class="bottom-gutter-3-2">
   {% if errors %}
@@ -232,6 +234,11 @@
     <p class="table-show-more-link">
       Only showing rows with errors
     </p>
+  {% endif %}
+
+  {% if errors %}
+    <h2 class="heading-medium">Preview of {{ template.name }}</h2>
+    {{ template|string }}
   {% endif %}
 
 {% endblock %}
