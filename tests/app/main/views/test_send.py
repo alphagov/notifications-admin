@@ -48,19 +48,16 @@ def test_upload_files_in_different_formats(
     filename,
     acceptable_file,
     logged_in_client,
-    api_user_active,
+    service_one,
     mocker,
-    mock_login,
-    mock_get_service,
     mock_get_service_template,
     mock_s3_upload,
-    mock_has_permissions,
     fake_uuid,
 ):
 
     with open(filename, 'rb') as uploaded:
         response = logged_in_client.post(
-            url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
+            url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
             data={'file': (BytesIO(uploaded.read()), filename)},
             content_type='multipart/form-data'
         )
@@ -81,13 +78,10 @@ def test_upload_files_in_different_formats(
 
 def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     logged_in_client,
-    api_user_active,
+    service_one,
     mocker,
-    mock_login,
-    mock_get_service,
     mock_get_service_template_with_placeholders,
     mock_s3_upload,
-    mock_has_permissions,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
     fake_uuid,
@@ -103,13 +97,13 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     )
 
     initial_upload = logged_in_client.post(
-        url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
         data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
     )
     reupload = logged_in_client.post(
-        url_for('main.check_messages', service_id=fake_uuid, template_type='sms', upload_id='abc123'),
+        url_for('main.check_messages', service_id=service_one['id'], template_type='sms', upload_id='abc123'),
         data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
@@ -191,20 +185,14 @@ def test_upload_csvfile_with_missing_columns_shows_error(
 
 def test_upload_csv_invalid_extension(
     logged_in_client,
-    api_user_active,
-    mocker,
     mock_login,
-    mock_get_service,
+    service_one,
     mock_get_service_template,
-    mock_s3_upload,
-    mock_has_permissions,
-    mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
     fake_uuid,
 ):
 
     resp = logged_in_client.post(
-        url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
         data={'file': (BytesIO('contents'.encode('utf-8')), 'invalid.txt')},
         content_type='multipart/form-data',
         follow_redirects=True
@@ -312,48 +300,38 @@ def test_send_test_doesnt_show_file_contents(
 
 def test_send_test_sms_message(
     logged_in_client,
+    service_one,
+    fake_uuid,
     mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
     mock_get_service_template,
     mock_s3_upload,
-    mock_has_permissions,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
-    fake_uuid
 ):
 
     expected_data = {'data': 'phone number\r\n07700 900762\r\n', 'file_name': 'Test message'}
     mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
 
     response = logged_in_client.get(
-        url_for('main.send_test', service_id=fake_uuid, template_id=fake_uuid),
+        url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid),
         follow_redirects=True
     )
     assert response.status_code == 200
-    mock_s3_upload.assert_called_with(fake_uuid, expected_data, 'eu-west-1')
+    mock_s3_upload.assert_called_with(service_one['id'], expected_data, 'eu-west-1')
 
 
 def test_send_test_sms_message_redirects_with_help_argument(
     logged_in_client,
-    mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
-    mock_get_service_template,
-    mock_has_permissions,
-    mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
-    fake_uuid
+    service_one,
+    fake_uuid,
 ):
     response = logged_in_client.get(
-        url_for('main.send_test', service_id=fake_uuid, template_id=fake_uuid, help=1)
+        url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid, help=1)
     )
     assert response.status_code == 302
     assert response.location == url_for(
         'main.send_test_step',
-        service_id=fake_uuid,
+        service_id=service_one['id'],
         template_id=fake_uuid,
         step_index=0,
         help=1,
@@ -364,26 +342,23 @@ def test_send_test_sms_message_redirects_with_help_argument(
 def test_send_test_email_message_without_placeholders(
     logged_in_client,
     mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
+    service_one,
     mock_get_service_email_template_without_placeholders,
     mock_s3_upload,
-    mock_has_permissions,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
-    fake_uuid
+    fake_uuid,
 ):
 
     expected_data = {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'Test message'}
     mocker.patch('app.main.views.send.s3download', return_value='email address\r\ntest@user.gov.uk')
 
     response = logged_in_client.get(
-        url_for('main.send_test', service_id=fake_uuid, template_id=fake_uuid),
+        url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid),
         follow_redirects=True
     )
     assert response.status_code == 200
-    mock_s3_upload.assert_called_with(fake_uuid, expected_data, 'eu-west-1')
+    mock_s3_upload.assert_called_with(service_one['id'], expected_data, 'eu-west-1')
 
 
 def test_send_test_sms_message_with_placeholders_shows_first_field(
@@ -569,15 +544,12 @@ def test_send_test_allows_empty_optional_address_columns(
 def test_send_test_sms_message_puts_submitted_data_in_session_and_file(
     logged_in_client,
     mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
+    service_one,
     mock_get_service_template_with_placeholders,
     mock_s3_upload,
-    mock_has_permissions,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
-    fake_uuid
+    fake_uuid,
 ):
 
     with logged_in_client.session_transaction() as session:
@@ -588,7 +560,7 @@ def test_send_test_sms_message_puts_submitted_data_in_session_and_file(
     response = logged_in_client.post(
         url_for(
             'main.send_test_step',
-            service_id=fake_uuid,
+            service_id=service_one['id'],
             template_id=fake_uuid,
             step_index=0,
         ),
@@ -602,7 +574,7 @@ def test_send_test_sms_message_puts_submitted_data_in_session_and_file(
         assert session['send_test_values']['name'] == 'Jo'
 
     mock_s3_upload.assert_called_with(
-        fake_uuid,
+        service_one['id'],
         {
             'data': 'name,phone number\r\nJo,07700 900762\r\n',
             'file_name': 'Test message'
@@ -656,15 +628,8 @@ def test_send_test_works_as_letter_preview(
 def test_send_test_clears_session(
     logged_in_client,
     mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
-    mock_get_service_template_with_placeholders,
-    mock_s3_upload,
-    mock_has_permissions,
-    mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
-    fake_uuid
+    service_one,
+    fake_uuid,
 ):
 
     with logged_in_client.session_transaction() as session:
@@ -673,7 +638,7 @@ def test_send_test_clears_session(
     response = logged_in_client.get(
         url_for(
             'main.send_test',
-            service_id=fake_uuid,
+            service_id=service_one['id'],
             template_id=fake_uuid,
         ),
     )
@@ -705,16 +670,13 @@ def test_download_example_csv(
 
 def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     logged_in_client,
-    mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
     mock_get_service_template,
-    mock_s3_upload,
-    mock_has_permissions,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
-    fake_uuid
+    service_one,
+    fake_uuid,
+    mock_s3_upload,
+    mocker,
 ):
 
     mocker.patch(
@@ -725,7 +687,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     )
 
     response = logged_in_client.post(
-        url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
         data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
@@ -742,7 +704,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     assert '07700 900750' not in content
     assert 'Only showing the first 50 rows' in content
 
-    mock_get_detailed_service_for_today.assert_called_once_with(fake_uuid)
+    mock_get_detailed_service_for_today.assert_called_once_with(service_one['id'])
 
 
 @pytest.mark.parametrize('service_mock, should_allow_international', [
@@ -784,12 +746,9 @@ def test_upload_csvfile_with_international_validates(
 def test_test_message_can_only_be_sent_now(
     logged_in_client,
     mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
+    service_one,
     mock_get_service_template,
     mock_s3_download,
-    mock_has_permissions,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
     fake_uuid
@@ -804,7 +763,7 @@ def test_test_message_can_only_be_sent_now(
         }
     response = logged_in_client.get(url_for(
         'main.check_messages',
-        service_id=fake_uuid,
+        service_id=service_one['id'],
         upload_id=fake_uuid,
         template_type='sms',
         from_test=True
@@ -817,10 +776,9 @@ def test_test_message_can_only_be_sent_now(
 def test_letter_can_only_be_sent_now(
     logged_in_client,
     mocker,
-    mock_get_service,
+    service_one,
     mock_get_service_letter_template,
     mock_s3_download,
-    mock_has_permissions,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
     fake_uuid,
@@ -838,7 +796,7 @@ def test_letter_can_only_be_sent_now(
 
     response = logged_in_client.get(url_for(
         'main.check_messages',
-        service_id=fake_uuid,
+        service_id=service_one['id'],
         upload_id=fake_uuid,
         template_type='letter',
         from_test=True
@@ -848,15 +806,12 @@ def test_letter_can_only_be_sent_now(
     assert 'name="scheduled_for"' not in content
 
 
-@pytest.mark.parametrize(
-    'when', [
-        '', '2016-08-25T13:04:21.767198'
-    ]
-)
+@pytest.mark.parametrize('when', [
+    '', '2016-08-25T13:04:21.767198'
+])
 def test_create_job_should_call_api(
     logged_in_client,
     service_one,
-    active_user_with_permissions,
     mock_create_job,
     mock_get_job,
     mock_get_notifications,
@@ -991,13 +946,11 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 def test_check_messages_should_revalidate_file_when_uploading_file(
     logged_in_client,
     service_one,
-    active_user_with_permissions,
     mock_create_job,
     mock_get_job,
     mock_get_service_template_with_placeholders,
     mock_s3_upload,
     mocker,
-    mock_has_permissions,
     mock_get_detailed_service_for_today,
     mock_get_users_by_service,
     fake_uuid
@@ -1020,7 +973,7 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
                                   'notification_count': data['notification_count'],
                                   'valid': True}
     response = logged_in_client.post(
-        url_for('main.start_job', service_id=service_id, upload_id=data['id']),
+        url_for('main.start_job', service_id=service_one['id'], upload_id=data['id']),
         data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
