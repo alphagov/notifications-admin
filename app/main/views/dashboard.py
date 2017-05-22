@@ -135,6 +135,16 @@ def monthly(service_id):
     )
 
 
+@main.route("/services/<service_id>/inbox")
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def inbox(service_id):
+    return render_template(
+        'views/dashboard/inbox.html',
+        messages=service_api_client.get_inbound_sms(service_id),
+    )
+
+
 def aggregate_usage(template_statistics, sort_key='count'):
     return sorted(
         template_statistics,
@@ -165,6 +175,10 @@ def get_dashboard_partials(service_id):
         'upcoming': render_template(
             'views/dashboard/_upcoming.html',
             scheduled_jobs=scheduled_jobs
+        ),
+        'inbox': render_template(
+            'views/dashboard/_inbox.html',
+            inbound_sms_summary=service_api_client.get_inbound_sms_summary(service_id),
         ),
         'totals': render_template(
             'views/dashboard/_totals.html',

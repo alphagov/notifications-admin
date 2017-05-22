@@ -5,6 +5,7 @@ from unittest.mock import call, ANY
 from flask import url_for
 import pytest
 from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 from freezegun import freeze_time
 
 from app.main.views.dashboard import (
@@ -18,7 +19,11 @@ from app.main.views.dashboard import (
 )
 
 from tests import validate_route_permission
-from tests.conftest import SERVICE_ONE_ID
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    mock_get_inbound_sms_summary,
+    mock_get_inbound_sms_summary_with_no_messages,
+)
 from tests.app.test_utils import normalize_spaces
 
 stub_template_stats = [
@@ -44,6 +49,7 @@ def test_get_started(
     mock_get_jobs,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -62,6 +68,7 @@ def test_get_started_is_hidden_once_templates_exist(
     mock_get_jobs,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -72,6 +79,83 @@ def test_get_started_is_hidden_once_templates_exist(
     assert 'Get started' not in response.get_data(as_text=True)
 
 
+@pytest.mark.parametrize('inbound_summary_mock, expected_text', [
+    (mock_get_inbound_sms_summary_with_no_messages, '0 text messages received'),
+    (mock_get_inbound_sms_summary, '99 text messages received latest message just now'),
+])
+def test_inbound_messages_shows_count_of_messages(
+    logged_in_client,
+    mocker,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    mock_get_detailed_service,
+    mock_get_template_statistics,
+    mock_get_usage,
+    inbound_summary_mock,
+    expected_text,
+):
+
+    inbound_summary_mock(mocker)
+
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert normalize_spaces(page.select('.big-number-meta-wrapper')[0].text) == expected_text
+    assert page.select('.big-number-meta-wrapper a')[0]['href'] == url_for(
+        'main.inbox', service_id=SERVICE_ONE_ID
+    )
+
+
+@pytest.mark.parametrize('index, expected_row', enumerate([
+    '07900900000 foo 1 hour ago',
+    '07900900001 foo 2 hours ago',
+    '07900900002 foo 3 hours ago',
+    '07900900003 foo 4 hours ago',
+    '07900900004 foo 5 hours ago',
+]))
+def test_inbox_showing_inbound_messages(
+    logged_in_client,
+    mocker,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    mock_get_detailed_service,
+    mock_get_template_statistics,
+    mock_get_usage,
+    mock_get_inbound_sms,
+    index,
+    expected_row,
+):
+
+    response = logged_in_client.get(url_for('main.inbox', service_id=SERVICE_ONE_ID))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    rows = page.select('tbody tr')
+    assert len(rows) == 5
+    assert normalize_spaces(rows[index].text) == expected_row
+
+
+def test_empty_inbox(
+    logged_in_client,
+    mocker,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    mock_get_detailed_service,
+    mock_get_template_statistics,
+    mock_get_usage,
+    mock_get_inbound_sms_with_no_messages,
+):
+
+    response = logged_in_client.get(url_for('main.inbox', service_id=SERVICE_ONE_ID))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert normalize_spaces(page.select('tbody tr')) == (
+        'When users text your service’s phone number (GOVUK) you’ll see the messages here'
+    )
+
+
 def test_should_show_recent_templates_on_dashboard(
     logged_in_client,
     mocker,
@@ -79,6 +163,7 @@ def test_should_show_recent_templates_on_dashboard(
     mock_get_jobs,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -144,6 +229,7 @@ def test_should_show_upcoming_jobs_on_dashboard(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
@@ -174,6 +260,7 @@ def test_should_show_recent_jobs_on_dashboard(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
@@ -292,6 +379,7 @@ def test_menu_send_messages(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -322,6 +410,7 @@ def test_menu_manage_service(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -351,6 +440,7 @@ def test_menu_manage_api_keys(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -380,6 +470,7 @@ def test_menu_all_services_for_platform_admin_user(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -409,6 +500,7 @@ def test_route_for_service_permissions(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     with app_.test_request_context():
         validate_route_permission(
@@ -445,6 +537,7 @@ def test_service_dashboard_updates_gets_dashboard_totals(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
         'email': {'requested': 123, 'delivered': 0, 'failed': 0},
@@ -668,6 +761,7 @@ def test_should_show_all_jobs_with_valid_statuses(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     get_dashboard_partials(service_id=SERVICE_ONE_ID)
 

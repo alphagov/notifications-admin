@@ -156,5 +156,7 @@ def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
     assert mock_get_notifications.mock_calls[1][2]['page'] == 2
 
 
-def normalize_spaces(string):
-    return ' '.join(string.split())
+def normalize_spaces(input):
+    if isinstance(input, str):
+        return ' '.join(input.split())
+    return normalize_spaces(' '.join(item.text for item in input))
