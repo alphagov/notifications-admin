@@ -1,7 +1,6 @@
 import re
 import pytz
 
-from flask_login import current_user
 from flask_wtf import Form
 from datetime import datetime, timedelta
 from notifications_utils.recipients import (
