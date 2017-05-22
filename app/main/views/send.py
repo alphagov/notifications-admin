@@ -177,6 +177,11 @@ def send_test(service_id, template_id):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test_step(service_id, template_id, step_index):
 
+    if 'send_test_values' not in session:
+        return redirect(url_for(
+            '.send_test', service_id=service_id, template_id=template_id
+        ))
+
     template = service_api_client.get_service_template(service_id, template_id)['data']
 
     if not session.get('send_test_letter_page_count'):
@@ -201,7 +206,12 @@ def send_test_step(service_id, template_id, step_index):
     if len(placeholders) == 0:
         return make_and_upload_csv_file(service_id, template)
 
-    current_placeholder = placeholders[step_index]
+    try:
+        current_placeholder = placeholders[step_index]
+    except IndexError:
+        return redirect(url_for(
+            '.send_test', service_id=service_id, template_id=template_id
+        ))
     optional_placeholder = (current_placeholder in optional_address_columns)
     form = get_placeholder_form_instance(
         current_placeholder,

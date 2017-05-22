@@ -21,6 +21,8 @@ from tests.conftest import (
     mock_get_service_letter_template,
     mock_get_service,
     mock_get_international_service,
+    mock_get_service_template,
+    mock_get_service_email_template,
 )
 
 template_types = ['email', 'sms']
@@ -318,6 +320,119 @@ def test_send_test_sms_message(
     )
     assert response.status_code == 200
     mock_s3_upload.assert_called_with(service_one['id'], expected_data, 'eu-west-1')
+
+
+def test_send_test_step_redirects_if_session_not_setup(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    mock_get_service_email_template,
+):
+
+    with logged_in_client.session_transaction() as session:
+        assert 'send_test_values' not in session
+
+    response = logged_in_client.get(
+        url_for('main.send_test_step', service_id=service_one['id'], template_id=fake_uuid, step_index=0),
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+
+    with logged_in_client.session_transaction() as session:
+        assert session['send_test_values'] == {'email address': 'test@user.gov.uk'}
+
+
+def test_send_test_redirects_to_end_if_step_out_of_bounds(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    mock_get_service_template,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+):
+
+    with logged_in_client.session_transaction() as session:
+        session['send_test_values'] = {'name': 'foo'}
+
+    response = logged_in_client.get(url_for(
+        'main.send_test_step',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        step_index=999,
+    ))
+
+    assert response.status_code == 302
+    expected_url = url_for(
+        'main.check_messages',
+        service_id=service_one['id'],
+        upload_id=fake_uuid,
+        template_type='sms',
+        _external=True,
+    )
+    assert response.location in (
+        expected_url + '?help=0&from_test=True',
+        expected_url + '?from_test=True&help=0',
+    )
+
+
+def test_send_test_redirects_to_start_if_you_skip_steps(
+    logged_in_platform_admin_client,
+    service_one,
+    fake_uuid,
+    mock_get_service_letter_template,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    mocker,
+):
+
+    with logged_in_platform_admin_client.session_transaction() as session:
+        session['send_test_letter_page_count'] = 1
+        session['send_test_values'] = {'address_line_1': 'foo'}
+
+    response = logged_in_platform_admin_client.get(url_for(
+        'main.send_test_step',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        step_index=7,  # letter template has 7 placeholders – we’re at the end
+    ))
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.send_test',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _external=True,
+    )
+
+
+def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholders_empty(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    mock_get_service_email_template,
+    mock_s3_download,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+):
+
+    with logged_in_client.session_transaction() as session:
+        session['send_test_values'] = {'name': 'foo'}
+
+    response = logged_in_client.get(url_for(
+        'main.send_test_step',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        step_index=999,
+    ))
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.send_test',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _external=True,
+    )
 
 
 def test_send_test_sms_message_redirects_with_help_argument(
