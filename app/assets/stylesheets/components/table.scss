@@ -74,6 +74,12 @@
 
   }
 
+  &-invisible-error {
+    border-left: 5px solid transparent;
+    padding-left: 7px;
+    display: block;
+  }
+
   &-status {
 
     &-default {
