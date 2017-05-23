@@ -73,9 +73,9 @@
   </th>
 {%- endmacro %}
 
-{% macro index_field(text) -%}
+{% macro index_field(text=None) -%}
   <td class="table-field-index">
-    <span>{{ text }}</span>
+    {{ text if text != None else caller()  }}
   </td>
 {%- endmacro %}
 
