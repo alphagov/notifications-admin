@@ -123,6 +123,7 @@
   }
 
   &-index {
+    @include bold-16;
     width: 15px;
   }
 
@@ -130,6 +131,10 @@
     margin: 0 0 5px 0;
   }
 
+}
+
+.table-font-xsmall td.table-field-index {  // overrides GOV.UK Elements
+  @include bold-16;
 }
 
 .table-field-headings,
