@@ -47,7 +47,7 @@ def service_json(
     restricted=True,
     email_from=None,
     reply_to_email_address=None,
-    sms_sender=None,
+    sms_sender='GOVUK',
     research_mode=False,
     can_send_letters=False,
     can_send_international_sms=False,

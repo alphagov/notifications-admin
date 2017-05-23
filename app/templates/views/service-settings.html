@@ -36,7 +36,7 @@
 
         {% call row() %}
           {{ text_field('Text message sender') }}
-          {{ text_field(current_service.sms_sender or 'GOVUK') }}
+          {{ text_field(current_service.sms_sender) }}
           {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id)) }}
         {% endcall %}
 
