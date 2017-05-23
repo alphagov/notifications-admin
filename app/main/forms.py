@@ -1,7 +1,6 @@
 import re
-
 import pytz
-from flask_login import current_user
+
 from flask_wtf import Form
 from datetime import datetime, timedelta
 from notifications_utils.recipients import (
@@ -619,3 +618,26 @@ class ChooseTemplateType(Form):
 class SearchTemplatesForm(Form):
 
     search = SearchField('Search by name')
+
+
+class PlaceholderForm(Form):
+
+    pass
+
+
+def get_placeholder_form_instance(
+    placeholder_name,
+    dict_to_populate_from,
+    optional_placeholder=False
+):
+
+    PlaceholderForm.placeholder_value = StringField(
+        placeholder_name,
+        validators=[
+            DataRequired(message='Can’t be empty')
+        ] if not optional_placeholder else []
+    )
+
+    return PlaceholderForm(
+        placeholder_value=dict_to_populate_from.get(placeholder_name, '')
+    )
