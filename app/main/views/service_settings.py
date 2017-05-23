@@ -14,6 +14,8 @@ from flask_login import (
     login_required,
     current_user
 )
+
+from notifications_utils.field import Field
 from notifications_python_client.errors import HTTPError
 
 from app import service_api_client
@@ -46,7 +48,8 @@ def service_settings(service_id):
         organisation=organisation,
         letter_branding=letter_branding_organisations.get(
             current_service.get('dvla_organisation', '001')
-        )
+        ),
+        letter_contact_block=Field(current_service['letter_contact_block'], html='escape')
     )
 
 
