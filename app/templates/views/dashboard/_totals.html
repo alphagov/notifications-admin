@@ -6,7 +6,7 @@
     <div id="total-email" class="column-half">
       {{ big_number_with_status(
         statistics['email']['requested'],
-        message_count_label(statistics['email']['requested'], 'email', suffix=''),
+        message_count_label(statistics['email']['requested'], 'email', suffix='sent'),
         statistics['email']['failed'],
         statistics['email']['failed_percentage'],
         statistics['email']['show_warning'],
@@ -17,7 +17,7 @@
     <div id="total-sms" class="column-half">
       {{ big_number_with_status(
         statistics['sms']['requested'],
-        message_count_label(statistics['sms']['requested'], 'sms', suffix=''),
+        message_count_label(statistics['sms']['requested'], 'sms', suffix='sent'),
         statistics['sms']['failed'],
         statistics['sms']['failed_percentage'],
         statistics['sms']['show_warning'],
