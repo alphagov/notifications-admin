@@ -615,6 +615,32 @@ def test_set_text_message_sender(
     )
 
 
+@pytest.mark.parametrize('content, expected_error', [
+    ("", "Can’t be empty"),
+    ("twelvecharss", "Enter 11 characters or fewer"),
+    (".", "Use letters and numbers only")
+])
+def test_set_text_message_sender_validation(
+    logged_in_client,
+    mock_update_service,
+    service_one,
+    mock_get_letter_organisations,
+    content,
+    expected_error,
+):
+    response = logged_in_client.post(url_for(
+        'main.service_set_sms_sender',
+        service_id=service_one['id']),
+        data={"sms_sender": content},
+        follow_redirects=True
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.select(".error-message")[0].text.strip() == expected_error
+    assert not mock_update_service.called
+
+
 def test_if_sms_sender_set_then_form_populated(
     logged_in_client,
     service_one,

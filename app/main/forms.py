@@ -491,6 +491,7 @@ class ServiceSmsSender(Form):
     sms_sender = StringField(
         'Text message sender',
         validators=[
+            DataRequired(message="Can’t be empty"),
             Length(max=11, message="Enter 11 characters or fewer")
         ]
     )
