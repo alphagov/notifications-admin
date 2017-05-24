@@ -1333,6 +1333,15 @@ def mock_get_usage(mocker, service_one, fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def mock_get_yearly_sms_unit_count_and_cost(mocker, service_one, fake_uuid):
+    def _get_usage(service_id, year=None):
+        return {"billable_sms_units": 100, "total_cost": 200.0}
+
+    return mocker.patch(
+        'app.service_api_client.get_yearly_sms_unit_count_and_cost', side_effect=_get_usage)
+
+
+@pytest.fixture(scope='function')
 def mock_get_billable_units(mocker):
     def _get_usage(service_id, year):
         return [

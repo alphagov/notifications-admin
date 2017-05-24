@@ -186,7 +186,7 @@ def get_dashboard_partials(service_id):
         'has_jobs': bool(immediate_jobs),
         'usage': render_template(
             'views/dashboard/_usage.html',
-            **calculate_usage(service_api_client.get_service_usage(
+            **calculate_fee_tier_usage(service_api_client.get_yearly_sms_unit_count_and_cost(
                 service_id,
                 get_current_financial_year(),
             ))
@@ -199,6 +199,18 @@ def get_dashboard_totals(statistics):
         msg_type['failed_percentage'] = get_formatted_percentage(msg_type['failed'], msg_type['requested'])
         msg_type['show_warning'] = float(msg_type['failed_percentage']) > 3
     return statistics
+
+
+def calculate_fee_tier_usage(usage):
+    # TODO: Don't hardcode these - get em from the API
+    sms_free_allowance = 250000
+
+    return({
+        'sms_chargeable': max(0, usage['billable_sms_units'] - sms_free_allowance),
+        'total_sms_bill': usage['billable_sms_units'],
+        'total_sms_cost': usage['total_cost'],
+        'sms_allowance_remaining': sms_free_allowance - int(usage['billable_sms_units'])
+    })
 
 
 def calculate_usage(usage):

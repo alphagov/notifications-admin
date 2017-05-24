@@ -221,6 +221,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             params=dict(year=year)
         )
 
+    def get_yearly_sms_unit_count_and_cost(self, service_id, year=None):
+        return self.get(
+            '/service/{0}/yearly-sms-billable-units'.format(service_id),
+            params=dict(year=year)
+        )
+
     def get_monthly_notification_stats(self, service_id, year):
         return self.get(url='/service/{}/notifications/monthly?year={}'.format(service_id, year))
 

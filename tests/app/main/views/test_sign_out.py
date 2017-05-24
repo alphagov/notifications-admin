@@ -23,6 +23,7 @@ def test_sign_out_user(
     mock_has_permissions,
     mock_get_template_statistics,
     mock_get_detailed_service,
+    mock_get_yearly_sms_unit_count_and_cost,
     mock_get_usage,
 ):
     with logged_in_client.session_transaction() as session:
