@@ -27,5 +27,6 @@ from app.main.views import (
     feedback,
     providers,
     platform_admin,
-    letter_jobs
+    letter_jobs,
+    conversation,
 )

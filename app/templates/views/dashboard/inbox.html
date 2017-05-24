@@ -25,7 +25,12 @@
       field_headings_visible=False
     ) %}
       {% call field() %}
-        <span class="file-list-filename" href="#">{{ item.user_number | format_phone_number_human_readable }}</span>
+        <a
+          class="file-list-filename"
+          href="{{ url_for('.conversation', service_id=current_service.id, notification_id=item.id) }}#n{{ item.id }}"
+        >
+          {{ item.user_number | format_phone_number_human_readable }}
+        </a>
         <span class="wide-left-hand-column">{{ item.content }}</span>
       {% endcall %}
       {% call field(align='right') %}
