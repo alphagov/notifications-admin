@@ -1,5 +1,8 @@
+$tail-angle: 20deg;
+
 .sms-message-wrapper {
 
+  position: relative;
   width: 100%;
   max-width: 464px;
   box-sizing: border-box;
@@ -11,6 +14,20 @@
   margin: 0 0 $gutter 0;
   clear: both;
   word-wrap: break-word;
+
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -4px;
+    right: -20px;
+    border: 10px solid transparent;
+    border-left-width: 13px;
+    border-right-width: 13px;
+    border-bottom-color: $panel-colour;
+    border-left-color: $panel-colour;
+    transform: rotate($tail-angle);
+  }
 
 }
 
