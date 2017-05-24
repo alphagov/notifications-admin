@@ -255,7 +255,7 @@ def test_upload_valid_csv_shows_file_contents(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     for index, cell in enumerate([
-        '<td class="table-field-index"> <span>2</span> </td>',
+        '<td class="table-field-index"> <span class=""> 2 </span> </td>',
         '<td class="table-field-center-aligned "> <div class=""> 07700900986 </div> </td>',
         '<td class="table-field-center-aligned "> <div class=""> Jo </div> </td>',
         (

@@ -74,6 +74,12 @@
 
   }
 
+  &-invisible-error {
+    border-left: 5px solid transparent;
+    padding-left: 7px;
+    display: block;
+  }
+
   &-status {
 
     &-default {
@@ -123,6 +129,7 @@
   }
 
   &-index {
+    @include bold-16;
     width: 15px;
   }
 
@@ -130,6 +137,10 @@
     margin: 0 0 5px 0;
   }
 
+}
+
+.table-font-xsmall td.table-field-index {  // overrides GOV.UK Elements
+  @include bold-16;
 }
 
 .table-field-headings,
