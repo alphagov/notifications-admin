@@ -284,6 +284,7 @@ def send_test_step(service_id, template_id, step_index):
 
     return render_template(
         'views/send-test.html',
+        page_title=get_send_test_page_title(template.template_type, request.endpoint),
         template=template,
         form=form,
         optional_placeholder=optional_placeholder,
@@ -546,3 +547,14 @@ def all_placeholders_in_session(placeholders):
         get_normalised_send_test_values_from_session().get(placeholder, False) not in (False, None)
         for placeholder in placeholders
     )
+
+
+def get_send_test_page_title(template_type, endpoint):
+    if get_help_argument():
+        return 'Example text message'
+    if template_type == 'letter':
+        return 'Print a test letter'
+    return {
+        'main.send_test_step': 'Send yourself a test',
+        'main.send_one_off_step': 'Send one-off message',
+    }[endpoint]

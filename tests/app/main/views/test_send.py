@@ -332,6 +332,71 @@ def test_send_test_step_redirects_if_session_not_setup(
         assert session['send_test_values'] == expected_session_contents
 
 
+@pytest.mark.parametrize('template_mock, partial_url, expected_h1', [
+    (
+        mock_get_service_template_with_placeholders,
+        partial(url_for, 'main.send_test'),
+        'Send yourself a test',
+    ),
+    (
+        mock_get_service_template_with_placeholders,
+        partial(url_for, 'main.send_one_off'),
+        'Send one-off message',
+    ),
+    (
+        mock_get_service_template_with_placeholders,
+        partial(url_for, 'main.send_test', help=1),
+        'Example text message',
+    ),
+    (
+        mock_get_service_email_template,
+        partial(url_for, 'main.send_test', help=1),
+        'Example text message',
+    ),
+    (
+        mock_get_service_email_template,
+        partial(url_for, 'main.send_test'),
+        'Send yourself a test',
+    ),
+    (
+        mock_get_service_email_template,
+        partial(url_for, 'main.send_one_off'),
+        'Send one-off message',
+    ),
+    (
+        mock_get_service_letter_template,
+        partial(url_for, 'main.send_test'),
+        'Print a test letter',
+    ),
+    (
+        mock_get_service_letter_template,
+        partial(url_for, 'main.send_one_off'),
+        'Print a test letter',
+    ),
+])
+def test_send_one_off_or_test_has_correct_page_titles(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    mocker,
+    template_mock,
+    partial_url,
+    expected_h1,
+):
+
+    template_mock(mocker)
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
+
+    response = logged_in_client.get(
+        partial_url(service_id=service_one['id'], template_id=fake_uuid, step_index=0),
+        follow_redirects=True,
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.h1.text.strip() == expected_h1
+
+
 @pytest.mark.parametrize('endpoint, expected_redirect, send_test_values', [
     (
         'main.send_test_step',

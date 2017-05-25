@@ -5,25 +5,13 @@
 {% from "components/table.html" import list_table, field, text_field, index_field, index_field_heading %}
 
 {% block service_page_title %}
-  {% if request.args['help'] %}
-    Example text message
-  {% else %}
-    Send yourself a test
-  {% endif %}
+  {{ page_title }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-  {% if request.args['help'] %}
-    Example text message
-  {% else %}
-    {% if template.template_type == 'letter' %}
-      Print a test letter
-    {% else %}
-      Send yourself a test
-    {% endif %}
-  {% endif %}
+    {{ page_title }}
   </h1>
 
   <form method="post" class="js-stick-at-top-when-scrolling" data-module="autofocus">
