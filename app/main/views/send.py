@@ -219,7 +219,10 @@ def send_test_step(service_id, template_id, step_index):
         page_count=session['send_test_letter_page_count']
     )
 
-    placeholders = fields_to_fill_in(template)
+    placeholders = fields_to_fill_in(
+        template,
+        prefill_current_user=(request.endpoint == 'main.send_test_step'),
+    )
 
     if len(placeholders) == 0:
         return make_and_upload_csv_file(service_id, template)
@@ -227,6 +230,8 @@ def send_test_step(service_id, template_id, step_index):
     try:
         current_placeholder = placeholders[step_index]
     except IndexError:
+        if all_placeholders_in_session(placeholders):
+            return make_and_upload_csv_file(service_id, template)
         return redirect(url_for(
             {
                 'main.send_test_step': '.send_test',
@@ -246,10 +251,7 @@ def send_test_step(service_id, template_id, step_index):
 
         session['send_test_values'][current_placeholder] = form.placeholder_value.data
 
-        if all(
-            get_normalised_send_test_values_from_session().get(placeholder, False) not in (False, None)
-            for placeholder in placeholders
-        ):
+        if all_placeholders_in_session(placeholders):
             return make_and_upload_csv_file(service_id, template)
 
         return redirect(url_for(
@@ -493,11 +495,11 @@ def get_check_messages_back_url(service_id, template_type):
     return url_for('main.choose_template', service_id=service_id)
 
 
-def fields_to_fill_in(template):
+def fields_to_fill_in(template, prefill_current_user=False):
 
     recipient_columns = first_column_headings[template.template_type]
 
-    if 'letter' == template.template_type:
+    if 'letter' == template.template_type or not prefill_current_user:
         return recipient_columns + list(template.placeholders)
 
     session['send_test_values'][recipient_columns[0]] = {
@@ -536,3 +538,10 @@ def make_and_upload_csv_file(service_id, template):
         from_test=True,
         help=2 if get_help_argument() else 0
     ))
+
+
+def all_placeholders_in_session(placeholders):
+    return all(
+        get_normalised_send_test_values_from_session().get(placeholder, False) not in (False, None)
+        for placeholder in placeholders
+    )

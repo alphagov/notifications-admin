@@ -297,34 +297,52 @@ def test_send_test_sms_message(
     mock_s3_upload.assert_called_with(service_one['id'], expected_data, 'eu-west-1')
 
 
-@pytest.mark.parametrize('endpoint', [
-    'main.send_test_step',
-    'main.send_one_off_step',
+@pytest.mark.parametrize('endpoint, template_mock, expected_session_contents', [
+    ('main.send_test_step', mock_get_service_template_with_placeholders, {'phone number': '07700 900762'}),
+    ('main.send_test_step', mock_get_service_email_template, {'email address': 'test@user.gov.uk'}),
+    ('main.send_test_step', mock_get_service_letter_template, {}),
+    ('main.send_one_off_step', mock_get_service_template, {}),
+    ('main.send_one_off_step', mock_get_service_email_template, {}),
+    ('main.send_one_off_step', mock_get_service_letter_template, {}),
 ])
 def test_send_test_step_redirects_if_session_not_setup(
+    mocker,
     logged_in_client,
-    service_one,
+    mock_get_detailed_service_for_today,
+    mock_get_users_by_service,
     fake_uuid,
-    mock_get_service_email_template,
     endpoint,
+    template_mock,
+    expected_session_contents,
 ):
+
+    template_mock(mocker)
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
     with logged_in_client.session_transaction() as session:
         assert 'send_test_values' not in session
 
     response = logged_in_client.get(
-        url_for(endpoint, service_id=service_one['id'], template_id=fake_uuid, step_index=0),
+        url_for(endpoint, service_id=SERVICE_ONE_ID, template_id=fake_uuid, step_index=0),
         follow_redirects=True
     )
     assert response.status_code == 200
 
     with logged_in_client.session_transaction() as session:
-        assert session['send_test_values'] == {'email address': 'test@user.gov.uk'}
+        assert session['send_test_values'] == expected_session_contents
 
 
-@pytest.mark.parametrize('endpoint', [
-    'main.send_test_step',
-    'main.send_one_off_step',
+@pytest.mark.parametrize('endpoint, expected_redirect, send_test_values', [
+    (
+        'main.send_test_step',
+        'main.send_test',
+        {'name': 'foo'},
+    ),
+    (
+        'main.send_one_off_step',
+        'main.send_one_off',
+        {'name': 'foo', 'phone number': '07900900123'},
+    ),
 ])
 def test_send_test_redirects_to_end_if_step_out_of_bounds(
     logged_in_client,
@@ -335,10 +353,12 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
     endpoint,
+    send_test_values,
+    expected_redirect,
 ):
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {'name': 'foo'}
+        session['send_test_values'] = send_test_values
 
     response = logged_in_client.get(url_for(
         endpoint,
