@@ -245,6 +245,7 @@ def send_test_step(service_id, template_id, step_index):
         current_placeholder,
         dict_to_populate_from=get_normalised_send_test_values_from_session(),
         optional_placeholder=optional_placeholder,
+        allow_international_phone_numbers=current_service['can_send_international_sms'],
     )
 
     if form.validate_on_submit():
