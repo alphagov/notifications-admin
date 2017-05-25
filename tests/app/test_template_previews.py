@@ -29,15 +29,15 @@ def test_from_utils_template_calls_through(
 @pytest.mark.parametrize('partial_call, expected_url', [
     (
         partial(TemplatePreview.from_database_object, filetype='bar'),
-        'http://localhost:6013/preview.bar',
+        'http://localhost:9999/preview.bar',
     ),
     (
         partial(TemplatePreview.from_database_object, filetype='baz'),
-        'http://localhost:6013/preview.baz',
+        'http://localhost:9999/preview.baz',
     ),
     (
         partial(TemplatePreview.from_database_object, filetype='bar', page=99),
-        'http://localhost:6013/preview.bar?page=99',
+        'http://localhost:9999/preview.bar?page=99',
     ),
 ])
 def test_from_database_object_makes_request(

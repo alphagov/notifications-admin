@@ -98,6 +98,7 @@ class Test(Development):
     WTF_CSRF_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'test-notifications-csv-upload'
     NOTIFY_ENVIRONMENT = 'test'
+    TEMPLATE_PREVIEW_API_HOST = 'http://localhost:9999'
 
 
 class Preview(Config):
