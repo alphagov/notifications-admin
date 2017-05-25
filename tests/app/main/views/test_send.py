@@ -286,7 +286,6 @@ def test_send_test_sms_message(
     mock_get_detailed_service_for_today,
 ):
 
-    expected_data = {'data': 'phone number\r\n07700 900762\r\n', 'file_name': 'Test message'}
     mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
 
     response = logged_in_client.get(
@@ -294,7 +293,11 @@ def test_send_test_sms_message(
         follow_redirects=True
     )
     assert response.status_code == 200
-    mock_s3_upload.assert_called_with(service_one['id'], expected_data, 'eu-west-1')
+    mock_s3_upload.assert_called_with(
+        service_one['id'],
+        {'data': 'phone number\r\n07700 900762\r\n', 'file_name': 'One-off message'},
+        'eu-west-1'
+    )
 
 
 @pytest.mark.parametrize('endpoint, template_mock, expected_session_contents', [
@@ -336,7 +339,7 @@ def test_send_test_step_redirects_if_session_not_setup(
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_test'),
-        'Send yourself a test',
+        'Send one-off message',
     ),
     (
         mock_get_service_template_with_placeholders,
@@ -356,7 +359,7 @@ def test_send_test_step_redirects_if_session_not_setup(
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_test'),
-        'Send yourself a test',
+        'Send one-off message',
     ),
     (
         mock_get_service_email_template,
@@ -395,6 +398,44 @@ def test_send_one_off_or_test_has_correct_page_titles(
 
     assert response.status_code == 200
     assert page.h1.text.strip() == expected_h1
+
+
+@pytest.mark.parametrize('template_mock, expected_link_text, expected_link_url', [
+    (mock_get_service_template, 'Use my phone number', partial(url_for, 'main.send_test')),
+    (mock_get_service_email_template, 'Use my email address', partial(url_for, 'main.send_test')),
+    (mock_get_service_letter_template, None, None),
+])
+def test_send_one_off_has_skip_link(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    mock_get_service_email_template,
+    mocker,
+    template_mock,
+    expected_link_text,
+    expected_link_url,
+):
+
+    template_mock(mocker)
+    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
+
+    response = logged_in_client.get(
+        url_for('main.send_one_off_step', service_id=service_one['id'], template_id=fake_uuid, step_index=0),
+        follow_redirects=True
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    skip_links = page.select('a.top-gutter-4-3')
+
+    assert response.status_code == 200
+
+    if expected_link_text and expected_link_url:
+        assert skip_links[0].text.strip() == expected_link_text
+        assert skip_links[0]['href'] == expected_link_url(
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+        )
+    else:
+        assert not skip_links
 
 
 @pytest.mark.parametrize('endpoint, expected_redirect, send_test_values', [
@@ -553,7 +594,6 @@ def test_send_test_email_message_without_placeholders(
     fake_uuid,
 ):
 
-    expected_data = {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'Test message'}
     mocker.patch('app.main.views.send.s3download', return_value='email address\r\ntest@user.gov.uk')
 
     response = logged_in_client.get(
@@ -561,7 +601,11 @@ def test_send_test_email_message_without_placeholders(
         follow_redirects=True
     )
     assert response.status_code == 200
-    mock_s3_upload.assert_called_with(service_one['id'], expected_data, 'eu-west-1')
+    mock_s3_upload.assert_called_with(
+        service_one['id'],
+        {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'One-off message'},
+        'eu-west-1'
+    )
 
 
 def test_send_test_sms_message_with_placeholders_shows_first_field(
@@ -780,7 +824,7 @@ def test_send_test_sms_message_puts_submitted_data_in_session_and_file(
         service_one['id'],
         {
             'data': 'name,phone number\r\nJo,07700 900762\r\n',
-            'file_name': 'Test message'
+            'file_name': 'One-off message'
         },
         'eu-west-1'
     )

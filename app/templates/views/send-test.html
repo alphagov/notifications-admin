@@ -15,10 +15,20 @@
   </h1>
 
   <form method="post" class="js-stick-at-top-when-scrolling" data-module="autofocus">
-    {{ textbox(
-      form.placeholder_value,
-      hint='Optional' if optional_placeholder else None
-    ) }}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ textbox(
+          form.placeholder_value,
+          hint='Optional' if optional_placeholder else None,
+          width='1-1',
+        ) }}
+      </div>
+      {% if skip_link %}
+        <div class="column-one-third">
+          <a href="{{ skip_link[1] }}" class="top-gutter-4-3">{{ skip_link[0] }}</a>
+        </div>
+      {% endif %}
+    </div>
     {{ page_footer('Next', back_link=back_link) }}
   </form>
 

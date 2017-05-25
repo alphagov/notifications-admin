@@ -26,6 +26,19 @@
   @include grid-column(7/8);
 }
 
+%top-gutter,
+.top-gutter {
+  @extend %contain-floats;
+  display: block;
+  margin-top: $gutter;
+  clear: both;
+}
+
+.top-gutter-4-3 {
+  @extend %top-gutter;
+  margin-top: $gutter * 4 / 3;
+}
+
 %bottom-gutter,
 .bottom-gutter {
   @extend %contain-floats;

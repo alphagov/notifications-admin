@@ -13,8 +13,8 @@
           </a>
         </div>
         <div class="{{ 'column-half' if template.template_type == 'letter' else 'column-third' }}">
-          <a href="{{ url_for(".send_test", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
-            {{ 'Print a test letter' if template.template_type == 'letter' else 'Send yourself a test' }}
+          <a href="{{ url_for(".send_one_off", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
+            {{ 'Print a test letter' if template.template_type == 'letter' else 'Send one-off message' }}
           </a>
         </div>
         {% endif %}

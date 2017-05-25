@@ -282,13 +282,25 @@ def send_test_step(service_id, template_id, step_index):
     template.values = get_normalised_send_test_values_from_session()
     template.values[current_placeholder] = None
 
+    if (
+        request.endpoint == 'main.send_one_off_step' and
+        step_index == 0 and
+        template.template_type != 'letter'
+    ):
+        skip_link = (
+            'Use my {}'.format(first_column_headings[template.template_type][0]),
+            url_for('.send_test', service_id=service_id, template_id=template.id),
+        )
+    else:
+        skip_link = None
+
     return render_template(
         'views/send-test.html',
-        page_title=get_send_test_page_title(template.template_type, request.endpoint),
+        page_title=get_send_test_page_title(template.template_type, get_help_argument()),
         template=template,
         form=form,
+        skip_link=skip_link,
         optional_placeholder=optional_placeholder,
-        help=get_help_argument(),
         back_link=back_link,
     )
 
@@ -549,12 +561,9 @@ def all_placeholders_in_session(placeholders):
     )
 
 
-def get_send_test_page_title(template_type, endpoint):
-    if get_help_argument():
+def get_send_test_page_title(template_type, help_argument):
+    if help_argument:
         return 'Example text message'
     if template_type == 'letter':
         return 'Print a test letter'
-    return {
-        'main.send_test_step': 'Send yourself a test',
-        'main.send_one_off_step': 'Send one-off message',
-    }[endpoint]
+    return 'Send one-off message'
