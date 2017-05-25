@@ -157,14 +157,18 @@ def get_example_csv(service_id, template_id):
     }
 
 
-@main.route("/services/<service_id>/send/<template_id>/test")
+@main.route("/services/<service_id>/send/<template_id>/test", endpoint='send_test')
+@main.route("/services/<service_id>/send/<template_id>/one-off", endpoint='send_one_off')
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test(service_id, template_id):
     session['send_test_values'] = dict()
     session['send_test_letter_page_count'] = None
     return redirect(url_for(
-        '.send_test_step',
+        {
+            'main.send_test': '.send_test_step',
+            'main.send_one_off': '.send_one_off_step',
+        }[request.endpoint],
         service_id=service_id,
         template_id=template_id,
         step_index=0,
@@ -172,14 +176,28 @@ def send_test(service_id, template_id):
     ))
 
 
-@main.route("/services/<service_id>/send/<template_id>/test/step-<int:step_index>", methods=['GET', 'POST'])
+@main.route(
+    "/services/<service_id>/send/<template_id>/test/step-<int:step_index>",
+    methods=['GET', 'POST'],
+    endpoint='send_test_step',
+)
+@main.route(
+    "/services/<service_id>/send/<template_id>/one-off/step-<int:step_index>",
+    methods=['GET', 'POST'],
+    endpoint='send_one_off_step',
+)
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test_step(service_id, template_id, step_index):
 
     if 'send_test_values' not in session:
         return redirect(url_for(
-            '.send_test', service_id=service_id, template_id=template_id
+            {
+                'main.send_test_step': '.send_test',
+                'main.send_one_off_step': '.send_one_off',
+            }[request.endpoint],
+            service_id=service_id,
+            template_id=template_id,
         ))
 
     template = service_api_client.get_service_template(service_id, template_id)['data']
@@ -210,7 +228,12 @@ def send_test_step(service_id, template_id, step_index):
         current_placeholder = placeholders[step_index]
     except IndexError:
         return redirect(url_for(
-            '.send_test', service_id=service_id, template_id=template_id
+            {
+                'main.send_test_step': '.send_test',
+                'main.send_one_off_step': '.send_one_off',
+            }[request.endpoint],
+            service_id=service_id,
+            template_id=template_id,
         ))
     optional_placeholder = (current_placeholder in optional_address_columns)
     form = get_placeholder_form_instance(
@@ -230,7 +253,7 @@ def send_test_step(service_id, template_id, step_index):
             return make_and_upload_csv_file(service_id, template)
 
         return redirect(url_for(
-            '.send_test_step',
+            request.endpoint,
             service_id=service_id,
             template_id=template_id,
             step_index=step_index + 1,
@@ -247,7 +270,7 @@ def send_test_step(service_id, template_id, step_index):
         )
     else:
         back_link = url_for(
-            '.send_test_step',
+            request.endpoint,
             service_id=service_id,
             template_id=template_id,
             step_index=step_index - 1,

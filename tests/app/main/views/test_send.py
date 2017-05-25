@@ -297,18 +297,23 @@ def test_send_test_sms_message(
     mock_s3_upload.assert_called_with(service_one['id'], expected_data, 'eu-west-1')
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.send_test_step',
+    'main.send_one_off_step',
+])
 def test_send_test_step_redirects_if_session_not_setup(
     logged_in_client,
     service_one,
     fake_uuid,
     mock_get_service_email_template,
+    endpoint,
 ):
 
     with logged_in_client.session_transaction() as session:
         assert 'send_test_values' not in session
 
     response = logged_in_client.get(
-        url_for('main.send_test_step', service_id=service_one['id'], template_id=fake_uuid, step_index=0),
+        url_for(endpoint, service_id=service_one['id'], template_id=fake_uuid, step_index=0),
         follow_redirects=True
     )
     assert response.status_code == 200
@@ -317,6 +322,10 @@ def test_send_test_step_redirects_if_session_not_setup(
         assert session['send_test_values'] == {'email address': 'test@user.gov.uk'}
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.send_test_step',
+    'main.send_one_off_step',
+])
 def test_send_test_redirects_to_end_if_step_out_of_bounds(
     logged_in_client,
     service_one,
@@ -325,13 +334,14 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
+    endpoint,
 ):
 
     with logged_in_client.session_transaction() as session:
         session['send_test_values'] = {'name': 'foo'}
 
     response = logged_in_client.get(url_for(
-        'main.send_test_step',
+        endpoint,
         service_id=service_one['id'],
         template_id=fake_uuid,
         step_index=999,
@@ -351,6 +361,10 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
     )
 
 
+@pytest.mark.parametrize('endpoint, expected_redirect', [
+    ('main.send_test_step', 'main.send_test'),
+    ('main.send_one_off_step', 'main.send_one_off'),
+])
 def test_send_test_redirects_to_start_if_you_skip_steps(
     logged_in_platform_admin_client,
     service_one,
@@ -360,6 +374,8 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
     mocker,
+    endpoint,
+    expected_redirect,
 ):
 
     with logged_in_platform_admin_client.session_transaction() as session:
@@ -367,20 +383,24 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
         session['send_test_values'] = {'address_line_1': 'foo'}
 
     response = logged_in_platform_admin_client.get(url_for(
-        'main.send_test_step',
+        endpoint,
         service_id=service_one['id'],
         template_id=fake_uuid,
         step_index=7,  # letter template has 7 placeholders – we’re at the end
     ))
     assert response.status_code == 302
     assert response.location == url_for(
-        'main.send_test',
+        expected_redirect,
         service_id=service_one['id'],
         template_id=fake_uuid,
         _external=True,
     )
 
 
+@pytest.mark.parametrize('endpoint, expected_redirect', [
+    ('main.send_test_step', 'main.send_test'),
+    ('main.send_one_off_step', 'main.send_one_off'),
+])
 def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholders_empty(
     logged_in_client,
     service_one,
@@ -389,13 +409,15 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     mock_s3_download,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
+    endpoint,
+    expected_redirect,
 ):
 
     with logged_in_client.session_transaction() as session:
         session['send_test_values'] = {'name': 'foo'}
 
     response = logged_in_client.get(url_for(
-        'main.send_test_step',
+        endpoint,
         service_id=service_one['id'],
         template_id=fake_uuid,
         step_index=999,
@@ -403,24 +425,30 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
 
     assert response.status_code == 302
     assert response.location == url_for(
-        'main.send_test',
+        expected_redirect,
         service_id=service_one['id'],
         template_id=fake_uuid,
         _external=True,
     )
 
 
+@pytest.mark.parametrize('endpoint, expected_redirect', [
+    ('main.send_test', 'main.send_test_step'),
+    ('main.send_one_off', 'main.send_one_off_step'),
+])
 def test_send_test_sms_message_redirects_with_help_argument(
     logged_in_client,
     service_one,
     fake_uuid,
+    endpoint,
+    expected_redirect,
 ):
     response = logged_in_client.get(
-        url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid, help=1)
+        url_for(endpoint, service_id=service_one['id'], template_id=fake_uuid, help=1)
     )
     assert response.status_code == 302
     assert response.location == url_for(
-        'main.send_test_step',
+        expected_redirect,
         service_id=service_one['id'],
         template_id=fake_uuid,
         step_index=0,
