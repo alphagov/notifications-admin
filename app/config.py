@@ -81,6 +81,7 @@ class Config(object):
         r"hmcts\.net",
         r"scotent\.co\.uk",
         r"assembly\.wales",
+        r"cjsm\.net",
     ]
 
 
