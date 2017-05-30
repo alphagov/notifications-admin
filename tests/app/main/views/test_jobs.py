@@ -311,6 +311,13 @@ def test_should_show_updates_for_one_job_as_json(
         (None, 1)
     ]
 )
+@pytest.mark.parametrize(
+    "to_argument, expected_to_argument", [
+        ('', ''),
+        ('+447900900123', '+447900900123'),
+        ('test@example.com', 'test@example.com'),
+    ]
+)
 def test_can_show_notifications(
     logged_in_client,
     service_one,
@@ -322,13 +329,17 @@ def test_can_show_notifications(
     expected_api_call,
     page_argument,
     expected_page_argument,
+    to_argument,
+    expected_to_argument,
 ):
     response = logged_in_client.get(url_for(
         'main.view_notifications',
         service_id=service_one['id'],
         message_type=message_type,
         status=status_argument,
-        page=page_argument))
+        page=page_argument,
+        to=to_argument,
+    ))
     assert response.status_code == 200
     content = response.get_data(as_text=True)
     notifications = notification_json(service_one['id'])
@@ -348,13 +359,16 @@ def test_can_show_notifications(
         assert query_dict['status'] == [status_argument]
     if expected_page_argument:
         assert query_dict['page'] == [str(expected_page_argument)]
+    if to_argument:
+        assert query_dict['to'] == [to_argument]
 
     mock_get_notifications.assert_called_with(
         limit_days=7,
         page=expected_page_argument,
         service_id=service_one['id'],
         status=expected_api_call,
-        template_type=[message_type]
+        template_type=[message_type],
+        to=expected_to_argument,
     )
 
     json_response = logged_in_client.get(url_for(

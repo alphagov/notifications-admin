@@ -1069,6 +1069,7 @@ def mock_get_notifications(mocker, api_user_active):
         rows=5,
         include_jobs=None,
         include_from_test_key=None,
+        to=None,
     ):
         job = None
         if job_id is not None:
@@ -1101,7 +1102,9 @@ def mock_get_notifications_with_previous_next(mocker):
                            status=None,
                            limit_days=None,
                            include_jobs=None,
-                           include_from_test_key=None):
+                           include_from_test_key=None,
+                           to=None,
+                           ):
         return notification_json(service_id, with_links=True)
 
     return mocker.patch(

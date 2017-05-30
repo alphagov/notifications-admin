@@ -198,7 +198,8 @@ def view_notifications(service_id, message_type):
         partials=get_notifications(service_id, message_type),
         message_type=message_type,
         status=request.args.get('status'),
-        page=request.args.get('page', 1)
+        page=request.args.get('page', 1),
+        to=request.args.get('to'),
     )
 
 
@@ -241,7 +242,9 @@ def get_notifications(service_id, message_type, status_override=None):
         page=page,
         template_type=[message_type],
         status=filter_args.get('status'),
-        limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
+        limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'],
+        to=request.args.get('to'),
+    )
 
     url_args = {
         'message_type': message_type,
