@@ -1,6 +1,8 @@
 {% extends "withnav_template.html" %}
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/message-count-label.html" import message_count_label, recipient_count_label %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/textbox.html" import textbox %}
 
 {% block service_page_title %}
   {{ message_count_label(99, message_type, suffix='') | capitalize }}
@@ -17,6 +19,24 @@
     url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status),
     'counts'
   ) }}
+
+  <form
+    method="get"
+    action="{{ url_for('.view_notifications', service_id=current_service.id, message_type=message_type) }}"
+    class="grid-row"
+  >
+    <div class="column-three-quarters">
+      <input type="hidden" name="status" value="{{ status }}">
+      {{ textbox(
+        search_form.to,
+        width='1-1',
+        label='Search by {}'.format('email address' if message_type == 'email' else 'phone number')
+      ) }}
+    </div>
+    <div class="column-one-quarter align-button-with-textbox">
+      <input type="submit" class="button" value="Search">
+    </div>
+  </form>
 
   {{ ajax_block(
     partials,
