@@ -392,6 +392,14 @@ def test_can_show_notifications(
     ),
     (
         {
+            'message_type': 'sms',
+            'to': '+33(0)5-12-34-56-78',
+        },
+        'sending,delivered,failed',
+        '+33(0)5-12-34-56-78',
+    ),
+    (
+        {
             'status': 'failed',
             'message_type': 'email',
             'page': '99',
