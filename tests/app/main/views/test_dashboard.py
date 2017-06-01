@@ -698,7 +698,7 @@ def test_should_show_all_jobs_with_valid_statuses(
     })
 
 
-def test_should_show_remaining_fee_tier_count(
+def test_should_show_remaining_free_tier_count(
     logged_in_client,
     mock_get_service_templates,
     mock_get_template_statistics,
@@ -719,7 +719,7 @@ def test_should_show_remaining_fee_tier_count(
     assert 'free text messages left' in response.get_data(as_text=True)
 
 
-def test_should_show_cost_if_exceeded_fee_tier_count(
+def test_should_show_cost_if_exceeded_free_tier_count(
     logged_in_client,
     mock_get_service_templates,
     mock_get_template_statistics,
