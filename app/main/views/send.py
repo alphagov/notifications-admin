@@ -157,14 +157,18 @@ def get_example_csv(service_id, template_id):
     }
 
 
-@main.route("/services/<service_id>/send/<template_id>/test")
+@main.route("/services/<service_id>/send/<template_id>/test", endpoint='send_test')
+@main.route("/services/<service_id>/send/<template_id>/one-off", endpoint='send_one_off')
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test(service_id, template_id):
     session['send_test_values'] = dict()
     session['send_test_letter_page_count'] = None
     return redirect(url_for(
-        '.send_test_step',
+        {
+            'main.send_test': '.send_test_step',
+            'main.send_one_off': '.send_one_off_step',
+        }[request.endpoint],
         service_id=service_id,
         template_id=template_id,
         step_index=0,
@@ -172,14 +176,28 @@ def send_test(service_id, template_id):
     ))
 
 
-@main.route("/services/<service_id>/send/<template_id>/test/step-<int:step_index>", methods=['GET', 'POST'])
+@main.route(
+    "/services/<service_id>/send/<template_id>/test/step-<int:step_index>",
+    methods=['GET', 'POST'],
+    endpoint='send_test_step',
+)
+@main.route(
+    "/services/<service_id>/send/<template_id>/one-off/step-<int:step_index>",
+    methods=['GET', 'POST'],
+    endpoint='send_one_off_step',
+)
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test_step(service_id, template_id, step_index):
 
     if 'send_test_values' not in session:
         return redirect(url_for(
-            '.send_test', service_id=service_id, template_id=template_id
+            {
+                'main.send_test_step': '.send_test',
+                'main.send_one_off_step': '.send_one_off',
+            }[request.endpoint],
+            service_id=service_id,
+            template_id=template_id,
         ))
 
     template = service_api_client.get_service_template(service_id, template_id)['data']
@@ -201,7 +219,10 @@ def send_test_step(service_id, template_id, step_index):
         page_count=session['send_test_letter_page_count']
     )
 
-    placeholders = fields_to_fill_in(template)
+    placeholders = fields_to_fill_in(
+        template,
+        prefill_current_user=(request.endpoint == 'main.send_test_step'),
+    )
 
     if len(placeholders) == 0:
         return make_and_upload_csv_file(service_id, template)
@@ -209,28 +230,33 @@ def send_test_step(service_id, template_id, step_index):
     try:
         current_placeholder = placeholders[step_index]
     except IndexError:
+        if all_placeholders_in_session(placeholders):
+            return make_and_upload_csv_file(service_id, template)
         return redirect(url_for(
-            '.send_test', service_id=service_id, template_id=template_id
+            {
+                'main.send_test_step': '.send_test',
+                'main.send_one_off_step': '.send_one_off',
+            }[request.endpoint],
+            service_id=service_id,
+            template_id=template_id,
         ))
     optional_placeholder = (current_placeholder in optional_address_columns)
     form = get_placeholder_form_instance(
         current_placeholder,
         dict_to_populate_from=get_normalised_send_test_values_from_session(),
         optional_placeholder=optional_placeholder,
+        allow_international_phone_numbers=current_service['can_send_international_sms'],
     )
 
     if form.validate_on_submit():
 
         session['send_test_values'][current_placeholder] = form.placeholder_value.data
 
-        if all(
-            get_normalised_send_test_values_from_session().get(placeholder, False) not in (False, None)
-            for placeholder in placeholders
-        ):
+        if all_placeholders_in_session(placeholders):
             return make_and_upload_csv_file(service_id, template)
 
         return redirect(url_for(
-            '.send_test_step',
+            request.endpoint,
             service_id=service_id,
             template_id=template_id,
             step_index=step_index + 1,
@@ -247,7 +273,7 @@ def send_test_step(service_id, template_id, step_index):
         )
     else:
         back_link = url_for(
-            '.send_test_step',
+            request.endpoint,
             service_id=service_id,
             template_id=template_id,
             step_index=step_index - 1,
@@ -256,13 +282,27 @@ def send_test_step(service_id, template_id, step_index):
     template.values = get_normalised_send_test_values_from_session()
     template.values[current_placeholder] = None
 
+    if (
+        request.endpoint == 'main.send_one_off_step' and
+        step_index == 0 and
+        template.template_type != 'letter'
+    ):
+        skip_link = (
+            'Use my {}'.format(first_column_headings[template.template_type][0]),
+            url_for('.send_test', service_id=service_id, template_id=template.id),
+        )
+    else:
+        skip_link = None
+
     return render_template(
         'views/send-test.html',
+        page_title=get_send_test_page_title(template.template_type, get_help_argument()),
         template=template,
         form=form,
+        skip_link=skip_link,
         optional_placeholder=optional_placeholder,
-        help=get_help_argument(),
         back_link=back_link,
+        help=get_help_argument(),
     )
 
 
@@ -470,11 +510,11 @@ def get_check_messages_back_url(service_id, template_type):
     return url_for('main.choose_template', service_id=service_id)
 
 
-def fields_to_fill_in(template):
+def fields_to_fill_in(template, prefill_current_user=False):
 
     recipient_columns = first_column_headings[template.template_type]
 
-    if 'letter' == template.template_type:
+    if 'letter' == template.template_type or not prefill_current_user:
         return recipient_columns + list(template.placeholders)
 
     session['send_test_values'][recipient_columns[0]] = {
@@ -513,3 +553,18 @@ def make_and_upload_csv_file(service_id, template):
         from_test=True,
         help=2 if get_help_argument() else 0
     ))
+
+
+def all_placeholders_in_session(placeholders):
+    return all(
+        get_normalised_send_test_values_from_session().get(placeholder, False) not in (False, None)
+        for placeholder in placeholders
+    )
+
+
+def get_send_test_page_title(template_type, help_argument):
+    if help_argument:
+        return 'Example text message'
+    if template_type == 'letter':
+        return 'Print a test letter'
+    return 'Send to one recipient'

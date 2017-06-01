@@ -5,32 +5,30 @@
 {% from "components/table.html" import list_table, field, text_field, index_field, index_field_heading %}
 
 {% block service_page_title %}
-  {% if request.args['help'] %}
-    Example text message
-  {% else %}
-    Send yourself a test
-  {% endif %}
+  {{ page_title }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-  {% if request.args['help'] %}
-    Example text message
-  {% else %}
-    {% if template.template_type == 'letter' %}
-      Print a test letter
-    {% else %}
-      Send yourself a test
-    {% endif %}
-  {% endif %}
+    {{ page_title }}
   </h1>
 
   <form method="post" class="js-stick-at-top-when-scrolling" data-module="autofocus">
-    {{ textbox(
-      form.placeholder_value,
-      hint='Optional' if optional_placeholder else None
-    ) }}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        {{ textbox(
+          form.placeholder_value,
+          hint='Optional' if optional_placeholder else None,
+          width='1-1',
+        ) }}
+      </div>
+      {% if skip_link %}
+        <div class="column-one-third">
+          <a href="{{ skip_link[1] }}" class="top-gutter-4-3">{{ skip_link[0] }}</a>
+        </div>
+      {% endif %}
+    </div>
     {{ page_footer('Next', back_link=back_link) }}
   </form>
 

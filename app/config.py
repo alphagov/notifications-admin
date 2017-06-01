@@ -57,7 +57,7 @@ class Config(object):
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
     DESKPRO_PERSON_EMAIL = 'donotreply@notifications.service.gov.uk'
     ACTIVITY_STATS_LIMIT_DAYS = 7
-    TEST_MESSAGE_FILENAME = 'Test message'
+    TEST_MESSAGE_FILENAME = 'Report'
 
     STATSD_ENABLED = False
     STATSD_HOST = "statsd.hostedgraphite.com"
