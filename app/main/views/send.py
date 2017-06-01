@@ -566,4 +566,4 @@ def get_send_test_page_title(template_type, help_argument):
         return 'Example text message'
     if template_type == 'letter':
         return 'Print a test letter'
-    return 'Send one-off message'
+    return 'Send to one recipient'

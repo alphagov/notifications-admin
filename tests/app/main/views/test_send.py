@@ -295,7 +295,7 @@ def test_send_test_sms_message(
     assert response.status_code == 200
     mock_s3_upload.assert_called_with(
         service_one['id'],
-        {'data': 'phone number\r\n07700 900762\r\n', 'file_name': 'One-off message'},
+        {'data': 'phone number\r\n07700 900762\r\n', 'file_name': 'Report'},
         'eu-west-1'
     )
 
@@ -339,12 +339,12 @@ def test_send_test_step_redirects_if_session_not_setup(
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_test'),
-        'Send one-off message',
+        'Send to one recipient',
     ),
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_one_off'),
-        'Send one-off message',
+        'Send to one recipient',
     ),
     (
         mock_get_service_template_with_placeholders,
@@ -359,12 +359,12 @@ def test_send_test_step_redirects_if_session_not_setup(
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_test'),
-        'Send one-off message',
+        'Send to one recipient',
     ),
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_one_off'),
-        'Send one-off message',
+        'Send to one recipient',
     ),
     (
         mock_get_service_letter_template,
@@ -603,7 +603,7 @@ def test_send_test_email_message_without_placeholders(
     assert response.status_code == 200
     mock_s3_upload.assert_called_with(
         service_one['id'],
-        {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'One-off message'},
+        {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'Report'},
         'eu-west-1'
     )
 
@@ -824,7 +824,7 @@ def test_send_test_sms_message_puts_submitted_data_in_session_and_file(
         service_one['id'],
         {
             'data': 'name,phone number\r\nJo,07700 900762\r\n',
-            'file_name': 'One-off message'
+            'file_name': 'Report'
         },
         'eu-west-1'
     )
