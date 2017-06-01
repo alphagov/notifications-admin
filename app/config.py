@@ -59,6 +59,8 @@ class Config(object):
     ACTIVITY_STATS_LIMIT_DAYS = 7
     TEST_MESSAGE_FILENAME = 'Test message'
 
+    SMS_FREE_TIER_AMOUNT = 250000
+
     STATSD_ENABLED = False
     STATSD_HOST = "statsd.hostedgraphite.com"
     STATSD_PORT = 8125
