@@ -641,6 +641,11 @@ class SearchTemplatesForm(Form):
     search = SearchField('Search by name')
 
 
+class SearchNotificationsForm(Form):
+
+    to = SearchField('Search by phone number or email address')
+
+
 class PlaceholderForm(Form):
 
     pass
