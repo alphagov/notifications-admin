@@ -335,46 +335,54 @@ def test_send_test_step_redirects_if_session_not_setup(
         assert session['send_test_values'] == expected_session_contents
 
 
-@pytest.mark.parametrize('template_mock, partial_url, expected_h1', [
+@pytest.mark.parametrize('template_mock, partial_url, expected_h1, tour_shown', [
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_test'),
         'Send to one recipient',
+        False,
     ),
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_one_off'),
         'Send to one recipient',
+        False,
     ),
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_test', help=1),
         'Example text message',
+        True,
     ),
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_test', help=1),
         'Example text message',
+        True,
     ),
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_test'),
         'Send to one recipient',
+        False,
     ),
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_one_off'),
         'Send to one recipient',
+        False,
     ),
     (
         mock_get_service_letter_template,
         partial(url_for, 'main.send_test'),
         'Print a test letter',
+        False,
     ),
     (
         mock_get_service_letter_template,
         partial(url_for, 'main.send_one_off'),
         'Print a test letter',
+        False,
     ),
 ])
 def test_send_one_off_or_test_has_correct_page_titles(
@@ -385,6 +393,7 @@ def test_send_one_off_or_test_has_correct_page_titles(
     template_mock,
     partial_url,
     expected_h1,
+    tour_shown,
 ):
 
     template_mock(mocker)
@@ -398,6 +407,8 @@ def test_send_one_off_or_test_has_correct_page_titles(
 
     assert response.status_code == 200
     assert page.h1.text.strip() == expected_h1
+
+    assert (len(page.select('.banner-tour')) == 1) == tour_shown
 
 
 @pytest.mark.parametrize('template_mock, expected_link_text, expected_link_url', [

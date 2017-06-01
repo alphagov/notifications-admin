@@ -302,6 +302,7 @@ def send_test_step(service_id, template_id, step_index):
         skip_link=skip_link,
         optional_placeholder=optional_placeholder,
         back_link=back_link,
+        help=get_help_argument(),
     )
 
 
