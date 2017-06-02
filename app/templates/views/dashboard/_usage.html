@@ -10,7 +10,7 @@
     <div class="keyline-block">
       {% if sms_chargeable %}
         {{ big_number(
-          total_sms_cost,
+          (sms_chargeable * sms_rate),
           'spent on text messages',
           currency="£",
           smaller=True

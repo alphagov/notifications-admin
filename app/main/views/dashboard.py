@@ -2,7 +2,6 @@ from datetime import datetime
 from functools import partial
 from flask import (
     render_template,
-    current_app,
     url_for,
     session,
     jsonify,
@@ -187,7 +186,7 @@ def get_dashboard_partials(service_id):
         'has_jobs': bool(immediate_jobs),
         'usage': render_template(
             'views/dashboard/_usage.html',
-            **calculate_free_tier_usage(service_api_client.get_yearly_sms_unit_count_and_cost(
+            **calculate_usage(service_api_client.get_service_usage(
                 service_id,
                 get_current_financial_year(),
             ))
@@ -202,19 +201,9 @@ def get_dashboard_totals(statistics):
     return statistics
 
 
-def calculate_free_tier_usage(usage):
-    sms_free_allowance = current_app.config['SMS_FREE_TIER_AMOUNT']
-
-    return({
-        'sms_chargeable': max(0, usage['billable_sms_units'] - sms_free_allowance),
-        'total_sms_bill': usage['billable_sms_units'],
-        'total_sms_cost': usage['total_cost'],
-        'sms_allowance_remaining': sms_free_allowance - int(usage['billable_sms_units'])
-    })
-
-
 def calculate_usage(usage):
-    sms_free_allowance = current_app.config['SMS_FREE_TIER_AMOUNT']
+    # TODO: Don't hardcode these - get em from the API
+    sms_free_allowance = 250000
 
     sms_rate = 0 if len(usage) == 0 else usage[0].get("rate", 0)
     sms_sent = get_sum_billing_units(breakdown for breakdown in usage if breakdown['notification_type'] == 'sms')
