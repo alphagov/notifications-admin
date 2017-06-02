@@ -94,6 +94,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'organisation',
             'letter_contact_block',
             'dvla_organisation',
+            'permissions'
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(

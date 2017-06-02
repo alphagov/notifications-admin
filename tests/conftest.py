@@ -167,7 +167,8 @@ def mock_update_service(mocker):
                 'restricted',
                 'email_from',
                 'reply_to_email_address',
-                'sms_sender'
+                'sms_sender',
+                'permissions'
             ]}
         )
         return {'data': service}

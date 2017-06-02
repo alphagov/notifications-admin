@@ -49,6 +49,7 @@ def service_settings(service_id):
         letter_branding=letter_branding_organisations.get(
             current_service.get('dvla_organisation', '001')
         ),
+        can_receive_inbound=('inbound_sms' in current_service['permissions']),
         letter_contact_block=Field(current_service['letter_contact_block'], html='escape')
     )
 
@@ -267,14 +268,27 @@ def service_set_reply_to_email(service_id):
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_sms_sender(service_id):
     form = ServiceSmsSender()
+    if form.validate_on_submit():
+        set_inbound_sms = request.args.get('set_inbound_sms', False)
+        if set_inbound_sms == 'True':
+            permissions = current_service['permissions']
+            if 'inbound_sms' in permissions:
+                permissions.remove('inbound_sms')
+            else:
+                permissions.append('inbound_sms')
+            service_api_client.update_service_with_properties(
+                current_service['id'],
+                {'permissions': permissions,
+                 'sms_sender': form.sms_sender.data or None}
+            )
+        else:
+            service_api_client.update_service(
+                current_service['id'],
+                sms_sender=form.sms_sender.data or None
+            )
+        return redirect(url_for('.service_settings', service_id=service_id))
     if request.method == 'GET':
         form.sms_sender.data = current_service.get('sms_sender')
-    if form.validate_on_submit():
-        service_api_client.update_service(
-            current_service['id'],
-            sms_sender=form.sms_sender.data or None
-        )
-        return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/set-sms-sender.html',
         form=form)
