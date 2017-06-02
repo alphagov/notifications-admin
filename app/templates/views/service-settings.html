@@ -36,7 +36,7 @@
 
         {% call row() %}
           {{ text_field('Text message sender') }}
-          {{ text_field(current_service.sms_sender}}
+          {{ text_field(current_service.sms_sender) }}
           {% if current_user.has_permissions([], admin_override=True) or not can_receive_inbound %}
             {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id, set_inbound_sms=False)) }}
           {% else %}
