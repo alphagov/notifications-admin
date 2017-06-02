@@ -44,6 +44,7 @@ def test_get_started(
     mock_get_jobs,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -62,6 +63,7 @@ def test_get_started_is_hidden_once_templates_exist(
     mock_get_jobs,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -79,6 +81,7 @@ def test_should_show_recent_templates_on_dashboard(
     mock_get_jobs,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -144,6 +147,7 @@ def test_should_show_upcoming_jobs_on_dashboard(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
@@ -174,6 +178,7 @@ def test_should_show_recent_jobs_on_dashboard(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
@@ -292,6 +297,7 @@ def test_menu_send_messages(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -322,6 +328,7 @@ def test_menu_manage_service(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -351,6 +358,7 @@ def test_menu_manage_api_keys(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -380,6 +388,7 @@ def test_menu_all_services_for_platform_admin_user(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -409,6 +418,7 @@ def test_route_for_service_permissions(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     with app_.test_request_context():
         validate_route_permission(
@@ -445,6 +455,7 @@ def test_service_dashboard_updates_gets_dashboard_totals(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
         'email': {'requested': 123, 'delivered': 0, 'failed': 0},
@@ -668,6 +679,7 @@ def test_should_show_all_jobs_with_valid_statuses(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
+    mock_get_yearly_sms_unit_count_and_cost
 ):
     get_dashboard_partials(service_id=SERVICE_ONE_ID)
 
@@ -684,3 +696,45 @@ def test_should_show_all_jobs_with_valid_statuses(
         'ready to send',
         'sent to dvla'
     })
+
+
+def test_should_show_remaining_free_tier_count(
+    logged_in_client,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_jobs,
+    mock_get_usage,
+    mocker
+):
+    mocker.patch(
+        'app.service_api_client.get_yearly_sms_unit_count_and_cost',
+        return_value={"billable_sms_units": 100, "total_cost": 200.0}
+    )
+
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+
+    assert response.status_code == 200
+    assert '249,900' in response.get_data(as_text=True)
+    assert 'free text messages left' in response.get_data(as_text=True)
+
+
+def test_should_show_cost_if_exceeded_free_tier_count(
+    logged_in_client,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_jobs,
+    mock_get_usage,
+    mocker
+):
+    mocker.patch(
+        'app.service_api_client.get_yearly_sms_unit_count_and_cost',
+        return_value={"billable_sms_units": 300000, "total_cost": 1500.50}
+    )
+
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+
+    assert response.status_code == 200
+    assert '£1,500.50' in response.get_data(as_text=True)
+    assert 'spent on text messages' in response.get_data(as_text=True)
