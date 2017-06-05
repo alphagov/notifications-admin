@@ -24,6 +24,7 @@ def test_sign_out_user(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
+    mock_get_inbound_sms_summary,
 ):
     with logged_in_client.session_transaction() as session:
         assert session.get('user_id') is not None

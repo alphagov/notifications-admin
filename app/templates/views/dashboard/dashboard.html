@@ -29,6 +29,8 @@
       In the last 7 days
     </h2>
 
+    {{ ajax_block(partials, updates_url, 'inbox') }}
+
     {{ ajax_block(partials, updates_url, 'totals') }}
     {{ show_more(
       url_for('.monthly', service_id=current_service.id),

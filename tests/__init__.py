@@ -55,10 +55,12 @@ def service_json(
     branding='govuk',
     created_at=None,
     letter_contact_block=None,
-    permissions=[]
+    permissions=None,
 ):
     if users is None:
         users = []
+    if permissions is None:
+        permissions = []
     return {
         'id': id_,
         'name': name,

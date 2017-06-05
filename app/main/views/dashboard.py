@@ -12,6 +12,7 @@ from flask_login import login_required
 
 from app.main import main
 from app import (
+    current_service,
     job_api_client,
     service_api_client,
     template_statistics_client
@@ -135,6 +136,20 @@ def monthly(service_id):
     )
 
 
+@main.route("/services/<service_id>/inbox")
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def inbox(service_id):
+
+    if 'inbound_sms' not in current_service['permissions']:
+        abort(403)
+
+    return render_template(
+        'views/dashboard/inbox.html',
+        messages=service_api_client.get_inbound_sms(service_id),
+    )
+
+
 def aggregate_usage(template_statistics, sort_key='count'):
     return sorted(
         template_statistics,
@@ -165,6 +180,13 @@ def get_dashboard_partials(service_id):
         'upcoming': render_template(
             'views/dashboard/_upcoming.html',
             scheduled_jobs=scheduled_jobs
+        ),
+        'inbox': render_template(
+            'views/dashboard/_inbox.html',
+            inbound_sms_summary=(
+                service_api_client.get_inbound_sms_summary(service_id)
+                if 'inbound_sms' in current_service['permissions'] else None
+            ),
         ),
         'totals': render_template(
             'views/dashboard/_totals.html',
