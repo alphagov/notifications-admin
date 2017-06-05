@@ -82,6 +82,7 @@ class Config(object):
         r"scotent\.co\.uk",
         r"assembly\.wales",
         r"cjsm\.net",
+        r"cqc\.org\.uk",
     ]
 
 
