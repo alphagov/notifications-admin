@@ -79,6 +79,27 @@ def test_get_started_is_hidden_once_templates_exist(
     assert 'Get started' not in response.get_data(as_text=True)
 
 
+def test_inbound_messages_not_visible_to_service_without_permissions(
+    logged_in_client,
+    service_one,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    mock_get_detailed_service,
+    mock_get_template_statistics,
+    mock_get_usage,
+    mock_get_inbound_sms_summary,
+):
+
+    service_one['permissions'] = []
+
+    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert not page.select('.big-number-meta-wrapper')
+    assert mock_get_inbound_sms_summary.called is False
+
+
 @pytest.mark.parametrize('inbound_summary_mock, expected_text', [
     (mock_get_inbound_sms_summary_with_no_messages, '0 text messages received'),
     (mock_get_inbound_sms_summary, '99 text messages received latest message just now'),
@@ -86,6 +107,7 @@ def test_get_started_is_hidden_once_templates_exist(
 def test_inbound_messages_shows_count_of_messages(
     logged_in_client,
     mocker,
+    service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
     mock_get_detailed_service,
@@ -95,6 +117,7 @@ def test_inbound_messages_shows_count_of_messages(
     expected_text,
 ):
 
+    service_one['permissions'] = ['inbound_sms']
     inbound_summary_mock(mocker)
 
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
@@ -116,7 +139,7 @@ def test_inbound_messages_shows_count_of_messages(
 ]))
 def test_inbox_showing_inbound_messages(
     logged_in_client,
-    mocker,
+    service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
     mock_get_detailed_service,
@@ -126,6 +149,8 @@ def test_inbox_showing_inbound_messages(
     index,
     expected_row,
 ):
+
+    service_one['permissions'] = ['inbound_sms']
 
     response = logged_in_client.get(url_for('main.inbox', service_id=SERVICE_ONE_ID))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -138,7 +163,7 @@ def test_inbox_showing_inbound_messages(
 
 def test_empty_inbox(
     logged_in_client,
-    mocker,
+    service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
     mock_get_detailed_service,
@@ -147,6 +172,8 @@ def test_empty_inbox(
     mock_get_inbound_sms_with_no_messages,
 ):
 
+    service_one['permissions'] = ['inbound_sms']
+
     response = logged_in_client.get(url_for('main.inbox', service_id=SERVICE_ONE_ID))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
@@ -154,6 +181,16 @@ def test_empty_inbox(
     assert normalize_spaces(page.select('tbody tr')) == (
         'When users text your service’s phone number (GOVUK) you’ll see the messages here'
     )
+
+
+def test_inbox_not_accessible_to_service_without_permissions(
+    logged_in_client,
+    service_one,
+):
+    service_one['permissions'] = []
+    response = logged_in_client.get(url_for('main.inbox', service_id=SERVICE_ONE_ID))
+
+    assert response.status_code == 403
 
 
 def test_should_show_recent_templates_on_dashboard(
@@ -759,11 +796,12 @@ def test_should_show_all_jobs_with_valid_statuses(
     logged_in_client,
     mock_get_template_statistics,
     mock_get_detailed_service,
+    mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
     mock_get_usage,
     mock_get_inbound_sms_summary,
 ):
-    get_dashboard_partials(service_id=SERVICE_ONE_ID)
+    logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
     first_call = mock_get_jobs.call_args_list[0]
     # first call - scheduled jobs only
