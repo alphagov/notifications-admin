@@ -681,6 +681,30 @@ def test_turn_inbound_sms_off(
     assert app.current_service['permissions'] == []
 
 
+def test_set_text_message_sender_and_not_inbound_sms(
+    logged_in_client,
+    service_one,
+    mock_get_letter_organisations,
+    mocker,
+):
+    service_one['permissions'] = []
+    update_service_mock = mocker.patch('app.service_api_client.update_service',
+                                       return_value=service_one)
+
+    data = {"sms_sender": "elevenchars"}
+    response = logged_in_client.post(url_for('main.service_set_sms_sender', service_id=service_one['id'],
+                                             set_inbound_sms=False),
+                                     data=data,
+                                     follow_redirects=True)
+    assert response.status_code == 200
+
+    update_service_mock.assert_called_with(
+        service_one['id'],
+        sms_sender="elevenchars"
+    )
+    assert app.current_service['permissions'] == []
+
+
 @pytest.mark.parametrize('content, expected_error', [
     ("", "Can’t be empty"),
     ("twelvecharss", "Enter 11 characters or fewer"),

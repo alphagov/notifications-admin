@@ -270,7 +270,7 @@ def service_set_sms_sender(service_id):
     form = ServiceSmsSender()
     if form.validate_on_submit():
         set_inbound_sms = request.args.get('set_inbound_sms', False)
-        if set_inbound_sms:
+        if set_inbound_sms == 'True':
             permissions = current_service['permissions']
             if 'inbound_sms' in permissions:
                 permissions.remove('inbound_sms')
