@@ -54,7 +54,8 @@ def service_json(
     organisation=None,
     branding='govuk',
     created_at=None,
-    letter_contact_block=None
+    letter_contact_block=None,
+    permissions=[]
 ):
     if users is None:
         users = []
@@ -76,6 +77,7 @@ def service_json(
         'created_at': created_at or str(datetime.utcnow()),
         'letter_contact_block': letter_contact_block,
         'dvla_organisation': '001',
+        'permissions': permissions,
     }
 
 
