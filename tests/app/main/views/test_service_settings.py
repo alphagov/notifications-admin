@@ -637,7 +637,7 @@ def test_set_text_message_sender_and_inbound_sms(
     mock_get_letter_organisations,
     mocker,
 ):
-
+    service_one['permissions'] = []
     update_service_mock = mocker.patch('app.service_api_client.update_service_with_properties',
                                        return_value=service_one)
 
@@ -653,6 +653,32 @@ def test_set_text_message_sender_and_inbound_sms(
         {'permissions': ['inbound_sms'],
          'sms_sender': "elevenchars"}
     )
+    assert app.current_service['permissions'] == ['inbound_sms']
+
+
+def test_turn_inbound_sms_off(
+    logged_in_client,
+    service_one,
+    mock_get_letter_organisations,
+    mocker,
+):
+    service_one['permissions'] = ['inbound_sms']
+    update_service_mock = mocker.patch('app.service_api_client.update_service_with_properties',
+                                       return_value=service_one)
+
+    data = {"sms_sender": "elevenchars"}
+    response = logged_in_client.post(url_for('main.service_set_sms_sender', service_id=service_one['id'],
+                                             set_inbound_sms=True),
+                                     data=data,
+                                     follow_redirects=True)
+    assert response.status_code == 200
+
+    update_service_mock.assert_called_with(
+        service_one['id'],
+        {'permissions': [],
+         'sms_sender': "elevenchars"}
+    )
+    assert app.current_service['permissions'] == []
 
 
 @pytest.mark.parametrize('content, expected_error', [
