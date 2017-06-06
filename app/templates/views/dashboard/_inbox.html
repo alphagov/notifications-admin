@@ -12,8 +12,8 @@
         )
       }}
       <div class="big-number-meta">
-        {% if inbound_sms_summary.latest_message %}
-          latest message {{ inbound_sms_summary.latest_message | format_delta }}
+        {% if inbound_sms_summary.most_recent %}
+          latest message {{ inbound_sms_summary.most_recent | format_delta }}
         {% endif %}
       </div>
     </div>

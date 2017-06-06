@@ -1169,7 +1169,7 @@ def mock_get_inbound_sms_summary(mocker):
     ):
         return {
             'count': 99,
-            'latest_message': datetime.utcnow().isoformat()
+            'most_recent': datetime.utcnow().isoformat()
         }
 
     return mocker.patch(
