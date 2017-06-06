@@ -1139,9 +1139,9 @@ def mock_get_inbound_sms(mocker):
     ):
         return [{
             'user_number': '0790090000' + str(i),
-            'content': 'foo',
+            'content': 'message-{}'.format(index + 1),
             'created_at': (datetime.utcnow() - timedelta(minutes=60 * (i + 1))).isoformat()
-        } for i in range(5)]
+        } for index, i in enumerate([0, 0, 0, 2, 4, 6, 8, 8])]
 
     return mocker.patch(
         'app.service_api_client.get_inbound_sms',
