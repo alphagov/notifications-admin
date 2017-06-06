@@ -63,3 +63,13 @@ $tail-angle: 20deg;
 .sms-message-status-outbound {
   text-align: right;
 }
+
+.sms-message-row {
+
+  &:focus {
+    outline: none;
+    padding-top: 20px;
+    margin-top: -20px;
+  }
+
+}

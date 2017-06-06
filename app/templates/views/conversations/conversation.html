@@ -14,7 +14,7 @@
       </h1>
     </div>
     {% for message in conversation %}
-      <div class="grid-row" id="n{{ message.id }}">
+      <div class="grid-row sms-message-row" id="n{{ message.id }}" tabindex="0">
         {% if message.inbound %}
           <div class="column-two-thirds sms-message-inbound">
             {{ message.content | string }}
