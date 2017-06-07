@@ -10,6 +10,8 @@ from flask import (
 )
 from flask_login import login_required
 
+from notifications_utils.recipients import format_phone_number_human_readable
+
 from app.main import main
 from app import (
     current_service,
@@ -144,9 +146,21 @@ def inbox(service_id):
     if 'inbound_sms' not in current_service['permissions']:
         abort(403)
 
+    messages_to_show = list()
+    inbound_messages = service_api_client.get_inbound_sms(service_id)
+
+    for message in inbound_messages:
+        if format_phone_number_human_readable(message['user_number']) not in {
+            format_phone_number_human_readable(message['user_number'])
+            for message in messages_to_show
+        }:
+            messages_to_show.append(message)
+
     return render_template(
         'views/dashboard/inbox.html',
-        messages=service_api_client.get_inbound_sms(service_id),
+        messages=messages_to_show,
+        count_of_messages=len(inbound_messages),
+        count_of_users=len(messages_to_show),
     )
 
 
