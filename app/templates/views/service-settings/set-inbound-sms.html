@@ -1,0 +1,43 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Receive text messages
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <h1 class="heading-large">Receive text messages</h1>
+      {% if 'inbound_sms' in current_service.permissions %}
+        <p>
+          Your service can receive text messages sent to {{ current_service.sms_sender }}.
+        </p>
+        <p>
+          If you want to turn this feature off,
+          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
+        </p>
+      {% else %}
+        <p>
+          Receiving text messages from your users is an
+          invitation&#8209;only feature.
+        </p>
+        <p>
+          If you want to try it out,
+          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
+        </p>
+        <p>
+          We’ll set you up with a special phone number, and you’ll be able to see
+          the messages on your dashboard, or get them using the API.
+        </p>
+      {% endif %}
+      {{ page_footer(
+        back_link=url_for('.service_settings', service_id=current_service.id),
+        back_link_text='Back to settings'
+      ) }}
+    </div>
+  </div>
+
+{% endblock %}

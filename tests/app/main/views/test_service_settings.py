@@ -21,6 +21,7 @@ from tests.conftest import active_user_with_permissions, platform_admin_user
         'Email reply to address None Change',
         'Text message sender GOVUK Change',
         'International text messages Off Change',
+        'Receive text messages Off Change',
         'Letters Off Change',
     ]),
     (platform_admin_user, [
@@ -29,6 +30,7 @@ from tests.conftest import active_user_with_permissions, platform_admin_user
         'Email reply to address None Change',
         'Text message sender GOVUK Change',
         'International text messages Off Change',
+        'Receive text messages Off Change',
         'Letters Off Change',
         'Label Value Action',
         'Email branding GOV.UK Change',
@@ -67,6 +69,8 @@ def test_should_show_overview_for_service_with_more_things_set(
     mock_get_letter_organisations,
 ):
     client.login(active_user_with_permissions, mocker, service_with_reply_to_addresses)
+    service_with_reply_to_addresses['permissions'] = ['inbound_sms']
+    service_with_reply_to_addresses['can_send_international_sms'] = True
     response = client.get(url_for(
         'main.service_settings', service_id=service_with_reply_to_addresses['id']
     ))
@@ -74,8 +78,9 @@ def test_should_show_overview_for_service_with_more_things_set(
     for index, row in enumerate([
         'Service name service one Change',
         'Email reply to address test@example.com Change',
-        'Text message sender elevenchars Change',
-        'International text messages Off Change',
+        'Text message sender elevenchars',
+        'International text messages On Change',
+        'Receive text messages On Change',
         'Letters Off Change',
     ]):
         assert row == " ".join(page.find_all('tr')[index + 1].text.split())
@@ -120,7 +125,7 @@ def test_letter_contact_block_shows_none_if_not_set(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = page.find_all('tr')[6].find_all('td')[1].div
+    div = page.find_all('tr')[7].find_all('td')[1].div
     assert div.text.strip() == 'None'
     assert 'default' in div.attrs['class'][0]
 
@@ -138,7 +143,7 @@ def test_escapes_letter_contact_block(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = str(page.find_all('tr')[6].find_all('td')[1].div)
+    div = str(page.find_all('tr')[7].find_all('td')[1].div)
     assert 'foo<br>bar' in div
     assert '<script>' not in div
 

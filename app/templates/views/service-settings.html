@@ -52,6 +52,12 @@
         {% endcall %}
 
         {% call row() %}
+          {{ text_field('Receive text messages') }}
+          {{ text_field('On' if 'inbound_sms' in current_service.permissions else 'Off') }}
+          {{ edit_field('Change', url_for('.service_set_inbound_sms', service_id=current_service.id)) }}
+        {% endcall %}
+
+        {% call row() %}
           {{ text_field('Letters') }}
           {{ text_field('On' if current_service.can_send_letters else 'Off') }}
           {{ edit_field('Change', url_for('.service_set_letters', service_id=current_service.id)) }}
