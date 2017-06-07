@@ -17,9 +17,18 @@ def no_redirect():
     return lambda _external=True: None
 
 
-def test_get_support_index_page(client):
-    resp = client.get(url_for('main.support'))
-    assert resp.status_code == 200
+@pytest.mark.parametrize('endpoint', [
+    'main.old_feedback',
+    'main.support',
+])
+def test_get_support_index_page(
+    client,
+    endpoint,
+):
+    response = client.get(url_for('main.support'), follow_redirects=True)
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.string.strip() == 'Support'
 
 
 @freeze_time('2016-12-12 12:00:00.000000')

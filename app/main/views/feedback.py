@@ -8,6 +8,11 @@ from app.main.forms import SupportType, Feedback, Problem, Triage
 from datetime import datetime
 
 
+@main.route('/feedback', methods=['GET'])
+def old_feedback():
+    return redirect(url_for('.support'))
+
+
 @main.route('/support', methods=['GET', 'POST'])
 def support():
     form = SupportType()
