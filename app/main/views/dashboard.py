@@ -190,7 +190,7 @@ def get_dashboard_partials(service_id):
             **calculate_free_tier_usage(service_api_client.get_yearly_sms_unit_count_and_cost(
                 service_id,
                 get_current_financial_year(),
-            ))
+            ), service)
         ),
     }
 
@@ -202,9 +202,8 @@ def get_dashboard_totals(statistics):
     return statistics
 
 
-def calculate_free_tier_usage(usage):
-    sms_free_allowance = current_app.config['SMS_FREE_TIER_AMOUNT']
-
+def calculate_free_tier_usage(usage, service):
+    sms_free_allowance = service['data']['free_sms_fragment_limit']
     return({
         'sms_chargeable': max(0, usage['billable_sms_units'] - sms_free_allowance),
         'total_sms_bill': usage['billable_sms_units'],

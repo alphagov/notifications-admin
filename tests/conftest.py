@@ -92,6 +92,7 @@ def mock_get_detailed_service(mocker, api_user_active):
         return {
             'data': {
                 'id': service_id,
+                'free_sms_fragment_limit': 250000,
                 'statistics': {
                     'email': {'requested': 0, 'delivered': 0, 'failed': 0},
                     'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
@@ -109,6 +110,7 @@ def mock_get_detailed_service_for_today(mocker, api_user_active):
         return {
             'data': {
                 'id': service_id,
+                'free_sms_fragment_limit': 250000,
                 'statistics': {
                     'email': {'requested': 0, 'delivered': 0, 'failed': 0},
                     'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
