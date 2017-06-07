@@ -26,6 +26,7 @@ from app import (
     current_service,
     format_datetime_short)
 from app.main import main
+from app.main.forms import SearchNotificationsForm
 from app.utils import (
     get_page_from_request,
     generate_next_dict,
@@ -197,8 +198,10 @@ def view_notifications(service_id, message_type):
         'views/notifications.html',
         partials=get_notifications(service_id, message_type),
         message_type=message_type,
-        status=request.args.get('status'),
-        page=request.args.get('page', 1)
+        status=request.args.get('status') or 'sending,delivered,failed',
+        page=request.args.get('page', 1),
+        to=request.args.get('to'),
+        search_form=SearchNotificationsForm(to=request.args.get('to')),
     )
 
 
@@ -241,7 +244,9 @@ def get_notifications(service_id, message_type, status_override=None):
         page=page,
         template_type=[message_type],
         status=filter_args.get('status'),
-        limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
+        limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'],
+        to=request.args.get('to'),
+    )
 
     url_args = {
         'message_type': message_type,
@@ -249,11 +254,11 @@ def get_notifications(service_id, message_type, status_override=None):
     }
     prev_page = None
 
-    if notifications['links'].get('prev', None):
+    if 'links' in notifications and notifications['links'].get('prev', None):
         prev_page = generate_previous_dict('main.view_notifications', service_id, page, url_args=url_args)
     next_page = None
 
-    if notifications['links'].get('next', None):
+    if 'links' in notifications and notifications['links'].get('next', None):
         next_page = generate_next_dict('main.view_notifications', service_id, page, url_args)
 
     return {

@@ -2,7 +2,6 @@ from datetime import datetime
 from functools import partial
 from flask import (
     render_template,
-    current_app,
     url_for,
     session,
     jsonify,
@@ -13,6 +12,7 @@ from flask_login import login_required
 
 from app.main import main
 from app import (
+    current_service,
     job_api_client,
     service_api_client,
     template_statistics_client
@@ -136,6 +136,20 @@ def monthly(service_id):
     )
 
 
+@main.route("/services/<service_id>/inbox")
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def inbox(service_id):
+
+    if 'inbound_sms' not in current_service['permissions']:
+        abort(403)
+
+    return render_template(
+        'views/dashboard/inbox.html',
+        messages=service_api_client.get_inbound_sms(service_id),
+    )
+
+
 def aggregate_usage(template_statistics, sort_key='count'):
     return sorted(
         template_statistics,
@@ -166,6 +180,13 @@ def get_dashboard_partials(service_id):
         'upcoming': render_template(
             'views/dashboard/_upcoming.html',
             scheduled_jobs=scheduled_jobs
+        ),
+        'inbox': render_template(
+            'views/dashboard/_inbox.html',
+            inbound_sms_summary=(
+                service_api_client.get_inbound_sms_summary(service_id)
+                if 'inbound_sms' in current_service['permissions'] else None
+            ),
         ),
         'totals': render_template(
             'views/dashboard/_totals.html',
@@ -213,7 +234,8 @@ def calculate_free_tier_usage(usage, service):
 
 
 def calculate_usage(usage):
-    sms_free_allowance = current_app.config['SMS_FREE_TIER_AMOUNT']
+    # TODO: Don't hardcode these - get em from the API
+    sms_free_allowance = 250000
 
     sms_rate = 0 if len(usage) == 0 else usage[0].get("rate", 0)
     sms_sent = get_sum_billing_units(breakdown for breakdown in usage if breakdown['notification_type'] == 'sms')

@@ -57,9 +57,7 @@ class Config(object):
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
     DESKPRO_PERSON_EMAIL = 'donotreply@notifications.service.gov.uk'
     ACTIVITY_STATS_LIMIT_DAYS = 7
-    TEST_MESSAGE_FILENAME = 'Test message'
-
-    SMS_FREE_TIER_AMOUNT = 250000
+    TEST_MESSAGE_FILENAME = 'Report'
 
     STATSD_ENABLED = False
     STATSD_HOST = "statsd.hostedgraphite.com"
@@ -83,6 +81,8 @@ class Config(object):
         r"hmcts\.net",
         r"scotent\.co\.uk",
         r"assembly\.wales",
+        r"cjsm\.net",
+        r"cqc\.org\.uk",
     ]
 
 
@@ -100,6 +100,7 @@ class Test(Development):
     WTF_CSRF_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'test-notifications-csv-upload'
     NOTIFY_ENVIRONMENT = 'test'
+    TEMPLATE_PREVIEW_API_HOST = 'http://localhost:9999'
 
 
 class Preview(Config):

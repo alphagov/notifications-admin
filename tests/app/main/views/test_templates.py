@@ -44,11 +44,11 @@ def test_should_show_page_for_one_template(
     ),
     (
         ['send_texts', 'send_emails', 'send_letters'],
-        ['.send_messages', '.send_test']
+        ['.send_messages', '.send_one_off']
     ),
     (
         ['send_texts', 'send_emails', 'send_letters', 'manage_templates'],
-        ['.send_messages', '.send_test', '.edit_service_template']
+        ['.send_messages', '.send_one_off', '.edit_service_template']
     ),
 ])
 def test_should_be_able_to_view_a_template_with_links(

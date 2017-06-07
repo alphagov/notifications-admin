@@ -31,22 +31,25 @@
   failure_percentage,
   danger_zone=False,
   failure_link=None,
-  link=None
+  link=None,
+  show_failures=True
 ) %}
   <div class="big-number-with-status">
     {{ big_number(number, label, link=link) }}
-    <div class="big-number-status{% if danger_zone %}-failing{% endif %}">
-      {% if failures %}
-        {% if failure_link %}
-          <a href="{{ failure_link }}">
+    {% if show_failures %}
+      <div class="big-number-status{% if danger_zone %}-failing{% endif %}">
+        {% if failures %}
+          {% if failure_link %}
+            <a href="{{ failure_link }}">
+              {{ "{:,}".format(failures) }} failed – {{ failure_percentage }}%
+            </a>
+          {% else %}
             {{ "{:,}".format(failures) }} failed – {{ failure_percentage }}%
-          </a>
+          {% endif %}
         {% else %}
-          {{ "{:,}".format(failures) }} failed – {{ failure_percentage }}%
+          No failures
         {% endif %}
-      {% else %}
-        No failures
-      {% endif %}
-    </div>
+      </div>
+    {% endif %}
   </div>
 {% endmacro %}

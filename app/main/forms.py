@@ -7,6 +7,7 @@ from notifications_utils.recipients import (
     validate_phone_number,
     InvalidPhoneError
 )
+from notifications_utils.columns import Columns
 from wtforms import (
     validators,
     StringField,
@@ -102,9 +103,24 @@ class UKMobileNumber(TelField):
             raise ValidationError(str(e))
 
 
-def mobile_number():
-    return UKMobileNumber('Mobile number',
+class InternationalPhoneNumber(TelField):
+    def pre_validate(self, form):
+        try:
+            validate_phone_number(self.data, international=True)
+        except InvalidPhoneError as e:
+            raise ValidationError(str(e))
+
+
+def mobile_number(label='Mobile number'):
+    return UKMobileNumber(label,
                           validators=[DataRequired(message='Can’t be empty')])
+
+
+def international_phone_number(label='Mobile number'):
+    return InternationalPhoneNumber(
+        label,
+        validators=[DataRequired(message='Can’t be empty')]
+    )
 
 
 def password(label='Password'):
@@ -502,7 +518,11 @@ class ServiceSmsSender(Form):
 
 
 class ServiceLetterContactBlock(Form):
-    letter_contact_block = TextAreaField()
+    letter_contact_block = TextAreaField(
+        validators=[
+            NoCommasInPlaceHolders()
+        ]
+    )
 
     def validate_letter_contact_block(form, field):
         line_count = field.data.strip().count('\n')
@@ -621,6 +641,11 @@ class SearchTemplatesForm(Form):
     search = SearchField('Search by name')
 
 
+class SearchNotificationsForm(Form):
+
+    to = SearchField('Search by phone number or email address')
+
+
 class PlaceholderForm(Form):
 
     pass
@@ -629,15 +654,25 @@ class PlaceholderForm(Form):
 def get_placeholder_form_instance(
     placeholder_name,
     dict_to_populate_from,
-    optional_placeholder=False
+    optional_placeholder=False,
+    allow_international_phone_numbers=False,
 ):
 
-    PlaceholderForm.placeholder_value = StringField(
-        placeholder_name,
-        validators=[
+    if Columns.make_key(placeholder_name) == 'emailaddress':
+        field = email_address(label=placeholder_name, gov_user=False)
+    elif Columns.make_key(placeholder_name) == 'phonenumber':
+        if allow_international_phone_numbers:
+            field = international_phone_number(label=placeholder_name)
+        else:
+            field = mobile_number(label=placeholder_name)
+    elif optional_placeholder:
+        field = StringField(placeholder_name)
+    else:
+        field = StringField(placeholder_name, validators=[
             DataRequired(message='Can’t be empty')
-        ] if not optional_placeholder else []
-    )
+        ])
+
+    PlaceholderForm.placeholder_value = field
 
     return PlaceholderForm(
         placeholder_value=dict_to_populate_from.get(placeholder_name, '')

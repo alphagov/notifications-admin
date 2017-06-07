@@ -92,6 +92,22 @@ def test_if_cant_send_letters_then_cant_see_letter_contact_block(
     assert 'Letter contact block' not in response.get_data(as_text=True)
 
 
+def test_if_can_receive_inbound_then_cant_change_sms_sender(
+    logged_in_client,
+    service_one,
+    mock_get_letter_organisations,
+):
+    service_one['permissions'] = ['inbound_sms']
+    service_one['sms_sender'] = 'SomeNumber'
+    response = logged_in_client.get(url_for(
+        'main.service_settings', service_id=service_one['id']
+    ))
+    assert 'Text message sender SomeNumber Change' not in response.get_data(as_text=True)
+    assert url_for('.service_set_sms_sender', service_id=service_one['id'],
+                   set_inbound_sms=False) not in response.get_data(as_text=True)
+    assert 'SomeNumber' in response.get_data(as_text=True)
+
+
 def test_letter_contact_block_shows_none_if_not_set(
     logged_in_client,
     service_one,
@@ -613,6 +629,80 @@ def test_set_text_message_sender(
         service_one['id'],
         sms_sender="elevenchars"
     )
+
+
+def test_set_text_message_sender_and_inbound_sms(
+    logged_in_client,
+    service_one,
+    mock_get_letter_organisations,
+    mocker,
+):
+    service_one['permissions'] = []
+    update_service_mock = mocker.patch('app.service_api_client.update_service_with_properties',
+                                       return_value=service_one)
+
+    data = {"sms_sender": "elevenchars"}
+    response = logged_in_client.post(url_for('main.service_set_sms_sender', service_id=service_one['id'],
+                                             set_inbound_sms=True),
+                                     data=data,
+                                     follow_redirects=True)
+    assert response.status_code == 200
+
+    update_service_mock.assert_called_with(
+        service_one['id'],
+        {'permissions': ['inbound_sms'],
+         'sms_sender': "elevenchars"}
+    )
+    assert app.current_service['permissions'] == ['inbound_sms']
+
+
+def test_turn_inbound_sms_off(
+    logged_in_client,
+    service_one,
+    mock_get_letter_organisations,
+    mocker,
+):
+    service_one['permissions'] = ['inbound_sms']
+    update_service_mock = mocker.patch('app.service_api_client.update_service_with_properties',
+                                       return_value=service_one)
+
+    data = {"sms_sender": "elevenchars"}
+    response = logged_in_client.post(url_for('main.service_set_sms_sender', service_id=service_one['id'],
+                                             set_inbound_sms=True),
+                                     data=data,
+                                     follow_redirects=True)
+    assert response.status_code == 200
+
+    update_service_mock.assert_called_with(
+        service_one['id'],
+        {'permissions': [],
+         'sms_sender': "elevenchars"}
+    )
+    assert app.current_service['permissions'] == []
+
+
+def test_set_text_message_sender_and_not_inbound_sms(
+    logged_in_client,
+    service_one,
+    mock_get_letter_organisations,
+    mocker,
+):
+    service_one['permissions'] = []
+    update_service_mock = mocker.patch('app.service_api_client.update_service',
+                                       return_value=service_one)
+
+    data = {"sms_sender": "elevenchars"}
+    response = logged_in_client.post(url_for('main.service_set_sms_sender', service_id=service_one['id'],
+                                             set_inbound_sms=False),
+                                     data=data,
+                                     follow_redirects=True)
+    assert response.status_code == 200
+
+    update_service_mock.assert_called_with(
+        service_one['id'],
+        sms_sender="elevenchars"
+    )
+    assert app.current_service['permissions'] == []
 
 
 @pytest.mark.parametrize('content, expected_error', [

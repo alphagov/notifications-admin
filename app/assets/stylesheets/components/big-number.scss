@@ -129,3 +129,26 @@
   }
 
 }
+
+.big-number-meta-wrapper {
+
+  position: relative;
+  margin: $gutter-half 0 $gutter 0;
+  background: $govuk-blue;
+
+  .big-number-meta {
+
+    padding: ($gutter / 3) $gutter-half;
+    color: $white;
+    pointer-events: none;
+
+    @include media(desktop) {
+      position: absolute;
+      bottom: 7px;
+      right: 5px;
+      text-align: right;
+    }
+
+  }
+
+}

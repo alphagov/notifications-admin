@@ -1,6 +1,8 @@
-%sms-message-wrapper,
+$tail-angle: 20deg;
+
 .sms-message-wrapper {
 
+  position: relative;
   width: 100%;
   max-width: 464px;
   box-sizing: border-box;
@@ -13,44 +15,24 @@
   clear: both;
   word-wrap: break-word;
 
-  p {
-    margin: 0;
-    line-height: 1.6;
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -4px;
+    right: -20px;
+    border: 10px solid transparent;
+    border-left-width: 13px;
+    border-right-width: 13px;
+    border-bottom-color: $panel-colour;
+    border-left-color: $panel-colour;
+    transform: rotate($tail-angle);
   }
 
-  p + p {
-    margin-top: 20px;
-  }
-
-}
-
-.sms-message-wrapper-with-radio {
-  @extend %sms-message-wrapper;
-  padding-left: 45px;
-  cursor: pointer;
 }
 
 .sms-message-recipient {
   @include copy-19;
   color: $secondary-text-colour;
   margin: 10px 0 0 0;
-}
-
-.sms-message-name {
-  @include bold-24;
-  margin: 20px 0 5px 0;
-}
-
-.sms-message-picker {
-  display: block;
-  margin: 7px 0 0 0;
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  z-index: 50;
-}
-
-.sms-message-from {
-  @include bold-19;
-  display: block;
 }

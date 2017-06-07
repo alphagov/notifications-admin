@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 
 from app.main.views.jobs import get_time_left, get_status_filters
 from tests import notification_json
+from tests.conftest import SERVICE_ONE_ID
 from freezegun import freeze_time
 
 
@@ -311,6 +312,13 @@ def test_should_show_updates_for_one_job_as_json(
         (None, 1)
     ]
 )
+@pytest.mark.parametrize(
+    "to_argument, expected_to_argument", [
+        ('', ''),
+        ('+447900900123', '+447900900123'),
+        ('test@example.com', 'test@example.com'),
+    ]
+)
 def test_can_show_notifications(
     logged_in_client,
     service_one,
@@ -322,13 +330,17 @@ def test_can_show_notifications(
     expected_api_call,
     page_argument,
     expected_page_argument,
+    to_argument,
+    expected_to_argument,
 ):
     response = logged_in_client.get(url_for(
         'main.view_notifications',
         service_id=service_one['id'],
         message_type=message_type,
         status=status_argument,
-        page=page_argument))
+        page=page_argument,
+        to=to_argument,
+    ))
     assert response.status_code == 200
     content = response.get_data(as_text=True)
     notifications = notification_json(service_one['id'])
@@ -348,13 +360,16 @@ def test_can_show_notifications(
         assert query_dict['status'] == [status_argument]
     if expected_page_argument:
         assert query_dict['page'] == [str(expected_page_argument)]
+    if to_argument:
+        assert query_dict['to'] == [to_argument]
 
     mock_get_notifications.assert_called_with(
         limit_days=7,
         page=expected_page_argument,
         service_id=service_one['id'],
         status=expected_api_call,
-        template_type=[message_type]
+        template_type=[message_type],
+        to=expected_to_argument,
     )
 
     json_response = logged_in_client.get(url_for(
@@ -365,6 +380,62 @@ def test_can_show_notifications(
     ))
     json_content = json.loads(json_response.get_data(as_text=True))
     assert json_content.keys() == {'counts', 'notifications'}
+
+
+@pytest.mark.parametrize("initial_query_arguments, expected_status_field_value, expected_search_box_contents", [
+    (
+        {
+            'message_type': 'sms',
+        },
+        'sending,delivered,failed',
+        '',
+    ),
+    (
+        {
+            'message_type': 'sms',
+            'to': '+33(0)5-12-34-56-78',
+        },
+        'sending,delivered,failed',
+        '+33(0)5-12-34-56-78',
+    ),
+    (
+        {
+            'status': 'failed',
+            'message_type': 'email',
+            'page': '99',
+            'to': 'test@example.com',
+        },
+        'failed',
+        'test@example.com',
+    ),
+])
+def test_search_recipient_form(
+    logged_in_client,
+    mock_get_notifications,
+    mock_get_detailed_service,
+    initial_query_arguments,
+    expected_status_field_value,
+    expected_search_box_contents,
+):
+    response = logged_in_client.get(url_for(
+        'main.view_notifications',
+        service_id=SERVICE_ONE_ID,
+        **initial_query_arguments
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    action_url = page.find("form")['action']
+    url = urlparse(action_url)
+    assert url.path == '/services/{}/notifications/{}'.format(
+        SERVICE_ONE_ID,
+        initial_query_arguments['message_type']
+    )
+    query_dict = parse_qs(url.query)
+    assert query_dict == {}
+
+    assert page.find("input", {'name': 'status'})['value'] == expected_status_field_value
+    assert page.find("input", {'name': 'to'})['value'] == expected_search_box_contents
 
 
 def test_should_show_notifications_for_a_service_with_next_previous(

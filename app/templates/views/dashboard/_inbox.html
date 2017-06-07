@@ -1,0 +1,21 @@
+{% from "components/big-number.html" import big_number, big_number_with_status %}
+
+<div class="ajax-block">
+  {% if inbound_sms_summary != None %}
+    <div class="big-number-meta-wrapper">
+      {{
+        big_number_with_status(
+          inbound_sms_summary.count,
+          'text messages received',
+          link=url_for('.inbox', service_id=current_service.id),
+          show_failures=False
+        )
+      }}
+      <div class="big-number-meta">
+        {% if inbound_sms_summary.most_recent %}
+          latest message {{ inbound_sms_summary.most_recent | format_delta }}
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</div>

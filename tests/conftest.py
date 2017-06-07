@@ -169,7 +169,8 @@ def mock_update_service(mocker):
                 'restricted',
                 'email_from',
                 'reply_to_email_address',
-                'sms_sender'
+                'sms_sender',
+                'permissions'
             ]}
         )
         return {'data': service}
@@ -1071,6 +1072,7 @@ def mock_get_notifications(mocker, api_user_active):
         rows=5,
         include_jobs=None,
         include_from_test_key=None,
+        to=None,
     ):
         job = None
         if job_id is not None:
@@ -1103,7 +1105,9 @@ def mock_get_notifications_with_previous_next(mocker):
                            status=None,
                            limit_days=None,
                            include_jobs=None,
-                           include_from_test_key=None):
+                           include_from_test_key=None,
+                           to=None,
+                           ):
         return notification_json(service_id, with_links=True)
 
     return mocker.patch(
@@ -1127,6 +1131,68 @@ def mock_get_notifications_with_no_notifications(mocker):
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
         side_effect=_get_notifications
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_inbound_sms(mocker):
+    def _get_inbound_sms(
+        service_id,
+    ):
+        return [{
+            'user_number': '0790090000' + str(i),
+            'content': 'foo',
+            'created_at': (datetime.utcnow() - timedelta(minutes=60 * (i + 1))).isoformat()
+        } for i in range(5)]
+
+    return mocker.patch(
+        'app.service_api_client.get_inbound_sms',
+        side_effect=_get_inbound_sms,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_inbound_sms_with_no_messages(mocker):
+    def _get_inbound_sms(
+        service_id,
+    ):
+        return []
+
+    return mocker.patch(
+        'app.service_api_client.get_inbound_sms',
+        side_effect=_get_inbound_sms,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_inbound_sms_summary(mocker):
+    def _get_inbound_sms_summary(
+        service_id,
+    ):
+        return {
+            'count': 99,
+            'most_recent': datetime.utcnow().isoformat()
+        }
+
+    return mocker.patch(
+        'app.service_api_client.get_inbound_sms_summary',
+        side_effect=_get_inbound_sms_summary,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_inbound_sms_summary_with_no_messages(mocker):
+    def _get_inbound_sms_summary(
+        service_id,
+    ):
+        return {
+            'count': 0,
+            'latest_message': None
+        }
+
+    return mocker.patch(
+        'app.service_api_client.get_inbound_sms_summary',
+        side_effect=_get_inbound_sms_summary,
     )
 
 

@@ -47,17 +47,20 @@ def service_json(
     restricted=True,
     email_from=None,
     reply_to_email_address=None,
-    sms_sender=None,
+    sms_sender='GOVUK',
     research_mode=False,
     can_send_letters=False,
     can_send_international_sms=False,
     organisation=None,
     branding='govuk',
     created_at=None,
-    letter_contact_block=None
+    letter_contact_block=None,
+    permissions=None,
 ):
     if users is None:
         users = []
+    if permissions is None:
+        permissions = []
     return {
         'id': id_,
         'name': name,
@@ -76,6 +79,7 @@ def service_json(
         'created_at': created_at or str(datetime.utcnow()),
         'letter_contact_block': letter_contact_block,
         'dvla_organisation': '001',
+        'permissions': permissions,
     }
 
 

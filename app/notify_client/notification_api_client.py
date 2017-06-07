@@ -21,7 +21,8 @@ class NotificationApiClient(NotifyAdminAPIClient):
         limit_days=None,
         include_jobs=None,
         include_from_test_key=None,
-        format_for_csv=None
+        format_for_csv=None,
+        to=None,
     ):
         params = {}
         if page is not None:
@@ -38,6 +39,8 @@ class NotificationApiClient(NotifyAdminAPIClient):
             params['include_from_test_key'] = include_from_test_key
         if format_for_csv is not None:
             params['format_for_csv'] = format_for_csv
+        if to is not None:
+            params['to'] = to
         if job_id:
             return self.get(
                 url='/service/{}/job/{}/notifications'.format(service_id, job_id),

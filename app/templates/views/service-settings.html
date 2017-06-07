@@ -36,8 +36,13 @@
 
         {% call row() %}
           {{ text_field('Text message sender') }}
-          {{ text_field(current_service.sms_sender or 'GOVUK') }}
-          {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id)) }}
+          {{ text_field(current_service.sms_sender) }}
+          {% if current_user.has_permissions([], admin_override=True) or not can_receive_inbound %}
+            {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id, set_inbound_sms=False)) }}
+          {% else %}
+               {{ text_field('') }}
+          {% endif %}
+
         {% endcall %}
 
         {% call row() %}
@@ -56,7 +61,7 @@
           {% call row() %}
             {{ text_field('Letter contact details') }}
             {% call field(status='' if current_service.letter_contact_block else 'default') %}
-              {{ current_service.letter_contact_block | escape | nl2br | safe }}
+              {{ letter_contact_block | string | nl2br | safe if current_service.letter_contact_block else 'None'}}
             {% endcall %}
             {{ edit_field('Change', url_for('.service_set_letter_contact_block', service_id=current_service.id)) }}
           {% endcall %}
@@ -162,6 +167,11 @@
             </a>
           </li>
         {% endif %}
+        <li class="bottom-gutter">
+          <a href="{{ url_for('.service_set_sms_sender', service_id=current_service.id, set_inbound_sms=True) }}" class="button">
+            {{ 'Stop inbound sms' if can_receive_inbound else 'Allow inbound sms' }}
+          </a>
+        </li>
       </ul>
 
     {% endif %}

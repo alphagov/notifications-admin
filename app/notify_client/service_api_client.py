@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+
 from flask import url_for
 from app.utils import BrowsableItem
 from app.notify_client import _attach_current_user, NotifyAdminAPIClient
@@ -94,6 +95,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'organisation',
             'letter_contact_block',
             'dvla_organisation',
+            'permissions'
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(
@@ -240,6 +242,16 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.get(
             '/service/{0}/monthly-usage'.format(service_id),
             params=dict(year=year)
+        )
+
+    def get_inbound_sms(self, service_id):
+        return self.get(
+            '/service/{}/inbound-sms'.format(service_id)
+        )['data']
+
+    def get_inbound_sms_summary(self, service_id):
+        return self.get(
+            '/service/{}/inbound-sms/summary'.format(service_id)
         )
 
 
