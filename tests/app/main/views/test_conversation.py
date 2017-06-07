@@ -76,8 +76,6 @@ def test_view_conversation(
     expected,
 ):
 
-    print(index)
-
     response = logged_in_client.get(url_for(
         'main.conversation',
         service_id=SERVICE_ONE_ID,
@@ -89,9 +87,8 @@ def test_view_conversation(
     messages = page.select('.sms-message-wrapper')
     statuses = page.select('.sms-message-status')
 
-    for elements in (messages, statuses):
-        assert len(elements) == 13
-
+    assert len(messages) == 13
+    assert len(statuses) == 13
     assert (
         normalize_spaces(messages[index].text),
         normalize_spaces(statuses[index].text),

@@ -33,23 +33,23 @@ def get_user_number(service_id, notification_id):
 
 
 def get_sms_thread(service_id, user_number):
-    return [
-        {
-            'inbound': ('notify_number' in notification),
+
+    for notification in sorted((
+        notification_api_client.get_notifications_for_service(service_id, to=user_number)['notifications'] +
+        service_api_client.get_inbound_sms(service_id, user_number=user_number)
+    ), key=lambda notification: notification['created_at']):
+
+        is_inbound = ('notify_number' in notification)
+
+        yield {
+            'inbound': is_inbound,
             'content': SMSPreviewTemplate(
                 {
                     'content': notification.get('content') or notification['template']['content']
-                }
+                },
+                downgrade_non_gsm_characters=(not is_inbound)
             ),
             'created_at': notification['created_at'],
             'status': notification.get('status'),
             'id': notification['id'],
         }
-        for notification in sorted(
-            (
-                notification_api_client.get_notifications_for_service(service_id, to=user_number)['notifications'] +
-                service_api_client.get_inbound_sms(service_id, user_number=user_number)
-            ),
-            key=lambda notification: notification['created_at'],
-        )
-    ]
