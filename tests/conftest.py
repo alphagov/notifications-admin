@@ -92,6 +92,7 @@ def mock_get_detailed_service(mocker, api_user_active):
         return {
             'data': {
                 'id': service_id,
+                'free_sms_fragment_limit': 250000,
                 'statistics': {
                     'email': {'requested': 0, 'delivered': 0, 'failed': 0},
                     'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
@@ -109,6 +110,7 @@ def mock_get_detailed_service_for_today(mocker, api_user_active):
         return {
             'data': {
                 'id': service_id,
+                'free_sms_fragment_limit': 250000,
                 'statistics': {
                     'email': {'requested': 0, 'delivered': 0, 'failed': 0},
                     'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
@@ -1396,6 +1398,15 @@ def mock_get_usage(mocker, service_one, fake_uuid):
 
     return mocker.patch(
         'app.service_api_client.get_service_usage', side_effect=_get_usage)
+
+
+@pytest.fixture(scope='function')
+def mock_get_yearly_sms_unit_count_and_cost(mocker, service_one, fake_uuid):
+    def _get_usage(service_id, year=None):
+        return {"billable_sms_units": 100, "total_cost": 200.0}
+
+    return mocker.patch(
+        'app.service_api_client.get_yearly_sms_unit_count_and_cost', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')
