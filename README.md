@@ -22,6 +22,7 @@ Brew is a package manager for OSX. The following command installs brew:
 
 Languages needed
 - Python 3.4
+- [pip] (https://pip.pypa.io/en/stable/installing/)
 - [Node](https://nodejs.org/) 5.0.0 or greater
 - [npm](https://www.npmjs.com/) 3.0.0 or greater
 ```shell
@@ -34,7 +35,7 @@ different versions of Node. The following installs `n` and uses the latest
 version of Node.
 ```shell
     npm install -g n
-    n latest
+    sudo n latest
     npm rebuild node-sass
 ```
 
