@@ -10,6 +10,8 @@ from flask import (
 )
 from flask_login import login_required
 
+from notifications_utils.recipients import format_phone_number_human_readable
+
 from app.main import main
 from app import (
     current_service,
@@ -144,9 +146,21 @@ def inbox(service_id):
     if 'inbound_sms' not in current_service['permissions']:
         abort(403)
 
+    messages_to_show = list()
+    inbound_messages = service_api_client.get_inbound_sms(service_id)
+
+    for message in inbound_messages:
+        if format_phone_number_human_readable(message['user_number']) not in {
+            format_phone_number_human_readable(message['user_number'])
+            for message in messages_to_show
+        }:
+            messages_to_show.append(message)
+
     return render_template(
         'views/dashboard/inbox.html',
-        messages=service_api_client.get_inbound_sms(service_id),
+        messages=messages_to_show,
+        count_of_messages=len(inbound_messages),
+        count_of_users=len(messages_to_show),
     )
 
 
@@ -208,10 +222,10 @@ def get_dashboard_partials(service_id):
         'has_jobs': bool(immediate_jobs),
         'usage': render_template(
             'views/dashboard/_usage.html',
-            **calculate_usage(service_api_client.get_service_usage(
+            **calculate_free_tier_usage(service_api_client.get_yearly_sms_unit_count_and_cost(
                 service_id,
                 get_current_financial_year(),
-            ))
+            ), service)
         ),
     }
 
@@ -221,6 +235,16 @@ def get_dashboard_totals(statistics):
         msg_type['failed_percentage'] = get_formatted_percentage(msg_type['failed'], msg_type['requested'])
         msg_type['show_warning'] = float(msg_type['failed_percentage']) > 3
     return statistics
+
+
+def calculate_free_tier_usage(usage, service):
+    sms_free_allowance = service['data']['free_sms_fragment_limit']
+    return({
+        'sms_chargeable': max(0, usage['billable_sms_units'] - sms_free_allowance),
+        'total_sms_bill': usage['billable_sms_units'],
+        'total_sms_cost': usage['total_cost'],
+        'sms_allowance_remaining': sms_free_allowance - int(usage['billable_sms_units'])
+    })
 
 
 def calculate_usage(usage):

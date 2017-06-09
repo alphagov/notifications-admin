@@ -4,7 +4,7 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Inbox
+  Received text messages
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -25,7 +25,7 @@
       field_headings_visible=False
     ) %}
       {% call field() %}
-        <span class="file-list-filename" href="#">{{ item.user_number }}</span>
+        <span class="file-list-filename" href="#">{{ item.user_number | format_phone_number_human_readable }}</span>
         <span class="wide-left-hand-column">{{ item.content }}</span>
       {% endcall %}
       {% call field(align='right') %}
@@ -36,7 +36,8 @@
     {% endcall %}
     {% if messages %}
       <p class="table-show-more-link">
-        Showing all {{ messages | length }} messages
+        {{ count_of_messages }} message{{ '' if 1 == count_of_messages else 's' }}
+        from {{ count_of_users }} user{{ '' if 1 == count_of_users else 's' }}
       </p>
     {% endif %}
   </div>
