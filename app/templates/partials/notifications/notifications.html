@@ -1,0 +1,39 @@
+{% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading, notification_status_field %}
+{% from "components/page-footer.html" import page_footer %}
+
+<div class="ajax-block-container" aria-labelledby='pill-selected-item'>
+  <div class="dashboard-table bottom-gutter-3-2">
+
+  {% if not help %}
+    <p class="bottom-gutter">
+      <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
+      &emsp;
+      <span id="time-left">{{ time_left }}</span>
+    </p>
+  {% endif %}
+
+  {% call(item, row_number) list_table(
+    [notification],
+    caption=None,
+    caption_visible=False,
+    empty_message=None,
+    field_headings=[
+      'Recipient',
+      'Status'
+    ],
+    field_headings_visible=False
+  ) %}
+    {% call row_heading() %}
+      <p>{{ item.to }}</p>
+    {% endcall %}
+    {{ notification_status_field(item) }}
+  {% endcall %}
+
+  {% if more_than_one_page %}
+    <p class="table-show-more-link">
+      Only showing the first 50 rows
+    </p>
+  {% endif %}
+
+  </div>
+</div>

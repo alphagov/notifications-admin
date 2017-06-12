@@ -1,0 +1,6 @@
+<div class="ajax-block-container">
+  <p class='heading-small bottom-gutter'>
+    Sent {% if notification.created_by %}by {{ notification.created_by.name }} {% endif %}
+    on {{ notification.created_at|format_datetime_short }}
+  </p>
+</div>

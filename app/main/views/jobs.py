@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-import ago
-import dateutil
 from orderedset import OrderedSet
-from datetime import datetime, timedelta, timezone
 from itertools import chain
 
 from flask import (
@@ -35,6 +32,7 @@ from app.utils import (
     generate_notifications_csv,
     get_help_argument,
     get_template,
+    get_time_left,
     REQUESTED_STATUSES,
     FAILURE_STATUSES,
     SENDING_STATUSES,
@@ -364,7 +362,7 @@ def get_job_partials(job):
     )
     return {
         'counts': render_template(
-            'partials/jobs/count.html',
+            'partials/count.html',
             counts=_get_job_counts(job, request.args.get('help', 0)),
             status=filter_args['status']
         ),
@@ -388,16 +386,3 @@ def get_job_partials(job):
             job=job
         ),
     }
-
-
-def get_time_left(job_created_at):
-    return ago.human(
-        (
-            datetime.now(timezone.utc).replace(hour=23, minute=59, second=59)
-        ) - (
-            dateutil.parser.parse(job_created_at) + timedelta(days=8)
-        ),
-        future_tense='Data available for {}',
-        past_tense='Data no longer available',  # No-one should ever see this
-        precision=1
-    )
