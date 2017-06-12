@@ -303,6 +303,15 @@ def service_set_international_sms(service_id):
     )
 
 
+@main.route("/services/<service_id>/service-settings/set-inbound-sms", methods=['GET'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_set_inbound_sms(service_id):
+    return render_template(
+        'views/service-settings/set-inbound-sms.html',
+    )
+
+
 @main.route("/services/<service_id>/service-settings/set-letters", methods=['GET'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)

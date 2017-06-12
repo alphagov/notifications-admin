@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/browse-list.html" import browse_list %}
-{% from "components/table.html" import mapping_table, row, text_field, edit_field, field %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field, boolean_field %}
 
 {% block service_page_title %}
   Settings
@@ -47,13 +47,19 @@
 
         {% call row() %}
           {{ text_field('International text messages') }}
-          {{ text_field('On' if current_service.can_send_international_sms else 'Off') }}
+          {{ boolean_field(current_service.can_send_international_sms) }}
           {{ edit_field('Change', url_for('.service_set_international_sms', service_id=current_service.id)) }}
         {% endcall %}
 
         {% call row() %}
+          {{ text_field('Receive text messages') }}
+          {{ boolean_field('inbound_sms' in current_service.permissions) }}
+          {{ edit_field('Change', url_for('.service_set_inbound_sms', service_id=current_service.id)) }}
+        {% endcall %}
+
+        {% call row() %}
           {{ text_field('Letters') }}
-          {{ text_field('On' if current_service.can_send_letters else 'Off') }}
+          {{ boolean_field(current_service.can_send_letters) }}
           {{ edit_field('Change', url_for('.service_set_letters', service_id=current_service.id)) }}
         {% endcall %}
 
