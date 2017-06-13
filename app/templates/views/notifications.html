@@ -24,9 +24,9 @@
     method="post"
     action="{{ url_for('.view_notifications', service_id=current_service.id, message_type=message_type) }}"
     class="grid-row"
+    id="search-form"
   >
     <div class="column-three-quarters">
-      <input type="hidden" name="status" value="{{ status }}">
       {{ textbox(
         search_form.to,
         width='1-1',
@@ -41,8 +41,9 @@
 
   {{ ajax_block(
     partials,
-    url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status, page=page, to=to),
-    'notifications'
+    url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status, page=page),
+    'notifications',
+    form='search-form'
   ) }}
 
 {% endblock %}

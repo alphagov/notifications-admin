@@ -110,8 +110,7 @@ def test_can_show_notifications(
         assert query_dict['status'] == [status_argument]
     if expected_page_argument:
         assert query_dict['page'] == [str(expected_page_argument)]
-    if to_argument:
-        assert query_dict['to'] == [to_argument]
+    assert 'to' not in query_dict
 
     mock_get_notifications.assert_called_with(
         limit_days=7,
@@ -135,7 +134,6 @@ def test_can_show_notifications(
 @pytest.mark.parametrize((
     'initial_query_arguments,'
     'form_post_data,'
-    'expected_status_field_value,'
     'expected_search_box_contents'
 ), [
     (
@@ -143,7 +141,6 @@ def test_can_show_notifications(
             'message_type': 'sms',
         },
         {},
-        'sending,delivered,failed',
         '',
     ),
     (
@@ -153,7 +150,6 @@ def test_can_show_notifications(
         {
             'to': '+33(0)5-12-34-56-78',
         },
-        'sending,delivered,failed',
         '+33(0)5-12-34-56-78',
     ),
     (
@@ -165,7 +161,6 @@ def test_can_show_notifications(
         {
             'to': 'test@example.com',
         },
-        'failed',
         'test@example.com',
     ),
 ])
@@ -175,7 +170,6 @@ def test_search_recipient_form(
     mock_get_detailed_service,
     initial_query_arguments,
     form_post_data,
-    expected_status_field_value,
     expected_search_box_contents,
 ):
     response = logged_in_client.post(
@@ -199,7 +193,6 @@ def test_search_recipient_form(
     query_dict = parse_qs(url.query)
     assert query_dict == {}
 
-    assert page.find("input", {'name': 'status'})['value'] == expected_status_field_value
     assert page.find("input", {'name': 'to'})['value'] == expected_search_box_contents
 
 

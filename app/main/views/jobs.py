@@ -205,7 +205,7 @@ def view_notifications(service_id, message_type):
     )
 
 
-@main.route('/services/<service_id>/notifications/<message_type>.json')
+@main.route('/services/<service_id>/notifications/<message_type>.json', methods=['GET', 'POST'])
 @user_has_permissions('view_activity', admin_override=True)
 def get_notifications_as_json(service_id, message_type):
     return jsonify(get_notifications(
