@@ -3,7 +3,8 @@
 {% macro pill(
   items=[],
   current_value=None,
-  big_number_args={'smaller': True}
+  big_number_args={'smaller': True},
+  show_count=True
 ) %}
   <ul role='tablist' class='pill'>
     {% for label, option, link, count in items %}
@@ -14,7 +15,9 @@
         <li aria-selected='false' role='tab'>
           <a href="{{ link }}">
       {% endif %}
+        {% if show_count %}
             {{ big_number(count, **big_number_args) }}
+        {% endif %}
             <div class="pill-label">{{ label }}</div>
       {% if current_value == option %}
           </div>
