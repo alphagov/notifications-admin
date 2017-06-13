@@ -190,7 +190,7 @@ def view_job_updates(service_id, job_id):
     ))
 
 
-@main.route('/services/<service_id>/notifications/<message_type>')
+@main.route('/services/<service_id>/notifications/<message_type>', methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_notifications(service_id, message_type):
@@ -200,8 +200,8 @@ def view_notifications(service_id, message_type):
         message_type=message_type,
         status=request.args.get('status') or 'sending,delivered,failed',
         page=request.args.get('page', 1),
-        to=request.args.get('to'),
-        search_form=SearchNotificationsForm(to=request.args.get('to')),
+        to=request.form.get('to', ''),
+        search_form=SearchNotificationsForm(to=request.form.get('to', '')),
     )
 
 
@@ -245,7 +245,7 @@ def get_notifications(service_id, message_type, status_override=None):
         template_type=[message_type],
         status=filter_args.get('status'),
         limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'],
-        to=request.args.get('to'),
+        to=request.form.get('to', ''),
     )
 
     url_args = {

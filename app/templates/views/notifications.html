@@ -21,7 +21,7 @@
   ) }}
 
   <form
-    method="get"
+    method="post"
     action="{{ url_for('.view_notifications', service_id=current_service.id, message_type=message_type) }}"
     class="grid-row"
   >
@@ -34,6 +34,7 @@
       ) }}
     </div>
     <div class="column-one-quarter align-button-with-textbox">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="submit" class="button" value="Search">
     </div>
   </form>
