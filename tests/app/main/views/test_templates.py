@@ -64,6 +64,19 @@ def test_should_show_page_for_choosing_a_template(
     mock_get_service_templates.assert_called_with(SERVICE_ONE_ID)
 
 
+def test_should_not_show_template_nav_if_only_one_type_of_template(
+    client_request,
+    mock_get_service_templates_with_only_one_template,
+):
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert not page.select('.pill')
+
+
 def test_should_show_page_for_one_template(
     logged_in_client,
     mock_get_service_template,

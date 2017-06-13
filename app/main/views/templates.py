@@ -88,6 +88,10 @@ def view_template(service_id, template_id):
 def choose_template(service_id, template_type='all'):
     templates = service_api_client.get_service_templates(service_id)['data']
 
+    has_multiple_template_types = len({
+        template['template_type'] for template in templates
+    }) > 1
+
     template_nav_items = [
         (label, key, url_for('.choose_template', service_id=current_service['id'], template_type=key), '')
         for label, key in filter(None, [
@@ -104,6 +108,7 @@ def choose_template(service_id, template_type='all'):
             template for template in templates
             if template_type in ['all', template['template_type']]
         ],
+        show_template_nav=has_multiple_template_types,
         template_nav_items=template_nav_items,
         template_type=template_type,
         search_form=SearchTemplatesForm(),

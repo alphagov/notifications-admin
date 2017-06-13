@@ -48,9 +48,11 @@
       {% endif %}
     </div>
 
-    <div class="bottom-gutter-2-3">
-      {{ pill(template_nav_items, current_value=template_type, show_count=False) }}
-    </div>
+    {% if show_template_nav %}
+      <div class="bottom-gutter-2-3">
+        {{ pill(template_nav_items, current_value=template_type, show_count=False) }}
+      </div>
+    {% endif %}
 
     {% if templates|length > 7 %}
       <div data-module="autofocus">
