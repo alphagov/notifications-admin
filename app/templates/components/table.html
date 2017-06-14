@@ -105,10 +105,8 @@
   {% endcall %}
 {%- endmacro %}
 
-{% macro boolean_field(yes) -%}
-  {% call field(status='yes' if yes else 'no') %}
-    {{ "Yes" if yes else "No" }}
-  {% endcall %}
+{% macro boolean_field(value) -%}
+  {{ text_field('On' if value else 'Off') }}
 {%- endmacro %}
 
 {% macro right_aligned_field_heading(text) %}

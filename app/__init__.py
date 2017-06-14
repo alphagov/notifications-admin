@@ -165,14 +165,16 @@ def init_csrf(application):
 
     @csrf.error_handler
     def csrf_handler(reason):
+        application.logger.warning('csrf.error_message: {}'.format(reason))
+
         if 'user_id' not in session:
-            application.logger.info(
+            application.logger.warning(
                 u'csrf.session_expired: Redirecting user to log in page'
             )
 
             return application.login_manager.unauthorized()
 
-        application.logger.info(
+        application.logger.warning(
             u'csrf.invalid_token: Aborting request, user_id: {user_id}',
             extra={'user_id': session['user_id']})
 
