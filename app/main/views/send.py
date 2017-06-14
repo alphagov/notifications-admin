@@ -112,9 +112,17 @@ def send_messages(service_id, template_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
+            file_data = Spreadsheet.from_file(form.file.data, filename=form.file.data.filename).as_dict
+            if template.template_type == 'letter':
+                def is_ascii(s):
+                    return all(ord(c) < 128 for c in s)
+
+                if is_ascii(str(file_data)) is False:
+                    raise ValueError("Invalid characters in {}".format(form.file.data.filename))
+
             upload_id = s3upload(
                 service_id,
-                Spreadsheet.from_file(form.file.data, filename=form.file.data.filename).as_dict,
+                file_data,
                 current_app.config['AWS_REGION']
             )
             session['upload_data'] = {
@@ -127,6 +135,10 @@ def send_messages(service_id, template_id):
                                     template_type=template.template_type))
         except (UnicodeDecodeError, BadZipFile, XLRDError):
             flash('Couldn’t read {}. Try using a different file format.'.format(
+                form.file.data.filename
+            ))
+        except ValueError:
+            flash('Invalid characters in the address fields within {}.'.format(
                 form.file.data.filename
             ))
 
@@ -333,7 +345,6 @@ def send_test_preview(service_id, template_id, filetype):
 
 
 def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
-
     if not session.get('upload_data'):
         # if we just return a `redirect` (302) object here, we'll get errors when we try and unpack in the
         # check_messages route - so raise a werkzeug.routing redirect to ensure that doesn't happen.
