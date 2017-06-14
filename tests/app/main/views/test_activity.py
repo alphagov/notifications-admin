@@ -70,14 +70,27 @@ def test_can_show_notifications(
     to_argument,
     expected_to_argument,
 ):
-    response = logged_in_client.get(url_for(
-        'main.view_notifications',
-        service_id=service_one['id'],
-        message_type=message_type,
-        status=status_argument,
-        page=page_argument,
-        to=to_argument,
-    ))
+    if expected_to_argument:
+        response = logged_in_client.post(
+            url_for(
+                'main.view_notifications',
+                service_id=service_one['id'],
+                message_type=message_type,
+                status=status_argument,
+                page=page_argument,
+            ),
+            data={
+                'to': to_argument
+            }
+        )
+    else:
+        response = logged_in_client.get(url_for(
+            'main.view_notifications',
+            service_id=service_one['id'],
+            message_type=message_type,
+            status=status_argument,
+            page=page_argument,
+        ))
     assert response.status_code == 200
     content = response.get_data(as_text=True)
     notifications = notification_json(service_one['id'])
@@ -97,8 +110,7 @@ def test_can_show_notifications(
         assert query_dict['status'] == [status_argument]
     if expected_page_argument:
         assert query_dict['page'] == [str(expected_page_argument)]
-    if to_argument:
-        assert query_dict['to'] == [to_argument]
+    assert 'to' not in query_dict
 
     mock_get_notifications.assert_called_with(
         limit_days=7,
@@ -119,20 +131,25 @@ def test_can_show_notifications(
     assert json_content.keys() == {'counts', 'notifications'}
 
 
-@pytest.mark.parametrize("initial_query_arguments, expected_status_field_value, expected_search_box_contents", [
+@pytest.mark.parametrize((
+    'initial_query_arguments,'
+    'form_post_data,'
+    'expected_search_box_contents'
+), [
     (
         {
             'message_type': 'sms',
         },
-        'sending,delivered,failed',
+        {},
         '',
     ),
     (
         {
             'message_type': 'sms',
+        },
+        {
             'to': '+33(0)5-12-34-56-78',
         },
-        'sending,delivered,failed',
         '+33(0)5-12-34-56-78',
     ),
     (
@@ -140,9 +157,10 @@ def test_can_show_notifications(
             'status': 'failed',
             'message_type': 'email',
             'page': '99',
+        },
+        {
             'to': 'test@example.com',
         },
-        'failed',
         'test@example.com',
     ),
 ])
@@ -151,17 +169,21 @@ def test_search_recipient_form(
     mock_get_notifications,
     mock_get_detailed_service,
     initial_query_arguments,
-    expected_status_field_value,
+    form_post_data,
     expected_search_box_contents,
 ):
-    response = logged_in_client.get(url_for(
-        'main.view_notifications',
-        service_id=SERVICE_ONE_ID,
-        **initial_query_arguments
-    ))
+    response = logged_in_client.post(
+        url_for(
+            'main.view_notifications',
+            service_id=SERVICE_ONE_ID,
+            **initial_query_arguments
+        ),
+        data=form_post_data
+    )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
+    assert page.find("form")['method'] == 'post'
     action_url = page.find("form")['action']
     url = urlparse(action_url)
     assert url.path == '/services/{}/notifications/{}'.format(
@@ -171,8 +193,11 @@ def test_search_recipient_form(
     query_dict = parse_qs(url.query)
     assert query_dict == {}
 
-    assert page.find("input", {'name': 'status'})['value'] == expected_status_field_value
-    assert page.find("input", {'name': 'to'})['value'] == expected_search_box_contents
+    recipient_inputs = page.select("input[name=to]")
+    assert(len(recipient_inputs) == 2)
+
+    for field in recipient_inputs:
+        assert field['value'] == expected_search_box_contents
 
 
 def test_should_show_notifications_for_a_service_with_next_previous(
