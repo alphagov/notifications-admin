@@ -113,5 +113,5 @@ def roadmap():
 
 
 @main.route('/features')
-def roadmap():
+def features():
     return render_template('views/features.html')
