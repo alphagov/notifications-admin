@@ -1,0 +1,74 @@
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field %}
+{% extends "withoutnav_template.html" %}
+
+{% block per_page_title %}
+  Features of GOV.UK Notify
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-two-thirds">
+    <h1 class="heading-large">Features</h1>
+
+    <p>
+        Here’s a list of what you can do with GOV.UK Notify. We’re adding new features all the time, 
+        so keep an eye on our <a href="{{ url_for('main.roadmap') }}">roadmap</a> to see what’s coming up.
+    </p>
+
+    <div class="panel panel-border-wide">
+      <p>
+          You can <a href="{{ url_for('main.index') }}">create yourself a trial account now</a> to see all 
+          of these features in action.
+      </p>
+    </div>
+
+    <h2 class="heading-medium">What you can do with Notify</h2>
+      <ul class="list list-bullet">
+        <li>Send emails</li>
+        <li>Send text messages – UK and internationally</li>
+        <li>Receive text messages</li>
+        <li>Send letters</li>
+      </ul>
+
+    <h2 class="heading-medium">What Notify costs</h2>
+      <ul class="list list-bullet">
+        <li>Free for email</li>
+        <li>250,000 free text messages – then 1.58p + VAT</li>
+        <li>Letters from 29p + VAT</li>
+      </ul>
+      <p>
+          See our <a href="{{ url_for('main.pricing') }}">pricing</a> page for more details.
+      </p>
+
+    <h2 class="heading-medium">Manage your message content</h2>
+      <ul class="list list-bullet">
+        <li>Personalise your messages</li>
+        <li>Format emails and letters</li>
+        <li>Choose email and letter branding</li>
+        <li>Specify an email account for replies</li>
+        <li>Specify text message sender name</li>
+      </ul>
+
+    <h2 class="heading-medium">Using Notify</h2>
+      <ul class="list list-bullet">
+        <li>Create and update message templates in real time</li>
+        <li>Preview messages before sending them</li>
+        <li>Schedule when your messages are sent</li>
+        <li>Send individual emails or text messages</li>
+        <li>See the delivery status of emails and text messages</li>
+        <li>Manually upload batch files of recipient data</li>
+        <li>Automate sending with our API</li>
+        <li>Integrate using supported client libraries</li>
+        <li>Use different types of API key for your 
+          <a href="{{ url_for('main.integration_testing') }}">integration testing</a></li>
+      </ul>
+
+    <h2 class="heading-medium">Managing your Notify account</h2>
+      <ul class="list list-bullet">
+        <li>Real-time dashboard of activity</li>
+        <li>View usage and reports</li>
+        <li>Manage your team members permissions</li>
+      </ul>
+
+{% endblock %}
