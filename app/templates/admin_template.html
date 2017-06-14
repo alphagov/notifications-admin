@@ -61,6 +61,8 @@
             </li>
           {% else %}
             <li>
+              <a href="{{ url_for('main.features' )}}">Features</a>
+              <a href="{{ url_for('main.pricing' )}}">Pricing</a>          
               <a href="{{ url_for('main.sign_in' )}}">Sign in</a>
             </li>
           {% endif %}
@@ -94,6 +96,7 @@
         <div class="column-one-third">
           <h2>About</h2>
           <ul>
+            <li><a href="{{ url_for("main.features") }}">Features</a></li>
             <li><a href="{{ url_for("main.terms") }}">Terms of use</a></li>
             <li><a href="{{ url_for("main.trial_mode") }}">Trial mode</a></li>
             <li><a href="{{ url_for("main.pricing") }}">Pricing</a></li>
