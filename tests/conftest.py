@@ -1097,6 +1097,22 @@ def mock_get_notifications(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_get_notification(mocker, api_user_active):
+    def _get_notification(
+        service_id,
+        notification_id,
+    ):
+        return single_notification_json(
+            service_id,
+        )
+
+    return mocker.patch(
+        'app.notification_api_client.get_notification',
+        side_effect=_get_notification
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_notifications_with_previous_next(mocker):
     def _get_notifications(service_id,
                            job_id=None,
@@ -1138,11 +1154,13 @@ def mock_get_notifications_with_no_notifications(mocker):
 def mock_get_inbound_sms(mocker):
     def _get_inbound_sms(
         service_id,
+        user_number=None,
     ):
         return [{
             'user_number': '0790090000' + str(i),
             'content': 'message-{}'.format(index + 1),
-            'created_at': (datetime.utcnow() - timedelta(minutes=60 * (i + 1))).isoformat()
+            'created_at': (datetime.utcnow() - timedelta(minutes=60 * (i + 1), seconds=index)).isoformat(),
+            'id': sample_uuid(),
         } for index, i in enumerate([0, 0, 0, 2, 4, 6, 8, 8])]
 
     return mocker.patch(

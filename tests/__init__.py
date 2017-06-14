@@ -248,7 +248,9 @@ def notification_json(
             'template': {
                 'id': template['id'],
                 'name': template['name'],
-                'template_type': template['template_type']},
+                'template_type': template['template_type'],
+                'content': template['content'],
+            },
             'job': job_payload,
             'sent_at': sent_at,
             'status': status,

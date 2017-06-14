@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from flask import url_for
 from app.utils import BrowsableItem
 from app.notify_client import _attach_current_user, NotifyAdminAPIClient
+from . import notification_api_client
 
 
 class ServiceAPIClient(NotifyAdminAPIClient):
@@ -244,10 +245,21 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             params=dict(year=year)
         )
 
-    def get_inbound_sms(self, service_id):
+    def get_inbound_sms(self, service_id, user_number=''):
         return self.get(
-            '/service/{}/inbound-sms'.format(service_id)
+            '/service/{}/inbound-sms?user_number={}'.format(
+                service_id,
+                user_number,
+            )
         )['data']
+
+    def get_inbound_sms_by_id(self, service_id, notification_id):
+        return self.get(
+            '/service/{}/inbound-sms/{}'.format(
+                service_id,
+                notification_id,
+            )
+        )
 
     def get_inbound_sms_summary(self, service_id):
         return self.get(

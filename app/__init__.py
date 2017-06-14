@@ -257,13 +257,20 @@ def format_datetime_relative(date):
 
 
 def get_human_day(time):
+
     #  Add 1 hour to get ‘midnight today’ instead of ‘midnight tomorrow’
-    time = (gmt_timezones(time) - timedelta(hours=1)).strftime('%A')
-    if time == datetime.utcnow().strftime('%A'):
-        return 'today'
-    if time == (datetime.utcnow() + timedelta(days=1)).strftime('%A'):
+    time_as_day = (gmt_timezones(time) - timedelta(hours=1)).strftime('%A')
+    six_days_ago = gmt_timezones((datetime.utcnow() + timedelta(days=-6)).isoformat())
+
+    if gmt_timezones(time) < six_days_ago:
+        return format_date_short(time)
+    if time_as_day == (datetime.utcnow() + timedelta(days=1)).strftime('%A'):
         return 'tomorrow'
-    return time
+    if time_as_day == datetime.utcnow().strftime('%A'):
+        return 'today'
+    if time_as_day == (datetime.utcnow() + timedelta(days=-1)).strftime('%A'):
+        return 'yesterday'
+    return format_date_short(time)
 
 
 def format_time(date):
