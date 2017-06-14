@@ -193,7 +193,11 @@ def test_search_recipient_form(
     query_dict = parse_qs(url.query)
     assert query_dict == {}
 
-    assert page.find("input", {'name': 'to'})['value'] == expected_search_box_contents
+    recipient_inputs = page.select("input[name=to]")
+    assert(len(recipient_inputs) == 2)
+
+    for field in recipient_inputs:
+        assert field['value'] == expected_search_box_contents
 
 
 def test_should_show_notifications_for_a_service_with_next_previous(

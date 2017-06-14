@@ -24,7 +24,6 @@
     method="post"
     action="{{ url_for('.view_notifications', service_id=current_service.id, message_type=message_type) }}"
     class="grid-row"
-    id="search-form"
   >
     <div class="column-three-quarters">
       {{ textbox(
@@ -34,9 +33,14 @@
       ) }}
     </div>
     <div class="column-one-quarter align-button-with-textbox">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <input type="submit" class="button" value="Search">
     </div>
+  </form>
+
+  <form id="search-form" method="post">
+    <input type="hidden" name="to" value="{{ search_form.to.data }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   </form>
 
   {{ ajax_block(
