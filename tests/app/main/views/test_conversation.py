@@ -70,60 +70,6 @@ def test_get_user_phone_number_raises_if_both_API_requests_fail(
     mock_get_notification.assert_called_once_with('service', 'notification')
 
 
-@pytest.mark.parametrize('index, expected', enumerate([
-    (
-        'message-8',
-        'Failed (sent yesterday at 2:59pm)',
-    ),
-    (
-        'message-7',
-        'Failed (sent yesterday at 2:59pm)',
-    ),
-    (
-        'message-6',
-        'Failed (sent yesterday at 4:59pm)',
-    ),
-    (
-        'message-5',
-        'Failed (sent yesterday at 6:59pm)',
-    ),
-    (
-        'message-4',
-        'Failed (sent yesterday at 8:59pm)',
-    ),
-    (
-        'message-3',
-        'Failed (sent yesterday at 10:59pm)',
-    ),
-    (
-        'message-2',
-        'Failed (sent yesterday at 10:59pm)',
-    ),
-    (
-        'message-1',
-        'Failed (sent yesterday at 11:00pm)',
-    ),
-    (
-        'template content',
-        'yesterday at midnight',
-    ),
-    (
-        'template content',
-        'yesterday at midnight',
-    ),
-    (
-        'template content',
-        'yesterday at midnight',
-    ),
-    (
-        'template content',
-        'yesterday at midnight',
-    ),
-    (
-        'template content',
-        'yesterday at midnight',
-    ),
-]))
 @freeze_time("2012-01-01 00:00:00")
 def test_view_conversation(
     logged_in_client,
@@ -131,8 +77,6 @@ def test_view_conversation(
     mock_get_notification,
     mock_get_inbound_sms,
     mock_get_notifications,
-    index,
-    expected,
 ):
 
     response = logged_in_client.get(url_for(
@@ -148,7 +92,62 @@ def test_view_conversation(
 
     assert len(messages) == 13
     assert len(statuses) == 13
-    assert (
-        normalize_spaces(messages[index].text),
-        normalize_spaces(statuses[index].text),
-    ) == expected
+
+    for index, expected in enumerate([
+        (
+            'message-8',
+            'Failed (sent yesterday at 2:59pm)',
+        ),
+        (
+            'message-7',
+            'Failed (sent yesterday at 2:59pm)',
+        ),
+        (
+            'message-6',
+            'Failed (sent yesterday at 4:59pm)',
+        ),
+        (
+            'message-5',
+            'Failed (sent yesterday at 6:59pm)',
+        ),
+        (
+            'message-4',
+            'Failed (sent yesterday at 8:59pm)',
+        ),
+        (
+            'message-3',
+            'Failed (sent yesterday at 10:59pm)',
+        ),
+        (
+            'message-2',
+            'Failed (sent yesterday at 10:59pm)',
+        ),
+        (
+            'message-1',
+            'Failed (sent yesterday at 11:00pm)',
+        ),
+        (
+            'template content',
+            'yesterday at midnight',
+        ),
+        (
+            'template content',
+            'yesterday at midnight',
+        ),
+        (
+            'template content',
+            'yesterday at midnight',
+        ),
+        (
+            'template content',
+            'yesterday at midnight',
+        ),
+        (
+            'template content',
+            'yesterday at midnight',
+        ),
+    ]):
+        assert (
+            normalize_spaces(messages[index].text),
+            normalize_spaces(statuses[index].text),
+        ) == expected
