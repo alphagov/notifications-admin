@@ -4,11 +4,70 @@ from bs4 import BeautifulSoup
 from flask import (
     url_for,
 )
+from notifications_python_client.errors import HTTPError
 from tests.conftest import (
     SERVICE_ONE_ID,
 )
 from tests.app.test_utils import normalize_spaces
 from freezegun import freeze_time
+from unittest import mock
+from app.main.views.conversation import get_user_number
+
+
+@mock.patch(
+    'app.main.views.conversation.service_api_client.get_inbound_sms_by_id',
+    return_value={
+        'user_number': '4407900900123'
+    }
+)
+@mock.patch(
+    'app.main.views.conversation.notification_api_client.get_notification',
+    side_effect=HTTPError,
+)
+def test_get_user_phone_number_when_only_inbound_exists(
+    mock_get_notification,
+    mock_get_inbound_sms,
+):
+    assert get_user_number('service', 'notification') == '07900 900123'
+    mock_get_inbound_sms.assert_called_once_with('service', 'notification')
+    assert mock_get_notification.called is False
+
+
+@mock.patch(
+    'app.main.views.conversation.service_api_client.get_inbound_sms_by_id',
+    side_effect=HTTPError,
+)
+@mock.patch(
+    'app.main.views.conversation.notification_api_client.get_notification',
+    return_value={
+        'to': '15550000000'
+    }
+)
+def test_get_user_phone_number_when_only_outbound_exists(
+    mock_get_notification,
+    mock_get_inbound_sms,
+):
+    assert get_user_number('service', 'notification') == '+1 555-000-0000'
+    mock_get_inbound_sms.assert_called_once_with('service', 'notification')
+    mock_get_notification.assert_called_once_with('service', 'notification')
+
+
+@mock.patch(
+    'app.main.views.conversation.service_api_client.get_inbound_sms_by_id',
+    side_effect=HTTPError,
+)
+@mock.patch(
+    'app.main.views.conversation.notification_api_client.get_notification',
+    side_effect=HTTPError,
+)
+def test_get_user_phone_number_raises_if_both_API_requests_fail(
+    mock_get_notification,
+    mock_get_inbound_sms,
+):
+    with pytest.raises(HTTPError):
+        get_user_number('service', 'notification')
+    mock_get_inbound_sms.assert_called_once_with('service', 'notification')
+    mock_get_notification.assert_called_once_with('service', 'notification')
 
 
 @pytest.mark.parametrize('index, expected', enumerate([

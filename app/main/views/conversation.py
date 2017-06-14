@@ -8,6 +8,7 @@ from notifications_utils.template import SMSPreviewTemplate
 from app.main import main
 from app.utils import user_has_permissions
 from app import notification_api_client, service_api_client
+from notifications_python_client.errors import HTTPError
 
 
 @main.route("/services/<service_id>/conversation/<notification_id>")
@@ -27,7 +28,7 @@ def conversation(service_id, notification_id):
 def get_user_number(service_id, notification_id):
     try:
         user_number = service_api_client.get_inbound_sms_by_id(service_id, notification_id)['user_number']
-    except Exception:
+    except HTTPError:
         user_number = notification_api_client.get_notification(service_id, notification_id)['to']
     return format_phone_number_human_readable(user_number)
 
