@@ -2,7 +2,7 @@
 {% extends "withoutnav_template.html" %}
 
 {% block per_page_title %}
-  Features of GOV.UK Notify
+  Features
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -12,13 +12,13 @@
     <h1 class="heading-large">Features</h1>
 
     <p>
-        Here’s a list of what you can do with GOV.UK Notify. We’re adding new features all the time, 
+        Here’s a list of what you can do with GOV.UK Notify. We’re adding new features all the time,
         so keep an eye on our <a href="{{ url_for('main.roadmap') }}">roadmap</a> to see what’s coming up.
     </p>
 
     <div class="panel panel-border-wide">
       <p>
-          You can <a href="{{ url_for('main.index') }}">create yourself a trial account now</a> to see all 
+          You can <a href="{{ url_for('main.index') }}">create yourself a trial account now</a> to see all
           of these features in action.
       </p>
     </div>
@@ -41,7 +41,7 @@
           See our <a href="{{ url_for('main.pricing') }}">pricing</a> page for more details.
       </p>
 
-    <h2 class="heading-medium">Manage your message content</h2>
+    <h2 class="heading-medium">Managing your message content</h2>
       <ul class="list list-bullet">
         <li>Personalise your messages</li>
         <li>Format emails and letters</li>
@@ -60,7 +60,7 @@
         <li>Manually upload batch files of recipient data</li>
         <li>Automate sending with our API</li>
         <li>Integrate using supported client libraries</li>
-        <li>Use different types of API key for your 
+        <li>Use different types of API key for your
           <a href="{{ url_for('main.integration_testing') }}">integration testing</a></li>
       </ul>
 
@@ -68,7 +68,7 @@
       <ul class="list list-bullet">
         <li>Real-time dashboard of activity</li>
         <li>View usage and reports</li>
-        <li>Manage your team members permissions</li>
+        <li>Manage your team members’ permissions</li>
       </ul>
 
 {% endblock %}
