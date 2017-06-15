@@ -30,7 +30,7 @@ from app.main.forms import (
     ServiceLetterContactBlock,
     ServiceBrandingOrg,
     LetterBranding,
-)
+    ServiceInboundApiForm)
 from app import user_api_client, current_service, organisations_client
 
 
@@ -38,6 +38,7 @@ from app import user_api_client, current_service, organisations_client
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_settings(service_id):
+    print(current_service)
     letter_branding_organisations = organisations_client.get_letter_organisations()
     if current_service['organisation']:
         organisation = organisations_client.get_organisation(current_service['organisation'])['organisation']
@@ -410,3 +411,24 @@ def get_branding_as_dict(organisations):
             'colour': organisation['colour']
         } for organisation in organisations
     }
+
+
+@main.route("/services/<service_id>/service-settings/set-inbound-api", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_set_inbound_api(service_id):
+    form = ServiceInboundApiForm()
+
+    if form.validate_on_submit():
+        service_api_client.update_service_inbound_api(
+            service_id,
+            url=form.url.data,
+            bearer_token=form.bearer_token.data,
+            user_id=current_user.id
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/set-inbound-api.html',
+        form=form,
+    )

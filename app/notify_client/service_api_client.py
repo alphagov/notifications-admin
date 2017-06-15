@@ -266,6 +266,14 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             '/service/{}/inbound-sms/summary'.format(service_id)
         )
 
+    def update_service_inbound_api(self, service_id, url, bearer_token, user_id):
+        data = {
+            "url":url,
+            "bearer_token": bearer_token,
+            "updated_by_id": user_id
+        }
+        return self.post("/service/{}/inbound-api".format(service_id), data)
+
 
 class ServicesBrowsableItem(BrowsableItem):
     @property

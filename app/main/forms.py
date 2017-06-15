@@ -651,6 +651,17 @@ class PlaceholderForm(Form):
     pass
 
 
+class ServiceInboundApiForm(Form):
+    url = StringField("Inbound sms url",
+                      validators=[DataRequired(message='Can’t be empty'),
+                                  Regexp(regex="^https.*",
+                                         message='Must be a valid https url')]
+                      )
+    bearer_token = StringField("Bearer token",
+                               validators=[DataRequired(message='Can’t be empty'),
+                                           Length(min=5, message='Must be at least 10 characters')])
+
+
 def get_placeholder_form_instance(
     placeholder_name,
     dict_to_populate_from,

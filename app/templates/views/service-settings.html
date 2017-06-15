@@ -72,6 +72,13 @@
             {{ edit_field('Change', url_for('.service_set_letter_contact_block', service_id=current_service.id)) }}
           {% endcall %}
         {% endif %}
+
+        {% call row() %}
+          {{ text_field('Inbound API') }}
+             {{ boolean_field(current_service.can_send_letters) }}
+            {{ edit_field('Change', url_for('.service_set_inbound_api', service_id=current_service.id)) }}
+          {% endcall %}
+
       {% endcall %}
     </div>
 
