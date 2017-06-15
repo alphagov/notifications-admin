@@ -333,6 +333,7 @@ def send_test_preview(service_id, template_id, filetype):
 
 
 def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
+
     if not session.get('upload_data'):
         # if we just return a `redirect` (302) object here, we'll get errors when we try and unpack in the
         # check_messages route - so raise a werkzeug.routing redirect to ensure that doesn't happen.

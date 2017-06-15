@@ -1529,7 +1529,7 @@ def test_check_messages_shows_over_max_row_error(
     )
 
 
-def test_special_characters_in_letter_recipients_file_shows_error(
+def test_non_ascii_characters_in_letter_recipients_file_shows_error(
     logged_in_client,
     mock_get_users_by_service,
     mock_get_service,
@@ -1544,7 +1544,7 @@ def test_special_characters_in_letter_recipients_file_shows_error(
     mock_recipients.as_dict = {
             'file_name': 'invalid_characters.csv', 'data':
             'address line 1,address line 2,address line 3,address line 4,address line 5,address line 6,postcode\r\n'
-            'B. √Name,345 Example Street,,,,,ZM4 6HQ©'
+            'Fran\u00e7oise Fr\u00e9d\u00e9rich,345 Example Street,,,,,ZM4 6HQ'
         }
 
     response = logged_in_client.post(
