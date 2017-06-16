@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import uuid
 from io import BytesIO
 from os import path
@@ -1546,7 +1547,7 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
         mocker,
         content=u"""
         address line 1,address line 2,address line 3,address line 4,address line 5,address line 6,postcode
-        \u041F\u0435\u0442\u044F,345 Example Street,,,,,AA1 6BB
+        Петя,345 Example Street,,,,,AA1 6BB
         """
     )
 
@@ -1568,10 +1569,7 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
             'You need to fix 1 address '
             'Skip to file contents'
         )
-    assert page.select_one(
-        '#content > div.grid-row > main > table > tbody > '
-        'tr:nth-of-type(1) > td:nth-of-type(2) > div > span > span'
-        ).get_text(strip=True) == u'Can\u2019t include \u041F, \u0435, \u0442 or \u044F'
+    assert page.find('span', class_='table-field-error-label').text == u'Can’t include П, е, т or я'
 
 
 def test_check_messages_redirects_if_no_upload_data(logged_in_client, service_one, mocker):
