@@ -1544,7 +1544,7 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
     mock_recipients.as_dict = {
             'file_name': 'invalid_characters.csv', 'data':
             'address line 1,address line 2,address line 3,address line 4,address line 5,address line 6,postcode\r\n'
-            '\u041F\u0435\u0442\u044F,345 Example Street,,,,,ZM4 6HQ'
+            '\u041F\u0435\u0442\u044F,345 Example Street,,,,,AA1 6BB'
         }
 
     response = logged_in_client.post(
