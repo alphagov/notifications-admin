@@ -4,14 +4,6 @@
 <div class="ajax-block-container" aria-labelledby='pill-selected-item'>
   <div class="dashboard-table bottom-gutter-3-2">
 
-  {% if not help %}
-    <p class="bottom-gutter">
-      <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
-      &emsp;
-      <span id="time-left">{{ time_left }}</span>
-    </p>
-  {% endif %}
-
   {% call(item, row_number) list_table(
     [notification],
     caption=None,

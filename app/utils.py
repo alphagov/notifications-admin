@@ -155,23 +155,6 @@ def generate_notifications_csv(**kwargs):
     raise Exception("Should never reach here")
 
 
-def generate_single_notification_csv(notification):
-    fieldnames = ['Recipient', 'Template', 'Type', 'Status', 'Time']
-    yield ','.join(fieldnames) + '\n'
-
-    values = [
-        notification['to'],
-        notification['template']['name'],
-        notification['template']['template_type'],
-        notification['status'],
-        notification['created_at']
-    ]
-    line = ','.join(str(i) for i in values) + '\n'
-    yield line
-
-    return
-
-
 def get_page_from_request():
     if 'page' in request.args:
         try:
