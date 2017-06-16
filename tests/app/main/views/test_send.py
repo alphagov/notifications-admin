@@ -1531,13 +1531,24 @@ def test_check_messages_shows_over_max_row_error(
 
 def test_non_ascii_characters_in_letter_recipients_file_shows_error(
     logged_in_client,
+    api_user_active,
+    mock_login,
     mock_get_users_by_service,
     mock_get_service,
+    mock_has_permissions,
     mock_get_service_letter_template,
     mock_get_detailed_service_for_today,
     fake_uuid,
     mocker
 ):
+    from tests.conftest import mock_s3_download
+    mock_s3_download(
+        mocker,
+        content=u"""
+        address line 1,address line 2,address line 3,address line 4,address line 5,address line 6,postcode
+        \u041F\u0435\u0442\u044F,345 Example Street,,,,,AA1 6BB
+        """
+    )
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
     mock_recipients = mocker.patch('app.utils.Spreadsheet.from_file').return_value
