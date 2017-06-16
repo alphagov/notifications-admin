@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import uuid
 from io import BytesIO
 from os import path
@@ -1527,6 +1528,48 @@ def test_check_messages_shows_over_max_row_error(
         'Your file has 99,999 rows. '
         'Skip to file contents'
     )
+
+
+def test_non_ascii_characters_in_letter_recipients_file_shows_error(
+    logged_in_client,
+    api_user_active,
+    mock_login,
+    mock_get_users_by_service,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_service_letter_template,
+    mock_get_detailed_service_for_today,
+    fake_uuid,
+    mocker
+):
+    from tests.conftest import mock_s3_download
+    mock_s3_download(
+        mocker,
+        content=u"""
+        address line 1,address line 2,address line 3,address line 4,address line 5,address line 6,postcode
+        Петя,345 Example Street,,,,,AA1 6BB
+        """
+    )
+
+    with logged_in_client.session_transaction() as session:
+        session['upload_data'] = {'template_id': fake_uuid}
+    response = logged_in_client.get(url_for(
+        'main.check_messages',
+        service_id=fake_uuid,
+        template_type='letter',
+        upload_id=fake_uuid
+    ))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert ' '.join(
+        page.find('div', class_='banner-dangerous').text.split()
+    ) == (
+            'There is a problem with your data '
+            'You need to fix 1 address '
+            'Skip to file contents'
+        )
+    assert page.find('span', class_='table-field-error-label').text == u'Can’t include П, е, т or я'
 
 
 def test_check_messages_redirects_if_no_upload_data(logged_in_client, service_one, mocker):
