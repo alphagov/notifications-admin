@@ -1549,20 +1549,15 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
         \u041F\u0435\u0442\u044F,345 Example Street,,,,,AA1 6BB
         """
     )
-    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
-    mock_recipients = mocker.patch('app.utils.Spreadsheet.from_file').return_value
-    mock_recipients.as_dict = {
-            'file_name': 'invalid_characters.csv', 'data':
-            'address line 1,address line 2,address line 3,address line 4,address line 5,address line 6,postcode\r\n'
-            '\u041F\u0435\u0442\u044F,345 Example Street,,,,,AA1 6BB'
-        }
-
-    response = logged_in_client.post(
-        url_for('main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'invalid_characters.csv')},
-        follow_redirects=True
-    )
+    with logged_in_client.session_transaction() as session:
+        session['upload_data'] = {'template_id': fake_uuid}
+    response = logged_in_client.get(url_for(
+        'main.check_messages',
+        service_id=fake_uuid,
+        template_type='letter',
+        upload_id=fake_uuid
+    ))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
