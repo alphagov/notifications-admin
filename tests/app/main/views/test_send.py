@@ -1549,7 +1549,7 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
 
     response = logged_in_client.post(
         url_for('main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid),
-        data={'file': (None, 'invalid_characters.csv')},
+        data={'file': (BytesIO(''.encode('utf-8')), 'invalid_characters.csv')},
         follow_redirects=True
     )
 
