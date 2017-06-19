@@ -44,7 +44,7 @@ def test_notification_status_page_shows_details(
     )
 
     assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
-        'service one: template content'
+        'service one: hello Jo'
     )
     assert normalize_spaces(page.select('.ajax-block-container p')[0].text) == (
         expected_status

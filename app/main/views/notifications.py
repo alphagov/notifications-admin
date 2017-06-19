@@ -44,22 +44,24 @@ def get_status_arg(filter_args):
 @user_has_permissions('view_activity', admin_override=True)
 def view_notification(service_id, notification_id):
     notification = notification_api_client.get_notification(service_id, notification_id)
+    template = get_template(
+        notification['template'],
+        current_service,
+        letter_preview_url=url_for(
+            '.view_template_version_preview',
+            service_id=service_id,
+            template_id=notification['template']['id'],
+            version=notification['template_version'],
+            filetype='png',
+        ),
+        show_recipient=True,
+    )
+    template.values = notification['personalisation']
     return render_template(
         'views/notifications/notification.html',
         finished=(notification['status'] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
         uploaded_file_name='Report',
-        template=get_template(
-            notification['template'],
-            current_service,
-            letter_preview_url=url_for(
-                '.view_template_version_preview',
-                service_id=service_id,
-                template_id=notification['template']['id'],
-                version=notification['template_version'],
-                filetype='png',
-            ),
-            show_recipient=True,
-        ),
+        template=template,
         updates_url=url_for(
             ".view_notification_updates",
             service_id=service_id,
