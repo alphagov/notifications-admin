@@ -38,7 +38,6 @@ from app import user_api_client, current_service, organisations_client
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_settings(service_id):
-    print(current_service)
     letter_branding_organisations = organisations_client.get_letter_organisations()
     if current_service['organisation']:
         organisation = organisations_client.get_organisation(current_service['organisation'])['organisation']
