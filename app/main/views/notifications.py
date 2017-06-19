@@ -39,7 +39,7 @@ def get_status_arg(filter_args):
         return REQUESTED_STATUSES
 
 
-@main.route("/services/<service_id>/one-off-notification/<notification_id>")
+@main.route("/services/<service_id>/notification/<notification_id>")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_notification(service_id, notification_id):
@@ -72,7 +72,7 @@ def view_notification(service_id, notification_id):
     )
 
 
-@main.route("/services/<service_id>/one-off-notification/<notification_id>.json")
+@main.route("/services/<service_id>/notification/<notification_id>.json")
 @user_has_permissions('view_activity', admin_override=True)
 def view_notification_updates(service_id, notification_id):
     return jsonify(**get_single_notification_partials(
