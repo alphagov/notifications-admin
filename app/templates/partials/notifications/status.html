@@ -1,6 +1,13 @@
 <div class="ajax-block-container">
-  <p class='heading-small bottom-gutter'>
-    Sent {% if notification.created_by %}by {{ notification.created_by.name }} {% endif %}
-    on {{ notification.created_at|format_datetime_short }}
+  <p class="notification-status {{ notification.status|format_notification_status_as_field_status }}">
+    {% if notification.status|format_notification_status_as_url %}
+      <a href="{{ notification.status|format_notification_status_as_url }}">
+    {% endif %}
+    {{ notification.status|format_notification_status(
+      notification.template.template_type
+    ) }}
+    {% if notification.status|format_notification_status_as_url %}
+      </a>
+    {% endif %}
   </p>
 </div>
