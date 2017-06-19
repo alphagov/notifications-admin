@@ -58,6 +58,7 @@ def view_notification(service_id, notification_id):
                 version=notification['template_version'],
                 filetype='png',
             ),
+            show_recipient=True,
         ),
         updates_url=url_for(
             ".view_notification_updates",
