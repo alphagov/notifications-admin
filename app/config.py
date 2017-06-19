@@ -96,6 +96,7 @@ class Development(Config):
 
 class Test(Development):
     DEBUG = True
+    TESTING = True
     STATSD_ENABLED = True
     WTF_CSRF_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'test-notifications-csv-upload'

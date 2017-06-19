@@ -39,10 +39,8 @@ def test_notification_status_page_shows_details(
 ):
     page = client_request.get(
         'main.view_notification',
-        endpoint_kwargs={
-            'service_id': service_one['id'],
-            'notification_id': fake_uuid
-        }
+        service_id=service_one['id'],
+        notification_id=fake_uuid
     )
 
     assert page.find('div', {'class': 'sms-message-wrapper'}).text.strip() == 'service one: template content'
@@ -72,10 +70,8 @@ def test_notification_status_page_shows_correct_numbers(
 
     page = client_request.get(
         'main.view_notification',
-        endpoint_kwargs={
-            'service_id': service_one['id'],
-            'notification_id': fake_uuid
-        }
+        service_id=service_one['id'],
+        notification_id=fake_uuid
     )
 
     big_numbers = page.find_all('div', {'class': 'big-number-number'})

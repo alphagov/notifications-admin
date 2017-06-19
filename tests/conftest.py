@@ -1,3 +1,4 @@
+
 import os
 from datetime import date, datetime, timedelta
 from unittest.mock import Mock
@@ -1703,25 +1704,26 @@ def os_environ():
 
 
 @pytest.fixture
-@pytest.fixture
 def client_request(logged_in_client):
     class ClientRequest:
 
         @staticmethod
-        def get(endpoint, endpoint_kwargs=None, expected_status=200, follow_redirects=False):
+        def get(endpoint, _expected_status=200, _follow_redirects=False, **endpoint_kwargs):
             resp = logged_in_client.get(
-                url_for(endpoint, **(endpoint_kwargs or {}))
+                url_for(endpoint, **(endpoint_kwargs or {})),
+                follow_redirects=_follow_redirects,
             )
-            assert resp.status_code == expected_status
+            assert resp.status_code == _expected_status
             return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
 
         @staticmethod
-        def post(endpoint, endpoint_kwargs=None, data=None, expected_status=302, follow_redirects=False):
+        def post(endpoint, _data=None, _expected_status=302, _follow_redirects=False, **endpoint_kwargs):
             resp = logged_in_client.post(
                 url_for(endpoint, **(endpoint_kwargs or {})),
-                data
+                data=_data,
+                follow_redirects=_follow_redirects,
             )
-            assert resp.status_code == expected_status
+            assert resp.status_code == _expected_status
             return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
 
     return ClientRequest
