@@ -80,6 +80,7 @@ def test_should_show_page_for_one_job(
     status_argument,
     expected_api_call,
 ):
+
     response = logged_in_client.get(url_for(
         'main.view_job',
         service_id=service_one['id'],
@@ -94,7 +95,7 @@ def test_should_show_page_for_one_job(
         '{}: Template <em>content</em> with & entity'.format(service_one['name'])
     )
     assert ' '.join(page.find('tbody').find('tr').text.split()) == (
-        '07123456789 Delivered 1 January at 11:10am'
+        '07123456789 template content Delivered 1 January at 11:10am'
     )
     assert page.find('div', {'data-key': 'notifications'})['data-resource'] == url_for(
         'main.view_job_updates',
