@@ -16,7 +16,6 @@
     {{ template|string }}
 
     {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
-    {{ ajax_block(partials, updates_url, 'counts', finished=finished) }}
     {{ ajax_block(partials, updates_url, 'notifications', finished=finished) }}
 
     {{ page_footer(

@@ -59,7 +59,6 @@ def view_notification(service_id, notification_id):
                 filetype='png',
             ),
         ),
-        status=request.args.get('status'),
         updates_url=url_for(
             ".view_notification_updates",
             service_id=service_id,
@@ -80,49 +79,10 @@ def view_notification_updates(service_id, notification_id):
     ))
 
 
-def _get_single_notification_counts(notification, help_argument):
-    return [
-        (
-            label,
-            query_param,
-            url_for(
-                ".view_notification",
-                service_id=notification['service'],
-                notification_id=notification['id'],
-                status=query_param,
-                help=help_argument
-            ),
-            count
-        ) for label, query_param, count in [
-            [
-                'total', '',
-                1
-            ],
-            [
-                'sending', 'sending',
-                int(notification['status'] in SENDING_STATUSES)
-            ],
-            [
-                'delivered', 'delivered',
-                int(notification['status'] in DELIVERED_STATUSES)
-            ],
-            [
-                'failed', 'failed',
-                int(notification['status'] in FAILURE_STATUSES)
-            ]
-        ]
-    ]
-
-
 def get_single_notification_partials(notification):
     status_args = get_status_arg(request.args)
 
     return {
-        'counts': render_template(
-            'partials/count.html',
-            counts=_get_single_notification_counts(notification, request.args.get('help', 0)),
-            status=status_args
-        ),
         'notifications': render_template(
             'partials/notifications/notifications.html',
             notification=notification,
