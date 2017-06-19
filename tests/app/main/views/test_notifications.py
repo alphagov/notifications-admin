@@ -43,7 +43,9 @@ def test_notification_status_page_shows_details(
         notification_id=fake_uuid
     )
 
-    assert page.find('div', {'class': 'sms-message-wrapper'}).text.strip() == 'service one: template content'
+    assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
+        'service one: template content'
+    )
     assert normalize_spaces(page.select('.ajax-block-container p')[0].text) == (
         expected_status
     )
