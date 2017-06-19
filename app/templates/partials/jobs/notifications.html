@@ -48,7 +48,9 @@
         field_headings_visible=False
       ) %}
         {% call row_heading() %}
-          <p>{{ item.to }}</p>
+          <p>
+            <a href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.to }}</a>
+          </p>
         {% endcall %}
         {{ notification_status_field(item) }}
       {% endcall %}

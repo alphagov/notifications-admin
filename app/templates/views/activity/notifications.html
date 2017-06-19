@@ -18,7 +18,7 @@
 
       {% call row_heading() %}
         <p>
-          {{ item.to }}
+          <a href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.to }}</a>
         </p>
         <p class="hint">
           {% if item.job and item.job.original_file_name == 'Report' %}
