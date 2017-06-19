@@ -91,9 +91,6 @@ def test_should_show_page_for_one_job(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.text.strip() == 'thisisatest.csv'
-    assert page.find('div', {'class': 'sms-message-wrapper'}).text.strip() == (
-        '{}: Template <em>content</em> with & entity'.format(service_one['name'])
-    )
     assert ' '.join(page.find('tbody').find('tr').text.split()) == (
         '07123456789 template content Delivered 1 January at 11:10am'
     )

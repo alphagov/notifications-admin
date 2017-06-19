@@ -114,21 +114,7 @@ def view_job(service_id, job_id):
         'views/jobs/job.html',
         finished=(total_notifications == processed_notifications),
         uploaded_file_name=job['original_file_name'],
-        template=get_template(
-            service_api_client.get_service_template(
-                service_id=service_id,
-                template_id=job['template'],
-                version=job['template_version']
-            )['data'],
-            current_service,
-            letter_preview_url=url_for(
-                '.view_template_version_preview',
-                service_id=service_id,
-                template_id=job['template'],
-                version=job['template_version'],
-                filetype='png',
-            ),
-        ),
+        template_id=job['template'],
         status=request.args.get('status', ''),
         updates_url=url_for(
             ".view_job_updates",
