@@ -16,7 +16,6 @@
     {{ template|string }}
 
     {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
-    {{ ajax_block(partials, updates_url, 'notifications', finished=finished) }}
 
     {{ page_footer(
       secondary_link=url_for('.view_template', service_id=current_service.id, template_id=template.id),

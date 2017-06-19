@@ -10,6 +10,7 @@ from app.utils import (
     DELIVERED_STATUSES,
 )
 
+from tests.app.test_utils import normalize_spaces
 from tests.conftest import mock_get_notification
 
 
@@ -27,7 +28,9 @@ def test_notification_status_page_shows_details(
     )
 
     assert page.find('div', {'class': 'sms-message-wrapper'}).text.strip() == 'service one: template content'
-    assert ' '.join(page.find('tbody').find('tr').text.split()) == '07123456789 Delivered 1 January at 11:10am'
+    assert normalize_spaces(page.select('.ajax-block-container p')[0].text) == (
+        'Sent by Test User on 1 January at 11:09am'
+    )
 
     mock_get_notification.assert_called_with(
         service_one['id'],
