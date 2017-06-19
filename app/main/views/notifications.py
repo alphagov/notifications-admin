@@ -70,6 +70,8 @@ def view_notification(service_id, notification_id):
             help=get_help_argument()
         ),
         partials=get_single_notification_partials(notification),
+        created_by=notification.get('created_by'),
+        created_at=notification['created_at'],
         help=get_help_argument()
     )
 
