@@ -10,6 +10,7 @@ from flask_login import login_required
 
 from app import (
     notification_api_client,
+    job_api_client,
     current_service
 )
 from app.main import main
@@ -57,11 +58,16 @@ def view_notification(service_id, notification_id):
         show_recipient=True,
     )
     template.values = notification['personalisation']
+    if notification['job']:
+        job = job_api_client.get_job(service_id, notification['job']['id'])['data']
+    else:
+        job = None
     return render_template(
         'views/notifications/notification.html',
         finished=(notification['status'] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
         uploaded_file_name='Report',
         template=template,
+        job=job,
         updates_url=url_for(
             ".view_notification_updates",
             service_id=service_id,
