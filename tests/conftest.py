@@ -1100,22 +1100,6 @@ def mock_get_notifications(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
-def mock_get_notification(mocker, api_user_active):
-    def _get_notification(
-        service_id,
-        notification_id,
-    ):
-        return single_notification_json(
-            service_id,
-        )
-
-    return mocker.patch(
-        'app.notification_api_client.get_notification',
-        side_effect=_get_notification
-    )
-
-
-@pytest.fixture(scope='function')
 def mock_get_notifications_with_previous_next(mocker):
     def _get_notifications(service_id,
                            job_id=None,
