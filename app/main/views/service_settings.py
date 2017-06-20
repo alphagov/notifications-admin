@@ -449,13 +449,21 @@ def service_set_inbound_api(service_id):
     form = ServiceInboundApiForm(url=inbound_api.get('url') if inbound_api else '')
 
     if form.validate_on_submit():
-        service_api_client.update_service_inbound_api(
-            service_id,
-            url=form.url.data,
-            bearer_token=form.bearer_token.data,
-            user_id=current_user.id,
-            inbound_api_id=inbound_api.get('id') if inbound_api else ''
-        )
+        if inbound_api:
+            service_api_client.update_service_inbound_api(
+                service_id,
+                url=form.url.data,
+                bearer_token=form.bearer_token.data,
+                user_id=current_user.id,
+                inbound_api_id=inbound_api.get('id') if inbound_api else ''
+            )
+        else:
+            service_api_client.create_service_inbound_api(
+                service_id,
+                url=form.url.data,
+                bearer_token=form.bearer_token.data,
+                user_id=current_user.id
+            )
         return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
