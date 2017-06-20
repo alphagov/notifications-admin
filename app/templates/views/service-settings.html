@@ -57,7 +57,7 @@
           {{ edit_field('Change', url_for('.service_set_inbound_sms', service_id=current_service.id)) }}
         {% endcall %}
 
-        {% if 'inbound_sms' in current_service.permissions %}
+        {% if can_receive_inbound %}
           {% call row() %}
             {{ text_field('API endpoint for received text messages') }}
             {{ text_field(
