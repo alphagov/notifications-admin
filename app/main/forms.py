@@ -657,9 +657,9 @@ class ServiceInboundApiForm(Form):
                                   Regexp(regex="^https.*",
                                          message='Must be a valid https url')]
                       )
-    bearer_token = StringField("Bearer token",
-                               validators=[DataRequired(message='Can’t be empty'),
-                                           Length(min=5, message='Must be at least 10 characters')])
+    bearer_token = PasswordField("Bearer token",
+                                 validators=[DataRequired(message='Can’t be empty'),
+                                             Length(min=10, message='Must be at least 10 characters')])
 
 
 def get_placeholder_form_instance(
