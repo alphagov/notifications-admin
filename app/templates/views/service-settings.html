@@ -57,6 +57,17 @@
           {{ edit_field('Change', url_for('.service_set_inbound_sms', service_id=current_service.id)) }}
         {% endcall %}
 
+        {% if 'inbound_sms' in current_service.permissions %}
+          {% call row() %}
+            {{ text_field('API endpoint for received text messages') }}
+            {{ text_field(
+              'None' if not inbound_api_url else inbound_api_url,
+              status='' if inbound_api_url else 'default'
+            ) }}
+            {{ edit_field('Change', url_for('.service_set_inbound_api', service_id=current_service.id)) }}
+          {% endcall %}
+        {% endif %}
+
         {% call row() %}
           {{ text_field('Letters') }}
           {{ boolean_field(current_service.can_send_letters) }}
@@ -72,12 +83,6 @@
             {{ edit_field('Change', url_for('.service_set_letter_contact_block', service_id=current_service.id)) }}
           {% endcall %}
         {% endif %}
-
-        {% call row() %}
-          {{ text_field('Inbound API') }}
-             {{ boolean_field(current_service.can_send_letters) }}
-            {{ edit_field('Change', url_for('.service_set_inbound_api', service_id=current_service.id)) }}
-          {% endcall %}
 
       {% endcall %}
     </div>
