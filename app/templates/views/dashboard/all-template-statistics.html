@@ -41,11 +41,9 @@
             field_headings_visible=False
           ) %}
             {% call row_heading() %}
-              <span class="spark-bar-label">
-                <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.id) }}">{{ item.name }}</a>
-                <span class="file-list-hint">
-                  {{ message_count_label(1, item.type, suffix='template')|capitalize }}
-                </span>
+              <a class="file-list-filename" href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.id) }}">{{ item.name }}</a>
+              <span class="file-list-hint">
+                {{ message_count_label(1, item.type, suffix='template')|capitalize }}
               </span>
             {% endcall %}
             {{ spark_bar_field(item.requested_count, most_used_template_count) }}
