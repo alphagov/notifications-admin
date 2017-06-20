@@ -3,6 +3,19 @@
   &-name {
     @include bold-24;
     margin: 20px 0 5px 0;
+
+    a {
+      display: block;
+      margin-bottom: -$gutter;
+      padding-bottom: $gutter;
+    }
+
+  }
+
+  &-type {
+    color: $secondary-text-colour;
+    margin-bottom: $gutter / 3;
+    pointer-events: none;
   }
 
   &-updated-at {
