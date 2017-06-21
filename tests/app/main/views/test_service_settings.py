@@ -100,6 +100,42 @@ def test_should_show_overview_for_service_with_more_things_set(
         assert row == " ".join(page.find_all('tr')[index + 1].text.split())
 
 
+@pytest.mark.parametrize('url, elided_url', [
+    ('https://test.url.com/inbound', 'https://test.url.com...'),
+    ('https://test.url.com/', 'https://test.url.com...'),
+    ('https://test.url.com', 'https://test.url.com'),
+])
+def test_service_settings_show_elided_api_url_if_needed(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_get_letter_organisations,
+    mocker,
+    fake_uuid,
+    url,
+    elided_url
+):
+    service_one['permissions'] = ['inbound_sms']
+    service_one['inbound_api'] = [fake_uuid]
+
+    mocked_get_fn = mocker.patch(
+        'app.service_api_client.get',
+        return_value={'data': {'id': fake_uuid, 'url': url}})
+
+    response = logged_in_platform_admin_client.get(
+        url_for(
+            'main.service_settings',
+            service_id=service_one['id']
+        )
+    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    non_empty_trs = [tr.find_all('td') for tr in page.find_all('tr') if tr.find_all('td')]
+    api_url = [api_setting[1].text.strip() for api_setting in non_empty_trs
+               if api_setting[0].text.strip() == 'API endpoint for received text messages'][0]
+    assert api_url == elided_url
+
+
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
     logged_in_client,
     service_one,
