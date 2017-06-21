@@ -182,7 +182,7 @@ def job_json(
     if job_id is None:
         job_id = str(generate_uuid())
     if template_id is None:
-        template_id = str(generate_uuid())
+        template_id = "5d729fbd-239c-44ab-b498-75a985f3198f"
     if created_at is None:
         created_at = str(datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%f%z'))
     data = {

@@ -350,6 +350,11 @@ def get_job_partials(job):
     notifications = notification_api_client.get_notifications_for_service(
         job['service'], job['id'], status=filter_args['status']
     )
+    template = service_api_client.get_service_template(
+        service_id=current_service['id'],
+        template_id=job['template'],
+        version=job['template_version']
+    )['data']
     return {
         'counts': render_template(
             'partials/count.html',
@@ -369,7 +374,9 @@ def get_job_partials(job):
             ),
             help=get_help_argument(),
             time_left=get_time_left(job['created_at']),
-            job=job
+            job=job,
+            template=template,
+            template_version=job['template_version'],
         ),
         'status': render_template(
             'partials/jobs/status.html',
