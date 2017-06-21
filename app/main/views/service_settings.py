@@ -289,24 +289,19 @@ def service_set_reply_to_email(service_id):
 def service_set_sms_sender(service_id):
     form = ServiceSmsSender()
 
-    def update_service(permissions, sms_sender):
-        service_api_client.update_service_with_properties(
-            current_service['id'],
-            {'permissions': permissions, 'sms_sender': sms_sender}
-        )
-
-    set_inbound_sms = request.args.get('set_inbound_sms')
-    if set_inbound_sms == 'True':
-        if 'inbound_sms' in current_service['permissions']:
-            current_service['permissions'].remove('inbound_sms')
-            update_service(current_service['permissions'], current_service['sms_sender'])
-            return redirect(url_for('.service_settings', service_id=service_id))
-
     if form.validate_on_submit():
+        set_inbound_sms = request.args.get('set_inbound_sms', False)
         if set_inbound_sms == 'True':
             permissions = current_service['permissions']
-            permissions.append('inbound_sms')
-            update_service(permissions, form.sms_sender.data)
+            if 'inbound_sms' in permissions:
+                permissions.remove('inbound_sms')
+            else:
+                permissions.append('inbound_sms')
+            service_api_client.update_service_with_properties(
+                current_service['id'],
+                {'permissions': permissions,
+                 'sms_sender': form.sms_sender.data or None}
+            )
         else:
             service_api_client.update_service(
                 current_service['id'],
@@ -455,7 +450,7 @@ def service_set_inbound_api(service_id):
                 url=form.url.data,
                 bearer_token=form.bearer_token.data,
                 user_id=current_user.id,
-                inbound_api_id=inbound_api.get('id') if inbound_api else ''
+                inbound_api_id=inbound_api.get('id')
             )
         else:
             service_api_client.create_service_inbound_api(

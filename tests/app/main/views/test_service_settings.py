@@ -60,6 +60,25 @@ def test_should_show_overview(
     app.service_api_client.get_service.assert_called_with(service_one['id'])
 
 
+@pytest.mark.parametrize('permissions, expected_rows', [
+    (['email', 'sms', 'inbound_sms'], [
+        'Service name service one Change',
+        'Email reply to address test@example.com Change',
+        'Text message sender elevenchars',
+        'International text messages On Change',
+        'Receive text messages On Change',
+        'API endpoint for received text messages None Change',
+        'Letters Off Change',
+    ]),
+    (['email', 'sms'], [
+        'Service name service one Change',
+        'Email reply to address test@example.com Change',
+        'Text message sender elevenchars Change',
+        'International text messages On Change',
+        'Receive text messages Off Change',
+        'Letters Off Change',
+    ]),
+])
 def test_should_show_overview_for_service_with_more_things_set(
     client,
     active_user_with_permissions,
@@ -67,22 +86,17 @@ def test_should_show_overview_for_service_with_more_things_set(
     service_with_reply_to_addresses,
     mock_get_organisation,
     mock_get_letter_organisations,
+    permissions,
+    expected_rows
 ):
     client.login(active_user_with_permissions, mocker, service_with_reply_to_addresses)
-    service_with_reply_to_addresses['permissions'] = ['inbound_sms']
+    service_with_reply_to_addresses['permissions'] = permissions
     service_with_reply_to_addresses['can_send_international_sms'] = True
     response = client.get(url_for(
         'main.service_settings', service_id=service_with_reply_to_addresses['id']
     ))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    for index, row in enumerate([
-        'Service name service one Change',
-        'Email reply to address test@example.com Change',
-        'Text message sender elevenchars',
-        'International text messages On Change',
-        'Receive text messages On Change',
-        'Letters Off Change',
-    ]):
+    for index, row in enumerate(expected_rows):
         assert row == " ".join(page.find_all('tr')[index + 1].text.split())
 
 
@@ -736,6 +750,34 @@ def test_set_text_message_sender_validation(
     assert not mock_update_service.called
 
 
+@pytest.mark.parametrize('url, bearer_token, expected_errors', [
+    ("", "", "Can’t be empty Can’t be empty"),
+    ("http://not_https.com", "1234567890", "Must be a valid https url"),
+    ("https://test.com", "123456789", "Must be at least 10 characters"),
+])
+def test_set_inbound_api_validation(
+    logged_in_client,
+    mock_update_service,
+    service_one,
+    mock_get_letter_organisations,
+    url,
+    bearer_token,
+    expected_errors,
+):
+    service_one['permissions'] = ['inbound_sms']
+    response = logged_in_client.post(url_for(
+        'main.service_set_inbound_api',
+        service_id=service_one['id']),
+        data={"url": url, "bearer_token": bearer_token}
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    error_msgs = ' '.join(msg.text.strip() for msg in page.select(".error-message"))
+
+    assert response.status_code == 200
+    assert error_msgs == expected_errors
+    assert not mock_update_service.called
+
+
 def test_if_sms_sender_set_then_form_populated(
     logged_in_client,
     service_one,
@@ -1006,6 +1048,65 @@ def test_switch_service_disable_international_sms(
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
     assert mocked_fn.call_args == call(service_one['id'], {"can_send_international_sms": False})
+
+
+def test_set_new_inbound_api_and_valid_bearer_token_calls_create_inbound_api_endpoint(
+    logged_in_platform_admin_client,
+    service_one,
+    mocker,
+):
+    service_one['permissions'] = ['inbound_sms']
+    service_one['inbound_api'] = []
+
+    mocked_post_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
+
+    inbound_api_data = {'url': "https://test.url.com/", 'bearer_token': '1234567890'}
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            'main.service_set_inbound_api',
+            service_id=service_one['id']
+        ),
+        data=inbound_api_data
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_post_fn.called
+
+    inbound_api_data['updated_by_id'] = service_one['users'][0]
+    assert mocked_post_fn.call_args == call("/service/{}/inbound-api".format(service_one['id']), inbound_api_data)
+
+
+def test_update_inbound_api_and_valid_bearer_token_calls_update_inbound_api_endpoint(
+    logged_in_platform_admin_client,
+    service_one,
+    mocker,
+    fake_uuid
+):
+    service_one['permissions'] = ['inbound_sms']
+    service_one['inbound_api'] = [fake_uuid]
+
+    mocked_get_fn = mocker.patch(
+        'app.service_api_client.get',
+        return_value={'data': {'id': fake_uuid, 'url': "https://test.url.com/"}})
+    mocked_post_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
+
+    inbound_api_data = {'url': "https://test.url.com/", 'bearer_token': '1234567890', 'inbound_api_id': fake_uuid}
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            'main.service_set_inbound_api',
+            service_id=service_one['id']
+        ),
+        data=inbound_api_data
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_post_fn.called
+
+    del inbound_api_data['inbound_api_id']
+    inbound_api_data['updated_by_id'] = service_one['users'][0]
+
+    assert mocked_post_fn.call_args == call(
+        "/service/{}/inbound-api/{}".format(service_one['id'], fake_uuid), inbound_api_data)
 
 
 def test_archive_service_after_confirm(
