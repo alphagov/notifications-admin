@@ -29,4 +29,5 @@ from app.main.views import (
     platform_admin,
     letter_jobs,
     conversation,
+    notifications
 )

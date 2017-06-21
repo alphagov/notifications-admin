@@ -1,9 +1,12 @@
+
 import os
 from datetime import date, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
 from notifications_python_client.errors import HTTPError
+from flask import url_for
+from bs4 import BeautifulSoup
 
 from app import create_app
 from app.notify_client.models import (
@@ -1097,22 +1100,6 @@ def mock_get_notifications(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
-def mock_get_notification(mocker, api_user_active):
-    def _get_notification(
-        service_id,
-        notification_id,
-    ):
-        return single_notification_json(
-            service_id,
-        )
-
-    return mocker.patch(
-        'app.notification_api_client.get_notification',
-        side_effect=_get_notification
-    )
-
-
-@pytest.fixture(scope='function')
 def mock_get_notifications_with_previous_next(mocker):
     def _get_notifications(service_id,
                            job_id=None,
@@ -1630,6 +1617,33 @@ def mock_reset_failed_login_count(mocker):
     return mocker.patch('app.user_api_client.reset_failed_login_count')
 
 
+@pytest.fixture
+def mock_get_notification(mocker, fake_uuid, notification_status='delivered'):
+    def _get_notification(
+        service_id,
+        notification_id,
+    ):
+        noti = notification_json(
+            service_id,
+            rows=1,
+            status=notification_status
+        )['notifications'][0]
+
+        noti['id'] = notification_id
+        noti['created_by'] = {
+            'id': fake_uuid,
+            'name': 'Test User',
+            'email_address': 'test@user.gov.uk'
+        }
+        noti['template'] = template_json(service_id, str(generate_uuid()))
+        return noti
+
+    return mocker.patch(
+        'app.notification_api_client.get_notification',
+        side_effect=_get_notification
+    )
+
+
 @pytest.fixture(scope='function')
 def client(app_):
     with app_.test_request_context(), app_.test_client() as client:
@@ -1671,3 +1685,29 @@ def os_environ():
     os.environ = {}
     yield
     os.environ = old_env
+
+
+@pytest.fixture
+def client_request(logged_in_client):
+    class ClientRequest:
+
+        @staticmethod
+        def get(endpoint, _expected_status=200, _follow_redirects=False, **endpoint_kwargs):
+            resp = logged_in_client.get(
+                url_for(endpoint, **(endpoint_kwargs or {})),
+                follow_redirects=_follow_redirects,
+            )
+            assert resp.status_code == _expected_status
+            return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
+
+        @staticmethod
+        def post(endpoint, _data=None, _expected_status=302, _follow_redirects=False, **endpoint_kwargs):
+            resp = logged_in_client.post(
+                url_for(endpoint, **(endpoint_kwargs or {})),
+                data=_data,
+                follow_redirects=_follow_redirects,
+            )
+            assert resp.status_code == _expected_status
+            return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
+
+    return ClientRequest

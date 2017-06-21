@@ -56,6 +56,4 @@ class NotificationApiClient(NotifyAdminAPIClient):
             )
 
     def get_notification(self, service_id, notification_id):
-        return self.get(
-            url='/service/{}/notifications/{}'.format(service_id, notification_id)
-        )
+        return self.get(url='/service/{}/notifications/{}'.format(service_id, notification_id))

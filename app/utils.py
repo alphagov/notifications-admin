@@ -1,11 +1,13 @@
 import re
 import csv
-from io import StringIO, BytesIO
+from io import StringIO
 from os import path
 from functools import wraps
 import unicodedata
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
+import dateutil
+import ago
 from flask import (
     abort,
     current_app,
@@ -15,6 +17,11 @@ from flask import (
     url_for
 )
 from flask_login import current_user
+import pyexcel
+import pyexcel.ext.io
+import pyexcel.ext.xls
+import pyexcel.ext.xlsx
+import pyexcel.ext.ods3
 
 from notifications_utils.template import (
     SMSPreviewTemplate,
@@ -22,12 +29,6 @@ from notifications_utils.template import (
     LetterImageTemplate,
     LetterPreviewTemplate,
 )
-
-import pyexcel
-import pyexcel.ext.io
-import pyexcel.ext.xls
-import pyexcel.ext.xlsx
-import pyexcel.ext.ods3
 
 
 SENDING_STATUSES = ['created', 'pending', 'sending']
@@ -144,13 +145,14 @@ def generate_notifications_csv(**kwargs):
                 notification['status'],
                 notification['created_at']
             ]
-            line = ','.join([str(i) for i in values]) + '\n'
+            line = ','.join(str(i) for i in values) + '\n'
             yield line
 
         if notifications_resp['links'].get('next'):
             kwargs['page'] += 1
         else:
             return
+    raise Exception("Should never reach here")
 
 
 def get_page_from_request():
@@ -301,3 +303,16 @@ def get_current_financial_year():
     current_month = int(now.strftime('%-m'))
     current_year = int(now.strftime('%Y'))
     return current_year if current_month > 3 else current_year - 1
+
+
+def get_time_left(created_at):
+    return ago.human(
+        (
+            datetime.now(timezone.utc).replace(hour=23, minute=59, second=59)
+        ) - (
+            dateutil.parser.parse(created_at) + timedelta(days=8)
+        ),
+        future_tense='Data available for {}',
+        past_tense='Data no longer available',  # No-one should ever see this
+        precision=1
+    )

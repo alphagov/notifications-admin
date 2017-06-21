@@ -245,18 +245,16 @@ def notification_json(
         'notifications': [{
             'id': uuid.uuid4(),
             'to': to,
-            'template': {
-                'id': template['id'],
-                'name': template['name'],
-                'template_type': template['template_type'],
-            },
             'body': template['content'],
+            'template': template,
             'job': job_payload,
             'sent_at': sent_at,
             'status': status,
             'created_at': created_at,
+            'created_by': None,
             'updated_at': updated_at,
             'job_row_number': job_row_number,
+            'service': service_id,
             'template_version': template['version']
         } for i in range(rows)],
         'total': rows,
