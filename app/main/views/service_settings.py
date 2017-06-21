@@ -36,6 +36,9 @@ from app.main.forms import (
 from app import user_api_client, current_service, organisations_client
 
 
+dummy_bearer_token = 'bearer_token_set'
+
+
 def get_inbound_api():
     if current_service['inbound_api']:
         return service_api_client.get_service_inbound_api(
@@ -441,17 +444,21 @@ def service_set_inbound_api(service_id):
         abort(403)
 
     inbound_api = get_inbound_api()
-    form = ServiceInboundApiForm(url=inbound_api.get('url') if inbound_api else '')
+    form = ServiceInboundApiForm(
+        url=inbound_api.get('url') if inbound_api else '',
+        bearer_token=dummy_bearer_token if inbound_api else ''
+    )
 
     if form.validate_on_submit():
         if inbound_api:
-            service_api_client.update_service_inbound_api(
-                service_id,
-                url=form.url.data,
-                bearer_token=form.bearer_token.data,
-                user_id=current_user.id,
-                inbound_api_id=inbound_api.get('id')
-            )
+            if inbound_api.get('url') != form.url.data or form.bearer_token.data != dummy_bearer_token:
+                service_api_client.update_service_inbound_api(
+                    service_id,
+                    url=form.url.data,
+                    bearer_token=form.bearer_token.data if form.bearer_token.data != dummy_bearer_token else '',
+                    user_id=current_user.id,
+                    inbound_api_id=inbound_api.get('id')
+                )
         else:
             service_api_client.create_service_inbound_api(
                 service_id,

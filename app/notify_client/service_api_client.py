@@ -277,9 +277,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def update_service_inbound_api(self, service_id, url, bearer_token, user_id, inbound_api_id):
         data = {
             "url": url,
-            "bearer_token": bearer_token,
             "updated_by_id": user_id
         }
+        if bearer_token:
+            data['bearer_token'] = bearer_token
         return self.post("/service/{}/inbound-api/{}".format(service_id, inbound_api_id), data)
 
     def get_service_inbound_api(self, service_id, inbound_sms_api_id):

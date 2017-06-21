@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from werkzeug.exceptions import InternalServerError
 
 import app
+from app.main.views.service_settings import dummy_bearer_token
 from app.utils import email_safe
 from tests import validate_route_permission, service_json
 from tests.app.test_utils import normalize_spaces
@@ -1112,21 +1113,39 @@ def test_set_new_inbound_api_and_valid_bearer_token_calls_create_inbound_api_end
     assert mocked_post_fn.call_args == call("/service/{}/inbound-api".format(service_one['id']), inbound_api_data)
 
 
+@pytest.mark.parametrize(
+    'inbound_api_data', [
+        {'url': "https://test.url.com/inbound", 'bearer_token': dummy_bearer_token},
+        {'url': "https://test.url.com/inbound", 'bearer_token': '1234567890'},
+        {'url': "https://test.url.com/", 'bearer_token': 'new_1234567890'},
+    ]
+)
 def test_update_inbound_api_and_valid_bearer_token_calls_update_inbound_api_endpoint(
     logged_in_platform_admin_client,
     service_one,
     mocker,
-    fake_uuid
+    fake_uuid,
+    inbound_api_data
 ):
     service_one['permissions'] = ['inbound_sms']
     service_one['inbound_api'] = [fake_uuid]
 
-    mocked_get_fn = mocker.patch(
-        'app.service_api_client.get',
-        return_value={'data': {'id': fake_uuid, 'url': "https://test.url.com/"}})
+    initial_api_data = {'data': {'id': fake_uuid, 'url': "https://test.url.com/"}}
+
+    mocked_get_fn = mocker.patch('app.service_api_client.get', return_value=initial_api_data)
     mocked_post_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
 
-    inbound_api_data = {'url': "https://test.url.com/", 'bearer_token': '1234567890', 'inbound_api_id': fake_uuid}
+    response = logged_in_platform_admin_client.get(
+        url_for(
+            'main.service_set_inbound_api',
+            service_id=service_one['id']
+        )
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert page.find('input', {'id': 'url'}).get('value') == initial_api_data['data']['url']
+    assert page.find('input', {'id': 'bearer_token'}).get('value') == dummy_bearer_token
+
     response = logged_in_platform_admin_client.post(
         url_for(
             'main.service_set_inbound_api',
@@ -1138,11 +1157,39 @@ def test_update_inbound_api_and_valid_bearer_token_calls_update_inbound_api_endp
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
     assert mocked_post_fn.called
 
-    del inbound_api_data['inbound_api_id']
+    if inbound_api_data['bearer_token'] == dummy_bearer_token:
+        del inbound_api_data['bearer_token']
     inbound_api_data['updated_by_id'] = service_one['users'][0]
 
     assert mocked_post_fn.call_args == call(
         "/service/{}/inbound-api/{}".format(service_one['id'], fake_uuid), inbound_api_data)
+
+
+def test_save_inbound_api_without_changes_does_not_update_inbound_api(
+    logged_in_platform_admin_client,
+    service_one,
+    mocker,
+    fake_uuid
+):
+    service_one['permissions'] = ['inbound_sms']
+    service_one['inbound_api'] = [fake_uuid]
+
+    initial_api_data = {'data': {'id': fake_uuid, 'url': "https://test.url.com/"}}
+    inbound_api_data = {'url': initial_api_data['data']['url'], 'bearer_token': dummy_bearer_token}
+
+    mocked_get_fn = mocker.patch('app.service_api_client.get', return_value=initial_api_data)
+    mocked_post_fn = mocker.patch('app.service_api_client.post', return_value=service_one)
+
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            'main.service_set_inbound_api',
+            service_id=service_one['id']
+        ),
+        data=inbound_api_data
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert mocked_post_fn.called is False
 
 
 def test_archive_service_after_confirm(
