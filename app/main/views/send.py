@@ -15,7 +15,6 @@ from flask import (
     abort,
     session,
     current_app,
-    send_file,
 )
 
 from flask_login import login_required, current_user
@@ -24,7 +23,6 @@ from notifications_utils.columns import Columns
 from notifications_utils.recipients import (
     RecipientCSV,
     first_column_headings,
-    validate_and_format_phone_number,
     optional_address_columns,
 )
 
@@ -32,14 +30,13 @@ from app.main import main
 from app.main.forms import (
     CsvUploadForm,
     ChooseTimeForm,
-    get_furthest_possible_scheduled_time,
     get_placeholder_form_instance
 )
 from app.main.uploader import (
     s3upload,
     s3download
 )
-from app import job_api_client, service_api_client, current_service, user_api_client
+from app import job_api_client, service_api_client, current_service, user_api_client, notification_api_client
 from app.utils import (
     user_has_permissions,
     get_errors_for_csv,
@@ -93,10 +90,10 @@ def get_example_letter_address(key):
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_messages(service_id, template_id):
 
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
     template = get_template(
-        template,
+        db_template,
         current_service,
         show_recipient=True,
         expand_emails=True,
@@ -105,7 +102,7 @@ def send_messages(service_id, template_id):
             service_id=service_id,
             template_id=template_id,
             filetype='png',
-            page_count=get_page_count_for_letter(template),
+            page_count=get_page_count_for_letter(db_template),
         ),
     )
 
@@ -200,13 +197,13 @@ def send_test_step(service_id, template_id, step_index):
             template_id=template_id,
         ))
 
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
     if not session.get('send_test_letter_page_count'):
-        session['send_test_letter_page_count'] = get_page_count_for_letter(template)
+        session['send_test_letter_page_count'] = get_page_count_for_letter(db_template)
 
     template = get_template(
-        template,
+        db_template,
         current_service,
         show_recipient=True,
         expand_emails=True,
@@ -224,9 +221,6 @@ def send_test_step(service_id, template_id, step_index):
         prefill_current_user=(request.endpoint == 'main.send_test_step'),
     )
 
-    if len(placeholders) == 0:
-        return make_and_upload_csv_file(service_id, template)
-
     try:
         current_placeholder = placeholders[step_index]
     except IndexError:
@@ -240,6 +234,7 @@ def send_test_step(service_id, template_id, step_index):
             service_id=service_id,
             template_id=template_id,
         ))
+
     optional_placeholder = (current_placeholder in optional_address_columns)
     form = get_placeholder_form_instance(
         current_placeholder,
@@ -263,21 +258,7 @@ def send_test_step(service_id, template_id, step_index):
             help=get_help_argument(),
         ))
 
-    if get_help_argument():
-        back_link = None
-    elif step_index == 0:
-        back_link = url_for(
-            '.view_template',
-            service_id=service_id,
-            template_id=template_id,
-        )
-    else:
-        back_link = url_for(
-            request.endpoint,
-            service_id=service_id,
-            template_id=template_id,
-            step_index=step_index - 1,
-        )
+    back_link = get_back_link(service_id, template_id, step_index)
 
     template.values = get_normalised_send_test_values_from_session()
     template.values[current_placeholder] = None
@@ -314,10 +295,10 @@ def send_test_preview(service_id, template_id, filetype):
     if filetype not in ('pdf', 'png'):
         abort(404)
 
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
     template = get_template(
-        template,
+        db_template,
         current_service,
         letter_preview_url=url_for(
             '.send_test_preview',
@@ -568,3 +549,21 @@ def get_send_test_page_title(template_type, help_argument):
     if template_type == 'letter':
         return 'Print a test letter'
     return 'Send to one recipient'
+
+
+def get_back_link(service_id, template_id, step_index):
+    if get_help_argument():
+        return None
+    elif step_index == 0:
+        return url_for(
+            '.view_template',
+            service_id=service_id,
+            template_id=template_id,
+        )
+    else:
+        return url_for(
+            request.endpoint,
+            service_id=service_id,
+            template_id=template_id,
+            step_index=step_index - 1,
+        )
