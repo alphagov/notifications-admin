@@ -56,11 +56,14 @@ def service_json(
     created_at=None,
     letter_contact_block=None,
     permissions=None,
+    inbound_api=None,
 ):
     if users is None:
         users = []
     if permissions is None:
         permissions = []
+    if inbound_api is None:
+        inbound_api = []
     return {
         'id': id_,
         'name': name,
@@ -80,6 +83,7 @@ def service_json(
         'letter_contact_block': letter_contact_block,
         'dvla_organisation': '001',
         'permissions': permissions,
+        'inbound_api': inbound_api,
     }
 
 

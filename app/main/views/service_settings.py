@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 import requests
 from flask import (
     render_template,
@@ -30,8 +32,19 @@ from app.main.forms import (
     ServiceLetterContactBlock,
     ServiceBrandingOrg,
     LetterBranding,
-)
+    ServiceInboundApiForm)
 from app import user_api_client, current_service, organisations_client
+
+
+dummy_bearer_token = 'bearer_token_set'
+
+
+def get_inbound_api():
+    if current_service['inbound_api']:
+        return service_api_client.get_service_inbound_api(
+            current_service['id'],
+            current_service.get('inbound_api')[0]
+        )
 
 
 @main.route("/services/<service_id>/service-settings")
@@ -43,6 +56,15 @@ def service_settings(service_id):
         organisation = organisations_client.get_organisation(current_service['organisation'])['organisation']
     else:
         organisation = None
+
+    inbound_api = get_inbound_api()
+    if inbound_api:
+        parsed_url = urlparse(inbound_api.get('url')) if inbound_api else ''
+        inbound_api_url = '{uri.scheme}://{uri.netloc}{elide_token}'.format(
+            uri=parsed_url, elide_token='...' if parsed_url.path else '')
+    else:
+        inbound_api_url = ''
+
     return render_template(
         'views/service-settings.html',
         organisation=organisation,
@@ -50,6 +72,7 @@ def service_settings(service_id):
             current_service.get('dvla_organisation', '001')
         ),
         can_receive_inbound=('inbound_sms' in current_service['permissions']),
+        inbound_api_url=inbound_api_url,
         letter_contact_block=Field(current_service['letter_contact_block'], html='escape')
     )
 
@@ -268,6 +291,7 @@ def service_set_reply_to_email(service_id):
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_sms_sender(service_id):
     form = ServiceSmsSender()
+
     if form.validate_on_submit():
         set_inbound_sms = request.args.get('set_inbound_sms', False)
         if set_inbound_sms == 'True':
@@ -410,3 +434,41 @@ def get_branding_as_dict(organisations):
             'colour': organisation['colour']
         } for organisation in organisations
     }
+
+
+@main.route("/services/<service_id>/service-settings/set-inbound-api", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_set_inbound_api(service_id):
+    if 'inbound_sms' not in current_service['permissions']:
+        abort(403)
+
+    inbound_api = get_inbound_api()
+    form = ServiceInboundApiForm(
+        url=inbound_api.get('url') if inbound_api else '',
+        bearer_token=dummy_bearer_token if inbound_api else ''
+    )
+
+    if form.validate_on_submit():
+        if inbound_api:
+            if inbound_api.get('url') != form.url.data or form.bearer_token.data != dummy_bearer_token:
+                service_api_client.update_service_inbound_api(
+                    service_id,
+                    url=form.url.data,
+                    bearer_token=form.bearer_token.data if form.bearer_token.data != dummy_bearer_token else '',
+                    user_id=current_user.id,
+                    inbound_api_id=inbound_api.get('id')
+                )
+        else:
+            service_api_client.create_service_inbound_api(
+                service_id,
+                url=form.url.data,
+                bearer_token=form.bearer_token.data,
+                user_id=current_user.id
+            )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/set-inbound-api.html',
+        form=form,
+    )
