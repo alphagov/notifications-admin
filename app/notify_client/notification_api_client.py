@@ -1,4 +1,4 @@
-from app.notify_client import NotifyAdminAPIClient
+from app.notify_client import _attach_current_user, NotifyAdminAPIClient
 
 
 class NotificationApiClient(NotifyAdminAPIClient):
@@ -54,6 +54,15 @@ class NotificationApiClient(NotifyAdminAPIClient):
                 url='/service/{}/notifications'.format(service_id),
                 params=params
             )
+
+    def send_notification(self, service_id, *, template_id, recipient, personalisation=None):
+        data = {
+            'template_id': template_id,
+            'to': recipient,
+            'personalisation': personalisation,
+        }
+        data = _attach_current_user(data)
+        return self.post(url='/service/{}/send-notification'.format(service_id), data=data)
 
     def get_notification(self, service_id, notification_id):
         return self.get(url='/service/{}/notifications/{}'.format(service_id, notification_id))
