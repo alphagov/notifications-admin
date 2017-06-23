@@ -1,0 +1,18 @@
+.notification-status {
+
+  @include core-16;
+  color: $secondary-text-colour;
+  margin-top: -$gutter-half;
+
+  &.error {
+
+    color: $error-colour;
+    font-weight: bold;
+
+    a {
+      color: $error-colour;
+    }
+
+  }
+
+}

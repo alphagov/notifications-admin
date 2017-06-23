@@ -14,6 +14,10 @@ from flask import (
     stream_with_context
 )
 from flask_login import login_required
+from notifications_utils.template import (
+    Template,
+    WithSubjectTemplate,
+)
 from werkzeug.datastructures import MultiDict
 
 from app import (
@@ -110,21 +114,7 @@ def view_job(service_id, job_id):
         'views/jobs/job.html',
         finished=(total_notifications == processed_notifications),
         uploaded_file_name=job['original_file_name'],
-        template=get_template(
-            service_api_client.get_service_template(
-                service_id=service_id,
-                template_id=job['template'],
-                version=job['template_version']
-            )['data'],
-            current_service,
-            letter_preview_url=url_for(
-                '.view_template_version_preview',
-                service_id=service_id,
-                template_id=job['template'],
-                version=job['template_version'],
-                filetype='png',
-            ),
-        ),
+        template_id=job['template'],
         status=request.args.get('status', ''),
         updates_url=url_for(
             ".view_job_updates",
@@ -271,7 +261,7 @@ def get_notifications(service_id, message_type, status_override=None):
         ),
         'notifications': render_template(
             'views/activity/notifications.html',
-            notifications=notifications['notifications'],
+            notifications=add_preview_of_content_to_notifications(notifications['notifications']),
             page=page,
             prev_page=prev_page,
             next_page=next_page,
@@ -360,6 +350,11 @@ def get_job_partials(job):
     notifications = notification_api_client.get_notifications_for_service(
         job['service'], job['id'], status=filter_args['status']
     )
+    template = service_api_client.get_service_template(
+        service_id=current_service['id'],
+        template_id=job['template'],
+        version=job['template_version']
+    )['data']
     return {
         'counts': render_template(
             'partials/count.html',
@@ -368,7 +363,7 @@ def get_job_partials(job):
         ),
         'notifications': render_template(
             'partials/jobs/notifications.html',
-            notifications=notifications['notifications'],
+            notifications=add_preview_of_content_to_notifications(notifications['notifications']),
             more_than_one_page=bool(notifications.get('links', {}).get('next')),
             percentage_complete=(job['notifications_requested'] / job['notification_count'] * 100),
             download_link=url_for(
@@ -379,10 +374,26 @@ def get_job_partials(job):
             ),
             help=get_help_argument(),
             time_left=get_time_left(job['created_at']),
-            job=job
+            job=job,
+            template=template,
+            template_version=job['template_version'],
         ),
         'status': render_template(
             'partials/jobs/status.html',
             job=job
         ),
     }
+
+
+def add_preview_of_content_to_notifications(notifications):
+    return (
+        dict(
+            preview_of_content=(
+                str(Template(notification['template'], notification['personalisation']))
+                if notification['template']['template_type'] == 'sms' else
+                WithSubjectTemplate(notification['template'], notification['personalisation']).subject
+            ),
+            **notification
+        )
+        for notification in notifications
+    )

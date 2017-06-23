@@ -10,6 +10,7 @@ from flask_login import login_required
 
 from app import (
     notification_api_client,
+    job_api_client,
     current_service
 )
 from app.main import main
@@ -39,27 +40,34 @@ def get_status_arg(filter_args):
         return REQUESTED_STATUSES
 
 
-@main.route("/services/<service_id>/one-off-notification/<notification_id>")
+@main.route("/services/<service_id>/notification/<notification_id>")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_notification(service_id, notification_id):
     notification = notification_api_client.get_notification(service_id, notification_id)
+    template = get_template(
+        notification['template'],
+        current_service,
+        letter_preview_url=url_for(
+            '.view_template_version_preview',
+            service_id=service_id,
+            template_id=notification['template']['id'],
+            version=notification['template_version'],
+            filetype='png',
+        ),
+        show_recipient=True,
+    )
+    template.values = notification['personalisation']
+    if notification['job']:
+        job = job_api_client.get_job(service_id, notification['job']['id'])['data']
+    else:
+        job = None
     return render_template(
         'views/notifications/notification.html',
         finished=(notification['status'] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
         uploaded_file_name='Report',
-        template=get_template(
-            notification['template'],
-            current_service,
-            letter_preview_url=url_for(
-                '.view_template_version_preview',
-                service_id=service_id,
-                template_id=notification['template']['id'],
-                version=notification['template_version'],
-                filetype='png',
-            ),
-        ),
-        status=request.args.get('status'),
+        template=template,
+        job=job,
         updates_url=url_for(
             ".view_notification_updates",
             service_id=service_id,
@@ -68,11 +76,13 @@ def view_notification(service_id, notification_id):
             help=get_help_argument()
         ),
         partials=get_single_notification_partials(notification),
+        created_by=notification.get('created_by'),
+        created_at=notification['created_at'],
         help=get_help_argument()
     )
 
 
-@main.route("/services/<service_id>/one-off-notification/<notification_id>.json")
+@main.route("/services/<service_id>/notification/<notification_id>.json")
 @user_has_permissions('view_activity', admin_override=True)
 def view_notification_updates(service_id, notification_id):
     return jsonify(**get_single_notification_partials(
@@ -80,49 +90,10 @@ def view_notification_updates(service_id, notification_id):
     ))
 
 
-def _get_single_notification_counts(notification, help_argument):
-    return [
-        (
-            label,
-            query_param,
-            url_for(
-                ".view_notification",
-                service_id=notification['service'],
-                notification_id=notification['id'],
-                status=query_param,
-                help=help_argument
-            ),
-            count
-        ) for label, query_param, count in [
-            [
-                'total', '',
-                1
-            ],
-            [
-                'sending', 'sending',
-                int(notification['status'] in SENDING_STATUSES)
-            ],
-            [
-                'delivered', 'delivered',
-                int(notification['status'] in DELIVERED_STATUSES)
-            ],
-            [
-                'failed', 'failed',
-                int(notification['status'] in FAILURE_STATUSES)
-            ]
-        ]
-    ]
-
-
 def get_single_notification_partials(notification):
     status_args = get_status_arg(request.args)
 
     return {
-        'counts': render_template(
-            'partials/count.html',
-            counts=_get_single_notification_counts(notification, request.args.get('help', 0)),
-            status=status_args
-        ),
         'notifications': render_template(
             'partials/notifications/notifications.html',
             notification=notification,
