@@ -7,11 +7,74 @@ from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from tests.conftest import service_one as create_sample_service
-from tests.conftest import mock_get_service_email_template, mock_get_service_letter_template
+from tests.conftest import mock_get_service_email_template, mock_get_service_letter_template, SERVICE_ONE_ID
 from tests import validate_route_permission, template_json, single_notification_json
 from tests.app.test_utils import normalize_spaces
 
 from app.main.views.templates import get_last_use_message, get_human_readable_delta
+
+
+@pytest.mark.parametrize('extra_args, expected_nav_links, expected_templates', [
+    (
+        {},
+        ['Text message', 'Email'],
+        ['sms_template_one', 'sms_template_two', 'email_template_one', 'email_template_two']
+    ),
+    (
+        {'template_type': 'sms'},
+        ['All', 'Email'],
+        ['sms_template_one', 'sms_template_two'],
+    ),
+    (
+        {'template_type': 'email'},
+        ['All', 'Text message'],
+        ['email_template_one', 'email_template_two'],
+    ),
+])
+def test_should_show_page_for_choosing_a_template(
+    client_request,
+    mock_get_service_templates,
+    extra_args,
+    expected_nav_links,
+    expected_templates,
+):
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        **extra_args
+    )
+
+    assert normalize_spaces(page.select('h1')[0].text) == 'Templates'
+
+    links_in_page = page.select('.pill a')
+
+    assert len(links_in_page) == len(expected_nav_links)
+
+    for index, expected_link in enumerate(expected_nav_links):
+        assert links_in_page[index].text.strip() == expected_link
+
+    template_links = page.select('.message-name a')
+
+    assert len(template_links) == len(expected_templates)
+
+    for index, expected_template in enumerate(expected_templates):
+        assert template_links[index].text.strip() == expected_template
+
+    mock_get_service_templates.assert_called_with(SERVICE_ONE_ID)
+
+
+def test_should_not_show_template_nav_if_only_one_type_of_template(
+    client_request,
+    mock_get_service_templates_with_only_one_template,
+):
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert not page.select('.pill')
 
 
 def test_should_show_page_for_one_template(

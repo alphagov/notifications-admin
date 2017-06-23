@@ -493,6 +493,21 @@ def mock_get_service_templates_when_no_templates_exist(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_service_templates_with_only_one_template(mocker):
+
+    def _get(service_id):
+        return {'data': [
+            template_json(
+                service_id, generate_uuid(), "sms_template_one", "sms", "sms template one content"
+            )
+        ]}
+
+    return mocker.patch(
+        'app.service_api_client.get_service_templates',
+        side_effect=_get)
+
+
+@pytest.fixture(scope='function')
 def mock_delete_service_template(mocker):
     def _delete(service_id, template_id):
         template = template_json(

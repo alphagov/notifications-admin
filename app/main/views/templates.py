@@ -43,26 +43,7 @@ page_headings = {
 }
 
 
-@main.route("/services/<service_id>/templates", methods=['GET'])
-@login_required
-@user_has_permissions(
-    'view_activity',
-    'send_texts',
-    'send_emails',
-    'manage_templates',
-    'manage_api_keys',
-    admin_override=True,
-    any_=True,
-)
-def choose_template(service_id):
-    return render_template(
-        'views/templates/choose.html',
-        templates=service_api_client.get_service_templates(service_id)['data'],
-        search_form=SearchTemplatesForm(),
-    )
-
-
-@main.route("/services/<service_id>/templates/<template_id>")
+@main.route("/services/<service_id>/templates/<uuid:template_id>")
 @login_required
 @user_has_permissions(
     'view_activity',
@@ -73,7 +54,7 @@ def choose_template(service_id):
     admin_override=True, any_=True
 )
 def view_template(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = service_api_client.get_service_template(service_id, str(template_id))['data']
     return render_template(
         'views/templates/template.html',
         template=get_template(
@@ -89,6 +70,51 @@ def view_template(service_id, template_id):
             show_recipient=True,
             page_count=get_page_count_for_letter(template),
         ),
+    )
+
+
+@main.route("/services/<service_id>/templates")
+@main.route("/services/<service_id>/templates/<template_type>")
+@login_required
+@user_has_permissions(
+    'view_activity',
+    'send_texts',
+    'send_emails',
+    'manage_templates',
+    'manage_api_keys',
+    admin_override=True,
+    any_=True,
+)
+def choose_template(service_id, template_type='all'):
+    templates = service_api_client.get_service_templates(service_id)['data']
+
+    has_multiple_template_types = len({
+        template['template_type'] for template in templates
+    }) > 1
+
+    template_nav_items = [
+        (label, key, url_for('.choose_template', service_id=current_service['id'], template_type=key), '')
+        for label, key in filter(None, [
+            ('All', 'all'),
+            ('Text message', 'sms'),
+            ('Email', 'email'),
+            ('Letter', 'letter') if current_service['can_send_letters'] else None,
+        ])
+    ]
+
+    templates_on_page = [
+        template for template in templates
+        if template_type in ['all', template['template_type']]
+    ]
+
+    return render_template(
+        'views/templates/choose.html',
+        templates=templates_on_page,
+        show_search_box=(len(templates_on_page) > 7),
+        show_template_nav=has_multiple_template_types and (len(templates) > 2),
+        template_nav_items=template_nav_items,
+        template_type=template_type,
+        search_form=SearchTemplatesForm(),
     )
 
 
