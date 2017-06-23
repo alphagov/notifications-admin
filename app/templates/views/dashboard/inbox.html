@@ -31,10 +31,10 @@
         >
           {{ item.user_number | format_phone_number_human_readable }}
         </a>
-        <span class="file-list-hint">{{ item.content }}</span>
+        <span class="wide-left-hand-column">{{ item.content }}</span>
       {% endcall %}
       {% call field(align='right') %}
-        <span class="align-with-message-body">
+        <span class="file-list-hint align-with-message-body">
           {{ item.created_at | format_delta }}
         </span>
       {% endcall %}

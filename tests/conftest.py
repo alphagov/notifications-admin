@@ -1650,8 +1650,7 @@ def mock_get_notification(mocker, fake_uuid, notification_status='delivered'):
             'name': 'Test User',
             'email_address': 'test@user.gov.uk'
         }
-        noti['personalisation'] = {'name': 'Jo'}
-        noti['template'] = template_json(service_id, str(generate_uuid()), content='hello ((name))')
+        noti['template'] = template_json(service_id, str(generate_uuid()))
         return noti
 
     return mocker.patch(

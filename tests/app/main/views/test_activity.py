@@ -92,17 +92,13 @@ def test_can_show_notifications(
             page=page_argument,
         ))
     assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     content = response.get_data(as_text=True)
     notifications = notification_json(service_one['id'])
     notification = notifications['notifications'][0]
-    text_of_first_row = page.select('tbody tr')[0].text
-    assert '07123456789' in text_of_first_row
-    assert (
-        'template content' in text_of_first_row or
-        'template subject' in text_of_first_row
-    )
-    assert 'Delivered' in text_of_first_row
+    assert notification['to'] in content
+    assert notification['status'] in content
+    assert notification['template']['name'] in content
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page_title in page.h1.text.strip()
 
     path_to_json = page.find("div", {'data-key': 'notifications'})['data-resource']
