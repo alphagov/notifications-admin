@@ -225,7 +225,11 @@ def send_test_step(service_id, template_id, step_index):
         current_placeholder = placeholders[step_index]
     except IndexError:
         if all_placeholders_in_session(placeholders):
-            return make_and_upload_csv_file(service_id, template)
+            return redirect(url_for(
+                'main.send_notification',
+                service_id=service_id,
+                template_id=template_id,
+            ))
         return redirect(url_for(
             {
                 'main.send_test_step': '.send_test',
@@ -248,7 +252,11 @@ def send_test_step(service_id, template_id, step_index):
         session['send_test_values'][current_placeholder] = form.placeholder_value.data
 
         if all_placeholders_in_session(placeholders):
-            return make_and_upload_csv_file(service_id, template)
+            return redirect(url_for(
+                'main.send_notification',
+                service_id=service_id,
+                template_id=template_id,
+            ))
 
         return redirect(url_for(
             request.endpoint,
@@ -567,3 +575,53 @@ def get_back_link(service_id, template_id, step_index):
             template_id=template_id,
             step_index=step_index - 1,
         )
+
+
+@main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['GET'])
+@login_required
+@user_has_permissions('manage_templates')
+def check_notification(service_id, template_id):
+    # go back to start of process
+    back_link = get_back_link(service_id, template_id, 0)
+
+    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = get_template(
+        db_template,
+        current_service,
+        show_recipient=True,
+        letter_preview_url='FUCK WHAT DO I DO HERE'
+    )
+
+    return render_template(
+        'views/notifications/check.html',
+        template=template,
+        back_link=back_link,
+        help=get_help_argument(),
+    )
+
+
+@main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['POST'])
+@login_required
+@user_has_permissions('manage_templates')
+def send_notification(service_id, template_id):
+    if 'send_test_values' not in session.keys():
+        return redirect(url_for(
+            '.send_one_off',
+            service_id=service_id,
+            template_id=template_id,
+        ))
+
+    noti = notification_api_client.send_notification(
+        service_id,
+        template_id=template_id,
+        recipient=next(x for x in session['send_test_values'].values()),
+        personalisation=None
+    )
+
+    session.pop('send_test_values')
+
+    return redirect(url_for(
+        '.view_notification',
+        service_id=service_id,
+        notification_id=noti['id']
+    ))
