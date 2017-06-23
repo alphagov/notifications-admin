@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from app.main.views.jobs import get_time_left, get_status_filters
 from tests import notification_json
 from tests.conftest import SERVICE_ONE_ID
+from tests.app.test_utils import normalize_spaces
 from freezegun import freeze_time
 
 
@@ -133,6 +134,23 @@ def test_can_show_notifications(
     ))
     json_content = json.loads(json_response.get_data(as_text=True))
     assert json_content.keys() == {'counts', 'notifications'}
+
+
+def test_shows_message_when_no_notifications(
+    client_request,
+    mock_get_detailed_service,
+    mock_get_notifications_with_no_notifications,
+):
+
+    page = client_request.get(
+        'main.view_notifications',
+        service_id=SERVICE_ONE_ID,
+        message_type='sms',
+    )
+
+    assert normalize_spaces(page.select('tbody tr')[0].text) == (
+        'No messages found'
+    )
 
 
 @pytest.mark.parametrize((

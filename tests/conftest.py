@@ -1128,7 +1128,9 @@ def mock_get_notifications_with_no_notifications(mocker):
                            status=None,
                            limit_days=None,
                            include_jobs=None,
-                           include_from_test_key=None):
+                           include_from_test_key=None,
+                           to=None,
+                           ):
         return notification_json(service_id, rows=0)
 
     return mocker.patch(
