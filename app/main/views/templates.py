@@ -98,7 +98,7 @@ def choose_template(service_id, template_type='all'):
             ('All', 'all'),
             ('Text message', 'sms'),
             ('Email', 'email'),
-            ('Letter', 'letter') if current_service['can_send_letters'] else None,
+            ('Letter', 'letter') if 'letter' in current_service['permissions'] else None,
         ])
     ]
 

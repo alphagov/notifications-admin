@@ -62,7 +62,7 @@ def test_should_show_overview(
 
 
 @pytest.mark.parametrize('permissions, expected_rows', [
-    (['email', 'sms', 'inbound_sms'], [
+    (['email', 'sms', 'inbound_sms', 'international_sms'], [
         'Service name service one Change',
         'Email reply to address test@example.com Change',
         'Text message sender elevenchars',
@@ -75,7 +75,7 @@ def test_should_show_overview(
         'Service name service one Change',
         'Email reply to address test@example.com Change',
         'Text message sender elevenchars Change',
-        'International text messages On Change',
+        'International text messages Off Change',
         'Receive text messages Off Change',
         'Letters Off Change',
     ]),
@@ -91,7 +91,7 @@ def test_should_show_overview_for_service_with_more_things_set(
     expected_rows
 ):
     client.login(active_user_with_permissions, mocker, service_with_reply_to_addresses)
-    service_with_reply_to_addresses['permissions'] = ['email', 'sms', 'inbound_sms', 'international_sms']
+    service_with_reply_to_addresses['permissions'] = permissions
     response = client.get(url_for(
         'main.service_settings', service_id=service_with_reply_to_addresses['id']
     ))
@@ -158,8 +158,7 @@ def test_if_can_receive_inbound_then_cant_change_sms_sender(
         'main.service_settings', service_id=service_one['id']
     ))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    rows = page.find_all('tr')
-    rows_as_text = [" ".join(row.text.split()) for row in rows]
+    rows_as_text = [" ".join(row.text.split()) for row in page.find_all('tr')]
     assert 'Text message sender SomeNumber Change' not in rows_as_text
     assert url_for('main.service_request_to_go_live', service_id=service_one['id'],
                    set_inbound_sms=False) not in response.get_data(as_text=True)
