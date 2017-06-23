@@ -208,14 +208,24 @@ def service_switch_research_mode(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
+def switch_service_permissions(service_id, permission):
+    permissions = current_service['permissions'].copy()
+    if permission in permissions:
+        permissions.remove(permission)
+    else:
+        permissions.append(permission)
+
+    service_api_client.update_service_with_properties(
+        service_id,
+        {'permissions': permissions}
+    )
+
+
 @main.route("/services/<service_id>/service-settings/can-send-letters")
 @login_required
 @user_has_permissions(admin_override=True)
 def service_switch_can_send_letters(service_id):
-    service_api_client.update_service_with_properties(
-        service_id,
-        {"can_send_letters": not current_service['can_send_letters']}
-    )
+    switch_service_permissions(service_id, 'letter')
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
@@ -223,10 +233,7 @@ def service_switch_can_send_letters(service_id):
 @login_required
 @user_has_permissions(admin_override=True)
 def service_switch_can_send_international_sms(service_id):
-    service_api_client.update_service_with_properties(
-        service_id,
-        {"can_send_international_sms": not current_service['can_send_international_sms']}
-    )
+    switch_service_permissions(service_id, 'international_sms')
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
@@ -350,7 +357,7 @@ def service_set_letters(service_id):
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_letter_contact_block(service_id):
 
-    if not current_service['can_send_letters']:
+    if 'letter' not in current_service['permissions']:
         abort(403)
 
     form = ServiceLetterContactBlock(letter_contact_block=current_service['letter_contact_block'])

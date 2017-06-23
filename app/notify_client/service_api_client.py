@@ -88,8 +88,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'email_from',
             'reply_to_email_address',
             'research_mode',
-            'can_send_letters',
-            'can_send_international_sms',
             'sms_sender',
             'created_by',
             'branding',

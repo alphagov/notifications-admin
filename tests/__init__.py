@@ -49,14 +49,12 @@ def service_json(
     reply_to_email_address=None,
     sms_sender='GOVUK',
     research_mode=False,
-    can_send_letters=False,
-    can_send_international_sms=False,
     organisation=None,
     branding='govuk',
     created_at=None,
     letter_contact_block=None,
-    permissions=None,
     inbound_api=None,
+    permissions=['email', 'sms'],
 ):
     if users is None:
         users = []
@@ -75,8 +73,6 @@ def service_json(
         'reply_to_email_address': reply_to_email_address,
         'sms_sender': sms_sender,
         'research_mode': research_mode,
-        'can_send_letters': can_send_letters,
-        'can_send_international_sms': can_send_international_sms,
         'organisation': organisation,
         'branding': branding,
         'created_at': created_at or str(datetime.utcnow()),

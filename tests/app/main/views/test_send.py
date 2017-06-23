@@ -853,7 +853,7 @@ def test_send_test_works_as_letter_preview(
     fake_uuid,
     mocker,
 ):
-    service_one['can_send_letters'] = True
+    service_one['permissions'] = ['letter']
     mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
     mocked_preview = mocker.patch(
@@ -1139,7 +1139,7 @@ def test_should_show_preview_letter_message(
     fake_uuid,
     mocker,
 ):
-    service_one['can_send_letters'] = True
+    service_one['permissions'] = ['letter']
     mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 

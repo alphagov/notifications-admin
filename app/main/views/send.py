@@ -245,7 +245,7 @@ def send_test_step(service_id, template_id, step_index):
         current_placeholder,
         dict_to_populate_from=get_normalised_send_test_values_from_session(),
         optional_placeholder=optional_placeholder,
-        allow_international_phone_numbers=current_service['can_send_international_sms'],
+        allow_international_phone_numbers='international_sms' in current_service['permissions'],
     )
 
     if form.validate_on_submit():
@@ -375,7 +375,7 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
             [user.name, user.mobile_number, user.email_address] for user in users
         ) if current_service['restricted'] else None,
         remaining_messages=remaining_messages,
-        international_sms=current_service['can_send_international_sms'],
+        international_sms='international_sms' in current_service['permissions'],
     )
 
     if request.args.get('from_test'):

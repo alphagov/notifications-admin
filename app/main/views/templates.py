@@ -184,7 +184,7 @@ def view_template_version_preview(service_id, template_id, version, filetype):
 def add_template_by_type(service_id):
 
     form = ChooseTemplateType(
-        include_letters=current_service['can_send_letters']
+        include_letters='letter' in current_service['permissions']
     )
 
     if form.validate_on_submit():
@@ -220,7 +220,7 @@ def add_service_template(service_id, template_type):
 
     if template_type not in ['sms', 'email', 'letter']:
         abort(404)
-    if not current_service['can_send_letters'] and template_type == 'letter':
+    if 'letter' not in current_service['permissions'] and template_type == 'letter':
         abort(403)
 
     form = form_objects[template_type]()
@@ -448,5 +448,5 @@ def get_human_readable_delta(from_time, until_time):
 def should_show_template(template_type):
     return (
         template_type != 'letter' or
-        current_service['can_send_letters']
+        'letter' in current_service['permissions']
     )
