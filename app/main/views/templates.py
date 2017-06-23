@@ -102,13 +102,16 @@ def choose_template(service_id, template_type='all'):
         ])
     ]
 
+    templates_on_page = [
+        template for template in templates
+        if template_type in ['all', template['template_type']]
+    ]
+
     return render_template(
         'views/templates/choose.html',
-        templates=[
-            template for template in templates
-            if template_type in ['all', template['template_type']]
-        ],
-        show_template_nav=has_multiple_template_types,
+        templates=templates_on_page,
+        show_search_box=(len(templates_on_page) > 7),
+        show_template_nav=has_multiple_template_types and (len(templates) > 2),
         template_nav_items=template_nav_items,
         template_type=template_type,
         search_form=SearchTemplatesForm(),
