@@ -107,8 +107,6 @@ def template_json(service_id,
         'archived': archived,
         'process_type': process_type
     }
-    if subject is None and type_ != 'sms':
-        template['subject'] = "template subject"
     if subject is not None:
         template['subject'] = subject
     return template
@@ -186,7 +184,7 @@ def job_json(
     if job_id is None:
         job_id = str(generate_uuid())
     if template_id is None:
-        template_id = "5d729fbd-239c-44ab-b498-75a985f3198f"
+        template_id = str(generate_uuid())
     if created_at is None:
         created_at = str(datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%f%z'))
     data = {
@@ -222,8 +220,7 @@ def notification_json(
     created_at=None,
     updated_at=None,
     with_links=False,
-    rows=5,
-    personalisation=None,
+    rows=5
 ):
     if template is None:
         template = template_json(service_id, str(generate_uuid()))
@@ -262,8 +259,7 @@ def notification_json(
             'updated_at': updated_at,
             'job_row_number': job_row_number,
             'service': service_id,
-            'template_version': template['version'],
-            'personalisation': personalisation or {},
+            'template_version': template['version']
         } for i in range(rows)],
         'total': rows,
         'page_size': 50,

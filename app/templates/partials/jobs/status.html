@@ -1,5 +1,5 @@
 <div class="ajax-block-container">
-  <p class='bottom-gutter'>
+  <p class='heading-small bottom-gutter'>
     {% if job.scheduled_for %}
       {% if job.processing_started %}
         Sent by {{ job.created_by.name }} on {{ job.processing_started|format_datetime_short }}

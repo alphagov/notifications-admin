@@ -1143,9 +1143,7 @@ def mock_get_notifications_with_no_notifications(mocker):
                            status=None,
                            limit_days=None,
                            include_jobs=None,
-                           include_from_test_key=None,
-                           to=None,
-                           ):
+                           include_from_test_key=None):
         return notification_json(service_id, rows=0)
 
     return mocker.patch(
@@ -1652,8 +1650,7 @@ def mock_get_notification(mocker, fake_uuid, notification_status='delivered'):
             'name': 'Test User',
             'email_address': 'test@user.gov.uk'
         }
-        noti['personalisation'] = {'name': 'Jo'}
-        noti['template'] = template_json(service_id, str(generate_uuid()), content='hello ((name))')
+        noti['template'] = template_json(service_id, str(generate_uuid()))
         return noti
 
     return mocker.patch(

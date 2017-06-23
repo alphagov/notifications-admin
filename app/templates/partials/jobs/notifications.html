@@ -5,9 +5,7 @@
   {% if job.job_status == 'scheduled' %}
 
     <p>
-      Sending
-      <a href="{{ url_for('.view_template_version', service_id=current_service.id, template_id=template.id, version=template_version) }}">{{ template.name }}</a>
-      {{ job.scheduled_for|format_datetime_relative }}
+      Sending will start {{ job.scheduled_for|format_datetime_relative }}
     </p>
     <div class="page-footer">
       <form method="post">
@@ -50,10 +48,7 @@
         field_headings_visible=False
       ) %}
         {% call row_heading() %}
-          <a class="file-list-filename" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.to }}</a>
-          <p class="file-list-hint">
-            {{ item.preview_of_content }}
-          </p>
+          <p>{{ item.to }}</p>
         {% endcall %}
         {{ notification_status_field(item) }}
       {% endcall %}
