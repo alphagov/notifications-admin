@@ -43,6 +43,9 @@ def test_notification_status_page_shows_details(
         notification_id=fake_uuid
     )
 
+    assert normalize_spaces(page.select('.sms-message-recipient')[0].text) == (
+        'To: 07123456789'
+    )
     assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
         'service one: hello Jo'
     )
