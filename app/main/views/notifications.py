@@ -57,7 +57,7 @@ def view_notification(service_id, notification_id):
         ),
         show_recipient=True,
     )
-    template.values = get_all_personalisation_from_notification(notification)
+    template.values = notification['personalisation']
     if notification['job']:
         job = job_api_client.get_job(service_id, notification['job']['id'])['data']
     else:
@@ -106,18 +106,3 @@ def get_single_notification_partials(notification):
             notification=notification
         ),
     }
-
-
-def get_all_personalisation_from_notification(notification):
-    if notification['template']['template_type'] == 'email':
-        return dict(
-            email_address=notification['to'],
-            **notification['personalisation']
-        )
-    if notification['template']['template_type'] == 'sms':
-        return dict(
-            phone_number=notification['to'],
-            **notification['personalisation']
-        )
-    if notification['template']['template_type'] == 'letter':
-        return notification['personalisation']
