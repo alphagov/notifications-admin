@@ -159,7 +159,8 @@ def get_example_csv(service_id, template_id):
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test(service_id, template_id):
-    session['send_test_values'] = dict()
+    session['recipient'] = None
+    session['placeholders'] = {}
     session['send_test_letter_page_count'] = None
     return redirect(url_for(
         {
@@ -171,6 +172,17 @@ def send_test(service_id, template_id):
         step_index=0,
         help=get_help_argument(),
     ))
+
+
+def get_notification_check_endpoint(service_id, template):
+    if template.template_type == 'letter':
+        return make_and_upload_csv_file(service_id, template)
+    else:
+        return redirect(url_for(
+            'main.check_notification',
+            service_id=service_id,
+            template_id=template.id,
+        ))
 
 
 @main.route(
@@ -186,8 +198,7 @@ def send_test(service_id, template_id):
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_test_step(service_id, template_id, step_index):
-
-    if 'send_test_values' not in session:
+    if {'recipient', 'placeholders'} - set(session.keys()):
         return redirect(url_for(
             {
                 'main.send_test_step': '.send_test',
@@ -225,11 +236,7 @@ def send_test_step(service_id, template_id, step_index):
         current_placeholder = placeholders[step_index]
     except IndexError:
         if all_placeholders_in_session(placeholders):
-            return redirect(url_for(
-                'main.send_notification',
-                service_id=service_id,
-                template_id=template_id,
-            ))
+            return get_notification_check_endpoint(service_id, template)
         return redirect(url_for(
             {
                 'main.send_test_step': '.send_test',
@@ -242,21 +249,20 @@ def send_test_step(service_id, template_id, step_index):
     optional_placeholder = (current_placeholder in optional_address_columns)
     form = get_placeholder_form_instance(
         current_placeholder,
-        dict_to_populate_from=get_normalised_send_test_values_from_session(),
+        dict_to_populate_from=get_normalised_placeholders_from_session(),
         optional_placeholder=optional_placeholder,
         allow_international_phone_numbers='international_sms' in current_service['permissions'],
     )
 
     if form.validate_on_submit():
+        # if it's zero, we store against `recipient` as well, for easier extraction
+        if step_index == 0 and template.template_type != 'letter':
+            session['recipient'] = form.placeholder_value.data
 
-        session['send_test_values'][current_placeholder] = form.placeholder_value.data
+        session['placeholders'][current_placeholder] = form.placeholder_value.data
 
         if all_placeholders_in_session(placeholders):
-            return redirect(url_for(
-                'main.send_notification',
-                service_id=service_id,
-                template_id=template_id,
-            ))
+            return get_notification_check_endpoint(service_id, template)
 
         return redirect(url_for(
             request.endpoint,
@@ -268,7 +274,7 @@ def send_test_step(service_id, template_id, step_index):
 
     back_link = get_back_link(service_id, template_id, step_index)
 
-    template.values = get_normalised_send_test_values_from_session()
+    template.values = get_normalised_placeholders_from_session()
     template.values[current_placeholder] = None
 
     if (
@@ -316,7 +322,7 @@ def send_test_preview(service_id, template_id, filetype):
         ),
     )
 
-    template.values = get_normalised_send_test_values_from_session()
+    template.values = get_normalised_placeholders_from_session()
 
     return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
 
@@ -506,7 +512,7 @@ def fields_to_fill_in(template, prefill_current_user=False):
     if 'letter' == template.template_type or not prefill_current_user:
         return recipient_columns + list(template.placeholders)
 
-    session['send_test_values'][recipient_columns[0]] = {
+    session['placeholders'][recipient_columns[0]] = {
         'email': current_user.email_address,
         'sms': current_user.mobile_number,
     }.get(template.template_type)
@@ -514,10 +520,10 @@ def fields_to_fill_in(template, prefill_current_user=False):
     return list(template.placeholders)
 
 
-def get_normalised_send_test_values_from_session():
+def get_normalised_placeholders_from_session():
     return {
         key: ''.join(value or [])
-        for key, value in session.get('send_test_values', {}).items()
+        for key, value in session.get('placeholders', {}).items()
     }
 
 
@@ -525,7 +531,7 @@ def make_and_upload_csv_file(service_id, template):
     upload_id = s3upload(
         service_id,
         Spreadsheet.from_dict(
-            session['send_test_values'],
+            session['placeholders'],
             filename=current_app.config['TEST_MESSAGE_FILENAME']
         ).as_dict,
         current_app.config['AWS_REGION'],
@@ -546,7 +552,7 @@ def make_and_upload_csv_file(service_id, template):
 
 def all_placeholders_in_session(placeholders):
     return all(
-        get_normalised_send_test_values_from_session().get(placeholder, False) not in (False, None)
+        get_normalised_placeholders_from_session().get(placeholder, False) not in (False, None)
         for placeholder in placeholders
     )
 
@@ -585,12 +591,14 @@ def check_notification(service_id, template_id):
     back_link = get_back_link(service_id, template_id, 0)
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
+
     template = get_template(
         db_template,
         current_service,
         show_recipient=True,
         letter_preview_url='FUCK WHAT DO I DO HERE'
     )
+    template.values = session['placeholders']
 
     return render_template(
         'views/notifications/check.html',
@@ -604,7 +612,7 @@ def check_notification(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates')
 def send_notification(service_id, template_id):
-    if 'send_test_values' not in session.keys():
+    if {'recipient', 'placeholders'} - set(session.keys()):
         return redirect(url_for(
             '.send_one_off',
             service_id=service_id,
@@ -614,11 +622,12 @@ def send_notification(service_id, template_id):
     noti = notification_api_client.send_notification(
         service_id,
         template_id=template_id,
-        recipient=next(x for x in session['send_test_values'].values()),
-        personalisation=None
+        recipient=session['recipient'],
+        personalisation=session['placeholders']
     )
 
-    session.pop('send_test_values')
+    session.pop('placeholders')
+    session.pop('recipient')
 
     return redirect(url_for(
         '.view_notification',
