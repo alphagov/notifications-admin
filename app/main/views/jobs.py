@@ -386,7 +386,7 @@ def get_job_partials(job):
 
 
 def add_preview_of_content_to_notifications(notifications):
-    return [
+    return (
         dict(
             preview_of_content=(
                 str(Template(notification['template'], notification['personalisation']))
@@ -396,4 +396,4 @@ def add_preview_of_content_to_notifications(notifications):
             **notification
         )
         for notification in notifications
-    ]
+    )
