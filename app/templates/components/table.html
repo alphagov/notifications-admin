@@ -120,6 +120,7 @@
 
 {% macro notification_status_field(notification) %}
   {% call field(status=notification.status|format_notification_status_as_field_status, align='right') %}
+    {% if notification.status in ['created', 'sending', 'delivered'] %}<span class="align-with-message-body">{% endif %}
     {% if notification.status|format_notification_status_as_url %}
       <a href="{{ notification.status|format_notification_status_as_url }}">
     {% endif %}
@@ -135,6 +136,7 @@
         (notification.updated_at or notification.created_at)|format_datetime_short
       ) }}
     </span>
+    {% if notification.status in ['created', 'sending', 'delivered'] %}</span>{% endif %}
   {% endcall %}
 {% endmacro %}
 

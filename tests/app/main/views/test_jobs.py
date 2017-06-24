@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 
 from app.main.views.jobs import get_time_left, get_status_filters
 from tests import notification_json
+from tests.app.test_utils import normalize_spaces
 from tests.conftest import SERVICE_ONE_ID
 from freezegun import freeze_time
 
@@ -80,6 +81,7 @@ def test_should_show_page_for_one_job(
     status_argument,
     expected_api_call,
 ):
+
     response = logged_in_client.get(url_for(
         'main.view_job',
         service_id=service_one['id'],
@@ -90,11 +92,8 @@ def test_should_show_page_for_one_job(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.text.strip() == 'thisisatest.csv'
-    assert page.find('div', {'class': 'sms-message-wrapper'}).text.strip() == (
-        '{}: Template <em>content</em> with & entity'.format(service_one['name'])
-    )
     assert ' '.join(page.find('tbody').find('tr').text.split()) == (
-        '07123456789 Delivered 1 January at 11:10am'
+        '07123456789 template content Delivered 1 January at 11:10am'
     )
     assert page.find('div', {'data-key': 'notifications'})['data-resource'] == url_for(
         'main.view_job_updates',
@@ -163,7 +162,6 @@ def test_should_show_job_in_progress(
 @freeze_time("2016-01-01T00:00:00.061258")
 def test_should_show_scheduled_job(
     logged_in_client,
-    service_one,
     active_user_with_permissions,
     mock_get_service_template,
     mock_get_scheduled_job,
@@ -173,13 +171,21 @@ def test_should_show_scheduled_job(
 ):
     response = logged_in_client.get(url_for(
         'main.view_job',
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         job_id=fake_uuid
     ))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.find('main').find_all('p')[1].text.strip() == 'Sending will start today at midnight'
+    assert normalize_spaces(page.select('main p')[1].text) == (
+        'Sending Two week reminder today at midnight'
+    )
+    assert page.select('main p a')[0]['href'] == url_for(
+        'main.view_template_version',
+        service_id=SERVICE_ONE_ID,
+        template_id='5d729fbd-239c-44ab-b498-75a985f3198f',
+        version=1,
+    )
     assert page.find('input', {'type': 'submit', 'value': 'Cancel sending'})
 
 
@@ -256,6 +262,7 @@ def test_should_show_updates_for_one_job_as_json(
     service_one,
     active_user_with_permissions,
     mock_get_notifications,
+    mock_get_service_template,
     mock_get_job,
     mocker,
     fake_uuid,
