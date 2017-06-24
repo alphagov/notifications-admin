@@ -390,12 +390,29 @@ def get_job_partials(job):
 
 
 def add_preview_of_content_to_notifications(notifications):
+
     for notification in notifications:
-        yield dict(
-            preview_of_content=(
-                str(Template(notification['template'], notification['personalisation']))
-                if notification['template']['template_type'] == 'sms' else
-                WithSubjectTemplate(notification['template'], notification['personalisation']).subject
-            ),
-            **notification
-        )
+
+        if notification['template'].get('redact_personalisation'):
+            notification['personalisation'] = {}
+
+        if notification['template']['template_type'] == 'sms':
+            yield dict(
+                preview_of_content=str(Template(
+                    notification['template'],
+                    notification['personalisation'],
+                    redact_missing_personalisation=True,
+                )),
+                **notification
+            )
+        else:
+            yield dict(
+                preview_of_content=(
+                    WithSubjectTemplate(
+                        notification['template'],
+                        notification['personalisation'],
+                        redact_missing_personalisation=True,
+                    ).subject
+                ),
+                **notification
+            )

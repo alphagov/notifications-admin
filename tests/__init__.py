@@ -87,12 +87,12 @@ def template_json(service_id,
                   id_,
                   name="sample template",
                   type_="sms",
-                  content="template content",
+                  content=None,
                   subject=None,
                   version=1,
                   archived=False,
                   process_type='normal',
-                  redact_personalisation=False,
+                  redact_personalisation=None,
                   ):
     template = {
         'id': id_,
@@ -105,6 +105,8 @@ def template_json(service_id,
         'archived': archived,
         'process_type': process_type,
     }
+    if content is None:
+        template['content'] = "template content"
     if subject is None and type_ != 'sms':
         template['subject'] = "template subject"
     if subject is not None:

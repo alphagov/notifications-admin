@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 from app.main.views.jobs import get_time_left, get_status_filters
 from tests import notification_json
-from tests.conftest import SERVICE_ONE_ID
+from tests.conftest import SERVICE_ONE_ID, mock_get_notifications
 from tests.app.test_utils import normalize_spaces
 from freezegun import freeze_time
 
@@ -321,3 +321,27 @@ def test_html_contains_notification_id(
     notifications = page.tbody.find_all('tr')
     for tr in notifications:
         assert uuid.UUID(tr.attrs['id'])
+
+
+def test_redacts_templates_that_should_be_redacted(
+    client_request,
+    mocker,
+    active_user_with_permissions,
+    mock_get_detailed_service,
+):
+    _notifications_mock = mock_get_notifications(
+        mocker,
+        active_user_with_permissions,
+        template_content="hello ((name))",
+        personalisation={'name': 'Jo'},
+        redact_personalisation=True,
+    )
+    page = client_request.get(
+        'main.view_notifications',
+        service_id=SERVICE_ONE_ID,
+        message_type='sms',
+    )
+
+    assert normalize_spaces(page.select('tbody tr th')[0].text) == (
+        '07123456789 hello hidden'
+    )

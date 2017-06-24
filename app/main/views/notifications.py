@@ -56,6 +56,7 @@ def view_notification(service_id, notification_id):
             filetype='png',
         ),
         show_recipient=True,
+        redact_missing_personalisation=True,
     )
     template.values = get_all_personalisation_from_notification(notification)
     if notification['job']:
@@ -109,15 +110,21 @@ def get_single_notification_partials(notification):
 
 
 def get_all_personalisation_from_notification(notification):
+
+    if notification['template'].get('redact_personalisation'):
+        notification['personalisation'] = {}
+
     if notification['template']['template_type'] == 'email':
         return dict(
             email_address=notification['to'],
             **notification['personalisation']
         )
+
     if notification['template']['template_type'] == 'sms':
         return dict(
             phone_number=notification['to'],
             **notification['personalisation']
         )
+
     if notification['template']['template_type'] == 'letter':
         return notification['personalisation']

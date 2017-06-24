@@ -57,3 +57,37 @@ def test_notification_status_page_shows_details(
         service_one['id'],
         fake_uuid
     )
+
+
+@pytest.mark.parametrize('template_redaction_setting, expected_content', [
+    (False, 'service one: hello Jo'),
+    (True, 'service one: hello hidden'),
+])
+@freeze_time("2016-01-01 11:09:00.061258")
+def test_notification_status_page_respects_redaction(
+    client_request,
+    mocker,
+    service_one,
+    fake_uuid,
+    template_redaction_setting,
+    expected_content,
+):
+
+    _mock_get_notification = mock_get_notification(
+        mocker,
+        fake_uuid,
+        redact_personalisation=template_redaction_setting,
+    )
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=service_one['id'],
+        notification_id=fake_uuid
+    )
+
+    assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == expected_content
+
+    _mock_get_notification.assert_called_with(
+        service_one['id'],
+        fake_uuid,
+    )

@@ -1079,7 +1079,13 @@ def mock_get_jobs(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
-def mock_get_notifications(mocker, api_user_active):
+def mock_get_notifications(
+    mocker,
+    api_user_active,
+    template_content=None,
+    personalisation=None,
+    redact_personalisation=False,
+):
     def _get_notifications(
         service_id,
         job_id=None,
@@ -1096,17 +1102,28 @@ def mock_get_notifications(mocker, api_user_active):
         job = None
         if job_id is not None:
             job = job_json(service_id, api_user_active, job_id=job_id)
-
         if template_type:
-            template = template_json(service_id, id_=str(generate_uuid()), type_=template_type[0])
+            template = template_json(
+                service_id,
+                id_=str(generate_uuid()),
+                type_=template_type[0],
+                content=template_content,
+                redact_personalisation=redact_personalisation,
+            )
         else:
-            template = template_json(service_id, id_=str(generate_uuid()))
+            template = template_json(
+                service_id,
+                id_=str(generate_uuid()),
+                content=template_content,
+                redact_personalisation=redact_personalisation,
+            )
 
         return notification_json(
             service_id,
             template=template,
             rows=rows,
-            job=job
+            job=job,
+            personalisation=personalisation,
         )
 
     return mocker.patch(
@@ -1636,7 +1653,12 @@ def mock_reset_failed_login_count(mocker):
 
 
 @pytest.fixture
-def mock_get_notification(mocker, fake_uuid, notification_status='delivered'):
+def mock_get_notification(
+    mocker,
+    fake_uuid,
+    notification_status='delivered',
+    redact_personalisation=False,
+):
     def _get_notification(
         service_id,
         notification_id,
@@ -1654,7 +1676,12 @@ def mock_get_notification(mocker, fake_uuid, notification_status='delivered'):
             'email_address': 'test@user.gov.uk'
         }
         noti['personalisation'] = {'name': 'Jo'}
-        noti['template'] = template_json(service_id, str(generate_uuid()), content='hello ((name))')
+        noti['template'] = template_json(
+            service_id,
+            str(generate_uuid()),
+            content='hello ((name))',
+            redact_personalisation=redact_personalisation,
+        )
         return noti
 
     return mocker.patch(
