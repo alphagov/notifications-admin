@@ -261,7 +261,9 @@ def get_notifications(service_id, message_type, status_override=None):
         ),
         'notifications': render_template(
             'views/activity/notifications.html',
-            notifications=add_preview_of_content_to_notifications(notifications['notifications']),
+            notifications=list(add_preview_of_content_to_notifications(
+                notifications['notifications']
+            )),
             page=page,
             prev_page=prev_page,
             next_page=next_page,
@@ -388,8 +390,8 @@ def get_job_partials(job):
 
 
 def add_preview_of_content_to_notifications(notifications):
-    return [
-        dict(
+    for notification in notifications:
+        yield dict(
             preview_of_content=(
                 str(Template(notification['template'], notification['personalisation']))
                 if notification['template']['template_type'] == 'sms' else
@@ -397,5 +399,3 @@ def add_preview_of_content_to_notifications(notifications):
             ),
             **notification
         )
-        for notification in notifications
-    ]
