@@ -267,6 +267,7 @@ def get_template(
     expand_emails=False,
     letter_preview_url=None,
     page_count=1,
+    redact_missing_personalisation=False,
 ):
     if 'email' == template['template_type']:
         return EmailPreviewTemplate(
@@ -274,14 +275,16 @@ def get_template(
             from_name=service['name'],
             from_address='{}@notifications.service.gov.uk'.format(service['email_from']),
             expanded=expand_emails,
-            show_recipient=show_recipient
+            show_recipient=show_recipient,
+            redact_missing_personalisation=redact_missing_personalisation,
         )
     if 'sms' == template['template_type']:
         return SMSPreviewTemplate(
             template,
             prefix=service['name'],
             sender=(service['sms_sender'] not in {'GOVUK', None}),
-            show_recipient=show_recipient
+            show_recipient=show_recipient,
+            redact_missing_personalisation=redact_missing_personalisation,
         )
     if 'letter' == template['template_type']:
         if letter_preview_url:
@@ -294,7 +297,8 @@ def get_template(
             return LetterPreviewTemplate(
                 template,
                 contact_block=service['letter_contact_block'],
-                admin_base_url=current_app.config['ADMIN_BASE_URL']
+                admin_base_url=current_app.config['ADMIN_BASE_URL'],
+                redact_missing_personalisation=redact_missing_personalisation,
             )
 
 
