@@ -255,8 +255,14 @@ def send_test_step(service_id, template_id, step_index):
     )
 
     if form.validate_on_submit():
-        # if it's zero, we store against `recipient` as well, for easier extraction
-        if step_index == 0 and template.template_type != 'letter':
+        # if it's the first input (phone/email), we store against `recipient` as well, for easier extraction.
+        # Only if it's not a letter.
+        # And only if we're not on the test route, since that will already have the user's own number set
+        if (
+            step_index == 0 and
+            template.template_type != 'letter' and
+            request.endpoint != 'main.send_test_step'
+        ):
             session['recipient'] = form.placeholder_value.data
 
         session['placeholders'][current_placeholder] = form.placeholder_value.data
@@ -512,10 +518,7 @@ def fields_to_fill_in(template, prefill_current_user=False):
     if 'letter' == template.template_type or not prefill_current_user:
         return recipient_columns + list(template.placeholders)
 
-    session['placeholders'][recipient_columns[0]] = {
-        'email': current_user.email_address,
-        'sms': current_user.mobile_number,
-    }.get(template.template_type)
+    session['recipient'] = current_user.mobile_number if template.template_type == 'sms' else current_user.mobile_number
 
     return list(template.placeholders)
 
@@ -590,13 +593,15 @@ def check_notification(service_id, template_id):
     # go back to start of process
     back_link = get_back_link(service_id, template_id, 0)
 
+    if {'recipient', 'placeholders'} - set(session.keys()) and back_link:
+        return redirect(back_link)
+
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
     template = get_template(
         db_template,
         current_service,
-        show_recipient=True,
-        letter_preview_url='FUCK WHAT DO I DO HERE'
+        show_recipient=True
     )
     template.values = session['placeholders']
 
