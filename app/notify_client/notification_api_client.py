@@ -55,7 +55,7 @@ class NotificationApiClient(NotifyAdminAPIClient):
                 params=params
             )
 
-    def send_notification(self, service_id, *, template_id, recipient, personalisation=None):
+    def send_notification(self, service_id, *, template_id, recipient, personalisation):
         data = {
             'template_id': template_id,
             'to': recipient,

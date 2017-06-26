@@ -601,12 +601,6 @@ def get_back_link(service_id, template_id, step_index):
 @login_required
 @user_has_permissions('manage_templates')
 def check_notification(service_id, template_id):
-    # go back to start of process
-    back_link = get_back_link(service_id, template_id, 0)
-
-    if {'recipient', 'placeholders'} - set(session.keys()) and back_link:
-        return redirect(back_link)
-
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
     template = get_template(
@@ -614,6 +608,19 @@ def check_notification(service_id, template_id):
         current_service,
         show_recipient=True
     )
+
+    # go back to start of process
+    back_link = get_back_link(service_id, template_id, 0)
+
+    if (
+        (
+            not session.get('recipient') or
+            not all_placeholders_in_session(template.placeholders)
+        )
+        and back_link
+    ):
+        return redirect(back_link)
+
     template.values = get_receipient_and_placeholders_from_session(template.template_type)
 
     return render_template(

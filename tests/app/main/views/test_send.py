@@ -561,7 +561,7 @@ def _redirects_with_help_argument(
     )
 
 
-def test_send_test_email_message_without_placeholders(
+def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     logged_in_client,
     mocker,
     service_one,
@@ -571,19 +571,16 @@ def test_send_test_email_message_without_placeholders(
     mock_get_detailed_service_for_today,
     fake_uuid,
 ):
-
-    mocker.patch('app.main.views.send.s3download', return_value='email address\r\ntest@user.gov.uk')
+    with logged_in_client.session_transaction() as session:
+        session['recipient'] = 'foo@bar.com'
 
     response = logged_in_client.get(
-        url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid),
+        url_for('main.send_test', step_index=0, service_id=service_one['id'], template_id=fake_uuid),
         follow_redirects=True
     )
     assert response.status_code == 200
-    mock_s3_upload.assert_called_with(
-        service_one['id'],
-        {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'Report'},
-        'eu-west-1'
-    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select('h1')[0].text.strip() == 'Preview of Two week reminder'
 
 
 def test_send_test_sms_message_with_placeholders_shows_first_field(
@@ -778,6 +775,7 @@ def test_send_test_sms_message_puts_submitted_data_in_session(
     fake_uuid,
 ):
     with logged_in_client.session_transaction() as session:
+        session['recipient'] = '07700 900762'
         session['placeholders'] = {}
 
     response = logged_in_client.post(
@@ -800,7 +798,6 @@ def test_send_test_sms_message_puts_submitted_data_in_session(
     with logged_in_client.session_transaction() as session:
         assert session['recipient'] == '07700 900762'
         assert session['placeholders']['name'] == 'Jo'
-
 
 
 @pytest.mark.parametrize('filetype', ['pdf', 'png'])
@@ -866,7 +863,7 @@ def test_send_test_clears_session(
     assert response.status_code == 302
 
     with logged_in_client.session_transaction() as session:
-        assert session['recipient'] == None
+        assert session['recipient'] is None
         assert session['placeholders'] == {}
 
 
@@ -1588,4 +1585,144 @@ def test_check_messages_back_from_help_handles_unexpected_templates(client, mock
     assert get_check_messages_back_url('1234', 'sms') == url_for(
         'main.choose_template',
         service_id='1234',
+    )
+
+
+@pytest.mark.parametrize('existing_session_items', [
+    {},
+    {'recipient': '07700900001'},
+    {'name': 'Jo'}
+])
+def test_check_notification_redirects_if_session_not_populated(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    existing_session_items,
+    mock_get_service_template_with_placeholders
+):
+    with logged_in_client.session_transaction() as session:
+        session.update(existing_session_items)
+
+    resp = logged_in_client.get(url_for(
+        'main.check_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid
+    ))
+
+    assert resp.location == url_for(
+        'main.view_template',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _external=True
+    )
+
+
+def test_check_notification_shows_preview(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_template
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {}
+
+    page = client_request.get(
+        'main.check_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid
+    )
+
+    assert page.h1.text.strip() == 'Preview of Two week reminder'
+    assert (
+        page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
+    ) == url_for('main.view_template', service_id=service_one['id'], template_id=fake_uuid)
+
+
+def test_send_notification_submits_data(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_send_notification,
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'a': 'b'}
+
+    client_request.post(
+        'main.send_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid
+    )
+
+    mock_send_notification.assert_called_once_with(
+        service_one['id'],
+        template_id=fake_uuid,
+        recipient='07700900001',
+        personalisation={'a': 'b'}
+    )
+
+
+def test_send_notification_clears_session(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_send_notification,
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'a': 'b'}
+
+    client_request.post(
+        'main.send_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid
+    )
+
+    with client_request.session_transaction() as session:
+        assert 'recipient' not in session
+        assert 'placeholders' not in session
+
+
+def test_send_notification_redirects_if_missing_data(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+):
+    with logged_in_client.session_transaction() as session:
+        session['placeholders'] = {'a': 'b'}
+
+    resp = logged_in_client.post(
+        url_for('main.send_notification', service_id=service_one['id'], template_id=fake_uuid)
+    )
+
+    assert resp.status_code == 302
+    assert resp.location == url_for(
+        '.send_one_off',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _external=True
+    )
+
+
+def test_send_notification_redirects_to_view_page(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    mock_send_notification,
+):
+    with logged_in_client.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'a': 'b'}
+
+    resp = logged_in_client.post(
+        url_for('main.send_notification', service_id=service_one['id'], template_id=fake_uuid)
+    )
+
+    assert resp.status_code == 302
+    assert resp.location == url_for(
+        '.view_notification',
+        service_id=service_one['id'],
+        notification_id=fake_uuid,
+        _external=True
     )

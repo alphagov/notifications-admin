@@ -1,4 +1,4 @@
-
+from contextlib import contextmanager
 import os
 from datetime import date, datetime, timedelta
 from unittest.mock import Mock
@@ -59,11 +59,6 @@ def service_with_reply_to_addresses(api_user_active):
         reply_to_email_address='test@example.com',
         sms_sender='elevenchars',
     )
-
-
-@pytest.fixture(scope='function')
-def mock_send_sms(request, mocker):
-    return mocker.patch("app.service_api_client.send_sms")
 
 
 @pytest.fixture(scope='function')
@@ -1665,6 +1660,19 @@ def mock_get_notification(mocker, fake_uuid, notification_status='delivered'):
     )
 
 
+@pytest.fixture
+def mock_send_notification(mocker, fake_uuid):
+    def _send_notification(
+        service_id, *, template_id, recipient, personalisation
+    ):
+        return {'id': fake_uuid}
+
+    return mocker.patch(
+        'app.notification_api_client.send_notification',
+        side_effect=_send_notification
+    )
+
+
 @pytest.fixture(scope='function')
 def client(app_):
     with app_.test_request_context(), app_.test_client() as client:
@@ -1711,6 +1719,12 @@ def os_environ():
 @pytest.fixture
 def client_request(logged_in_client):
     class ClientRequest:
+
+        @staticmethod
+        @contextmanager
+        def session_transaction():
+            with logged_in_client.session_transaction() as session:
+                yield session
 
         @staticmethod
         def get(endpoint, _expected_status=200, _follow_redirects=False, **endpoint_kwargs):
