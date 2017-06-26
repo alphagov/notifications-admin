@@ -1716,7 +1716,9 @@ def client_request(logged_in_client):
             return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
 
         @staticmethod
-        def post(endpoint, _data=None, _expected_status=302, _follow_redirects=False, **endpoint_kwargs):
+        def post(endpoint, _data=None, _expected_status=None, _follow_redirects=False, **endpoint_kwargs):
+            if _expected_status is None:
+                _expected_status = 200 if _follow_redirects else 302
             resp = logged_in_client.post(
                 url_for(endpoint, **(endpoint_kwargs or {})),
                 data=_data,
