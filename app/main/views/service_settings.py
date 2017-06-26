@@ -247,6 +247,14 @@ def service_switch_can_send_email(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
+@main.route("/services/<service_id>/service-settings/can-send-sms")
+@login_required
+@user_has_permissions(admin_override=True)
+def service_switch_can_send_sms(service_id):
+    switch_service_permissions(service_id, 'sms')
+    return redirect(url_for('.service_settings', service_id=service_id))
+
+
 @main.route("/services/<service_id>/service-settings/archive", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
@@ -333,6 +341,15 @@ def service_set_sms_sender(service_id):
     return render_template(
         'views/service-settings/set-sms-sender.html',
         form=form)
+
+
+@main.route("/services/<service_id>/service-settings/set-sms", methods=['GET'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_set_sms(service_id):
+    return render_template(
+        'views/service-settings/set-sms.html',
+    )
 
 
 @main.route("/services/<service_id>/service-settings/set-international-sms", methods=['GET'])

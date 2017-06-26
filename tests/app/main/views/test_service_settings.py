@@ -21,6 +21,7 @@ from tests.conftest import active_user_with_permissions, platform_admin_user
         'Service name service one Change',
         'Send emails On Change',
         'Email reply to address None Change',
+        'Send text messages On Change',
         'Text message sender GOVUK Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
@@ -31,6 +32,7 @@ from tests.conftest import active_user_with_permissions, platform_admin_user
         'Service name service one Change',
         'Send emails On Change',
         'Email reply to address None Change',
+        'Send text messages On Change',
         'Text message sender GOVUK Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
@@ -70,6 +72,7 @@ def test_should_show_overview(
         'Service name service one Change',
         'Send emails On Change',
         'Email reply to address test@example.com Change',
+        'Send text messages On Change',
         'Text message sender elevenchars',
         'International text messages On Change',
         'Receive text messages On Change',
@@ -80,6 +83,7 @@ def test_should_show_overview(
         'Service name service one Change',
         'Send emails On Change',
         'Email reply to address test@example.com Change',
+        'Send text messages On Change',
         'Text message sender elevenchars Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
@@ -158,7 +162,7 @@ def test_if_can_receive_inbound_then_cant_change_sms_sender(
     service_one,
     mock_get_letter_organisations,
 ):
-    service_one['permissions'] = ['email', 'sms','inbound_sms']
+    service_one['permissions'] = ['email', 'sms', 'inbound_sms']
     service_one['sms_sender'] = 'SomeNumber'
     response = logged_in_client.get(url_for(
         'main.service_settings', service_id=service_one['id']
@@ -183,7 +187,7 @@ def test_letter_contact_block_shows_none_if_not_set(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = page.find_all('tr')[7].find_all('td')[1].div
+    div = page.find_all('tr')[5].find_all('td')[1].div
     assert div.text.strip() == 'None'
     assert 'default' in div.attrs['class'][0]
 
@@ -201,7 +205,7 @@ def test_escapes_letter_contact_block(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = str(page.find_all('tr')[7].find_all('td')[1].div)
+    div = str(page.find_all('tr')[5].find_all('td')[1].div)
     assert 'foo<br>bar' in div
     assert '<script>' not in div
 
@@ -576,38 +580,30 @@ def test_route_for_platform_admin_update_service(
                               service_one)
 
 
-def test_switch_service_enable_email(
+@pytest.mark.parametrize('notification_type, permissions_before_switch, permissions_after_switch', [
+    ('email', [], ['email']),
+    ('email', ['email'], []),
+    ('sms', [], ['sms']),
+    ('sms', ['sms'], [])
+])
+def test_enabling_and_disabling_email_and_sms(
     logged_in_platform_admin_client,
     service_one,
     mocker,
+    notification_type,
+    permissions_before_switch,
+    permissions_after_switch,
 ):
-    service_one['permissions'] = []
+    service_one['permissions'] = permissions_before_switch
     mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
 
     response = logged_in_platform_admin_client.get(
-        url_for('main.service_switch_can_send_email', service_id=service_one['id'])
+        url_for('main.service_switch_can_send_{}'.format(notification_type), service_id=service_one['id'])
     )
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    assert mocked_fn.call_args == call(service_one['id'], {'permissions': ['email']})
-
-
-def test_switch_service_disable_email(
-    logged_in_platform_admin_client,
-    service_one,
-    mocker,
-):
-    service_one['permissions'] = ['email']
-    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
-
-    response = logged_in_platform_admin_client.get(
-        url_for('main.service_switch_can_send_email', service_id=service_one['id'])
-    )
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    assert mocked_fn.call_args == call(service_one['id'], {'permissions': []})
+    assert mocked_fn.call_args == call(service_one['id'], {'permissions': permissions_after_switch})
 
 
 def test_set_reply_to_email_address(

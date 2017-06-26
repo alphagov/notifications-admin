@@ -45,37 +45,47 @@
         {% endif %}
 
         {% call row() %}
-          {{ text_field('Text message sender') }}
-          {{ text_field(current_service.sms_sender) }}
-          {% if current_user.has_permissions([], admin_override=True) or not can_receive_inbound %}
-            {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id, set_inbound_sms=False)) }}
-          {% else %}
-               {{ text_field('') }}
+          {{ text_field('Send text messages') }}
+          {{ boolean_field('sms' in current_service.permissions) }}
+          {{ edit_field('Change', url_for('.service_set_sms', service_id=current_service.id)) }}
+        {% endcall %}
+
+        {% if 'sms' in current_service.permissions %}
+
+          {% call row() %}
+            {{ text_field('Text message sender') }}
+            {{ text_field(current_service.sms_sender) }}
+            {% if current_user.has_permissions([], admin_override=True) or not can_receive_inbound %}
+              {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id, set_inbound_sms=False)) }}
+            {% else %}
+                 {{ text_field('') }}
+            {% endif %}
+
+          {% endcall %}
+
+          {% call row() %}
+            {{ text_field('International text messages') }}
+            {{ boolean_field('international_sms' in current_service.permissions) }}
+            {{ edit_field('Change', url_for('.service_set_international_sms', service_id=current_service.id)) }}
+          {% endcall %}
+
+          {% call row() %}
+            {{ text_field('Receive text messages') }}
+            {{ boolean_field('inbound_sms' in current_service.permissions) }}
+            {{ edit_field('Change', url_for('.service_set_inbound_sms', service_id=current_service.id)) }}
+          {% endcall %}
+
+          {% if can_receive_inbound %}
+            {% call row() %}
+              {{ text_field('API endpoint for received text messages') }}
+              {{ text_field(
+                'None' if not inbound_api_url else inbound_api_url,
+                status='' if inbound_api_url else 'default'
+              ) }}
+              {{ edit_field('Change', url_for('.service_set_inbound_api', service_id=current_service.id)) }}
+            {% endcall %}
           {% endif %}
 
-        {% endcall %}
-
-        {% call row() %}
-          {{ text_field('International text messages') }}
-          {{ boolean_field('international_sms' in current_service.permissions) }}
-          {{ edit_field('Change', url_for('.service_set_international_sms', service_id=current_service.id)) }}
-        {% endcall %}
-
-        {% call row() %}
-          {{ text_field('Receive text messages') }}
-          {{ boolean_field('inbound_sms' in current_service.permissions) }}
-          {{ edit_field('Change', url_for('.service_set_inbound_sms', service_id=current_service.id)) }}
-        {% endcall %}
-
-        {% if can_receive_inbound %}
-          {% call row() %}
-            {{ text_field('API endpoint for received text messages') }}
-            {{ text_field(
-              'None' if not inbound_api_url else inbound_api_url,
-              status='' if inbound_api_url else 'default'
-            ) }}
-            {{ edit_field('Change', url_for('.service_set_inbound_api', service_id=current_service.id)) }}
-          {% endcall %}
         {% endif %}
 
         {% call row() %}
@@ -177,10 +187,22 @@
           </a>
         </li>
         <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_can_send_international_sms', service_id=current_service.id) }}" class="button">
-            {{ 'Stop sending international sms' if 'international_sms' in current_service.permissions else 'Allow international sms' }}
+          <a href="{{ url_for('.service_switch_can_send_sms', service_id=current_service.id) }}" class="button">
+            {{ 'Stop sending sms' if 'sms' in current_service.permissions else 'Allow to send sms' }}
           </a>
         </li>
+        {% if 'sms' in current_service.permissions %}
+          <li class="bottom-gutter">
+            <a href="{{ url_for('.service_switch_can_send_international_sms', service_id=current_service.id) }}" class="button">
+              {{ 'Stop sending international sms' if 'international_sms' in current_service.permissions else 'Allow to send international sms' }}
+            </a>
+          </li>
+          <li class="bottom-gutter">
+            <a href="{{ url_for('.service_set_sms_sender', service_id=current_service.id, set_inbound_sms=True) }}" class="button">
+              {{ 'Stop inbound sms' if can_receive_inbound else 'Allow inbound sms' }}
+            </a>
+          </li>
+        {% endif %}
         {% if current_service.active %}
           <li class="bottom-gutter">
             <a href="{{ url_for('.archive_service', service_id=current_service.id) }}" class="button">
@@ -200,11 +222,6 @@
             </a>
           </li>
         {% endif %}
-        <li class="bottom-gutter">
-          <a href="{{ url_for('.service_set_sms_sender', service_id=current_service.id, set_inbound_sms=True) }}" class="button">
-            {{ 'Stop inbound sms' if can_receive_inbound else 'Allow inbound sms' }}
-          </a>
-        </li>
       </ul>
 
     {% endif %}
