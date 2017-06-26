@@ -22,7 +22,6 @@ from tests.conftest import (
     mock_get_service_letter_template,
     mock_get_service,
     mock_get_international_service,
-    mock_get_service_template,
     mock_get_service_email_template,
     SERVICE_ONE_ID,
 )
@@ -276,38 +275,13 @@ def test_send_test_doesnt_show_file_contents(
     assert page.select('input[type=submit]')[0]['value'].strip() == 'Send 1 text message'
 
 
-def test_send_test_sms_message(
-    logged_in_client,
-    service_one,
-    fake_uuid,
-    mocker,
-    mock_get_service_template,
-    mock_s3_upload,
-    mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
-):
-
-    mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
-
-    response = logged_in_client.get(
-        url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid),
-        follow_redirects=True
-    )
-    assert response.status_code == 200
-    mock_s3_upload.assert_called_with(
-        service_one['id'],
-        {'data': 'phone number\r\n07700 900762\r\n', 'file_name': 'Report'},
-        'eu-west-1'
-    )
-
-
-@pytest.mark.parametrize('endpoint, template_mock, expected_session_contents', [
-    ('main.send_test_step', mock_get_service_template_with_placeholders, {'phone number': '07700 900762'}),
-    ('main.send_test_step', mock_get_service_email_template, {'email address': 'test@user.gov.uk'}),
-    ('main.send_test_step', mock_get_service_letter_template, {}),
-    ('main.send_one_off_step', mock_get_service_template, {}),
-    ('main.send_one_off_step', mock_get_service_email_template, {}),
-    ('main.send_one_off_step', mock_get_service_letter_template, {}),
+@pytest.mark.parametrize('endpoint, template_mock, expected_recipient', [
+    ('main.send_test_step', mock_get_service_template_with_placeholders, '07700 900762'),
+    ('main.send_test_step', mock_get_service_email_template, 'test@user.gov.uk'),
+    ('main.send_test_step', mock_get_service_letter_template, None),
+    ('main.send_one_off_step', mock_get_service_template, None),
+    ('main.send_one_off_step', mock_get_service_email_template, None),
+    ('main.send_one_off_step', mock_get_service_letter_template, None),
 ])
 def test_send_test_step_redirects_if_session_not_setup(
     mocker,
@@ -317,14 +291,14 @@ def test_send_test_step_redirects_if_session_not_setup(
     fake_uuid,
     endpoint,
     template_mock,
-    expected_session_contents,
+    expected_recipient,
 ):
-
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
     with logged_in_client.session_transaction() as session:
-        assert 'send_test_values' not in session
+        assert 'recipient' not in session
+        assert 'placeholders' not in session
 
     response = logged_in_client.get(
         url_for(endpoint, service_id=SERVICE_ONE_ID, template_id=fake_uuid, step_index=0),
@@ -333,7 +307,7 @@ def test_send_test_step_redirects_if_session_not_setup(
     assert response.status_code == 200
 
     with logged_in_client.session_transaction() as session:
-        assert session['send_test_values'] == expected_session_contents
+        assert session['recipient'] == expected_recipient
 
 
 @pytest.mark.parametrize('template_mock, partial_url, expected_h1, tour_shown', [
@@ -450,7 +424,7 @@ def test_send_one_off_has_skip_link(
         assert not skip_links
 
 
-@pytest.mark.parametrize('endpoint, expected_redirect, send_test_values', [
+@pytest.mark.parametrize('endpoint, expected_redirect, placeholders', [
     (
         'main.send_test_step',
         'main.send_test',
@@ -466,17 +440,13 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
     logged_in_client,
     service_one,
     fake_uuid,
-    mock_get_service_template,
-    mock_s3_upload,
-    mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
     endpoint,
-    send_test_values,
+    placeholders,
     expected_redirect,
 ):
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = send_test_values
+        session['placeholders'] = placeholders
 
     response = logged_in_client.get(url_for(
         endpoint,
@@ -487,16 +457,12 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
 
     assert response.status_code == 302
     expected_url = url_for(
-        'main.check_messages',
+        expected_redirect,
         service_id=service_one['id'],
-        upload_id=fake_uuid,
-        template_type='sms',
+        template_id=fake_uuid,
         _external=True,
     )
-    assert response.location in (
-        expected_url + '?help=0&from_test=True',
-        expected_url + '?from_test=True&help=0',
-    )
+    assert response.location == expected_url
 
 
 @pytest.mark.parametrize('endpoint, expected_redirect', [
@@ -518,7 +484,7 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
 
     with logged_in_platform_admin_client.session_transaction() as session:
         session['send_test_letter_page_count'] = 1
-        session['send_test_values'] = {'address_line_1': 'foo'}
+        session['placeholders'] = {'address_line_1': 'foo'}
 
     response = logged_in_platform_admin_client.get(url_for(
         endpoint,
@@ -552,7 +518,7 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
 ):
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {'name': 'foo'}
+        session['placeholders'] = {'name': 'foo'}
 
     response = logged_in_client.get(url_for(
         endpoint,
@@ -574,7 +540,7 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     ('main.send_test', 'main.send_test_step'),
     ('main.send_one_off', 'main.send_one_off_step'),
 ])
-def test_send_test_sms_message_redirects_with_help_argument(
+def _redirects_with_help_argument(
     logged_in_client,
     service_one,
     fake_uuid,
@@ -631,7 +597,7 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
 ):
 
     with logged_in_client.session_transaction() as session:
-        assert 'send_test_values' not in session
+        assert 'placeholders' not in session
 
     response = logged_in_client.get(
         url_for(
@@ -652,7 +618,7 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
         template_id=fake_uuid,
     )
     with logged_in_client.session_transaction() as session:
-        assert session['send_test_values']['phone number'] == '07700 900762'
+        assert session['recipient'] == '07700 900762'
 
 
 def test_send_test_letter_clears_previous_page_cache(
@@ -690,8 +656,9 @@ def test_send_test_populates_field_from_session(
 ):
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {}
-        session['send_test_values']['name'] = 'Jo'
+        session['recipient'] = None
+        session['placeholders'] = {}
+        session['placeholders']['name'] = 'Jo'
 
     response = logged_in_client.get(url_for(
         'main.send_test_step',
@@ -742,7 +709,8 @@ def test_send_test_indicates_optional_address_columns(
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {}
+        session['recipient'] = None
+        session['placeholders'] = {}
 
     response = logged_in_client.get(url_for(
         'main.send_test_step',
@@ -778,7 +746,8 @@ def test_send_test_allows_empty_optional_address_columns(
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {}
+        session['recipient'] = None
+        session['placeholders'] = {}
 
     response = logged_in_client.post(
         url_for(
@@ -800,21 +769,16 @@ def test_send_test_allows_empty_optional_address_columns(
     )
 
 
-def test_send_test_sms_message_puts_submitted_data_in_session_and_file(
+def test_send_test_sms_message_puts_submitted_data_in_session(
     logged_in_client,
-    mocker,
     service_one,
     mock_get_service_template_with_placeholders,
-    mock_s3_upload,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
     fake_uuid,
 ):
-
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {}
-
-    mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
+        session['placeholders'] = {}
 
     response = logged_in_client.post(
         url_for(
@@ -823,23 +787,20 @@ def test_send_test_sms_message_puts_submitted_data_in_session_and_file(
             template_id=fake_uuid,
             step_index=0,
         ),
-        data={'placeholder_value': 'Jo'},
-        follow_redirects=True,
+        data={'placeholder_value': 'Jo'}
     )
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.check_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _external=True
+    )
 
     with logged_in_client.session_transaction() as session:
-        assert session['send_test_values']['phone number'] == '07700 900762'
-        assert session['send_test_values']['name'] == 'Jo'
+        assert session['recipient'] == '07700 900762'
+        assert session['placeholders']['name'] == 'Jo'
 
-    mock_s3_upload.assert_called_with(
-        service_one['id'],
-        {
-            'data': 'name,phone number\r\nJo,07700 900762\r\n',
-            'file_name': 'Report'
-        },
-        'eu-west-1'
-    )
 
 
 @pytest.mark.parametrize('filetype', ['pdf', 'png'])
@@ -864,7 +825,7 @@ def test_send_test_works_as_letter_preview(
     service_id = service_one['id']
     template_id = fake_uuid
     with logged_in_platform_admin_client.session_transaction() as session:
-        session['send_test_values'] = {'address_line_1': 'Jo Lastname'}
+        session['placeholders'] = {'address_line_1': 'Jo Lastname'}
     response = logged_in_platform_admin_client.get(
         url_for(
             'main.send_test_preview',
@@ -892,7 +853,8 @@ def test_send_test_clears_session(
 ):
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {'foo': 'bar'}
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'foo': 'bar'}
 
     response = logged_in_client.get(
         url_for(
@@ -904,7 +866,8 @@ def test_send_test_clears_session(
     assert response.status_code == 302
 
     with logged_in_client.session_transaction() as session:
-        assert session['send_test_values'] == {}
+        assert session['recipient'] == None
+        assert session['placeholders'] == {}
 
 
 def test_download_example_csv(

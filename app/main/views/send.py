@@ -280,7 +280,7 @@ def send_test_step(service_id, template_id, step_index):
 
     back_link = get_back_link(service_id, template_id, step_index)
 
-    template.values = get_normalised_placeholders_from_session()
+    template.values = get_receipient_and_placeholders_from_session(template.template_type)
     template.values[current_placeholder] = None
 
     if (
@@ -518,7 +518,7 @@ def fields_to_fill_in(template, prefill_current_user=False):
     if 'letter' == template.template_type or not prefill_current_user:
         return recipient_columns + list(template.placeholders)
 
-    session['recipient'] = current_user.mobile_number if template.template_type == 'sms' else current_user.mobile_number
+    session['recipient'] = current_user.mobile_number if template.template_type == 'sms' else current_user.email_address
 
     return list(template.placeholders)
 
@@ -528,6 +528,17 @@ def get_normalised_placeholders_from_session():
         key: ''.join(value or [])
         for key, value in session.get('placeholders', {}).items()
     }
+
+
+def get_receipient_and_placeholders_from_session(template_type):
+    placeholders = get_normalised_placeholders_from_session()
+
+    if template_type == 'sms':
+        placeholders['phone_number'] = session['recipient']
+    else:
+        placeholders['email_address'] = session['recipient']
+
+    return placeholders
 
 
 def make_and_upload_csv_file(service_id, template):
@@ -603,7 +614,7 @@ def check_notification(service_id, template_id):
         current_service,
         show_recipient=True
     )
-    template.values = session['placeholders']
+    template.values = get_receipient_and_placeholders_from_session(template.template_type)
 
     return render_template(
         'views/notifications/check.html',
