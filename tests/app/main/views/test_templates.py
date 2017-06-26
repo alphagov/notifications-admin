@@ -942,3 +942,48 @@ def test_should_create_sms_template_without_downgrading_unicode_characters(
         ANY  # process_type
     )
     assert resp.status_code == 302
+
+
+def test_should_show_message_before_redacting_template(
+    client_request,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+
+    page = client_request.get(
+        'main.redact_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert (
+        'Are you sure you want to hide personalisation after sending?'
+    ) in page.select('.banner-dangerous')[0].text
+
+    form = page.select('.banner-dangerous form')[0]
+
+    assert 'action' not in form
+    assert form['method'] == 'post'
+
+
+def test_should_show_redact_template(
+    client_request,
+    mock_get_service_template,
+    mock_redact_template,
+    service_one,
+    fake_uuid,
+):
+
+    page = client_request.post(
+        'main.redact_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select('.banner-default-with-tick')[0].text) == (
+        'Personalised content will be hidden for messages sent with this template'
+    )
+
+    mock_redact_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid)

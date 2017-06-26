@@ -383,6 +383,44 @@ def delete_service_template(service_id, template_id):
     )
 
 
+@main.route("/services/<service_id>/templates/<template_id>/redact", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_templates', admin_override=True)
+def redact_template(service_id, template_id):
+
+    if request.method == 'POST':
+
+        service_api_client.redact_service_template(service_id, template_id)
+
+        flash(
+            'Personalised content will be hidden for messages sent with this template',
+            'default_with_tick'
+        )
+
+        return redirect(url_for(
+            '.view_template',
+            service_id=service_id,
+            template_id=template_id,
+        ))
+
+    return render_template(
+        'views/templates/template.html',
+        template=get_template(
+            service_api_client.get_service_template(service_id, template_id)['data'],
+            current_service,
+            expand_emails=True,
+            letter_preview_url=url_for(
+                '.view_letter_template_preview',
+                service_id=service_id,
+                template_id=template_id,
+                filetype='png',
+            ),
+            show_recipient=True,
+        ),
+        show_redaction_message=True,
+    )
+
+
 @main.route('/services/<service_id>/templates/<template_id>/versions')
 @login_required
 @user_has_permissions(

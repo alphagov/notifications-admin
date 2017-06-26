@@ -519,6 +519,11 @@ def mock_delete_service_template(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_redact_template(mocker):
+    return mocker.patch('app.service_api_client.redact_service_template')
+
+
+@pytest.fixture(scope='function')
 def api_user_pending(fake_uuid):
     from app.notify_client.user_api_client import User
     user_data = {'id': fake_uuid,
