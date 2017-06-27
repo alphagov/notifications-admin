@@ -208,17 +208,19 @@ def service_switch_research_mode(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
-def switch_service_permissions(service_id, permission):
+def switch_service_permissions(service_id, permission, sms_sender=None):
     permissions = current_service['permissions'].copy()
     if permission in permissions:
         permissions.remove(permission)
     else:
         permissions.append(permission)
+    current_service['permissions'] = permissions
 
-    service_api_client.update_service_with_properties(
-        service_id,
-        {'permissions': permissions}
-    )
+    data = {'permissions': permissions}
+    if sms_sender:
+        data['sms_sender'] = sms_sender
+
+    service_api_client.update_service_with_properties(service_id, data)
 
 
 @main.route("/services/<service_id>/service-settings/can-send-letters")
@@ -302,16 +304,7 @@ def service_set_sms_sender(service_id):
     if form.validate_on_submit():
         set_inbound_sms = request.args.get('set_inbound_sms', False)
         if set_inbound_sms == 'True':
-            permissions = current_service['permissions']
-            if 'inbound_sms' in permissions:
-                permissions.remove('inbound_sms')
-            else:
-                permissions.append('inbound_sms')
-            service_api_client.update_service_with_properties(
-                current_service['id'],
-                {'permissions': permissions,
-                 'sms_sender': form.sms_sender.data or None}
-            )
+            switch_service_permissions(current_service['id'], 'inbound_sms', form.sms_sender.data)
         else:
             service_api_client.update_service(
                 current_service['id'],
