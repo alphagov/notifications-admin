@@ -383,26 +383,10 @@ def delete_service_template(service_id, template_id):
     )
 
 
-@main.route("/services/<service_id>/templates/<template_id>/redact", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/templates/<template_id>/redact", methods=['GET'])
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
-def redact_template(service_id, template_id):
-
-    if request.method == 'POST':
-
-        service_api_client.redact_service_template(service_id, template_id)
-
-        flash(
-            'Personalised content will be hidden for messages sent with this template',
-            'default_with_tick'
-        )
-
-        return redirect(url_for(
-            '.view_template',
-            service_id=service_id,
-            template_id=template_id,
-        ))
-
+def confirm_redact_template(service_id, template_id):
     return render_template(
         'views/templates/template.html',
         template=get_template(
@@ -419,6 +403,25 @@ def redact_template(service_id, template_id):
         ),
         show_redaction_message=True,
     )
+
+
+@main.route("/services/<service_id>/templates/<template_id>/redact", methods=['POST'])
+@login_required
+@user_has_permissions('manage_templates', admin_override=True)
+def redact_template(service_id, template_id):
+
+    service_api_client.redact_service_template(service_id, template_id)
+
+    flash(
+        'Personalised content will be hidden for messages sent with this template',
+        'default_with_tick'
+    )
+
+    return redirect(url_for(
+        '.view_template',
+        service_id=service_id,
+        template_id=template_id,
+    ))
 
 
 @main.route('/services/<service_id>/templates/<template_id>/versions')

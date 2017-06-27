@@ -56,7 +56,7 @@
       &emsp;
       {% if not template.redact_personalisation %}
         <span class="page-footer-delete-link page-footer-delete-link-without-button">
-          <a href="{{ url_for('.redact_template', service_id=current_service.id, template_id=template.id) }}">Hide personalisation after sending</a>
+          <a href="{{ url_for('.confirm_redact_template', service_id=current_service.id, template_id=template.id) }}">Hide personalisation after sending</a>
         </span>
       {% endif %}
     {% endif %}
