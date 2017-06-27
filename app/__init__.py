@@ -303,6 +303,8 @@ def format_delta(date):
     )
     if delta < timedelta(seconds=30):
         return "just now"
+    if delta < timedelta(seconds=60):
+        return "in the last minute"
     return ago.human(
         delta,
         future_tense='{} from now',  # No-one should ever see this
