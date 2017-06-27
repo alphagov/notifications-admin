@@ -83,7 +83,7 @@ def mock_get_service(mocker, api_user_active):
 @pytest.fixture(scope='function')
 def mock_get_international_service(mocker, api_user_active):
     def _get(service_id):
-        service = service_json(service_id, users=[api_user_active.id], can_send_international_sms=True)
+        service = service_json(service_id, users=[api_user_active.id], permissions=['international_sms'])
         return {'data': service}
 
     return mocker.patch('app.service_api_client.get_service', side_effect=_get)

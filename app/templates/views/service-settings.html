@@ -47,7 +47,7 @@
 
         {% call row() %}
           {{ text_field('International text messages') }}
-          {{ boolean_field(current_service.can_send_international_sms) }}
+          {{ boolean_field('international_sms' in current_service.permissions) }}
           {{ edit_field('Change', url_for('.service_set_international_sms', service_id=current_service.id)) }}
         {% endcall %}
 
@@ -70,11 +70,11 @@
 
         {% call row() %}
           {{ text_field('Letters') }}
-          {{ boolean_field(current_service.can_send_letters) }}
+          {{ boolean_field('letter' in current_service.permissions) }}
           {{ edit_field('Change', url_for('.service_set_letters', service_id=current_service.id)) }}
         {% endcall %}
 
-        {% if current_service.can_send_letters %}
+        {% if 'letter' in current_service.permissions %}
           {% call row() %}
             {{ text_field('Letter contact details') }}
             {% call field(status='' if current_service.letter_contact_block else 'default') %}
@@ -158,12 +158,12 @@
         </li>
         <li class="bottom-gutter">
           <a href="{{ url_for('.service_switch_can_send_letters', service_id=current_service.id) }}" class="button">
-            {{ 'Stop sending letters' if current_service.can_send_letters else 'Allow to send letters' }}
+            {{ 'Stop sending letters' if 'letter' in current_service.permissions else 'Allow to send letters' }}
           </a>
         </li>
         <li class="bottom-gutter">
           <a href="{{ url_for('.service_switch_can_send_international_sms', service_id=current_service.id) }}" class="button">
-            {{ 'Stop sending international sms' if current_service.can_send_international_sms else 'Allow to send international sms' }}
+            {{ 'Stop sending international sms' if 'international_sms' in current_service.permissions else 'Allow international sms' }}
           </a>
         </li>
         {% if current_service.active %}

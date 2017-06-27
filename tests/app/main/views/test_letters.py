@@ -11,22 +11,24 @@ letters_urls = [
 
 
 @pytest.mark.parametrize('url', letters_urls)
-@pytest.mark.parametrize('can_send_letters, response_code', [
-    (True, 200),
-    (False, 403)
+@pytest.mark.parametrize('permissions, response_code', [
+    (['letter'], 200),
+    ([], 403)
 ])
 def test_letters_access_restricted(
     logged_in_platform_admin_client,
     mocker,
-    can_send_letters,
+    permissions,
     response_code,
     mock_get_service_templates,
     url,
+    service_one,
 ):
-    service = service_json(can_send_letters=can_send_letters)
-    mocker.patch('app.service_api_client.get_service', return_value={"data": service})
+    service_one['permissions'] = permissions
 
-    response = logged_in_platform_admin_client.get(url(service_id=service['id']))
+    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
+
+    response = logged_in_platform_admin_client.get(url(service_id=service_one['id']))
 
     assert response.status_code == response_code
 
@@ -40,29 +42,30 @@ def test_letters_lets_in_without_permission(
     api_user_active,
     mock_get_service_templates,
     url,
+    service_one
 ):
-    service = service_json(can_send_letters=True)
-    mocker.patch('app.service_api_client.get_service', return_value={"data": service})
+    service_one['permissions'] = ['letter']
+    mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
 
     client.login(api_user_active)
-    response = client.get(url(service_id=service['id']))
+    response = client.get(url(service_id=service_one['id']))
 
     assert api_user_active.permissions == {}
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize('can_send_letters, choices', [
-    (True, ['Email', 'Text message', 'Letter']),
-    (False, ['Email', 'Text message'])
+@pytest.mark.parametrize('permissions, choices', [
+    (['email', 'sms', 'letter'], ['Email', 'Text message', 'Letter']),
+    (['email', 'sms'], ['Email', 'Text message'])
 ])
 def test_given_option_to_add_letters_if_allowed(
     logged_in_client,
     service_one,
     mocker,
-    can_send_letters,
+    permissions,
     choices,
 ):
-    service_one['can_send_letters'] = can_send_letters
+    service_one['permissions'] = permissions
     mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
 
     response = logged_in_client.get(url_for('main.add_template_by_type', service_id=service_one['id']))
