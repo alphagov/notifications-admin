@@ -50,14 +50,16 @@
       <br/>
     {% endif %}
     {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
-      <span class="page-footer-delete-link page-footer-delete-link-without-button">
+      <span class="page-footer-delete-link page-footer-delete-link-without-button bottom-gutter-2-3">
         <a href="{{ url_for('.delete_service_template', service_id=current_service.id, template_id=template.id) }}">Delete this template</a>
       </span>
       &emsp;
-      {% if not template.redact_personalisation %}
+      {% if not template._template.redact_personalisation %}
         <span class="page-footer-delete-link page-footer-delete-link-without-button">
           <a href="{{ url_for('.confirm_redact_template', service_id=current_service.id, template_id=template.id) }}">Hide personalisation after sending</a>
         </span>
+      {% else %}
+        <p class="hint">Personalisation is hidden after sending</p>
       {% endif %}
     {% endif %}
   </div>

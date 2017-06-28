@@ -42,6 +42,7 @@
   &-delete-link-without-button {
     @include core-19;
     padding-left: 0;
+    display: inline-block;
   }
 
   &-secondary-link {

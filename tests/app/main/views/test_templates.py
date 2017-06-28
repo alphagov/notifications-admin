@@ -987,3 +987,21 @@ def test_should_show_redact_template(
     )
 
     mock_redact_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid)
+
+
+def test_should_show_hint_once_template_redacted(
+    client_request,
+    mocker,
+    service_one,
+    fake_uuid,
+):
+
+    mock_get_service_email_template(mocker, redact_personalisation=True)
+
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert page.select('.hint')[0].text == 'Personalisation is hidden after sending'

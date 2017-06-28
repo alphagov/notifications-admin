@@ -91,7 +91,9 @@ def template_json(service_id,
                   subject=None,
                   version=1,
                   archived=False,
-                  process_type='normal'):
+                  process_type='normal',
+                  redact_personalisation=False,
+                  ):
     template = {
         'id': id_,
         'name': name,
@@ -101,10 +103,12 @@ def template_json(service_id,
         'version': version,
         'updated_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
         'archived': archived,
-        'process_type': process_type
+        'process_type': process_type,
     }
     if subject is not None:
         template['subject'] = subject
+    if redact_personalisation is not None:
+        template['redact_personalisation'] = redact_personalisation
     return template
 
 

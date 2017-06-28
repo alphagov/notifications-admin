@@ -351,7 +351,7 @@ def mock_get_service_template_with_placeholders(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_email_template(mocker, content=None, subject=None):
+def mock_get_service_email_template(mocker, content=None, subject=None, redact_personalisation=False):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id,
@@ -360,6 +360,7 @@ def mock_get_service_email_template(mocker, content=None, subject=None):
             "email",
             content or "Your vehicle tax expires on ((date))",
             subject or "Your ((thing)) is due soon",
+            redact_personalisation=redact_personalisation,
         )
         return {'data': template}
 
