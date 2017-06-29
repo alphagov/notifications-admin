@@ -59,10 +59,9 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     assert session['service_id'] == 101
     assert response.status_code == 302
     assert response.location == url_for(
-        'main.send_test',
+        'main.start_tour',
         service_id=101,
-        template_id="Example text message template",
-        help=1,
+        template_id="Example%20text%20message%20template",
         _external=True
     )
 

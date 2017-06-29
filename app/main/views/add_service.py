@@ -80,10 +80,9 @@ def add_service():
         )
 
         return redirect(url_for(
-            'main.send_test',
+            'main.start_tour',
             service_id=service_id,
             template_id=example_sms_template['data']['id'],
-            help=1
         ))
     else:
         return render_template(

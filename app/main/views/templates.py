@@ -18,7 +18,7 @@ from notifications_utils.recipients import first_column_headings
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
-from app.utils import user_has_permissions, get_template
+from app.utils import user_has_permissions, get_template, get_help_argument
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.main.forms import (
     ChooseTemplateType,
@@ -70,6 +70,34 @@ def view_template(service_id, template_id):
             show_recipient=True,
             page_count=get_page_count_for_letter(template),
         ),
+    )
+
+
+@main.route("/services/<service_id>/start-tour/<uuid:template_id>")
+@login_required
+@user_has_permissions(
+    'view_activity',
+    'send_texts',
+    'send_emails',
+    'manage_templates',
+    'manage_api_keys',
+    admin_override=True, any_=True
+)
+def start_tour(service_id, template_id):
+
+    template = service_api_client.get_service_template(service_id, str(template_id))['data']
+
+    if template['template_type'] != 'sms':
+        abort(404)
+
+    return render_template(
+        'views/templates/start-tour.html',
+        template=get_template(
+            template,
+            current_service,
+            show_recipient=True,
+        ),
+        help='1',
     )
 
 
