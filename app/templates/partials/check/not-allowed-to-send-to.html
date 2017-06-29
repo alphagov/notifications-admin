@@ -1,0 +1,25 @@
+{% from "components/banner.html" import banner_wrapper %}
+
+{% macro skip_to_file_contents() %}
+  <p class="visually-hidden">
+    <a href="#{{ file_contents_header_id }}">Skip to file contents</a>
+  </p>
+{% endmacro %}
+
+<div class="bottom-gutter">
+  {% call banner_wrapper(type='dangerous') %}
+    <h1 class='banner-title'>
+      You can’t send to
+      {{ 'this' if count_of_recipients == 1 else 'these' }}
+      {{ template_type_label }}
+      {%- if count_of_recipients != 1 -%}
+        {{ 'es' if 'email address' == template_type_label else 's' }}
+      {%- endif %}
+    </h1>
+    <p>
+      In <a href="{{ url_for('.trial_mode') }}">trial mode</a> you can only
+      send to yourself and members of your team
+    </p>
+    {{ skip_to_file_contents() }}
+  {% endcall %}
+</div>

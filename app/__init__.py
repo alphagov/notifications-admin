@@ -447,7 +447,10 @@ def register_errorhandlers(application):
         ))
         error_code = error.status_code
         if error_code == 400:
-            msg = list(itertools.chain(*[error.message[x] for x in error.message.keys()]))
+            if isinstance(error.message, str):
+                msg = [error.message]
+            else:
+                msg = list(itertools.chain(*[error.message[x] for x in error.message.keys()]))
             resp = make_response(render_template("error/400.html", message=msg))
             return useful_headers_after_request(resp)
         elif error_code not in [401, 404, 403, 410, 500]:
