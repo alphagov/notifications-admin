@@ -1,0 +1,10 @@
+<div class="bottom-gutter">
+  {% call banner_wrapper(type='dangerous') %}
+    <h1 class='banner-title'>
+      Message too long
+    </h1>
+    <p>
+      Text messages can’t be longer than {{ template|string|length }} characters. Your message is {{message_length}} characters.
+    </p>
+  {% endcall %}
+</div>
