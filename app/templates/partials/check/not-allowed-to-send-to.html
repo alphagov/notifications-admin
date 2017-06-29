@@ -1,11 +1,19 @@
+{% from "components/banner.html" import banner_wrapper %}
+
+{% macro skip_to_file_contents() %}
+  <p class="visually-hidden">
+    <a href="#{{ file_contents_header_id }}">Skip to file contents</a>
+  </p>
+{% endmacro %}
+
 <div class="bottom-gutter">
   {% call banner_wrapper(type='dangerous') %}
     <h1 class='banner-title'>
       You can’t send to
       {{ 'this' if count_of_recipients == 1 else 'these' }}
-      {{ recipients.recipient_column_headers[0] }}
+      {{ template_type_label }}
       {%- if count_of_recipients != 1 -%}
-        {{ 'es' if 'email address' == recipients.recipient_column_headers[0] else 's' }}
+        {{ 'es' if 'email address' == template_type_label else 's' }}
       {%- endif %}
     </h1>
     <p>

@@ -120,7 +120,12 @@
     </div>
 
   {% elif not recipients.allowed_to_send_to %}
-    {% include "partials/check/not-allowed-to-send-to.html" %}
+    {% with
+      count_of_recipients=count_of_recipients,
+      template_type_label=recipients.recipient_column_headers[0]
+    %}
+      {% include "partials/check/not-allowed-to-send-to.html" %}
+    {% endwith %}
   {% elif recipients.more_rows_than_can_send %}
     {% include "partials/check/too-many-messages.html" %}
   {% else %}

@@ -4,7 +4,8 @@
       Message too long
     </h1>
     <p>
-      Text messages can’t be longer than {{ template|string|length }} characters. Your message is {{message_length}} characters.
+      Text messages can’t be longer than {{ SMS_CHAR_COUNT_LIMIT }} characters.
+      Your message is {{ template.content_count }} characters.
     </p>
   {% endcall %}
 </div>
