@@ -19,6 +19,7 @@ from flask import (
 
 from flask_login import login_required, current_user
 
+from notifications_python_client.errors import HTTPError
 from notifications_utils.columns import Columns
 from notifications_utils.recipients import (
     RecipientCSV,
@@ -280,7 +281,7 @@ def send_test_step(service_id, template_id, step_index):
 
     back_link = get_back_link(service_id, template_id, step_index)
 
-    template.values = get_receipient_and_placeholders_from_session(template.template_type)
+    template.values = get_recipient_and_placeholders_from_session(template.template_type)
     template.values[current_placeholder] = None
 
     if (
@@ -530,7 +531,7 @@ def get_normalised_placeholders_from_session():
     }
 
 
-def get_receipient_and_placeholders_from_session(template_type):
+def get_recipient_and_placeholders_from_session(template_type):
     placeholders = get_normalised_placeholders_from_session()
 
     if template_type == 'sms':
@@ -601,6 +602,10 @@ def get_back_link(service_id, template_id, step_index):
 @login_required
 @user_has_permissions('manage_templates')
 def check_notification(service_id, template_id):
+    return _check_notification(service_id, template_id)
+
+
+def _check_notification(service_id, template_id, exception=None):
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
     template = get_template(
@@ -621,14 +626,27 @@ def check_notification(service_id, template_id):
     ):
         return redirect(back_link)
 
-    template.values = get_receipient_and_placeholders_from_session(template.template_type)
-
+    template.values = get_recipient_and_placeholders_from_session(template.template_type)
     return render_template(
         'views/notifications/check.html',
         template=template,
         back_link=back_link,
         help=get_help_argument(),
+
+        **(get_template_error_dict(exception) if exception else {})
     )
+
+
+def get_template_error_dict(exception):
+    if 'service is in trial mode' in exception.message:
+        error = 'not-allowed-to-send-to'
+    else:
+        raise exception
+
+    return {
+        'error': error,
+        'SMS_CHAR_COUNT_LIMIT': 0
+    }
 
 
 @main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['POST'])
@@ -642,12 +660,15 @@ def send_notification(service_id, template_id):
             template_id=template_id,
         ))
 
-    noti = notification_api_client.send_notification(
-        service_id,
-        template_id=template_id,
-        recipient=session['recipient'],
-        personalisation=session['placeholders']
-    )
+    try:
+        noti = notification_api_client.send_notification(
+            service_id,
+            template_id=template_id,
+            recipient=session['recipient'],
+            personalisation=session['placeholders']
+        )
+    except HTTPError as exception:
+        return _check_notification(service_id, template_id, exception)
 
     session.pop('placeholders')
     session.pop('recipient')

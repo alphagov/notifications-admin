@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import uuid
+from unittest.mock import Mock
 from io import BytesIO
 from os import path
 from glob import glob
@@ -9,6 +10,7 @@ from functools import partial
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from notifications_python_client.errors import HTTPError
 from notifications_utils.template import LetterPreviewTemplate, LetterImageTemplate
 from notifications_utils.recipients import RecipientCSV
 
@@ -1726,3 +1728,32 @@ def test_send_notification_redirects_to_view_page(
         notification_id=fake_uuid,
         _external=True
     )
+
+
+def test_send_notification_shows_error_if_400(
+    client_request,
+    service_one,
+    fake_uuid,
+    mocker,
+    mock_get_service_template
+):
+    trial_mode_msg = (
+        'Can’t send to this recipient when service is in trial mode – '
+        'see https://www.notifications.service.gov.uk/trial-mode'
+    )
+    mocker.patch(
+        'app.notification_api_client.send_notification',
+        side_effect=HTTPError(response=Mock(status_code=400), message=trial_mode_msg)
+    )
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'a': 'b'}
+
+    page = client_request.post(
+        'main.send_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _expected_status=200
+    )
+
+    assert ' '.join(page.h1.text.split()) == 'You can’t send to this phone number'
