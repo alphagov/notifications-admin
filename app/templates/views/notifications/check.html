@@ -14,9 +14,9 @@
     %}
       {% include "partials/check/not-allowed-to-send-to.html" %}
     {% endwith %}
-  {% elif error == 'more_rows_than_can_send' %}
+  {% elif error == 'too-many-messages' %}
     {% include "partials/check/too-many-messages.html" %}
-  {% elif error == 'row_errors' %}
+  {% elif error == 'message-too-long' %}
     {# the only row_errors we can get when sending one off messages is that the message is too long #}
     {% include "partials/check/message-too-long.html" %}
   {% else %}

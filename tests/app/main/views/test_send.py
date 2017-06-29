@@ -1730,24 +1730,48 @@ def test_send_notification_redirects_to_view_page(
     )
 
 
+TRIAL_MODE_MSG = (
+    'Can’t send to this recipient when service is in trial mode – '
+    'see https://www.notifications.service.gov.uk/trial-mode'
+)
+TOO_LONG_MSG = 'Content for template has a character count greater than the limit of 495'
+SERVICE_DAILY_LIMIT_MSG = 'Exceeded send limits (1000) for today'
+
+
+@pytest.mark.parametrize('exception_msg, expected_h1, expected_err_details', [
+    (
+        TRIAL_MODE_MSG,
+        'You can’t send to this phone number',
+        'In trial mode you can only send to yourself and members of your team'
+    ),
+    (
+        TOO_LONG_MSG,
+        'Message too long',
+        'Text messages can’t be longer than 459 characters. Your message is 678 characters.'
+    ),
+    (
+        SERVICE_DAILY_LIMIT_MSG,
+        'Daily limit reached',
+        'You can only send 1000 messages per day in trial mode.'
+    ),
+])
 def test_send_notification_shows_error_if_400(
     client_request,
     service_one,
     fake_uuid,
     mocker,
-    mock_get_service_template
+    mock_get_service_template_with_placeholders,
+    exception_msg,
+    expected_h1,
+    expected_err_details
 ):
-    trial_mode_msg = (
-        'Can’t send to this recipient when service is in trial mode – '
-        'see https://www.notifications.service.gov.uk/trial-mode'
-    )
     mocker.patch(
         'app.notification_api_client.send_notification',
-        side_effect=HTTPError(response=Mock(status_code=400), message=trial_mode_msg)
+        side_effect=HTTPError(response=Mock(status_code=400), message=exception_msg)
     )
     with client_request.session_transaction() as session:
         session['recipient'] = '07700900001'
-        session['placeholders'] = {'a': 'b'}
+        session['placeholders'] = {'name': 'a' * 500}
 
     page = client_request.post(
         'main.send_notification',
@@ -1756,4 +1780,6 @@ def test_send_notification_shows_error_if_400(
         _expected_status=200
     )
 
-    assert ' '.join(page.h1.text.split()) == 'You can’t send to this phone number'
+    assert ' '.join(page.h1.text.split()) == expected_h1
+    assert ' '.join(page.h1.parent.p.text.split()) == expected_err_details
+    assert not page.find('input[type=submit]')

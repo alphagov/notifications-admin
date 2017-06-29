@@ -638,14 +638,23 @@ def _check_notification(service_id, template_id, exception=None):
 
 
 def get_template_error_dict(exception):
+    # TODO: Make API return some computer-friendly identifier as well as the end user error messages
     if 'service is in trial mode' in exception.message:
         error = 'not-allowed-to-send-to'
+    elif 'Exceeded send limits' in exception.message:
+        error = 'too-many-messages'
+    elif 'Content for template has a character count greater than the limit of' in exception.message:
+        error = 'message-too-long'
     else:
         raise exception
 
     return {
         'error': error,
-        'SMS_CHAR_COUNT_LIMIT': 0
+        'SMS_CHAR_COUNT_LIMIT': current_app.config['SMS_CHAR_COUNT_LIMIT'],
+        'current_service': current_service,
+
+        # used to trigger CSV specific err msg content, so not needed for single notification errors.
+        'original_file_name': False
     }
 
 
@@ -668,6 +677,10 @@ def send_notification(service_id, template_id):
             personalisation=session['placeholders']
         )
     except HTTPError as exception:
+        current_app.logger.info('Service {} could not send notification: "{}"'.format(
+            current_service['id'],
+            exception.message
+        ))
         return _check_notification(service_id, template_id, exception)
 
     session.pop('placeholders')
