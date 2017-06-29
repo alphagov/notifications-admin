@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/api-key.html" import api_key %}
@@ -9,6 +10,24 @@
 
 {% block maincolumn_content %}
 
+  {% if show_redaction_message %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous', subhead='Are you sure you want to hide personalisation after sending?') %}
+        <ul class="list list-bullet">
+          <li>
+            You won’t be able to see personalised content in Notify for this template
+          </li>
+          <li>
+            You can’t undo this
+          </li>
+        </ul>
+        <form method='post'>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="submit" class="button" name="delete" value="Confirm" />
+        </form>
+      {% endcall %}
+    </div>
+  {% endif %}
 
   <h1 class="heading-large">{{ template.name }}</h1>
 
@@ -18,26 +37,31 @@
     {% endwith %}
   </div>
 
-  <div class="bottom-gutter">
+  <div class="bottom-gutter-1-2">
     {{ api_key(template.id, name="Template ID", thing='template ID') }}
   </div>
 
-  {% if template._template.updated_at %}
-    <div class="bottom-gutter-1-2">
-      <h2 class="heading-small">Last edited {{ template._template.updated_at|format_delta }}</h2>
-      <p>
-        <a href="{{ url_for('.view_template_versions', service_id=current_service.id, template_id=template.id) }}">See previous versions</a>
-      </p>
-    </div>
-  {% endif %}
-
-  {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
-    <div class="bottom-gutter">
-      {{ page_footer(
-        delete_link=url_for('.delete_service_template', service_id=current_service.id, template_id=template.id),
-        delete_link_text='Delete this template'
-      ) }}
-    </div>
-  {% endif %}
+  <div class="bottom-gutter-1-2">
+    {% if template._template.updated_at %}
+      <h2 class="heading-small bottom-gutter-2-3 heading-inline">Last edited {{ template._template.updated_at|format_delta }}</h2>
+      &emsp;
+      <a href="{{ url_for('.view_template_versions', service_id=current_service.id, template_id=template.id) }}">See previous versions</a>
+      &emsp;
+      <br/>
+    {% endif %}
+    {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
+      <span class="page-footer-delete-link page-footer-delete-link-without-button bottom-gutter-2-3">
+        <a href="{{ url_for('.delete_service_template', service_id=current_service.id, template_id=template.id) }}">Delete this template</a>
+      </span>
+      &emsp;
+      {% if not template._template.redact_personalisation %}
+        <span class="page-footer-delete-link page-footer-delete-link-without-button">
+          <a href="{{ url_for('.confirm_redact_template', service_id=current_service.id, template_id=template.id) }}">Hide personalisation after sending</a>
+        </span>
+      {% else %}
+        <p class="hint">Personalisation is hidden after sending</p>
+      {% endif %}
+    {% endif %}
+  </div>
 
 {% endblock %}

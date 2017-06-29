@@ -351,7 +351,7 @@ def mock_get_service_template_with_placeholders(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_email_template(mocker, content=None, subject=None):
+def mock_get_service_email_template(mocker, content=None, subject=None, redact_personalisation=False):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id,
@@ -360,6 +360,7 @@ def mock_get_service_email_template(mocker, content=None, subject=None):
             "email",
             content or "Your vehicle tax expires on ((date))",
             subject or "Your ((thing)) is due soon",
+            redact_personalisation=redact_personalisation,
         )
         return {'data': template}
 
@@ -516,6 +517,11 @@ def mock_delete_service_template(mocker):
 
     return mocker.patch(
         'app.service_api_client.delete_service_template', side_effect=_delete)
+
+
+@pytest.fixture(scope='function')
+def mock_redact_template(mocker):
+    return mocker.patch('app.service_api_client.redact_service_template')
 
 
 @pytest.fixture(scope='function')
@@ -1716,7 +1722,9 @@ def client_request(logged_in_client):
             return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
 
         @staticmethod
-        def post(endpoint, _data=None, _expected_status=302, _follow_redirects=False, **endpoint_kwargs):
+        def post(endpoint, _data=None, _expected_status=None, _follow_redirects=False, **endpoint_kwargs):
+            if _expected_status is None:
+                _expected_status = 200 if _follow_redirects else 302
             resp = logged_in_client.post(
                 url_for(endpoint, **(endpoint_kwargs or {})),
                 data=_data,

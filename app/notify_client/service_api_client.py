@@ -168,6 +168,14 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
         return self.post(endpoint, data)
 
+    def redact_service_template(self, service_id, id_):
+        return self.post(
+            "/service/{}/template/{}".format(service_id, id_),
+            _attach_current_user(
+                {'redact_personalisation': True}
+            ),
+        )
+
     def get_service_template(self, service_id, template_id, version=None, *params):
         """
         Retrieve a service template.
