@@ -28,9 +28,13 @@
   {{ template|string }}
 
   <div class="bottom-gutter-3-2">
-    <form method="post" enctype="multipart/form-data" action="{{url_for('main.send_notification', service_id=current_service.id, template_id=template.id)}}" class='page-footer'>
+    <form method="post" enctype="multipart/form-data" action="{{url_for(
+        'main.send_notification',
+        service_id=current_service.id,
+        template_id=template.id,
+        help='3' if help else 0
+      )}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <input type="hidden" name="help" value="{{ '3' if help else 0 }}" />
       {% if not error %}
         {% if template.template_type != 'letter' or not request.args.from_test %}
         <input type="submit" class="button" value="Send 1 {{ message_count_label(1, template.template_type, suffix='') }}" />

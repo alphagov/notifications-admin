@@ -183,6 +183,8 @@ def get_notification_check_endpoint(service_id, template):
             'main.check_notification',
             service_id=service_id,
             template_id=template.id,
+            # at check phase we should move to help stage 2 ("the template pulls in the data you provide")
+            help='2' if 'help' in request.args else None
         ))
 
 
@@ -343,7 +345,7 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
         # NOTE: this is a 301 MOVED PERMANENTLY (httpstatus.es/301), so the browser will cache this redirect, and it'll
         # *always* happen for that browser. _check_messages is only used by endpoints that contain `upload_id`, which
         # is a one-time-use id (that ties to a given file in S3 that is already deleted if it's not in the session)
-        raise RequestRedirect(get_check_messages_back_url(service_id, template_type))
+        raise RequestRedirect(url_for('main.choose_template', service_id=service_id))
 
     users = user_api_client.get_users_for_service(service_id=service_id)
 
@@ -381,15 +383,8 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
     )
 
     if request.args.get('from_test'):
-        extra_args = {'help': 1} if request.args.get('help', '0') != '0' else {}
-        if len(template.placeholders) or template.template_type == 'letter':
-            back_link = url_for(
-                '.send_test', service_id=service_id, template_id=template.id, **extra_args
-            )
-        else:
-            back_link = url_for(
-                '.view_template', service_id=service_id, template_id=template.id, **extra_args
-            )
+        # only happens if generating a letter preview test
+        back_link = url_for('.send_test', service_id=service_id, template_id=template.id)
         choose_time_form = None
     else:
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
@@ -499,19 +494,6 @@ def go_to_dashboard_after_tour(service_id, example_template_id):
     )
 
 
-def get_check_messages_back_url(service_id, template_type):
-    if get_help_argument():
-        # if the user is on the introductory tour, then they should be redirected back to the beginning of the tour -
-        # but to do that we need to find the template_id of the example template. That template *should* be the only
-        # template for that service, but it's possible they've opened another tab and deleted it for example. In that
-        # case we should just redirect back to the main page as they clearly know what they're doing.
-        templates = service_api_client.get_service_templates(service_id)['data']
-        if len(templates) == 1:
-            return url_for('.send_test', service_id=service_id, template_id=templates[0]['id'], help=1)
-
-    return url_for('main.choose_template', service_id=service_id)
-
-
 def fields_to_fill_in(template, prefill_current_user=False):
 
     recipient_columns = first_column_headings[template.template_type]
@@ -582,7 +564,16 @@ def get_send_test_page_title(template_type, help_argument):
 
 def get_back_link(service_id, template_id, step_index):
     if get_help_argument():
-        return None
+        # if we're on the check page, redirect back to the beginning. anywhere else, don't return the back link
+        if request.endpoint == 'main.check_notification':
+            return url_for(
+                'main.send_test',
+                service_id=service_id,
+                template_id=template_id,
+                help=get_help_argument()
+            )
+        else:
+            return None
     elif step_index == 0:
         return url_for(
             '.view_template',
@@ -618,11 +609,8 @@ def _check_notification(service_id, template_id, exception=None):
     back_link = get_back_link(service_id, template_id, 0)
 
     if (
-        (
-            not session.get('recipient') or
-            not all_placeholders_in_session(template.placeholders)
-        )
-        and back_link
+        not session.get('recipient') or
+        not all_placeholders_in_session(template.placeholders)
     ):
         return redirect(back_link)
 
@@ -689,5 +677,6 @@ def send_notification(service_id, template_id):
     return redirect(url_for(
         '.view_notification',
         service_id=service_id,
-        notification_id=noti['id']
+        notification_id=noti['id'],
+        help=request.args.get('help')
     ))

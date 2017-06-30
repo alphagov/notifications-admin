@@ -19,9 +19,11 @@
     {{ ajax_block(partials, updates_url, 'counts', finished=finished) }}
     {{ ajax_block(partials, updates_url, 'notifications', finished=finished) }}
 
-    {{ page_footer(
-      secondary_link=url_for('.view_template', service_id=current_service.id, template_id=template.id),
-      secondary_link_text='Back to {}'.format(template.name)
-    ) }}
+    {% if not help %}
+      {{ page_footer(
+        secondary_link=url_for('.view_template', service_id=current_service.id, template_id=template.id),
+        secondary_link_text='Back to {}'.format(template.name)
+      ) }}
+    {% endif %}
 
 {% endblock %}
