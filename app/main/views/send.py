@@ -183,6 +183,8 @@ def get_notification_check_endpoint(service_id, template):
             'main.check_notification',
             service_id=service_id,
             template_id=template.id,
+            # at check phase we should move to help stage 2 ("the template pulls in the data you provide")
+            help='2' if 'help' in request.args else None
         ))
 
 
@@ -381,15 +383,8 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
     )
 
     if request.args.get('from_test'):
-        extra_args = {'help': 1} if request.args.get('help', '0') != '0' else {}
-        if len(template.placeholders) or template.template_type == 'letter':
-            back_link = url_for(
-                '.send_test', service_id=service_id, template_id=template.id, **extra_args
-            )
-        else:
-            back_link = url_for(
-                '.view_template', service_id=service_id, template_id=template.id, **extra_args
-            )
+        # only happens if generating a letter preview test
+        back_link = url_for('.send_test', service_id=service_id, template_id=template.id)
         choose_time_form = None
     else:
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
@@ -689,5 +684,6 @@ def send_notification(service_id, template_id):
     return redirect(url_for(
         '.view_notification',
         service_id=service_id,
-        notification_id=noti['id']
+        notification_id=noti['id'],
+        help=request.args.get('help')
     ))

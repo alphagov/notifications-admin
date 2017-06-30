@@ -1289,11 +1289,6 @@ def test_route_invalid_permissions(
             partial(url_for, '.send_messages')
         ),
         (
-            mock_get_service_template,
-            dict(from_test=True),
-            partial(url_for, '.view_template')
-        ),
-        (
             mock_get_service_letter_template,  # No placeholders
             dict(from_test=True),
             partial(url_for, '.send_test')
@@ -1302,16 +1297,6 @@ def test_route_invalid_permissions(
             mock_get_service_template_with_placeholders,
             dict(from_test=True),
             partial(url_for, '.send_test')
-        ),
-        (
-            mock_get_service_template_with_placeholders,
-            dict(help='0', from_test=True),
-            partial(url_for, '.send_test')
-        ),
-        (
-            mock_get_service_template_with_placeholders,
-            dict(help='2', from_test=True),
-            partial(url_for, '.send_test', help='1')
         )
     ]
 )
@@ -1640,6 +1625,40 @@ def test_check_notification_shows_preview(
         page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
     ) == url_for('main.view_template', service_id=service_one['id'], template_id=fake_uuid)
 
+    # assert tour not visible
+    assert not page.select('.banner-tour')
+    assert page.form.attrs['action'] == url_for(
+        'main.send_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        help='0'
+    )
+
+
+def test_check_notification_shows_help(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_template
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {}
+
+    page = client_request.get(
+        'main.check_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        help='2'
+    )
+    assert page.select('.banner-tour')
+    assert page.form.attrs['action'] == url_for(
+        'main.send_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        help='3'
+    )
+
 
 def test_send_notification_submits_data(
     client_request,
@@ -1707,18 +1726,24 @@ def test_send_notification_redirects_if_missing_data(
     )
 
 
+@pytest.mark.parametrize('extra_args, extra_redirect_args', [
+    ({}, {}),
+    ({'help': '3'}, {'help': '3'})
+])
 def test_send_notification_redirects_to_view_page(
     logged_in_client,
     service_one,
     fake_uuid,
     mock_send_notification,
+    extra_args,
+    extra_redirect_args
 ):
     with logged_in_client.session_transaction() as session:
         session['recipient'] = '07700900001'
         session['placeholders'] = {'a': 'b'}
 
     resp = logged_in_client.post(
-        url_for('main.send_notification', service_id=service_one['id'], template_id=fake_uuid)
+        url_for('main.send_notification', service_id=service_one['id'], template_id=fake_uuid, **extra_args)
     )
 
     assert resp.status_code == 302
@@ -1726,6 +1751,7 @@ def test_send_notification_redirects_to_view_page(
         '.view_notification',
         service_id=service_one['id'],
         notification_id=fake_uuid,
+        **extra_redirect_args,
         _external=True
     )
 
