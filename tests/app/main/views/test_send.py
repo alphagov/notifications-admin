@@ -14,9 +14,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.template import LetterPreviewTemplate, LetterImageTemplate
 from notifications_utils.recipients import RecipientCSV
 
-from app.main.views.send import get_check_messages_back_url
-
-from tests import validate_route_permission, template_json
+from tests import validate_route_permission
 from tests.app.test_utils import normalize_spaces
 from tests.conftest import (
     mock_get_service_template,
@@ -1519,8 +1517,7 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
     assert page.find('span', class_='table-field-error-label').text == u'Can’t include П, е, т or я'
 
 
-def test_check_messages_redirects_if_no_upload_data(logged_in_client, service_one, mocker):
-    checker = mocker.patch('app.main.views.send.get_check_messages_back_url', return_value='foo')
+def test_check_messages_redirects_if_no_upload_data(logged_in_client, service_one):
     response = logged_in_client.get(url_for(
         'main.check_messages',
         service_id=service_one['id'],
@@ -1528,51 +1525,8 @@ def test_check_messages_redirects_if_no_upload_data(logged_in_client, service_on
         upload_id='baz'
     ))
 
-    checker.assert_called_once_with(service_one['id'], 'bar')
     assert response.status_code == 301
-    assert response.location == 'http://localhost/foo'
-
-
-@pytest.mark.parametrize('template_type', ['sms', 'email'])
-def test_get_check_messages_back_url_returns_to_correct_select_template(client, mocker, template_type):
-    mocker.patch('app.main.views.send.get_help_argument', return_value=False)
-
-    assert get_check_messages_back_url('1234', template_type) == url_for(
-        'main.choose_template',
-        service_id='1234'
-    )
-
-
-def test_check_messages_back_from_help_goes_to_start_of_help(client, service_one, mocker):
-    mocker.patch('app.main.views.send.get_help_argument', return_value=True)
-    mocker.patch('app.service_api_client.get_service_templates', lambda service_id: {
-        'data': [template_json(service_one['id'], '111', type_='sms')]
-    })
-    assert get_check_messages_back_url(service_one['id'], 'sms') == url_for(
-        'main.send_test',
-        service_id=service_one['id'],
-        template_id='111',
-        help='1'
-    )
-
-
-@pytest.mark.parametrize('templates', [
-    [],
-    [
-        template_json('000', '111', type_='sms'),
-        template_json('000', '222', type_='sms')
-    ]
-], ids=['no_templates', 'two_templates'])
-def test_check_messages_back_from_help_handles_unexpected_templates(client, mocker, templates):
-    mocker.patch('app.main.views.send.get_help_argument', return_value=True)
-    mocker.patch('app.service_api_client.get_service_templates', lambda service_id: {
-        'data': templates
-    })
-
-    assert get_check_messages_back_url('1234', 'sms') == url_for(
-        'main.choose_template',
-        service_id='1234',
-    )
+    assert response.location == url_for('main.choose_template', service_id=service_one['id'], _external=True)
 
 
 @pytest.mark.parametrize('existing_session_items', [
@@ -1600,6 +1554,37 @@ def test_check_notification_redirects_if_session_not_populated(
         'main.view_template',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        _external=True
+    )
+
+
+@pytest.mark.parametrize('existing_session_items', [
+    {},
+    {'recipient': '07700900001'},
+    {'name': 'Jo'}
+])
+def test_check_notification_redirects_with_help_if_session_not_populated(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    existing_session_items,
+    mock_get_service_template_with_placeholders
+):
+    with logged_in_client.session_transaction() as session:
+        session.update(existing_session_items)
+
+    resp = logged_in_client.get(url_for(
+        'main.check_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        help='2'
+    ))
+
+    assert resp.location == url_for(
+        'main.send_test',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        help='2',
         _external=True
     )
 
@@ -1651,12 +1636,18 @@ def test_check_notification_shows_help(
         template_id=fake_uuid,
         help='2'
     )
-    assert page.select('.banner-tour')
+    assert page.select_one('.banner-tour')
     assert page.form.attrs['action'] == url_for(
         'main.send_notification',
         service_id=service_one['id'],
         template_id=fake_uuid,
         help='3'
+    )
+    assert page.select_one('.page-footer-back-link')['href'] == url_for(
+        'main.send_test',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        help='2'
     )
 
 
@@ -1751,8 +1742,8 @@ def test_send_notification_redirects_to_view_page(
         '.view_notification',
         service_id=service_one['id'],
         notification_id=fake_uuid,
-        **extra_redirect_args,
         _external=True
+        **extra_redirect_args,
     )
 
 
