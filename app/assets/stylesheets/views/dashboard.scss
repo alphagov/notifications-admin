@@ -46,17 +46,6 @@
     transition: width 0.6s ease-in-out;
   }
 
-  &-label {
-    @include bold-19;
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: $govuk-blue;
-    max-width: 100%;
-    background: $white;
-  }
-
 }
 
 .file-list {
@@ -67,12 +56,17 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-bottom: 30px;
+    padding-top: 10px;
+    margin-bottom: -30px;
+    margin-top: -10px;
   }
 
   &-hint {
     @include core-16;
     display: block;
     color: $secondary-text-colour;
+    pointer-events: none;
   }
 
 }
@@ -96,5 +90,6 @@
 }
 
 .align-with-message-body {
+  display: block;
   margin-top: $gutter * 5 / 6;
 }
