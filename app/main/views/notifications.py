@@ -115,16 +115,9 @@ def get_all_personalisation_from_notification(notification):
         notification['personalisation'] = {}
 
     if notification['template']['template_type'] == 'email':
-        return dict(
-            email_address=notification['to'],
-            **notification['personalisation']
-        )
+        notification['personalisation']['email_address'] = notification['to']
 
     if notification['template']['template_type'] == 'sms':
-        return dict(
-            phone_number=notification['to'],
-            **notification['personalisation']
-        )
+        notification['personalisation']['phone_number'] = notification['to']
 
-    if notification['template']['template_type'] == 'letter':
-        return notification['personalisation']
+    return notification['personalisation']
