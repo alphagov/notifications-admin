@@ -1742,8 +1742,8 @@ def test_send_notification_redirects_to_view_page(
         '.view_notification',
         service_id=service_one['id'],
         notification_id=fake_uuid,
-        _external=True
-        **extra_redirect_args,
+        _external=True,
+        **extra_redirect_args
     )
 
 
