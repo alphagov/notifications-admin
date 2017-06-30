@@ -93,6 +93,16 @@ def send_messages(service_id, template_id):
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
+    if (db_template['template_type'] in ['email', 'sms']) \
+            and (db_template['template_type'] not in current_service['permissions']):
+        return redirect(url_for(
+            '.action_blocked',
+            service_id=service_id,
+            notification_type=db_template['template_type'],
+            return_to='view_template',
+            template_id=template_id
+        ))
+
     template = get_template(
         db_template,
         current_service,
@@ -163,6 +173,18 @@ def send_test(service_id, template_id):
     session['recipient'] = None
     session['placeholders'] = {}
     session['send_test_letter_page_count'] = None
+
+    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+
+    if (db_template['template_type'] in ['email', 'sms']) \
+            and (db_template['template_type'] not in current_service['permissions']):
+        return redirect(url_for(
+            '.action_blocked',
+            service_id=service_id,
+            notification_type=db_template['template_type'],
+            return_to='view_template',
+            template_id=template_id))
+
     return redirect(url_for(
         {
             'main.send_test': '.send_test_step',
