@@ -1678,7 +1678,7 @@ def mock_get_notification(
         noti['personalisation'] = {'name': 'Jo'}
         noti['template'] = template_json(
             service_id,
-            str(generate_uuid()),
+            '5407f4db-51c7-4150-8758-35412d42186a',
             content='hello ((name))',
             redact_personalisation=redact_personalisation,
         )

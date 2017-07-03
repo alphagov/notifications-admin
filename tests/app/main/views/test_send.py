@@ -1334,7 +1334,27 @@ def test_check_messages_back_link(
     ) == expected_url(service_id=fake_uuid, template_id=fake_uuid)
 
 
-def test_go_to_dashboard_after_tour(
+def test_shows_link_to_end_tour(
+    client_request,
+    mock_get_notification,
+    fake_uuid,
+):
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        help=3,
+    )
+
+    assert page.select(".banner-tour a")[0]['href'] == url_for(
+        'main.go_to_dashboard_after_tour',
+        service_id=SERVICE_ONE_ID,
+        example_template_id='5407f4db-51c7-4150-8758-35412d42186a',
+    )
+
+
+def test_go_to_dashboard_after_tour_link(
     logged_in_client,
     mocker,
     api_user_active,
