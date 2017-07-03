@@ -353,3 +353,38 @@ def validate_route_permission(mocker,
                 print(resp.status_code)
                 pytest.fail("Invalid permissions set for endpoint {}".format(route))
     return resp
+
+
+def validate_route_permission_with_client(mocker,
+                                          client,
+                                          method,
+                                          response_code,
+                                          route,
+                                          permissions,
+                                          usr,
+                                          service):
+    usr._permissions[str(service['id'])] = permissions
+    mocker.patch(
+        'app.user_api_client.check_verify_code',
+        return_value=(True, ''))
+    mocker.patch(
+        'app.service_api_client.get_services',
+        return_value={'data': []})
+    mocker.patch('app.service_api_client.update_service', return_value=service)
+    mocker.patch('app.service_api_client.update_service_with_properties', return_value=service)
+    mocker.patch('app.user_api_client.get_user', return_value=usr)
+    mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service})
+    mocker.patch('app.user_api_client.get_users_for_service', return_value=[usr])
+    client.login(usr)
+    resp = None
+    if method == 'GET':
+        resp = client.get(route)
+    elif method == 'POST':
+        resp = client.post(route)
+    else:
+        pytest.fail("Invalid method call {}".format(method))
+    if resp.status_code != response_code:
+        print(resp.status_code)
+        pytest.fail("Invalid permissions set for endpoint {}".format(route))
+    return resp

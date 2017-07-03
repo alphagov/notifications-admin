@@ -14,7 +14,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.template import LetterPreviewTemplate, LetterImageTemplate
 from notifications_utils.recipients import RecipientCSV
 
-from tests import validate_route_permission
+from tests import validate_route_permission, validate_route_permission_with_client
 from tests.app.test_utils import normalize_spaces
 from tests.conftest import (
     mock_get_service_template,
@@ -1236,6 +1236,41 @@ def test_route_permissions(
         ['send_texts', 'send_emails', 'send_letters'],
         api_user_active,
         service_one)
+
+
+@pytest.mark.parametrize('route, response_code, method', [
+    ('main.check_notification', 200, 'GET'),
+    ('main.send_notification', 302, 'POST')
+])
+def test_route_permissions_send_check_notifications(
+    mocker,
+    app_,
+    client,
+    api_user_active,
+    service_one,
+    mock_send_notification,
+    mock_get_service_template,
+    fake_uuid,
+    route,
+    response_code,
+    method
+):
+    with client.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'name': 'a'}
+    validate_route_permission_with_client(
+            mocker,
+            client,
+            method,
+            response_code,
+            url_for(
+                route,
+                service_id=service_one['id'],
+                template_id=fake_uuid
+            ),
+            ['send_texts', 'send_emails', 'send_letters'],
+            api_user_active,
+            service_one)
 
 
 @pytest.mark.parametrize('route', [
