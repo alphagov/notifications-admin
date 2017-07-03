@@ -224,38 +224,6 @@ def test_should_not_show_cancelled_job(
     assert response.status_code == 404
 
 
-def test_should_show_not_show_csv_download_in_tour(
-    logged_in_client,
-    service_one,
-    active_user_with_permissions,
-    mock_get_service_template,
-    mock_get_job,
-    mocker,
-    mock_get_notifications,
-    fake_uuid,
-):
-    response = logged_in_client.get(url_for(
-        'main.view_job',
-        service_id=service_one['id'],
-        job_id=fake_uuid,
-        help=3
-    ))
-
-    assert response.status_code == 200
-    assert url_for(
-        'main.view_job_updates',
-        service_id=service_one['id'],
-        job_id=fake_uuid,
-        status='',
-        help=3
-    ).replace('&', '&amp;') in response.get_data(as_text=True)
-    assert url_for(
-        'main.view_job_csv',
-        service_id=service_one['id'],
-        job_id=fake_uuid
-    ) not in response.get_data(as_text=True)
-
-
 @freeze_time("2016-01-01 00:00:00.000001")
 def test_should_show_updates_for_one_job_as_json(
     logged_in_client,
