@@ -34,7 +34,6 @@ from app.utils import (
     generate_previous_dict,
     user_has_permissions,
     generate_notifications_csv,
-    get_help_argument,
     get_template,
     get_time_left,
     REQUESTED_STATUSES,
@@ -121,10 +120,8 @@ def view_job(service_id, job_id):
             service_id=service_id,
             job_id=job['id'],
             status=request.args.get('status', ''),
-            help=get_help_argument()
         ),
         partials=get_job_partials(job),
-        help=get_help_argument()
     )
 
 
@@ -307,7 +304,7 @@ def get_status_filters(service, message_type, statistics):
     ]
 
 
-def _get_job_counts(job, help_argument):
+def _get_job_counts(job):
     sending = 0 if job['job_status'] == 'scheduled' else (
         job.get('notification_count', 0) -
         job.get('notifications_delivered', 0) -
@@ -322,7 +319,6 @@ def _get_job_counts(job, help_argument):
                 service_id=job['service'],
                 job_id=job['id'],
                 status=query_param,
-                help=help_argument
             ),
             count
         ) for label, query_param, count in [
@@ -360,7 +356,7 @@ def get_job_partials(job):
     return {
         'counts': render_template(
             'partials/count.html',
-            counts=_get_job_counts(job, request.args.get('help', 0)),
+            counts=_get_job_counts(job),
             status=filter_args['status']
         ),
         'notifications': render_template(
@@ -376,7 +372,6 @@ def get_job_partials(job):
                 job_id=job['id'],
                 status=request.args.get('status')
             ),
-            help=get_help_argument(),
             time_left=get_time_left(job['created_at']),
             job=job,
             template=template,
