@@ -591,7 +591,7 @@ def get_back_link(service_id, template_id, step_index):
 
 @main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['GET'])
 @login_required
-@user_has_permissions('manage_templates')
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def check_notification(service_id, template_id):
     return _check_notification(service_id, template_id)
 
@@ -648,7 +648,7 @@ def get_template_error_dict(exception):
 
 @main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['POST'])
 @login_required
-@user_has_permissions('manage_templates')
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_notification(service_id, template_id):
     if {'recipient', 'placeholders'} - set(session.keys()):
         return redirect(url_for(
