@@ -5,7 +5,6 @@ from unittest.mock import call, ANY
 from flask import url_for
 import pytest
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
 from freezegun import freeze_time
 
 from app.main.views.dashboard import (
@@ -14,8 +13,7 @@ from app.main.views.dashboard import (
     get_free_paid_breakdown_for_billable_units,
     aggregate_status_types,
     format_template_stats_to_list,
-    get_tuples_of_financial_years,
-    get_dashboard_partials
+    get_tuples_of_financial_years
 )
 
 from tests import validate_route_permission
@@ -833,45 +831,3 @@ def test_should_show_all_jobs_with_valid_statuses(
         'ready to send',
         'sent to dvla'
     })
-
-
-def test_should_show_remaining_free_tier_count(
-    logged_in_client,
-    mock_get_service_templates,
-    mock_get_template_statistics,
-    mock_get_detailed_service,
-    mock_get_jobs,
-    mock_get_usage,
-    mocker
-):
-    mocker.patch(
-        'app.service_api_client.get_yearly_sms_unit_count_and_cost',
-        return_value={"billable_sms_units": 100, "total_cost": 200.0}
-    )
-
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
-
-    assert response.status_code == 200
-    assert '249,900' in response.get_data(as_text=True)
-    assert 'free text messages left' in response.get_data(as_text=True)
-
-
-def test_should_show_cost_if_exceeded_free_tier_count(
-    logged_in_client,
-    mock_get_service_templates,
-    mock_get_template_statistics,
-    mock_get_detailed_service,
-    mock_get_jobs,
-    mock_get_usage,
-    mocker
-):
-    mocker.patch(
-        'app.service_api_client.get_yearly_sms_unit_count_and_cost',
-        return_value={"billable_sms_units": 300000, "total_cost": 1500.50}
-    )
-
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
-
-    assert response.status_code == 200
-    assert '£1,500.50' in response.get_data(as_text=True)
-    assert 'spent on text messages' in response.get_data(as_text=True)
