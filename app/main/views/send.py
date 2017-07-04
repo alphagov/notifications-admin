@@ -43,7 +43,8 @@ from app.utils import (
     get_errors_for_csv,
     Spreadsheet,
     get_help_argument,
-    get_template
+    get_template,
+    email_or_sms_not_enabled,
 )
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 
@@ -93,8 +94,7 @@ def send_messages(service_id, template_id):
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
-    if (db_template['template_type'] in ['email', 'sms']) \
-            and (db_template['template_type'] not in current_service['permissions']):
+    if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
         return redirect(url_for(
             '.action_blocked',
             service_id=service_id,
@@ -176,8 +176,7 @@ def send_test(service_id, template_id):
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
-    if (db_template['template_type'] in ['email', 'sms']) \
-            and (db_template['template_type'] not in current_service['permissions']):
+    if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
         return redirect(url_for(
             '.action_blocked',
             service_id=service_id,
