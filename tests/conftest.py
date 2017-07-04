@@ -1778,3 +1778,9 @@ def client_request(logged_in_client):
             return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
 
     return ClientRequest
+
+
+def normalize_spaces(input):
+    if isinstance(input, str):
+        return ' '.join(input.split())
+    return normalize_spaces(' '.join(item.text for item in input))

@@ -10,7 +10,7 @@ import app
 from app.main.views.service_settings import dummy_bearer_token
 from app.utils import email_safe
 from tests import validate_route_permission, service_json
-from tests.app.test_utils import normalize_spaces
+from tests.conftest import normalize_spaces
 
 from tests.conftest import active_user_with_permissions, platform_admin_user
 

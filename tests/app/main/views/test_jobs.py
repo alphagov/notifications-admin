@@ -8,8 +8,7 @@ from bs4 import BeautifulSoup
 
 from app.main.views.jobs import get_time_left, get_status_filters
 from tests import notification_json
-from tests.app.test_utils import normalize_spaces
-from tests.conftest import SERVICE_ONE_ID
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 from freezegun import freeze_time
 
 

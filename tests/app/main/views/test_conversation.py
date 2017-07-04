@@ -8,7 +8,7 @@ from notifications_python_client.errors import HTTPError
 from tests.conftest import (
     SERVICE_ONE_ID,
 )
-from tests.app.test_utils import normalize_spaces
+from tests.conftest import normalize_spaces
 from freezegun import freeze_time
 from unittest import mock
 from app.main.views.conversation import get_user_number

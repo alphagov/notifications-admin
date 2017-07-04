@@ -154,9 +154,3 @@ def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
     # mock_calls[0][2] is the kwargs from first call
     assert mock_get_notifications.mock_calls[0][2]['page'] == 1
     assert mock_get_notifications.mock_calls[1][2]['page'] == 2
-
-
-def normalize_spaces(input):
-    if isinstance(input, str):
-        return ' '.join(input.split())
-    return normalize_spaces(' '.join(item.text for item in input))

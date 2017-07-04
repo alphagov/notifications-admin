@@ -15,7 +15,6 @@ from notifications_utils.template import LetterPreviewTemplate, LetterImageTempl
 from notifications_utils.recipients import RecipientCSV
 
 from tests import validate_route_permission, validate_route_permission_with_client
-from tests.app.test_utils import normalize_spaces
 from tests.conftest import (
     mock_get_service_template,
     mock_get_service_template_with_placeholders,
@@ -23,6 +22,7 @@ from tests.conftest import (
     mock_get_service,
     mock_get_international_service,
     mock_get_service_email_template,
+    normalize_spaces,
     SERVICE_ONE_ID,
 )
 

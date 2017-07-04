@@ -7,9 +7,13 @@ from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from tests.conftest import service_one as create_sample_service
-from tests.conftest import mock_get_service_email_template, mock_get_service_letter_template, SERVICE_ONE_ID
+from tests.conftest import (
+    mock_get_service_email_template,
+    mock_get_service_letter_template,
+    normalize_spaces,
+    SERVICE_ONE_ID,
+)
 from tests import validate_route_permission, template_json, single_notification_json
-from tests.app.test_utils import normalize_spaces
 
 from app.main.views.templates import get_last_use_message, get_human_readable_delta
 
