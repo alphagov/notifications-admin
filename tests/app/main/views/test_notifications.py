@@ -9,7 +9,7 @@ from app.utils import (
 )
 
 from tests.app.test_utils import normalize_spaces
-from tests.conftest import mock_get_notification
+from tests.conftest import mock_get_notification, SERVICE_ONE_ID
 
 
 @pytest.mark.parametrize('notification_status, expected_status', [
@@ -91,3 +91,23 @@ def test_notification_status_page_respects_redaction(
         service_one['id'],
         fake_uuid,
     )
+
+
+@freeze_time("2012-01-01 01:01")
+def test_notification_page_doesnt_link_to_template_in_tour(
+    client_request,
+    fake_uuid,
+    mock_get_notification,
+):
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        help=3,
+    )
+
+    assert normalize_spaces(page.select('main p:nth-of-type(1)')[0].text) == (
+        'sample template sent by Test User on 1 January at 1:01am'
+    )
+    assert len(page.select('main p:nth-of-type(1) a')) == 0
