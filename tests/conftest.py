@@ -1757,13 +1757,26 @@ def client_request(logged_in_client):
                 yield session
 
         @staticmethod
-        def get(endpoint, _expected_status=200, _follow_redirects=False, **endpoint_kwargs):
+        def get(
+            endpoint,
+            _expected_status=200,
+            _follow_redirects=False,
+            _test_page_title=True,
+            **endpoint_kwargs
+        ):
             resp = logged_in_client.get(
                 url_for(endpoint, **(endpoint_kwargs or {})),
                 follow_redirects=_follow_redirects,
             )
             assert resp.status_code == _expected_status
-            return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
+            page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
+            if _test_page_title:
+                page_title, h1 = (
+                    normalize_spaces(page.find(selector).text) for selector in ('title', 'h1')
+                )
+                if not normalize_spaces(page_title).startswith(h1):
+                    raise AssertionError('Page title ‘{}’ does not start with H1 ‘{}’'.format(page_title, h1))
+            return page
 
         @staticmethod
         def post(endpoint, _data=None, _expected_status=None, _follow_redirects=False, **endpoint_kwargs):
