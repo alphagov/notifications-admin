@@ -26,7 +26,7 @@
 
       {% if percentage_complete < 100 %}
         <p class="bottom-gutter hint">
-          Report is {{ "{:.0f}%".format(percentage_complete) }} complete…
+          Report is {{ "{:.0f}%".format(percentage_complete * 0.99) }} complete…
         </p>
       {% elif notifications %}
         <p class="bottom-gutter">
