@@ -3,7 +3,7 @@
 {% from "components/message-count-label.html" import message_count_label %}
 
 {% block service_page_title %}
-  {{ "Error" if error else "Preview" }}
+  {{ "Error" if error else "Preview of {}".format(template.name) }}
 {% endblock %}
 
 {% block maincolumn_content %}
