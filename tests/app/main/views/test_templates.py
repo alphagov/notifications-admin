@@ -944,6 +944,57 @@ def test_should_create_sms_template_without_downgrading_unicode_characters(
     assert resp.status_code == 302
 
 
+def test_should_show_template_as_first_page_of_tour(
+    client_request,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+
+    page = client_request.get(
+        'main.start_tour',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert normalize_spaces(
+        page.select('.banner-tour .heading-medium')[0].text
+    ) == (
+        'Try sending yourself this example'
+    )
+
+    assert normalize_spaces(
+        page.select('.sms-message-wrapper')[0].text
+    ) == (
+        'service one: Template <em>content</em> with & entity'
+    )
+
+    assert page.select('a.button')[0]['href'] == url_for(
+        '.send_test', service_id=SERVICE_ONE_ID, template_id=fake_uuid, help=2
+    )
+
+
+@pytest.mark.parametrize('template_mock', [
+    mock_get_service_email_template,
+    mock_get_service_letter_template,
+])
+def test_cant_see_email_template_in_tour(
+    client_request,
+    fake_uuid,
+    mocker,
+    template_mock,
+):
+
+    template_mock(mocker)
+
+    client_request.get(
+        'main.start_tour',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=404,
+    )
+
+
 def test_should_show_message_before_redacting_template(
     client_request,
     mock_get_service_template,
