@@ -8,8 +8,7 @@ from app.utils import (
     DELIVERED_STATUSES,
 )
 
-from tests.app.test_utils import normalize_spaces
-from tests.conftest import mock_get_notification, SERVICE_ONE_ID
+from tests.conftest import mock_get_notification, SERVICE_ONE_ID, normalize_spaces
 
 
 @pytest.mark.parametrize('notification_status, expected_status', [

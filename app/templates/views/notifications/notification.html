@@ -5,7 +5,7 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-  Report
+  {{ message_count_label(1, template.template_type, suffix='') | capitalize }}
 {% endblock %}
 
 {% block maincolumn_content %}

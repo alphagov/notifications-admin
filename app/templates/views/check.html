@@ -14,7 +14,7 @@
 {% endmacro %}
 
 {% block service_page_title %}
-  {{ "Error" if errors else "Preview" }}
+  {{ "Error" if errors else "Preview of {}".format(template.name) }}
 {% endblock %}
 
 {% block maincolumn_content %}

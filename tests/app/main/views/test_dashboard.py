@@ -21,8 +21,8 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_inbound_sms_summary,
     mock_get_inbound_sms_summary_with_no_messages,
+    normalize_spaces,
 )
-from tests.app.test_utils import normalize_spaces
 
 stub_template_stats = [
     {
