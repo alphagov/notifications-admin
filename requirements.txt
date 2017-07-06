@@ -5,7 +5,7 @@ Flask-Script==2.0.5
 Flask-WTF==0.14.2
 Flask-Login==0.4.0
 
-credstash==1.8.0
+credstash==1.13.2
 boto3==1.4.4
 py-gfm==0.1.2
 blinker==1.4
