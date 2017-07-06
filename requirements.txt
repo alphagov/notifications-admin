@@ -11,7 +11,7 @@ py-gfm==0.1.3
 blinker==1.4
 lxml==3.8.0
 pyexcel==0.5.0
-pyexcel-io==0.1.0
+pyexcel-io==0.4.2
 pyexcel-xls==0.1.0
 pyexcel-xlsx==0.1.0
 pyexcel-ods3==0.1.1
