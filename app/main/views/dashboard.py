@@ -122,7 +122,7 @@ def usage(service_id):
 
 @main.route("/services/<service_id>/monthly")
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('view_activity', admin_override=True)
 def monthly(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
     return render_template(
@@ -140,7 +140,7 @@ def monthly(service_id):
 
 @main.route("/services/<service_id>/inbox")
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('view_activity', admin_override=True)
 def inbox(service_id):
 
     if 'inbound_sms' not in current_service['permissions']:
