@@ -7,8 +7,9 @@ from flask import (
 from notifications_python_client.errors import HTTPError
 from tests.conftest import (
     SERVICE_ONE_ID,
+    mock_get_notifications,
+    normalize_spaces,
 )
-from tests.conftest import normalize_spaces
 from freezegun import freeze_time
 from unittest import mock
 from app.main.views.conversation import get_user_number
@@ -70,14 +71,29 @@ def test_get_user_phone_number_raises_if_both_API_requests_fail(
     mock_get_notification.assert_called_once_with('service', 'notification')
 
 
+@pytest.mark.parametrize('outbound_redacted, expected_outbound_content', [
+    (True, 'Hello hidden'),
+    (False, 'Hello Jo'),
+])
 @freeze_time("2012-01-01 00:00:00")
 def test_view_conversation(
     logged_in_client,
+    mocker,
+    api_user_active,
     fake_uuid,
     mock_get_notification,
     mock_get_inbound_sms,
-    mock_get_notifications,
+    outbound_redacted,
+    expected_outbound_content,
 ):
+
+    mock_get_notifications(
+        mocker,
+        api_user_active,
+        template_content='Hello ((name))',
+        personalisation={'name': 'Jo'},
+        redact_personalisation=outbound_redacted,
+    )
 
     response = logged_in_client.get(url_for(
         'main.conversation',
@@ -127,23 +143,23 @@ def test_view_conversation(
             'Failed (sent yesterday at 11:00pm)',
         ),
         (
-            'template content',
+            expected_outbound_content,
             'yesterday at midnight',
         ),
         (
-            'template content',
+            expected_outbound_content,
             'yesterday at midnight',
         ),
         (
-            'template content',
+            expected_outbound_content,
             'yesterday at midnight',
         ),
         (
-            'template content',
+            expected_outbound_content,
             'yesterday at midnight',
         ),
         (
-            'template content',
+            expected_outbound_content,
             'yesterday at midnight',
         ),
     ]):

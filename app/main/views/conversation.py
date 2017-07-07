@@ -41,14 +41,20 @@ def get_sms_thread(service_id, user_number):
     ), key=lambda notification: notification['created_at']):
 
         is_inbound = ('notify_number' in notification)
+        redact_personalisation = notification.get('template', {}).get('redact_personalisation', False)
+
+        if redact_personalisation:
+            notification['personalisation'] = {}
 
         yield {
             'inbound': is_inbound,
             'content': SMSPreviewTemplate(
                 {
-                    'content': notification.get('content') or notification['body']
+                    'content': notification.get('content') or notification['template']['content']
                 },
-                downgrade_non_gsm_characters=(not is_inbound)
+                notification.get('personalisation'),
+                downgrade_non_gsm_characters=(not is_inbound),
+                redact_missing_personalisation=redact_personalisation,
             ),
             'created_at': notification['created_at'],
             'status': notification.get('status'),
