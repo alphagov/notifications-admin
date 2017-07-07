@@ -6,9 +6,9 @@ from unittest import mock
 from app.asset_fingerprinter import AssetFingerprinter
 
 
-@mock.patch.object(AssetFingerprinter, 'get_asset_file_contents')
 class TestAssetFingerprint(object):
-    def test_url_format(self, get_file_content_mock):
+    def test_url_format(self, mocker):
+        get_file_content_mock = mocker.patch.object(AssetFingerprinter, 'get_asset_file_contents')
         get_file_content_mock.return_value = """
             body {
                 font-family: nta;
@@ -26,7 +26,8 @@ class TestAssetFingerprint(object):
             '/suppliers/static/application-ie6.css?418e6f4a6cdf1142e45c072ed3e1c90a'  # noqa
         )
 
-    def test_building_file_path(self, get_file_content_mock):
+    def test_building_file_path(self, mocker):
+        get_file_content_mock = mocker.patch.object(AssetFingerprinter, 'get_asset_file_contents')
         get_file_content_mock.return_value = """
             document.write('Hello world!');
         """
@@ -36,7 +37,8 @@ class TestAssetFingerprint(object):
             'app/static/javascripts/application.js'
         )
 
-    def test_hashes_are_consistent(self, get_file_content_mock):
+    def test_hashes_are_consistent(self, mocker):
+        get_file_content_mock = mocker.patch.object(AssetFingerprinter, 'get_asset_file_contents')
         get_file_content_mock.return_value = """
             body {
                 font-family: nta;
@@ -49,8 +51,9 @@ class TestAssetFingerprint(object):
         )
 
     def test_hashes_are_different_for_different_files(
-        self, get_file_content_mock
+        self, mocker
     ):
+        get_file_content_mock = mocker.patch.object(AssetFingerprinter, 'get_asset_file_contents')
         asset_fingerprinter = AssetFingerprinter()
         get_file_content_mock.return_value = """
             body {
@@ -66,7 +69,8 @@ class TestAssetFingerprint(object):
             js_hash != css_hash
         )
 
-    def test_hash_gets_cached(self, get_file_content_mock):
+    def test_hash_gets_cached(self, mocker):
+        get_file_content_mock = mocker.patch.object(AssetFingerprinter, 'get_asset_file_contents')
         get_file_content_mock.return_value = """
             body {
                 font-family: nta;

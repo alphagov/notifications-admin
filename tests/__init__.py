@@ -254,7 +254,6 @@ def notification_json(
         'notifications': [{
             'id': uuid.uuid4(),
             'to': to,
-            'body': template['content'],
             'template': template,
             'job': job_payload,
             'sent_at': sent_at,
