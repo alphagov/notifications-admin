@@ -1,0 +1,34 @@
+<div class="ajax-block-container">
+  {% for message in conversation %}
+    <div class="grid-row sms-message-row" id="n{{ message.id }}" tabindex="0">
+      {% if message.inbound %}
+        <div class="column-two-thirds sms-message-inbound">
+          {{ message.content | string }}
+          <div class="sms-message-status">
+            {{ message.created_at | format_datetime_relative }}
+          </div>
+        </div>
+      {% else %}
+        <div class="column-one-third">
+          &nbsp;
+        </div>
+        <div class="column-two-thirds">
+          {{ message.content | string }}
+          {% if message.status == 'delivered' %}
+            <div class="sms-message-status sms-message-status-outbound">
+              {{ message.created_at | format_datetime_relative }}
+            </div>
+          {% elif message.status in ['pending', 'sending', 'created'] %}
+            <div class="sms-message-status sms-message-status-outbound hint">
+              sending
+            </div>
+          {% else %}
+            <div class="sms-message-status sms-message-status-outbound table-field-error-label">
+              Failed (sent {{ message.created_at | format_datetime_relative }})
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
