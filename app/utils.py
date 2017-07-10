@@ -320,3 +320,7 @@ def get_time_left(created_at):
         past_tense='Data no longer available',  # No-one should ever see this
         precision=1
     )
+
+
+def email_or_sms_not_enabled(template_type, permissions):
+    return (template_type in ['email', 'sms']) and (template_type not in permissions)

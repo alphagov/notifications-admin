@@ -270,6 +270,64 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
     assert mock_get_service_template.called is False
 
 
+@pytest.mark.parametrize('type_of_template', ['email', 'sms'])
+def test_should_not_allow_creation_of_template_through_form_without_correct_permission(
+    logged_in_client,
+    service_one,
+    mocker,
+    type_of_template,
+):
+    service_one['permissions'] = []
+    template_description = {'sms': 'text messages', 'email': 'emails'}
+
+    response = logged_in_client.post(url_for(
+        '.add_template_by_type',
+        service_id=service_one['id']),
+        data={'template_type': type_of_template},
+        follow_redirects=True)
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.select('main p')[0].text.strip() == \
+        "Sending {} has been disabled for your service.".format(template_description[type_of_template])
+    assert page.select(".page-footer-back-link")[0].text == "Back to add new template"
+    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+        '.add_template_by_type',
+        service_id=service_one['id'],
+        template_id='0',
+    )
+
+
+@pytest.mark.parametrize('type_of_template', ['email', 'sms'])
+def test_should_not_allow_creation_of_a_template_without_correct_permission(
+    logged_in_client,
+    service_one,
+    mocker,
+    type_of_template,
+):
+    service_one['permissions'] = []
+    template_description = {'sms': 'text messages', 'email': 'emails'}
+
+    response = logged_in_client.get(url_for(
+        '.add_service_template',
+        service_id=service_one['id'],
+        template_type=type_of_template),
+        follow_redirects=True)
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.select('main p')[0].text.strip() == \
+        "Sending {} has been disabled for your service.".format(template_description[type_of_template])
+    assert page.select(".page-footer-back-link")[0].text == "Back to templates"
+    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+        '.choose_template',
+        service_id=service_one['id'],
+        template_id='0',
+    )
+
+
 def test_should_redirect_when_saving_a_template(
     logged_in_client,
     active_user_with_permissions,
@@ -337,6 +395,32 @@ def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
         service['id'],
         None,
         'priority'
+    )
+
+
+def test_should_not_allow_template_edits_without_correct_permission(
+    logged_in_client,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+    template_id = fake_uuid
+    service_one['permissions'] = ['email']
+
+    response = logged_in_client.get(url_for(
+        '.edit_service_template',
+        service_id=service_one['id'],
+        template_id=template_id),
+        follow_redirects=True)
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
+    assert page.select(".page-footer-back-link")[0].text == "Back to the template"
+    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=template_id,
     )
 
 

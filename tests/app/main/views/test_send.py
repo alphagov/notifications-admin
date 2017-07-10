@@ -38,6 +38,32 @@ def test_that_test_files_exist():
     assert len(test_non_spreadsheet_files) == 6
 
 
+def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
+    logged_in_client,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+    template_id = fake_uuid
+    service_one['permissions'] = []
+
+    response = logged_in_client.get(url_for(
+        '.send_messages',
+        service_id=service_one['id'],
+        template_id=template_id),
+        follow_redirects=True)
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
+    assert page.select(".page-footer-back-link")[0].text == "Back to the template"
+    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=template_id,
+    )
+
+
 @pytest.mark.parametrize(
     "filename, acceptable_file",
     list(zip(
@@ -310,6 +336,32 @@ def test_send_test_step_redirects_if_session_not_setup(
         assert session['recipient'] == expected_recipient
 
 
+def test_send_one_off_does_not_send_without_the_correct_permissions(
+    logged_in_client,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+    template_id = fake_uuid
+    service_one['permissions'] = []
+
+    response = logged_in_client.get(url_for(
+        '.send_one_off',
+        service_id=service_one['id'],
+        template_id=template_id),
+        follow_redirects=True)
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
+    assert page.select(".page-footer-back-link")[0].text == "Back to the template"
+    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=template_id,
+    )
+
+
 @pytest.mark.parametrize('template_mock, partial_url, expected_h1, tour_shown', [
     (
         mock_get_service_template_with_placeholders,
@@ -542,11 +594,15 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
 ])
 def _redirects_with_help_argument(
     logged_in_client,
+    mocker,
     service_one,
     fake_uuid,
     endpoint,
     expected_redirect,
 ):
+    template = {'data': {'template_type': 'sms'}}
+    mocker.patch('app.service_api_client.get_service_template', return_value=template)
+
     response = logged_in_client.get(
         url_for(endpoint, service_id=service_one['id'], template_id=fake_uuid, help=1)
     )
@@ -848,6 +904,8 @@ def test_send_test_clears_session(
     service_one,
     fake_uuid,
 ):
+    template = {'data': {'template_type': 'sms'}}
+    mocker.patch('app.service_api_client.get_service_template', return_value=template)
 
     with logged_in_client.session_transaction() as session:
         session['recipient'] = '07700900001'

@@ -18,7 +18,7 @@ from notifications_utils.recipients import first_column_headings
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
-from app.utils import user_has_permissions, get_template, get_help_argument
+from app.utils import user_has_permissions, get_template, get_help_argument, email_or_sms_not_enabled
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.main.forms import (
     ChooseTemplateType,
@@ -232,13 +232,40 @@ def add_template_by_type(service_id):
                 template_id=blank_letter['data']['id'],
             ))
 
-        return redirect(url_for(
-            '.add_service_template',
-            service_id=service_id,
-            template_type=form.template_type.data,
-        ))
+        if email_or_sms_not_enabled(form.template_type.data, current_service['permissions']):
+            return redirect(url_for(
+                '.action_blocked',
+                service_id=service_id,
+                notification_type=form.template_type.data,
+                return_to='add_new_template',
+                template_id='0'
+            ))
+        else:
+            return redirect(url_for(
+                '.add_service_template',
+                service_id=service_id,
+                template_type=form.template_type.data,
+            ))
 
     return render_template('views/templates/add.html', form=form)
+
+
+@main.route("/services/<service_id>/templates/action-blocked/<notification_type>/<return_to>/<template_id>")
+@login_required
+@user_has_permissions('manage_templates', admin_override=True)
+def action_blocked(service_id, notification_type, return_to, template_id):
+    if notification_type == 'sms':
+        notification_type = 'text messages'
+    elif notification_type == 'email':
+        notification_type = 'emails'
+
+    return render_template(
+        'views/templates/action_blocked.html',
+        service_id=service_id,
+        notification_type=notification_type,
+        return_to=return_to,
+        template_id=template_id
+    )
 
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
@@ -278,12 +305,21 @@ def add_service_template(service_id, template_type):
                 url_for('.view_template', service_id=service_id, template_id=new_template['data']['id'])
             )
 
-    return render_template(
-        'views/edit-{}-template.html'.format(template_type),
-        form=form,
-        template_type=template_type,
-        heading_action='Add'
-    )
+    if email_or_sms_not_enabled(template_type, current_service['permissions']):
+        return redirect(url_for(
+            '.action_blocked',
+            service_id=service_id,
+            notification_type=template_type,
+            return_to='templates',
+            template_id='0'
+        ))
+    else:
+        return render_template(
+            'views/edit-{}-template.html'.format(template_type),
+            form=form,
+            template_type=template_type,
+            heading_action='Add',
+        )
 
 
 def abort_403_if_not_admin_user():
@@ -354,13 +390,25 @@ def edit_service_template(service_id, template_id):
                 service_id=service_id,
                 template_id=template_id
             ))
-    return render_template(
-        'views/edit-{}-template.html'.format(template['template_type']),
-        form=form,
-        template_id=template_id,
-        template_type=template['template_type'],
-        heading_action='Edit'
-    )
+
+    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+
+    if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
+        return redirect(url_for(
+            '.action_blocked',
+            service_id=service_id,
+            notification_type=db_template['template_type'],
+            return_to='view_template',
+            template_id=template_id
+        ))
+    else:
+        return render_template(
+            'views/edit-{}-template.html'.format(template['template_type']),
+            form=form,
+            template_id=template_id,
+            template_type=template['template_type'],
+            heading_action='Edit'
+        )
 
 
 @main.route("/services/<service_id>/templates/<template_id>/delete", methods=['GET', 'POST'])
