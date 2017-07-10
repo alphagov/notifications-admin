@@ -286,7 +286,7 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
 
     assert response.status_code == 200
     assert page.select('main p')[0].text.strip() == \
-        "Sending {} is an invitation‑only feature.".format(template_description[type_of_template])
+        "Sending {} has been disabled for your service.".format(template_description[type_of_template])
     assert page.select(".page-footer-back-link")[0].text == "Back to add new template"
     assert page.select(".page-footer-back-link")[0]['href'] == url_for(
         '.add_template_by_type',
@@ -315,7 +315,7 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
 
     assert response.status_code == 200
     assert page.select('main p')[0].text.strip() == \
-        "Sending {} is an invitation‑only feature.".format(template_description[type_of_template])
+        "Sending {} has been disabled for your service.".format(template_description[type_of_template])
     assert page.select(".page-footer-back-link")[0].text == "Back to templates"
     assert page.select(".page-footer-back-link")[0]['href'] == url_for(
         '.choose_template',
@@ -411,7 +411,7 @@ def test_should_not_allow_template_edits_without_correct_permission(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert response.status_code == 200
-    assert page.select('main p')[0].text.strip() == "Sending text messages is an invitation‑only feature."
+    assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
     assert page.select(".page-footer-back-link")[0].text == "Back to the template"
     assert page.select(".page-footer-back-link")[0]['href'] == url_for(
         '.view_template',

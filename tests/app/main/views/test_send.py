@@ -55,7 +55,7 @@ def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert response.status_code == 200
-    assert page.select('main p')[0].text.strip() == "Sending text messages is an invitation‑only feature."
+    assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
     assert page.select(".page-footer-back-link")[0].text == "Back to the template"
     assert page.select(".page-footer-back-link")[0]['href'] == url_for(
         '.view_template',
@@ -353,7 +353,7 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert response.status_code == 200
-    assert page.select('main p')[0].text.strip() == "Sending text messages is an invitation‑only feature."
+    assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
     assert page.select(".page-footer-back-link")[0].text == "Back to the template"
     assert page.select(".page-footer-back-link")[0]['href'] == url_for(
         '.view_template',
