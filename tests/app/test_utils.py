@@ -11,7 +11,8 @@ from app.utils import (
     generate_notifications_csv,
     generate_previous_dict,
     generate_next_dict,
-    Spreadsheet
+    Spreadsheet,
+    get_estimated_delivery_date_for_letters,
 )
 
 from tests import notification_json, single_notification_json
@@ -154,3 +155,45 @@ def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
     # mock_calls[0][2] is the kwargs from first call
     assert mock_get_notifications.mock_calls[0][2]['page'] == 1
     assert mock_get_notifications.mock_calls[1][2]['page'] == 2
+
+
+@pytest.mark.parametrize('upload_time, expected_estimate', [
+
+    # BST
+    # ==================================================================
+    #  First thing Monday
+    ('2017-07-10 00:00:01', ('Thursday', 'Friday')),
+    #  Monday at 16:59 BST
+    ('2017-07-10 15:59:59', ('Thursday', 'Friday')),
+    #  Monday at 17:00 BST
+    ('2017-07-10 16:00:01', ('Friday', 'Saturday')),
+    #  Tuesday before 17:00 BST
+    ('2017-07-11 12:00:00', ('Friday', 'Saturday')),
+    #  Wednesday before 17:00 BST
+    ('2017-07-12 12:00:00', ('Saturday', 'Monday')),
+    #  Thursday before 17:00 BST
+    ('2017-07-13 12:00:00', ('Monday', 'Tuesday')),
+    #  Friday anytime
+    ('2017-07-14 00:00:00', ('Wednesday', 'Thursday')),
+    ('2017-07-14 12:00:00', ('Wednesday', 'Thursday')),
+    ('2017-07-14 22:00:00', ('Wednesday', 'Thursday')),
+    #  Saturday anytime
+    ('2017-07-14 12:00:00', ('Wednesday', 'Thursday')),
+    #  Sunday before 1700 BST
+    ('2017-07-15 15:59:59', ('Wednesday', 'Thursday')),
+    #  Sunday after 17:00 BST
+    ('2017-07-16 16:00:01', ('Thursday', 'Friday')),
+
+    # GMT
+    # ==================================================================
+    #  Monday at 16:59 GMT
+    ('2017-01-02 16:59:59', ('Thursday', 'Friday')),
+    #  Monday at 17:00 GMT
+    ('2017-01-02 17:00:01', ('Friday', 'Saturday')),
+
+])
+def test_get_estimated_delivery_date_for_letter(upload_time, expected_estimate):
+    assert tuple(
+        day.strftime('%A')
+        for day in get_estimated_delivery_date_for_letters(upload_time)
+    ) == expected_estimate

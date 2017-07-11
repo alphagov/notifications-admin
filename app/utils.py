@@ -1,10 +1,12 @@
 import re
 import csv
+import pytz
 from io import StringIO
 from os import path
 from functools import wraps
 import unicodedata
 from datetime import datetime, timedelta, timezone
+from dateutil import parser
 
 import dateutil
 import ago
@@ -324,3 +326,25 @@ def get_time_left(created_at):
 
 def email_or_sms_not_enabled(template_type, permissions):
     return (template_type in ['email', 'sms']) and (template_type not in permissions)
+
+
+def get_estimated_delivery_date_for_letters(upload_time):
+
+    # shift anything after 5pm to the next day
+    processing_day = gmt_timezones(upload_time) + timedelta(hours=(7))
+
+    return tuple(
+        processing_day + timedelta(days=days)
+        for days in {
+            'Wednesday': (3, 5),
+            'Thursday': (4, 5),
+            'Friday': (5, 6),
+            'Saturday': (4, 5),
+        }.get(processing_day.strftime('%A'), (3, 4))
+    )
+
+
+def gmt_timezones(date):
+    date = dateutil.parser.parse(date)
+    forced_utc = date.replace(tzinfo=pytz.utc)
+    return forced_utc.astimezone(pytz.timezone('Europe/London'))
