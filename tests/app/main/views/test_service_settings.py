@@ -17,29 +17,46 @@ from tests.conftest import active_user_with_permissions, platform_admin_user
 
 @pytest.mark.parametrize('user, expected_rows', [
     (active_user_with_permissions, [
+
         'Label Value Action',
         'Service name service one Change',
+
+        'Label Value Action',
         'Send emails On Change',
         'Email reply to address None Change',
+
+        'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
+
+        'Label Value Action',
         'Letters Off Change',
+
     ]),
     (platform_admin_user, [
+
         'Label Value Action',
         'Service name service one Change',
+
+        'Label Value Action',
         'Send emails On Change',
         'Email reply to address None Change',
+
+        'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
+
+        'Label Value Action',
         'Letters Off Change',
+
         'Label Value Action',
         'Email branding GOV.UK Change',
         'Letter branding HM Government Change',
+
     ]),
 ])
 def test_should_show_overview(
@@ -51,6 +68,7 @@ def test_should_show_overview(
     user,
     expected_rows,
 ):
+
     service_one['permissions'] = ['sms', 'email']
 
     client.login(user(fake_uuid), mocker, service_one)
@@ -60,7 +78,7 @@ def test_should_show_overview(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find('h1').text == 'Settings'
-    rows = page.find_all('tr')
+    rows = page.select('tr')
     assert len(rows) == len(expected_rows)
     for index, row in enumerate(expected_rows):
         assert row == " ".join(rows[index].text.split())
@@ -69,25 +87,41 @@ def test_should_show_overview(
 
 @pytest.mark.parametrize('permissions, expected_rows', [
     (['email', 'sms', 'inbound_sms', 'international_sms'], [
+
         'Service name service one Change',
+
+        'Label Value Action',
         'Send emails On Change',
         'Email reply to address test@example.com Change',
+
+        'Label Value Action',
         'Send text messages On Change',
         'Text message sender elevenchars',
         'International text messages On Change',
         'Receive text messages On Change',
         'API endpoint for received text messages None Change',
+
+        'Label Value Action',
         'Letters Off Change',
+
     ]),
     (['email', 'sms'], [
+
         'Service name service one Change',
+
+        'Label Value Action',
         'Send emails On Change',
         'Email reply to address test@example.com Change',
+
+        'Label Value Action',
         'Send text messages On Change',
         'Text message sender elevenchars Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
+
+        'Label Value Action',
         'Letters Off Change',
+
     ]),
 ])
 def test_should_show_overview_for_service_with_more_things_set(
@@ -187,7 +221,7 @@ def test_letter_contact_block_shows_none_if_not_set(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = page.find_all('tr')[5].find_all('td')[1].div
+    div = page.find_all('tr')[8].find_all('td')[1].div
     assert div.text.strip() == 'None'
     assert 'default' in div.attrs['class'][0]
 
@@ -205,7 +239,7 @@ def test_escapes_letter_contact_block(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = str(page.find_all('tr')[5].find_all('td')[1].div)
+    div = str(page.find_all('tr')[8].find_all('td')[1].div)
     assert 'foo<br/>bar' in div
     assert '<script>' not in div
 
