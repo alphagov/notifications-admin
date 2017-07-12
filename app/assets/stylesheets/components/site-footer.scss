@@ -1,0 +1,29 @@
+#footer {
+  .footer-categories {
+    margin: 0 auto;
+
+    &-wrapper {
+      margin-bottom: $gutter;
+      padding-bottom: $gutter * 2;
+      border-bottom: 1px solid $grey-2;
+    }
+
+    h2 {
+      margin: 20px 0;
+
+      @include media(tablet) {
+        margin-top: 0;
+      }
+    }
+
+    ul {
+      margin: 0;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+  }
+}
