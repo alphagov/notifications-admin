@@ -32,7 +32,7 @@ from tests.conftest import active_user_with_permissions, platform_admin_user
         'Receive text messages Off Change',
 
         'Label Value Action',
-        'Letters Off Change',
+        'Send letters Off Change',
 
     ]),
     (platform_admin_user, [
@@ -51,7 +51,7 @@ from tests.conftest import active_user_with_permissions, platform_admin_user
         'Receive text messages Off Change',
 
         'Label Value Action',
-        'Letters Off Change',
+        'Send letters Off Change',
 
         'Label Value Action',
         'Email branding GOV.UK Change',
@@ -102,7 +102,7 @@ def test_should_show_overview(
         'API endpoint for received text messages None Change',
 
         'Label Value Action',
-        'Letters Off Change',
+        'Send letters Off Change',
 
     ]),
     (['email', 'sms'], [
@@ -120,7 +120,7 @@ def test_should_show_overview(
         'Receive text messages Off Change',
 
         'Label Value Action',
-        'Letters Off Change',
+        'Send letters Off Change',
 
     ]),
 ])

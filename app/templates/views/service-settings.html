@@ -117,7 +117,7 @@
       ) %}
 
         {% call row() %}
-          {{ text_field('Letters') }}
+          {{ text_field('Send letters') }}
           {{ boolean_field('letter' in current_service.permissions) }}
           {{ edit_field('Change', url_for('.service_set_letters', service_id=current_service.id)) }}
         {% endcall %}
