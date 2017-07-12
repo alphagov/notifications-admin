@@ -35,9 +35,6 @@ from notifications_utils.recipients import (
     format_phone_number_human_readable,
 )
 from notifications_utils.formatters import formatted_list
-from pygments import highlight
-from pygments.formatters.html import HtmlFormatter
-from pygments.lexers.javascript import JavascriptLexer
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
