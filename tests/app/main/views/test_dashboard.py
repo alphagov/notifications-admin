@@ -16,7 +16,7 @@ from app.main.views.dashboard import (
     get_tuples_of_financial_years
 )
 
-from tests import validate_route_permission
+from tests import validate_route_permission, validate_route_permission_with_client
 from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_inbound_sms_summary,
@@ -198,6 +198,28 @@ def test_inbox_not_accessible_to_service_without_permissions(
     assert response.status_code == 403
 
 
+def test_anyone_can_see_inbox(
+    client,
+    api_user_active,
+    service_one,
+    mocker,
+    mock_get_inbound_sms_with_no_messages,
+):
+
+    service_one['permissions'] = ['inbound_sms']
+
+    validate_route_permission_with_client(
+        mocker,
+        client,
+        'GET',
+        200,
+        url_for('main.inbox', service_id=service_one['id']),
+        ['view_activity'],
+        api_user_active,
+        service_one,
+    )
+
+
 def test_should_show_recent_templates_on_dashboard(
     logged_in_client,
     mocker,
@@ -262,6 +284,25 @@ def test_should_show_monthly_breakdown_of_template_usage(
 
     assert len(table_rows) == len(['April'])
     assert len(page.select('.table-no-data')) == len(['May', 'June', 'July'])
+
+
+def test_anyone_can_see_monthly_breakdown(
+    client,
+    api_user_active,
+    service_one,
+    mocker,
+    mock_get_monthly_notification_stats,
+):
+    validate_route_permission_with_client(
+        mocker,
+        client,
+        'GET',
+        200,
+        url_for('main.monthly', service_id=service_one['id']),
+        ['view_activity'],
+        api_user_active,
+        service_one,
+    )
 
 
 @freeze_time("2016-01-01 11:09:00.061258")

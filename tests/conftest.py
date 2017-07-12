@@ -1410,6 +1410,27 @@ def mock_get_monthly_template_statistics(mocker, service_one, fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def mock_get_monthly_notification_stats(mocker, service_one, fake_uuid):
+    def _stats(service_id, year):
+        return {'data': {
+            datetime.utcnow().strftime('%Y-%m'): {
+                "email": {
+                    "sending": 1,
+                    "delivered": 1,
+                },
+                "sms": {
+                    "sending": 1,
+                    "delivered": 1,
+                },
+            }
+        }}
+    return mocker.patch(
+        'app.service_api_client.get_monthly_notification_stats',
+        side_effect=_stats
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_template_statistics_for_template(mocker, service_one):
     def _get_stats(service_id, template_id):
         template = template_json(service_id, template_id, "Test template", "sms", "Something very interesting")
