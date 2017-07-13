@@ -177,6 +177,12 @@ def test_should_show_letter_job(
     assert normalize_spaces(page.select('tbody tr')[0].text) == (
         '07123456789 template content'
     )
+    assert normalize_spaces(page.select('.keyline-block')[0].text) == (
+        '1 Letter'
+    )
+    assert normalize_spaces(page.select('.keyline-block')[1].text) == (
+        '6 January Estimated delivery date'
+    )
 
     mock_get_notifications.assert_called_with(
         SERVICE_ONE_ID,

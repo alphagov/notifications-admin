@@ -40,6 +40,7 @@ from app.utils import (
     FAILURE_STATUSES,
     SENDING_STATUSES,
     DELIVERED_STATUSES,
+    get_letter_timings,
 )
 from app.statistics_utils import add_rate_to_job
 
@@ -353,12 +354,22 @@ def get_job_partials(job):
         template_id=job['template'],
         version=job['template_version']
     )['data']
-    return {
-        'counts': render_template(
+
+    if template['template_type'] == 'letter':
+        counts = render_template(
+            'partials/jobs/count-letters.html',
+            total=job.get('notification_count', 0),
+            delivery_estimate=get_letter_timings(job['created_at']).earliest_delivery,
+        )
+    else:
+        counts = render_template(
             'partials/count.html',
             counts=_get_job_counts(job),
             status=filter_args['status']
-        ),
+        )
+
+    return {
+        'counts': counts,
         'notifications': render_template(
             'partials/jobs/notifications.html',
             notifications=list(
