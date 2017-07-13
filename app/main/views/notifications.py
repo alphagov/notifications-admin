@@ -19,6 +19,7 @@ from app.utils import (
     get_help_argument,
     get_template,
     get_time_left,
+    get_letter_timings,
     REQUESTED_STATUSES,
     FAILURE_STATUSES,
     SENDING_STATUSES,
@@ -63,6 +64,7 @@ def view_notification(service_id, notification_id):
         job = job_api_client.get_job(service_id, notification['job']['id'])['data']
     else:
         job = None
+
     return render_template(
         'views/notifications/notification.html',
         finished=(notification['status'] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
@@ -79,7 +81,8 @@ def view_notification(service_id, notification_id):
         partials=get_single_notification_partials(notification),
         created_by=notification.get('created_by'),
         created_at=notification['created_at'],
-        help=get_help_argument()
+        help=get_help_argument(),
+        estimated_letter_delivery_date=get_letter_timings(notification['created_at']).earliest_delivery,
     )
 
 

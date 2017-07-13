@@ -110,3 +110,27 @@ def test_notification_page_doesnt_link_to_template_in_tour(
         'sample template sent by Test User on 1 January at 1:01am'
     )
     assert len(page.select('main p:nth-of-type(1) a')) == 0
+
+
+@freeze_time("2016-01-01 01:01")
+def test_notification_page_shows_status_of_letter_notification(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+
+    mock_get_notification(mocker, fake_uuid, template_type='letter')
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select('main p:nth-of-type(1)')[0].text) == (
+        'sample template sent by Test User on 1 January at 1:01am'
+    )
+    assert normalize_spaces(page.select('main p:nth-of-type(2)')[0].text) == (
+        'Estimated delivery date: 6 January'
+    )
+    assert page.select('p.notification-status') == []
