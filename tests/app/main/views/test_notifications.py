@@ -1,4 +1,5 @@
 from freezegun import freeze_time
+from flask import url_for
 import pytest
 
 from app.utils import (
@@ -8,6 +9,7 @@ from app.utils import (
     DELIVERED_STATUSES,
 )
 
+from notifications_utils.template import LetterImageTemplate
 from tests.conftest import mock_get_notification, SERVICE_ONE_ID, normalize_spaces
 
 
@@ -134,3 +136,28 @@ def test_notification_page_shows_status_of_letter_notification(
         'Estimated delivery date: 6 January'
     )
     assert page.select('p.notification-status') == []
+
+
+def test_should_show_image_of_letter_notification(
+    logged_in_client,
+    fake_uuid,
+    mocker
+):
+
+    mock_get_notification(mocker, fake_uuid, template_type='letter')
+
+    mocked_preview = mocker.patch(
+        'app.main.views.templates.TemplatePreview.from_utils_template',
+        return_value='foo'
+    )
+
+    response = logged_in_client.get(url_for(
+        'main.view_letter_notification_as_image',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    ))
+
+    assert response.status_code == 200
+    assert response.get_data(as_text=True) == 'foo'
+    assert isinstance(mocked_preview.call_args[0][0], LetterImageTemplate)
+    assert mocked_preview.call_args[0][1] == 'png'

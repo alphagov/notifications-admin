@@ -14,6 +14,7 @@ from app import (
     current_service
 )
 from app.main import main
+from app.template_previews import TemplatePreview
 from app.utils import (
     user_has_permissions,
     get_help_argument,
@@ -41,20 +42,18 @@ def get_status_arg(filter_args):
         return REQUESTED_STATUSES
 
 
-@main.route("/services/<service_id>/notification/<notification_id>")
+@main.route("/services/<service_id>/notification/<uuid:notification_id>")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_notification(service_id, notification_id):
-    notification = notification_api_client.get_notification(service_id, notification_id)
+    notification = notification_api_client.get_notification(service_id, str(notification_id))
     template = get_template(
         notification['template'],
         current_service,
         letter_preview_url=url_for(
-            '.view_template_version_preview',
+            '.view_letter_notification_as_image',
             service_id=service_id,
-            template_id=notification['template']['id'],
-            version=notification['template_version'],
-            filetype='png',
+            notification_id=notification_id,
         ),
         show_recipient=True,
         redact_missing_personalisation=True,
@@ -84,6 +83,28 @@ def view_notification(service_id, notification_id):
         help=get_help_argument(),
         estimated_letter_delivery_date=get_letter_timings(notification['created_at']).earliest_delivery,
     )
+
+
+@main.route("/services/<service_id>/notification/<uuid:notification_id>.png")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def view_letter_notification_as_image(service_id, notification_id):
+
+    notification = notification_api_client.get_notification(service_id, notification_id)
+
+    template = get_template(
+        notification['template'],
+        current_service,
+        letter_preview_url=url_for(
+            '.view_letter_notification_as_image',
+            service_id=service_id,
+            notification_id=notification_id,
+        ),
+    )
+
+    template.values = notification['personalisation']
+
+    return TemplatePreview.from_utils_template(template, 'png', page=request.args.get('page'))
 
 
 @main.route("/services/<service_id>/notification/<notification_id>.json")

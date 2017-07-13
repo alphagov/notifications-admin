@@ -1703,6 +1703,7 @@ def mock_get_notification(
             service_id,
             '5407f4db-51c7-4150-8758-35412d42186a',
             content='hello ((name))',
+            subject='blah',
             redact_personalisation=redact_personalisation,
             type_=template_type,
         )
