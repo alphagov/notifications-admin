@@ -183,6 +183,8 @@ def test_should_show_letter_job(
     assert normalize_spaces(page.select('.keyline-block')[1].text) == (
         '6 January Estimated delivery date'
     )
+    assert page.select('[download=download]') == []
+    assert page.select('.hint') == []
 
     mock_get_notifications.assert_called_with(
         SERVICE_ONE_ID,
