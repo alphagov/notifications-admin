@@ -53,7 +53,9 @@
             {{ item.preview_of_content }}
           </p>
         {% endcall %}
-        {{ notification_status_field(item) }}
+        {{ notification_status_field(
+          '' if template.template_type == 'letter' else item
+        ) }}
       {% endcall %}
 
       {% if more_than_one_page %}

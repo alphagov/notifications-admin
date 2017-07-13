@@ -158,6 +158,43 @@ def test_should_show_job_in_progress(
     assert page.find('p', {'class': 'hint'}).text.strip() == 'Report is 50% complete…'
 
 
+@freeze_time("2016-01-01 11:09:00.061258")
+def test_should_show_letter_job(
+    client_request,
+    mock_get_service_letter_template,
+    mock_get_job,
+    mock_get_notifications,
+    fake_uuid,
+):
+
+    page = client_request.get(
+        'main.view_job',
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.h1.text) == 'thisisatest.csv'
+    assert normalize_spaces(page.select('tbody tr')[0].text) == (
+        '07123456789 template content'
+    )
+
+    mock_get_notifications.assert_called_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        status=[
+            'created',
+            'pending',
+            'sending',
+            'delivered',
+            'sent',
+            'failed',
+            'temporary-failure',
+            'permanent-failure',
+            'technical-failure',
+        ],
+    )
+
+
 @freeze_time("2016-01-01T00:00:00.061258")
 def test_should_show_scheduled_job(
     logged_in_client,
