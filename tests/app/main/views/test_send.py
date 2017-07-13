@@ -1144,6 +1144,7 @@ def test_can_start_letters_job(
         data={}
     )
     assert response.status_code == 302
+    assert 'just_sent=yes' in response.location
 
 
 @pytest.mark.parametrize('filetype', ['pdf', 'png'])

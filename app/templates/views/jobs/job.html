@@ -13,7 +13,11 @@
       {{ uploaded_file_name }}
     </h1>
 
-    {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+    {% if just_sent %}
+      {{ banner('We’ve started printing your letters', type='default', with_tick=True) }}
+    {% else %}
+      {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+    {% endif %}
     {{ ajax_block(partials, updates_url, 'counts', finished=finished) }}
     {{ ajax_block(partials, updates_url, 'notifications', finished=finished) }}
 
