@@ -1,3 +1,4 @@
+import json
 import pytest
 from bs4 import BeautifulSoup
 
@@ -95,7 +96,6 @@ def test_view_conversation(
         'main.conversation',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
-        _test_page_title=False,
     )
 
     messages = page.select('.sms-message-wrapper')
@@ -162,3 +162,27 @@ def test_view_conversation(
             normalize_spaces(messages[index].text),
             normalize_spaces(statuses[index].text),
         ) == expected
+
+
+def test_view_conversation_updates(
+    logged_in_client,
+    mocker,
+    fake_uuid,
+    mock_get_notification,
+):
+
+    mock_get_partials = mocker.patch(
+        'app.main.views.conversation.get_conversation_partials',
+        return_value={'messages': 'foo'}
+    )
+
+    response = logged_in_client.get(url_for(
+        'main.conversation_updates',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    ))
+
+    assert response.status_code == 200
+    assert json.loads(response.get_data(as_text=True)) == {'messages': 'foo'}
+
+    mock_get_partials.assert_called_once_with(SERVICE_ONE_ID, '07123 456789')

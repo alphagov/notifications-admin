@@ -1,4 +1,5 @@
 from flask import (
+    jsonify,
     render_template,
     url_for,
 )
@@ -20,9 +21,31 @@ def conversation(service_id, notification_id):
 
     return render_template(
         'views/conversations/conversation.html',
-        conversation=get_sms_thread(service_id, user_number=user_number),
         user_number=user_number,
+        partials=get_conversation_partials(service_id, user_number),
+        updates_url=url_for('.conversation_updates', service_id=service_id, notification_id=notification_id),
     )
+
+
+@main.route("/services/<service_id>/conversation/<notification_id>.json")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def conversation_updates(service_id, notification_id):
+
+    return jsonify(get_conversation_partials(
+        service_id,
+        get_user_number(service_id, notification_id)
+    ))
+
+
+def get_conversation_partials(service_id, user_number):
+
+    return {
+        'messages': render_template(
+            'views/conversations/messages.html',
+            conversation=get_sms_thread(service_id, user_number),
+        )
+    }
 
 
 def get_user_number(service_id, notification_id):

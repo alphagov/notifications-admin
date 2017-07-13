@@ -1,5 +1,4 @@
-{% from "components/table.html" import list_table, field, hidden_field_heading, right_aligned_field_heading, row_heading %}
-{% from "components/message-count-label.html" import message_count_label %}
+{% from "components/ajax-block.html" import ajax_block %}
 
 {% extends "withnav_template.html" %}
 
@@ -12,38 +11,11 @@
   <h1 class="heading-large">
     Received text messages
   </h1>
-  <div>
-    {% call(item, row_number) list_table(
-      messages,
-      caption="Inbox",
-      caption_visible=False,
-      empty_message='When users text your service’s phone number ({}) you’ll see the messages here'.format(current_service.sms_sender),
-      field_headings=[
-        'From',
-        'First two lines of message'
-      ],
-      field_headings_visible=False
-    ) %}
-      {% call field() %}
-        <a
-          class="file-list-filename"
-          href="{{ url_for('.conversation', service_id=current_service.id, notification_id=item.id) }}#n{{ item.id }}"
-        >
-          {{ item.user_number | format_phone_number_human_readable }}
-        </a>
-        <span class="file-list-hint">{{ item.content }}</span>
-      {% endcall %}
-      {% call field(align='right') %}
-        <span class="align-with-message-body">
-          {{ item.created_at | format_delta }}
-        </span>
-      {% endcall %}
-    {% endcall %}
-    {% if messages %}
-      <p class="table-show-more-link">
-        {{ count_of_messages }} message{{ '' if 1 == count_of_messages else 's' }}
-        from {{ count_of_users }} user{{ '' if 1 == count_of_users else 's' }}
-      </p>
-    {% endif %}
-  </div>
+
+  {{ ajax_block(
+    partials,
+    updates_url,
+    'messages',
+  ) }}
+
 {% endblock %}

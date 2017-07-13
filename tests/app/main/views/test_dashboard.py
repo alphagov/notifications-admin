@@ -1,3 +1,4 @@
+import json
 from functools import partial
 import copy
 from unittest.mock import call, ANY
@@ -188,12 +189,17 @@ def test_empty_inbox(
     )
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.inbox',
+    'main.inbox_updates',
+])
 def test_inbox_not_accessible_to_service_without_permissions(
     logged_in_client,
     service_one,
+    endpoint,
 ):
     service_one['permissions'] = []
-    response = logged_in_client.get(url_for('main.inbox', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(url_for(endpoint, service_id=SERVICE_ONE_ID))
 
     assert response.status_code == 403
 
@@ -218,6 +224,28 @@ def test_anyone_can_see_inbox(
         api_user_active,
         service_one,
     )
+
+
+def test_view_inbox_updates(
+    logged_in_client,
+    service_one,
+    mocker,
+    mock_get_inbound_sms_with_no_messages,
+):
+
+    mock_get_partials = mocker.patch(
+        'app.main.views.dashboard.get_inbox_partials',
+        return_value={'messages': 'foo'},
+    )
+
+    response = logged_in_client.get(url_for(
+        'main.inbox_updates', service_id=SERVICE_ONE_ID,
+    ))
+
+    assert response.status_code == 200
+    assert json.loads(response.get_data(as_text=True)) == {'messages': 'foo'}
+
+    mock_get_partials.assert_called_once_with(SERVICE_ONE_ID)
 
 
 def test_should_show_recent_templates_on_dashboard(

@@ -143,6 +143,23 @@ def monthly(service_id):
 @user_has_permissions('view_activity', admin_override=True)
 def inbox(service_id):
 
+    return render_template(
+        'views/dashboard/inbox.html',
+        partials=get_inbox_partials(service_id),
+        updates_url=url_for('.inbox_updates', service_id=service_id),
+    )
+
+
+@main.route("/services/<service_id>/inbox.json")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def inbox_updates(service_id):
+
+    return jsonify(get_inbox_partials(service_id))
+
+
+def get_inbox_partials(service_id):
+
     if 'inbound_sms' not in current_service['permissions']:
         abort(403)
 
@@ -156,12 +173,12 @@ def inbox(service_id):
         }:
             messages_to_show.append(message)
 
-    return render_template(
-        'views/dashboard/inbox.html',
+    return {'messages': render_template(
+        'views/dashboard/_inbox_messages.html',
         messages=messages_to_show,
         count_of_messages=len(inbound_messages),
         count_of_users=len(messages_to_show),
-    )
+    )}
 
 
 def aggregate_usage(template_statistics, sort_key='count'):
