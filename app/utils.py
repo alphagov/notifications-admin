@@ -5,6 +5,7 @@ from io import StringIO
 from os import path
 from functools import wraps
 import unicodedata
+from collections import namedtuple
 from datetime import datetime, timedelta, timezone
 from dateutil import parser
 
@@ -328,19 +329,34 @@ def email_or_sms_not_enabled(template_type, permissions):
     return (template_type in ['email', 'sms']) and (template_type not in permissions)
 
 
-def get_estimated_delivery_date_for_letters(upload_time):
+def get_letter_timings(upload_time):
+
+    LetterTimings = namedtuple(
+        'LetterTimings',
+        'printed_by, is_printed, earliest_delivery, latest_delivery'
+    )
 
     # shift anything after 5pm to the next day
     processing_day = gmt_timezones(upload_time) + timedelta(hours=(7))
 
-    return tuple(
+    print_day, earliest_delivery, latest_delivery = (
         processing_day + timedelta(days=days)
         for days in {
-            'Wednesday': (3, 5),
-            'Thursday': (4, 5),
-            'Friday': (5, 6),
-            'Saturday': (4, 5),
-        }.get(processing_day.strftime('%A'), (3, 4))
+            'Wednesday': (1, 3, 5),
+            'Thursday': (1, 4, 5),
+            'Friday': (3, 5, 6),
+            'Saturday': (2, 4, 5),
+        }.get(processing_day.strftime('%A'), (1, 3, 4))
+    )
+
+    printed_by = print_day.astimezone(pytz.timezone('Europe/London')).replace(hour=15, minute=0)
+    now = datetime.utcnow().replace(tzinfo=pytz.timezone('Europe/London'))
+
+    return LetterTimings(
+        printed_by=printed_by,
+        is_printed=(now > printed_by),
+        earliest_delivery=earliest_delivery,
+        latest_delivery=latest_delivery,
     )
 
 
