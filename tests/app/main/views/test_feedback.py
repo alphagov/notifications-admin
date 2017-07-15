@@ -449,6 +449,13 @@ def test_bat_email_page(
     response = client.get(bat_phone_page)
     assert response.status_code == 200
 
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select('main a')[1].text == 'Fill in this form'
+    assert page.select('main a')[1]['href'] == url_for('main.feedback', ticket_type='problem', severe='no')
+    next_page_response = client.get(page.select('main a')[1]['href'])
+    next_page = BeautifulSoup(next_page_response.data.decode('utf-8'), 'html.parser')
+    assert next_page.h1.text.strip() == 'Report a problem'
+
     client.login(active_user_with_permissions, mocker, service_one)
     logged_in_response = client.get(bat_phone_page)
     assert logged_in_response.status_code == 302
