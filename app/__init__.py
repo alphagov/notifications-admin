@@ -7,7 +7,6 @@ from time import monotonic
 
 import dateutil
 import itertools
-import pytz
 import ago
 from flask import (
     Flask,
@@ -54,6 +53,8 @@ from app.notify_client.provider_client import ProviderClient
 from app.notify_client.organisations_client import OrganisationsClient
 from app.notify_client.models import AnonymousUser
 from app.notify_client.letter_jobs_client import LetterJobsClient
+
+from app.utils import gmt_timezones
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
@@ -210,12 +211,6 @@ def linkable_name(value):
 
 def syntax_highlight_json(code):
     return Markup(highlight(code, JavascriptLexer(), HtmlFormatter(noclasses=True)))
-
-
-def gmt_timezones(date):
-    date = dateutil.parser.parse(date)
-    forced_utc = date.replace(tzinfo=pytz.utc)
-    return forced_utc.astimezone(pytz.timezone('Europe/London'))
 
 
 def format_datetime(date):
