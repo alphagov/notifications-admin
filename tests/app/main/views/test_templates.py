@@ -7,11 +7,78 @@ from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from tests.conftest import service_one as create_sample_service
-from tests.conftest import mock_get_service_email_template, mock_get_service_letter_template
+from tests.conftest import (
+    mock_get_service_email_template,
+    mock_get_service_letter_template,
+    normalize_spaces,
+    SERVICE_ONE_ID,
+)
 from tests import validate_route_permission, template_json, single_notification_json
-from tests.app.test_utils import normalize_spaces
 
 from app.main.views.templates import get_last_use_message, get_human_readable_delta
+
+
+@pytest.mark.parametrize('extra_args, expected_nav_links, expected_templates', [
+    (
+        {},
+        ['Text message', 'Email'],
+        ['sms_template_one', 'sms_template_two', 'email_template_one', 'email_template_two']
+    ),
+    (
+        {'template_type': 'sms'},
+        ['All', 'Email'],
+        ['sms_template_one', 'sms_template_two'],
+    ),
+    (
+        {'template_type': 'email'},
+        ['All', 'Text message'],
+        ['email_template_one', 'email_template_two'],
+    ),
+])
+def test_should_show_page_for_choosing_a_template(
+    client_request,
+    mock_get_service_templates,
+    extra_args,
+    expected_nav_links,
+    expected_templates,
+):
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        **extra_args
+    )
+
+    assert normalize_spaces(page.select('h1')[0].text) == 'Templates'
+
+    links_in_page = page.select('.pill a')
+
+    assert len(links_in_page) == len(expected_nav_links)
+
+    for index, expected_link in enumerate(expected_nav_links):
+        assert links_in_page[index].text.strip() == expected_link
+
+    template_links = page.select('.message-name a')
+
+    assert len(template_links) == len(expected_templates)
+
+    for index, expected_template in enumerate(expected_templates):
+        assert template_links[index].text.strip() == expected_template
+
+    mock_get_service_templates.assert_called_with(SERVICE_ONE_ID)
+
+
+def test_should_not_show_template_nav_if_only_one_type_of_template(
+    client_request,
+    mock_get_service_templates_with_only_one_template,
+):
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert not page.select('.pill')
 
 
 def test_should_show_page_for_one_template(
@@ -203,6 +270,64 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
     assert mock_get_service_template.called is False
 
 
+@pytest.mark.parametrize('type_of_template', ['email', 'sms'])
+def test_should_not_allow_creation_of_template_through_form_without_correct_permission(
+    logged_in_client,
+    service_one,
+    mocker,
+    type_of_template,
+):
+    service_one['permissions'] = []
+    template_description = {'sms': 'text messages', 'email': 'emails'}
+
+    response = logged_in_client.post(url_for(
+        '.add_template_by_type',
+        service_id=service_one['id']),
+        data={'template_type': type_of_template},
+        follow_redirects=True)
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.select('main p')[0].text.strip() == \
+        "Sending {} has been disabled for your service.".format(template_description[type_of_template])
+    assert page.select(".page-footer-back-link")[0].text == "Back to add new template"
+    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+        '.add_template_by_type',
+        service_id=service_one['id'],
+        template_id='0',
+    )
+
+
+@pytest.mark.parametrize('type_of_template', ['email', 'sms'])
+def test_should_not_allow_creation_of_a_template_without_correct_permission(
+    logged_in_client,
+    service_one,
+    mocker,
+    type_of_template,
+):
+    service_one['permissions'] = []
+    template_description = {'sms': 'text messages', 'email': 'emails'}
+
+    response = logged_in_client.get(url_for(
+        '.add_service_template',
+        service_id=service_one['id'],
+        template_type=type_of_template),
+        follow_redirects=True)
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.select('main p')[0].text.strip() == \
+        "Sending {} has been disabled for your service.".format(template_description[type_of_template])
+    assert page.select(".page-footer-back-link")[0].text == "Back to templates"
+    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+        '.choose_template',
+        service_id=service_one['id'],
+        template_id='0',
+    )
+
+
 def test_should_redirect_when_saving_a_template(
     logged_in_client,
     active_user_with_permissions,
@@ -270,6 +395,32 @@ def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
         service['id'],
         None,
         'priority'
+    )
+
+
+def test_should_not_allow_template_edits_without_correct_permission(
+    logged_in_client,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+    template_id = fake_uuid
+    service_one['permissions'] = ['email']
+
+    response = logged_in_client.get(url_for(
+        '.edit_service_template',
+        service_id=service_one['id'],
+        template_id=template_id),
+        follow_redirects=True)
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
+    assert page.select(".page-footer-back-link")[0].text == "Back to the template"
+    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=template_id,
     )
 
 
@@ -879,3 +1030,117 @@ def test_should_create_sms_template_without_downgrading_unicode_characters(
         ANY  # process_type
     )
     assert resp.status_code == 302
+
+
+def test_should_show_template_as_first_page_of_tour(
+    client_request,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+
+    page = client_request.get(
+        'main.start_tour',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert normalize_spaces(
+        page.select('.banner-tour .heading-medium')[0].text
+    ) == (
+        'Try sending yourself this example'
+    )
+
+    assert normalize_spaces(
+        page.select('.sms-message-wrapper')[0].text
+    ) == (
+        'service one: Template <em>content</em> with & entity'
+    )
+
+    assert page.select('a.button')[0]['href'] == url_for(
+        '.send_test', service_id=SERVICE_ONE_ID, template_id=fake_uuid, help=2
+    )
+
+
+@pytest.mark.parametrize('template_mock', [
+    mock_get_service_email_template,
+    mock_get_service_letter_template,
+])
+def test_cant_see_email_template_in_tour(
+    client_request,
+    fake_uuid,
+    mocker,
+    template_mock,
+):
+
+    template_mock(mocker)
+
+    client_request.get(
+        'main.start_tour',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=404,
+    )
+
+
+def test_should_show_message_before_redacting_template(
+    client_request,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+
+    page = client_request.get(
+        'main.redact_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert (
+        'Are you sure you want to hide personalisation after sending?'
+    ) in page.select('.banner-dangerous')[0].text
+
+    form = page.select('.banner-dangerous form')[0]
+
+    assert 'action' not in form
+    assert form['method'] == 'post'
+
+
+def test_should_show_redact_template(
+    client_request,
+    mock_get_service_template,
+    mock_redact_template,
+    service_one,
+    fake_uuid,
+):
+
+    page = client_request.post(
+        'main.redact_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select('.banner-default-with-tick')[0].text) == (
+        'Personalised content will be hidden for messages sent with this template'
+    )
+
+    mock_redact_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid)
+
+
+def test_should_show_hint_once_template_redacted(
+    client_request,
+    mocker,
+    service_one,
+    fake_uuid,
+):
+
+    mock_get_service_email_template(mocker, redact_personalisation=True)
+
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert page.select('.hint')[0].text == 'Personalisation is hidden after sending'

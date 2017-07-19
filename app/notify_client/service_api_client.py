@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from flask import url_for
 from app.utils import BrowsableItem
 from app.notify_client import _attach_current_user, NotifyAdminAPIClient
+from . import notification_api_client
 
 
 class ServiceAPIClient(NotifyAdminAPIClient):
@@ -87,8 +88,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'email_from',
             'reply_to_email_address',
             'research_mode',
-            'can_send_letters',
-            'can_send_international_sms',
             'sms_sender',
             'created_by',
             'branding',
@@ -169,6 +168,14 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
         return self.post(endpoint, data)
 
+    def redact_service_template(self, service_id, id_):
+        return self.post(
+            "/service/{}/template/{}".format(service_id, id_),
+            _attach_current_user(
+                {'redact_personalisation': True}
+            ),
+        )
+
     def get_service_template(self, service_id, template_id, version=None, *params):
         """
         Retrieve a service template.
@@ -244,15 +251,50 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             params=dict(year=year)
         )
 
-    def get_inbound_sms(self, service_id):
+    def get_inbound_sms(self, service_id, user_number=''):
         return self.get(
-            '/service/{}/inbound-sms'.format(service_id)
+            '/service/{}/inbound-sms?user_number={}'.format(
+                service_id,
+                user_number,
+            )
         )['data']
+
+    def get_inbound_sms_by_id(self, service_id, notification_id):
+        return self.get(
+            '/service/{}/inbound-sms/{}'.format(
+                service_id,
+                notification_id,
+            )
+        )
 
     def get_inbound_sms_summary(self, service_id):
         return self.get(
             '/service/{}/inbound-sms/summary'.format(service_id)
         )
+
+    def create_service_inbound_api(self, service_id, url, bearer_token, user_id):
+        data = {
+            "url": url,
+            "bearer_token": bearer_token,
+            "updated_by_id": user_id
+        }
+        return self.post("/service/{}/inbound-api".format(service_id), data)
+
+    def update_service_inbound_api(self, service_id, url, bearer_token, user_id, inbound_api_id):
+        data = {
+            "url": url,
+            "updated_by_id": user_id
+        }
+        if bearer_token:
+            data['bearer_token'] = bearer_token
+        return self.post("/service/{}/inbound-api/{}".format(service_id, inbound_api_id), data)
+
+    def get_service_inbound_api(self, service_id, inbound_sms_api_id):
+        return self.get(
+            "/service/{}/inbound-api/{}".format(
+                service_id, inbound_sms_api_id
+            )
+        )['data']
 
 
 class ServicesBrowsableItem(BrowsableItem):

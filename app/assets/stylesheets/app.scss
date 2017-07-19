@@ -126,26 +126,6 @@ td {
   margin-top: $gutter;
 }
 
-#footer {
-
-  .footer-categories {
-
-    @extend %site-width-container;
-
-    &-wrapper {
-      padding: 0 0 $gutter * 2;
-      margin: 0 0 $gutter;
-      border-bottom: 1px solid $border-colour;
-    }
-
-    h2 {
-      margin: 0 0 $gutter-two-thirds;
-    }
-
-  }
-
-}
-
 .form-label {
   margin-bottom: 5px;
 }
@@ -251,4 +231,8 @@ details .arrow {
   opacity: 1;
   color: $secondary-text-colour;
   cursor: default;
+}
+
+.heading-inline {
+  display: inline-block;
 }

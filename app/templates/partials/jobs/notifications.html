@@ -5,7 +5,9 @@
   {% if job.job_status == 'scheduled' %}
 
     <p>
-      Sending will start {{ job.scheduled_for|format_datetime_relative }}
+      Sending
+      <a href="{{ url_for('.view_template_version', service_id=current_service.id, template_id=template.id, version=template_version) }}">{{ template.name }}</a>
+      {{ job.scheduled_for|format_datetime_relative }}
     </p>
     <div class="page-footer">
       <form method="post">
@@ -22,18 +24,16 @@
       <div class="dashboard-table bottom-gutter-3-2">
     {% endif %}
 
-      {% if not help %}
-        {% if percentage_complete < 100 %}
-          <p class="bottom-gutter hint">
-            Report is {{ "{:.0f}%".format(percentage_complete) }} complete…
-          </p>
-        {% elif notifications %}
-          <p class="bottom-gutter">
-            <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
-            &emsp;
-            <span id="time-left">{{ time_left }}</span>
-          </p>
-        {% endif %}
+      {% if percentage_complete < 100 %}
+        <p class="bottom-gutter hint">
+          Report is {{ "{:.0f}%".format(percentage_complete * 0.99) }} complete…
+        </p>
+      {% elif notifications %}
+        <p class="bottom-gutter">
+          <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
+          &emsp;
+          <span id="time-left">{{ time_left }}</span>
+        </p>
       {% endif %}
 
       {% call(item, row_number) list_table(
@@ -48,7 +48,10 @@
         field_headings_visible=False
       ) %}
         {% call row_heading() %}
-          <p>{{ item.to }}</p>
+          <a class="file-list-filename" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.to }}</a>
+          <p class="file-list-hint">
+            {{ item.preview_of_content }}
+          </p>
         {% endcall %}
         {{ notification_status_field(item) }}
       {% endcall %}

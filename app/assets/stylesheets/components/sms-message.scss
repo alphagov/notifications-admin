@@ -19,7 +19,7 @@ $tail-angle: 20deg;
     content: "";
     display: block;
     position: absolute;
-    bottom: -4px;
+    bottom: -5px;
     right: -20px;
     border: 10px solid transparent;
     border-left-width: 13px;
@@ -31,8 +31,45 @@ $tail-angle: 20deg;
 
 }
 
+.sms-message-inbound {
+
+  .sms-message-wrapper {
+
+    &:after {
+      border-left-color: transparent;
+      border-bottom-color: $panel-colour;
+      border-right-color: $panel-colour;
+      right: auto;
+      left: -20px;
+      transform: rotate(-$tail-angle);
+    }
+
+  }
+
+}
+
 .sms-message-recipient {
   @include copy-19;
   color: $secondary-text-colour;
   margin: 10px 0 0 0;
+}
+
+.sms-message-status {
+  @include core-16;
+  color: $secondary-text-colour;
+  margin: -20px $gutter-half 20px $gutter-half;
+}
+
+.sms-message-status-outbound {
+  text-align: right;
+}
+
+.sms-message-row {
+
+  &:focus {
+    outline: none;
+    padding-top: 120px;
+    margin-top: -120px;
+  }
+
 }

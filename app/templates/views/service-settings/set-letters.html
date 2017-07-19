@@ -11,7 +11,7 @@
   <div class="grid-row">
     <div class="column-five-sixths">
       <h1 class="heading-large">Letters</h1>
-      {% if current_service.can_send_letters %}
+      {% if 'letter' in current_service.permissions %} 
         <p>
           Your service can send letters.
         </p>

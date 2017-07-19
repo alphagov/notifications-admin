@@ -1,7 +1,13 @@
+{% from "components/banner.html" import banner_wrapper %}
+
 <div class="bottom-gutter">
   {% call banner_wrapper(type='dangerous') %}
     <h1 class='banner-title'>
-      Too many recipients
+      {% if original_file_name %}
+        Too many recipients
+      {% else %}
+        Daily limit reached
+      {% endif %}
     </h1>
     <p>
       You can only send {{ current_service.message_limit }} messages per day
@@ -10,29 +16,31 @@
       {%- endif -%}
       .
     </p>
-    <p>
-      {% if current_service.message_limit != remaining_messages %}
-        You can still send {{ remaining_messages }} messages today, but
-      {% endif %}
-      ‘{{ original_file_name }}’ contains
-      {{ count_of_recipients }}
-      {% if count_of_recipients == 1 -%}
-        {%- if template.template_type == 'email' -%}
-          email address
-        {%- elif template.template_type == 'sms' -%}
-          phone number
-        {%- elif template.template_type == 'letter' -%}
-          address
-        {%- endif -%}
-      {%- else -%}
-        {%- if template.template_type == 'email' -%}
-          email addresses
-        {%- elif template.template_type == 'sms' -%}
-          phone numbers
-        {%- elif template.template_type == 'letter' -%}
-          addresses
-        {%- endif -%}
-      {%- endif -%}.
-    </p>
+    {% if original_file_name %}
+      <p>
+        {% if current_service.message_limit != remaining_messages %}
+          You can still send {{ remaining_messages }} messages today, but
+        {% endif %}
+        ‘{{ original_file_name }}’ contains
+        {{ count_of_recipients }}
+        {% if count_of_recipients == 1 -%}
+          {%- if template.template_type == 'email' -%}
+            email address
+          {%- elif template.template_type == 'sms' -%}
+            phone number
+          {%- elif template.template_type == 'letter' -%}
+            address
+          {%- endif -%}
+        {%- else -%}
+          {%- if template.template_type == 'email' -%}
+            email addresses
+          {%- elif template.template_type == 'sms' -%}
+            phone numbers
+          {%- elif template.template_type == 'letter' -%}
+            addresses
+          {%- endif -%}
+        {%- endif -%}.
+      </p>
+    {% endif %}
   {% endcall %}
 </div>

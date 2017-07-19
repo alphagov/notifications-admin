@@ -14,7 +14,7 @@
 {% endmacro %}
 
 {% block service_page_title %}
-  {{ "Error" if errors else "Preview" }}
+  {{ "Error" if errors else "Preview of {}".format(template.name) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -120,25 +120,12 @@
     </div>
 
   {% elif not recipients.allowed_to_send_to %}
-
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
-        <h1 class='banner-title'>
-          You can’t send to
-          {{ 'this' if count_of_recipients == 1 else 'these' }}
-          {{ recipients.recipient_column_headers[0] }}
-          {%- if count_of_recipients != 1 -%}
-            {{ 'es' if 'email address' == recipients.recipient_column_headers[0] else 's' }}
-          {%- endif %}
-        </h1>
-        <p>
-          In <a href="{{ url_for('.trial_mode') }}">trial mode</a> you can only
-          send to yourself and members of your team
-        </p>
-        {{ skip_to_file_contents() }}
-      {% endcall %}
-    </div>
-
+    {% with
+      count_of_recipients=count_of_recipients,
+      template_type_label=recipients.recipient_column_headers[0]
+    %}
+      {% include "partials/check/not-allowed-to-send-to.html" %}
+    {% endwith %}
   {% elif recipients.more_rows_than_can_send %}
     {% include "partials/check/too-many-messages.html" %}
   {% else %}

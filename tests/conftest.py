@@ -1,9 +1,12 @@
+from contextlib import contextmanager
 import os
 from datetime import date, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
 from notifications_python_client.errors import HTTPError
+from flask import url_for
+from bs4 import BeautifulSoup
 
 from app import create_app
 from app.notify_client.models import (
@@ -59,11 +62,6 @@ def service_with_reply_to_addresses(api_user_active):
 
 
 @pytest.fixture(scope='function')
-def mock_send_sms(request, mocker):
-    return mocker.patch("app.service_api_client.send_sms")
-
-
-@pytest.fixture(scope='function')
 def fake_uuid():
     return sample_uuid()
 
@@ -80,7 +78,7 @@ def mock_get_service(mocker, api_user_active):
 @pytest.fixture(scope='function')
 def mock_get_international_service(mocker, api_user_active):
     def _get(service_id):
-        service = service_json(service_id, users=[api_user_active.id], can_send_international_sms=True)
+        service = service_json(service_id, users=[api_user_active.id], permissions=['sms', 'international_sms'])
         return {'data': service}
 
     return mocker.patch('app.service_api_client.get_service', side_effect=_get)
@@ -348,7 +346,7 @@ def mock_get_service_template_with_placeholders(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_service_email_template(mocker, content=None, subject=None):
+def mock_get_service_email_template(mocker, content=None, subject=None, redact_personalisation=False):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id,
@@ -357,6 +355,7 @@ def mock_get_service_email_template(mocker, content=None, subject=None):
             "email",
             content or "Your vehicle tax expires on ((date))",
             subject or "Your ((thing)) is due soon",
+            redact_personalisation=redact_personalisation,
         )
         return {'data': template}
 
@@ -490,6 +489,21 @@ def mock_get_service_templates_when_no_templates_exist(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_service_templates_with_only_one_template(mocker):
+
+    def _get(service_id):
+        return {'data': [
+            template_json(
+                service_id, generate_uuid(), "sms_template_one", "sms", "sms template one content"
+            )
+        ]}
+
+    return mocker.patch(
+        'app.service_api_client.get_service_templates',
+        side_effect=_get)
+
+
+@pytest.fixture(scope='function')
 def mock_delete_service_template(mocker):
     def _delete(service_id, template_id):
         template = template_json(
@@ -498,6 +512,11 @@ def mock_delete_service_template(mocker):
 
     return mocker.patch(
         'app.service_api_client.delete_service_template', side_effect=_delete)
+
+
+@pytest.fixture(scope='function')
+def mock_redact_template(mocker):
+    return mocker.patch('app.service_api_client.redact_service_template')
 
 
 @pytest.fixture(scope='function')
@@ -1060,7 +1079,13 @@ def mock_get_jobs(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
-def mock_get_notifications(mocker, api_user_active):
+def mock_get_notifications(
+    mocker,
+    api_user_active,
+    template_content=None,
+    personalisation=None,
+    redact_personalisation=False,
+):
     def _get_notifications(
         service_id,
         job_id=None,
@@ -1077,17 +1102,28 @@ def mock_get_notifications(mocker, api_user_active):
         job = None
         if job_id is not None:
             job = job_json(service_id, api_user_active, job_id=job_id)
-
         if template_type:
-            template = template_json(service_id, id_=str(generate_uuid()), type_=template_type[0])
+            template = template_json(
+                service_id,
+                id_=str(generate_uuid()),
+                type_=template_type[0],
+                content=template_content,
+                redact_personalisation=redact_personalisation,
+            )
         else:
-            template = template_json(service_id, id_=str(generate_uuid()))
+            template = template_json(
+                service_id,
+                id_=str(generate_uuid()),
+                content=template_content,
+                redact_personalisation=redact_personalisation,
+            )
 
         return notification_json(
             service_id,
             template=template,
             rows=rows,
-            job=job
+            job=job,
+            personalisation=personalisation,
         )
 
     return mocker.patch(
@@ -1125,7 +1161,9 @@ def mock_get_notifications_with_no_notifications(mocker):
                            status=None,
                            limit_days=None,
                            include_jobs=None,
-                           include_from_test_key=None):
+                           include_from_test_key=None,
+                           to=None,
+                           ):
         return notification_json(service_id, rows=0)
 
     return mocker.patch(
@@ -1138,11 +1176,13 @@ def mock_get_notifications_with_no_notifications(mocker):
 def mock_get_inbound_sms(mocker):
     def _get_inbound_sms(
         service_id,
+        user_number=None,
     ):
         return [{
             'user_number': '0790090000' + str(i),
             'content': 'message-{}'.format(index + 1),
-            'created_at': (datetime.utcnow() - timedelta(minutes=60 * (i + 1))).isoformat()
+            'created_at': (datetime.utcnow() - timedelta(minutes=60 * (i + 1), seconds=index)).isoformat(),
+            'id': sample_uuid(),
         } for index, i in enumerate([0, 0, 0, 2, 4, 6, 8, 8])]
 
     return mocker.patch(
@@ -1365,6 +1405,27 @@ def mock_get_monthly_template_statistics(mocker, service_one, fake_uuid):
         }
     return mocker.patch(
         'app.template_statistics_client.get_monthly_template_statistics_for_service',
+        side_effect=_stats
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_monthly_notification_stats(mocker, service_one, fake_uuid):
+    def _stats(service_id, year):
+        return {'data': {
+            datetime.utcnow().strftime('%Y-%m'): {
+                "email": {
+                    "sending": 1,
+                    "delivered": 1,
+                },
+                "sms": {
+                    "sending": 1,
+                    "delivered": 1,
+                },
+            }
+        }}
+    return mocker.patch(
+        'app.service_api_client.get_monthly_notification_stats',
         side_effect=_stats
     )
 
@@ -1612,6 +1673,57 @@ def mock_reset_failed_login_count(mocker):
     return mocker.patch('app.user_api_client.reset_failed_login_count')
 
 
+@pytest.fixture
+def mock_get_notification(
+    mocker,
+    fake_uuid,
+    notification_status='delivered',
+    redact_personalisation=False,
+):
+    def _get_notification(
+        service_id,
+        notification_id,
+    ):
+        noti = notification_json(
+            service_id,
+            rows=1,
+            status=notification_status
+        )['notifications'][0]
+
+        noti['id'] = notification_id
+        noti['created_by'] = {
+            'id': fake_uuid,
+            'name': 'Test User',
+            'email_address': 'test@user.gov.uk'
+        }
+        noti['personalisation'] = {'name': 'Jo'}
+        noti['template'] = template_json(
+            service_id,
+            '5407f4db-51c7-4150-8758-35412d42186a',
+            content='hello ((name))',
+            redact_personalisation=redact_personalisation,
+        )
+        return noti
+
+    return mocker.patch(
+        'app.notification_api_client.get_notification',
+        side_effect=_get_notification
+    )
+
+
+@pytest.fixture
+def mock_send_notification(mocker, fake_uuid):
+    def _send_notification(
+        service_id, *, template_id, recipient, personalisation
+    ):
+        return {'id': fake_uuid}
+
+    return mocker.patch(
+        'app.notification_api_client.send_notification',
+        side_effect=_send_notification
+    )
+
+
 @pytest.fixture(scope='function')
 def client(app_):
     with app_.test_request_context(), app_.test_client() as client:
@@ -1653,3 +1765,56 @@ def os_environ():
     os.environ = {}
     yield
     os.environ = old_env
+
+
+@pytest.fixture
+def client_request(logged_in_client):
+    class ClientRequest:
+
+        @staticmethod
+        @contextmanager
+        def session_transaction():
+            with logged_in_client.session_transaction() as session:
+                yield session
+
+        @staticmethod
+        def get(
+            endpoint,
+            _expected_status=200,
+            _follow_redirects=False,
+            _test_page_title=True,
+            **endpoint_kwargs
+        ):
+            resp = logged_in_client.get(
+                url_for(endpoint, **(endpoint_kwargs or {})),
+                follow_redirects=_follow_redirects,
+            )
+            assert resp.status_code == _expected_status
+            page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
+            if _test_page_title:
+                page_title, h1 = (
+                    normalize_spaces(page.find(selector).text) for selector in ('title', 'h1')
+                )
+                if not normalize_spaces(page_title).startswith(h1):
+                    raise AssertionError('Page title ‘{}’ does not start with H1 ‘{}’'.format(page_title, h1))
+            return page
+
+        @staticmethod
+        def post(endpoint, _data=None, _expected_status=None, _follow_redirects=False, **endpoint_kwargs):
+            if _expected_status is None:
+                _expected_status = 200 if _follow_redirects else 302
+            resp = logged_in_client.post(
+                url_for(endpoint, **(endpoint_kwargs or {})),
+                data=_data,
+                follow_redirects=_follow_redirects,
+            )
+            assert resp.status_code == _expected_status
+            return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
+
+    return ClientRequest
+
+
+def normalize_spaces(input):
+    if isinstance(input, str):
+        return ' '.join(input.split())
+    return normalize_spaces(' '.join(item.text for item in input))

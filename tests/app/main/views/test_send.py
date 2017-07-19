@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import uuid
+from unittest.mock import Mock
 from io import BytesIO
 from os import path
 from glob import glob
@@ -8,21 +10,19 @@ from functools import partial
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from notifications_python_client.errors import HTTPError
 from notifications_utils.template import LetterPreviewTemplate, LetterImageTemplate
 from notifications_utils.recipients import RecipientCSV
 
-from app.main.views.send import get_check_messages_back_url
-
-from tests import validate_route_permission, template_json
-from tests.app.test_utils import normalize_spaces
+from tests import validate_route_permission, validate_route_permission_with_client
 from tests.conftest import (
     mock_get_service_template,
     mock_get_service_template_with_placeholders,
     mock_get_service_letter_template,
     mock_get_service,
     mock_get_international_service,
-    mock_get_service_template,
     mock_get_service_email_template,
+    normalize_spaces,
     SERVICE_ONE_ID,
 )
 
@@ -36,6 +36,32 @@ test_non_spreadsheet_files = glob(path.join('tests', 'non_spreadsheet_files', '*
 def test_that_test_files_exist():
     assert len(test_spreadsheet_files) == 8
     assert len(test_non_spreadsheet_files) == 6
+
+
+def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
+    logged_in_client,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+    template_id = fake_uuid
+    service_one['permissions'] = []
+
+    response = logged_in_client.get(url_for(
+        '.send_messages',
+        service_id=service_one['id'],
+        template_id=template_id),
+        follow_redirects=True)
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
+    assert page.select(".page-footer-back-link")[0].text == "Back to the template"
+    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=template_id,
+    )
 
 
 @pytest.mark.parametrize(
@@ -275,38 +301,13 @@ def test_send_test_doesnt_show_file_contents(
     assert page.select('input[type=submit]')[0]['value'].strip() == 'Send 1 text message'
 
 
-def test_send_test_sms_message(
-    logged_in_client,
-    service_one,
-    fake_uuid,
-    mocker,
-    mock_get_service_template,
-    mock_s3_upload,
-    mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
-):
-
-    mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
-
-    response = logged_in_client.get(
-        url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid),
-        follow_redirects=True
-    )
-    assert response.status_code == 200
-    mock_s3_upload.assert_called_with(
-        service_one['id'],
-        {'data': 'phone number\r\n07700 900762\r\n', 'file_name': 'Report'},
-        'eu-west-1'
-    )
-
-
-@pytest.mark.parametrize('endpoint, template_mock, expected_session_contents', [
-    ('main.send_test_step', mock_get_service_template_with_placeholders, {'phone number': '07700 900762'}),
-    ('main.send_test_step', mock_get_service_email_template, {'email address': 'test@user.gov.uk'}),
-    ('main.send_test_step', mock_get_service_letter_template, {}),
-    ('main.send_one_off_step', mock_get_service_template, {}),
-    ('main.send_one_off_step', mock_get_service_email_template, {}),
-    ('main.send_one_off_step', mock_get_service_letter_template, {}),
+@pytest.mark.parametrize('endpoint, template_mock, expected_recipient', [
+    ('main.send_test_step', mock_get_service_template_with_placeholders, '07700 900762'),
+    ('main.send_test_step', mock_get_service_email_template, 'test@user.gov.uk'),
+    ('main.send_test_step', mock_get_service_letter_template, None),
+    ('main.send_one_off_step', mock_get_service_template, None),
+    ('main.send_one_off_step', mock_get_service_email_template, None),
+    ('main.send_one_off_step', mock_get_service_letter_template, None),
 ])
 def test_send_test_step_redirects_if_session_not_setup(
     mocker,
@@ -316,14 +317,14 @@ def test_send_test_step_redirects_if_session_not_setup(
     fake_uuid,
     endpoint,
     template_mock,
-    expected_session_contents,
+    expected_recipient,
 ):
-
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
     with logged_in_client.session_transaction() as session:
-        assert 'send_test_values' not in session
+        assert 'recipient' not in session
+        assert 'placeholders' not in session
 
     response = logged_in_client.get(
         url_for(endpoint, service_id=SERVICE_ONE_ID, template_id=fake_uuid, step_index=0),
@@ -332,7 +333,33 @@ def test_send_test_step_redirects_if_session_not_setup(
     assert response.status_code == 200
 
     with logged_in_client.session_transaction() as session:
-        assert session['send_test_values'] == expected_session_contents
+        assert session['recipient'] == expected_recipient
+
+
+def test_send_one_off_does_not_send_without_the_correct_permissions(
+    logged_in_client,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+):
+    template_id = fake_uuid
+    service_one['permissions'] = []
+
+    response = logged_in_client.get(url_for(
+        '.send_one_off',
+        service_id=service_one['id'],
+        template_id=template_id),
+        follow_redirects=True)
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert page.select('main p')[0].text.strip() == "Sending text messages has been disabled for your service."
+    assert page.select(".page-footer-back-link")[0].text == "Back to the template"
+    assert page.select(".page-footer-back-link")[0]['href'] == url_for(
+        '.view_template',
+        service_id=service_one['id'],
+        template_id=template_id,
+    )
 
 
 @pytest.mark.parametrize('template_mock, partial_url, expected_h1, tour_shown', [
@@ -449,7 +476,7 @@ def test_send_one_off_has_skip_link(
         assert not skip_links
 
 
-@pytest.mark.parametrize('endpoint, expected_redirect, send_test_values', [
+@pytest.mark.parametrize('endpoint, expected_redirect, placeholders', [
     (
         'main.send_test_step',
         'main.send_test',
@@ -465,17 +492,13 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
     logged_in_client,
     service_one,
     fake_uuid,
-    mock_get_service_template,
-    mock_s3_upload,
-    mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
     endpoint,
-    send_test_values,
+    placeholders,
     expected_redirect,
 ):
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = send_test_values
+        session['placeholders'] = placeholders
 
     response = logged_in_client.get(url_for(
         endpoint,
@@ -486,16 +509,12 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
 
     assert response.status_code == 302
     expected_url = url_for(
-        'main.check_messages',
+        expected_redirect,
         service_id=service_one['id'],
-        upload_id=fake_uuid,
-        template_type='sms',
+        template_id=fake_uuid,
         _external=True,
     )
-    assert response.location in (
-        expected_url + '?help=0&from_test=True',
-        expected_url + '?from_test=True&help=0',
-    )
+    assert response.location == expected_url
 
 
 @pytest.mark.parametrize('endpoint, expected_redirect', [
@@ -517,7 +536,7 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
 
     with logged_in_platform_admin_client.session_transaction() as session:
         session['send_test_letter_page_count'] = 1
-        session['send_test_values'] = {'address_line_1': 'foo'}
+        session['placeholders'] = {'address_line_1': 'foo'}
 
     response = logged_in_platform_admin_client.get(url_for(
         endpoint,
@@ -551,7 +570,7 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
 ):
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {'name': 'foo'}
+        session['placeholders'] = {'name': 'foo'}
 
     response = logged_in_client.get(url_for(
         endpoint,
@@ -573,13 +592,17 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     ('main.send_test', 'main.send_test_step'),
     ('main.send_one_off', 'main.send_one_off_step'),
 ])
-def test_send_test_sms_message_redirects_with_help_argument(
+def _redirects_with_help_argument(
     logged_in_client,
+    mocker,
     service_one,
     fake_uuid,
     endpoint,
     expected_redirect,
 ):
+    template = {'data': {'template_type': 'sms'}}
+    mocker.patch('app.service_api_client.get_service_template', return_value=template)
+
     response = logged_in_client.get(
         url_for(endpoint, service_id=service_one['id'], template_id=fake_uuid, help=1)
     )
@@ -594,7 +617,7 @@ def test_send_test_sms_message_redirects_with_help_argument(
     )
 
 
-def test_send_test_email_message_without_placeholders(
+def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     logged_in_client,
     mocker,
     service_one,
@@ -604,19 +627,16 @@ def test_send_test_email_message_without_placeholders(
     mock_get_detailed_service_for_today,
     fake_uuid,
 ):
-
-    mocker.patch('app.main.views.send.s3download', return_value='email address\r\ntest@user.gov.uk')
+    with logged_in_client.session_transaction() as session:
+        session['recipient'] = 'foo@bar.com'
 
     response = logged_in_client.get(
-        url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid),
+        url_for('main.send_test', step_index=0, service_id=service_one['id'], template_id=fake_uuid),
         follow_redirects=True
     )
     assert response.status_code == 200
-    mock_s3_upload.assert_called_with(
-        service_one['id'],
-        {'data': 'email address\r\ntest@user.gov.uk\r\n', 'file_name': 'Report'},
-        'eu-west-1'
-    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select('h1')[0].text.strip() == 'Preview of Two week reminder'
 
 
 def test_send_test_sms_message_with_placeholders_shows_first_field(
@@ -630,7 +650,7 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
 ):
 
     with logged_in_client.session_transaction() as session:
-        assert 'send_test_values' not in session
+        assert 'placeholders' not in session
 
     response = logged_in_client.get(
         url_for(
@@ -651,7 +671,7 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
         template_id=fake_uuid,
     )
     with logged_in_client.session_transaction() as session:
-        assert session['send_test_values']['phone number'] == '07700 900762'
+        assert session['recipient'] == '07700 900762'
 
 
 def test_send_test_letter_clears_previous_page_cache(
@@ -689,8 +709,9 @@ def test_send_test_populates_field_from_session(
 ):
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {}
-        session['send_test_values']['name'] = 'Jo'
+        session['recipient'] = None
+        session['placeholders'] = {}
+        session['placeholders']['name'] = 'Jo'
 
     response = logged_in_client.get(url_for(
         'main.send_test_step',
@@ -741,7 +762,8 @@ def test_send_test_indicates_optional_address_columns(
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {}
+        session['recipient'] = None
+        session['placeholders'] = {}
 
     response = logged_in_client.get(url_for(
         'main.send_test_step',
@@ -777,7 +799,8 @@ def test_send_test_allows_empty_optional_address_columns(
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {}
+        session['recipient'] = None
+        session['placeholders'] = {}
 
     response = logged_in_client.post(
         url_for(
@@ -799,21 +822,17 @@ def test_send_test_allows_empty_optional_address_columns(
     )
 
 
-def test_send_test_sms_message_puts_submitted_data_in_session_and_file(
+def test_send_test_sms_message_puts_submitted_data_in_session(
     logged_in_client,
-    mocker,
     service_one,
     mock_get_service_template_with_placeholders,
-    mock_s3_upload,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
     fake_uuid,
 ):
-
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {}
-
-    mocker.patch('app.main.views.send.s3download', return_value='phone number\r\n+4412341234')
+        session['recipient'] = '07700 900762'
+        session['placeholders'] = {}
 
     response = logged_in_client.post(
         url_for(
@@ -822,23 +841,19 @@ def test_send_test_sms_message_puts_submitted_data_in_session_and_file(
             template_id=fake_uuid,
             step_index=0,
         ),
-        data={'placeholder_value': 'Jo'},
-        follow_redirects=True,
+        data={'placeholder_value': 'Jo'}
     )
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.check_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _external=True
+    )
 
     with logged_in_client.session_transaction() as session:
-        assert session['send_test_values']['phone number'] == '07700 900762'
-        assert session['send_test_values']['name'] == 'Jo'
-
-    mock_s3_upload.assert_called_with(
-        service_one['id'],
-        {
-            'data': 'name,phone number\r\nJo,07700 900762\r\n',
-            'file_name': 'Report'
-        },
-        'eu-west-1'
-    )
+        assert session['recipient'] == '07700 900762'
+        assert session['placeholders']['name'] == 'Jo'
 
 
 @pytest.mark.parametrize('filetype', ['pdf', 'png'])
@@ -852,7 +867,7 @@ def test_send_test_works_as_letter_preview(
     fake_uuid,
     mocker,
 ):
-    service_one['can_send_letters'] = True
+    service_one['permissions'] = ['letter']
     mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
     mocked_preview = mocker.patch(
@@ -863,7 +878,7 @@ def test_send_test_works_as_letter_preview(
     service_id = service_one['id']
     template_id = fake_uuid
     with logged_in_platform_admin_client.session_transaction() as session:
-        session['send_test_values'] = {'address_line_1': 'Jo Lastname'}
+        session['placeholders'] = {'address_line_1': 'Jo Lastname'}
     response = logged_in_platform_admin_client.get(
         url_for(
             'main.send_test_preview',
@@ -889,9 +904,12 @@ def test_send_test_clears_session(
     service_one,
     fake_uuid,
 ):
+    template = {'data': {'template_type': 'sms'}}
+    mocker.patch('app.service_api_client.get_service_template', return_value=template)
 
     with logged_in_client.session_transaction() as session:
-        session['send_test_values'] = {'foo': 'bar'}
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'foo': 'bar'}
 
     response = logged_in_client.get(
         url_for(
@@ -903,7 +921,8 @@ def test_send_test_clears_session(
     assert response.status_code == 302
 
     with logged_in_client.session_transaction() as session:
-        assert session['send_test_values'] == {}
+        assert session['recipient'] is None
+        assert session['placeholders'] == {}
 
 
 def test_download_example_csv(
@@ -1138,7 +1157,7 @@ def test_should_show_preview_letter_message(
     fake_uuid,
     mocker,
 ):
-    service_one['can_send_letters'] = True
+    service_one['permissions'] = ['letter']
     mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
@@ -1277,6 +1296,41 @@ def test_route_permissions(
         service_one)
 
 
+@pytest.mark.parametrize('route, response_code, method', [
+    ('main.check_notification', 200, 'GET'),
+    ('main.send_notification', 302, 'POST')
+])
+def test_route_permissions_send_check_notifications(
+    mocker,
+    app_,
+    client,
+    api_user_active,
+    service_one,
+    mock_send_notification,
+    mock_get_service_template,
+    fake_uuid,
+    route,
+    response_code,
+    method
+):
+    with client.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'name': 'a'}
+    validate_route_permission_with_client(
+            mocker,
+            client,
+            method,
+            response_code,
+            url_for(
+                route,
+                service_id=service_one['id'],
+                template_id=fake_uuid
+            ),
+            ['send_texts', 'send_emails', 'send_letters'],
+            api_user_active,
+            service_one)
+
+
 @pytest.mark.parametrize('route', [
     'main.choose_template',
     'main.send_messages',
@@ -1326,11 +1380,6 @@ def test_route_invalid_permissions(
             partial(url_for, '.send_messages')
         ),
         (
-            mock_get_service_template,
-            dict(from_test=True),
-            partial(url_for, '.view_template')
-        ),
-        (
             mock_get_service_letter_template,  # No placeholders
             dict(from_test=True),
             partial(url_for, '.send_test')
@@ -1339,16 +1388,6 @@ def test_route_invalid_permissions(
             mock_get_service_template_with_placeholders,
             dict(from_test=True),
             partial(url_for, '.send_test')
-        ),
-        (
-            mock_get_service_template_with_placeholders,
-            dict(help='0', from_test=True),
-            partial(url_for, '.send_test')
-        ),
-        (
-            mock_get_service_template_with_placeholders,
-            dict(help='2', from_test=True),
-            partial(url_for, '.send_test', help='1')
         )
     ]
 )
@@ -1388,7 +1427,27 @@ def test_check_messages_back_link(
     ) == expected_url(service_id=fake_uuid, template_id=fake_uuid)
 
 
-def test_go_to_dashboard_after_tour(
+def test_shows_link_to_end_tour(
+    client_request,
+    mock_get_notification,
+    fake_uuid,
+):
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        help=3,
+    )
+
+    assert page.select(".banner-tour a")[0]['href'] == url_for(
+        'main.go_to_dashboard_after_tour',
+        service_id=SERVICE_ONE_ID,
+        example_template_id='5407f4db-51c7-4150-8758-35412d42186a',
+    )
+
+
+def test_go_to_dashboard_after_tour_link(
     logged_in_client,
     mocker,
     api_user_active,
@@ -1529,8 +1588,49 @@ def test_check_messages_shows_over_max_row_error(
     )
 
 
-def test_check_messages_redirects_if_no_upload_data(logged_in_client, service_one, mocker):
-    checker = mocker.patch('app.main.views.send.get_check_messages_back_url', return_value='foo')
+def test_non_ascii_characters_in_letter_recipients_file_shows_error(
+    logged_in_client,
+    api_user_active,
+    mock_login,
+    mock_get_users_by_service,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_service_letter_template,
+    mock_get_detailed_service_for_today,
+    fake_uuid,
+    mocker
+):
+    from tests.conftest import mock_s3_download
+    mock_s3_download(
+        mocker,
+        content=u"""
+        address line 1,address line 2,address line 3,address line 4,address line 5,address line 6,postcode
+        Петя,345 Example Street,,,,,AA1 6BB
+        """
+    )
+
+    with logged_in_client.session_transaction() as session:
+        session['upload_data'] = {'template_id': fake_uuid}
+    response = logged_in_client.get(url_for(
+        'main.check_messages',
+        service_id=fake_uuid,
+        template_type='letter',
+        upload_id=fake_uuid
+    ))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert ' '.join(
+        page.find('div', class_='banner-dangerous').text.split()
+    ) == (
+            'There is a problem with your data '
+            'You need to fix 1 address '
+            'Skip to file contents'
+        )
+    assert page.find('span', class_='table-field-error-label').text == u'Can’t include П, е, т or я'
+
+
+def test_check_messages_redirects_if_no_upload_data(logged_in_client, service_one):
     response = logged_in_client.get(url_for(
         'main.check_messages',
         service_id=service_one['id'],
@@ -1538,48 +1638,278 @@ def test_check_messages_redirects_if_no_upload_data(logged_in_client, service_on
         upload_id='baz'
     ))
 
-    checker.assert_called_once_with(service_one['id'], 'bar')
     assert response.status_code == 301
-    assert response.location == 'http://localhost/foo'
+    assert response.location == url_for('main.choose_template', service_id=service_one['id'], _external=True)
 
 
-@pytest.mark.parametrize('template_type', ['sms', 'email'])
-def test_get_check_messages_back_url_returns_to_correct_select_template(client, mocker, template_type):
-    mocker.patch('app.main.views.send.get_help_argument', return_value=False)
+@pytest.mark.parametrize('existing_session_items', [
+    {},
+    {'recipient': '07700900001'},
+    {'name': 'Jo'}
+])
+def test_check_notification_redirects_if_session_not_populated(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    existing_session_items,
+    mock_get_service_template_with_placeholders
+):
+    with logged_in_client.session_transaction() as session:
+        session.update(existing_session_items)
 
-    assert get_check_messages_back_url('1234', template_type) == url_for(
-        'main.choose_template',
-        service_id='1234'
+    resp = logged_in_client.get(url_for(
+        'main.check_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid
+    ))
+
+    assert resp.location == url_for(
+        'main.view_template',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _external=True
     )
 
 
-def test_check_messages_back_from_help_goes_to_start_of_help(client, service_one, mocker):
-    mocker.patch('app.main.views.send.get_help_argument', return_value=True)
-    mocker.patch('app.service_api_client.get_service_templates', lambda service_id: {
-        'data': [template_json(service_one['id'], '111', type_='sms')]
-    })
-    assert get_check_messages_back_url(service_one['id'], 'sms') == url_for(
+@pytest.mark.parametrize('existing_session_items', [
+    {},
+    {'recipient': '07700900001'},
+    {'name': 'Jo'}
+])
+def test_check_notification_redirects_with_help_if_session_not_populated(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    existing_session_items,
+    mock_get_service_template_with_placeholders
+):
+    with logged_in_client.session_transaction() as session:
+        session.update(existing_session_items)
+
+    resp = logged_in_client.get(url_for(
+        'main.check_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        help='2'
+    ))
+
+    assert resp.location == url_for(
         'main.send_test',
         service_id=service_one['id'],
-        template_id='111',
-        help='1'
+        template_id=fake_uuid,
+        help='2',
+        _external=True
     )
 
 
-@pytest.mark.parametrize('templates', [
-    [],
-    [
-        template_json('000', '111', type_='sms'),
-        template_json('000', '222', type_='sms')
-    ]
-], ids=['no_templates', 'two_templates'])
-def test_check_messages_back_from_help_handles_unexpected_templates(client, mocker, templates):
-    mocker.patch('app.main.views.send.get_help_argument', return_value=True)
-    mocker.patch('app.service_api_client.get_service_templates', lambda service_id: {
-        'data': templates
-    })
+def test_check_notification_shows_preview(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_template
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {}
 
-    assert get_check_messages_back_url('1234', 'sms') == url_for(
-        'main.choose_template',
-        service_id='1234',
+    page = client_request.get(
+        'main.check_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid
     )
+
+    assert page.h1.text.strip() == 'Preview of Two week reminder'
+    assert (
+        page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
+    ) == url_for('main.view_template', service_id=service_one['id'], template_id=fake_uuid)
+
+    # assert tour not visible
+    assert not page.select('.banner-tour')
+    assert page.form.attrs['action'] == url_for(
+        'main.send_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        help='0'
+    )
+
+
+def test_check_notification_shows_help(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_template
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {}
+
+    page = client_request.get(
+        'main.check_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        help='2'
+    )
+    assert page.select_one('.banner-tour')
+    assert page.form.attrs['action'] == url_for(
+        'main.send_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        help='3'
+    )
+    assert page.select_one('.page-footer-back-link')['href'] == url_for(
+        'main.send_test',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        help='2'
+    )
+
+
+def test_send_notification_submits_data(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_send_notification,
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'a': 'b'}
+
+    client_request.post(
+        'main.send_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid
+    )
+
+    mock_send_notification.assert_called_once_with(
+        service_one['id'],
+        template_id=fake_uuid,
+        recipient='07700900001',
+        personalisation={'a': 'b'}
+    )
+
+
+def test_send_notification_clears_session(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_send_notification,
+):
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'a': 'b'}
+
+    client_request.post(
+        'main.send_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid
+    )
+
+    with client_request.session_transaction() as session:
+        assert 'recipient' not in session
+        assert 'placeholders' not in session
+
+
+def test_send_notification_redirects_if_missing_data(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+):
+    with logged_in_client.session_transaction() as session:
+        session['placeholders'] = {'a': 'b'}
+
+    resp = logged_in_client.post(
+        url_for('main.send_notification', service_id=service_one['id'], template_id=fake_uuid)
+    )
+
+    assert resp.status_code == 302
+    assert resp.location == url_for(
+        '.send_one_off',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _external=True
+    )
+
+
+@pytest.mark.parametrize('extra_args, extra_redirect_args', [
+    ({}, {}),
+    ({'help': '3'}, {'help': '3'})
+])
+def test_send_notification_redirects_to_view_page(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    mock_send_notification,
+    extra_args,
+    extra_redirect_args
+):
+    with logged_in_client.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'a': 'b'}
+
+    resp = logged_in_client.post(
+        url_for('main.send_notification', service_id=service_one['id'], template_id=fake_uuid, **extra_args)
+    )
+
+    assert resp.status_code == 302
+    assert resp.location == url_for(
+        '.view_notification',
+        service_id=service_one['id'],
+        notification_id=fake_uuid,
+        _external=True,
+        **extra_redirect_args
+    )
+
+
+TRIAL_MODE_MSG = (
+    'Can’t send to this recipient when service is in trial mode – '
+    'see https://www.notifications.service.gov.uk/trial-mode'
+)
+TOO_LONG_MSG = 'Content for template has a character count greater than the limit of 495'
+SERVICE_DAILY_LIMIT_MSG = 'Exceeded send limits (1000) for today'
+
+
+@pytest.mark.parametrize('exception_msg, expected_h1, expected_err_details', [
+    (
+        TRIAL_MODE_MSG,
+        'You can’t send to this phone number',
+        'In trial mode you can only send to yourself and members of your team'
+    ),
+    (
+        TOO_LONG_MSG,
+        'Message too long',
+        'Text messages can’t be longer than 459 characters. Your message is 554 characters.'
+    ),
+    (
+        SERVICE_DAILY_LIMIT_MSG,
+        'Daily limit reached',
+        'You can only send 1000 messages per day in trial mode.'
+    ),
+])
+def test_send_notification_shows_error_if_400(
+    client_request,
+    service_one,
+    fake_uuid,
+    mocker,
+    mock_get_service_template_with_placeholders,
+    exception_msg,
+    expected_h1,
+    expected_err_details
+):
+    mocker.patch(
+        'app.notification_api_client.send_notification',
+        side_effect=HTTPError(response=Mock(status_code=400), message=exception_msg)
+    )
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07700900001'
+        session['placeholders'] = {'name': 'a' * 500}
+
+    page = client_request.post(
+        'main.send_notification',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _expected_status=200
+    )
+
+    assert ' '.join(page.h1.text.split()) == expected_h1
+    assert ' '.join(page.h1.parent.p.text.split()) == expected_err_details
+    assert not page.find('input[type=submit]')

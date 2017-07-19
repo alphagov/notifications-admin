@@ -1,3 +1,4 @@
+{% from "components/pill.html" import pill %}
 {% from "components/message-count-label.html" import message_count_label %}
 {% from "components/textbox.html" import textbox %}
 
@@ -16,7 +17,7 @@
     {% if current_user.has_permissions(permissions=['manage_templates'], any_=True) %}
        <p class="bottom-gutter">
          You need a template before you can send
-         {% if current_service.can_send_letters %}
+         {% if 'letter' in current_service.permissions %}
            emails, text messages or letters
          {%- else -%}
            emails or text messages
@@ -26,7 +27,7 @@
     {% else %}
       <p>
         You need to ask your service manager to add templates before you can send
-        {% if current_service.can_send_letters %}
+        {% if 'letter' in current_service.permissions %}
           emails, text messages or letters
         {%- else -%}
           emails or text messages
@@ -36,7 +37,7 @@
 
   {% else %}
 
-    <div class="grid-row bottom-gutter-1-2">
+    <div class="grid-row bottom-gutter-2-3">
       <div class="column-two-thirds">
         <h1 class="heading-large">Templates</h1>
       </div>
@@ -47,7 +48,13 @@
       {% endif %}
     </div>
 
-    {% if templates|length > 7 %}
+    {% if show_template_nav %}
+      <div class="bottom-gutter-2-3">
+        {{ pill(template_nav_items, current_value=template_type, show_count=False) }}
+      </div>
+    {% endif %}
+
+    {% if show_search_box %}
       <div data-module="autofocus">
         <div class="live-search" data-module="live-search" data-targets="#template-list .column-whole">
           {{ textbox(
@@ -64,7 +71,7 @@
           <h2 class="message-name">
             <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">{{ template.name }}</a>
           </h2>
-          <p class="hint bottom-gutter-1-3">
+          <p class="message-type">
             {{ message_count_label(1, template.template_type, suffix='')|capitalize }} template
           </p>
         </div>

@@ -7,7 +7,6 @@ from time import monotonic
 
 import dateutil
 import itertools
-import pytz
 import ago
 from flask import (
     Flask,
@@ -35,9 +34,6 @@ from notifications_utils.recipients import (
     format_phone_number_human_readable,
 )
 from notifications_utils.formatters import formatted_list
-from pygments import highlight
-from pygments.formatters.html import HtmlFormatter
-from pygments.lexers.javascript import JavascriptLexer
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
@@ -57,6 +53,8 @@ from app.notify_client.provider_client import ProviderClient
 from app.notify_client.organisations_client import OrganisationsClient
 from app.notify_client.models import AnonymousUser
 from app.notify_client.letter_jobs_client import LetterJobsClient
+
+from app.utils import gmt_timezones
 
 login_manager = LoginManager()
 csrf = CsrfProtect()
@@ -215,12 +213,6 @@ def syntax_highlight_json(code):
     return Markup(highlight(code, JavascriptLexer(), HtmlFormatter(noclasses=True)))
 
 
-def gmt_timezones(date):
-    date = dateutil.parser.parse(date)
-    forced_utc = date.replace(tzinfo=pytz.utc)
-    return forced_utc.astimezone(pytz.timezone('Europe/London'))
-
-
 def format_datetime(date):
     return '{} at {}'.format(
         format_date(date),
@@ -257,13 +249,20 @@ def format_datetime_relative(date):
 
 
 def get_human_day(time):
+
     #  Add 1 hour to get ‘midnight today’ instead of ‘midnight tomorrow’
-    time = (gmt_timezones(time) - timedelta(hours=1)).strftime('%A')
-    if time == datetime.utcnow().strftime('%A'):
-        return 'today'
-    if time == (datetime.utcnow() + timedelta(days=1)).strftime('%A'):
+    time_as_day = (gmt_timezones(time) - timedelta(hours=1)).strftime('%A')
+    six_days_ago = gmt_timezones((datetime.utcnow() + timedelta(days=-6)).isoformat())
+
+    if gmt_timezones(time) < six_days_ago:
+        return format_date_short(time)
+    if time_as_day == (datetime.utcnow() + timedelta(days=1)).strftime('%A'):
         return 'tomorrow'
-    return time
+    if time_as_day == datetime.utcnow().strftime('%A'):
+        return 'today'
+    if time_as_day == (datetime.utcnow() + timedelta(days=-1)).strftime('%A'):
+        return 'yesterday'
+    return format_date_short(time)
 
 
 def format_time(date):
@@ -296,6 +295,8 @@ def format_delta(date):
     )
     if delta < timedelta(seconds=30):
         return "just now"
+    if delta < timedelta(seconds=60):
+        return "in the last minute"
     return ago.human(
         delta,
         future_tense='{} from now',  # No-one should ever see this
@@ -438,7 +439,10 @@ def register_errorhandlers(application):
         ))
         error_code = error.status_code
         if error_code == 400:
-            msg = list(itertools.chain(*[error.message[x] for x in error.message.keys()]))
+            if isinstance(error.message, str):
+                msg = [error.message]
+            else:
+                msg = list(itertools.chain(*[error.message[x] for x in error.message.keys()]))
             resp = make_response(render_template("error/400.html", message=msg))
             return useful_headers_after_request(resp)
         elif error_code not in [401, 404, 403, 410, 500]:

@@ -1,11 +1,16 @@
 import re
 import csv
-from io import StringIO, BytesIO
+import pytz
+from io import StringIO
 from os import path
 from functools import wraps
 import unicodedata
-from datetime import datetime
+from collections import namedtuple
+from datetime import datetime, timedelta, timezone
+from dateutil import parser
 
+import dateutil
+import ago
 from flask import (
     abort,
     current_app,
@@ -15,6 +20,11 @@ from flask import (
     url_for
 )
 from flask_login import current_user
+import pyexcel
+import pyexcel.ext.io
+import pyexcel.ext.xls
+import pyexcel.ext.xlsx
+import pyexcel.ext.ods3
 
 from notifications_utils.template import (
     SMSPreviewTemplate,
@@ -22,12 +32,6 @@ from notifications_utils.template import (
     LetterImageTemplate,
     LetterPreviewTemplate,
 )
-
-import pyexcel
-import pyexcel.ext.io
-import pyexcel.ext.xls
-import pyexcel.ext.xlsx
-import pyexcel.ext.ods3
 
 
 SENDING_STATUSES = ['created', 'pending', 'sending']
@@ -144,13 +148,14 @@ def generate_notifications_csv(**kwargs):
                 notification['status'],
                 notification['created_at']
             ]
-            line = ','.join([str(i) for i in values]) + '\n'
+            line = ','.join(str(i) for i in values) + '\n'
             yield line
 
         if notifications_resp['links'].get('next'):
             kwargs['page'] += 1
         else:
             return
+    raise Exception("Should never reach here")
 
 
 def get_page_from_request():
@@ -265,6 +270,7 @@ def get_template(
     expand_emails=False,
     letter_preview_url=None,
     page_count=1,
+    redact_missing_personalisation=False,
 ):
     if 'email' == template['template_type']:
         return EmailPreviewTemplate(
@@ -272,14 +278,16 @@ def get_template(
             from_name=service['name'],
             from_address='{}@notifications.service.gov.uk'.format(service['email_from']),
             expanded=expand_emails,
-            show_recipient=show_recipient
+            show_recipient=show_recipient,
+            redact_missing_personalisation=redact_missing_personalisation,
         )
     if 'sms' == template['template_type']:
         return SMSPreviewTemplate(
             template,
             prefix=service['name'],
             sender=(service['sms_sender'] not in {'GOVUK', None}),
-            show_recipient=show_recipient
+            show_recipient=show_recipient,
+            redact_missing_personalisation=redact_missing_personalisation,
         )
     if 'letter' == template['template_type']:
         if letter_preview_url:
@@ -292,7 +300,8 @@ def get_template(
             return LetterPreviewTemplate(
                 template,
                 contact_block=service['letter_contact_block'],
-                admin_base_url=current_app.config['ADMIN_BASE_URL']
+                admin_base_url=current_app.config['ADMIN_BASE_URL'],
+                redact_missing_personalisation=redact_missing_personalisation,
             )
 
 
@@ -301,3 +310,57 @@ def get_current_financial_year():
     current_month = int(now.strftime('%-m'))
     current_year = int(now.strftime('%Y'))
     return current_year if current_month > 3 else current_year - 1
+
+
+def get_time_left(created_at):
+    return ago.human(
+        (
+            datetime.now(timezone.utc).replace(hour=23, minute=59, second=59)
+        ) - (
+            dateutil.parser.parse(created_at) + timedelta(days=8)
+        ),
+        future_tense='Data available for {}',
+        past_tense='Data no longer available',  # No-one should ever see this
+        precision=1
+    )
+
+
+def email_or_sms_not_enabled(template_type, permissions):
+    return (template_type in ['email', 'sms']) and (template_type not in permissions)
+
+
+def get_letter_timings(upload_time):
+
+    LetterTimings = namedtuple(
+        'LetterTimings',
+        'printed_by, is_printed, earliest_delivery, latest_delivery'
+    )
+
+    # shift anything after 5pm to the next day
+    processing_day = gmt_timezones(upload_time) + timedelta(hours=(7))
+
+    print_day, earliest_delivery, latest_delivery = (
+        processing_day + timedelta(days=days)
+        for days in {
+            'Wednesday': (1, 3, 5),
+            'Thursday': (1, 4, 5),
+            'Friday': (3, 5, 6),
+            'Saturday': (2, 4, 5),
+        }.get(processing_day.strftime('%A'), (1, 3, 4))
+    )
+
+    printed_by = print_day.astimezone(pytz.timezone('Europe/London')).replace(hour=15, minute=0)
+    now = datetime.utcnow().replace(tzinfo=pytz.timezone('Europe/London'))
+
+    return LetterTimings(
+        printed_by=printed_by,
+        is_printed=(now > printed_by),
+        earliest_delivery=earliest_delivery,
+        latest_delivery=latest_delivery,
+    )
+
+
+def gmt_timezones(date):
+    date = dateutil.parser.parse(date)
+    forced_utc = date.replace(tzinfo=pytz.utc)
+    return forced_utc.astimezone(pytz.timezone('Europe/London'))

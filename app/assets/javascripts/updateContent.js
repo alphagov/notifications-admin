@@ -19,10 +19,14 @@
 
   var clearQueue = queue => (queue.length = 0);
 
-  var poll = function(renderer, resource, queue, interval) {
+  var poll = function(renderer, resource, queue, interval, form) {
 
     if (queue.push(renderer) === 1) $.ajax(
-      resource
+      resource,
+      {
+        'method': form ? 'post' : 'get',
+        'data': form ? $('#' + form).serialize() : {}
+      }
     ).done(
       response => flushQueue(queue, response)
     ).fail(
@@ -41,7 +45,8 @@
       getRenderer($(component)),
       $(component).data('resource'),
       getQueue($(component).data('resource')),
-      ($(component).data('interval-seconds') || 1.5) * 1000
+      ($(component).data('interval-seconds') || 1.5) * 1000,
+      $(component).data('form')
     );
 
   };

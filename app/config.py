@@ -51,6 +51,8 @@ class Config(object):
     SESSION_COOKIE_SECURE = True
     SESSION_REFRESH_EACH_REQUEST = True
     SHOW_STYLEGUIDE = True
+    # TODO: move to utils
+    SMS_CHAR_COUNT_LIMIT = 459
     TOKEN_MAX_AGE_SECONDS = 3600
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
@@ -96,6 +98,7 @@ class Development(Config):
 
 class Test(Development):
     DEBUG = True
+    TESTING = True
     STATSD_ENABLED = True
     WTF_CSRF_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'test-notifications-csv-upload'

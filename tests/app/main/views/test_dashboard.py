@@ -1,3 +1,4 @@
+import json
 from functools import partial
 import copy
 from unittest.mock import call, ANY
@@ -5,7 +6,6 @@ from unittest.mock import call, ANY
 from flask import url_for
 import pytest
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
 from freezegun import freeze_time
 
 from app.main.views.dashboard import (
@@ -14,17 +14,16 @@ from app.main.views.dashboard import (
     get_free_paid_breakdown_for_billable_units,
     aggregate_status_types,
     format_template_stats_to_list,
-    get_tuples_of_financial_years,
-    get_dashboard_partials
+    get_tuples_of_financial_years
 )
 
-from tests import validate_route_permission
+from tests import validate_route_permission, validate_route_permission_with_client
 from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_inbound_sms_summary,
     mock_get_inbound_sms_summary_with_no_messages,
+    normalize_spaces,
 )
-from tests.app.test_utils import normalize_spaces
 
 stub_template_stats = [
     {
@@ -190,14 +189,63 @@ def test_empty_inbox(
     )
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.inbox',
+    'main.inbox_updates',
+])
 def test_inbox_not_accessible_to_service_without_permissions(
     logged_in_client,
     service_one,
+    endpoint,
 ):
     service_one['permissions'] = []
-    response = logged_in_client.get(url_for('main.inbox', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(url_for(endpoint, service_id=SERVICE_ONE_ID))
 
     assert response.status_code == 403
+
+
+def test_anyone_can_see_inbox(
+    client,
+    api_user_active,
+    service_one,
+    mocker,
+    mock_get_inbound_sms_with_no_messages,
+):
+
+    service_one['permissions'] = ['inbound_sms']
+
+    validate_route_permission_with_client(
+        mocker,
+        client,
+        'GET',
+        200,
+        url_for('main.inbox', service_id=service_one['id']),
+        ['view_activity'],
+        api_user_active,
+        service_one,
+    )
+
+
+def test_view_inbox_updates(
+    logged_in_client,
+    service_one,
+    mocker,
+    mock_get_inbound_sms_with_no_messages,
+):
+
+    mock_get_partials = mocker.patch(
+        'app.main.views.dashboard.get_inbox_partials',
+        return_value={'messages': 'foo'},
+    )
+
+    response = logged_in_client.get(url_for(
+        'main.inbox_updates', service_id=SERVICE_ONE_ID,
+    ))
+
+    assert response.status_code == 200
+    assert json.loads(response.get_data(as_text=True)) == {'messages': 'foo'}
+
+    mock_get_partials.assert_called_once_with(SERVICE_ONE_ID)
 
 
 def test_should_show_recent_templates_on_dashboard(
@@ -264,6 +312,25 @@ def test_should_show_monthly_breakdown_of_template_usage(
 
     assert len(table_rows) == len(['April'])
     assert len(page.select('.table-no-data')) == len(['May', 'June', 'July'])
+
+
+def test_anyone_can_see_monthly_breakdown(
+    client,
+    api_user_active,
+    service_one,
+    mocker,
+    mock_get_monthly_notification_stats,
+):
+    validate_route_permission_with_client(
+        mocker,
+        client,
+        'GET',
+        200,
+        url_for('main.monthly', service_id=service_one['id']),
+        ['view_activity'],
+        api_user_active,
+        service_one,
+    )
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
@@ -833,45 +900,3 @@ def test_should_show_all_jobs_with_valid_statuses(
         'ready to send',
         'sent to dvla'
     })
-
-
-def test_should_show_remaining_free_tier_count(
-    logged_in_client,
-    mock_get_service_templates,
-    mock_get_template_statistics,
-    mock_get_detailed_service,
-    mock_get_jobs,
-    mock_get_usage,
-    mocker
-):
-    mocker.patch(
-        'app.service_api_client.get_yearly_sms_unit_count_and_cost',
-        return_value={"billable_sms_units": 100, "total_cost": 200.0}
-    )
-
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
-
-    assert response.status_code == 200
-    assert '249,900' in response.get_data(as_text=True)
-    assert 'free text messages left' in response.get_data(as_text=True)
-
-
-def test_should_show_cost_if_exceeded_free_tier_count(
-    logged_in_client,
-    mock_get_service_templates,
-    mock_get_template_statistics,
-    mock_get_detailed_service,
-    mock_get_jobs,
-    mock_get_usage,
-    mocker
-):
-    mocker.patch(
-        'app.service_api_client.get_yearly_sms_unit_count_and_cost',
-        return_value={"billable_sms_units": 300000, "total_cost": 1500.50}
-    )
-
-    response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
-
-    assert response.status_code == 200
-    assert '£1,500.50' in response.get_data(as_text=True)
-    assert 'spent on text messages' in response.get_data(as_text=True)

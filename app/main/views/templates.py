@@ -18,7 +18,7 @@ from notifications_utils.recipients import first_column_headings
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
-from app.utils import user_has_permissions, get_template
+from app.utils import user_has_permissions, get_template, get_help_argument, email_or_sms_not_enabled
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.main.forms import (
     ChooseTemplateType,
@@ -43,26 +43,7 @@ page_headings = {
 }
 
 
-@main.route("/services/<service_id>/templates", methods=['GET'])
-@login_required
-@user_has_permissions(
-    'view_activity',
-    'send_texts',
-    'send_emails',
-    'manage_templates',
-    'manage_api_keys',
-    admin_override=True,
-    any_=True,
-)
-def choose_template(service_id):
-    return render_template(
-        'views/templates/choose.html',
-        templates=service_api_client.get_service_templates(service_id)['data'],
-        search_form=SearchTemplatesForm(),
-    )
-
-
-@main.route("/services/<service_id>/templates/<template_id>")
+@main.route("/services/<service_id>/templates/<uuid:template_id>")
 @login_required
 @user_has_permissions(
     'view_activity',
@@ -73,7 +54,7 @@ def choose_template(service_id):
     admin_override=True, any_=True
 )
 def view_template(service_id, template_id):
-    template = service_api_client.get_service_template(service_id, template_id)['data']
+    template = service_api_client.get_service_template(service_id, str(template_id))['data']
     return render_template(
         'views/templates/template.html',
         template=get_template(
@@ -89,6 +70,79 @@ def view_template(service_id, template_id):
             show_recipient=True,
             page_count=get_page_count_for_letter(template),
         ),
+    )
+
+
+@main.route("/services/<service_id>/start-tour/<uuid:template_id>")
+@login_required
+@user_has_permissions(
+    'view_activity',
+    'send_texts',
+    'send_emails',
+    'manage_templates',
+    'manage_api_keys',
+    admin_override=True, any_=True
+)
+def start_tour(service_id, template_id):
+
+    template = service_api_client.get_service_template(service_id, str(template_id))['data']
+
+    if template['template_type'] != 'sms':
+        abort(404)
+
+    return render_template(
+        'views/templates/start-tour.html',
+        template=get_template(
+            template,
+            current_service,
+            show_recipient=True,
+        ),
+        help='1',
+    )
+
+
+@main.route("/services/<service_id>/templates")
+@main.route("/services/<service_id>/templates/<template_type>")
+@login_required
+@user_has_permissions(
+    'view_activity',
+    'send_texts',
+    'send_emails',
+    'manage_templates',
+    'manage_api_keys',
+    admin_override=True,
+    any_=True,
+)
+def choose_template(service_id, template_type='all'):
+    templates = service_api_client.get_service_templates(service_id)['data']
+
+    has_multiple_template_types = len({
+        template['template_type'] for template in templates
+    }) > 1
+
+    template_nav_items = [
+        (label, key, url_for('.choose_template', service_id=current_service['id'], template_type=key), '')
+        for label, key in filter(None, [
+            ('All', 'all'),
+            ('Text message', 'sms'),
+            ('Email', 'email'),
+            ('Letter', 'letter') if 'letter' in current_service['permissions'] else None,
+        ])
+    ]
+
+    templates_on_page = [
+        template for template in templates
+        if template_type in ['all', template['template_type']]
+    ]
+
+    return render_template(
+        'views/templates/choose.html',
+        templates=templates_on_page,
+        show_search_box=(len(templates_on_page) > 7),
+        show_template_nav=has_multiple_template_types and (len(templates) > 2),
+        template_nav_items=template_nav_items,
+        template_type=template_type,
+        search_form=SearchTemplatesForm(),
     )
 
 
@@ -158,7 +212,7 @@ def view_template_version_preview(service_id, template_id, version, filetype):
 def add_template_by_type(service_id):
 
     form = ChooseTemplateType(
-        include_letters=current_service['can_send_letters']
+        include_letters='letter' in current_service['permissions']
     )
 
     if form.validate_on_submit():
@@ -178,13 +232,40 @@ def add_template_by_type(service_id):
                 template_id=blank_letter['data']['id'],
             ))
 
-        return redirect(url_for(
-            '.add_service_template',
-            service_id=service_id,
-            template_type=form.template_type.data,
-        ))
+        if email_or_sms_not_enabled(form.template_type.data, current_service['permissions']):
+            return redirect(url_for(
+                '.action_blocked',
+                service_id=service_id,
+                notification_type=form.template_type.data,
+                return_to='add_new_template',
+                template_id='0'
+            ))
+        else:
+            return redirect(url_for(
+                '.add_service_template',
+                service_id=service_id,
+                template_type=form.template_type.data,
+            ))
 
     return render_template('views/templates/add.html', form=form)
+
+
+@main.route("/services/<service_id>/templates/action-blocked/<notification_type>/<return_to>/<template_id>")
+@login_required
+@user_has_permissions('manage_templates', admin_override=True)
+def action_blocked(service_id, notification_type, return_to, template_id):
+    if notification_type == 'sms':
+        notification_type = 'text messages'
+    elif notification_type == 'email':
+        notification_type = 'emails'
+
+    return render_template(
+        'views/templates/action_blocked.html',
+        service_id=service_id,
+        notification_type=notification_type,
+        return_to=return_to,
+        template_id=template_id
+    )
 
 
 @main.route("/services/<service_id>/templates/add-<template_type>", methods=['GET', 'POST'])
@@ -194,7 +275,7 @@ def add_service_template(service_id, template_type):
 
     if template_type not in ['sms', 'email', 'letter']:
         abort(404)
-    if not current_service['can_send_letters'] and template_type == 'letter':
+    if 'letter' not in current_service['permissions'] and template_type == 'letter':
         abort(403)
 
     form = form_objects[template_type]()
@@ -224,12 +305,21 @@ def add_service_template(service_id, template_type):
                 url_for('.view_template', service_id=service_id, template_id=new_template['data']['id'])
             )
 
-    return render_template(
-        'views/edit-{}-template.html'.format(template_type),
-        form=form,
-        template_type=template_type,
-        heading_action='Add'
-    )
+    if email_or_sms_not_enabled(template_type, current_service['permissions']):
+        return redirect(url_for(
+            '.action_blocked',
+            service_id=service_id,
+            notification_type=template_type,
+            return_to='templates',
+            template_id='0'
+        ))
+    else:
+        return render_template(
+            'views/edit-{}-template.html'.format(template_type),
+            form=form,
+            template_type=template_type,
+            heading_action='Add',
+        )
 
 
 def abort_403_if_not_admin_user():
@@ -300,13 +390,25 @@ def edit_service_template(service_id, template_id):
                 service_id=service_id,
                 template_id=template_id
             ))
-    return render_template(
-        'views/edit-{}-template.html'.format(template['template_type']),
-        form=form,
-        template_id=template_id,
-        template_type=template['template_type'],
-        heading_action='Edit'
-    )
+
+    db_template = service_api_client.get_service_template(service_id, template_id)['data']
+
+    if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
+        return redirect(url_for(
+            '.action_blocked',
+            service_id=service_id,
+            notification_type=db_template['template_type'],
+            return_to='view_template',
+            template_id=template_id
+        ))
+    else:
+        return render_template(
+            'views/edit-{}-template.html'.format(template['template_type']),
+            form=form,
+            template_id=template_id,
+            template_type=template['template_type'],
+            heading_action='Edit'
+        )
 
 
 @main.route("/services/<service_id>/templates/<template_id>/delete", methods=['GET', 'POST'])
@@ -355,6 +457,47 @@ def delete_service_template(service_id, template_id):
             show_recipient=True,
         )
     )
+
+
+@main.route("/services/<service_id>/templates/<template_id>/redact", methods=['GET'])
+@login_required
+@user_has_permissions('manage_templates', admin_override=True)
+def confirm_redact_template(service_id, template_id):
+    return render_template(
+        'views/templates/template.html',
+        template=get_template(
+            service_api_client.get_service_template(service_id, template_id)['data'],
+            current_service,
+            expand_emails=True,
+            letter_preview_url=url_for(
+                '.view_letter_template_preview',
+                service_id=service_id,
+                template_id=template_id,
+                filetype='png',
+            ),
+            show_recipient=True,
+        ),
+        show_redaction_message=True,
+    )
+
+
+@main.route("/services/<service_id>/templates/<template_id>/redact", methods=['POST'])
+@login_required
+@user_has_permissions('manage_templates', admin_override=True)
+def redact_template(service_id, template_id):
+
+    service_api_client.redact_service_template(service_id, template_id)
+
+    flash(
+        'Personalised content will be hidden for messages sent with this template',
+        'default_with_tick'
+    )
+
+    return redirect(url_for(
+        '.view_template',
+        service_id=service_id,
+        template_id=template_id,
+    ))
 
 
 @main.route('/services/<service_id>/templates/<template_id>/versions')
@@ -422,5 +565,5 @@ def get_human_readable_delta(from_time, until_time):
 def should_show_template(template_type):
     return (
         template_type != 'letter' or
-        current_service['can_send_letters']
+        'letter' in current_service['permissions']
     )

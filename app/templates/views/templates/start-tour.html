@@ -1,0 +1,21 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/api-key.html" import api_key %}
+
+{% block service_page_title %}
+  {{ template.name }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+
+  <h1 class="heading-large">{{ template.name }}</h1>
+
+  {{ template|string }}
+
+  <div class="page-footer">
+    <a href="{{ url_for('.send_test', service_id=current_service.id, template_id=template.id, help=2) }}" class="button">Next</a>
+  </div>
+
+{% endblock %}

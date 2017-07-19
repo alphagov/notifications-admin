@@ -110,3 +110,8 @@ def integration_testing():
 @main.route('/roadmap')
 def roadmap():
     return render_template('views/roadmap.html')
+
+
+@main.route('/features')
+def features():
+    return render_template('views/features.html')

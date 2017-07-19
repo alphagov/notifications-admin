@@ -5,13 +5,15 @@ from csv import DictReader
 import pytest
 
 from collections import OrderedDict
+from freezegun import freeze_time
 
 from app.utils import (
     email_safe,
     generate_notifications_csv,
     generate_previous_dict,
     generate_next_dict,
-    Spreadsheet
+    Spreadsheet,
+    get_letter_timings,
 )
 
 from tests import notification_json, single_notification_json
@@ -156,7 +158,135 @@ def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
     assert mock_get_notifications.mock_calls[1][2]['page'] == 2
 
 
-def normalize_spaces(input):
-    if isinstance(input, str):
-        return ' '.join(input.split())
-    return normalize_spaces(' '.join(item.text for item in input))
+@freeze_time('2017-07-14 14:59:59')  # Friday, before print deadline
+@pytest.mark.parametrize('upload_time, expected_print_time, is_printed, expected_earliest, expected_latest', [
+
+    # BST
+    # ==================================================================
+    #  First thing Monday
+    (
+        '2017-07-10 00:00:01',
+        'Tuesday 15:00',
+        True,
+        'Thursday 2017-07-13',
+        'Friday 2017-07-14'
+    ),
+    #  Monday at 16:59 BST
+    (
+        '2017-07-10 15:59:59',
+        'Tuesday 15:00',
+        True,
+        'Thursday 2017-07-13',
+        'Friday 2017-07-14'
+    ),
+    #  Monday at 17:00 BST
+    (
+        '2017-07-10 16:00:01',
+        'Wednesday 15:00',
+        True,
+        'Friday 2017-07-14',
+        'Saturday 2017-07-15'
+    ),
+    #  Tuesday before 17:00 BST
+    (
+        '2017-07-11 12:00:00',
+        'Wednesday 15:00',
+        True,
+        'Friday 2017-07-14',
+        'Saturday 2017-07-15'
+    ),
+    #  Wednesday before 17:00 BST
+    (
+        '2017-07-12 12:00:00',
+        'Thursday 15:00',
+        True,
+        'Saturday 2017-07-15',
+        'Monday 2017-07-17'
+    ),
+    #  Thursday before 17:00 BST
+    (
+        '2017-07-13 12:00:00',
+        'Friday 15:00',
+        True,  # WRONG
+        'Monday 2017-07-17',
+        'Tuesday 2017-07-18'
+    ),
+    #  Friday anytime
+    (
+        '2017-07-14 00:00:00',
+        'Monday 15:00',
+        False,
+        'Wednesday 2017-07-19',
+        'Thursday 2017-07-20'
+    ),
+    (
+        '2017-07-14 12:00:00',
+        'Monday 15:00',
+        False,
+        'Wednesday 2017-07-19',
+        'Thursday 2017-07-20'
+    ),
+    (
+        '2017-07-14 22:00:00',
+        'Monday 15:00',
+        False,
+        'Wednesday 2017-07-19',
+        'Thursday 2017-07-20'
+    ),
+    #  Saturday anytime
+    (
+        '2017-07-14 12:00:00',
+        'Monday 15:00',
+        False,
+        'Wednesday 2017-07-19',
+        'Thursday 2017-07-20'
+    ),
+    #  Sunday before 1700 BST
+    (
+        '2017-07-15 15:59:59',
+        'Monday 15:00',
+        False,
+        'Wednesday 2017-07-19',
+        'Thursday 2017-07-20'
+    ),
+    #  Sunday after 17:00 BST
+    (
+        '2017-07-16 16:00:01',
+        'Tuesday 15:00',
+        False,
+        'Thursday 2017-07-20',
+        'Friday 2017-07-21'
+    ),
+
+    # GMT
+    # ==================================================================
+    #  Monday at 16:59 GMT
+    (
+        '2017-01-02 16:59:59',
+        'Tuesday 15:00',
+        True,
+        'Thursday 2017-01-05',
+        'Friday 2017-01-06',
+    ),
+    #  Monday at 17:00 GMT
+    (
+        '2017-01-02 17:00:01',
+        'Wednesday 15:00',
+        True,
+        'Friday 2017-01-06',
+        'Saturday 2017-01-07',
+    ),
+
+])
+def test_get_estimated_delivery_date_for_letter(
+    upload_time,
+    expected_print_time,
+    is_printed,
+    expected_earliest,
+    expected_latest,
+):
+    timings = get_letter_timings(upload_time)
+    assert timings.printed_by.strftime('%A %H:%M') == expected_print_time
+    assert timings.is_printed == is_printed
+    assert timings.earliest_delivery.strftime('%A %Y-%m-%d') == expected_earliest
+    assert timings.latest_delivery.strftime('%A %Y-%m-%d') == expected_latest

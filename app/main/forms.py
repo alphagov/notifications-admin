@@ -9,6 +9,7 @@ from notifications_utils.recipients import (
 )
 from notifications_utils.columns import Columns
 from wtforms import (
+    widgets,
     validators,
     StringField,
     PasswordField,
@@ -649,6 +650,21 @@ class SearchNotificationsForm(Form):
 class PlaceholderForm(Form):
 
     pass
+
+
+class PasswordFieldShowHasContent(StringField):
+    widget = widgets.PasswordInput(hide_value=False)
+
+
+class ServiceInboundApiForm(Form):
+    url = StringField("Inbound sms url",
+                      validators=[DataRequired(message='Can’t be empty'),
+                                  Regexp(regex="^https.*",
+                                         message='Must be a valid https url')]
+                      )
+    bearer_token = PasswordFieldShowHasContent("Bearer token",
+                                               validators=[DataRequired(message='Can’t be empty'),
+                                                           Length(min=10, message='Must be at least 10 characters')])
 
 
 def get_placeholder_form_instance(

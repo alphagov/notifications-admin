@@ -1,0 +1,27 @@
+{% from "components/ajax-block.html" import ajax_block %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  {{ user_number }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="dashboard">
+
+    <div class="bottom-gutter js-stick-at-top-when-scrolling">
+      <h1 class="heading-large">
+        {{ user_number }}
+      </h1>
+    </div>
+
+    {{ ajax_block(
+      partials,
+      updates_url,
+      'messages',
+    ) }}
+
+  </div>
+
+{% endblock %}

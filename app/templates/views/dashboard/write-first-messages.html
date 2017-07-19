@@ -2,7 +2,7 @@
 
 <nav>
   <a class="pill-separate-item" href="{{ url_for('.choose_template', service_id=current_service.id) }}">
-    {% if current_service.can_send_letters %}
+    {% if 'letter' in current_service.permissions %}
       Write an email, text message or letter
     {% else %}
       Write an email or text message

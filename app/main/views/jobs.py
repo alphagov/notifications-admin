@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-import ago
-import dateutil
 from orderedset import OrderedSet
-from datetime import datetime, timedelta, timezone
 from itertools import chain
 
 from flask import (
@@ -17,6 +14,10 @@ from flask import (
     stream_with_context
 )
 from flask_login import login_required
+from notifications_utils.template import (
+    Template,
+    WithSubjectTemplate,
+)
 from werkzeug.datastructures import MultiDict
 
 from app import (
@@ -33,8 +34,8 @@ from app.utils import (
     generate_previous_dict,
     user_has_permissions,
     generate_notifications_csv,
-    get_help_argument,
     get_template,
+    get_time_left,
     REQUESTED_STATUSES,
     FAILURE_STATUSES,
     SENDING_STATUSES,
@@ -112,31 +113,15 @@ def view_job(service_id, job_id):
         'views/jobs/job.html',
         finished=(total_notifications == processed_notifications),
         uploaded_file_name=job['original_file_name'],
-        template=get_template(
-            service_api_client.get_service_template(
-                service_id=service_id,
-                template_id=job['template'],
-                version=job['template_version']
-            )['data'],
-            current_service,
-            letter_preview_url=url_for(
-                '.view_template_version_preview',
-                service_id=service_id,
-                template_id=job['template'],
-                version=job['template_version'],
-                filetype='png',
-            ),
-        ),
+        template_id=job['template'],
         status=request.args.get('status', ''),
         updates_url=url_for(
             ".view_job_updates",
             service_id=service_id,
             job_id=job['id'],
             status=request.args.get('status', ''),
-            help=get_help_argument()
         ),
         partials=get_job_partials(job),
-        help=get_help_argument()
     )
 
 
@@ -190,7 +175,7 @@ def view_job_updates(service_id, job_id):
     ))
 
 
-@main.route('/services/<service_id>/notifications/<message_type>')
+@main.route('/services/<service_id>/notifications/<message_type>', methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def view_notifications(service_id, message_type):
@@ -200,12 +185,12 @@ def view_notifications(service_id, message_type):
         message_type=message_type,
         status=request.args.get('status') or 'sending,delivered,failed',
         page=request.args.get('page', 1),
-        to=request.args.get('to'),
-        search_form=SearchNotificationsForm(to=request.args.get('to')),
+        to=request.form.get('to', ''),
+        search_form=SearchNotificationsForm(to=request.form.get('to', '')),
     )
 
 
-@main.route('/services/<service_id>/notifications/<message_type>.json')
+@main.route('/services/<service_id>/notifications/<message_type>.json', methods=['GET', 'POST'])
 @user_has_permissions('view_activity', admin_override=True)
 def get_notifications_as_json(service_id, message_type):
     return jsonify(get_notifications(
@@ -245,7 +230,7 @@ def get_notifications(service_id, message_type, status_override=None):
         template_type=[message_type],
         status=filter_args.get('status'),
         limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'],
-        to=request.args.get('to'),
+        to=request.form.get('to', ''),
     )
 
     url_args = {
@@ -273,7 +258,9 @@ def get_notifications(service_id, message_type, status_override=None):
         ),
         'notifications': render_template(
             'views/activity/notifications.html',
-            notifications=notifications['notifications'],
+            notifications=list(add_preview_of_content_to_notifications(
+                notifications['notifications']
+            )),
             page=page,
             prev_page=prev_page,
             next_page=next_page,
@@ -317,7 +304,7 @@ def get_status_filters(service, message_type, statistics):
     ]
 
 
-def _get_job_counts(job, help_argument):
+def _get_job_counts(job):
     sending = 0 if job['job_status'] == 'scheduled' else (
         job.get('notification_count', 0) -
         job.get('notifications_delivered', 0) -
@@ -332,7 +319,6 @@ def _get_job_counts(job, help_argument):
                 service_id=job['service'],
                 job_id=job['id'],
                 status=query_param,
-                help=help_argument
             ),
             count
         ) for label, query_param, count in [
@@ -362,15 +348,22 @@ def get_job_partials(job):
     notifications = notification_api_client.get_notifications_for_service(
         job['service'], job['id'], status=filter_args['status']
     )
+    template = service_api_client.get_service_template(
+        service_id=current_service['id'],
+        template_id=job['template'],
+        version=job['template_version']
+    )['data']
     return {
         'counts': render_template(
-            'partials/jobs/count.html',
-            counts=_get_job_counts(job, request.args.get('help', 0)),
+            'partials/count.html',
+            counts=_get_job_counts(job),
             status=filter_args['status']
         ),
         'notifications': render_template(
             'partials/jobs/notifications.html',
-            notifications=notifications['notifications'],
+            notifications=list(
+                add_preview_of_content_to_notifications(notifications['notifications'])
+            ),
             more_than_one_page=bool(notifications.get('links', {}).get('next')),
             percentage_complete=(job['notifications_requested'] / job['notification_count'] * 100),
             download_link=url_for(
@@ -379,9 +372,10 @@ def get_job_partials(job):
                 job_id=job['id'],
                 status=request.args.get('status')
             ),
-            help=get_help_argument(),
             time_left=get_time_left(job['created_at']),
-            job=job
+            job=job,
+            template=template,
+            template_version=job['template_version'],
         ),
         'status': render_template(
             'partials/jobs/status.html',
@@ -390,14 +384,30 @@ def get_job_partials(job):
     }
 
 
-def get_time_left(job_created_at):
-    return ago.human(
-        (
-            datetime.now(timezone.utc).replace(hour=23, minute=59, second=59)
-        ) - (
-            dateutil.parser.parse(job_created_at) + timedelta(days=8)
-        ),
-        future_tense='Data available for {}',
-        past_tense='Data no longer available',  # No-one should ever see this
-        precision=1
-    )
+def add_preview_of_content_to_notifications(notifications):
+
+    for notification in notifications:
+
+        if notification['template'].get('redact_personalisation'):
+            notification['personalisation'] = {}
+
+        if notification['template']['template_type'] == 'sms':
+            yield dict(
+                preview_of_content=str(Template(
+                    notification['template'],
+                    notification['personalisation'],
+                    redact_missing_personalisation=True,
+                )),
+                **notification
+            )
+        else:
+            yield dict(
+                preview_of_content=(
+                    WithSubjectTemplate(
+                        notification['template'],
+                        notification['personalisation'],
+                        redact_missing_personalisation=True,
+                    ).subject
+                ),
+                **notification
+            )
