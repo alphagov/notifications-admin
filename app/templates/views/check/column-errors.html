@@ -19,10 +19,11 @@
 
 {% block maincolumn_content %}
 
-  {% if recipients.too_many_rows %}
+  <div class="bottom-gutter">
+    {% call banner_wrapper(type='dangerous') %}
 
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
+      {% if recipients.too_many_rows %}
+
         <h1 class='banner-title'>
           Your file has too many rows
         </h1>
@@ -31,14 +32,9 @@
           {{ "{:,}".format(recipients.max_rows) }} rows at once. Your
           file has {{ "{:,}".format(recipients|length) }} rows.
         </p>
-        {{ skip_to_file_contents() }}
-      {% endcall %}
-    </div>
 
-  {% elif not count_of_recipients %}
+      {% elif not count_of_recipients %}
 
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
         <h1 class='banner-title'>
           Your file is missing some rows
         </h1>
@@ -48,14 +44,9 @@
             prefix_plural='columns called'
           ) }}.
         </p>
-        {{ skip_to_file_contents() }}
-      {% endcall %}
-    </div>
 
-  {% elif not recipients.has_recipient_columns %}
+      {% elif not recipients.has_recipient_columns %}
 
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
         <h1 class='banner-title'>
           Your file needs {{ recipients.recipient_column_headers | formatted_list(
             prefix='a column called',
@@ -68,14 +59,9 @@
             prefix_plural='columns called '
           ) }}.
         </p>
-        {{ skip_to_file_contents() }}
-      {% endcall %}
-    </div>
 
-  {% elif recipients.missing_column_headers %}
+      {% elif recipients.missing_column_headers %}
 
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
         <h1 class='banner-title'>
           The columns in your file need to match the double brackets in
           your template
@@ -87,20 +73,22 @@
             prefix_plural='columns called '
           ) }}.
         </p>
-        {{ skip_to_file_contents() }}
-      {% endcall %}
-    </div>
 
-  {% elif not recipients.allowed_to_send_to %}
-    {% with
-      count_of_recipients=count_of_recipients,
-      template_type_label=recipients.recipient_column_headers[0]
-    %}
-      {% include "partials/check/not-allowed-to-send-to.html" %}
-    {% endwith %}
-  {% elif recipients.more_rows_than_can_send %}
-    {% include "partials/check/too-many-messages.html" %}
-  {% endif %}
+      {% elif not recipients.allowed_to_send_to %}
+        {% with
+          count_of_recipients=count_of_recipients,
+          template_type_label=recipients.recipient_column_headers[0]
+        %}
+          {% include "partials/check/not-allowed-to-send-to.html" %}
+        {% endwith %}
+      {% elif recipients.more_rows_than_can_send %}
+        {% include "partials/check/too-many-messages.html" %}
+      {% endif %}
+
+      {{ skip_to_file_contents() }}
+
+    {% endcall %}
+  </div>
 
   <div class="bottom-gutter-3-2">
     {% if request.args.from_test %}
