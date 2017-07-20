@@ -85,7 +85,9 @@ generate-version-file: ## Generates the app version file
 .PHONY: build
 build: dependencies generate-version-file ## Build project
 	npm run build
-	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel wheel --wheel-dir=wheelhouse -r requirements.txt
+	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel install -r requirements.txt
+	mkdir -p vendor/
+	cp -r ${PIP_ACCEL_CACHE}/sources/ vendor/
 
 .PHONY: cf-build
 cf-build: dependencies generate-version-file ## Build project
@@ -199,7 +201,7 @@ clean-docker-containers: ## Clean up any remaining docker containers
 
 .PHONY: clean
 clean:
-	rm -rf node_modules cache target venv .coverage wheelhouse
+	rm -rf node_modules cache target venv .coverage vendor
 
 .PHONY: cf-login
 cf-login: ## Log in to Cloud Foundry
