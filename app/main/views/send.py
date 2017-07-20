@@ -450,6 +450,14 @@ def check_messages(service_id, template_type, upload_id):
 
     data = _check_messages(service_id, template_type, upload_id)
 
+    if (
+        data['recipients'].too_many_rows or
+        not data['count_of_recipients'] or
+        not data['recipients'].has_recipient_columns or
+        data['recipients'].missing_column_headers
+    ):
+        return render_template('views/check/column-errors.html', **data)
+
     if data['row_errors']:
         return render_template('views/check/row-errors.html', **data)
 
