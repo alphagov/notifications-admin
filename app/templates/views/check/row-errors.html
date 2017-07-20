@@ -62,7 +62,7 @@
       caption=original_file_name,
       caption_visible=False,
       field_headings=[
-        '<span class="visually-hidden">Row in file</span><span aria-hidden="true" class="{}">1</span>'.format("table-field-invisible-error" if errors else "")|safe
+        '<span class="visually-hidden">Row in file</span><span aria-hidden="true" class="table-field-invisible-error">1</span>'|safe
       ] + recipients.column_headers
     ) %}
       {% call index_field() %}
