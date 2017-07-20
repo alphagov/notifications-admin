@@ -30,8 +30,16 @@
       on {{ created_at|format_datetime_short }}
     </p>
 
+    {% if template.template_type == 'letter' %}
+      <p>
+        Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
+      </p>
+    {% endif %}
+
     {{ template|string }}
 
-    {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+    {% if template.template_type != 'letter' %}
+      {{ ajax_block(partials, updates_url, 'status', finished=finished) }}
+    {% endif %}
 
 {% endblock %}

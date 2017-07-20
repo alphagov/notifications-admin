@@ -86,7 +86,7 @@ def service_json(
 def template_json(service_id,
                   id_,
                   name="sample template",
-                  type_="sms",
+                  type_=None,
                   content=None,
                   subject=None,
                   version=1,
@@ -97,7 +97,7 @@ def template_json(service_id,
     template = {
         'id': id_,
         'name': name,
-        'template_type': type_,
+        'template_type': type_ or "sms",
         'content': content,
         'service': service_id,
         'version': version,
@@ -226,9 +226,10 @@ def notification_json(
     with_links=False,
     rows=5,
     personalisation=None,
+    template_type=None,
 ):
     if template is None:
-        template = template_json(service_id, str(generate_uuid()))
+        template = template_json(service_id, str(generate_uuid()), type_=template_type)
     if sent_at is None:
         sent_at = str(datetime.utcnow().time())
     if created_at is None:

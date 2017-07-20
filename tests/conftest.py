@@ -1679,6 +1679,7 @@ def mock_get_notification(
     fake_uuid,
     notification_status='delivered',
     redact_personalisation=False,
+    template_type=None,
 ):
     def _get_notification(
         service_id,
@@ -1687,7 +1688,8 @@ def mock_get_notification(
         noti = notification_json(
             service_id,
             rows=1,
-            status=notification_status
+            status=notification_status,
+            template_type=template_type,
         )['notifications'][0]
 
         noti['id'] = notification_id
@@ -1701,7 +1703,9 @@ def mock_get_notification(
             service_id,
             '5407f4db-51c7-4150-8758-35412d42186a',
             content='hello ((name))',
+            subject='blah',
             redact_personalisation=redact_personalisation,
+            type_=template_type,
         )
         return noti
 
