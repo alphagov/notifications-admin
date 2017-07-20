@@ -24,7 +24,7 @@
 
       {% if recipients.too_many_rows %}
 
-        <h1 class='banner-title'>
+        <h1 class='banner-title' data-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
           Your file has too many rows
         </h1>
         <p>
@@ -35,7 +35,7 @@
 
       {% elif not count_of_recipients %}
 
-        <h1 class='banner-title'>
+        <h1 class='banner-title' data-module="track-error" data-error-type="No rows" data-error-label="{{ upload_id }}">
           Your file is missing some rows
         </h1>
         <p>
@@ -47,7 +47,7 @@
 
       {% elif not recipients.has_recipient_columns %}
 
-        <h1 class='banner-title'>
+        <h1 class='banner-title' data-module="track-error" data-error-type="Missing recipient columns" data-error-label="{{ upload_id }}">
           Your file needs {{ recipients.recipient_column_headers | formatted_list(
             prefix='a column called',
             prefix_plural='columns called'
@@ -62,7 +62,7 @@
 
       {% elif recipients.missing_column_headers %}
 
-        <h1 class='banner-title'>
+        <h1 class='banner-title' data-module="track-error" data-error-type="Missing placeholder columns" data-error-label="{{ upload_id }}">
           The columns in your file need to match the double brackets in
           your template
         </h1>

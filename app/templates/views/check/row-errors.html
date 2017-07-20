@@ -22,7 +22,7 @@
   <div class="bottom-gutter">
     {% call banner_wrapper(type='dangerous') %}
       {% if row_errors|length == 1 %}
-        <h1 class='banner-title'>
+        <h1 class='banner-title' data-module="track-error" data-error-type="Bad rows" data-error-label="{{ upload_id }}">
           There is a problem with your data
         </h1>
         <p>

@@ -1,7 +1,7 @@
 (function(Modules) {
   "use strict";
 
-  Modules.TrackEvent = function() {
+  Modules.TrackError = function() {
 
     this.start = function(component) {
 
