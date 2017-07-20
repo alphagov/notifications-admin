@@ -185,6 +185,32 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
             'Skip to file contents'
         )
     ),
+    (
+        """
+            phone number, name
+            +447700900986, example
+            , example
+            +447700900986, example
+        """,
+        (
+            'There is a problem with your data '
+            'You need to enter missing data in 1 row '
+            'Skip to file contents'
+        )
+    ),
+    (
+        """
+            phone number, name
+            +447700900986, example
+            +447700900986,
+            +447700900986, example
+        """,
+        (
+            'There is a problem with your data '
+            'You need to enter missing data in 1 row '
+            'Skip to file contents'
+        )
+    ),
 ])
 def test_upload_csvfile_with_missing_columns_shows_error(
     logged_in_client,
