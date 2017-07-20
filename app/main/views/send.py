@@ -447,10 +447,24 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def check_messages(service_id, template_type, upload_id):
-    return render_template(
-        'views/check.html',
-        **_check_messages(service_id, template_type, upload_id)
-    )
+
+    data = _check_messages(service_id, template_type, upload_id)
+
+    if (
+        data['recipients'].too_many_rows or
+        not data['count_of_recipients'] or
+        not data['recipients'].has_recipient_columns or
+        data['recipients'].missing_column_headers
+    ):
+        return render_template('views/check/column-errors.html', **data)
+
+    if data['row_errors']:
+        return render_template('views/check/row-errors.html', **data)
+
+    if data['errors']:
+        return render_template('views/check/column-errors.html', **data)
+
+    return render_template('views/check/ok.html', **data)
 
 
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>.<filetype>", methods=['GET'])

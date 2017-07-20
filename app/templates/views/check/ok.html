@@ -1,0 +1,91 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/radios.html" import radio_select %}
+{% from "components/table.html" import list_table, field, text_field, index_field, hidden_field_heading %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/message-count-label.html" import message_count_label %}
+
+{% set file_contents_header_id = 'file-preview' %}
+{% macro skip_to_file_contents() %}
+  <p class="visually-hidden">
+    <a href="#{{ file_contents_header_id }}">Skip to file contents</a>
+  </p>
+{% endmacro %}
+
+{% block service_page_title %}
+  {{ "Preview of {}".format(template.name) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    Preview of {{ template.name }}
+  </h1>
+  {{ skip_to_file_contents() }}
+
+  {{ template|string }}
+
+  <div class="bottom-gutter-3-2">
+    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}" class='page-footer'>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="hidden" name="help" value="{{ '3' if help else 0 }}" />
+      {% if choose_time_form and template.template_type != 'letter' %}
+        {{ radio_select(
+          choose_time_form.scheduled_for,
+          wrapping_class='bottom-gutter-2-3'
+        ) }}
+      {% endif %}
+      {% if template.template_type != 'letter' or not request.args.from_test %}
+      <input type="submit" class="button" value="Send {{ count_of_recipients }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}" />
+      {% else %}
+        <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_type=template.template_type, upload_id=upload_id, filetype='pdf') }}" download="download" class="button">Download as a printable PDF</a>
+      {% endif %}
+      <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
+    </form>
+  </div>
+
+  {% if not request.args.from_test %}
+
+    <h2 class="heading-medium" id="{{ file_contents_header_id }}">{{ original_file_name }}</h2>
+
+    {% call(item, row_number) list_table(
+      recipients.initial_annotated_rows_with_errors if row_errors and not recipients.missing_column_headers else recipients.initial_annotated_rows,
+      caption=original_file_name,
+      caption_visible=False,
+      field_headings=[
+        '<span class="visually-hidden">Row in file</span><span aria-hidden="true">1</span>'|safe
+      ] + recipients.column_headers
+    ) %}
+      {% call index_field() %}
+        <span class="{% if item.index in recipients.rows_with_errors %}table-field-error{% endif %}">
+          {{ item.index + 2 }}
+        </span>
+      {% endcall %}
+      {% for column in recipients.column_headers %}
+        {% if item['columns'][column].ignore %}
+          {{ text_field(item['columns'][column].data or '', status='default') }}
+        {% else %}
+          {{ text_field(item['columns'][column].data or '') }}
+        {% endif %}
+      {% endfor %}
+      {% if item['columns'].get(None) %}
+        {% for column in item['columns'][None].data %}
+          {{ text_field(column, status='default') }}
+        {% endfor %}
+      {% endif %}
+    {% endcall %}
+
+  {% endif %}
+
+  {% if count_of_displayed_recipients < count_of_recipients %}
+    <p class="table-show-more-link">
+      {% if row_errors and not recipients.missing_column_headers %}
+        Only showing the first {{ count_of_displayed_recipients }} rows with errors
+      {% else %}
+        Only showing the first {{ count_of_displayed_recipients }} rows
+      {% endif %}
+    </p>
+  {% endif %}
+
+{% endblock %}

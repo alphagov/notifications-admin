@@ -14,16 +14,17 @@
 {% endmacro %}
 
 {% block service_page_title %}
-  {{ "Error" if errors else "Preview of {}".format(template.name) }}
+  Error
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {% if recipients.too_many_rows %}
+  <div class="bottom-gutter">
+    {% call banner_wrapper(type='dangerous') %}
 
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
-        <h1 class='banner-title'>
+      {% if recipients.too_many_rows %}
+
+        <h1 class='banner-title' data-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
           Your file has too many rows
         </h1>
         <p>
@@ -31,15 +32,10 @@
           {{ "{:,}".format(recipients.max_rows) }} rows at once. Your
           file has {{ "{:,}".format(recipients|length) }} rows.
         </p>
-        {{ skip_to_file_contents() }}
-      {% endcall %}
-    </div>
 
-  {% elif not count_of_recipients %}
+      {% elif not count_of_recipients %}
 
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
-        <h1 class='banner-title'>
+        <h1 class='banner-title' data-module="track-error" data-error-type="No rows" data-error-label="{{ upload_id }}">
           Your file is missing some rows
         </h1>
         <p>
@@ -48,15 +44,10 @@
             prefix_plural='columns called'
           ) }}.
         </p>
-        {{ skip_to_file_contents() }}
-      {% endcall %}
-    </div>
 
-  {% elif not recipients.has_recipient_columns %}
+      {% elif not recipients.has_recipient_columns %}
 
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
-        <h1 class='banner-title'>
+        <h1 class='banner-title' data-module="track-error" data-error-type="Missing recipient columns" data-error-label="{{ upload_id }}">
           Your file needs {{ recipients.recipient_column_headers | formatted_list(
             prefix='a column called',
             prefix_plural='columns called'
@@ -68,15 +59,10 @@
             prefix_plural='columns called '
           ) }}.
         </p>
-        {{ skip_to_file_contents() }}
-      {% endcall %}
-    </div>
 
-  {% elif recipients.missing_column_headers %}
+      {% elif recipients.missing_column_headers %}
 
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
-        <h1 class='banner-title'>
+        <h1 class='banner-title' data-module="track-error" data-error-type="Missing placeholder columns" data-error-label="{{ upload_id }}">
           The columns in your file need to match the double brackets in
           your template
         </h1>
@@ -87,85 +73,29 @@
             prefix_plural='columns called '
           ) }}.
         </p>
-        {{ skip_to_file_contents() }}
-      {% endcall %}
-    </div>
 
-  {% elif row_errors %}
+      {% elif not recipients.allowed_to_send_to %}
+        {% with
+          count_of_recipients=count_of_recipients,
+          template_type_label=recipients.recipient_column_headers[0]
+        %}
+          {% include "partials/check/not-allowed-to-send-to.html" %}
+        {% endwith %}
+      {% elif recipients.more_rows_than_can_send %}
+        {% include "partials/check/too-many-messages.html" %}
+      {% endif %}
 
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
-        {% if row_errors|length == 1 %}
-          <h1 class='banner-title'>
-            There is a problem with your data
-          </h1>
-          <p>
-            You need to {{ row_errors[0] }}
-          </p>
-        {% else %}
-          <h1 class='banner-title'>
-            There are some problems with your data
-          </h1>
-          <p>
-            You need to:
-          </p>
-          <ul class="list-bullet">
-            {% for error in row_errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-        {{ skip_to_file_contents() }}
-      {% endcall %}
-    </div>
+      {{ skip_to_file_contents() }}
 
-  {% elif not recipients.allowed_to_send_to %}
-    {% with
-      count_of_recipients=count_of_recipients,
-      template_type_label=recipients.recipient_column_headers[0]
-    %}
-      {% include "partials/check/not-allowed-to-send-to.html" %}
-    {% endwith %}
-  {% elif recipients.more_rows_than_can_send %}
-    {% include "partials/check/too-many-messages.html" %}
-  {% else %}
-
-    <h1 class="heading-large">
-      Preview of {{ template.name }}
-    </h1>
-    {{ skip_to_file_contents() }}
-
-  {% endif %}
-
-  {% if not errors %}
-    {{ template|string }}
-  {% endif %}
+    {% endcall %}
+  </div>
 
   <div class="bottom-gutter-3-2">
-  {% if errors %}
     {% if request.args.from_test %}
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
     {% else %}
       {{file_upload(form.file, button_text='Re-upload your file')}}
     {% endif %}
-  {% else %}
-    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}" class='page-footer'>
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <input type="hidden" name="help" value="{{ '3' if help else 0 }}" />
-      {% if choose_time_form and template.template_type != 'letter' %}
-        {{ radio_select(
-          choose_time_form.scheduled_for,
-          wrapping_class='bottom-gutter-2-3'
-        ) }}
-      {% endif %}
-      {% if template.template_type != 'letter' or not request.args.from_test %}
-      <input type="submit" class="button" value="Send {{ count_of_recipients }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}" />
-      {% else %}
-        <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_type=template.template_type, upload_id=upload_id, filetype='pdf') }}" download="download" class="button">Download as a printable PDF</a>
-      {% endif %}
-      <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
-    </form>
-  {% endif %}
   </div>
 
   {% if not request.args.from_test %}
@@ -177,7 +107,7 @@
       caption=original_file_name,
       caption_visible=False,
       field_headings=[
-        '<span class="visually-hidden">Row in file</span><span aria-hidden="true" class="{}">1</span>'.format("table-field-invisible-error" if errors else "")|safe
+        '<span class="visually-hidden">Row in file</span><span aria-hidden="true">1</span>'|safe
       ] + recipients.column_headers
     ) %}
       {% call index_field() %}
@@ -227,9 +157,7 @@
     </p>
   {% endif %}
 
-  {% if errors %}
-    <h2 class="heading-medium">Preview of {{ template.name }}</h2>
-    {{ template|string }}
-  {% endif %}
+  <h2 class="heading-medium">Preview of {{ template.name }}</h2>
+  {{ template|string }}
 
 {% endblock %}
