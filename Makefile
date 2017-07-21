@@ -86,8 +86,6 @@ generate-version-file: ## Generates the app version file
 build: dependencies generate-version-file ## Build project
 	npm run build
 	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel install -r requirements.txt
-	mkdir -p vendor/
-	cp ${PIP_ACCEL_CACHE}/sources/* vendor/
 
 .PHONY: cf-build
 cf-build: dependencies generate-version-file ## Build project
@@ -201,7 +199,7 @@ clean-docker-containers: ## Clean up any remaining docker containers
 
 .PHONY: clean
 clean:
-	rm -rf node_modules cache target venv .coverage vendor
+	rm -rf node_modules cache target venv .coverage
 
 .PHONY: cf-login
 cf-login: ## Log in to Cloud Foundry
