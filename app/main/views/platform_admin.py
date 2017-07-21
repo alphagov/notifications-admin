@@ -33,11 +33,7 @@ def platform_admin():
         'views/platform-admin/index.html',
         include_from_test_key=form.include_from_test_key.data,
         form=form,
-        **get_statistics(sorted(
-            services,
-            key=lambda service: (service['active'], sum_service_usage(service), service['created_at']),
-            reverse=True
-        ))
+        global_stats=create_global_stats(services),
     )
 
 
@@ -77,18 +73,6 @@ def sum_service_usage(service):
     for notification_type in service['statistics'].keys():
         total += service['statistics'][notification_type]['requested']
     return total
-
-
-def get_statistics(services):
-    return {
-        'global_stats': create_global_stats(services),
-        'live_services': format_stats_by_service(
-            service for service in services if not service['restricted']
-        ),
-        'trial_mode_services': format_stats_by_service(
-            service for service in services if service['restricted']
-        ),
-    }
 
 
 def filter_and_sort_services(services, trial_mode_services=False):

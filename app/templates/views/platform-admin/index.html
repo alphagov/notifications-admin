@@ -5,80 +5,6 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/table.html" import mapping_table, field, stats_fields, row_group, row, right_aligned_field_heading, hidden_field_heading, text_field %}
 
-{% macro stats_fields(channel, data) -%}
-
-  {% call field(border=False) %}
-      <span class="heading-medium">{{ channel.title() }}</span>
-  {% endcall %}
-
-  {% call field(align='right', border=False) %}
-    {{ big_number(data[channel]['sending'], smaller=True) }}
-  {% endcall %}
-
-  {% call field(align='right', border=False) %}
-    {{ big_number(data[channel]['delivered'], smaller=True) }}
-  {% endcall %}
-
-  {% call field(align='right', status='error' if data[channel]['failed'], border=False) %}
-    {{ big_number(data[channel]['failed'], smaller=True) }}
-  {% endcall %}
-
-{%- endmacro %}
-
-{% macro services_table(services, caption) %}
-  {% call(item, row_number) mapping_table(
-    caption=caption,
-    caption_visible=True,
-    field_headings=[
-    'Service',
-    hidden_field_heading('Type'),
-    right_aligned_field_heading('Sending'),
-    right_aligned_field_heading('Delivered'),
-    right_aligned_field_heading('Failed')
-    ],
-    field_headings_visible=True
-  ) %}
-
-    {% for service in services %}
-
-      {% call row_group() %}
-
-        {% call row() %}
-          {% call field(border=False) %}
-            <a href="{{ url_for('main.service_dashboard', service_id=service['id']) }}" class="browse-list-link">{{ service['name'] }}</a>
-          {% endcall %}
-
-          {{ stats_fields('email', service['stats']) }}
-        {% endcall %}
-
-        {% call row() %}
-          {% if not service['active'] %}
-            {% call field(status='default') %}
-              <span class="heading-medium">archived</span>
-            {% endcall %}
-          {% elif service['research_mode'] %}
-            {% call field(border=False) %}
-              <span class="research-mode">research mode</span>
-            {% endcall %}
-          {% elif not service['restricted'] %}
-            {% call field(status='error') %}
-              <span class="heading-medium">Live</span>
-            {% endcall %}
-          {% else %}
-            {{ text_field('') }}
-          {% endif %}
-
-          {{ stats_fields('sms', service['stats']) }}
-        {% endcall %}
-
-      {% endcall %}
-
-    {% endfor %}
-
-  {% endcall %}
-{% endmacro %}
-
-
 {% block per_page_title %}
   Platform admin
 {% endblock %}
@@ -97,9 +23,5 @@
   </details>
 
   {% include "views/platform-admin/_global_stats.html" %}
-
-  {{ services_table(live_services, 'Live services') }}
-
-  {{ services_table(trial_mode_services, 'Trial mode services') }}
 
 {% endblock %}
