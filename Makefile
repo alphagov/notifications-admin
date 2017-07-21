@@ -87,7 +87,7 @@ build: dependencies generate-version-file ## Build project
 	npm run build
 	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel install -r requirements.txt
 	mkdir -p vendor/
-	cp -r ${PIP_ACCEL_CACHE}/sources/ vendor/
+	cp ${PIP_ACCEL_CACHE}/sources/* vendor/
 
 .PHONY: cf-build
 cf-build: dependencies generate-version-file ## Build project
