@@ -86,7 +86,8 @@ generate-version-file: ## Generates the app version file
 build: dependencies generate-version-file ## Build project
 	npm run build
 	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel install -r requirements.txt
-	mkdir -p vendor/
+	rm -rf vendor
+	mkdir -p vendor
 	cp ${PIP_ACCEL_CACHE}/sources/* vendor/
 
 .PHONY: cf-build
