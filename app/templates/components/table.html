@@ -119,25 +119,29 @@
 
 
 {% macro notification_status_field(notification) %}
-  {% call field(status=notification.status|format_notification_status_as_field_status, align='right') %}
-    {% if notification.status in ['created', 'sending', 'delivered'] %}<span class="align-with-message-body">{% endif %}
-    {% if notification.status|format_notification_status_as_url %}
-      <a href="{{ notification.status|format_notification_status_as_url }}">
-    {% endif %}
-    {{ notification.status|format_notification_status(
-      notification.template.template_type
-    ) }}
-    {% if notification.status|format_notification_status_as_url %}
-      </a>
-    {% endif %}
-    <span class="status-hint">
-      {{ notification.status|format_notification_status_as_time(
-        notification.created_at|format_datetime_short,
-        (notification.updated_at or notification.created_at)|format_datetime_short
+  {% if not notification %}
+    {% call field(align='right') %}{% endcall %}
+  {% else %}
+    {% call field(status=notification.status|format_notification_status_as_field_status, align='right') %}
+      {% if notification.status in ['created', 'sending', 'delivered'] %}<span class="align-with-message-body">{% endif %}
+      {% if notification.status|format_notification_status_as_url %}
+        <a href="{{ notification.status|format_notification_status_as_url }}">
+      {% endif %}
+      {{ notification.status|format_notification_status(
+        notification.template.template_type
       ) }}
-    </span>
-    {% if notification.status in ['created', 'sending', 'delivered'] %}</span>{% endif %}
-  {% endcall %}
+      {% if notification.status|format_notification_status_as_url %}
+        </a>
+      {% endif %}
+      <span class="status-hint">
+        {{ notification.status|format_notification_status_as_time(
+          notification.created_at|format_datetime_short,
+          (notification.updated_at or notification.created_at)|format_datetime_short
+        ) }}
+      </span>
+      {% if notification.status in ['created', 'sending', 'delivered'] %}</span>{% endif %}
+    {% endcall %}
+  {% endif %}
 {% endmacro %}
 
 

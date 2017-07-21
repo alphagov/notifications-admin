@@ -40,6 +40,7 @@ from app.utils import (
     FAILURE_STATUSES,
     SENDING_STATUSES,
     DELIVERED_STATUSES,
+    get_letter_timings,
 )
 from app.statistics_utils import add_rate_to_job
 
@@ -109,6 +110,13 @@ def view_job(service_id, job_id):
 
     total_notifications = job.get('notification_count', 0)
     processed_notifications = job.get('notifications_delivered', 0) + job.get('notifications_failed', 0)
+
+    template = service_api_client.get_service_template(
+        service_id=service_id,
+        template_id=job['template'],
+        version=job['template_version']
+    )['data']
+
     return render_template(
         'views/jobs/job.html',
         finished=(total_notifications == processed_notifications),
@@ -121,7 +129,11 @@ def view_job(service_id, job_id):
             job_id=job['id'],
             status=request.args.get('status', ''),
         ),
-        partials=get_job_partials(job),
+        partials=get_job_partials(job, template),
+        just_sent=bool(
+            request.args.get('just_sent') == 'yes' and
+            template['template_type'] == 'letter'
+        )
     )
 
 
@@ -170,8 +182,16 @@ def cancel_job(service_id, job_id):
 @main.route("/services/<service_id>/jobs/<job_id>.json")
 @user_has_permissions('view_activity', admin_override=True)
 def view_job_updates(service_id, job_id):
+
+    job = job_api_client.get_job(service_id, job_id)['data']
+
     return jsonify(**get_job_partials(
-        job_api_client.get_job(service_id, job_id)['data']
+        job,
+        service_api_client.get_service_template(
+            service_id=current_service['id'],
+            template_id=job['template'],
+            version=job['template_version']
+        )['data'],
     ))
 
 
@@ -342,23 +362,28 @@ def _get_job_counts(job):
     ]
 
 
-def get_job_partials(job):
+def get_job_partials(job, template):
     filter_args = _parse_filter_args(request.args)
     filter_args['status'] = _set_status_filters(filter_args)
     notifications = notification_api_client.get_notifications_for_service(
         job['service'], job['id'], status=filter_args['status']
     )
-    template = service_api_client.get_service_template(
-        service_id=current_service['id'],
-        template_id=job['template'],
-        version=job['template_version']
-    )['data']
-    return {
-        'counts': render_template(
+
+    if template['template_type'] == 'letter':
+        counts = render_template(
+            'partials/jobs/count-letters.html',
+            total=job.get('notification_count', 0),
+            delivery_estimate=get_letter_timings(job['created_at']).earliest_delivery,
+        )
+    else:
+        counts = render_template(
             'partials/count.html',
             counts=_get_job_counts(job),
             status=filter_args['status']
-        ),
+        )
+
+    return {
+        'counts': counts,
         'notifications': render_template(
             'partials/jobs/notifications.html',
             notifications=list(
