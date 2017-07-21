@@ -1,8 +1,9 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
-{% from "components/big-number.html" import big_number %}
 {% from "components/checkbox.html" import checkbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/big-number.html" import big_number, big_number_with_status %}
+{% from "components/message-count-label.html" import message_count_label %}
 {% from "components/table.html" import mapping_table, field, stats_fields, row_group, row, right_aligned_field_heading, hidden_field_heading, text_field %}
 
 {% macro stats_fields(channel, data) -%}
@@ -28,7 +29,7 @@
 {% macro services_table(services, caption) %}
   {% call(item, row_number) mapping_table(
     caption=caption,
-    caption_visible=True,
+    caption_visible=False,
     field_headings=[
     'Service',
     hidden_field_heading('Type'),
@@ -80,13 +81,13 @@
 
 
 {% block per_page_title %}
-  Platform admin
+  {{ page_title|capitalize }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    Platform admin
+    {{ page_title|capitalize }}
   </h1>
 
     <details>
@@ -102,8 +103,6 @@
 
   {% include "views/platform-admin/_global_stats.html" %}
 
-  {{ services_table(live_services, 'Live services') }}
-
-  {{ services_table(trial_mode_services, 'Trial mode services') }}
+  {{ services_table(services, page_title|capitalize) }}
 
 {% endblock %}

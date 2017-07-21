@@ -10,22 +10,34 @@ from tests import service_json
 from app.main.views.platform_admin import format_stats_by_service, create_global_stats, sum_service_usage
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.platform_admin',
+    'main.live_services',
+    'main.trial_services',
+])
 def test_should_redirect_if_not_logged_in(
-    client
+    client,
+    endpoint
 ):
-    response = client.get(url_for('main.platform_admin'))
+    response = client.get(url_for(endpoint))
     assert response.status_code == 302
-    assert response.location == url_for('main.sign_in', next=url_for('main.platform_admin'), _external=True)
+    assert response.location == url_for('main.sign_in', next=url_for(endpoint), _external=True)
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.platform_admin',
+    'main.live_services',
+    'main.trial_services',
+])
 def test_should_403_if_not_platform_admin(
     client,
     active_user_with_permissions,
     mocker,
+    endpoint,
 ):
     mock_get_user(mocker, user=active_user_with_permissions)
     client.login(active_user_with_permissions)
-    response = client.get(url_for('main.platform_admin'))
+    response = client.get(url_for(endpoint))
 
     assert response.status_code == 403
 
@@ -64,24 +76,33 @@ def test_should_show_research_and_restricted_mode(
     assert service_mode == displayed
 
 
+@pytest.mark.parametrize('endpoint, expected_services_shown', [
+    ('main.platform_admin', 2),
+    ('main.live_services', 1),
+    ('main.trial_services', 1),
+])
 def test_should_render_platform_admin_page(
     client,
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
+    endpoint,
+    expected_services_shown,
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin'))
-
+    response = client.get(url_for(endpoint))
     assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'Platform admin' in resp_data
-    assert 'Live services' in resp_data
-    assert 'Trial mode services' in resp_data
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.select('tbody tr')) == expected_services_shown * 2  # one row for SMS, one for email
     mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.platform_admin',
+    'main.live_services',
+    'main.trial_services',
+])
 @pytest.mark.parametrize('include_from_test_key, api_args', [
     ("Y", {'detailed': True, 'include_from_test_key': True}),
     ("N", {'detailed': True, 'include_from_test_key': False})
@@ -93,30 +114,35 @@ def test_platform_admin_toggle_including_from_test_key(
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
+    endpoint,
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin', include_from_test_key=include_from_test_key))
+    response = client.get(url_for(endpoint, include_from_test_key=include_from_test_key))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with(api_args)
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.platform_admin',
+    'main.live_services',
+    'main.trial_services',
+])
 def test_platform_admin_with_date_filter(
     client,
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
+    endpoint,
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin', start_date='2016-12-20', end_date='2016-12-28'))
+    response = client.get(url_for(endpoint, start_date='2016-12-20', end_date='2016-12-28'))
 
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
     assert 'Platform admin' in resp_data
-    assert 'Live services' in resp_data
-    assert 'Trial mode services' in resp_data
     mock_get_detailed_services.assert_called_once_with({
         'include_from_test_key': False,
         'start_date': datetime.date(2016, 12, 20),
