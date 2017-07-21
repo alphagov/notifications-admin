@@ -1,4 +1,4 @@
-{% extends "withoutnav_template.html" %}
+{% extends "views/platform-admin/_base_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/checkbox.html" import checkbox %}
@@ -83,22 +83,18 @@
   Platform admin
 {% endblock %}
 
-{% block maincolumn_content %}
+{% block platform_admin_content %}
 
-  <h1 class="heading-large">
-    Platform admin
-  </h1>
-
-    <details>
-      <summary>Apply filters</summary>
-      <form autocomplete="off" method="get">
-        {{ textbox(form.start_date, hint="Enter start date in format YYYY-MM-DD") }}
-        {{ textbox(form.end_date, hint="Enter end date in format YYYY-MM-DD") }}
-        {{ checkbox(form.include_from_test_key) }}
-        </br>
-        <input type="submit" class="button">
-      </form>
-    </details>
+  <details>
+    <summary>Apply filters</summary>
+    <form autocomplete="off" method="get">
+      {{ textbox(form.start_date, hint="Enter start date in format YYYY-MM-DD") }}
+      {{ textbox(form.end_date, hint="Enter end date in format YYYY-MM-DD") }}
+      {{ checkbox(form.include_from_test_key) }}
+      </br>
+      <input type="submit" class="button">
+    </form>
+  </details>
 
   {% include "views/platform-admin/_global_stats.html" %}
 
