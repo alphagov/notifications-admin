@@ -30,7 +30,7 @@ def platform_admin():
     services = service_api_client.get_services(api_args)['data']
 
     return render_template(
-        'views/platform-admin.html',
+        'views/platform-admin/index.html',
         include_from_test_key=form.include_from_test_key.data,
         form=form,
         **get_statistics(sorted(
