@@ -23,19 +23,18 @@
       {% endcall %}
     </div>
   {% else %}
-
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        <h1 class="heading-large">
+          API keys
+        </h1>
+      </div>
+      <div class="column-one-third">
+        <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}" class="button align-with-heading">Create an API key</a>
+      </div>
+    </div>
   {% endif %}
 
-  <div class="grid-row">
-    <div class="column-two-thirds">
-      <h1 class="heading-large">
-        API keys
-      </h1>
-    </div>
-    <div class="column-one-third">
-      <a href="{{ url_for('.create_api_key', service_id=current_service.id) }}" class="button align-with-heading">Create an API key</a>
-    </div>
-  </div>
   <div class="body-copy-table">
     {% call(item, row_number) list_table(
       keys,

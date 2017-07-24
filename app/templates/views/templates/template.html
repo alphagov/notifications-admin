@@ -27,9 +27,7 @@
         </form>
       {% endcall %}
     </div>
-  {% endif %}
-
-  {% if template_delete_confirmation_message %}
+  {% elif template_delete_confirmation_message %}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous', subhead=template_delete_confirmation_message[0]) %}
         <p>
@@ -41,9 +39,9 @@
         </form>
       {% endcall %}
     </div>
+  {% else %}
+    <h1 class="heading-large">{{ template.name }}</h1>
   {% endif %}
-
-  <h1 class="heading-large">{{ template.name }}</h1>
 
   <div class="grid-row">
     {% with show_title=False, expanded=True %}
