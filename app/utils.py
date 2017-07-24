@@ -1,14 +1,21 @@
 import re
 import csv
+<<<<<<< HEAD
 import pytz
+=======
+from datetime import datetime, timedelta, timezone
+>>>>>>> Update emails to use logos cdn
 from io import StringIO
 from os import path
 from functools import wraps
 import unicodedata
 from urllib.parse import urlparse
+<<<<<<< HEAD
 from collections import namedtuple
 from datetime import datetime, timedelta, timezone
 from dateutil import parser
+=======
+>>>>>>> Update emails to use logos cdn
 
 import dateutil
 import ago
@@ -330,6 +337,7 @@ def email_or_sms_not_enabled(template_type, permissions):
     return (template_type in ['email', 'sms']) and (template_type not in permissions)
 
 
+<<<<<<< HEAD
 def get_letter_timings(upload_time):
 
     LetterTimings = namedtuple(
@@ -367,6 +375,8 @@ def gmt_timezones(date):
     return forced_utc.astimezone(pytz.timezone('Europe/London'))
 
 
+=======
+>>>>>>> Update emails to use logos cdn
 def get_cdn_domain():
     parsed_uri = urlparse(current_app.config['ADMIN_BASE_URL'])
 
