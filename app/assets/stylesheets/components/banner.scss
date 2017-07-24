@@ -49,7 +49,7 @@
   @extend %banner;
   @include bold-19;
   background: $white;
-  color: $error-colour;
+  color: $text-colour;
   border: 5px solid $error-colour;
   margin: 15px 0;
   text-align: left;
