@@ -1,6 +1,8 @@
+def test_owasp_useful_headers_set(client, mocker):
+    mocker.patch('app.get_cdn_domain', return_value='static-logos.test.com')
 
-def test_owasp_useful_headers_set(client):
     response = client.get('/')
+
     assert response.status_code == 200
     assert response.headers['X-Frame-Options'] == 'deny'
     assert response.headers['X-Content-Type-Options'] == 'nosniff'
@@ -10,6 +12,6 @@ def test_owasp_useful_headers_set(client):
         "script-src 'self' *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
         "object-src 'self';"
         "font-src 'self' data:;"
-        "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk data:;"
+        "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk static-logos.test.com data:;"
         "frame-src www.youtube.com;"
     )

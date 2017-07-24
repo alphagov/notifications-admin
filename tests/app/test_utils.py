@@ -13,7 +13,11 @@ from app.utils import (
     generate_previous_dict,
     generate_next_dict,
     Spreadsheet,
+<<<<<<< HEAD
     get_letter_timings,
+=======
+    get_cdn_domain
+>>>>>>> Update emails to use logos cdn
 )
 
 from tests import notification_json, single_notification_json
@@ -158,6 +162,7 @@ def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
     assert mock_get_notifications.mock_calls[1][2]['page'] == 2
 
 
+<<<<<<< HEAD
 @freeze_time('2017-07-14 14:59:59')  # Friday, before print deadline
 @pytest.mark.parametrize('upload_time, expected_print_time, is_printed, expected_earliest, expected_latest', [
 
@@ -290,3 +295,15 @@ def test_get_estimated_delivery_date_for_letter(
     assert timings.is_printed == is_printed
     assert timings.earliest_delivery.strftime('%A %Y-%m-%d') == expected_earliest
     assert timings.latest_delivery.strftime('%A %Y-%m-%d') == expected_latest
+=======
+def test_get_cdn_domain_on_localhost(client, mocker):
+    mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'http://localhost:6012'})
+    domain = get_cdn_domain()
+    assert domain == 'static-logos.notify.tools'
+
+
+def test_get_cdn_domain_without_logo_base_domain_env_returns_admin_base_domain(client, mocker):
+    mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'https://some.admintest.com'})
+    domain = get_cdn_domain()
+    assert domain == 'static-logos.admintest.com'
+>>>>>>> Update emails to use logos cdn

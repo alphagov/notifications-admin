@@ -5,6 +5,7 @@ from io import StringIO
 from os import path
 from functools import wraps
 import unicodedata
+from urllib.parse import urlparse
 from collections import namedtuple
 from datetime import datetime, timedelta, timezone
 from dateutil import parser
@@ -364,3 +365,15 @@ def gmt_timezones(date):
     date = dateutil.parser.parse(date)
     forced_utc = date.replace(tzinfo=pytz.utc)
     return forced_utc.astimezone(pytz.timezone('Europe/London'))
+
+
+def get_cdn_domain():
+    parsed_uri = urlparse(current_app.config['ADMIN_BASE_URL'])
+
+    if parsed_uri.netloc.startswith('localhost'):
+        return 'static-logos.notify.tools'
+
+    subdomain = parsed_uri.hostname.split('.')[0]
+    domain = parsed_uri.netloc[len(subdomain + '.'):]
+
+    return "static-logos.{}".format(domain)

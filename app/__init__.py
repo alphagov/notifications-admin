@@ -54,6 +54,7 @@ from app.notify_client.provider_client import ProviderClient
 from app.notify_client.organisations_client import OrganisationsClient
 from app.notify_client.models import AnonymousUser
 from app.notify_client.letter_jobs_client import LetterJobsClient
+from app.utils import get_cdn_domain
 
 from app.utils import gmt_timezones
 
@@ -415,8 +416,8 @@ def useful_headers_after_request(response):
         "script-src 'self' *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
         "object-src 'self';"
         "font-src 'self' data:;"
-        "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk data:;"
-        "frame-src www.youtube.com;"
+        "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk {} data:;"
+        "frame-src www.youtube.com;".format(get_cdn_domain())
     ))
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']

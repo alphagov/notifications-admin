@@ -22,7 +22,7 @@ from notifications_python_client.errors import HTTPError
 
 from app import service_api_client
 from app.main import main
-from app.utils import user_has_permissions, email_safe
+from app.utils import user_has_permissions, email_safe, get_cdn_domain
 from app.main.forms import (
     ConfirmPasswordForm,
     ServiceNameForm,
@@ -464,7 +464,7 @@ def get_branding_as_value_and_label(organisations):
 def get_branding_as_dict(organisations):
     return {
         organisation['id']: {
-            'logo': '/static/images/email-template/crests/{}'.format(organisation['logo']),
+            'logo': 'https://{}/{}'.format(get_cdn_domain(), organisation['logo']),
             'colour': organisation['colour']
         } for organisation in organisations
     }
