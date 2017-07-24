@@ -725,9 +725,7 @@ def test_should_show_delete_template_page_with_never_used_block(
         _test_page_title=False,
     )
     assert page.h1.text == 'Are you sure you want to delete Two week reminder?'
-    assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == (
-        'It’s never been used.'
-    )
+    assert not page.select('.banner-dangerous p')
     assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
         'service one: Template <em>content</em> with & entity'
     )

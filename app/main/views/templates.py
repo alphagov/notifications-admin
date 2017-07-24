@@ -436,7 +436,7 @@ def delete_service_template(service_id, template_id):
         )
     except HTTPError as e:
         if e.status_code == 404:
-            message = 'It’s never been used.'.format(template['name'])
+            message = None
         else:
             raise e
 
