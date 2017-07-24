@@ -110,8 +110,9 @@ def revoke_api_key(service_id, key_id):
     key_name = api_key_api_client.get_api_keys(service_id=service_id, key_id=key_id)['apiKeys'][0]['name']
     if request.method == 'GET':
         return render_template(
-            'views/api/keys/revoke.html',
-            key_name=key_name
+            'views/api/keys.html',
+            revoke_key=key_name,
+            keys=api_key_api_client.get_api_keys(service_id=service_id)['apiKeys'],
         )
     elif request.method == 'POST':
         api_key_api_client.revoke_api_key(service_id=service_id, key_id=key_id)
