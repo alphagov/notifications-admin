@@ -12,7 +12,9 @@
       {% call banner_wrapper(type='dangerous') %}
         {% with
           count_of_recipients=1,
-          template_type_label='phone number'
+          template_type_label=(
+            'phone number' if template.template_type == 'sms' else 'email address'
+          )
         %}
           {% include "partials/check/not-allowed-to-send-to.html" %}
         {% endwith %}
