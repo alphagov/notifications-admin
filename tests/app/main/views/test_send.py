@@ -1937,6 +1937,6 @@ def test_send_notification_shows_error_if_400(
         _expected_status=200
     )
 
-    assert ' '.join(page.h1.text.split()) == expected_h1
-    assert ' '.join(page.h1.parent.p.text.split()) == expected_err_details
+    assert normalize_spaces(page.select('.banner-dangerous h1')[0].text) == expected_h1
+    assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == expected_err_details
     assert not page.find('input[type=submit]')
