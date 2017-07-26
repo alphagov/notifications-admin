@@ -1,5 +1,6 @@
 from datetime import datetime
 from unittest.mock import Mock, ANY
+import uuid
 
 import pytest
 from bs4 import BeautifulSoup
@@ -10,6 +11,7 @@ from tests.conftest import service_one as create_sample_service
 from tests.conftest import (
     mock_get_service_email_template,
     mock_get_service_letter_template,
+    mock_get_service_template,
     normalize_spaces,
     SERVICE_ONE_ID,
 )
@@ -700,7 +702,36 @@ def test_should_show_delete_template_page_with_time_block(
         )
     assert page.h1.text == 'Are you sure you want to delete Two week reminder?'
     assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == (
-        'It was last used 10 minutes ago.'
+        'It was last used 10 minutes ago'
+    )
+    assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
+        'service one: Template <em>content</em> with & entity'
+    )
+    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid)
+
+
+def test_should_show_delete_template_page_with_time_block_for_empty_notification(
+    client_request,
+    mock_get_service_template,
+    mocker,
+    fake_uuid
+):
+    with freeze_time('2012-01-08 12:00:00'):
+        template = template_json('1234', '1234', "Test template", "sms", "Something very interesting")
+        single_notification_json('1234', template=template)
+        mocker.patch('app.template_statistics_client.get_template_statistics_for_template',
+                     return_value=None)
+
+    with freeze_time('2012-01-01 11:00:00'):
+        page = client_request.get(
+            '.delete_service_template',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _test_page_title=False,
+        )
+    assert page.h1.text == 'Are you sure you want to delete Two week reminder?'
+    assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == (
+        'It was last used more than seven days ago'
     )
     assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
         'service one: Template <em>content</em> with & entity'
