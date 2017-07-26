@@ -21,10 +21,8 @@ class JobApiClient(NotifyAdminAPIClient):
 
     def init_app(self, app):
         self.base_url = app.config['API_HOST_NAME']
-        self.api_key = '{}-{}'.format(
-            app.config['ADMIN_CLIENT_USER_NAME'],
-            app.config['ADMIN_CLIENT_SECRET'],
-        )
+        self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
+        self.api_key = app.config['ADMIN_CLIENT_SECRET']
 
     @staticmethod
     def __convert_statistics(job):

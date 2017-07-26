@@ -14,10 +14,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     def init_app(self, application):
         self.base_url = application.config['API_HOST_NAME']
-        self.api_key = '{}-{}'.format(
-            application.config['ADMIN_CLIENT_USER_NAME'],
-            application.config['ADMIN_CLIENT_SECRET'],
-        )
+        self.service_id = application.config['ADMIN_CLIENT_USER_NAME']
+        self.api_key = application.config['ADMIN_CLIENT_SECRET']
 
     def create_service(self, service_name, message_limit, restricted, user_id, email_from):
         """
