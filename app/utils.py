@@ -21,10 +21,10 @@ from flask import (
 )
 from flask_login import current_user
 import pyexcel
-import pyexcel.ext.io
-import pyexcel.ext.xls
-import pyexcel.ext.xlsx
-import pyexcel.ext.ods3
+import pyexcel_io
+import pyexcel_xls
+import pyexcel_xlsx
+import pyexcel_ods3
 
 from notifications_utils.template import (
     SMSPreviewTemplate,
