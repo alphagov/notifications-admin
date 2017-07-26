@@ -206,7 +206,7 @@ def test_escapes_letter_contact_block(
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     div = str(page.find_all('tr')[5].find_all('td')[1].div)
-    assert 'foo<br>bar' in div
+    assert 'foo<br/>bar' in div
     assert '<script>' not in div
 
 
