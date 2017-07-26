@@ -9,6 +9,9 @@ from tests.conftest import api_user_active, platform_admin_user
 from app.notify_client import NotifyAdminAPIClient
 
 
+SAMPLE_API_KEY = '{}-{}'.format('a' * 36, 's' * 36)
+
+
 @pytest.mark.parametrize('method', [
     'put',
     'post',
@@ -23,7 +26,7 @@ from app.notify_client import NotifyAdminAPIClient
     None
 ], ids=['active_service', 'no_service'])
 def test_active_service_can_be_modified(app_, method, user, service):
-    api_client = NotifyAdminAPIClient('api_key', 'base_url', 'service_id')
+    api_client = NotifyAdminAPIClient(SAMPLE_API_KEY, 'base_url')
 
     with app_.test_request_context() as request_context, app_.test_client() as client:
         client.login(user)
@@ -42,7 +45,7 @@ def test_active_service_can_be_modified(app_, method, user, service):
     'delete'
 ])
 def test_inactive_service_cannot_be_modified_by_normal_user(app_, api_user_active, method):
-    api_client = NotifyAdminAPIClient('api_key', 'base_url', 'service_id')
+    api_client = NotifyAdminAPIClient(SAMPLE_API_KEY, 'base_url')
 
     with app_.test_request_context() as request_context, app_.test_client() as client:
         client.login(api_user_active)
@@ -61,7 +64,7 @@ def test_inactive_service_cannot_be_modified_by_normal_user(app_, api_user_activ
     'delete'
 ])
 def test_inactive_service_can_be_modified_by_platform_admin(app_, platform_admin_user, method):
-    api_client = NotifyAdminAPIClient('api_key', 'base_url', 'service_id')
+    api_client = NotifyAdminAPIClient(SAMPLE_API_KEY, 'base_url')
 
     with app_.test_request_context() as request_context, app_.test_client() as client:
         client.login(platform_admin_user)
@@ -75,7 +78,7 @@ def test_inactive_service_can_be_modified_by_platform_admin(app_, platform_admin
 
 
 def test_generate_headers_sets_standard_headers():
-    api_client = NotifyAdminAPIClient('api_key', 'base_url', 'service_id')
+    api_client = NotifyAdminAPIClient(SAMPLE_API_KEY, 'base_url')
 
     # with patch('app.notify_client.has_request_context', return_value=False):
     headers = api_client.generate_headers('api_token')
@@ -87,7 +90,7 @@ def test_generate_headers_sets_standard_headers():
 
 
 def test_generate_headers_sets_request_id_if_in_request_context(app_):
-    api_client = NotifyAdminAPIClient('api_key', 'base_url', 'service_id')
+    api_client = NotifyAdminAPIClient(SAMPLE_API_KEY, 'base_url')
 
     with app_.test_request_context() as request_context:
         headers = api_client.generate_headers('api_token')

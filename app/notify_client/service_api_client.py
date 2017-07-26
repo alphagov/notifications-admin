@@ -10,12 +10,14 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     # Fudge assert in the super __init__ so
     # we can set those variables later.
     def __init__(self):
-        super().__init__("a", "b", "c")
+        super().__init__("a" * 73, "b")
 
     def init_app(self, application):
         self.base_url = application.config['API_HOST_NAME']
-        self.service_id = application.config['ADMIN_CLIENT_USER_NAME']
-        self.api_key = application.config['ADMIN_CLIENT_SECRET']
+        self.api_key = '{}-{}'.format(
+            application.config['ADMIN_CLIENT_USER_NAME'],
+            application.config['ADMIN_CLIENT_SECRET'],
+        )
 
     def create_service(self, service_name, message_limit, restricted, user_id, email_from):
         """
