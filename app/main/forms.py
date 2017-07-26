@@ -1,7 +1,7 @@
 import re
 import pytz
 
-from flask_wtf import Form
+from flask_wtf import FlaskForm as Form
 from datetime import datetime, timedelta
 from notifications_utils.recipients import (
     validate_phone_number,

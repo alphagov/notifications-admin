@@ -8,12 +8,14 @@ KEY_TYPE_TEST = 'test'
 
 class ApiKeyApiClient(NotifyAdminAPIClient):
     def __init__(self):
-        super().__init__("a", "b", "c")
+        super().__init__("a" * 73, "b")
 
     def init_app(self, app):
         self.base_url = app.config['API_HOST_NAME']
-        self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
-        self.api_key = app.config['ADMIN_CLIENT_SECRET']
+        self.api_key = '{}-{}'.format(
+            app.config['ADMIN_CLIENT_USER_NAME'],
+            app.config['ADMIN_CLIENT_SECRET'],
+        )
 
     def get_api_keys(self, service_id, key_id=None):
         if key_id:

@@ -55,8 +55,14 @@ def test_letters_lets_in_without_permission(
 
 
 @pytest.mark.parametrize('permissions, choices', [
-    (['email', 'sms', 'letter'], ['Email', 'Text message', 'Letter']),
-    (['email', 'sms'], ['Email', 'Text message'])
+    (
+        ['email', 'sms', 'letter'],
+        ['Email', 'Text message', 'Letter']
+    ),
+    (
+        ['email', 'sms'],
+        ['Email', 'Text message']
+    ),
 ])
 def test_given_option_to_add_letters_if_allowed(
     logged_in_client,
@@ -73,8 +79,13 @@ def test_given_option_to_add_letters_if_allowed(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     radios = page.select('input[type=radio]')
+    labels = page.select('label')
 
     assert len(radios) == len(choices)
+    assert len(labels) == len(choices)
 
-    for index, choice in enumerate(choices):
-        assert radios[index].text.strip() == choice
+    for index, choice in enumerate(permissions):
+        assert radios[index]['value'] == choice
+
+    for index, label in enumerate(choices):
+        assert labels[index].text.strip() == label
