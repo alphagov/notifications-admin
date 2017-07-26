@@ -23,6 +23,7 @@ from flask._compat import string_types
 from flask.globals import _lookup_req_object, _request_ctx_stack
 from flask_login import LoginManager
 from flask_wtf import CsrfProtect
+from flask_wtf.csrf import CSRFError
 from functools import partial
 
 from notifications_python_client.errors import HTTPError
@@ -161,7 +162,7 @@ def create_app():
 def init_csrf(application):
     csrf.init_app(application)
 
-    @csrf.error_handler
+    @application.errorhandler(CSRFError)
     def csrf_handler(reason):
         application.logger.warning('csrf.error_message: {}'.format(reason))
 
