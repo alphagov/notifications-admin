@@ -13,7 +13,7 @@ lxml==3.8.0
 pyexcel==0.5.2
 pyexcel-io==0.4.2
 pyexcel-xls==0.4.0
-pyexcel-xlsx==0.4.0
+pyexcel-xlsx==0.4.1
 pyexcel-ods3==0.4.0
 pytz==2017.2
 six==1.10.0
