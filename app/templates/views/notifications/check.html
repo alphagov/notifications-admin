@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/radios.html" import radio_select %}
+{% from "components/banner.html" import banner_wrapper %}
 {% from "components/message-count-label.html" import message_count_label %}
 
 {% block service_page_title %}
@@ -8,17 +8,31 @@
 
 {% block maincolumn_content %}
   {% if error == 'not-allowed-to-send-to' %}
-    {% with
-      count_of_recipients=1,
-      template_type_label='phone number'
-    %}
-      {% include "partials/check/not-allowed-to-send-to.html" %}
-    {% endwith %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% with
+          count_of_recipients=1,
+          template_type_label=(
+            'phone number' if template.template_type == 'sms' else 'email address'
+          )
+        %}
+          {% include "partials/check/not-allowed-to-send-to.html" %}
+        {% endwith %}
+      {% endcall %}
+    </div>
   {% elif error == 'too-many-messages' %}
-    {% include "partials/check/too-many-messages.html" %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% include "partials/check/too-many-messages.html" %}
+      {% endcall %}
+    </div>
   {% elif error == 'message-too-long' %}
     {# the only row_errors we can get when sending one off messages is that the message is too long #}
-    {% include "partials/check/message-too-long.html" %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% include "partials/check/message-too-long.html" %}
+      {% endcall %}
+    </div>
   {% else %}
     <h1 class="heading-large">
       Preview of {{ template.name }}
