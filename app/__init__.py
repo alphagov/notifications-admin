@@ -481,7 +481,7 @@ def register_errorhandlers(application):
 
 
 def setup_event_handlers():
-    from flask.ext.login import user_logged_in
+    from flask_login import user_logged_in
     from app.event_handlers import on_user_logged_in
 
     user_logged_in.connect(on_user_logged_in)
