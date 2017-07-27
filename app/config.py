@@ -87,8 +87,6 @@ class Config(object):
         r"cqc\.org\.uk",
     ]
 
-    LOGO_UPLOAD_BUCKET_NAME = 'local-notifications-logo-upload'
-
 
 class Development(Config):
     DEBUG = True
@@ -96,7 +94,6 @@ class Development(Config):
     SESSION_PROTECTION = None
     STATSD_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'development-notifications-csv-upload'
-    LOGO_UPLOAD_BUCKET_NAME = 'development-notifications-logo-upload'
 
 
 class Test(Development):
@@ -105,7 +102,6 @@ class Test(Development):
     STATSD_ENABLED = True
     WTF_CSRF_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'test-notifications-csv-upload'
-    LOGO_UPLOAD_BUCKET_NAME = 'test-notifications-logo-upload'
     NOTIFY_ENVIRONMENT = 'test'
     TEMPLATE_PREVIEW_API_HOST = 'http://localhost:9999'
 
@@ -115,7 +111,6 @@ class Preview(Config):
     HEADER_COLOUR = '#F499BE'  # $baby-pink
     STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'preview-notifications-csv-upload'
-    LOGO_UPLOAD_BUCKET_NAME = 'preview-notifications-logo-upload'
     NOTIFY_ENVIRONMENT = 'preview'
 
 
@@ -125,7 +120,6 @@ class Staging(Config):
     HEADER_COLOUR = '#6F72AF'  # $mauve
     STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'staging-notify-csv-upload'
-    LOGO_UPLOAD_BUCKET_NAME = 'staging-notifications-logo-upload'
     NOTIFY_ENVIRONMENT = 'staging'
 
 
@@ -135,7 +129,6 @@ class Live(Config):
     HTTP_PROTOCOL = 'https'
     STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
-    LOGO_UPLOAD_BUCKET_NAME = 'live-notifications-logo-upload'
     NOTIFY_ENVIRONMENT = 'live'
 
 
@@ -149,7 +142,6 @@ class Sandbox(CloudFoundryConfig):
     HEADER_COLOUR = '#F499BE'  # $baby-pink
     STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'cf-sandbox-notifications-csv-upload'
-    LOGO_UPLOAD_BUCKET_NAME = 'cf-sandbox-notifications-logo-upload'
     NOTIFY_ENVIRONMENT = 'sandbox'
 
 
