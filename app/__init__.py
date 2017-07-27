@@ -22,7 +22,7 @@ from flask import (
 from flask._compat import string_types
 from flask.globals import _lookup_req_object, _request_ctx_stack
 from flask_login import LoginManager
-from flask_wtf import CsrfProtect
+from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
 from functools import partial
 
@@ -58,7 +58,7 @@ from app.notify_client.letter_jobs_client import LetterJobsClient
 from app.utils import gmt_timezones
 
 login_manager = LoginManager()
-csrf = CsrfProtect()
+csrf = CSRFProtect()
 
 service_api_client = ServiceAPIClient()
 user_api_client = UserApiClient()
