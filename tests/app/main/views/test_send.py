@@ -1922,9 +1922,13 @@ def test_send_notification_shows_error_if_400(
     expected_h1,
     expected_err_details
 ):
+
+    class MockHTTPError(HTTPError):
+        message = exception_msg
+
     mocker.patch(
         'app.notification_api_client.send_notification',
-        side_effect=HTTPError(response=Mock(status_code=400), message=exception_msg)
+        side_effect=MockHTTPError(),
     )
     with client_request.session_transaction() as session:
         session['recipient'] = '07700900001'
@@ -1948,9 +1952,13 @@ def test_send_notification_shows_email_error_in_trial_mode(
     mocker,
     mock_get_service_email_template,
 ):
+    class MockHTTPError(HTTPError):
+        message = TRIAL_MODE_MSG
+        status_code = 400
+
     mocker.patch(
         'app.notification_api_client.send_notification',
-        side_effect=HTTPError(response=Mock(status_code=400), message=TRIAL_MODE_MSG)
+        side_effect=MockHTTPError(),
     )
     with client_request.session_transaction() as session:
         session['recipient'] = 'test@example.com'
