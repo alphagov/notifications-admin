@@ -28,6 +28,7 @@ from app.main.views import (
     providers,
     platform_admin,
     letter_jobs,
+    organisations,
     conversation,
     notifications
 )

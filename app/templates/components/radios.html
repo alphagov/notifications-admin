@@ -79,16 +79,19 @@
 {% macro branding_radios(
   field,
   hint=None,
-  branding_dict={}
+  branding_dict={},
+  show_header=True
 ) %}
   <div class="form-group {% if field.errors %} form-group-error{% endif %}">
     <fieldset>
       <legend class="form-label">
-        {{ field.label.text }}
+        {% if show_header %}
+          {{ field.label.text }}
+        {% endif %}
         {% if field.errors %}
-          <span class="error-message">
-            {{ field.errors[0] }}
-          </span>
+            <span class="error-message">
+              {{ field.errors[0] }}
+            </span>
         {% endif %}
       </legend>
       {% for value, option, checked in field.iter_choices() %}
@@ -102,7 +105,7 @@
           />
           <label class="block-label" for="{{ field.name }}-{{ loop.index }}">
             {% if branding_dict.get(value, {}).get('colour') %}
-              <span style="background: {{ branding_dict[value].colour }}; display: inline-block; width: 3px; height: 27px"></span>
+              <span style="background: {{ branding_dict[value].colour }}; display: inline-block; width: 3px; height: 27px;"></span>
             {% endif %}
             {% if branding_dict.get(value, {}).get('logo') %}
               <img

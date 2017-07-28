@@ -1,0 +1,55 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/textbox.html" import textbox %}
+
+{% block service_page_title %}
+  {{ '{} an organisations logo'.format('Update' if organisation else 'Create')}}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">{{ '{} an organisations logo'.format('Update' if organisation else 'Create')}}</h1>
+  <div class="grid-row">
+    <div class="column-three-quarters">
+
+      {% if logo %}
+        <div id="logo-img">
+          <img src="https://{{ cdn_url }}/{{ logo }}"/>
+        </div>
+      {% endif %}
+      {{
+        file_upload(
+        form.file,
+        button_text='{} logo'.format('Update' if organisation else 'Upload')
+      ) }}
+      <form method="post">
+        <div class="form-group">
+          <div style='margin-top:15px;'>{{textbox(form.name)}}</div>
+          <div>{{textbox(form.colour, width='1-4')}} 
+            <span id='colour_span' style="background: {{ organisation.colour }}; {% if not organisation.colour %}visibility:hidden; {% endif %}border:1px black solid; width: 3px; height: 25px;position:absolute;margin-top:138px;margin-left:185px;display:block;"></span>
+          </div>
+        {{ page_footer(
+          'Save',
+          back_link=url_for('.organisations', organisation_id=organisation.id if organisation else 'None'),
+          back_link_text='Back to organisation selection',
+          button_disabled=True if not logo else False
+        ) }}
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    function update_colour_span() {
+      if (document.getElementById('colour').value) {
+        document.getElementById('colour_span').style.visibility =  'visible';
+        document.getElementById('colour_span').style.background = document.getElementById('colour').value;
+      }
+      else {
+        document.getElementById('colour_span').style.visibility =  'hidden';
+        document.getElementById('colour_span').style.background = '';
+      }
+    }
+  </script>
+{% endblock %}

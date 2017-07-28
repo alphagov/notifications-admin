@@ -1,0 +1,26 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/radios.html" import radios, branding_radios %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Select organisation
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    <div>Select an organisation to update</div>
+    <div>or create a new organisation</div>
+  </h1>
+  <div class="grid-row">
+    <div class="column-three-quarters">
+      <form method="post">
+        {{ branding_radios(form.organisation, branding_dict=branding_dict, show_header=False) }}
+        {{ page_footer(
+          'Next'
+        ) }}
+      </form>
+    </div>
+  </div>
+
+{% endblock %}

@@ -96,7 +96,7 @@ class Development(Config):
     SESSION_PROTECTION = None
     STATSD_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'development-notifications-csv-upload'
-    LOGO_UPLOAD_BUCKET_NAME = 'development-notifications-logo-upload'
+    LOGO_UPLOAD_BUCKET_NAME = 'public-logos-tools'
 
 
 class Test(Development):

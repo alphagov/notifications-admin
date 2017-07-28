@@ -19,3 +19,19 @@ class OrganisationsClient(NotifyAdminAPIClient):
 
     def get_letter_organisations(self):
         return self.get(url='/dvla_organisations')
+
+    def create_organisation(self, logo, name, colour):
+        data = {
+            "logo": logo,
+            "name": name,
+            "colour": colour
+        }
+        return self.post("/organisation", data)
+
+    def update_organisation(self, org_id, logo, name, colour):
+        data = {
+            "logo": logo,
+            "name": name,
+            "colour": colour
+        }
+        return self.post("/organisation/{}".format(org_id), data)
