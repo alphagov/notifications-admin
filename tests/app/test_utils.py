@@ -296,7 +296,7 @@ def test_get_cdn_domain_on_localhost(client, mocker):
     assert domain == 'static-logos.notify.tools'
 
 
-def test_get_cdn_domain_without_logo_base_domain_env_returns_admin_base_domain(client, mocker):
+def test_get_cdn_domain_on_non_localhost(client, mocker):
     mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'https://some.admintest.com'})
     domain = get_cdn_domain()
     assert domain == 'static-logos.admintest.com'
