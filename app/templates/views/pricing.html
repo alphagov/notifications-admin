@@ -61,34 +61,39 @@
       times the cost of messages to UK mobile numbers.
     </p>
 
-    <div class="live-search" data-module="live-search" data-targets="#international-pricing .table-row">
-      {{ textbox(
-        search_form.search,
-        width='1-1',
-        label='Search by country name or code'
-      ) }}
-    </div>
+    <details>
+      <summary>International text message rates</summary>
 
-    <div id="international-pricing" class="bottom-gutter-3-2">
-      {% call mapping_table(
-        caption='Letter pricing',
-        field_headings=['Country code', 'Country', 'Cost multipler'],
-        field_headings_visible=True,
-        caption_visible=False
-      ) %}
-        {% for cc, names, billable_units in international_sms_rates %}
-          {% call row() %}
-            {{ text_field('+' + cc) }}
-            {% call field() %}
-              {% for name in names %}
-                {{ name }}<br>
-              {% endfor %}
+      <div class="live-search" data-module="live-search" data-targets="#international-pricing .table-row">
+        {{ textbox(
+          search_form.search,
+          width='1-1',
+          label='Search by country name or code'
+        ) }}
+      </div>
+
+      <div id="international-pricing" class="bottom-gutter-3-2">
+        {% call mapping_table(
+          caption='Letter pricing',
+          field_headings=['Country code', 'Country', 'Cost multipler'],
+          field_headings_visible=True,
+          caption_visible=False
+        ) %}
+          {% for cc, names, billable_units in international_sms_rates %}
+            {% call row() %}
+              {{ text_field('+' + cc) }}
+              {% call field() %}
+                {% for name in names %}
+                  {{ name }}<br>
+                {% endfor %}
+              {% endcall %}
+              {{ text_field('{}&hairsp;&times;'.format(billable_units)|safe) }}
             {% endcall %}
-            {{ text_field('{}&hairsp;&times;'.format(billable_units)|safe) }}
-          {% endcall %}
-        {% endfor %}
-      {% endcall %}
-    </div>
+          {% endfor %}
+        {% endcall %}
+      </div>
+
+    </details>
 
     <h2 class="heading-medium">
       Letters
