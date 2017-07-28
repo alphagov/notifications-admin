@@ -1,3 +1,5 @@
+{% from "components/table.html" import mapping_table, row, text_field, row_heading %}
+
 {% extends "withoutnav_template.html" %}
 
 {% block per_page_title %}
@@ -58,6 +60,38 @@
       times the cost of messages to UK mobile numbers.
     </p>
 
+    <h2 class="heading-medium">
+      Letters
+    </h2>
+    <p>
+      Letters are printed double sided in colour. Prices include
+      printing, paper, envelope, and postage. All letters are sent
+      second class post.
+    </p>
+    <p>
+      The price of letters increases with the number of sheets printed:
+    </p>
+
+    <div class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Letter pricing',
+        field_headings=['', 'Central government', 'Local government'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for sheets, central, local in [
+          ('1 sheet', '30', '33'),
+          ('2 sheets', '33', '39'),
+          ('3 sheets', '36', '45')
+        ] %}
+          {% call row() %}
+            {% call row_heading() %} {{ sheets }} (double sided) {% endcall %}
+            {{ text_field(central + 'p + VAT') }}
+            {{ text_field(local + 'p + VAT') }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    </div>
 
     <h2 class="heading-medium">No monthly charge or setup fee</h2>
     <p>
