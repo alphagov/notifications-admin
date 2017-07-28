@@ -1,6 +1,7 @@
 from flask import (render_template, url_for, redirect, request, abort)
 from app.main import main
 from app import convert_to_boolean
+from app.main.forms import SearchTemplatesForm
 from flask_login import (login_required, current_user)
 
 from notifications_utils.template import HTMLEmailTemplate
@@ -38,7 +39,8 @@ def pricing():
         international_sms_rates=sorted([
             (cc, country['names'], country['billable_units'])
             for cc, country in INTERNATIONAL_BILLING_RATES.items()
-        ], key=lambda x: x[0])
+        ], key=lambda x: x[0]),
+        search_form=SearchTemplatesForm(),
     )
 
 
