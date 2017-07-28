@@ -4,6 +4,7 @@ from app import convert_to_boolean
 from flask_login import (login_required, current_user)
 
 from notifications_utils.template import HTMLEmailTemplate
+from notifications_utils.international_billing_rates import INTERNATIONAL_BILLING_RATES
 
 
 @main.route('/')
@@ -31,7 +32,11 @@ def trial_mode():
 
 @main.route('/pricing')
 def pricing():
-    return render_template('views/pricing.html', sms_rate=0.0158)
+    return render_template(
+        'views/pricing.html',
+        sms_rate=0.0158,
+        international_sms_rates=INTERNATIONAL_BILLING_RATES,
+    )
 
 
 @main.route('/delivery-and-failure')
