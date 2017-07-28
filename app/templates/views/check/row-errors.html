@@ -23,14 +23,14 @@
     {% call banner_wrapper(type='dangerous') %}
       {% if row_errors|length == 1 %}
         <h1 class='banner-title' data-module="track-error" data-error-type="Bad rows" data-error-label="{{ upload_id }}">
-          There is a problem with your data
+          There is a problem with {{ original_file_name }}
         </h1>
         <p>
           You need to {{ row_errors[0] }}
         </p>
       {% else %}
         <h1 class='banner-title' data-module="track-error" data-error-type="Bad rows" data-error-label="{{ upload_id }}">
-          There are some problems with your data
+          There are some problems with {{ original_file_name }}
         </h1>
         <p>
           You need to:
@@ -48,8 +48,6 @@
   <div class="bottom-gutter-3-2">
     {{ file_upload(form.file, button_text='Re-upload your file') }}
   </div>
-
-  <h2 class="heading-medium" id="{{ file_contents_header_id }}">{{ original_file_name }}</h2>
 
   {% call(item, row_number) list_table(
     recipients.initial_annotated_rows_with_errors if row_errors and not recipients.missing_column_headers else recipients.initial_annotated_rows,
