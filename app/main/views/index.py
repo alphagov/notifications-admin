@@ -35,7 +35,10 @@ def pricing():
     return render_template(
         'views/pricing.html',
         sms_rate=0.0158,
-        international_sms_rates=INTERNATIONAL_BILLING_RATES,
+        international_sms_rates=sorted([
+            (cc, country['names'], country['billable_units'])
+            for cc, country in INTERNATIONAL_BILLING_RATES.items()
+        ], key=lambda x: x[0])
     )
 
 

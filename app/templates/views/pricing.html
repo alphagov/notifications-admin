@@ -60,6 +60,21 @@
       times the cost of messages to UK mobile numbers.
     </p>
 
+    {% call mapping_table(
+      caption='Letter pricing',
+      field_headings=['Country code', 'Country', 'Cost multipler'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for cc, names, billable_units in international_sms_rates %}
+        {% call row() %}
+          {{ text_field('+&hairsp;'|safe + cc) }}
+          {{ text_field(names[0]) }}
+          {{ text_field('{}&hairsp;&times;'.format(billable_units)|safe) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+
     <h2 class="heading-medium">
       Letters
     </h2>
