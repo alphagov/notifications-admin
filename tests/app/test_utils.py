@@ -1,11 +1,10 @@
 from pathlib import Path
 from io import StringIO
+from collections import OrderedDict
 from csv import DictReader
 
-import pytest
-
-from collections import OrderedDict
 from freezegun import freeze_time
+import pytest
 
 from app.utils import (
     email_safe,
@@ -14,9 +13,8 @@ from app.utils import (
     generate_next_dict,
     Spreadsheet,
     get_letter_timings,
+    get_cdn_domain
 )
-
-from tests import notification_json, single_notification_json
 
 
 def _get_notifications_csv(
@@ -290,3 +288,15 @@ def test_get_estimated_delivery_date_for_letter(
     assert timings.is_printed == is_printed
     assert timings.earliest_delivery.strftime('%A %Y-%m-%d') == expected_earliest
     assert timings.latest_delivery.strftime('%A %Y-%m-%d') == expected_latest
+
+
+def test_get_cdn_domain_on_localhost(client, mocker):
+    mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'http://localhost:6012'})
+    domain = get_cdn_domain()
+    assert domain == 'static-logos.notify.tools'
+
+
+def test_get_cdn_domain_on_non_localhost(client, mocker):
+    mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'https://some.admintest.com'})
+    domain = get_cdn_domain()
+    assert domain == 'static-logos.admintest.com'
