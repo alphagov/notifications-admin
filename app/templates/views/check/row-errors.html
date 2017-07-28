@@ -46,52 +46,44 @@
   </div>
 
   <div class="bottom-gutter-3-2">
-    {% if request.args.from_test %}
-      <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
-    {% else %}
-      {{file_upload(form.file, button_text='Re-upload your file')}}
-    {% endif %}
+    {{ file_upload(form.file, button_text='Re-upload your file') }}
   </div>
 
-  {% if not request.args.from_test %}
+  <h2 class="heading-medium" id="{{ file_contents_header_id }}">{{ original_file_name }}</h2>
 
-    <h2 class="heading-medium" id="{{ file_contents_header_id }}">{{ original_file_name }}</h2>
-
-    {% call(item, row_number) list_table(
-      recipients.initial_annotated_rows_with_errors if row_errors and not recipients.missing_column_headers else recipients.initial_annotated_rows,
-      caption=original_file_name,
-      caption_visible=False,
-      field_headings=[
-        '<span class="visually-hidden">Row in file</span><span aria-hidden="true" class="table-field-invisible-error">1</span>'|safe
-      ] + recipients.column_headers
-    ) %}
-      {% call index_field() %}
-        <span class="{% if item.index in recipients.rows_with_errors %}table-field-error{% endif %}">
-          {{ item.index + 2 }}
-        </span>
-      {% endcall %}
-      {% for column in recipients.column_headers %}
-        {% if item['columns'][column].error and not recipients.missing_column_headers %}
-          {% call field() %}
-            <span>
-              <span class="table-field-error-label">{{ item['columns'][column].error }}</span>
-              {{ item['columns'][column].data if item['columns'][column].data != None }}
-            </span>
-          {% endcall %}
-        {% elif item['columns'][column].ignore %}
-          {{ text_field(item['columns'][column].data or '', status='default') }}
-        {% else %}
-          {{ text_field(item['columns'][column].data or '') }}
-        {% endif %}
-      {% endfor %}
-      {% if item['columns'].get(None) %}
-        {% for column in item['columns'][None].data %}
-          {{ text_field(column, status='default') }}
-        {% endfor %}
-      {% endif %}
+  {% call(item, row_number) list_table(
+    recipients.initial_annotated_rows_with_errors if row_errors and not recipients.missing_column_headers else recipients.initial_annotated_rows,
+    caption=original_file_name,
+    caption_visible=False,
+    field_headings=[
+      '<span class="visually-hidden">Row in file</span><span aria-hidden="true" class="table-field-invisible-error">1</span>'|safe
+    ] + recipients.column_headers
+  ) %}
+    {% call index_field() %}
+      <span class="{% if item.index in recipients.rows_with_errors %}table-field-error{% endif %}">
+        {{ item.index + 2 }}
+      </span>
     {% endcall %}
-
-  {% endif %}
+    {% for column in recipients.column_headers %}
+      {% if item['columns'][column].error and not recipients.missing_column_headers %}
+        {% call field() %}
+          <span>
+            <span class="table-field-error-label">{{ item['columns'][column].error }}</span>
+            {{ item['columns'][column].data if item['columns'][column].data != None }}
+          </span>
+        {% endcall %}
+      {% elif item['columns'][column].ignore %}
+        {{ text_field(item['columns'][column].data or '', status='default') }}
+      {% else %}
+        {{ text_field(item['columns'][column].data or '') }}
+      {% endif %}
+    {% endfor %}
+    {% if item['columns'].get(None) %}
+      {% for column in item['columns'][None].data %}
+        {{ text_field(column, status='default') }}
+      {% endfor %}
+    {% endif %}
+  {% endcall %}
 
   {% if count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
