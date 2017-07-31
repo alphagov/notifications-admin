@@ -8,15 +8,16 @@ import pytest
 from app.main.s3_client import TEMP_TAG, LOGO_LOCATION_STRUCTURE
 
 sample_orgs = [
-    {'id': '1', 'name': 'org 1', 'colour': 'red', 'logo': 'logo1.png'}, 
-    {'id': '2', 'name': 'org 2', 'colour': 'orange', 'logo': 'logo2.png'}, 
-    {'id': '3', 'name': None, 'colour': None, 'logo': 'logo3.png'}, 
-    {'id': '4', 'name': 'org 4', 'colour': None, 'logo': 'logo4.png'}, 
-    {'id': '5', 'name': None, 'colour': 'blue', 'logo': 'logo5.png'}, 
+    {'id': '1', 'name': 'org 1', 'colour': 'red', 'logo': 'logo1.png'},
+    {'id': '2', 'name': 'org 2', 'colour': 'orange', 'logo': 'logo2.png'},
+    {'id': '3', 'name': None, 'colour': None, 'logo': 'logo3.png'},
+    {'id': '4', 'name': 'org 4', 'colour': None, 'logo': 'logo4.png'},
+    {'id': '5', 'name': None, 'colour': 'blue', 'logo': 'logo5.png'},
 ]
 
+
 @pytest.fixture
-def visit_manage_org_with_org(logged_in_platform_admin_client):
+def request_get_manage_org_with_org(logged_in_platform_admin_client):
     with logged_in_platform_admin_client.session_transaction() as session:
         session['organisation'] = sample_orgs[0]
 
@@ -28,7 +29,7 @@ def visit_manage_org_with_org(logged_in_platform_admin_client):
 
 
 @pytest.fixture
-def visit_manage_org_without_org(logged_in_platform_admin_client):
+def request_get_manage_org_without_org(logged_in_platform_admin_client):
     response = logged_in_platform_admin_client.get(
         url_for('.manage_org')
     )
@@ -105,28 +106,29 @@ def test_organisations_post_deletes_organisation_session_on_new_org(
     assert response.location == url_for('.manage_org', _external=True)
 
 
-def test_manage_orgs_shows_correct_org_info(visit_manage_org_with_org):
-    assert visit_manage_org_with_org.select_one('#logo-img > img')['src'].endswith('/' + sample_orgs[0]['logo'])
-    assert visit_manage_org_with_org.select_one('#name').attrs.get('value') == sample_orgs[0]['name']
-    assert visit_manage_org_with_org.select_one('#colour').attrs.get('value') == sample_orgs[0]['colour']
+def test_manage_orgs_shows_correct_org_info(request_get_manage_org_with_org):
+    assert request_get_manage_org_with_org.select_one('#logo-img > img')['src'].endswith('/' + sample_orgs[0]['logo'])
+    assert request_get_manage_org_with_org.select_one('#name').attrs.get('value') == sample_orgs[0]['name']
+    assert request_get_manage_org_with_org.select_one('#colour').attrs.get('value') == sample_orgs[0]['colour']
 
 
-def test_manage_orgs_does_not_show_data_for_new_org(visit_manage_org_without_org):
-    assert visit_manage_org_without_org.select_one('div.page-footer > input.button').has_attr('disabled')
-    assert visit_manage_org_without_org.select_one('#logo-img > img') is None
-    assert visit_manage_org_without_org.select_one('#name').attrs.get('value') == ''
-    assert visit_manage_org_without_org.select_one('#colour').attrs.get('value') == ''
+def test_manage_orgs_does_not_show_data_for_new_org(request_get_manage_org_without_org):
+    assert request_get_manage_org_without_org.select_one('div.page-footer > input.button').has_attr('disabled')
+    assert request_get_manage_org_without_org.select_one('#logo-img > img') is None
+    assert request_get_manage_org_without_org.select_one('#name').attrs.get('value') == ''
+    assert request_get_manage_org_without_org.select_one('#colour').attrs.get('value') == ''
 
 
-def test_save_is_enabled_when_logo_is_set(visit_manage_org_with_org):
-    assert visit_manage_org_with_org.select_one('div.page-footer > input.button').has_attr('disabled') is False
+def test_save_is_enabled_when_logo_is_set(request_get_manage_org_with_org):
+    assert request_get_manage_org_with_org.select_one('div.page-footer > input.button').has_attr('disabled') is False
 
 
-def test_save_is_disabled_when_logo_is_set(visit_manage_org_without_org):
-    assert visit_manage_org_without_org.select_one('div.page-footer > input.button').has_attr('disabled')
+def test_save_is_disabled_when_logo_is_not_set(request_get_manage_org_without_org):
+    assert request_get_manage_org_without_org.select_one('div.page-footer > input.button').has_attr('disabled')
 
 
-def test_shows_temp_logo_after_uploading_logo(logged_in_platform_admin_client, mocker, fake_uuid):
+@pytest.fixture
+def request_post_manage_org_redirect(logged_in_platform_admin_client, mocker, fake_uuid):
     with logged_in_platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
@@ -144,51 +146,16 @@ def test_shows_temp_logo_after_uploading_logo(logged_in_platform_admin_client, m
     )
 
     assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    return BeautifulSoup(response.data.decode('utf-8'), 'html.parser'), temp_filename
 
+
+def test_shows_temp_logo_after_uploading_logo(request_post_manage_org_redirect):
+    page, temp_filename = request_post_manage_org_redirect
     assert page.select_one('#logo-img > img').attrs['src'].endswith(temp_filename)
 
 
-def test_save_enabled_after_loading_logo(logged_in_platform_admin_client, mocker, fake_uuid):
-    with logged_in_platform_admin_client.session_transaction() as session:
-        user_id = session["user_id"]
-
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(TEMP_TAG.format(user_id), fake_uuid, 'test.png')
-
-    mocker.patch('app.main.views.organisations.upload_logo', return_value=temp_filename)
-    mocker.patch('app.main.views.organisations.delete_temp_file')
-    mocker.patch('app.main.views.organisations.delete_temp_files_created_by')
-
-    response = logged_in_platform_admin_client.post(
-        url_for('.manage_org'),
-        data={'file': (BytesIO(''.encode('utf-8')), 'test.png')},
-        content_type='multipart/form-data',
-        follow_redirects=True
-    )
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert not page.select_one('div.page-footer > input.button').has_attr('disabled')
-
-
-def test_allows_saving_after_uploading_logo():
-    with logged_in_platform_admin_client.session_transaction() as session:
-        user_id = session["user_id"]
-
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(TEMP_TAG.format(user_id), fake_uuid, 'test.png')
-
-    mocker.patch('app.main.views.organisations.upload_logo', return_value=temp_filename)
-    mocker.patch('app.main.views.organisations.delete_temp_file')
-    mocker.patch('app.main.views.organisations.delete_temp_files_created_by')
-
-    response = logged_in_platform_admin_client.post(
-        url_for('.manage_org'),
-        data={'file': (BytesIO(''.encode('utf-8')), 'test.png')},
-        content_type='multipart/form-data',
-        follow_redirects=True
-    )
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
+def test_save_enabled_after_uploading_logo(request_post_manage_org_redirect):
+    page, _ = request_post_manage_org_redirect
     assert not page.select_one('div.page-footer > input.button').has_attr('disabled')
 
 
@@ -235,7 +202,3 @@ def test_logo_persisted_when_organisation_saved(logged_in_platform_admin_client,
     assert mocked_persist_logo.called
     assert mocked_delete_temp_files_by.called
     assert mocked_delete_temp_files_by.call_args == call(user_id)
-
-
-def test_shows_colour_when_valid_colour_entered():
-    pass
