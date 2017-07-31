@@ -1,3 +1,6 @@
+{% from "components/table.html" import mapping_table, row, text_field, field, row_heading %}
+{% from "components/textbox.html" import textbox %}
+
 {% extends "withoutnav_template.html" %}
 
 {% block per_page_title %}
@@ -18,21 +21,112 @@
 
     <h2 class="heading-medium">Text messages</h2>
 
-    <ul class="list list-bullet">
-      <li>Free allowance: 250,000 text messages per service, per financial year</li>
-      <li>If your messages are long, they will count as 2 or 3 text messages, depending on length:
-      <ul class="list list-bullet">
-        <li>Up to 160 characters = 1 text message</li>
-        <li>Up to 306 characters = 2 text messages</li>
-        <li>Up to 459 characters = 3 text messages</li>
-      </ul></li>
-      <li>Standard text message rate: {{ '{:.2f}'.format(sms_rate * 100) }} pence + VAT</li>
-    </ul>
+    <p>
+      Text message rate: {{ '{:.2f}'.format(sms_rate * 100) }} pence + VAT
+    </p>
+
+    <h3 class="heading-small">
+      Free allowance
+    </h3>
 
     <p>
-      We simply charge you the costs we pay to our delivery partners.
-      We don’t mark these costs up in any way.
+      All services have a free allowance of text messages, per financial year:
     </p>
+
+    <ul class="list list-bullet">
+      <li>250,000 text messages for central government services</li>
+      <li>25,000 text messages for local government services</li>
+    </ul>
+
+    <h3 class="heading-small">
+      Long messages
+    </h3>
+
+    <p>
+      Long messages count as 2 or 3 text messages depending on length:
+    </p>
+
+    <ul class="list list-bullet">
+      <li>Up to 160 characters = 1 text message</li>
+      <li>Up to 306 characters = 2 text messages</li>
+      <li>Up to 459 characters = 3 text messages</li>
+    </ul>
+
+    <h3 class="heading-small">
+      International numbers
+    </h3>
+
+    <p>
+      Messages to international mobile numbers are charged at 1, 2, or 3
+      times the cost of messages to UK mobile numbers.
+    </p>
+
+    <details>
+      <summary>International text message rates</summary>
+
+      <div class="live-search" data-module="live-search" data-targets="#international-pricing .table-row">
+        {{ textbox(
+          search_form.search,
+          width='1-1',
+          label='Search by country name or code'
+        ) }}
+      </div>
+
+      <div id="international-pricing" class="bottom-gutter-3-2">
+        {% call mapping_table(
+          caption='Letter pricing',
+          field_headings=['Country code', 'Country', 'Cost multipler'],
+          field_headings_visible=True,
+          caption_visible=False
+        ) %}
+          {% for cc, names, billable_units in international_sms_rates %}
+            {% call row() %}
+              {{ text_field('+' + cc) }}
+              {% call field() %}
+                {% for name in names %}
+                  {{ name }}<br>
+                {% endfor %}
+              {% endcall %}
+              {{ text_field('{}&hairsp;&times;'.format(billable_units)|safe) }}
+            {% endcall %}
+          {% endfor %}
+        {% endcall %}
+      </div>
+
+    </details>
+
+    <h2 class="heading-medium">
+      Letters
+    </h2>
+    <p>
+      Letters are printed double sided in colour. Prices include
+      printing, paper, envelope, and postage. All letters are sent
+      second class post.
+    </p>
+    <p>
+      The price of letters increases with the number of sheets printed:
+    </p>
+
+    <div class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Letter pricing',
+        field_headings=['', 'Central government', 'Local government'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for sheets, central, local in [
+          ('1 sheet', '30', '33'),
+          ('2 sheets', '33', '39'),
+          ('3 sheets', '36', '45')
+        ] %}
+          {% call row() %}
+            {% call row_heading() %} {{ sheets }} (double sided) {% endcall %}
+            {{ text_field(central + 'p + VAT') }}
+            {{ text_field(local + 'p + VAT') }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    </div>
 
     <h2 class="heading-medium">No monthly charge or setup fee</h2>
     <p>
@@ -43,6 +137,11 @@
     <p>
       The Government Digital Service is funding the development and running
       of Notify. We’re also covering the cost of the free emails and text messages.
+    </p>
+
+    <p>
+      We simply charge you the costs we pay to our delivery partners. We
+      don’t mark these costs up in any way.
     </p>
 
   </div>
