@@ -202,3 +202,34 @@ def test_logo_persisted_when_organisation_saved(logged_in_platform_admin_client,
     assert mocked_persist_logo.called
     assert mocked_delete_temp_files_by.called
     assert mocked_delete_temp_files_by.call_args == call(user_id)
+
+
+def test_existing_organisation_updated_when_organisation_saved(logged_in_platform_admin_client, mocker, fake_uuid):
+    with logged_in_platform_admin_client.session_transaction() as session:
+        session["organisation"] = sample_orgs[0]
+        user_id = session["user_id"]
+
+    update_org = {'logo': 'test.png', 'colour': 'blue', 'name': 'new name'}
+
+    temp_filename = LOGO_LOCATION_STRUCTURE.format(TEMP_TAG.format(user_id), fake_uuid, update_org['logo'])
+
+    mocked_update_org = mocker.patch('app.organisations_client.update_organisation')
+    mocked_persist_logo = mocker.patch('app.main.views.organisations.persist_logo', return_value=update_org['logo'])
+    mocked_delete_temp_files_by = mocker.patch('app.main.views.organisations.delete_temp_files_created_by')
+
+    logged_in_platform_admin_client.post(
+        url_for('.manage_org', logo=temp_filename),
+        content_type='multipart/form-data',
+        data={'colour': update_org['colour'], 'name': update_org['name'], 'cdn_url': 'https://static-logos.cdn.com'}
+    )
+
+    assert mocked_update_org.called
+    assert mocked_update_org.call_args == call(
+        org_id=sample_orgs[0]['id'],
+        logo=update_org['logo'],
+        name=update_org['name'],
+        colour=update_org['colour']
+    )
+    assert mocked_persist_logo.called
+    assert mocked_delete_temp_files_by.called
+    assert mocked_delete_temp_files_by.call_args == call(user_id)
