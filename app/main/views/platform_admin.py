@@ -76,7 +76,7 @@ def sum_service_usage(service):
 
 
 def filter_and_sort_services(services, trial_mode_services=False):
-    return (
+    return [
         service for service in sorted(
             services,
             key=lambda service: (
@@ -87,7 +87,7 @@ def filter_and_sort_services(services, trial_mode_services=False):
             reverse=True,
         )
         if service['restricted'] == trial_mode_services
-    )
+    ]
 
 
 def create_global_stats(services):
