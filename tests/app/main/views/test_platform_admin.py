@@ -10,35 +10,47 @@ from tests import service_json
 from app.main.views.platform_admin import format_stats_by_service, create_global_stats, sum_service_usage
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.platform_admin',
+    'main.live_services',
+    'main.trial_services',
+])
 def test_should_redirect_if_not_logged_in(
-    client
+    client,
+    endpoint
 ):
-    response = client.get(url_for('main.platform_admin'))
+    response = client.get(url_for(endpoint))
     assert response.status_code == 302
-    assert response.location == url_for('main.sign_in', next=url_for('main.platform_admin'), _external=True)
+    assert response.location == url_for('main.sign_in', next=url_for(endpoint), _external=True)
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.platform_admin',
+    'main.live_services',
+    'main.trial_services',
+])
 def test_should_403_if_not_platform_admin(
     client,
     active_user_with_permissions,
     mocker,
+    endpoint,
 ):
     mock_get_user(mocker, user=active_user_with_permissions)
     client.login(active_user_with_permissions)
-    response = client.get(url_for('main.platform_admin'))
+    response = client.get(url_for(endpoint))
 
     assert response.status_code == 403
 
 
-@pytest.mark.parametrize('restricted, table_index, research_mode, displayed', [
-    (True, 1, False, ''),
-    (False, 0, False, 'Live'),
-    (False, 0, True, 'research mode'),
-    (True, 1, True, 'research mode')
+@pytest.mark.parametrize('endpoint, restricted, research_mode, displayed', [
+    ('main.trial_services', True, False, ''),
+    ('main.live_services', False, False, 'Live'),
+    ('main.live_services', False, True, 'research mode'),
+    ('main.trial_services', True, True, 'research mode')
 ])
 def test_should_show_research_and_restricted_mode(
+    endpoint,
     restricted,
-    table_index,
     research_mode,
     displayed,
     client,
@@ -53,35 +65,43 @@ def test_should_show_research_and_restricted_mode(
     mock_get_detailed_services.return_value = {'data': services}
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin'))
+    response = client.get(url_for(endpoint))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     # get first column in second row, which contains flags as text.
-    table_body = page.find_all('table')[table_index].find_all('tbody')[0]
+    table_body = page.find_all('table')[0].find_all('tbody')[0]
     service_mode = table_body.find_all('tbody')[0].find_all('tr')[1].find_all('td')[0].text.strip()
     assert service_mode == displayed
 
 
+@pytest.mark.parametrize('endpoint, expected_services_shown', [
+    ('main.live_services', 1),
+    ('main.trial_services', 1),
+])
 def test_should_render_platform_admin_page(
     client,
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
+    endpoint,
+    expected_services_shown,
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin'))
-
+    response = client.get(url_for(endpoint))
     assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'Platform admin' in resp_data
-    assert 'Live services' in resp_data
-    assert 'Trial mode services' in resp_data
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert len(page.select('tbody tr')) == expected_services_shown * 2  # one row for SMS, one for email
     mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.platform_admin',
+    'main.live_services',
+    'main.trial_services',
+])
 @pytest.mark.parametrize('include_from_test_key, api_args', [
     ("Y", {'detailed': True, 'include_from_test_key': True}),
     ("N", {'detailed': True, 'include_from_test_key': False})
@@ -93,30 +113,35 @@ def test_platform_admin_toggle_including_from_test_key(
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
+    endpoint,
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin', include_from_test_key=include_from_test_key))
+    response = client.get(url_for(endpoint, include_from_test_key=include_from_test_key))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with(api_args)
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.platform_admin',
+    'main.live_services',
+    'main.trial_services',
+])
 def test_platform_admin_with_date_filter(
     client,
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
+    endpoint,
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin', start_date='2016-12-20', end_date='2016-12-28'))
+    response = client.get(url_for(endpoint, start_date='2016-12-20', end_date='2016-12-28'))
 
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
     assert 'Platform admin' in resp_data
-    assert 'Live services' in resp_data
-    assert 'Trial mode services' in resp_data
     mock_get_detailed_services.assert_called_once_with({
         'include_from_test_key': False,
         'start_date': datetime.date(2016, 12, 20),
@@ -203,13 +228,13 @@ def test_format_stats_by_service_returns_correct_values(fake_uuid):
     assert ret[0]['stats']['sms']['failed'] == 11
 
 
-@pytest.mark.parametrize('restricted, table_index, research_mode', [
-    (True, 1, False),
-    (False, 0, False)
+@pytest.mark.parametrize('endpoint, restricted, research_mode', [
+    ('main.trial_services', True, False),
+    ('main.live_services', False, False)
 ])
 def test_should_show_email_and_sms_stats_for_all_service_types(
+    endpoint,
     restricted,
-    table_index,
     research_mode,
     client,
     platform_admin_user,
@@ -230,13 +255,13 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     mock_get_detailed_services.return_value = {'data': services}
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin'))
+    response = client.get(url_for(endpoint))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    table_body = page.find_all('table')[table_index].find_all('tbody')[0]
+    table_body = page.find_all('table')[0].find_all('tbody')[0]
     service_row_group = table_body.find_all('tbody')[0].find_all('tr')
     email_stats = service_row_group[0].find_all('div', class_='big-number-number')
     sms_stats = service_row_group[1].find_all('div', class_='big-number-number')
@@ -251,17 +276,17 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     assert sms_failed == 11
 
 
-@pytest.mark.parametrize('restricted, table_index', [
-    (False, 0),
-    (True, 1)
+@pytest.mark.parametrize('endpoint, restricted', [
+    ('main.live_services', False),
+    ('main.trial_services', True)
 ], ids=['live', 'trial'])
 def test_should_show_archived_services_last(
+    endpoint,
     client,
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
     restricted,
-    table_index,
 ):
     services = [
         service_json(name='C', restricted=restricted, active=False, created_at='2002-02-02 12:00:00'),
@@ -275,13 +300,13 @@ def test_should_show_archived_services_last(
     mock_get_detailed_services.return_value = {'data': services}
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin'))
+    response = client.get(url_for(endpoint))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    table_body = page.find_all('table')[table_index].find_all('tbody')[0]
+    table_body = page.find_all('table')[0].find_all('tbody')[0]
     services = [service.tr for service in table_body.find_all('tbody')]
     assert len(services) == 3
     assert services[0].td.text.strip() == 'A'
@@ -305,7 +330,7 @@ def test_shows_archived_label_instead_of_live_or_research_mode_label(
     mock_get_detailed_services.return_value = {'data': services}
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin'))
+    response = client.get(url_for('main.live_services'))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -349,13 +374,13 @@ def test_should_show_correct_sent_totals_for_platform_admin(
     assert sms_total == 40
 
 
-@pytest.mark.parametrize('restricted, table_index, research_mode', [
-    (True, 1, False),
-    (False, 0, False)
+@pytest.mark.parametrize('endpoint, restricted, research_mode', [
+    ('main.trial_services', True, False),
+    ('main.live_services', False, False)
 ])
 def test_should_order_services_by_usage_with_inactive_last(
+    endpoint,
     restricted,
-    table_index,
     research_mode,
     client,
     platform_admin_user,
@@ -398,13 +423,13 @@ def test_should_order_services_by_usage_with_inactive_last(
     mock_get_detailed_services.return_value = {'data': services}
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin'))
+    response = client.get(url_for(endpoint))
 
     assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    table_body = page.find_all('table')[table_index].find_all('tbody')[0]
+    table_body = page.find_all('table')[0].find_all('tbody')[0]
     services = [service.tr for service in table_body.find_all('tbody')]
     assert len(services) == 3
     assert services[0].td.text.strip() == 'My Service 2'

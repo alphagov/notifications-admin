@@ -121,12 +121,31 @@ def mock_get_detailed_service_for_today(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_get_detailed_services(mocker, fake_uuid):
-    service_one = service_json(SERVICE_ONE_ID, "service_one", [fake_uuid], 1000, True, False)
+    service_one = service_json(
+        id_=SERVICE_ONE_ID,
+        name="service_one",
+        users=[fake_uuid],
+        message_limit=1000,
+        active=True,
+        restricted=False,
+    )
+    service_two = service_json(
+        id_=fake_uuid,
+        name="service_two",
+        users=[fake_uuid],
+        message_limit=1000,
+        active=True,
+        restricted=True,
+    )
     service_one['statistics'] = {
         'email': {'requested': 0, 'delivered': 0, 'failed': 0},
         'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
     }
-    services = {'data': [service_one]}
+    service_two['statistics'] = {
+        'email': {'requested': 0, 'delivered': 0, 'failed': 0},
+        'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+    }
+    services = {'data': [service_one, service_two]}
 
     return mocker.patch('app.service_api_client.get_services', return_value=services)
 
