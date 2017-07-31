@@ -4,7 +4,7 @@ from flask import url_for
 import pytest
 from bs4 import BeautifulSoup
 
-from tests.conftest import mock_get_user
+from tests.conftest import mock_get_user, normalize_spaces
 from tests import service_json
 
 from app.main.views.platform_admin import format_stats_by_service, create_global_stats, sum_service_usage
@@ -148,6 +148,70 @@ def test_platform_admin_with_date_filter(
         'end_date': datetime.date(2016, 12, 28),
         'detailed': True,
     })
+
+
+@pytest.mark.parametrize('endpoint, expected_big_numbers', [
+    (
+        'main.platform_admin', (
+            '61 emails sent 6 failed – 5.5%',
+            '121 text messages sent 11 failed – 5.0%',
+        ),
+    ),
+    (
+        'main.live_services', (
+            '55 emails sent 5 failed – 5.0%',
+            '110 text messages sent 10 failed – 5.0%',
+        ),
+    ),
+    (
+        'main.trial_services', (
+            '6 emails sent 1 failed – 10.0%',
+            '11 text messages sent 1 failed – 5.0%',
+        ),
+    ),
+])
+def test_should_show_total_on_platform_admin_pages(
+    client,
+    platform_admin_user,
+    mocker,
+    mock_get_detailed_services,
+    endpoint,
+    fake_uuid,
+    expected_big_numbers,
+):
+    services = [
+        service_json(fake_uuid, 'My Service 1', [], restricted=False),
+        service_json(fake_uuid, 'My Service 2', [], restricted=True),
+    ]
+    services[0]['statistics'] = create_stats(
+        emails_requested=100,
+        emails_delivered=50,
+        emails_failed=5,
+        sms_requested=200,
+        sms_delivered=100,
+        sms_failed=10,
+    )
+
+    services[1]['statistics'] = create_stats(
+        emails_requested=10,
+        emails_delivered=5,
+        emails_failed=1,
+        sms_requested=20,
+        sms_delivered=10,
+        sms_failed=1,
+    )
+
+    mock_get_detailed_services.return_value = {'data': services}
+
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for(endpoint))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert (
+        normalize_spaces(page.select('.big-number-with-status')[0].text),
+        normalize_spaces(page.select('.big-number-with-status')[1].text),
+    ) == expected_big_numbers
 
 
 def test_create_global_stats_sets_failure_rates(fake_uuid):
