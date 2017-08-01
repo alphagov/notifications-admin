@@ -26,7 +26,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
             "name": name,
             "colour": colour
         }
-        return self.post("/organisation", data)
+        return self.post(url="/organisation", data=data)
 
     def update_organisation(self, org_id, logo, name, colour):
         data = {
@@ -34,4 +34,4 @@ class OrganisationsClient(NotifyAdminAPIClient):
             "name": name,
             "colour": colour
         }
-        return self.post("/organisation/{}".format(org_id), data)
+        return self.post(url="/organisation/{}".format(org_id), data=data)

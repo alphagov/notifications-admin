@@ -132,7 +132,8 @@ def request_post_manage_org_redirect(logged_in_platform_admin_client, mocker, fa
     with logged_in_platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(TEMP_TAG.format(user_id), fake_uuid, 'test.png')
+    temp_filename = LOGO_LOCATION_STRUCTURE.format(
+        temp=TEMP_TAG.format(user_id=user_id), unique_id=fake_uuid, filename='test.png')
 
     mocker.patch('app.main.views.organisations.upload_logo', return_value=temp_filename)
     mocker.patch('app.main.views.organisations.delete_temp_file')
@@ -163,8 +164,10 @@ def test_deletes_previous_temp_logo_after_uploading_logo(logged_in_platform_admi
     with logged_in_platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
-    temp_old_filename = LOGO_LOCATION_STRUCTURE.format(TEMP_TAG.format(user_id), fake_uuid, 'old_test.png')
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(TEMP_TAG.format(user_id), fake_uuid, 'test.png')
+    temp_old_filename = LOGO_LOCATION_STRUCTURE.format(
+        temp=TEMP_TAG.format(user_id=user_id), unique_id=fake_uuid, filename='old_test.png')
+    temp_filename = LOGO_LOCATION_STRUCTURE.format(
+        temp=TEMP_TAG.format(user_id=user_id), unique_id=fake_uuid, filename='test.png')
 
     mocked_upload_logo = mocker.patch(
         'app.main.views.organisations.upload_logo',
@@ -187,7 +190,8 @@ def test_logo_persisted_when_organisation_saved(logged_in_platform_admin_client,
     with logged_in_platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(TEMP_TAG.format(user_id), fake_uuid, 'test.png')
+    temp_filename = LOGO_LOCATION_STRUCTURE.format(
+        temp=TEMP_TAG.format(user_id=user_id), unique_id=fake_uuid, filename='test.png')
 
     mocked_upload_logo = mocker.patch('app.main.views.organisations.upload_logo')
     mocked_persist_logo = mocker.patch('app.main.views.organisations.persist_logo', return_value='test.png')
@@ -211,11 +215,12 @@ def test_existing_organisation_updated_when_organisation_saved(logged_in_platfor
 
     update_org = {'logo': 'test.png', 'colour': 'blue', 'name': 'new name'}
 
-    temp_filename = LOGO_LOCATION_STRUCTURE.format(TEMP_TAG.format(user_id), fake_uuid, update_org['logo'])
+    temp_filename = LOGO_LOCATION_STRUCTURE.format(
+        temp=TEMP_TAG.format(user_id=user_id), unique_id=fake_uuid, filename=update_org['logo'])
 
     mocked_update_org = mocker.patch('app.organisations_client.update_organisation')
-    mocked_persist_logo = mocker.patch('app.main.views.organisations.persist_logo', return_value=update_org['logo'])
-    mocked_delete_temp_files_by = mocker.patch('app.main.views.organisations.delete_temp_files_created_by')
+    mocker.patch('app.main.views.organisations.persist_logo', return_value=update_org['logo'])
+    mocker.patch('app.main.views.organisations.delete_temp_files_created_by')
 
     logged_in_platform_admin_client.post(
         url_for('.manage_org', logo=temp_filename),
@@ -230,6 +235,30 @@ def test_existing_organisation_updated_when_organisation_saved(logged_in_platfor
         name=update_org['name'],
         colour=update_org['colour']
     )
-    assert mocked_persist_logo.called
-    assert mocked_delete_temp_files_by.called
-    assert mocked_delete_temp_files_by.call_args == call(user_id)
+
+
+def test_create_new_organisation_when_organisation_saved(logged_in_platform_admin_client, mocker, fake_uuid):
+    with logged_in_platform_admin_client.session_transaction() as session:
+        user_id = session["user_id"]
+
+    new_org = {'logo': 'test.png', 'colour': 'red', 'name': 'new name'}
+
+    temp_filename = LOGO_LOCATION_STRUCTURE.format(
+        temp=TEMP_TAG.format(user_id=user_id), unique_id=fake_uuid, filename=new_org['logo'])
+
+    mocked_new_org = mocker.patch('app.organisations_client.create_organisation')
+    mocker.patch('app.main.views.organisations.persist_logo', return_value=new_org['logo'])
+    mocker.patch('app.main.views.organisations.delete_temp_files_created_by')
+
+    logged_in_platform_admin_client.post(
+        url_for('.manage_org', logo=temp_filename),
+        content_type='multipart/form-data',
+        data={'colour': new_org['colour'], 'name': new_org['name'], 'cdn_url': 'https://static-logos.cdn.com'}
+    )
+
+    assert mocked_new_org.called
+    assert mocked_new_org.call_args == call(
+        logo=new_org['logo'],
+        name=new_org['name'],
+        colour=new_org['colour']
+    )

@@ -5,8 +5,8 @@ from flask import current_app
 from notifications_utils.s3 import s3upload as utils_s3upload
 
 FILE_LOCATION_STRUCTURE = 'service-{}-notify/{}.csv'
-TEMP_TAG = 'temp-{}_'
-LOGO_LOCATION_STRUCTURE = '{}{}-{}'
+TEMP_TAG = 'temp-{user_id}_'
+LOGO_LOCATION_STRUCTURE = '{temp}{unique_id}-{filename}'
 
 
 def s3upload(service_id, filedata, region):
@@ -35,8 +35,11 @@ def s3download(service_id, upload_id):
 
 
 def upload_logo(filename, filedata, region, user_id):
-    upload_id = str(uuid.uuid4())
-    upload_file_name = LOGO_LOCATION_STRUCTURE.format(TEMP_TAG.format(user_id), upload_id, filename)
+    upload_file_name = LOGO_LOCATION_STRUCTURE.format(
+        temp=TEMP_TAG.format(user_id=user_id),
+        unique_id=str(uuid.uuid4()),
+        filename=filename
+    )
     utils_s3upload(filedata=filedata,
                    region=region,
                    bucket_name=current_app.config['LOGO_UPLOAD_BUCKET_NAME'],
@@ -47,7 +50,7 @@ def upload_logo(filename, filedata, region, user_id):
 
 def persist_logo(filename, user_id):
     try:
-        if filename.startswith(TEMP_TAG.format(user_id)):
+        if filename.startswith(TEMP_TAG.format(user_id=user_id)):
             persisted_filename = filename[len(TEMP_TAG.format(user_id)):]
         else:
             return filename

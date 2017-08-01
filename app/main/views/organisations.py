@@ -65,7 +65,7 @@ def manage_org(logo=None):
                 user_id=session["user_id"]
             )
 
-            if logo and logo.startswith(TEMP_TAG.format(session['user_id'])):
+            if logo and logo.startswith(TEMP_TAG.format(user_id=session['user_id'])):
                 delete_temp_file(logo)
 
             return redirect(
@@ -84,7 +84,6 @@ def manage_org(logo=None):
             org_id = resp['data']['id']
 
         return redirect(url_for('.organisations', organisation_id=org_id))
-
     if org:
         form.name.data = org['name']
         form.colour.data = org['colour']
