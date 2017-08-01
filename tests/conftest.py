@@ -1760,7 +1760,7 @@ def logged_in_client(
     active_user_with_permissions,
     mocker,
     service_one,
-    mock_login,
+    mock_login
 ):
     client.login(active_user_with_permissions, mocker, service_one)
     yield client

@@ -428,12 +428,13 @@ def delete_service_template(service_id, template_id):
         last_used_notification = template_statistics_client.get_template_statistics_for_template(
             service_id, template['id']
         )
-        message = 'It was last used {} ago.'.format(
-            get_human_readable_delta(
+        message = 'It was last used {} ago'.format(
+            'more than seven days' if not last_used_notification else get_human_readable_delta(
                 parse(last_used_notification['created_at']).replace(tzinfo=None),
                 datetime.utcnow()
             )
         )
+
     except HTTPError as e:
         if e.status_code == 404:
             message = None
