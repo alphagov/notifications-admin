@@ -113,18 +113,18 @@ def test_manage_orgs_shows_correct_org_info(request_get_manage_org_with_org):
 
 
 def test_manage_orgs_does_not_show_data_for_new_org(request_get_manage_org_without_org):
-    assert request_get_manage_org_without_org.select_one('div.page-footer > input.button').has_attr('disabled')
+    assert request_get_manage_org_without_org.select_one('div.page-footer input.button').has_attr('disabled')
     assert request_get_manage_org_without_org.select_one('#logo-img > img') is None
     assert request_get_manage_org_without_org.select_one('#name').attrs.get('value') == ''
     assert request_get_manage_org_without_org.select_one('#colour').attrs.get('value') == ''
 
 
 def test_save_is_enabled_when_logo_is_set(request_get_manage_org_with_org):
-    assert request_get_manage_org_with_org.select_one('div.page-footer > input.button').has_attr('disabled') is False
+    assert request_get_manage_org_with_org.select_one('div.page-footer input.button').has_attr('disabled') is False
 
 
 def test_save_is_disabled_when_logo_is_not_set(request_get_manage_org_without_org):
-    assert request_get_manage_org_without_org.select_one('div.page-footer > input.button').has_attr('disabled')
+    assert request_get_manage_org_without_org.select_one('div.page-footer input.button').has_attr('disabled')
 
 
 @pytest.fixture
@@ -157,7 +157,7 @@ def test_shows_temp_logo_after_uploading_logo(request_post_manage_org_redirect):
 
 def test_save_enabled_after_uploading_logo(request_post_manage_org_redirect):
     page, _ = request_post_manage_org_redirect
-    assert not page.select_one('div.page-footer > input.button').has_attr('disabled')
+    assert not page.select_one('div.page-footer input.button').has_attr('disabled')
 
 
 def test_deletes_previous_temp_logo_after_uploading_logo(logged_in_platform_admin_client, mocker, fake_uuid):

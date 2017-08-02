@@ -156,8 +156,6 @@ def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
     assert mock_get_notifications.mock_calls[1][2]['page'] == 2
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 @freeze_time('2017-07-14 14:59:59')  # Friday, before print deadline
 @pytest.mark.parametrize('upload_time, expected_print_time, is_printed, expected_earliest, expected_latest', [
 

@@ -55,11 +55,8 @@ from app.notify_client.organisations_client import OrganisationsClient
 from app.notify_client.models import AnonymousUser
 from app.notify_client.letter_jobs_client import LetterJobsClient
 from app.utils import get_cdn_domain
-<<<<<<< HEAD
 
 from app.utils import gmt_timezones
-=======
->>>>>>> Update emails to use logos cdn
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
