@@ -160,6 +160,7 @@ def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 @freeze_time('2017-07-14 14:59:59')  # Friday, before print deadline
 @pytest.mark.parametrize('upload_time, expected_print_time, is_printed, expected_earliest, expected_latest', [
 
@@ -298,6 +299,9 @@ def test_get_estimated_delivery_date_for_letter(
 >>>>>>> Update emails to use logos cdn
 def test_get_cdn_domain_on_localhost(client, mocker):
     mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'http://localhost:6012'})
+=======
+def test_get_cdn_domain_on_localhost(client):
+>>>>>>> Update config to new s3 bucket names
     domain = get_cdn_domain()
     assert domain == 'static-logos.notify.tools'
 
