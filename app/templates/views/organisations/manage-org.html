@@ -27,7 +27,7 @@
         <div class="form-group">
           <div style='margin-top:15px;'>{{textbox(form.name)}}</div>
           <div>{{textbox(form.colour, width='1-4')}} 
-            <span id='colour_span' style="background: {{ organisation.colour }}; {% if not organisation.colour %}visibility:hidden; {% endif %}border:1px black solid; width: 3px; height: 25px;position:absolute;margin-top:138px;margin-left:185px;display:block;"></span>
+            <span id='colour_span' style="background: {{ organisation.colour }}; {% if not organisation.colour %}visibility:hidden; {% endif %}border:1px black solid; width: 3px; height: 25px;position:absolute;margin-top:138px;margin-left:135px;display:block;"></span>
           </div>
         {{ page_footer(
           'Save',
@@ -42,13 +42,13 @@
 
   <script type="text/javascript">
     function update_colour_span() {
+      document.getElementById('colour_span').style.background = '';
       if (document.getElementById('colour').value) {
         document.getElementById('colour_span').style.visibility =  'visible';
         document.getElementById('colour_span').style.background = document.getElementById('colour').value;
       }
       else {
         document.getElementById('colour_span').style.visibility =  'hidden';
-        document.getElementById('colour_span').style.background = '';
       }
     }
   </script>
