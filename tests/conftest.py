@@ -121,12 +121,31 @@ def mock_get_detailed_service_for_today(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_get_detailed_services(mocker, fake_uuid):
-    service_one = service_json(SERVICE_ONE_ID, "service_one", [fake_uuid], 1000, True, False)
+    service_one = service_json(
+        id_=SERVICE_ONE_ID,
+        name="service_one",
+        users=[fake_uuid],
+        message_limit=1000,
+        active=True,
+        restricted=False,
+    )
+    service_two = service_json(
+        id_=fake_uuid,
+        name="service_two",
+        users=[fake_uuid],
+        message_limit=1000,
+        active=True,
+        restricted=True,
+    )
     service_one['statistics'] = {
         'email': {'requested': 0, 'delivered': 0, 'failed': 0},
         'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
     }
-    services = {'data': [service_one]}
+    service_two['statistics'] = {
+        'email': {'requested': 0, 'delivered': 0, 'failed': 0},
+        'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+    }
+    services = {'data': [service_one, service_two]}
 
     return mocker.patch('app.service_api_client.get_services', return_value=services)
 
@@ -374,7 +393,7 @@ def mock_get_service_email_template_without_placeholders(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_letter_template(mocker, content=None, subject=None):
-    def _create(service_id, template_id):
+    def _get(service_id, template_id, version=None):
         template = template_json(
             service_id,
             template_id,
@@ -386,7 +405,8 @@ def mock_get_service_letter_template(mocker, content=None, subject=None):
         return {'data': template}
 
     return mocker.patch(
-        'app.service_api_client.get_service_template', side_effect=_create)
+        'app.service_api_client.get_service_template', side_effect=_get
+    )
 
 
 @pytest.fixture(scope='function')
@@ -1679,6 +1699,7 @@ def mock_get_notification(
     fake_uuid,
     notification_status='delivered',
     redact_personalisation=False,
+    template_type=None,
 ):
     def _get_notification(
         service_id,
@@ -1687,7 +1708,8 @@ def mock_get_notification(
         noti = notification_json(
             service_id,
             rows=1,
-            status=notification_status
+            status=notification_status,
+            template_type=template_type,
         )['notifications'][0]
 
         noti['id'] = notification_id
@@ -1701,7 +1723,9 @@ def mock_get_notification(
             service_id,
             '5407f4db-51c7-4150-8758-35412d42186a',
             content='hello ((name))',
+            subject='blah',
             redact_personalisation=redact_personalisation,
+            type_=template_type,
         )
         return noti
 
@@ -1736,7 +1760,7 @@ def logged_in_client(
     active_user_with_permissions,
     mocker,
     service_one,
-    mock_login,
+    mock_login
 ):
     client.login(active_user_with_permissions, mocker, service_one)
     yield client

@@ -3,7 +3,7 @@ from app.notify_client import NotifyAdminAPIClient
 
 class TemplateStatisticsApiClient(NotifyAdminAPIClient):
     def __init__(self):
-        super().__init__("a", "b", "c")
+        super().__init__("a" * 73, "b")
 
     def init_app(self, app):
         self.base_url = app.config['API_HOST_NAME']

@@ -1,0 +1,31 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/big-number.html" import big_number %}
+{% from "components/checkbox.html" import checkbox %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/table.html" import mapping_table, field, stats_fields, row_group, row, right_aligned_field_heading, hidden_field_heading, text_field %}
+
+{% block per_page_title %}
+  Platform admin
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-large">
+    Summary
+  </h1>
+
+  <details>
+    <summary>Apply filters</summary>
+    <form autocomplete="off" method="get">
+      {{ textbox(form.start_date, hint="Enter start date in format YYYY-MM-DD") }}
+      {{ textbox(form.end_date, hint="Enter end date in format YYYY-MM-DD") }}
+      {{ checkbox(form.include_from_test_key) }}
+      </br>
+      <input type="submit" class="button">
+    </form>
+  </details>
+
+  {% include "views/platform-admin/_global_stats.html" %}
+
+{% endblock %}

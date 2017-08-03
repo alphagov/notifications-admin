@@ -185,6 +185,32 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
             'Skip to file contents'
         )
     ),
+    (
+        """
+            phone number, name
+            +447700900986, example
+            , example
+            +447700900986, example
+        """,
+        (
+            'There is a problem with your data '
+            'You need to enter missing data in 1 row '
+            'Skip to file contents'
+        )
+    ),
+    (
+        """
+            phone number, name
+            +447700900986, example
+            +447700900986,
+            +447700900986, example
+        """,
+        (
+            'There is a problem with your data '
+            'You need to enter missing data in 1 row '
+            'Skip to file contents'
+        )
+    ),
 ])
 def test_upload_csvfile_with_missing_columns_shows_error(
     logged_in_client,
@@ -1144,6 +1170,7 @@ def test_can_start_letters_job(
         data={}
     )
     assert response.status_code == 302
+    assert 'just_sent=yes' in response.location
 
 
 @pytest.mark.parametrize('filetype', ['pdf', 'png'])
@@ -1895,9 +1922,13 @@ def test_send_notification_shows_error_if_400(
     expected_h1,
     expected_err_details
 ):
+
+    class MockHTTPError(HTTPError):
+        message = exception_msg
+
     mocker.patch(
         'app.notification_api_client.send_notification',
-        side_effect=HTTPError(response=Mock(status_code=400), message=exception_msg)
+        side_effect=MockHTTPError(),
     )
     with client_request.session_transaction() as session:
         session['recipient'] = '07700900001'
@@ -1910,6 +1941,39 @@ def test_send_notification_shows_error_if_400(
         _expected_status=200
     )
 
-    assert ' '.join(page.h1.text.split()) == expected_h1
-    assert ' '.join(page.h1.parent.p.text.split()) == expected_err_details
+    assert normalize_spaces(page.select('.banner-dangerous h1')[0].text) == expected_h1
+    assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == expected_err_details
     assert not page.find('input[type=submit]')
+
+
+def test_send_notification_shows_email_error_in_trial_mode(
+    client_request,
+    fake_uuid,
+    mocker,
+    mock_get_service_email_template,
+):
+    class MockHTTPError(HTTPError):
+        message = TRIAL_MODE_MSG
+        status_code = 400
+
+    mocker.patch(
+        'app.notification_api_client.send_notification',
+        side_effect=MockHTTPError(),
+    )
+    with client_request.session_transaction() as session:
+        session['recipient'] = 'test@example.com'
+        session['placeholders'] = {'date': 'foo', 'thing': 'bar'}
+
+    page = client_request.post(
+        'main.send_notification',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.select('.banner-dangerous h1')[0].text) == (
+        'You can’t send to this email address'
+    )
+    assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == (
+        'In trial mode you can only send to yourself and members of your team'
+    )

@@ -1,5 +1,6 @@
 from datetime import datetime
 from unittest.mock import Mock, ANY
+import uuid
 
 import pytest
 from bs4 import BeautifulSoup
@@ -10,6 +11,7 @@ from tests.conftest import service_one as create_sample_service
 from tests.conftest import (
     mock_get_service_email_template,
     mock_get_service_letter_template,
+    mock_get_service_template,
     normalize_spaces,
     SERVICE_ONE_ID,
 )
@@ -679,16 +681,10 @@ def test_should_redirect_when_saving_a_template_email(
 
 
 def test_should_show_delete_template_page_with_time_block(
-    logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_service,
+    client_request,
     mock_get_service_template,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_has_permissions,
-    fake_uuid,
     mocker,
+    fake_uuid
 ):
     with freeze_time('2012-01-01 12:00:00'):
         template = template_json('1234', '1234', "Test template", "sms", "Something very interesting")
@@ -698,30 +694,54 @@ def test_should_show_delete_template_page_with_time_block(
                      return_value=notification)
 
     with freeze_time('2012-01-01 12:10:00'):
-        service_id = fake_uuid
-        template_id = fake_uuid
-        response = logged_in_client.get(url_for(
+        page = client_request.get(
             '.delete_service_template',
-            service_id=service_id,
-            template_id=template_id))
-    content = response.get_data(as_text=True)
-    assert response.status_code == 200
-    assert 'Test template was last used 10 minutes ago. Are you sure you want to delete it?' in content
-    assert 'Are you sure' in content
-    assert 'Two week reminder' in content
-    assert 'Template &lt;em&gt;content&lt;/em&gt; with &amp; entity' in content
-    mock_get_service_template.assert_called_with(service_id, template_id)
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _test_page_title=False,
+        )
+    assert page.h1.text == 'Are you sure you want to delete Two week reminder?'
+    assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == (
+        'It was last used 10 minutes ago'
+    )
+    assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
+        'service one: Template <em>content</em> with & entity'
+    )
+    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid)
+
+
+def test_should_show_delete_template_page_with_time_block_for_empty_notification(
+    client_request,
+    mock_get_service_template,
+    mocker,
+    fake_uuid
+):
+    with freeze_time('2012-01-08 12:00:00'):
+        template = template_json('1234', '1234', "Test template", "sms", "Something very interesting")
+        single_notification_json('1234', template=template)
+        mocker.patch('app.template_statistics_client.get_template_statistics_for_template',
+                     return_value=None)
+
+    with freeze_time('2012-01-01 11:00:00'):
+        page = client_request.get(
+            '.delete_service_template',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _test_page_title=False,
+        )
+    assert page.h1.text == 'Are you sure you want to delete Two week reminder?'
+    assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == (
+        'It was last used more than seven days ago'
+    )
+    assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
+        'service one: Template <em>content</em> with & entity'
+    )
+    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid)
 
 
 def test_should_show_delete_template_page_with_never_used_block(
-    logged_in_client,
-    api_user_active,
-    mock_login,
-    mock_get_service,
+    client_request,
     mock_get_service_template,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_has_permissions,
     fake_uuid,
     mocker,
 ):
@@ -729,20 +749,18 @@ def test_should_show_delete_template_page_with_never_used_block(
         'app.template_statistics_client.get_template_statistics_for_template',
         side_effect=HTTPError(response=Mock(status_code=404), message="Default message")
     )
-    service_id = fake_uuid
-    template_id = fake_uuid
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         '.delete_service_template',
-        service_id=service_id,
-        template_id=template_id))
-
-    content = response.get_data(as_text=True)
-    assert response.status_code == 200
-    assert 'Two week reminder has never been used. Are you sure you want to delete it?' in content
-    assert 'Are you sure' in content
-    assert 'Two week reminder' in content
-    assert 'Template &lt;em&gt;content&lt;/em&gt; with &amp; entity' in content
-    mock_get_service_template.assert_called_with(service_id, template_id)
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+    assert page.h1.text == 'Are you sure you want to delete Two week reminder?'
+    assert not page.select('.banner-dangerous p')
+    assert normalize_spaces(page.select('.sms-message-wrapper')[0].text) == (
+        'service one: Template <em>content</em> with & entity'
+    )
+    mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid)
 
 
 def test_should_redirect_when_deleting_a_template(
@@ -1094,6 +1112,7 @@ def test_should_show_message_before_redacting_template(
         'main.redact_template',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+        _test_page_title=False,
     )
 
     assert (

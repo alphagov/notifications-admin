@@ -1,4 +1,4 @@
-{% extends "withoutnav_template.html" %}
+{% extends "views/platform-admin/_base_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/checkbox.html" import checkbox %}
 {% from "components/page-footer.html" import page_footer %}
@@ -29,7 +29,7 @@
 {% macro services_table(services, caption) %}
   {% call(item, row_number) mapping_table(
     caption=caption,
-    caption_visible=True,
+    caption_visible=False,
     field_headings=[
     'Service',
     hidden_field_heading('Type'),
@@ -81,13 +81,13 @@
 
 
 {% block per_page_title %}
-  Platform admin
+  {{ page_title|capitalize }}
 {% endblock %}
 
-{% block maincolumn_content %}
+{% block platform_admin_content %}
 
   <h1 class="heading-large">
-    Platform admin
+    {{ page_title|capitalize }}
   </h1>
 
     <details>
@@ -101,29 +101,8 @@
       </form>
     </details>
 
-  <div class="grid-row bottom-gutter">
-    <div class="column-half">
-      {{ big_number_with_status(
-        global_stats.email.delivered + global_stats.email.failed,
-        message_count_label(global_stats.email.delivered, 'email'),
-        global_stats.email.failed,
-        global_stats.email.failure_rate,
-        global_stats.email.failure_rate|float > 3,
-      ) }}
-    </div>
-    <div class="column-half">
-      {{ big_number_with_status(
-        global_stats.sms.delivered + global_stats.sms.failed,
-        message_count_label(global_stats.sms.delivered, 'sms'),
-        global_stats.sms.failed,
-        global_stats.sms.failure_rate,
-        global_stats.sms.failure_rate|float > 3,
-      ) }}
-    </div>
-  </div>
+  {% include "views/platform-admin/_global_stats.html" %}
 
-  {{ services_table(live_services, 'Live services') }}
-
-  {{ services_table(trial_mode_services, 'Trial mode services') }}
+  {{ services_table(services, page_title|capitalize) }}
 
 {% endblock %}

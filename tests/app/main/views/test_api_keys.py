@@ -4,8 +4,10 @@ from collections import OrderedDict
 import pytest
 from flask import url_for
 from bs4 import BeautifulSoup
+from unittest.mock import call
 
 from tests import validate_route_permission
+from tests.conftest import normalize_spaces, SERVICE_ONE_ID
 
 
 def test_should_show_api_page(
@@ -196,18 +198,27 @@ def test_cant_create_normal_api_key_in_trial_mode(
 
 
 def test_should_show_confirm_revoke_api_key(
-    logged_in_client,
-    api_user_active,
-    mock_login,
+    client_request,
     mock_get_api_keys,
-    mock_get_service,
-    mock_has_permissions,
     fake_uuid,
 ):
-    response = logged_in_client.get(url_for('main.revoke_api_key', service_id=fake_uuid, key_id=fake_uuid))
-    assert response.status_code == 200
-    assert 'some key name' in response.get_data(as_text=True)
-    mock_get_api_keys.assert_called_once_with(service_id=fake_uuid, key_id=fake_uuid)
+    page = client_request.get(
+        'main.revoke_api_key', service_id=SERVICE_ONE_ID, key_id=fake_uuid,
+        _test_page_title=False,
+    )
+    assert normalize_spaces(page.select('.banner-dangerous')[0].text) == (
+        'Are you sure you want to revoke this API key? '
+        '‘some key name’ will no longer let you connect to GOV.UK Notify.'
+    )
+    assert mock_get_api_keys.call_args_list == [
+        call(
+            key_id=fake_uuid,
+            service_id='596364a0-858e-42c8-9062-a8fe822260eb',
+        ),
+        call(
+            service_id='596364a0-858e-42c8-9062-a8fe822260eb'
+        ),
+    ]
 
 
 def test_should_redirect_after_revoking_api_key(

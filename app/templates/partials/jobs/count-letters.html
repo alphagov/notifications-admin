@@ -1,0 +1,23 @@
+{% from 'components/big-number.html' import big_number %}
+{% from 'components/message-count-label.html' import message_count_label %}
+
+<div class="grid-row bottom-gutter-2-3">
+  <div class="column-half">
+    <div class="keyline-block">
+      {{ big_number(
+        total,
+        message_count_label(total, 'letter', suffix='')|capitalize,
+        smaller=True
+      )}}
+    </div>
+  </div>
+  <div class="column-half">
+    <div class="keyline-block">
+      {{ big_number(
+        delivery_estimate|string|format_date_short,
+        'Estimated delivery date',
+        smaller=True
+      )}}
+    </div>
+  </div>
+</div>

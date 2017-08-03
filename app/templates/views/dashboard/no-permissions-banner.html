@@ -1,5 +1,6 @@
 {% from "components/banner.html" import banner_wrapper %}
 
-{% call banner_wrapper(type="default") %}
-  You only have permission to view this service
+{% call banner_wrapper(type="warning") %}
+  You only have permission to view this service. To send messages, edit
+  templates or manage team members, contact the person who invited you.
 {% endcall %}

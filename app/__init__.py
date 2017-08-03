@@ -22,7 +22,8 @@ from flask import (
 from flask._compat import string_types
 from flask.globals import _lookup_req_object, _request_ctx_stack
 from flask_login import LoginManager
-from flask_wtf import CsrfProtect
+from flask_wtf import CSRFProtect
+from flask_wtf.csrf import CSRFError
 from functools import partial
 
 from notifications_python_client.errors import HTTPError
@@ -53,11 +54,12 @@ from app.notify_client.provider_client import ProviderClient
 from app.notify_client.organisations_client import OrganisationsClient
 from app.notify_client.models import AnonymousUser
 from app.notify_client.letter_jobs_client import LetterJobsClient
+from app.utils import get_cdn_domain
 
 from app.utils import gmt_timezones
 
 login_manager = LoginManager()
-csrf = CsrfProtect()
+csrf = CSRFProtect()
 
 service_api_client = ServiceAPIClient()
 user_api_client = UserApiClient()
@@ -161,7 +163,7 @@ def create_app():
 def init_csrf(application):
     csrf.init_app(application)
 
-    @csrf.error_handler
+    @application.errorhandler(CSRFError)
     def csrf_handler(reason):
         application.logger.warning('csrf.error_message: {}'.format(reason))
 
@@ -414,8 +416,8 @@ def useful_headers_after_request(response):
         "script-src 'self' *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
         "object-src 'self';"
         "font-src 'self' data:;"
-        "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk data:;"
-        "frame-src www.youtube.com;"
+        "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk {} data:;"
+        "frame-src www.youtube.com;".format(get_cdn_domain())
     ))
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']
@@ -480,7 +482,7 @@ def register_errorhandlers(application):
 
 
 def setup_event_handlers():
-    from flask.ext.login import user_logged_in
+    from flask_login import user_logged_in
     from app.event_handlers import on_user_logged_in
 
     user_logged_in.connect(on_user_logged_in)
