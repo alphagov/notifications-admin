@@ -1,3 +1,4 @@
+
 from flask import (
     render_template,
     redirect,
@@ -10,7 +11,6 @@ from flask_login import (
     current_user,
     login_required
 )
-
 from werkzeug.exceptions import abort
 
 from app.main import main
@@ -60,15 +60,15 @@ def add_service():
     if not is_gov_user(current_user.email_address):
         abort(403)
 
-    form = AddServiceForm(service_api_client.find_all_service_email_from)
+    form = AddServiceForm()
     heading = 'Which service do you want to set up notifications for?'
 
     if form.validate_on_submit():
-        email_from = email_safe(form.name.data)
-        service_name = form.name.data
-        service_id = _create_service(service_name, email_from)
-
-        if (len(service_api_client.get_active_services({'user_id': session['user_id']}).get('data', [])) > 1):
+        # email_from = email_safe(form.name.data)
+        # service_name = form.name.data
+        # service_id = _create_service(service_name, email_from)
+        service_id = form.service_id
+        if len(service_api_client.get_active_services({'user_id': session['user_id']}).get('data', [])) > 1:
             return redirect(url_for('main.service_dashboard', service_id=service_id))
 
         example_sms_template = service_api_client.create_service_template(

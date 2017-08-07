@@ -1,5 +1,5 @@
 from flask import url_for, session
-from unittest.mock import ANY
+
 import app
 from app.utils import is_gov_user
 
@@ -107,16 +107,14 @@ def test_should_return_form_errors_with_duplicate_service_name_regardless_of_cas
     mocker,
     service_one,
     api_user_active,
-    mock_create_service,
+    mock_create_duplicate_service,
 ):
-    mocker.patch('app.service_api_client.find_all_service_email_from',
-                 return_value=['service_one', 'service.two'])
     response = logged_in_client.post(url_for('main.add_service'), data={'name': 'SERVICE TWO'})
-
-    assert response.status_code == 200
+    print(response.status_code)
+    assert response.status_code == 400
+    assert response.message == "Duplicate service name 'SERVICE_TWO'"
     assert 'This service name is already in use' in response.get_data(as_text=True)
-    app.service_api_client.find_all_service_email_from.assert_called_once_with()
-    assert not mock_create_service.called
+    assert mock_create_duplicate_service.called
 
 
 def test_non_whitelist_user_cannot_access_create_service_page(
