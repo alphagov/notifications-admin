@@ -29,6 +29,7 @@
         border-left: 10px solid $yellow;
         border-right: 3px solid $yellow;
         right: -3px;
+        color: $text-colour;
       }
 
     }
@@ -51,6 +52,10 @@
     &:hover {
       color: $link-hover-colour;
       text-decoration: underline;
+    }
+
+    &:focus {
+      color: $text-colour;
     }
 
   }
