@@ -38,11 +38,16 @@
 
   li {
     @include core-19;
-    margin: 10px 0 0 0;
+    margin: 0;
     list-style-type: none;
   }
 
   a {
+
+    display: block;
+    padding: 5px 0;
+    position: relative;
+    top: 5px;
 
     &:link,
     &:visited {
