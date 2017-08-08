@@ -439,7 +439,10 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
         remaining_messages=remaining_messages,
         choose_time_form=choose_time_form,
         back_link=back_link,
-        help=get_help_argument()
+        help=get_help_argument(),
+        trying_to_send_letters_in_trial_mode=bool(
+            current_service['restricted'] and template.template_type == 'letter'
+        ),
     )
 
 
@@ -461,7 +464,7 @@ def check_messages(service_id, template_type, upload_id):
     if data['row_errors']:
         return render_template('views/check/row-errors.html', **data)
 
-    if data['errors']:
+    if data['errors'] or data['trying_to_send_letters_in_trial_mode']:
         return render_template('views/check/column-errors.html', **data)
 
     return render_template('views/check/ok.html', **data)

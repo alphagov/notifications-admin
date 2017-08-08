@@ -24,6 +24,8 @@ from tests.conftest import (
     mock_get_service_email_template,
     normalize_spaces,
     SERVICE_ONE_ID,
+    mock_get_service,
+    mock_get_live_service,
 )
 
 template_types = ['email', 'sms']
@@ -1575,6 +1577,52 @@ def test_check_messages_shows_trial_mode_error(
         'In trial mode you can only send to yourself and members of your team '
         'Skip to file contents'
     )
+
+
+@pytest.mark.parametrize('service_mock, error_should_be_shown', [
+    (mock_get_service, True),
+    (mock_get_live_service, False),
+])
+def test_check_messages_shows_trial_mode_error_for_letters(
+    client_request,
+    api_user_active,
+    mock_get_service_letter_template,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    mocker,
+    service_mock,
+    error_should_be_shown,
+):
+
+    service_mock(mocker, api_user_active)
+
+    mocker.patch('app.main.views.send.s3download', return_value='''
+        address_line_1,address_line_2,postcode,
+        First Last,    123 Street,    SW1 1AA
+    ''')
+
+    with client_request.session_transaction() as session:
+        session['upload_data'] = {'template_id': ''}
+
+    page = client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_type='letter',
+        upload_id=uuid.uuid4(),
+        _test_page_title=False,
+    )
+
+    error = page.select('.banner-dangerous')
+
+    if error_should_be_shown:
+        assert normalize_spaces(error[0].text) == (
+            'You can’t send this letter '
+            'In trial mode you can only preview how your letters will look '
+            'Skip to file contents'
+        )
+    else:
+        assert not error
 
 
 def test_check_messages_shows_over_max_row_error(
