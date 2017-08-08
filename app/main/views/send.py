@@ -457,14 +457,15 @@ def check_messages(service_id, template_type, upload_id):
         data['recipients'].too_many_rows or
         not data['count_of_recipients'] or
         not data['recipients'].has_recipient_columns or
-        data['recipients'].missing_column_headers
+        data['recipients'].missing_column_headers or
+        data['trying_to_send_letters_in_trial_mode']
     ):
         return render_template('views/check/column-errors.html', **data)
 
     if data['row_errors']:
         return render_template('views/check/row-errors.html', **data)
 
-    if data['errors'] or data['trying_to_send_letters_in_trial_mode']:
+    if data['errors']:
         return render_template('views/check/column-errors.html', **data)
 
     return render_template('views/check/ok.html', **data)

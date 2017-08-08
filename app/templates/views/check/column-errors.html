@@ -83,10 +83,6 @@
           {% include "partials/check/not-allowed-to-send-to.html" %}
         {% endwith %}
 
-      {% elif recipients.more_rows_than_can_send %}
-
-        {% include "partials/check/too-many-messages.html" %}
-
       {% elif trying_to_send_letters_in_trial_mode %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Trying to send letters in trial mode" data-error-label="{{ upload_id }}">
@@ -97,6 +93,10 @@
           In <a href="{{ url_for('.trial_mode') }}">trial mode</a> you
           can only preview how your letters will look
         </p>
+
+      {% elif recipients.more_rows_than_can_send %}
+
+        {% include "partials/check/too-many-messages.html" %}
 
       {% endif %}
 

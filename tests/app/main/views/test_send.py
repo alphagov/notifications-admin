@@ -1583,6 +1583,10 @@ def test_check_messages_shows_trial_mode_error(
     (mock_get_service, True),
     (mock_get_live_service, False),
 ])
+@pytest.mark.parametrize('number_of_rows, expected_error_message', [
+    (1, 'You can’t send this letter'),
+    (111, 'You can’t send these letters'),
+])
 def test_check_messages_shows_trial_mode_error_for_letters(
     client_request,
     api_user_active,
@@ -1593,14 +1597,16 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     mocker,
     service_mock,
     error_should_be_shown,
+    number_of_rows,
+    expected_error_message,
 ):
 
     service_mock(mocker, api_user_active)
 
-    mocker.patch('app.main.views.send.s3download', return_value='''
-        address_line_1,address_line_2,postcode,
-        First Last,    123 Street,    SW1 1AA
-    ''')
+    mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
+        ['address_line_1,address_line_2,postcode,'] +
+        ['First Last,    123 Street,    SW1 1AA'] * number_of_rows
+    ))
 
     with client_request.session_transaction() as session:
         session['upload_data'] = {'template_id': ''}
@@ -1617,10 +1623,10 @@ def test_check_messages_shows_trial_mode_error_for_letters(
 
     if error_should_be_shown:
         assert normalize_spaces(error[0].text) == (
-            'You can’t send this letter '
+            '{} '
             'In trial mode you can only preview how your letters will look '
             'Skip to file contents'
-        )
+        ).format(expected_error_message)
     else:
         assert not error
 
@@ -1668,7 +1674,7 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
     api_user_active,
     mock_login,
     mock_get_users_by_service,
-    mock_get_service,
+    mock_get_live_service,
     mock_has_permissions,
     mock_get_service_letter_template,
     mock_get_detailed_service_for_today,
