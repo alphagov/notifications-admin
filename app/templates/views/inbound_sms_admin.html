@@ -14,26 +14,6 @@ Inbound Numbers
   'caption_visible': True
 } %}
 
-{% set phone_number = {
-    'num':['012345560', '012345561', '012345562', '012345563', '012345564', '012345564', '012345564', '012345564', '012345564'
-    , '012345564', '012345564'],
-    'field_headings_visible': True,
-    'caption_visible': True
-} %}
-
-{% set service = {
-    'name':['GOV.UK', 'DVLA', 'Passport office', 'Fishing Dept', 'Gov Wifi', 'Test', '', '', ''
-    , '', ''],
-    'field_headings_visible': True,
-    'caption_visible': True
-} %}
-
-{% set active = {
-    'state':['active', 'active', 'active', 'active', 'active', 'active', '', '', ''
-    , '', ''],
-    'field_headings_visible': True,
-    'caption_visible': True
-} %}
 
 .inbound {
   font-style:normal;
@@ -71,9 +51,13 @@ Inbound Numbers
               <th style="font-weight:normal;">{{loop.index}}</th>
               <th style="font-weight:normal;">{{value.number}}</th>
               <th style="font-weight:normal;">
+
               {% if value.active %}
                 Active
-              {% else %}Inactive
+              {% elif not value.service.name  %}
+                  Not used
+              {% else %}
+                Inactive
               {% endif %}
               </th>
               <th style="font-weight:normal;">{{value.service.name}}</th>
