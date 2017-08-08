@@ -1,6 +1,5 @@
 from flask import url_for, session
 
-import app
 from app.utils import is_gov_user
 
 
@@ -17,9 +16,7 @@ def test_non_gov_user_cannot_see_add_service_button(
 
 
 def test_get_should_render_add_service_template(
-    logged_in_client,
-    api_user_active,
-    mocker,
+    logged_in_client
 ):
     response = logged_in_client.get(url_for('main.add_service'))
     assert response.status_code == 200
@@ -29,7 +26,6 @@ def test_get_should_render_add_service_template(
 def test_should_add_service_and_redirect_to_tour_when_no_services(
     app_,
     logged_in_client,
-    mocker,
     mock_create_service,
     mock_create_service_template,
     mock_get_services_with_no_services,
@@ -69,7 +65,6 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
 def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     app_,
     logged_in_client,
-    mocker,
     mock_create_service,
     mock_create_service_template,
     mock_get_services,
@@ -93,9 +88,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
 
 
 def test_should_return_form_errors_when_service_name_is_empty(
-    logged_in_client,
-    mocker,
-    api_user_active,
+    logged_in_client
 ):
     response = logged_in_client.post(url_for('main.add_service'), data={})
     assert response.status_code == 200
@@ -104,22 +97,16 @@ def test_should_return_form_errors_when_service_name_is_empty(
 
 def test_should_return_form_errors_with_duplicate_service_name_regardless_of_case(
     logged_in_client,
-    mocker,
-    service_one,
-    api_user_active,
     mock_create_duplicate_service,
 ):
-    response = logged_in_client.post(url_for('main.add_service'), data={'name': 'SERVICE TWO'})
-    print(response.status_code)
-    assert response.status_code == 400
-    assert response.message == "Duplicate service name 'SERVICE_TWO'"
+    response = logged_in_client.post(url_for('main.add_service'), data={'name': 'SERVICE ONE'})
+
+    assert response.status_code == 200
     assert 'This service name is already in use' in response.get_data(as_text=True)
-    assert mock_create_duplicate_service.called
 
 
 def test_non_whitelist_user_cannot_access_create_service_page(
     logged_in_client,
-    mock_login,
     mock_get_non_govuser,
     api_nongov_user_active,
 ):
@@ -130,7 +117,6 @@ def test_non_whitelist_user_cannot_access_create_service_page(
 
 def test_non_whitelist_user_cannot_create_service(
     logged_in_client,
-    mock_login,
     mock_get_non_govuser,
     api_nongov_user_active,
 ):

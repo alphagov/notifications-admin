@@ -4,7 +4,6 @@ import pytz
 from flask_wtf import FlaskForm as Form
 from datetime import datetime, timedelta
 
-from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import (
     validate_phone_number,
     InvalidPhoneError
@@ -222,28 +221,6 @@ class AddServiceForm(Form):
             DataRequired(message='Can’t be empty')
         ]
     )
-
-    service_id = HiddenField('service_id')
-
-    def _create_service(self, service_name, email_from):
-        from app import service_api_client
-        from flask import current_app, session
-        service_id = service_api_client.create_service(service_name=service_name,
-                                                       message_limit=current_app.config['DEFAULT_SERVICE_LIMIT'],
-                                                       restricted=True,
-                                                       user_id=session['user_id'],
-                                                       email_from=email_from)
-        session['service_id'] = service_id
-        return service_id
-
-    def validate_name(self, a):
-        from app.utils import email_safe
-        email_from = email_safe(a.data)
-        try:
-            self.service_id = self._create_service(a.data, email_from)
-        except HTTPError as e:
-            if e.status_code == 400 and e.message['name']:
-                raise ValidationError(message=e.message['name'][0])
 
 
 class ServiceNameForm(Form):
