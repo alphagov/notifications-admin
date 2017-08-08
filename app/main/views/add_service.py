@@ -52,6 +52,8 @@ def _create_service(service_name, email_from, form):
         if e.status_code == 400 and e.message['name']:
             form.name.errors.append("This service name is already in use")
             return None, e
+        else:
+            raise e
 
 
 def _create_example_template(service_id):
