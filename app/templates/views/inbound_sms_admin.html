@@ -1,0 +1,85 @@
+{% extends "withnav_template.html" %}
+{% from "components/table.html" import list_table, row, field, hidden_field_heading %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+Inbound Numbers
+{% endblock %}
+
+{% set table_headings = {
+  'field_headings': [
+    '', 'Number', 'Status', 'Service', 'Created on'
+  ],
+  'field_headings_visible': True,
+  'caption_visible': True
+} %}
+
+{% set phone_number = {
+    'num':['012345560', '012345561', '012345562', '012345563', '012345564', '012345564', '012345564', '012345564', '012345564'
+    , '012345564', '012345564'],
+    'field_headings_visible': True,
+    'caption_visible': True
+} %}
+
+{% set service = {
+    'name':['GOV.UK', 'DVLA', 'Passport office', 'Fishing Dept', 'Gov Wifi', 'Test', '', '', ''
+    , '', ''],
+    'field_headings_visible': True,
+    'caption_visible': True
+} %}
+
+{% set active = {
+    'state':['active', 'active', 'active', 'active', 'active', 'active', '', '', ''
+    , '', ''],
+    'field_headings_visible': True,
+    'caption_visible': True
+} %}
+
+.inbound {
+  font-style:normal;
+  font-weight:normal;
+}
+
+{% block maincolumn_content %}
+
+  <div class="grid-row bottom-gutter">
+    <div class="column-two-thirds">
+      <h1 class="heading-large">
+        Inbound SMS
+      </h1>
+    </div>
+  </div>
+
+
+  <table class="inbound">
+          <col style="width:8%">
+          <col style="width:20%">
+          <col style="width:17%">
+          <col style="width:30%">
+          <thread>
+              <tr>
+                <th>{{table_headings.field_headings[0]}}</th>
+                <th>{{table_headings.field_headings[1]}}</th>
+                <th>{{table_headings.field_headings[2]}}</th>
+                <th>{{table_headings.field_headings[3]}}</th>
+              </tr>
+          </thread>
+          <tbody>
+
+          {% for value in inbound_num_list.data: %}
+          <tr>
+              <th style="font-weight:normal;">{{loop.index}}</th>
+              <th style="font-weight:normal;">{{value.number}}</th>
+              <th style="font-weight:normal;">
+              {% if value.active %}
+                Active
+              {% else %}Inactive
+              {% endif %}
+              </th>
+              <th style="font-weight:normal;">{{value.service.name}}</th>
+          </tr>
+          {% endfor %}
+          </tbody>
+  </table>
+
+{% endblock %}
