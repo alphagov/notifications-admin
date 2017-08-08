@@ -174,6 +174,18 @@ def mock_create_service(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_create_duplicate_service(mocker):
+    def _create(service_name, message_limit, restricted, user_id, email_from):
+        json_mock = Mock(return_value={'message': {'name': ["Duplicate service name '{}'".format(service_name)]}})
+        resp_mock = Mock(status_code=400, json=json_mock)
+        http_error = HTTPError(response=resp_mock, message="Default message")
+        raise http_error
+
+    return mocker.patch(
+        'app.service_api_client.create_service', side_effect=_create)
+
+
+@pytest.fixture(scope='function')
 def mock_update_service(mocker):
     def _update(service_id, **kwargs):
         service = service_json(

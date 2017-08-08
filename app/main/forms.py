@@ -3,6 +3,7 @@ import pytz
 
 from flask_wtf import FlaskForm as Form
 from datetime import datetime, timedelta
+
 from notifications_utils.recipients import (
     validate_phone_number,
     InvalidPhoneError
@@ -211,13 +212,7 @@ class TextNotReceivedForm(Form):
 
 
 class AddServiceForm(Form):
-    def __init__(self, names_func, *args, **kwargs):
-        """
-        Keyword arguments:
-        names_func -- Returns a list of unique service_names already registered
-        on the system.
-        """
-        self._names_func = names_func
+    def __init__(self, *args, **kwargs):
         super(AddServiceForm, self).__init__(*args, **kwargs)
 
     name = StringField(
@@ -226,12 +221,6 @@ class AddServiceForm(Form):
             DataRequired(message='Can’t be empty')
         ]
     )
-
-    def validate_name(self, a):
-        from app.utils import email_safe
-        # make sure the email_from will be unique to all services
-        if email_safe(a.data) in self._names_func():
-            raise ValidationError('This service name is already in use')
 
 
 class ServiceNameForm(Form):
