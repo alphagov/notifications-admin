@@ -92,8 +92,8 @@ def cloudfoundry_environ(monkeypatch, cloudfoundry_config):
 def test_extract_cloudfoundry_config_populates_other_vars():
     extract_cloudfoundry_config()
 
-    assert os.environ['LOGGING_STDOUT_JSON'] == '1'
     assert os.environ['NOTIFY_ENVIRONMENT'] == '🚀🌌'
+    assert os.environ['NOTIFY_LOG_PATH'] == '/home/vcap/logs/app.log'
 
 
 @pytest.mark.usefixtures('os_environ', 'cloudfoundry_environ')
