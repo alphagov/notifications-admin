@@ -26,6 +26,7 @@ from wtforms import (
     SelectField)
 from wtforms.fields.html5 import EmailField, TelField, SearchField
 from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
+from flask_wtf.file import FileField as FileField_wtf, FileAllowed
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidGovEmail, NoCommasInPlaceHolders, OnlyGSMCharacters)
 
@@ -546,6 +547,28 @@ class ServiceBrandingOrg(Form):
             DataRequired()
         ]
     )
+
+
+class ServiceSelectOrg(Form):
+
+    def __init__(self, organisations=[], *args, **kwargs):
+        self.organisation.choices = organisations
+        super(ServiceSelectOrg, self).__init__(*args, **kwargs)
+
+    organisation = RadioField(
+        'Organisation',
+        validators=[
+            DataRequired()
+        ]
+    )
+
+
+class ServiceManageOrg(Form):
+
+    name = StringField('Name')
+
+    colour = StringField('Colour', render_kw={'onkeyup': 'update_colour_span()', 'onblur': 'update_colour_span()'})
+    file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
 
 
 class LetterBranding(Form):
