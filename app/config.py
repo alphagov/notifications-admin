@@ -135,7 +135,7 @@ class Live(Config):
     HTTP_PROTOCOL = 'https'
     STATSD_ENABLED = True
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
-    LOGO_UPLOAD_BUCKET_NAME = 'public-logos-live'
+    LOGO_UPLOAD_BUCKET_NAME = 'public-logos-production'
     NOTIFY_ENVIRONMENT = 'live'
 
 
