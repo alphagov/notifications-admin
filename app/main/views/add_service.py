@@ -14,7 +14,7 @@ from notifications_python_client.errors import HTTPError
 from werkzeug.exceptions import abort
 
 from app.main import main
-from app.main.forms import AddServiceForm
+from app.main.forms import ServiceNameForm
 from app.notify_client.models import InvitedUser
 
 from app import (
@@ -78,7 +78,7 @@ def add_service():
     if not is_gov_user(current_user.email_address):
         abort(403)
 
-    form = AddServiceForm()
+    form = ServiceNameForm()
     heading = 'Which service do you want to set up notifications for?'
 
     if form.validate_on_submit():
