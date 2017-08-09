@@ -15,23 +15,39 @@
     }
 
     &-switch {
+
       @include core-16;
       text-align: right;
       position: absolute;
       top: 0;
       right: 0;
       padding: 13px 0 9px 15px;
+
+      &:focus {
+        outline: none;
+        border-bottom: 4px solid $yellow;
+        border-left: 10px solid $yellow;
+        border-right: 3px solid $yellow;
+        right: -3px;
+        color: $text-colour;
+      }
+
     }
 
   }
 
   li {
     @include core-19;
-    margin: 10px 0 0 0;
+    margin: 0;
     list-style-type: none;
   }
 
   a {
+
+    display: block;
+    padding: 5px 0;
+    position: relative;
+    top: 5px;
 
     &:link,
     &:visited {
@@ -41,6 +57,10 @@
     &:hover {
       color: $link-hover-colour;
       text-decoration: underline;
+    }
+
+    &:focus {
+      color: $text-colour;
     }
 
   }
