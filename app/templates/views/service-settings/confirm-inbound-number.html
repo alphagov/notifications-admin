@@ -1,0 +1,33 @@
+{% extends "withnav_template.html" %}
+{% from "components/table.html" import text_field, edit_field %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Inbound SMS Assigned Number
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">Inbound SMS Assigned Nubmer</h1>
+
+  <p>
+    The following number has been assigned to your inbound sms service.
+  </p>
+
+  <p style="font-weight:bold;">
+  {{inbound_number}}
+  </p>
+
+  <p>
+    If you would like to continue and activate the inbound sms service, please click the confirm button.
+  </p>
+  <form method="post">
+
+    {{ page_footer(
+      'Confirm',
+      back_link=url_for('.service_settings', service_id=current_service.id),
+      back_link_text='Back to settings'
+  ) }}
+  </form>
+
+{% endblock %}

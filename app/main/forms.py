@@ -504,6 +504,10 @@ class ServiceReplyToEmailFrom(Form):
     email_address = email_address(label='Email reply to address')
 
 
+class InboudnSmsConfirm(Form):
+    inbound_number = ''
+
+
 class ServiceSmsSender(Form):
     sms_sender = StringField(
         'Text message sender',
