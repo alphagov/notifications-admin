@@ -216,9 +216,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         data = _attach_current_user(data)
         return self.post(endpoint, data=data)
 
-    def find_all_service_email_from(self, user_id=None):
-        resp = self.get_services(user_id)
-        return [x['email_from'] for x in resp['data']]
+    def is_service_name_unique(self, name, email_from):
+        """
+        Check that the service name or email from are unique across all services.
+        """
+        endpoint = "/service/unique"
+        params = {"name": name, "email_from": email_from}
+        return self.get(url=endpoint, params=params)["result"]
 
     # Temp access of service history data. Includes service and api key history
     def get_service_history(self, service_id):
