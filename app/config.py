@@ -85,6 +85,7 @@ class Config(object):
         r"assembly\.wales",
         r"cjsm\.net",
         r"cqc\.org\.uk",
+        r"bl\.uk",
     ]
 
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
