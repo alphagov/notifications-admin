@@ -32,8 +32,7 @@ from app.main.forms import (
     ServiceLetterContactBlock,
     ServiceBrandingOrg,
     LetterBranding,
-    ServiceInboundApiForm,
-    InboudnSmsConfirm)
+    ServiceInboundApiForm)
 from app import user_api_client, current_service, organisations_client, inbound_number_client
 
 
@@ -364,8 +363,7 @@ def service_set_inbound_number(service_id):
         inbound_number = inbound_number_client.get_available_inbound_number(service_id)
         new_number = True
 
-    form = InboudnSmsConfirm()
-    if form.validate_on_submit():
+    if request.method == 'POST':
         switch_service_permissions(current_service['id'], 'inbound_sms')
         if new_number:
             inbound_number_client.activate_inbound_sms_service(service_id, inbound_number['data']['id'])
@@ -376,8 +374,7 @@ def service_set_inbound_number(service_id):
 
     return render_template(
         'views/service-settings/confirm-inbound-number.html',
-        inbound_number=inbound_number['data']['number'],
-        form=form
+        inbound_number=inbound_number['data']['number']
     )
 
 

@@ -7,8 +7,6 @@ class InboundNumberClient(NotifyAdminAPIClient):
         super().__init__("a" * 73, "b")
 
     def init_app(self, app):
-        import pdb
-        pdb.set_trace()
         self.base_url = app.config['API_HOST_NAME']
         self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.api_key = app.config['ADMIN_CLIENT_SECRET']
@@ -29,5 +27,5 @@ class InboundNumberClient(NotifyAdminAPIClient):
     def deactivate_inbound_sms_permission(self, inbound_number_id):
         return self.post(url='/inbound_number/{}/off'.format(inbound_number_id), data={})
 
-    def get_available_inbound_number(self, service_id):
-        return self.get(url='/inbound_number/{}/available'.format(service_id))
+    def get_available_inbound_number(self):
+        return self.get(url='/inbound_number/available'.format())
