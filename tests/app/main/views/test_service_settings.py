@@ -233,7 +233,7 @@ def test_should_redirect_after_change_service_name(
     logged_in_client,
     service_one,
     mock_update_service,
-    mock_get_services,
+    mock_service_name_is_unique
 ):
     response = logged_in_client.post(
         url_for('main.service_name_change', service_id=service_one['id']),
@@ -312,7 +312,7 @@ def test_switch_service_to_restricted(
 
 def test_should_not_allow_duplicate_names(
         logged_in_client,
-        mocker,
+        mock_service_name_is_not_unique,
         service_one,
 ):
     service_id = service_one['id']
