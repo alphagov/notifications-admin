@@ -96,7 +96,7 @@ def test_should_return_200_when_email_is_not_gov_uk(
                                  'password': 'validPassword!'})
 
     assert response.status_code == 200
-    assert 'Enter a central government email address' in response.get_data(as_text=True)
+    assert 'Enter a government email address' in response.get_data(as_text=True)
 
 
 def test_should_add_user_details_to_session(
