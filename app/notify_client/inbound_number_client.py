@@ -1,6 +1,5 @@
 from app.notify_client import NotifyAdminAPIClient
 
-
 class InboundNumberClient(NotifyAdminAPIClient):
 
     def __init__(self):
