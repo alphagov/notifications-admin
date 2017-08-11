@@ -3,6 +3,7 @@ import pytz
 
 from flask_wtf import FlaskForm as Form
 from datetime import datetime, timedelta
+
 from notifications_utils.recipients import (
     validate_phone_number,
     InvalidPhoneError
@@ -25,6 +26,7 @@ from wtforms import (
     SelectField)
 from wtforms.fields.html5 import EmailField, TelField, SearchField
 from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
+from flask_wtf.file import FileField as FileField_wtf, FileAllowed
 
 from app.main.validators import (Blacklist, CsvFileValidator, ValidGovEmail, NoCommasInPlaceHolders, OnlyGSMCharacters)
 
@@ -210,38 +212,8 @@ class TextNotReceivedForm(Form):
     mobile_number = mobile_number()
 
 
-class AddServiceForm(Form):
-    def __init__(self, names_func, *args, **kwargs):
-        """
-        Keyword arguments:
-        names_func -- Returns a list of unique service_names already registered
-        on the system.
-        """
-        self._names_func = names_func
-        super(AddServiceForm, self).__init__(*args, **kwargs)
-
-    name = StringField(
-        'Service name',
-        validators=[
-            DataRequired(message='Can’t be empty')
-        ]
-    )
-
-    def validate_name(self, a):
-        from app.utils import email_safe
-        # make sure the email_from will be unique to all services
-        if email_safe(a.data) in self._names_func():
-            raise ValidationError('This service name is already in use')
-
-
 class ServiceNameForm(Form):
-    def __init__(self, names_func, *args, **kwargs):
-        """
-        Keyword arguments:
-        names_func -- Returns a list of unique service_names already registered
-        on the system.
-        """
-        self._names_func = names_func
+    def __init__(self, *args, **kwargs):
         super(ServiceNameForm, self).__init__(*args, **kwargs)
 
     name = StringField(
@@ -249,12 +221,6 @@ class ServiceNameForm(Form):
         validators=[
             DataRequired(message='Can’t be empty')
         ])
-
-    def validate_name(self, a):
-        from app.utils import email_safe
-        # make sure the email_from will be unique to all services
-        if email_safe(a.data) in self._names_func():
-            raise ValidationError('This service name is already in use')
 
 
 class ConfirmPasswordForm(Form):
@@ -557,6 +523,28 @@ class ServiceBrandingOrg(Form):
             DataRequired()
         ]
     )
+
+
+class ServiceSelectOrg(Form):
+
+    def __init__(self, organisations=[], *args, **kwargs):
+        self.organisation.choices = organisations
+        super(ServiceSelectOrg, self).__init__(*args, **kwargs)
+
+    organisation = RadioField(
+        'Organisation',
+        validators=[
+            DataRequired()
+        ]
+    )
+
+
+class ServiceManageOrg(Form):
+
+    name = StringField('Name')
+
+    colour = StringField('Colour', render_kw={'onkeyup': 'update_colour_span()', 'onblur': 'update_colour_span()'})
+    file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
 
 
 class LetterBranding(Form):
