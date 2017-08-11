@@ -81,7 +81,6 @@ def service_settings(service_id):
         inbound_api_url=inbound_api_url,
         letter_contact_block=Field(current_service['letter_contact_block'], html='escape'),
         inbound_number=disp_inbound_number
-
     )
 
 
