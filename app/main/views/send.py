@@ -33,7 +33,7 @@ from app.main.forms import (
     ChooseTimeForm,
     get_placeholder_form_instance
 )
-from app.main.uploader import (
+from app.main.s3_client import (
     s3upload,
     s3download
 )

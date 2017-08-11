@@ -230,10 +230,10 @@ def test_should_show_service_name(
 
 
 def test_should_redirect_after_change_service_name(
-        logged_in_client,
-        service_one,
-        mock_update_service,
-        mock_get_services,
+    logged_in_client,
+    service_one,
+    mock_update_service,
+    mock_get_services,
 ):
     response = logged_in_client.post(
         url_for('main.service_name_change', service_id=service_one['id']),
@@ -243,7 +243,7 @@ def test_should_redirect_after_change_service_name(
     settings_url = url_for(
         'main.service_name_change_confirm', service_id=service_one['id'], _external=True)
     assert settings_url == response.location
-    assert mock_get_services.called
+    assert mock_service_name_is_unique.called
 
 
 def test_show_restricted_service(
@@ -315,8 +315,6 @@ def test_should_not_allow_duplicate_names(
         mocker,
         service_one,
 ):
-    mocker.patch('app.service_api_client.find_all_service_email_from',
-                 return_value=['service_one', 'service.two'])
     service_id = service_one['id']
     response = logged_in_client.post(
         url_for('main.service_name_change', service_id=service_id),
@@ -325,7 +323,7 @@ def test_should_not_allow_duplicate_names(
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
     assert 'This service name is already in use' in resp_data
-    app.service_api_client.find_all_service_email_from.assert_called_once_with()
+    app.service_api_client.is_service_name_unique.assert_called_once_with('SErvICE TWO', 'service.two')
 
 
 def test_should_show_service_name_confirmation(

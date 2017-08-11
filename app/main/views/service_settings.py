@@ -88,12 +88,16 @@ def service_settings(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_name_change(service_id):
-    form = ServiceNameForm(service_api_client.find_all_service_email_from)
+    form = ServiceNameForm()
 
     if request.method == 'GET':
         form.name.data = current_service.get('name')
 
     if form.validate_on_submit():
+        unique_name = service_api_client.is_service_name_unique(form.name.data, email_safe(form.name.data))
+        if not unique_name:
+            form.name.errors.append("This service name is already in use")
+            return render_template('views/service-settings/name.html', form=form)
         session['service_name_change'] = form.name.data
         return redirect(url_for('.service_name_change_confirm', service_id=service_id))
 

@@ -150,6 +150,16 @@ def mock_get_detailed_services(mocker, fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def mock_service_name_is_not_unique(mocker):
+    return mocker.patch('app.service_api_client.is_service_name_unique', return_value=False)
+
+
+@pytest.fixture(scope='function')
+def mock_service_name_is_unique(mocker):
+    return mocker.patch('app.service_api_client.is_service_name_unique', return_value=True)
+
+
+@pytest.fixture(scope='function')
 def mock_get_live_service(mocker, api_user_active):
     def _get(service_id):
         service = service_json(
@@ -167,6 +177,18 @@ def mock_create_service(mocker):
         service = service_json(
             101, service_name, [user_id], message_limit=message_limit, restricted=restricted, email_from=email_from)
         return service['id']
+
+    return mocker.patch(
+        'app.service_api_client.create_service', side_effect=_create)
+
+
+@pytest.fixture(scope='function')
+def mock_create_duplicate_service(mocker):
+    def _create(service_name, message_limit, restricted, user_id, email_from):
+        json_mock = Mock(return_value={'message': {'name': ["Duplicate service name '{}'".format(service_name)]}})
+        resp_mock = Mock(status_code=400, json=json_mock)
+        http_error = HTTPError(response=resp_mock, message="Default message")
+        raise http_error
 
     return mocker.patch(
         'app.service_api_client.create_service', side_effect=_create)
