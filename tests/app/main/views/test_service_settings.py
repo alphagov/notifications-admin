@@ -807,7 +807,7 @@ def test_if_currently_inbound_number_is_none(
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
 
     mocker_get_inbound_number_fun.assert_called_once_with(service_one['id'])
-    mocker_get_available_inbound_number_fun.assert_called_once_with(service_one['id'])
+    mocker_get_available_inbound_number_fun.assert_called_once_with()
     mocker_get_activate_inbound_number_fun.assert_called_once_with(service_one['id'], 'some_uuid')
 
 
@@ -824,14 +824,40 @@ def test_if_currently_inbound_number_is_not_empty(
     mocker_get_reactivate_inbound_number_fun = mocker.patch(
         'app.inbound_number_client.reactivate_inbound_sms_service')
 
-    response = logged_in_client.post(url_for('main.service_set_inbound_number', service_id=service_one['id']),
-                                     )
+    response = logged_in_client.post(url_for('main.service_set_inbound_number', service_id=service_one['id']),)
 
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
 
     mocker_get_inbound_number_fun.assert_called_once_with(service_one['id'])
     mocker_get_reactivate_inbound_number_fun.assert_called_once_with('some_uuid')
+
+
+def test_no_inbound_number_available(
+        logged_in_client,
+        mock_update_service,
+        service_one,
+        mocker
+):
+    mocker_get_inbound_number_fun = mocker.patch(
+        'app.inbound_number_client.get_inbound_sms_number_for_service',
+        return_value={'data': None})
+
+    mocker_get_available_inbound_number_fun = mocker.patch(
+        'app.inbound_number_client.get_available_inbound_number',
+        return_value=Mock('something',
+            status_code=400,
+            json=lambda: {
+            }
+        ))
+
+    response = logged_in_client.get(url_for('main.service_set_inbound_number', service_id=service_one['id']),
+                     )
+
+    assert response.status_code == 400
+
+    # mocker_get_inbound_number_fun.assert_called_once_with(service_one['id'])
+    # mocker_get_available_inbound_number_fun.assert_called_once_with()
 
 
 def test_set_text_message_sender_and_inbound_sms(

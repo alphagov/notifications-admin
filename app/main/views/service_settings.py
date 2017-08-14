@@ -359,21 +359,34 @@ def service_set_sms_sender(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_inbound_number(service_id):
-    inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)
+
     new_number = False
 
-    if inbound_number['data'] == '' or inbound_number['data'] is None:
-        inbound_number = inbound_number_client.get_available_inbound_number(service_id)
+    inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)
+
+    if inbound_number['data'] is None:
+
+        inbound_number = inbound_number_client.get_available_inbound_number()
+        # if (inbound_number['data'] is None):
+        if (inbound_number['data'] is []):
+            # either return 404 or 400 or return a message to the html
+
+
         new_number = True
 
     if request.method == 'POST':
-        switch_service_permissions(current_service['id'], 'inbound_sms')
-        if new_number:
-            inbound_number_client.activate_inbound_sms_service(service_id, inbound_number['data']['id'])
-            return redirect(url_for('.service_settings', service_id=service_id))
-        else:
-            inbound_number_client.reactivate_inbound_sms_service(inbound_number['data']['id'])
-            return redirect(url_for('.service_settings', service_id=service_id))
+        try:
+            switch_service_permissions(current_service['id'], 'inbound_sms')
+            if new_number:
+                inbound_number_client.activate_inbound_sms_service(service_id, inbound_number['data']['id'])
+                return redirect(url_for('.service_settings', service_id=service_id))
+            else:
+                inbound_number_client.reactivate_inbound_sms_service(inbound_number['data']['id'])
+                return redirect(url_for('.service_settings', service_id=service_id))
+
+        except HTTPError as e:
+            raise e
+
 
     return render_template(
         'views/service-settings/confirm-inbound-number.html',
