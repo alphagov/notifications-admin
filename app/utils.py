@@ -22,10 +22,6 @@ from flask import (
 )
 from flask_login import current_user
 import pyexcel
-import pyexcel_io
-import pyexcel_xls
-import pyexcel_xlsx
-import pyexcel_ods3
 
 from notifications_utils.template import (
     SMSPreviewTemplate,
@@ -246,12 +242,16 @@ class Spreadsheet():
             return cls(Spreadsheet.normalise_newlines(file_content), filename)
 
         if extension == 'tsv':
-            file_content = StringIO(Spreadsheet.normalise_newlines(file_content))
+            file_content = StringIO(
+                Spreadsheet.normalise_newlines(file_content))
 
-        return cls.from_rows(pyexcel.get_sheet(
-            file_type=extension,
-            file_content=file_content.read()
-        ).to_array(), filename)
+        instance = cls.from_rows(
+            pyexcel.iget_array(
+                file_type=extension,
+                file_stream=file_content),
+            filename)
+        pyexcel.free_resources()
+        return instance
 
 
 def get_help_argument():
