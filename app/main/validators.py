@@ -36,7 +36,7 @@ class ValidGovEmail:
     def __call__(self, form, field):
         from flask import url_for
         message = (
-            'Enter a central government email address.'
+            'Enter a government email address.'
             ' If you think you should have access'
             ' <a href="{}">contact us</a>').format(url_for('main.support'))
         if not is_gov_user(field.data.lower()):
