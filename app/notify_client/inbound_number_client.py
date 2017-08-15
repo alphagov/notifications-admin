@@ -1,5 +1,6 @@
 from app.notify_client import NotifyAdminAPIClient
 
+
 class InboundNumberClient(NotifyAdminAPIClient):
 
     def __init__(self):
@@ -15,21 +16,16 @@ class InboundNumberClient(NotifyAdminAPIClient):
         return self.get('/inbound_number')
 
     def get_inbound_sms_number_for_service(self, service_id):
-        return self.get('/inbound_number/service/{}'.format(service_id))
+        return self.get('/inbound-number/service/{}'.format(service_id))
 
-    # def activate_inbound_sms_service(self, service_id, inbound_number_id):
-    #     return self.post(url='/inbound_number/{}/service/{}'.format(inbound_number_id, service_id), data={})
+    def activate_inbound_sms_service(self, service_id):
+        return self.post(url='/inbound-number/service/{}'.format(service_id), data={})
 
     def reactivate_inbound_sms_service(self, inbound_number_id):
-        try:
-
-
-        catch:
-
         return self.post(url='/inbound_number/{}/on'.format(inbound_number_id), data={})
 
-    def deactivate_inbound_sms_permission(self, inbound_number_id):
-        return self.post(url='/inbound_number/{}/off'.format(inbound_number_id), data={})
+    def deactivate_inbound_sms_permission(self, service_id):
+        return self.post(url='/inbound-number/service/{}/off'.format(service_id), data={})
 
-    # def get_available_inbound_number(self):
-    #     return self.get(url='/inbound_number/available'.format())
+    def get_available_inbound_number(self):
+        return self.get(url='/inbound_number/available'.format())

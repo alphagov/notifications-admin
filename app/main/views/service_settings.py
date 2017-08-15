@@ -66,7 +66,7 @@ def service_settings(service_id):
         inbound_api_url = ''
 
     inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)
-    if inbound_number['data'] is None or inbound_number['data'] == '':
+    if inbound_number['data'] == {}:
         disp_inbound_number = ''
     else:
         disp_inbound_number = inbound_number['data']['number']
@@ -335,15 +335,12 @@ def service_set_reply_to_email(service_id):
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_sms_sender(service_id):
     form = ServiceSmsSender()
-
     if form.validate_on_submit():
-        set_inbound_sms = request.args.get('set_inbound_sms', False)
-        if set_inbound_sms == 'True':
-            switch_service_permissions(current_service['id'], 'inbound_sms', form.sms_sender.data)
-        else:
-            service_api_client.update_service(
-                current_service['id'],
-                sms_sender=form.sms_sender.data or None
+        if 'inbound_sms' in current_service['permissions']:
+            abort(403)
+        service_api_client.update_service(
+            current_service['id'],
+            sms_sender=form.sms_sender.data or None
             )
         return redirect(url_for('.service_settings', service_id=service_id))
 
@@ -355,43 +352,22 @@ def service_set_sms_sender(service_id):
         form=form)
 
 
-@main.route("/services/<service_id>/service-settings/set-inbound-number", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/set-inbound-number", methods=['GET'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_inbound_number(service_id):
-
-    new_number = False
-
-    inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)
-
-    if inbound_number['data'] is None:
-
-        inbound_number = inbound_number_client.get_available_inbound_number()
-        # if (inbound_number['data'] is None):
-        if (inbound_number['data'] is []):
-            # either return 404 or 400 or return a message to the html
-
-
-        new_number = True
-
-    if request.method == 'POST':
-        try:
-            switch_service_permissions(current_service['id'], 'inbound_sms')
-            if new_number:
-                inbound_number_client.activate_inbound_sms_service(service_id, inbound_number['data']['id'])
-                return redirect(url_for('.service_settings', service_id=service_id))
-            else:
-                inbound_number_client.reactivate_inbound_sms_service(inbound_number['data']['id'])
-                return redirect(url_for('.service_settings', service_id=service_id))
-
-        except HTTPError as e:
-            raise e
-
-
-    return render_template(
-        'views/service-settings/confirm-inbound-number.html',
-        inbound_number=inbound_number['data']['number']
-    )
+    switch_service_permissions(current_service['id'], 'inbound_sms')
+    set_inbound_sms = request.args.get('set_inbound_sms', False)
+    try:
+        if set_inbound_sms:
+            inbound_number_client.activate_inbound_sms_service(service_id)
+            return redirect(url_for('.service_settings', service_id=service_id))
+        else:
+            inbound_number_client.deactivate_inbound_sms_permission(service_id=service_id)
+            return redirect(url_for('.service_set_sms_sender', service_id=service_id))
+    except HTTPError as e:
+        switch_service_permissions(current_service['id'], 'inbound_sms')
+        raise e
 
 
 @main.route("/services/<service_id>/service-settings/set-sms", methods=['GET'])
