@@ -8,15 +8,13 @@ from notifications_python_client.errors import HTTPError
 def test_set_text_message_sender(
         logged_in_client,
         mock_update_service,
-        service_one,
-        mock_get_letter_organisations,
-        mock_get_inbound_number_for_service
+        service_one
 ):
     data = {"sms_sender": "elevenchars"}
     response = logged_in_client.post(url_for('main.service_set_sms_sender', service_id=service_one['id']),
-                                     data=data,
-                                     follow_redirects=True)
-    assert response.status_code == 200
+                                     data=data)
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
 
     mock_update_service.assert_called_with(
         service_one['id'],
@@ -69,7 +67,8 @@ def test_allow_inbound_sms_returns_400_if_no_numbers_available(
     mock_switch_service = mocker.patch('app.service_api_client.update_service_with_properties')
     mock_activate_inbound = mocker.patch('app.inbound_number_client.activate_inbound_sms_service',
                                          side_effect=HTTPError)
-    logged_in_client.get(url_for('main.service_set_inbound_number', service_id=service_one['id']))
+    logged_in_client.get(
+        url_for('main.service_set_inbound_number', service_id=service_one['id'], set_inbound_sms='True'))
     mock_activate_inbound.assert_called_once_with(service_one['id'])
     assert mock_switch_service.call_count == 2
 
@@ -80,12 +79,13 @@ def test_set_text_message_sender_and_inbound_sms_permission_exists_return_403(
         mocker,
 ):
     service_one['permissions'] = ['inbound_sms']
-    update_service_mock = mocker.patch('app.service_api_client.update_service_with_properties',
-                                       return_value=service_one)
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
+    update_service_mock = mocker.patch('app.service_api_client.update_service_with_properties')
 
     data = {"sms_sender": "elevenchars"}
     response = logged_in_client.post(url_for('main.service_set_sms_sender', service_id=service_one['id']),
                                      data=data)
+
     assert response.status_code == 403
 
     assert not update_service_mock.called
@@ -105,18 +105,17 @@ def test_turn_inbound_sms_off(
     response = logged_in_client.get(url_for('main.service_set_inbound_number', service_id=service_one['id'],
                                             set_inbound_sms=False))
     assert response.status_code == 302
-    assert response.location == url_for('main.service_set_sms_sender', service_id=service_one['id'])
+    assert response.location == url_for('main.service_set_sms_sender', service_id=service_one['id'], _external=True)
 
     assert app.current_service['permissions'] == []
     mock_deactivate_inbound.assert_called_once_with(service_id=service_one['id'])
+    assert update_service_mock.called
 
 
 def test_set_text_message_sender_and_not_inbound_sms(
         logged_in_client,
         service_one,
-        mock_get_letter_organisations,
-        mocker,
-        mock_get_inbound_number_for_service
+        mocker
 ):
     service_one['permissions'] = []
     update_service_mock = mocker.patch('app.service_api_client.update_service',
@@ -125,9 +124,9 @@ def test_set_text_message_sender_and_not_inbound_sms(
     data = {"sms_sender": "elevenchars"}
     response = logged_in_client.post(url_for('main.service_set_sms_sender', service_id=service_one['id'],
                                              set_inbound_sms=False),
-                                     data=data,
-                                     follow_redirects=True)
-    assert response.status_code == 200
+                                     data=data)
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
 
     update_service_mock.assert_called_with(
         service_one['id'],
@@ -145,8 +144,6 @@ def test_set_text_message_sender_validation(
         logged_in_client,
         mock_update_service,
         service_one,
-        mock_get_letter_organisations,
-        mock_get_inbound_number_for_service,
         content,
         expected_error,
 ):

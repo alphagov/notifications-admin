@@ -359,7 +359,7 @@ def service_set_inbound_number(service_id):
     switch_service_permissions(current_service['id'], 'inbound_sms')
     set_inbound_sms = request.args.get('set_inbound_sms', False)
     try:
-        if set_inbound_sms:
+        if set_inbound_sms == 'True':
             inbound_number_client.activate_inbound_sms_service(service_id)
             return redirect(url_for('.service_settings', service_id=service_id))
         else:

@@ -724,7 +724,6 @@ def test_does_not_show_research_mode_indicator(
     assert not element
 
 
-
 @pytest.mark.parametrize('url, bearer_token, expected_errors', [
     ("", "", "Can’t be empty Can’t be empty"),
     ("http://not_https.com", "1234567890", "Must be a valid https url"),
