@@ -1,6 +1,4 @@
-{% extends "withnav_template.html" %}
-{% from "components/table.html" import list_table, row, field, hidden_field_heading %}
-{% from "components/page-footer.html" import page_footer %}
+{% extends "views/platform-admin/_base_template.html" %}
 
 {% block service_page_title %}
 Inbound Numbers
@@ -8,7 +6,7 @@ Inbound Numbers
 
 {% set table_headings = {
   'field_headings': [
-    '', 'Number', 'Status', 'Service', 'Created on'
+    'Number', 'Status', 'Service', 'Created on'
   ],
   'field_headings_visible': True,
   'caption_visible': True
@@ -20,7 +18,7 @@ Inbound Numbers
   font-weight:normal;
 }
 
-{% block maincolumn_content %}
+{% block platform_admin_content %}
 
   <div class="grid-row bottom-gutter">
     <div class="column-two-thirds">
@@ -29,6 +27,7 @@ Inbound Numbers
       </h1>
     </div>
   </div>
+
 
 
   <table class="inbound">
@@ -41,14 +40,12 @@ Inbound Numbers
                 <th>{{table_headings.field_headings[0]}}</th>
                 <th>{{table_headings.field_headings[1]}}</th>
                 <th>{{table_headings.field_headings[2]}}</th>
-                <th>{{table_headings.field_headings[3]}}</th>
               </tr>
           </thread>
           <tbody>
 
           {% for value in inbound_num_list.data: %}
           <tr>
-              <th style="font-weight:normal;">{{loop.index}}</th>
               <th style="font-weight:normal;">{{value.number}}</th>
               <th style="font-weight:normal;">
 

@@ -158,3 +158,16 @@ def test_set_text_message_sender_validation(
     assert response.status_code == 200
     assert page.select(".error-message")[0].text.strip() == expected_error
     assert not mock_update_service.called
+
+
+def test_if_sms_sender_set_then_form_populated(
+        logged_in_client,
+        service_one,
+        mock_get_inbound_number_for_service
+):
+    service_one['sms_sender'] = 'elevenchars'
+    response = logged_in_client.get(url_for('main.service_set_sms_sender', service_id=service_one['id']))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find(id='sms_sender')['value'] == 'elevenchars'

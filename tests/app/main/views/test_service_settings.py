@@ -752,19 +752,6 @@ def test_set_inbound_api_validation(
     assert not mock_update_service.called
 
 
-def test_if_sms_sender_set_then_form_populated(
-        logged_in_client,
-        service_one,
-        mock_get_inbound_number_for_service
-):
-    service_one['sms_sender'] = 'elevenchars'
-    response = logged_in_client.get(url_for('main.service_set_sms_sender', service_id=service_one['id']))
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.find(id='sms_sender')['value'] == 'elevenchars'
-
-
 @pytest.mark.parametrize('method', ['get', 'post'])
 def test_cant_set_letter_contact_block_if_service_cant_send_letters(
         logged_in_client,
