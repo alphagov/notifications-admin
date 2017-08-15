@@ -55,13 +55,13 @@ class JobApiClient(NotifyAdminAPIClient):
         if statuses is not None:
             params['statuses'] = ','.join(statuses)
 
-        jobs = self.get(url='/service/{}/job'.format(service_id), params=params)
+        jobs = self.get(url='/service/{}/job/job-stats'.format(service_id), params=params)
+
         for job in jobs['data']:
-            stats = self.__convert_statistics(job)
-            job['notifications_sent'] = stats['delivered'] + stats['failed']
-            job['notifications_delivered'] = stats['delivered']
-            job['notifications_failed'] = stats['failed']
-            job['notifications_requested'] = stats['requested']
+            job['notifications_delivered'] = job['delivered']
+            job['notifications_failed'] = job['failed']
+            job['notification_count'] = job['sent']
+            job['id'] = job['job_id']
 
         return jobs
 
