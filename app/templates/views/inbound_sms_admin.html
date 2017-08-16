@@ -57,7 +57,9 @@ Inbound Numbers
                 Inactive
               {% endif %}
               </th>
-              <th style="font-weight:normal;">{{value.service.name}}</th>
+              <th style="font-weight:normal;">
+                  <a href="{{ url_for('main.service_dashboard', service_id=value.service.id) }}" class="browse-list-link">{{ value.service.name }}</a>
+              </th>
           </tr>
           {% endfor %}
           </tbody>
