@@ -5,32 +5,29 @@ import app
 from app.notify_client.models import InvitedUser
 from app.utils import is_gov_user
 from tests.conftest import service_one as create_sample_service
+from tests.conftest import (
+    normalize_spaces,
+    SERVICE_ONE_ID,
+)
 
 
 def test_should_show_overview_page(
-    logged_in_client,
+    client_request,
     active_user_with_permissions,
     mocker,
     mock_get_invites_for_service,
 ):
-    service = create_sample_service(active_user_with_permissions)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
-    response = logged_in_client.get(url_for('main.manage_users', service_id=service['id']))
+    page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
 
-    assert 'Team members' in response.get_data(as_text=True)
-    assert response.status_code == 200
-    app.user_api_client.get_users_for_service.assert_called_once_with(service_id=service['id'])
+    assert normalize_spaces(page.select_one('h1').text) == 'Team members'
+    app.user_api_client.get_users_for_service.assert_called_once_with(service_id=SERVICE_ONE_ID)
 
 
 def test_should_show_page_for_one_user(
-    logged_in_client,
-    active_user_with_permissions,
-    mocker,
+    client_request,
 ):
-    service = create_sample_service(active_user_with_permissions)
-    response = logged_in_client.get(url_for('main.edit_user_permissions', service_id=service['id'], user_id=0))
-
-    assert response.status_code == 200
+    page = client_request.get('main.edit_user_permissions', service_id=SERVICE_ONE_ID, user_id=0)
 
 
 def test_edit_user_permissions(
@@ -177,21 +174,18 @@ def test_cancel_invited_user_cancels_user_invitations(
 
 
 def test_manage_users_shows_invited_user(
-    logged_in_client,
+    client_request,
     mocker,
     active_user_with_permissions,
     sample_invite,
 ):
-    service = create_sample_service(active_user_with_permissions)
     data = [InvitedUser(**sample_invite)]
 
     mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
 
-    response = logged_in_client.get(url_for('main.manage_users', service_id=service['id']))
+    page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'Team members'
     invited_users_list = page.find_all('div', {'class': 'user-list'})[1]
     assert invited_users_list.find_all('h3')[0].text.strip() == 'invited_user@test.gov.uk'

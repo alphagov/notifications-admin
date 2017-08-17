@@ -3,7 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-Manage users
+  {{ user.name or user.email_localpart }}
 {% endblock %}
 
 {% block maincolumn_content %}
