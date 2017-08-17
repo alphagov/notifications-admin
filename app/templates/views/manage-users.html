@@ -37,7 +37,7 @@
     {% for user in users %}
       <div class="user-list-item">
         <h3>
-          {{ user.name }}&ensp;<span class="hint">
+          <span class="heading-small">{{ user.name }}</span>&ensp;<span class="hint">
             {%- if user.email_address == current_user.email_address -%}
               (you)
             {% else %}
@@ -84,7 +84,7 @@
       {% for user in invited_users %}
         <div class="user-list-item">
           <h3>
-            {{ user.email_address }}
+            <span style="font-weight: bold">{{ user.email_address }}</span>
           </h3>
           <ul class="tick-cross-list">
             <div class="tick-cross-list-permissions">
