@@ -25,7 +25,8 @@ from app.utils import user_has_permissions
 
 roles = {
     'send_messages': ['send_texts', 'send_emails', 'send_letters'],
-    'manage_service': ['manage_users', 'manage_templates', 'manage_settings'],
+    'manage_templates': ['manage_templates'],
+    'manage_service': ['manage_users', 'manage_settings'],
     'manage_api_keys': ['manage_api_keys']
 }
 

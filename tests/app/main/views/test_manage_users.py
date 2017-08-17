@@ -10,6 +10,7 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     active_user_with_permissions,
     active_user_view_permissions,
+    active_user_manage_template_permission,
 )
 
 
@@ -18,14 +19,21 @@ from tests.conftest import (
         active_user_with_permissions,
         (
             'Test User (you) '
-            'Can Send messages Can Manage service Can Access API keys'
+            'Can Send messages Can Manage templates Can Manage service Can Access API keys'
         ),
     ),
     (
         active_user_view_permissions,
         (
             'Test User With Permissions (you) '
-            'Can’t Send messages Can’t Manage service Can’t Access API keys'
+            'Can’t Send messages Can’t Manage templates Can’t Manage service Can’t Access API keys'
+        ),
+    ),
+    (
+        active_user_manage_template_permission,
+        (
+            'Test User With Permissions (you) '
+            'Can’t Send messages Can Manage templates Can’t Manage service Can’t Access API keys'
         ),
     ),
 ])
@@ -53,6 +61,7 @@ def test_should_show_overview_page(
         {'user_id': 0},
         [
             ('send_messages', True),
+            ('manage_templates', True),
             ('manage_service', True),
             ('manage_api_keys', True),
         ]
@@ -62,6 +71,7 @@ def test_should_show_overview_page(
         {},
         [
             ('send_messages', False),
+            ('manage_templates', False),
             ('manage_service', False),
             ('manage_api_keys', False),
         ]
@@ -76,7 +86,7 @@ def test_should_show_page_for_one_user(
     page = client_request.get(endpoint, service_id=SERVICE_ONE_ID, **extra_args)
     checkboxes = page.select('input[type=checkbox]')
 
-    assert len(checkboxes) == 3
+    assert len(checkboxes) == 4
 
     for index, expected in enumerate(expected_checkboxes):
         expected_input_name, expected_checked = expected
@@ -96,6 +106,7 @@ def test_edit_user_permissions(
         'main.edit_user_permissions', service_id=service['id'], user_id=active_user_with_permissions.id
     ), data={'email_address': active_user_with_permissions.email_address,
              'send_messages': 'y',
+             'manage_templates': 'y',
              'manage_service': 'y',
              'manage_api_keys': 'y'})
 
@@ -192,6 +203,7 @@ def test_invite_user(
         url_for('main.invite_user', service_id=service['id']),
         data={'email_address': email_address,
               'send_messages': 'y',
+              'manage_templates': 'y',
               'manage_service': 'y',
               'manage_api_keys': 'y'},
         follow_redirects=True
@@ -243,7 +255,7 @@ def test_manage_users_shows_invited_user(
     assert page.h1.string.strip() == 'Team members'
     assert normalize_spaces(page.select('.user-list')[1].text) == (
         'invited_user@test.gov.uk '
-        'Can’t Send messages Can’t Manage service Can Access API keys '
+        'Can’t Send messages Can’t Edit templates Can’t Manage service Can Access API keys '
         'Cancel invitation'
     )
 

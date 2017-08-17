@@ -682,6 +682,29 @@ def active_user_view_permissions(fake_uuid):
     return user
 
 
+@pytest.fixture
+def active_user_manage_template_permission(fake_uuid):
+    from app.notify_client.user_api_client import User
+
+    user_data = {
+        'id': fake_uuid,
+        'name': 'Test User With Permissions',
+        'password': 'somepassword',
+        'password_changed_at': str(datetime.utcnow()),
+        'email_address': 'test@user.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {SERVICE_ONE_ID: [
+            'manage_templates',
+            'view_activity',
+        ]},
+        'platform_admin': False
+    }
+    user = User(user_data)
+    return user
+
+
 @pytest.fixture(scope='function')
 def api_user_locked(fake_uuid):
     from app.notify_client.user_api_client import User

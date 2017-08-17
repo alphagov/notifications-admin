@@ -52,7 +52,11 @@
               'Send messages'
             ) }}
             {{ tick_cross(
-              user.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings']),
+              user.has_permissions(permissions=['manage_templates']),
+              'Manage templates'
+            ) }}
+            {{ tick_cross(
+              user.has_permissions(permissions=['manage_users', 'manage_settings']),
               'Manage service'
             ) }}
             {{ tick_cross(
@@ -89,7 +93,11 @@
                 'Send messages'
               ) }}
               {{ tick_cross(
-                user.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings']),
+                user.has_permissions(permissions=['manage_templates']),
+                'Edit templates'
+              ) }}
+              {{ tick_cross(
+                user.has_permissions(permissions=['manage_users', 'manage_settings']),
                 'Manage service'
               ) }}
               {{ tick_cross(
