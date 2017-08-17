@@ -20,6 +20,6 @@ class BillingAPIClient(NotifyAdminAPIClient):
 
     def get_service_usage(self, service_id, year=None):
         return self.get(
-            '/service/{0}/billing/yearly-usage'.format(service_id),
+            '/service/{0}/billing/yearly-usage-summary'.format(service_id),
             params=dict(year=year)
         )
