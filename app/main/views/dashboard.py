@@ -15,6 +15,7 @@ from notifications_utils.recipients import format_phone_number_human_readable
 from app.main import main
 from app import (
     current_service,
+    billing_api_client,
     job_api_client,
     service_api_client,
     template_statistics_client
@@ -105,10 +106,11 @@ def template_history(service_id):
 @user_has_permissions('manage_settings', admin_override=True)
 def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
+
     return render_template(
         'views/usage.html',
         months=list(get_free_paid_breakdown_for_billable_units(
-            year, service_api_client.get_billable_units(service_id, year)
+            year, billing_api_client.get_billable_units(service_id, year)
         )),
         selected_year=year,
         years=get_tuples_of_financial_years(
@@ -116,7 +118,7 @@ def usage(service_id):
             start=current_financial_year - 1,
             end=current_financial_year + 1,
         ),
-        **calculate_usage(service_api_client.get_service_usage(service_id, year))
+        **calculate_usage(billing_api_client.get_service_usage(service_id, year))
     )
 
 
