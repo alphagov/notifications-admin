@@ -8,26 +8,80 @@ from tests.conftest import service_one as create_sample_service
 from tests.conftest import (
     normalize_spaces,
     SERVICE_ONE_ID,
+    active_user_with_permissions,
+    active_user_view_permissions,
 )
 
 
+@pytest.mark.parametrize('user, expected_text', [
+    (
+        active_user_with_permissions,
+        (
+            'Test User (you) '
+            'Can Send messages Can Manage service Can Access API keys'
+        ),
+    ),
+    (
+        active_user_view_permissions,
+        (
+            'Test User With Permissions (you) '
+            'Can’t Send messages Can’t Manage service Can’t Access API keys'
+        ),
+    ),
+])
 def test_should_show_overview_page(
     client_request,
-    active_user_with_permissions,
     mocker,
     mock_get_invites_for_service,
+    fake_uuid,
+    user,
+    expected_text,
 ):
-    mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
+    mocker.patch('app.user_api_client.get_users_for_service', return_value=[user(fake_uuid)])
     page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one('h1').text) == 'Team members'
+    assert normalize_spaces(page.select_one('.user-list-item').text) == (
+        expected_text
+    )
     app.user_api_client.get_users_for_service.assert_called_once_with(service_id=SERVICE_ONE_ID)
 
 
+@pytest.mark.parametrize('endpoint, extra_args, expected_checkboxes', [
+    (
+        'main.edit_user_permissions',
+        {'user_id': 0},
+        [
+            ('send_messages', True),
+            ('manage_service', True),
+            ('manage_api_keys', True),
+        ]
+    ),
+    (
+        'main.invite_user',
+        {},
+        [
+            ('send_messages', False),
+            ('manage_service', False),
+            ('manage_api_keys', False),
+        ]
+    ),
+])
 def test_should_show_page_for_one_user(
     client_request,
+    endpoint,
+    extra_args,
+    expected_checkboxes,
 ):
-    page = client_request.get('main.edit_user_permissions', service_id=SERVICE_ONE_ID, user_id=0)
+    page = client_request.get(endpoint, service_id=SERVICE_ONE_ID, **extra_args)
+    checkboxes = page.select('input[type=checkbox]')
+
+    assert len(checkboxes) == 3
+
+    for index, expected in enumerate(expected_checkboxes):
+        expected_input_name, expected_checked = expected
+        assert checkboxes[index]['name'] == expected_input_name
+        assert checkboxes[index].has_attr('checked') == expected_checked
 
 
 def test_edit_user_permissions(
@@ -187,9 +241,11 @@ def test_manage_users_shows_invited_user(
     page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
 
     assert page.h1.string.strip() == 'Team members'
-    invited_users_list = page.find_all('div', {'class': 'user-list'})[1]
-    assert invited_users_list.find_all('h3')[0].text.strip() == 'invited_user@test.gov.uk'
-    assert invited_users_list.find_all('a')[0].text.strip() == 'Cancel invitation'
+    assert normalize_spaces(page.select('.user-list')[1].text) == (
+        'invited_user@test.gov.uk '
+        'Can’t Send messages Can’t Manage service Can Access API keys '
+        'Cancel invitation'
+    )
 
 
 def test_manage_users_does_not_show_accepted_invite(
