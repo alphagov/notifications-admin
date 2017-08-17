@@ -54,14 +54,7 @@ def invite_user(service_id):
 
     if form.validate_on_submit():
         email_address = form.email_address.data
-        # view_activity is a default role to be added to all users.
-        # All users will have at minimum view_activity to allow users to see notifications,
-        # templates, team members but no update privileges
-        selected_permissions = [permissions for role, permissions in roles.items() if request.form.get(role) == 'y']
-        selected_permissions = list(chain.from_iterable(selected_permissions))
-        selected_permissions.append('view_activity')
-        selected_permissions.sort()
-        permissions = ','.join(selected_permissions)
+        permissions = ','.join(sorted(get_permissions_from_form(form)))
         invited_user = invite_api_client.create_invite(
             current_user.id,
             service_id,
@@ -94,9 +87,7 @@ def edit_user_permissions(service_id, user_id):
     if form.validate_on_submit():
         user_api_client.set_user_permissions(
             user_id, service_id,
-            permissions=set(chain.from_iterable(
-                permissions for role, permissions in roles.items() if form[role].data
-            )) | {'view_activity'}
+            permissions=set(get_permissions_from_form(form)),
         )
         return redirect(url_for('.manage_users', service_id=service_id))
 
@@ -150,3 +141,17 @@ def cancel_invited_user(service_id, invited_user_id):
     invite_api_client.cancel_invited_user(service_id=service_id, invited_user_id=invited_user_id)
 
     return redirect(url_for('main.manage_users', service_id=service_id))
+
+
+def get_permissions_from_form(form):
+    # view_activity is a default role to be added to all users.
+    # All users will have at minimum view_activity to allow users to see notifications,
+    # templates, team members but no update privileges
+    selected_permissions = [
+        permissions
+        for role, permissions in roles.items()
+        if form[role].data is True
+    ]
+    selected_permissions = list(chain.from_iterable(selected_permissions))
+    selected_permissions.append('view_activity')
+    return selected_permissions
