@@ -13,7 +13,6 @@ from app.notify_client.models import (
     User,
     InvitedUser
 )
-
 from . import (
     service_json,
     TestClient,
@@ -220,8 +219,8 @@ def mock_update_service(mocker):
 @pytest.fixture(scope='function')
 def mock_update_service_raise_httperror_duplicate_name(mocker):
     def _update(
-            service_id,
-            **kwargs
+        service_id,
+        **kwargs
     ):
         json_mock = Mock(return_value={'message': {'name': ["Duplicate service name '{}'".format(kwargs.get('name'))]}})
         resp_mock = Mock(status_code=400, json=json_mock)
@@ -519,6 +518,7 @@ def mock_get_service_templates(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_templates_when_no_templates_exist(mocker):
+
     def _create(service_id):
         return {'data': []}
 
@@ -529,6 +529,7 @@ def mock_get_service_templates_when_no_templates_exist(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_templates_with_only_one_template(mocker):
+
     def _get(service_id):
         return {'data': [
             template_json(
@@ -1118,24 +1119,24 @@ def mock_get_jobs(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_get_notifications(
-        mocker,
-        api_user_active,
-        template_content=None,
-        personalisation=None,
-        redact_personalisation=False,
+    mocker,
+    api_user_active,
+    template_content=None,
+    personalisation=None,
+    redact_personalisation=False,
 ):
     def _get_notifications(
-            service_id,
-            job_id=None,
-            page=1,
-            page_size=50,
-            template_type=None,
-            status=None,
-            limit_days=None,
-            rows=5,
-            include_jobs=None,
-            include_from_test_key=None,
-            to=None,
+        service_id,
+        job_id=None,
+        page=1,
+        page_size=50,
+        template_type=None,
+        status=None,
+        limit_days=None,
+        rows=5,
+        include_jobs=None,
+        include_from_test_key=None,
+        to=None,
     ):
         job = None
         if job_id is not None:
@@ -1213,8 +1214,8 @@ def mock_get_notifications_with_no_notifications(mocker):
 @pytest.fixture(scope='function')
 def mock_get_inbound_sms(mocker):
     def _get_inbound_sms(
-            service_id,
-            user_number=None,
+        service_id,
+        user_number=None,
     ):
         return [{
             'user_number': '0790090000' + str(i),
@@ -1232,7 +1233,7 @@ def mock_get_inbound_sms(mocker):
 @pytest.fixture(scope='function')
 def mock_get_inbound_sms_with_no_messages(mocker):
     def _get_inbound_sms(
-            service_id,
+        service_id,
     ):
         return []
 
@@ -1245,7 +1246,7 @@ def mock_get_inbound_sms_with_no_messages(mocker):
 @pytest.fixture(scope='function')
 def mock_get_inbound_sms_summary(mocker):
     def _get_inbound_sms_summary(
-            service_id,
+        service_id,
     ):
         return {
             'count': 99,
@@ -1261,7 +1262,7 @@ def mock_get_inbound_sms_summary(mocker):
 @pytest.fixture(scope='function')
 def mock_get_inbound_sms_summary_with_no_messages(mocker):
     def _get_inbound_sms_summary(
-            service_id,
+        service_id,
     ):
         return {
             'count': 0,
@@ -1449,7 +1450,6 @@ def mock_get_monthly_template_statistics(mocker, service_one, fake_uuid):
                 }
             }
         }
-
     return mocker.patch(
         'app.template_statistics_client.get_monthly_template_statistics_for_service',
         side_effect=_stats
@@ -1471,7 +1471,6 @@ def mock_get_monthly_notification_stats(mocker, service_one, fake_uuid):
                 },
             }
         }}
-
     return mocker.patch(
         'app.service_api_client.get_monthly_notification_stats',
         side_effect=_stats
@@ -1723,11 +1722,11 @@ def mock_reset_failed_login_count(mocker):
 
 @pytest.fixture
 def mock_get_notification(
-        mocker,
-        fake_uuid,
-        notification_status='delivered',
-        redact_personalisation=False,
-        template_type=None,
+    mocker,
+    fake_uuid,
+    notification_status='delivered',
+    redact_personalisation=False,
+    template_type=None,
 ):
     def _get_notification(
             service_id,
@@ -1766,7 +1765,7 @@ def mock_get_notification(
 @pytest.fixture
 def mock_send_notification(mocker, fake_uuid):
     def _send_notification(
-            service_id, *, template_id, recipient, personalisation
+        service_id, *, template_id, recipient, personalisation
     ):
         return {'id': fake_uuid}
 
@@ -1784,11 +1783,11 @@ def client(app_):
 
 @pytest.fixture(scope='function')
 def logged_in_client(
-        client,
-        active_user_with_permissions,
-        mocker,
-        service_one,
-        mock_login
+    client,
+    active_user_with_permissions,
+    mocker,
+    service_one,
+    mock_login
 ):
     client.login(active_user_with_permissions, mocker, service_one)
     yield client
@@ -1796,11 +1795,11 @@ def logged_in_client(
 
 @pytest.fixture(scope='function')
 def logged_in_platform_admin_client(
-        client,
-        platform_admin_user,
-        mocker,
-        service_one,
-        mock_login,
+    client,
+    platform_admin_user,
+    mocker,
+    service_one,
+    mock_login,
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user, mocker, service_one)
