@@ -228,12 +228,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_service_history(self, service_id):
         return self.get('/service/{0}/history'.format(service_id))
 
-    def get_service_usage(self, service_id, year=None):
-        return self.get(
-            '/service/{0}/yearly-usage'.format(service_id),
-            params=dict(year=year)
-        )
-
     def get_yearly_sms_unit_count_and_cost(self, service_id, year=None):
         return self.get(
             '/service/{0}/yearly-sms-billable-units'.format(service_id),
@@ -248,12 +242,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     def update_whitelist(self, service_id, data):
         return self.put(url='/service/{}/whitelist'.format(service_id), data=data)
-
-    def get_billable_units(self, service_id, year):
-        return self.get(
-            '/service/{0}/monthly-usage'.format(service_id),
-            params=dict(year=year)
-        )
 
     def get_inbound_sms(self, service_id, user_number=''):
         return self.get(

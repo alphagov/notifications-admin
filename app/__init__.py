@@ -55,6 +55,7 @@ from app.notify_client.organisations_client import OrganisationsClient
 from app.notify_client.models import AnonymousUser
 from app.notify_client.letter_jobs_client import LetterJobsClient
 from app.notify_client.inbound_number_client import InboundNumberClient
+from app.notify_client.billing_api_client import BillingAPIClient
 from app.utils import get_cdn_domain
 
 from app.utils import gmt_timezones
@@ -77,6 +78,7 @@ asset_fingerprinter = AssetFingerprinter()
 statsd_client = StatsdClient()
 letter_jobs_client = LetterJobsClient()
 inbound_number_client = InboundNumberClient()
+billing_api_client = BillingAPIClient()
 
 # The current service attached to the request stack.
 current_service = LocalProxy(partial(_lookup_req_object, 'service'))
@@ -110,6 +112,7 @@ def create_app():
     organisations_client.init_app(application)
     letter_jobs_client.init_app(application)
     inbound_number_client.init_app(application)
+    billing_api_client.init_app(application)
 
     login_manager.init_app(application)
     login_manager.login_view = 'main.sign_in'
