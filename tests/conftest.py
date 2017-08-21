@@ -13,6 +13,7 @@ from app.notify_client.models import (
     User,
     InvitedUser
 )
+
 from . import (
     service_json,
     TestClient,
@@ -1729,8 +1730,8 @@ def mock_get_notification(
     template_type=None,
 ):
     def _get_notification(
-            service_id,
-            notification_id,
+        service_id,
+        notification_id,
     ):
         noti = notification_json(
             service_id,
@@ -1830,11 +1831,11 @@ def client_request(logged_in_client):
 
         @staticmethod
         def get(
-                endpoint,
-                _expected_status=200,
-                _follow_redirects=False,
-                _test_page_title=True,
-                **endpoint_kwargs
+            endpoint,
+            _expected_status=200,
+            _follow_redirects=False,
+            _test_page_title=True,
+            **endpoint_kwargs
         ):
             resp = logged_in_client.get(
                 url_for(endpoint, **(endpoint_kwargs or {})),
