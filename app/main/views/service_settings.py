@@ -33,7 +33,7 @@ from app.main.forms import (
     ServiceBrandingOrg,
     LetterBranding,
     ServiceInboundApiForm)
-from app import user_api_client, current_service, organisations_client
+from app import user_api_client, current_service, organisations_client, inbound_number_client
 
 
 dummy_bearer_token = 'bearer_token_set'
@@ -65,6 +65,12 @@ def service_settings(service_id):
     else:
         inbound_api_url = ''
 
+    inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)
+    if inbound_number['data'] == {}:
+        disp_inbound_number = ''
+    else:
+        disp_inbound_number = inbound_number['data']['number']
+
     return render_template(
         'views/service-settings.html',
         organisation=organisation,
@@ -73,7 +79,8 @@ def service_settings(service_id):
         ),
         can_receive_inbound=('inbound_sms' in current_service['permissions']),
         inbound_api_url=inbound_api_url,
-        letter_contact_block=Field(current_service['letter_contact_block'], html='escape')
+        letter_contact_block=Field(current_service['letter_contact_block'], html='escape'),
+        inbound_number=disp_inbound_number
     )
 
 
@@ -223,7 +230,6 @@ def switch_service_permissions(service_id, permission, sms_sender=None):
     data = {'permissions': permissions}
     if sms_sender:
         data['sms_sender'] = sms_sender
-
     service_api_client.update_service_with_properties(service_id, data)
 
 
@@ -329,22 +335,39 @@ def service_set_reply_to_email(service_id):
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_sms_sender(service_id):
     form = ServiceSmsSender()
-
     if form.validate_on_submit():
-        set_inbound_sms = request.args.get('set_inbound_sms', False)
-        if set_inbound_sms == 'True':
-            switch_service_permissions(current_service['id'], 'inbound_sms', form.sms_sender.data)
-        else:
-            service_api_client.update_service(
-                current_service['id'],
-                sms_sender=form.sms_sender.data or None
+        if 'inbound_sms' in current_service['permissions']:
+            abort(403)
+        service_api_client.update_service(
+            current_service['id'],
+            sms_sender=form.sms_sender.data or None
             )
         return redirect(url_for('.service_settings', service_id=service_id))
+
     if request.method == 'GET':
         form.sms_sender.data = current_service.get('sms_sender')
+
     return render_template(
         'views/service-settings/set-sms-sender.html',
         form=form)
+
+
+@main.route("/services/<service_id>/service-settings/set-inbound-number", methods=['GET'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_set_inbound_number(service_id):
+    switch_service_permissions(current_service['id'], 'inbound_sms')
+    set_inbound_sms = request.args.get('set_inbound_sms', False)
+    try:
+        if set_inbound_sms == 'True':
+            inbound_number_client.activate_inbound_sms_service(service_id)
+            return redirect(url_for('.service_settings', service_id=service_id))
+        else:
+            inbound_number_client.deactivate_inbound_sms_permission(service_id=service_id)
+            return redirect(url_for('.service_set_sms_sender', service_id=service_id))
+    except HTTPError as e:
+        switch_service_permissions(current_service['id'], 'inbound_sms')
+        raise e
 
 
 @main.route("/services/<service_id>/service-settings/set-sms", methods=['GET'])

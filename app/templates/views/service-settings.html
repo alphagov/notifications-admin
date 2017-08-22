@@ -53,9 +53,14 @@
         {% if 'sms' in current_service.permissions %}
 
           {% call row() %}
+
             {{ text_field('Text message sender') }}
-            {{ text_field(current_service.sms_sender) }}
-            {% if current_user.has_permissions([], admin_override=True) or not can_receive_inbound %}
+            {% if can_receive_inbound %}
+               {{ text_field(inbound_number) }}
+            {% else %}
+               {{ text_field(current_service.sms_sender) }}
+            {% endif %}
+            {% if (current_user.has_permissions([], admin_override=True) or not can_receive_inbound)  and not can_receive_inbound %}
               {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id, set_inbound_sms=False)) }}
             {% else %}
                  {{ text_field('') }}
@@ -198,9 +203,15 @@
             </a>
           </li>
           <li class="bottom-gutter">
-            <a href="{{ url_for('.service_set_sms_sender', service_id=current_service.id, set_inbound_sms=True) }}" class="button">
-              {{ 'Stop inbound sms' if can_receive_inbound else 'Allow inbound sms' }}
+          {% if can_receive_inbound %}
+            <a href="{{ url_for('.service_set_inbound_number', service_id=current_service.id, set_inbound_sms=False) }}" class="button">
+              Stop inbound sms
             </a>
+          {% else %}
+            <a href="{{ url_for('.service_set_inbound_number', service_id=current_service.id, set_inbound_sms=True) }}" class="button">
+              Allow inbound sms
+            </a>
+          {% endif %}
           </li>
         {% endif %}
         {% if current_service.active %}

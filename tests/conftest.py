@@ -14,7 +14,6 @@ from app.notify_client.models import (
     InvitedUser
 )
 
-
 from . import (
     service_json,
     TestClient,
@@ -297,7 +296,6 @@ def mock_get_service_template(mocker):
 @pytest.fixture(scope='function')
 def mock_get_service_template_with_priority(mocker):
     def _get(service_id, template_id, version=None):
-
         template = template_json(
             service_id, template_id, "Two week reminder", "sms", "Template <em>content</em> with & entity",
             process_type='priority')
@@ -1279,6 +1277,13 @@ def mock_get_inbound_sms_summary_with_no_messages(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_inbound_number_for_service(mocker):
+    return mocker.patch(
+        'app.inbound_number_client.get_inbound_sms_number_for_service',
+        return_value={'data': {'number': '0781239871'}})
+
+
+@pytest.fixture(scope='function')
 def mock_has_permissions(mocker):
     def _has_permission(permissions=None, any_=False, admin_override=False):
         return True
@@ -1331,6 +1336,7 @@ def mock_s3_download(mocker, content=None):
 
     def _download(service_id, upload_id):
         return content
+
     return mocker.patch('app.main.views.send.s3download', side_effect=_download)
 
 

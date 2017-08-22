@@ -1,0 +1,68 @@
+{% extends "views/platform-admin/_base_template.html" %}
+
+{% block service_page_title %}
+Inbound Numbers
+{% endblock %}
+
+{% set table_headings = {
+  'field_headings': [
+    'Number', 'Status', 'Service', 'Created on'
+  ],
+  'field_headings_visible': True,
+  'caption_visible': True
+} %}
+
+
+.inbound {
+  font-style:normal;
+  font-weight:normal;
+}
+
+{% block platform_admin_content %}
+
+  <div class="grid-row bottom-gutter">
+    <div class="column-two-thirds">
+      <h1 class="heading-large">
+        Inbound SMS
+      </h1>
+    </div>
+  </div>
+
+
+
+  <table class="inbound">
+          <col style="width:8%">
+          <col style="width:20%">
+          <col style="width:17%">
+          <col style="width:30%">
+          <thread>
+              <tr>
+                <th>{{table_headings.field_headings[0]}}</th>
+                <th>{{table_headings.field_headings[1]}}</th>
+                <th>{{table_headings.field_headings[2]}}</th>
+              </tr>
+          </thread>
+          <tbody>
+
+          {% for value in inbound_num_list.data: %}
+          <tr>
+              <th style="font-weight:normal;">{{value.number}}</th>
+              <th style="font-weight:normal;">
+
+              {% if value.active %}
+                Active
+              {% elif not value.service.name  %}
+                  Not used
+              {% else %}
+                Inactive
+              {% endif %}
+              </th>
+              <th style="font-weight:normal;">
+                  <a href="{{ url_for('main.service_dashboard', service_id=value.service.id) }}" class="browse-list-link">{{ value.service.name }}</a>
+              </th>
+          </tr>
+          {% endfor %}
+          </tbody>
+  </table>
+
+{% endblock %}

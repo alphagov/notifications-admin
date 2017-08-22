@@ -30,5 +30,6 @@ from app.main.views import (
     letter_jobs,
     organisations,
     conversation,
-    notifications
+    notifications,
+    inbound_number
 )
