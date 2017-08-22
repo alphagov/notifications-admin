@@ -11,19 +11,29 @@
 
     <h1 class="heading-large">Settings</h1>
 
-    <div class="bottom-gutter-3-2 body-copy-table">
+    <div class="bottom-gutter-3-2 dashboard-table body-copy-table">
 
       {% call mapping_table(
-        caption='Settings',
+        caption='General',
         field_headings=['Label', 'Value', 'Action'],
         field_headings_visible=False,
         caption_visible=False
       ) %}
+
         {% call row() %}
           {{ text_field('Service name') }}
           {{ text_field(current_service.name) }}
           {{ edit_field('Change', url_for('.service_name_change', service_id=current_service.id)) }}
         {% endcall %}
+
+      {% endcall %}
+
+      {% call mapping_table(
+        caption='Email',
+        field_headings=['Label', 'Value', 'Action'],
+        field_headings_visible=False,
+        caption_visible=True
+      ) %}
 
         {% call row() %}
           {{ text_field('Send emails') }}
@@ -43,6 +53,15 @@
           {% endcall %}
 
         {% endif %}
+
+      {% endcall %}
+
+      {% call mapping_table(
+        caption='Text messages',
+        field_headings=['Label', 'Value', 'Action'],
+        field_headings_visible=False,
+        caption_visible=True
+      ) %}
 
         {% call row() %}
           {{ text_field('Send text messages') }}
@@ -93,8 +112,17 @@
 
         {% endif %}
 
+      {% endcall %}
+
+      {% call mapping_table(
+        caption='Letters',
+        field_headings=['Label', 'Value', 'Action'],
+        field_headings_visible=False,
+        caption_visible=True
+      ) %}
+
         {% call row() %}
-          {{ text_field('Letters') }}
+          {{ text_field('Send letters') }}
           {{ boolean_field('letter' in current_service.permissions) }}
           {{ edit_field('Change', url_for('.service_set_letters', service_id=current_service.id)) }}
         {% endcall %}

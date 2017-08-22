@@ -143,6 +143,25 @@
   @include bold-16;
 }
 
+
+.table-field-headings {
+
+  th {
+    padding: 1px; /* needs some height for the grey border to show */
+  }
+
+}
+
+.table-field-headings-visible {
+
+  height: auto;
+
+  th {
+    padding: .75em 1.25em .5625em 0;
+  }
+
+}
+
 .table-field-headings,
 .table-field-headings-visible {
 
