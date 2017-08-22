@@ -12,7 +12,7 @@
 } %}
 
 {% block service_page_title %}
-Manage users
+  Team members
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -37,7 +37,7 @@ Manage users
     {% for user in users %}
       <div class="user-list-item">
         <h3>
-          {{ user.name }}&ensp;<span class="hint">
+          <span class="heading-small">{{ user.name }}</span>&ensp;<span class="hint">
             {%- if user.email_address == current_user.email_address -%}
               (you)
             {% else %}
@@ -52,7 +52,11 @@ Manage users
               'Send messages'
             ) }}
             {{ tick_cross(
-              user.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings']),
+              user.has_permissions(permissions=['manage_templates']),
+              'Manage templates'
+            ) }}
+            {{ tick_cross(
+              user.has_permissions(permissions=['manage_users', 'manage_settings']),
               'Manage service'
             ) }}
             {{ tick_cross(
@@ -80,7 +84,7 @@ Manage users
       {% for user in invited_users %}
         <div class="user-list-item">
           <h3>
-            {{ user.email_address }}
+            <span style="font-weight: bold">{{ user.email_address }}</span>
           </h3>
           <ul class="tick-cross-list">
             <div class="tick-cross-list-permissions">
@@ -89,7 +93,11 @@ Manage users
                 'Send messages'
               ) }}
               {{ tick_cross(
-                user.has_permissions(permissions=['manage_users', 'manage_templates', 'manage_settings']),
+                user.has_permissions(permissions=['manage_templates']),
+                'Edit templates'
+              ) }}
+              {{ tick_cross(
+                user.has_permissions(permissions=['manage_users', 'manage_settings']),
                 'Manage service'
               ) }}
               {{ tick_cross(
