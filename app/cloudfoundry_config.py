@@ -16,7 +16,7 @@ def extract_cloudfoundry_config():
 def set_config_env_vars(vcap_services):
     vcap_application = json.loads(os.environ.get('VCAP_APPLICATION'))
     os.environ['NOTIFY_ENVIRONMENT'] = vcap_application['space_name']
-    os.environ['LOGGING_STDOUT_JSON'] = '1'
+    os.environ['NOTIFY_LOG_PATH'] = '/home/vcap/logs/app.log'
 
     for s in vcap_services['user-provided']:
         if s['name'] == 'notify-config':

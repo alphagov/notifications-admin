@@ -28,7 +28,7 @@ class Config(object):
 
     # Logging
     DEBUG = False
-    LOGGING_STDOUT_JSON = os.getenv('LOGGING_STDOUT_JSON') == '1'
+    NOTIFY_LOG_PATH = os.getenv('NOTIFY_LOG_PATH')
 
     DESKPRO_DEPT_ID = 5
     DESKPRO_ASSIGNED_AGENT_TEAM_ID = 5
@@ -43,7 +43,6 @@ class Config(object):
     MAX_FAILED_LOGIN_COUNT = 10
     NOTIFY_APP_NAME = 'admin'
     NOTIFY_LOG_LEVEL = 'DEBUG'
-    NOTIFY_LOG_PATH = '/var/log/notify/application.log'
     PERMANENT_SESSION_LIFETIME = 20 * 60 * 60  # 20 hours
     SEND_FILE_MAX_AGE_DEFAULT = 365 * 24 * 60 * 60  # 1 year
     SESSION_COOKIE_HTTPONLY = True
@@ -93,6 +92,7 @@ class Config(object):
 
 
 class Development(Config):
+    NOTIFY_LOG_PATH = 'application.log'
     DEBUG = True
     SESSION_COOKIE_SECURE = False
     SESSION_PROTECTION = None
