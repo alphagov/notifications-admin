@@ -140,7 +140,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     for response in [initial_upload, reupload]:
         assert response.status_code == 200
         content = response.get_data(as_text=True)
-        assert 'There is a problem with your data' in content
+        assert 'There is a problem with invalid.csv' in content
         assert '+447700900986' in content
         assert 'Missing' in content
         assert 'Re-upload your file' in content
@@ -193,7 +193,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
             +447700900986, example
         """,
         (
-            'There is a problem with your data '
+            'There is a problem with invalid.csv '
             'You need to enter missing data in 1 row '
             'Skip to file contents'
         )
@@ -206,7 +206,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
             +447700900986, example
         """,
         (
-            'There is a problem with your data '
+            'There is a problem with invalid.csv '
             'You need to enter missing data in 1 row '
             'Skip to file contents'
         )
@@ -1283,7 +1283,7 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
         follow_redirects=True
     )
     assert response.status_code == 200
-    assert 'There is a problem with your data' in response.get_data(as_text=True)
+    assert 'There is a problem with invalid.csv' in response.get_data(as_text=True)
 
 
 @pytest.mark.parametrize('route, response_code', [
@@ -1637,7 +1637,11 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
     )
 
     with logged_in_client.session_transaction() as session:
-        session['upload_data'] = {'template_id': fake_uuid}
+        session['upload_data'] = {
+            'template_id': fake_uuid,
+            'original_file_name': 'unicode.csv',
+        }
+
     response = logged_in_client.get(url_for(
         'main.check_messages',
         service_id=fake_uuid,
@@ -1650,7 +1654,7 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
     assert ' '.join(
         page.find('div', class_='banner-dangerous').text.split()
     ) == (
-            'There is a problem with your data '
+            'There is a problem with unicode.csv '
             'You need to fix 1 address '
             'Skip to file contents'
         )
