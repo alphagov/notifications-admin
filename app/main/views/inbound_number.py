@@ -19,4 +19,4 @@ from flask import jsonify
 def inbound_sms_admin():
     data = inbound_number_client.get_all_inbound_sms_number_service()
 
-    return render_template('views/inbound_sms_admin.html', inbound_num_list=data)
+    return render_template('views/inbound-sms-admin.html', inbound_num_list=data)
