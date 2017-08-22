@@ -14,6 +14,9 @@ from tests.conftest import (
     mock_get_service_template,
     normalize_spaces,
     SERVICE_ONE_ID,
+    active_user_with_permissions,
+    platform_admin_user,
+    mock_get_user,
 )
 from tests import validate_route_permission, template_json, single_notification_json
 
@@ -1163,3 +1166,48 @@ def test_should_show_hint_once_template_redacted(
     )
 
     assert page.select('.hint')[0].text == 'Personalisation is hidden after sending'
+
+
+@pytest.mark.parametrize('test_user, template_mock, expected_response_code', [
+    (
+        active_user_with_permissions,
+        mock_get_service_letter_template,
+        403
+    ),
+    (
+        platform_admin_user,
+        mock_get_service_template,
+        404
+    ),
+    (
+        platform_admin_user,
+        mock_get_service_email_template,
+        404
+    ),
+    (
+        platform_admin_user,
+        mock_get_service_letter_template,
+        200
+    ),
+])
+def test_should_show_letter_template_as_dvla_markup(
+    client,
+    mocker,
+    service_one,
+    fake_uuid,
+    mock_get_service,
+    test_user,
+    template_mock,
+    expected_response_code,
+):
+
+    client.login(test_user(fake_uuid), mocker, service_one)
+    template_mock(mocker)
+
+    response = client.get(url_for(
+        '.view_template_as_dvla_markup',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    ))
+
+    assert response.status_code == expected_response_code
