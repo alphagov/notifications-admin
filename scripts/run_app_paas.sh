@@ -81,7 +81,7 @@ trap "on_exit" EXIT
 configure_aws_logs
 
 # The application has to start first!
-start_appplication "$@"
+start_application "$@"
 
 start_aws_logs_agent
 
