@@ -23,7 +23,6 @@ def test_sign_out_user(
     mock_has_permissions,
     mock_get_template_statistics,
     mock_get_detailed_service,
-    mock_get_yearly_sms_unit_count_and_cost,
     mock_get_usage,
     mock_get_inbound_sms_summary,
 ):

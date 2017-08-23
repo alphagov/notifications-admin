@@ -48,8 +48,7 @@ def test_get_started(
     mock_get_jobs,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -68,8 +67,7 @@ def test_get_started_is_hidden_once_templates_exist(
     mock_get_jobs,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -88,8 +86,7 @@ def test_inbound_messages_not_visible_to_service_without_permissions(
     mock_get_detailed_service,
     mock_get_template_statistics,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
 
     service_one['permissions'] = []
@@ -116,8 +113,7 @@ def test_inbound_messages_shows_count_of_messages(
     mock_get_template_statistics,
     mock_get_usage,
     inbound_summary_mock,
-    expected_text,
-    mock_get_yearly_sms_unit_count_and_cost
+    expected_text
 ):
 
     service_one['permissions'] = ['inbound_sms']
@@ -255,8 +251,7 @@ def test_should_show_recent_templates_on_dashboard(
     mock_get_jobs,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
                                        return_value=copy.deepcopy(stub_template_stats))
@@ -341,8 +336,7 @@ def test_should_show_upcoming_jobs_on_dashboard(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
@@ -373,8 +367,7 @@ def test_should_show_recent_jobs_on_dashboard(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
@@ -493,8 +486,7 @@ def test_menu_send_messages(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -525,8 +517,7 @@ def test_menu_manage_service(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -556,8 +547,7 @@ def test_menu_manage_api_keys(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -587,8 +577,7 @@ def test_menu_all_services_for_platform_admin_user(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -618,8 +607,7 @@ def test_route_for_service_permissions(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     with app_.test_request_context():
         validate_route_permission(
@@ -656,8 +644,7 @@ def test_service_dashboard_updates_gets_dashboard_totals(
     mock_get_detailed_service,
     mock_get_jobs,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     mocker.patch('app.main.views.dashboard.get_dashboard_totals', return_value={
         'email': {'requested': 123, 'delivered': 0, 'failed': 0},
@@ -882,8 +869,7 @@ def test_should_show_all_jobs_with_valid_statuses(
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
     mock_get_usage,
-    mock_get_inbound_sms_summary,
-    mock_get_yearly_sms_unit_count_and_cost
+    mock_get_inbound_sms_summary
 ):
     logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
