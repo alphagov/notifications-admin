@@ -1298,25 +1298,25 @@ def test_cant_resume_active_service(
 
 @pytest.mark.parametrize('endpoint, expected_p', [
     (
-            'main.service_set_international_sms',
-            (
-                    'Sending text messages to international phone numbers is '
-                    'an invitation‑only feature.'
-            )
+        'main.service_set_international_sms',
+        (
+            'Sending text messages to international phone numbers is '
+            'an invitation‑only feature.'
+        )
     ),
     (
-            'main.service_set_letters',
-            (
-                    'Using GOV.UK Notify to send letters is an invitation‑only '
-                    'feature.'
-            )
+        'main.service_set_letters',
+        (
+            'Using GOV.UK Notify to send letters is an invitation‑only '
+            'feature.'
+        )
     ),
 ])
 def test_invitation_pages(
-        logged_in_client,
-        service_one,
-        endpoint,
-        expected_p,
+    logged_in_client,
+    service_one,
+    endpoint,
+    expected_p,
 ):
     response = logged_in_client.get(url_for(endpoint, service_id=service_one['id']))
 
