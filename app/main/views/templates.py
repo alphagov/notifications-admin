@@ -162,7 +162,7 @@ def view_template_as_dvla_markup(service_id, template_id):
         str(LetterDVLATemplate(
             template,
             notification_reference=1,
-        )).replace('<cr>', '<cr>\n'),
+        )),
         mimetype='text/plain',
     )
 
