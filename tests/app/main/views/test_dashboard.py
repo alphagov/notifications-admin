@@ -176,6 +176,7 @@ def test_empty_inbox(
     mock_get_template_statistics,
     mock_get_usage,
     mock_get_inbound_sms_with_no_messages,
+    mock_get_inbound_number_for_service,
 ):
 
     service_one['permissions'] = ['inbound_sms']
@@ -185,7 +186,7 @@ def test_empty_inbox(
 
     assert response.status_code == 200
     assert normalize_spaces(page.select('tbody tr')) == (
-        'When users text your service’s phone number (GOVUK) you’ll see the messages here'
+        'When users text your service’s phone number (0781239871) you’ll see the messages here'
     )
 
 
@@ -210,6 +211,7 @@ def test_anyone_can_see_inbox(
     service_one,
     mocker,
     mock_get_inbound_sms_with_no_messages,
+    mock_get_inbound_number_for_service,
 ):
 
     service_one['permissions'] = ['inbound_sms']

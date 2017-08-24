@@ -18,7 +18,8 @@ from app import (
     billing_api_client,
     job_api_client,
     service_api_client,
-    template_statistics_client
+    template_statistics_client,
+    inbound_number_client,
 )
 from app.statistics_utils import get_formatted_percentage, add_rate_to_job
 from app.utils import (
@@ -175,11 +176,17 @@ def get_inbox_partials(service_id):
         }:
             messages_to_show.append(message)
 
+    if not inbound_messages:
+        inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)['data']['number']
+    else:
+        inbound_number = None
+
     return {'messages': render_template(
         'views/dashboard/_inbox_messages.html',
         messages=messages_to_show,
         count_of_messages=len(inbound_messages),
         count_of_users=len(messages_to_show),
+        inbound_number=inbound_number,
     )}
 
 

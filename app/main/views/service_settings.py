@@ -394,6 +394,7 @@ def service_set_international_sms(service_id):
 def service_set_inbound_sms(service_id):
     return render_template(
         'views/service-settings/set-inbound-sms.html',
+        inbound_number=inbound_number_client.get_inbound_sms_number_for_service(service_id)['data']['number'],
     )
 
 
