@@ -1296,23 +1296,47 @@ def test_cant_resume_active_service(
     assert 'Resume service' not in {a.text for a in page.find_all('a', class_='button')}
 
 
-@pytest.mark.parametrize('endpoint, expected_p', [
+@pytest.mark.parametrize('endpoint, permissions, expected_p', [
     (
         'main.service_set_international_sms',
+        ['sms'],
         (
             'Sending text messages to international phone numbers is '
             'an invitation‑only feature.'
         )
     ),
     (
+        'main.service_set_international_sms',
+        ['sms', 'international_sms'],
+        (
+            'Your service can send text messages to international phone numbers.'
+        )
+    ),
+    (
         'main.service_set_letters',
+        [],
         (
             'Using GOV.UK Notify to send letters is an invitation‑only '
             'feature.'
         )
     ),
     (
+        'main.service_set_letters',
+        ['letter'],
+        (
+            'Your service can send letters.'
+        )
+    ),
+    (
         'main.service_set_inbound_sms',
+        ['sms'],
+        (
+            'Receiving text messages from your users is an invitation‑only feature.'
+        )
+    ),
+    (
+        'main.service_set_inbound_sms',
+        ['sms', 'inbound_sms'],
         (
             'Your service can receive text messages sent to 0781239871.'
         )
@@ -1321,11 +1345,12 @@ def test_cant_resume_active_service(
 def test_invitation_pages(
     logged_in_client,
     service_one,
-    endpoint,
-    expected_p,
     mock_get_inbound_number_for_service,
+    endpoint,
+    permissions,
+    expected_p,
 ):
-    service_one['permissions'] = ['sms', 'email', 'inbound_sms']
+    service_one['permissions'] = permissions
     response = logged_in_client.get(url_for(endpoint, service_id=service_one['id']))
 
     assert response.status_code == 200
