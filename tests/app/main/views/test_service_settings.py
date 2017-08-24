@@ -1311,13 +1311,21 @@ def test_cant_resume_active_service(
             'feature.'
         )
     ),
+    (
+        'main.service_set_inbound_sms',
+        (
+            'Your service can receive text messages sent to 0781239871.'
+        )
+    ),
 ])
 def test_invitation_pages(
     logged_in_client,
     service_one,
     endpoint,
     expected_p,
+    mock_get_inbound_number_for_service,
 ):
+    service_one['permissions'] = ['sms', 'email', 'inbound_sms']
     response = logged_in_client.get(url_for(endpoint, service_id=service_one['id']))
 
     assert response.status_code == 200
