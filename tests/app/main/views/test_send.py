@@ -24,6 +24,8 @@ from tests.conftest import (
     mock_get_service_email_template,
     normalize_spaces,
     SERVICE_ONE_ID,
+    mock_get_service,
+    mock_get_live_service,
 )
 
 template_types = ['email', 'sms']
@@ -1577,6 +1579,58 @@ def test_check_messages_shows_trial_mode_error(
     )
 
 
+@pytest.mark.parametrize('service_mock, error_should_be_shown', [
+    (mock_get_service, True),
+    (mock_get_live_service, False),
+])
+@pytest.mark.parametrize('number_of_rows, expected_error_message', [
+    (1, 'You can’t send this letter'),
+    (111, 'You can’t send these letters'),
+])
+def test_check_messages_shows_trial_mode_error_for_letters(
+    client_request,
+    api_user_active,
+    mock_get_service_letter_template,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    mocker,
+    service_mock,
+    error_should_be_shown,
+    number_of_rows,
+    expected_error_message,
+):
+
+    service_mock(mocker, api_user_active)
+
+    mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
+        ['address_line_1,address_line_2,postcode,'] +
+        ['First Last,    123 Street,    SW1 1AA'] * number_of_rows
+    ))
+
+    with client_request.session_transaction() as session:
+        session['upload_data'] = {'template_id': ''}
+
+    page = client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_type='letter',
+        upload_id=uuid.uuid4(),
+        _test_page_title=False,
+    )
+
+    error = page.select('.banner-dangerous')
+
+    if error_should_be_shown:
+        assert normalize_spaces(error[0].text) == (
+            '{} '
+            'In trial mode you can only preview how your letters will look '
+            'Skip to file contents'
+        ).format(expected_error_message)
+    else:
+        assert not error
+
+
 def test_check_messages_shows_over_max_row_error(
     logged_in_client,
     api_user_active,
@@ -1620,7 +1674,7 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
     api_user_active,
     mock_login,
     mock_get_users_by_service,
-    mock_get_service,
+    mock_get_live_service,
     mock_has_permissions,
     mock_get_service_letter_template,
     mock_get_detailed_service_for_today,

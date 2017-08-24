@@ -75,14 +75,29 @@
         </p>
 
       {% elif not recipients.allowed_to_send_to %}
+
         {% with
           count_of_recipients=count_of_recipients,
           template_type_label=recipients.recipient_column_headers[0]
         %}
           {% include "partials/check/not-allowed-to-send-to.html" %}
         {% endwith %}
+
+      {% elif trying_to_send_letters_in_trial_mode %}
+
+        <h1 class='banner-title' data-module="track-error" data-error-type="Trying to send letters in trial mode" data-error-label="{{ upload_id }}">
+          You can’t send
+          {{ 'this letter' if count_of_recipients == 1 else 'these letters' }}
+        </h1>
+        <p>
+          In <a href="{{ url_for('.trial_mode') }}">trial mode</a> you
+          can only preview how your letters will look
+        </p>
+
       {% elif recipients.more_rows_than_can_send %}
+
         {% include "partials/check/too-many-messages.html" %}
+
       {% endif %}
 
       {{ skip_to_file_contents() }}
