@@ -1631,6 +1631,38 @@ def test_check_messages_shows_trial_mode_error_for_letters(
         assert not error
 
 
+def test_generate_test_letter_doesnt_block_in_trial_mode(
+    client_request,
+    mocker,
+    mock_get_service,
+    mock_get_service_letter_template,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+):
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        address_line_1,address_line_2,postcode,
+        First Last,    123 Street,    SW1 1AA
+    """)
+
+    with client_request.session_transaction() as session:
+        session['upload_data'] = {'template_id': ''}
+
+    page = client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_type='letter',
+        upload_id=uuid.uuid4(),
+        from_test=True,
+        _test_page_title=False,
+    )
+
+    assert not page.select('.banner-dangerous')
+
+    assert page.select_one('a.button').text == 'Download as a printable PDF'
+
+
 def test_check_messages_shows_over_max_row_error(
     logged_in_client,
     api_user_active,

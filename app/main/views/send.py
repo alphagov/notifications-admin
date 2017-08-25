@@ -440,9 +440,11 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
         choose_time_form=choose_time_form,
         back_link=back_link,
         help=get_help_argument(),
-        trying_to_send_letters_in_trial_mode=bool(
-            current_service['restricted'] and template.template_type == 'letter'
-        ),
+        trying_to_send_letters_in_trial_mode=all((
+            current_service['restricted'],
+            template.template_type == 'letter',
+            not request.args.get('from_test'),
+        )),
     )
 
 
