@@ -1,3 +1,5 @@
+import pytest
+
 from datetime import datetime
 from bs4 import BeautifulSoup
 from unittest.mock import ANY
@@ -30,6 +32,10 @@ def test_logged_in_user_redirects_to_choose_service(
     assert response.location == url_for('main.choose_service', _external=True)
 
 
+@pytest.mark.parametrize('phone_number_to_register_with', [
+    '+4407700900460',
+    '+1800-555-555',
+])
 def test_register_creates_new_user_and_redirects_to_continue_page(
     client,
     mock_send_verify_code,
@@ -38,10 +44,11 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
     mock_is_email_unique,
     mock_send_verify_email,
     mock_login,
+    phone_number_to_register_with,
 ):
     user_data = {'name': 'Some One Valid',
                  'email_address': 'notfound@example.gov.uk',
-                 'mobile_number': '+4407700900460',
+                 'mobile_number': phone_number_to_register_with,
                  'password': 'validPassword!'
                  }
 
