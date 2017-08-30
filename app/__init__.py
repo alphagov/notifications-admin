@@ -377,7 +377,7 @@ def format_notification_status_as_field_status(status):
 
 
 def format_notification_status_as_url(status):
-    url = partial(url_for, "main.delivery_and_failure")
+    url = partial(url_for, "main.using_notify")
     return {
         'technical-failure': url(_anchor='technical-failure'),
         'temporary-failure': url(_anchor='not-accepting-messages'),

@@ -77,7 +77,7 @@ def create_api_key(service_id):
         disabled_options = [KEY_TYPE_NORMAL]
         option_hints = {KEY_TYPE_NORMAL: Markup(
             'This option is not available because your service is in '
-            '<a href="{}">trial mode</a>'.format(url_for(".trial_mode"))
+            '<a href="{}#trial-mode">trial mode</a>'.format(url_for(".using_notify"))
         )}
     else:
         disabled_options, option_hints = [], {}
