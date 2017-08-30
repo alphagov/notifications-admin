@@ -13,7 +13,7 @@ pyexcel==0.5.3
 pyexcel-io==0.4.4
 pyexcel-xls==0.4.1
 pyexcel-xlsx==0.4.1
-pyexcel-ods3==0.4.1
+pyexcel-ods3==0.5.0
 pytz==2017.2
 six==1.10.0
 gunicorn==19.7.1
