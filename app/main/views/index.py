@@ -28,7 +28,7 @@ def cookies():
 
 @main.route('/trial-mode')
 def trial_mode():
-    return render_template('views/trial-mode.html')
+    return redirect(url_for('.using_notify') + '#trial-mode', 301)
 
 
 @main.route('/pricing')
@@ -46,7 +46,7 @@ def pricing():
 
 @main.route('/delivery-and-failure')
 def delivery_and_failure():
-    return render_template('views/delivery-and-failure.html')
+    return redirect(url_for('.using_notify') + '#messagedeliveryandfailure', 301)
 
 
 @main.route('/design-patterns-content-guidance')
@@ -125,3 +125,8 @@ def roadmap():
 @main.route('/features')
 def features():
     return render_template('views/features.html')
+
+
+@main.route('/using_notify')
+def using_notify():
+    return render_template('views/using-notify.html')
