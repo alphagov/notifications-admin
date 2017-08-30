@@ -318,7 +318,8 @@ def test_should_update_whitelist(
     data = OrderedDict([
         ('email_addresses-1', 'test@example.com'),
         ('email_addresses-3', 'test@example.com'),
-        ('phone_numbers-0', '07900900000')
+        ('phone_numbers-0', '07900900000'),
+        ('phone_numbers-2', '+1800-555-555'),
     ])
 
     response = logged_in_client.post(
@@ -328,7 +329,7 @@ def test_should_update_whitelist(
 
     mock_update_whitelist.assert_called_once_with(service_id, {
         'email_addresses': ['test@example.com', 'test@example.com'],
-        'phone_numbers': ['07900900000']})
+        'phone_numbers': ['07900900000', '+1800-555-555']})
 
 
 def test_should_validate_whitelist_items(

@@ -1,3 +1,4 @@
+import pytest
 import uuid
 import json
 
@@ -117,16 +118,23 @@ def test_should_show_mobile_number_page(
     assert response.status_code == 200
 
 
+@pytest.mark.parametrize('phone_number_to_register_with', [
+    '+4407700900460',
+    '+1800-555-555',
+])
 def test_should_redirect_after_mobile_number_change(
     logged_in_client,
+    phone_number_to_register_with,
 ):
-    data = {'mobile_number': '07121231234'}
+    data = {'mobile_number': phone_number_to_register_with}
     response = logged_in_client.post(
         url_for('main.user_profile_mobile_number'),
         data=data)
     assert response.status_code == 302
     assert response.location == url_for(
         'main.user_profile_mobile_number_authenticate', _external=True)
+    with logged_in_client.session_transaction() as session:
+        assert session['new-mob'] == phone_number_to_register_with
 
 
 def test_should_show_authenticate_after_mobile_number_change(
@@ -172,12 +180,17 @@ def test_should_show_confirm_after_mobile_number_change(
     assert response.status_code == 200
 
 
+@pytest.mark.parametrize('phone_number_to_register_with', [
+    '+4407700900460',
+    '+1800-555-555',
+])
 def test_should_redirect_after_mobile_number_confirm(
     logged_in_client,
     mocker,
     mock_update_user_attribute,
     mock_check_verify_code,
-    fake_uuid
+    fake_uuid,
+    phone_number_to_register_with,
 ):
     user_before = create_user(fake_uuid)
     user_after = create_user(fake_uuid)
@@ -189,7 +202,7 @@ def test_should_redirect_after_mobile_number_confirm(
 
     with logged_in_client.session_transaction() as session:
         session['new-mob-password-confirmed'] = True
-        session['new-mob'] = '+441234123123'
+        session['new-mob'] = phone_number_to_register_with
         session['current_session_id'] = user_before.current_session_id
     data = {'sms_code': '12345'}
     response = logged_in_client.post(

@@ -114,7 +114,7 @@ class InternationalPhoneNumber(TelField):
             raise ValidationError(str(e))
 
 
-def mobile_number(label='Mobile number'):
+def uk_mobile_number(label='Mobile number'):
     return UKMobileNumber(label,
                           validators=[DataRequired(message='Can’t be empty')])
 
@@ -156,14 +156,14 @@ class RegisterUserForm(Form):
     name = StringField('Full name',
                        validators=[DataRequired(message='Can’t be empty')])
     email_address = email_address()
-    mobile_number = mobile_number()
+    mobile_number = international_phone_number()
     password = password()
 
 
 class RegisterUserFromInviteForm(Form):
     name = StringField('Full name',
                        validators=[DataRequired(message='Can’t be empty')])
-    mobile_number = mobile_number()
+    mobile_number = international_phone_number()
     password = password()
     service = HiddenField('service')
     email_address = HiddenField('email_address')
@@ -210,7 +210,7 @@ class EmailNotReceivedForm(Form):
 
 
 class TextNotReceivedForm(Form):
-    mobile_number = mobile_number()
+    mobile_number = international_phone_number()
 
 
 class ServiceNameForm(Form):
@@ -329,7 +329,7 @@ class ChangeEmailForm(Form):
 
 
 class ChangeMobileNumberForm(Form):
-    mobile_number = mobile_number()
+    mobile_number = international_phone_number()
 
 
 class ConfirmMobileNumberForm(Form):
@@ -587,7 +587,7 @@ class Whitelist(Form):
     )
 
     phone_numbers = FieldList(
-        UKMobileNumber(
+        InternationalPhoneNumber(
             '',
             validators=[
                 Optional()
@@ -669,7 +669,7 @@ def get_placeholder_form_instance(
         if allow_international_phone_numbers:
             field = international_phone_number(label=placeholder_name)
         else:
-            field = mobile_number(label=placeholder_name)
+            field = uk_mobile_number(label=placeholder_name)
     elif optional_placeholder:
         field = StringField(placeholder_name)
     else:

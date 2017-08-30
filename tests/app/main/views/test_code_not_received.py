@@ -71,12 +71,17 @@ def test_should_render_correct_resend_template_for_pending_user(
     assert page.find('form').input['value'] == api_user_pending.mobile_number
 
 
+@pytest.mark.parametrize('phone_number_to_register_with', [
+    '+447700900460',
+    '+1800-555-555',
+])
 def test_should_resend_verify_code_and_update_mobile_for_pending_user(
     client,
     mocker,
     api_user_pending,
     mock_update_user,
     mock_send_verify_code,
+    phone_number_to_register_with,
 ):
 
     mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_pending)
@@ -86,12 +91,12 @@ def test_should_resend_verify_code_and_update_mobile_for_pending_user(
             'id': api_user_pending.id,
             'email': api_user_pending.email_address}
     response = client.post(url_for('main.check_and_resend_text_code'),
-                           data={'mobile_number': '+447700900460'})
+                           data={'mobile_number': phone_number_to_register_with})
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)
 
     mock_update_user.assert_called_once_with(api_user_pending)
-    mock_send_verify_code.assert_called_once_with(api_user_pending.id, 'sms', to='+447700900460')
+    mock_send_verify_code.assert_called_once_with(api_user_pending.id, 'sms', to=phone_number_to_register_with)
 
 
 def test_check_and_redirect_to_two_factor_if_user_active(
