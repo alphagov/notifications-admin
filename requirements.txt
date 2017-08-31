@@ -11,7 +11,7 @@ blinker==1.4
 lxml==3.8.0
 pyexcel==0.5.3
 pyexcel-io==0.5.0
-pyexcel-xls==0.4.1
+pyexcel-xls==0.5.0
 pyexcel-xlsx==0.5.0.1
 pyexcel-ods3==0.5.0
 pytz==2017.2
