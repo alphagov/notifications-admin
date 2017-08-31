@@ -17,7 +17,7 @@ def test_logged_in_user_redirects_to_choose_service(
 
 
 @pytest.mark.parametrize('view', [
-    'cookies', 'trial_mode', 'pricing', 'terms', 'delivery_and_failure', 'integration_testing', 'roadmap', 'features'
+    'cookies', 'using_notify', 'pricing', 'terms', 'integration_testing', 'roadmap', 'features'
 ])
 def test_static_pages(
     client,
@@ -25,3 +25,21 @@ def test_static_pages(
 ):
     response = client.get(url_for('main.{}'.format(view)))
     assert response.status_code == 200
+
+
+@pytest.mark.parametrize('view, expected_anchor', [
+    ('delivery_and_failure', 'messagedeliveryandfailure'),
+    ('trial_mode', 'trial-mode'),
+])
+def test_old_static_pages(
+    client,
+    view,
+    expected_anchor,
+):
+    response = client.get(url_for('main.{}'.format(view)))
+    assert response.status_code == 301
+    assert response.location == url_for(
+        'main.using_notify',
+        _anchor=expected_anchor,
+        _external=True
+    )
