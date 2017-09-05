@@ -1356,3 +1356,31 @@ def test_invitation_pages(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(page.select('main p')[0].text) == expected_p
+
+
+def test_service_settings_when_inbound_number_is_not_set(
+    logged_in_client,
+    service_one,
+    mocker,
+    mock_get_letter_organisations,
+):
+    mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service',
+                 return_value={'data': {}})
+    response = logged_in_client.get(url_for(
+        'main.service_settings', service_id=service_one['id']
+    ))
+    assert response.status_code == 200
+
+
+def test_set_inbound_sms_when_inbound_number_is_not_set(
+    logged_in_client,
+    service_one,
+    mocker,
+    mock_get_letter_organisations,
+):
+    mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service',
+                 return_value={'data': {}})
+    response = logged_in_client.get(url_for(
+        'main.service_set_inbound_sms', service_id=service_one['id']
+    ))
+    assert response.status_code == 200
