@@ -66,10 +66,7 @@ def service_settings(service_id):
         inbound_api_url = ''
 
     inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)
-    if inbound_number['data'] == {}:
-        disp_inbound_number = ''
-    else:
-        disp_inbound_number = inbound_number['data']['number']
+    disp_inbound_number = inbound_number['data'].get('number', '')
 
     return render_template(
         'views/service-settings.html',
@@ -392,9 +389,10 @@ def service_set_international_sms(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_inbound_sms(service_id):
+    number = inbound_number_client.get_inbound_sms_number_for_service(service_id)['data'].get('number', '')
     return render_template(
         'views/service-settings/set-inbound-sms.html',
-        inbound_number=inbound_number_client.get_inbound_sms_number_for_service(service_id)['data']['number'],
+        inbound_number=number,
     )
 
 
