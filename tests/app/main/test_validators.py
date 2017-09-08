@@ -95,6 +95,7 @@ def _gen_mock_field(x):
     'test@digital.cqc.org.uk',
     'test@bl.uk',
     'test@stfc.ac.uk',
+    'test@wmfs.net',
 ])
 def test_valid_list_of_white_list_email_domains(
     client,
