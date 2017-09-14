@@ -180,6 +180,7 @@ details summary {
     th,
     td {
       @include core-19;
+      word-wrap: break-word;
     }
 
     thead {
