@@ -1631,6 +1631,38 @@ def test_check_messages_shows_trial_mode_error_for_letters(
         assert not error
 
 
+def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
+    mocker,
+    client_request,
+    mock_get_service_letter_template,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+):
+
+    mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
+        ['address_line_1,address_line_2,postcode,'] +
+        ['              ,              ,11SW1 1AA']
+    ))
+
+    with client_request.session_transaction() as session:
+        session['upload_data'] = {'template_id': '', 'original_file_name': 'example.xlsx'}
+
+    page = client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_type='letter',
+        upload_id=uuid.uuid4(),
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'There is a problem with example.xlsx '
+        'You need to enter missing data in 1 row '
+        'Skip to file contents'
+    )
+
+
 def test_generate_test_letter_doesnt_block_in_trial_mode(
     client_request,
     mocker,
