@@ -44,7 +44,8 @@ def platform_admin():
 def platform_admin_services():
     form = DateFilterForm(request.args)
     api_args = {'detailed': True,  # specifically DO get inactive services
-                'include_from_test_key': form.include_from_test_key.data
+                'include_from_test_key': form.include_from_test_key.data,
+                'trial_mode_services' : request.endpoint == 'main.trial_services'
                 }
 
     if form.start_date.data:
