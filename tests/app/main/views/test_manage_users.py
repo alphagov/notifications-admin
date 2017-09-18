@@ -19,21 +19,21 @@ from tests.conftest import (
         active_user_with_permissions,
         (
             'Test User (you) '
-            'Can Send messages Can Manage templates Can Manage service Can Access API keys'
+            'Can Send messages Can Add and edit templates Can Manage service Can Access API keys'
         ),
     ),
     (
         active_user_view_permissions,
         (
             'Test User With Permissions (you) '
-            'Can’t Send messages Can’t Manage templates Can’t Manage service Can’t Access API keys'
+            'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
         ),
     ),
     (
         active_user_manage_template_permission,
         (
             'Test User With Permissions (you) '
-            'Can’t Send messages Can Manage templates Can’t Manage service Can’t Access API keys'
+            'Can’t Send messages Can Add and edit templates Can’t Manage service Can’t Access API keys'
         ),
     ),
 ])
@@ -255,7 +255,7 @@ def test_manage_users_shows_invited_user(
     assert page.h1.string.strip() == 'Team members'
     assert normalize_spaces(page.select('.user-list')[1].text) == (
         'invited_user@test.gov.uk '
-        'Can’t Send messages Can’t Edit templates Can’t Manage service Can Access API keys '
+        'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can Access API keys '
         'Cancel invitation'
     )
 
