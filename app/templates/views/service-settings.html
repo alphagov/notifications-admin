@@ -187,6 +187,8 @@
               GOV.UK and {{ organisation.name if organisation else None }}
             {% elif current_service.branding == 'org' %}
               Only {{ organisation.name if organisation else None }}
+            {% elif current_service.branding == 'org_banner' %}
+              Only {{ organisation.name if organisation else None }} banner
             {% endif %}
           {% endcall %}
           {{ edit_field('Change', url_for('.service_set_branding_and_org', service_id=current_service.id)) }}

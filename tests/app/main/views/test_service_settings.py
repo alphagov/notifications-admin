@@ -922,10 +922,12 @@ def test_should_show_branding(
     assert page.find('input', attrs={"id": "branding_type-0"})['value'] == 'govuk'
     assert page.find('input', attrs={"id": "branding_type-1"})['value'] == 'both'
     assert page.find('input', attrs={"id": "branding_type-2"})['value'] == 'org'
+    assert page.find('input', attrs={"id": "branding_type-3"})['value'] == 'org_banner'
 
     assert 'checked' in page.find('input', attrs={"id": "branding_type-0"}).attrs
     assert 'checked' not in page.find('input', attrs={"id": "branding_type-1"}).attrs
     assert 'checked' not in page.find('input', attrs={"id": "branding_type-2"}).attrs
+    assert 'checked' not in page.find('input', attrs={"id": "branding_type-3"}).attrs
 
     app.organisations_client.get_organisations.assert_called_once_with()
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
@@ -945,10 +947,12 @@ def test_should_show_organisations(
     assert page.find('input', attrs={"id": "branding_type-0"})['value'] == 'govuk'
     assert page.find('input', attrs={"id": "branding_type-1"})['value'] == 'both'
     assert page.find('input', attrs={"id": "branding_type-2"})['value'] == 'org'
+    assert page.find('input', attrs={"id": "branding_type-3"})['value'] == 'org_banner'
 
     assert 'checked' in page.find('input', attrs={"id": "branding_type-0"}).attrs
     assert 'checked' not in page.find('input', attrs={"id": "branding_type-1"}).attrs
     assert 'checked' not in page.find('input', attrs={"id": "branding_type-2"}).attrs
+    assert 'checked' not in page.find('input', attrs={"id": "branding_type-3"}).attrs
 
     app.organisations_client.get_organisations.assert_called_once_with()
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
