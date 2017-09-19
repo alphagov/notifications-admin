@@ -6,7 +6,6 @@ Flask-WTF==0.14.2
 Flask-Login==0.4.0
 
 boto3==1.4.7
-py-gfm==0.1.3
 blinker==1.4
 pyexcel==0.5.3
 pyexcel-io==0.5.1
