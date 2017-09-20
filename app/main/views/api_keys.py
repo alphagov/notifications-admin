@@ -13,13 +13,18 @@ from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST,
 def api_integration(service_id):
     return render_template(
         'views/api/index.html',
-        api_notifications=notification_api_client.get_notifications_for_service(
+        api_notifications=map_letters_to_accepted(notification_api_client.get_notifications_for_service(
             service_id=service_id,
             include_jobs=False,
             include_from_test_key=True
-        )
+        ))
     )
 
+def map_letters_to_accepted(notifications):
+    for notification in notifications['notifications']:
+        if notification['notification_type'] == 'letter' and notification['status'] in ('created', 'sending'):
+            notification['status'] = 'accepted'
+    return notifications
 
 @main.route("/services/<service_id>/api/documentation")
 @login_required
