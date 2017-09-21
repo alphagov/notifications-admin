@@ -6,13 +6,12 @@
   secondary_link=False,
   secondary_link_text=None,
   delete_link=False,
-  delete_link_text="delete",
-  button_disabled=False
+  delete_link_text="delete"
 ) %}
   <div class="page-footer">
     {% if button_text %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <input type="submit" class="button{% if destructive %}-destructive{% endif %}" value="{{ button_text }}"{% if button_disabled %} disabled{% endif %}/>
+      <input type="submit" class="button{% if destructive %}-destructive{% endif %}" value="{{ button_text }}" />
     {% endif %}
     {% if back_link %}
       <a class="page-footer-back-link" href="{{ back_link }}">{{ back_link_text }}</a>
