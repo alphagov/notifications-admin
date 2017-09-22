@@ -216,9 +216,6 @@ def get_dashboard_partials(service_id):
     ]
     service = service_api_client.get_detailed_service(service_id)
 
-    # import pdb
-    # pdb.set_trace()
-
     return {
         'upcoming': render_template(
             'views/dashboard/_upcoming.html',

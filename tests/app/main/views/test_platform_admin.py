@@ -9,6 +9,8 @@ from tests import service_json
 
 from app.main.views.platform_admin import format_stats_by_service, create_global_stats, sum_service_usage
 
+from unittest.mock import ANY
+
 
 @pytest.mark.parametrize('endpoint', [
     'main.platform_admin',
@@ -68,7 +70,10 @@ def test_should_show_research_and_restricted_mode(
     response = client.get(url_for(endpoint))
 
     assert response.status_code == 200
-    mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
+    mock_get_detailed_services.assert_called_once_with({'detailed': True,
+                                                        'include_from_test_key': True,
+                                                        'only_active': False,
+                                                        'trial_mode_services': ANY})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     # get first column in second row, which contains flags as text.
     table_body = page.find_all('table')[0].find_all('tbody')[0]
@@ -76,9 +81,9 @@ def test_should_show_research_and_restricted_mode(
     assert service_mode == displayed
 
 
-@pytest.mark.parametrize('endpoint, expected_services_shown', [
-    ('main.live_services', 1),
-    ('main.trial_services', 1),
+@pytest.mark.parametrize('endpoint, expected_services_shown, trial_mode_services', [
+    ('main.live_services', 1, False),
+    ('main.trial_services', 1, True),
 ])
 def test_should_render_platform_admin_page(
     client,
@@ -87,6 +92,7 @@ def test_should_render_platform_admin_page(
     mock_get_detailed_services,
     endpoint,
     expected_services_shown,
+    trial_mode_services,
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
@@ -94,46 +100,54 @@ def test_should_render_platform_admin_page(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert len(page.select('tbody tr')) == expected_services_shown * 2  # one row for SMS, one for email
-    mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
+    mock_get_detailed_services.assert_called_once_with({'detailed': True,
+                                                        'include_from_test_key': True,
+                                                        'only_active': False,
+                                                        'trial_mode_services': trial_mode_services})
 
 
-@pytest.mark.parametrize('endpoint', [
-    'main.platform_admin',
-    'main.live_services',
-    'main.trial_services',
+@pytest.mark.parametrize('endpoint, trial_mode_services', [
+    ('main.platform_admin', None),
+    ('main.live_services', False),
+    ('main.trial_services', True),
 ])
-@pytest.mark.parametrize('include_from_test_key, api_args', [
-    ("Y", {'detailed': True, 'include_from_test_key': True}),
-    ("N", {'detailed': True, 'include_from_test_key': False})
+@pytest.mark.parametrize('include_from_test_key, inc', [
+    ("Y", True),
+    ("N", False)
 ])
 def test_platform_admin_toggle_including_from_test_key(
     include_from_test_key,
-    api_args,
     client,
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
     endpoint,
+    trial_mode_services,
+    inc
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
     response = client.get(url_for(endpoint, include_from_test_key=include_from_test_key))
 
     assert response.status_code == 200
-    mock_get_detailed_services.assert_called_once_with(api_args)
+    mock_get_detailed_services.assert_called_once_with({'detailed': True,
+                                                        'only_active': False,
+                                                        'trial_mode_services': trial_mode_services,
+                                                        'include_from_test_key': inc})
 
 
-@pytest.mark.parametrize('endpoint', [
-    'main.platform_admin',
-    'main.live_services',
-    'main.trial_services',
+@pytest.mark.parametrize('endpoint, trial_mode_services', [
+    ('main.platform_admin', None),
+    ('main.live_services', False),
+    ('main.trial_services', True)
 ])
 def test_platform_admin_with_date_filter(
     client,
     platform_admin_user,
     mocker,
     mock_get_detailed_services,
-    endpoint,
+    trial_mode_services,
+    endpoint
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
@@ -144,9 +158,11 @@ def test_platform_admin_with_date_filter(
     assert 'Platform admin' in resp_data
     mock_get_detailed_services.assert_called_once_with({
         'include_from_test_key': False,
-        'start_date': datetime.date(2016, 12, 20),
         'end_date': datetime.date(2016, 12, 28),
+        'start_date': datetime.date(2016, 12, 20),
         'detailed': True,
+        'only_active': False,
+        'trial_mode_services': trial_mode_services,
     })
 
 
@@ -292,14 +308,15 @@ def test_format_stats_by_service_returns_correct_values(fake_uuid):
     assert ret[0]['stats']['sms']['failed'] == 11
 
 
-@pytest.mark.parametrize('endpoint, restricted, research_mode', [
-    ('main.trial_services', True, False),
-    ('main.live_services', False, False)
+@pytest.mark.parametrize('endpoint, restricted, research_mode, trial_mode_services', [
+    ('main.trial_services', True, False, True),
+    ('main.live_services', False, False, False)
 ])
 def test_should_show_email_and_sms_stats_for_all_service_types(
     endpoint,
     restricted,
     research_mode,
+    trial_mode_services,
     client,
     platform_admin_user,
     mocker,
@@ -322,7 +339,10 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     response = client.get(url_for(endpoint))
 
     assert response.status_code == 200
-    mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
+    mock_get_detailed_services.assert_called_once_with({'detailed': True,
+                                                        'include_from_test_key': True,
+                                                        'trial_mode_services': trial_mode_services,
+                                                        'only_active': ANY})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     table_body = page.find_all('table')[0].find_all('tbody')[0]
@@ -340,12 +360,13 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     assert sms_failed == 11
 
 
-@pytest.mark.parametrize('endpoint, restricted', [
-    ('main.live_services', False),
-    ('main.trial_services', True)
+@pytest.mark.parametrize('endpoint, restricted, trial_mode_services', [
+    ('main.live_services', False, False),
+    ('main.trial_services', True, True)
 ], ids=['live', 'trial'])
 def test_should_show_archived_services_last(
     endpoint,
+    trial_mode_services,
     client,
     platform_admin_user,
     mocker,
@@ -367,7 +388,10 @@ def test_should_show_archived_services_last(
     response = client.get(url_for(endpoint))
 
     assert response.status_code == 200
-    mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
+    mock_get_detailed_services.assert_called_once_with({'detailed': True,
+                                                        'include_from_test_key': True,
+                                                        'only_active': ANY,
+                                                        'trial_mode_services': trial_mode_services})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     table_body = page.find_all('table')[0].find_all('tbody')[0]
@@ -438,14 +462,15 @@ def test_should_show_correct_sent_totals_for_platform_admin(
     assert sms_total == 40
 
 
-@pytest.mark.parametrize('endpoint, restricted, research_mode', [
-    ('main.trial_services', True, False),
-    ('main.live_services', False, False)
+@pytest.mark.parametrize('endpoint, restricted, research_mode, trial_mode_services', [
+    ('main.trial_services', True, False, True),
+    ('main.live_services', False, False, False)
 ])
 def test_should_order_services_by_usage_with_inactive_last(
     endpoint,
     restricted,
     research_mode,
+    trial_mode_services,
     client,
     platform_admin_user,
     mocker,
@@ -490,7 +515,10 @@ def test_should_order_services_by_usage_with_inactive_last(
     response = client.get(url_for(endpoint))
 
     assert response.status_code == 200
-    mock_get_detailed_services.assert_called_once_with({'detailed': True, 'include_from_test_key': True})
+    mock_get_detailed_services.assert_called_once_with({'detailed': True,
+                                                        'include_from_test_key': True,
+                                                        'only_active': ANY,
+                                                        'trial_mode_services': trial_mode_services})
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     table_body = page.find_all('table')[0].find_all('tbody')[0]
