@@ -71,7 +71,9 @@ def manage_org(logo=None):
             return redirect(
                 url_for('.manage_org', logo=upload_filename))
 
-        logo = persist_logo(logo, session["user_id"])
+        if logo:
+            logo = persist_logo(logo, session["user_id"])
+
         delete_temp_files_created_by(session["user_id"])
 
         if org:

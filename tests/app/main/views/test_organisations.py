@@ -113,18 +113,9 @@ def test_manage_orgs_shows_correct_org_info(request_get_manage_org_with_org):
 
 
 def test_manage_orgs_does_not_show_data_for_new_org(request_get_manage_org_without_org):
-    assert request_get_manage_org_without_org.select_one('div.page-footer input.button').has_attr('disabled')
     assert request_get_manage_org_without_org.select_one('#logo-img > img') is None
     assert request_get_manage_org_without_org.select_one('#name').attrs.get('value') == ''
     assert request_get_manage_org_without_org.select_one('#colour').attrs.get('value') == ''
-
-
-def test_save_is_enabled_when_logo_is_set(request_get_manage_org_with_org):
-    assert request_get_manage_org_with_org.select_one('div.page-footer input.button').has_attr('disabled') is False
-
-
-def test_save_is_disabled_when_logo_is_not_set(request_get_manage_org_without_org):
-    assert request_get_manage_org_without_org.select_one('div.page-footer input.button').has_attr('disabled')
 
 
 @pytest.fixture
@@ -262,3 +253,29 @@ def test_create_new_organisation_when_organisation_saved(logged_in_platform_admi
         name=new_org['name'],
         colour=new_org['colour']
     )
+
+
+def test_create_new_organisation_without_logo(logged_in_platform_admin_client, mocker, fake_uuid):
+
+    new_org = {'logo': None, 'colour': 'red', 'name': 'new name'}
+
+    mocked_new_org = mocker.patch('app.organisations_client.create_organisation')
+    mock_persist = mocker.patch('app.main.views.organisations.persist_logo')
+    mocker.patch('app.main.views.organisations.delete_temp_files_created_by')
+
+    logged_in_platform_admin_client.post(
+        url_for('.manage_org'),
+        content_type='multipart/form-data',
+        data={
+            'colour': new_org['colour'],
+            'name': new_org['name'],
+        }
+    )
+
+    assert mocked_new_org.called
+    assert mocked_new_org.call_args == call(
+        logo=new_org['logo'],
+        name=new_org['name'],
+        colour=new_org['colour']
+    )
+    assert mock_persist.call_args_list == []

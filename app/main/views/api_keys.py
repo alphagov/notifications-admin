@@ -13,11 +13,7 @@ from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST,
 def api_integration(service_id):
     return render_template(
         'views/api/index.html',
-        api_notifications=notification_api_client.get_notifications_for_service(
-            service_id=service_id,
-            include_jobs=False,
-            include_from_test_key=True
-        )
+        api_notifications=notification_api_client.get_api_notifications_for_service(service_id)
     )
 
 

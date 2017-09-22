@@ -26,14 +26,13 @@
       <form method="post">
         <div class="form-group">
           <div style='margin-top:15px;'>{{textbox(form.name)}}</div>
-          <div>{{textbox(form.colour, width='1-4')}} 
+          <div>{{textbox(form.colour, width='1-4')}}
             <span id='colour_span' style="background: {{ organisation.colour }}; {% if not organisation.colour %}visibility:hidden; {% endif %}border:1px black solid; width: 3px; height: 25px;position:absolute;margin-top:138px;margin-left:135px;display:block;"></span>
           </div>
         {{ page_footer(
           'Save',
           back_link=url_for('.organisations', organisation_id=organisation.id if organisation else 'None'),
           back_link_text='Back to organisation selection',
-          button_disabled=True if not logo else False
         ) }}
         </div>
       </form>

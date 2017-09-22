@@ -511,7 +511,8 @@ class ServiceBrandingOrg(Form):
         choices=[
             ('govuk', 'GOV.UK only'),
             ('both', 'GOV.UK and organisation'),
-            ('org', 'Organisation only')
+            ('org', 'Organisation only'),
+            ('org_banner', 'Organisation banner')
         ],
         validators=[
             DataRequired()
