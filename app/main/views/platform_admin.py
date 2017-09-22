@@ -45,7 +45,7 @@ def platform_admin():
 def platform_admin_services():
     form = DateFilterForm(request.args)
     api_args = {'detailed': True,
-                'only_active: False',    # specifically DO get inactive services
+                'only_active': False,    # specifically DO get inactive services
                 'include_from_test_key': form.include_from_test_key.data,
                 'trial_mode_services': request.endpoint == 'main.trial_services'
                 }
@@ -106,6 +106,8 @@ def create_global_stats(services):
             'requested': 0
         }
     }
+    # import pdb
+    # pdb.set_trace()
     for service in services:
         for msg_type, status in itertools.product(('sms', 'email'), ('delivered', 'failed', 'requested')):
             stats[msg_type][status] += service['statistics'][msg_type][status]
