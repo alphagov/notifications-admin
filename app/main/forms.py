@@ -467,8 +467,9 @@ class ProviderForm(Form):
     priority = IntegerField('Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")])
 
 
-class ServiceReplyToEmailFrom(Form):
+class ServiceReplyToEmailForm(Form):
     email_address = email_address(label='Email reply to address')
+    is_default = BooleanField("Make this address the default")
 
 
 class ServiceSmsSender(Form):

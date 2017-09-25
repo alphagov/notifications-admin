@@ -27,7 +27,7 @@ from app.main.forms import (
     ConfirmPasswordForm,
     ServiceNameForm,
     RequestToGoLiveForm,
-    ServiceReplyToEmailFrom,
+    ServiceReplyToEmailForm,
     ServiceSmsSender,
     ServiceLetterContactBlock,
     ServiceBrandingOrg,
@@ -67,7 +67,11 @@ def service_settings(service_id):
 
     inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)
     disp_inbound_number = inbound_number['data'].get('number', '')
-
+    reply_to_email_addresses = service_api_client.get_reply_to_email_addresses(service_id)
+    reply_to_email_address_count = len(reply_to_email_addresses)
+    default_reply_to_email_address = next(
+        (x['email_address'] for x in reply_to_email_addresses if x['is_default']), "None"
+        )
     return render_template(
         'views/service-settings.html',
         organisation=organisation,
@@ -77,7 +81,9 @@ def service_settings(service_id):
         can_receive_inbound=('inbound_sms' in current_service['permissions']),
         inbound_api_url=inbound_api_url,
         letter_contact_block=Field(current_service['letter_contact_block'], html='escape'),
-        inbound_number=disp_inbound_number
+        inbound_number=disp_inbound_number,
+        default_reply_to_email_address=default_reply_to_email_address,
+        reply_to_email_address_count=reply_to_email_address_count
     )
 
 
@@ -308,23 +314,64 @@ def service_set_email(service_id):
     )
 
 
-@main.route("/services/<service_id>/service-settings/set-reply-to-email", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/set-reply-to-email", methods=['GET'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_reply_to_email(service_id):
-    form = ServiceReplyToEmailFrom()
-    if request.method == 'GET':
-        form.email_address.data = current_service.get('reply_to_email_address')
-    if form.validate_on_submit():
-        service_api_client.update_service(
-            current_service['id'],
-            reply_to_email_address=form.email_address.data
-        )
-        return redirect(url_for('.service_settings', service_id=service_id))
+    return redirect(url_for('.service_email_reply_to', service_id=service_id))
 
+
+@main.route("/services/<service_id>/service-settings/email-reply-to", methods=['GET'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_email_reply_to(service_id):
+    reply_to_email_addresses = service_api_client.get_reply_to_email_addresses(service_id)
     return render_template(
-        'views/service-settings/set-reply-to-email.html',
-        form=form)
+        'views/service-settings/email_reply_to.html',
+        reply_to_email_addresses=reply_to_email_addresses)
+
+
+@main.route("/services/<service_id>/service-settings/email-reply-to/add", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_add_email_reply_to(service_id):
+    form = ServiceReplyToEmailForm()
+    reply_to_email_address_count = len(service_api_client.get_reply_to_email_addresses(service_id))
+    first_email_address = reply_to_email_address_count == 0
+    if form.validate_on_submit():
+        service_api_client.add_reply_to_email_address(
+            current_service['id'],
+            email_address=form.email_address.data,
+            is_default=first_email_address if first_email_address else form.is_default.data
+        )
+        return redirect(url_for('.service_email_reply_to', service_id=service_id))
+    return render_template(
+        'views/service-settings/email-reply-to/add.html',
+        form=form,
+        first_email_address=first_email_address)
+
+
+@main.route("/services/<service_id>/service-settings/email-reply-to/<reply_to_email_id>/edit", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_edit_email_reply_to(service_id, reply_to_email_id):
+    form = ServiceReplyToEmailForm()
+    reply_to_email_address = service_api_client.get_reply_to_email_address(service_id, reply_to_email_id)
+    if request.method == 'GET':
+        form.email_address.data = reply_to_email_address['email_address']
+        form.is_default.data = reply_to_email_address['is_default']
+    if form.validate_on_submit():
+        service_api_client.update_reply_to_email_address(
+            current_service['id'],
+            reply_to_email_id=reply_to_email_id,
+            email_address=form.email_address.data,
+            is_default=True if reply_to_email_address['is_default'] else form.is_default.data
+        )
+        return redirect(url_for('.service_email_reply_to', service_id=service_id))
+    return render_template(
+        'views/service-settings/email-reply-to/edit.html',
+        form=form,
+        reply_to_email_address_id=reply_to_email_address['id'])
 
 
 @main.route("/services/<service_id>/service-settings/set-sms-sender", methods=['GET', 'POST'])

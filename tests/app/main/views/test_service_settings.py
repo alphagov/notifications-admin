@@ -10,8 +10,17 @@ import app
 from app.main.views.service_settings import dummy_bearer_token
 from app.utils import email_safe
 from tests import validate_route_permission, service_json
-from tests.conftest import active_user_with_permissions, platform_admin_user
-from tests.conftest import normalize_spaces
+from tests.conftest import (
+    active_user_with_permissions,
+    platform_admin_user,
+    normalize_spaces,
+    no_reply_to_email_addresses,
+    single_reply_to_email_addresses,
+    multiple_reply_to_email_addresses,
+    get_default_reply_to_email_address,
+    get_non_default_reply_to_email_address,
+    SERVICE_ONE_ID
+    )
 
 
 @pytest.mark.parametrize('user, expected_rows', [
@@ -64,6 +73,7 @@ def test_should_show_overview(
         service_one,
         fake_uuid,
         mock_get_letter_organisations,
+        no_reply_to_email_addresses,
         user,
         expected_rows,
         mock_get_inbound_number_for_service
@@ -115,7 +125,7 @@ def test_should_show_overview(
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender elevenchars Change',
+        'Text message sender GOVUK Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -128,17 +138,18 @@ def test_should_show_overview_for_service_with_more_things_set(
         client,
         active_user_with_permissions,
         mocker,
-        service_with_reply_to_addresses,
+        service_one,
+        single_reply_to_email_addresses,
         mock_get_organisation,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service,
         permissions,
         expected_rows
 ):
-    client.login(active_user_with_permissions, mocker, service_with_reply_to_addresses)
-    service_with_reply_to_addresses['permissions'] = permissions
+    client.login(active_user_with_permissions, mocker, service_one)
+    service_one['permissions'] = permissions
     response = client.get(url_for(
-        'main.service_settings', service_id=service_with_reply_to_addresses['id']
+        'main.service_settings', service_id=service_one['id']
     ))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     for index, row in enumerate(expected_rows):
@@ -154,6 +165,7 @@ def test_service_settings_show_elided_api_url_if_needed(
         logged_in_platform_admin_client,
         service_one,
         mock_get_letter_organisations,
+        single_reply_to_email_addresses,
         mocker,
         fake_uuid,
         url,
@@ -198,6 +210,7 @@ def test_if_can_receive_inbound_then_cant_change_sms_sender(
         logged_in_client,
         service_one,
         mock_get_letter_organisations,
+        single_reply_to_email_addresses,
         mock_get_inbound_number_for_service
 ):
     service_one['permissions'] = ['email', 'sms', 'inbound_sms']
@@ -216,6 +229,7 @@ def test_letter_contact_block_shows_none_if_not_set(
         logged_in_client,
         service_one,
         mocker,
+        single_reply_to_email_addresses,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -234,6 +248,7 @@ def test_escapes_letter_contact_block(
         logged_in_client,
         service_one,
         mocker,
+        single_reply_to_email_addresses,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -283,6 +298,7 @@ def test_show_restricted_service(
         logged_in_client,
         service_one,
         mock_get_letter_organisations,
+        single_reply_to_email_addresses,
         mock_get_inbound_number_for_service
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
@@ -314,6 +330,7 @@ def test_show_live_service(
         logged_in_client,
         service_one,
         mock_get_live_service,
+        single_reply_to_email_addresses,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -435,6 +452,7 @@ def test_should_redirect_after_request_to_go_live(
         active_user_with_permissions,
         service_one,
         mocker,
+        single_reply_to_email_addresses,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -528,6 +546,7 @@ def test_route_permissions(
         client,
         api_user_active,
         service_one,
+        single_reply_to_email_addresses,
         mock_get_letter_organisations,
         route,
         mock_get_inbound_number_for_service
@@ -585,6 +604,7 @@ def test_route_for_platform_admin(
         client,
         platform_admin_user,
         service_one,
+        single_reply_to_email_addresses,
         mock_get_letter_organisations,
         route,
         mock_get_inbound_number_for_service
@@ -652,37 +672,173 @@ def test_enabling_and_disabling_email_and_sms(
     assert mocked_fn.call_args == call(service_one['id'], {'permissions': permissions_after_switch})
 
 
-def test_set_reply_to_email_address(
-        logged_in_client,
-        mock_update_service,
+def test_reply_to_hint_appears_when_service_has_multiple_reply_to_addresses(
+        client_request,
+        multiple_reply_to_email_addresses,
         service_one,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
-    service_one['permissions'] = ['email']
-    data = {"email_address": "test@someservice.gov.uk"}
-    response = logged_in_client.post(url_for('main.service_set_reply_to_email', service_id=service_one['id']),
-                                     data=data,
-                                     follow_redirects=True)
-    assert response.status_code == 200
-    mock_update_service.assert_called_with(
-        service_one['id'],
-        reply_to_email_address="test@someservice.gov.uk"
+    page = client_request.get(
+        'main.service_settings',
+        service_id=service_one['id']
+    )
+
+    assert normalize_spaces(
+        page.select('tbody tr')[2].text
+    ) == "Email reply to address test@example.com …and 2 more Change"
+
+
+def test_default_email_reply_to_address_has_default_hint(
+    client_request,
+    multiple_reply_to_email_addresses
+):
+    page = client_request.get(
+        'main.service_email_reply_to',
+        service_id=SERVICE_ONE_ID
+    )
+
+    assert normalize_spaces(page.select('tbody tr')[0].text) == "test@example.com (default) Change"
+    assert normalize_spaces(page.select('tbody tr')[1].text) == "test2@example.com Change"
+    assert normalize_spaces(page.select('tbody tr')[2].text) == "test3@example.com Change"
+    assert len(page.select('tbody tr')) == 3
+
+
+def test_no_reply_to_email_addresses_message_shows(
+    client_request,
+    no_reply_to_email_addresses
+):
+    page = client_request.get(
+        'main.service_email_reply_to',
+        service_id=SERVICE_ONE_ID
+    )
+
+    assert normalize_spaces(page.select('tbody tr')[0].text) == "You haven’t added any email addresses yet."
+    assert len(page.select('tbody tr')) == 1
+
+
+@pytest.mark.parametrize('reply_to_input, expected_error', [
+    ('', 'Can’t be empty'),
+    ('testtest', 'Enter a valid email address'),
+    ('test@hello.com', 'Enter a government email address. If you think you should have access contact us')
+])
+def test_incorrect_reply_to_email_address(
+    reply_to_input,
+    expected_error,
+    client_request,
+    no_reply_to_email_addresses
+):
+    page = client_request.post(
+        'main.service_add_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        _data={'email_address': reply_to_input},
+        _expected_status=200
+    )
+
+    assert normalize_spaces(page.select_one('.error-message').text) == expected_error
+
+
+@pytest.mark.parametrize('fixture, data, api_default_args', [
+    (no_reply_to_email_addresses, {}, True),
+    (multiple_reply_to_email_addresses, {}, False),
+    (multiple_reply_to_email_addresses, {"is_default": "y"}, True)
+])
+def test_add_reply_to_email_address(
+    fixture,
+    data,
+    api_default_args,
+    mocker,
+    client_request,
+    mock_add_reply_to_email_address
+):
+    fixture(mocker)
+    data['email_address'] = "test@example.gov.uk"
+    page = client_request.post(
+        'main.service_add_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        _data=data
+    )
+
+    mock_add_reply_to_email_address.assert_called_once_with(
+        SERVICE_ONE_ID,
+        email_address="test@example.gov.uk",
+        is_default=api_default_args
     )
 
 
-def test_if_reply_to_email_address_set_then_form_populated(
-        logged_in_client,
-        service_one,
-        mock_get_inbound_number_for_service
+@pytest.mark.parametrize('fixture, checkbox_present', [
+    (no_reply_to_email_addresses, False),
+    (multiple_reply_to_email_addresses, True)
+])
+def test_default_box_shows_on_first_email_address(
+    fixture,
+    mocker,
+    checkbox_present,
+    client_request
 ):
-    service_one['permissions'] = ['email']
-    service_one['reply_to_email_address'] = 'test@service.gov.uk'
-    response = logged_in_client.get(url_for('main.service_set_reply_to_email', service_id=service_one['id']))
+    fixture(mocker)
+    page = client_request.get(
+        'main.service_add_email_reply_to',
+        service_id=SERVICE_ONE_ID
+    )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.find(id='email_address')['value'] == 'test@service.gov.uk'
+    assert bool(page.select_one('[name=is_default]')) == checkbox_present
+
+
+@pytest.mark.parametrize('fixture, data, api_default_args', [
+    (get_default_reply_to_email_address, {"is_default": "y"}, True),
+    (get_default_reply_to_email_address, {}, True),
+    (get_non_default_reply_to_email_address, {}, False),
+    (get_non_default_reply_to_email_address, {"is_default": "y"}, True)
+])
+def test_edit_reply_to_email_address(
+    fixture,
+    data,
+    api_default_args,
+    mocker,
+    fake_uuid,
+    client_request,
+    mock_update_reply_to_email_address
+):
+    fixture(mocker)
+    data['email_address'] = "test@example.gov.uk"
+    page = client_request.post(
+        'main.service_edit_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        reply_to_email_id=fake_uuid,
+        _data=data
+    )
+
+    mock_update_reply_to_email_address.assert_called_once_with(
+        SERVICE_ONE_ID,
+        reply_to_email_id=fake_uuid,
+        email_address="test@example.gov.uk",
+        is_default=api_default_args
+    )
+
+
+@pytest.mark.parametrize('fixture, checkbox_present', [
+    (get_default_reply_to_email_address, False),
+    (get_non_default_reply_to_email_address, True)
+])
+def test_default_box_shows_on_non_default_email_addresses_while_editing(
+    fixture,
+    fake_uuid,
+    mocker,
+    checkbox_present,
+    client_request
+):
+    fixture(mocker)
+    page = client_request.get(
+        'main.service_edit_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        reply_to_email_id=fake_uuid
+    )
+
+    if checkbox_present:
+        assert page.select_one('[name=is_default]')
+    else:
+        assert normalize_spaces(page.select_one('form p').text) == "This email address is the default"
 
 
 def test_switch_service_to_research_mode(
@@ -731,6 +887,7 @@ def test_shows_research_mode_indicator(
         service_one,
         mocker,
         mock_get_letter_organisations,
+        single_reply_to_email_addresses,
         mock_get_inbound_number_for_service
 ):
     service_one['research_mode'] = True
@@ -748,6 +905,7 @@ def test_does_not_show_research_mode_indicator(
         logged_in_client,
         service_one,
         mock_get_letter_organisations,
+        single_reply_to_email_addresses,
         mock_get_inbound_number_for_service
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
@@ -1176,6 +1334,7 @@ def test_archive_service_prompts_user(
         logged_in_platform_admin_client,
         service_one,
         mocker,
+        single_reply_to_email_addresses,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -1192,6 +1351,7 @@ def test_archive_service_prompts_user(
 def test_cant_archive_inactive_service(
         logged_in_platform_admin_client,
         service_one,
+        single_reply_to_email_addresses,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -1223,6 +1383,7 @@ def test_suspend_service_prompts_user(
         logged_in_platform_admin_client,
         service_one,
         mocker,
+        single_reply_to_email_addresses,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -1240,6 +1401,7 @@ def test_suspend_service_prompts_user(
 def test_cant_suspend_inactive_service(
         logged_in_platform_admin_client,
         service_one,
+        single_reply_to_email_addresses,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -1255,6 +1417,7 @@ def test_cant_suspend_inactive_service(
 def test_resume_service_after_confirm(
         logged_in_platform_admin_client,
         service_one,
+        single_reply_to_email_addresses,
         mocker,
         mock_get_inbound_number_for_service
 ):
@@ -1271,6 +1434,7 @@ def test_resume_service_after_confirm(
 def test_resume_service_prompts_user(
         logged_in_platform_admin_client,
         service_one,
+        single_reply_to_email_addresses,
         mocker,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
@@ -1290,6 +1454,7 @@ def test_resume_service_prompts_user(
 def test_cant_resume_active_service(
         logged_in_platform_admin_client,
         service_one,
+        single_reply_to_email_addresses,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -1365,6 +1530,7 @@ def test_invitation_pages(
 def test_service_settings_when_inbound_number_is_not_set(
     logged_in_client,
     service_one,
+    single_reply_to_email_addresses,
     mocker,
     mock_get_letter_organisations,
 ):
@@ -1379,6 +1545,7 @@ def test_service_settings_when_inbound_number_is_not_set(
 def test_set_inbound_sms_when_inbound_number_is_not_set(
     logged_in_client,
     service_one,
+    single_reply_to_email_addresses,
     mocker,
     mock_get_letter_organisations,
 ):

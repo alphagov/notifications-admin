@@ -50,14 +50,105 @@ def service_one(api_user_active):
 
 
 @pytest.fixture(scope='function')
-def service_with_reply_to_addresses(api_user_active):
-    return service_json(
-        SERVICE_ONE_ID,
-        'service one',
-        [api_user_active.id],
-        reply_to_email_address='test@example.com',
-        sms_sender='elevenchars',
-    )
+def multiple_reply_to_email_addresses(mocker):
+    def _get(service_id):
+        return [
+            {
+                'id': '1234',
+                'service_id': service_id,
+                'email_address': 'test@example.com',
+                'is_default': True,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }, {
+                'id': '5678',
+                'service_id': service_id,
+                'email_address': 'test2@example.com',
+                'is_default': False,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }, {
+                'id': '9457',
+                'service_id': service_id,
+                'email_address': 'test3@example.com',
+                'is_default': False,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }
+        ]
+
+    return mocker.patch('app.service_api_client.get_reply_to_email_addresses', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def no_reply_to_email_addresses(mocker):
+    def _get(service_id):
+        return []
+
+    return mocker.patch('app.service_api_client.get_reply_to_email_addresses', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def single_reply_to_email_addresses(mocker):
+    def _get(service_id):
+        return [
+            {
+                'id': '1234',
+                'service_id': service_id,
+                'email_address': 'test@example.com',
+                'is_default': True,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }
+        ]
+
+    return mocker.patch('app.service_api_client.get_reply_to_email_addresses', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def get_default_reply_to_email_address(mocker):
+    def _get(service_id, reply_to_email_id):
+        return {
+            'id': '1234',
+            'service_id': service_id,
+            'email_address': 'test@example.com',
+            'is_default': True,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }
+
+    return mocker.patch('app.service_api_client.get_reply_to_email_address', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def get_non_default_reply_to_email_address(mocker):
+    def _get(service_id, reply_to_email_id):
+        return {
+            'id': '1234',
+            'service_id': service_id,
+            'email_address': 'test@example.com',
+            'is_default': False,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }
+
+    return mocker.patch('app.service_api_client.get_reply_to_email_address', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def mock_add_reply_to_email_address(mocker):
+    def _add_reply_to(service_id, email_address, is_default=False):
+        return
+
+    return mocker.patch('app.service_api_client.add_reply_to_email_address', side_effect=_add_reply_to)
+
+
+@pytest.fixture(scope='function')
+def mock_update_reply_to_email_address(mocker):
+    def _update_reply_to(service_id, reply_to_email_id, email_address, is_default=False):
+        return
+
+    return mocker.patch('app.service_api_client.update_reply_to_email_address', side_effect=_update_reply_to)
 
 
 @pytest.fixture(scope='function')
@@ -206,7 +297,6 @@ def mock_update_service(mocker):
                 'active',
                 'restricted',
                 'email_from',
-                'reply_to_email_address',
                 'sms_sender',
                 'permissions'
             ]}
