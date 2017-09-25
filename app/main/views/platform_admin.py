@@ -19,8 +19,10 @@ from app.statistics_utils import get_formatted_percentage
 @user_has_permissions(admin_override=True)
 def platform_admin():
     form = DateFilterForm(request.args)
-    api_args = {'detailed': True,  # specifically DO get inactive services
-                'include_from_test_key': form.include_from_test_key.data
+    api_args = {'detailed': True,
+                'only_active': False,     # specifically DO get inactive services
+                'include_from_test_key': form.include_from_test_key.data,
+                'trial_mode_services': None
                 }
 
     if form.start_date.data:
@@ -43,8 +45,10 @@ def platform_admin():
 @user_has_permissions(admin_override=True)
 def platform_admin_services():
     form = DateFilterForm(request.args)
-    api_args = {'detailed': True,  # specifically DO get inactive services
-                'include_from_test_key': form.include_from_test_key.data
+    api_args = {'detailed': True,
+                'only_active': False,    # specifically DO get inactive services
+                'include_from_test_key': form.include_from_test_key.data,
+                'trial_mode_services': request.endpoint == 'main.trial_services'
                 }
 
     if form.start_date.data:
@@ -103,6 +107,7 @@ def create_global_stats(services):
             'requested': 0
         }
     }
+
     for service in services:
         for msg_type, status in itertools.product(('sms', 'email'), ('delivered', 'failed', 'requested')):
             stats[msg_type][status] += service['statistics'][msg_type][status]
