@@ -1176,38 +1176,57 @@ def test_switch_service_disable_letters(
     assert mocked_fn.call_args == call(service_one['id'], {"permissions": []})
 
 
+@pytest.mark.parametrize('permissions, expected_checked', [
+    (['international_sms'], 'on'),
+    ([''], 'off'),
+])
+def test_show_international_sms_as_radio_button(
+    client_request,
+    service_one,
+    mocker,
+    permissions,
+    expected_checked,
+):
+    service_one['permissions'] = permissions
+
+    checked_radios = client_request.get(
+        'main.service_set_international_sms',
+        service_id=service_one['id'],
+    ).select(
+        '.multiple-choice input[checked]'
+    )
+
+    assert len(checked_radios) == 1
+    assert checked_radios[0]['value'] == expected_checked
+
+
+@pytest.mark.parametrize('post_value, international_sms_permission_expected_in_api_call', [
+    ('on', True),
+    ('off', False),
+])
 def test_switch_service_enable_international_sms(
-        logged_in_platform_admin_client,
-        service_one,
-        mocker,
+    client_request,
+    service_one,
+    mocker,
+    post_value,
+    international_sms_permission_expected_in_api_call,
 ):
     mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
-
-    response = logged_in_platform_admin_client.get(
-        url_for('main.service_switch_can_send_international_sms', service_id=service_one['id'])
+    page = client_request.post(
+        'main.service_set_international_sms',
+        service_id=service_one['id'],
+        _data={
+            'enabled': post_value
+        },
+        _expected_redirect=url_for('main.service_settings', service_id=service_one['id'], _external=True)
     )
 
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    assert 'international_sms' in mocked_fn.call_args[0][1]['permissions']
+    if international_sms_permission_expected_in_api_call:
+        assert 'international_sms' in mocked_fn.call_args[0][1]['permissions']
+    else:
+        assert 'international_sms' not in mocked_fn.call_args[0][1]['permissions']
+
     assert mocked_fn.call_args[0][0] == service_one['id']
-
-
-def test_switch_service_disable_international_sms(
-        logged_in_platform_admin_client,
-        service_one,
-        mocker,
-):
-    service_one['permissions'] = ['international_sms']
-    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
-
-    response = logged_in_platform_admin_client.get(
-        url_for('main.service_switch_can_send_international_sms', service_id=service_one['id'])
-    )
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    assert mocked_fn.call_args == call(service_one['id'], {"permissions": []})
 
 
 def test_set_new_inbound_api_and_valid_bearer_token_calls_create_inbound_api_endpoint(
@@ -1466,21 +1485,6 @@ def test_cant_resume_active_service(
 
 
 @pytest.mark.parametrize('endpoint, permissions, expected_p', [
-    (
-        'main.service_set_international_sms',
-        ['sms'],
-        (
-            'Sending text messages to international phone numbers is '
-            'an invitation‑only feature.'
-        )
-    ),
-    (
-        'main.service_set_international_sms',
-        ['sms', 'international_sms'],
-        (
-            'Your service can send text messages to international phone numbers.'
-        )
-    ),
     (
         'main.service_set_letters',
         [],
