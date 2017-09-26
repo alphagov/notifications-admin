@@ -984,9 +984,9 @@ def test_set_letter_contact_block_saves(
 
 
 def test_set_letter_contact_block_redirects_to_template(
-        logged_in_client,
-        service_one,
-        mock_update_service,
+    logged_in_client,
+    service_one,
+    mock_update_service,
 ):
     service_one['permissions'] = ['letter']
     fake_template_id = uuid.uuid4()
@@ -996,7 +996,7 @@ def test_set_letter_contact_block_redirects_to_template(
             service_id=service_one['id'],
             from_template=fake_template_id,
         ),
-        data={'letter_contact_block': ''},
+        data={'letter_contact_block': '23 Whitechapel Road'},
     )
     assert response.status_code == 302
     assert response.location == url_for(
@@ -1555,3 +1555,20 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
         'main.service_set_inbound_sms', service_id=service_one['id']
     ))
     assert response.status_code == 200
+
+
+def test_empty_letter_contact_block_returns_error(
+    logged_in_client,
+    service_one,
+    mock_update_service,
+):
+    service_one['permissions'] = ['letter']
+    response = logged_in_client.post(
+        url_for('main.service_set_letter_contact_block', service_id=service_one['id']),
+        data={'letter_contact_block': None}
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    error_message = page.find('span', class_='error-message').text.strip()
+    assert error_message == 'Can’t be empty'

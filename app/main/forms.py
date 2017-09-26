@@ -489,6 +489,7 @@ class ServiceSmsSender(Form):
 class ServiceLetterContactBlock(Form):
     letter_contact_block = TextAreaField(
         validators=[
+            DataRequired(message="Can’t be empty"),
             NoCommasInPlaceHolders()
         ]
     )
