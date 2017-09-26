@@ -31,7 +31,7 @@ from tests.conftest import (
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to address None Change',
+        'Email reply to addresses None Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -50,7 +50,7 @@ from tests.conftest import (
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to address None Change',
+        'Email reply to addresses None Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -102,7 +102,7 @@ def test_should_show_overview(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to address test@example.com Change',
+        'Email reply to addresses test@example.com Manage',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -121,7 +121,7 @@ def test_should_show_overview(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to address test@example.com Change',
+        'Email reply to addresses test@example.com Manage',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -686,7 +686,7 @@ def test_reply_to_hint_appears_when_service_has_multiple_reply_to_addresses(
 
     assert normalize_spaces(
         page.select('tbody tr')[2].text
-    ) == "Email reply to address test@example.com …and 2 more Change"
+    ) == "Email reply to addresses test@example.com …and 2 more Manage"
 
 
 def test_default_email_reply_to_address_has_default_hint(
