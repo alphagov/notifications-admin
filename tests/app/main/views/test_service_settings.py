@@ -838,7 +838,9 @@ def test_default_box_shows_on_non_default_email_addresses_while_editing(
     if checkbox_present:
         assert page.select_one('[name=is_default]')
     else:
-        assert normalize_spaces(page.select_one('form p').text) == "This email address is the default"
+        assert normalize_spaces(page.select_one('form p').text) == (
+            'This is the default reply to address for service one emails'
+        )
 
 
 def test_switch_service_to_research_mode(

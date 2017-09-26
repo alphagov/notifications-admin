@@ -20,7 +20,7 @@
     ) }}
     {% if form.is_default.data %}
       <p class="form-group">
-        This email address is the default
+        This is the default reply to address for {{ current_service.name }} emails
       </p>
     {% else %}
       <div class="form-group">
