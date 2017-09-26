@@ -1,0 +1,33 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/checkbox.html" import checkbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Add email reply to address
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    Add email reply to address
+  </h1>
+  <form method="post" novalidate>
+    {{ textbox(
+      form.email_address,
+      width='2-3',
+      safe_error_message=True
+    ) }}
+    {% if not first_email_address %}
+      <div class="form-group">
+        {{ checkbox(form.is_default) }}
+      </div>
+    {% endif %}
+    {{ page_footer(
+      'Add',
+      back_link=url_for('.service_email_reply_to', service_id=current_service.id),
+      back_link_text='Back'
+  ) }}
+  </form>
+
+{% endblock %}

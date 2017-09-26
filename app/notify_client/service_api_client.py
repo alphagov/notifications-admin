@@ -282,6 +282,42 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             )
         )['data']
 
+    def get_reply_to_email_addresses(self, service_id):
+        return self.get(
+            "/service/{}/email-reply-to".format(
+                service_id
+            )
+        )
+
+    def get_reply_to_email_address(self, service_id, reply_to_email_id):
+        return self.get(
+            "/service/{}/email-reply-to/{}".format(
+                service_id,
+                reply_to_email_id
+            )
+        )
+
+    def add_reply_to_email_address(self, service_id, email_address, is_default=False):
+        return self.post(
+            "/service/{}/email-reply-to".format(service_id),
+            data={
+                "email_address": email_address,
+                "is_default": is_default
+            }
+        )
+
+    def update_reply_to_email_address(self, service_id, reply_to_email_id, email_address, is_default=False):
+        return self.post(
+            "/service/{}/email-reply-to/{}".format(
+                service_id,
+                reply_to_email_id,
+            ),
+            data={
+                "email_address": email_address,
+                "is_default": is_default
+            }
+        )
+
 
 class ServicesBrowsableItem(BrowsableItem):
     @property

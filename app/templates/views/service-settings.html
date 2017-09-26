@@ -45,11 +45,15 @@
 
           {% call row() %}
             {{ text_field('Email reply to address') }}
-            {{ text_field(
-              current_service.reply_to_email_address,
-              status='' if current_service.reply_to_email_address else 'default'
-            ) }}
-            {{ edit_field('Change', url_for('.service_set_reply_to_email', service_id=current_service.id)) }}
+            {% call field() %}
+              {{ default_reply_to_email_address }}
+              {% if reply_to_email_address_count > 1 %}
+                <div class="hint">
+                  {{ '…and %d more' | format(reply_to_email_address_count - 1) }}
+                </div>
+              {% endif %}
+            {% endcall %}
+            {{ edit_field('Change', url_for('.service_email_reply_to', service_id=current_service.id)) }}
           {% endcall %}
 
         {% endif %}
