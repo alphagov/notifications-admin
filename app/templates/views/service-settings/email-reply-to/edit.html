@@ -19,7 +19,9 @@
       safe_error_message=True
     ) }}
     {% if form.is_default.data %}
-      <p> This email address is the default </p>
+      <p>
+        This email address is the default
+      </p>
     {% else %}
       <div class="form-group">
         {{ checkbox(form.is_default) }}
