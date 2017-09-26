@@ -693,28 +693,32 @@ def test_default_email_reply_to_address_has_default_hint(
     client_request,
     multiple_reply_to_email_addresses
 ):
-    page = client_request.get(
+    rows = client_request.get(
         'main.service_email_reply_to',
         service_id=SERVICE_ONE_ID
+    ).select(
+        '.user-list-item'
     )
 
-    assert normalize_spaces(page.select('tbody tr')[0].text) == "test@example.com (default) Change"
-    assert normalize_spaces(page.select('tbody tr')[1].text) == "test2@example.com Change"
-    assert normalize_spaces(page.select('tbody tr')[2].text) == "test3@example.com Change"
-    assert len(page.select('tbody tr')) == 3
+    assert normalize_spaces(rows[0].text) == "test@example.com (default) Change 1234"
+    assert normalize_spaces(rows[1].text) == "test2@example.com Change 5678"
+    assert normalize_spaces(rows[2].text) == "test3@example.com Change 9457"
+    assert len(rows) == 3
 
 
 def test_no_reply_to_email_addresses_message_shows(
     client_request,
     no_reply_to_email_addresses
 ):
-    page = client_request.get(
+    rows = client_request.get(
         'main.service_email_reply_to',
         service_id=SERVICE_ONE_ID
+    ).select(
+        '.user-list-item'
     )
 
-    assert normalize_spaces(page.select('tbody tr')[0].text) == "You haven’t added any email reply to addresses yet"
-    assert len(page.select('tbody tr')) == 1
+    assert normalize_spaces(rows[0].text) == "You haven’t added any email reply to addresses yet"
+    assert len(rows) == 1
 
 
 @pytest.mark.parametrize('reply_to_input, expected_error', [
