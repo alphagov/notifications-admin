@@ -713,7 +713,7 @@ def test_no_reply_to_email_addresses_message_shows(
         service_id=SERVICE_ONE_ID
     )
 
-    assert normalize_spaces(page.select('tbody tr')[0].text) == "You haven’t added any email addresses yet."
+    assert normalize_spaces(page.select('tbody tr')[0].text) == "You haven’t added any email reply to addresses yet"
     assert len(page.select('tbody tr')) == 1
 
 

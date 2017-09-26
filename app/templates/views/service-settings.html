@@ -45,7 +45,8 @@
 
           {% call row() %}
             {{ text_field('Email reply to address') }}
-            {% call field() %}
+            {% call field(status='default' if default_reply_to_email_address == "None" else '') %}
+
               {{ default_reply_to_email_address }}
               {% if reply_to_email_address_count > 1 %}
                 <div class="hint">

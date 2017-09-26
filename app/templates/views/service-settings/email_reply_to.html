@@ -22,7 +22,7 @@
   <div class="bottom-gutter-3-2 body-copy-table">
     {% call(item, row_number) list_table(
       reply_to_email_addresses,
-      empty_message="You haven’t added any email addresses yet.",
+      empty_message="You haven’t added any email reply to addresses yet",
       caption="Reply to email addresses",
       caption_visible=false,
       field_headings=[
@@ -39,7 +39,27 @@
             </span>
           {% endif %}
         {% endcall %}
-		{{ edit_field('Change', url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id)) }}        
+		{{ edit_field('Change', url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id)) }}
     {% endcall %}
+  </div>
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <p>
+        Your emails will be sent from
+        {{ current_service.email_from }}@notifications.service.gov.uk
+      </p>
+      <p>
+        This is so they have the best chance of being delivered.
+        This email address can’t receive replies.
+      </p>
+      <p>
+        Set up separate email addresses to receive replies
+        from your users.
+        {% if current_service.restricted and not reply_to_email_addresses %}
+          Your service can’t go live until you’ve added at least one
+          reply to address.
+        {% endif %}
+      </p>
+    </div>
   </div>
 {% endblock %}
