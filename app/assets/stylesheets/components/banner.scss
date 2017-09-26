@@ -2,8 +2,8 @@
 .banner,
 .banner-default {
 
-  @include core-19;
-  color: $text-colour;
+  @include bold-19;
+  color: $button-colour;
   display: block;
   padding: $gutter-half;
   margin: $gutter-half 0 $gutter 0;
