@@ -73,7 +73,10 @@ def get_sms_thread(service_id, user_number):
             'inbound': is_inbound,
             'content': SMSPreviewTemplate(
                 {
-                    'content': notification.get('content') or notification['template']['content']
+                    'content': (
+                        notification['content'] if is_inbound else
+                        notification['template']['content']
+                    )
                 },
                 notification.get('personalisation'),
                 downgrade_non_gsm_characters=(not is_inbound),
