@@ -658,6 +658,16 @@ class ServiceInboundApiForm(Form):
                                                            Length(min=10, message='Must be at least 10 characters')])
 
 
+class InternationalSMSForm(Form):
+    enabled = RadioField(
+        'Send text messages to international phone numbers',
+        choices=[
+            ('on', 'On'),
+            ('off', 'Off'),
+        ],
+    )
+
+
 def get_placeholder_form_instance(
     placeholder_name,
     dict_to_populate_from,

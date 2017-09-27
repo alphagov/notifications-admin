@@ -32,7 +32,9 @@ from app.main.forms import (
     ServiceLetterContactBlock,
     ServiceBrandingOrg,
     LetterBranding,
-    ServiceInboundApiForm)
+    ServiceInboundApiForm,
+    InternationalSMSForm,
+)
 from app import user_api_client, current_service, organisations_client, inbound_number_client
 
 
@@ -223,16 +225,35 @@ def service_switch_research_mode(service_id):
 
 
 def switch_service_permissions(service_id, permission, sms_sender=None):
-    permissions = current_service['permissions'].copy()
-    if permission in permissions:
-        permissions.remove(permission)
-    else:
-        permissions.append(permission)
-    current_service['permissions'] = permissions
 
-    data = {'permissions': permissions}
+    force_service_permission(
+        service_id,
+        permission,
+        on=permission not in current_service['permissions'],
+        sms_sender=sms_sender
+    )
+
+
+def force_service_permission(service_id, permission, on=False, sms_sender=None):
+
+    permissions, permission = set(current_service['permissions']), {permission}
+
+    update_service_permissions(
+        service_id,
+        permissions | permission if on else permissions - permission,
+        sms_sender=sms_sender
+    )
+
+
+def update_service_permissions(service_id, permissions, sms_sender=None):
+
+    current_service['permissions'] = list(permissions)
+
+    data = {'permissions': current_service['permissions']}
+
     if sms_sender:
         data['sms_sender'] = sms_sender
+
     service_api_client.update_service_with_properties(service_id, data)
 
 
@@ -423,12 +444,25 @@ def service_set_sms(service_id):
     )
 
 
-@main.route("/services/<service_id>/service-settings/set-international-sms", methods=['GET'])
+@main.route("/services/<service_id>/service-settings/set-international-sms", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_international_sms(service_id):
+    form = InternationalSMSForm(
+        enabled='on' if 'international_sms' in current_service['permissions'] else 'off'
+    )
+    if form.validate_on_submit():
+        force_service_permission(
+            service_id,
+            'international_sms',
+            on=(form.enabled.data == 'on'),
+        )
+        return redirect(
+            url_for(".service_settings", service_id=service_id)
+        )
     return render_template(
         'views/service-settings/set-international-sms.html',
+        form=form,
     )
 
 

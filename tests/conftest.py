@@ -1956,7 +1956,14 @@ def client_request(logged_in_client):
             return page
 
         @staticmethod
-        def post(endpoint, _data=None, _expected_status=None, _follow_redirects=False, **endpoint_kwargs):
+        def post(
+            endpoint,
+            _data=None,
+            _expected_status=None,
+            _follow_redirects=False,
+            _expected_redirect=None,
+            **endpoint_kwargs
+        ):
             if _expected_status is None:
                 _expected_status = 200 if _follow_redirects else 302
             resp = logged_in_client.post(
@@ -1965,6 +1972,8 @@ def client_request(logged_in_client):
                 follow_redirects=_follow_redirects,
             )
             assert resp.status_code == _expected_status
+            if _expected_redirect:
+                assert resp.location == _expected_redirect
             return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
 
     return ClientRequest
