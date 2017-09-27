@@ -20,3 +20,18 @@
     </label>
   </div>
 {% endmacro %}
+
+
+{% macro checkbox_group(
+  legend,
+  fields
+) %}
+  <fieldset class="form-group">
+    <legend class="form-label">
+      {{ legend }}
+    </legend>
+    {% for field in fields %}
+      {{ checkbox(field) }}
+    {% endfor %}
+  </fieldset>
+{% endmacro %}

@@ -34,6 +34,7 @@ from app.main.forms import (
     LetterBranding,
     ServiceInboundApiForm)
 from app import user_api_client, current_service, organisations_client, inbound_number_client
+from notifications_utils.formatters import formatted_list
 
 
 dummy_bearer_token = 'bearer_token_set'
@@ -166,7 +167,11 @@ def service_request_to_go_live(service_id):
                 current_service['name'],
                 url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
                 form.mou.data,
-                form.channel.data,
+                formatted_list(filter(None, (
+                    'email' if form.channel_email.data else None,
+                    'text messages' if form.channel_sms.data else None,
+                    'letters' if form.channel_letter.data else None,
+                )), before_each='', after_each=''),
                 form.start_date.data,
                 form.start_volume.data,
                 form.peak_volume.data,

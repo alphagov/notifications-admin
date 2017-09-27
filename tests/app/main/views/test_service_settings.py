@@ -435,43 +435,48 @@ def test_should_raise_duplicate_name_handled(
 
 
 def test_should_show_request_to_go_live(
-        logged_in_client,
-        mock_get_service,
-        service_one
+    client_request,
 ):
-    response = logged_in_client.get(
-        url_for('main.service_request_to_go_live', service_id=service_one['id']))
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'Request to go live' in resp_data
-    assert mock_get_service.called
+    page = client_request.get(
+        'main.service_request_to_go_live', service_id=SERVICE_ONE_ID
+    )
+    assert page.h1.text == 'Request to go live'
+    for channel, label in (
+        ('email', 'Emails'),
+        ('sms', 'Text messages'),
+        ('letter', 'Letters'),
+    ):
+        assert normalize_spaces(
+            page.select_one('label[for=channel_{}]'.format(channel)).text
+        ) == label
 
 
 def test_should_redirect_after_request_to_go_live(
-        logged_in_client,
-        active_user_with_permissions,
-        service_one,
-        mocker,
-        single_reply_to_email_addresses,
-        mock_get_letter_organisations,
-        mock_get_inbound_number_for_service
+    client_request,
+    mocker,
+    active_user_with_permissions,
+    single_reply_to_email_addresses,
+    mock_get_letter_organisations,
+    mock_get_inbound_number_for_service,
 ):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
-        return_value=Mock(status_code=201))
-    response = logged_in_client.post(
-        url_for('main.service_request_to_go_live', service_id=service_one['id']),
-        data={
+        return_value=Mock(status_code=201),
+    )
+    page = client_request.post(
+        'main.service_request_to_go_live',
+        service_id=SERVICE_ONE_ID,
+        _data={
             'mou': 'yes',
-            'channel': 'emails',
+            'channel_email': 'y',
+            'channel_sms': 'y',
             'start_date': '01/01/2017',
             'start_volume': '100,000',
             'peak_volume': '2,000,000',
             'upload_or_api': 'API'
         },
-        follow_redirects=True
+        _follow_redirects=True
     )
-    assert response.status_code == 200
     mock_post.assert_called_with(
         ANY,
         data={
@@ -486,17 +491,18 @@ def test_should_redirect_after_request_to_go_live(
     )
 
     returned_message = mock_post.call_args[1]['data']['message']
-    assert 'emails' in returned_message
-    assert '01/01/2017' in returned_message
-    assert '100,000' in returned_message
-    assert '2,000,000' in returned_message
-    assert 'API' in returned_message
+    assert 'Channel: email and text messages' in returned_message
+    assert 'Start date: 01/01/2017' in returned_message
+    assert 'Start volume: 100,000' in returned_message
+    assert 'Peak volume: 2,000,000' in returned_message
+    assert 'Upload or API: API' in returned_message
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    flash_banner = page.find('div', class_='banner-default').string.strip()
-    h1 = page.find('h1').string.strip()
-    assert flash_banner == 'We’ve received your request to go live'
-    assert h1 == 'Settings'
+    assert normalize_spaces(page.select_one('.banner-default').text) == (
+        'We’ve received your request to go live'
+    )
+    assert normalize_spaces(page.select_one('h1').text) == (
+        'Settings'
+    )
 
 
 def test_log_error_on_request_to_go_live(
