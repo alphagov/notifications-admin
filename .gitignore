@@ -72,3 +72,4 @@ environment.sh
 
 # CloudFoundry
 .cf
+package-lock.json
