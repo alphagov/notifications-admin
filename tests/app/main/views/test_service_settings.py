@@ -689,6 +689,21 @@ def test_reply_to_hint_appears_when_service_has_multiple_reply_to_addresses(
     ) == "Email reply to addresses test@example.com …and 2 more Manage"
 
 
+def test_single_reply_to_address_shows_default_but_without_id(
+    client_request,
+    single_reply_to_email_addresses
+):
+    rows = client_request.get(
+        'main.service_email_reply_to',
+        service_id=SERVICE_ONE_ID
+    ).select(
+        '.user-list-item'
+    )
+
+    assert normalize_spaces(rows[0].text) == "test@example.com (default) Change"
+    assert len(rows) == 1
+
+
 def test_default_email_reply_to_address_has_default_hint(
     client_request,
     multiple_reply_to_email_addresses

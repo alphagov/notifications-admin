@@ -42,12 +42,12 @@
   &-list {
 
     @extend %grid-row;
-    margin-top: 5px;
     position: relative;
 
     &-permissions {
 
       @include grid-column(3/4);
+      margin-top: 5px;
 
       li {
         display: block;
@@ -59,7 +59,7 @@
     &-edit-link {
       text-align: right;
       position: absolute;
-      top: -1.6em;
+      top: -25px;
       right: -135px;
     }
 

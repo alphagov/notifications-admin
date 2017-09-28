@@ -39,7 +39,9 @@
             <a href="{{ url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id) }}">Change</a>
           </li>
         </ul>
-        {{ api_key(item.id, thing="ID") }}
+        {% if reply_to_email_addresses|length  > 1 %}
+          {{ api_key(item.id, thing="ID") }}
+        {% endif %}
       </div>
     {% endfor %}
   </div>
