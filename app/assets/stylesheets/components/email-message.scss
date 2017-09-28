@@ -31,7 +31,7 @@ $email-message-gutter: $gutter * 2;
       padding-right: $email-message-gutter;
       word-break: break-word;
 
-      &:first-child {
+      &:last-child {
         padding-right: $email-message-gutter;
       }
 
