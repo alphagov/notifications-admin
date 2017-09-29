@@ -88,6 +88,7 @@ class Config(object):
         r"stfc\.ac\.uk",
         r"wmfs\.net",
         r"bbsrc\.ac\.uk",
+        r"acas\.org\.uk",
     ]
 
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
