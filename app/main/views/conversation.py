@@ -64,7 +64,7 @@ def get_sms_thread(service_id, user_number):
     ), key=lambda notification: notification['created_at']):
 
         is_inbound = ('notify_number' in notification)
-        redact_personalisation = notification.get('template', {}).get('redact_personalisation', False)
+        redact_personalisation = not is_inbound and notification['template']['redact_personalisation']
 
         if redact_personalisation:
             notification['personalisation'] = {}

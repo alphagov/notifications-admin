@@ -22,7 +22,8 @@ def test_get_user_phone_number_when_only_inbound_exists(mocker):
     mock_get_inbound_sms = mocker.patch(
         'app.main.views.conversation.service_api_client.get_inbound_sms_by_id',
         return_value={
-            'user_number': '4407900900123'
+            'user_number': '4407900900123',
+            'notify_number': '07900000002'
         }
     )
     mock_get_notification = mocker.patch(
@@ -104,35 +105,35 @@ def test_view_conversation(
     for index, expected in enumerate([
         (
             'message-8',
-            'Failed (sent yesterday at 2:59pm)',
+            'yesterday at 2:59pm',
         ),
         (
             'message-7',
-            'Failed (sent yesterday at 2:59pm)',
+            'yesterday at 2:59pm',
         ),
         (
             'message-6',
-            'Failed (sent yesterday at 4:59pm)',
+            'yesterday at 4:59pm',
         ),
         (
             'message-5',
-            'Failed (sent yesterday at 6:59pm)',
+            'yesterday at 6:59pm',
         ),
         (
             'message-4',
-            'Failed (sent yesterday at 8:59pm)',
+            'yesterday at 8:59pm',
         ),
         (
             'message-3',
-            'Failed (sent yesterday at 10:59pm)',
+            'yesterday at 10:59pm',
         ),
         (
             'message-2',
-            'Failed (sent yesterday at 10:59pm)',
+            'yesterday at 10:59pm',
         ),
         (
             'message-1',
-            'Failed (sent yesterday at 11:00pm)',
+            'yesterday at 11:00pm',
         ),
         (
             expected_outbound_content,
@@ -198,6 +199,7 @@ def test_view_conversation_with_empty_inbound(
         'app.main.views.conversation.service_api_client.get_inbound_sms',
         return_value=[{
             'user_number': '07900000001',
+            'notify_number': '07900000002',
             'content': '',
             'created_at': datetime.utcnow().isoformat(),
             'id': fake_uuid

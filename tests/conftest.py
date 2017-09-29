@@ -1333,6 +1333,7 @@ def mock_get_inbound_sms(mocker):
     ):
         return [{
             'user_number': '0790090000' + str(i),
+            'notify_number': '07900000002',
             'content': 'message-{}'.format(index + 1),
             'created_at': (datetime.utcnow() - timedelta(minutes=60 * (i + 1), seconds=index)).isoformat(),
             'id': sample_uuid(),
