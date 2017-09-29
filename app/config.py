@@ -107,7 +107,7 @@ class Development(Config):
 class Test(Development):
     DEBUG = True
     TESTING = True
-    STATSD_ENABLED = True
+    STATSD_ENABLED = False
     WTF_CSRF_ENABLED = False
     CSV_UPLOAD_BUCKET_NAME = 'test-notifications-csv-upload'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-test'

@@ -1,19 +1,19 @@
+from datetime import datetime
 import json
 import pytest
-from bs4 import BeautifulSoup
 
+from bs4 import BeautifulSoup
 from flask import (
     url_for,
 )
 from notifications_python_client.errors import HTTPError
+from freezegun import freeze_time
+
 from tests.conftest import (
     SERVICE_ONE_ID,
     normalize_spaces,
     mock_get_notifications,
-    mock_get_inbound_sms,
 )
-from freezegun import freeze_time
-from unittest import mock
 from app.main.views.conversation import get_user_number
 
 
@@ -22,7 +22,8 @@ def test_get_user_phone_number_when_only_inbound_exists(mocker):
     mock_get_inbound_sms = mocker.patch(
         'app.main.views.conversation.service_api_client.get_inbound_sms_by_id',
         return_value={
-            'user_number': '4407900900123'
+            'user_number': '4407900900123',
+            'notify_number': '07900000002'
         }
     )
     mock_get_notification = mocker.patch(
@@ -78,6 +79,7 @@ def test_view_conversation(
     fake_uuid,
     outbound_redacted,
     expected_outbound_content,
+    mock_get_inbound_sms
 ):
 
     mock_get_notifications(
@@ -86,10 +88,6 @@ def test_view_conversation(
         template_content='Hello ((name))',
         personalisation={'name': 'Jo'},
         redact_personalisation=outbound_redacted,
-    )
-
-    mock_get_inbound_sms(
-        mocker
     )
 
     page = client_request.get(
@@ -107,35 +105,35 @@ def test_view_conversation(
     for index, expected in enumerate([
         (
             'message-8',
-            'Failed (sent yesterday at 2:59pm)',
+            'yesterday at 2:59pm',
         ),
         (
             'message-7',
-            'Failed (sent yesterday at 2:59pm)',
+            'yesterday at 2:59pm',
         ),
         (
             'message-6',
-            'Failed (sent yesterday at 4:59pm)',
+            'yesterday at 4:59pm',
         ),
         (
             'message-5',
-            'Failed (sent yesterday at 6:59pm)',
+            'yesterday at 6:59pm',
         ),
         (
             'message-4',
-            'Failed (sent yesterday at 8:59pm)',
+            'yesterday at 8:59pm',
         ),
         (
             'message-3',
-            'Failed (sent yesterday at 10:59pm)',
+            'yesterday at 10:59pm',
         ),
         (
             'message-2',
-            'Failed (sent yesterday at 10:59pm)',
+            'yesterday at 10:59pm',
         ),
         (
             'message-1',
-            'Failed (sent yesterday at 11:00pm)',
+            'yesterday at 11:00pm',
         ),
         (
             expected_outbound_content,
@@ -186,3 +184,33 @@ def test_view_conversation_updates(
     assert json.loads(response.get_data(as_text=True)) == {'messages': 'foo'}
 
     mock_get_partials.assert_called_once_with(SERVICE_ONE_ID, '07123 456789')
+
+
+@freeze_time("2012-01-01 00:00:00")
+def test_view_conversation_with_empty_inbound(
+    client_request,
+    mocker,
+    api_user_active,
+    mock_get_notification,
+    mock_get_notifications_with_no_notifications,
+    fake_uuid
+):
+    mock_get_inbound_sms = mocker.patch(
+        'app.main.views.conversation.service_api_client.get_inbound_sms',
+        return_value=[{
+            'user_number': '07900000001',
+            'notify_number': '07900000002',
+            'content': '',
+            'created_at': datetime.utcnow().isoformat(),
+            'id': fake_uuid
+        }]
+    )
+
+    page = client_request.get(
+        'main.conversation',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    messages = page.select('.sms-message-wrapper')
+    assert len(messages) == 1
