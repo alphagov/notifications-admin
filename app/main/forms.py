@@ -431,15 +431,9 @@ class RequestToGoLiveForm(Form):
         ],
         validators=[DataRequired()]
     )
-    channel = RadioField(
-        'What kind of messages will you be sending?',
-        choices=[
-            ('emails', 'Emails'),
-            ('text messages', 'Text messages'),
-            ('emails and text messages', 'Both')
-        ],
-        validators=[DataRequired()]
-    )
+    channel_email = BooleanField('Emails')
+    channel_sms = BooleanField('Text messages')
+    channel_letter = BooleanField('Letters')
     start_date = StringField(
         'When will you be ready to start sending messages?',
         validators=[DataRequired(message='Can’t be empty')]
