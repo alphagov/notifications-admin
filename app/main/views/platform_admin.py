@@ -22,7 +22,6 @@ def platform_admin():
     api_args = {'detailed': True,
                 'only_active': False,     # specifically DO get inactive services
                 'include_from_test_key': form.include_from_test_key.data,
-                'trial_mode_services': None
                 }
 
     if form.start_date.data:
@@ -48,7 +47,6 @@ def platform_admin_services():
     api_args = {'detailed': True,
                 'only_active': False,    # specifically DO get inactive services
                 'include_from_test_key': form.include_from_test_key.data,
-                'trial_mode_services': request.endpoint == 'main.trial_services'
                 }
 
     if form.start_date.data:
