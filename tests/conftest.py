@@ -183,7 +183,8 @@ def mock_get_detailed_service(mocker, api_user_active):
                 'free_sms_fragment_limit': 250000,
                 'statistics': {
                     'email': {'requested': 0, 'delivered': 0, 'failed': 0},
-                    'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+                    'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
+                    'letter': {'requested': 0, 'delivered': 0, 'failed': 0}
                 },
                 'created_at': str(datetime.utcnow())
             }
@@ -201,7 +202,8 @@ def mock_get_detailed_service_for_today(mocker, api_user_active):
                 'free_sms_fragment_limit': 250000,
                 'statistics': {
                     'email': {'requested': 0, 'delivered': 0, 'failed': 0},
-                    'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+                    'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
+                    'letter': {'requested': 0, 'delivered': 0, 'failed': 0}
                 }
             }
         }
@@ -229,11 +231,15 @@ def mock_get_detailed_services(mocker, fake_uuid):
     )
     service_one['statistics'] = {
         'email': {'requested': 0, 'delivered': 0, 'failed': 0},
-        'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+        'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
+        'letter': {'requested': 0, 'delivered': 0, 'failed': 0}
+
     }
     service_two['statistics'] = {
         'email': {'requested': 0, 'delivered': 0, 'failed': 0},
-        'sms': {'requested': 0, 'delivered': 0, 'failed': 0}
+        'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
+        'letter': {'requested': 0, 'delivered': 0, 'failed': 0}
+
     }
     services = {'data': [service_one, service_two]}
 
@@ -1236,6 +1242,7 @@ def mock_get_notifications(
     mocker,
     api_user_active,
     template_content=None,
+    diff_template_type=None,
     personalisation=None,
     redact_personalisation=False,
 ):
@@ -1259,7 +1266,7 @@ def mock_get_notifications(
             template = template_json(
                 service_id,
                 id_=str(generate_uuid()),
-                type_=template_type[0],
+                type_=diff_template_type or template_type[0],
                 content=template_content,
                 redact_personalisation=redact_personalisation,
             )
@@ -1270,13 +1277,13 @@ def mock_get_notifications(
                 content=template_content,
                 redact_personalisation=redact_personalisation,
             )
-
         return notification_json(
             service_id,
             template=template,
             rows=rows,
             job=job,
             personalisation=personalisation,
+            template_type=diff_template_type
         )
 
     return mocker.patch(
@@ -1584,6 +1591,10 @@ def mock_get_monthly_notification_stats(mocker, service_one, fake_uuid):
                     "sending": 1,
                     "delivered": 1,
                 },
+                "letter": {
+                    "sending": 1,
+                    "delivered": 1,
+                }
             }
         }}
     return mocker.patch(

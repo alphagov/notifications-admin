@@ -3,7 +3,7 @@
 
 <div class="ajax-block-container">
   <div class="grid-row">
-    <div id="total-email" class="column-half">
+    <div id="total-email" class="{{column_width}}">
       {{ big_number_with_status(
         statistics['email']['requested'],
         message_count_label(statistics['email']['requested'], 'email', suffix='sent'),
@@ -14,7 +14,7 @@
         link=url_for(".view_notifications", service_id=service_id, message_type='email', status='sending,delivered,failed')
       ) }}
     </div>
-    <div id="total-sms" class="column-half">
+    <div id="total-sms" class="{{column_width}}">
       {{ big_number_with_status(
         statistics['sms']['requested'],
         message_count_label(statistics['sms']['requested'], 'sms', suffix='sent'),
@@ -25,5 +25,18 @@
         link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='sending,delivered,failed')
       ) }}
     </div>
+    {% if 'letter' in current_service['permissions'] %}
+      <div id="total-letters" class="{{column_width}}">
+        {{ big_number_with_status(
+          statistics['letter']['requested'],
+          message_count_label(statistics['letter']['requested'], 'letter', suffix='sent'),
+          statistics['letter']['failed'],
+          statistics['letter']['failed_percentage'],
+          statistics['letter']['show_warning'],
+          failure_link=url_for(".view_notifications", service_id=service_id, message_type='letter', status='failed'),
+          link=url_for(".view_notifications", service_id=service_id, message_type='letter', status='')
+        ) }}
+      </div>
+    {% endif %}
   </div>
 </div>

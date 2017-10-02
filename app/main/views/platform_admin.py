@@ -105,11 +105,16 @@ def create_global_stats(services):
             'delivered': 0,
             'failed': 0,
             'requested': 0
+        },
+        'letter': {
+            'delivered': 0,
+            'failed': 0,
+            'requested': 0
         }
     }
 
     for service in services:
-        for msg_type, status in itertools.product(('sms', 'email'), ('delivered', 'failed', 'requested')):
+        for msg_type, status in itertools.product(('sms', 'email', 'letter'), ('delivered', 'failed', 'requested')):
             stats[msg_type][status] += service['statistics'][msg_type][status]
 
     for stat in stats.values():

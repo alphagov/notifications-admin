@@ -361,6 +361,33 @@ def test_should_show_upcoming_jobs_on_dashboard(
     assert table_rows[1].find_all('td')[0].text.strip() == '1'
 
 
+@pytest.mark.parametrize('permissions, column_name, expected_column_count', [
+    (['email', 'sms'], '.column-half', 2),
+    (['email', 'letter'], '.column-third', 3),
+    (['email', 'sms', 'letter'], '.column-third', 3)
+])
+def test_correct_columns_display_on_dashboard(
+    client_request,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_detailed_service,
+    mock_get_jobs,
+    service_one,
+    permissions,
+    expected_column_count,
+    column_name
+):
+
+    service_one['permissions'] = permissions
+
+    page = client_request.get(
+        'main.service_dashboard',
+        service_id=service_one['id']
+    )
+
+    assert len(page.select(column_name)) == expected_column_count
+
+
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_recent_jobs_on_dashboard(
     logged_in_client,

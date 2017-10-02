@@ -49,7 +49,6 @@ class NotificationApiClient(NotifyAdminAPIClient):
         else:
             if limit_days is not None:
                 params['limit_days'] = limit_days
-
             return self.get(
                 url='/service/{}/notifications'.format(service_id),
                 params=params

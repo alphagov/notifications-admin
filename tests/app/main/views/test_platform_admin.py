@@ -171,18 +171,21 @@ def test_platform_admin_with_date_filter(
         'main.platform_admin', (
             '61 emails sent 6 failed – 5.5%',
             '121 text messages sent 11 failed – 5.0%',
+            '45 letters sent 13 failed – 28.9%'
         ),
     ),
     (
         'main.live_services', (
             '55 emails sent 5 failed – 5.0%',
             '110 text messages sent 10 failed – 5.0%',
+            '15 letters sent 3 failed – 20.0%'
         ),
     ),
     (
         'main.trial_services', (
             '6 emails sent 1 failed – 10.0%',
             '11 text messages sent 1 failed – 5.0%',
+            '30 letters sent 10 failed – 33.3%'
         ),
     ),
 ])
@@ -206,6 +209,9 @@ def test_should_show_total_on_platform_admin_pages(
         sms_requested=200,
         sms_delivered=100,
         sms_failed=10,
+        letters_requested=15,
+        letters_delivered=12,
+        letters_failed=3
     )
 
     services[1]['statistics'] = create_stats(
@@ -215,6 +221,9 @@ def test_should_show_total_on_platform_admin_pages(
         sms_requested=20,
         sms_delivered=10,
         sms_failed=1,
+        letters_requested=30,
+        letters_delivered=20,
+        letters_failed=10
     )
 
     mock_get_detailed_services.return_value = {'data': services}
@@ -227,6 +236,7 @@ def test_should_show_total_on_platform_admin_pages(
     assert (
         normalize_spaces(page.select('.big-number-with-status')[0].text),
         normalize_spaces(page.select('.big-number-with-status')[1].text),
+        normalize_spaces(page.select('.big-number-with-status')[2].text),
     ) == expected_big_numbers
 
 
@@ -259,6 +269,12 @@ def test_create_global_stats_sets_failure_rates(fake_uuid):
             'failed': 0,
             'requested': 0,
             'failure_rate': '0'
+        },
+        'letter': {
+            'delivered': 0,
+            'failed': 0,
+            'requested': 0,
+            'failure_rate': '0'
         }
     }
 
@@ -269,7 +285,10 @@ def create_stats(
     emails_failed=0,
     sms_requested=0,
     sms_delivered=0,
-    sms_failed=0
+    sms_failed=0,
+    letters_requested=0,
+    letters_delivered=0,
+    letters_failed=0
 ):
     return {
         'sms': {
@@ -281,7 +300,12 @@ def create_stats(
             'requested': emails_requested,
             'delivered': emails_delivered,
             'failed': emails_failed,
-        }
+        },
+        'letter': {
+            'requested': letters_requested,
+            'delivered': letters_delivered,
+            'failed': letters_failed,
+        },
     }
 
 
@@ -293,7 +317,10 @@ def test_format_stats_by_service_returns_correct_values(fake_uuid):
         emails_failed=5,
         sms_requested=50,
         sms_delivered=7,
-        sms_failed=11
+        sms_failed=11,
+        letters_requested=40,
+        letters_delivered=20,
+        letters_failed=7
     )
 
     ret = list(format_stats_by_service(services))
@@ -306,6 +333,10 @@ def test_format_stats_by_service_returns_correct_values(fake_uuid):
     assert ret[0]['stats']['sms']['sending'] == 32
     assert ret[0]['stats']['sms']['delivered'] == 7
     assert ret[0]['stats']['sms']['failed'] == 11
+
+    assert ret[0]['stats']['letter']['sending'] == 13
+    assert ret[0]['stats']['letter']['delivered'] == 20
+    assert ret[0]['stats']['letter']['failed'] == 7
 
 
 @pytest.mark.parametrize('endpoint, restricted, research_mode, trial_mode_services', [
@@ -443,7 +474,10 @@ def test_should_show_correct_sent_totals_for_platform_admin(
         emails_failed=40,
         sms_requested=100,
         sms_delivered=10,
-        sms_failed=30
+        sms_failed=30,
+        letters_requested=60,
+        letters_delivered=40,
+        letters_failed=5
     )
 
     mock_get_detailed_services.return_value = {'data': services}
@@ -457,9 +491,11 @@ def test_should_show_correct_sent_totals_for_platform_admin(
     totals = page.find_all('div', 'big-number-with-status')
     email_total = int(totals[0].find_all('div', 'big-number-number')[0].text.strip())
     sms_total = int(totals[1].find_all('div', 'big-number-number')[0].text.strip())
+    letter_total = int(totals[2].find_all('div', 'big-number-number')[0].text.strip())
 
     assert email_total == 60
     assert sms_total == 40
+    assert letter_total == 45
 
 
 @pytest.mark.parametrize('endpoint, restricted, research_mode, trial_mode_services', [

@@ -217,7 +217,7 @@ def notification_json(
     service_id,
     job=None,
     template=None,
-    to='07123456789',
+    to=None,
     status=None,
     sent_at=None,
     job_row_number=None,
@@ -230,6 +230,13 @@ def notification_json(
 ):
     if template is None:
         template = template_json(service_id, str(generate_uuid()), type_=template_type)
+    if to is None:
+        if template_type == 'letter':
+            to = '1 Example Street'
+        elif template_type == 'email':
+            to = 'example@gov.uk'
+        else:
+            to = '07123456789'
     if sent_at is None:
         sent_at = str(datetime.utcnow().time())
     if created_at is None:
@@ -266,7 +273,7 @@ def notification_json(
             'service': service_id,
             'template_version': template['version'],
             'personalisation': personalisation or {},
-            'notification_type': 'sms',
+            'notification_type': template_type,
         } for i in range(rows)],
         'total': rows,
         'page_size': 50,

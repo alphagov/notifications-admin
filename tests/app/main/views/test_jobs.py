@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 from app.main.views.jobs import get_time_left, get_status_filters
 from tests import notification_json
-from tests.conftest import SERVICE_ONE_ID, normalize_spaces
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces, mock_get_notifications
 from freezegun import freeze_time
 
 
@@ -163,23 +163,25 @@ def test_should_show_letter_job(
     client_request,
     mock_get_service_letter_template,
     mock_get_job,
-    mock_get_notifications,
     fake_uuid,
+    active_user_with_permissions,
+    mocker,
 ):
+
+    get_notifications = mock_get_notifications(mocker, active_user_with_permissions, diff_template_type='letter')
 
     page = client_request.get(
         'main.view_job',
         service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
     )
-
     assert normalize_spaces(page.h1.text) == 'thisisatest.csv'
     assert normalize_spaces(page.select('p.bottom-gutter')[0].text) == (
         'Sent by Test User on 1 January at 11:09am'
     )
     assert page.select('.banner-default-with-tick') == []
     assert normalize_spaces(page.select('tbody tr')[0].text) == (
-        '07123456789 template content'
+        '1 Example Street template content 1 January at 11:09am'
     )
     assert normalize_spaces(page.select('.keyline-block')[0].text) == (
         '1 Letter'
@@ -190,7 +192,7 @@ def test_should_show_letter_job(
     assert page.select('[download=download]') == []
     assert page.select('.hint') == []
 
-    mock_get_notifications.assert_called_with(
+    get_notifications.assert_called_with(
         SERVICE_ONE_ID,
         fake_uuid,
         status=[

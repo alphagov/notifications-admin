@@ -42,7 +42,8 @@
   position: relative;
   margin-bottom: $gutter-two-thirds;
 
-  .big-number {
+  .big-number,
+  .big-number-smaller {
     padding: $gutter-half;
     position: relative;
     background: $black;
