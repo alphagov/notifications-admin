@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/textbox.html" import textbox %}
+{% from "components/api-key.html" import api_key %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table %}
 
@@ -19,27 +19,50 @@
 	   <a href="{{ url_for('.service_add_email_reply_to', service_id=current_service.id) }}" class="button align-with-heading">Add email address</a>
 	 </div>
   </div>
-  <div class="bottom-gutter-3-2 body-copy-table">
-    {% call(item, row_number) list_table(
-      reply_to_email_addresses,
-      empty_message="You haven’t added any email addresses yet.",
-      caption="Reply to email addresses",
-      caption_visible=false,
-      field_headings=[
-        'Email addresses',
-        'Action'
-      ],
-      field_headings_visible=False
-    ) %}
-        {% call field() %}
-          {{ item.email_address }}
-          {% if item.is_default %}
-            <span class="hint">
-              {{ "(default)" }}
-            </span>
-          {% endif %}
-        {% endcall %}
-		{{ edit_field('Change', url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id)) }}        
-    {% endcall %}
+  <div class="user-list">
+    {% if not reply_to_email_addresses %}
+      <div class="user-list-item">
+        <span class="hint">You haven’t added any email reply to addresses yet</span>
+      </div>
+    {% endif %}
+    {% for item in reply_to_email_addresses %}
+      <div class="user-list-item">
+        <h3>
+          <span class="heading-small">{{ item.email_address }}</span>&ensp;<span class="hint">
+            {%- if item.is_default -%}
+              (default)
+            {% endif %}
+          </span>
+        </h3>
+        <ul class="tick-cross-list">
+          <li class="tick-cross-list-edit-link">
+            <a href="{{ url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id) }}">Change</a>
+          </li>
+        </ul>
+        {% if reply_to_email_addresses|length  > 1 %}
+          {{ api_key(item.id, thing="ID") }}
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <p>
+        Your emails will be sent from
+        {{ current_service.email_from }}@notifications.service.gov.uk
+      </p>
+      <p>
+        This is so they have the best chance of being delivered.
+        This email address can’t receive replies.
+      </p>
+      <p>
+        Set up separate email addresses to receive replies
+        from your users.
+        {% if current_service.restricted and not reply_to_email_addresses %}
+          Your service can’t go live until you’ve added at least one
+          reply to address.
+        {% endif %}
+      </p>
+    </div>
   </div>
 {% endblock %}

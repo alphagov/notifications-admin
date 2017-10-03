@@ -44,8 +44,9 @@
         {% if 'email' in current_service.permissions %}
 
           {% call row() %}
-            {{ text_field('Email reply to address') }}
-            {% call field() %}
+            {{ text_field('Email reply to addresses') }}
+            {% call field(status='default' if default_reply_to_email_address == "None" else '') %}
+
               {{ default_reply_to_email_address }}
               {% if reply_to_email_address_count > 1 %}
                 <div class="hint">
@@ -53,7 +54,10 @@
                 </div>
               {% endif %}
             {% endcall %}
-            {{ edit_field('Change', url_for('.service_email_reply_to', service_id=current_service.id)) }}
+            {{ edit_field(
+              'Manage' if reply_to_email_address_count else 'Change',
+              url_for('.service_email_reply_to', service_id=current_service.id))
+            }}
           {% endcall %}
 
         {% endif %}

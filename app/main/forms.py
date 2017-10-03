@@ -463,7 +463,7 @@ class ProviderForm(Form):
 
 class ServiceReplyToEmailForm(Form):
     email_address = email_address(label='Email reply to address')
-    is_default = BooleanField("Make this address the default")
+    is_default = BooleanField("Make this email address the default")
 
 
 class ServiceSmsSender(Form):

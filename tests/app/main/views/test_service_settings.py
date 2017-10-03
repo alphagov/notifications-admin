@@ -31,7 +31,7 @@ from tests.conftest import (
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to address None Change',
+        'Email reply to addresses None Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -50,7 +50,7 @@ from tests.conftest import (
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to address None Change',
+        'Email reply to addresses None Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -102,7 +102,7 @@ def test_should_show_overview(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to address test@example.com Change',
+        'Email reply to addresses test@example.com Manage',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -121,7 +121,7 @@ def test_should_show_overview(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to address test@example.com Change',
+        'Email reply to addresses test@example.com Manage',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -692,35 +692,54 @@ def test_reply_to_hint_appears_when_service_has_multiple_reply_to_addresses(
 
     assert normalize_spaces(
         page.select('tbody tr')[2].text
-    ) == "Email reply to address test@example.com …and 2 more Change"
+    ) == "Email reply to addresses test@example.com …and 2 more Manage"
+
+
+def test_single_reply_to_address_shows_default_but_without_id(
+    client_request,
+    single_reply_to_email_addresses
+):
+    rows = client_request.get(
+        'main.service_email_reply_to',
+        service_id=SERVICE_ONE_ID
+    ).select(
+        '.user-list-item'
+    )
+
+    assert normalize_spaces(rows[0].text) == "test@example.com (default) Change"
+    assert len(rows) == 1
 
 
 def test_default_email_reply_to_address_has_default_hint(
     client_request,
     multiple_reply_to_email_addresses
 ):
-    page = client_request.get(
+    rows = client_request.get(
         'main.service_email_reply_to',
         service_id=SERVICE_ONE_ID
+    ).select(
+        '.user-list-item'
     )
 
-    assert normalize_spaces(page.select('tbody tr')[0].text) == "test@example.com (default) Change"
-    assert normalize_spaces(page.select('tbody tr')[1].text) == "test2@example.com Change"
-    assert normalize_spaces(page.select('tbody tr')[2].text) == "test3@example.com Change"
-    assert len(page.select('tbody tr')) == 3
+    assert normalize_spaces(rows[0].text) == "test@example.com (default) Change 1234"
+    assert normalize_spaces(rows[1].text) == "test2@example.com Change 5678"
+    assert normalize_spaces(rows[2].text) == "test3@example.com Change 9457"
+    assert len(rows) == 3
 
 
 def test_no_reply_to_email_addresses_message_shows(
     client_request,
     no_reply_to_email_addresses
 ):
-    page = client_request.get(
+    rows = client_request.get(
         'main.service_email_reply_to',
         service_id=SERVICE_ONE_ID
+    ).select(
+        '.user-list-item'
     )
 
-    assert normalize_spaces(page.select('tbody tr')[0].text) == "You haven’t added any email addresses yet."
-    assert len(page.select('tbody tr')) == 1
+    assert normalize_spaces(rows[0].text) == "You haven’t added any email reply to addresses yet"
+    assert len(rows) == 1
 
 
 @pytest.mark.parametrize('reply_to_input, expected_error', [
@@ -844,7 +863,9 @@ def test_default_box_shows_on_non_default_email_addresses_while_editing(
     if checkbox_present:
         assert page.select_one('[name=is_default]')
     else:
-        assert normalize_spaces(page.select_one('form p').text) == "This email address is the default"
+        assert normalize_spaces(page.select_one('form p').text) == (
+            'This is the default reply to address for service one emails'
+        )
 
 
 def test_switch_service_to_research_mode(
