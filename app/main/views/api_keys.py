@@ -69,14 +69,15 @@ def create_api_key(service_id):
         (KEY_TYPE_TEAM, 'Team and whitelist – limits who you can send to'),
         (KEY_TYPE_TEST, 'Test – pretends to send messages'),
     ]
+    disabled_options, option_hints = [], {}
     if current_service['restricted']:
         disabled_options = [KEY_TYPE_NORMAL]
-        option_hints = {KEY_TYPE_NORMAL: Markup(
+        option_hints[KEY_TYPE_NORMAL] = Markup(
             'This option is not available because your service is in '
             '<a href="{}#trial-mode">trial mode</a>'.format(url_for(".using_notify"))
-        )}
-    else:
-        disabled_options, option_hints = [], {}
+        )
+    if 'letter' in current_service['permissions']:
+        option_hints[KEY_TYPE_TEAM] = 'Can’t be used to send letters'
     if form.validate_on_submit():
         if form.key_type.data in disabled_options:
             abort(400)

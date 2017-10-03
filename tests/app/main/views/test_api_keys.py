@@ -10,6 +10,7 @@ from tests import validate_route_permission
 from tests.conftest import (
     mock_get_service,
     mock_get_live_service,
+    mock_get_service_with_letters,
     normalize_spaces,
     SERVICE_ONE_ID,
 )
@@ -142,6 +143,17 @@ def test_should_show_api_keys_page(
         [
             'Live – sends to anyone',
             'Team and whitelist – limits who you can send to',
+            'Test – pretends to send messages',
+        ]
+    ),
+    (
+        mock_get_service_with_letters,
+        [
+            'Live – sends to anyone',
+            (
+                'Team and whitelist – limits who you can send to '
+                'Can’t be used to send letters'
+            ),
             'Test – pretends to send messages',
         ]
     ),
