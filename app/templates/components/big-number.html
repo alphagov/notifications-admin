@@ -32,10 +32,12 @@
   danger_zone=False,
   failure_link=None,
   link=None,
-  show_failures=True
+  show_failures=True,
+  smaller=False,
+  smallest=False
 ) %}
   <div class="big-number-with-status">
-    {{ big_number(number, label, link=link) }}
+    {{ big_number(number, label, link=link, smaller=smaller, smallest=smallest) }}
     {% if show_failures %}
       <div class="big-number-status{% if danger_zone %}-failing{% endif %}">
         {% if failures %}

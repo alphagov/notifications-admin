@@ -8,8 +8,14 @@ from bs4 import BeautifulSoup
 
 from app.main.views.jobs import get_time_left, get_status_filters
 from tests import notification_json
-from tests.conftest import SERVICE_ONE_ID, mock_get_notifications, normalize_spaces
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    mock_get_notifications,
+    normalize_spaces,
+    mock_get_notifications
+)
 from freezegun import freeze_time
+from datetime import datetime
 
 
 @pytest.mark.parametrize(
@@ -344,3 +350,63 @@ def test_redacts_templates_that_should_be_redacted(
     assert normalize_spaces(page.select('tbody tr th')[0].text) == (
         '07123456789 hello hidden'
     )
+
+
+@pytest.mark.parametrize(
+    "message_type, tablist_visible, search_bar_visible", [
+        ('email', True, True),
+        ('sms', True, True),
+        ('letter', False, False)
+    ]
+)
+def test_big_numbers_and_search_dont_show_for_letters(
+    client_request,
+    service_one,
+    mock_get_notifications,
+    active_user_with_permissions,
+    mock_get_detailed_service,
+    message_type,
+    tablist_visible,
+    search_bar_visible
+):
+    page = client_request.get(
+            'main.view_notifications',
+            service_id=service_one['id'],
+            message_type=message_type,
+            status='',
+            page=1,
+        )
+
+    assert (len(page.select("[role=tablist]")) > 0) == tablist_visible
+    assert (len(page.select("[type=search]")) > 0) == search_bar_visible
+
+
+@freeze_time("2017-09-27 16:30:00.000000")
+@pytest.mark.parametrize(
+    "message_type, hint_status_visible", [
+        ('email', True),
+        ('sms', True),
+        ('letter', False)
+    ]
+)
+def test_sending_status_hint_does_not_include_status_for_letters(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_detailed_service,
+    message_type,
+    hint_status_visible,
+    mocker
+):
+    mock_get_notifications(mocker, True, diff_template_type=message_type)
+
+    page = client_request.get(
+            'main.view_notifications',
+            service_id=service_one['id'],
+            message_type=message_type
+        )
+
+    if message_type == 'letter':
+        assert normalize_spaces(page.select(".align-with-message-body")[0].text) == "27 September at 5:30pm"
+    else:
+        assert normalize_spaces(page.select(".align-with-message-body")[0].text) == "Delivered 27 September at 5:31pm"

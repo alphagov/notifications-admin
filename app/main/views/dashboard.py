@@ -215,6 +215,7 @@ def get_dashboard_partials(service_id):
         for job in job_api_client.get_jobs(service_id, limit_days=7, statuses=statuses_to_display)['data']
     ]
     service = service_api_client.get_detailed_service(service_id)
+    column_width = 'column-third' if 'letter' in current_service['permissions'] else 'column-half'
 
     return {
         'upcoming': render_template(
@@ -231,7 +232,8 @@ def get_dashboard_partials(service_id):
         'totals': render_template(
             'views/dashboard/_totals.html',
             service_id=service_id,
-            statistics=get_dashboard_totals(service['data']['statistics'])
+            statistics=get_dashboard_totals(service['data']['statistics']),
+            column_width=column_width
         ),
         'template-statistics': render_template(
             'views/dashboard/template-statistics.html',

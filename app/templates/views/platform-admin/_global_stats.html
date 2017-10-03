@@ -1,22 +1,34 @@
 {% from "components/big-number.html" import big_number_with_status %}
 {% from "components/message-count-label.html" import message_count_label %}
 <div class="grid-row bottom-gutter">
-  <div class="column-half">
+  <div class="column-third">
     {{ big_number_with_status(
       global_stats.email.delivered + global_stats.email.failed,
       message_count_label(global_stats.email.delivered, 'email'),
       global_stats.email.failed,
       global_stats.email.failure_rate,
       global_stats.email.failure_rate|float > 3,
+      smaller=True
     ) }}
   </div>
-  <div class="column-half">
+  <div class="column-third">
     {{ big_number_with_status(
       global_stats.sms.delivered + global_stats.sms.failed,
       message_count_label(global_stats.sms.delivered, 'sms'),
       global_stats.sms.failed,
       global_stats.sms.failure_rate,
       global_stats.sms.failure_rate|float > 3,
+      smaller=True
+    ) }}
+  </div>
+  <div class="column-third">
+    {{ big_number_with_status(
+      global_stats.letter.delivered + global_stats.letter.failed,
+      message_count_label(global_stats.letter.delivered, 'letter'),
+      global_stats.letter.failed,
+      global_stats.letter.failure_rate,
+      global_stats.letter.failure_rate|float > 3,
+      smaller=True
     ) }}
   </div>
 </div>

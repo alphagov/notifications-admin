@@ -13,35 +13,36 @@
   <h1 class="heading-large">
     {{ message_count_label(99, message_type, suffix='') | capitalize }}
   </h1>
+  {% if not message_type == "letter" %}
+    {{ ajax_block(
+      partials,
+      url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status),
+      'counts'
+    ) }}
 
-  {{ ajax_block(
-    partials,
-    url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status),
-    'counts'
-  ) }}
+    <form
+      method="post"
+      action="{{ url_for('.view_notifications', service_id=current_service.id, message_type=message_type) }}"
+      class="grid-row"
+    >
+      <div class="column-three-quarters">
+        {{ textbox(
+          search_form.to,
+          width='1-1',
+          label='Search by {}'.format('email address' if message_type == 'email' else 'phone number')
+        ) }}
+      </div>
+      <div class="column-one-quarter align-button-with-textbox">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="submit" class="button" value="Search">
+      </div>
+    </form>
 
-  <form
-    method="post"
-    action="{{ url_for('.view_notifications', service_id=current_service.id, message_type=message_type) }}"
-    class="grid-row"
-  >
-    <div class="column-three-quarters">
-      {{ textbox(
-        search_form.to,
-        width='1-1',
-        label='Search by {}'.format('email address' if message_type == 'email' else 'phone number')
-      ) }}
-    </div>
-    <div class="column-one-quarter align-button-with-textbox">
+    <form id="search-form" method="post">
+      <input type="hidden" name="to" value="{{ search_form.to.data }}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <input type="submit" class="button" value="Search">
-    </div>
-  </form>
-
-  <form id="search-form" method="post">
-    <input type="hidden" name="to" value="{{ search_form.to.data }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  </form>
+    </form>
+  {% endif %}
 
   {{ ajax_block(
     partials,

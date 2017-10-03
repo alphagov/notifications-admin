@@ -225,7 +225,7 @@ def get_notifications(service_id, message_type, status_override=None):
     page = get_page_from_request()
     if page is None:
         abort(404, "Invalid page argument ({}) reverting to page 1.".format(request.args['page'], None))
-    if message_type not in ['email', 'sms']:
+    if message_type not in ['email', 'sms', 'letter']:
         abort(404)
     filter_args = _parse_filter_args(request.args)
     filter_args['status'] = _set_status_filters(filter_args)
@@ -243,7 +243,6 @@ def get_notifications(service_id, message_type, status_override=None):
             headers={
                 'Content-Disposition': 'inline; filename="notifications.csv"'}
         )
-
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
         page=page,

@@ -126,17 +126,23 @@
       {% if notification.status|format_notification_status_as_url %}
         <a href="{{ notification.status|format_notification_status_as_url }}">
       {% endif %}
-      {{ notification.status|format_notification_status(
-        notification.template.template_type
-      ) }}
+      {% if notification['notification_type'] != "letter" %}
+        {{ notification.status|format_notification_status(
+          notification.template.template_type
+        ) }}
+      {% endif %}
       {% if notification.status|format_notification_status_as_url %}
         </a>
       {% endif %}
       <span class="status-hint">
-        {{ notification.status|format_notification_status_as_time(
-          notification.created_at|format_datetime_short,
-          (notification.updated_at or notification.created_at)|format_datetime_short
-        ) }}
+        {% if notification['notification_type'] == "letter" %}
+          {{ notification.created_at|format_datetime_short }}
+        {% else %}
+          {{ notification.status|format_notification_status_as_time(
+            notification.created_at|format_datetime_short,
+            (notification.updated_at or notification.created_at)|format_datetime_short
+          ) }}
+        {% endif %}
       </span>
       {% if notification.status in ['created', 'sending', 'delivered'] %}</span>{% endif %}
     {% endcall %}
