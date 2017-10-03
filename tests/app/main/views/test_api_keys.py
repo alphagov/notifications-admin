@@ -127,36 +127,27 @@ def test_should_show_api_keys_page(
 
 
 @pytest.mark.parametrize('service_mock, expected_options', [
-    (
-        mock_get_service,
-        [
-            (
-                'Live – sends to anyone '
-                'Not available because your service is in trial mode'
-            ),
-            'Team and whitelist – limits who you can send to',
-            'Test – pretends to send messages',
-        ]
-    ),
-    (
-        mock_get_live_service,
-        [
-            'Live – sends to anyone',
-            'Team and whitelist – limits who you can send to',
-            'Test – pretends to send messages',
-        ]
-    ),
-    (
-        mock_get_service_with_letters,
-        [
-            'Live – sends to anyone',
-            (
-                'Team and whitelist – limits who you can send to '
-                'Can’t be used to send letters'
-            ),
-            'Test – pretends to send messages',
-        ]
-    ),
+    (mock_get_service, [
+        (
+            'Live – sends to anyone '
+            'Not available because your service is in trial mode'
+        ),
+        'Team and whitelist – limits who you can send to',
+        'Test – pretends to send messages',
+    ]),
+    (mock_get_live_service, [
+        'Live – sends to anyone',
+        'Team and whitelist – limits who you can send to',
+        'Test – pretends to send messages',
+    ]),
+    (mock_get_service_with_letters, [
+        'Live – sends to anyone',
+        (
+            'Team and whitelist – limits who you can send to '
+            'Can’t be used to send letters'
+        ),
+        'Test – pretends to send messages',
+    ]),
 ])
 def test_should_show_create_api_key_page(
     client_request,
