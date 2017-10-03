@@ -48,7 +48,7 @@
       {% elif not recipients.has_recipient_columns %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Missing recipient columns" data-error-label="{{ upload_id }}">
-          Your file needs {{ recipients.recipient_column_headers | formatted_list(
+          Your file needs {{ required_recipient_columns | formatted_list(
             prefix='a column called',
             prefix_plural='columns called'
           ) }}
