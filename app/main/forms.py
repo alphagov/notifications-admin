@@ -214,9 +214,6 @@ class TextNotReceivedForm(Form):
 
 
 class ServiceNameForm(Form):
-    def __init__(self, *args, **kwargs):
-        super(ServiceNameForm, self).__init__(*args, **kwargs)
-
     name = StringField(
         u'Service name',
         validators=[
