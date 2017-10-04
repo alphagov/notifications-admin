@@ -1,6 +1,7 @@
 import itertools
 from string import ascii_uppercase
 
+from orderedset import OrderedSet
 from contextlib import suppress
 from zipfile import BadZipFile
 from xlrd.biffh import XLRDError
@@ -445,6 +446,7 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
             template.template_type == 'letter',
             not request.args.get('from_test'),
         )),
+        required_recipient_columns=OrderedSet(recipients.recipient_column_headers) - optional_address_columns
     )
 
 
