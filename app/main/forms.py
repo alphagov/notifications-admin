@@ -213,12 +213,29 @@ class TextNotReceivedForm(Form):
     mobile_number = international_phone_number()
 
 
-class ServiceNameForm(Form):
+class RenameServiceForm(Form):
     name = StringField(
         u'Service name',
         validators=[
             DataRequired(message='Can’t be empty')
         ])
+
+
+class CreateServiceForm(Form):
+    name = StringField(
+        u'What’s your service called?',
+        validators=[
+            DataRequired(message='Can’t be empty')
+        ])
+    organisation_type = RadioField(
+        'Who runs this service?',
+        choices=[
+            ('central', 'Central government'),
+            ('local', 'Local government'),
+            ('nhs', 'NHS'),
+        ],
+        validators=[DataRequired()],
+    )
 
 
 class ConfirmPasswordForm(Form):

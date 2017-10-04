@@ -25,7 +25,7 @@ from app.main import main
 from app.utils import user_has_permissions, email_safe, get_cdn_domain
 from app.main.forms import (
     ConfirmPasswordForm,
-    ServiceNameForm,
+    RenameServiceForm,
     RequestToGoLiveForm,
     ServiceReplyToEmailForm,
     ServiceSmsSender,
@@ -100,7 +100,7 @@ def service_settings(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_name_change(service_id):
-    form = ServiceNameForm()
+    form = RenameServiceForm()
 
     if request.method == 'GET':
         form.name.data = current_service.get('name')
