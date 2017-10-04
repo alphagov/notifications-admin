@@ -7,7 +7,13 @@ from bs4 import BeautifulSoup
 from unittest.mock import call
 
 from tests import validate_route_permission
-from tests.conftest import normalize_spaces, SERVICE_ONE_ID
+from tests.conftest import (
+    mock_get_service,
+    mock_get_live_service,
+    mock_get_service_with_letters,
+    normalize_spaces,
+    SERVICE_ONE_ID,
+)
 
 
 def test_should_show_api_page(
@@ -120,20 +126,43 @@ def test_should_show_api_keys_page(
     mock_get_api_keys.assert_called_once_with(service_id=fake_uuid)
 
 
+@pytest.mark.parametrize('service_mock, expected_options', [
+    (mock_get_service, [
+        (
+            'Live – sends to anyone '
+            'Not available because your service is in trial mode'
+        ),
+        'Team and whitelist – limits who you can send to',
+        'Test – pretends to send messages',
+    ]),
+    (mock_get_live_service, [
+        'Live – sends to anyone',
+        'Team and whitelist – limits who you can send to',
+        'Test – pretends to send messages',
+    ]),
+    (mock_get_service_with_letters, [
+        'Live – sends to anyone',
+        (
+            'Team and whitelist – limits who you can send to '
+            'Can’t be used to send letters'
+        ),
+        'Test – pretends to send messages',
+    ]),
+])
 def test_should_show_create_api_key_page(
-    logged_in_client,
+    client_request,
+    mocker,
     api_user_active,
-    mock_login,
     mock_get_api_keys,
-    mock_get_service,
-    mock_has_permissions,
-    fake_uuid,
+    service_mock,
+    expected_options,
 ):
-    logged_in_client.login(api_user_active)
-    service_id = fake_uuid
-    response = logged_in_client.get(url_for('main.create_api_key', service_id=fake_uuid))
+    service_mock(mocker, api_user_active)
 
-    assert response.status_code == 200
+    page = client_request.get('main.create_api_key', service_id=SERVICE_ONE_ID)
+
+    for index, option in enumerate(expected_options):
+        assert normalize_spaces(page.select('.block-label')[index].text) == option
 
 
 def test_should_create_api_key_with_type_normal(
