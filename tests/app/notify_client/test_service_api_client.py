@@ -57,6 +57,7 @@ def test_client_creates_service_with_correct_data(
     client.create_service(
         service_name='My first service',
         organisation_type='central_government',
+        free_sms_fragment_limit=2,
         message_limit=1,
         restricted=True,
         user_id=fake_uuid,
@@ -72,6 +73,7 @@ def test_client_creates_service_with_correct_data(
             name='My first service',
             # The rest pass through with the same names
             organisation_type='central_government',
+            free_sms_fragment_limit=2,
             message_limit=1,
             restricted=True,
             user_id=fake_uuid,

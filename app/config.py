@@ -36,6 +36,11 @@ class Config(object):
     ASSETS_DEBUG = False
     AWS_REGION = 'eu-west-1'
     DEFAULT_SERVICE_LIMIT = 50
+    DEFAULT_FREE_SMS_FRAGMENT_LIMITS = {
+        'central': 250000,
+        'local': 25000,
+        'nhs': 25000,
+    }
     EMAIL_EXPIRY_SECONDS = 3600 * 24 * 7  # one week
     HEADER_COLOUR = '#FFBF47'  # $yellow
     HTTP_PROTOCOL = 'http'

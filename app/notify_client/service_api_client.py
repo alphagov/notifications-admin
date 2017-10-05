@@ -20,6 +20,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         self,
         service_name,
         organisation_type,
+        free_sms_fragment_limit,
         message_limit,
         restricted,
         user_id,
@@ -31,6 +32,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         data = {
             "name": service_name,
             "organisation_type": organisation_type,
+            "free_sms_fragment_limit": free_sms_fragment_limit,
             "active": True,
             "message_limit": message_limit,
             "user_id": user_id,

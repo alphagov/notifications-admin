@@ -45,6 +45,7 @@ def _create_service(service_name, organisation_type, email_from, form):
             service_name=service_name,
             organisation_type=organisation_type,
             message_limit=current_app.config['DEFAULT_SERVICE_LIMIT'],
+            free_sms_fragment_limit=current_app.config['DEFAULT_FREE_SMS_FRAGMENT_LIMITS'].get(organisation_type),
             restricted=True,
             user_id=session['user_id'],
             email_from=email_from,
