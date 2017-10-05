@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/browse-list.html" import browse_list %}
-{% from "components/table.html" import mapping_table, row, text_field, edit_field, field, boolean_field %}
+{% from "components/table.html" import mapping_table, row, text_field, optional_text_field, edit_field, field, boolean_field %}
 
 {% block service_page_title %}
   Settings
@@ -90,7 +90,7 @@
             {% if (current_user.has_permissions([], admin_override=True) or not can_receive_inbound)  and not can_receive_inbound %}
               {{ edit_field('Change', url_for('.service_set_sms_sender', service_id=current_service.id, set_inbound_sms=False)) }}
             {% else %}
-                 {{ text_field('') }}
+              {{ text_field('') }}
             {% endif %}
 
           {% endcall %}
@@ -110,10 +110,7 @@
           {% if can_receive_inbound %}
             {% call row() %}
               {{ text_field('API endpoint for received text messages') }}
-              {{ text_field(
-                'None' if not inbound_api_url else inbound_api_url,
-                status='' if inbound_api_url else 'default'
-              ) }}
+              {{ optional_text_field(inbound_api_url) }}
               {{ edit_field('Change', url_for('.service_set_inbound_api', service_id=current_service.id)) }}
             {% endcall %}
           {% endif %}
@@ -193,9 +190,8 @@
       ) %}
         {% call row() %}
           {{ text_field('Organisation type')}}
-          {{ text_field(
-            current_service.organisation_type|title or 'Not set',
-            status='' if current_service.organisation_type else 'default'
+          {{ optional_text_field(
+            (current_service.organisation_type or '')|title
           ) }}
           {{ text_field() }}
         {% endcall %}
