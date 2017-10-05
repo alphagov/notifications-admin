@@ -65,6 +65,8 @@ from tests.conftest import (
         'Send letters Off Change',
 
         'Label Value Action',
+        'Organisation type Central',
+        'Free text message allowance 250,000',
         'Email branding GOV.UK Change',
         'Letter branding HM Government Change',
 

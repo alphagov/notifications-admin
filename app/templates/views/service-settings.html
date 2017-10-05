@@ -192,6 +192,19 @@
         caption_visible=False
       ) %}
         {% call row() %}
+          {{ text_field('Organisation type')}}
+          {{ text_field(
+            current_service.organisation_type|title or 'Not set',
+            status='' if current_service.organisation_type else 'default'
+          ) }}
+          {{ text_field() }}
+        {% endcall %}
+        {% call row() %}
+          {{ text_field('Free text message allowance')}}
+          {{ text_field('{:,}'.format(current_service.free_sms_fragment_limit)) }}
+          {{ text_field() }}
+        {% endcall %}
+        {% call row() %}
           {{ text_field('Email branding' )}}
           {% call field() %}
             {% if current_service.branding == 'govuk' %}

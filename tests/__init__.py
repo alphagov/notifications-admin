@@ -54,6 +54,8 @@ def service_json(
     letter_contact_block=None,
     inbound_api=None,
     permissions=['email', 'sms'],
+    organisation_type='central',
+    free_sms_fragment_limit=250000,
 ):
     if users is None:
         users = []
@@ -66,12 +68,14 @@ def service_json(
         'name': name,
         'users': users,
         'message_limit': message_limit,
+        'free_sms_fragment_limit': free_sms_fragment_limit,
         'active': active,
         'restricted': restricted,
         'email_from': email_from,
         'reply_to_email_address': reply_to_email_address,
         'sms_sender': sms_sender,
         'research_mode': research_mode,
+        'organisation_type': organisation_type,
         'organisation': organisation,
         'branding': branding,
         'created_at': created_at or str(datetime.utcnow()),
