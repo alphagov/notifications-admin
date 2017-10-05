@@ -34,7 +34,7 @@ from tests.conftest import (
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to addresses None Change',
+        'Email reply to addresses Not set Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -53,7 +53,7 @@ from tests.conftest import (
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to addresses None Change',
+        'Email reply to addresses Not set Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -115,7 +115,7 @@ def test_should_show_overview(
         'Text message sender 0781239871',
         'International text messages On Change',
         'Receive text messages On Change',
-        'API endpoint for received text messages None Change',
+        'API endpoint for received text messages Not set Change',
 
         'Label Value Action',
         'Send letters Off Change',
@@ -252,7 +252,7 @@ def test_letter_contact_block_shows_none_if_not_set(
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     div = page.find_all('tr')[8].find_all('td')[1].div
-    assert div.text.strip() == 'None'
+    assert div.text.strip() == 'Not set'
     assert 'default' in div.attrs['class'][0]
 
 

@@ -73,12 +73,12 @@ def service_settings(service_id):
     reply_to_email_addresses = service_api_client.get_reply_to_email_addresses(service_id)
     reply_to_email_address_count = len(reply_to_email_addresses)
     default_reply_to_email_address = next(
-        (x['email_address'] for x in reply_to_email_addresses if x['is_default']), "None"
+        (x['email_address'] for x in reply_to_email_addresses if x['is_default']), "Not set"
     )
     letter_contact_details = service_api_client.get_letter_contacts(service_id)
     letter_contact_details_count = len(letter_contact_details)
     default_letter_contact_block = next(
-        (Field(x['contact_block'], html='escape') for x in letter_contact_details if x['is_default']), "None"
+        (Field(x['contact_block'], html='escape') for x in letter_contact_details if x['is_default']), "Not set"
     )
     return render_template(
         'views/service-settings.html',
