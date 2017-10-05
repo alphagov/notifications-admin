@@ -34,6 +34,7 @@ from app.main.forms import (
     LetterBranding,
     ServiceInboundApiForm,
     InternationalSMSForm,
+    OrganisationTypeForm,
 )
 from app import user_api_client, current_service, organisations_client, inbound_number_client
 from notifications_utils.formatters import formatted_list
@@ -571,6 +572,28 @@ def service_set_letter_contact_block(service_id):
     return render_template(
         'views/service-settings/set-letter-contact-block.html',
         form=form
+    )
+
+
+@main.route("/services/<service_id>/service-settings/set-organisation-type", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions(admin_override=True)
+def set_organisation_type(service_id):
+
+    form = OrganisationTypeForm(organisation_type=current_service.get('organisation_type'))
+
+    if form.validate_on_submit():
+        service_api_client.update_service(
+            service_id,
+            organisation_type=form.organisation_type.data,
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    form.organisation_type.data = current_service.get('organisation_type')
+
+    return render_template(
+        'views/service-settings/set-organisation-type.html',
+        form=form,
     )
 
 

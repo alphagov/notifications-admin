@@ -141,6 +141,18 @@ def sms_code():
                                           message='Code not found')])
 
 
+def organisation_type():
+    return RadioField(
+        'Who runs this service?',
+        choices=[
+            ('central', 'Central government'),
+            ('local', 'Local government'),
+            ('nhs', 'NHS'),
+        ],
+        validators=[DataRequired()],
+    )
+
+
 class LoginForm(Form):
     email_address = StringField('Email address', validators=[
         Length(min=5, max=255),
@@ -227,15 +239,11 @@ class CreateServiceForm(Form):
         validators=[
             DataRequired(message='Can’t be empty')
         ])
-    organisation_type = RadioField(
-        'Who runs this service?',
-        choices=[
-            ('central', 'Central government'),
-            ('local', 'Local government'),
-            ('nhs', 'NHS'),
-        ],
-        validators=[DataRequired()],
-    )
+    organisation_type = organisation_type()
+
+
+class OrganisationTypeForm(Form):
+    organisation_type = organisation_type()
 
 
 class ConfirmPasswordForm(Form):

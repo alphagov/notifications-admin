@@ -193,7 +193,7 @@
           {{ optional_text_field(
             (current_service.organisation_type or '')|title
           ) }}
-          {{ text_field() }}
+          {{ edit_field('Change', url_for('.set_organisation_type', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}
           {{ text_field('Free text message allowance')}}

@@ -22,7 +22,7 @@ from tests.conftest import (
     get_non_default_reply_to_email_address,
     get_default_letter_contact_block,
     get_non_default_letter_contact_block,
-    SERVICE_ONE_ID
+    SERVICE_ONE_ID,
 )
 
 
@@ -65,7 +65,7 @@ from tests.conftest import (
         'Send letters Off Change',
 
         'Label Value Action',
-        'Organisation type Central',
+        'Organisation type Central Change',
         'Free text message allowance 250,000',
         'Email branding GOV.UK Change',
         'Letter branding HM Government Change',
@@ -1359,6 +1359,74 @@ def test_should_set_branding_and_organisations(
         service_one['id'],
         branding='org',
         organisation='organisation-id'
+    )
+
+
+@pytest.mark.parametrize('method', ['get', 'post'])
+def test_organisation_type_pages_are_platform_admin_only(
+    client_request,
+    method,
+):
+    getattr(client_request, method)(
+        'main.set_organisation_type',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+        _test_page_title=False,
+    )
+
+
+def test_should_show_page_to_set_organisation_type(
+    logged_in_platform_admin_client,
+):
+    response = logged_in_platform_admin_client.get(url_for(
+        'main.set_organisation_type',
+        service_id=SERVICE_ONE_ID
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    labels = page.select('label')
+    checked_radio_buttons = page.select('input[checked]')
+
+    assert len(checked_radio_buttons) == 1
+    assert checked_radio_buttons[0]['value'] == 'central'
+
+    assert len(labels) == 3
+    for index, expected in enumerate((
+        'Central government',
+        'Local government',
+        'NHS',
+    )):
+        assert normalize_spaces(labels[index].text) == expected
+
+
+@pytest.mark.parametrize('organisation_type', [
+    'central',
+    'local',
+    'nhs',
+    pytest.mark.xfail('private sector'),
+])
+def test_should_set_organisaton_type(
+    logged_in_platform_admin_client,
+    mock_update_service,
+    organisation_type,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            'main.set_organisation_type',
+            service_id=SERVICE_ONE_ID,
+        ),
+        data={
+            'organisation_type': organisation_type,
+            'organisation': 'organisation-id'
+        },
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        organisation_type=organisation_type,
     )
 
 
