@@ -1,0 +1,62 @@
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field %}
+{% extends "withoutnav_template.html" %}
+
+{% block per_page_title %}
+  Information risk management
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-two-thirds">
+    <h1 class="heading-large">Approach to information risk management</h1>
+
+    <p>
+        The information risk management approach taken by GOV.UK Notify is aligned to the guidance provided by the 
+        National Cyber Security Centre (NCSC) on GOV.UK.
+    </p>
+
+    <p>
+      The scope includes the risk assessment of:
+    </p>
+
+      <ul class="list list-bullet">
+        <li>the GOV.UK Notify technical solution, infrastructure and supporting operations</li>
+        <li>the text message, email, and letter service providers used by GOV.UK Notify</li>
+      </ul>
+
+    <p>
+      The ongoing information risk management activities include:
+    </p>
+
+      <ul class="list list-bullet">
+        <li>formal risk assessments using a methodology based on <a href="http://www.iso.org/iso/catalogue_detail?csnumber=56742">ISO 27005</a>:2011
+            and supplemented by reference to NCSC standards and guidance documentation</li>
+        <li><a href="https://www.cesg.gov.uk/articles/check-fundamental-principles">CHECK</a>-based IT Health Check (ITHC) testing 
+            (annual and on major change)</li>
+        <li>residual risk statement preparation and active management of the risk treatment plan</li>
+        <li>regular updates to the Privacy Impact Assessment</li>
+        <li>security impact assessments</li>
+        <li>legal reviews of the service’s Privacy Policy, Terms of Use and Data Sharing and Financial 
+            Agreement to ensure Data Protection Act (‘DPA’) compliance</li>
+        <li>Office of the Government’s SIRO (OGSIRO) offshoring approvals to host data within the EEA</li>
+        <li>annual reviews of the risk acceptance status with the Cabinet Office Senior Information Risk Owner (SIRO)</li>
+      </ul>
+
+    <p>
+      Controls implemented for the GOV.UK Notify technical solution and operational support team include:
+    </p>
+
+      <ul class="list list-bullet">
+        <li>Data encryption in transit and at rest</li>
+        <li>Protective Monitoring</li>
+        <li>System administration staff SC cleared</li>
+        <li>Service subject to Cabinet Office and GDS security governance</li>
+      </ul>
+
+    <p>
+      Information within the GOV.UK Notify service is deemed to have a classification of ‘OFFICIAL’ under 
+      the Government Security Classifications Policy.
+    </p>
+
+{% endblock %}
