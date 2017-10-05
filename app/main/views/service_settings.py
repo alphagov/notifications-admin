@@ -35,6 +35,7 @@ from app.main.forms import (
     ServiceInboundApiForm,
     InternationalSMSForm,
     OrganisationTypeForm,
+    FreeSMSAllowance,
 )
 from app import user_api_client, current_service, organisations_client, inbound_number_client
 from notifications_utils.formatters import formatted_list
@@ -589,10 +590,28 @@ def set_organisation_type(service_id):
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 
-    form.organisation_type.data = current_service.get('organisation_type')
-
     return render_template(
         'views/service-settings/set-organisation-type.html',
+        form=form,
+    )
+
+
+@main.route("/services/<service_id>/service-settings/set-free-sms-allowance", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions(admin_override=True)
+def set_free_sms_allowance(service_id):
+
+    form = FreeSMSAllowance(free_sms_allowance=current_service['free_sms_fragment_limit'])
+
+    if form.validate_on_submit():
+        service_api_client.update_service(
+            service_id,
+            free_sms_fragment_limit=form.free_sms_allowance.data,
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/set-free-sms-allowance.html',
         form=form,
     )
 

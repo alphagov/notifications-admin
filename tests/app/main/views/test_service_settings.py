@@ -66,7 +66,7 @@ from tests.conftest import (
 
         'Label Value Action',
         'Organisation type Central Change',
-        'Free text message allowance 250,000',
+        'Free text message allowance 250,000 Change',
         'Email branding GOV.UK Change',
         'Letter branding HM Government Change',
 
@@ -1363,12 +1363,17 @@ def test_should_set_branding_and_organisations(
 
 
 @pytest.mark.parametrize('method', ['get', 'post'])
+@pytest.mark.parametrize('endpoint', [
+    'main.set_organisation_type',
+    'main.set_free_sms_allowance',
+])
 def test_organisation_type_pages_are_platform_admin_only(
     client_request,
     method,
+    endpoint,
 ):
     getattr(client_request, method)(
-        'main.set_organisation_type',
+        endpoint,
         service_id=SERVICE_ONE_ID,
         _expected_status=403,
         _test_page_title=False,
@@ -1406,7 +1411,7 @@ def test_should_show_page_to_set_organisation_type(
     'nhs',
     pytest.mark.xfail('private sector'),
 ])
-def test_should_set_organisaton_type(
+def test_should_set_organisation_type(
     logged_in_platform_admin_client,
     mock_update_service,
     organisation_type,
@@ -1427,6 +1432,48 @@ def test_should_set_organisaton_type(
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
         organisation_type=organisation_type,
+    )
+
+
+def test_should_show_page_to_set_sms_allowance(
+    logged_in_platform_admin_client,
+):
+    response = logged_in_platform_admin_client.get(url_for(
+        'main.set_free_sms_allowance',
+        service_id=SERVICE_ONE_ID
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.select_one('label').text) == 'Numbers of text message fragments per year'
+
+
+@pytest.mark.parametrize('given_allowance, expected_api_argument', [
+    ('1', 1),
+    ('250000', 250000),
+    pytest.mark.xfail(('foo', 'foo')),
+])
+def test_should_set_sms_allowance(
+    logged_in_platform_admin_client,
+    mock_update_service,
+    given_allowance,
+    expected_api_argument,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            'main.set_free_sms_allowance',
+            service_id=SERVICE_ONE_ID,
+        ),
+        data={
+            'free_sms_allowance': given_allowance,
+        },
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        free_sms_fragment_limit=expected_api_argument,
     )
 
 

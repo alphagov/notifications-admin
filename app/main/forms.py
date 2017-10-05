@@ -246,6 +246,15 @@ class OrganisationTypeForm(Form):
     organisation_type = organisation_type()
 
 
+class FreeSMSAllowance(Form):
+    free_sms_allowance = IntegerField(
+        'Numbers of text message fragments per year',
+        validators=[
+            DataRequired(message='Can’t be empty')
+        ]
+    )
+
+
 class ConfirmPasswordForm(Form):
     def __init__(self, validate_password_func, *args, **kwargs):
         self.validate_password_func = validate_password_func
