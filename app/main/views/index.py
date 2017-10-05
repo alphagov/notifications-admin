@@ -130,3 +130,8 @@ def features():
 @main.route('/using_notify')
 def using_notify():
     return render_template('views/using-notify.html')
+
+
+@main.route('/information_risk_management')
+def information_risk_management():
+    return render_template('views/information-risk-management.html')
