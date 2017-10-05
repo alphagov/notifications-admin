@@ -89,7 +89,7 @@ def no_reply_to_email_addresses(mocker):
 
 
 @pytest.fixture(scope='function')
-def single_reply_to_email_addresses(mocker):
+def single_reply_to_email_address(mocker):
     def _get(service_id):
         return [
             {
@@ -149,6 +149,125 @@ def mock_update_reply_to_email_address(mocker):
         return
 
     return mocker.patch('app.service_api_client.update_reply_to_email_address', side_effect=_update_reply_to)
+
+
+@pytest.fixture(scope='function')
+def multiple_letter_contact_blocks(mocker):
+    def _get(service_id):
+        return [
+            {
+                'id': '1234',
+                'service_id': service_id,
+                'contact_block': '1 Example Street',
+                'is_default': True,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }, {
+                'id': '5678',
+                'service_id': service_id,
+                'contact_block': '2 Example Street',
+                'is_default': False,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }, {
+                'id': '9457',
+                'service_id': service_id,
+                'contact_block': '3 Example Street',
+                'is_default': False,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }
+        ]
+
+    return mocker.patch('app.service_api_client.get_letter_contacts', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def no_letter_contact_blocks(mocker):
+    def _get(service_id):
+        return []
+
+    return mocker.patch('app.service_api_client.get_letter_contacts', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def single_letter_contact_block(mocker):
+    def _get(service_id):
+        return [
+            {
+                'id': '1234',
+                'service_id': service_id,
+                'contact_block': '1 Example Street',
+                'is_default': True,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }
+        ]
+
+    return mocker.patch('app.service_api_client.get_letter_contacts', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def injected_letter_contact_block(mocker):
+    def _get(service_id):
+        return [
+            {
+                'id': '1234',
+                'service_id': service_id,
+                'contact_block': 'foo\nbar<script>alert(1);</script>',
+                'is_default': True,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }
+        ]
+
+    return mocker.patch('app.service_api_client.get_letter_contacts', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def get_default_letter_contact_block(mocker):
+    def _get(service_id, letter_contact_id):
+        return {
+            'id': '1234',
+            'service_id': service_id,
+            'contact_block': '1 Example Street',
+            'is_default': True,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }
+
+    return mocker.patch('app.service_api_client.get_letter_contact', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def get_non_default_letter_contact_block(mocker):
+    def _get(service_id, letter_contact_id):
+        return {
+            'id': '1234',
+            'service_id': service_id,
+            'contact_block': '1 Example Street',
+            'is_default': False,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }
+
+    return mocker.patch('app.service_api_client.get_letter_contact', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def mock_add_letter_contact(mocker):
+    def _add_letter_contact(service_id, contact_block, is_default=False):
+        return
+
+    return mocker.patch('app.service_api_client.add_letter_contact', side_effect=_add_letter_contact)
+
+
+@pytest.fixture(scope='function')
+def mock_update_letter_contact(mocker):
+    def _update_letter_contact(service_id, letter_contact_id, contact_block, is_default=False):
+        return
+
+    return mocker.patch('app.service_api_client.update_letter_contact', side_effect=_update_letter_contact)
 
 
 @pytest.fixture(scope='function')

@@ -1,0 +1,48 @@
+{% extends "withnav_template.html" %}
+{% from "components/api-key.html" import api_key %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table %}
+
+{% block service_page_title %}
+  Sender addresses
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="grid-row bottom-gutter">
+    <div class="column-two-thirds">
+      <h1 class="heading-large">
+        Sender addresses
+      </h1>
+    </div>
+   <div class="column-one-third">
+     <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id) }}" class="button align-with-heading">Add a new address</a>
+   </div>
+  </div>
+  <div class="user-list">
+    {% if not letter_contact_details %}
+      <div class="user-list-item">
+        <span class="hint">You haven’t added any letter contact details yet</span>
+      </div>
+    {% endif %}
+    {% for item in letter_contact_details %}
+      <div class="user-list-item">
+        <h3>
+          <span class="heading-small">{{ item.contact_block }}</span>&ensp;<span class="hint">
+            {%- if item.is_default -%}
+              (default)
+            {% endif %}
+          </span>
+        </h3>
+        <ul class="tick-cross-list">
+          <li class="tick-cross-list-edit-link">
+            <a href="{{ url_for('.service_edit_letter_contact', service_id =current_service.id, letter_contact_id = item.id) }}">Change</a>
+          </li>
+        </ul>
+        {% if letter_contact_details|length  > 1 %}
+          {{ api_key(item.id, thing="ID") }}
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

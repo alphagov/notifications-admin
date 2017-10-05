@@ -15,10 +15,15 @@ from tests.conftest import (
     platform_admin_user,
     normalize_spaces,
     no_reply_to_email_addresses,
-    single_reply_to_email_addresses,
+    single_reply_to_email_address,
     multiple_reply_to_email_addresses,
+    multiple_letter_contact_blocks,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
     get_default_reply_to_email_address,
     get_non_default_reply_to_email_address,
+    get_default_letter_contact_block,
+    get_non_default_letter_contact_block,
     SERVICE_ONE_ID
     )
 
@@ -74,6 +79,7 @@ def test_should_show_overview(
         fake_uuid,
         mock_get_letter_organisations,
         no_reply_to_email_addresses,
+        no_letter_contact_blocks,
         user,
         expected_rows,
         mock_get_inbound_number_for_service
@@ -139,7 +145,8 @@ def test_should_show_overview_for_service_with_more_things_set(
         active_user_with_permissions,
         mocker,
         service_one,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_organisation,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service,
@@ -165,7 +172,8 @@ def test_service_settings_show_elided_api_url_if_needed(
         logged_in_platform_admin_client,
         service_one,
         mock_get_letter_organisations,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mocker,
         fake_uuid,
         url,
@@ -210,7 +218,8 @@ def test_if_can_receive_inbound_then_cant_change_sms_sender(
         logged_in_client,
         service_one,
         mock_get_letter_organisations,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_inbound_number_for_service
 ):
     service_one['permissions'] = ['email', 'sms', 'inbound_sms']
@@ -229,7 +238,8 @@ def test_letter_contact_block_shows_none_if_not_set(
         logged_in_client,
         service_one,
         mocker,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        no_letter_contact_blocks,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -248,12 +258,12 @@ def test_escapes_letter_contact_block(
         logged_in_client,
         service_one,
         mocker,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        injected_letter_contact_block,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
     service_one['permissions'] = ['letter']
-    service_one['letter_contact_block'] = 'foo\nbar<script>alert(1);</script>'
     response = logged_in_client.get(url_for(
         'main.service_settings', service_id=service_one['id']
     ))
@@ -298,7 +308,8 @@ def test_show_restricted_service(
         logged_in_client,
         service_one,
         mock_get_letter_organisations,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_inbound_number_for_service
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
@@ -330,7 +341,8 @@ def test_show_live_service(
         logged_in_client,
         service_one,
         mock_get_live_service,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -455,7 +467,8 @@ def test_should_redirect_after_request_to_go_live(
     client_request,
     mocker,
     active_user_with_permissions,
-    single_reply_to_email_addresses,
+    single_reply_to_email_address,
+    single_letter_contact_block,
     mock_get_letter_organisations,
     mock_get_inbound_number_for_service,
 ):
@@ -552,7 +565,8 @@ def test_route_permissions(
         client,
         api_user_active,
         service_one,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_letter_organisations,
         route,
         mock_get_inbound_number_for_service
@@ -610,7 +624,8 @@ def test_route_for_platform_admin(
         client,
         platform_admin_user,
         service_one,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_letter_organisations,
         route,
         mock_get_inbound_number_for_service
@@ -678,13 +693,16 @@ def test_enabling_and_disabling_email_and_sms(
     assert mocked_fn.call_args == call(service_one['id'], {'permissions': permissions_after_switch})
 
 
-def test_reply_to_hint_appears_when_service_has_multiple_reply_to_addresses(
+def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         client_request,
-        multiple_reply_to_email_addresses,
         service_one,
         mock_get_letter_organisations,
-        mock_get_inbound_number_for_service
+        mock_get_inbound_number_for_service,
+        multiple_reply_to_email_addresses,
+        multiple_letter_contact_blocks
 ):
+    service_one['permissions'] = ['email', 'sms', 'letter']
+
     page = client_request.get(
         'main.service_settings',
         service_id=service_one['id']
@@ -693,52 +711,107 @@ def test_reply_to_hint_appears_when_service_has_multiple_reply_to_addresses(
     assert normalize_spaces(
         page.select('tbody tr')[2].text
     ) == "Email reply to addresses test@example.com …and 2 more Manage"
+    assert normalize_spaces(
+        page.select('tbody tr')[8].text
+    ) == "Sender addresses 1 Example Street …and 2 more Manage"
 
 
-def test_single_reply_to_address_shows_default_but_without_id(
+@pytest.mark.parametrize('sender_list_page, expected_output', [
+    ('main.service_email_reply_to', 'test@example.com (default) Change'),
+    ('main.service_letter_contact_details', '1 Example Street (default) Change'),
+])
+def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
     client_request,
-    single_reply_to_email_addresses
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    sender_list_page,
+    expected_output
 ):
     rows = client_request.get(
-        'main.service_email_reply_to',
+        sender_list_page,
         service_id=SERVICE_ONE_ID
     ).select(
         '.user-list-item'
     )
 
-    assert normalize_spaces(rows[0].text) == "test@example.com (default) Change"
+    assert normalize_spaces(rows[0].text) == expected_output
     assert len(rows) == 1
 
 
-def test_default_email_reply_to_address_has_default_hint(
-    client_request,
-    multiple_reply_to_email_addresses
-):
-    rows = client_request.get(
+@pytest.mark.parametrize(
+    'sender_list_page, \
+    sample_data, \
+    expected_default_sender_output, \
+    expected_second_sender_output, \
+    expected_third_sender_output',
+    [(
         'main.service_email_reply_to',
+        multiple_reply_to_email_addresses,
+        'test@example.com (default) Change 1234',
+        'test2@example.com Change 5678',
+        'test3@example.com Change 9457'
+    ), (
+        'main.service_letter_contact_details',
+        multiple_letter_contact_blocks,
+        '1 Example Street (default) Change 1234',
+        '2 Example Street Change 5678',
+        '3 Example Street Change 9457'
+    ),
+    ]
+)
+def test_default_option_shows_for_default_sender(
+    client_request,
+    mocker,
+    sender_list_page,
+    sample_data,
+    expected_default_sender_output,
+    expected_second_sender_output,
+    expected_third_sender_output
+):
+    sample_data(mocker)
+
+    rows = client_request.get(
+        sender_list_page,
         service_id=SERVICE_ONE_ID
     ).select(
         '.user-list-item'
     )
 
-    assert normalize_spaces(rows[0].text) == "test@example.com (default) Change 1234"
-    assert normalize_spaces(rows[1].text) == "test2@example.com Change 5678"
-    assert normalize_spaces(rows[2].text) == "test3@example.com Change 9457"
+    assert normalize_spaces(rows[0].text) == expected_default_sender_output
+    assert normalize_spaces(rows[1].text) == expected_second_sender_output
+    assert normalize_spaces(rows[2].text) == expected_third_sender_output
     assert len(rows) == 3
 
 
-def test_no_reply_to_email_addresses_message_shows(
-    client_request,
-    no_reply_to_email_addresses
-):
-    rows = client_request.get(
+@pytest.mark.parametrize('sender_list_page, sample_data, expected_output', [
+    (
         'main.service_email_reply_to',
+        no_reply_to_email_addresses,
+        'You haven’t added any email reply to addresses yet'
+    ),
+    (
+        'main.service_letter_contact_details',
+        no_letter_contact_blocks,
+        'You haven’t added any letter contact details yet'
+    ),
+])
+def test_no_senders_message_shows(
+    client_request,
+    sender_list_page,
+    expected_output,
+    sample_data,
+    mocker
+):
+    sample_data(mocker)
+
+    rows = client_request.get(
+        sender_list_page,
         service_id=SERVICE_ONE_ID
     ).select(
         '.user-list-item'
     )
 
-    assert normalize_spaces(rows[0].text) == "You haven’t added any email reply to addresses yet"
+    assert normalize_spaces(rows[0].text) == expected_output
     assert len(rows) == 1
 
 
@@ -757,6 +830,26 @@ def test_incorrect_reply_to_email_address(
         'main.service_add_email_reply_to',
         service_id=SERVICE_ONE_ID,
         _data={'email_address': reply_to_input},
+        _expected_status=200
+    )
+
+    assert normalize_spaces(page.select_one('.error-message').text) == expected_error
+
+
+@pytest.mark.parametrize('contact_block_input, expected_error', [
+    ('', 'Can’t be empty'),
+    ('1 \n 2 \n 3 \n 4 \n 5 \n 6 \n 7 \n 8 \n 9 \n 0 \n a', 'Contains 11 lines, maximum is 10')
+])
+def test_incorrect_letter_contact_block(
+    contact_block_input,
+    expected_error,
+    client_request,
+    no_letter_contact_blocks
+):
+    page = client_request.post(
+        'main.service_add_letter_contact',
+        service_id=SERVICE_ONE_ID,
+        _data={'letter_contact_block': contact_block_input},
         _expected_status=200
     )
 
@@ -791,11 +884,42 @@ def test_add_reply_to_email_address(
     )
 
 
-@pytest.mark.parametrize('fixture, checkbox_present', [
-    (no_reply_to_email_addresses, False),
-    (multiple_reply_to_email_addresses, True)
+@pytest.mark.parametrize('fixture, data, api_default_args', [
+    (no_letter_contact_blocks, {}, True),
+    (multiple_letter_contact_blocks, {}, False),
+    (multiple_letter_contact_blocks, {"is_default": "y"}, True)
 ])
-def test_default_box_shows_on_first_email_address(
+def test_add_letter_contact(
+    fixture,
+    data,
+    api_default_args,
+    mocker,
+    client_request,
+    mock_add_letter_contact
+):
+    fixture(mocker)
+    data['letter_contact_block'] = "1 Example Street"
+    page = client_request.post(
+        'main.service_add_letter_contact',
+        service_id=SERVICE_ONE_ID,
+        _data=data
+    )
+
+    mock_add_letter_contact.assert_called_once_with(
+        SERVICE_ONE_ID,
+        contact_block="1 Example Street",
+        is_default=api_default_args
+    )
+
+
+@pytest.mark.parametrize('sender_page, fixture, checkbox_present', [
+    ('main.service_add_email_reply_to', no_reply_to_email_addresses, False),
+    ('main.service_add_email_reply_to', multiple_reply_to_email_addresses, True),
+    ('main.service_add_letter_contact', no_letter_contact_blocks, False),
+    ('main.service_add_letter_contact', multiple_letter_contact_blocks, True)
+])
+def test_default_box_doesnt_show_on_first_sender(
+    sender_page,
     fixture,
     mocker,
     checkbox_present,
@@ -803,7 +927,7 @@ def test_default_box_shows_on_first_email_address(
 ):
     fixture(mocker)
     page = client_request.get(
-        'main.service_add_email_reply_to',
+        sender_page,
         service_id=SERVICE_ONE_ID
     )
 
@@ -842,29 +966,94 @@ def test_edit_reply_to_email_address(
     )
 
 
-@pytest.mark.parametrize('fixture, checkbox_present', [
-    (get_default_reply_to_email_address, False),
-    (get_non_default_reply_to_email_address, True)
+@pytest.mark.parametrize('fixture, data, api_default_args', [
+    (get_default_letter_contact_block, {"is_default": "y"}, True),
+    (get_default_letter_contact_block, {}, True),
+    (get_non_default_letter_contact_block, {}, False),
+    (get_non_default_letter_contact_block, {"is_default": "y"}, True)
 ])
-def test_default_box_shows_on_non_default_email_addresses_while_editing(
+def test_edit_letter_contact_block(
+    fixture,
+    data,
+    api_default_args,
+    mocker,
+    fake_uuid,
+    client_request,
+    mock_update_letter_contact
+):
+    fixture(mocker)
+    data['letter_contact_block'] = "1 Example Street"
+    page = client_request.post(
+        'main.service_edit_letter_contact',
+        service_id=SERVICE_ONE_ID,
+        letter_contact_id=fake_uuid,
+        _data=data
+    )
+
+    mock_update_letter_contact.assert_called_once_with(
+        SERVICE_ONE_ID,
+        letter_contact_id=fake_uuid,
+        contact_block="1 Example Street",
+        is_default=api_default_args
+    )
+
+
+@pytest.mark.parametrize('sender_page, fixture, default_message, params, checkbox_present', [
+    (
+        'main.service_edit_email_reply_to',
+        get_default_reply_to_email_address,
+        'This is the default reply to address for service one emails',
+        'reply_to_email_id',
+        False
+    ),
+    (
+        'main.service_edit_email_reply_to',
+        get_non_default_reply_to_email_address,
+        'This is the default reply to address for service one emails',
+        'reply_to_email_id',
+        True
+    ),
+    (
+        'main.service_edit_letter_contact',
+        get_default_letter_contact_block,
+        'This is currently your default address for service one',
+        'letter_contact_id',
+        False
+    ),
+    (
+        'main.service_edit_letter_contact',
+        get_non_default_letter_contact_block,
+        'This is the default contact details for service one letters',
+        'letter_contact_id',
+        True
+    )
+])
+def test_default_box_shows_on_non_default_sender_details_while_editing(
     fixture,
     fake_uuid,
     mocker,
+    sender_page,
+    client_request,
+    default_message,
     checkbox_present,
-    client_request
+    params
 ):
+    page_arguments = {
+        'service_id': SERVICE_ONE_ID
+    }
+    page_arguments[params] = fake_uuid
+
     fixture(mocker)
     page = client_request.get(
-        'main.service_edit_email_reply_to',
-        service_id=SERVICE_ONE_ID,
-        reply_to_email_id=fake_uuid
+        sender_page,
+        **page_arguments
     )
 
     if checkbox_present:
         assert page.select_one('[name=is_default]')
     else:
         assert normalize_spaces(page.select_one('form p').text) == (
-            'This is the default reply to address for service one emails'
+            default_message
         )
 
 
@@ -914,7 +1103,8 @@ def test_shows_research_mode_indicator(
         service_one,
         mocker,
         mock_get_letter_organisations,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_inbound_number_for_service
 ):
     service_one['research_mode'] = True
@@ -932,7 +1122,8 @@ def test_does_not_show_research_mode_indicator(
         logged_in_client,
         service_one,
         mock_get_letter_organisations,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_inbound_number_for_service
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
@@ -1380,7 +1571,8 @@ def test_archive_service_prompts_user(
         logged_in_platform_admin_client,
         service_one,
         mocker,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -1397,7 +1589,8 @@ def test_archive_service_prompts_user(
 def test_cant_archive_inactive_service(
         logged_in_platform_admin_client,
         service_one,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -1429,7 +1622,8 @@ def test_suspend_service_prompts_user(
         logged_in_platform_admin_client,
         service_one,
         mocker,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -1447,7 +1641,8 @@ def test_suspend_service_prompts_user(
 def test_cant_suspend_inactive_service(
         logged_in_platform_admin_client,
         service_one,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -1463,7 +1658,8 @@ def test_cant_suspend_inactive_service(
 def test_resume_service_after_confirm(
         logged_in_platform_admin_client,
         service_one,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mocker,
         mock_get_inbound_number_for_service
 ):
@@ -1480,7 +1676,8 @@ def test_resume_service_after_confirm(
 def test_resume_service_prompts_user(
         logged_in_platform_admin_client,
         service_one,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mocker,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
@@ -1500,7 +1697,8 @@ def test_resume_service_prompts_user(
 def test_cant_resume_active_service(
         logged_in_platform_admin_client,
         service_one,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -1561,7 +1759,8 @@ def test_invitation_pages(
 def test_service_settings_when_inbound_number_is_not_set(
     logged_in_client,
     service_one,
-    single_reply_to_email_addresses,
+    single_reply_to_email_address,
+    single_letter_contact_block,
     mocker,
     mock_get_letter_organisations,
 ):
@@ -1576,7 +1775,8 @@ def test_service_settings_when_inbound_number_is_not_set(
 def test_set_inbound_sms_when_inbound_number_is_not_set(
     logged_in_client,
     service_one,
-    single_reply_to_email_addresses,
+    single_reply_to_email_address,
+    single_letter_contact_block,
     mocker,
     mock_get_letter_organisations,
 ):
