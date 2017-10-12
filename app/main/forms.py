@@ -480,13 +480,14 @@ class ServiceSmsSender(Form):
             raise ValidationError('Use letters and numbers only')
 
 
-class ServiceLetterContactBlock(Form):
+class ServiceLetterContactBlockForm(Form):
     letter_contact_block = TextAreaField(
         validators=[
             DataRequired(message="Can’t be empty"),
             NoCommasInPlaceHolders()
         ]
     )
+    is_default = BooleanField("Set as your default address")
 
     def validate_letter_contact_block(form, field):
         line_count = field.data.strip().count('\n')

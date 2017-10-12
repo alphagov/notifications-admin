@@ -127,6 +127,7 @@ def test_should_be_able_to_view_a_template_with_links(
     client,
     mock_get_service_template,
     active_user_with_permissions,
+    single_letter_contact_block,
     mocker,
     service_one,
     fake_uuid,
@@ -178,6 +179,7 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
     logged_in_client,
     mocker,
     service_one,
+    single_letter_contact_block,
     fake_uuid,
 ):
     msg = 'here:\tare some “fancy quotes” and zero\u200Bwidth\u200Bspaces'
@@ -813,6 +815,7 @@ def test_should_show_page_for_a_deleted_template(
     mock_login,
     mock_get_service,
     mock_get_deleted_template,
+    single_letter_contact_block,
     mock_get_user,
     mock_get_user_by_email,
     mock_has_permissions,
@@ -1132,6 +1135,7 @@ def test_should_show_redact_template(
     client_request,
     mock_get_service_template,
     mock_redact_template,
+    single_letter_contact_block,
     service_one,
     fake_uuid,
 ):

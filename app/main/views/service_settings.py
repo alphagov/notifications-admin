@@ -29,7 +29,7 @@ from app.main.forms import (
     RequestToGoLiveForm,
     ServiceReplyToEmailForm,
     ServiceSmsSender,
-    ServiceLetterContactBlock,
+    ServiceLetterContactBlockForm,
     ServiceBrandingOrg,
     LetterBranding,
     ServiceInboundApiForm,
@@ -75,6 +75,11 @@ def service_settings(service_id):
     default_reply_to_email_address = next(
         (x['email_address'] for x in reply_to_email_addresses if x['is_default']), "None"
         )
+    letter_contact_details = service_api_client.get_letter_contacts(service_id)
+    letter_contact_details_count = len(letter_contact_details)
+    default_letter_contact_block = next(
+        (Field(x['contact_block'], html='escape') for x in letter_contact_details if x['is_default']), "None"
+        )
     return render_template(
         'views/service-settings.html',
         organisation=organisation,
@@ -83,10 +88,11 @@ def service_settings(service_id):
         ),
         can_receive_inbound=('inbound_sms' in current_service['permissions']),
         inbound_api_url=inbound_api_url,
-        letter_contact_block=Field(current_service['letter_contact_block'], html='escape'),
         inbound_number=disp_inbound_number,
         default_reply_to_email_address=default_reply_to_email_address,
-        reply_to_email_address_count=reply_to_email_address_count
+        reply_to_email_address_count=reply_to_email_address_count,
+        default_letter_contact_block=default_letter_contact_block,
+        letter_contact_details_count=letter_contact_details_count
     )
 
 
@@ -491,6 +497,58 @@ def service_set_letters(service_id):
     )
 
 
+@main.route("/services/<service_id>/service-settings/letter-contacts", methods=['GET'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_letter_contact_details(service_id):
+    letter_contact_details = service_api_client.get_letter_contacts(service_id)
+    return render_template(
+        'views/service-settings/letter-contact-details.html',
+        letter_contact_details=letter_contact_details)
+
+
+@main.route("/services/<service_id>/service-settings/letter-contact/add", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_add_letter_contact(service_id):
+    form = ServiceLetterContactBlockForm()
+    letter_contact_blocks_count = len(service_api_client.get_letter_contacts(service_id))
+    first_contact_block = letter_contact_blocks_count == 0
+    if form.validate_on_submit():
+        service_api_client.add_letter_contact(
+            current_service['id'],
+            contact_block=form.letter_contact_block.data.replace('\r', '') or None,
+            is_default=first_contact_block if first_contact_block else form.is_default.data
+        )
+        return redirect(url_for('.service_letter_contact_details', service_id=service_id))
+    return render_template(
+        'views/service-settings/letter-contact/add.html',
+        form=form,
+        first_contact_block=first_contact_block)
+
+
+@main.route("/services/<service_id>/service-settings/letter-contact/<letter_contact_id>/edit", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_edit_letter_contact(service_id, letter_contact_id):
+    letter_contact_block = service_api_client.get_letter_contact(service_id, letter_contact_id)
+    form = ServiceLetterContactBlockForm(letter_contact_block=letter_contact_block['contact_block'])
+    if request.method == 'GET':
+        form.is_default.data = letter_contact_block['is_default']
+    if form.validate_on_submit():
+        service_api_client.update_letter_contact(
+            current_service['id'],
+            letter_contact_id=letter_contact_id,
+            contact_block=form.letter_contact_block.data.replace('\r', '') or None,
+            is_default=True if letter_contact_block['is_default'] else form.is_default.data
+        )
+        return redirect(url_for('.service_letter_contact_details', service_id=service_id))
+    return render_template(
+        'views/service-settings/letter-contact/edit.html',
+        form=form,
+        letter_contact_id=letter_contact_block['id'])
+
+
 @main.route("/services/<service_id>/service-settings/set-letter-contact-block", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
@@ -499,7 +557,7 @@ def service_set_letter_contact_block(service_id):
     if 'letter' not in current_service['permissions']:
         abort(403)
 
-    form = ServiceLetterContactBlock(letter_contact_block=current_service['letter_contact_block'])
+    form = ServiceLetterContactBlockForm(letter_contact_block=current_service['letter_contact_block'])
     if form.validate_on_submit():
         service_api_client.update_service(
             current_service['id'],

@@ -318,6 +318,42 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             }
         )
 
+    def get_letter_contacts(self, service_id):
+        return self.get(
+            "/service/{}/letter-contact".format(
+                service_id
+            )
+        )
+
+    def get_letter_contact(self, service_id, letter_contact_id):
+        return self.get(
+            "/service/{}/letter-contact/{}".format(
+                service_id,
+                letter_contact_id
+            )
+        )
+
+    def add_letter_contact(self, service_id, contact_block, is_default=False):
+        return self.post(
+            "/service/{}/letter-contact".format(service_id),
+            data={
+                "contact_block": contact_block,
+                "is_default": is_default
+            }
+        )
+
+    def update_letter_contact(self, service_id, letter_contact_id, contact_block, is_default=False):
+        return self.post(
+            "/service/{}/letter-contact/{}".format(
+                service_id,
+                letter_contact_id,
+            ),
+            data={
+                "contact_block": contact_block,
+                "is_default": is_default
+            }
+        )
+
 
 class ServicesBrowsableItem(BrowsableItem):
     @property

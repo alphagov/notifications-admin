@@ -26,7 +26,8 @@ def test_get_inbound_number_in_service_settings(
         logged_in_client,
         mock_update_service,
         mock_get_letter_organisations,
-        single_reply_to_email_addresses,
+        single_reply_to_email_address,
+        single_letter_contact_block,
         service_one,
         mocker
 ):
