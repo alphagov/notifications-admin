@@ -28,16 +28,7 @@
 
   {% else %}
 
-    {% if show_search_box %}
-      <div data-module="autofocus">
-        <div class="live-search" data-module="live-search" data-targets="#template-list .column-whole">
-          {{ textbox(
-            search_form.search,
-            width='1-1'
-          ) }}
-        </div>
-      </div>
-    {% endif %}
+    {% include "views/templates/_search-box.html" %}
 
     <nav class="grid-row" id=template-list>
       {% for template in templates %}
