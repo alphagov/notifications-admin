@@ -1,5 +1,7 @@
 from flask import (
     jsonify,
+    session,
+    redirect,
     render_template,
     url_for,
 )
@@ -60,7 +62,28 @@ def conversation_reply(
         show_search_box=(len(templates) > 7),
         template_type='sms',
         search_form=SearchTemplatesForm(),
+        notification_id=notification_id,
     )
+
+
+@main.route("/services/<service_id>/conversation/<notification_id>/reply-with/<template_id>")
+@login_required
+@user_has_permissions('send_texts', admin_override=True)
+def conversation_reply_with_template(
+    service_id,
+    notification_id,
+    template_id,
+):
+
+    session['recipient'] = get_user_number(service_id, notification_id)
+    session['placeholders'] = {'phone number': session['recipient']}
+
+    return redirect(url_for(
+        'main.send_one_off_step',
+        service_id=service_id,
+        template_id=template_id,
+        step_index=1,
+    ))
 
 
 def get_conversation_partials(service_id, user_number):

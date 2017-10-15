@@ -43,7 +43,7 @@
       {% for template in templates %}
         <div class="column-whole">
           <h2 class="message-name">
-            <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">{{ template.name }}</a>
+            <a href="{{ url_for('.conversation_reply_with_template', service_id=current_service.id, template_id=template.id, notification_id=notification_id) }}">{{ template.name }}</a>
           </h2>
           <p class="message-type">
             {{ message_count_label(1, template.template_type, suffix='')|capitalize }} template
