@@ -1,0 +1,56 @@
+{% from "components/pill.html" import pill %}
+{% from "components/message-count-label.html" import message_count_label %}
+{% from "components/textbox.html" import textbox %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Choose a template
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">Choose a template</h1>
+
+  {% if not templates %}
+
+    {% if current_user.has_permissions(permissions=['manage_templates'], any_=True) %}
+       <p class="bottom-gutter">
+         You need a template before you can send text messages.
+       </p>
+      <a href="{{ url_for('.add_template_by_type', service_id=current_service.id) }}" class="button">Add a new template</a>
+    {% else %}
+      <p>
+        You need to ask your service manager to add templates before you
+        can send text messages.
+      </p>
+    {% endif %}
+
+  {% else %}
+
+    {% if show_search_box %}
+      <div data-module="autofocus">
+        <div class="live-search" data-module="live-search" data-targets="#template-list .column-whole">
+          {{ textbox(
+            search_form.search,
+            width='1-1'
+          ) }}
+        </div>
+      </div>
+    {% endif %}
+
+    <nav class="grid-row" id=template-list>
+      {% for template in templates %}
+        <div class="column-whole">
+          <h2 class="message-name">
+            <a href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">{{ template.name }}</a>
+          </h2>
+          <p class="message-type">
+            {{ message_count_label(1, template.template_type, suffix='')|capitalize }} template
+          </p>
+        </div>
+      {% endfor %}
+    </nav>
+  {% endif %}
+
+{% endblock %}
