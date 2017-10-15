@@ -71,7 +71,7 @@ def user_has_permissions(*permissions, admin_override=False, any_=False):
         def wrap_func(*args, **kwargs):
             if current_user and current_user.is_authenticated:
                 if current_user.has_permissions(
-                    permissions=permissions,
+                    *permissions,
                     admin_override=admin_override,
                     any_=any_
                 ):

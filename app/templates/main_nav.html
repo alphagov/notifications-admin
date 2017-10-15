@@ -44,17 +44,17 @@
 <nav class="navigation">
   <ul>
     <li><a href="{{ url_for('.service_dashboard', service_id=current_service.id) }}">Dashboard</a></li>
-  {% if current_user.has_permissions(['view_activity', 'manage_templates', 'manage_api_keys'], admin_override=True, any_=True) %}
+  {% if current_user.has_permissions('view_activity', 'manage_templates', 'manage_api_keys', admin_override=True, any_=True) %}
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id) }}">Templates</a></li>
   {% endif %}
-  {% if current_user.has_permissions(['manage_users', 'manage_settings'], admin_override=True) %}
+  {% if current_user.has_permissions('manage_users', 'manage_settings', admin_override=True) %}
     <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>
     <li><a href="{{ url_for('.usage', service_id=current_service.id) }}">Usage</a></li>
     <li><a href="{{ url_for('.service_settings', service_id=current_service.id) }}">Settings</a></li>
-  {% elif current_user.has_permissions(['view_activity']) %}
+  {% elif current_user.has_permissions('view_activity') %}
     <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>
   {% endif %}
-  {% if current_user.has_permissions(['manage_api_keys'], admin_override=True) %}
+  {% if current_user.has_permissions('manage_api_keys', admin_override=True) %}
     <li><a href="{{ url_for('.api_integration', service_id=current_service.id) }}">API integration</a></li>
   {% endif %}
   </ul>

@@ -91,7 +91,8 @@ class User(UserMixin):
     def permissions(self, permissions):
         raise AttributeError("Read only property")
 
-    def has_permissions(self, permissions=[], any_=False, admin_override=False):
+    def has_permissions(self, *permissions, any_=False, admin_override=False):
+
         # Only available to the platform admin user
         if admin_override and self.platform_admin:
             return True
@@ -166,7 +167,7 @@ class InvitedUser(object):
         self.created_at = created_at
         self.auth_type = auth_type
 
-    def has_permissions(self, permissions):
+    def has_permissions(self, *permissions):
         return set(self.permissions) > set(permissions)
 
     def __eq__(self, other):
