@@ -161,3 +161,45 @@ def test_should_show_image_of_letter_notification(
     assert response.get_data(as_text=True) == 'foo'
     assert isinstance(mocked_preview.call_args[0][0], LetterImageTemplate)
     assert mocked_preview.call_args[0][1] == 'png'
+
+
+@pytest.mark.parametrize('service_permissions, template_type, link_expected', [
+    ([], '', False),
+    (['inbound_sms'], 'email', False),
+    (['inbound_sms'], 'letter', False),
+    (['inbound_sms'], 'sms', True),
+])
+def test_notification_page_has_link_to_send_another_for_sms(
+    client_request,
+    mocker,
+    fake_uuid,
+    service_one,
+    service_permissions,
+    template_type,
+    link_expected,
+):
+
+    service_one['permissions'] = service_permissions
+    mock_get_notification(mocker, fake_uuid, template_type=template_type)
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    last_paragraph = page.select('main p')[-1]
+
+    if link_expected:
+        assert normalize_spaces(last_paragraph.text) == (
+            'See all text messages sent to this phone number'
+        )
+        assert last_paragraph.select_one('a')['href'] == url_for(
+            '.conversation',
+            service_id=SERVICE_ONE_ID,
+            notification_id=fake_uuid,
+            _anchor='n{}'.format(fake_uuid),
+        )
+    else:
+        # covers ‘Delivered’, ‘Expected delivery date’
+        assert 'deliver' in normalize_spaces(last_paragraph.text).lower()
