@@ -13,7 +13,7 @@
     </h1>
     <div class="grid-row">
       <div class="column-two-thirds">
-        <form method="post">
+        <form method="post" autocomplete="off" novalidate>
             {{ textbox(form.feedback, width='1-1', hint='', rows=10) }}
             {% if not current_user.is_authenticated %}
               <h3 class="heading-medium">Do you want a reply?</h3>
