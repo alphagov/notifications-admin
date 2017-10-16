@@ -26,6 +26,12 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_service,
     mock_get_live_service,
+    multiple_reply_to_email_addresses,
+    multiple_letter_contact_blocks,
+    multiple_sms_senders,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    no_sms_senders
 )
 
 template_types = ['email', 'sms']
@@ -33,6 +39,101 @@ template_types = ['email', 'sms']
 # The * ignores hidden files, eg .DS_Store
 test_spreadsheet_files = glob(path.join('tests', 'spreadsheet_files', '*'))
 test_non_spreadsheet_files = glob(path.join('tests', 'non_spreadsheet_files', '*'))
+
+
+@pytest.mark.parametrize('template_mock, sender_data, expected_title, expected_description', [
+    (
+        mock_get_service_email_template,
+        multiple_reply_to_email_addresses,
+        'Choose where to send replies',
+        'Select an email address that recipients can reply to'
+    ),
+])
+def test_show_correct_title_and_description_for_sender_type(
+    client_request,
+    service_one,
+    fake_uuid,
+    template_mock,
+    sender_data,
+    expected_title,
+    expected_description,
+    mocker
+):
+    template_mock(mocker)
+    sender_data(mocker)
+
+    page = client_request.get(
+        '.set_sender',
+        service_id=service_one['id'],
+        template_id=fake_uuid
+    )
+
+    assert page.select_one('h1').text == expected_title
+    assert normalize_spaces(page.select_one('legend').text) == expected_description
+
+
+def test_default_sender_is_checked_and_has_hint(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_email_template,
+    multiple_reply_to_email_addresses
+):
+    page = client_request.get(
+        '.set_sender',
+        service_id=service_one['id'],
+        template_id=fake_uuid
+    )
+
+    assert page.select('.multiple-choice input')[0].has_attr('checked')
+    assert normalize_spaces(page.select_one('.multiple-choice label .block-label-hint').text) == "Default"
+    assert not page.select('.multiple-choice input')[1].has_attr('checked')
+    assert not page.select('.multiple-choice input')[2].has_attr('checked')
+
+
+def test_sender_session_is_present_after_selected(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    mock_get_service_email_template,
+    multiple_reply_to_email_addresses
+):
+    response = logged_in_client.post(
+        url_for('.set_sender', service_id=service_one['id'], template_id=fake_uuid),
+        data={'sender': '1234'}
+    )
+
+    with logged_in_client.session_transaction() as session:
+        assert session['sender_id'] == '1234'
+
+
+@pytest.mark.parametrize('template_mock, sender_data', [
+    (
+        mock_get_service_email_template,
+        no_reply_to_email_addresses,
+    ),
+])
+def test_set_sender_redirects_if_no_sender_data(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    template_mock,
+    sender_data,
+    mocker
+):
+    template_mock(mocker)
+    sender_data(mocker)
+    response = logged_in_client.get(
+        url_for('.set_sender', service_id=service_one['id'], template_id=fake_uuid)
+    )
+    assert response.status_code == 302
+    expected_url = url_for(
+        '.send_one_off',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _external=True,
+    )
+    assert response.location == expected_url
 
 
 def test_that_test_files_exist():
@@ -1965,7 +2066,8 @@ def test_send_notification_submits_data(
         service_one['id'],
         template_id=fake_uuid,
         recipient='07700900001',
-        personalisation={'a': 'b'}
+        personalisation={'a': 'b'},
+        sender_id=None
     )
 
 

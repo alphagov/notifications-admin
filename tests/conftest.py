@@ -271,6 +271,92 @@ def mock_update_letter_contact(mocker):
 
 
 @pytest.fixture(scope='function')
+def multiple_sms_senders(mocker):
+    def _get(service_id):
+        return [
+            {
+                'id': '1234',
+                'service_id': service_id,
+                'sms_sender': 'Example',
+                'is_default': True,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }, {
+                'id': '5678',
+                'service_id': service_id,
+                'sms_sender': 'Example 2',
+                'is_default': False,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }, {
+                'id': '9457',
+                'service_id': service_id,
+                'sms_sender': 'Example 3',
+                'is_default': False,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }
+        ]
+
+    return mocker.patch('app.service_api_client.get_sms_senders', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def no_sms_senders(mocker):
+    def _get(service_id):
+        return []
+
+    return mocker.patch('app.service_api_client.get_sms_senders', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def single_sms_sender(mocker):
+    def _get(service_id):
+        return [
+            {
+                'id': '1234',
+                'service_id': service_id,
+                'sms_sender': 'Example',
+                'is_default': True,
+                'created_at': datetime.utcnow(),
+                'updated_at': None
+            }
+        ]
+
+    return mocker.patch('app.service_api_client.get_sms_senders', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def get_default_sms_sender(mocker):
+    def _get(service_id, sms_sender_id):
+        return {
+            'id': '1234',
+            'service_id': service_id,
+            'sms_sender': 'Example',
+            'is_default': True,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }
+
+    return mocker.patch('app.service_api_client.get_sms_sender', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def get_non_default_sms_sender(mocker):
+    def _get(service_id, sms_sender_id):
+        return {
+            'id': '1234',
+            'service_id': service_id,
+            'service_id': service_id,
+            'is_default': False,
+            'created_at': datetime.utcnow(),
+            'updated_at': None
+        }
+
+    return mocker.patch('app.service_api_client.get_sms_sender', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
 def fake_uuid():
     return sample_uuid()
 
@@ -2014,7 +2100,7 @@ def mock_get_notification(
 @pytest.fixture
 def mock_send_notification(mocker, fake_uuid):
     def _send_notification(
-        service_id, *, template_id, recipient, personalisation
+        service_id, *, template_id, recipient, personalisation, sender_id
     ):
         return {'id': fake_uuid}
 

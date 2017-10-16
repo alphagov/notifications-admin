@@ -690,3 +690,13 @@ def get_placeholder_form_instance(
     return PlaceholderForm(
         placeholder_value=dict_to_populate_from.get(placeholder_name, '')
     )
+
+
+class SetSenderForm(Form):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.sender.choices = kwargs['sender_choices']
+        self.sender.label.text = kwargs['sender_label']
+
+    sender = RadioField()

@@ -79,7 +79,7 @@ def view_template(service_id, template_id):
             show_recipient=True,
             page_count=get_page_count_for_letter(template),
         ),
-        default_letter_contact_block_id=default_letter_contact_block_id
+        default_letter_contact_block_id=default_letter_contact_block_id,
     )
 
 
@@ -487,7 +487,7 @@ def delete_service_template(service_id, template_id):
                 filetype='png',
             ),
             show_recipient=True,
-        )
+        ),
     )
 
 
@@ -495,10 +495,12 @@ def delete_service_template(service_id, template_id):
 @login_required
 @user_has_permissions('manage_templates', admin_override=True)
 def confirm_redact_template(service_id, template_id):
+    template = service_api_client.get_service_template(service_id, template_id)['data']
+
     return render_template(
         'views/templates/template.html',
         template=get_template(
-            service_api_client.get_service_template(service_id, template_id)['data'],
+            template,
             current_service,
             expand_emails=True,
             letter_preview_url=url_for(
