@@ -9,7 +9,7 @@
       <legend class="form-label">
         {{ field.label.text|safe }}
         {% if field.errors %}
-          <span class="error-message">
+          <span class="error-message" data-module="track-error" data-error-type="{{ field.errors[0] }}" data-error-label="{{ field.name }}">
             {{ field.errors[0] }}
           </span>
         {% endif %}
@@ -50,7 +50,7 @@
      <legend class="form-label">
        {{ field.label.text }}
        {% if field.errors %}
-         <span class="error-message">
+         <span class="error-message" data-module="track-error" data-error-type="{{ field.errors[0] }}" data-error-label="{{ field.name }}">
            {{ field.errors[0] }}
          </span>
        {% endif %}
@@ -89,7 +89,7 @@
           {{ field.label.text }}
         {% endif %}
         {% if field.errors %}
-            <span class="error-message">
+            <span class="error-message" data-module="track-error" data-error-type="{{ field.errors[0] }}" data-error-label="{{ field.name }}">
               {{ field.errors[0] }}
             </span>
         {% endif %}
