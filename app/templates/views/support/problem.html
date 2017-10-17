@@ -20,7 +20,7 @@
             page to see if there are any known issues with GOV.UK Notify.
           </p>
         </div>
-        <form method="post">
+        <form method="post" autocomplete="off" novalidate>
             {{ textbox(form.feedback, width='1-1', hint='', rows=10) }}
             {% if not current_user.is_authenticated %}
               {{ textbox(form.name, width='1-1') }}

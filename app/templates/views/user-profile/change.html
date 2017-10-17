@@ -17,7 +17,7 @@
       </p>
     {% endif %}
     <div class="column-three-quarters">
-      <form method="post">
+      <form method="post" autocomplete="off" novalidate>
         {{ textbox(form_field, safe_error_message=True) }}
         {{ page_footer(
           'Save',
