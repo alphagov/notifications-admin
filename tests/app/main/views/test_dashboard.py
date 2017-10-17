@@ -7,6 +7,7 @@ from flask import url_for
 import pytest
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
+from datetime import datetime
 
 from app.main.views.dashboard import (
     get_dashboard_totals,
@@ -161,6 +162,10 @@ def test_inbox_showing_inbound_messages(
     assert normalize_spaces(page.select('.table-show-more-link')) == (
         '8 messages from 5 users'
     )
+    assert page.select_one('a[download]')['href'] == url_for(
+        'main.inbox_download',
+        service_id=SERVICE_ONE_ID,
+    )
 
 
 def test_empty_inbox(
@@ -184,6 +189,7 @@ def test_empty_inbox(
     assert normalize_spaces(page.select('tbody tr')) == (
         'When users text your service’s phone number (0781239871) you’ll see the messages here'
     )
+    assert not page.select('a[download]')
 
 
 @pytest.mark.parametrize('endpoint', [
@@ -244,6 +250,69 @@ def test_view_inbox_updates(
     assert json.loads(response.get_data(as_text=True)) == {'messages': 'foo'}
 
     mock_get_partials.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@freeze_time("2016-07-01 13:00")
+def test_download_inbox(
+    logged_in_client,
+    mock_get_inbound_sms,
+):
+    response = logged_in_client.get(
+        url_for('main.inbox_download', service_id=SERVICE_ONE_ID)
+    )
+    assert response.status_code == 200
+    assert response.headers['Content-Type'] == (
+        'text/csv; '
+        'charset=utf-8'
+    )
+    assert response.headers['Content-Disposition'] == (
+        'inline; '
+        'filename="Received text messages 2016-07-01.csv"'
+    )
+    assert response.get_data(as_text=True) == (
+        'Phone number,Message,Received\r\n'
+        '07900900000,message-1,2016-07-01 13:00\r\n'
+        '07900900000,message-2,2016-07-01 12:59\r\n'
+        '07900900000,message-3,2016-07-01 12:59\r\n'
+        '07900900002,message-4,2016-07-01 10:59\r\n'
+        '07900900004,message-5,2016-07-01 08:59\r\n'
+        '07900900006,message-6,2016-07-01 06:59\r\n'
+        '07900900008,message-7,2016-07-01 04:59\r\n'
+        '07900900008,message-8,2016-07-01 04:59\r\n'
+    )
+
+
+@freeze_time("2016-07-01 13:00")
+@pytest.mark.parametrize('message_content, expected_cell', [
+    ('=2+5', '2+5'),
+    ('==2+5', '2+5'),
+    ('-2+5', '2+5'),
+    ('+2+5', '2+5'),
+    ('@2+5', '2+5'),
+    ('looks safe,=2+5', '"looks safe,=2+5"'),
+])
+def test_download_inbox_strips_formulae(
+    mocker,
+    logged_in_client,
+    fake_uuid,
+    message_content,
+    expected_cell,
+):
+
+    mocker.patch(
+        'app.service_api_client.get_inbound_sms',
+        return_value=[{
+            'user_number': 'elevenchars',
+            'notify_number': 'foo',
+            'content': message_content,
+            'created_at': datetime.utcnow().isoformat(),
+            'id': fake_uuid,
+        }],
+    )
+    response = logged_in_client.get(
+        url_for('main.inbox_download', service_id=SERVICE_ONE_ID)
+    )
+    assert expected_cell in response.get_data(as_text=True).split('\r\n')[1]
 
 
 def test_should_show_recent_templates_on_dashboard(
