@@ -116,11 +116,11 @@ def test_should_show_page_for_one_template(
     ),
     (
         ['send_texts', 'send_emails', 'send_letters'],
-        ['.send_messages', '.send_one_off']
+        ['.send_messages', '.set_sender']
     ),
     (
         ['send_texts', 'send_emails', 'send_letters', 'manage_templates'],
-        ['.send_messages', '.send_one_off', '.edit_service_template']
+        ['.send_messages', '.set_sender', '.edit_service_template']
     ),
 ])
 def test_should_be_able_to_view_a_template_with_links(
@@ -333,6 +333,30 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
         service_id=service_one['id'],
         template_id='0',
     )
+
+
+@pytest.mark.parametrize('fixture,  expected_status_code', [
+    (mock_get_service_email_template, 200),
+    (mock_get_service_template, 302),
+    (mock_get_service_letter_template, 302),
+])
+def test_should_redirect_to_one_off_if_template_type_is_not_email(
+    logged_in_client,
+    active_user_with_permissions,
+    multiple_reply_to_email_addresses,
+    service_one,
+    fake_uuid,
+    mocker,
+    fixture,
+    expected_status_code
+):
+    fixture(mocker)
+
+    page = logged_in_client.get(
+        url_for('.set_sender', service_id=service_one['id'], template_id=fake_uuid)
+    )
+
+    assert page.status_code == expected_status_code
 
 
 def test_should_redirect_when_saving_a_template(

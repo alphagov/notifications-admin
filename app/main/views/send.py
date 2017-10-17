@@ -32,6 +32,7 @@ from app.main import main
 from app.main.forms import (
     CsvUploadForm,
     ChooseTimeForm,
+    SetSenderForm,
     get_placeholder_form_instance
 )
 from app.main.s3_client import (
@@ -92,7 +93,7 @@ def get_example_letter_address(key):
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
 def send_messages(service_id, template_id):
-
+    session['sender_id'] = None
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
     if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
@@ -166,6 +167,77 @@ def get_example_csv(service_id, template_id):
     }
 
 
+@main.route("/services/<service_id>/send/<template_id>/set-sender", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+def set_sender(service_id, template_id):
+    session['sender_id'] = None
+    redirect_to_one_off = redirect(
+        url_for('.send_one_off', service_id=service_id, template_id=template_id)
+    )
+
+    template = service_api_client.get_service_template(service_id, template_id)['data']
+
+    if template['template_type'] != 'email':
+        return redirect_to_one_off
+
+    sender_details = get_sender_details(service_id, template['template_type'])
+    if len(sender_details) <= 1:
+        return redirect_to_one_off
+
+    sender_context = get_sender_context(sender_details, template['template_type'])
+
+    form = SetSenderForm(
+        sender=sender_context['default_id'],
+        sender_choices=sender_context['value_and_label'],
+        sender_label=sender_context['description']
+    )
+    option_hints = {sender_context['default_id']: 'Default'}
+
+    if form.validate_on_submit():
+        session['sender_id'] = form.sender.data
+        return redirect(url_for('.send_one_off',
+                                service_id=service_id,
+                                template_id=template_id))
+
+    return render_template(
+        'views/templates/set-sender.html',
+        form=form,
+        template_id=template_id,
+        sender_context={'title': sender_context['title'], 'description': sender_context['description']},
+        option_hints=option_hints
+    )
+
+
+def get_sender_context(sender_details, template_type):
+    context = {
+        'email': {
+            'title': "Choose where to send replies",
+            'description': "Select an email address that recipients can reply to",
+            'field_name': 'email_address'
+        },
+        'letter': {
+            'title': 'Choose sender address',
+            'description': 'Select an address that recipients can reply to',
+            'field_name': 'contact_block'
+        }
+    }[template_type]
+
+    sender_format = context['field_name']
+
+    context['default_id'] = next(sender['id'] for sender in sender_details if sender['is_default'])
+    context['value_and_label'] = [(sender['id'], sender[sender_format]) for sender in sender_details]
+    return context
+
+
+def get_sender_details(service_id, template_type):
+    api_call = {
+        'email': service_api_client.get_reply_to_email_addresses,
+        'letter': service_api_client.get_letter_contacts
+    }[template_type]
+    return api_call(service_id)
+
+
 @main.route("/services/<service_id>/send/<template_id>/test", endpoint='send_test')
 @main.route("/services/<service_id>/send/<template_id>/one-off", endpoint='send_one_off')
 @login_required
@@ -176,6 +248,8 @@ def send_test(service_id, template_id):
     session['send_test_letter_page_count'] = None
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
+    if db_template['template_type'] != 'email':
+        session['sender_id'] = None
 
     if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
         return redirect(url_for(
@@ -319,7 +393,6 @@ def send_test_step(service_id, template_id, step_index):
         )
     else:
         skip_link = None
-
     return render_template(
         'views/send-test.html',
         page_title=get_send_test_page_title(template.template_type, get_help_argument()),
@@ -707,13 +780,13 @@ def send_notification(service_id, template_id):
             service_id=service_id,
             template_id=template_id,
         ))
-
     try:
         noti = notification_api_client.send_notification(
             service_id,
             template_id=template_id,
             recipient=session['recipient'],
-            personalisation=session['placeholders']
+            personalisation=session['placeholders'],
+            sender_id=session['sender_id'] if 'sender_id' in session else None
         )
     except HTTPError as exception:
         current_app.logger.info('Service {} could not send notification: "{}"'.format(
@@ -724,6 +797,7 @@ def send_notification(service_id, template_id):
 
     session.pop('placeholders')
     session.pop('recipient')
+    session.pop('sender_id', None)
 
     return redirect(url_for(
         '.view_notification',

@@ -581,6 +581,7 @@ def service_set_branding_and_org(service_id):
     organisations = organisations_client.get_organisations()
 
     form = ServiceBrandingOrg(branding_type=current_service.get('branding'))
+
     # dynamically create org choices, including the null option
     form.organisation.choices = [('None', 'None')] + get_branding_as_value_and_label(organisations)
 

@@ -54,12 +54,14 @@ class NotificationApiClient(NotifyAdminAPIClient):
                 params=params
             )
 
-    def send_notification(self, service_id, *, template_id, recipient, personalisation):
+    def send_notification(self, service_id, *, template_id, recipient, personalisation, sender_id):
         data = {
             'template_id': template_id,
             'to': recipient,
             'personalisation': personalisation,
         }
+        if sender_id:
+            data['sender_id'] = sender_id
         data = _attach_current_user(data)
         return self.post(url='/service/{}/send-notification'.format(service_id), data=data)
 
