@@ -16,7 +16,7 @@
 
   <form method="post" class="js-stick-at-top-when-scrolling" data-module="autofocus" autocomplete="off" novalidate>
     <div class="grid-row">
-      <div class="column-two-thirds">
+      <div class="column-two-thirds {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
         {{ textbox(
           form.placeholder_value,
           hint='Optional' if optional_placeholder else None,

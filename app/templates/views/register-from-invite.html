@@ -14,7 +14,9 @@ Create an account
     <p>Your account will be created with this email: {{email_address}}</p>
     <form method="post" autocomplete="off">
       {{ textbox(form.name, width='3-4') }}
-      {{ textbox(form.mobile_number, width='3-4', hint='We’ll send you a security code by text message') }}
+      <div class="extra-tracking">
+        {{ textbox(form.mobile_number, width='3-4', hint='We’ll send you a security code by text message') }}
+      </div>
       {{ textbox(form.password, hint="At least 8 characters", width='3-4') }}
       {{ page_footer("Continue") }}
       {{form.service}}
