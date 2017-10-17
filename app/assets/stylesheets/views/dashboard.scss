@@ -67,6 +67,10 @@
     display: block;
     color: $secondary-text-colour;
     pointer-events: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 580px;
   }
 
 }
