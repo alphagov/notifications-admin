@@ -4,6 +4,8 @@ import json
 from flask import url_for
 from bs4 import BeautifulSoup
 
+from tests.conftest import normalize_spaces
+
 
 def test_should_return_verify_template(
     client,
@@ -68,17 +70,23 @@ def test_should_activate_user_after_verify(
 
 
 def test_should_return_200_when_sms_code_is_wrong(
-    client,
+    client_request,
     api_user_active,
     mock_check_verify_code_code_not_found,
 ):
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
-    response = client.post(url_for('main.verify'),
-                           data={'sms_code': '12345'})
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert resp_data.count('Code not found') == 1
+
+    page = client_request.post(
+        'main.verify',
+        _data={'sms_code': '12345'},
+        _expected_status=200,
+    )
+
+    assert len(page.select('.error-message')) == 1
+    assert normalize_spaces(page.select_one('.error-message').text) == (
+        'Code not found'
+    )
 
 
 def test_verify_email_redirects_to_verify_if_token_valid(
