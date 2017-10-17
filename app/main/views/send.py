@@ -323,7 +323,8 @@ def send_test_step(service_id, template_id, step_index):
             template_id=template_id,
             filetype='png',
         ),
-        page_count=session['send_test_letter_page_count']
+        page_count=session['send_test_letter_page_count'],
+        email_reply_to=get_email_reply_to_address_from_session(service_id),
     )
 
     placeholders = fields_to_fill_in(
@@ -448,7 +449,6 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
     remaining_messages = (current_service['message_limit'] - sum(stat['requested'] for stat in statistics.values()))
 
     contents = s3download(service_id, upload_id)
-
     template = get_template(
         service_api_client.get_service_template(
             service_id,
@@ -462,7 +462,8 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
             template_type=template_type,
             upload_id=upload_id,
             filetype='png',
-        ) if not letters_as_pdf else None
+        ) if not letters_as_pdf else None,
+        email_reply_to=get_email_reply_to_address_from_session(service_id),
     )
     recipients = RecipientCSV(
         contents,
@@ -726,7 +727,8 @@ def _check_notification(service_id, template_id, exception=None):
     template = get_template(
         db_template,
         current_service,
-        show_recipient=True
+        show_recipient=True,
+        email_reply_to=get_email_reply_to_address_from_session(service_id),
     )
 
     # go back to start of process
@@ -805,3 +807,10 @@ def send_notification(service_id, template_id):
         notification_id=noti['id'],
         help=request.args.get('help')
     ))
+
+
+def get_email_reply_to_address_from_session(service_id):
+    if session.get('sender_id'):
+        return service_api_client.get_reply_to_email_address(
+            service_id, session['sender_id']
+        )['email_address']
