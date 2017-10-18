@@ -239,14 +239,14 @@ def test_create_global_stats_sets_failure_rates(fake_uuid):
         service_json(fake_uuid, 'b', [])
     ]
     services[0]['statistics'] = create_stats(
-            emails_requested=1,
-            emails_delivered=1,
-            emails_failed=0,
+        emails_requested=1,
+        emails_delivered=1,
+        emails_failed=0,
     )
     services[1]['statistics'] = create_stats(
-            emails_requested=2,
-            emails_delivered=1,
-            emails_failed=1,
+        emails_requested=2,
+        emails_delivered=1,
+        emails_failed=1,
     )
 
     stats = create_global_stats(services)

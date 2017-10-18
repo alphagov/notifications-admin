@@ -1,24 +1,20 @@
 import os
-import re
 import urllib
-import json
 from datetime import datetime, timedelta, timezone
 from time import monotonic
 
-import dateutil
 import itertools
 import ago
 from flask import (
     Flask,
     session,
-    Markup,
-    escape,
     render_template,
     make_response,
     current_app,
     request,
     g,
-    url_for)
+    url_for
+)
 from flask._compat import string_types
 from flask.globals import _lookup_req_object, _request_ctx_stack
 from flask_login import LoginManager
@@ -38,7 +34,7 @@ from notifications_utils.formatters import formatted_list
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
-import app.proxy_fix
+from app import proxy_fix
 from app.asset_fingerprinter import AssetFingerprinter
 from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.notify_client.service_api_client import ServiceAPIClient
@@ -135,7 +131,6 @@ def create_app():
     application.add_template_filter(format_datetime_normal)
     application.add_template_filter(format_datetime_short)
     application.add_template_filter(format_time)
-    application.add_template_filter(syntax_highlight_json)
     application.add_template_filter(valid_phone_number)
     application.add_template_filter(linkable_name)
     application.add_template_filter(format_date)
@@ -215,10 +210,6 @@ def convert_to_boolean(value):
 
 def linkable_name(value):
     return urllib.parse.quote_plus(value)
-
-
-def syntax_highlight_json(code):
-    return Markup(highlight(code, JavascriptLexer(), HtmlFormatter(noclasses=True)))
 
 
 def format_datetime(date):

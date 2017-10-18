@@ -23,7 +23,7 @@ from wtforms import (
     RadioField,
     FieldList,
     DateField,
-    SelectField)
+)
 from wtforms.fields.html5 import EmailField, TelField, SearchField
 from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
 from flask_wtf.file import FileField as FileField_wtf, FileAllowed

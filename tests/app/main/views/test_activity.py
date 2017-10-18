@@ -7,15 +7,12 @@ from flask import url_for
 from bs4 import BeautifulSoup
 
 from app.main.views.jobs import get_time_left, get_status_filters
-from tests import notification_json
 from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_notifications,
     normalize_spaces,
-    mock_get_notifications
 )
 from freezegun import freeze_time
-from datetime import datetime
 
 
 @pytest.mark.parametrize(
@@ -99,9 +96,6 @@ def test_can_show_notifications(
         ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    content = response.get_data(as_text=True)
-    notifications = notification_json(service_one['id'])
-    notification = notifications['notifications'][0]
     text_of_first_row = page.select('tbody tr')[0].text
     assert '07123456789' in text_of_first_row
     assert (
@@ -334,7 +328,7 @@ def test_redacts_templates_that_should_be_redacted(
     active_user_with_permissions,
     mock_get_detailed_service,
 ):
-    _notifications_mock = mock_get_notifications(
+    mock_get_notifications(
         mocker,
         active_user_with_permissions,
         template_content="hello ((name))",
@@ -370,12 +364,12 @@ def test_big_numbers_and_search_dont_show_for_letters(
     search_bar_visible
 ):
     page = client_request.get(
-            'main.view_notifications',
-            service_id=service_one['id'],
-            message_type=message_type,
-            status='',
-            page=1,
-        )
+        'main.view_notifications',
+        service_id=service_one['id'],
+        message_type=message_type,
+        status='',
+        page=1,
+    )
 
     assert (len(page.select("[role=tablist]")) > 0) == tablist_visible
     assert (len(page.select("[type=search]")) > 0) == search_bar_visible
@@ -401,10 +395,10 @@ def test_sending_status_hint_does_not_include_status_for_letters(
     mock_get_notifications(mocker, True, diff_template_type=message_type)
 
     page = client_request.get(
-            'main.view_notifications',
-            service_id=service_one['id'],
-            message_type=message_type
-        )
+        'main.view_notifications',
+        service_id=service_one['id'],
+        message_type=message_type
+    )
 
     if message_type == 'letter':
         assert normalize_spaces(page.select(".align-with-message-body")[0].text) == "27 September at 5:30pm"

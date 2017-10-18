@@ -34,7 +34,6 @@ from app.utils import (
     generate_previous_dict,
     user_has_permissions,
     generate_notifications_csv,
-    get_template,
     get_time_left,
     REQUESTED_STATUSES,
     FAILURE_STATUSES,

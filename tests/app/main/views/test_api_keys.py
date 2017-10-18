@@ -351,7 +351,7 @@ def test_should_update_whitelist(
         ('phone_numbers-2', '+1800-555-555'),
     ])
 
-    response = logged_in_client.post(
+    logged_in_client.post(
         url_for('main.whitelist', service_id=service_id),
         data=data
     )

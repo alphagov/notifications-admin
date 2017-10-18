@@ -2,13 +2,6 @@ from freezegun import freeze_time
 from flask import url_for
 import pytest
 
-from app.utils import (
-    REQUESTED_STATUSES,
-    FAILURE_STATUSES,
-    SENDING_STATUSES,
-    DELIVERED_STATUSES,
-)
-
 from notifications_utils.template import LetterImageTemplate
 from tests.conftest import mock_get_notification, SERVICE_ONE_ID, normalize_spaces
 

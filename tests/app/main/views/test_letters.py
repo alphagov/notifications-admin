@@ -3,8 +3,6 @@ from bs4 import BeautifulSoup
 from flask import url_for
 from functools import partial
 
-from tests import service_json
-
 letters_urls = [
     partial(url_for, 'main.add_service_template', template_type='letter'),
 ]

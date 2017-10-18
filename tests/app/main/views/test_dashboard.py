@@ -51,8 +51,10 @@ def test_get_started(
     mock_get_usage,
     mock_get_inbound_sms_summary
 ):
-    mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
-                                       return_value=copy.deepcopy(stub_template_stats))
+    mocker.patch(
+        'app.template_statistics_client.get_template_statistics_for_service',
+        return_value=copy.deepcopy(stub_template_stats)
+    )
 
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
@@ -70,8 +72,10 @@ def test_get_started_is_hidden_once_templates_exist(
     mock_get_usage,
     mock_get_inbound_sms_summary
 ):
-    mock_template_stats = mocker.patch('app.template_statistics_client.get_template_statistics_for_service',
-                                       return_value=copy.deepcopy(stub_template_stats))
+    mocker.patch(
+        'app.template_statistics_client.get_template_statistics_for_service',
+        return_value=copy.deepcopy(stub_template_stats)
+    )
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
     # mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)

@@ -1,6 +1,6 @@
 import requests
 import pytz
-from flask import render_template, url_for, redirect, flash, current_app, abort, request, session
+from flask import render_template, url_for, redirect, current_app, abort, request, session
 from flask_login import current_user
 from app import convert_to_boolean, current_service, service_api_client
 from app.main import main
@@ -118,8 +118,9 @@ def feedback(ticket_type):
             current_app.logger.error(
                 "Deskpro create ticket request failed with {} '{}'".format(
                     resp.status_code,
-                    resp.json())
+                    resp.json()
                 )
+            )
             abort(500, "Feedback submission failed")
         return redirect(url_for('.thanks', urgent=urgent, anonymous=anonymous))
 

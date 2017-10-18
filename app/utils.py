@@ -8,7 +8,6 @@ import unicodedata
 from urllib.parse import urlparse
 from collections import namedtuple
 from datetime import datetime, timedelta, timezone
-from dateutil import parser
 
 import dateutil
 import ago

@@ -353,4 +353,4 @@ def test_new_invited_user_verifies_and_added_to_service(
 
     raw_html = response.data.decode('utf-8')
     page = BeautifulSoup(raw_html, 'html.parser')
-    element = page.find('h2').text == 'Trial mode'
+    assert page.find('h1').text == 'Dashboard'

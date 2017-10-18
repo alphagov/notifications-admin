@@ -1,6 +1,5 @@
 from datetime import datetime
 from unittest.mock import Mock, ANY
-import uuid
 
 import pytest
 from bs4 import BeautifulSoup
@@ -16,7 +15,6 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     active_user_with_permissions,
     platform_admin_user,
-    mock_get_user,
 )
 from tests import validate_route_permission, template_json, single_notification_json
 

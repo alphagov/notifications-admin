@@ -11,13 +11,11 @@ from flask import (
 
 from flask_login import (
     current_user,
-    confirm_login
 )
 
 from app import (
     login_manager,
     user_api_client,
-    service_api_client,
     invite_api_client
 )
 
@@ -56,9 +54,10 @@ def sign_in():
                 else:
                     return redirect(url_for('.two_factor'))
         # Vague error message for login in case of user not known, locked, inactive or password not verified
-        flash(Markup((
-            "The email address or password you entered is incorrect."
-            " <a href={password_reset}>Forgot your password</a>?"
+        flash(Markup(
+            (
+                "The email address or password you entered is incorrect."
+                " <a href={password_reset}>Forgot your password</a>?"
             ).format(password_reset=url_for('.forgot_password'))
         ))
 

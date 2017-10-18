@@ -1,16 +1,8 @@
-from flask import (
-    render_template,
-    redirect,
-    session,
-    url_for,
-    request
-)
-
+from flask import render_template
 from flask_login import login_required
 from app.main import main
 from app import inbound_number_client
 from app.utils import user_has_permissions
-from flask import jsonify
 
 
 @main.route('/inbound-sms-admin', methods=['GET', 'POST'])
