@@ -214,3 +214,75 @@ def test_view_conversation_with_empty_inbound(
 
     messages = page.select('.sms-message-wrapper')
     assert len(messages) == 1
+
+
+def test_conversation_links_to_reply(
+    client_request,
+    fake_uuid,
+    mock_get_notification,
+    mock_get_notifications,
+    mock_get_inbound_sms,
+):
+    page = client_request.get(
+        'main.conversation',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert page.select('main p')[-1].select_one('a')['href'] == (
+        url_for(
+            '.conversation_reply',
+            service_id=SERVICE_ONE_ID,
+            notification_id=fake_uuid,
+        )
+    )
+
+
+def test_conversation_reply_shows_templates(
+    client_request,
+    fake_uuid,
+    mock_get_service_templates,
+):
+    page = client_request.get(
+        'main.conversation_reply',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    for index, expected in enumerate([
+        'sms_template_one',
+        'sms_template_two',
+    ]):
+        link = page.select('.message-name')[index]
+        assert normalize_spaces(link.text) == expected
+        assert link.select_one('a')['href'].startswith(
+            url_for(
+                'main.conversation_reply_with_template',
+                service_id=SERVICE_ONE_ID,
+                notification_id=fake_uuid,
+                template_id='',
+            )
+        )
+
+
+def test_conversation_reply_redirects_with_phone_number_from_notification(
+    client_request,
+    fake_uuid,
+    mock_get_notification,
+    mock_get_service_template,
+):
+
+    page = client_request.get(
+        'main.conversation_reply_with_template',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        template_id=fake_uuid,
+        _follow_redirects=True,
+    )
+
+    for element, expected_text in [
+        ('h1', 'Preview of Two week reminder'),
+        ('.sms-message-recipient', 'To: 07123 456789'),
+        ('.sms-message-wrapper', 'service one: Template <em>content</em> with & entity'),
+    ]:
+        assert normalize_spaces(page.select_one(element).text) == expected_text

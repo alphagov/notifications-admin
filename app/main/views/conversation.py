@@ -1,5 +1,7 @@
 from flask import (
     jsonify,
+    session,
+    redirect,
     render_template,
     url_for,
 )
@@ -7,6 +9,7 @@ from flask_login import login_required
 from notifications_utils.recipients import format_phone_number_human_readable
 from notifications_utils.template import SMSPreviewTemplate
 from app.main import main
+from app.main.forms import SearchTemplatesForm
 from app.utils import user_has_permissions
 from app import notification_api_client, service_api_client
 from notifications_python_client.errors import HTTPError
@@ -24,6 +27,7 @@ def conversation(service_id, notification_id):
         user_number=user_number,
         partials=get_conversation_partials(service_id, user_number),
         updates_url=url_for('.conversation_updates', service_id=service_id, notification_id=notification_id),
+        notification_id=notification_id,
     )
 
 
@@ -35,6 +39,50 @@ def conversation_updates(service_id, notification_id):
     return jsonify(get_conversation_partials(
         service_id,
         get_user_number(service_id, notification_id)
+    ))
+
+
+@main.route("/services/<service_id>/conversation/<notification_id>/reply-with")
+@login_required
+@user_has_permissions('send_texts', admin_override=True)
+def conversation_reply(
+    service_id,
+    notification_id,
+):
+
+    templates = [
+        template
+        for template in service_api_client.get_service_templates(service_id)['data']
+        if template['template_type'] == 'sms'
+    ]
+
+    return render_template(
+        'views/templates/choose-reply.html',
+        templates=templates,
+        show_search_box=(len(templates) > 7),
+        template_type='sms',
+        search_form=SearchTemplatesForm(),
+        notification_id=notification_id,
+    )
+
+
+@main.route("/services/<service_id>/conversation/<notification_id>/reply-with/<template_id>")
+@login_required
+@user_has_permissions('send_texts', admin_override=True)
+def conversation_reply_with_template(
+    service_id,
+    notification_id,
+    template_id,
+):
+
+    session['recipient'] = get_user_number(service_id, notification_id)
+    session['placeholders'] = {'phone number': session['recipient']}
+
+    return redirect(url_for(
+        'main.send_one_off_step',
+        service_id=service_id,
+        template_id=template_id,
+        step_index=1,
     ))
 
 
