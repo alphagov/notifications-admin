@@ -16,6 +16,7 @@ from notifications_utils.recipients import RecipientCSV
 
 from tests import validate_route_permission, validate_route_permission_with_client
 from tests.conftest import (
+    fake_uuid,
     mock_get_service_template,
     mock_get_service_template_with_placeholders,
     mock_get_service_letter_template,
@@ -2233,3 +2234,54 @@ def test_send_notification_shows_email_error_in_trial_mode(
     assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == (
         'In trial mode you can only send to yourself and members of your team'
     )
+
+
+@pytest.mark.parametrize('endpoint, extra_args', [
+    ('main.check_messages', {'template_type': 'email', 'upload_id': fake_uuid()}),
+    ('main.send_one_off_step', {'template_id': fake_uuid(), 'step_index': 0}),
+])
+@pytest.mark.parametrize('reply_to_address', [
+    None,
+    fake_uuid(),
+])
+def test_reply_to_is_previewed_if_chosen(
+    client_request,
+    mocker,
+    mock_get_service_email_template,
+    mock_s3_download,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    get_default_reply_to_email_address,
+    endpoint,
+    extra_args,
+    reply_to_address,
+):
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        email_address,date,thing
+        notify@digital.cabinet-office.gov.uk,foo,bar
+    """)
+
+    with client_request.session_transaction() as session:
+        session['recipient'] = 'notify@digital.cabinet-office.gov.uk'
+        session['placeholders'] = {}
+        session['upload_data'] = {
+            'original_file_name': 'example.csv',
+            'template_id': fake_uuid(),
+            'notification_count': 1,
+            'valid': True
+        }
+        session['sender_id'] = reply_to_address
+
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        **extra_args
+    )
+
+    email_meta = page.select_one('.email-message-meta').text
+
+    if reply_to_address:
+        assert 'test@example.com' in email_meta
+    else:
+        assert 'test@example.com' not in email_meta

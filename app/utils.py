@@ -272,6 +272,7 @@ def get_template(
     letter_preview_url=None,
     page_count=1,
     redact_missing_personalisation=False,
+    email_reply_to=None,
 ):
     if 'email' == template['template_type']:
         return EmailPreviewTemplate(
@@ -281,6 +282,7 @@ def get_template(
             expanded=expand_emails,
             show_recipient=show_recipient,
             redact_missing_personalisation=redact_missing_personalisation,
+            reply_to=email_reply_to,
         )
     if 'sms' == template['template_type']:
         return SMSPreviewTemplate(
