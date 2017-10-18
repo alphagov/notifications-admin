@@ -6,7 +6,8 @@ from flask import (
     session,
     jsonify,
     request,
-    abort
+    abort,
+    Response,
 )
 from flask_login import login_required
 
@@ -20,6 +21,9 @@ from app import (
     service_api_client,
     template_statistics_client,
     inbound_number_client,
+    format_datetime_short,
+    format_date_numeric,
+    format_datetime_numeric,
 )
 from app.statistics_utils import get_formatted_percentage, add_rate_to_job
 from app.utils import (
@@ -27,6 +31,7 @@ from app.utils import (
     get_current_financial_year,
     FAILURE_STATUSES,
     REQUESTED_STATUSES,
+    Spreadsheet,
 )
 
 
@@ -159,6 +164,31 @@ def inbox(service_id):
 def inbox_updates(service_id):
 
     return jsonify(get_inbox_partials(service_id))
+
+
+@main.route("/services/<service_id>/inbox.csv")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def inbox_download(service_id):
+    return Response(
+        Spreadsheet.from_rows(
+            [[
+                'Phone number',
+                'Message',
+                'Received',
+            ]] + [[
+                message['user_number'],
+                message['content'].lstrip(('=+-@')),
+                format_datetime_numeric(message['created_at']),
+            ] for message in service_api_client.get_inbound_sms(service_id)]
+        ).as_csv_data,
+        mimetype='text/csv',
+        headers={
+            'Content-Disposition': 'inline; filename="Received text messages {}.csv"'.format(
+                format_date_numeric(datetime.utcnow().isoformat())
+            )
+        }
+    )
 
 
 def get_inbox_partials(service_id):

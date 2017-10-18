@@ -231,7 +231,7 @@ def format_datetime(date):
 def format_datetime_24h(date):
     return '{} at {}'.format(
         format_date(date),
-        gmt_timezones(date).strftime('%H:%M')
+        format_time_24h(date),
     )
 
 
@@ -254,6 +254,21 @@ def format_datetime_relative(date):
         get_human_day(date),
         format_time(date)
     )
+
+
+def format_datetime_numeric(date):
+    return '{} {}'.format(
+        format_date_numeric(date),
+        format_time_24h(date),
+    )
+
+
+def format_date_numeric(date):
+    return gmt_timezones(date).strftime('%Y-%m-%d')
+
+
+def format_time_24h(date):
+    return gmt_timezones(date).strftime('%H:%M')
 
 
 def get_human_day(time):

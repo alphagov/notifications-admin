@@ -39,6 +39,11 @@
   margin-top: $gutter * 4 / 3;
 }
 
+.top-gutter-2-3 {
+  @extend %top-gutter;
+  margin-top: $gutter-half;
+}
+
 %bottom-gutter,
 .bottom-gutter {
   @extend %contain-floats;

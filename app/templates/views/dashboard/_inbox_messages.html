@@ -2,6 +2,11 @@
 {% from "components/message-count-label.html" import message_count_label %}
 
 <div class="ajax-block-container">
+  {% if messages %}
+    <p class="bottom-gutter-2-3 top-gutter-2-3">
+      <a href="{{ url_for('.inbox_download', service_id=current_service.id) }}" download="download" class="heading-small">Download these messages</a>
+    </p>
+  {% endif %}
   {% call(item, row_number) list_table(
     messages,
     caption="Inbox",
