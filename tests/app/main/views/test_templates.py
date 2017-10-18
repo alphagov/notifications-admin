@@ -860,6 +860,7 @@ def test_should_show_page_for_a_deleted_template(
     assert url_for("main.edit_service_template", service_id=fake_uuid, template_id=fake_uuid) not in content
     assert url_for("main.send_test", service_id=fake_uuid, template_id=fake_uuid) not in content
     assert page.select('p.hint')[0].text.strip() == 'This template was deleted today at 3:00pm.'
+    assert 'Delete this template' not in page.select_one('main').text
 
     mock_get_deleted_template.assert_called_with(service_id, template_id)
 
