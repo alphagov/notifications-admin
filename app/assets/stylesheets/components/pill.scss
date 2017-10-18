@@ -80,7 +80,9 @@
       text-decoration: underline;
     }
 
-    &:hover {
+    &:hover,
+    &:focus,
+    &:link:focus {
       color: $light-blue-25;
     }
 
