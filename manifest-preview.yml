@@ -2,6 +2,14 @@
 
 inherit: manifest-base.yml
 
+services:
+  - notify-aws
+  - notify-config
+  - notify-template-preview
+  - hosted-graphite
+  - deskpro
+  - logit-ssl-syslog-drain
+
 routes:
   - route: notify-admin-preview.cloudapps.digital
   - route: www.notify.works
