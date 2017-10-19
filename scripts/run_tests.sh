@@ -35,5 +35,5 @@ npm test
 display_result $? 2 "Front end code style check"
 
 ## Code coverage
-py.test -n2 --cov=app --cov-report=term-missing tests/ --junitxml=test_results.xml --strict
+py.test -n4 --cov=app --cov-report=term-missing tests/ --junitxml=test_results.xml --strict
 display_result $? 3 "Code coverage"
