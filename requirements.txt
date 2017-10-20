@@ -9,7 +9,7 @@ blinker==1.4
 pyexcel==0.5.5
 pyexcel-io==0.5.2
 pyexcel-xls==0.5.0
-pyexcel-xlsx==0.5.0.1
+pyexcel-xlsx==0.5.1
 pyexcel-ods3==0.5.1
 pytz==2017.2
 gunicorn==19.7.1
