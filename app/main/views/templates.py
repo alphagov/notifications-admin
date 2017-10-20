@@ -8,19 +8,17 @@ from flask import (
     url_for,
     flash,
     abort,
-    json,
     Response,
 )
 from flask_login import login_required, current_user
 from dateutil.parser import parse
 
-from notifications_utils.formatters import escape_html
 from notifications_utils.recipients import first_column_headings
 from notifications_utils.template import LetterDVLATemplate
 from notifications_python_client.errors import HTTPError
 
 from app.main import main
-from app.utils import user_has_permissions, get_template, get_help_argument, email_or_sms_not_enabled
+from app.utils import user_has_permissions, get_template, email_or_sms_not_enabled
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.main.forms import (
     ChooseTemplateType,
@@ -61,7 +59,7 @@ def view_template(service_id, template_id):
         letter_contact_details = service_api_client.get_letter_contacts(service_id)
         default_letter_contact_block_id = next(
             (x['id'] for x in letter_contact_details if x['is_default']), "None"
-            )
+        )
     else:
         default_letter_contact_block_id = None
     return render_template(

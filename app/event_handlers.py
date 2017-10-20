@@ -1,5 +1,4 @@
 from app import events_api_client
-from flask_login import current_user
 
 
 def on_user_logged_in(sender, user):

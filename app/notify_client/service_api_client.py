@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from flask import url_for
 from app.utils import BrowsableItem
 from app.notify_client import _attach_current_user, NotifyAdminAPIClient
-from . import notification_api_client
 
 
 class ServiceAPIClient(NotifyAdminAPIClient):

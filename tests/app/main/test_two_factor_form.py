@@ -6,8 +6,10 @@ def test_form_is_valid_returns_no_errors(
     app_,
     mock_check_verify_code,
 ):
-    with app_.test_request_context(method='POST',
-                                   data={'sms_code': '12345'}) as req:
+    with app_.test_request_context(
+        method='POST',
+        data={'sms_code': '12345'}
+    ):
         def _check_code(code):
             return user_api_client.check_verify_code('1', code, "sms")
         form = TwoFactorForm(_check_code)
@@ -19,8 +21,10 @@ def test_returns_errors_when_code_is_too_short(
     app_,
     mock_check_verify_code,
 ):
-    with app_.test_request_context(method='POST',
-                                   data={'sms_code': '145'}) as req:
+    with app_.test_request_context(
+        method='POST',
+        data={'sms_code': '145'}
+    ):
         def _check_code(code):
             return user_api_client.check_verify_code('1', code, "sms")
         form = TwoFactorForm(_check_code)
@@ -33,8 +37,10 @@ def test_returns_errors_when_code_is_missing(
     app_,
     mock_check_verify_code,
 ):
-    with app_.test_request_context(method='POST',
-                                   data={}) as req:
+    with app_.test_request_context(
+        method='POST',
+        data={}
+    ):
         def _check_code(code):
             return user_api_client.check_verify_code('1', code, "sms")
         form = TwoFactorForm(_check_code)
@@ -47,8 +53,10 @@ def test_returns_errors_when_code_contains_letters(
     app_,
     mock_check_verify_code,
 ):
-    with app_.test_request_context(method='POST',
-                                   data={'sms_code': 'asdfg'}) as req:
+    with app_.test_request_context(
+        method='POST',
+        data={'sms_code': 'asdfg'}
+    ):
         def _check_code(code):
             return user_api_client.check_verify_code('1', code, "sms")
         form = TwoFactorForm(_check_code)
@@ -61,8 +69,10 @@ def test_should_return_errors_when_code_is_expired(
     app_,
     mock_check_verify_code_code_expired,
 ):
-    with app_.test_request_context(method='POST',
-                                   data={'sms_code': '23456'}) as req:
+    with app_.test_request_context(
+        method='POST',
+        data={'sms_code': '23456'}
+    ):
         def _check_code(code):
             return user_api_client.check_verify_code('1', code, "sms")
         form = TwoFactorForm(_check_code)

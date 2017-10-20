@@ -118,8 +118,6 @@ def view_notification_updates(service_id, notification_id):
 
 
 def get_single_notification_partials(notification):
-    status_args = get_status_arg(request.args)
-
     return {
         'notifications': render_template(
             'partials/notifications/notifications.html',

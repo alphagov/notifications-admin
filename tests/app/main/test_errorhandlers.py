@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-from flask import url_for
 
 
 def test_bad_url_returns_page_not_found(client):

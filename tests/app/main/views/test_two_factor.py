@@ -64,7 +64,7 @@ def test_should_login_user_and_should_redirect_to_next_url(
         'main.service_dashboard',
         service_id=SERVICE_ONE_ID,
         _external=True
-            )
+    )
 
 
 def test_should_login_user_and_not_redirect_to_external_url(

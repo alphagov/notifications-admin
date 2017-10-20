@@ -1,9 +1,7 @@
-import datetime
-
 from flask import redirect, render_template, request, session, url_for
 from flask_login import login_required
 
-from app import letter_jobs_client, format_datetime_24h
+from app import letter_jobs_client
 from app.main import main
 from app.utils import user_has_permissions
 

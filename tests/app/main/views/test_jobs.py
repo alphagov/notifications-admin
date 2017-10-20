@@ -1,13 +1,10 @@
 import json
-import uuid
-from urllib.parse import urlparse, quote, parse_qs
 
 import pytest
 from flask import url_for
 from bs4 import BeautifulSoup
 
-from app.main.views.jobs import get_time_left, get_status_filters
-from tests import notification_json
+from app.main.views.jobs import get_time_left
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, mock_get_notifications
 from freezegun import freeze_time
 

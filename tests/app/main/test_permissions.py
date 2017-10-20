@@ -20,10 +20,10 @@ def _test_permissions(
     decorator = user_has_permissions(*permissions, any_=any_, admin_override=admin_override)
     decorated_index = decorator(index)
     if will_succeed:
-        response = decorated_index()
+        decorated_index()
     else:
         try:
-            response = decorated_index()
+            decorated_index()
             pytest.fail("Failed to throw a forbidden or unauthorised exception")
         except (Forbidden, Unauthorized):
             pass

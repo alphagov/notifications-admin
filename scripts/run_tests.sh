@@ -28,7 +28,7 @@ if [[ -z "$VIRTUAL_ENV" ]] && [[ -d venv ]]; then
   source ./venv/bin/activate
 fi
 
-pycodestyle .
+flake8 .
 display_result $? 1 "Code style check"
 
 npm test

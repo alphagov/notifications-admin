@@ -1,4 +1,4 @@
-from flask import current_app, redirect, render_template, session, url_for, request
+from flask import current_app, redirect, render_template, session, url_for
 from flask_login import login_required
 
 from app import organisations_client

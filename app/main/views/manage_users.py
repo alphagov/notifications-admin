@@ -108,7 +108,7 @@ def remove_user_from_service(service_id, user_id):
     # Do it through the template or the form class?
     form = PermissionsForm(**{
         role: user.has_permissions(permissions=permissions) for role, permissions in roles.items()
-        })
+    })
 
     if request.method == 'POST':
         try:

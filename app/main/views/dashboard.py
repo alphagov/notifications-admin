@@ -21,7 +21,6 @@ from app import (
     service_api_client,
     template_statistics_client,
     inbound_number_client,
-    format_datetime_short,
     format_date_numeric,
     format_datetime_numeric,
 )

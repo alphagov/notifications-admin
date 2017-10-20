@@ -2,7 +2,7 @@ from flask import Blueprint
 
 main = Blueprint('main', __name__)  # noqa
 
-from app.main.views import (
+from app.main.views import (  # noqa
     index,
     sign_in,
     sign_out,

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import uuid
-from unittest.mock import Mock
 from io import BytesIO
 from os import path
 from glob import glob
@@ -25,14 +24,9 @@ from tests.conftest import (
     mock_get_service_email_template,
     normalize_spaces,
     SERVICE_ONE_ID,
-    mock_get_service,
     mock_get_live_service,
     multiple_reply_to_email_addresses,
-    multiple_letter_contact_blocks,
-    multiple_sms_senders,
     no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    no_sms_senders
 )
 
 template_types = ['email', 'sms']
@@ -99,7 +93,7 @@ def test_sender_session_is_present_after_selected(
     mock_get_service_email_template,
     multiple_reply_to_email_addresses
 ):
-    response = logged_in_client.post(
+    logged_in_client.post(
         url_for('.set_sender', service_id=service_one['id'], template_id=fake_uuid),
         data={'sender': '1234'}
     )
@@ -867,7 +861,7 @@ def test_send_test_caches_page_count(
 
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
-    response = logged_in_client.get(
+    logged_in_client.get(
         url_for(
             'main.send_test',
             service_id=service_one['id'],
@@ -1364,8 +1358,6 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
     fake_uuid
 ):
 
-    service_id = service_one['id']
-
     mocker.patch(
         'app.main.views.send.s3download',
         return_value="""
@@ -1374,14 +1366,14 @@ def test_check_messages_should_revalidate_file_when_uploading_file(
             +447700900986,,,,
         """
     )
-    data = mock_get_job(service_one['id'], fake_uuid)['data']
+    data = mock_get_job(SERVICE_ONE_ID, fake_uuid)['data']
     with logged_in_client.session_transaction() as session:
         session['upload_data'] = {'original_file_name': 'invalid.csv',
                                   'template_id': data['template'],
                                   'notification_count': data['notification_count'],
                                   'valid': True}
     response = logged_in_client.post(
-        url_for('main.start_job', service_id=service_one['id'], upload_id=data['id']),
+        url_for('main.start_job', service_id=SERVICE_ONE_ID, upload_id=data['id']),
         data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
@@ -1448,18 +1440,19 @@ def test_route_permissions_send_check_notifications(
         session['recipient'] = '07700900001'
         session['placeholders'] = {'name': 'a'}
     validate_route_permission_with_client(
-            mocker,
-            client,
-            method,
-            response_code,
-            url_for(
-                route,
-                service_id=service_one['id'],
-                template_id=fake_uuid
-            ),
-            ['send_texts', 'send_emails', 'send_letters'],
-            api_user_active,
-            service_one)
+        mocker,
+        client,
+        method,
+        response_code,
+        url_for(
+            route,
+            service_id=service_one['id'],
+            template_id=fake_uuid
+        ),
+        ['send_texts', 'send_emails', 'send_letters'],
+        api_user_active,
+        service_one
+    )
 
 
 @pytest.mark.parametrize('route', [
@@ -1617,7 +1610,7 @@ def test_check_messages_shows_too_many_messages_errors(
 ):
     # csv with 100 phone numbers
     mocker.patch('app.main.views.send.s3download', return_value=',\n'.join(
-        ['phone number'] + ([mock_get_users_by_service(None)[0]._mobile_number]*100)
+        ['phone number'] + ([mock_get_users_by_service(None)[0]._mobile_number] * 100)
     ))
     mocker.patch('app.service_api_client.get_detailed_service_for_today', return_value={
         'data': {
@@ -1906,10 +1899,10 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
     assert ' '.join(
         page.find('div', class_='banner-dangerous').text.split()
     ) == (
-            'There is a problem with unicode.csv '
-            'You need to fix 1 address '
-            'Skip to file contents'
-        )
+        'There is a problem with unicode.csv '
+        'You need to fix 1 address '
+        'Skip to file contents'
+    )
     assert page.find('span', class_='table-field-error-label').text == u'Can’t include П, е, т or я'
 
 

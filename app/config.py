@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 
 
 if os.environ.get('VCAP_SERVICES'):

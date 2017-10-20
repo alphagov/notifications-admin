@@ -2,7 +2,6 @@ from datetime import datetime
 import json
 import pytest
 
-from bs4 import BeautifulSoup
 from flask import (
     url_for,
 )
@@ -214,6 +213,7 @@ def test_view_conversation_with_empty_inbound(
 
     messages = page.select('.sms-message-wrapper')
     assert len(messages) == 1
+    assert mock_get_inbound_sms.called is True
 
 
 def test_conversation_links_to_reply(

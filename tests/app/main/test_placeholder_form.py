@@ -1,6 +1,5 @@
 import pytest
 from app.main.forms import get_placeholder_form_instance
-from wtforms import Label
 
 
 def test_form_class_not_mutated(app_):
@@ -8,7 +7,7 @@ def test_form_class_not_mutated(app_):
     with app_.test_request_context(
         method='POST',
         data={'placeholder_value': ''}
-    ) as req:
+    ):
         form1 = get_placeholder_form_instance('name', {}, optional_placeholder=False)
         form2 = get_placeholder_form_instance('city', {}, optional_placeholder=True)
 

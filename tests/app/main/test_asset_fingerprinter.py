@@ -1,7 +1,4 @@
 # coding=utf-8
-import os
-
-from unittest import mock
 
 from app.asset_fingerprinter import AssetFingerprinter
 
@@ -95,5 +92,5 @@ class TestAssetFingerprint(object):
 
 class TestAssetFingerprintWithUnicode(object):
     def test_can_read_self(self):
-        string_with_unicode_character = 'Ralph’s apostrophe'
+        'Ralph’s apostrophe is a string containing a unicode character'
         AssetFingerprinter(filesystem_path='tests/app/main/').get_url('test_asset_fingerprinter.py')
