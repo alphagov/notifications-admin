@@ -88,6 +88,7 @@ class Config(object):
         r"wmfs\.net",
         r"bbsrc\.ac\.uk",
         r"acas\.org\.uk",
+        r"gov\.wales",
     ]
 
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
