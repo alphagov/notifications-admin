@@ -28,13 +28,16 @@ def platform_admin():
         api_args['start_date'] = form.start_date.data
         api_args['end_date'] = form.end_date.data or datetime.utcnow().date()
 
-    services = service_api_client.get_services(api_args)['data']
+    platform_stats = service_api_client.get_aggregate_platform_stats(api_args)
+
+    for stat in platform_stats.values():
+        stat['failure_rate'] = get_formatted_percentage(stat['failed'], stat['requested'])
 
     return render_template(
         'views/platform-admin/index.html',
         include_from_test_key=form.include_from_test_key.data,
         form=form,
-        global_stats=create_global_stats(services),
+        global_stats=platform_stats,
     )
 
 
@@ -114,6 +117,36 @@ def create_global_stats(services):
     for service in services:
         for msg_type, status in itertools.product(('sms', 'email', 'letter'), ('delivered', 'failed', 'requested')):
             stats[msg_type][status] += service['statistics'][msg_type][status]
+
+    for stat in stats.values():
+        stat['failure_rate'] = get_formatted_percentage(stat['failed'], stat['requested'])
+    return stats
+
+
+def platform_failure_percentages(services):
+    stats = {
+        'email': {
+            'delivered': 0,
+            'failed': 0,
+            'requested': 0
+        },
+        'sms': {
+            'delivered': 0,
+            'failed': 0,
+            'requested': 0
+        },
+        'letter': {
+            'delivered': 0,
+            'failed': 0,
+            'requested': 0
+        }
+    }
+
+    for service in services:
+        for msg_type, status in itertools.product(('sms', 'email', 'letter'), ('delivered', 'failed', 'requested')):
+            import pdb
+            pdb.set_trace()
+            stats[msg_type][status] += service[msg_type][status]
 
     for stat in stats.values():
         stat['failure_rate'] = get_formatted_percentage(stat['failed'], stat['requested'])

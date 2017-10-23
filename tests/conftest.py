@@ -2213,3 +2213,14 @@ def normalize_spaces(input):
     if isinstance(input, str):
         return ' '.join(input.split())
     return normalize_spaces(' '.join(item.text for item in input))
+
+
+@pytest.fixture(scope='function')
+def mock_get_aggregate_platform_stats(mocker):
+    stats = {
+        'email': {'requested': 0, 'delivered': 0, 'failed': 0},
+        'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
+        'letter': {'requested': 0, 'delivered': 0, 'failed': 0}
+
+    }
+    return mocker.patch('app.service_api_client.get_aggregate_platform_stats', return_value=stats)

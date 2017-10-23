@@ -104,15 +104,14 @@ def test_should_render_platform_admin_page(
 
 
 @pytest.mark.parametrize('endpoint', [
-    ('main.platform_admin'),
-    ('main.live_services'),
-    ('main.trial_services'),
+    'main.live_services',
+    'main.trial_services',
 ])
 @pytest.mark.parametrize('include_from_test_key, inc', [
     ("Y", True),
     ("N", False)
 ])
-def test_platform_admin_toggle_including_from_test_key(
+def test_live_trial_services_toggle_including_from_test_key(
     include_from_test_key,
     client,
     platform_admin_user,
@@ -131,12 +130,33 @@ def test_platform_admin_toggle_including_from_test_key(
                                                         'include_from_test_key': inc})
 
 
+@pytest.mark.parametrize('include_from_test_key, inc', [
+    ("Y", True),
+    ("N", False)
+])
+def test_platform_admin_toggle_including_from_test_key(
+        include_from_test_key,
+        client,
+        platform_admin_user,
+        mocker,
+        mock_get_aggregate_platform_stats,
+        inc
+):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin', include_from_test_key=include_from_test_key))
+
+    assert response.status_code == 200
+    mock_get_aggregate_platform_stats.assert_called_once_with({'detailed': True,
+                                                               'only_active': False,
+                                                               'include_from_test_key': inc})
+
+
 @pytest.mark.parametrize('endpoint', [
-    'main.platform_admin',
     'main.live_services',
     'main.trial_services'
 ])
-def test_platform_admin_with_date_filter(
+def test_live_trial_services_with_date_filter(
     client,
     platform_admin_user,
     mocker,
@@ -159,14 +179,60 @@ def test_platform_admin_with_date_filter(
     })
 
 
+def test_platform_admin_with_date_filter(
+    client,
+    platform_admin_user,
+    mocker,
+    mock_get_aggregate_platform_stats
+):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin', start_date='2016-12-20', end_date='2016-12-28'))
+
+    assert response.status_code == 200
+    resp_data = response.get_data(as_text=True)
+    assert 'Platform admin' in resp_data
+    mock_get_aggregate_platform_stats.assert_called_once_with({
+        'include_from_test_key': False,
+        'end_date': datetime.date(2016, 12, 28),
+        'start_date': datetime.date(2016, 12, 20),
+        'detailed': True,
+        'only_active': False,
+    })
+
+
+def test_should_show_total_on_platform_admin_page(
+    client,
+    platform_admin_user,
+    mocker,
+    mock_get_aggregate_platform_stats
+):
+    stats = {
+        'email': {'requested': 61, 'delivered': 55, 'failed': 6},
+        'sms': {'requested': 121, 'delivered': 110, 'failed': 11},
+        'letter': {'requested': 45, 'delivered': 32, 'failed': 13}
+    }
+    expected = (
+        '61 emails sent 6 failed – 9.8%',
+        '121 text messages sent 11 failed – 9.1%',
+        '45 letters sent 13 failed – 28.9%'
+    )
+
+    mock_get_aggregate_platform_stats.return_value = stats
+
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin'))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert (
+        normalize_spaces(page.select('.big-number-with-status')[0].text),
+        normalize_spaces(page.select('.big-number-with-status')[1].text),
+        normalize_spaces(page.select('.big-number-with-status')[2].text),
+    ) == expected
+
+
 @pytest.mark.parametrize('endpoint, expected_big_numbers', [
-    (
-        'main.platform_admin', (
-            '61 emails sent 6 failed – 5.5%',
-            '121 text messages sent 11 failed – 5.0%',
-            '45 letters sent 13 failed – 28.9%'
-        ),
-    ),
     (
         'main.live_services', (
             '55 emails sent 5 failed – 5.0%',
@@ -182,7 +248,7 @@ def test_platform_admin_with_date_filter(
         ),
     ),
 ])
-def test_should_show_total_on_platform_admin_pages(
+def test_should_show_total_on_live_trial_services_pages(
     client,
     platform_admin_user,
     mocker,
@@ -453,23 +519,16 @@ def test_should_show_correct_sent_totals_for_platform_admin(
     client,
     platform_admin_user,
     mocker,
-    mock_get_detailed_services,
+    mock_get_aggregate_platform_stats,
     fake_uuid,
 ):
-    services = [service_json(fake_uuid, 'My Service', [])]
-    services[0]['statistics'] = create_stats(
-        emails_requested=100,
-        emails_delivered=20,
-        emails_failed=40,
-        sms_requested=100,
-        sms_delivered=10,
-        sms_failed=30,
-        letters_requested=60,
-        letters_delivered=40,
-        letters_failed=5
-    )
+    stats = {
+        'email': {'requested': 100, 'delivered': 20, 'failed': 40},
+        'sms': {'requested': 100, 'delivered': 10, 'failed': 30},
+        'letter': {'requested': 60, 'delivered': 40, 'failed': 5}
 
-    mock_get_detailed_services.return_value = {'data': services}
+    }
+    mock_get_aggregate_platform_stats.return_value = stats
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
     response = client.get(url_for('main.platform_admin'))
