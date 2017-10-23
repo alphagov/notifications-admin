@@ -5,5 +5,14 @@ inherit: manifest-base.yml
 routes:
   - route: notify-admin-staging.cloudapps.digital
   - route: www.staging-notify.works
+
+services:
+  - notify-aws
+  - notify-config
+  - notify-template-preview
+  - hosted-graphite
+  - deskpro
+  - logit-ssl-syslog-drain
+
 instances: 2
 memory: 1G
