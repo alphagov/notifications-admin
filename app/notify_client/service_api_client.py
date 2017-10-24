@@ -331,19 +331,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         )
 
     def get_letter_contacts(self, service_id):
-        return self.get(
-            "/service/{}/letter-contact".format(
-                service_id
-            )
-        )
+        return self.get("/service/{}/letter-contact".format(service_id))
 
     def get_letter_contact(self, service_id, letter_contact_id):
-        return self.get(
-            "/service/{}/letter-contact/{}".format(
-                service_id,
-                letter_contact_id
-            )
-        )
+        return self.get("/service/{}/letter-contact/{}".format(service_id, letter_contact_id))
 
     def add_letter_contact(self, service_id, contact_block, is_default=False):
         return self.post(
@@ -368,6 +359,34 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     def get_aggregate_platform_stats(self, params_dict=None):
         return self.get("/service/platform-stats", params=params_dict)
+
+    def get_sms_senders(self, service_id):
+        return self.get(
+            "/service/{}/sms-sender".format(service_id)
+        )
+
+    def get_sms_sender(self, service_id, sms_sender_id):
+        return self.get(
+            "/service/{}/sms-sender/{}".format(service_id, sms_sender_id)
+        )
+
+    def add_sms_sender(self, service_id, sms_sender, is_default=False, inbound_number_id=None):
+        data = {
+            "sms_sender": sms_sender,
+            "is_default": is_default
+        }
+        if inbound_number_id:
+            data["inbound_number_id"] = inbound_number_id
+        return self.post("/service/{}/sms-sender".format(service_id), data=data)
+
+    def update_sms_sender(self, service_id, sms_sender_id, sms_sender, is_default=False):
+        return self.post(
+            "/service/{}/sms-sender/{}".format(service_id, sms_sender_id),
+            data={
+                "sms_sender": sms_sender,
+                "is_default": is_default
+            }
+        )
 
 
 class ServicesBrowsableItem(BrowsableItem):

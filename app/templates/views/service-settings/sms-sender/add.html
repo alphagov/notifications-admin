@@ -1,0 +1,31 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/checkbox.html" import checkbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Add text message sender
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">Add text message sender</h1>
+  <form method="post">
+    {{ textbox(
+      form.sms_sender,
+      width='1-4',
+      hint='Up to 11 characters, letters, numbers and spaces only'
+    ) }}
+    {% if not first_sms_sender %}
+      <div class="form-group">
+        {{ checkbox(form.is_default) }}
+      </div>
+    {% endif %}
+    {{ page_footer(
+      'Save',
+      back_link=url_for('.service_sms_senders', service_id=current_service.id),
+      back_link_text='Back'
+  ) }}
+  </form>
+
+{% endblock %}
