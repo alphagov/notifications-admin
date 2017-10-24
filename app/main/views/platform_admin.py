@@ -28,13 +28,16 @@ def platform_admin():
         api_args['start_date'] = form.start_date.data
         api_args['end_date'] = form.end_date.data or datetime.utcnow().date()
 
-    services = service_api_client.get_services(api_args)['data']
+    platform_stats = service_api_client.get_aggregate_platform_stats(api_args)
+
+    for stat in platform_stats.values():
+        stat['failure_rate'] = get_formatted_percentage(stat['failed'], stat['requested'])
 
     return render_template(
         'views/platform-admin/index.html',
         include_from_test_key=form.include_from_test_key.data,
         form=form,
-        global_stats=create_global_stats(services),
+        global_stats=platform_stats,
     )
 
 

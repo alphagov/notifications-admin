@@ -353,6 +353,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             }
         )
 
+    def get_aggregate_platform_stats(self, params_dict=None):
+        return self.get("/service/platform-stats", params=params_dict)
+
 
 class ServicesBrowsableItem(BrowsableItem):
     @property
