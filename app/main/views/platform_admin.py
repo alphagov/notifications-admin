@@ -123,36 +123,6 @@ def create_global_stats(services):
     return stats
 
 
-def platform_failure_percentages(services):
-    stats = {
-        'email': {
-            'delivered': 0,
-            'failed': 0,
-            'requested': 0
-        },
-        'sms': {
-            'delivered': 0,
-            'failed': 0,
-            'requested': 0
-        },
-        'letter': {
-            'delivered': 0,
-            'failed': 0,
-            'requested': 0
-        }
-    }
-
-    for service in services:
-        for msg_type, status in itertools.product(('sms', 'email', 'letter'), ('delivered', 'failed', 'requested')):
-            import pdb
-            pdb.set_trace()
-            stats[msg_type][status] += service[msg_type][status]
-
-    for stat in stats.values():
-        stat['failure_rate'] = get_formatted_percentage(stat['failed'], stat['requested'])
-    return stats
-
-
 def format_stats_by_service(services):
     for service in services:
         yield {
