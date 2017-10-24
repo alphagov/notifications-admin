@@ -14,7 +14,7 @@ from notifications_python_client.errors import HTTPError
 from werkzeug.exceptions import abort
 
 from app.main import main
-from app.main.forms import ServiceNameForm
+from app.main.forms import CreateServiceForm
 from app.notify_client.models import InvitedUser
 
 from app import (
@@ -39,13 +39,17 @@ def _add_invited_user_to_service(invited_user):
     return service_id
 
 
-def _create_service(service_name, email_from, form):
+def _create_service(service_name, organisation_type, email_from, form):
     try:
-        service_id = service_api_client.create_service(service_name=service_name,
-                                                       message_limit=current_app.config['DEFAULT_SERVICE_LIMIT'],
-                                                       restricted=True,
-                                                       user_id=session['user_id'],
-                                                       email_from=email_from)
+        service_id = service_api_client.create_service(
+            service_name=service_name,
+            organisation_type=organisation_type,
+            message_limit=current_app.config['DEFAULT_SERVICE_LIMIT'],
+            free_sms_fragment_limit=current_app.config['DEFAULT_FREE_SMS_FRAGMENT_LIMITS'].get(organisation_type),
+            restricted=True,
+            user_id=session['user_id'],
+            email_from=email_from,
+        )
         session['service_id'] = service_id
         return service_id, None
     except HTTPError as e:
@@ -78,14 +82,14 @@ def add_service():
     if not is_gov_user(current_user.email_address):
         abort(403)
 
-    form = ServiceNameForm()
-    heading = 'Which service do you want to set up notifications for?'
+    form = CreateServiceForm()
+    heading = 'About your service'
 
     if form.validate_on_submit():
         email_from = email_safe(form.name.data)
         service_name = form.name.data
 
-        service_id, error = _create_service(service_name, email_from, form)
+        service_id, error = _create_service(service_name, form.organisation_type.data, email_from, form)
         if error:
             return render_template('views/add-service.html', form=form, heading=heading)
         if len(service_api_client.get_active_services({'user_id': session['user_id']}).get('data', [])) > 1:

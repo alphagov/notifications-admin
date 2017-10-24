@@ -16,12 +16,23 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         self.service_id = application.config['ADMIN_CLIENT_USER_NAME']
         self.api_key = application.config['ADMIN_CLIENT_SECRET']
 
-    def create_service(self, service_name, message_limit, restricted, user_id, email_from):
+    def create_service(
+        self,
+        service_name,
+        organisation_type,
+        free_sms_fragment_limit,
+        message_limit,
+        restricted,
+        user_id,
+        email_from,
+    ):
         """
         Create a service and return the json.
         """
         data = {
             "name": service_name,
+            "organisation_type": organisation_type,
+            "free_sms_fragment_limit": free_sms_fragment_limit,
             "active": True,
             "message_limit": message_limit,
             "user_id": user_id,
@@ -93,7 +104,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'organisation',
             'letter_contact_block',
             'dvla_organisation',
-            'permissions'
+            'permissions',
+            'organisation_type',
+            'free_sms_fragment_limit',
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(

@@ -25,7 +25,7 @@ from app.main import main
 from app.utils import user_has_permissions, email_safe, get_cdn_domain
 from app.main.forms import (
     ConfirmPasswordForm,
-    ServiceNameForm,
+    RenameServiceForm,
     RequestToGoLiveForm,
     ServiceReplyToEmailForm,
     ServiceSmsSender,
@@ -34,6 +34,8 @@ from app.main.forms import (
     LetterBranding,
     ServiceInboundApiForm,
     InternationalSMSForm,
+    OrganisationTypeForm,
+    FreeSMSAllowance,
 )
 from app import user_api_client, current_service, organisations_client, inbound_number_client
 from notifications_utils.formatters import formatted_list
@@ -73,12 +75,12 @@ def service_settings(service_id):
     reply_to_email_addresses = service_api_client.get_reply_to_email_addresses(service_id)
     reply_to_email_address_count = len(reply_to_email_addresses)
     default_reply_to_email_address = next(
-        (x['email_address'] for x in reply_to_email_addresses if x['is_default']), "None"
+        (x['email_address'] for x in reply_to_email_addresses if x['is_default']), "Not set"
     )
     letter_contact_details = service_api_client.get_letter_contacts(service_id)
     letter_contact_details_count = len(letter_contact_details)
     default_letter_contact_block = next(
-        (Field(x['contact_block'], html='escape') for x in letter_contact_details if x['is_default']), "None"
+        (Field(x['contact_block'], html='escape') for x in letter_contact_details if x['is_default']), "Not set"
     )
     return render_template(
         'views/service-settings.html',
@@ -100,7 +102,7 @@ def service_settings(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_name_change(service_id):
-    form = ServiceNameForm()
+    form = RenameServiceForm()
 
     if request.method == 'GET':
         form.name.data = current_service.get('name')
@@ -571,6 +573,46 @@ def service_set_letter_contact_block(service_id):
     return render_template(
         'views/service-settings/set-letter-contact-block.html',
         form=form
+    )
+
+
+@main.route("/services/<service_id>/service-settings/set-organisation-type", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions(admin_override=True)
+def set_organisation_type(service_id):
+
+    form = OrganisationTypeForm(organisation_type=current_service.get('organisation_type'))
+
+    if form.validate_on_submit():
+        service_api_client.update_service(
+            service_id,
+            organisation_type=form.organisation_type.data,
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/set-organisation-type.html',
+        form=form,
+    )
+
+
+@main.route("/services/<service_id>/service-settings/set-free-sms-allowance", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions(admin_override=True)
+def set_free_sms_allowance(service_id):
+
+    form = FreeSMSAllowance(free_sms_allowance=current_service['free_sms_fragment_limit'])
+
+    if form.validate_on_submit():
+        service_api_client.update_service(
+            service_id,
+            free_sms_fragment_limit=form.free_sms_allowance.data,
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/set-free-sms-allowance.html',
+        form=form,
     )
 
 

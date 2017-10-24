@@ -22,7 +22,7 @@ from tests.conftest import (
     get_non_default_reply_to_email_address,
     get_default_letter_contact_block,
     get_non_default_letter_contact_block,
-    SERVICE_ONE_ID
+    SERVICE_ONE_ID,
 )
 
 
@@ -34,7 +34,7 @@ from tests.conftest import (
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to addresses None Change',
+        'Email reply to addresses Not set Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -53,7 +53,7 @@ from tests.conftest import (
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to addresses None Change',
+        'Email reply to addresses Not set Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -65,6 +65,8 @@ from tests.conftest import (
         'Send letters Off Change',
 
         'Label Value Action',
+        'Organisation type Central Change',
+        'Free text message allowance 250,000 Change',
         'Email branding GOV.UK Change',
         'Letter branding HM Government Change',
 
@@ -113,7 +115,7 @@ def test_should_show_overview(
         'Text message sender 0781239871',
         'International text messages On Change',
         'Receive text messages On Change',
-        'API endpoint for received text messages None Change',
+        'API endpoint for received text messages Not set Change',
 
         'Label Value Action',
         'Send letters Off Change',
@@ -250,7 +252,7 @@ def test_letter_contact_block_shows_none_if_not_set(
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     div = page.find_all('tr')[8].find_all('td')[1].div
-    assert div.text.strip() == 'None'
+    assert div.text.strip() == 'Not set'
     assert 'default' in div.attrs['class'][0]
 
 
@@ -1357,6 +1359,121 @@ def test_should_set_branding_and_organisations(
         service_one['id'],
         branding='org',
         organisation='organisation-id'
+    )
+
+
+@pytest.mark.parametrize('method', ['get', 'post'])
+@pytest.mark.parametrize('endpoint', [
+    'main.set_organisation_type',
+    'main.set_free_sms_allowance',
+])
+def test_organisation_type_pages_are_platform_admin_only(
+    client_request,
+    method,
+    endpoint,
+):
+    getattr(client_request, method)(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+        _test_page_title=False,
+    )
+
+
+def test_should_show_page_to_set_organisation_type(
+    logged_in_platform_admin_client,
+):
+    response = logged_in_platform_admin_client.get(url_for(
+        'main.set_organisation_type',
+        service_id=SERVICE_ONE_ID
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    labels = page.select('label')
+    checked_radio_buttons = page.select('input[checked]')
+
+    assert len(checked_radio_buttons) == 1
+    assert checked_radio_buttons[0]['value'] == 'central'
+
+    assert len(labels) == 3
+    for index, expected in enumerate((
+        'Central government',
+        'Local government',
+        'NHS',
+    )):
+        assert normalize_spaces(labels[index].text) == expected
+
+
+@pytest.mark.parametrize('organisation_type', [
+    'central',
+    'local',
+    'nhs',
+    pytest.mark.xfail('private sector'),
+])
+def test_should_set_organisation_type(
+    logged_in_platform_admin_client,
+    mock_update_service,
+    organisation_type,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            'main.set_organisation_type',
+            service_id=SERVICE_ONE_ID,
+        ),
+        data={
+            'organisation_type': organisation_type,
+            'organisation': 'organisation-id'
+        },
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        organisation_type=organisation_type,
+    )
+
+
+def test_should_show_page_to_set_sms_allowance(
+    logged_in_platform_admin_client,
+):
+    response = logged_in_platform_admin_client.get(url_for(
+        'main.set_free_sms_allowance',
+        service_id=SERVICE_ONE_ID
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.select_one('label').text) == 'Numbers of text message fragments per year'
+
+
+@pytest.mark.parametrize('given_allowance, expected_api_argument', [
+    ('1', 1),
+    ('250000', 250000),
+    pytest.mark.xfail(('foo', 'foo')),
+])
+def test_should_set_sms_allowance(
+    logged_in_platform_admin_client,
+    mock_update_service,
+    given_allowance,
+    expected_api_argument,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            'main.set_free_sms_allowance',
+            service_id=SERVICE_ONE_ID,
+        ),
+        data={
+            'free_sms_allowance': given_allowance,
+        },
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        free_sms_fragment_limit=expected_api_argument,
     )
 
 

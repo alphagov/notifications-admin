@@ -488,7 +488,15 @@ def mock_get_service_with_letters(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_create_service(mocker):
-    def _create(service_name, message_limit, restricted, user_id, email_from):
+    def _create(
+        service_name,
+        organisation_type,
+        message_limit,
+        free_sms_fragment_limit,
+        restricted,
+        user_id,
+        email_from,
+    ):
         service = service_json(
             101, service_name, [user_id], message_limit=message_limit, restricted=restricted, email_from=email_from)
         return service['id']
@@ -499,7 +507,15 @@ def mock_create_service(mocker):
 
 @pytest.fixture(scope='function')
 def mock_create_duplicate_service(mocker):
-    def _create(service_name, message_limit, restricted, user_id, email_from):
+    def _create(
+        service_name,
+        organisation_type,
+        message_limit,
+        free_sms_fragment_limit,
+        restricted,
+        user_id,
+        email_from,
+    ):
         json_mock = Mock(return_value={'message': {'name': ["Duplicate service name '{}'".format(service_name)]}})
         resp_mock = Mock(status_code=400, json=json_mock)
         http_error = HTTPError(response=resp_mock, message="Default message")

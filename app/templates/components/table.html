@@ -92,6 +92,13 @@
   {% endcall %}
 {%- endmacro %}
 
+{% macro optional_text_field(text, default='Not set') -%}
+  {{ text_field(
+    text or default,
+    status='' if text else 'default'
+  ) }}
+{%- endmacro %}
+
 {% macro link_field(text, link) -%}
   {% call field() %}
     <a href="{{ link }}">{{ text }}</a>

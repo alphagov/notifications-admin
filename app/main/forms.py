@@ -141,6 +141,18 @@ def sms_code():
                                           message='Code not found')])
 
 
+def organisation_type():
+    return RadioField(
+        'Who runs this service?',
+        choices=[
+            ('central', 'Central government'),
+            ('local', 'Local government'),
+            ('nhs', 'NHS'),
+        ],
+        validators=[DataRequired()],
+    )
+
+
 class LoginForm(Form):
     email_address = StringField('Email address', validators=[
         Length(min=5, max=255),
@@ -213,15 +225,34 @@ class TextNotReceivedForm(Form):
     mobile_number = international_phone_number()
 
 
-class ServiceNameForm(Form):
-    def __init__(self, *args, **kwargs):
-        super(ServiceNameForm, self).__init__(*args, **kwargs)
-
+class RenameServiceForm(Form):
     name = StringField(
         u'Service name',
         validators=[
             DataRequired(message='Can’t be empty')
         ])
+
+
+class CreateServiceForm(Form):
+    name = StringField(
+        u'What’s your service called?',
+        validators=[
+            DataRequired(message='Can’t be empty')
+        ])
+    organisation_type = organisation_type()
+
+
+class OrganisationTypeForm(Form):
+    organisation_type = organisation_type()
+
+
+class FreeSMSAllowance(Form):
+    free_sms_allowance = IntegerField(
+        'Numbers of text message fragments per year',
+        validators=[
+            DataRequired(message='Can’t be empty')
+        ]
+    )
 
 
 class ConfirmPasswordForm(Form):
