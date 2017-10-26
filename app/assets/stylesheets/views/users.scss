@@ -1,3 +1,5 @@
+$item-top-padding: $gutter-half;
+
 .user-list {
 
   @include core-19;
@@ -5,13 +7,21 @@
 
   &-item {
 
-    padding: $gutter-half 150px $gutter-half 0;
+    padding: $item-top-padding 150px $gutter-half 0;
     border-top: 1px solid $border-colour;
+    position: relative;
 
     &:last-child {
       border-bottom: 1px solid $border-colour;
     }
 
+  }
+
+  &-edit-link {
+    text-align: right;
+    position: absolute;
+    top: $item-top-padding;
+    right: 0px;
   }
 
 }
