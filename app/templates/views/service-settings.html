@@ -45,7 +45,7 @@
 
           {% call row() %}
             {{ text_field('Email reply to addresses') }}
-            {% call field(status='default' if default_reply_to_email_address == "None" else '') %}
+            {% call field(status='default' if default_reply_to_email_address == "Not set" else '') %}
 
               {{ default_reply_to_email_address }}
               {% if reply_to_email_address_count > 1 %}
@@ -197,7 +197,7 @@
         {% endcall %}
         {% call row() %}
           {{ text_field('Free text message allowance')}}
-          {{ text_field('{:,}'.format(current_service.free_sms_fragment_limit)) }}
+          {{ text_field('{:,}'.format(current_service.free_sms_fragment_limit or 0)) }}
           {{ edit_field('Change', url_for('.set_free_sms_allowance', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}
