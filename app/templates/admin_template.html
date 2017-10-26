@@ -141,6 +141,9 @@
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
     ga('create', 'UA-75215134-1', 'auto');
+    ga('set', 'anonymizeIp', true);
+    ga('set', 'displayFeaturesTask', null);
+    ga('set', 'transport', 'beacon');
     // strip UUIDs
     page = (window.location.pathname + window.location.search).replace(
       /[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}/g, '…'
