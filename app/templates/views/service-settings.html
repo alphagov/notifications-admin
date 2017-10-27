@@ -261,6 +261,11 @@
           {% endif %}
           </li>
         {% endif %}
+        <li class="bottom-gutter">
+          <a href="{{ url_for('.service_switch_email_auth', service_id=current_service.id) }}" class="button">
+            {{ 'Stop email auth' if 'email_auth' in current_service.permissions else 'Allow email auth' }}
+          </a>
+        </li>
         {% if current_service.active %}
           <li class="bottom-gutter">
             <a href="{{ url_for('.archive_service', service_id=current_service.id) }}" class="button">
@@ -272,8 +277,7 @@
               Suspend service
             </a>
           </li>
-        {% endif %}
-        {% if not current_service.active %}
+        {% else %}
           <li class="bottom-gutter">
             <a href="{{ url_for('.resume_service', service_id=current_service.id) }}" class="button">
               Resume service

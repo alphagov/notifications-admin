@@ -80,7 +80,7 @@ def template_history(service_id):
 
     months = [
         {
-            'name': YYYY_MM_to_datetime(month).strftime('%B'),
+            'name': yyyy_mm_to_datetime(month).strftime('%B'),
             'templates_used': aggregate_usage(
                 format_template_stats_to_list(stats.get(month)), sort_key='requested_count'
             ),
@@ -310,14 +310,14 @@ def format_monthly_stats_to_list(historical_stats):
     return sorted((
         dict(
             date=key,
-            future=YYYY_MM_to_datetime(key) > datetime.utcnow(),
-            name=YYYY_MM_to_datetime(key).strftime('%B'),
+            future=yyyy_mm_to_datetime(key) > datetime.utcnow(),
+            name=yyyy_mm_to_datetime(key).strftime('%B'),
             **aggregate_status_types(value)
         ) for key, value in historical_stats.items()
     ), key=lambda x: x['date'])
 
 
-def YYYY_MM_to_datetime(string):
+def yyyy_mm_to_datetime(string):
     return datetime(int(string[0:4]), int(string[5:7]), 1)
 
 

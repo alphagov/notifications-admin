@@ -302,6 +302,14 @@ def service_switch_can_send_sms(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
+@main.route("/services/<service_id>/service-settings/email-auth")
+@login_required
+@user_has_permissions(admin_override=True)
+def service_switch_email_auth(service_id):
+    switch_service_permissions(service_id, 'email_auth')
+    return redirect(url_for('.service_settings', service_id=service_id))
+
+
 @main.route("/services/<service_id>/service-settings/archive", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
