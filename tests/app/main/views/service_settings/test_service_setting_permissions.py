@@ -78,3 +78,16 @@ def test_service_setting_toggles_dont_show(get_service_settings_page, service_on
     page = get_service_settings_page()
     toggles = page.find_all('a', {'class': 'button'})
     assert not any(button for button in toggles if hidden_button_text in button.text)
+
+
+def test_normal_user_doesnt_see_any_toggle_buttons(
+    client_request,
+    service_one,
+    mock_get_inbound_number_for_service,
+    mock_get_letter_organisations,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+):
+    page = client_request.get('main.service_settings', service_id=service_one['id'])
+    toggles = page.find('a', {'class': 'button'})
+    assert toggles is None
