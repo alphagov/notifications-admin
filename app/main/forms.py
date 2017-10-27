@@ -506,7 +506,7 @@ class ServiceSmsSender(Form):
         ]
     )
 
-    def validate_sms_sender(form, field):
+    def validate_sms_sender(self, field):
         if field.data and not re.match(r'^[a-zA-Z0-9\s]+$', field.data):
             raise ValidationError('Use letters and numbers only')
 
@@ -520,7 +520,7 @@ class ServiceLetterContactBlockForm(Form):
     )
     is_default = BooleanField("Set as your default address")
 
-    def validate_letter_contact_block(form, field):
+    def validate_letter_contact_block(self, field):
         line_count = field.data.strip().count('\n')
         if line_count >= 10:
             raise ValidationError(

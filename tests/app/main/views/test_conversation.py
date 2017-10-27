@@ -50,7 +50,7 @@ def test_get_user_phone_number_when_only_outbound_exists(mocker):
     mock_get_notification.assert_called_once_with('service', 'notification')
 
 
-def test_get_user_phone_number_raises_if_both_API_requests_fail(mocker):
+def test_get_user_phone_number_raises_if_both_api_requests_fail(mocker):
     mock_get_inbound_sms = mocker.patch(
         'app.main.views.conversation.service_api_client.get_inbound_sms_by_id',
         side_effect=HTTPError,
