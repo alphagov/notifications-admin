@@ -1,3 +1,5 @@
+import functools
+
 import pytest
 from flask import url_for
 
@@ -5,8 +7,16 @@ from tests.conftest import client_request as client_request_factory
 
 
 @pytest.fixture
-def platform_admin_request(logged_in_platform_admin_client):
-    return client_request_factory(logged_in_platform_admin_client)
+def get_service_settings_page(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_get_inbound_number_for_service,
+    mock_get_letter_organisations,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+):
+    platform_admin_request = client_request_factory(logged_in_platform_admin_client)
+    return functools.partial(platform_admin_request.get, 'main.service_settings', service_id=service_one['id'])
 
 
 @pytest.mark.parametrize('service_fields, endpoint, kwargs, text', [
@@ -32,19 +42,23 @@ def platform_admin_request(logged_in_platform_admin_client):
     ({'active': True}, '.suspend_service', {}, 'Suspend service'),
     ({'active': False}, '.resume_service', {}, 'Resume service'),
 ])
-def test_service_setting_toggles_show(platform_admin_request, service_one, service_fields, endpoint, kwargs, text):
+def test_service_setting_toggles_show(get_service_settings_page, service_one, service_fields, endpoint, kwargs, text):
     button_url = url_for(endpoint, **kwargs, service_id=service_one['id'])
     service_one.update(service_fields)
-    page = platform_admin_request.get('main.service_settings', service_id=service_one['id'])
+    page = get_service_settings_page()
     assert page.find('a', {'class': 'button', 'href': button_url}).text.strip() == text
 
 
 @pytest.mark.parametrize('permissions', [
     ['inbound_sms'], []
 ])
-def test_service_settings_doesnt_show_inbound_options_if_sms_disabled(platform_admin_request, service_one, permissions):
+def test_service_settings_doesnt_show_inbound_options_if_sms_disabled(
+    get_service_settings_page,
+    service_one,
+    permissions
+):
     service_one['permissions'] = permissions
-    page = platform_admin_request.get('main.service_settings', service_id=service_one['id'])
+    page = get_service_settings_page()
     toggles = page.find_all('a', {'class': 'button'})
     assert not any(button for button in toggles if 'inbound sms' in button.text)
 
@@ -59,8 +73,8 @@ def test_service_settings_doesnt_show_inbound_options_if_sms_disabled(platform_a
     ({'active': False}, 'Suspend service'),
     ({'active': True}, 'Resume service'),
 ])
-def test_service_setting_toggles_dont_show(platform_admin_request, service_one, service_fields, hidden_button_text):
+def test_service_setting_toggles_dont_show(get_service_settings_page, service_one, service_fields, hidden_button_text):
     service_one.update(service_fields)
-    page = platform_admin_request.get('main.service_settings', service_id=service_one['id'])
+    page = get_service_settings_page()
     toggles = page.find_all('a', {'class': 'button'})
     assert not any(button for button in toggles if hidden_button_text in button.text)
