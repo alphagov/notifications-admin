@@ -1060,10 +1060,10 @@ def test_edit_letter_contact_block(
 
 
 @pytest.mark.parametrize('fixture, data, api_default_args', [
-    (get_default_sms_sender, {"is_default": "y"}, True),
-    (get_default_sms_sender, {}, True),
-    (get_non_default_sms_sender, {}, False),
-    (get_non_default_sms_sender, {"is_default": "y"}, True)
+    (get_default_sms_sender, {"is_default": "y", "sms_sender": "test"}, True),
+    (get_default_sms_sender, {"sms_sender": "test"}, True),
+    (get_non_default_sms_sender, {"sms_sender": "test"}, False),
+    (get_non_default_sms_sender, {"is_default": "y", "sms_sender": "test"}, True)
 ])
 def test_edit_sms_sender(
     fixture,
@@ -1085,7 +1085,7 @@ def test_edit_sms_sender(
     mock_update_sms_sender.assert_called_once_with(
         SERVICE_ONE_ID,
         sms_sender_id=fake_uuid,
-        sms_sender="GOVUK",
+        sms_sender="test",
         is_default=api_default_args
     )
 
@@ -1184,7 +1184,7 @@ def test_inbound_sms_sender_is_not_editable(
         sms_sender_id=fixture_sender_id,
     )
 
-    assert (page.select_one('main input[name="sms_sender"]') is None) == hide_textbox
+    assert bool(page.find('input', attrs={'name': "sms_sender"})) != hide_textbox
     if hide_textbox:
         assert normalize_spaces(
             page.select_one('form[method="post"] p').text

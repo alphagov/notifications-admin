@@ -29,7 +29,7 @@ from app.main.forms import (
     RequestToGoLiveForm,
     ServiceReplyToEmailForm,
     ServiceInboundNumberForm,
-    ServiceSmsSender,
+    ServiceSmsSenderForm,
     ServiceLetterContactBlockForm,
     ServiceBrandingOrg,
     LetterBranding,
@@ -37,6 +37,7 @@ from app.main.forms import (
     InternationalSMSForm,
     OrganisationTypeForm,
     FreeSMSAllowance,
+    ServiceEditInboundNumberForm,
 )
 from app import user_api_client, current_service, organisations_client, inbound_number_client
 from notifications_utils.formatters import formatted_list
@@ -428,7 +429,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_sms_sender(service_id):
-    form = ServiceSmsSender()
+    form = ServiceSmsSenderForm()
     if form.validate_on_submit():
         if 'inbound_sms' in current_service['permissions']:
             abort(403)
@@ -608,7 +609,7 @@ def service_sms_senders(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_add_sms_sender(service_id):
-    form = ServiceSmsSender()
+    form = ServiceSmsSenderForm()
     sms_sender_count = len(service_api_client.get_sms_senders(service_id))
     first_sms_sender = sms_sender_count == 0
     if form.validate_on_submit():
@@ -629,24 +630,28 @@ def service_add_sms_sender(service_id):
 @user_has_permissions('manage_settings', admin_override=True)
 def service_edit_sms_sender(service_id, sms_sender_id):
     sms_sender = service_api_client.get_sms_sender(service_id, sms_sender_id)
-    form = ServiceSmsSender()
-    form.sms_sender.data = sms_sender['sms_sender']
-    is_inbound_number = True if sms_sender['inbound_number_id'] else False
-    if request.method == 'GET':
-        form.is_default.data = sms_sender['is_default']
+    is_inbound_number = sms_sender['inbound_number_id']
+    if is_inbound_number:
+        form = ServiceEditInboundNumberForm(is_default=sms_sender['is_default'])
+    else:
+        form = ServiceSmsSenderForm(**sms_sender)
+
     if form.validate_on_submit():
         service_api_client.update_sms_sender(
             current_service['id'],
             sms_sender_id=sms_sender_id,
-            sms_sender=form.sms_sender.data.replace('\r', ''),
+            sms_sender=sms_sender['sms_sender'] if is_inbound_number else form.sms_sender.data.replace('\r', ''),
             is_default=True if sms_sender['is_default'] else form.is_default.data
         )
         return redirect(url_for('.service_sms_senders', service_id=service_id))
+
+    form.is_default.data = sms_sender['is_default']
     return render_template(
         'views/service-settings/sms-sender/edit.html',
         form=form,
-        sms_sender_id=sms_sender['id'],
-        is_inbound_number=is_inbound_number)
+        sms_sender=sms_sender,
+        inbound_number=is_inbound_number
+    )
 
 
 @main.route("/services/<service_id>/service-settings/set-letter-contact-block", methods=['GET', 'POST'])
