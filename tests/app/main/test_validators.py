@@ -1,5 +1,5 @@
 import pytest
-from app.main.forms import RegisterUserForm, ServiceSmsSender
+from app.main.forms import RegisterUserForm, ServiceSmsSenderForm
 from app.main.validators import ValidGovEmail, NoCommasInPlaceHolders, OnlyGSMCharacters
 from wtforms import ValidationError
 from unittest.mock import Mock
@@ -184,7 +184,7 @@ def test_sms_sender_form_validation(
     client,
     mock_get_user_by_email,
 ):
-    form = ServiceSmsSender()
+    form = ServiceSmsSenderForm()
 
     form.sms_sender.data = 'elevenchars'
     form.validate()
