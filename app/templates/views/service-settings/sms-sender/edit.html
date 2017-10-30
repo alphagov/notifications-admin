@@ -1,0 +1,44 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/checkbox.html" import checkbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Edit text message sender
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    Edit text message sender
+  </h1>
+  <form method="post">
+    {% if is_inbound_number %}
+      <p>
+        <span class="bottom-gutter-1-3"> {{ form.sms_sender.data }} </span>
+        <span class="hint"> This phone number receives replies and can’t be changed </span>
+      </p>
+    {% else %}
+      {{ textbox(
+        form.sms_sender,
+        width='1-4',
+        hint='Up to 11 characters, letters, numbers and spaces only'
+      ) }}
+    {% endif %}
+    {% if form.is_default.data %}
+      <p class="form-group">
+        This is currently your text message sender for {{ current_service.name }}
+      </p>
+    {% else %}
+      <div class="form-group">
+        {{ checkbox(form.is_default) }}
+      </div>
+    {% endif %}
+    {{ page_footer(
+      'Save',
+      back_link=None if request.args.get('from_template') else url_for('.service_sms_senders', service_id=current_service.id),
+      back_link_text='Back'
+    ) }}
+  </form>
+
+{% endblock %}

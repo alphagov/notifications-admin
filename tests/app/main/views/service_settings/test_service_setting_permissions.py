@@ -14,6 +14,7 @@ def get_service_settings_page(
     mock_get_letter_organisations,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
+    single_sms_sender,
 ):
     platform_admin_request = client_request_factory(logged_in_platform_admin_client)
     return functools.partial(platform_admin_request.get, 'main.service_settings', service_id=service_one['id'])
@@ -35,7 +36,6 @@ def get_service_settings_page(
     ({'permissions': ['sms']}, '.service_switch_can_send_sms', {}, 'Stop sending sms'),
     ({'permissions': []}, '.service_switch_can_send_sms', {}, 'Allow to send sms'),
 
-    ({'permissions': ['sms', 'inbound_sms']}, '.service_set_inbound_number', {'set_inbound_sms': False}, 'Stop inbound sms'),  # noqa
     ({'permissions': ['sms']}, '.service_set_inbound_number', {'set_inbound_sms': True}, 'Allow inbound sms'),
 
     ({'active': True}, '.archive_service', {}, 'Archive service'),
@@ -87,6 +87,7 @@ def test_normal_user_doesnt_see_any_toggle_buttons(
     mock_get_letter_organisations,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
+    single_sms_sender,
 ):
     page = client_request.get('main.service_settings', service_id=service_one['id'])
     toggles = page.find('a', {'class': 'button'})
