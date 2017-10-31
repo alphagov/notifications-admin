@@ -502,6 +502,7 @@ def test_usage_page(
     logged_in_client,
     mock_get_usage,
     mock_get_billable_units,
+    mock_get_free_sms_fragment_limit
 ):
     response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID))
 
@@ -509,6 +510,7 @@ def test_usage_page(
 
     mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
+    mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
@@ -540,11 +542,14 @@ def test_usage_page(
 def test_usage_page_with_year_argument(
     logged_in_client,
     mock_get_usage,
-    mock_get_billable_units
+    mock_get_billable_units,
+    mock_get_free_sms_fragment_limit,
+    mock_create_or_update_free_sms_fragment_limit
 ):
     assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2000)).status_code == 200
     mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2000)
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2000)
+    mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2000)
 
 
 def test_usage_page_for_invalid_year(
@@ -558,11 +563,13 @@ def test_future_usage_page(
     logged_in_client,
     mock_get_future_usage,
     mock_get_future_billable_units,
+    mock_get_free_sms_fragment_limit
 ):
     assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2014)).status_code == 200
 
     mock_get_future_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2014)
     mock_get_future_usage.assert_called_once_with(SERVICE_ONE_ID, 2014)
+    mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2014)
 
 
 def _test_dashboard_menu(mocker, app_, usr, service, permissions):
@@ -866,9 +873,10 @@ def test_aggregate_status_types(dict_in, expected_failed, expected_requested):
     ]
 )
 def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_months):
+    sms_allowance = 250000
     with now:
         billing_units = get_free_paid_breakdown_for_billable_units(
-            2016, [
+            2016, sms_allowance, [
                 {
                     'month': 'April', 'international': False, 'rate_multiplier': 1,
                     'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000

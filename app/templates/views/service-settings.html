@@ -194,7 +194,7 @@
         {% endcall %}
         {% call row() %}
           {{ text_field('Free text message allowance')}}
-          {{ text_field('{:,}'.format(current_service.free_sms_fragment_limit or 0)) }}
+          {{ text_field('{:,}'.format(free_sms_fragment_limit or 0)) }}
           {{ edit_field('Change', url_for('.set_free_sms_allowance', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}

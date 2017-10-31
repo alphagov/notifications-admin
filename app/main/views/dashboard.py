@@ -115,7 +115,9 @@ def usage(service_id):
     return render_template(
         'views/usage.html',
         months=list(get_free_paid_breakdown_for_billable_units(
-            year, billing_api_client.get_billable_units(service_id, year)
+            year,
+            billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year),
+            billing_api_client.get_billable_units(service_id, year)
         )),
         selected_year=year,
         years=get_tuples_of_financial_years(
@@ -123,7 +125,8 @@ def usage(service_id):
             start=current_financial_year - 1,
             end=current_financial_year + 1,
         ),
-        **calculate_usage(billing_api_client.get_service_usage(service_id, year))
+        **calculate_usage(billing_api_client.get_service_usage(service_id, year),
+                          billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year))
     )
 
 
@@ -287,9 +290,9 @@ def get_dashboard_totals(statistics):
     return statistics
 
 
-def calculate_usage(usage):
+def calculate_usage(usage, free_sms_fragment_limit):
     # TODO: Don't hardcode these - get em from the API
-    sms_free_allowance = 250000
+    sms_free_allowance = free_sms_fragment_limit         # VB-Progress
 
     sms_rate = 0 if len(usage) == 0 else usage[0].get("rate", 0)
     sms_sent = get_sum_billing_units(breakdown for breakdown in usage if breakdown['notification_type'] == 'sms')
@@ -355,14 +358,14 @@ def get_sum_billing_units(billing_units, month=None):
     return sum(b['billing_units'] * b.get('rate_multiplier', 1) for b in billing_units)
 
 
-def get_free_paid_breakdown_for_billable_units(year, billing_units):
+def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, billing_units):
     cumulative = 0
     for month in get_months_for_financial_year(year):
         previous_cumulative = cumulative
         monthly_usage = get_sum_billing_units(billing_units, month)
         cumulative += monthly_usage
         breakdown = get_free_paid_breakdown_for_month(
-            cumulative, previous_cumulative,
+            free_sms_fragment_limit, cumulative, previous_cumulative,
             [billing_month for billing_month in billing_units if billing_month['month'] == month]
         )
         yield {
@@ -373,11 +376,12 @@ def get_free_paid_breakdown_for_billable_units(year, billing_units):
 
 
 def get_free_paid_breakdown_for_month(
+    free_sms_fragment_limit,
     cumulative,
     previous_cumulative,
     monthly_usage
 ):
-    allowance = 250000
+    allowance = free_sms_fragment_limit
 
     total_monthly_billing_units = get_sum_billing_units(monthly_usage)
 

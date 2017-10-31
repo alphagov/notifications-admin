@@ -88,7 +88,8 @@ def test_should_show_overview(
         single_sms_sender,
         user,
         expected_rows,
-        mock_get_inbound_number_for_service
+        mock_get_inbound_number_for_service,
+        mock_get_free_sms_fragment_limit
 ):
 
     service_one['permissions'] = ['sms', 'email']
@@ -1592,7 +1593,9 @@ def test_should_set_sms_allowance(
     mock_update_service,
     given_allowance,
     expected_api_argument,
+    mock_create_or_update_free_sms_fragment_limit
 ):
+
     response = logged_in_platform_admin_client.post(
         url_for(
             'main.set_free_sms_allowance',
@@ -1608,6 +1611,10 @@ def test_should_set_sms_allowance(
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
         free_sms_fragment_limit=expected_api_argument,
+    )
+    mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(
+        SERVICE_ONE_ID,
+        expected_api_argument
     )
 
 

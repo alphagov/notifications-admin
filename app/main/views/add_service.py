@@ -20,7 +20,8 @@ from app.notify_client.models import InvitedUser
 from app import (
     invite_api_client,
     user_api_client,
-    service_api_client
+    service_api_client,
+    billing_api_client
 )
 
 from app.utils import (
@@ -40,17 +41,21 @@ def _add_invited_user_to_service(invited_user):
 
 
 def _create_service(service_name, organisation_type, email_from, form):
+    free_sms_fragment_limit = current_app.config['DEFAULT_FREE_SMS_FRAGMENT_LIMITS'].get(organisation_type)
     try:
         service_id = service_api_client.create_service(
             service_name=service_name,
             organisation_type=organisation_type,
             message_limit=current_app.config['DEFAULT_SERVICE_LIMIT'],
-            free_sms_fragment_limit=current_app.config['DEFAULT_FREE_SMS_FRAGMENT_LIMITS'].get(organisation_type),
+            free_sms_fragment_limit=free_sms_fragment_limit,
             restricted=True,
             user_id=session['user_id'],
             email_from=email_from,
         )
         session['service_id'] = service_id
+
+        billing_api_client.create_or_update_free_sms_fragment_limit_for_year(service_id, free_sms_fragment_limit)
+
         return service_id, None
     except HTTPError as e:
         if e.status_code == 400 and e.message['name']:
