@@ -41,6 +41,7 @@ from app.main.forms import (
 )
 from app import user_api_client, current_service, organisations_client, inbound_number_client, billing_api_client
 from notifications_utils.formatters import formatted_list
+from app.utils import get_current_financial_year
 
 
 dummy_bearer_token = 'bearer_token_set'
@@ -715,9 +716,16 @@ def set_free_sms_allowance(service_id):
             # TODO: Retire this after new end points are added.
             free_sms_fragment_limit=form.free_sms_allowance.data,
         )
-        form.set_free_sms_allowance = \
-            billing_api_client.create_or_update_free_sms_fragment_limit_for_year(service_id,
-                                                                                 form.free_sms_allowance.data)
+        # get a list of all the free sms allowance entries for this service
+        sms_list = billing_api_client.get_free_sms_fragment_limit_for_all_years(service_id)
+
+        for item in range(0, len(sms_list)):
+            if sms_list[item]['financial_year_start'] >= get_current_financial_year():
+                form.set_free_sms_allowance = \
+                    billing_api_client.create_or_update_free_sms_fragment_limit_for_year(service_id,
+                                                                                         form.free_sms_allowance.data,
+                                                                                         sms_list[item][
+                                                                                             'financial_year_start'])
         return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(

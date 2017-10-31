@@ -29,6 +29,7 @@ from tests.conftest import (
     get_inbound_number_sms_sender,
     SERVICE_ONE_ID
 )
+from freezegun import freeze_time
 
 
 @pytest.mark.parametrize('user, expected_rows', [
@@ -1583,6 +1584,7 @@ def test_should_show_page_to_set_sms_allowance(
     assert normalize_spaces(page.select_one('label').text) == 'Numbers of text message fragments per year'
 
 
+@freeze_time("2017-04-01 11:09:00.061258")
 @pytest.mark.parametrize('given_allowance, expected_api_argument', [
     ('1', 1),
     ('250000', 250000),
@@ -1593,7 +1595,8 @@ def test_should_set_sms_allowance(
     mock_update_service,
     given_allowance,
     expected_api_argument,
-    mock_create_or_update_free_sms_fragment_limit
+    mock_create_or_update_free_sms_fragment_limit,
+    mock_get_free_sms_fragment_limit_for_all_years
 ):
 
     response = logged_in_platform_admin_client.post(
@@ -1612,10 +1615,12 @@ def test_should_set_sms_allowance(
         SERVICE_ONE_ID,
         free_sms_fragment_limit=expected_api_argument,
     )
-    mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(
+    mock_create_or_update_free_sms_fragment_limit.assert_called_with(
         SERVICE_ONE_ID,
-        expected_api_argument
+        expected_api_argument,
+        2017
     )
+    mock_get_free_sms_fragment_limit_for_all_years.assert_called_once_with(SERVICE_ONE_ID)
 
 
 def test_switch_service_enable_letters(
