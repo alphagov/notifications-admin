@@ -50,34 +50,26 @@ def verify():
 @main.route('/verify-email/<token>')
 def verify_email(token):
     try:
-        token_data = check_token(token,
-                                 current_app.config['SECRET_KEY'],
-                                 current_app.config['DANGEROUS_SALT'],
-                                 current_app.config['EMAIL_EXPIRY_SECONDS'])
-
-        token_data = json.loads(token_data)
-        verified = user_api_client.check_verify_code(token_data['user_id'], token_data['secret_code'], 'email')
-        user = user_api_client.get_user(token_data['user_id'])
-        if not user:
-            abort(404)
-
-        if user.is_active:
-            flash("That verification link has expired.")
-            return redirect(url_for('main.sign_in'))
-
-        session['user_details'] = {"email": user.email_address, "id": user.id}
-        if verified[0]:
-            user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
-            return redirect('verify')
-        else:
-            if verified[1] == 'Code has expired':
-                flash("The link in the email we sent you has expired. We've sent you a new one.")
-                return redirect(url_for('main.resend_email_verification'))
-            else:
-                message = "There was a problem verifying your account. Error message: '{}'".format(verified[1])
-                flash(message)
-                return redirect(url_for('main.index'))
-
+        token_data = check_token(
+            token,
+            current_app.config['SECRET_KEY'],
+            current_app.config['DANGEROUS_SALT'],
+            current_app.config['EMAIL_EXPIRY_SECONDS']
+        )
     except SignatureExpired:
-        flash('The link in the email we sent you has expired')
+        flash("The link in the email we sent you has expired. We've sent you a new one.")
         return redirect(url_for('main.resend_email_verification'))
+
+    # token contains json blob of format: {'user_id': '...', 'secret_code': '...'} (secret_code is unused)
+    token_data = json.loads(token_data)
+    user = user_api_client.get_user(token_data['user_id'])
+    if not user:
+        abort(404)
+
+    if user.is_active:
+        flash("That verification link has expired.")
+        return redirect(url_for('main.sign_in'))
+
+    session['user_details'] = {"email": user.email_address, "id": user.id}
+    user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
+    return redirect('verify')
