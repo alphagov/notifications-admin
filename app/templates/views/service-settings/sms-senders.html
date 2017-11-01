@@ -1,0 +1,49 @@
+{% extends "withnav_template.html" %}
+{% from "components/api-key.html" import api_key %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table %}
+
+{% block service_page_title %}
+  Text message senders
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="grid-row bottom-gutter">
+    <div class="column-two-thirds">
+      <h1 class="heading-large">
+        Text message senders
+      </h1>
+    </div>
+	 <div class="column-one-third">
+	   <a href="{{ url_for('.service_add_sms_sender', service_id=current_service.id) }}" class="button align-with-heading">Add text message sender</a>
+	 </div>
+  </div>
+  <div class="user-list">
+    {% if not sms_senders %}
+      <div class="user-list-item">
+        <span class="hint">You haven’t added any sms senders yet</span>
+      </div>
+    {% endif %} 
+    {% for item in sms_senders %}
+      <div class="user-list-item">
+        <h3>
+          <span class="heading-small">{{ item.sms_sender }}</span>
+          {% if item.hint %}
+            &ensp;
+            <span class="hint">
+              {{ item.hint }}
+            </span>
+          {% endif %}
+        </h3>
+        <ul class="tick-cross-list">
+          <li class="tick-cross-list-edit-link">
+            <a href="{{ url_for('.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">Change</a>
+          </li>
+        </ul>
+        {% if sms_senders|length  > 1 %}
+          {{ api_key(item.id, thing="ID") }}
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

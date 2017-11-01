@@ -1,6 +1,7 @@
 import uuid
 import json
 
+from itsdangerous import SignatureExpired
 from flask import url_for
 from bs4 import BeautifulSoup
 
@@ -97,7 +98,7 @@ def test_verify_email_redirects_to_verify_if_token_valid(
     mock_send_verify_code,
     mock_check_verify_code,
 ):
-    token_data = {"user_id": api_user_pending.id, "secret_code": 12345}
+    token_data = {"user_id": api_user_pending.id, "secret_code": 'UNUSED'}
     mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
 
     with client.session_transaction() as session:
@@ -108,38 +109,19 @@ def test_verify_email_redirects_to_verify_if_token_valid(
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)
 
+    assert not mock_check_verify_code.called
+    mock_send_verify_code.assert_called_once_with(api_user_pending.id, 'sms', api_user_pending.mobile_number)
+
+    with client.session_transaction() as session:
+        assert session['user_details'] == {'email': api_user_pending.email_address, 'id': api_user_pending.id}
+
 
 def test_verify_email_redirects_to_email_sent_if_token_expired(
     client,
     mocker,
     api_user_pending,
-    mock_check_verify_code,
 ):
-    from itsdangerous import SignatureExpired
     mocker.patch('app.main.views.verify.check_token', side_effect=SignatureExpired('expired'))
-
-    with client.session_transaction() as session:
-        session['user_details'] = {'email_address': api_user_pending.email_address, 'id': api_user_pending.id}
-
-    response = client.get(url_for('main.verify_email', token='notreal'))
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.resend_email_verification', _external=True)
-
-
-def test_verify_email_redirects_to_email_sent_if_token_used(
-    client,
-    mocker,
-    api_user_pending,
-    mock_get_user_pending,
-    mock_send_verify_code,
-    mock_check_verify_code_code_expired,
-):
-    from itsdangerous import SignatureExpired
-    mocker.patch('app.main.views.verify.check_token', side_effect=SignatureExpired('expired'))
-
-    with client.session_transaction() as session:
-        session['user_details'] = {'email_address': api_user_pending.email_address, 'id': api_user_pending.id}
 
     response = client.get(url_for('main.verify_email', token='notreal'))
 
@@ -157,9 +139,6 @@ def test_verify_email_redirects_to_sign_in_if_user_active(
 ):
     token_data = {"user_id": api_user_active.id, "secret_code": 12345}
     mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
-
-    with client.session_transaction() as session:
-        session['user_details'] = {'email_address': api_user_active.email_address, 'id': api_user_active.id}
 
     response = client.get(url_for('main.verify_email', token='notreal'), follow_redirects=True)
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')

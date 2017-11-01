@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+from itsdangerous import SignatureExpired
 from flask import url_for
 from notifications_utils.url_safe_token import generate_token
 
@@ -69,13 +70,13 @@ def test_should_redirect_index_if_user_has_already_changed_password(
 def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_expired(
     app_,
     client,
-    mock_get_user_by_email_request_password_reset,
     mock_login,
+    mocker
 ):
-    app_.config['TOKEN_MAX_AGE_SECONDS'] = -1000
-    user = mock_get_user_by_email_request_password_reset.return_value
-    token = generate_token(user.email_address, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
-    response = client.post(url_for('.new_password', token=token), data={'new_password': 'a-new_password'})
+    mocker.patch('app.main.views.new_password.check_token', side_effect=SignatureExpired('expired'))
+    token = generate_token('foo@bar.com', app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
+
+    response = client.get(url_for('.new_password', token=token))
+
     assert response.status_code == 302
     assert response.location == url_for('.forgot_password', _external=True)
-    app_.config['TOKEN_MAX_AGE_SECONDS'] = 3600

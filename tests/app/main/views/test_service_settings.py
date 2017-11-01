@@ -14,15 +14,20 @@ from tests.conftest import (
     active_user_with_permissions,
     platform_admin_user,
     normalize_spaces,
-    no_reply_to_email_addresses,
     multiple_reply_to_email_addresses,
     multiple_letter_contact_blocks,
+    multiple_sms_senders,
+    no_reply_to_email_addresses,
     no_letter_contact_blocks,
+    no_sms_senders,
     get_default_reply_to_email_address,
     get_non_default_reply_to_email_address,
     get_default_letter_contact_block,
     get_non_default_letter_contact_block,
-    SERVICE_ONE_ID,
+    get_default_sms_sender,
+    get_non_default_sms_sender,
+    get_inbound_number_sms_sender,
+    SERVICE_ONE_ID
 )
 
 
@@ -38,7 +43,7 @@ from tests.conftest import (
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender GOVUK Change',
+        'Text message sender GOVUK Manage',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -57,7 +62,7 @@ from tests.conftest import (
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender GOVUK Change',
+        'Text message sender GOVUK Manage',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -80,6 +85,7 @@ def test_should_show_overview(
         mock_get_letter_organisations,
         no_reply_to_email_addresses,
         no_letter_contact_blocks,
+        single_sms_sender,
         user,
         expected_rows,
         mock_get_inbound_number_for_service
@@ -112,7 +118,7 @@ def test_should_show_overview(
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender 0781239871',
+        'Text message sender GOVUK Manage',
         'International text messages On Change',
         'Receive text messages On Change',
         'API endpoint for received text messages Not set Change',
@@ -131,7 +137,7 @@ def test_should_show_overview(
 
         'Label Value Action',
         'Send text messages On Change',
-        'Text message sender GOVUK Change',
+        'Text message sender GOVUK Manage',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -147,6 +153,7 @@ def test_should_show_overview_for_service_with_more_things_set(
         service_one,
         single_reply_to_email_address,
         single_letter_contact_block,
+        single_sms_sender,
         mock_get_organisation,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service,
@@ -173,12 +180,13 @@ def test_service_settings_show_elided_api_url_if_needed(
     service_one,
     mock_get_letter_organisations,
     single_reply_to_email_address,
+    single_sms_sender,
     single_letter_contact_block,
     mocker,
     fake_uuid,
     url,
     elided_url,
-    mock_get_inbound_number_for_service,
+    mock_get_inbound_number_for_service
 ):
     service_one['permissions'] = ['sms', 'email', 'inbound_sms']
     service_one['inbound_api'] = [fake_uuid]
@@ -216,32 +224,13 @@ def test_if_cant_send_letters_then_cant_see_letter_contact_block(
     assert 'Letter contact block' not in response.get_data(as_text=True)
 
 
-def test_if_can_receive_inbound_then_cant_change_sms_sender(
-        logged_in_client,
-        service_one,
-        mock_get_letter_organisations,
-        single_reply_to_email_address,
-        single_letter_contact_block,
-        mock_get_inbound_number_for_service
-):
-    service_one['permissions'] = ['email', 'sms', 'inbound_sms']
-    response = logged_in_client.get(url_for(
-        'main.service_settings', service_id=service_one['id']
-    ))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    rows_as_text = [" ".join(row.text.split()) for row in page.find_all('tr')]
-    assert 'Text message sender 0781239871 Change' not in rows_as_text
-    assert url_for('main.service_request_to_go_live', service_id=service_one['id'],
-                   set_inbound_sms=False) not in response.get_data(as_text=True)
-    assert '0781239871' in response.get_data(as_text=True)
-
-
 def test_letter_contact_block_shows_none_if_not_set(
         logged_in_client,
         service_one,
         mocker,
         single_reply_to_email_address,
         no_letter_contact_blocks,
+        single_sms_sender,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -261,6 +250,7 @@ def test_escapes_letter_contact_block(
         service_one,
         mocker,
         single_reply_to_email_address,
+        single_sms_sender,
         injected_letter_contact_block,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
@@ -312,6 +302,7 @@ def test_show_restricted_service(
         mock_get_letter_organisations,
         single_reply_to_email_address,
         single_letter_contact_block,
+        single_sms_sender,
         mock_get_inbound_number_for_service
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
@@ -345,6 +336,7 @@ def test_show_live_service(
         mock_get_live_service,
         single_reply_to_email_address,
         single_letter_contact_block,
+        single_sms_sender,
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service
 ):
@@ -471,6 +463,7 @@ def test_should_redirect_after_request_to_go_live(
     active_user_with_permissions,
     single_reply_to_email_address,
     single_letter_contact_block,
+    single_sms_sender,
     mock_get_letter_organisations,
     mock_get_inbound_number_for_service,
 ):
@@ -569,6 +562,7 @@ def test_route_permissions(
         service_one,
         single_reply_to_email_address,
         single_letter_contact_block,
+        single_sms_sender,
         mock_get_letter_organisations,
         route,
         mock_get_inbound_number_for_service
@@ -628,6 +622,7 @@ def test_route_for_platform_admin(
         service_one,
         single_reply_to_email_address,
         single_letter_contact_block,
+        single_sms_sender,
         mock_get_letter_organisations,
         route,
         mock_get_inbound_number_for_service
@@ -701,7 +696,8 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         mock_get_letter_organisations,
         mock_get_inbound_number_for_service,
         multiple_reply_to_email_addresses,
-        multiple_letter_contact_blocks
+        multiple_letter_contact_blocks,
+        multiple_sms_senders
 ):
     service_one['permissions'] = ['email', 'sms', 'letter']
 
@@ -710,22 +706,26 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         service_id=service_one['id']
     )
 
-    assert normalize_spaces(
-        page.select('tbody tr')[2].text
-    ) == "Email reply to addresses test@example.com …and 2 more Manage"
-    assert normalize_spaces(
-        page.select('tbody tr')[8].text
-    ) == "Sender addresses 1 Example Street …and 2 more Manage"
+    def get_row(page, index):
+        return normalize_spaces(
+            page.select('tbody tr')[index].text
+        )
+
+    assert get_row(page, 2) == "Email reply to addresses test@example.com …and 2 more Manage"
+    assert get_row(page, 4) == "Text message sender Example …and 2 more Manage"
+    assert get_row(page, 8) == "Sender addresses 1 Example Street …and 2 more Manage"
 
 
 @pytest.mark.parametrize('sender_list_page, expected_output', [
     ('main.service_email_reply_to', 'test@example.com (default) Change'),
     ('main.service_letter_contact_details', '1 Example Street (default) Change'),
+    ('main.service_sms_senders', 'GOVUK (default) Change')
 ])
 def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
     client_request,
     single_reply_to_email_address,
     single_letter_contact_block,
+    single_sms_sender,
     sender_list_page,
     expected_output
 ):
@@ -758,6 +758,12 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
         '1 Example Street (default) Change 1234',
         '2 Example Street Change 5678',
         '3 Example Street Change 9457'
+    ), (
+        'main.service_sms_senders',
+        multiple_sms_senders,
+        'Example (default and recieves replies) Change 1234',
+        'Example 2 Change 5678',
+        'Example 3 Change 9457'
     ),
     ]
 )
@@ -796,6 +802,11 @@ def test_default_option_shows_for_default_sender(
         no_letter_contact_blocks,
         'You haven’t added any letter contact details yet'
     ),
+    (
+        'main.service_sms_senders',
+        no_sms_senders,
+        'You haven’t added any sms senders yet'
+    ),
 ])
 def test_no_senders_message_shows(
     client_request,
@@ -822,7 +833,7 @@ def test_no_senders_message_shows(
     ('testtest', 'Enter a valid email address'),
     ('test@hello.com', 'Enter a government email address. If you think you should have access contact us')
 ])
-def test_incorrect_reply_to_email_address(
+def test_incorrect_reply_to_email_address_input(
     reply_to_input,
     expected_error,
     client_request,
@@ -842,7 +853,7 @@ def test_incorrect_reply_to_email_address(
     ('', 'Can’t be empty'),
     ('1 \n 2 \n 3 \n 4 \n 5 \n 6 \n 7 \n 8 \n 9 \n 0 \n a', 'Contains 11 lines, maximum is 10')
 ])
-def test_incorrect_letter_contact_block(
+def test_incorrect_letter_contact_block_input(
     contact_block_input,
     expected_error,
     client_request,
@@ -852,6 +863,26 @@ def test_incorrect_letter_contact_block(
         'main.service_add_letter_contact',
         service_id=SERVICE_ONE_ID,
         _data={'letter_contact_block': contact_block_input},
+        _expected_status=200
+    )
+
+    assert normalize_spaces(page.select_one('.error-message').text) == expected_error
+
+
+@pytest.mark.parametrize('sms_sender_input, expected_error', [
+    ('', 'Can’t be empty'),
+    ('abcdefghijkhgkg', 'Enter 11 characters or fewer')
+])
+def test_incorrect_sms_sender_input(
+    sms_sender_input,
+    expected_error,
+    client_request,
+    no_sms_senders
+):
+    page = client_request.post(
+        'main.service_add_sms_sender',
+        service_id=SERVICE_ONE_ID,
+        _data={'sms_sender': sms_sender_input},
         _expected_status=200
     )
 
@@ -910,6 +941,34 @@ def test_add_letter_contact(
     mock_add_letter_contact.assert_called_once_with(
         SERVICE_ONE_ID,
         contact_block="1 Example Street",
+        is_default=api_default_args
+    )
+
+
+@pytest.mark.parametrize('fixture, data, api_default_args', [
+    (no_sms_senders, {}, True),
+    (multiple_sms_senders, {}, False),
+    (multiple_sms_senders, {"is_default": "y"}, True)
+])
+def test_add_sms_sender(
+    fixture,
+    data,
+    api_default_args,
+    mocker,
+    client_request,
+    mock_add_sms_sender
+):
+    fixture(mocker)
+    data['sms_sender'] = "Example"
+    client_request.post(
+        'main.service_add_sms_sender',
+        service_id=SERVICE_ONE_ID,
+        _data=data
+    )
+
+    mock_add_sms_sender.assert_called_once_with(
+        SERVICE_ONE_ID,
+        sms_sender="Example",
         is_default=api_default_args
     )
 
@@ -1000,6 +1059,37 @@ def test_edit_letter_contact_block(
     )
 
 
+@pytest.mark.parametrize('fixture, data, api_default_args', [
+    (get_default_sms_sender, {"is_default": "y", "sms_sender": "test"}, True),
+    (get_default_sms_sender, {"sms_sender": "test"}, True),
+    (get_non_default_sms_sender, {"sms_sender": "test"}, False),
+    (get_non_default_sms_sender, {"is_default": "y", "sms_sender": "test"}, True)
+])
+def test_edit_sms_sender(
+    fixture,
+    data,
+    api_default_args,
+    mocker,
+    fake_uuid,
+    client_request,
+    mock_update_sms_sender
+):
+    fixture(mocker)
+    client_request.post(
+        'main.service_edit_sms_sender',
+        service_id=SERVICE_ONE_ID,
+        sms_sender_id=fake_uuid,
+        _data=data
+    )
+
+    mock_update_sms_sender.assert_called_once_with(
+        SERVICE_ONE_ID,
+        sms_sender_id=fake_uuid,
+        sms_sender="test",
+        is_default=api_default_args
+    )
+
+
 @pytest.mark.parametrize('sender_page, fixture, default_message, params, checkbox_present', [
     (
         'main.service_edit_email_reply_to',
@@ -1027,6 +1117,20 @@ def test_edit_letter_contact_block(
         get_non_default_letter_contact_block,
         'This is the default contact details for service one letters',
         'letter_contact_id',
+        True
+    ),
+    (
+        'main.service_edit_sms_sender',
+        get_default_sms_sender,
+        'This is currently your text message sender for service one',
+        'sms_sender_id',
+        False
+    ),
+    (
+        'main.service_edit_sms_sender',
+        get_non_default_sms_sender,
+        'This is currently your text message sender for service one',
+        'sms_sender_id',
         True
     )
 ])
@@ -1057,6 +1161,34 @@ def test_default_box_shows_on_non_default_sender_details_while_editing(
         assert normalize_spaces(page.select_one('form p').text) == (
             default_message
         )
+
+
+@pytest.mark.parametrize('fixture, hide_textbox, fixture_sender_id', [
+    (get_inbound_number_sms_sender, True, '1234'),
+    (get_default_sms_sender, False, '1234'),
+])
+def test_inbound_sms_sender_is_not_editable(
+    client_request,
+    service_one,
+    fake_uuid,
+    fixture,
+    hide_textbox,
+    fixture_sender_id,
+    mocker
+):
+    fixture(mocker)
+
+    page = client_request.get(
+        '.service_edit_sms_sender',
+        service_id=SERVICE_ONE_ID,
+        sms_sender_id=fixture_sender_id,
+    )
+
+    assert bool(page.find('input', attrs={'name': "sms_sender"})) != hide_textbox
+    if hide_textbox:
+        assert normalize_spaces(
+            page.select_one('form[method="post"] p').text
+        ) == "GOVUK This phone number receives replies and can’t be changed"
 
 
 def test_switch_service_to_research_mode(
@@ -1107,7 +1239,8 @@ def test_shows_research_mode_indicator(
     mock_get_letter_organisations,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_inbound_number_for_service,
+    single_sms_sender,
+    mock_get_inbound_number_for_service
 ):
     service_one['research_mode'] = True
     mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
@@ -1126,7 +1259,8 @@ def test_does_not_show_research_mode_indicator(
     mock_get_letter_organisations,
     single_reply_to_email_address,
     single_letter_contact_block,
-    mock_get_inbound_number_for_service,
+    single_sms_sender,
+    mock_get_inbound_number_for_service
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     assert response.status_code == 200
@@ -1692,8 +1826,9 @@ def test_archive_service_prompts_user(
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
+    single_sms_sender,
     mock_get_letter_organisations,
-    mock_get_inbound_number_for_service,
+    mock_get_inbound_number_for_service
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
 
@@ -1710,8 +1845,9 @@ def test_cant_archive_inactive_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    single_sms_sender,
     mock_get_letter_organisations,
-    mock_get_inbound_number_for_service,
+    mock_get_inbound_number_for_service
 ):
     service_one['active'] = False
 
@@ -1743,8 +1879,9 @@ def test_suspend_service_prompts_user(
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
+    single_sms_sender,
     mock_get_letter_organisations,
-    mock_get_inbound_number_for_service,
+    mock_get_inbound_number_for_service
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
 
@@ -1762,8 +1899,9 @@ def test_cant_suspend_inactive_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    single_sms_sender,
     mock_get_letter_organisations,
-    mock_get_inbound_number_for_service,
+    mock_get_inbound_number_for_service
 ):
     service_one['active'] = False
 
@@ -1797,9 +1935,10 @@ def test_resume_service_prompts_user(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    single_sms_sender,
     mocker,
     mock_get_letter_organisations,
-    mock_get_inbound_number_for_service,
+    mock_get_inbound_number_for_service
 ):
     service_one['active'] = False
     mocked_fn = mocker.patch('app.service_api_client.post')
@@ -1818,8 +1957,9 @@ def test_cant_resume_active_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    single_sms_sender,
     mock_get_letter_organisations,
-    mock_get_inbound_number_for_service,
+    mock_get_inbound_number_for_service
 ):
     response = logged_in_platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
 
@@ -1880,6 +2020,7 @@ def test_service_settings_when_inbound_number_is_not_set(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    single_sms_sender,
     mocker,
     mock_get_letter_organisations,
 ):

@@ -11,7 +11,7 @@ pyexcel-io==0.5.3
 pyexcel-xls==0.5.2
 pyexcel-xlsx==0.5.2
 pyexcel-ods3==0.5.2
-pytz==2017.2
+pytz==2017.3
 gunicorn==19.7.1
 whitenoise==3.3.1  #manages static assets
 

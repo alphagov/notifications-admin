@@ -4,24 +4,29 @@ from flask import (
     session,
     flash,
     render_template,
-    abort
+    abort,
+    current_app
 )
 from markupsafe import Markup
+from notifications_utils.url_safe_token import check_token
+from flask_login import current_user
 
 from app.main import main
-
 from app import (
     invite_api_client,
     user_api_client,
     service_api_client
 )
 
-from flask_login import current_user
-
 
 @main.route("/invitation/<token>")
 def accept_invite(token):
-
+    check_token(
+        token,
+        current_app.config['SECRET_KEY'],
+        current_app.config['DANGEROUS_SALT'],
+        current_app.config['EMAIL_EXPIRY_SECONDS']
+    )
     invited_user = invite_api_client.check_token(token)
 
     if not current_user.is_anonymous and current_user.email_address != invited_user.email_address:

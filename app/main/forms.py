@@ -497,7 +497,7 @@ class ServiceReplyToEmailForm(Form):
     is_default = BooleanField("Make this email address the default")
 
 
-class ServiceSmsSender(Form):
+class ServiceSmsSenderForm(Form):
     sms_sender = StringField(
         'Text message sender',
         validators=[
@@ -505,10 +505,15 @@ class ServiceSmsSender(Form):
             Length(max=11, message="Enter 11 characters or fewer")
         ]
     )
+    is_default = BooleanField("Make this text message sender the default")
 
     def validate_sms_sender(self, field):
         if field.data and not re.match(r'^[a-zA-Z0-9\s]+$', field.data):
             raise ValidationError('Use letters and numbers only')
+
+
+class ServiceEditInboundNumberForm(Form):
+    is_default = BooleanField("Make this text message sender the default")
 
 
 class ServiceLetterContactBlockForm(Form):
@@ -672,6 +677,19 @@ class PlaceholderForm(Form):
 
 class PasswordFieldShowHasContent(StringField):
     widget = widgets.PasswordInput(hide_value=False)
+
+
+class ServiceInboundNumberForm(Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.inbound_number.choices = kwargs['inbound_number_choices']
+
+    inbound_number = RadioField(
+        "Select your inbound number",
+        validators=[
+            DataRequired("Option must be selected")
+        ]
+    )
 
 
 class ServiceInboundApiForm(Form):
