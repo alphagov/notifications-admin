@@ -23,8 +23,8 @@
   </div>
   <div class="column-third">
     {{ big_number_with_status(
-      global_stats.letter.delivered + global_stats.letter.failed,
-      message_count_label(global_stats.letter.delivered, 'letter'),
+      global_stats.letter.requested,
+      message_count_label(global_stats.letter.requested, 'letter'),
       global_stats.letter.failed,
       global_stats.letter.failure_rate,
       global_stats.letter.failure_rate|float > 3,
