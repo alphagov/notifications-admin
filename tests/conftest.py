@@ -1003,7 +1003,8 @@ def platform_admin_user(fake_uuid):
                                                   'manage_settings',
                                                   'manage_api_keys',
                                                   'view_activity']},
-                 'platform_admin': True
+                 'platform_admin': True,
+                 'auth_type': 'sms_auth'
                  }
     user = User(user_data)
     return user
@@ -1021,6 +1022,7 @@ def api_user_active(fake_uuid, email_address='test@user.gov.uk'):
                  'failed_login_count': 0,
                  'permissions': {},
                  'platform_admin': False,
+                 'auth_type': 'sms_auth',
                  'password_changed_at': str(datetime.utcnow())
                  }
     user = User(user_data)
@@ -1039,6 +1041,7 @@ def api_nongov_user_active(fake_uuid):
                  'failed_login_count': 0,
                  'permissions': {},
                  'platform_admin': False,
+                 'auth_type': 'sms_auth',
                  'password_changed_at': str(datetime.utcnow())
                  }
     user = User(user_data)
@@ -1065,7 +1068,35 @@ def active_user_with_permissions(fake_uuid):
                                                   'manage_settings',
                                                   'manage_api_keys',
                                                   'view_activity']},
-                 'platform_admin': False
+                 'platform_admin': False,
+                 'auth_type': 'sms_auth'
+                 }
+    user = User(user_data)
+    return user
+
+
+@pytest.fixture(scope='function')
+def active_user_no_mobile(fake_uuid):
+    from app.notify_client.user_api_client import User
+
+    user_data = {'id': fake_uuid,
+                 'name': 'Test User',
+                 'password': 'somepassword',
+                 'password_changed_at': str(datetime.utcnow()),
+                 'email_address': 'test@user.gov.uk',
+                 'mobile_number': None,
+                 'state': 'active',
+                 'failed_login_count': 0,
+                 'permissions': {SERVICE_ONE_ID: ['send_texts',
+                                                  'send_emails',
+                                                  'send_letters',
+                                                  'manage_users',
+                                                  'manage_templates',
+                                                  'manage_settings',
+                                                  'manage_api_keys',
+                                                  'view_activity']},
+                 'platform_admin': False,
+                 'auth_type': 'email_auth'
                  }
     user = User(user_data)
     return user
@@ -1084,7 +1115,8 @@ def active_user_view_permissions(fake_uuid):
                  'state': 'active',
                  'failed_login_count': 0,
                  'permissions': {SERVICE_ONE_ID: ['view_activity']},
-                 'platform_admin': False
+                 'platform_admin': False,
+                 'auth_type': 'sms_auth'
                  }
     user = User(user_data)
     return user
@@ -1107,7 +1139,8 @@ def active_user_manage_template_permission(fake_uuid):
             'manage_templates',
             'view_activity',
         ]},
-        'platform_admin': False
+        'platform_admin': False,
+        'auth_type': 'sms_auth'
     }
     user = User(user_data)
     return user
@@ -1123,7 +1156,8 @@ def api_user_locked(fake_uuid):
                  'mobile_number': '07700 900762',
                  'state': 'active',
                  'failed_login_count': 5,
-                 'permissions': {}
+                 'permissions': {},
+                 'auth_type': 'sms_auth'
                  }
     user = User(user_data)
     return user
@@ -1140,7 +1174,8 @@ def api_user_request_password_reset(fake_uuid):
                  'state': 'active',
                  'failed_login_count': 5,
                  'permissions': {},
-                 'password_changed_at': None
+                 'password_changed_at': None,
+                 'auth_type': 'sms_auth'
                  }
     user = User(user_data)
     return user
@@ -1157,6 +1192,7 @@ def api_user_changed_password(fake_uuid):
                  'state': 'active',
                  'failed_login_count': 5,
                  'permissions': {},
+                 'auth_type': 'sms_auth',
                  'password_changed_at': str(datetime.utcnow() + timedelta(minutes=1))
                  }
     user = User(user_data)
@@ -1753,6 +1789,7 @@ def mock_get_users_by_service(mocker):
                  'password_changed_at': None,
                  'name': 'Test User',
                  'email_address': 'notify@digital.cabinet-office.gov.uk',
+                 'auth_type': 'sms_auth',
                  'failed_login_count': 0}]
         return [User(data[0])]
 

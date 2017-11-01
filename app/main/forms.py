@@ -186,6 +186,14 @@ class PermissionsForm(Form):
     manage_templates = BooleanField("Add and edit templates")
     manage_service = BooleanField("Modify this service and its team")
     manage_api_keys = BooleanField("Create and revoke API keys")
+    login_authentication = RadioField(
+        'Sign in using',
+        choices=[
+            ('sms_auth', 'Text message code'),
+            ('email_auth', 'Email link'),
+        ],
+        validators=[DataRequired()]
+    )
 
 
 class InviteUserForm(PermissionsForm):

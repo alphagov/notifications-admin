@@ -12,12 +12,13 @@ class InviteApiClient(NotifyAdminAPIClient):
         self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.api_key = app.config['ADMIN_CLIENT_SECRET']
 
-    def create_invite(self, invite_from_id, service_id, email_address, permissions):
+    def create_invite(self, invite_from_id, service_id, email_address, permissions, auth_type):
         data = {
             'service': str(service_id),
             'email_address': email_address,
             'from_user': invite_from_id,
-            'permissions': permissions
+            'permissions': permissions,
+            'auth_type': auth_type
         }
         data = _attach_current_user(data)
         resp = self.post(url='/service/{}/invite'.format(service_id), data=data)
