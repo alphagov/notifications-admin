@@ -1,20 +1,20 @@
+from datetime import datetime
 import json
 
 from flask import (render_template, url_for, redirect, flash, session, current_app)
 from itsdangerous import SignatureExpired
+from notifications_utils.url_safe_token import check_token
 
+from app import user_api_client
 from app.main import main
 from app.main.forms import NewPasswordForm
-from datetime import datetime
-from app import user_api_client
 
 
 @main.route('/new-password/<path:token>', methods=['GET', 'POST'])
 def new_password(token):
-    from notifications_utils.url_safe_token import check_token
     try:
         token_data = check_token(token, current_app.config['SECRET_KEY'], current_app.config['DANGEROUS_SALT'],
-                                 current_app.config['TOKEN_MAX_AGE_SECONDS'])
+                                 current_app.config['EMAIL_EXPIRY_SECONDS'])
     except SignatureExpired:
         flash('The link in the email we sent you has expired. Enter your email address to resend.')
         return redirect(url_for('.forgot_password'))
