@@ -15,8 +15,8 @@ def test_bad_url_returns_page_not_found(client):
     '/user-profile/email/confirm/MALFORMED_TOKEN',
     '/verify-email/MALFORMED_TOKEN'
 ])
-def test_malformed_token_returns_page_not_found(client, url):
-    response = client.get(url)
+def test_malformed_token_returns_page_not_found(logged_in_client, url):
+    response = logged_in_client.get(url)
 
     assert response.status_code == 404
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')

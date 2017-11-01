@@ -440,7 +440,7 @@ def useful_headers_after_request(response):
     return response
 
 
-def register_errorhandlers(application):
+def register_errorhandlers(application):  # noqa (C901 too complex)
     def _error_response(error_code):
         application.logger.exception('Admin app errored with %s', error_code)
         resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
