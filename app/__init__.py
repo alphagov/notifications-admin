@@ -5,6 +5,7 @@ from time import monotonic
 
 import itertools
 import ago
+from itsdangerous import BadSignature
 from flask import (
     Flask,
     session,
@@ -13,7 +14,8 @@ from flask import (
     current_app,
     request,
     g,
-    url_for
+    url_for,
+    flash
 )
 from flask._compat import string_types
 from flask.globals import _lookup_req_object, _request_ctx_stack
@@ -491,6 +493,12 @@ def register_errorhandlers(application):
         if current_app.config.get('DEBUG', None):
             raise error
         return _error_response(500)
+
+    @application.errorhandler(BadSignature)
+    def handle_bad_token(error):
+        # if someone has a malformed token
+        flash('There’s something wrong with the link you’ve used.')
+        return _error_response(404)
 
 
 def setup_event_handlers():
