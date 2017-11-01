@@ -406,10 +406,23 @@ def load_service_before_request():
     if '/static/' in request.url:
         _request_ctx_stack.top.service = None
         return
-    service_id = request.view_args.get('service_id', session.get('service_id')) if request.view_args \
-        else session.get('service_id')
     if _request_ctx_stack.top is not None:
-        _request_ctx_stack.top.service = service_api_client.get_service(service_id)['data'] if service_id else None
+        _request_ctx_stack.top.service = None
+
+        if request.view_args:
+            service_id = request.view_args.get('service_id', session.get('service_id'))
+        else:
+            service_id = session.get('service_id')
+
+        if service_id:
+            try:
+                _request_ctx_stack.top.service = service_api_client.get_service(service_id)['data']
+            except HTTPError as exc:
+                # if service id isn't real, then 404 rather than 500ing later because we expect service to be set
+                if exc.status_code == 404:
+                    abort(404)
+                else:
+                    raise
 
 
 def save_service_after_request(response):
