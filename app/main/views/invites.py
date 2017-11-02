@@ -7,6 +7,7 @@ from flask import (
     abort,
     current_app
 )
+from itsdangerous import SignatureExpired
 from markupsafe import Markup
 from notifications_utils.url_safe_token import check_token
 from flask_login import current_user
@@ -21,12 +22,20 @@ from app import (
 
 @main.route("/invitation/<token>")
 def accept_invite(token):
-    check_token(
-        token,
-        current_app.config['SECRET_KEY'],
-        current_app.config['DANGEROUS_SALT'],
-        current_app.config['EMAIL_EXPIRY_SECONDS']
-    )
+    try:
+        check_token(
+            token,
+            current_app.config['SECRET_KEY'],
+            current_app.config['DANGEROUS_SALT'],
+            current_app.config['INVITATION_EXPIRY_SECONDS']
+        )
+    except SignatureExpired:
+        errors = [
+            'Your invitation to GOV.UK Notify has expired. '
+            'Please ask the person that invited you to send you another one'
+        ]
+        return render_template("error/400.html", message=errors), 400
+
     invited_user = invite_api_client.check_token(token)
 
     if not current_user.is_anonymous and current_user.email_address != invited_user.email_address:

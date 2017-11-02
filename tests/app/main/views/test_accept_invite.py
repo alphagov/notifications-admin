@@ -1,6 +1,7 @@
 from flask import url_for
 from bs4 import BeautifulSoup
 from unittest.mock import ANY
+from itsdangerous import SignatureExpired
 
 import app
 
@@ -368,3 +369,21 @@ def test_new_invited_user_verifies_and_added_to_service(
     raw_html = response.data.decode('utf-8')
     page = BeautifulSoup(raw_html, 'html.parser')
     assert page.find('h1').text == 'Dashboard'
+
+
+def test_gives_message_if_token_has_expired(
+    app_,
+    client,
+    mock_check_invite_token,
+    mocker,
+):
+    check_token = mocker.patch('app.main.views.invites.check_token', side_effect=SignatureExpired('this is too old'))
+
+    response = client.get(url_for('main.accept_invite', token='a really old token'))
+    raw_html = response.data.decode('utf-8')
+    page = BeautifulSoup(raw_html, 'html.parser')
+
+    check_token.assert_called_once_with(ANY, ANY, ANY, 3600 * 24 * 2)
+    assert response.status_code == 400
+    assert 'Your invitation to GOV.UK Notify has expired' in page.find('h1').text
+    assert not mock_check_invite_token.called
