@@ -97,7 +97,7 @@ def test_should_render_platform_admin_page(
     response = client.get(url_for(endpoint))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert len(page.select('tbody tr')) == expected_services_shown * 2  # one row for SMS, one for email
+    assert len(page.select('tbody tr')) == expected_services_shown * 3  # one row for SMS, one for email, one for letter
     mock_get_detailed_services.assert_called_once_with({'detailed': True,
                                                         'include_from_test_key': True,
                                                         'only_active': False})
@@ -543,7 +543,7 @@ def test_should_show_correct_sent_totals_for_platform_admin(
 
     assert email_total == 60
     assert sms_total == 40
-    assert letter_total == 45
+    assert letter_total == 60
 
 
 @pytest.mark.parametrize('endpoint, restricted, research_mode', [
