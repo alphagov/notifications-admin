@@ -132,7 +132,7 @@ def test_default_inbound_sender_is_checked_and_has_hint_with_default_and_receive
     assert not page.select('.multiple-choice input')[2].has_attr('checked')
 
 
-def test_sms_sender_is_has_receives_replies_hint(
+def test_sms_sender_has_receives_replies_hint(
     client_request,
     service_one,
     fake_uuid,
