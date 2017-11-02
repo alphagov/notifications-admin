@@ -42,6 +42,7 @@ class Config(object):
         'nhs': 25000,
     }
     EMAIL_EXPIRY_SECONDS = 3600  # 1 hour
+    INVITATION_EXPIRY_SECONDS = 3600 * 24 * 2  # 2 days - also set on api
     HEADER_COLOUR = '#FFBF47'  # $yellow
     HTTP_PROTOCOL = 'http'
     MAX_FAILED_LOGIN_COUNT = 10
