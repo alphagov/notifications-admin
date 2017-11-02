@@ -305,6 +305,66 @@ def multiple_sms_senders(mocker):
 
 
 @pytest.fixture(scope='function')
+def multiple_sms_senders_with_diff_default(mocker):
+    def _get(service_id):
+        return [
+            {
+                'id': '1234',
+                'service_id': service_id,
+                'sms_sender': 'Example',
+                'is_default': True,
+                'created_at': datetime.utcnow(),
+                'inbound_number_id': None,
+                'updated_at': None
+            }, {
+                'id': '5678',
+                'service_id': service_id,
+                'sms_sender': 'Example 2',
+                'is_default': False,
+                'created_at': datetime.utcnow(),
+                'inbound_number_id': None,
+                'updated_at': None
+            }, {
+                'id': '9457',
+                'service_id': service_id,
+                'sms_sender': 'Example 3',
+                'is_default': False,
+                'created_at': datetime.utcnow(),
+                'inbound_number_id': '12354',
+                'updated_at': None
+            }
+        ]
+
+    return mocker.patch('app.service_api_client.get_sms_senders', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def multiple_sms_senders_no_inbound(mocker):
+    def _get(service_id):
+        return [
+            {
+                'id': '1234',
+                'service_id': service_id,
+                'sms_sender': 'Example',
+                'is_default': True,
+                'created_at': datetime.utcnow(),
+                'inbound_number_id': None,
+                'updated_at': None
+            }, {
+                'id': '5678',
+                'service_id': service_id,
+                'sms_sender': 'Example 2',
+                'is_default': False,
+                'created_at': datetime.utcnow(),
+                'inbound_number_id': None,
+                'updated_at': None
+            }
+        ]
+
+    return mocker.patch('app.service_api_client.get_sms_senders', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
 def no_sms_senders(mocker):
     def _get(service_id):
         return []

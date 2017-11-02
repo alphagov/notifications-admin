@@ -192,8 +192,12 @@ def set_sender(service_id, template_id):
         sender_choices=sender_context['value_and_label'],
         sender_label=sender_context['description']
     )
-    option_hints = {sender_context['default_id']: 'Default',
-                    sender_context['receives_text_message']: 'Receives replies'}
+    option_hints = {sender_context['default_id']: '(Default)',
+                    }
+    if sender_context.get('receives_text_message', None):
+        option_hints.update({sender_context['receives_text_message']: '(Receives replies)'})
+    if sender_context.get('default_and_receives', None):
+        option_hints = {sender_context['default_and_receives']: '(Default and receives replies)'}
 
     if form.validate_on_submit():
         session['sender_id'] = form.sender.data
@@ -233,8 +237,12 @@ def get_sender_context(sender_details, template_type):
 
     context['default_id'] = next(sender['id'] for sender in sender_details if sender['is_default'])
     if template_type == 'sms':
-        context['receives_text_message'] = next(
-            sender['id'] for sender in sender_details if sender['inbound_number_id'])
+        inbound = [sender['id'] for sender in sender_details if sender['inbound_number_id']]
+        if inbound:
+            context['receives_text_message'] = next(iter(inbound))
+        if context['default_id'] == context.get('receives_text_message', None):
+            context['default_and_receives'] = context['default_id']
+
     context['value_and_label'] = [(sender['id'], sender[sender_format]) for sender in sender_details]
     return context
 
