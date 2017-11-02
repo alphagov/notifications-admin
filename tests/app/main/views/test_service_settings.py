@@ -761,7 +761,7 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
     ), (
         'main.service_sms_senders',
         multiple_sms_senders,
-        'Example (default and recieves replies) Change 1234',
+        'Example (default and receives replies) Change 1234',
         'Example 2 Change 5678',
         'Example 3 Change 9457'
     ),

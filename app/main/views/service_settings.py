@@ -590,7 +590,7 @@ def service_sms_senders(service_id):
         if sender['is_default']:
             hints += ["default"]
         if sender['inbound_number_id']:
-            hints += ["recieves replies"]
+            hints += ["receives replies"]
         if hints:
             sender['hint'] = "(" + " and ".join(hints) + ")"
 
