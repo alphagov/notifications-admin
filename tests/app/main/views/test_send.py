@@ -27,6 +27,8 @@ from tests.conftest import (
     mock_get_live_service,
     multiple_reply_to_email_addresses,
     no_reply_to_email_addresses,
+    multiple_sms_senders,
+    no_sms_senders
 )
 
 template_types = ['email', 'sms']
@@ -43,6 +45,12 @@ test_non_spreadsheet_files = glob(path.join('tests', 'non_spreadsheet_files', '*
         'Choose where to send replies',
         'Select an email address that recipients can reply to'
     ),
+    (
+        mock_get_service_template,
+        multiple_sms_senders,
+        'Chose text message sender',
+        'Select a text message sender that the recipients can reply to'
+    )
 ])
 def test_show_correct_title_and_description_for_sender_type(
     client_request,
@@ -67,13 +75,26 @@ def test_show_correct_title_and_description_for_sender_type(
     assert normalize_spaces(page.select_one('legend').text) == expected_description
 
 
+@pytest.mark.parametrize('template_mock, sender_data', [
+    (
+        mock_get_service_email_template,
+        multiple_reply_to_email_addresses,
+    ),
+    (
+        mock_get_service_template,
+        multiple_sms_senders
+    )
+])
 def test_default_sender_is_checked_and_has_hint(
     client_request,
     service_one,
     fake_uuid,
-    mock_get_service_email_template,
-    multiple_reply_to_email_addresses
+    template_mock,
+    sender_data,
+    mocker
 ):
+    template_mock(mocker)
+    sender_data(mocker)
     page = client_request.get(
         '.set_sender',
         service_id=service_one['id'],
@@ -86,13 +107,26 @@ def test_default_sender_is_checked_and_has_hint(
     assert not page.select('.multiple-choice input')[2].has_attr('checked')
 
 
+@pytest.mark.parametrize('template_mock, sender_data', [
+    (
+        mock_get_service_email_template,
+        multiple_reply_to_email_addresses,
+    ),
+    (
+        mock_get_service_template,
+        multiple_sms_senders
+    )
+])
 def test_sender_session_is_present_after_selected(
     logged_in_client,
     service_one,
     fake_uuid,
-    mock_get_service_email_template,
-    multiple_reply_to_email_addresses
+    template_mock,
+    sender_data,
+    mocker
 ):
+    template_mock(mocker)
+    sender_data(mocker)
     logged_in_client.post(
         url_for('.set_sender', service_id=service_one['id'], template_id=fake_uuid),
         data={'sender': '1234'}
@@ -107,6 +141,10 @@ def test_sender_session_is_present_after_selected(
         mock_get_service_email_template,
         no_reply_to_email_addresses,
     ),
+    (
+        mock_get_service_template,
+        no_sms_senders
+    )
 ])
 def test_set_sender_redirects_if_no_sender_data(
     logged_in_client,

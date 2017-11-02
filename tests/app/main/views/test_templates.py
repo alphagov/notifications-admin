@@ -335,13 +335,14 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
 
 @pytest.mark.parametrize('fixture,  expected_status_code', [
     (mock_get_service_email_template, 200),
-    (mock_get_service_template, 302),
+    (mock_get_service_template, 200),
     (mock_get_service_letter_template, 302),
 ])
-def test_should_redirect_to_one_off_if_template_type_is_not_email(
+def test_should_redirect_to_one_off_if_template_type_is_letter(
     logged_in_client,
     active_user_with_permissions,
     multiple_reply_to_email_addresses,
+    multiple_sms_senders,
     service_one,
     fake_uuid,
     mocker,

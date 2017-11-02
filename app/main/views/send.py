@@ -178,7 +178,7 @@ def set_sender(service_id, template_id):
 
     template = service_api_client.get_service_template(service_id, template_id)['data']
 
-    if template['template_type'] != 'email':
+    if template['template_type'] == 'letter':
         return redirect_to_one_off
 
     sender_details = get_sender_details(service_id, template['template_type'])
@@ -220,6 +220,11 @@ def get_sender_context(sender_details, template_type):
             'title': 'Choose sender address',
             'description': 'Select an address that recipients can reply to',
             'field_name': 'contact_block'
+        },
+        'sms': {
+            'title': 'Chose text message sender',
+            'description': 'Select a text message sender that the recipients can reply to',
+            'field_name': 'sms_sender'
         }
     }[template_type]
 
@@ -233,7 +238,8 @@ def get_sender_context(sender_details, template_type):
 def get_sender_details(service_id, template_type):
     api_call = {
         'email': service_api_client.get_reply_to_email_addresses,
-        'letter': service_api_client.get_letter_contacts
+        'letter': service_api_client.get_letter_contacts,
+        'sms': service_api_client.get_sms_senders
     }[template_type]
     return api_call(service_id)
 
@@ -248,7 +254,7 @@ def send_test(service_id, template_id):
     session['send_test_letter_page_count'] = None
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
-    if db_template['template_type'] != 'email':
+    if db_template['template_type'] == 'letter':
         session['sender_id'] = None
 
     if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
@@ -311,7 +317,12 @@ def send_test_step(service_id, template_id, step_index):
 
     if not session.get('send_test_letter_page_count'):
         session['send_test_letter_page_count'] = get_page_count_for_letter(db_template)
-
+    email_reply_to = None
+    sms_sender = None
+    if db_template['template_type'] == 'email':
+        email_reply_to = get_email_reply_to_address_from_session(service_id)
+    elif db_template['template_type'] == 'sms':
+        sms_sender = get_sms_sender_from_session(service_id)
     template = get_template(
         db_template,
         current_service,
@@ -324,7 +335,8 @@ def send_test_step(service_id, template_id, step_index):
             filetype='png',
         ),
         page_count=session['send_test_letter_page_count'],
-        email_reply_to=get_email_reply_to_address_from_session(service_id),
+        email_reply_to=email_reply_to,
+        sms_sender=sms_sender
     )
 
     placeholders = fields_to_fill_in(
@@ -449,6 +461,12 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
     remaining_messages = (current_service['message_limit'] - sum(stat['requested'] for stat in statistics.values()))
 
     contents = s3download(service_id, upload_id)
+    email_reply_to = None
+    sms_sender = None
+    if template_type == 'email':
+        email_reply_to = get_email_reply_to_address_from_session(service_id)
+    elif template_type == 'sms':
+        sms_sender = get_sms_sender_from_session(service_id)
     template = get_template(
         service_api_client.get_service_template(
             service_id,
@@ -463,7 +481,8 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
             upload_id=upload_id,
             filetype='png',
         ) if not letters_as_pdf else None,
-        email_reply_to=get_email_reply_to_address_from_session(service_id),
+        email_reply_to=email_reply_to,
+        sms_sender=sms_sender
     )
     recipients = RecipientCSV(
         contents,
@@ -723,12 +742,18 @@ def check_notification(service_id, template_id):
 
 def _check_notification(service_id, template_id, exception=None):
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
-
+    email_reply_to = None
+    sms_sender = None
+    if db_template['template_type'] == 'email':
+        email_reply_to = get_email_reply_to_address_from_session(service_id)
+    elif db_template['template_type'] == 'sms':
+        sms_sender = get_sms_sender_from_session(service_id)
     template = get_template(
         db_template,
         current_service,
         show_recipient=True,
-        email_reply_to=get_email_reply_to_address_from_session(service_id),
+        email_reply_to=email_reply_to,
+        sms_sender=sms_sender
     )
 
     # go back to start of process
@@ -814,3 +839,10 @@ def get_email_reply_to_address_from_session(service_id):
         return service_api_client.get_reply_to_email_address(
             service_id, session['sender_id']
         )['email_address']
+
+
+def get_sms_sender_from_session(service_id):
+    if session.get('sender_id'):
+        return service_api_client.get_sms_sender(
+            service_id=service_id, sms_sender_id=session['sender_id']
+        )['sms_sender']
