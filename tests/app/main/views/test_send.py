@@ -107,6 +107,25 @@ def test_default_sender_is_checked_and_has_hint(
     assert not page.select('.multiple-choice input')[2].has_attr('checked')
 
 
+def test_sms_sender_is_has_receives_replies_hint(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_template,
+    multiple_sms_senders
+):
+    page = client_request.get(
+        '.set_sender',
+        service_id=service_one['id'],
+        template_id=fake_uuid
+    )
+
+    assert page.select('.multiple-choice input')[0].has_attr('checked')
+    assert normalize_spaces(page.select_one('.multiple-choice label .block-label-hint').text) == "Receives replies"
+    assert not page.select('.multiple-choice input')[1].has_attr('checked')
+    assert not page.select('.multiple-choice input')[2].has_attr('checked')
+
+
 @pytest.mark.parametrize('template_mock, sender_data', [
     (
         mock_get_service_email_template,

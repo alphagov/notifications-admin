@@ -61,7 +61,6 @@ class NotificationApiClient(NotifyAdminAPIClient):
             'personalisation': personalisation,
         }
         if sender_id:
-            print(sender_id)
             data['sender_id'] = sender_id
         data = _attach_current_user(data)
         return self.post(url='/service/{}/send-notification'.format(service_id), data=data)
