@@ -1,0 +1,63 @@
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field %}
+{% extends "withoutnav_template.html" %}
+
+{% block per_page_title %}
+  Callbacks
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-two-thirds">
+    <h1 class="heading-large">Callbacks for received text messages</h1>
+
+    <p>
+      Text messages you receive can be forwarded to a URL that you specify, using our callback feature. 
+    </p>
+
+    <p>
+      Messages are forwarded as they are received.
+    </p>
+
+    <p>
+      To protect your service, we require you to provide a bearer token. We put this token in the authorisation header of the callback requests.
+    </p>
+
+    <p>
+      Once you have ‘receive text messages’ enabled, you can set up your callback on the settings page of your service.
+    </p>
+
+    <p>
+      If you don’t have ‘receive text messages’ enabled for your service, <a href="{{ url_for('.support') }}">get in touch</a> and we can turn it on for you.
+    </p>
+
+    <h2 class="heading-medium">Format of the callback</h2>
+
+    <p>
+      The format of the callback message you receive is JSON.
+    </p>
+
+    <div class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Callback message format',
+        field_headings=['Key', 'Description', 'Format'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for key, description, format in [
+          ('id', 'Notify’s id for the received message', 'UUID'),
+          ('source_number', 'The phone number the message was sent from', '447700912345'),
+          ('destination_number', 'The number the message was sent to (your number)', '07700987654'),
+          ('message', 'The received message', 'Hello Notify!'),
+          ('date_received', 'The UTC datetime that the message was received by Notify', '2017-05-14T12:15:30.000000Z')
+        ] %}
+          {% call row() %}
+            {% call row_heading() %} {{ key }} {% endcall %}
+            {{ text_field(description) }}
+            {{ text_field(format) }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    </div>
+
+{% endblock %}
