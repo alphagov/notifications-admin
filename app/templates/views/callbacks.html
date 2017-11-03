@@ -1,4 +1,4 @@
-{% from "components/table.html" import mapping_table, row, text_field, edit_field, field %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field, row_heading%}
 {% extends "withoutnav_template.html" %}
 
 {% block per_page_title %}
@@ -12,7 +12,7 @@
     <h1 class="heading-large">Callbacks for received text messages</h1>
 
     <p>
-      Text messages you receive can be forwarded to a URL that you specify, using our callback feature. 
+      Text messages you receive can be forwarded to a URL that you specify, using our callback feature.
     </p>
 
     <p>
