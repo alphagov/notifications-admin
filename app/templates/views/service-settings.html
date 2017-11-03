@@ -106,7 +106,7 @@
 
           {% if can_receive_inbound %}
             {% call row() %}
-              {{ text_field('API endpoint for received text messages') }}
+              {{ text_field('Callback URL for received text messages') }}
               {{ optional_text_field(inbound_api_url) }}
               {{ edit_field('Change', url_for('.service_set_inbound_api', service_id=current_service.id)) }}
             {% endcall %}

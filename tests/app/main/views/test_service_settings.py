@@ -121,7 +121,7 @@ def test_should_show_overview(
         'Text message sender GOVUK Manage',
         'International text messages On Change',
         'Receive text messages On Change',
-        'API endpoint for received text messages Not set Change',
+        'Callback URL for received text messages Not set Change',
 
         'Label Value Action',
         'Send letters Off Change',
@@ -207,7 +207,7 @@ def test_service_settings_show_elided_api_url_if_needed(
 
     non_empty_trs = [tr.find_all('td') for tr in page.find_all('tr') if tr.find_all('td')]
     api_url = [api_setting[1].text.strip() for api_setting in non_empty_trs
-               if api_setting[0].text.strip() == 'API endpoint for received text messages'][0]
+               if api_setting[0].text.strip() == 'Callback URL for received text messages'][0]
     assert api_url == elided_url
     assert mocked_get_fn.called is True
 
@@ -1272,7 +1272,7 @@ def test_does_not_show_research_mode_indicator(
 
 @pytest.mark.parametrize('url, bearer_token, expected_errors', [
     ("", "", "Can’t be empty Can’t be empty"),
-    ("http://not_https.com", "1234567890", "Must be a valid https url"),
+    ("http://not_https.com", "1234567890", "Must be a valid https URL"),
     ("https://test.com", "123456789", "Must be at least 10 characters"),
 ])
 def test_set_inbound_api_validation(
