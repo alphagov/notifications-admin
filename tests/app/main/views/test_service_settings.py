@@ -1272,7 +1272,7 @@ def test_does_not_show_research_mode_indicator(
 
 @pytest.mark.parametrize('url, bearer_token, expected_errors', [
     ("", "", "Can’t be empty Can’t be empty"),
-    ("http://not_https.com", "1234567890", "Must be a valid https url"),
+    ("http://not_https.com", "1234567890", "Must be a valid https URL"),
     ("https://test.com", "123456789", "Must be at least 10 characters"),
 ])
 def test_set_inbound_api_validation(
