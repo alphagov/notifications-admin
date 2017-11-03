@@ -288,7 +288,7 @@ def get_template(
         return SMSPreviewTemplate(
             template,
             prefix=service['name'],
-            sender=sms_sender if sms_sender else (service['sms_sender'] not in {'GOVUK', None}),
+            sender=not service['prefix_sms_with_service_name'],
             show_recipient=show_recipient,
             redact_missing_personalisation=redact_missing_personalisation,
         )
