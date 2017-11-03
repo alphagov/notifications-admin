@@ -693,10 +693,10 @@ class ServiceInboundNumberForm(Form):
 
 
 class ServiceInboundApiForm(Form):
-    url = StringField("Inbound sms url",
+    url = StringField("Callback URL",
                       validators=[DataRequired(message='Can’t be empty'),
                                   Regexp(regex="^https.*",
-                                         message='Must be a valid https url')]
+                                         message='Must be a valid https URL')]
                       )
     bearer_token = PasswordFieldShowHasContent("Bearer token",
                                                validators=[DataRequired(message='Can’t be empty'),
