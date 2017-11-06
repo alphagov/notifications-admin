@@ -69,6 +69,9 @@ export DANGEROUS_SALT='dev-notify-salt'
 export SECRET_KEY='notify-secret-key'
 export DESKPRO_API_HOST="some-host"
 export DESKPRO_API_KEY="some-key"
+export FLASK_APP=application.py
+export FLASK_DEBUG=1
+export WERKZEUG_DEBUG_PIN=off
 "> environment.sh
 ```
 

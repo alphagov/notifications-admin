@@ -1,4 +1,4 @@
 #!/bin/bash
 
 source environment.sh
-python3 app.py runserver
+flask run -p 6012

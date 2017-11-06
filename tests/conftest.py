@@ -5,7 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 from notifications_python_client.errors import HTTPError
-from flask import url_for
+from flask import url_for, Flask
 from bs4 import BeautifulSoup
 
 from app import create_app
@@ -31,17 +31,16 @@ from . import (
 
 @pytest.fixture(scope='session')
 def app_(request):
-    app = create_app()
+    app = Flask('app')
+    create_app(app)
 
     ctx = app.app_context()
     ctx.push()
 
-    def teardown():
-        ctx.pop()
-
-    request.addfinalizer(teardown)
     app.test_client_class = TestClient
-    return app
+    yield app
+
+    ctx.pop()
 
 
 @pytest.fixture(scope='function')

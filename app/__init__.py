@@ -7,7 +7,6 @@ import itertools
 import ago
 from itsdangerous import BadSignature
 from flask import (
-    Flask,
     session,
     render_template,
     make_response,
@@ -37,6 +36,7 @@ from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
 from app import proxy_fix
+from app.config import configs
 from app.asset_fingerprinter import AssetFingerprinter
 from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.notify_client.service_api_client import ServiceAPIClient
@@ -54,8 +54,8 @@ from app.notify_client.models import AnonymousUser
 from app.notify_client.letter_jobs_client import LetterJobsClient
 from app.notify_client.inbound_number_client import InboundNumberClient
 from app.notify_client.billing_api_client import BillingAPIClient
+from app.commands import setup_commands
 from app.utils import get_cdn_domain
-
 from app.utils import gmt_timezones
 
 login_manager = LoginManager()
@@ -82,10 +82,8 @@ billing_api_client = BillingAPIClient()
 current_service = LocalProxy(partial(_lookup_req_object, 'service'))
 
 
-def create_app():
-    from app.config import configs
-
-    application = Flask(__name__)
+def create_app(application):
+    setup_commands(application)
 
     notify_environment = os.environ['NOTIFY_ENVIRONMENT']
 
@@ -128,39 +126,11 @@ def create_app():
 
     application.session_interface = ItsdangerousSessionInterface()
 
-    application.add_template_filter(format_datetime)
-    application.add_template_filter(format_datetime_24h)
-    application.add_template_filter(format_datetime_normal)
-    application.add_template_filter(format_datetime_short)
-    application.add_template_filter(format_time)
-    application.add_template_filter(valid_phone_number)
-    application.add_template_filter(linkable_name)
-    application.add_template_filter(format_date)
-    application.add_template_filter(format_date_normal)
-    application.add_template_filter(format_date_short)
-    application.add_template_filter(format_datetime_relative)
-    application.add_template_filter(format_delta)
-    application.add_template_filter(format_notification_status)
-    application.add_template_filter(format_notification_status_as_time)
-    application.add_template_filter(format_notification_status_as_field_status)
-    application.add_template_filter(format_notification_status_as_url)
-    application.add_template_filter(formatted_list)
-    application.add_template_filter(nl2br)
-    application.add_template_filter(format_phone_number_human_readable)
-
-    application.after_request(useful_headers_after_request)
-    application.after_request(save_service_after_request)
-    application.before_request(load_service_before_request)
-
-    @application.context_processor
-    def _attach_current_service():
-        return {'current_service': current_service}
+    add_template_filters(application)
 
     register_errorhandlers(application)
 
     setup_event_handlers()
-
-    return application
 
 
 def init_csrf(application):
@@ -185,6 +155,13 @@ def init_csrf(application):
 
 
 def init_app(application):
+    application.after_request(useful_headers_after_request)
+    application.after_request(save_service_after_request)
+    application.before_request(load_service_before_request)
+
+    @application.context_processor
+    def _attach_current_service():
+        return {'current_service': current_service}
 
     @application.before_request
     def record_start_time():
@@ -519,3 +496,25 @@ def setup_event_handlers():
     from app.event_handlers import on_user_logged_in
 
     user_logged_in.connect(on_user_logged_in)
+
+
+def add_template_filters(application):
+    application.add_template_filter(format_datetime)
+    application.add_template_filter(format_datetime_24h)
+    application.add_template_filter(format_datetime_normal)
+    application.add_template_filter(format_datetime_short)
+    application.add_template_filter(format_time)
+    application.add_template_filter(valid_phone_number)
+    application.add_template_filter(linkable_name)
+    application.add_template_filter(format_date)
+    application.add_template_filter(format_date_normal)
+    application.add_template_filter(format_date_short)
+    application.add_template_filter(format_datetime_relative)
+    application.add_template_filter(format_delta)
+    application.add_template_filter(format_notification_status)
+    application.add_template_filter(format_notification_status_as_time)
+    application.add_template_filter(format_notification_status_as_field_status)
+    application.add_template_filter(format_notification_status_as_url)
+    application.add_template_filter(formatted_list)
+    application.add_template_filter(nl2br)
+    application.add_template_filter(format_phone_number_human_readable)

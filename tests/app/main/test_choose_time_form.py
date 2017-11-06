@@ -34,7 +34,7 @@ def test_form_contains_next_24h():
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
-def test_form_defaults_to_now():
+def test_form_defaults_to_now(client):
     assert ChooseTimeForm().scheduled_for.data == ''
 
 
