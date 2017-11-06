@@ -502,7 +502,7 @@ def service_set_sms_prefix(service_id):
     if form.validate_on_submit():
         service_api_client.update_service(
             current_service['id'],
-            prefix_sms_with_service_name=(form.enabled.data == 'on')
+            prefix_sms=(form.enabled.data == 'on')
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 
