@@ -133,6 +133,6 @@ def get_sms_thread(service_id, user_number):
 
 def get_sms_content(notification, is_inbound):
     return (
-        notification['content'] if is_inbound else
+        bytes(notification['content'], "utf-8").decode('unicode_escape') if is_inbound else
         notification['template']['content']
     )
