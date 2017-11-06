@@ -3,15 +3,12 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-  Start all text messages with service name
+  Text messages start with service name
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Start all text messages with service name</h1>
-  <p>
-    Your service name is {{ current_service.name}}.
-  </p>
+  <h1 class="heading-large">Text messages start with service name</h1>
   <form method="post">
     {{ radios(form.enabled) }}
     {{ page_footer(

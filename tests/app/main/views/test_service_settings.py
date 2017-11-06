@@ -44,7 +44,7 @@ from tests.conftest import (
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
-        'Start all text messages with service name On Change',
+        'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -64,7 +64,7 @@ from tests.conftest import (
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
-        'Start all text messages with service name On Change',
+        'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -121,7 +121,7 @@ def test_should_show_overview(
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
-        'Start all text messages with service name On Change',
+        'Text messages start with service name On Change',
         'International text messages On Change',
         'Receive text messages On Change',
         'Callback URL for received text messages Not set Change',
@@ -141,7 +141,7 @@ def test_should_show_overview(
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
-        'Start all text messages with service name On Change',
+        'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -2076,8 +2076,8 @@ def test_show_sms_prefixing_setting_page(
     page = client_request.get(
         'main.service_set_sms_prefix', service_id=SERVICE_ONE_ID
     )
-    assert normalize_spaces(page.select_one('main p').text) == (
-        'Your service name is service one.'
+    assert normalize_spaces(page.select_one('legend').text) == (
+        'Start all text messages with ‘service one:’'
     )
     radios = page.select('input[type=radio]')
     assert len(radios) == 2

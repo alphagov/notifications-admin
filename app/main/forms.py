@@ -723,7 +723,7 @@ class InternationalSMSForm(Form):
 
 class SMSPrefixForm(Form):
     enabled = RadioField(
-        'Start all text messages with service name',
+        '',
         choices=[
             ('on', 'On'),
             ('off', 'Off'),
