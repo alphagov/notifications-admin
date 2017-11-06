@@ -44,6 +44,7 @@ from tests.conftest import (
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
+        'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -63,6 +64,7 @@ from tests.conftest import (
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
+        'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -119,6 +121,7 @@ def test_should_show_overview(
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
+        'Text messages start with service name On Change',
         'International text messages On Change',
         'Receive text messages On Change',
         'Callback URL for received text messages Not set Change',
@@ -138,6 +141,7 @@ def test_should_show_overview(
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
+        'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -713,7 +717,7 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
 
     assert get_row(page, 2) == "Email reply to addresses test@example.com …and 2 more Manage"
     assert get_row(page, 4) == "Text message sender Example …and 2 more Manage"
-    assert get_row(page, 8) == "Sender addresses 1 Example Street …and 2 more Manage"
+    assert get_row(page, 9) == "Sender addresses 1 Example Street …and 2 more Manage"
 
 
 @pytest.mark.parametrize('sender_list_page, expected_output', [
@@ -2063,3 +2067,46 @@ def test_empty_letter_contact_block_returns_error(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     error_message = page.find('span', class_='error-message').text.strip()
     assert error_message == 'Can’t be empty'
+
+
+def test_show_sms_prefixing_setting_page(
+    client_request,
+    mock_update_service,
+):
+    page = client_request.get(
+        'main.service_set_sms_prefix', service_id=SERVICE_ONE_ID
+    )
+    assert normalize_spaces(page.select_one('legend').text) == (
+        'Start all text messages with ‘service one:’'
+    )
+    radios = page.select('input[type=radio]')
+    assert len(radios) == 2
+    assert radios[0]['value'] == 'on'
+    assert radios[0]['checked'] == ''
+    assert radios[1]['value'] == 'off'
+    with pytest.raises(KeyError):
+        assert radios[1]['checked']
+
+
+@pytest.mark.parametrize('post_value, expected_api_argument', [
+    ('on', True),
+    ('off', False),
+])
+def test_updates_sms_prefixing(
+    client_request,
+    mock_update_service,
+    post_value,
+    expected_api_argument,
+):
+    client_request.post(
+        'main.service_set_sms_prefix', service_id=SERVICE_ONE_ID,
+        _data={'enabled': post_value},
+        _expected_redirect=url_for(
+            'main.service_settings', service_id=SERVICE_ONE_ID,
+            _external=True
+        )
+    )
+    mock_update_service.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        prefix_sms=expected_api_argument,
+    )

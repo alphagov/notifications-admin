@@ -721,6 +721,16 @@ class InternationalSMSForm(Form):
     )
 
 
+class SMSPrefixForm(Form):
+    enabled = RadioField(
+        '',
+        choices=[
+            ('on', 'On'),
+            ('off', 'Off'),
+        ],
+    )
+
+
 def get_placeholder_form_instance(
     placeholder_name,
     dict_to_populate_from,

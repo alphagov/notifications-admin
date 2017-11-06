@@ -93,6 +93,12 @@
           {% endcall %}
 
           {% call row() %}
+            {{ text_field('Text messages start with service name') }}
+            {{ boolean_field(prefix_sms_with_service_name) }}
+            {{ edit_field('Change', url_for('.service_set_sms_prefix', service_id=current_service.id)) }}
+          {% endcall %}
+
+          {% call row() %}
             {{ text_field('International text messages') }}
             {{ boolean_field('international_sms' in current_service.permissions) }}
             {{ edit_field('Change', url_for('.service_set_international_sms', service_id=current_service.id)) }}
