@@ -120,12 +120,7 @@ def get_sms_thread(service_id, user_number):
         yield {
             'inbound': is_inbound,
             'content': SMSPreviewTemplate(
-                {
-                    'content': (
-                        notification['content'] if is_inbound else
-                        notification['template']['content']
-                    )
-                },
+                {'content': get_sms_content(notification, is_inbound)},
                 notification.get('personalisation'),
                 downgrade_non_gsm_characters=(not is_inbound),
                 redact_missing_personalisation=redact_personalisation,
@@ -134,3 +129,10 @@ def get_sms_thread(service_id, user_number):
             'status': notification.get('status'),
             'id': notification['id'],
         }
+
+
+def get_sms_content(notification, is_inbound):
+    return (
+        notification['content'] if is_inbound else
+        notification['template']['content']
+    )
