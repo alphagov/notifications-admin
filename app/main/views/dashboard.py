@@ -31,6 +31,7 @@ from app.utils import (
     FAILURE_STATUSES,
     REQUESTED_STATUSES,
     Spreadsheet,
+    unescape_string,
 )
 
 
@@ -204,7 +205,7 @@ def get_inbox_partials(service_id):
             for message in messages_to_show
         }:
             message.update({
-                'content': bytes(message['content'], 'utf-8').decode('unicode_escape')
+                'content': unescape_string(message['content'])
             })
             messages_to_show.append(message)
 

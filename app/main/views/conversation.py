@@ -10,7 +10,7 @@ from notifications_utils.recipients import format_phone_number_human_readable
 from notifications_utils.template import SMSPreviewTemplate
 from app.main import main
 from app.main.forms import SearchTemplatesForm
-from app.utils import user_has_permissions
+from app.utils import user_has_permissions, unescape_string
 from app import notification_api_client, service_api_client
 from notifications_python_client.errors import HTTPError
 
@@ -133,6 +133,6 @@ def get_sms_thread(service_id, user_number):
 
 def get_sms_content(notification, is_inbound):
     return (
-        bytes(notification['content'], "utf-8").decode('unicode_escape') if is_inbound else
+        unescape_string(notification['content']) if is_inbound else
         notification['template']['content']
     )
