@@ -63,6 +63,15 @@
               user.has_permissions(permissions=['manage_api_keys']),
               'Access API keys'
             ) }}
+            {% if 'email_auth' in current_service['permissions'] %}
+              <div class="tick-cross-list-hint">
+                {% if user.auth_type == 'sms_auth' %}
+                  Signs in with a text message code
+                {% else %}
+                  Signs in with an email link
+                {% endif %}
+              </div>
+            {% endif %}
           </div>
           {% if current_user.has_permissions(['manage_users'], admin_override=True) %}
             {% if current_user.id != user.id %}
@@ -104,6 +113,15 @@
                 user.has_permissions(permissions=['manage_api_keys']),
                 'Access API keys'
               ) }}
+            {% if 'email_auth' in current_service['permissions'] %}
+              <div class="tick-cross-list-hint">
+                {% if user.auth_type == 'sms_auth' %}
+                  Signs in with a text message code
+                {% else %}
+                  Signs in with an email link
+                {% endif %}
+              </div>
+            {% endif %}
             </div>
             <li class="tick-cross-list-edit-link">
               {% if user.status == 'pending' and current_user.has_permissions(['manage_users']) %}

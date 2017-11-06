@@ -53,7 +53,7 @@ def service_json(
     created_at=None,
     letter_contact_block=None,
     inbound_api=None,
-    permissions=['email', 'sms'],
+    permissions=None,
     organisation_type='central',
     free_sms_fragment_limit=250000,
     prefix_sms_with_service_name=None,
@@ -61,7 +61,7 @@ def service_json(
     if users is None:
         users = []
     if permissions is None:
-        permissions = []
+        permissions = ['email', 'sms']
     if inbound_api is None:
         inbound_api = []
     if prefix_sms_with_service_name is None:
