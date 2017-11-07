@@ -16,7 +16,7 @@ gunicorn==19.7.1
 whitenoise==3.3.1  #manages static assets
 
 # pin to minor version 3.1.x
-notifications-python-client==4.5.0
+notifications-python-client==4.6.0
 
 # PaaS
 awscli>=1.11,<1.12
