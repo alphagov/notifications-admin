@@ -179,7 +179,7 @@ def test_escaped_characters_in_inbound_messages(
         str(page.select_one('.sms-message-inbound .sms-message-wrapper'))
     ) == (
         "<div class=\"sms-message-wrapper\"> "
-        "the first line's content<br/>the second line's content "
+        "the first line's content<br/>the second line's content<br/>a fire truck 🚒 "
         "</div>"
     )
 

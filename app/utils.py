@@ -382,4 +382,4 @@ def get_cdn_domain():
 
 
 def unescape_string(string):
-    return bytes(string, "utf-8").decode('unicode_escape')
+    return string.encode('raw_unicode_escape').decode('unicode_escape')

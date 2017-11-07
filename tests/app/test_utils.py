@@ -13,7 +13,8 @@ from app.utils import (
     generate_next_dict,
     Spreadsheet,
     get_letter_timings,
-    get_cdn_domain
+    get_cdn_domain,
+    unescape_string,
 )
 
 
@@ -300,3 +301,33 @@ def test_get_cdn_domain_on_non_localhost(client, mocker):
     mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'https://some.admintest.com'})
     domain = get_cdn_domain()
     assert domain == 'static-logos.admintest.com'
+
+
+@pytest.mark.parametrize('raw, expected', [
+    (
+        '😬',
+        '😬',
+    ),
+    (
+        '1\\n2',
+        '1\n2',
+    ),
+    (
+        '\\\'"\\\'',
+        '\'"\'',
+    ),
+    (
+        """
+
+        """,
+        """
+
+        """,
+    ),
+    (
+        '\x79 \\x79 \\\\x79',  # we should never see the middle one
+        'y y \\x79',
+    ),
+])
+def test_unescape_string(raw, expected):
+    assert unescape_string(raw) == expected

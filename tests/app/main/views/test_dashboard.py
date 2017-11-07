@@ -186,7 +186,7 @@ def test_inbox_handles_escaped_characters(
         str(page.select_one('tbody tr .file-list-hint'))
     ) == (
         "<span class=\"file-list-hint\">"
-        "the first line's content the second line's content"
+        "the first line's content the second line's content a fire truck 🚒"
         "</span>"
     )
 

@@ -1771,7 +1771,7 @@ def mock_get_inbound_sms_with_special_characters(mocker):
         return [{
             'user_number': '07900900001',
             'notify_number': '07900000002',
-            'content': "the first line\\'s content\\nthe second line\\'s content",
+            'content': "the first line\\'s content\\nthe second line\\'s content\\na fire truck 🚒",
             'created_at': datetime.utcnow().isoformat(),
             'id': sample_uuid(),
         }]
