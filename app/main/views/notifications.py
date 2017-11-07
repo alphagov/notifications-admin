@@ -4,7 +4,6 @@ from flask import (
     jsonify,
     request,
     url_for,
-    current_app
 )
 from flask_login import login_required
 
@@ -21,25 +20,9 @@ from app.utils import (
     get_template,
     get_time_left,
     get_letter_timings,
-    REQUESTED_STATUSES,
     FAILURE_STATUSES,
-    SENDING_STATUSES,
     DELIVERED_STATUSES,
 )
-
-
-def get_status_arg(filter_args):
-    if 'status' not in filter_args or not filter_args['status']:
-        return REQUESTED_STATUSES
-    elif filter_args['status'] == 'sending':
-        return SENDING_STATUSES
-    elif filter_args['status'] == 'delivered':
-        return DELIVERED_STATUSES
-    elif filter_args['status'] == 'failed':
-        return FAILURE_STATUSES
-    else:
-        current_app.logger.info('Unrecognised status filter: {}'.format(filter_args['status']))
-        return REQUESTED_STATUSES
 
 
 @main.route("/services/<service_id>/notification/<uuid:notification_id>")
