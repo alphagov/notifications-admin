@@ -288,7 +288,7 @@ def get_template(
         return SMSPreviewTemplate(
             template,
             prefix=service['name'],
-            sender=not service['prefix_sms_with_service_name'],
+            sender=not service['prefix_sms'],
             show_recipient=show_recipient,
             redact_missing_personalisation=redact_missing_personalisation,
         )
