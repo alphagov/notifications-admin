@@ -161,29 +161,6 @@ def test_view_conversation(
         ) == expected
 
 
-def test_escaped_characters_in_inbound_messages(
-    client_request,
-    mock_get_notification,
-    mock_get_notifications,
-    mock_get_inbound_sms_with_special_characters,
-    fake_uuid,
-):
-
-    page = client_request.get(
-        'main.conversation',
-        service_id=SERVICE_ONE_ID,
-        notification_id=fake_uuid,
-    )
-
-    assert normalize_spaces(
-        str(page.select_one('.sms-message-inbound .sms-message-wrapper'))
-    ) == (
-        "<div class=\"sms-message-wrapper\"> "
-        "the first line's content<br/>the second line's content "
-        "</div>"
-    )
-
-
 def test_view_conversation_updates(
     logged_in_client,
     mocker,
