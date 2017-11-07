@@ -379,7 +379,3 @@ def get_cdn_domain():
     domain = parsed_uri.netloc[len(subdomain + '.'):]
 
     return "static-logos.{}".format(domain)
-
-
-def unescape_string(string):
-    return bytes(string, "utf-8").decode('unicode_escape')

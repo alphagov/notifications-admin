@@ -172,25 +172,6 @@ def test_inbox_showing_inbound_messages(
     )
 
 
-def test_inbox_handles_escaped_characters(
-    client_request,
-    service_one,
-    mock_get_inbound_sms_with_special_characters,
-):
-
-    service_one['permissions'] = ['inbound_sms']
-
-    page = client_request.get('main.inbox', service_id=SERVICE_ONE_ID)
-
-    assert normalize_spaces(
-        str(page.select_one('tbody tr .file-list-hint'))
-    ) == (
-        "<span class=\"file-list-hint\">"
-        "the first line's content the second line's content"
-        "</span>"
-    )
-
-
 def test_empty_inbox(
     logged_in_client,
     service_one,
