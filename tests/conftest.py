@@ -28,6 +28,9 @@ from . import (
     single_notification_json
 )
 
+from notifications_utils.url_safe_token import generate_token
+import json
+
 
 @pytest.fixture(scope='session')
 def app_(request):
@@ -1083,6 +1086,25 @@ def api_user_active(fake_uuid, email_address='test@user.gov.uk'):
                  'permissions': {},
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
+                 'password_changed_at': str(datetime.utcnow())
+                 }
+    user = User(user_data)
+    return user
+
+
+@pytest.fixture(scope='function')
+def api_user_active_email_auth(fake_uuid, email_address='test@user.gov.uk'):
+    from app.notify_client.user_api_client import User
+    user_data = {'id': fake_uuid,
+                 'name': 'Test User',
+                 'password': 'somepassword',
+                 'email_address': email_address,
+                 'mobile_number': '07700 900762',
+                 'state': 'active',
+                 'failed_login_count': 0,
+                 'permissions': {},
+                 'platform_admin': False,
+                 'auth_type': 'email_auth',
                  'password_changed_at': str(datetime.utcnow())
                  }
     user = User(user_data)
@@ -2425,3 +2447,20 @@ def mock_get_aggregate_platform_stats(mocker):
 
     }
     return mocker.patch('app.service_api_client.get_aggregate_platform_stats', return_value=stats)
+
+
+@contextmanager
+def set_config(app, name, value):
+    old_val = app.config.get(name)
+    app.config[name] = value
+    yield
+    app.config[name] = old_val
+
+
+@pytest.fixture(scope='function')
+def valid_token(app_, fake_uuid):
+    return generate_token(
+        json.dumps({'user_id': fake_uuid, 'secret_code': 'my secret'}),
+        app_.config['SECRET_KEY'],
+        app_.config['DANGEROUS_SALT']
+    )
