@@ -31,6 +31,7 @@ from app.utils import (
     FAILURE_STATUSES,
     REQUESTED_STATUSES,
     Spreadsheet,
+    unescape_string,
 )
 
 
@@ -203,6 +204,9 @@ def get_inbox_partials(service_id):
             format_phone_number_human_readable(message['user_number'])
             for message in messages_to_show
         }:
+            message.update({
+                'content': unescape_string(message['content'])
+            })
             messages_to_show.append(message)
 
     if not inbound_messages:
