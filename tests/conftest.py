@@ -1763,6 +1763,26 @@ def mock_get_inbound_sms(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_inbound_sms_with_special_characters(mocker):
+    def _get_inbound_sms(
+        service_id,
+        user_number=None,
+    ):
+        return [{
+            'user_number': '07900900001',
+            'notify_number': '07900000002',
+            'content': "the first line\\'s content\\nthe second line\\'s content\\na fire truck 🚒",
+            'created_at': datetime.utcnow().isoformat(),
+            'id': sample_uuid(),
+        }]
+
+    return mocker.patch(
+        'app.service_api_client.get_inbound_sms',
+        side_effect=_get_inbound_sms,
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_inbound_sms_with_no_messages(mocker):
     def _get_inbound_sms(
         service_id,
