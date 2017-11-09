@@ -54,7 +54,7 @@ def _create_service(service_name, organisation_type, email_from, form):
         )
         session['service_id'] = service_id
 
-        billing_api_client.create_or_update_free_sms_fragment_limit_for_year(service_id, free_sms_fragment_limit)
+        billing_api_client.create_or_update_free_sms_fragment_limit(service_id, free_sms_fragment_limit)
 
         return service_id, None
     except HTTPError as e:

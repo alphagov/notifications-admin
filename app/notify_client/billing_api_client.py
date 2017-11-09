@@ -1,6 +1,4 @@
 from app.notify_client import NotifyAdminAPIClient
-from flask import current_app
-from notifications_python_client.errors import HTTPError
 
 
 class BillingAPIClient(NotifyAdminAPIClient):
@@ -27,44 +25,23 @@ class BillingAPIClient(NotifyAdminAPIClient):
         )
 
     def get_free_sms_fragment_limit_for_year(self, service_id, year=None):
-        try:
-            if year is None:
-                result = self.get(
-                    '/service/{0}/billing/free-sms-fragment-limit/current-year'.format(service_id)
-                )
-            else:
-                result = self.get(
-                    '/service/{0}/billing/free-sms-fragment-limit'.format(service_id),
-                    params=dict(financial_year_start=year)
-                )
-            return result['free_sms_fragment_limit']
-        except HTTPError:
-            current_app.logger.info(
-                'Requested free_sms_fragment_limit entry for service {0} and year {1} does not exist'
-                .format(service_id, year))
-            return -1
+        result = self.get(
+            '/service/{0}/billing/free-sms-fragment-limit'.format(service_id),
+            params=dict(financial_year_start=year)
+        )
+        return result['free_sms_fragment_limit']
 
     def get_free_sms_fragment_limit_for_all_years(self, service_id, year=None):
-        try:
-            return self.get(
-                '/service/{0}/billing/free-sms-fragment-limit'.format(service_id),
-            )
-        except HTTPError:
-            current_app.logger.info(
-                'No free_sms_fragment_limit entry exists for service {0} '
-                .format(service_id, year))
-            return []
+        return self.get(
+            '/service/{0}/billing/free-sms-fragment-limit'.format(service_id))
 
-    def create_or_update_free_sms_fragment_limit_for_year(self, service_id, free_sms_fragment_limit, year=None):
-        if year is None:
-            data = {
-                "free_sms_fragment_limit": free_sms_fragment_limit,
-            }
-        else:
-            data = {
-                "financial_year_start": year,
-                "free_sms_fragment_limit": free_sms_fragment_limit,
-            }
+    def create_or_update_free_sms_fragment_limit(self, service_id, free_sms_fragment_limit, year=None):
+        # year = None will update current and future year in the API
+        data = {
+            "financial_year_start": year,
+            "free_sms_fragment_limit": free_sms_fragment_limit
+        }
+
         return self.post(
             url='/service/{0}/billing/free-sms-fragment-limit'.format(service_id),
             data=data

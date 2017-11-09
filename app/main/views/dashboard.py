@@ -112,11 +112,12 @@ def template_history(service_id):
 def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
 
+    free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year)
     return render_template(
         'views/usage.html',
         months=list(get_free_paid_breakdown_for_billable_units(
             year,
-            billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year),
+            free_sms_allowance,
             billing_api_client.get_billable_units(service_id, year)
         )),
         selected_year=year,
@@ -126,7 +127,7 @@ def usage(service_id):
             end=current_financial_year + 1,
         ),
         **calculate_usage(billing_api_client.get_service_usage(service_id, year),
-                          billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year))
+                          free_sms_allowance)
     )
 
 
@@ -291,8 +292,7 @@ def get_dashboard_totals(statistics):
 
 
 def calculate_usage(usage, free_sms_fragment_limit):
-    # TODO: Don't hardcode these - get em from the API
-    sms_free_allowance = free_sms_fragment_limit         # VB-Progress
+    sms_free_allowance = free_sms_fragment_limit
 
     sms_rate = 0 if len(usage) == 0 else usage[0].get("rate", 0)
     sms_sent = get_sum_billing_units(breakdown for breakdown in usage if breakdown['notification_type'] == 'sms')

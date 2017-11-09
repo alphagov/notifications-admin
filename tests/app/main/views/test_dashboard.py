@@ -595,7 +595,8 @@ def test_menu_send_messages(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_free_sms_fragment_limit,
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -626,7 +627,8 @@ def test_menu_manage_service(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_free_sms_fragment_limit,
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -656,7 +658,8 @@ def test_menu_manage_api_keys(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_free_sms_fragment_limit,
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
@@ -686,7 +689,8 @@ def test_menu_all_services_for_platform_admin_user(
     mock_get_template_statistics,
     mock_get_detailed_service,
     mock_get_usage,
-    mock_get_inbound_sms_summary
+    mock_get_inbound_sms_summary,
+    mock_get_free_sms_fragment_limit,
 ):
     with app_.test_request_context():
         resp = _test_dashboard_menu(
