@@ -56,8 +56,9 @@ def two_factor_email(token):
     logged_in, msg = user_api_client.check_verify_code(user_id, token_data['secret_code'], "email")
 
     if not logged_in:
-        flash("There’s something wrong with the code")
-        return redirect(url_for('.two_factor_email_sent'))
+        flash("This link has already been used")
+        session['user_details'] = {'id': user_id}
+        return redirect(url_for('.resend_email_link'))
     return log_in_user(user_id)
 
 

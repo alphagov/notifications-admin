@@ -276,7 +276,9 @@ def test_two_factor_email_link_is_invalid(
 def test_two_factor_email_link_is_already_used(
     client,
     valid_token,
-    mocker
+    mocker,
+    mock_send_verify_code
+
 ):
     mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code has expired'))
 
@@ -288,14 +290,15 @@ def test_two_factor_email_link_is_already_used(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
-    ) == "There’s something wrong with the code"
+    ) == "This link has already been used"
     assert response.status_code == 200
 
 
 def test_two_factor_email_link_when_user_is_locked_out(
     client,
     valid_token,
-    mocker
+    mocker,
+    mock_send_verify_code
 ):
     mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code not found'))
 
@@ -307,7 +310,7 @@ def test_two_factor_email_link_when_user_is_locked_out(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
-    ) == "There’s something wrong with the code"
+    ) == "This link has already been used"
     assert response.status_code == 200
 
 
