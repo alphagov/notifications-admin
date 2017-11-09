@@ -200,7 +200,7 @@ def test_two_factor_should_activate_pending_user(
     mocker,
     api_user_pending,
     mock_check_verify_code,
-    mock_update_user,
+    mock_activate_user,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
     mocker.patch('app.service_api_client.get_services', return_value={'data': []})
@@ -211,5 +211,5 @@ def test_two_factor_should_activate_pending_user(
         }
     client.post(url_for('main.two_factor'), data={'sms_code': '12345'})
 
-    assert mock_update_user.called
+    assert mock_activate_user.called
     assert api_user_pending.is_active

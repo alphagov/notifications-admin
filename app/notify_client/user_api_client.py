@@ -54,12 +54,6 @@ class UserApiClient(NotifyAdminAPIClient):
             users.append(User(user, max_failed_login_count=self.max_failed_login_count))
         return users
 
-    def update_user(self, user):
-        data = user.serialize()
-        url = "/user/{}".format(user.id)
-        user_data = self.put(url, data=data)
-        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
-
     def update_user_attribute(self, user_id, **kwargs):
         data = dict(kwargs)
         disallowed_attributes = set(data.keys()) - ALLOWED_ATTRIBUTES
@@ -155,7 +149,9 @@ class UserApiClient(NotifyAdminAPIClient):
     def activate_user(self, user):
         if user.state == 'pending':
             user.state = 'active'
-            return self.update_user(user)
+            url = "/user/{}".format(user.id)
+            user_data = self.post(url, data={'state': 'active'})
+            return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
         else:
             return user
 
