@@ -148,9 +148,8 @@ class UserApiClient(NotifyAdminAPIClient):
 
     def activate_user(self, user):
         if user.state == 'pending':
-            user.state = 'active'
-            url = "/user/{}".format(user.id)
-            user_data = self.post(url, data={'state': 'active'})
+            url = "/user/{}/activate".format(user.id)
+            user_data = self.post(url)
             return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
         else:
             return user
