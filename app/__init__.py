@@ -499,22 +499,25 @@ def setup_event_handlers():
 
 
 def add_template_filters(application):
-    application.add_template_filter(format_datetime)
-    application.add_template_filter(format_datetime_24h)
-    application.add_template_filter(format_datetime_normal)
-    application.add_template_filter(format_datetime_short)
-    application.add_template_filter(format_time)
-    application.add_template_filter(valid_phone_number)
-    application.add_template_filter(linkable_name)
-    application.add_template_filter(format_date)
-    application.add_template_filter(format_date_normal)
-    application.add_template_filter(format_date_short)
-    application.add_template_filter(format_datetime_relative)
-    application.add_template_filter(format_delta)
-    application.add_template_filter(format_notification_status)
-    application.add_template_filter(format_notification_status_as_time)
-    application.add_template_filter(format_notification_status_as_field_status)
-    application.add_template_filter(format_notification_status_as_url)
-    application.add_template_filter(formatted_list)
-    application.add_template_filter(nl2br)
-    application.add_template_filter(format_phone_number_human_readable)
+    for fn in [
+        format_datetime,
+        format_datetime_24h,
+        format_datetime_normal,
+        format_datetime_short,
+        format_time,
+        valid_phone_number,
+        linkable_name,
+        format_date,
+        format_date_normal,
+        format_date_short,
+        format_datetime_relative,
+        format_delta,
+        format_notification_status,
+        format_notification_status_as_time,
+        format_notification_status_as_field_status,
+        format_notification_status_as_url,
+        formatted_list,
+        nl2br,
+        format_phone_number_human_readable,
+    ]:
+        application.add_template_filter(fn)
