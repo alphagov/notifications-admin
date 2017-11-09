@@ -31,8 +31,7 @@ def check_and_resend_text_code():
     form = TextNotReceivedForm(mobile_number=user.mobile_number)
     if form.validate_on_submit():
         user_api_client.send_verify_code(user.id, 'sms', to=form.mobile_number.data)
-        user.mobile_number = form.mobile_number.data
-        user_api_client.update_user(user)
+        user = user_api_client.update_user_attribute(user.id, mobile_number=form.mobile_number.data)
         return redirect(url_for('.verify'))
 
     return render_template('views/text-not-received.html', form=form)
