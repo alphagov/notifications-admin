@@ -3,27 +3,27 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-  Inbound api
+  Callback URL
 {% endblock %}
 
 {% block maincolumn_content %}
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">API endpoint for received text messages</h1>
+      <h1 class="heading-large">Callback URL for received text messages</h1>
       <p>
-        This is the https url that the inbound SMS messages will be posted to
-          and the bearer token used in the authorisation header of the request.
+        Text messages you receive can be forwarded to your systems with our callback feature.
+        See our <a href="{{ url_for('.callbacks') }}">documentation on the format of the callback</a>.
       </p>
 
       <form method="post">
         {{ textbox(
           form.url,
           width='2-3',
-          hint='Valid https url'
+          hint='Valid https URL'
         ) }}
         {{ textbox(
           form.bearer_token,
-          width='1-4',
+          width='2-3',
           hint='At least 10 characters'
         ) }}
           {{ page_footer(

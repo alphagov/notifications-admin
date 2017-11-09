@@ -41,7 +41,8 @@ class Config(object):
         'local': 25000,
         'nhs': 25000,
     }
-    EMAIL_EXPIRY_SECONDS = 3600 * 24 * 7  # one week
+    EMAIL_EXPIRY_SECONDS = 3600  # 1 hour
+    INVITATION_EXPIRY_SECONDS = 3600 * 24 * 2  # 2 days - also set on api
     HEADER_COLOUR = '#FFBF47'  # $yellow
     HTTP_PROTOCOL = 'http'
     MAX_FAILED_LOGIN_COUNT = 10
@@ -56,7 +57,6 @@ class Config(object):
     SHOW_STYLEGUIDE = True
     # TODO: move to utils
     SMS_CHAR_COUNT_LIMIT = 459
-    TOKEN_MAX_AGE_SECONDS = 3600
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'

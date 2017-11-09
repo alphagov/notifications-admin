@@ -38,6 +38,7 @@ from app.main.forms import (
     OrganisationTypeForm,
     FreeSMSAllowance,
     ServiceEditInboundNumberForm,
+    SMSPrefixForm,
 )
 from app import user_api_client, current_service, organisations_client, inbound_number_client, billing_api_client
 from notifications_utils.formatters import formatted_list
@@ -108,7 +109,9 @@ def service_settings(service_id):
         letter_contact_details_count=letter_contact_details_count,
         default_sms_sender=default_sms_sender,
         sms_sender_count=sms_sender_count,
-        free_sms_fragment_limit=free_sms_fragment_limit
+        free_sms_fragment_limit=free_sms_fragment_limit,
+        prefix_sms_with_service_name=current_service['prefix_sms_with_service_name'],
+
     )
 
 
@@ -491,6 +494,30 @@ def service_set_sms(service_id):
     )
 
 
+@main.route("/services/<service_id>/service-settings/sms-prefix", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_set_sms_prefix(service_id):
+
+    form = SMSPrefixForm(enabled=(
+        'on' if current_service['prefix_sms_with_service_name'] else 'off'
+    ))
+
+    form.enabled.label.text = 'Start all text messages with ‘{}:’'.format(current_service['name'])
+
+    if form.validate_on_submit():
+        service_api_client.update_service(
+            current_service['id'],
+            prefix_sms=(form.enabled.data == 'on')
+        )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/sms-prefix.html',
+        form=form
+    )
+
+
 @main.route("/services/<service_id>/service-settings/set-international-sms", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
@@ -595,7 +622,7 @@ def service_sms_senders(service_id):
         if sender['is_default']:
             hints += ["default"]
         if sender['inbound_number_id']:
-            hints += ["recieves replies"]
+            hints += ["receives replies"]
         if hints:
             sender['hint'] = "(" + " and ".join(hints) + ")"
 

@@ -186,6 +186,14 @@ class PermissionsForm(Form):
     manage_templates = BooleanField("Add and edit templates")
     manage_service = BooleanField("Modify this service and its team")
     manage_api_keys = BooleanField("Create and revoke API keys")
+    login_authentication = RadioField(
+        'Sign in using',
+        choices=[
+            ('sms_auth', 'Text message code'),
+            ('email_auth', 'Email link'),
+        ],
+        validators=[DataRequired()]
+    )
 
 
 class InviteUserForm(PermissionsForm):
@@ -693,10 +701,10 @@ class ServiceInboundNumberForm(Form):
 
 
 class ServiceInboundApiForm(Form):
-    url = StringField("Inbound sms url",
+    url = StringField("Callback URL",
                       validators=[DataRequired(message='Can’t be empty'),
                                   Regexp(regex="^https.*",
-                                         message='Must be a valid https url')]
+                                         message='Must be a valid https URL')]
                       )
     bearer_token = PasswordFieldShowHasContent("Bearer token",
                                                validators=[DataRequired(message='Can’t be empty'),
@@ -706,6 +714,16 @@ class ServiceInboundApiForm(Form):
 class InternationalSMSForm(Form):
     enabled = RadioField(
         'Send text messages to international phone numbers',
+        choices=[
+            ('on', 'On'),
+            ('off', 'Off'),
+        ],
+    )
+
+
+class SMSPrefixForm(Form):
+    enabled = RadioField(
+        '',
         choices=[
             ('on', 'On'),
             ('off', 'Off'),

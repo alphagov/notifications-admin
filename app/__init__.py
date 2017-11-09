@@ -5,6 +5,7 @@ from time import monotonic
 
 import itertools
 import ago
+from itsdangerous import BadSignature
 from flask import (
     Flask,
     session,
@@ -13,7 +14,8 @@ from flask import (
     current_app,
     request,
     g,
-    url_for
+    url_for,
+    flash
 )
 from flask._compat import string_types
 from flask.globals import _lookup_req_object, _request_ctx_stack
@@ -404,10 +406,23 @@ def load_service_before_request():
     if '/static/' in request.url:
         _request_ctx_stack.top.service = None
         return
-    service_id = request.view_args.get('service_id', session.get('service_id')) if request.view_args \
-        else session.get('service_id')
     if _request_ctx_stack.top is not None:
-        _request_ctx_stack.top.service = service_api_client.get_service(service_id)['data'] if service_id else None
+        _request_ctx_stack.top.service = None
+
+        if request.view_args:
+            service_id = request.view_args.get('service_id', session.get('service_id'))
+        else:
+            service_id = session.get('service_id')
+
+        if service_id:
+            try:
+                _request_ctx_stack.top.service = service_api_client.get_service(service_id)['data']
+            except HTTPError as exc:
+                # if service id isn't real, then 404 rather than 500ing later because we expect service to be set
+                if exc.status_code == 404:
+                    abort(404)
+                else:
+                    raise
 
 
 def save_service_after_request(response):
@@ -426,6 +441,7 @@ def useful_headers_after_request(response):
     response.headers.add('Content-Security-Policy', (
         "default-src 'self' 'unsafe-inline';"
         "script-src 'self' *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
+        "connect-src 'self' *.google-analytics.com;"
         "object-src 'self';"
         "font-src 'self' data:;"
         "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk {} data:;"
@@ -438,7 +454,7 @@ def useful_headers_after_request(response):
     return response
 
 
-def register_errorhandlers(application):
+def register_errorhandlers(application):  # noqa (C901 too complex)
     def _error_response(error_code):
         application.logger.exception('Admin app errored with %s', error_code)
         resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
@@ -491,6 +507,12 @@ def register_errorhandlers(application):
         if current_app.config.get('DEBUG', None):
             raise error
         return _error_response(500)
+
+    @application.errorhandler(BadSignature)
+    def handle_bad_token(error):
+        # if someone has a malformed token
+        flash('There’s something wrong with the link you’ve used.')
+        return _error_response(404)
 
 
 def setup_event_handlers():

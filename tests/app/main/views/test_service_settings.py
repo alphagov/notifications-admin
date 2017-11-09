@@ -45,6 +45,7 @@ from freezegun import freeze_time
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
+        'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -64,6 +65,7 @@ from freezegun import freeze_time
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
+        'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -121,9 +123,10 @@ def test_should_show_overview(
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
+        'Text messages start with service name On Change',
         'International text messages On Change',
         'Receive text messages On Change',
-        'API endpoint for received text messages Not set Change',
+        'Callback URL for received text messages Not set Change',
 
         'Label Value Action',
         'Send letters Off Change',
@@ -140,6 +143,7 @@ def test_should_show_overview(
         'Label Value Action',
         'Send text messages On Change',
         'Text message sender GOVUK Manage',
+        'Text messages start with service name On Change',
         'International text messages Off Change',
         'Receive text messages Off Change',
 
@@ -209,7 +213,7 @@ def test_service_settings_show_elided_api_url_if_needed(
 
     non_empty_trs = [tr.find_all('td') for tr in page.find_all('tr') if tr.find_all('td')]
     api_url = [api_setting[1].text.strip() for api_setting in non_empty_trs
-               if api_setting[0].text.strip() == 'API endpoint for received text messages'][0]
+               if api_setting[0].text.strip() == 'Callback URL for received text messages'][0]
     assert api_url == elided_url
     assert mocked_get_fn.called is True
 
@@ -715,7 +719,7 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
 
     assert get_row(page, 2) == "Email reply to addresses test@example.com …and 2 more Manage"
     assert get_row(page, 4) == "Text message sender Example …and 2 more Manage"
-    assert get_row(page, 8) == "Sender addresses 1 Example Street …and 2 more Manage"
+    assert get_row(page, 9) == "Sender addresses 1 Example Street …and 2 more Manage"
 
 
 @pytest.mark.parametrize('sender_list_page, expected_output', [
@@ -763,7 +767,7 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
     ), (
         'main.service_sms_senders',
         multiple_sms_senders,
-        'Example (default and recieves replies) Change 1234',
+        'Example (default and receives replies) Change 1234',
         'Example 2 Change 5678',
         'Example 3 Change 9457'
     ),
@@ -1274,7 +1278,7 @@ def test_does_not_show_research_mode_indicator(
 
 @pytest.mark.parametrize('url, bearer_token, expected_errors', [
     ("", "", "Can’t be empty Can’t be empty"),
-    ("http://not_https.com", "1234567890", "Must be a valid https url"),
+    ("http://not_https.com", "1234567890", "Must be a valid https URL"),
     ("https://test.com", "123456789", "Must be at least 10 characters"),
 ])
 def test_set_inbound_api_validation(
@@ -2075,3 +2079,46 @@ def test_empty_letter_contact_block_returns_error(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     error_message = page.find('span', class_='error-message').text.strip()
     assert error_message == 'Can’t be empty'
+
+
+def test_show_sms_prefixing_setting_page(
+    client_request,
+    mock_update_service,
+):
+    page = client_request.get(
+        'main.service_set_sms_prefix', service_id=SERVICE_ONE_ID
+    )
+    assert normalize_spaces(page.select_one('legend').text) == (
+        'Start all text messages with ‘service one:’'
+    )
+    radios = page.select('input[type=radio]')
+    assert len(radios) == 2
+    assert radios[0]['value'] == 'on'
+    assert radios[0]['checked'] == ''
+    assert radios[1]['value'] == 'off'
+    with pytest.raises(KeyError):
+        assert radios[1]['checked']
+
+
+@pytest.mark.parametrize('post_value, expected_api_argument', [
+    ('on', True),
+    ('off', False),
+])
+def test_updates_sms_prefixing(
+    client_request,
+    mock_update_service,
+    post_value,
+    expected_api_argument,
+):
+    client_request.post(
+        'main.service_set_sms_prefix', service_id=SERVICE_ONE_ID,
+        _data={'enabled': post_value},
+        _expected_redirect=url_for(
+            'main.service_settings', service_id=SERVICE_ONE_ID,
+            _external=True
+        )
+    )
+    mock_update_service.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        prefix_sms=expected_api_argument,
+    )

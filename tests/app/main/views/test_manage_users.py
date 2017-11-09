@@ -10,6 +10,7 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     active_user_with_permissions,
     active_user_view_permissions,
+    active_user_no_mobile,
     active_user_manage_template_permission,
 )
 
@@ -53,6 +54,94 @@ def test_should_show_overview_page(
         expected_text
     )
     app.user_api_client.get_users_for_service.assert_called_once_with(service_id=SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize('endpoint, extra_args, service_has_email_auth, auth_options_hidden', [
+    (
+        'main.edit_user_permissions',
+        {'user_id': 0},
+        True,
+        False
+    ),
+    (
+        'main.edit_user_permissions',
+        {'user_id': 0},
+        False,
+        True
+    ),
+    (
+        'main.invite_user',
+        {},
+        True,
+        False
+    ),
+    (
+        'main.invite_user',
+        {},
+        False,
+        True
+    )
+])
+def test_service_with_no_email_auth_hides_auth_type_options(
+    client_request,
+    endpoint,
+    extra_args,
+    service_has_email_auth,
+    auth_options_hidden,
+    service_one
+):
+    if service_has_email_auth:
+        service_one['permissions'].append('email_auth')
+    page = client_request.get(endpoint, service_id=service_one['id'], **extra_args)
+    assert (page.find('input', attrs={"name": "login_authentication"}) is None) == auth_options_hidden
+
+
+@pytest.mark.parametrize('service_has_email_auth, displays_auth_type', [
+    (True, True),
+    (False, False)
+])
+def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_activated(
+    client_request,
+    service_has_email_auth,
+    service_one,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    displays_auth_type
+):
+    if service_has_email_auth:
+        service_one['permissions'].append('email_auth')
+    page = client_request.get('main.manage_users', service_id=service_one['id'])
+    assert bool(page.select_one('.tick-cross-list-hint')) == displays_auth_type
+
+
+@pytest.mark.parametrize('user, sms_option_disabled', [
+    (
+        active_user_no_mobile,
+        True,
+    ),
+    (
+        active_user_with_permissions,
+        False,
+    ),
+])
+def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
+    client_request,
+    user,
+    sms_option_disabled,
+    service_one,
+    mocker
+):
+    service_one['permissions'].append('email_auth')
+    test_user = mocker.patch('app.user_api_client.get_user', return_value=user(mocker))
+
+    page = client_request.get(
+        'main.edit_user_permissions',
+        service_id=service_one['id'],
+        user_id=test_user.id
+    )
+
+    sms_auth_radio_button = page.select_one('input[value="sms_auth"]')
+    assert sms_auth_radio_button.has_attr("disabled") == sms_option_disabled
 
 
 @pytest.mark.parametrize('endpoint, extra_args, expected_checkboxes', [
@@ -167,6 +256,60 @@ def test_edit_some_user_permissions(
     )
 
 
+@pytest.mark.parametrize('auth_type', ['email_auth', 'sms_auth'])
+def test_edit_user_permissions_including_authentication_with_email_auth_service(
+    logged_in_client,
+    active_user_with_permissions,
+    mocker,
+    mock_get_invites_for_service,
+    mock_set_user_permissions,
+    mock_update_user_attribute,
+    service_one,
+    auth_type
+):
+    service_one['permissions'].append('email_auth')
+
+    response = logged_in_client.post(
+        url_for(
+            'main.edit_user_permissions',
+            service_id=service_one['id'],
+            user_id=active_user_with_permissions.id
+        ),
+        data={
+            'email_address': active_user_with_permissions.email_address,
+            'send_messages': 'y',
+            'manage_templates': 'y',
+            'manage_service': 'y',
+            'manage_api_keys': 'y',
+            'login_authentication': auth_type
+        }
+    )
+
+    mock_set_user_permissions.assert_called_with(
+        str(active_user_with_permissions.id),
+        service_one['id'],
+        permissions={
+            'send_texts',
+            'send_emails',
+            'send_letters',
+            'manage_users',
+            'manage_templates',
+            'manage_settings',
+            'manage_api_keys',
+            'view_activity'
+        }
+    )
+    mock_update_user_attribute.assert_called_with(
+        str(active_user_with_permissions.id),
+        auth_type=auth_type
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.manage_users', service_id=service_one['id'], _external=True
+    )
+
+
 def test_should_show_page_for_inviting_user(
     logged_in_client,
     active_user_with_permissions,
@@ -220,7 +363,60 @@ def test_invite_user(
     app.invite_api_client.create_invite.assert_called_once_with(sample_invite['from_user'],
                                                                 sample_invite['service'],
                                                                 email_address,
-                                                                expected_permissions)
+                                                                expected_permissions,
+                                                                'sms_auth')
+
+
+@pytest.mark.parametrize('auth_type', [
+    ('sms_auth'),
+    ('email_auth')
+])
+@pytest.mark.parametrize('email_address, gov_user', [
+    ('test@example.gov.uk', True),
+    ('test@nonwhitelist.com', False)
+])
+def test_invite_user_with_email_auth_service(
+    logged_in_client,
+    active_user_with_permissions,
+    sample_invite,
+    email_address,
+    gov_user,
+    mocker,
+    service_one,
+    auth_type
+):
+    service_one['permissions'].append('email_auth')
+    sample_invite['email_address'] = 'test@example.gov.uk'
+
+    data = [InvitedUser(**sample_invite)]
+    assert is_gov_user(email_address) == gov_user
+    mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
+    mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
+    mocker.patch('app.invite_api_client.create_invite', return_value=InvitedUser(**sample_invite))
+    response = logged_in_client.post(
+        url_for('main.invite_user', service_id=service_one['id']),
+        data={'email_address': email_address,
+              'send_messages': 'y',
+              'manage_templates': 'y',
+              'manage_service': 'y',
+              'manage_api_keys': 'y',
+              'login_authentication': auth_type},
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.string.strip() == 'Team members'
+    flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
+    assert flash_banner == 'Invite sent to test@example.gov.uk'
+
+    expected_permissions = 'manage_api_keys,manage_settings,manage_templates,manage_users,send_emails,send_letters,send_texts,view_activity'  # noqa
+
+    app.invite_api_client.create_invite.assert_called_once_with(sample_invite['from_user'],
+                                                                sample_invite['service'],
+                                                                email_address,
+                                                                expected_permissions,
+                                                                auth_type)
 
 
 def test_cancel_invited_user_cancels_user_invitations(

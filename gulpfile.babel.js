@@ -138,7 +138,7 @@ gulp.task('lint:sass', () => gulp
 
 gulp.task('lint:js', () => gulp
   .src(paths.src + 'javascripts/**/*.js')
-    .pipe(plugins.jshint({'esversion': 6, 'esnext': false}))
+    .pipe(plugins.jshint())
     .pipe(plugins.jshint.reporter(stylish))
     .pipe(plugins.jshint.reporter('fail'))
 );

@@ -1,0 +1,21 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radios %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Text messages start with service name
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">Text messages start with service name</h1>
+  <form method="post">
+    {{ radios(form.enabled) }}
+    {{ page_footer(
+      button_text="Save",
+      back_link=url_for('.service_settings', service_id=current_service.id),
+      back_link_text='Back to settings'
+    ) }}
+  </form>
+
+{% endblock %}

@@ -54,7 +54,7 @@
 
         {% call row() %}
           {% if not service['active'] %}
-            {% call field(status='default') %}
+            {% call field(status='default', border=False) %}
               <span class="heading-medium">archived</span>
             {% endcall %}
           {% elif service['research_mode'] %}
@@ -62,14 +62,24 @@
               <span class="research-mode">research mode</span>
             {% endcall %}
           {% elif not service['restricted'] %}
-            {% call field(status='error') %}
+            {% call field(status='error', border=False) %}
               <span class="heading-medium">Live</span>
             {% endcall %}
           {% else %}
-            {{ text_field('') }}
+            {% call field(border=False) %}
+            {% endcall %}
           {% endif %}
 
           {{ stats_fields('sms', service['stats']) }}
+        {% endcall %}
+
+        {% call row() %}
+
+          {% call field(border=False) %}
+
+          {% endcall %}
+            {{ stats_fields('letter', service['stats']) }}
+
         {% endcall %}
 
       {% endcall %}

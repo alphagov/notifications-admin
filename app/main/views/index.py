@@ -135,3 +135,8 @@ def using_notify():
 @main.route('/information-risk-management')
 def information_risk_management():
     return render_template('views/information-risk-management.html')
+
+
+@main.route('/callbacks')
+def callbacks():
+    return render_template('views/callbacks.html')

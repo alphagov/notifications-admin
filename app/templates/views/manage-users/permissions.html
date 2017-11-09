@@ -1,4 +1,5 @@
 {% from "components/checkbox.html" import checkbox %}
+{% from "components/radios.html" import radios %}
 
 <fieldset class="form-group">
   <legend class="form-label">
@@ -20,3 +21,7 @@
     <li>who the other team members are</li>
   </ul>
 </div>
+
+{% if service_has_email_auth %}
+  {{ radios(form.login_authentication, disable=['sms_auth' if user_has_no_mobile_number]) }}
+{% endif %}

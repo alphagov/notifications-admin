@@ -10,6 +10,7 @@ def test_owasp_useful_headers_set(client, mocker):
     assert response.headers['Content-Security-Policy'] == (
         "default-src 'self' 'unsafe-inline';"
         "script-src 'self' *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
+        "connect-src 'self' *.google-analytics.com;"
         "object-src 'self';"
         "font-src 'self' data:;"
         "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk static-logos.test.com data:;"

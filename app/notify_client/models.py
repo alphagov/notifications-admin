@@ -10,6 +10,7 @@ class User(UserMixin):
         self._mobile_number = fields.get('mobile_number')
         self._password_changed_at = fields.get('password_changed_at')
         self._permissions = fields.get('permissions')
+        self._auth_type = fields.get('auth_type')
         self._failed_login_count = fields.get('failed_login_count')
         self._state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
@@ -109,6 +110,14 @@ class User(UserMixin):
         return False
 
     @property
+    def auth_type(self):
+        return self._auth_type
+
+    @auth_type.setter
+    def auth_type(self, auth_type):
+        self._auth_type = auth_type
+
+    @property
     def failed_login_count(self):
         return self._failed_login_count
 
@@ -155,6 +164,7 @@ class InvitedUser(object):
                 self.permissions = []
         self.status = status
         self.created_at = created_at
+        self.auth_type = auth_type
 
     def has_permissions(self, permissions):
         return set(self.permissions) > set(permissions)
@@ -164,10 +174,12 @@ class InvitedUser(object):
                 self.service,
                 self.from_user,
                 self.email_address,
+                self.auth_type,
                 self.status) == (other.id,
                 other.service,
                 other.from_user,
                 other.email_address,
+                other.auth_type,
                 other.status))
 
     def serialize(self, permissions_as_string=False):
@@ -176,7 +188,8 @@ class InvitedUser(object):
                 'from_user': self.from_user,
                 'email_address': self.email_address,
                 'status': self.status,
-                'created_at': str(self.created_at)
+                'created_at': str(self.created_at),
+                'auth_type': self.auth_type
                 }
         if permissions_as_string:
             data['permissions'] = ','.join(self.permissions)

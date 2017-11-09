@@ -6,7 +6,8 @@ from app.notify_client.models import User
 ALLOWED_ATTRIBUTES = {
     'name',
     'email_address',
-    'mobile_number'
+    'mobile_number',
+    'auth_type',
 }
 
 
