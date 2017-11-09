@@ -10,7 +10,6 @@ from flask import (
     Response,
 )
 from flask_login import login_required
-from math import pow
 from notifications_utils.recipients import format_phone_number_human_readable
 
 from app.main import main
@@ -244,9 +243,15 @@ def get_dashboard_partials(service_id):
         for job in job_api_client.get_jobs(service_id, limit_days=7, statuses=statuses_to_display)['data']
     ]
     service = service_api_client.get_detailed_service(service_id)
-    number_of_columns = 3 if 'letter' in current_service['permissions'] else 2
-    column_width = 'column-{}'.format(
-        {2: 'half', 3: 'third'}.get(number_of_columns)
+    column_width, max_notifiction_count = get_column_properties(
+        3 if 'letter' in current_service['permissions'] else 2
+    )
+    dashboard_totals = get_dashboard_totals(service['data']['statistics']),
+    highest_notification_count = max(
+        sum(
+            value[key] for key in {'requested', 'failed', 'delivered'}
+        )
+        for key, value in dashboard_totals[0].items()
     )
 
     return {
@@ -264,8 +269,11 @@ def get_dashboard_partials(service_id):
         'totals': render_template(
             'views/dashboard/_totals.html',
             service_id=service_id,
-            statistics=get_dashboard_totals(service['data']['statistics']),
-            column_width=column_width
+            statistics=dashboard_totals[0],
+            column_width=column_width,
+            smaller_font_size=(
+                highest_notification_count > max_notifiction_count
+            ),
         ),
         'template-statistics': render_template(
             'views/dashboard/template-statistics.html',
@@ -440,3 +448,10 @@ def get_tuples_of_financial_years(
         )
         for year in range(start, end + 1)
     )
+
+
+def get_column_properties(number_of_columns):
+    return {
+        2: ('column-half', 999999999),
+        3: ('column-third', 99999),
+    }.get(number_of_columns)
