@@ -48,11 +48,11 @@ def sign_in():
         if user:
             session['user_details'] = {"email": user.email_address, "id": user.id}
             if user.is_active:
-                user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
-                if request.args.get('next'):
-                    return redirect(url_for('.two_factor', next=request.args.get('next')))
+                if user.auth_type == "email_auth":
+                    return sign_in_email(user.id, user.email_address)
                 else:
-                    return redirect(url_for('.two_factor'))
+                    return sign_in_sms(user.id, user.mobile_number)
+
         # Vague error message for login in case of user not known, locked, inactive or password not verified
         flash(Markup(
             (
@@ -68,6 +68,22 @@ def sign_in():
         again=bool(request.args.get('next')),
         other_device=other_device
     )
+
+
+def sign_in_email(user_id, to):
+    if request.args.get('next'):
+        user_api_client.send_verify_code(user_id, 'email', None, request.args.get('next'))
+    else:
+        user_api_client.send_verify_code(user_id, 'email', None)
+    return redirect(url_for('.two_factor_email_sent'))
+
+
+def sign_in_sms(user_id, to):
+    user_api_client.send_verify_code(user_id, 'sms', to)
+    if request.args.get('next'):
+        return redirect(url_for('.two_factor', next=request.args.get('next')))
+    else:
+        return redirect(url_for('.two_factor'))
 
 
 @login_manager.unauthorized_handler

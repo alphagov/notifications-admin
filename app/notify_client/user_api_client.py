@@ -88,8 +88,10 @@ class UserApiClient(NotifyAdminAPIClient):
             if e.status_code == 400 or e.status_code == 404:
                 return False
 
-    def send_verify_code(self, user_id, code_type, to):
+    def send_verify_code(self, user_id, code_type, to, next_string=None):
         data = {'to': to}
+        if next_string:
+            data['next'] = next_string
         endpoint = '/user/{0}/{1}-code'.format(user_id, code_type)
         self.post(endpoint, data=data)
 
