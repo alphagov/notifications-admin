@@ -427,28 +427,6 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
         reply_to_email_address_id=reply_to_email_address['id'])
 
 
-@main.route("/services/<service_id>/service-settings/set-sms-sender", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions('manage_settings', admin_override=True)
-def service_set_sms_sender(service_id):
-    form = ServiceSmsSenderForm()
-    if form.validate_on_submit():
-        if 'inbound_sms' in current_service['permissions']:
-            abort(403)
-        service_api_client.update_service(
-            current_service['id'],
-            sms_sender=form.sms_sender.data or None
-        )
-        return redirect(url_for('.service_settings', service_id=service_id))
-
-    if request.method == 'GET':
-        form.sms_sender.data = current_service.get('sms_sender')
-
-    return render_template(
-        'views/service-settings/set-sms-sender.html',
-        form=form)
-
-
 @main.route("/services/<service_id>/service-settings/set-inbound-number", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
