@@ -42,7 +42,7 @@ def test_client_activates_if_pending(mocker, api_user_pending):
 
     client.activate_user(api_user_pending)
 
-    mock_post.assert_called_once_with('/user/{}/activate'.format(api_user_pending.id))
+    mock_post.assert_called_once_with('/user/{}/activate'.format(api_user_pending.id), data=None)
 
 
 def test_client_doesnt_activate_if_already_active(mocker, api_user_active):
