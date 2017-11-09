@@ -410,7 +410,8 @@ def send_test_step(service_id, template_id, step_index):
     if (
         request.endpoint == 'main.send_one_off_step' and
         step_index == 0 and
-        template.template_type != 'letter'
+        template.template_type != 'letter' and
+        not (template.template_type == 'sms' and current_user.mobile_number is None)
     ):
         skip_link = (
             'Use my {}'.format(first_column_headings[template.template_type][0]),
