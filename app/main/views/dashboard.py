@@ -10,7 +10,7 @@ from flask import (
     Response,
 )
 from flask_login import login_required
-
+from math import pow
 from notifications_utils.recipients import format_phone_number_human_readable
 
 from app.main import main
@@ -244,7 +244,10 @@ def get_dashboard_partials(service_id):
         for job in job_api_client.get_jobs(service_id, limit_days=7, statuses=statuses_to_display)['data']
     ]
     service = service_api_client.get_detailed_service(service_id)
-    column_width = 'column-third' if 'letter' in current_service['permissions'] else 'column-half'
+    number_of_columns = 3 if 'letter' in current_service['permissions'] else 2
+    column_width = 'column-{}'.format(
+        {2: 'half', 3: 'third'}.get(number_of_columns)
+    )
 
     return {
         'upcoming': render_template(
