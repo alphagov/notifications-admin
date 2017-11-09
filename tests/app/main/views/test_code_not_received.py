@@ -79,11 +79,10 @@ def test_should_resend_verify_code_and_update_mobile_for_pending_user(
     client,
     mocker,
     api_user_pending,
-    mock_update_user,
+    mock_update_user_attribute,
     mock_send_verify_code,
     phone_number_to_register_with,
 ):
-
     mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_pending)
 
     with client.session_transaction() as session:
@@ -95,7 +94,7 @@ def test_should_resend_verify_code_and_update_mobile_for_pending_user(
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)
 
-    mock_update_user.assert_called_once_with(api_user_pending)
+    mock_update_user_attribute.assert_called_once_with(api_user_pending.id, mobile_number=phone_number_to_register_with)
     mock_send_verify_code.assert_called_once_with(api_user_pending.id, 'sms', to=phone_number_to_register_with)
 
 
