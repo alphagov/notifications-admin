@@ -324,7 +324,7 @@ def test_new_invited_user_verifies_and_added_to_service(
     mock_send_verify_code,
     mock_check_verify_code,
     mock_get_user,
-    mock_update_user_attribute,
+    mock_update_user,
     mock_add_user_to_service,
     mock_accept_invite,
     mock_get_service,

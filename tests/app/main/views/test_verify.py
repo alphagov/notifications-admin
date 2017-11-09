@@ -30,7 +30,7 @@ def test_should_redirect_to_add_service_when_sms_code_is_correct(
     client,
     api_user_active,
     mocker,
-    mock_update_user_attribute,
+    mock_update_user,
     mock_check_verify_code,
     fake_uuid
 ):
@@ -60,14 +60,14 @@ def test_should_activate_user_after_verify(
     api_user_pending,
     mock_send_verify_code,
     mock_check_verify_code,
-    mock_activate_user,
+    mock_update_user,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
     with client.session_transaction() as session:
         session['user_details'] = {'email_address': api_user_pending.email_address, 'id': api_user_pending.id}
     client.post(url_for('main.verify'),
                 data={'sms_code': '12345'})
-    assert mock_activate_user.called
+    assert mock_update_user.called
 
 
 def test_should_return_200_when_sms_code_is_wrong(
