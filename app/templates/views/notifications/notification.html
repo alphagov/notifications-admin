@@ -34,6 +34,9 @@
       <p>
         Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
       </p>
+      <p class="bottom-gutter">
+        <a href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download="download">Download as a PDF</a>
+      </p>
     {% endif %}
 
     {{ template|string }}

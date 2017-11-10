@@ -1,5 +1,6 @@
 from freezegun import freeze_time
 from flask import url_for
+from functools import partial
 import pytest
 
 from notifications_utils.template import LetterImageTemplate
@@ -131,10 +132,14 @@ def test_notification_page_shows_status_of_letter_notification(
     assert page.select('p.notification-status') == []
 
 
+@pytest.mark.parametrize('filetype', [
+    'pdf', 'png'
+])
 def test_should_show_image_of_letter_notification(
     logged_in_client,
     fake_uuid,
-    mocker
+    mocker,
+    filetype,
 ):
 
     mock_get_notification(mocker, fake_uuid, template_type='letter')
@@ -145,15 +150,29 @@ def test_should_show_image_of_letter_notification(
     )
 
     response = logged_in_client.get(url_for(
-        'main.view_letter_notification_as_image',
+        'main.view_letter_notification_as_preview',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
+        filetype=filetype
     ))
 
     assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
     assert isinstance(mocked_preview.call_args[0][0], LetterImageTemplate)
-    assert mocked_preview.call_args[0][1] == 'png'
+    assert mocked_preview.call_args[0][1] == filetype
+
+
+def test_should_404_for_unknown_extension(
+    client_request,
+    fake_uuid,
+):
+    client_request.get(
+        'main.view_letter_notification_as_preview',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        filetype='docx',
+        _expected_status=404,
+    )
 
 
 @pytest.mark.parametrize('service_permissions, template_type, link_expected', [
@@ -182,17 +201,52 @@ def test_notification_page_has_link_to_send_another_for_sms(
     )
 
     last_paragraph = page.select('main p')[-1]
+    conversation_link = url_for(
+        '.conversation',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        _anchor='n{}'.format(fake_uuid),
+    )
 
     if link_expected:
         assert normalize_spaces(last_paragraph.text) == (
             'See all text messages sent to this phone number'
         )
-        assert last_paragraph.select_one('a')['href'] == url_for(
-            '.conversation',
-            service_id=SERVICE_ONE_ID,
-            notification_id=fake_uuid,
-            _anchor='n{}'.format(fake_uuid),
-        )
+        assert last_paragraph.select_one('a')['href'] == conversation_link
     else:
-        # covers ‘Delivered’, ‘Expected delivery date’
-        assert 'deliver' in normalize_spaces(last_paragraph.text).lower()
+        assert conversation_link not in str(page.select_one('main'))
+
+
+@pytest.mark.parametrize('template_type, expected_link', [
+    ('email', lambda notification_id: None),
+    ('sms', lambda notification_id: None),
+    ('letter', partial(
+        url_for,
+        'main.view_letter_notification_as_preview',
+        service_id=SERVICE_ONE_ID,
+        filetype='pdf'
+    )),
+])
+def test_notification_page_has_link_to_download_letter(
+    client_request,
+    mocker,
+    fake_uuid,
+    service_one,
+    template_type,
+    expected_link,
+):
+
+    mock_get_notification(mocker, fake_uuid, template_type=template_type)
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    try:
+        download_link = page.select_one('a[download]')['href']
+    except TypeError:
+        download_link = None
+
+    assert download_link == expected_link(notification_id=fake_uuid)

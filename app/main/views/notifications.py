@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import (
+    abort,
     render_template,
     jsonify,
     request,
@@ -51,9 +52,10 @@ def view_notification(service_id, notification_id):
         notification['template'],
         current_service,
         letter_preview_url=url_for(
-            '.view_letter_notification_as_image',
+            '.view_letter_notification_as_preview',
             service_id=service_id,
             notification_id=notification_id,
+            filetype='png',
         ),
         show_recipient=True,
         redact_missing_personalisation=True,
@@ -87,10 +89,13 @@ def view_notification(service_id, notification_id):
     )
 
 
-@main.route("/services/<service_id>/notification/<uuid:notification_id>.png")
+@main.route("/services/<service_id>/notification/<uuid:notification_id>.<filetype>")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
-def view_letter_notification_as_image(service_id, notification_id):
+def view_letter_notification_as_preview(service_id, notification_id, filetype):
+
+    if filetype not in ('pdf', 'png'):
+        abort(404)
 
     notification = notification_api_client.get_notification(service_id, notification_id)
 
@@ -98,15 +103,16 @@ def view_letter_notification_as_image(service_id, notification_id):
         notification['template'],
         current_service,
         letter_preview_url=url_for(
-            '.view_letter_notification_as_image',
+            '.view_letter_notification_as_preview',
             service_id=service_id,
             notification_id=notification_id,
+            filetype='png',
         ),
     )
 
     template.values = notification['personalisation']
 
-    return TemplatePreview.from_utils_template(template, 'png', page=request.args.get('page'))
+    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
 
 
 @main.route("/services/<service_id>/notification/<notification_id>.json")
