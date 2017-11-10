@@ -109,7 +109,8 @@ class UKMobileNumber(TelField):
 class InternationalPhoneNumber(TelField):
     def pre_validate(self, form):
         try:
-            validate_phone_number(self.data, international=True)
+            if self.data:
+                validate_phone_number(self.data, international=True)
         except InvalidPhoneError as e:
             raise ValidationError(str(e))
 
@@ -173,12 +174,22 @@ class RegisterUserForm(Form):
 
 
 class RegisterUserFromInviteForm(Form):
-    name = StringField('Full name',
-                       validators=[DataRequired(message='Can’t be empty')])
-    mobile_number = international_phone_number()
+    def __init__(self, auth_type, *args, **kwargs):
+        self.auth_type = auth_type
+        super().__init__(*args, **kwargs)
+
+    name = StringField(
+        'Full name',
+        validators=[DataRequired(message='Can’t be empty')]
+    )
+    mobile_number = InternationalPhoneNumber('Mobile number', validators=[])
     password = password()
     service = HiddenField('service')
     email_address = HiddenField('email_address')
+
+    def validate_mobile_number(self, field):
+        if self.auth_type == 'sms_auth' and not field.data:
+            raise ValidationError('Can’t be empty')
 
 
 class PermissionsForm(Form):

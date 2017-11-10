@@ -19,6 +19,7 @@ from app.main.forms import (
     RegisterUserForm,
     RegisterUserFromInviteForm
 )
+from app.main.views.verify import activate_user
 
 from app import (
     user_api_client,
@@ -41,17 +42,22 @@ def register():
 
 @main.route('/register-from-invite', methods=['GET', 'POST'])
 def register_from_invite():
-    form = RegisterUserFromInviteForm()
     invited_user = session.get('invited_user')
+    form = RegisterUserFromInviteForm(invited_user['auth_type'])
     if not invited_user:
         abort(404)
 
     if form.validate_on_submit():
         if form.service.data != invited_user['service'] or form.email_address.data != invited_user['email_address']:
             abort(400)
-        _do_registration(form, send_email=False)
+        _do_registration(form, send_email=False, send_sms=invited_user['auth_type'] == 'sms_auth')
         invite_api_client.accept_invite(invited_user['service'], invited_user['id'])
-        return redirect(url_for('main.verify'))
+        if invited_user['auth_type'] == 'sms_auth':
+            return redirect(url_for('main.verify'))
+        else:
+            # we've already proven this user has email because they clicked the invite link,
+            # so just activate them straight away
+            return activate_user(session['user_details']['id'])
 
     form.service.data = invited_user['service']
     form.email_address.data = invited_user['email_address']
