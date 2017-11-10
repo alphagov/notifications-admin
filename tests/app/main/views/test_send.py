@@ -1883,7 +1883,7 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
     )
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
-        'Your file needs columns called ‘address line 1’, ‘address line 2’ and ‘postcode’ '
+        'Your file needs a column called ‘postcode’ '
         'Right now it has columns called ‘address_line_1’, ‘address_line_2’ and ‘foo’. '
         'Skip to file contents'
     )
