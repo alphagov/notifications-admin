@@ -171,13 +171,11 @@ class RegisterUserForm(Form):
     email_address = email_address()
     mobile_number = international_phone_number()
     password = password()
+    # always register as sms type
+    auth_type = HiddenField('auth_type', default='sms_auth')
 
 
 class RegisterUserFromInviteForm(Form):
-    def __init__(self, auth_type, *args, **kwargs):
-        self.auth_type = auth_type
-        super().__init__(*args, **kwargs)
-
     name = StringField(
         'Full name',
         validators=[DataRequired(message='Can’t be empty')]
@@ -186,9 +184,10 @@ class RegisterUserFromInviteForm(Form):
     password = password()
     service = HiddenField('service')
     email_address = HiddenField('email_address')
+    auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
     def validate_mobile_number(self, field):
-        if self.auth_type == 'sms_auth' and not field.data:
+        if self.auth_type.data == 'sms_auth' and not field.data:
             raise ValidationError('Can’t be empty')
 
 

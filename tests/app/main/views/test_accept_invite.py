@@ -267,7 +267,8 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
             'from_user': invited_user['from_user'],
             'password': 'longpassword',
             'mobile_number': '+447890123456',
-            'name': 'Invited User'
+            'name': 'Invited User',
+            'auth_type': 'email_auth'
             }
 
     expected_redirect_location = 'http://localhost/verify'
@@ -280,7 +281,8 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     mock_register_user.assert_called_with(data['name'],
                                           data['email_address'],
                                           data['mobile_number'],
-                                          data['password'])
+                                          data['password'],
+                                          data['auth_type'])
 
     assert mock_accept_invite.call_count == 1
 
@@ -310,65 +312,6 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
     assert "This invite is for another email address." in banner_contents
     assert "Sign out and click the link again to accept this invite." in banner_contents
     assert mock_accept_invite.call_count == 0
-
-
-def test_new_invited_user_verifies_and_added_to_service(
-    client,
-    service_one,
-    sample_invite,
-    api_user_active,
-    mock_check_invite_token,
-    mock_dont_get_user_by_email,
-    mock_is_email_unique,
-    mock_register_user,
-    mock_send_verify_code,
-    mock_check_verify_code,
-    mock_get_user,
-    mock_update_user_attribute,
-    mock_add_user_to_service,
-    mock_accept_invite,
-    mock_get_service,
-    mock_get_service_templates,
-    mock_get_template_statistics,
-    mock_get_jobs,
-    mock_has_permissions,
-    mock_get_users_by_service,
-    mock_get_detailed_service,
-    mock_get_usage,
-    mocker,
-):
-    mocker.patch('app.main.views.invites.check_token')
-
-    # visit accept token page
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
-    data = {'service': sample_invite['service'],
-            'email_address': sample_invite['email_address'],
-            'from_user': sample_invite['from_user'],
-            'password': 'longpassword',
-            'mobile_number': '+447890123456',
-            'name': 'Invited User'
-            }
-
-    # get redirected to register from invite
-    response = client.post(url_for('main.register_from_invite'), data=data)
-
-    # that sends user on to verify
-    response = client.post(url_for('main.verify'), data={'sms_code': '12345'}, follow_redirects=True)
-
-    # when they post codes back to admin user should be added to
-    # service and sent on to dash board
-    expected_permissions = ['send_messages', 'manage_service', 'manage_api_keys']
-
-    with client.session_transaction() as session:
-        new_user_id = session['user_id']
-        mock_add_user_to_service.assert_called_with(data['service'], new_user_id, expected_permissions)
-        mock_accept_invite.assert_called_with(data['service'], sample_invite['id'])
-        mock_check_verify_code.assert_called_once_with(new_user_id, '12345', 'sms')
-        assert service_one['id'] == session['service_id']
-
-    raw_html = response.data.decode('utf-8')
-    page = BeautifulSoup(raw_html, 'html.parser')
-    assert page.find('h1').text == 'Dashboard'
 
 
 def test_gives_message_if_token_has_expired(

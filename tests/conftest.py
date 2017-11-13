@@ -1288,11 +1288,12 @@ def mock_send_change_email_verification(mocker):
 
 @pytest.fixture(scope='function')
 def mock_register_user(mocker, api_user_pending):
-    def _register(name, email_address, mobile_number, password):
+    def _register(name, email_address, mobile_number, password, auth_type):
         api_user_pending.name = name
         api_user_pending.email_address = email_address
         api_user_pending.mobile_number = mobile_number
         api_user_pending.password = password
+        api_user_pending.auth_type = auth_type
         return api_user_pending
 
     return mocker.patch('app.user_api_client.register_user', side_effect=_register)
@@ -1910,7 +1911,9 @@ def sample_invite(mocker, service_one, status='pending'):
     service_id = service_one['id']
     permissions = 'send_messages,manage_service,manage_api_keys'
     created_at = str(datetime.utcnow())
-    return invite_json(id_, from_user, service_id, email_address, permissions, created_at, status)
+    auth_type = 'sms_auth'
+
+    return invite_json(id_, from_user, service_id, email_address, permissions, created_at, status, auth_type)
 
 
 @pytest.fixture(scope='function')

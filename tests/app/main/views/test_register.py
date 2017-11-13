@@ -49,7 +49,8 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
     user_data = {'name': 'Some One Valid',
                  'email_address': 'notfound@example.gov.uk',
                  'mobile_number': phone_number_to_register_with,
-                 'password': 'validPassword!'
+                 'password': 'validPassword!',
+                 'auth_type': 'sms_auth'
                  }
 
     response = client.post(url_for('main.register'), data=user_data, follow_redirects=True)
@@ -62,7 +63,8 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
     mock_register_user.assert_called_with(user_data['name'],
                                           user_data['email_address'],
                                           user_data['mobile_number'],
-                                          user_data['password'])
+                                          user_data['password'],
+                                          user_data['auth_type'])
 
 
 def test_register_continue_handles_missing_session_sensibly(
@@ -175,15 +177,21 @@ def test_register_from_invite_(
                                "invited@user.com",
                                ["manage_users"],
                                "pending",
-                               datetime.utcnow())
+                               datetime.utcnow(),
+                               'sms_auth')
     with client.session_transaction() as session:
         session['invited_user'] = invited_user.serialize()
-    response = client.post(url_for('main.register_from_invite'),
-                           data={'name': 'Registered in another Browser',
-                                 'email_address': invited_user.email_address,
-                                 'mobile_number': '+4407700900460',
-                                 'service': str(invited_user.id),
-                                 'password': 'somreallyhardthingtoguess'})
+    response = client.post(
+        url_for('main.register_from_invite'),
+        data={
+            'name': 'Registered in another Browser',
+            'email_address': invited_user.email_address,
+            'mobile_number': '+4407700900460',
+            'service': str(invited_user.id),
+            'password': 'somreallyhardthingtoguess',
+            'auth_type': 'sms_auth'
+        }
+    )
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)
 
@@ -199,14 +207,20 @@ def test_register_from_invite_when_user_registers_in_another_browser(
                                api_user_active.email_address,
                                ["manage_users"],
                                "pending",
-                               datetime.utcnow())
+                               datetime.utcnow(),
+                               'sms_auth')
     with client.session_transaction() as session:
         session['invited_user'] = invited_user.serialize()
-    response = client.post(url_for('main.register_from_invite'),
-                           data={'name': 'Registered in another Browser',
-                                 'email_address': api_user_active.email_address,
-                                 'mobile_number': api_user_active.mobile_number,
-                                 'service': str(api_user_active.id),
-                                 'password': 'somreallyhardthingtoguess'})
+    response = client.post(
+        url_for('main.register_from_invite'),
+        data={
+            'name': 'Registered in another Browser',
+            'email_address': api_user_active.email_address,
+            'mobile_number': api_user_active.mobile_number,
+            'service': str(api_user_active.id),
+            'password': 'somreallyhardthingtoguess',
+            'auth_type': 'sms_auth'
+        }
+    )
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)

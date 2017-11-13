@@ -43,7 +43,7 @@ def register():
 @main.route('/register-from-invite', methods=['GET', 'POST'])
 def register_from_invite():
     invited_user = session.get('invited_user')
-    form = RegisterUserFromInviteForm(invited_user['auth_type'])
+    form = RegisterUserFromInviteForm()
     if not invited_user:
         abort(404)
 
@@ -70,7 +70,8 @@ def _do_registration(form, service=None, send_sms=True, send_email=True):
         user = user_api_client.register_user(form.name.data,
                                              form.email_address.data,
                                              form.mobile_number.data,
-                                             form.password.data)
+                                             form.password.data,
+                                             form.auth_type.data)
 
         # TODO possibly there should be some exception handling
         # for sending sms and email codes.
