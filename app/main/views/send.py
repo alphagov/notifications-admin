@@ -218,17 +218,17 @@ def get_sender_context(sender_details, template_type):
     context = {
         'email': {
             'title': "Choose where to send replies",
-            'description': "Select an email address that recipients can reply to",
+            'description': 'Where should replies go?',
             'field_name': 'email_address'
         },
         'letter': {
             'title': 'Choose sender address',
-            'description': 'Select an address that recipients can reply to',
+            'description': 'What should appear in the top right of the letter?',
             'field_name': 'contact_block'
         },
         'sms': {
             'title': 'Chose text message sender',
-            'description': 'Select a text message sender that the recipients can reply to',
+            'description': 'Who should the message come from?',
             'field_name': 'sms_sender'
         }
     }[template_type]
