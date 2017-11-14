@@ -2457,6 +2457,19 @@ def set_config(app, name, value):
     app.config[name] = old_val
 
 
+@contextmanager
+def set_config_values(app, dict):
+    old_values = {}
+
+    for key in dict:
+        old_values[key] = app.config.get(key)
+        app.config[key] = dict[key]
+
+    yield
+
+    for key in dict:
+        app.config[key] = old_values[key]
+
 @pytest.fixture(scope='function')
 def valid_token(app_, fake_uuid):
     return generate_token(
