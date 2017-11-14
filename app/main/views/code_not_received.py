@@ -31,8 +31,7 @@ def check_and_resend_text_code():
     form = TextNotReceivedForm(mobile_number=user.mobile_number)
     if form.validate_on_submit():
         user_api_client.send_verify_code(user.id, 'sms', to=form.mobile_number.data)
-        user.mobile_number = form.mobile_number.data
-        user_api_client.update_user(user)
+        user = user_api_client.update_user_attribute(user.id, mobile_number=form.mobile_number.data)
         return redirect(url_for('.verify'))
 
     return render_template('views/text-not-received.html', form=form)
@@ -47,3 +46,17 @@ def check_and_resend_verification_code():
         return redirect(url_for('main.verify'))
     else:
         return redirect(url_for('main.two_factor'))
+
+
+@main.route('/email-not-received', methods=['GET'])
+@redirect_to_sign_in
+def email_not_received():
+    return render_template('views/email-not-received.html')
+
+
+@main.route('/send-new-email-token', methods=['GET'])
+@redirect_to_sign_in
+def resend_email_link():
+    user_api_client.send_verify_code(session['user_details']['id'], 'email', None)
+    session.pop('user_details')
+    return redirect(url_for('main.two_factor_email_sent', email_resent=True))

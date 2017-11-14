@@ -28,6 +28,9 @@ from . import (
     single_notification_json
 )
 
+from notifications_utils.url_safe_token import generate_token
+import json
+
 
 @pytest.fixture(scope='session')
 def app_(request):
@@ -1090,6 +1093,25 @@ def api_user_active(fake_uuid, email_address='test@user.gov.uk'):
 
 
 @pytest.fixture(scope='function')
+def api_user_active_email_auth(fake_uuid, email_address='test@user.gov.uk'):
+    from app.notify_client.user_api_client import User
+    user_data = {'id': fake_uuid,
+                 'name': 'Test User',
+                 'password': 'somepassword',
+                 'email_address': email_address,
+                 'mobile_number': '07700 900762',
+                 'state': 'active',
+                 'failed_login_count': 0,
+                 'permissions': {},
+                 'platform_admin': False,
+                 'auth_type': 'email_auth',
+                 'password_changed_at': str(datetime.utcnow())
+                 }
+    user = User(user_data)
+    return user
+
+
+@pytest.fixture(scope='function')
 def api_nongov_user_active(fake_uuid):
     from app.notify_client.user_api_client import User
     user_data = {'id': fake_uuid,
@@ -1414,14 +1436,6 @@ def mock_verify_password(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_update_user(mocker, api_user_active):
-    def _update(user_id, **kwargs):
-        return api_user_active
-
-    return mocker.patch('app.user_api_client.update_user', side_effect=_update)
-
-
-@pytest.fixture(scope='function')
 def mock_update_user_password(mocker, api_user_active):
     def _update(user_id, **kwargs):
         return api_user_active
@@ -1435,6 +1449,15 @@ def mock_update_user_attribute(mocker, api_user_active):
         return api_user_active
 
     return mocker.patch('app.user_api_client.update_user_attribute', side_effect=_update)
+
+
+@pytest.fixture
+def mock_activate_user(mocker):
+    def _activate(user):
+        user.state = 'active'
+        return user
+
+    return mocker.patch('app.user_api_client.activate_user', side_effect=_activate)
 
 
 @pytest.fixture(scope='function')
@@ -1490,7 +1513,7 @@ def mock_get_no_api_keys(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_login(mocker, mock_get_user, mock_update_user, mock_events):
+def mock_login(mocker, mock_get_user, mock_update_user_attribute, mock_events):
     def _verify_code(user_id, code, code_type):
         return True, ''
 
@@ -2447,3 +2470,20 @@ def mock_get_free_sms_fragment_limit_for_all_years(mocker):
 
     return mocker.patch('app.billing_api_client.get_free_sms_fragment_limit_for_all_years',
                         return_value=sample_limit)
+
+
+@contextmanager
+def set_config(app, name, value):
+    old_val = app.config.get(name)
+    app.config[name] = value
+    yield
+    app.config[name] = old_val
+
+
+@pytest.fixture(scope='function')
+def valid_token(app_, fake_uuid):
+    return generate_token(
+        json.dumps({'user_id': fake_uuid, 'secret_code': 'my secret'}),
+        app_.config['SECRET_KEY'],
+        app_.config['DANGEROUS_SALT']
+    )

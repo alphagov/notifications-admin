@@ -33,3 +33,22 @@ def test_client_updates_password_separately(mocker, api_user_active):
 
     client.update_password(api_user_active.id, expected_params['_password'])
     mock_update_password.assert_called_once_with(expected_url, data=expected_params)
+
+
+def test_client_activates_if_pending(mocker, api_user_pending):
+    mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post')
+    client = UserApiClient()
+    client.max_failed_login_count = 1  # doesn't matter for this test
+
+    client.activate_user(api_user_pending)
+
+    mock_post.assert_called_once_with('/user/{}/activate'.format(api_user_pending.id), data=None)
+
+
+def test_client_doesnt_activate_if_already_active(mocker, api_user_active):
+    mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post')
+    client = UserApiClient()
+
+    client.activate_user(api_user_active)
+
+    assert not mock_post.called

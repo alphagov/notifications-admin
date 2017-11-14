@@ -1,0 +1,24 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block per_page_title %}
+  Resend email link
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-two-thirds">
+    <h1 class="heading-large">Resend email link</h1>
+
+    <p> Email messages sometimes take a few minutes to arrive. If you do not recieve the email, you can resend it.</p>
+    <p> If you no longer have access to the email address you registered for this service, speak to your service manager to reset the email.</p>
+
+    <p>
+  		<a class="button" href="{{url_for('main.resend_email_link')}}" role="button">Resend email link</a>
+  	</p>
+
+  </div>
+</div>
+
+{% endblock %}

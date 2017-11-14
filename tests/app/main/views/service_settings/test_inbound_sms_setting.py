@@ -1,4 +1,3 @@
-import app
 from flask import url_for
 from tests.conftest import normalize_spaces
 
@@ -59,22 +58,3 @@ def test_set_inbound_sms_when_service_already_has_sms(
     )
 
     assert normalize_spaces(page.select_one('main p').text) == "This service already has an inbound number"
-
-
-def test_set_text_message_sender_and_inbound_sms_permission_exists_return_403(
-        logged_in_client,
-        service_one,
-        mocker,
-):
-    service_one['permissions'] = ['inbound_sms']
-    mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
-    update_service_mock = mocker.patch('app.service_api_client.update_service_with_properties')
-
-    data = {"sms_sender": "elevenchars"}
-    response = logged_in_client.post(url_for('main.service_set_sms_sender', service_id=service_one['id']),
-                                     data=data)
-
-    assert response.status_code == 403
-
-    assert not update_service_mock.called
-    assert app.current_service['permissions'] == ['inbound_sms']

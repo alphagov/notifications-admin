@@ -1,7 +1,9 @@
-from flask import url_for
-from tests.conftest import SERVICE_ONE_ID
-
 from unittest.mock import ANY
+
+from flask import url_for
+from bs4 import BeautifulSoup
+
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces, set_config
 
 
 def test_should_render_two_factor_page(
@@ -200,7 +202,7 @@ def test_two_factor_should_activate_pending_user(
     mocker,
     api_user_pending,
     mock_check_verify_code,
-    mock_update_user,
+    mock_activate_user,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
     mocker.patch('app.service_api_client.get_services', return_value={'data': []})
@@ -211,5 +213,113 @@ def test_two_factor_should_activate_pending_user(
         }
     client.post(url_for('main.two_factor'), data={'sms_code': '12345'})
 
-    assert mock_update_user.called
+    assert mock_activate_user.called
     assert api_user_pending.is_active
+
+
+def test_valid_two_factor_email_link_logs_in_user(
+    client,
+    valid_token,
+    mock_get_user,
+    mock_get_services_with_one_service,
+    mocker
+):
+    mocker.patch('app.user_api_client.check_verify_code', return_value=(True, ''))
+
+    response = client.get(
+        url_for('main.two_factor_email', token=valid_token),
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_dashboard', service_id=SERVICE_ONE_ID, _external=True)
+
+
+def test_two_factor_email_link_has_expired(
+    app_,
+    valid_token,
+    client,
+    mock_send_verify_code,
+    fake_uuid
+):
+
+    with set_config(app_, 'EMAIL_2FA_EXPIRY_SECONDS', -1):
+        response = client.get(
+            url_for('main.two_factor_email', token=valid_token),
+            follow_redirects=True,
+        )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == "The link in the email we sent you has expired. We’ve sent you a new one."
+    assert page.h1.text.strip() == 'Email resent'
+    mock_send_verify_code.assert_called_once_with(fake_uuid, 'email', None)
+
+
+def test_two_factor_email_link_is_invalid(
+    client
+):
+    token = 12345
+    response = client.get(
+        url_for('main.two_factor_email', token=token),
+        follow_redirects=True
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == "There’s something wrong with the link you’ve used."
+    assert response.status_code == 404
+
+
+def test_two_factor_email_link_is_already_used(
+    client,
+    valid_token,
+    mocker,
+    mock_send_verify_code
+
+):
+    mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code has expired'))
+
+    response = client.get(
+        url_for('main.two_factor_email', token=valid_token),
+        follow_redirects=True
+    )
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == "This link has already been used"
+    assert response.status_code == 200
+
+
+def test_two_factor_email_link_when_user_is_locked_out(
+    client,
+    valid_token,
+    mocker,
+    mock_send_verify_code
+):
+    mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code not found'))
+
+    response = client.get(
+        url_for('main.two_factor_email', token=valid_token),
+        follow_redirects=True
+    )
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == "This link has already been used"
+    assert response.status_code == 200
+
+
+def test_two_factor_email_link_used_when_user_already_logged_in(
+    logged_in_client,
+    valid_token
+):
+    response = logged_in_client.get(
+        url_for('main.two_factor_email', token=valid_token)
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.choose_service', _external=True)

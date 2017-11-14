@@ -77,7 +77,7 @@ def test_logged_in_user_redirects_to_choose_service(
     assert response.location == url_for('main.choose_service', _external=True)
 
 
-def test_process_sign_in_return_2fa_template(
+def test_process_sms_auth_sign_in_return_2fa_template(
     client,
     api_user_active,
     mock_send_verify_code,
@@ -92,6 +92,25 @@ def test_process_sign_in_return_2fa_template(
     assert response.status_code == 302
     assert response.location == url_for('.two_factor', _external=True)
     mock_verify_password.assert_called_with(api_user_active.id, 'val1dPassw0rd!')
+
+
+def test_process_email_auth_sign_in_return_2fa_template(
+    client,
+    api_user_active_email_auth,
+    mock_send_verify_code,
+    mock_verify_password,
+    mocker
+):
+    mocker.patch('app.user_api_client.get_user', return_value=api_user_active_email_auth)
+    mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_active_email_auth)
+
+    response = client.post(
+        url_for('main.sign_in'), data={
+            'email_address': 'valid@example.gov.uk',
+            'password': 'val1dPassw0rd!'})
+    assert response.status_code == 302
+    assert response.location == url_for('.two_factor_email_sent', _external=True)
+    mock_verify_password.assert_called_with(api_user_active_email_auth.id, 'val1dPassw0rd!')
 
 
 def test_should_return_locked_out_true_when_user_is_locked(

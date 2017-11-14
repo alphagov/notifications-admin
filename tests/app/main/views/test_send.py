@@ -44,14 +44,14 @@ test_non_spreadsheet_files = glob(path.join('tests', 'non_spreadsheet_files', '*
     (
         mock_get_service_email_template,
         multiple_reply_to_email_addresses,
-        'Choose where to send replies',
-        'Select an email address that recipients can reply to'
+        'Send to one recipient',
+        'Where should replies go?',
     ),
     (
         mock_get_service_template,
         multiple_sms_senders,
-        'Chose text message sender',
-        'Select a text message sender that the recipients can reply to'
+        'Send to one recipient',
+        'Who should the message come from?'
     )
 ])
 def test_show_correct_title_and_description_for_sender_type(
@@ -660,7 +660,6 @@ def test_send_one_off_has_skip_link(
     expected_link_text,
     expected_link_url,
 ):
-
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
@@ -681,6 +680,23 @@ def test_send_one_off_has_skip_link(
         )
     else:
         assert not skip_links
+
+
+def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
+    logged_in_client,
+    service_one,
+    fake_uuid,
+    mock_get_service_template,
+    active_user_with_permissions
+):
+    active_user_with_permissions.mobile_number = None
+    response = logged_in_client.get(
+        url_for('main.send_one_off_step', service_id=service_one['id'], template_id=fake_uuid, step_index=0),
+        follow_redirects=True
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    skip_links = page.select('a.top-gutter-4-3')
+    assert not skip_links
 
 
 @pytest.mark.parametrize('endpoint, expected_redirect, placeholders', [
