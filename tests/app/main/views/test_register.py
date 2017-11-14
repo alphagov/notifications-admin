@@ -16,6 +16,8 @@ def test_render_register_returns_template_with_form(client):
     response = client.get('/register')
 
     assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('input', attrs={'name': 'auth_type'}).attrs['value'] == 'sms_auth'
     assert 'Create an account' in response.get_data(as_text=True)
 
 
