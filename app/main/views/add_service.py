@@ -20,8 +20,7 @@ from app.notify_client.models import InvitedUser
 from app import (
     invite_api_client,
     user_api_client,
-    service_api_client,
-    billing_api_client
+    service_api_client
 )
 
 from app.utils import (
@@ -54,7 +53,8 @@ def _create_service(service_name, organisation_type, email_from, form):
         )
         session['service_id'] = service_id
 
-        billing_api_client.create_or_update_free_sms_fragment_limit(service_id, free_sms_fragment_limit)
+        # TODO: Comment out until data migration
+        # billing_api_client.create_or_update_free_sms_fragment_limit(service_id, free_sms_fragment_limit)
 
         return service_id, None
     except HTTPError as e:

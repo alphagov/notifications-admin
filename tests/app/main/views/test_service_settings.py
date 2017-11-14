@@ -1615,10 +1615,11 @@ def test_should_set_sms_allowance(
         SERVICE_ONE_ID,
         free_sms_fragment_limit=expected_api_argument,
     )
-    mock_create_or_update_free_sms_fragment_limit.assert_called_with(
-        SERVICE_ONE_ID,
-        expected_api_argument
-    )
+    # Not assert until using the annual_billing end points
+    # mock_create_or_update_free_sms_fragment_limit.assert_called_with(
+    #     SERVICE_ONE_ID,
+    #     expected_api_argument
+    # )
 
 
 def test_switch_service_enable_letters(
