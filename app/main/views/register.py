@@ -43,9 +43,10 @@ def register():
 @main.route('/register-from-invite', methods=['GET', 'POST'])
 def register_from_invite():
     invited_user = session.get('invited_user')
-    form = RegisterUserFromInviteForm()
     if not invited_user:
         abort(404)
+
+    form = RegisterUserFromInviteForm()
 
     if form.validate_on_submit():
         if form.service.data != invited_user['service'] or form.email_address.data != invited_user['email_address']:
@@ -65,11 +66,11 @@ def register_from_invite():
     return render_template('views/register-from-invite.html', email_address=invited_user['email_address'], form=form)
 
 
-def _do_registration(form, service=None, send_sms=True, send_email=True):
+def _do_registration(form, send_sms=True, send_email=True):
     if user_api_client.is_email_unique(form.email_address.data):
         user = user_api_client.register_user(form.name.data,
                                              form.email_address.data,
-                                             form.mobile_number.data,
+                                             form.mobile_number.data or None,
                                              form.password.data,
                                              form.auth_type.data)
 
