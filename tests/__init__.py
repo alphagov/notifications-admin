@@ -149,15 +149,17 @@ def api_key_json(id_, name, expiry_date=None):
             }
 
 
-def invite_json(id_, from_user, service_id, email_address, permissions, created_at, status):
-    return {'id': id_,
-            'from_user': from_user,
-            'service': service_id,
-            'email_address': email_address,
-            'status': status,
-            'permissions': permissions,
-            'created_at': created_at
-            }
+def invite_json(id_, from_user, service_id, email_address, permissions, created_at, status, auth_type):
+    return {
+        'id': id_,
+        'from_user': from_user,
+        'service': service_id,
+        'email_address': email_address,
+        'status': status,
+        'permissions': permissions,
+        'created_at': created_at,
+        'auth_type': auth_type
+    }
 
 
 TEST_USER_EMAIL = 'test@user.gov.uk'

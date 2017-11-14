@@ -35,12 +35,7 @@ def verify():
 
     if form.validate_on_submit():
         try:
-            user = user_api_client.get_user(user_id)
-            # the user will have a new current_session_id set by the API - store it in the cookie for future requests
-            session['current_session_id'] = user.current_session_id
-            activated_user = user_api_client.activate_user(user)
-            login_user(activated_user)
-            return redirect(url_for('main.add_service', first='first'))
+            return activate_user(user_id)
         finally:
             session.pop('user_details', None)
 
@@ -73,3 +68,12 @@ def verify_email(token):
     session['user_details'] = {"email": user.email_address, "id": user.id}
     user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
     return redirect('verify')
+
+
+def activate_user(user_id):
+    user = user_api_client.get_user(user_id)
+    # the user will have a new current_session_id set by the API - store it in the cookie for future requests
+    session['current_session_id'] = user.current_session_id
+    activated_user = user_api_client.activate_user(user)
+    login_user(activated_user)
+    return redirect(url_for('main.add_service', first='first'))

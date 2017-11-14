@@ -109,7 +109,8 @@ class UKMobileNumber(TelField):
 class InternationalPhoneNumber(TelField):
     def pre_validate(self, form):
         try:
-            validate_phone_number(self.data, international=True)
+            if self.data:
+                validate_phone_number(self.data, international=True)
         except InvalidPhoneError as e:
             raise ValidationError(str(e))
 
@@ -170,15 +171,31 @@ class RegisterUserForm(Form):
     email_address = email_address()
     mobile_number = international_phone_number()
     password = password()
+    # always register as sms type
+    auth_type = HiddenField('auth_type', default='sms_auth')
 
 
 class RegisterUserFromInviteForm(Form):
-    name = StringField('Full name',
-                       validators=[DataRequired(message='Can’t be empty')])
-    mobile_number = international_phone_number()
+    def __init__(self, invited_user):
+        super().__init__(
+            service=invited_user['service'],
+            email_address=invited_user['email_address'],
+            auth_type=invited_user['auth_type'],
+        )
+
+    name = StringField(
+        'Full name',
+        validators=[DataRequired(message='Can’t be empty')]
+    )
+    mobile_number = InternationalPhoneNumber('Mobile number', validators=[])
     password = password()
     service = HiddenField('service')
     email_address = HiddenField('email_address')
+    auth_type = HiddenField('auth_type', validators=[DataRequired()])
+
+    def validate_mobile_number(self, field):
+        if self.auth_type.data == 'sms_auth' and not field.data:
+            raise ValidationError('Can’t be empty')
 
 
 class PermissionsForm(Form):

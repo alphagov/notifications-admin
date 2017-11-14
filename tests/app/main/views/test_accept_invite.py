@@ -267,7 +267,8 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
             'from_user': invited_user['from_user'],
             'password': 'longpassword',
             'mobile_number': '+447890123456',
-            'name': 'Invited User'
+            'name': 'Invited User',
+            'auth_type': 'email_auth'
             }
 
     expected_redirect_location = 'http://localhost/verify'
@@ -280,7 +281,8 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     mock_register_user.assert_called_with(data['name'],
                                           data['email_address'],
                                           data['mobile_number'],
-                                          data['password'])
+                                          data['password'],
+                                          data['auth_type'])
 
     assert mock_accept_invite.call_count == 1
 
@@ -341,19 +343,26 @@ def test_new_invited_user_verifies_and_added_to_service(
 
     # visit accept token page
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
-    data = {'service': sample_invite['service'],
-            'email_address': sample_invite['email_address'],
-            'from_user': sample_invite['from_user'],
-            'password': 'longpassword',
-            'mobile_number': '+447890123456',
-            'name': 'Invited User'
-            }
+    assert response.status_code == 302
+    assert response.location == url_for('main.register_from_invite', _external=True)
 
     # get redirected to register from invite
+    data = {
+        'service': sample_invite['service'],
+        'email_address': sample_invite['email_address'],
+        'from_user': sample_invite['from_user'],
+        'password': 'longpassword',
+        'mobile_number': '+447890123456',
+        'name': 'Invited User',
+        'auth_type': 'sms_auth'
+    }
     response = client.post(url_for('main.register_from_invite'), data=data)
+    assert response.status_code == 302
+    assert response.location == url_for('main.verify', _external=True)
 
     # that sends user on to verify
     response = client.post(url_for('main.verify'), data={'sms_code': '12345'}, follow_redirects=True)
+    assert response.status_code == 200
 
     # when they post codes back to admin user should be added to
     # service and sent on to dash board
