@@ -186,6 +186,8 @@ def init_csrf(application):
 
 def init_app(application):
 
+    application.before_request(request_helper.check_proxy_header_before_request)
+
     @application.before_request
     def record_start_time():
         g.start = monotonic()
