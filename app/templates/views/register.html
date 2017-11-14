@@ -19,6 +19,7 @@ Create an account
       </div>
       <input class="visually-hidden" aria-hidden="true" tabindex="-1" id="defeat-chrome-autocomplete">
       {{ textbox(form.password, hint="At least 8 characters", width='3-4') }}
+      {{form.auth_type}}
       {{ page_footer("Continue") }}
     </form>
   </div>
