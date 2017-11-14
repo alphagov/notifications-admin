@@ -402,7 +402,16 @@ def service_add_email_reply_to(service_id):
         first_email_address=first_email_address)
 
 
-@main.route("/services/<service_id>/service-settings/email-reply-to/<reply_to_email_id>/edit", methods=['GET', 'POST'])
+@main.route(
+    "/services/<service_id>/service-settings/email-reply-to/<reply_to_email_id>/edit",
+    methods=['GET', 'POST'],
+    endpoint="service_edit_email_reply_to"
+)
+@main.route(
+    "/services/<service_id>/service-settings/email-reply-to/<reply_to_email_id>/delete",
+    methods=['GET'],
+    endpoint="service_confirm_delete_email_reply_to"
+)
 @login_required
 @user_has_permissions('manage_service')
 def service_edit_email_reply_to(service_id, reply_to_email_id):
@@ -422,7 +431,21 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
     return render_template(
         'views/service-settings/email-reply-to/edit.html',
         form=form,
-        reply_to_email_address_id=reply_to_email_address['id'])
+        reply_to_email_address_id=reply_to_email_id,
+        confirm_delete=(request.endpoint == "main.service_confirm_delete_email_reply_to"),
+    )
+
+
+@main.route("/services/<service_id>/service-settings/email-reply-to/<reply_to_email_id>/delete", methods=['POST'])
+@login_required
+@user_has_permissions('manage_service')
+def service_delete_email_reply_to(service_id, reply_to_email_id):
+    service_api_client.update_reply_to_email_address(
+        current_service['id'],
+        reply_to_email_id=reply_to_email_id,
+        active=False,
+    )
+    return redirect(url_for('.service_email_reply_to', service_id=service_id))
 
 
 @main.route("/services/<service_id>/service-settings/set-inbound-number", methods=['GET', 'POST'])
@@ -653,7 +676,16 @@ def service_add_sms_sender(service_id):
         first_sms_sender=first_sms_sender)
 
 
-@main.route("/services/<service_id>/service-settings/sms-sender/<sms_sender_id>/edit", methods=['GET', 'POST'])
+@main.route(
+    "/services/<service_id>/service-settings/sms-sender/<sms_sender_id>/edit",
+    methods=['GET', 'POST'],
+    endpoint="service_edit_sms_sender"
+)
+@main.route(
+    "/services/<service_id>/service-settings/sms-sender/<sms_sender_id>/delete",
+    methods=['GET'],
+    endpoint="service_confirm_delete_sms_sender"
+)
 @login_required
 @user_has_permissions('manage_service')
 def service_edit_sms_sender(service_id, sms_sender_id):
@@ -678,8 +710,25 @@ def service_edit_sms_sender(service_id, sms_sender_id):
         'views/service-settings/sms-sender/edit.html',
         form=form,
         sms_sender=sms_sender,
-        inbound_number=is_inbound_number
+        inbound_number=is_inbound_number,
+        sms_sender_id=sms_sender_id,
+        confirm_delete=(request.endpoint == "main.service_confirm_delete_sms_sender")
     )
+
+
+@main.route(
+    "/services/<service_id>/service-settings/sms-sender/<sms_sender_id>/delete",
+    methods=['POST'],
+)
+@login_required
+@user_has_permissions('manage_service')
+def service_delete_sms_sender(service_id, sms_sender_id):
+    service_api_client.update_sms_sender(
+        current_service['id'],
+        sms_sender_id=sms_sender_id,
+        active=False,
+    )
+    return redirect(url_for('.service_sms_senders', service_id=service_id))
 
 
 @main.route("/services/<service_id>/service-settings/set-letter-contact-block", methods=['GET', 'POST'])

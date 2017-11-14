@@ -1,4 +1,5 @@
 import uuid
+from functools import partial
 from unittest.mock import ANY, call
 
 import pytest
@@ -15,6 +16,7 @@ from tests.conftest import (
     active_user_no_api_key_permission,
     active_user_no_settings_permission,
     active_user_with_permissions,
+    fake_uuid,
     get_default_letter_contact_block,
     get_default_reply_to_email_address,
     get_default_sms_sender,
@@ -1128,6 +1130,90 @@ def test_edit_reply_to_email_address(
     )
 
 
+fixed_fake_uuid = fake_uuid()
+
+
+@pytest.mark.parametrize('fixture, expected_link_text, partial_href', [
+    (
+        get_non_default_reply_to_email_address,
+        'Delete',
+        partial(url_for, 'main.service_confirm_delete_email_reply_to', reply_to_email_id=fixed_fake_uuid),
+    ),
+    (
+        get_default_reply_to_email_address,
+        'Back',
+        partial(url_for, '.service_email_reply_to'),
+    ),
+])
+def test_shows_delete_link_for_email_reply_to_address(
+    mocker,
+    fixture,
+    expected_link_text,
+    partial_href,
+    fake_uuid,
+    client_request,
+):
+
+    fixture(mocker)
+
+    page = client_request.get(
+        'main.service_edit_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        reply_to_email_id=fixed_fake_uuid,
+    )
+
+    last_link = page.select('.page-footer a')[-1]
+
+    assert normalize_spaces(last_link.text) == expected_link_text
+    assert last_link['href'] == partial_href(service_id=SERVICE_ONE_ID)
+
+
+def test_confirm_delete_reply_to_email_address(
+    fake_uuid,
+    client_request,
+    get_non_default_reply_to_email_address
+):
+
+    page = client_request.get(
+        'main.service_confirm_delete_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        reply_to_email_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Are you sure you want to delete this email reply to address?'
+    )
+    assert 'action' not in page.select_one('.banner-dangerous form')
+    assert page.select_one('.banner-dangerous form')['method'] == 'post'
+
+
+def test_delete_reply_to_email_address(
+    client_request,
+    service_one,
+    fake_uuid,
+    get_non_default_reply_to_email_address,
+    mock_update_reply_to_email_address,
+):
+
+    client_request.post(
+        '.service_delete_email_reply_to',
+        service_id=SERVICE_ONE_ID,
+        reply_to_email_id=fake_uuid,
+        _expected_redirect=url_for(
+            'main.service_email_reply_to',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+
+    mock_update_reply_to_email_address.assert_called_once_with(
+        SERVICE_ONE_ID,
+        active=False,
+        reply_to_email_id=fake_uuid,
+    )
+
+
 @pytest.mark.parametrize('fixture, data, api_default_args', [
     (get_default_letter_contact_block, {"is_default": "y"}, True),
     (get_default_letter_contact_block, {}, True),
@@ -1223,14 +1309,14 @@ def test_edit_sms_sender(
     (
         'main.service_edit_sms_sender',
         get_default_sms_sender,
-        'This is currently your text message sender for service one',
+        'This is the default text message sender',
         'sms_sender_id',
         False
     ),
     (
         'main.service_edit_sms_sender',
         get_non_default_sms_sender,
-        'This is currently your text message sender for service one',
+        'This is the default text message sender',
         'sms_sender_id',
         True
     )
@@ -1262,6 +1348,112 @@ def test_default_box_shows_on_non_default_sender_details_while_editing(
         assert normalize_spaces(page.select_one('form p').text) == (
             default_message
         )
+
+
+@pytest.mark.parametrize('fixture, expected_link_text, partial_href', [
+    (
+        get_non_default_sms_sender,
+        'Delete',
+        partial(url_for, 'main.service_confirm_delete_sms_sender', sms_sender_id=fixed_fake_uuid),
+    ),
+    (
+        get_default_sms_sender,
+        'Back',
+        partial(url_for, '.service_sms_senders'),
+    ),
+])
+def test_shows_delete_link_for_sms_sender(
+    mocker,
+    fixture,
+    expected_link_text,
+    partial_href,
+    fake_uuid,
+    client_request,
+):
+
+    fixture(mocker)
+
+    page = client_request.get(
+        'main.service_edit_sms_sender',
+        service_id=SERVICE_ONE_ID,
+        sms_sender_id=fixed_fake_uuid,
+    )
+
+    last_link = page.select('.page-footer a')[-1]
+
+    assert normalize_spaces(last_link.text) == expected_link_text
+    assert last_link['href'] == partial_href(service_id=SERVICE_ONE_ID)
+
+
+def test_confirm_delete_sms_sender(
+    fake_uuid,
+    client_request,
+    get_non_default_sms_sender,
+):
+
+    page = client_request.get(
+        'main.service_confirm_delete_sms_sender',
+        service_id=SERVICE_ONE_ID,
+        sms_sender_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Are you sure you want to delete this text message sender?'
+    )
+    assert 'action' not in page.select_one('.banner-dangerous form')
+    assert page.select_one('.banner-dangerous form')['method'] == 'post'
+
+
+@pytest.mark.parametrize('fixture, expected_link_text', [
+    (get_inbound_number_sms_sender, 'Back'),
+    (get_default_sms_sender, 'Back'),
+    (get_non_default_sms_sender, 'Delete'),
+])
+def test_inbound_sms_sender_is_not_deleteable(
+    client_request,
+    service_one,
+    fake_uuid,
+    fixture,
+    expected_link_text,
+    mocker
+):
+    fixture(mocker)
+
+    page = client_request.get(
+        '.service_edit_sms_sender',
+        service_id=SERVICE_ONE_ID,
+        sms_sender_id='1234',
+    )
+
+    last_link = page.select('.page-footer a')[-1]
+    assert normalize_spaces(last_link.text) == expected_link_text
+
+
+def test_delete_sms_sender(
+    client_request,
+    service_one,
+    fake_uuid,
+    get_non_default_sms_sender,
+    mock_update_sms_sender,
+):
+
+    client_request.post(
+        '.service_delete_sms_sender',
+        service_id=SERVICE_ONE_ID,
+        sms_sender_id='1234',
+        _expected_redirect=url_for(
+            'main.service_sms_senders',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
+
+    mock_update_sms_sender.assert_called_once_with(
+        SERVICE_ONE_ID,
+        active=False,
+        sms_sender_id='1234',
+    )
 
 
 @pytest.mark.parametrize('fixture, hide_textbox, fixture_sender_id', [

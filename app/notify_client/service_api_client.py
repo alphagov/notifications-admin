@@ -374,7 +374,25 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         )
 
     @cache.delete('service-{service_id}')
-    def update_reply_to_email_address(self, service_id, reply_to_email_id, email_address, is_default=False):
+    def update_reply_to_email_address(
+        self,
+        service_id,
+        reply_to_email_id,
+        email_address=None,
+        active=None,
+        is_default=False
+    ):
+        data = {
+            "is_default": is_default
+        }
+        if email_address is not None:
+            data.update({
+                'email_address': email_address
+            })
+        if active is not None:
+            data.update({
+                'active': active
+            })
         return self.post(
             "/service/{}/email-reply-to/{}".format(
                 service_id,
@@ -439,13 +457,21 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post("/service/{}/sms-sender".format(service_id), data=data)
 
     @cache.delete('service-{service_id}')
-    def update_sms_sender(self, service_id, sms_sender_id, sms_sender, is_default=False):
+    def update_sms_sender(self, service_id, sms_sender_id, sms_sender=None, active=None, is_default=False):
+        data = {
+            "is_default": is_default,
+        }
+        if sms_sender is not None:
+            data.update({
+                "sms_sender": sms_sender,
+            })
+        if active is not None:
+            data.update({
+                "active": active,
+            })
         return self.post(
             "/service/{}/sms-sender/{}".format(service_id, sms_sender_id),
-            data={
-                "sms_sender": sms_sender,
-                "is_default": is_default
-            }
+            data=data
         )
 
     def get_service_callback_api(self, service_id, callback_api_id):
