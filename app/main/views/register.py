@@ -46,24 +46,23 @@ def register_from_invite():
     if not invited_user:
         abort(404)
 
-    form = RegisterUserFromInviteForm()
+    is_sms_auth = invited_user['auth_type'] == 'sms_auth'
+
+    form = RegisterUserFromInviteForm(invited_user)
 
     if form.validate_on_submit():
         if form.service.data != invited_user['service'] or form.email_address.data != invited_user['email_address']:
             abort(400)
-        _do_registration(form, send_email=False, send_sms=invited_user['auth_type'] == 'sms_auth')
+        _do_registration(form, send_email=False, send_sms=is_sms_auth)
         invite_api_client.accept_invite(invited_user['service'], invited_user['id'])
-        if invited_user['auth_type'] == 'sms_auth':
+        if is_sms_auth:
             return redirect(url_for('main.verify'))
         else:
             # we've already proven this user has email because they clicked the invite link,
             # so just activate them straight away
             return activate_user(session['user_details']['id'])
 
-    form.service.data = invited_user['service']
-    form.email_address.data = invited_user['email_address']
-
-    return render_template('views/register-from-invite.html', email_address=invited_user['email_address'], form=form)
+    return render_template('views/register-from-invite.html', invited_user=invited_user, form=form)
 
 
 def _do_registration(form, send_sms=True, send_email=True):

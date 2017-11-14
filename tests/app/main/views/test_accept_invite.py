@@ -354,7 +354,7 @@ def test_new_invited_user_verifies_and_added_to_service(
         'password': 'longpassword',
         'mobile_number': '+447890123456',
         'name': 'Invited User',
-        # 'auth_type': 'sms_auth'
+        'auth_type': 'sms_auth'
     }
     response = client.post(url_for('main.register_from_invite'), data=data)
     assert response.status_code == 302

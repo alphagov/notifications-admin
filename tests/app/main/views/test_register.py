@@ -327,3 +327,19 @@ def test_cannot_register_with_sms_auth_and_missing_mobile_number(
     err = page.select_one('.error-message')
     assert err.text.strip() == 'Can’t be empty'
     assert err.attrs['data-error-label'] == 'mobile_number'
+
+
+def test_register_from_invite_form_doesnt_show_mobile_number_field_if_email_auth(
+    client,
+    sample_invite
+):
+    sample_invite['auth_type'] = 'email_auth'
+    with client.session_transaction() as session:
+        session['invited_user'] = sample_invite
+
+    response = client.get(url_for('main.register_from_invite'))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('input', attrs={'name': 'auth_type'}).attrs['value'] == 'email_auth'
+    assert page.find('input', attrs={'name': 'mobile_number'}) is None

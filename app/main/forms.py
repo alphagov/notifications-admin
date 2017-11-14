@@ -176,6 +176,13 @@ class RegisterUserForm(Form):
 
 
 class RegisterUserFromInviteForm(Form):
+    def __init__(self, invited_user):
+        super().__init__(
+            service=invited_user['service'],
+            email_address=invited_user['email_address'],
+            auth_type=invited_user['auth_type'],
+        )
+
     name = StringField(
         'Full name',
         validators=[DataRequired(message='Can’t be empty')]
