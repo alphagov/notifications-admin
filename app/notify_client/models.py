@@ -150,7 +150,7 @@ class User(UserMixin):
 
 class InvitedUser(object):
 
-    def __init__(self, id, service, from_user, email_address, permissions, status, created_at, auth_type=None):
+    def __init__(self, id, service, from_user, email_address, permissions, status, created_at, auth_type):
         self.id = id
         self.service = str(service)
         self.from_user = from_user

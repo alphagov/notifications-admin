@@ -21,12 +21,13 @@ class UserApiClient(NotifyAdminAPIClient):
         self.api_key = app.config['ADMIN_CLIENT_SECRET']
         self.max_failed_login_count = app.config["MAX_FAILED_LOGIN_COUNT"]
 
-    def register_user(self, name, email_address, mobile_number, password):
+    def register_user(self, name, email_address, mobile_number, password, auth_type):
         data = {
             "name": name,
             "email_address": email_address,
             "mobile_number": mobile_number,
-            "password": password
+            "password": password,
+            "auth_type": auth_type
         }
         user_data = self.post("/user", data)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)

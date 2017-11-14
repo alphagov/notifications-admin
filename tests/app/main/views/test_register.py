@@ -8,6 +8,7 @@ from flask import (
     url_for,
     session
 )
+from flask_login import current_user
 from app.notify_client.models import InvitedUser
 
 
@@ -15,6 +16,8 @@ def test_render_register_returns_template_with_form(client):
     response = client.get('/register')
 
     assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('input', attrs={'name': 'auth_type'}).attrs['value'] == 'sms_auth'
     assert 'Create an account' in response.get_data(as_text=True)
 
 
@@ -49,7 +52,8 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
     user_data = {'name': 'Some One Valid',
                  'email_address': 'notfound@example.gov.uk',
                  'mobile_number': phone_number_to_register_with,
-                 'password': 'validPassword!'
+                 'password': 'validPassword!',
+                 'auth_type': 'sms_auth'
                  }
 
     response = client.post(url_for('main.register'), data=user_data, follow_redirects=True)
@@ -62,7 +66,8 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
     mock_register_user.assert_called_with(user_data['name'],
                                           user_data['email_address'],
                                           user_data['mobile_number'],
-                                          user_data['password'])
+                                          user_data['password'],
+                                          user_data['auth_type'])
 
 
 def test_register_continue_handles_missing_session_sensibly(
@@ -163,7 +168,7 @@ def test_register_with_existing_email_sends_emails(
     assert response.location == url_for('main.registration_continue', _external=True)
 
 
-def test_register_from_invite_(
+def test_register_from_invite(
     client,
     fake_uuid,
     mock_is_email_unique,
@@ -175,15 +180,21 @@ def test_register_from_invite_(
                                "invited@user.com",
                                ["manage_users"],
                                "pending",
-                               datetime.utcnow())
+                               datetime.utcnow(),
+                               'sms_auth')
     with client.session_transaction() as session:
         session['invited_user'] = invited_user.serialize()
-    response = client.post(url_for('main.register_from_invite'),
-                           data={'name': 'Registered in another Browser',
-                                 'email_address': invited_user.email_address,
-                                 'mobile_number': '+4407700900460',
-                                 'service': str(invited_user.id),
-                                 'password': 'somreallyhardthingtoguess'})
+    response = client.post(
+        url_for('main.register_from_invite'),
+        data={
+            'name': 'Registered in another Browser',
+            'email_address': invited_user.email_address,
+            'mobile_number': '+4407700900460',
+            'service': str(invited_user.id),
+            'password': 'somreallyhardthingtoguess',
+            'auth_type': 'sms_auth'
+        }
+    )
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)
 
@@ -199,14 +210,138 @@ def test_register_from_invite_when_user_registers_in_another_browser(
                                api_user_active.email_address,
                                ["manage_users"],
                                "pending",
-                               datetime.utcnow())
+                               datetime.utcnow(),
+                               'sms_auth')
     with client.session_transaction() as session:
         session['invited_user'] = invited_user.serialize()
-    response = client.post(url_for('main.register_from_invite'),
-                           data={'name': 'Registered in another Browser',
-                                 'email_address': api_user_active.email_address,
-                                 'mobile_number': api_user_active.mobile_number,
-                                 'service': str(api_user_active.id),
-                                 'password': 'somreallyhardthingtoguess'})
+    response = client.post(
+        url_for('main.register_from_invite'),
+        data={
+            'name': 'Registered in another Browser',
+            'email_address': api_user_active.email_address,
+            'mobile_number': api_user_active.mobile_number,
+            'service': str(api_user_active.id),
+            'password': 'somreallyhardthingtoguess',
+            'auth_type': 'sms_auth'
+        }
+    )
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)
+
+
+def test_register_from_email_auth_invite(
+    client,
+    sample_invite,
+    mock_is_email_unique,
+    mock_register_user,
+    mock_get_user,
+    mock_send_verify_email,
+    mock_send_verify_code,
+    mock_accept_invite,
+):
+    sample_invite['auth_type'] = 'email_auth'
+    with client.session_transaction() as session:
+        session['invited_user'] = sample_invite
+    assert not current_user.is_authenticated
+
+    data = {
+        'name': 'invited user',
+        'email_address': sample_invite['email_address'],
+        'mobile_number': '07700900001',
+        'password': 'FSLKAJHFNvdzxgfyst',
+        'service': sample_invite['service'],
+        'auth_type': 'email_auth',
+    }
+
+    resp = client.post(url_for('main.register_from_invite'), data=data)
+    assert resp.status_code == 302
+    assert resp.location == url_for('main.add_service', first='first', _external=True)
+
+    # doesn't send any 2fa code
+    assert not mock_send_verify_email.called
+    assert not mock_send_verify_code.called
+    # creates user with email_auth set
+    mock_register_user.assert_called_once_with(
+        data['name'],
+        data['email_address'],
+        data['mobile_number'],
+        data['password'],
+        data['auth_type']
+    )
+    mock_accept_invite.assert_called_once_with(sample_invite['service'], sample_invite['id'])
+    # just logs them in
+    assert current_user.is_authenticated
+
+    with client.session_transaction() as session:
+        # invited user details are still there so they can get added to the service
+        assert session['invited_user'] == sample_invite
+
+
+def test_can_register_email_auth_without_phone_number(
+    client,
+    sample_invite,
+    mock_is_email_unique,
+    mock_register_user,
+    mock_get_user,
+    mock_send_verify_email,
+    mock_send_verify_code,
+    mock_accept_invite,
+):
+    sample_invite['auth_type'] = 'email_auth'
+    with client.session_transaction() as session:
+        session['invited_user'] = sample_invite
+
+    data = {
+        'name': 'invited user',
+        'email_address': sample_invite['email_address'],
+        'mobile_number': '',
+        'password': 'FSLKAJHFNvdzxgfyst',
+        'service': sample_invite['service'],
+        'auth_type': 'email_auth'
+    }
+
+    resp = client.post(url_for('main.register_from_invite'), data=data)
+    assert resp.status_code == 302
+    assert resp.location == url_for('main.add_service', first='first', _external=True)
+
+    mock_register_user.assert_called_once_with(
+        ANY,
+        ANY,
+        None,  # mobile_number
+        ANY,
+        ANY
+    )
+
+
+def test_cannot_register_with_sms_auth_and_missing_mobile_number(
+    client,
+    mock_send_verify_code,
+    mock_get_user_by_email_not_found,
+    mock_login,
+):
+    response = client.post(url_for('main.register'),
+                           data={'name': 'Missing Mobile',
+                                 'email_address': 'missing_mobile@example.gov.uk',
+                                 'password': 'validPassword!'})
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    err = page.select_one('.error-message')
+    assert err.text.strip() == 'Can’t be empty'
+    assert err.attrs['data-error-label'] == 'mobile_number'
+
+
+def test_register_from_invite_form_doesnt_show_mobile_number_field_if_email_auth(
+    client,
+    sample_invite
+):
+    sample_invite['auth_type'] = 'email_auth'
+    with client.session_transaction() as session:
+        session['invited_user'] = sample_invite
+
+    response = client.get(url_for('main.register_from_invite'))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('input', attrs={'name': 'auth_type'}).attrs['value'] == 'email_auth'
+    assert page.find('input', attrs={'name': 'mobile_number'}) is None
