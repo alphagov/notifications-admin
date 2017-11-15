@@ -72,6 +72,8 @@ def accept_invite(token):
         if existing_user in service_users:
             return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
         else:
+            if invited_user.auth_type != existing_user.auth_type:
+                user_api_client.update_user_attribute(existing_user.id, auth_type=invited_user.auth_type)
             user_api_client.add_user_to_service(invited_user.service,
                                                 existing_user.id,
                                                 invited_user.permissions)
