@@ -2473,6 +2473,7 @@ def set_config_values(app, dict):
     for key in dict:
         app.config[key] = old_values[key]
 
+
 @pytest.fixture(scope='function')
 def valid_token(app_, fake_uuid):
     return generate_token(
