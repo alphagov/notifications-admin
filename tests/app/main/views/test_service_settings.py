@@ -29,6 +29,16 @@ from tests.conftest import (
     get_inbound_number_sms_sender,
     SERVICE_ONE_ID
 )
+from freezegun import freeze_time
+
+
+@pytest.fixture
+def mock_get_service_settings_page_common(
+    mock_get_letter_organisations,
+    mock_get_inbound_number_for_service,
+    mock_get_free_sms_fragment_limit,
+):
+    return
 
 
 @pytest.mark.parametrize('user, expected_rows', [
@@ -84,13 +94,12 @@ def test_should_show_overview(
         mocker,
         service_one,
         fake_uuid,
-        mock_get_letter_organisations,
         no_reply_to_email_addresses,
         no_letter_contact_blocks,
         single_sms_sender,
         user,
         expected_rows,
-        mock_get_inbound_number_for_service
+        mock_get_service_settings_page_common,
 ):
 
     service_one['permissions'] = ['sms', 'email']
@@ -159,8 +168,7 @@ def test_should_show_overview_for_service_with_more_things_set(
         single_letter_contact_block,
         single_sms_sender,
         mock_get_organisation,
-        mock_get_letter_organisations,
-        mock_get_inbound_number_for_service,
+        mock_get_service_settings_page_common,
         permissions,
         expected_rows
 ):
@@ -182,7 +190,6 @@ def test_should_show_overview_for_service_with_more_things_set(
 def test_service_settings_show_elided_api_url_if_needed(
     logged_in_platform_admin_client,
     service_one,
-    mock_get_letter_organisations,
     single_reply_to_email_address,
     single_sms_sender,
     single_letter_contact_block,
@@ -190,7 +197,7 @@ def test_service_settings_show_elided_api_url_if_needed(
     fake_uuid,
     url,
     elided_url,
-    mock_get_inbound_number_for_service
+    mock_get_service_settings_page_common,
 ):
     service_one['permissions'] = ['sms', 'email', 'inbound_sms']
     service_one['inbound_api'] = [fake_uuid]
@@ -219,8 +226,7 @@ def test_service_settings_show_elided_api_url_if_needed(
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
         logged_in_client,
         service_one,
-        mock_get_letter_organisations,
-        mock_get_inbound_number_for_service
+        mock_get_service_settings_page_common,
 ):
     response = logged_in_client.get(url_for(
         'main.service_settings', service_id=service_one['id']
@@ -235,8 +241,7 @@ def test_letter_contact_block_shows_none_if_not_set(
         single_reply_to_email_address,
         no_letter_contact_blocks,
         single_sms_sender,
-        mock_get_letter_organisations,
-        mock_get_inbound_number_for_service
+        mock_get_service_settings_page_common,
 ):
     service_one['permissions'] = ['letter']
     response = logged_in_client.get(url_for(
@@ -256,8 +261,7 @@ def test_escapes_letter_contact_block(
         single_reply_to_email_address,
         single_sms_sender,
         injected_letter_contact_block,
-        mock_get_letter_organisations,
-        mock_get_inbound_number_for_service
+        mock_get_service_settings_page_common,
 ):
     service_one['permissions'] = ['letter']
     response = logged_in_client.get(url_for(
@@ -303,11 +307,10 @@ def test_should_redirect_after_change_service_name(
 def test_show_restricted_service(
         logged_in_client,
         service_one,
-        mock_get_letter_organisations,
         single_reply_to_email_address,
         single_letter_contact_block,
         single_sms_sender,
-        mock_get_inbound_number_for_service
+        mock_get_service_settings_page_common,
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -341,8 +344,7 @@ def test_show_live_service(
         single_reply_to_email_address,
         single_letter_contact_block,
         single_sms_sender,
-        mock_get_letter_organisations,
-        mock_get_inbound_number_for_service
+        mock_get_service_settings_page_common,
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -355,7 +357,7 @@ def test_switch_service_to_restricted(
         service_one,
         mock_get_live_service,
         mock_update_service,
-        mock_get_inbound_number_for_service
+        mock_get_inbound_number_for_service,
 ):
     response = logged_in_platform_admin_client.get(
         url_for('main.service_switch_live', service_id=service_one['id']))
@@ -404,7 +406,7 @@ def test_should_redirect_after_service_name_confirmation(
         service_one,
         mock_update_service,
         mock_verify_password,
-        mock_get_inbound_number_for_service
+        mock_get_inbound_number_for_service,
 ):
     service_id = service_one['id']
     service_new_name = 'New Name'
@@ -468,8 +470,7 @@ def test_should_redirect_after_request_to_go_live(
     single_reply_to_email_address,
     single_letter_contact_block,
     single_sms_sender,
-    mock_get_letter_organisations,
-    mock_get_inbound_number_for_service,
+    mock_get_service_settings_page_common
 ):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
@@ -567,9 +568,8 @@ def test_route_permissions(
         single_reply_to_email_address,
         single_letter_contact_block,
         single_sms_sender,
-        mock_get_letter_organisations,
         route,
-        mock_get_inbound_number_for_service
+        mock_get_service_settings_page_common,
 ):
     validate_route_permission(
         mocker,
@@ -627,9 +627,8 @@ def test_route_for_platform_admin(
         single_reply_to_email_address,
         single_letter_contact_block,
         single_sms_sender,
-        mock_get_letter_organisations,
         route,
-        mock_get_inbound_number_for_service
+        mock_get_service_settings_page_common,
 ):
     validate_route_permission(mocker,
                               app_,
@@ -697,11 +696,10 @@ def test_enabling_and_disabling_email_and_sms(
 def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         client_request,
         service_one,
-        mock_get_letter_organisations,
-        mock_get_inbound_number_for_service,
         multiple_reply_to_email_addresses,
         multiple_letter_contact_blocks,
-        multiple_sms_senders
+        multiple_sms_senders,
+        mock_get_service_settings_page_common,
 ):
     service_one['permissions'] = ['email', 'sms', 'letter']
 
@@ -1240,11 +1238,10 @@ def test_shows_research_mode_indicator(
     logged_in_client,
     service_one,
     mocker,
-    mock_get_letter_organisations,
     single_reply_to_email_address,
     single_letter_contact_block,
     single_sms_sender,
-    mock_get_inbound_number_for_service
+    mock_get_service_settings_page_common,
 ):
     service_one['research_mode'] = True
     mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
@@ -1260,11 +1257,10 @@ def test_shows_research_mode_indicator(
 def test_does_not_show_research_mode_indicator(
     logged_in_client,
     service_one,
-    mock_get_letter_organisations,
     single_reply_to_email_address,
     single_letter_contact_block,
     single_sms_sender,
-    mock_get_inbound_number_for_service
+    mock_get_service_settings_page_common,
 ):
     response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
     assert response.status_code == 200
@@ -1575,6 +1571,7 @@ def test_should_set_organisation_type(
 
 def test_should_show_page_to_set_sms_allowance(
     logged_in_platform_admin_client,
+    mock_get_free_sms_fragment_limit
 ):
     response = logged_in_platform_admin_client.get(url_for(
         'main.set_free_sms_allowance',
@@ -1584,8 +1581,10 @@ def test_should_show_page_to_set_sms_allowance(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(page.select_one('label').text) == 'Numbers of text message fragments per year'
+    mock_get_free_sms_fragment_limit.assert_called_once_with(SERVICE_ONE_ID)
 
 
+@freeze_time("2017-04-01 11:09:00.061258")
 @pytest.mark.parametrize('given_allowance, expected_api_argument', [
     ('1', 1),
     ('250000', 250000),
@@ -1596,7 +1595,10 @@ def test_should_set_sms_allowance(
     mock_update_service,
     given_allowance,
     expected_api_argument,
+    mock_get_free_sms_fragment_limit,
+    mock_create_or_update_free_sms_fragment_limit,
 ):
+
     response = logged_in_platform_admin_client.post(
         url_for(
             'main.set_free_sms_allowance',
@@ -1613,6 +1615,11 @@ def test_should_set_sms_allowance(
         SERVICE_ONE_ID,
         free_sms_fragment_limit=expected_api_argument,
     )
+    # Not assert until using the annual_billing end points
+    # mock_create_or_update_free_sms_fragment_limit.assert_called_with(
+    #     SERVICE_ONE_ID,
+    #     expected_api_argument
+    # )
 
 
 def test_switch_service_enable_letters(
@@ -1831,8 +1838,7 @@ def test_archive_service_prompts_user(
     single_reply_to_email_address,
     single_letter_contact_block,
     single_sms_sender,
-    mock_get_letter_organisations,
-    mock_get_inbound_number_for_service
+    mock_get_service_settings_page_common,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
 
@@ -1850,8 +1856,7 @@ def test_cant_archive_inactive_service(
     single_reply_to_email_address,
     single_letter_contact_block,
     single_sms_sender,
-    mock_get_letter_organisations,
-    mock_get_inbound_number_for_service
+    mock_get_service_settings_page_common
 ):
     service_one['active'] = False
 
@@ -1884,8 +1889,7 @@ def test_suspend_service_prompts_user(
     single_reply_to_email_address,
     single_letter_contact_block,
     single_sms_sender,
-    mock_get_letter_organisations,
-    mock_get_inbound_number_for_service
+    mock_get_service_settings_page_common,
 ):
     mocked_fn = mocker.patch('app.service_api_client.post')
 
@@ -1904,8 +1908,7 @@ def test_cant_suspend_inactive_service(
     single_reply_to_email_address,
     single_letter_contact_block,
     single_sms_sender,
-    mock_get_letter_organisations,
-    mock_get_inbound_number_for_service
+    mock_get_service_settings_page_common,
 ):
     service_one['active'] = False
 
@@ -1941,8 +1944,7 @@ def test_resume_service_prompts_user(
     single_letter_contact_block,
     single_sms_sender,
     mocker,
-    mock_get_letter_organisations,
-    mock_get_inbound_number_for_service
+    mock_get_service_settings_page_common,
 ):
     service_one['active'] = False
     mocked_fn = mocker.patch('app.service_api_client.post')
@@ -1962,8 +1964,7 @@ def test_cant_resume_active_service(
     single_reply_to_email_address,
     single_letter_contact_block,
     single_sms_sender,
-    mock_get_letter_organisations,
-    mock_get_inbound_number_for_service
+    mock_get_service_settings_page_common
 ):
     response = logged_in_platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
 
@@ -2027,6 +2028,7 @@ def test_service_settings_when_inbound_number_is_not_set(
     single_sms_sender,
     mocker,
     mock_get_letter_organisations,
+    mock_get_free_sms_fragment_limit,
 ):
     mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service',
                  return_value={'data': {}})

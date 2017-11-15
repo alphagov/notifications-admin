@@ -31,6 +31,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     mock_create_service_template,
     mock_get_services_with_no_services,
     api_user_active,
+    mock_create_or_update_free_sms_fragment_limit,
 ):
     response = logged_in_client.post(
         url_for('main.add_service'),
@@ -83,6 +84,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     api_user_active,
     organisation_type,
     free_allowance,
+    mock_create_or_update_free_sms_fragment_limit
 ):
     response = logged_in_client.post(
         url_for('main.add_service'),

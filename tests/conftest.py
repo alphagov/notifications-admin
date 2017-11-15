@@ -2452,6 +2452,29 @@ def mock_get_aggregate_platform_stats(mocker):
     return mocker.patch('app.service_api_client.get_aggregate_platform_stats', return_value=stats)
 
 
+@pytest.fixture(scope='function')
+def mock_get_free_sms_fragment_limit(mocker):
+    sample_limit = 250000
+    return mocker.patch('app.billing_api_client.get_free_sms_fragment_limit_for_year',
+                        return_value=sample_limit)
+
+
+@pytest.fixture(scope='function')
+def mock_create_or_update_free_sms_fragment_limit(mocker):
+    sample_limit = 250000
+    return mocker.patch('app.billing_api_client.create_or_update_free_sms_fragment_limit',
+                        return_value=sample_limit)
+
+
+@pytest.fixture(scope='function')
+def mock_get_free_sms_fragment_limit_for_all_years(mocker):
+    sample_limit = [{'financial_year_start': 2016, 'free_sms_fragment_limit': 250000},
+                    {'financial_year_start': 2017, 'free_sms_fragment_limit': 500000}]
+
+    return mocker.patch('app.billing_api_client.get_free_sms_fragment_limit_for_all_years',
+                        return_value=sample_limit)
+
+
 @contextmanager
 def set_config(app, name, value):
     old_val = app.config.get(name)
