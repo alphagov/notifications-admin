@@ -244,7 +244,9 @@ def get_dashboard_partials(service_id):
     ]
     service = service_api_client.get_detailed_service(service_id)
     column_width, max_notifiction_count = get_column_properties(
-        3 if 'letter' in current_service['permissions'] else 2
+        number_of_columns=(
+            3 if 'letter' in current_service['permissions'] else 2
+        )
     )
     dashboard_totals = get_dashboard_totals(service['data']['statistics']),
     highest_notification_count = max(
