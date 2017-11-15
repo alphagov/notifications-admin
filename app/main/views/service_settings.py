@@ -40,7 +40,7 @@ from app.main.forms import (
     ServiceEditInboundNumberForm,
     SMSPrefixForm,
 )
-from app import user_api_client, current_service, organisations_client, inbound_number_client
+from app import user_api_client, current_service, organisations_client, inbound_number_client, billing_api_client
 from notifications_utils.formatters import formatted_list
 
 
@@ -90,6 +90,9 @@ def service_settings(service_id):
     default_sms_sender = next(
         (Field(x['sms_sender'], html='escape') for x in sms_senders if x['is_default']), "None"
     )
+
+    free_sms_fragment_limit = billing_api_client.get_free_sms_fragment_limit_for_year(service_id)
+
     return render_template(
         'views/service-settings.html',
         organisation=organisation,
@@ -105,7 +108,9 @@ def service_settings(service_id):
         letter_contact_details_count=letter_contact_details_count,
         default_sms_sender=default_sms_sender,
         sms_sender_count=sms_sender_count,
+        free_sms_fragment_limit=free_sms_fragment_limit,
         prefix_sms_with_service_name=current_service['prefix_sms_with_service_name'],
+
     )
 
 
@@ -708,13 +713,18 @@ def set_organisation_type(service_id):
 @user_has_permissions(admin_override=True)
 def set_free_sms_allowance(service_id):
 
-    form = FreeSMSAllowance(free_sms_allowance=current_service['free_sms_fragment_limit'])
+    form = FreeSMSAllowance(free_sms_allowance=billing_api_client.get_free_sms_fragment_limit_for_year(service_id))
 
     if form.validate_on_submit():
         service_api_client.update_service(
             service_id,
+            # TODO: Retire this eventually after using annual_billing
             free_sms_fragment_limit=form.free_sms_allowance.data,
         )
+
+        # TODO: Comment out until data migration
+        # billing_api_client.create_or_update_free_sms_fragment_limit(service_id, form.free_sms_allowance.data)
+
         return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
