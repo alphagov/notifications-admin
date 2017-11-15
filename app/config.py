@@ -98,6 +98,8 @@ class Config(object):
     ]
 
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
+    ROUTE_SECRET_KEY_1 = os.environ.get('ROUTE_SECRET_KEY_1', '')
+    ROUTE_SECRET_KEY_2 = os.environ.get('ROUTE_SECRET_KEY_2', '')
 
 
 class Development(Config):
