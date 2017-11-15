@@ -12,7 +12,7 @@ def test_non_logged_in_user_can_see_homepage(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.select_one('meta[name=description]')['content'].startswith(
-        'GOV.UK Notify lets your send emails and text messages'
+        'GOV.UK Notify lets you send emails and text messages'
     )
 
 
