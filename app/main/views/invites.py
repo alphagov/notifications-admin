@@ -72,6 +72,16 @@ def accept_invite(token):
         if existing_user in service_users:
             return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
         else:
+            service = service_api_client.get_service(invited_user.service)['data']
+            # if the service you're being added to can modify auth type, then check if this is relevant
+            if 'email_auth' in service['permissions'] and (
+                    # they have a phone number, we want them to start using it. if they dont have a mobile we just
+                    # ignore that option of the invite
+                    (existing_user.mobile_number and invited_user.auth_type == 'sms_auth') or
+                    # we want them to start sending emails. it's always valid, so lets always update
+                    invited_user.auth_type == 'email_auth'
+            ):
+                user_api_client.update_user_attribute(existing_user.id, auth_type=invited_user.auth_type)
             user_api_client.add_user_to_service(invited_user.service,
                                                 existing_user.id,
                                                 invited_user.permissions)

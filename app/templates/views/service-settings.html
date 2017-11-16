@@ -262,7 +262,7 @@
         {% endif %}
         <li class="bottom-gutter">
           <a href="{{ url_for('.service_switch_email_auth', service_id=current_service.id) }}" class="button">
-            {{ 'Stop email auth' if 'email_auth' in current_service.permissions else 'Allow email auth' }}
+            {{ 'Stop editing user auth' if 'email_auth' in current_service.permissions else 'Allow editing user auth' }}
           </a>
         </li>
         {% if current_service.active %}
