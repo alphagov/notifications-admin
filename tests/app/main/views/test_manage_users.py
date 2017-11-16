@@ -114,20 +114,29 @@ def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_acti
     assert bool(page.select_one('.tick-cross-list-hint')) == displays_auth_type
 
 
-@pytest.mark.parametrize('user, sms_option_disabled', [
+@pytest.mark.parametrize('user, sms_option_disabled, expected_label', [
     (
         active_user_no_mobile,
         True,
+        """
+            Text message code
+            Not available because this team member hasn’t added a
+            phone number to their profile
+        """,
     ),
     (
         active_user_with_permissions,
         False,
+        """
+            Text message code
+        """,
     ),
 ])
 def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
     client_request,
     user,
     sms_option_disabled,
+    expected_label,
     service_one,
     mocker
 ):
@@ -142,6 +151,9 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
 
     sms_auth_radio_button = page.select_one('input[value="sms_auth"]')
     assert sms_auth_radio_button.has_attr("disabled") == sms_option_disabled
+    assert normalize_spaces(
+        page.select_one('label[for=login_authentication-0]').text
+    ) == normalize_spaces(expected_label)
 
 
 @pytest.mark.parametrize('endpoint, extra_args, expected_checkboxes', [

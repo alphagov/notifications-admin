@@ -102,10 +102,7 @@ def edit_user_permissions(service_id, user_id):
             permissions=set(get_permissions_from_form(form)),
         )
         if service_has_email_auth:
-            user_api_client.update_user_attribute(
-                user_id,
-                auth_type=form.login_authentication.data
-            )
+            user_api_client.update_user_attribute(user_id, auth_type=form.login_authentication.data)
         return redirect(url_for('.manage_users', service_id=service_id))
 
     return render_template(

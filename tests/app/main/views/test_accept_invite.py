@@ -4,8 +4,8 @@ from unittest.mock import ANY
 from itsdangerous import SignatureExpired
 
 import app
-
 from app.notify_client.models import InvitedUser
+
 from tests.conftest import sample_invite as create_sample_invite
 from tests.conftest import mock_check_invite_token as mock_check_token_invite
 
@@ -19,12 +19,12 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     mock_get_users_by_service,
     mock_accept_invite,
     mock_add_user_to_service,
+    mock_get_service,
     mocker,
 ):
     mocker.patch('app.main.views.invites.check_token')
 
     expected_service = service_one['id']
-    expected_redirect_location = 'http://localhost/services/{}/dashboard'.format(expected_service)
     expected_permissions = ['send_messages', 'manage_service', 'manage_api_keys']
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
@@ -35,7 +35,7 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     mock_add_user_to_service.assert_called_with(expected_service, api_user_active.id, expected_permissions)
 
     assert response.status_code == 302
-    assert response.location == expected_redirect_location
+    assert response.location == url_for('main.service_dashboard', service_id=expected_service, _external=True)
 
 
 def test_existing_user_with_no_permissions_accept_invite(
@@ -48,6 +48,7 @@ def test_existing_user_with_no_permissions_accept_invite(
     mock_get_user_by_email,
     mock_get_users_by_service,
     mock_add_user_to_service,
+    mock_get_service,
 ):
     mocker.patch('app.main.views.invites.check_token')
 
@@ -396,3 +397,132 @@ def test_gives_message_if_token_has_expired(
     assert response.status_code == 400
     assert 'Your invitation to GOV.UK Notify has expired' in page.find('h1').text
     assert not mock_check_invite_token.called
+
+
+def test_existing_user_accepts_and_sets_email_auth(
+    client_request,
+    api_user_active,
+    service_one,
+    sample_invite,
+    mock_get_user_by_email,
+    mock_get_users_by_service,
+    mock_accept_invite,
+    mock_update_user_attribute,
+    mock_add_user_to_service,
+    mocker
+):
+    mocker.patch('app.main.views.invites.check_token')
+    sample_invite['email_address'] = api_user_active.email_address
+
+    service_one['permissions'].append('email_auth')
+    sample_invite['auth_type'] = 'email_auth'
+    mocker.patch('app.main.views.invites.service_api_client.get_service', return_value={'data': service_one})
+    mocker.patch('app.invite_api_client.check_token', return_value=InvitedUser(**sample_invite))
+
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_status=302,
+        _expected_redirect=url_for('main.service_dashboard', service_id=service_one['id'], _external=True),
+    )
+
+    mock_update_user_attribute.assert_called_with(api_user_active.id, auth_type='email_auth')
+    mock_add_user_to_service.assert_called_with(ANY, api_user_active.id, ANY)
+
+
+def test_existing_user_doesnt_get_auth_changed_by_service_without_permission(
+    client_request,
+    api_user_active,
+    service_one,
+    sample_invite,
+    mock_get_user_by_email,
+    mock_get_users_by_service,
+    mock_accept_invite,
+    mock_update_user_attribute,
+    mock_add_user_to_service,
+    mocker
+):
+    mocker.patch('app.main.views.invites.check_token')
+    sample_invite['email_address'] = api_user_active.email_address
+
+    assert 'email_auth' not in service_one['permissions']
+
+    sample_invite['auth_type'] = 'email_auth'
+    mocker.patch('app.main.views.invites.service_api_client.get_service', return_value={'data': service_one})
+    mocker.patch('app.invite_api_client.check_token', return_value=InvitedUser(**sample_invite))
+
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_status=302,
+        _expected_redirect=url_for('main.service_dashboard', service_id=service_one['id'], _external=True),
+    )
+
+    assert not mock_update_user_attribute.called
+
+
+def test_existing_email_auth_user_without_phone_cannot_set_sms_auth(
+    client_request,
+    api_user_active,
+    service_one,
+    sample_invite,
+    mock_get_users_by_service,
+    mock_accept_invite,
+    mock_update_user_attribute,
+    mock_add_user_to_service,
+    mocker
+):
+    mocker.patch('app.main.views.invites.check_token')
+    sample_invite['email_address'] = api_user_active.email_address
+
+    service_one['permissions'].append('email_auth')
+
+    api_user_active.auth_type = 'email_auth'
+    api_user_active.mobile_number = None
+    sample_invite['auth_type'] = 'sms_auth'
+
+    mocker.patch('app.main.views.invites.user_api_client.get_user_by_email', return_value=api_user_active)
+    mocker.patch('app.main.views.invites.service_api_client.get_service', return_value={'data': service_one})
+    mocker.patch('app.invite_api_client.check_token', return_value=InvitedUser(**sample_invite))
+
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_status=302,
+        _expected_redirect=url_for('main.service_dashboard', service_id=service_one['id'], _external=True),
+    )
+
+    assert not mock_update_user_attribute.called
+
+
+def test_existing_email_auth_user_with_phone_can_set_sms_auth(
+    client_request,
+    api_user_active,
+    service_one,
+    sample_invite,
+    mock_get_users_by_service,
+    mock_accept_invite,
+    mock_update_user_attribute,
+    mock_add_user_to_service,
+    mocker
+):
+    mocker.patch('app.main.views.invites.check_token')
+    sample_invite['email_address'] = api_user_active.email_address
+
+    service_one['permissions'].append('email_auth')
+    sample_invite['auth_type'] = 'sms_auth'
+    api_user_active.auth_type = 'email_auth'
+    api_user_active.mobile_number = '07700900001'
+
+    mocker.patch('app.main.views.invites.user_api_client.get_user_by_email', return_value=api_user_active)
+    mocker.patch('app.main.views.invites.service_api_client.get_service', return_value={'data': service_one})
+    mocker.patch('app.invite_api_client.check_token', return_value=InvitedUser(**sample_invite))
+
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_status=302,
+        _expected_redirect=url_for('main.service_dashboard', service_id=service_one['id'], _external=True),
+    )
+
+    mock_update_user_attribute.assert_called_with(api_user_active.id, auth_type='sms_auth')
