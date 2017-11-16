@@ -48,6 +48,12 @@ $tail-angle: 20deg;
 
 }
 
+.sms-message-sender {
+  @include copy-19;
+  color: $secondary-text-colour;
+  margin: 0 0 -10px 0;
+}
+
 .sms-message-recipient {
   @include copy-19;
   color: $secondary-text-colour;
