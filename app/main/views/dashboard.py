@@ -106,6 +106,61 @@ def template_history(service_id):
     )
 
 
+@main.route("/services/<service_id>/template-usage")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def template_usage(service_id):
+
+    year, current_financial_year = requested_and_current_financial_year(request)
+    stats = template_statistics_client.get_monthly_template_usage_for_service(service_id, year)
+
+    stats = sorted(stats, key=lambda x: (x['count']), reverse=True)
+
+    stats_by_month = list()
+
+    for month in get_months_for_financial_year(year, time_format='%Y-%m'):
+        long_month = yyyy_mm_to_datetime(month).strftime('%B')
+
+        template_used = list()
+
+        for stat in stats:
+            if long_month == datetime(1900, stat['month'], 1).strftime("%B"):
+                template_used.append(
+                    {
+                        'name': stat['name'],
+                        'type': stat['type'],
+                        'requested_count': stat['count']
+                    }
+                )
+
+        stats_by_month.append(
+            {
+                'name': long_month,
+                'templates_used': template_used
+            }
+        )
+
+    months = stats_by_month
+
+    return render_template(
+        'views/dashboard/all-template-statistics.html',
+        months=months,
+        stats=stats,
+        most_used_template_count=max(
+            max((
+                template['requested_count']
+                for template in month['templates_used']
+            ), default=0)
+            for month in months
+        ),
+        years=get_tuples_of_financial_years(
+            partial(url_for, '.template_history', service_id=service_id),
+            end=current_financial_year,
+        ),
+        selected_year=year
+    )
+
+
 @main.route("/services/<service_id>/usage")
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
