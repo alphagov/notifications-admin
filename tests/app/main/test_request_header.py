@@ -1,33 +1,26 @@
+import pytest
+
 from tests.conftest import set_config_values
 
 
-def test_route_correct_secret_key(app_, client):
+@pytest.mark.parametrize('check_proxy_header,header_value,expected_code', [
+    (True, 'key_1', 200),
+    (True, 'wrong_key', 403),
+    (False, 'wrong_key', 200),
+    (False, 'key_1', 200),
+])
+def test_route_correct_secret_key(app_, check_proxy_header, header_value, expected_code):
     with set_config_values(app_, {
         'ROUTE_SECRET_KEY_1': 'key_1',
         'ROUTE_SECRET_KEY_2': '',
-        'DEBUG': False,
+        'CHECK_PROXY_HEADER': check_proxy_header,
     }):
 
+        client = app_.test_client()
         response = client.get(
-            path='/_status',
+            path='/_status?elb=True',
             headers=[
-                ('X-Custom-forwarder', 'key_1'),
+                ('X-Custom-forwarder', header_value),
             ]
         )
-        assert response.status_code == 200
-
-
-def test_route_incorrect_secret_key(app_, client):
-    with set_config_values(app_, {
-        'ROUTE_SECRET_KEY_1': 'key_1',
-        'ROUTE_SECRET_KEY_2': '',
-        'DEBUG': False,
-    }):
-
-        response = client.get(
-            path='/_status',
-            headers=[
-                ('X-Custom-forwarder', 'wrong_key'),
-            ]
-        )
-        assert response.status_code == 403
+        assert response.status_code == expected_code
