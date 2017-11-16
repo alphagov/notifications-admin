@@ -32,7 +32,7 @@ from notifications_utils.url_safe_token import generate_token
 import json
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def app_(request):
     app = Flask('app')
     create_app(app)

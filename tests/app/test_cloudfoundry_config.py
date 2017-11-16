@@ -16,6 +16,8 @@ def notify_config():
             'admin_client_secret': 'admin client secret',
             'secret_key': 'secret key',
             'dangerous_salt': 'dangerous salt',
+            'route_secret_key_1': 'key 1',
+            'route_secret_key_2': 'key 2',
         }
     }
 
@@ -118,6 +120,8 @@ def test_notify_config():
     assert os.environ['ADMIN_CLIENT_SECRET'] == 'admin client secret'
     assert os.environ['SECRET_KEY'] == 'secret key'
     assert os.environ['DANGEROUS_SALT'] == 'dangerous salt'
+    assert os.environ['ROUTE_SECRET_KEY_1'] == 'key 1'
+    assert os.environ['ROUTE_SECRET_KEY_2'] == 'key 2'
 
 
 @pytest.mark.usefixtures('os_environ', 'cloudfoundry_environ')
