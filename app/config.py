@@ -100,6 +100,7 @@ class Config(object):
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
     ROUTE_SECRET_KEY_1 = os.environ.get('ROUTE_SECRET_KEY_1', '')
     ROUTE_SECRET_KEY_2 = os.environ.get('ROUTE_SECRET_KEY_2', '')
+    CHECK_PROXY_HEADER = False
 
 
 class Development(Config):
@@ -130,6 +131,7 @@ class Preview(Config):
     CSV_UPLOAD_BUCKET_NAME = 'preview-notifications-csv-upload'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-preview'
     NOTIFY_ENVIRONMENT = 'preview'
+    CHECK_PROXY_HEADER = True
 
 
 class Staging(Config):
@@ -140,6 +142,7 @@ class Staging(Config):
     CSV_UPLOAD_BUCKET_NAME = 'staging-notify-csv-upload'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-staging'
     NOTIFY_ENVIRONMENT = 'staging'
+    CHECK_PROXY_HEADER = True
 
 
 class Live(Config):
@@ -150,6 +153,7 @@ class Live(Config):
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-production'
     NOTIFY_ENVIRONMENT = 'live'
+    CHECK_PROXY_HEADER = False
 
 
 class CloudFoundryConfig(Config):
