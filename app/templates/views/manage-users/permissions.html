@@ -23,5 +23,13 @@
 </div>
 
 {% if service_has_email_auth %}
-  {{ radios(form.login_authentication, disable=['sms_auth' if user_has_no_mobile_number]) }}
+  {% if user_has_no_mobile_number %}
+    {{ radios(
+      form.login_authentication,
+      disable=['sms_auth'],
+      option_hints={'sms_auth': 'Not available because this team member hasn’t added a phone&nbsp;number to their profile'|safe}
+    ) }}
+  {% else %}
+    {{ radios(form.login_authentication) }}
+  {% endif %}
 {% endif %}
