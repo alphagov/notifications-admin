@@ -16,11 +16,11 @@ def test_route_correct_secret_key(app_, check_proxy_header, header_value, expect
         'CHECK_PROXY_HEADER': check_proxy_header,
     }):
 
-        client = app_.test_client()
-        response = client.get(
-            path='/_status?elb=True',
-            headers=[
-                ('X-Custom-forwarder', header_value),
-            ]
-        )
+        with app_.test_client() as client:
+            response = client.get(
+                path='/_status?elb=True',
+                headers=[
+                    ('X-Custom-forwarder', header_value),
+                ]
+            )
         assert response.status_code == expected_code
