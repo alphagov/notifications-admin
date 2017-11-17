@@ -10,7 +10,6 @@ from flask import (
     Response,
 )
 from flask_login import login_required
-
 from notifications_utils.recipients import format_phone_number_human_readable
 
 from app.main import main
@@ -103,6 +102,61 @@ def template_history(service_id):
             end=current_financial_year,
         ),
         selected_year=year,
+    )
+
+
+@main.route("/services/<service_id>/template-usage")
+@login_required
+@user_has_permissions(admin_override=True)
+def template_usage(service_id):
+
+    year, current_financial_year = requested_and_current_financial_year(request)
+    stats = template_statistics_client.get_monthly_template_usage_for_service(service_id, year)
+
+    stats = sorted(stats, key=lambda x: (x['count']), reverse=True)
+
+    stats_by_month = list()
+
+    for month in get_months_for_financial_year(year, time_format='%Y-%m'):
+        long_month = yyyy_mm_to_datetime(month).strftime('%B')
+
+        template_used = list()
+
+        for stat in stats:
+            if long_month == datetime(1900, stat['month'], 1).strftime("%B"):
+                template_used.append(
+                    {
+                        'name': stat['name'],
+                        'type': stat['type'],
+                        'requested_count': stat['count']
+                    }
+                )
+
+        stats_by_month.append(
+            {
+                'name': long_month,
+                'templates_used': template_used
+            }
+        )
+
+    months = stats_by_month
+
+    return render_template(
+        'views/dashboard/all-template-statistics.html',
+        months=months,
+        stats=stats,
+        most_used_template_count=max(
+            max((
+                template['requested_count']
+                for template in month['templates_used']
+            ), default=0)
+            for month in months
+        ),
+        years=get_tuples_of_financial_years(
+            partial(url_for, '.template_history', service_id=service_id),
+            end=current_financial_year,
+        ),
+        selected_year=year
     )
 
 
@@ -248,7 +302,18 @@ def get_dashboard_partials(service_id):
         for job in job_api_client.get_jobs(service_id, limit_days=7, statuses=statuses_to_display)['data']
     ]
     service = service_api_client.get_detailed_service(service_id)
-    column_width = 'column-third' if 'letter' in current_service['permissions'] else 'column-half'
+    column_width, max_notifiction_count = get_column_properties(
+        number_of_columns=(
+            3 if 'letter' in current_service['permissions'] else 2
+        )
+    )
+    dashboard_totals = get_dashboard_totals(service['data']['statistics']),
+    highest_notification_count = max(
+        sum(
+            value[key] for key in {'requested', 'failed', 'delivered'}
+        )
+        for key, value in dashboard_totals[0].items()
+    )
 
     return {
         'upcoming': render_template(
@@ -265,8 +330,11 @@ def get_dashboard_partials(service_id):
         'totals': render_template(
             'views/dashboard/_totals.html',
             service_id=service_id,
-            statistics=get_dashboard_totals(service['data']['statistics']),
-            column_width=column_width
+            statistics=dashboard_totals[0],
+            column_width=column_width,
+            smaller_font_size=(
+                highest_notification_count > max_notifiction_count
+            ),
         ),
         'template-statistics': render_template(
             'views/dashboard/template-statistics.html',
@@ -441,3 +509,10 @@ def get_tuples_of_financial_years(
         )
         for year in range(start, end + 1)
     )
+
+
+def get_column_properties(number_of_columns):
+    return {
+        2: ('column-half', 999999999),
+        3: ('column-third', 99999),
+    }.get(number_of_columns)
