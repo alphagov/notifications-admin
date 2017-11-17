@@ -1,3 +1,5 @@
+import calendar
+from collections import defaultdict
 from datetime import datetime
 from functools import partial
 from flask import (
@@ -115,31 +117,18 @@ def template_usage(service_id):
 
     stats = sorted(stats, key=lambda x: (x['count']), reverse=True)
 
-    stats_by_month = list()
-
-    for month in get_months_for_financial_year(year, time_format='%Y-%m'):
-        long_month = yyyy_mm_to_datetime(month).strftime('%B')
-
-        template_used = list()
-
-        for stat in stats:
-            if long_month == datetime(1900, stat['month'], 1).strftime("%B"):
-                template_used.append(
-                    {
-                        'name': stat['name'],
-                        'type': stat['type'],
-                        'requested_count': stat['count']
-                    }
-                )
-
-        stats_by_month.append(
-            {
-                'name': long_month,
-                'templates_used': template_used
-            }
-        )
-
-    months = stats_by_month
+    templates_by_month = defaultdict(list)
+    for stat in stats:
+        templates_by_month[int(stat['month'])].append({
+            'name': stat['name'],
+            'type': stat['type'],
+            'requested_count': stat['count']
+        })
+        months = [{
+            'name': calendar.month_name[k],
+            'templates_used': v
+        } for k, v in templates_by_month.items()
+        ]
 
     return render_template(
         'views/dashboard/all-template-statistics.html',
