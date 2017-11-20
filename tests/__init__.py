@@ -56,7 +56,7 @@ def service_json(
     permissions=None,
     organisation_type='central',
     free_sms_fragment_limit=250000,
-    prefix_sms_with_service_name='Treat as None',
+    prefix_sms=True,
 ):
     if users is None:
         users = []
@@ -64,8 +64,6 @@ def service_json(
         permissions = ['email', 'sms']
     if inbound_api is None:
         inbound_api = []
-    if prefix_sms_with_service_name == 'Treat as None':
-        prefix_sms_with_service_name = (sms_sender == 'GOVUK')
     return {
         'id': id_,
         'name': name,
@@ -86,7 +84,7 @@ def service_json(
         'dvla_organisation': '001',
         'permissions': permissions,
         'inbound_api': inbound_api,
-        'prefix_sms_with_service_name': prefix_sms_with_service_name,
+        'prefix_sms': prefix_sms,
     }
 
 

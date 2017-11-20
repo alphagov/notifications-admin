@@ -109,8 +109,7 @@ def service_settings(service_id):
         default_sms_sender=default_sms_sender,
         sms_sender_count=sms_sender_count,
         free_sms_fragment_limit=free_sms_fragment_limit,
-        prefix_sms_with_service_name=current_service['prefix_sms_with_service_name'],
-
+        prefix_sms=current_service['prefix_sms'],
     )
 
 
@@ -477,7 +476,7 @@ def service_set_sms(service_id):
 def service_set_sms_prefix(service_id):
 
     form = SMSPrefixForm(enabled=(
-        'on' if current_service['prefix_sms_with_service_name'] else 'off'
+        'on' if current_service['prefix_sms'] else 'off'
     ))
 
     form.enabled.label.text = 'Start all text messages with ‘{}:’'.format(current_service['name'])

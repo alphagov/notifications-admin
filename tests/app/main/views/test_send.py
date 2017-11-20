@@ -2377,3 +2377,54 @@ def test_reply_to_is_previewed_if_chosen(
         assert 'test@example.com' in email_meta
     else:
         assert 'test@example.com' not in email_meta
+
+
+@pytest.mark.parametrize('endpoint, extra_args', [
+    ('main.check_messages', {'template_type': 'sms', 'upload_id': fake_uuid()}),
+    ('main.send_one_off_step', {'template_id': fake_uuid(), 'step_index': 0}),
+])
+@pytest.mark.parametrize('sms_sender', [
+    None,
+    fake_uuid(),
+])
+def test_sms_sender_is_previewed(
+    client_request,
+    mocker,
+    mock_get_service_template,
+    mock_s3_download,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    get_default_sms_sender,
+    endpoint,
+    extra_args,
+    sms_sender,
+):
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        phone number,date,thing
+        7700900986,foo,bar
+    """)
+
+    with client_request.session_transaction() as session:
+        session['recipient'] = '7700900986'
+        session['placeholders'] = {}
+        session['upload_data'] = {
+            'original_file_name': 'example.csv',
+            'template_id': fake_uuid(),
+            'notification_count': 1,
+            'valid': True
+        }
+        session['sender_id'] = sms_sender
+
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        **extra_args
+    )
+
+    sms_sender_on_page = page.select_one('.sms-message-sender')
+
+    if sms_sender:
+        assert sms_sender_on_page.text.strip() == 'From: GOVUK'
+    else:
+        assert not sms_sender_on_page
