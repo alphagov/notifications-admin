@@ -44,14 +44,14 @@ test_non_spreadsheet_files = glob(path.join('tests', 'non_spreadsheet_files', '*
     (
         mock_get_service_email_template,
         multiple_reply_to_email_addresses,
-        'Send to one recipient',
+        'Where should replies go?',
         'Where should replies go?',
     ),
     (
         mock_get_service_template,
         multiple_sms_senders,
-        'Send to one recipient',
-        'Who should the message come from?'
+        'Who should the message come from?',
+        'Who should the message come from?',
     )
 ])
 def test_show_correct_title_and_description_for_sender_type(

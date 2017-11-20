@@ -217,7 +217,7 @@ def set_sender(service_id, template_id):
 def get_sender_context(sender_details, template_type):
     context = {
         'email': {
-            'title': 'Send to one recipient',
+            'title': 'Where should replies go?',
             'description': 'Where should replies go?',
             'field_name': 'email_address'
         },
@@ -227,7 +227,7 @@ def get_sender_context(sender_details, template_type):
             'field_name': 'contact_block'
         },
         'sms': {
-            'title': 'Send to one recipient',
+            'title': 'Who should the message come from?',
             'description': 'Who should the message come from?',
             'field_name': 'sms_sender'
         }
