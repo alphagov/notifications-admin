@@ -74,7 +74,9 @@ def test_show_correct_title_and_description_for_sender_type(
     )
 
     assert page.select_one('h1').text == expected_title
-    assert normalize_spaces(page.select_one('legend').text) == expected_description
+
+    for element in ('legend', 'legend .visually-hidden'):
+        assert normalize_spaces(page.select_one(element).text) == expected_description
 
 
 @pytest.mark.parametrize('template_mock, sender_data', [
