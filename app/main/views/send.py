@@ -217,8 +217,8 @@ def set_sender(service_id, template_id):
 def get_sender_context(sender_details, template_type):
     context = {
         'email': {
-            'title': 'Where should replies go?',
-            'description': 'Where should replies go?',
+            'title': 'Where should replies come back to?',
+            'description': 'Where should replies come back to?',
             'field_name': 'email_address'
         },
         'letter': {

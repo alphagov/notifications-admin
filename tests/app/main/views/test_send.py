@@ -44,8 +44,8 @@ test_non_spreadsheet_files = glob(path.join('tests', 'non_spreadsheet_files', '*
     (
         mock_get_service_email_template,
         multiple_reply_to_email_addresses,
-        'Where should replies go?',
-        'Where should replies go?',
+        'Where should replies come back to?',
+        'Where should replies come back to?',
     ),
     (
         mock_get_service_template,
