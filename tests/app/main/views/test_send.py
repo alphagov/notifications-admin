@@ -575,13 +575,13 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_test'),
-        'Send to one recipient',
+        'Personalise this message',
         False,
     ),
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_one_off'),
-        'Send to one recipient',
+        'Who should this message be sent to?',
         False,
     ),
     (
@@ -599,13 +599,13 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_test'),
-        'Send to one recipient',
+        'Personalise this message',
         False,
     ),
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_one_off'),
-        'Send to one recipient',
+        'Who should this message be sent to?',
         False,
     ),
     (

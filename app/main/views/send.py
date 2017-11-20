@@ -421,7 +421,11 @@ def send_test_step(service_id, template_id, step_index):
         skip_link = None
     return render_template(
         'views/send-test.html',
-        page_title=get_send_test_page_title(template.template_type, get_help_argument()),
+        page_title=get_send_test_page_title(
+            template.template_type,
+            get_help_argument(),
+            entering_recipient=not session['recipient']
+        ),
         template=template,
         form=form,
         skip_link=skip_link,
@@ -711,12 +715,14 @@ def all_placeholders_in_session(placeholders):
     )
 
 
-def get_send_test_page_title(template_type, help_argument):
+def get_send_test_page_title(template_type, help_argument, entering_recipient):
     if help_argument:
         return 'Example text message'
     if template_type == 'letter':
         return 'Print a test letter'
-    return 'Send to one recipient'
+    if entering_recipient:
+        return 'Who should this message be sent to?'
+    return 'Personalise this message'
 
 
 def get_back_link(service_id, template_id, step_index):
