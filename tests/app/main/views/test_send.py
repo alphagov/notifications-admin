@@ -44,14 +44,14 @@ test_non_spreadsheet_files = glob(path.join('tests', 'non_spreadsheet_files', '*
     (
         mock_get_service_email_template,
         multiple_reply_to_email_addresses,
-        'Send to one recipient',
-        'Where should replies go?',
+        'Where should replies come back to?',
+        'Where should replies come back to?',
     ),
     (
         mock_get_service_template,
         multiple_sms_senders,
-        'Send to one recipient',
-        'Who should the message come from?'
+        'Who should the message come from?',
+        'Who should the message come from?',
     )
 ])
 def test_show_correct_title_and_description_for_sender_type(
@@ -74,7 +74,9 @@ def test_show_correct_title_and_description_for_sender_type(
     )
 
     assert page.select_one('h1').text == expected_title
-    assert normalize_spaces(page.select_one('legend').text) == expected_description
+
+    for element in ('legend', 'legend .visually-hidden'):
+        assert normalize_spaces(page.select_one(element).text) == expected_description
 
 
 @pytest.mark.parametrize('template_mock, sender_data', [
@@ -573,13 +575,13 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_test'),
-        'Send to one recipient',
+        'Personalise this message',
         False,
     ),
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_one_off'),
-        'Send to one recipient',
+        'Who should this message be sent to?',
         False,
     ),
     (
@@ -597,13 +599,13 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_test'),
-        'Send to one recipient',
+        'Personalise this message',
         False,
     ),
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_one_off'),
-        'Send to one recipient',
+        'Who should this message be sent to?',
         False,
     ),
     (
