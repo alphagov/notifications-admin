@@ -13,10 +13,10 @@
     <div class="column-three-quarters">
       <form method="post">
         {{ radios(
-          form.sender, 
-          option_hints=option_hints
-          ) 
-        }}
+          form.sender,
+          option_hints=option_hints,
+          hide_legend=True
+        ) }}
         {{ page_footer(
           'Continue',
           back_link=url_for('.view_template', service_id=current_service.id, template_id=template_id),
