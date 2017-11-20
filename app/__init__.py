@@ -24,7 +24,7 @@ from flask_wtf.csrf import CSRFError
 from functools import partial
 
 from notifications_python_client.errors import HTTPError
-from notifications_utils import logging, request_id, formatters
+from notifications_utils import logging, request_helper, formatters
 from notifications_utils.clients.statsd.statsd_client import StatsdClient
 from notifications_utils.recipients import (
     validate_phone_number,
@@ -93,7 +93,7 @@ def create_app(application):
     statsd_client.init_app(application)
     logging.init_app(application, statsd_client)
     init_csrf(application)
-    request_id.init_app(application)
+    request_helper.init_app(application)
 
     service_api_client.init_app(application)
     user_api_client.init_app(application)
