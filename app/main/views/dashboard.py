@@ -142,7 +142,7 @@ def template_usage(service_id):
             for month in months
         ),
         years=get_tuples_of_financial_years(
-            partial(url_for, '.template_history', service_id=service_id),
+            partial(url_for, '.template_usage', service_id=service_id),
             end=current_financial_year,
         ),
         selected_year=year
