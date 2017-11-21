@@ -95,6 +95,7 @@ class Config(object):
         r"bbsrc\.ac\.uk",
         r"acas\.org\.uk",
         r"gov\.wales",
+        r"biglotteryfund\.org\.uk",
     ]
 
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
