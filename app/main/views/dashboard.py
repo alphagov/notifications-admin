@@ -117,9 +117,18 @@ def template_usage(service_id):
 
     stats = sorted(stats, key=lambda x: (x['count']), reverse=True)
 
+    months = [
+        {
+            'name': yyyy_mm_to_datetime(month).strftime('%B'),
+            'templates_used': {},
+        }
+        for month in get_months_for_financial_year(year, time_format='%Y-%m')
+    ]
+
     templates_by_month = defaultdict(list)
     for stat in stats:
         templates_by_month[int(stat['month'])].append({
+            'id': stat['template_id'],
             'name': stat['name'],
             'type': stat['type'],
             'requested_count': stat['count']
