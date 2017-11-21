@@ -32,7 +32,7 @@ from notifications_utils.url_safe_token import generate_token
 import json
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def app_(request):
     app = Flask('app')
     create_app(app)
@@ -2480,6 +2480,20 @@ def set_config(app, name, value):
     app.config[name] = value
     yield
     app.config[name] = old_val
+
+
+@contextmanager
+def set_config_values(app, dict):
+    old_values = {}
+
+    for key in dict:
+        old_values[key] = app.config.get(key)
+        app.config[key] = dict[key]
+
+    yield
+
+    for key in dict:
+        app.config[key] = old_values[key]
 
 
 @pytest.fixture(scope='function')

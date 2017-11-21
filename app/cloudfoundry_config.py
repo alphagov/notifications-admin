@@ -37,6 +37,8 @@ def extract_notify_config(notify_config):
     os.environ['ADMIN_BASE_URL'] = notify_config['credentials']['admin_base_url']
     os.environ['SECRET_KEY'] = notify_config['credentials']['secret_key']
     os.environ['DANGEROUS_SALT'] = notify_config['credentials']['dangerous_salt']
+    os.environ['ROUTE_SECRET_KEY_1'] = notify_config['credentials']['route_secret_key_1']
+    os.environ['ROUTE_SECRET_KEY_2'] = notify_config['credentials']['route_secret_key_2']
 
 
 def extract_notify_aws_config(aws_config):

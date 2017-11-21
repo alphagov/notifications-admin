@@ -158,6 +158,7 @@ def init_app(application):
     application.after_request(useful_headers_after_request)
     application.after_request(save_service_after_request)
     application.before_request(load_service_before_request)
+    application.before_request(request_helper.check_proxy_header_before_request)
 
     @application.context_processor
     def _attach_current_service():

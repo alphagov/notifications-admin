@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from app import (version, status_api_client)
 from app.status import status
 from notifications_python_client.errors import HTTPError
@@ -12,6 +12,7 @@ def show_status():
         try:
             api_status = status_api_client.get_status()
         except HTTPError as e:
+            current_app.logger.exception("API failed to respond")
             return jsonify(status="error", message=str(e.message)), 500
         return jsonify(
             status="ok",
