@@ -1,5 +1,4 @@
 import calendar
-from collections import defaultdict
 from datetime import datetime
 from functools import partial
 from flask import (
