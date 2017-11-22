@@ -116,23 +116,25 @@ def template_usage(service_id):
 
     stats = sorted(stats, key=lambda x: (x['count']), reverse=True)
 
-    months = [
-        {
-            'name': yyyy_mm_to_datetime(month).strftime('%B'),
-            'templates_used': [],
-        }
-        for month in get_months_for_financial_year(year, time_format='%Y-%m')
-    ]
-
-    for i, d in enumerate(months):
-        for stat in stats:
-            if d['name'] == calendar.month_name[int(stat['month'])]:
-                d['templates_used'].append({
+    def get_monthly_template_stats(month_name, stats):
+        return {
+            'name': month_name,
+            'templates_used': [
+                {
                     'id': stat['template_id'],
                     'name': stat['name'],
                     'type': stat['type'],
                     'requested_count': stat['count']
-                })
+                }
+                for stat in stats
+                if calendar.month_name[int(stat['month'])] == month_name
+            ],
+        }
+
+    months = [
+        get_monthly_template_stats(month, stats)
+        for month in get_months_for_financial_year(year, time_format='%B')
+    ]
 
     return render_template(
         'views/dashboard/all-template-statistics.html',
