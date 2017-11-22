@@ -1,5 +1,4 @@
 import calendar
-from collections import defaultdict
 from datetime import datetime
 from functools import partial
 from flask import (
@@ -117,18 +116,25 @@ def template_usage(service_id):
 
     stats = sorted(stats, key=lambda x: (x['count']), reverse=True)
 
-    templates_by_month = defaultdict(list)
-    for stat in stats:
-        templates_by_month[int(stat['month'])].append({
-            'name': stat['name'],
-            'type': stat['type'],
-            'requested_count': stat['count']
-        })
-        months = [{
-            'name': calendar.month_name[k],
-            'templates_used': v
-        } for k, v in templates_by_month.items()
-        ]
+    def get_monthly_template_stats(month_name, stats):
+        return {
+            'name': month_name,
+            'templates_used': [
+                {
+                    'id': stat['template_id'],
+                    'name': stat['name'],
+                    'type': stat['type'],
+                    'requested_count': stat['count']
+                }
+                for stat in stats
+                if calendar.month_name[int(stat['month'])] == month_name
+            ],
+        }
+
+    months = [
+        get_monthly_template_stats(month, stats)
+        for month in get_months_for_financial_year(year, time_format='%B')
+    ]
 
     return render_template(
         'views/dashboard/all-template-statistics.html',
@@ -142,7 +148,7 @@ def template_usage(service_id):
             for month in months
         ),
         years=get_tuples_of_financial_years(
-            partial(url_for, '.template_history', service_id=service_id),
+            partial(url_for, '.template_usage', service_id=service_id),
             end=current_financial_year,
         ),
         selected_year=year
