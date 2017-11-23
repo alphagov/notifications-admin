@@ -1,0 +1,44 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Text message sender
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <h1 class="heading-large">Sign-in method</h1>
+      {% if 'email_auth' in current_service.permissions %}
+        <p class="heading-small bottom-gutter-2-3">
+          Email link or text message code
+        </p>
+        <p>
+          Your team members can sign in with either a text message code
+          or an email link.
+        </p>
+        <p>
+          You can <a href="{{ url_for('.manage_users', service_id=current_service.id) }}">set the sign-in method for individual team members</a>.
+        </p>
+      {% else %}
+        <p class="heading-small bottom-gutter-2-3">
+          Text message code
+        </p>
+        <p>
+          Your team members sign in with a text message code.
+        </p>
+        <p>
+          If signing in with a text message is a problem for your team,
+          please <a href="{{ url_for('.support') }}">contact us</a>.
+        </p>
+      {% endif %}
+      {{ page_footer(
+        back_link=url_for('.service_settings', service_id=current_service.id),
+        back_link_text='Back to settings'
+      ) }}
+    </div>
+  </div>
+
+{% endblock %}
