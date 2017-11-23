@@ -286,3 +286,18 @@ def test_conversation_reply_redirects_with_phone_number_from_notification(
         ('.sms-message-wrapper', 'service one: Template <em>content</em> with & entity'),
     ]:
         assert normalize_spaces(page.select_one(element).text) == expected_text
+
+
+def test_get_user_phone_number_when_not_a_standard_phone_number(mocker):
+    mocker.patch(
+        'app.main.views.conversation.service_api_client.get_inbound_sms_by_id',
+        return_value={
+            'user_number': 'ALPHANUM3R1C',
+            'notify_number': '07900000002'
+        }
+    )
+    mocker.patch(
+        'app.main.views.conversation.notification_api_client.get_notification',
+        side_effect=HTTPError,
+    )
+    assert get_user_number('service', 'notification') == 'ALPHANUM3R1C'
