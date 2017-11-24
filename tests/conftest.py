@@ -2001,22 +2001,18 @@ def mock_get_template_statistics(mocker, service_one, fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def mock_get_monthly_template_statistics(mocker, service_one, fake_uuid):
+def mock_get_monthly_template_usage(mocker, service_one, fake_uuid):
     def _stats(service_id, year):
-        return {
-            datetime.utcnow().strftime('%Y-%m'): {
-                fake_uuid: {
-                    "counts": {
-                        "sending": 1,
-                        "delivered": 1,
-                    },
-                    "name": 'My first template',
-                    "type": 'sms',
-                }
-            }
-        }
+        return [{
+            "template_id": fake_uuid,
+            "month": 4,
+            "year": year,
+            "count": 2,
+            "name": 'My first template',
+            "type": 'sms'
+        }]
     return mocker.patch(
-        'app.template_statistics_client.get_monthly_template_statistics_for_service',
+        'app.template_statistics_client.get_monthly_template_usage_for_service',
         side_effect=_stats
     )
 

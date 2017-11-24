@@ -20,12 +20,6 @@ class TemplateStatisticsApiClient(NotifyAdminAPIClient):
             params=params
         )['data']
 
-    def get_monthly_template_statistics_for_service(self, service_id, year):
-
-        return self.get(
-            url='/service/{}/notifications/templates/monthly?year={}'.format(service_id, year)
-        )['data']
-
     def get_monthly_template_usage_for_service(self, service_id, year):
 
         return self.get(
