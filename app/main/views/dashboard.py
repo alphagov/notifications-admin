@@ -12,6 +12,7 @@ from flask import (
 )
 from flask_login import login_required
 from notifications_utils.recipients import format_phone_number_human_readable
+from werkzeug.routing import RequestRedirect
 
 from app.main import main
 from app import (
@@ -75,35 +76,7 @@ def service_dashboard_updates(service_id):
 @user_has_permissions('view_activity', admin_override=True)
 def template_history(service_id):
 
-    year, current_financial_year = requested_and_current_financial_year(request)
-    stats = template_statistics_client.get_monthly_template_statistics_for_service(service_id, year)
-
-    months = [
-        {
-            'name': yyyy_mm_to_datetime(month).strftime('%B'),
-            'templates_used': aggregate_usage(
-                format_template_stats_to_list(stats.get(month)), sort_key='requested_count'
-            ),
-        }
-        for month in get_months_for_financial_year(year, time_format='%Y-%m')
-    ]
-
-    return render_template(
-        'views/dashboard/all-template-statistics.html',
-        months=months,
-        most_used_template_count=max(
-            max((
-                template['requested_count']
-                for template in month['templates_used']
-            ), default=0)
-            for month in months
-        ),
-        years=get_tuples_of_financial_years(
-            partial(url_for, '.template_history', service_id=service_id),
-            end=current_financial_year,
-        ),
-        selected_year=year,
-    )
+    raise RequestRedirect("/services/{}/template-usage".format(service_id))
 
 
 @main.route("/services/<service_id>/template-usage")

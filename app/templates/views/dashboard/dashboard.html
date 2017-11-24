@@ -40,7 +40,7 @@
     {% if partials['has_template_statistics'] %}
       {{ ajax_block(partials, updates_url, 'template-statistics') }}
       {{ show_more(
-        url_for('.template_history', service_id=current_service.id),
+        url_for('.template_usage', service_id=current_service.id),
         'See templates used by month'
       ) }}
     {% endif %}
