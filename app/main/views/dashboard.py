@@ -12,7 +12,7 @@ from flask import (
 )
 from flask_login import login_required
 from notifications_utils.recipients import format_phone_number_human_readable
-from werkzeug.routing import RequestRedirect
+from werkzeug.utils import redirect
 
 from app.main import main
 from app import (
@@ -76,7 +76,7 @@ def service_dashboard_updates(service_id):
 @user_has_permissions('view_activity', admin_override=True)
 def template_history(service_id):
 
-    raise RequestRedirect("/services/{}/template-usage".format(service_id))
+    return redirect(url_for('main.template_usage', service_id=service_id), code=301)
 
 
 @main.route("/services/<service_id>/template-usage")
