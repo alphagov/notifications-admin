@@ -359,17 +359,33 @@ def test_should_show_recent_templates_on_dashboard(
     partial(url_for),
     partial(url_for, year='2016'),
 ])
-def test_should_show_monthly_breakdown_of_template_usage(
-    logged_in_client,
-    mock_get_monthly_template_statistics,
-    partial_url,
+def test_should_show_redirect_from_template_history(
+        logged_in_client,
+        partial_url,
 ):
     response = logged_in_client.get(
         partial_url('main.template_history', service_id=SERVICE_ONE_ID, _external=True)
     )
 
+    assert response.status_code == 301
+
+
+@freeze_time("2016-07-01 12:00")  # 4 months into 2016 financial year
+@pytest.mark.parametrize('partial_url', [
+    partial(url_for),
+    partial(url_for, year='2016'),
+])
+def test_should_show_monthly_breakdown_of_template_usage(
+    logged_in_client,
+    mock_get_monthly_template_usage,
+    partial_url,
+):
+    response = logged_in_client.get(
+        partial_url('main.template_usage', service_id=SERVICE_ONE_ID, _external=True)
+    )
+
     assert response.status_code == 200
-    mock_get_monthly_template_statistics.assert_called_once_with(SERVICE_ONE_ID, 2016)
+    mock_get_monthly_template_usage.assert_called_once_with(SERVICE_ONE_ID, 2016)
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     table_rows = page.select('tbody tr')
