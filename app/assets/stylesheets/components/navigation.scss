@@ -66,3 +66,41 @@
   }
 
 }
+
+.sub-navigation {
+  @include media(tablet) {
+    margin-top: $gutter * 1.5;
+  }
+
+  ol,
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__item {
+    @include core-16;
+
+    border-bottom: 1px $grey-3 solid;
+    display: block;
+    padding: $gutter-one-third 0;
+
+    a:link {
+      text-decoration: none;
+    }
+
+    a:hover,
+    a:active {
+      text-decoration: underline;
+    }
+  }
+
+  &__item--active {
+    @include bold-16;
+    
+    a:link, a:visited {
+      color: $text-colour;
+    }
+  }
+}
