@@ -1,4 +1,5 @@
-from flask import Response
+from flask import Response, url_for
+from flask_wtf.csrf import CSRFError
 import pytest
 from bs4 import BeautifulSoup
 from notifications_python_client.errors import HTTPError
@@ -38,3 +39,25 @@ def test_malformed_token_returns_page_not_found(logged_in_client, url):
     assert page.h1.string.strip() == 'Page could not be found'
     flash_banner = page.find('div', class_='banner-dangerous').string.strip()
     assert flash_banner == "There’s something wrong with the link you’ve used."
+
+
+def test_csrf_returns_400(logged_in_client, mocker):
+    # we turn off CSRF handling for tests, so fake a CSRF response here.
+    csrf_err = CSRFError('400 Bad Request: The CSRF tokens do not match.')
+    mocker.patch('app.main.views.index.render_template', side_effect=csrf_err)
+
+    response = logged_in_client.get('/cookies')
+
+    assert response.status_code == 400
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.string.strip() == 'Something went wrong, please go back and try again.'
+
+
+def test_csrf_redirects_to_sign_in_page_if_not_signed_in(client, mocker):
+    csrf_err = CSRFError('400 Bad Request: The CSRF tokens do not match.')
+    mocker.patch('app.main.views.index.render_template', side_effect=csrf_err)
+
+    response = client.get('/cookies')
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.sign_in', next='/cookies', _external=True)

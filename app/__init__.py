@@ -92,7 +92,7 @@ def create_app(application):
     init_app(application)
     statsd_client.init_app(application)
     logging.init_app(application, statsd_client)
-    init_csrf(application)
+    csrf.init_app(application)
     request_helper.init_app(application)
 
     service_api_client.init_app(application)
@@ -131,27 +131,6 @@ def create_app(application):
     register_errorhandlers(application)
 
     setup_event_handlers()
-
-
-def init_csrf(application):
-    csrf.init_app(application)
-
-    @application.errorhandler(CSRFError)
-    def csrf_handler(reason):
-        application.logger.warning('csrf.error_message: {}'.format(reason))
-
-        if 'user_id' not in session:
-            application.logger.warning(
-                u'csrf.session_expired: Redirecting user to log in page'
-            )
-
-            return application.login_manager.unauthorized()
-
-        application.logger.warning(
-            u'csrf.invalid_token: Aborting request, user_id: {user_id}',
-            extra={'user_id': session['user_id']})
-
-        abort(403, reason)
 
 
 def init_app(application):
@@ -491,6 +470,27 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
         # if someone has a malformed token
         flash('There’s something wrong with the link you’ve used.')
         return _error_response(404)
+
+    @application.errorhandler(CSRFError)
+    def handle_csrf(reason):
+        application.logger.warning('csrf.error_message: {}'.format(reason))
+
+        if 'user_id' not in session:
+            application.logger.warning(
+                u'csrf.session_expired: Redirecting user to log in page'
+            )
+
+            return application.login_manager.unauthorized()
+
+        application.logger.warning(
+            u'csrf.invalid_token: Aborting request, user_id: {user_id}',
+            extra={'user_id': session['user_id']})
+
+        resp = make_response(render_template(
+            "error/400.html",
+            message=['Something went wrong, please go back and try again.']
+        ), 400)
+        return useful_headers_after_request(resp)
 
 
 def setup_event_handlers():
