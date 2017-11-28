@@ -1,4 +1,5 @@
 {% from "components/table.html" import mapping_table, row, text_field, edit_field, field %}
+{% from "components/sub-navigation.html" import sub_navigation %}
 {% extends "withoutnav_template.html" %}
 
 {% block per_page_title %}
@@ -8,55 +9,37 @@
 {% block maincolumn_content %}
 
 <div class="grid-row">
+  <div class="column-one-third">
+    {{ sub_navigation(navigation_links) }}
+  </div>
   <div class="column-two-thirds">
+
     <h1 class="heading-large">Roadmap</h1>
+    <p>The GOV.UK Notify roadmap shows the things we’re working on and when we hope to have them ready for you to use.</p>
+    <p>It’s only a guide and things might change.</p>
+    <p>You can <a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback')}}">contact us</a> for more detail about these features, or to suggest something else you’d like Notify to offer.</p>
 
-    <p>
-        Here’s a list of the new functionality we’re planning to offer through GOV.UK Notify over the next 6 to 9 months.
-    </p>
+    <h2 class="heading-medium">Sending and receiving messages</h2>
+    <p>We’re working on new features so that you can:</p>
+    <ul class="list list-bullet">
+      <li>allow services to get text messages replies via the API (November 2017)</li>
+      <li>posting delivery receipts to services (December 2017)</li>
+      <li>sending of pre-compiled letters (January 2018)</li>
+      <li>customising the expiry time for text messages (February - April 2018)</li>
+      <li>sending of pre-compiled text messages and emails (February - April 2018)</li>
+      <li>distributing delivery of notifications over a period of time (May 2018 onwards)</li>
+      <li>Automated content scanning for banned content (May 2018 onwards)</li>
+      <li>Checking mobile numbers are valid before sending (May 2018 onwards)</li>
+    </ul>
 
-    <div class="panel panel-border-wide">
-      <p>
-          This roadmap is a only a guide and may change from month to month.
-      </p>
-    </div>
+    <h2 class="heading-medium">Managing your account</h2>
+    <p>We want to offer the functionality for:</p>
+    <ul class="list list-bullet">
+      <li>allow service owners to manage team members details (February - April 2018)</li>
+      <li>allowing people to request to join a service (February - April 2018)</li>
+    </ul>
 
-    <p>
-        If you want to find out more about these features, or have some needs that Notify isn’t yet meeting,
-        please get in touch with us through our <a href="{{ url_for('main.support') }}">support page</a>, or chat with us in our
-        <a href="https://ukgovernmentdigital.slack.com/messages/govuk-notify">cross-government Slack channel</a>.
-    </p>
-
-    <h2 class="heading-medium">November 2017</h2>
-      <ul class="list list-bullet">
-        <li>Allow services to get text messages replies via the API</li>
-      </ul>
-
-    <h2 class="heading-medium">December 2017</h2>
-      <ul class="list list-bullet">
-        <li>Posting delivery receipts to services</li>
-      </ul>
-
-    <h2 class="heading-medium">January 2018</h2>
-      <ul class="list list-bullet">
-      <li>Sending of pre-compiled letters</li>
-      </ul>
-
-    <h2 class="heading-medium">February – April 2018</h2>
-      <ul class="list list-bullet">
-        <li>Customising the expiry time for text messages</li>
-        <li>Allow service owners to manage team members details</li>
-        <li>Allowing people to request to join a service</li>
-        <li>Sending of pre-compiled text messages and emails</li>
-        <li>Retire version 1 of the API</li>
-      </ul>
-
-    <h2 class="heading-medium">May 2018 onwards</h2>
-      <ul class="list list-bullet">
-        <li>Distributing delivery of notifications over a period of time</li>
-        <li>Explore other channels (Facebook messenger, WhatsApp, Push Notifications)</li>
-        <li>Automated content scanning for banned content</li>
-        <li>Checking mobile numbers are valid before sending</li>
-      </ul>
+  </div>
+</div>
 
 {% endblock %}

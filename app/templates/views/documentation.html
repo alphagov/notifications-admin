@@ -1,14 +1,25 @@
 {% extends "withoutnav_template.html" %}
 
 {% block per_page_title %}
-  API documentation
+  Documentation
 {% endblock %}
 
 {% block maincolumn_content %}
 
 <div class="grid-row">
-  <div class="column-two-thirds documentation">
-	{{ body }}
+  <div class="column-two-thirds">
+
+	<h1 class="heading-large"> Documentation </h1>
+	<p>Use our API documentation to integrate with GOV.UK Notify using the following clients:</p>
+	<ul class="list list-bullet">
+      <li><a href="https://github.com/alphagov/notifications-java-client">Java</a></li>
+      <li><a href="https://github.com/alphagov/notifications-net-client">.NET</a></li>
+      <li><a href="https://github.com/alphagov/notifications-node-client">Node JS</a></li>
+      <li><a href="https://github.com/alphagov/notifications-php-client">PHP</a></li>
+      <li><a href="https://github.com/alphagov/notifications-python-client">Python</a></li>
+      <li><a href="https://github.com/alphagov/notifications-ruby-client">Ruby</a></li>
+    </ul>
+    <p>You can also find out about integration testing and the different types of API keys that you can use.</p>
   </div>
 </div>
 
