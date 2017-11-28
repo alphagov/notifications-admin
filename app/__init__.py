@@ -151,7 +151,7 @@ def init_csrf(application):
             u'csrf.invalid_token: Aborting request, user_id: {user_id}',
             extra={'user_id': session['user_id']})
 
-        abort(400, reason)
+        abort(403, reason)
 
 
 def init_app(application):
