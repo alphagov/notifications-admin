@@ -68,10 +68,10 @@ def test_old_static_pages_redirect_to_using_notify_with_anchor(
     ('information_risk_management', 'security'),
     ('old_integration_testing', 'integration_testing'),
     ('old_roadmap', 'roadmap'),
-    ('information_risk_management','security'),
-    ('old_terms','terms'),
-    ('information_security','using_notify'),
-    ('old_using_notify','using_notify'),
+    ('information_risk_management', 'security'),
+    ('old_terms', 'terms'),
+    ('information_security', 'using_notify'),
+    ('old_using_notify', 'using_notify'),
 ])
 def test_old_static_pages_redirect(
     client,

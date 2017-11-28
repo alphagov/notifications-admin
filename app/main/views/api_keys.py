@@ -21,9 +21,7 @@ def api_integration(service_id):
 @login_required
 @user_has_permissions('manage_api_keys', admin_override=True)
 def api_documentation(service_id):
-    return render_template(
-        'views/api/documentation.html'
-    )
+    return redirect(url_for('.documentation'), code=301)
 
 
 @main.route("/services/<service_id>/api/whitelist", methods=['GET', 'POST'])

@@ -67,6 +67,7 @@
 
 }
 
+// https://github.com/alphagov/product-page-example/blob/master/source/stylesheets/modules/_sub-navigation.scss
 .sub-navigation {
   @include media(tablet) {
     margin-top: $gutter * 1.5;

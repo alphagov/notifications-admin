@@ -511,6 +511,7 @@ def test_thanks(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert ' '.join(page.find('main').find('p').text.split()) == message
 
+
 @pytest.mark.parametrize('view, old_ticket_type, expected_view, new_ticket_type', [
     ('old_submit_feedback', 'problem', 'feedback', 'report-problem'),
     ('old_submit_feedback', 'question', 'feedback', 'ask-question-give-feedback'),
@@ -534,4 +535,3 @@ def test_old_problem_and_question_urls_redirect(
         ticket_type=new_ticket_type,
         _external=True,
     )
-
