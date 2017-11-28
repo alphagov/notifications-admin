@@ -8,6 +8,7 @@ from notifications_utils.url_safe_token import check_token
 from app import user_api_client
 from app.main import main
 from app.main.forms import NewPasswordForm
+from app.main.views.two_factor import log_in_user
 
 
 @main.route('/new-password/<path:token>', methods=['GET', 'POST'])
@@ -29,12 +30,17 @@ def new_password(token):
     form = NewPasswordForm()
 
     if form.validate_on_submit():
-        user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
         user_api_client.reset_failed_login_count(user.id)
         session['user_details'] = {
             'id': user.id,
             'email': user.email_address,
             'password': form.new_password.data}
-        return redirect(url_for('main.two_factor'))
+        if user.auth_type == 'email_auth':
+            # they've just clicked an email link, so have done an email auth journey anyway. Just log them in.
+            return log_in_user(user.id)
+        else:
+            # send user a 2fa sms code
+            user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
+            return redirect(url_for('main.two_factor'))
     else:
         return render_template('views/new-password.html', token=token, form=form, user=user)
