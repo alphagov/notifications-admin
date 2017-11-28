@@ -32,7 +32,7 @@ def test_logged_in_user_redirects_to_choose_service(
 
 @pytest.mark.parametrize('view', [
     'cookies', 'using_notify', 'pricing', 'terms', 'integration_testing', 'roadmap',
-    'features', 'information_risk_management', 'callbacks'
+    'features', 'callbacks', 'documentation', 'security'
 ])
 def test_static_pages(
     client,
@@ -50,7 +50,7 @@ def test_static_pages(
     ('delivery_and_failure', 'messagedeliveryandfailure'),
     ('trial_mode', 'trial-mode'),
 ])
-def test_old_static_pages(
+def test_old_static_pages_redirect_to_using_notify_with_anchor(
     client,
     view,
     expected_anchor,
@@ -60,5 +60,27 @@ def test_old_static_pages(
     assert response.location == url_for(
         'main.using_notify',
         _anchor=expected_anchor,
+        _external=True
+    )
+
+
+@pytest.mark.parametrize('view, expected_view', [
+    ('information_risk_management', 'security'),
+    ('old_integration_testing', 'integration_testing'),
+    ('old_roadmap', 'roadmap'),
+    ('information_risk_management','security'),
+    ('old_terms','terms'),
+    ('information_security','using_notify'),
+    ('old_using_notify','using_notify'),
+])
+def test_old_static_pages_redirect(
+    client,
+    view,
+    expected_view
+):
+    response = client.get(url_for('main.{}'.format(view)))
+    assert response.status_code == 301
+    assert response.location == url_for(
+        'main.{}'.format(expected_view),
         _external=True
     )
