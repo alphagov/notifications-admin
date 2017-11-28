@@ -446,8 +446,8 @@ class SupportType(Form):
     support_type = RadioField(
         'How can we help you?',
         choices=[
-            ('problem', 'Report a problem'),
-            ('question', 'Ask a question or give feedback'),
+            ('report-problem', 'Report a problem'),
+            ('ask-question-give-feedback', 'Ask a question or give feedback'),
         ],
         validators=[DataRequired()]
     )
