@@ -45,27 +45,16 @@
         <ul id="proposition-links">
           <li><a href="{{ url_for('main.support') }}">Support</a></li>
           {% if current_user.is_authenticated %}
-            <li>
-              <a href="{{ url_for('main.user_profile') }}">{{ current_user.name }}</a>
-            </li>
+            <li><a href="{{ url_for('main.user_profile') }}">{{ current_user.name }}</a></li>
             {% if current_user.has_permissions(admin_override=True) %}
-                <li>
-                  <a href="{{ url_for('main.platform_admin') }}">Platform admin</a>
-                </li>
+              <li><a href="{{ url_for('main.platform_admin') }}">Platform admin</a></li>
             {% endif %}
-            <li>
-              <a href="{{ url_for('main.sign_out')}}">Sign out</a>
-            </li>
+            <li><a href="{{ url_for('main.sign_out')}}">Sign out</a></li>
           {% else %}
-            <li>
-              <a href="{{ url_for('main.features' )}}">Features</a>
-            </li>
-            <li>
-              <a href="{{ url_for('main.pricing' )}}">Pricing</a>
-            </li>
-            <li>
-              <a href="{{ url_for('main.sign_in' )}}">Sign in</a>
-            </li>
+            <li><a href="{{ url_for('main.features' )}}">Features</a></li>
+            <li><a href="{{ url_for('main.pricing' )}}">Pricing</a></li>
+            <li><a href="{{ url_for('main.documentation' )}}">Documentation</a></li>
+            <li><a href="{{ url_for('main.sign_in' )}}">Sign in</a></li>
           {% endif %}
         </ul>
       </nav>
