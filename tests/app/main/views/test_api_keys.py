@@ -76,7 +76,7 @@ def test_should_show_api_page_for_live_service(
     assert 'Your service is in trial mode' not in page.find('main').text
 
 
-def test_should_show_api_documentation_page(
+def test_api_documentation_page_should_redirect(
     logged_in_client,
     mock_login,
     api_user_active,
@@ -84,9 +84,11 @@ def test_should_show_api_documentation_page(
     mock_has_permissions
 ):
     response = logged_in_client.get(url_for('main.api_documentation', service_id=str(uuid.uuid4())))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.h1.string.strip() == 'Documentation'
+    assert response.status_code == 301
+    assert response.location == url_for(
+        'main.documentation',
+        _external=True
+    )
 
 
 def test_should_show_empty_api_keys_page(

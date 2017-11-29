@@ -7,6 +7,9 @@ from app.main import main
 from app.main.forms import SupportType, Feedback, Problem, Triage
 from datetime import datetime
 
+QUESTION_TICKET_TYPE = 'ask-question-give-feedback'
+PROBLEM_TICKET_TYPE = "report-problem"
+
 
 @main.route('/feedback', methods=['GET'])
 def old_feedback():
@@ -30,7 +33,7 @@ def triage():
     if form.validate_on_submit():
         return redirect(url_for(
             '.feedback',
-            ticket_type='problem',
+            ticket_type=PROBLEM_TICKET_TYPE,
             severe=form.severe.data
         ))
     return render_template(
@@ -39,13 +42,27 @@ def triage():
     )
 
 
-@main.route('/support/submit/<ticket_type>', methods=['GET', 'POST'])
-def feedback(ticket_type):
+@main.route('/support/submit/<ticket_type>')
+def old_submit_feedback(ticket_type):
+    try:
+        ticket_type = {
+            'problem': PROBLEM_TICKET_TYPE,
+            'question': QUESTION_TICKET_TYPE,
+        }[ticket_type]
+        return redirect(url_for(
+            '.feedback',
+            ticket_type=ticket_type,
+        ), 301)
+    except KeyError:
+        abort(404)
 
+
+@main.route('/support/<ticket_type>', methods=['GET', 'POST'])
+def feedback(ticket_type):
     try:
         form = {
-            'question': Feedback,
-            'problem': Problem,
+            QUESTION_TICKET_TYPE: Feedback,
+            PROBLEM_TICKET_TYPE: Problem,
         }[ticket_type]()
     except KeyError:
         abort(404)
@@ -60,7 +77,7 @@ def feedback(ticket_type):
 
     urgent = (
         in_business_hours() or
-        (ticket_type == 'problem' and severe)
+        (ticket_type == PROBLEM_TICKET_TYPE and severe)
     )
 
     anonymous = (
@@ -135,7 +152,7 @@ def feedback(ticket_type):
 def bat_phone():
 
     if current_user.is_authenticated:
-        return redirect(url_for('main.feedback', ticket_type='problem'))
+        return redirect(url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE))
 
     return render_template('views/support/bat-phone.html')
 
@@ -205,7 +222,7 @@ def has_live_services(user_id):
 
 def needs_triage(ticket_type, severe):
     return all((
-        ticket_type == 'problem',
+        ticket_type == PROBLEM_TICKET_TYPE,
         severe is None,
         (
             not current_user.is_authenticated or has_live_services(current_user.id)
@@ -216,7 +233,7 @@ def needs_triage(ticket_type, severe):
 
 def needs_escalation(ticket_type, severe):
     return all((
-        ticket_type == 'problem',
+        ticket_type == PROBLEM_TICKET_TYPE,
         severe,
         not current_user.is_authenticated,
         not in_business_hours(),

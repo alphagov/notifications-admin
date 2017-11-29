@@ -1,5 +1,6 @@
-{% from "components/table.html" import mapping_table, row, text_field, edit_field, field %}
 {% extends "withoutnav_template.html" %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field %}
+{% from "components/sub-navigation.html" import sub_navigation %}
 
 {% block per_page_title %}
   Features
@@ -8,86 +9,77 @@
 {% block maincolumn_content %}
 
 <div class="grid-row">
+  <div class="column-one-third">
+    {{ sub_navigation(navigation_links) }}
+  </div>
   <div class="column-two-thirds">
+
     <h1 class="heading-large">Features</h1>
+    <p>GOV.UK Notify helps government services to:</p>
+    <ul class="list list-bullet">
+      <li>send emails</li>
+      <li>send and receive text messages (Uk and internationally)</li>
+      <li>send letters</li>
+    </ul>
+    <p>You can use Notify if you’re running a service in:</p>
+    <ul class="list list-bullet">
+      <li>central government</li>
+      <li>a local authority</li>
+      <li>the NHS</li>
+    </ul>
+    <p>You don’t need any technical knowledge to use Notify.</p>
+    <p><a href="{{ url_for('main.register') }}">Create an account</a> for free and try it yourself.</p>
 
-    <p>
-        Here’s a list of what you can do with GOV.UK Notify. We’re adding new features all the time,
-        so keep an eye on our <a href="{{ url_for('main.roadmap') }}">roadmap</a> to see what’s coming up.
-    </p>
+    <h2 class="heading-medium"> Customise your messages</h2>
+    <p>With Notify, you control the content and format of your messages. You can:</p>
+    <ul class="list list-bullet">
+      <li>customise the content of your messages</li>
+      <li>change the formatting of emails and letters</li>
+      <li>create and update templates in real time</li>
+      <li>add your own branding</li>
+      <li>choose your text message sender name</li>
+      <li>choose an email account for users to reply to</li>
+      <li>preview messages before you send them</li>
+    </ul>
 
-    <div class="panel panel-border-wide">
-      <p>
-          You can <a href="{{ url_for('main.register') }}">create yourself a trial account now</a> to see all
-          of these features in action.
-      </p>
-    </div>
+    <h2 class="heading-medium">Send messages when you want to</h2>
+    <p>You can send messages straight away, or schedule them in advance.</p>
+    <h3 class="heading-small">Service levels</h3>
+    <p>Notify commits to:</p>
+    <ul class="list list-bullet">
+      <li>sending 95% of emails and text messages within 10 seconds</li>
+      <li>sending letters by 3pm the next working day (if you submit it through Notify before 5pm)</li>
+    </ul>
 
-    <h2 class="heading-medium">What you can do with Notify</h2>
-      <ul class="list list-bullet">
-        <li>Send emails</li>
-        <li>Send text messages – UK and internationally</li>
-        <li>Receive text messages</li>
-        <li>Send letters</li>
-      </ul>
+    <h2 class="heading-medium">See your activity</h2>
+    <p>Through the Notify dashboard, you can:</p>
+    <ul class="list list-bullet">
+      <li>check the delivery status of any emails and text messages</li>
+      <li>see a real-time dashboard of your activity</li>
+      <li>view your usage and reports</li>
+    </ul>
 
-    <h2 class="heading-medium">Notify service levels</h2>
-      <ul class="list list-bullet">
-        <li>95% of messages will be sent within 10 seconds</li>
-        <li>24 hour online support</li>
-      </ul>
+    <h2 class="heading-medium">Send messages in bulk or individually</h2>
+    <p>With Notify, you can:</p>
+    <ul class="list list-bullet">
+      <li>upload files with all your user data</li>
+      <li>send bulk messages to users</li>
+      <li>send messages to specific users</li>
+    </ul>
 
-    <h2 class="heading-medium">What Notify costs</h2>
-      <ul class="list list-bullet">
-        <li>Email – free</li>
-        <li>Text messages – free allowance, then 1.58p + VAT</li>
-        <li>Letters – from 30p + VAT</li>
-      </ul>
-      <p>
-          See our <a href="{{ url_for('main.pricing') }}">pricing</a> page for more details.
-      </p>
+    <h2 class="heading-medium">Manage user permissions</h2>
+    <p>Through the Notify dashboard, you can:</p>
+    <ul class="list list-bullet">
+      <li>set different permission levels for different team members</li>
+      <li>invite contractors to use Notify</li>
+    </ul>
 
-    <h2 class="heading-medium">Managing your message content</h2>
-      <ul class="list list-bullet">
-        <li>Personalise your messages</li>
-        <li>Format emails and letters</li>
-        <li>Choose email and letter branding</li>
-        <li>Specify an email account for replies</li>
-        <li>Specify text message sender name</li>
-      </ul>
+    <h2 class="heading-medium">Automate your messages</h2>
+    <p>You can integrate with our API to automatically send messages through Notify when relevant data changes in your systems.</p>
+    <p>This means you don’t have to manually download data from your system and upload it to Notify to send a message.</p>
+    <p><a href="{{ url_for('main.documentation') }}">Check our code libraries</a> for more information on how to integrate with Notify.</p>
 
-    <h2 class="heading-medium">Using Notify</h2>
-      <ul class="list list-bullet">
-        <li>Create and update message templates in real time</li>
-        <li>Preview messages before sending them</li>
-        <li>Schedule when your messages are sent</li>
-        <li>Send individual emails or text messages</li>
-        <li>See the delivery status of emails and text messages</li>
-        <li>Manually upload batch files of recipient data</li>
-        <li>Automate sending with our API</li>
-        <li>Integrate using supported client libraries</li>
-        <li>Use different types of API key for your
-          <a href="{{ url_for('main.integration_testing') }}">integration testing</a></li>
-      </ul>
-
-    <h2 class="heading-medium">Managing your Notify account</h2>
-      <ul class="list list-bullet">
-        <li>Real-time dashboard of activity</li>
-        <li>View usage and reports</li>
-        <li>Manage your team members’ permissions</li>
-      </ul>
-
-    <h2 class="heading-medium">Notify security</h2>
-      <ul class="list list-bullet">
-        <li>Approved by the Cabinet Office Senior Information Risk Officer (SIRO)</li>
-        <li>Ongoing information risk management activities</li>
-        <li>Data is encrypted as it passes through the service and when it’s stored</li>
-        <li>Personal data is only held for the minimum period of time</li>
-        <li>Permissions model allowing different functionality to different team members</li>
-        <li>Using an advanced API key standard, JSON Web Tokens, providing a higher degree of protection for services</li>
-      </ul>
-
-    <p>
-      See our <a href="{{ url_for('main.information_risk_management') }}">approach to information risk management</a> for more details.  
-    </p>
+    <h2 class="heading-medium">Reliable and resilient</h2>
+    <p>Notify sends messages through multiple providers. If one provider fails, Notify automatically switches to another so that your messages aren’t affected.</p>
+    
 {% endblock %}

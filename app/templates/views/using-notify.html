@@ -1,174 +1,70 @@
 {% extends "withoutnav_template.html" %}
+{% from "components/sub-navigation.html" import sub_navigation %}
 
 {% block per_page_title %}
-  Using GOV.UK Notify
+  Using Notify
 {% endblock %}
 
 {% block maincolumn_content %}
 
 <div class="grid-row">
+  <div class="column-one-third">
+    {{ sub_navigation(navigation_links) }}
+  </div>
   <div class="column-two-thirds">
 
-    <h1 class="heading-large">Using GOV.UK Notify</h1>
+    <h1 class="heading-large">Using Notify</h1>
 
-    <ul class="list">
-      <li><a href="#trial-mode">Trial mode</a></li>
-      <li><a href="#message-sending-flow">Email and text message sending flow</a></li>
-      <li><a href="#receiving-messages">Receiving messages</a></li>
-      <li><a href="#messagedeliveryandfailure">Delivery and failure</a></li>
+    <h2 class="heading-medium">Writing and sending text messages, emails and letters</h2>
+    <p>Check the Service Manual for guidance on how to:</p>
+    <ul class="list list-bullet">
+      <li><a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">plan and write text messages and emails</a></li>
+      <li><a href=""><a href="https://www.gov.uk/service-manual/technology/how-to-email-your-users"></a>send emails in a way that protects users from spam and phishing</a></li>
     </ul>
 
     <h2 id="trial-mode" class="heading-medium">Trial mode</h2>
+    <p>When you sign up to GOV.UK Notify, you’ll start in trial mode. In trial mode, you can send up to 50 text messages and emails a day. You can only send them to yourself and other people in your team.</p>
+    <p>You can’t send letters in trial mode.</p>
+    <p>When you request to go live on Notify, we’ll remove these restrictions.</p>
 
-    <p>
-      All new accounts on Notify start off in trial mode.
-    </p>
-    <p>
-      This means:
-    </p>
-    <ul class="list list-bullet">
-      <li>
-        you can only send text messages and emails to yourself
-      </li>
-      <li>
-        you can add people to
-        {% if current_service %}
-          <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">your team</a>,
-        {% else %}
-          your team,
-        {% endif %}
-        then you can send text messages and emails to them too
-      </li>
-      <li>
-        you can only send 50 text messages or emails per day
-      </li>
-      <li>
-        you can’t send any letters
-      </li>
-    </ul>
-
-    <p>
-      When you’re ready we can
-      {% if current_service %}
-        <a href="{{ url_for('main.service_request_to_go_live', service_id=current_service.id) }}">remove these restrictions</a>.
-      {% else %}
-        remove these restrictions.
-      {% endif %}
-
-    </p>
-
-    <h2 id="message-sending-flow" class="heading-medium">Email and text message sending flow</h2>
-
+    <h2 id="messagedeliveryandfailure" class="heading-medium">Sending messages</h2>
+    <p>When you send a message, it moves through different states in Notify.</p>
     <img
-          src="/static/images/message-sending-flow.svg"
-          alt="A picture of the sending flow of messages in Notify, showing the three states of Sending, Delivered, And Failed. Also shows the next
-               steps when messages fail, deleting data and trying a new channel for permanent failures, and trying again or trying a new channel for
-               temporary failures"
-          style="width: 100%;"
+        src="/static/images/message-sending-flow.svg"
+        alt="A picture of the sending flow of messages in Notify, showing the three states of Sending, Delivered, And Failed. Also shows the next
+             steps when messages fail, deleting data and trying a new channel for permanent failures, and trying again or trying a new channel for
+             temporary failures"
+        style="width: 100%;"
     >
-        
-    <h3 class="heading-small">Resending failed messages</h3>
+    <h3 class="heading-small">Sending</h3>
+    <p>This means that we’ve accepted the message and are sending it to our delivery providers.</p>
+    <h3 class="heading-small">Delivered</h3>
+    <p>You’ll see this when Notify has successfully delivered a message to user’s email inbox or phone.</p>
+    <p>Notify won’t tell you if a user has opened or read a message.</p>
+    <h3 class="heading-small">Sent internationally</h3>
+    <p>You’ll see this when Notify sends a text message to an international number, but mobile networks in that country don’t provide delivery receipts.</p>
+    <h3 class="heading-small">Phone number or email address does not exist</h3>
+    <p>You’ll see this when Notify couldn’t deliver a message because the email address or phone number was wrong.</p>
+    <p>You should remove these email addresses or phone numbers from your database.</p>
+    <p>You’ll still be charged for text messages to numbers that don’t exist.</p>
+    <h3 class="heading-small">Inbox/phone not accepting messages right now</h3>
+    <p>You’ll see this if Notify can’t deliver an email or text message after trying for 72 hours.</p>
+    <p>This might happen for a number of reasons. For example, the user’s inbox might be full, or their phone might be turned off.</p>
+    <p>You can try sending the message again if you want.</p>
+    <p>You’ll still be charged for text messages to phones that aren’t accepting messages.</p>
+    <h3 class="heading-small">Technical failure</h3>
+    <p>A technical failure means there’s a problem between Notify and our delivery providers. </p>
+    <p>You’ll have to try sending your messages again. </p>
+    <p>You won’t be charged for text messages that are affected by a technical failure.</p>
 
-    <p>If a message fails because the inbox or phone ‘isn’t accepting messages right now’ then it’s up to you to decide if you want to send the message again or not.</p>
-
-    <p>Notify attempts to send messages for up to 72 hours before it returns that status.</p>
-
-    <h3 class="heading-small">Using multiple channels</h3>
-
-    <p>If your user has provided you with multiple contact channels, you should send messages to the channel they’ve chosen as their preference. However there are some scenarios where you might want to send messages to more than one channel:</p>
-
-    <ul class="list list-bullet">
-      <li>If a message fails to be delivered, you could try a different channel</li>
-      <li>If a message is delivered but the recipient hasn’t taken the action they need, you could try a different channel</li>
-      <li>If you need to urgently contact someone, you could email them and send them a text message at the same time</li>
-    </ul>
-
-    <p>If you’re using the Notify API these scenarios could be automated.</p>
-
-    <h2 id="receiving-messages" class="heading-medium">Receiving messages</h2>
-
-    <p>Replies to emails that you’ve sent will go directly to the reply-to address that you have set up for your service.</p>
-
-    <p>If you’re set up to receive text messages then your users can reply to messages you’ve sent, or can start an interaction by sending you a text message.</p>
-
-    <p>Receiving inbound text messages can allow your service users to:</p>
-
-    <ul class="list list-bullet">
-      <li>confirm, cancel or change an appointment</li>
-      <li>register for a simple service</li>
-      <li>provide follow-up information for an application</li>
-      <li>report something</li>
-      <li>provide feedback</li>
-    </ul>
-
-    <p>You’ve then got the option to automate the processing of the messages you receive, or to view them in Notify.</p>
-
-    <p>If you automate the processing of text messages you receive, then you should have a manual process in place to deal with messages that can’t be automatically processed.</p>
-
-    <p>If you’d like your service to receive text messages, then <a href="{{ url_for('main.support') }}">let us know</a>.</p>
-
-    <h2 id="messagedeliveryandfailure" class="heading-medium">Delivery and failure</h2>
-
-    <p>Our delivery states are:</p>
-
-    <ul class="list list-bullet">
-      <li><a href="#sending">Sending</a></li>
-      <li><a href="#delivered">Delivered</a></li>
-      <li><a href="#sent-internationally">Sent internationally</a></li>
-      <li><a href="#does-not-exist">Phone number or email address does not exist</a></li>
-      <li><a href="#inbox-not-accepting-messages">Inbox not accepting messages right now</a></li>
-      <li><a href="#phone-not-accepting-messages">Phone not accepting messages right now</a></li>
-      <li><a href="#technical-failure">Technical failure</a></li>
-    </ul>
-
-    <h3 id="sending" class="heading-small">Sending</h3>
-
-    <p>All messages start in the ‘Sending’ state.</p>
-
-    <p>This means that we have accepted the message. It’s waiting in a queue to be sent to our email or text message delivery partners.</p>
-
-    <h3 id="delivered" class="heading-small">Delivered</h3>
-
-    <p>This means the message is in the person’s email inbox or on their phone.</p>
-
-    <p>We can’t tell you if they’ve read it – to do so would require invasive and unreliable tracking techniques.</p>
-
-    <h3 id="sent-internationally" class="heading-small">Sent internationally</h3>
-
-    <p>This means the text message has been sent to a valid international phone number, but delivery receipts aren’t provided by mobile networks in that country.</p>
-
-    <h3 id="does-not-exist" class="heading-small">Phone number or email address does not exist</h3>
-
-    <p>You’re still billed for text messages to non-existent phone numbers.</p>
-
-    <p><strong>You need to remove these email addresses or phone numbers from your database.</strong></p>
-
-    <a id="not-accepting-messages"></a>
-
-    <h3 id="inbox-not-accepting-messages" class="heading-small">Inbox not accepting messages right now</h3>
-
-    <p>This can happen for a number of reasons, eg the user’s inbox was full.</p>
-
-    <p><strong>You can choose to retry these messages later or not.</strong></p>
-
-    <h3 id="phone-not-accepting-messages" class="heading-small">Phone not accepting messages right now</h3>
-
-    <p>This means the user’s phone was full or hasn’t been switched on in the last 72 hours.</p>
-
-    <p>You’re still billed for these messages.</p>
-
-    <p><strong>You can choose to retry these messages later or not.</strong></p>
-
-    <h3 id="technical-failure" class="heading-small">Technical failure</h3>
-
-    <p>This means there is a problem with the connection between Notify and our email or text message delivery partners.</p>
-
-    <p>Messages still being retried are marked as ’Sending’. We mark messages as ‘Technical failure’ once we’ve given up.</p>
-
-    <p>You won’t be billed for these messages.</p>
-
-    <p><strong>You need to retry these messages yourself later.</strong></p>
-
+    <h2 class="heading-medium">Receiving messages</h2>
+    <h3 class="heading-small">Email replies</h3>
+    <p>You can choose an email address you want replies to go to.</p>
+    <h3 class="heading-small">Text messages</h3>
+    <p>You can contact us if you want to be able to receive text messages. </p>
+    <p>When you’ve done this, users will be able to reply to text messages you send them. They’ll also be able to start an interaction by sending you a text message.</p>
+    <p>You’ll be able to see and reply to text messages you receive. You can also create automated processes to manage replies.</p>
+    <p>You’ll still need to have a manual process in place for any messages that can’t be dealt with automatically.</p>
   </div>
 </div>
 

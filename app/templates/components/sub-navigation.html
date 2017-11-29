@@ -1,0 +1,24 @@
+{% macro sub_navigation(
+  item_set
+) %}
+  <nav class="sub-navigation">
+    <ol itemscope itemtype="http://schema.org/ItemList">
+      {% for item in item_set %}        
+        <li class="sub-navigation__item {% if item['link'] == request.endpoint %} sub-navigation__item--active {% endif %}" 
+            itemprop="itemListElement" 
+            itemscope 
+            itemtype="http://schema.org/ListItem"
+        >
+          <a href="{%- if item['external_link'] -%} 
+                     {{ item['link'] }} 
+                   {%- else -%} 
+                     {{ url_for(item['link']) }} 
+                   {%- endif -%}" 
+             itemprop="item">
+            <span itemprop="name">{{item['name']}}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ol>
+  </nav>
+{% endmacro %}

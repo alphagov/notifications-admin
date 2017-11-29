@@ -10,7 +10,7 @@ from tests.conftest import (
     mock_get_services_with_no_services,
     mock_get_services_with_one_service
 )
-from app.main.views.feedback import has_live_services, in_business_hours
+from app.main.views.feedback import has_live_services, in_business_hours, PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 
 
 def no_redirect():
@@ -33,8 +33,8 @@ def test_get_support_index_page(
 
 @freeze_time('2016-12-12 12:00:00.000000')
 @pytest.mark.parametrize('support_type, expected_h1', [
-    ('problem', 'Report a problem'),
-    ('question', 'Ask a question or give feedback'),
+    (PROBLEM_TICKET_TYPE, 'Report a problem'),
+    (QUESTION_TICKET_TYPE, 'Ask a question or give feedback'),
 ])
 @pytest.mark.parametrize('logged_in, expected_form_field, expected_contact_details', [
     (True, type(None), 'We’ll reply to test@user.gov.uk'),
@@ -68,8 +68,8 @@ def test_choose_support_type(
 
 @freeze_time('2016-12-12 12:00:00.000000')
 @pytest.mark.parametrize('ticket_type, expected_status_code', [
-    ('problem', 200),
-    ('question', 200),
+    (PROBLEM_TICKET_TYPE, 200),
+    (QUESTION_TICKET_TYPE, 200),
     ('gripe', 404)
 ])
 def test_get_feedback_page(client, ticket_type, expected_status_code):
@@ -78,7 +78,7 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
-@pytest.mark.parametrize('ticket_type', ['problem', 'question'])
+@pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
 def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_type):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
@@ -115,7 +115,7 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
     {'feedback': 'blah'},
     {'feedback': 'blah', 'name': 'Ignored', 'email_address': 'ignored@email.com'}
 ])
-@pytest.mark.parametrize('ticket_type', ['problem', 'question'])
+@pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
 def test_passes_user_details_through_flow(
     logged_in_client,
     mocker,
@@ -166,8 +166,8 @@ def test_passes_user_details_through_flow(
     {'feedback': 'blah'},
 ])
 @pytest.mark.parametrize('ticket_type, expected_response, things_expected_in_url, expected_error', [
-    ('problem', 200, [], element.Tag),
-    ('question', 302, ['thanks', 'anonymous=True', 'urgent=True'], type(None)),
+    (PROBLEM_TICKET_TYPE, 200, [], element.Tag),
+    (QUESTION_TICKET_TYPE, 302, ['thanks', 'anonymous=True', 'urgent=True'], type(None)),
 ])
 def test_email_address_required_for_problems(
     client,
@@ -197,18 +197,18 @@ def test_email_address_required_for_problems(
 @pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, numeric_urgency, is_urgent', [
 
     # business hours, always urgent
-    ('problem', 'yes', True, 10, True),
-    ('question', 'yes', True, 10, True),
-    ('problem', 'no', True, 10, True),
-    ('question', 'no', True, 10, True),
+    (PROBLEM_TICKET_TYPE, 'yes', True, 10, True),
+    (QUESTION_TICKET_TYPE, 'yes', True, 10, True),
+    (PROBLEM_TICKET_TYPE, 'no', True, 10, True),
+    (QUESTION_TICKET_TYPE, 'no', True, 10, True),
 
     # out of hours, non emergency, never urgent
-    ('problem', 'no', False, 1, False),
-    ('question', 'no', False, 1, False),
+    (PROBLEM_TICKET_TYPE, 'no', False, 1, False),
+    (QUESTION_TICKET_TYPE, 'no', False, 1, False),
 
     # out of hours, emergency problems are urgent
-    ('problem', 'yes', False, 10, True),
-    ('question', 'yes', False, 1, False),
+    (PROBLEM_TICKET_TYPE, 'yes', False, 10, True),
+    (QUESTION_TICKET_TYPE, 'yes', False, 1, False),
 
 ])
 def test_urgency(
@@ -233,23 +233,23 @@ def test_urgency(
 
 ids, params = zip(*[
     ('non-logged in users always have to triage', (
-        'problem', False, False, True,
+        PROBLEM_TICKET_TYPE, False, False, True,
         302, partial(url_for, 'main.triage')
     )),
     ('trial services are never high priority', (
-        'problem', False, True, False,
+        PROBLEM_TICKET_TYPE, False, True, False,
         200, no_redirect()
     )),
     ('we can triage in hours', (
-        'problem', True, True, True,
+        PROBLEM_TICKET_TYPE, True, True, True,
         200, no_redirect()
     )),
     ('only problems are high priority', (
-        'question', False, True, True,
+        QUESTION_TICKET_TYPE, False, True, True,
         200, no_redirect()
     )),
     ('should triage out of hours', (
-        'problem', False, True, True,
+        PROBLEM_TICKET_TYPE, False, True, True,
         302, partial(url_for, 'main.triage')
     ))
 ])
@@ -293,7 +293,7 @@ def test_doesnt_lose_message_if_post_across_closing(
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=False)
 
     response = logged_in_client.post(
-        url_for('main.feedback', ticket_type='problem'),
+        url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE),
         data={'feedback': 'foo'},
     )
     with logged_in_client.session_transaction() as session:
@@ -302,7 +302,7 @@ def test_doesnt_lose_message_if_post_across_closing(
     assert response.location == url_for('.triage', _external=True)
 
     response = logged_in_client.get(
-        url_for('main.feedback', ticket_type='problem', severe='yes')
+        url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, severe='yes')
     )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -357,7 +357,7 @@ def test_triage_redirects_to_correct_url(client, choice, expected_redirect_param
     assert response.status_code == 302
     assert response.location == url_for(
         'main.feedback',
-        ticket_type='problem',
+        ticket_type=PROBLEM_TICKET_TYPE,
         severe=expected_redirect_param,
         _external=True,
     )
@@ -424,7 +424,7 @@ def test_should_be_shown_the_bat_email(
 
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=is_in_business_hours)
 
-    feedback_page = url_for('main.feedback', ticket_type='problem', severe=severe)
+    feedback_page = url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, severe=severe)
 
     response = client.get(feedback_page)
 
@@ -451,7 +451,7 @@ def test_bat_email_page(
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select('main a')[1].text == 'Fill in this form'
-    assert page.select('main a')[1]['href'] == url_for('main.feedback', ticket_type='problem', severe='no')
+    assert page.select('main a')[1]['href'] == url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, severe='no')
     next_page_response = client.get(page.select('main a')[1]['href'])
     next_page = BeautifulSoup(next_page_response.data.decode('utf-8'), 'html.parser')
     assert next_page.h1.text.strip() == 'Report a problem'
@@ -459,11 +459,11 @@ def test_bat_email_page(
     client.login(active_user_with_permissions, mocker, service_one)
     logged_in_response = client.get(bat_phone_page)
     assert logged_in_response.status_code == 302
-    assert logged_in_response.location == url_for('main.feedback', ticket_type='problem', _external=True)
+    assert logged_in_response.location == url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, _external=True)
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
-@pytest.mark.parametrize('ticket_type', ['problem', 'question'])
+@pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
 def test_log_error_on_post(app_, mocker, ticket_type):
     mock_post = mocker.patch(
         'app.main.views.feedback.requests.post',
@@ -510,3 +510,28 @@ def test_thanks(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert ' '.join(page.find('main').find('p').text.split()) == message
+
+
+@pytest.mark.parametrize('view, old_ticket_type, expected_view, new_ticket_type', [
+    ('old_submit_feedback', 'problem', 'feedback', 'report-problem'),
+    ('old_submit_feedback', 'question', 'feedback', 'ask-question-give-feedback'),
+])
+def test_old_problem_and_question_urls_redirect(
+    client,
+    view,
+    old_ticket_type,
+    expected_view,
+    new_ticket_type
+):
+    response = client.get(
+        url_for(
+            'main.{}'.format(view),
+            ticket_type=old_ticket_type,
+        )
+    )
+    assert response.status_code == 301
+    assert response.location == url_for(
+        'main.{}'.format(expected_view),
+        ticket_type=new_ticket_type,
+        _external=True,
+    )

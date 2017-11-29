@@ -1,4 +1,4 @@
-from flask import (render_template, url_for, redirect, request, abort)
+from flask import (render_template, url_for, redirect, request)
 from app.main import main
 from app import convert_to_boolean
 from app.main.forms import SearchTemplatesForm
@@ -6,6 +6,8 @@ from flask_login import (login_required, current_user)
 
 from notifications_utils.template import HTMLEmailTemplate
 from notifications_utils.international_billing_rates import INTERNATIONAL_BILLING_RATES
+
+from app.main.views.sub_navigation_dictionaries import features_nav
 
 
 @main.route('/')
@@ -54,16 +56,6 @@ def design_content():
     return render_template('views/design-patterns-content-guidance.html')
 
 
-@main.route('/information-security')
-def information_security():
-    return render_template('views/information-security.html')
-
-
-@main.route('/terms')
-def terms():
-    return render_template('views/terms-of-use.html')
-
-
 @main.route('/_email')
 def email_template():
     return str(HTMLEmailTemplate({'subject': 'foo', 'content': (
@@ -109,34 +101,76 @@ def email_template():
 
 @main.route('/documentation')
 def documentation():
-    abort(410)
+    return render_template('views/documentation.html')
 
 
-@main.route('/integration_testing')
+@main.route('/integration-testing')
 def integration_testing():
-    return render_template('views/integration_testing.html')
-
-
-@main.route('/roadmap')
-def roadmap():
-    return render_template('views/roadmap.html')
-
-
-@main.route('/features')
-def features():
-    return render_template('views/features.html')
-
-
-@main.route('/using_notify')
-def using_notify():
-    return render_template('views/using-notify.html')
-
-
-@main.route('/information-risk-management')
-def information_risk_management():
-    return render_template('views/information-risk-management.html')
+    return render_template('views/integration-testing.html')
 
 
 @main.route('/callbacks')
 def callbacks():
     return render_template('views/callbacks.html')
+
+
+# --- Features page set --- #
+
+@main.route('/features')
+def features():
+    return render_template(
+        'views/features.html',
+        navigation_links=features_nav()
+    )
+
+
+@main.route('/features/roadmap', endpoint='roadmap')
+def roadmap():
+    return render_template(
+        'views/roadmap.html',
+        navigation_links=features_nav()
+    )
+
+
+@main.route('/features/security', endpoint='security')
+def security():
+    return render_template(
+        'views/security.html',
+        navigation_links=features_nav()
+    )
+
+
+@main.route('/features/terms', endpoint='terms')
+def terms():
+    return render_template(
+        'views/terms-of-use.html',
+        navigation_links=features_nav()
+    )
+
+
+@main.route('/features/using-notify')
+def using_notify():
+    return render_template(
+        'views/using-notify.html',
+        navigation_links=features_nav()
+    )
+
+
+# --- Redirects --- #
+
+@main.route('/roadmap', endpoint='old_roadmap')
+@main.route('/terms', endpoint='old_terms')
+@main.route('/information-security', endpoint='information_security')
+@main.route('/using_notify', endpoint='old_using_notify')
+@main.route('/information-risk-management', endpoint='information_risk_management')
+@main.route('/integration_testing', endpoint='old_integration_testing')
+def old_page_redirects():
+    redirects = {
+        'main.old_roadmap': 'main.roadmap',
+        'main.old_terms': 'main.terms',
+        'main.information_security': 'main.using_notify',
+        'main.old_using_notify': 'main.using_notify',
+        'main.information_risk_management': 'main.security',
+        'main.old_integration_testing': 'main.integration_testing',
+    }
+    return redirect(url_for(redirects[request.endpoint]), code=301)
