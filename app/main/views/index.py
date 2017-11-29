@@ -104,13 +104,9 @@ def documentation():
     return render_template('views/documentation.html')
 
 
-@main.route('/integration_testing', endpoint='old_integration_testing')
 @main.route('/integration-testing')
 def integration_testing():
-    if request.endpoint == "main.old_integration_testing":
-        return redirect(url_for('.integration_testing'), code=301)
-    else:
-        return render_template('views/integration-testing.html')
+    return render_template('views/integration-testing.html')
 
 
 @main.route('/callbacks')
@@ -118,7 +114,7 @@ def callbacks():
     return render_template('views/callbacks.html')
 
 
-# --- Features --- #
+# --- Features page set --- #
 
 @main.route('/features')
 def features():
@@ -128,50 +124,53 @@ def features():
     )
 
 
-@main.route('/roadmap', endpoint='old_roadmap')
 @main.route('/features/roadmap', endpoint='roadmap')
 def roadmap():
-    if request.endpoint == "main.old_roadmap":
-        return redirect(url_for('.roadmap'), code=301)
-    else:
-        return render_template(
-            'views/roadmap.html',
-            navigation_links=features_nav()
-        )
+    return render_template(
+        'views/roadmap.html',
+        navigation_links=features_nav()
+    )
 
 
-@main.route('/information-risk-management', endpoint='information_risk_management')
 @main.route('/features/security', endpoint='security')
 def security():
-    if request.endpoint == "main.information_risk_management":
-        return redirect(url_for('.security'), code=301)
-    else:
-        return render_template(
-            'views/security.html',
-            navigation_links=features_nav()
-        )
+    return render_template(
+        'views/security.html',
+        navigation_links=features_nav()
+    )
 
 
-@main.route('/terms', endpoint='old_terms')
 @main.route('/features/terms', endpoint='terms')
 def terms():
-    if request.endpoint != "main.terms":
-        return redirect(url_for('.terms'), code=301)
-    else:
-        return render_template(
-            'views/terms-of-use.html',
-            navigation_links=features_nav()
-        )
+    return render_template(
+        'views/terms-of-use.html',
+        navigation_links=features_nav()
+    )
 
 
-@main.route('/information-security', endpoint='information_security')
-@main.route('/using_notify', endpoint='old_using_notify')
 @main.route('/features/using-notify')
 def using_notify():
-    if request.endpoint != "main.using_notify":
-        return redirect(url_for('.using_notify'), code=301)
-    else:
-        return render_template(
-            'views/using-notify.html',
-            navigation_links=features_nav()
-        )
+    return render_template(
+        'views/using-notify.html',
+        navigation_links=features_nav()
+    )
+
+
+# --- Redirects --- #
+
+@main.route('/roadmap', endpoint='old_roadmap')
+@main.route('/terms', endpoint='old_terms')
+@main.route('/information-security', endpoint='information_security')
+@main.route('/using_notify', endpoint='old_using_notify')
+@main.route('/information-risk-management', endpoint='information_risk_management')
+@main.route('/integration_testing', endpoint='old_integration_testing')
+def old_page_redirects():
+    redirects = {
+        'main.old_roadmap': 'main.roadmap',
+        'main.old_terms': 'main.terms',
+        'main.information_security': 'main.using_notify',
+        'main.old_using_notify': 'main.using_notify',
+        'main.information_risk_management': 'main.security',
+        'main.old_integration_testing': 'main.integration_testing',
+    }
+    return redirect(url_for(redirects[request.endpoint]), code=301)
