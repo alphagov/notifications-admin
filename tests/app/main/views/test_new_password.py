@@ -80,3 +80,32 @@ def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_exp
 
     assert response.status_code == 302
     assert response.location == url_for('.forgot_password', _external=True)
+
+
+def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
+    app_,
+    client,
+    mock_get_user,
+    mock_get_user_by_email_request_password_reset,
+    mock_login,
+    mock_send_verify_code,
+    mock_reset_failed_login_count,
+    mock_update_user_password
+):
+    user = mock_get_user_by_email_request_password_reset.return_value
+    user.auth_type = 'email_auth'
+    data = json.dumps({'email': user.email_address, 'created_at': str(datetime.utcnow())})
+    token = generate_token(data, app_.config['SECRET_KEY'], app_.config['DANGEROUS_SALT'])
+
+    response = client.post(url_for('.new_password', token=token), data={'new_password': 'a-new_password'})
+
+    assert response.status_code == 302
+    assert response.location == url_for('.choose_service', _external=True)
+    assert mock_get_user_by_email_request_password_reset.called
+    assert mock_reset_failed_login_count.called
+
+    # the log-in flow makes a couple of calls
+    mock_get_user.assert_called_once_with(user.id)
+    mock_update_user_password.assert_called_once_with(user.id, password='a-new_password')
+
+    assert not mock_send_verify_code.called
