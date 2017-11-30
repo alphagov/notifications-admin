@@ -75,7 +75,7 @@
   <div class="footer-categories">
     <div class="footer-categories-wrapper">
       <div class="grid-row">
-        <div class="column-one-third">
+        <div class="column-one-quarter">
           <h2>Support</h2>
           <ul>
             <li><a href="https://status.notifications.service.gov.uk">System status</a></li>
@@ -84,7 +84,7 @@
             <li><a href="https://ukgovernmentdigital.slack.com/messages/govuk-notify">Chat with the Notify team</a></li>
           </ul>
         </div>
-        <div class="column-one-third">
+        <div class="column-one-quarter">
           <h2>About</h2>
           <ul>
             <li><a href="{{ url_for("main.features") }}">Features</a></li>
@@ -94,7 +94,12 @@
             <li><a href="{{ url_for("main.using_notify") }}">Using Notify</a></li>
           </ul>
         </div>
-        <div class="column-one-third">
+        <div class="column-one-quarter">
+          <ul>
+            <li><a href="{{ url_for("main.pricing") }}">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="column-one-quarter">
           <h2>API documentation</h2>
           <ul>
             {% for language, url in [
