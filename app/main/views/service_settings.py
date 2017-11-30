@@ -536,6 +536,15 @@ def service_set_letters(service_id):
     )
 
 
+@main.route("/services/<service_id>/service-settings/set-auth-type", methods=['GET'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def service_set_auth_type(service_id):
+    return render_template(
+        'views/service-settings/set-auth-type.html',
+    )
+
+
 @main.route("/services/<service_id>/service-settings/letter-contacts", methods=['GET'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
