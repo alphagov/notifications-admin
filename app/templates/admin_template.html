@@ -76,16 +76,14 @@
     <div class="footer-categories-wrapper">
       <div class="grid-row">
         <div class="column-one-quarter">
-          <h2>Support</h2>
           <ul>
-            <li><a href="https://status.notifications.service.gov.uk">System status</a></li>
             <li><a href="{{ url_for('main.support') }}">Support</a></li>
+            <li><a href="https://status.notifications.service.gov.uk">System status</a></li>
             <li><a href="https://www.gov.uk/performance/govuk-notify">Performance</a></li>
             <li><a href="https://ukgovernmentdigital.slack.com/messages/govuk-notify">Chat with the Notify team</a></li>
           </ul>
         </div>
         <div class="column-one-quarter">
-          <h2>About</h2>
           <ul>
             <li><a href="{{ url_for("main.features") }}">Features</a></li>
             <li><a href="{{ url_for("main.roadmap") }}">Roadmap</a></li>
@@ -100,19 +98,8 @@
           </ul>
         </div>
         <div class="column-one-quarter">
-          <h2>API documentation</h2>
           <ul>
-            {% for language, url in [
-              ('Java', 'https://github.com/alphagov/notifications-java-client'),
-              ('.NET', 'https://github.com/alphagov/notifications-net-client'),
-              ('Node JS', 'https://github.com/alphagov/notifications-node-client'),
-              ('PHP', 'https://github.com/alphagov/notifications-php-client'),
-              ('Python', 'https://github.com/alphagov/notifications-python-client'),
-              ('Ruby', 'https://github.com/alphagov/notifications-ruby-client')
-            ] %}
-            <li><a href="{{ url }}" target="_blank" rel="noopener noreferrer">{{ language }} client</a></li>
-            {% endfor %}
-            <li><a href="{{ url_for("main.integration_testing") }}">Integration testing</a></li>
+            <li><a href="{{ url_for("main.documentation") }}">Documentation</a></li>
           </ul>
         </div>
       </div>
