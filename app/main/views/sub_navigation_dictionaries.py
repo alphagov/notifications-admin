@@ -13,11 +13,6 @@ def features_nav():
             "link": "main.security",
         },
         {
-            "name": "Performance",
-            "link": "https://www.gov.uk/performance/govuk-notify",
-            "external_link": True,
-        },
-        {
             "name": "Terms of use",
             "link": "main.terms",
         },

@@ -44,6 +44,8 @@
       <nav id="proposition-menu">
         <ul id="proposition-links">
           <li><a href="{{ url_for('main.support') }}">Support</a></li>
+          <li><a href="{{ url_for('main.features') }}">Features</a></li>
+          <li><a href="{{ url_for('main.documentation') }}">Documentation</a></li>
           {% if current_user.is_authenticated %}
             <li><a href="{{ url_for('main.user_profile') }}">{{ current_user.name }}</a></li>
             {% if current_user.has_permissions(admin_override=True) %}
@@ -51,9 +53,7 @@
             {% endif %}
             <li><a href="{{ url_for('main.sign_out')}}">Sign out</a></li>
           {% else %}
-            <li><a href="{{ url_for('main.features' )}}">Features</a></li>
             <li><a href="{{ url_for('main.pricing' )}}">Pricing</a></li>
-            <li><a href="{{ url_for('main.documentation' )}}">Documentation</a></li>
             <li><a href="{{ url_for('main.sign_in' )}}">Sign in</a></li>
           {% endif %}
         </ul>
@@ -75,39 +75,31 @@
   <div class="footer-categories">
     <div class="footer-categories-wrapper">
       <div class="grid-row">
-        <div class="column-one-third">
-          <h2>Support</h2>
+        <div class="column-one-quarter">
           <ul>
-            <li><a href="https://status.notifications.service.gov.uk">System status</a></li>
             <li><a href="{{ url_for('main.support') }}">Support</a></li>
+            <li><a href="https://status.notifications.service.gov.uk">System status</a></li>
             <li><a href="https://www.gov.uk/performance/govuk-notify">Performance</a></li>
-            <li><a href="https://ukgovernmentdigital.slack.com/messages/govuk-notify">Chat with the Notify team</a></li>
+            <li><a href="https://ukgovernmentdigital.slack.com/messages/govuk-notify">Slack channel</a></li>
           </ul>
         </div>
-        <div class="column-one-third">
-          <h2>About</h2>
+        <div class="column-one-quarter">
           <ul>
-            <li><a href="{{ url_for("main.using_notify") }}">Using Notify</a></li>
             <li><a href="{{ url_for("main.features") }}">Features</a></li>
             <li><a href="{{ url_for("main.roadmap") }}">Roadmap</a></li>
+            <li><a href="{{ url_for("main.security") }}">Security</a></li>
             <li><a href="{{ url_for("main.terms") }}">Terms of use</a></li>
+            <li><a href="{{ url_for("main.using_notify") }}">Using Notify</a></li>
+          </ul>
+        </div>
+        <div class="column-one-quarter">
+          <ul>
             <li><a href="{{ url_for("main.pricing") }}">Pricing</a></li>
           </ul>
         </div>
-        <div class="column-one-third">
-          <h2>API documentation</h2>
+        <div class="column-one-quarter">
           <ul>
-            {% for language, url in [
-              ('Java', 'https://github.com/alphagov/notifications-java-client'),
-              ('.NET', 'https://github.com/alphagov/notifications-net-client'),
-              ('Node JS', 'https://github.com/alphagov/notifications-node-client'),
-              ('PHP', 'https://github.com/alphagov/notifications-php-client'),
-              ('Python', 'https://github.com/alphagov/notifications-python-client'),
-              ('Ruby', 'https://github.com/alphagov/notifications-ruby-client')
-            ] %}
-            <li><a href="{{ url }}" target="_blank" rel="noopener noreferrer">{{ language }} client</a></li>
-            {% endfor %}
-            <li><a href="{{ url_for("main.integration_testing") }}">Integration testing</a></li>
+            <li><a href="{{ url_for("main.documentation") }}">Documentation</a></li>
           </ul>
         </div>
       </div>
