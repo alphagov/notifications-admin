@@ -35,14 +35,10 @@ def test_logged_in_user_redirects_to_choose_service(
     'features', 'callbacks', 'documentation', 'security'
 ])
 def test_static_pages(
-    client,
+    client_request,
     view,
 ):
-    response = client.get(url_for('main.{}'.format(view)))
-    assert response.status_code == 200
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
+    page = client_request.get('main.{}'.format(view))
     assert not page.select_one('meta[name=description]')
 
 
