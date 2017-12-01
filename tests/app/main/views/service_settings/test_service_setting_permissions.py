@@ -39,6 +39,12 @@ def get_service_settings_page(
 
     ({'permissions': ['sms']}, '.service_set_inbound_number', {'set_inbound_sms': True}, 'Allow inbound sms'),
 
+    (
+        {'permissions': ['letter', 'letters_as_pdf']},
+        '.service_switch_send_letters_as_pdf', {}, 'Stop sending letters as PDF'
+    ),
+    ({'permissions': ['letter']}, '.service_switch_send_letters_as_pdf', {}, 'Send letters as PDF'),
+
     ({'active': True}, '.archive_service', {}, 'Archive service'),
     ({'active': True}, '.suspend_service', {}, 'Suspend service'),
     ({'active': False}, '.resume_service', {}, 'Resume service'),
@@ -62,6 +68,20 @@ def test_service_settings_doesnt_show_inbound_options_if_sms_disabled(
     page = get_service_settings_page()
     toggles = page.find_all('a', {'class': 'button'})
     assert not any(button for button in toggles if 'inbound sms' in button.text)
+
+
+@pytest.mark.parametrize('permissions', [
+    ['letters_as_pdf'], []
+])
+def test_service_settings_doesnt_show_letters_as_pdf_options_if_letters_disabled(
+    get_service_settings_page,
+    service_one,
+    permissions
+):
+    service_one['permissions'] = permissions
+    page = get_service_settings_page()
+    toggles = page.find_all('a', {'class': 'button'})
+    assert not any(button for button in toggles if 'letters as PDF' in button.text)
 
 
 @pytest.mark.parametrize('service_fields, hidden_button_text', [
