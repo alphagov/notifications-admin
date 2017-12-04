@@ -630,7 +630,7 @@ def test_usage_page_with_year_argument(
     logged_in_client,
     mock_get_usage,
     mock_get_billable_units,
-    mock_get_free_sms_fragment_limit
+    mock_get_free_sms_fragment_limit,
 ):
     assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2000)).status_code == 200
     mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2000)
