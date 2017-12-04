@@ -391,3 +391,267 @@ def test_should_validate_whitelist_items(
     assert jump_links[1]['href'] == '#phone_numbers'
 
     mock_update_whitelist.assert_not_called()
+
+
+@pytest.mark.parametrize('url, bearer_token, expected_errors', [
+    ("", "", "Can’t be empty Can’t be empty"),
+    ("http://not_https.com", "1234567890", "Must be a valid https URL"),
+    ("https://test.com", "123456789", "Must be at least 10 characters"),
+])
+def test_set_outbound_api_validation(
+    client_request,
+    service_one,
+    url,
+    bearer_token,
+    expected_errors,
+    mock_create_service_callback_api,
+    mock_update_service_callback_api
+):
+    response = client_request.post(
+        'main.api_callbacks',
+        service_id=service_one['id'],
+        _data={"outbound_url": url, "outbound_bearer_token": bearer_token},
+        _expected_status=200
+    )
+    error_msgs = ' '.join(msg.text.strip() for msg in response.select(".error-message"))
+
+    assert error_msgs == expected_errors
+    mock_create_service_callback_api.assert_not_called()
+    mock_update_service_callback_api.assert_not_called()
+
+
+@pytest.mark.parametrize('url, bearer_token, expected_errors', [
+    ("", "", "Can’t be empty Can’t be empty Can’t be empty Can’t be empty"),
+    ("http://not_https.com", "1234567890", "Must be a valid https URL Must be a valid https URL"),
+    ("https://test.com", "123456789", "Must be at least 10 characters Must be at least 10 characters"),
+])
+def test_set_inbound_api_validation(
+    client_request,
+    service_one,
+    url,
+    bearer_token,
+    expected_errors,
+    fake_uuid
+):
+    service_one['permissions'] = ['inbound_sms']
+
+    data = {
+        "inbound_url": url,
+        "inbound_bearer_token": bearer_token,
+        "outbound_url": url,
+        "outbound_bearer_token": bearer_token
+    }
+
+    response = client_request.post(
+        'main.api_callbacks',
+        service_id=service_one['id'],
+        _data=data,
+        _expected_status=200
+    )
+    error_msgs = ' '.join(msg.text.strip() for msg in response.select(".error-message"))
+
+    assert error_msgs == expected_errors
+
+
+def test_create_new_callback_api_without_inbound_set(
+    client_request,
+    service_one,
+    mock_create_service_callback_api,
+    mock_get_notifications,
+    fake_uuid,
+    mocker,
+):
+    service_one['service_callback_api'] = []
+
+    callback_api_data = {
+        'outbound_url': "https://test.url.com/",
+        'outbound_bearer_token': '1234567890',
+        'user_id': fake_uuid
+    }
+
+    client_request.post(
+        'main.api_callbacks',
+        service_id=service_one['id'],
+        _data=callback_api_data,
+        _follow_redirects=True,
+    )
+
+    callback_api_data['updated_by_id'] = service_one['users'][0]
+
+    mock_create_service_callback_api.assert_called_once_with(
+        service_one['id'],
+        url="https://test.url.com/",
+        bearer_token="1234567890",
+        user_id=fake_uuid
+    )
+
+
+def test_update_new_callback_api_without_inbound_set(
+    client_request,
+    service_one,
+    mock_get_valid_service_callback_api,
+    mock_update_service_callback_api,
+    mock_get_notifications,
+    fake_uuid,
+    mocker,
+):
+    service_one['service_callback_api'] = [fake_uuid]
+
+    callback_api_data = {
+        'outbound_url': "https://test.url.com/",
+        'outbound_bearer_token': '1234567890',
+        'user_id': fake_uuid
+    }
+
+    client_request.post(
+        'main.api_callbacks',
+        service_id=service_one['id'],
+        _data=callback_api_data,
+        _follow_redirects=True,
+    )
+
+    callback_api_data['updated_by_id'] = service_one['users'][0]
+
+    mock_update_service_callback_api.assert_called_once_with(
+        service_one['id'],
+        url="https://test.url.com/",
+        bearer_token="1234567890",
+        user_id=fake_uuid,
+        callback_api_id=fake_uuid
+    )
+
+
+def test_inbound_fields_do_not_show_if_inbound_is_disabled(
+    client_request,
+    service_one,
+    mocker
+):
+    response = client_request.get(
+        'main.api_callbacks',
+        service_id=service_one['id'],
+        _expected_status=200
+    )
+    assert response.select_one('label[for="inbound_url"]') is None
+    assert response.select_one('label[for="inbound_bearer_token"]') is None
+
+
+def test_create_inbound_and_outbound_apis(
+    client_request,
+    service_one,
+    mocker,
+    mock_create_service_callback_api,
+    mock_create_service_inbound_api,
+    mock_get_notifications,
+    fake_uuid,
+):
+    service_one['permissions'] = ['inbound_sms']
+
+    callback_api_data = {
+        'outbound_url': "https://test.url.com/",
+        'outbound_bearer_token': '1234567890',
+        'inbound_url': "https://test2.url.com/",
+        'inbound_bearer_token': '5678901234',
+        'user_id': fake_uuid
+    }
+
+    client_request.post(
+        'main.api_callbacks',
+        service_id=service_one['id'],
+        _data=callback_api_data,
+        _follow_redirects=True,
+    )
+
+    mock_create_service_callback_api.assert_called_once_with(
+        service_one['id'],
+        url="https://test.url.com/",
+        bearer_token="1234567890",
+        user_id=fake_uuid
+    )
+
+    mock_create_service_inbound_api.assert_called_once_with(
+        service_one['id'],
+        url="https://test2.url.com/",
+        bearer_token="5678901234",
+        user_id=fake_uuid
+    )
+
+
+def test_update_inbound_and_outbound_apis(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_valid_service_callback_api,
+    mock_get_valid_service_inbound_api,
+    mock_update_service_callback_api,
+    mock_update_service_inbound_api,
+    mock_get_notifications,
+    fake_uuid,
+):
+    service_one['service_callback_api'] = [fake_uuid]
+    service_one['inbound_api'] = [fake_uuid]
+    service_one['permissions'] = ['inbound_sms']
+
+    callback_api_data = {
+        'outbound_url': "https://test.url.com/",
+        'outbound_bearer_token': '1234567890',
+        'inbound_url': "https://test2.url.com/",
+        'inbound_bearer_token': '5678901234',
+        'user_id': fake_uuid
+    }
+
+    client_request.post(
+        'main.api_callbacks',
+        service_id=service_one['id'],
+        _data=callback_api_data,
+        _follow_redirects=True,
+    )
+
+    mock_update_service_callback_api.assert_called_once_with(
+        service_one['id'],
+        url="https://test.url.com/",
+        bearer_token="1234567890",
+        user_id=fake_uuid,
+        callback_api_id=fake_uuid
+    )
+
+    mock_update_service_inbound_api.assert_called_once_with(
+        service_one['id'],
+        url="https://test2.url.com/",
+        bearer_token="5678901234",
+        user_id=fake_uuid,
+        inbound_api_id=fake_uuid
+    )
+
+
+def test_save_callback_apis_without_changes_does_not_update_callback_apis(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_valid_service_callback_api,
+    mock_get_valid_service_inbound_api,
+    mock_update_service_callback_api,
+    mock_update_service_inbound_api,
+    mock_get_notifications,
+    fake_uuid,
+):
+    service_one['service_callback_api'] = [fake_uuid]
+    service_one['inbound_api'] = [fake_uuid]
+    service_one['permissions'] = ['inbound_sms']
+
+    callback_api_data = {
+        'outbound_url': "https://hello2.gov.uk",
+        'outbound_bearer_token': 'bearer_token_set',
+        'inbound_url': "https://hello3.gov.uk",
+        'inbound_bearer_token': 'bearer_token_set',
+        'user_id': fake_uuid
+    }
+
+    client_request.post(
+        'main.api_callbacks',
+        service_id=service_one['id'],
+        _data=callback_api_data,
+        _follow_redirects=True,
+    )
+
+    assert mock_update_service_callback_api.called is False
+    assert mock_update_service_inbound_api.called is False

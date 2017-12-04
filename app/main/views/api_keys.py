@@ -1,10 +1,12 @@
 from flask import request, render_template, redirect, url_for, flash, Markup, abort
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.main import main
-from app.main.forms import CreateKeyForm, Whitelist
+from app.main.forms import CreateKeyForm, Whitelist, ServiceCallbacksForm
 from app import api_key_api_client, service_api_client, notification_api_client, current_service
 from app.utils import user_has_permissions, email_safe
 from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
+
+dummy_bearer_token = 'bearer_token_set'
 
 
 @main.route("/services/<service_id>/api")
@@ -113,3 +115,87 @@ def revoke_api_key(service_id, key_id):
         api_key_api_client.revoke_api_key(service_id=service_id, key_id=key_id)
         flash('‘{}’ was revoked'.format(key_name), 'default_with_tick')
         return redirect(url_for('.api_keys', service_id=service_id))
+
+
+def get_apis():
+    callback_api = None
+    inbound_api = None
+    if current_service['service_callback_api']:
+        callback_api = service_api_client.get_service_callback_api(
+            current_service['id'],
+            current_service.get('service_callback_api')[0]
+        )
+    if current_service['inbound_api']:
+        inbound_api = service_api_client.get_service_inbound_api(
+            current_service['id'],
+            current_service.get('inbound_api')[0]
+        )
+
+    return (callback_api, inbound_api)
+
+
+def check_token_against_dummy_bearer(token):
+    if token != dummy_bearer_token:
+        return token
+    else:
+        return ''
+
+
+@main.route("/services/<service_id>/api/callbacks", methods=['GET', 'POST'])
+@login_required
+def api_callbacks(service_id):
+    callback_api, inbound_api = get_apis()
+    can_receive_inbound = 'inbound_sms' in current_service['permissions']
+
+    form = ServiceCallbacksForm(
+        inbound_url=inbound_api.get('url') if inbound_api else '',
+        inbound_bearer_token=dummy_bearer_token if inbound_api else '',
+        outbound_url=callback_api.get('url') if callback_api else '',
+        outbound_bearer_token=dummy_bearer_token if callback_api else '',
+        can_receive_inbound=can_receive_inbound,
+    )
+
+    if form.validate_on_submit():
+        if callback_api:
+            if (callback_api.get('url') != form.outbound_url.data
+                    or form.outbound_bearer_token.data != dummy_bearer_token):
+                service_api_client.update_service_callback_api(
+                    service_id,
+                    url=form.outbound_url.data,
+                    bearer_token=check_token_against_dummy_bearer(form.outbound_bearer_token.data),
+                    user_id=current_user.id,
+                    callback_api_id=callback_api.get('id')
+                )
+        else:
+            service_api_client.create_service_callback_api(
+                service_id,
+                url=form.outbound_url.data,
+                bearer_token=form.outbound_bearer_token.data,
+                user_id=current_user.id
+            )
+        if can_receive_inbound:
+            if inbound_api:
+                if (inbound_api.get('url') != form.inbound_url.data
+                        or form.inbound_bearer_token.data != dummy_bearer_token):
+                    service_api_client.update_service_inbound_api(
+                        service_id,
+                        url=form.inbound_url.data,
+                        bearer_token=check_token_against_dummy_bearer(form.inbound_bearer_token.data),
+                        user_id=current_user.id,
+                        inbound_api_id=inbound_api.get('id')
+                    )
+            else:
+                service_api_client.create_service_inbound_api(
+                    service_id,
+                    url=form.inbound_url.data,
+                    bearer_token=form.inbound_bearer_token.data,
+                    user_id=current_user.id
+                )
+
+        return redirect(url_for('.api_integration', service_id=service_id))
+
+    return render_template(
+        'views/api/callbacks.html',
+        form=form,
+        can_receive_inbound=can_receive_inbound,
+    )

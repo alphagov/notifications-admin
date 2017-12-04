@@ -717,15 +717,38 @@ class ServiceInboundNumberForm(Form):
     )
 
 
-class ServiceInboundApiForm(Form):
-    url = StringField("Callback URL",
-                      validators=[DataRequired(message='Can’t be empty'),
-                                  Regexp(regex="^https.*",
-                                         message='Must be a valid https URL')]
-                      )
-    bearer_token = PasswordFieldShowHasContent("Bearer token",
-                                               validators=[DataRequired(message='Can’t be empty'),
-                                                           Length(min=10, message='Must be at least 10 characters')])
+class ServiceCallbacksForm(Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.can_receive_inbound = kwargs['can_receive_inbound']
+
+    inbound_url = StringField("Inbound URL")
+    inbound_bearer_token = PasswordFieldShowHasContent("Bearer token")
+    outbound_url = StringField(
+        "Outbound URL",
+        validators=[DataRequired(message='Can’t be empty'),
+                    Regexp(regex="^https.*", message='Must be a valid https URL')]
+    )
+    outbound_bearer_token = PasswordFieldShowHasContent(
+        "Bearer token",
+        validators=[DataRequired(message='Can’t be empty'),
+                    Length(min=10, message='Must be at least 10 characters')]
+    )
+
+    def validate_inbound_url(self, field):
+        pattern = re.compile("^https.*")
+        if self.can_receive_inbound:
+            if not field.data:
+                raise ValidationError('Can’t be empty')
+            elif not pattern.match(field.data):
+                raise ValidationError('Must be a valid https URL')
+
+    def validate_inbound_bearer_token(self, field):
+        if self.can_receive_inbound:
+            if not field.data:
+                raise ValidationError('Can’t be empty')
+            elif len(field.data) < 10:
+                raise ValidationError('Must be at least 10 characters')
 
 
 class InternationalSMSForm(Form):
