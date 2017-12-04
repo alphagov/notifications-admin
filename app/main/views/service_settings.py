@@ -732,14 +732,7 @@ def set_free_sms_allowance(service_id):
     form = FreeSMSAllowance(free_sms_allowance=billing_api_client.get_free_sms_fragment_limit_for_year(service_id))
 
     if form.validate_on_submit():
-        service_api_client.update_service(
-            service_id,
-            # TODO: Retire this eventually after using annual_billing
-            free_sms_fragment_limit=form.free_sms_allowance.data,
-        )
-
-        # TODO: Comment out until data migration
-        # billing_api_client.create_or_update_free_sms_fragment_limit(service_id, form.free_sms_allowance.data)
+        billing_api_client.create_or_update_free_sms_fragment_limit(service_id, form.free_sms_allowance.data)
 
         return redirect(url_for('.service_settings', service_id=service_id))
 
