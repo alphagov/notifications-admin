@@ -1596,7 +1596,6 @@ def test_should_show_page_to_set_sms_allowance(
 ])
 def test_should_set_sms_allowance(
     logged_in_platform_admin_client,
-    mock_update_service,
     given_allowance,
     expected_api_argument,
     mock_get_free_sms_fragment_limit,
@@ -1615,15 +1614,10 @@ def test_should_set_sms_allowance(
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
 
-    mock_update_service.assert_called_once_with(
+    mock_create_or_update_free_sms_fragment_limit.assert_called_with(
         SERVICE_ONE_ID,
-        free_sms_fragment_limit=expected_api_argument,
+        expected_api_argument
     )
-    # Not assert until using the annual_billing end points
-    # mock_create_or_update_free_sms_fragment_limit.assert_called_with(
-    #     SERVICE_ONE_ID,
-    #     expected_api_argument
-    # )
 
 
 def test_switch_service_enable_letters(

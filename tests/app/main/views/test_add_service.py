@@ -45,7 +45,6 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         service_name='testing the post',
         organisation_type='local',
         message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
-        free_sms_fragment_limit=25000,
         restricted=True,
         user_id=api_user_active.id,
         email_from='testing.the.post'
@@ -68,6 +67,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         template_id="Example%20text%20message%20template",
         _external=True
     )
+    mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, 25000)
 
 
 @pytest.mark.parametrize('organisation_type, free_allowance', [
@@ -98,11 +98,11 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
         service_name='testing the post',
         organisation_type=organisation_type,
         message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
-        free_sms_fragment_limit=free_allowance,
         restricted=True,
         user_id=api_user_active.id,
         email_from='testing.the.post'
     )
+    mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, free_allowance)
     assert len(mock_create_service_template.call_args_list) == 0
     assert session['service_id'] == 101
     assert response.status_code == 302
