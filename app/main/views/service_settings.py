@@ -293,6 +293,14 @@ def service_switch_can_send_letters(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
+@main.route("/services/<service_id>/service-settings/send-letters-as-pdf")
+@login_required
+@user_has_permissions(admin_override=True)
+def service_switch_send_letters_as_pdf(service_id):
+    switch_service_permissions(service_id, 'letters_as_pdf')
+    return redirect(url_for('.service_settings', service_id=service_id))
+
+
 @main.route("/services/<service_id>/service-settings/can-send-international-sms")
 @login_required
 @user_has_permissions(admin_override=True)
