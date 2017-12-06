@@ -521,8 +521,8 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
         choose_time_form = ChooseTimeForm()
 
-    with suppress(StopIteration):
-        template.values = next(recipients.rows)
+    with suppress(IndexError):
+        template.values = recipients[0]
 
     session['upload_data']['notification_count'] = len(list(recipients.rows))
     session['upload_data']['valid'] = not recipients.has_errors
