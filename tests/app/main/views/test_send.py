@@ -454,14 +454,34 @@ def test_upload_valid_csv_redirects_to_check_page(
     )
 
 
+@pytest.mark.parametrize('extra_args, expected_recipient, expected_message', [
+    (
+        {},
+        'To: 07700900001',
+        'Test Service: A, Template <em>content</em> with & entity',
+    ),
+    (
+        {'row_index': 0},
+        'To: 07700900001',
+        'Test Service: A, Template <em>content</em> with & entity',
+    ),
+    (
+        {'row_index': 2},
+        'To: 07700900003',
+        'Test Service: C, Template <em>content</em> with & entity',
+    ),
+])
 def test_upload_valid_csv_shows_preview_and_table(
     client_request,
     mocker,
+    mock_get_live_service,
     mock_get_service_template_with_placeholders,
-    mock_s3_upload,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
     fake_uuid,
+    extra_args,
+    expected_recipient,
+    expected_message,
 ):
 
     with client_request.session_transaction() as session:
@@ -469,7 +489,9 @@ def test_upload_valid_csv_shows_preview_and_table(
 
     mocker.patch('app.main.views.send.s3download', return_value="""
         phone number,name,thing,thing,thing
-        07700900986, Jo,  foo,  foo,  foo
+        07700900001, A,   foo,  foo,  foo
+        07700900002, B,   foo,  foo,  foo
+        07700900003, C,   foo,  foo,  foo
     """)
 
     page = client_request.get(
@@ -477,13 +499,17 @@ def test_upload_valid_csv_shows_preview_and_table(
         service_id=SERVICE_ONE_ID,
         template_type='sms',
         upload_id=fake_uuid,
+        **extra_args
     )
 
     assert page.h1.text.strip() == 'Preview of Two week reminder'
+    assert page.select_one('.sms-message-recipient').text.strip() == expected_recipient
+    assert page.select_one('.sms-message-wrapper').text.strip() == expected_message
+
     for index, cell in enumerate([
         '<td class="table-field-index"> <span class=""> 2 </span> </td>',
-        '<td class="table-field-center-aligned "> <div class=""> 07700900986 </div> </td>',
-        '<td class="table-field-center-aligned "> <div class=""> Jo </div> </td>',
+        '<td class="table-field-center-aligned "> <div class=""> 07700900001 </div> </td>',
+        '<td class="table-field-center-aligned "> <div class=""> A </div> </td>',
         (
             '<td class="table-field-center-aligned "> '
             '<div class="table-field-status-default"> '
@@ -495,6 +521,43 @@ def test_upload_valid_csv_shows_preview_and_table(
         ),
     ]):
         assert normalize_spaces(str(page.select('table tbody td')[index])) == cell
+
+
+@pytest.mark.parametrize('row_index, expected_status', [
+    (0, 200),
+    (2, 200),
+    (3, 404),
+])
+def test_404_for_previewing_a_row_out_of_range(
+    client_request,
+    mocker,
+    mock_get_live_service,
+    mock_get_service_template_with_placeholders,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    fake_uuid,
+    row_index,
+    expected_status,
+):
+
+    with client_request.session_transaction() as session:
+        session['upload_data'] = {'template_id': fake_uuid}
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        phone number,name,thing,thing,thing
+        07700900001, A,   foo,  foo,  foo
+        07700900002, B,   foo,  foo,  foo
+        07700900003, C,   foo,  foo,  foo
+    """)
+
+    client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_type='sms',
+        upload_id=fake_uuid,
+        row_index=row_index,
+        _expected_status=expected_status,
+    )
 
 
 def test_send_test_doesnt_show_file_contents(
@@ -1389,6 +1452,20 @@ def test_can_start_letters_job(
 
 
 @pytest.mark.parametrize('filetype', ['pdf', 'png'])
+@pytest.mark.parametrize('extra_args, expected_values', [
+    (
+        {},
+        {'postcode': 'abc123', 'addressline1': '123 street'},
+    ),
+    (
+        {'row_index': 0},
+        {'postcode': 'abc123', 'addressline1': '123 street'},
+    ),
+    (
+        {'row_index': 1},
+        {'postcode': 'cba321', 'addressline1': '321 avenue'},
+    ),
+])
 def test_should_show_preview_letter_message(
     filetype,
     logged_in_platform_admin_client,
@@ -1398,6 +1475,8 @@ def test_should_show_preview_letter_message(
     service_one,
     fake_uuid,
     mocker,
+    extra_args,
+    expected_values,
 ):
     service_one['permissions'] = ['letter']
     mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
@@ -1407,7 +1486,8 @@ def test_should_show_preview_letter_message(
         'app.main.views.send.s3download',
         return_value='\n'.join(
             ['address line 1, postcode'] +
-            ['123 street, abc123']
+            ['123 street, abc123'] +
+            ['321 avenue, cba321']
         )
     )
     mocked_preview = mocker.patch(
@@ -1430,7 +1510,8 @@ def test_should_show_preview_letter_message(
             service_id=service_id,
             template_type='letter',
             upload_id=fake_uuid,
-            filetype=filetype
+            filetype=filetype,
+            **extra_args
         )
     )
 
@@ -1441,6 +1522,7 @@ def test_should_show_preview_letter_message(
     assert mocked_preview.call_args[0][0].id == template_id
     assert type(mocked_preview.call_args[0][0]) == LetterPreviewTemplate
     assert mocked_preview.call_args[0][1] == filetype
+    assert mocked_preview.call_args[0][0].values == expected_values
 
 
 def test_dont_show_preview_letter_templates_for_bad_filetype(
