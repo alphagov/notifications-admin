@@ -441,7 +441,7 @@ def test_upload_csv_invalid_extension(
 
 
 def test_upload_valid_csv_shows_file_contents(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_service_template_with_placeholders,
     mock_s3_upload,
@@ -455,14 +455,13 @@ def test_upload_valid_csv_shows_file_contents(
         07700900986, Jo,  foo,  foo,  foo
     """)
 
-    response = logged_in_client.post(
-        url_for('main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
-        follow_redirects=True,
+    page = client_request.post(
+        'main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
+        _follow_redirects=True,
+        _expected_status=200,
     )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.text.strip() == 'Preview of Two week reminder'
     for index, cell in enumerate([
         '<td class="table-field-index"> <span class=""> 2 </span> </td>',
