@@ -21,7 +21,7 @@ from app.main.views import (  # noqa
     styleguide,
     user_profile,
     choose_service,
-    api_keys,
+    api_integration,
     manage_users,
     invites,
     feedback,
