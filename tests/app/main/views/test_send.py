@@ -440,7 +440,21 @@ def test_upload_csv_invalid_extension(
     assert "invalid.txt isn’t a spreadsheet that Notify can read" in resp.get_data(as_text=True)
 
 
-def test_upload_valid_csv_shows_file_contents(
+def test_upload_valid_csv_redirects_to_check_page(
+    client_request,
+    mock_get_service_template_with_placeholders,
+    mock_s3_upload,
+    fake_uuid,
+):
+    client_request.post(
+        'main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
+        _expected_status=302,
+        expected_redirect='foo'
+    )
+
+
+def test_upload_valid_csv_shows_preview_and_table(
     client_request,
     mocker,
     mock_get_service_template_with_placeholders,
@@ -450,16 +464,19 @@ def test_upload_valid_csv_shows_file_contents(
     fake_uuid,
 ):
 
+    with client_request.session_transaction() as session:
+        session['upload_data'] = {'template_id': fake_uuid}
+
     mocker.patch('app.main.views.send.s3download', return_value="""
         phone number,name,thing,thing,thing
         07700900986, Jo,  foo,  foo,  foo
     """)
 
-    page = client_request.post(
-        'main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid,
-        _data={'file': (BytesIO(''.encode('utf-8')), 'valid.csv')},
-        _follow_redirects=True,
-        _expected_status=200,
+    page = client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_type='sms',
+        upload_id=fake_uuid,
     )
 
     assert page.h1.text.strip() == 'Preview of Two week reminder'
