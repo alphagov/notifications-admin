@@ -13,6 +13,8 @@ from tests.conftest import (
     mock_get_service_with_letters,
     normalize_spaces,
     SERVICE_ONE_ID,
+    mock_get_valid_service_callback_api,
+    mock_get_valid_service_inbound_api,
 )
 
 
@@ -393,236 +395,6 @@ def test_should_validate_whitelist_items(
     mock_update_whitelist.assert_not_called()
 
 
-@pytest.mark.parametrize('url, bearer_token, expected_errors', [
-    ("", "", "Can’t be empty Can’t be empty"),
-    ("http://not_https.com", "1234567890", "Must be a valid https URL"),
-    ("https://test.com", "123456789", "Must be at least 10 characters"),
-])
-def test_set_outbound_api_validation(
-    client_request,
-    service_one,
-    url,
-    bearer_token,
-    expected_errors,
-    mock_create_service_callback_api,
-    mock_update_service_callback_api
-):
-    response = client_request.post(
-        'main.api_callbacks',
-        service_id=service_one['id'],
-        _data={"outbound_url": url, "outbound_bearer_token": bearer_token},
-        _expected_status=200
-    )
-    error_msgs = ' '.join(msg.text.strip() for msg in response.select(".error-message"))
-
-    assert error_msgs == expected_errors
-    mock_create_service_callback_api.assert_not_called()
-    mock_update_service_callback_api.assert_not_called()
-
-
-@pytest.mark.parametrize('url, bearer_token, expected_errors', [
-    ("", "", "Can’t be empty Can’t be empty Can’t be empty Can’t be empty"),
-    ("http://not_https.com", "1234567890", "Must be a valid https URL Must be a valid https URL"),
-    ("https://test.com", "123456789", "Must be at least 10 characters Must be at least 10 characters"),
-])
-def test_set_inbound_api_validation(
-    client_request,
-    service_one,
-    url,
-    bearer_token,
-    expected_errors,
-    fake_uuid
-):
-    service_one['permissions'] = ['inbound_sms']
-
-    data = {
-        "inbound_url": url,
-        "inbound_bearer_token": bearer_token,
-        "outbound_url": url,
-        "outbound_bearer_token": bearer_token
-    }
-
-    response = client_request.post(
-        'main.api_callbacks',
-        service_id=service_one['id'],
-        _data=data,
-        _expected_status=200
-    )
-    error_msgs = ' '.join(msg.text.strip() for msg in response.select(".error-message"))
-
-    assert error_msgs == expected_errors
-
-
-def test_create_new_callback_api_without_inbound_set(
-    client_request,
-    service_one,
-    mock_create_service_callback_api,
-    mock_get_notifications,
-    fake_uuid,
-    mocker,
-):
-    service_one['service_callback_api'] = []
-
-    callback_api_data = {
-        'outbound_url': "https://test.url.com/",
-        'outbound_bearer_token': '1234567890',
-        'user_id': fake_uuid
-    }
-
-    client_request.post(
-        'main.api_callbacks',
-        service_id=service_one['id'],
-        _data=callback_api_data,
-        _follow_redirects=True,
-    )
-
-    callback_api_data['updated_by_id'] = service_one['users'][0]
-
-    mock_create_service_callback_api.assert_called_once_with(
-        service_one['id'],
-        url="https://test.url.com/",
-        bearer_token="1234567890",
-        user_id=fake_uuid
-    )
-
-
-def test_update_new_callback_api_without_inbound_set(
-    client_request,
-    service_one,
-    mock_get_valid_service_callback_api,
-    mock_update_service_callback_api,
-    mock_get_notifications,
-    fake_uuid,
-    mocker,
-):
-    service_one['service_callback_api'] = [fake_uuid]
-
-    callback_api_data = {
-        'outbound_url': "https://test.url.com/",
-        'outbound_bearer_token': '1234567890',
-        'user_id': fake_uuid
-    }
-
-    client_request.post(
-        'main.api_callbacks',
-        service_id=service_one['id'],
-        _data=callback_api_data,
-        _follow_redirects=True,
-    )
-
-    callback_api_data['updated_by_id'] = service_one['users'][0]
-
-    mock_update_service_callback_api.assert_called_once_with(
-        service_one['id'],
-        url="https://test.url.com/",
-        bearer_token="1234567890",
-        user_id=fake_uuid,
-        callback_api_id=fake_uuid
-    )
-
-
-def test_inbound_fields_do_not_show_if_inbound_is_disabled(
-    client_request,
-    service_one,
-    mocker
-):
-    response = client_request.get(
-        'main.api_callbacks',
-        service_id=service_one['id'],
-        _expected_status=200
-    )
-    assert response.select_one('label[for="inbound_url"]') is None
-    assert response.select_one('label[for="inbound_bearer_token"]') is None
-
-
-def test_create_inbound_and_outbound_apis(
-    client_request,
-    service_one,
-    mocker,
-    mock_create_service_callback_api,
-    mock_create_service_inbound_api,
-    mock_get_notifications,
-    fake_uuid,
-):
-    service_one['permissions'] = ['inbound_sms']
-
-    callback_api_data = {
-        'outbound_url': "https://test.url.com/",
-        'outbound_bearer_token': '1234567890',
-        'inbound_url': "https://test2.url.com/",
-        'inbound_bearer_token': '5678901234',
-        'user_id': fake_uuid
-    }
-
-    client_request.post(
-        'main.api_callbacks',
-        service_id=service_one['id'],
-        _data=callback_api_data,
-        _follow_redirects=True,
-    )
-
-    mock_create_service_callback_api.assert_called_once_with(
-        service_one['id'],
-        url="https://test.url.com/",
-        bearer_token="1234567890",
-        user_id=fake_uuid
-    )
-
-    mock_create_service_inbound_api.assert_called_once_with(
-        service_one['id'],
-        url="https://test2.url.com/",
-        bearer_token="5678901234",
-        user_id=fake_uuid
-    )
-
-
-def test_update_inbound_and_outbound_apis(
-    client_request,
-    service_one,
-    mocker,
-    mock_get_valid_service_callback_api,
-    mock_get_valid_service_inbound_api,
-    mock_update_service_callback_api,
-    mock_update_service_inbound_api,
-    mock_get_notifications,
-    fake_uuid,
-):
-    service_one['service_callback_api'] = [fake_uuid]
-    service_one['inbound_api'] = [fake_uuid]
-    service_one['permissions'] = ['inbound_sms']
-
-    callback_api_data = {
-        'outbound_url': "https://test.url.com/",
-        'outbound_bearer_token': '1234567890',
-        'inbound_url': "https://test2.url.com/",
-        'inbound_bearer_token': '5678901234',
-        'user_id': fake_uuid
-    }
-
-    client_request.post(
-        'main.api_callbacks',
-        service_id=service_one['id'],
-        _data=callback_api_data,
-        _follow_redirects=True,
-    )
-
-    mock_update_service_callback_api.assert_called_once_with(
-        service_one['id'],
-        url="https://test.url.com/",
-        bearer_token="1234567890",
-        user_id=fake_uuid,
-        callback_api_id=fake_uuid
-    )
-
-    mock_update_service_inbound_api.assert_called_once_with(
-        service_one['id'],
-        url="https://test2.url.com/",
-        bearer_token="5678901234",
-        user_id=fake_uuid,
-        inbound_api_id=fake_uuid
-    )
-
-
 def test_save_callback_apis_without_changes_does_not_update_callback_apis(
     client_request,
     service_one,
@@ -655,3 +427,247 @@ def test_save_callback_apis_without_changes_does_not_update_callback_apis(
 
     assert mock_update_service_callback_api.called is False
     assert mock_update_service_inbound_api.called is False
+
+
+@pytest.mark.parametrize('endpoint', [
+    ('main.delivery_status_callback'),
+    ('main.received_text_messages_callback'),
+])
+@pytest.mark.parametrize('url, bearer_token, expected_errors', [
+    ("", "", "Can’t be empty Can’t be empty"),
+    ("http://not_https.com", "1234567890", "Must be a valid https URL"),
+    ("https://test.com", "123456789", "Must be at least 10 characters"),
+])
+def test_callback_forms_validation(
+    client_request,
+    service_one,
+    endpoint,
+    url,
+    bearer_token,
+    expected_errors
+):
+    if endpoint == 'main.received_text_messages_callback':
+        service_one['permissions'] = ['inbound_sms']
+
+    data = {
+        "url": url,
+        "bearer_token": bearer_token,
+    }
+
+    response = client_request.post(
+        endpoint,
+        service_id=service_one['id'],
+        _data=data,
+        _expected_status=200
+    )
+    error_msgs = ' '.join(msg.text.strip() for msg in response.select(".error-message"))
+
+    assert error_msgs == expected_errors
+
+
+@pytest.mark.parametrize('has_inbound_sms, expected_link', [
+    (True, 'main.api_callbacks'),
+    (False, 'main.delivery_status_callback'),
+])
+def test_callbacks_button_links_straight_to_delivery_status_if_service_has_no_inbound_sms(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_notifications,
+    has_inbound_sms,
+    expected_link
+):
+    if has_inbound_sms:
+        service_one['permissions'] = ['inbound_sms']
+
+    page = client_request.get(
+        'main.api_integration',
+        service_id=service_one['id'],
+    )
+
+    assert page.select('.pill-separate-item')[2]['href'] == url_for(
+        expected_link, service_id=service_one['id']
+    )
+
+
+def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_sms(
+    client_request,
+    service_one,
+    mocker
+):
+    page = client_request.get(
+        'main.api_callbacks',
+        service_id=service_one['id'],
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select_one('h1').text) == "Callback for delivery receipts"
+
+
+@pytest.mark.parametrize('has_inbound_sms, expected_link', [
+    (True, 'main.api_callbacks'),
+    (False, 'main.api_integration'),
+])
+def test_back_link_directs_to_api_integration_from_delivery_callback_if_no_inbound_sms(
+    client_request,
+    service_one,
+    mocker,
+    has_inbound_sms,
+    expected_link
+):
+    if has_inbound_sms:
+        service_one['permissions'] = ['inbound_sms']
+
+    page = client_request.get(
+        'main.delivery_status_callback',
+        service_id=service_one['id'],
+        _follow_redirects=True,
+    )
+
+    assert page.select_one('.page-footer-back-link')['href'] == url_for(
+        expected_link, service_id=service_one['id']
+    )
+
+
+@pytest.mark.parametrize('endpoint', [
+    ('main.delivery_status_callback'),
+    ('main.received_text_messages_callback'),
+])
+def test_create_delivery_status_and_receive_text_message_callbacks(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_notifications,
+    mock_create_service_inbound_api,
+    mock_create_service_callback_api,
+    endpoint,
+    fake_uuid,
+):
+    if endpoint == 'main.received_text_messages_callback':
+        service_one['permissions'] = ['inbound_sms']
+
+    data = {
+        'url': "https://test.url.com/",
+        'bearer_token': '1234567890',
+        'user_id': fake_uuid
+    }
+
+    client_request.post(
+        endpoint,
+        service_id=service_one['id'],
+        _data=data,
+    )
+
+    if endpoint == 'main.received_text_messages_callback':
+        mock_create_service_inbound_api.assert_called_once_with(
+            service_one['id'],
+            url="https://test.url.com/",
+            bearer_token="1234567890",
+            user_id=fake_uuid,
+        )
+    else:
+        mock_create_service_callback_api.assert_called_once_with(
+            service_one['id'],
+            url="https://test.url.com/",
+            bearer_token="1234567890",
+            user_id=fake_uuid,
+        )
+
+
+@pytest.mark.parametrize('endpoint, fixture', [
+    ('main.delivery_status_callback', mock_get_valid_service_callback_api),
+    ('main.received_text_messages_callback', mock_get_valid_service_inbound_api),
+])
+def test_update_delivery_status_and_receive_text_message_callbacks(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_notifications,
+    mock_update_service_inbound_api,
+    mock_update_service_callback_api,
+    endpoint,
+    fixture,
+    fake_uuid,
+):
+    if endpoint == 'main.received_text_messages_callback':
+        service_one['inbound_api'] = [fake_uuid]
+        service_one['permissions'] = ['inbound_sms']
+    else:
+        service_one['service_callback_api'] = [fake_uuid]
+
+    fixture(mocker)
+
+    data = {
+        'url': "https://test.url.com/",
+        'bearer_token': '1234567890',
+        'user_id': fake_uuid
+    }
+
+    client_request.post(
+        endpoint,
+        service_id=service_one['id'],
+        _data=data,
+    )
+
+    if endpoint == 'main.received_text_messages_callback':
+        mock_update_service_inbound_api.assert_called_once_with(
+            service_one['id'],
+            url="https://test.url.com/",
+            bearer_token="1234567890",
+            user_id=fake_uuid,
+            inbound_api_id=fake_uuid,
+        )
+    else:
+        mock_update_service_callback_api.assert_called_once_with(
+            service_one['id'],
+            url="https://test.url.com/",
+            bearer_token="1234567890",
+            user_id=fake_uuid,
+            callback_api_id=fake_uuid
+        )
+
+
+@pytest.mark.parametrize('endpoint, data, fixture', [
+    (
+        'main.delivery_status_callback',
+        {"url": "https://hello2.gov.uk", "bearer_token": "bearer_token_set"},
+        mock_get_valid_service_callback_api
+    ),
+    (
+        'main.received_text_messages_callback',
+        {"url": "https://hello3.gov.uk", "bearer_token": "bearer_token_set"},
+        mock_get_valid_service_inbound_api
+    ),
+])
+def test_update_delivery_status_and_receive_text_message_callbacks_without_changes_do_not_update(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_notifications,
+    mock_update_service_callback_api,
+    mock_update_service_inbound_api,
+    data,
+    fixture,
+    endpoint,
+    fake_uuid,
+):
+    if endpoint == 'main.received_text_messages_callback':
+        service_one['inbound_api'] = [fake_uuid]
+        service_one['permissions'] = ['inbound_sms']
+    else:
+        service_one['service_callback_api'] = [fake_uuid]
+
+    fixture(mocker)
+
+    data['user_id'] = fake_uuid
+
+    client_request.post(
+        endpoint,
+        service_id=service_one['id'],
+        _data=data,
+    )
+
+    if endpoint == 'main.received_text_messages_callback':
+        assert mock_update_service_inbound_api.called is False
+    else:
+        assert mock_update_service_callback_api.called is False

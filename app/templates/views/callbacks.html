@@ -9,36 +9,14 @@
 
 <div class="grid-row">
   <div class="column-two-thirds">
+
     <h1 class="heading-large">Callbacks for received text messages</h1>
+    <p>A callback lets you receive messages from Notify to a URL you choose.</p>
+    <p>You’ll need to provide a bearer token, for security. We’ll add this to the authorisation header of the callback request.</p>
+    <p>The callback message is in JSON.</p>
 
-    <p>
-      Text messages you receive can be forwarded to a URL that you specify, using our callback feature.
-    </p>
-
-    <p>
-      Messages are forwarded as they are received.
-    </p>
-
-    <p>
-      To protect your service, we require you to provide a bearer token. We put this token in the authorisation header of the callback requests.
-    </p>
-
-    <p>
-      Once you have ‘receive text messages’ enabled, you can set up your callback on the settings page of your service.
-    </p>
-
-    <p>
-      If you don’t have ‘receive text messages’ enabled for your service, <a href="{{ url_for('.support') }}">get in touch</a> and we can turn it on for you.
-    </p>
-
-    <h2 class="heading-medium">Format of the callbacks</h2>
-
-    <p>
-      The format of the callback message you receive is JSON.
-    </p>
-
-    <h3 class="heading-small"> Received text messages callback </h3>
-
+    <h2 class="heading-medium">Text messages you receive</h2>
+    <p>If your service receives text messages in Notify, we can forward them to your callback URL as soon as they arrive.</p>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Callback message format',
@@ -62,8 +40,8 @@
       {% endcall %}
     </div>
 
-    <h3 class="heading-small"> Status callback </h3>
-
+    <h2 class="heading-medium">Email and text message delivery receipts</h2>
+    <p>When you send an email or text message through Notify, we can send a receipt to your callback URL to tell you if we were able to deliver it or not.</p>
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Callback message format',
@@ -77,7 +55,7 @@
           ('to', 'The email address of the recipient', 'hello@gov.uk'),
           ('status', 'The status of the notification', 'delivered | permanent-failure | temporary-failure | technical-failure'),
           ('created_at', 'The time the service sent the request', '2017-05-14T12:15:30.000000Z'),
-          ('updated_at', 'The last time the status was updated', '2017-05-14T12:15:30.000000Z'),
+          ('completed_at', 'The last time the status was updated', '2017-05-14T12:15:30.000000Z'),
           ('sent_at', 'The time the notification was sent', '2017-05-14T12:15:30.000000Z or nil'),
           ('notification_type', 'The notification type', 'email | sms | letter')
         ] %}
