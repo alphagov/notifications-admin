@@ -30,6 +30,9 @@ def sign_in():
         return redirect(url_for('main.choose_service'))
 
     form = LoginForm()
+    if form.email_address.data:
+        form.email_address.data = form.email_address.data.strip()
+
     if form.validate_on_submit():
 
         user = user_api_client.get_user_by_email_or_none(form.email_address.data)
