@@ -151,7 +151,7 @@ def check_token_against_dummy_bearer(token):
         return ''
 
 
-@main.route("/services/<service_id>/api/callbacks", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/api/callbacks", methods=['GET'])
 @login_required
 def api_callbacks(service_id):
     if 'inbound_sms' not in current_service['permissions']:
