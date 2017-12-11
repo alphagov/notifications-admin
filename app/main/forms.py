@@ -717,15 +717,30 @@ class ServiceInboundNumberForm(Form):
     )
 
 
-class ServiceInboundApiForm(Form):
-    url = StringField("Callback URL",
-                      validators=[DataRequired(message='Can’t be empty'),
-                                  Regexp(regex="^https.*",
-                                         message='Must be a valid https URL')]
-                      )
-    bearer_token = PasswordFieldShowHasContent("Bearer token",
-                                               validators=[DataRequired(message='Can’t be empty'),
-                                                           Length(min=10, message='Must be at least 10 characters')])
+class ServiceReceiveMessagesCallbackForm(Form):
+    url = StringField(
+        "URL",
+        validators=[DataRequired(message='Can’t be empty'),
+                    Regexp(regex="^https.*", message='Must be a valid https URL')]
+    )
+    bearer_token = PasswordFieldShowHasContent(
+        "Bearer token",
+        validators=[DataRequired(message='Can’t be empty'),
+                    Length(min=10, message='Must be at least 10 characters')]
+    )
+
+
+class ServiceDeliveryStatusCallbackForm(Form):
+    url = StringField(
+        "URL",
+        validators=[DataRequired(message='Can’t be empty'),
+                    Regexp(regex="^https.*", message='Must be a valid https URL')]
+    )
+    bearer_token = PasswordFieldShowHasContent(
+        "Bearer token",
+        validators=[DataRequired(message='Can’t be empty'),
+                    Length(min=10, message='Must be at least 10 characters')]
+    )
 
 
 class InternationalSMSForm(Form):
