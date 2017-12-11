@@ -7,7 +7,7 @@ boto3==1.4.8
 blinker==1.4
 pyexcel==0.5.6
 pyexcel-io==0.5.4
-pyexcel-xls==0.5.4
+pyexcel-xls==0.5.5
 pyexcel-xlsx==0.5.4
 pyexcel-ods3==0.5.2
 pytz==2017.3
