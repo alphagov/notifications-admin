@@ -77,9 +77,9 @@ def test_logged_in_user_redirects_to_choose_service(
     assert response.location == url_for('main.choose_service', _external=True)
 
 
-@pytest.mark.parametrize('email_address', [
-    'valid@example.gov.uk',
-    ' valid@example.gov.uk  ',
+@pytest.mark.parametrize('email_address, password', [
+    ('valid@example.gov.uk', 'val1dPassw0rd!'),
+    (' valid@example.gov.uk  ', '  val1dPassw0rd!  '),
 ])
 def test_process_sms_auth_sign_in_return_2fa_template(
     client,
@@ -89,14 +89,15 @@ def test_process_sms_auth_sign_in_return_2fa_template(
     mock_get_user_by_email,
     mock_verify_password,
     email_address,
+    password,
 ):
     response = client.post(
         url_for('main.sign_in'), data={
             'email_address': email_address,
-            'password': 'val1dPassw0rd!'})
+            'password': password})
     assert response.status_code == 302
     assert response.location == url_for('.two_factor', _external=True)
-    mock_verify_password.assert_called_with(api_user_active.id, 'val1dPassw0rd!')
+    mock_verify_password.assert_called_with(api_user_active.id, password)
     mock_get_user_by_email.assert_called_with('valid@example.gov.uk')
 
 
