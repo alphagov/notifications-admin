@@ -4,6 +4,7 @@ import weakref
 
 from flask_wtf import FlaskForm as Form
 from datetime import datetime, timedelta
+from itertools import chain
 
 from notifications_utils.recipients import (
     validate_phone_number,
@@ -172,6 +173,17 @@ class StripWhitespaceForm(Form):
             bound = unbound_field.bind(form=form, filters=filters, **options)
             bound.get_form = weakref.ref(form)  # GC won't collect the form if we don't use a weakref
             return bound
+
+
+class StripWhitespaceStringField(StringField):
+    def __init__(self, label=None, **kwargs):
+        kwargs['filters'] = tuple(chain(
+            kwargs.get('filters', ()),
+            (
+                strip_whitespace,
+            ),
+        ))
+        super(StringField, self).__init__(label, **kwargs)
 
 
 class LoginForm(StripWhitespaceForm):
@@ -641,6 +653,14 @@ class LetterBranding(StripWhitespaceForm):
     )
 
 
+class EmailFieldInWhitelist(EmailField, StripWhitespaceStringField):
+    pass
+
+
+class InternationalPhoneNumberInWhitelist(InternationalPhoneNumber, StripWhitespaceStringField):
+    pass
+
+
 class Whitelist(StripWhitespaceForm):
 
     def populate(self, email_addresses, phone_numbers):
@@ -652,7 +672,7 @@ class Whitelist(StripWhitespaceForm):
                 form_field[index].data = value
 
     email_addresses = FieldList(
-        EmailField(
+        EmailFieldInWhitelist(
             '',
             validators=[
                 Optional(),
@@ -666,7 +686,7 @@ class Whitelist(StripWhitespaceForm):
     )
 
     phone_numbers = FieldList(
-        InternationalPhoneNumber(
+        InternationalPhoneNumberInWhitelist(
             '',
             validators=[
                 Optional()
