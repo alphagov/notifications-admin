@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/table.html" import mapping_table, row, text_field, edit_field %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, optional_text_field %}
 
 
 {% block service_page_title %}
@@ -19,13 +19,13 @@
 	  ) %}
 	    {% call row() %}
 	      {{ text_field('Delivery status callback URL') }}
-	      {{ text_field(received_text_messages_callback) }}
+	      {{ optional_text_field(received_text_messages_callback) }}
 	      {{ edit_field('Change', url_for('.delivery_status_callback', service_id=current_service.id)) }}
 	    {% endcall %}
 
 	    {% call row() %}
 	      {{ text_field('Received text messages callback URL') }}
-	      {{ text_field(delivery_status_callback) }}
+	      {{ optional_text_field(delivery_status_callback) }}
 	    	{{ edit_field('Change', url_for('.received_text_messages_callback', service_id=current_service.id)) }}
 	    {% endcall %}
 	  {% endcall %}
