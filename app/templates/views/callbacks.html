@@ -15,31 +15,6 @@
     <p>You’ll need to provide a bearer token, for security. We’ll add this to the authorisation header of the callback request.</p>
     <p>The callback message is in JSON.</p>
 
-    <h2 class="heading-medium">Text messages you receive</h2>
-    <p>If your service receives text messages in Notify, we can forward them to your callback URL as soon as they arrive.</p>
-    <div class="bottom-gutter-3-2">
-      {% call mapping_table(
-        caption='Callback message format',
-        field_headings=['Key', 'Description', 'Format'],
-        field_headings_visible=True,
-        caption_visible=False
-      ) %}
-        {% for key, description, format in [
-          ('id', 'Notify’s id for the received message', 'UUID'),
-          ('source_number', 'The phone number the message was sent from', '447700912345'),
-          ('destination_number', 'The number the message was sent to (your number)', '07700987654'),
-          ('message', 'The received message', 'Hello Notify!'),
-          ('date_received', 'The UTC datetime that the message was received by Notify', '2017-05-14T12:15:30.000000Z')
-        ] %}
-          {% call row() %}
-            {% call row_heading() %} {{ key }} {% endcall %}
-            {{ text_field(description) }}
-            {{ text_field(format) }}
-          {% endcall %}
-        {% endfor %}
-      {% endcall %}
-    </div>
-
     <h2 class="heading-medium">Email and text message delivery receipts</h2>
     <p>When you send an email or text message through Notify, we can send a receipt to your callback URL to tell you if we were able to deliver it or not.</p>
     <div class="bottom-gutter-3-2">
@@ -68,4 +43,28 @@
       {% endcall %}
     </div>
 
+    <h2 class="heading-medium">Text messages you receive</h2>
+    <p>If your service receives text messages in Notify, we can forward them to your callback URL as soon as they arrive.</p>
+    <div class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Callback message format',
+        field_headings=['Key', 'Description', 'Format'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for key, description, format in [
+          ('id', 'Notify’s id for the received message', 'UUID'),
+          ('source_number', 'The phone number the message was sent from', '447700912345'),
+          ('destination_number', 'The number the message was sent to (your number)', '07700987654'),
+          ('message', 'The received message', 'Hello Notify!'),
+          ('date_received', 'The UTC datetime that the message was received by Notify', '2017-05-14T12:15:30.000000Z')
+        ] %}
+          {% call row() %}
+            {% call row_heading() %} {{ key }} {% endcall %}
+            {{ text_field(description) }}
+            {{ text_field(format) }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    </div>
 {% endblock %}

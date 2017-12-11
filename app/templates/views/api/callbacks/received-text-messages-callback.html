@@ -18,12 +18,12 @@
       <form method="post">
         {{ textbox(
           form.url,
-          width='2-3',
-          hint='Valid https URL'
+          width='1-1',
+          hint='Must start with https://'
         ) }}
         {{ textbox(
           form.bearer_token,
-          width='2-3',
+          width='1-1',
           hint='At least 10 characters',
           autocomplete='new-password'
         ) }}
