@@ -29,7 +29,7 @@
       {% endif %}
       {{ page_footer(
         'Add',
-        back_link=url_for('.service_letter_contact_details', service_id=current_service.id),
+        back_link=None if request.args.get('from_template') else url_for('.service_letter_contact_details', service_id=current_service.id),
         back_link_text='Back'
       ) }}
     </form>
