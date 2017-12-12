@@ -1,18 +1,30 @@
 from flask import request, render_template, redirect, url_for, flash, Markup, abort
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.main import main
-from app.main.forms import CreateKeyForm, Whitelist
+from app.main.forms import (
+    CreateKeyForm,
+    Whitelist,
+    ServiceReceiveMessagesCallbackForm,
+    ServiceDeliveryStatusCallbackForm
+)
 from app import api_key_api_client, service_api_client, notification_api_client, current_service
 from app.utils import user_has_permissions, email_safe
 from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
+
+dummy_bearer_token = 'bearer_token_set'
 
 
 @main.route("/services/<service_id>/api")
 @login_required
 @user_has_permissions('manage_api_keys', admin_override=True)
 def api_integration(service_id):
+    callbacks_link = (
+        '.api_callbacks' if 'inbound_sms' in current_service['permissions']
+        else '.delivery_status_callback'
+    )
     return render_template(
         'views/api/index.html',
+        callbacks_link=callbacks_link,
         api_notifications=notification_api_client.get_api_notifications_for_service(service_id)
     )
 
@@ -113,3 +125,137 @@ def revoke_api_key(service_id, key_id):
         api_key_api_client.revoke_api_key(service_id=service_id, key_id=key_id)
         flash('‘{}’ was revoked'.format(key_name), 'default_with_tick')
         return redirect(url_for('.api_keys', service_id=service_id))
+
+
+def get_apis():
+    callback_api = None
+    inbound_api = None
+    if current_service['service_callback_api']:
+        callback_api = service_api_client.get_service_callback_api(
+            current_service['id'],
+            current_service.get('service_callback_api')[0]
+        )
+    if current_service['inbound_api']:
+        inbound_api = service_api_client.get_service_inbound_api(
+            current_service['id'],
+            current_service.get('inbound_api')[0]
+        )
+
+    return (callback_api, inbound_api)
+
+
+def check_token_against_dummy_bearer(token):
+    if token != dummy_bearer_token:
+        return token
+    else:
+        return ''
+
+
+@main.route("/services/<service_id>/api/callbacks", methods=['GET'])
+@login_required
+def api_callbacks(service_id):
+    if 'inbound_sms' not in current_service['permissions']:
+        return redirect(url_for('.delivery_status_callback', service_id=service_id))
+
+    received_text_messages_callback, delivery_status_callback = get_apis()
+
+    return render_template(
+        'views/api/callbacks.html',
+        received_text_messages_callback=received_text_messages_callback['url']
+        if received_text_messages_callback else None,
+        delivery_status_callback=delivery_status_callback['url'] if delivery_status_callback else None
+    )
+
+
+def get_delivery_status_callback_details():
+    if current_service['service_callback_api']:
+        return service_api_client.get_service_callback_api(
+            current_service['id'],
+            current_service.get('service_callback_api')[0]
+        )
+
+
+@main.route("/services/<service_id>/api/callbacks/delivery-status-callback", methods=['GET', 'POST'])
+@login_required
+def delivery_status_callback(service_id):
+    delivery_status_callback = get_delivery_status_callback_details()
+    back_link = (
+        '.api_callbacks' if 'inbound_sms' in current_service['permissions']
+        else '.api_integration'
+    )
+
+    form = ServiceDeliveryStatusCallbackForm(
+        url=delivery_status_callback.get('url') if delivery_status_callback else '',
+        bearer_token=dummy_bearer_token if delivery_status_callback else ''
+    )
+
+    if form.validate_on_submit():
+        if delivery_status_callback:
+            if (delivery_status_callback.get('url') != form.url.data
+                    or form.bearer_token.data != dummy_bearer_token):
+                service_api_client.update_service_callback_api(
+                    service_id,
+                    url=form.url.data,
+                    bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
+                    user_id=current_user.id,
+                    callback_api_id=delivery_status_callback.get('id')
+                )
+        else:
+            service_api_client.create_service_callback_api(
+                service_id,
+                url=form.url.data,
+                bearer_token=form.bearer_token.data,
+                user_id=current_user.id
+            )
+        return redirect(url_for(back_link, service_id=service_id))
+
+    return render_template(
+        'views/api/callbacks/delivery-status-callback.html',
+        back_link=back_link,
+        form=form,
+    )
+
+
+def get_received_text_messages_callback():
+    if current_service['inbound_api']:
+        return service_api_client.get_service_inbound_api(
+            current_service['id'],
+            current_service.get('inbound_api')[0]
+        )
+
+
+@main.route("/services/<service_id>/api/callbacks/received-text-messages-callback", methods=['GET', 'POST'])
+@login_required
+def received_text_messages_callback(service_id):
+    if 'inbound_sms' not in current_service['permissions']:
+        return redirect(url_for('.api_integration', service_id=service_id))
+
+    received_text_messages_callback = get_received_text_messages_callback()
+    form = ServiceReceiveMessagesCallbackForm(
+        url=received_text_messages_callback.get('url') if received_text_messages_callback else '',
+        bearer_token=dummy_bearer_token if received_text_messages_callback else ''
+    )
+
+    if form.validate_on_submit():
+        if received_text_messages_callback:
+            if (received_text_messages_callback.get('url') != form.url.data
+                    or form.bearer_token.data != dummy_bearer_token):
+                service_api_client.update_service_inbound_api(
+                    service_id,
+                    url=form.url.data,
+                    bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
+                    user_id=current_user.id,
+                    inbound_api_id=received_text_messages_callback.get('id')
+                )
+        else:
+            service_api_client.create_service_inbound_api(
+                service_id,
+                url=form.url.data,
+                bearer_token=form.bearer_token.data,
+                user_id=current_user.id
+            )
+        return redirect(url_for('.api_callbacks', service_id=service_id))
+    return render_template(
+        'views/api/callbacks/received-text-messages-callback.html',
+        form=form,
+    )

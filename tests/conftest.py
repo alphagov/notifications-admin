@@ -2497,3 +2497,65 @@ def valid_token(app_, fake_uuid):
         app_.config['SECRET_KEY'],
         app_.config['DANGEROUS_SALT']
     )
+
+
+@pytest.fixture(scope='function')
+def mock_get_valid_service_inbound_api(mocker):
+    def _get(service_id, inbound_api_id):
+        return {
+            'created_at': '2017-12-04T10:52:55.289026Z',
+            'updated_by_id': fake_uuid,
+            'id': inbound_api_id,
+            'url': 'https://hello3.gov.uk',
+            'service_id': service_id,
+            'updated_at': '2017-12-04T11:28:42.575153Z'
+        }
+
+    return mocker.patch('app.service_api_client.get_service_inbound_api', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def mock_get_valid_service_callback_api(mocker):
+    def _get(service_id, callback_api_id):
+        return {
+            'created_at': '2017-12-04T10:52:55.289026Z',
+            'updated_by_id': fake_uuid,
+            'id': callback_api_id,
+            'url': 'https://hello2.gov.uk',
+            'service_id': service_id,
+            'updated_at': '2017-12-04T11:28:42.575153Z'
+        }
+
+    return mocker.patch('app.service_api_client.get_service_callback_api', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def mock_create_service_inbound_api(mocker):
+    def _create_service_inbound_api(service_id, url, bearer_token, user_id):
+        return
+
+    return mocker.patch('app.service_api_client.create_service_inbound_api', side_effect=_create_service_inbound_api)
+
+
+@pytest.fixture(scope='function')
+def mock_update_service_inbound_api(mocker):
+    def _update_service_inbound_api(service_id, url, bearer_token, user_id, inbound_api_id):
+        return
+
+    return mocker.patch('app.service_api_client.update_service_inbound_api', side_effect=_update_service_inbound_api)
+
+
+@pytest.fixture(scope='function')
+def mock_create_service_callback_api(mocker):
+    def _create_service_callback_api(service_id, url, bearer_token, user_id):
+        return
+
+    return mocker.patch('app.service_api_client.create_service_callback_api', side_effect=_create_service_callback_api)
+
+
+@pytest.fixture(scope='function')
+def mock_update_service_callback_api(mocker):
+    def _update_service_callback_api(service_id, url, bearer_token, user_id, callback_api_id):
+        return
+
+    return mocker.patch('app.service_api_client.update_service_callback_api', side_effect=_update_service_callback_api)

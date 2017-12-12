@@ -21,7 +21,7 @@
       <a class="pill-separate-item" href="{{ url_for('.whitelist', service_id=current_service.id) }}">Whitelist</a>
     </div>
     <div class="column-one-third">
-      <a class="pill-separate-item" href="{{ url_for('.api_documentation', service_id=current_service.id) }}">Documentation</a>
+      <a class="pill-separate-item" href="{{ url_for(callbacks_link, service_id=current_service.id) }}">Callbacks</a>
     </div>
   </nav>
 
