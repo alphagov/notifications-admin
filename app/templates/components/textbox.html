@@ -41,11 +41,12 @@
         ' form-control-error' if field.errors else ''
       )
     %}
-    {{ field(**{
-      'class': field_class,
-      'data-module': 'highlight-tags' if highlight_tags else '',
-      'rows': rows|string
-    }) }}
+    {{ field(
+      class=field_class,
+      data_module='highlight-tags' if highlight_tags else '',
+      rows=rows|string,
+      **kwargs
+    ) }}
     {% if suffix %}
       <span>{{ suffix }}</span>
     {% endif %}

@@ -3,32 +3,33 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-  Callback URL
+  Callback for delivery receipts
 {% endblock %}
 
 {% block maincolumn_content %}
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">Callback URL for received text messages</h1>
+      <h1 class="heading-large">Callback for delivery receipts</h1>
       <p>
-        Text messages you receive can be forwarded to your systems with our callback feature.
-        See our <a href="{{ url_for('.callbacks') }}">documentation on the format of the callback</a>.
+        When you send an email or text message, we can tell you if Notify was able to deliver it.
+        Check the <a href="{{ url_for('.callbacks') }}"> callback documentation </a> for more information.
       </p>
 
       <form method="post">
         {{ textbox(
           form.url,
-          width='2-3',
-          hint='Valid https URL'
+          width='1-1',
+          hint='Must start with https://'
         ) }}
         {{ textbox(
           form.bearer_token,
-          width='2-3',
-          hint='At least 10 characters'
+          width='1-1',
+          hint='At least 10 characters',
+          autocomplete='new-password'
         ) }}
           {{ page_footer(
           'Save',
-          back_link=url_for('.service_settings', service_id=current_service.id),
+          back_link=url_for(back_link, service_id=current_service.id),
           back_link_text='Back to settings'
       ) }}
       </form>

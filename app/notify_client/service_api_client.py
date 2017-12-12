@@ -387,6 +387,30 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             }
         )
 
+    def get_service_callback_api(self, service_id, callback_api_id):
+        return self.get(
+            "/service/{}/delivery-receipt-api/{}".format(
+                service_id, callback_api_id
+            )
+        )['data']
+
+    def update_service_callback_api(self, service_id, url, bearer_token, user_id, callback_api_id):
+        data = {
+            "url": url,
+            "updated_by_id": user_id
+        }
+        if bearer_token:
+            data['bearer_token'] = bearer_token
+        return self.post("/service/{}/delivery-receipt-api/{}".format(service_id, callback_api_id), data)
+
+    def create_service_callback_api(self, service_id, url, bearer_token, user_id):
+        data = {
+            "url": url,
+            "bearer_token": bearer_token,
+            "updated_by_id": user_id
+        }
+        return self.post("/service/{}/delivery-receipt-api".format(service_id), data)
+
 
 class ServicesBrowsableItem(BrowsableItem):
     @property
