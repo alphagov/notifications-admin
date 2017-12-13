@@ -3,13 +3,13 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-  Callback for received text messages
+  Callbacks for received text messages
 {% endblock %}
 
 {% block maincolumn_content %}
+  <h1 class="heading-large">Callbacks for received text messages</h1>
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">Callback for received text messages</h1>
       <p>
         When you receive a text message in Notify, we can forward it to your system.
         Check the <a href="{{ url_for('.callbacks') }}"> callback documentation </a> for more information.

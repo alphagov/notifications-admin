@@ -467,7 +467,7 @@ def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_s
         _follow_redirects=True,
     )
 
-    assert normalize_spaces(page.select_one('h1').text) == "Callback for delivery receipts"
+    assert normalize_spaces(page.select_one('h1').text) == "Callbacks for delivery receipts"
 
 
 @pytest.mark.parametrize('has_inbound_sms, expected_link', [
@@ -651,8 +651,10 @@ def test_callbacks_page_works_when_no_apis_set(
     page = client_request.get('main.api_callbacks',
                               service_id=service_one['id'],
                               _follow_redirects=True)
-    expected_rows = ['Delivery status callback URL Not set Change',
-                     'Received text messages callback URL Not set Change']
+    expected_rows = [
+        'Callbacks for delivery receipts Not set Change',
+        'Callbacks for received text messages Not set Change',
+    ]
     rows = page.select('tr')
     assert len(rows) == 3
     for index, row in enumerate(expected_rows):
