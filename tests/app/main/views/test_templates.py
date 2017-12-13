@@ -198,6 +198,53 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
     assert rendered_msg in response.get_data(as_text=True)
 
 
+def test_should_let_letter_contact_block_be_edited_if_a_letter_contact_block_exists(
+    mocker,
+    mock_get_service_letter_template,
+    single_letter_contact_block,
+    client_request,
+    service_one,
+    fake_uuid,
+):
+    service_one['permissions'].append('letter')
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
+
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid
+    )
+
+    assert page.find('a', {'class': 'edit-template-link-letter-contact'})['href'] == url_for(
+        '.service_edit_letter_contact',
+        service_id=service_one['id'],
+        letter_contact_id='1234',
+        from_template=fake_uuid)
+
+
+def test_should_let_letter_contact_block_be_added_if_no_letter_contact_blocks_exist(
+    mocker,
+    mock_get_service_letter_template,
+    no_letter_contact_blocks,
+    client_request,
+    service_one,
+    fake_uuid,
+):
+    service_one['permissions'].append('letter')
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
+
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid
+    )
+
+    assert page.find('a', {'class': 'edit-template-link-letter-contact'})['href'] == url_for(
+        '.service_add_letter_contact',
+        service_id=service_one['id'],
+        from_template=fake_uuid)
+
+
 def test_should_show_page_template_with_priority_select_if_platform_admin(
     logged_in_platform_admin_client,
     platform_admin_user,

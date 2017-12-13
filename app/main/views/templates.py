@@ -58,7 +58,7 @@ def view_template(service_id, template_id):
     if template["template_type"] == "letter":
         letter_contact_details = service_api_client.get_letter_contacts(service_id)
         default_letter_contact_block_id = next(
-            (x['id'] for x in letter_contact_details if x['is_default']), "None"
+            (x['id'] for x in letter_contact_details if x['is_default']), None
         )
     else:
         default_letter_contact_block_id = None
