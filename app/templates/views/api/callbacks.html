@@ -19,13 +19,13 @@
 	  ) %}
 	    {% call row() %}
 	      {{ text_field('Callbacks for delivery receipts') }}
-	      {{ optional_text_field(received_text_messages_callback) }}
+	      {{ optional_text_field(delivery_status_callback) }}
 	      {{ edit_field('Change', url_for('.delivery_status_callback', service_id=current_service.id)) }}
 	    {% endcall %}
 
 	    {% call row() %}
 	      {{ text_field('Callbacks for received text messages') }}
-	      {{ optional_text_field(delivery_status_callback) }}
+        {{ optional_text_field(received_text_messages_callback) }}
 	    	{{ edit_field('Change', url_for('.received_text_messages_callback', service_id=current_service.id)) }}
 	    {% endcall %}
 	  {% endcall %}
