@@ -157,7 +157,7 @@ def api_callbacks(service_id):
     if 'inbound_sms' not in current_service['permissions']:
         return redirect(url_for('.delivery_status_callback', service_id=service_id))
 
-    received_text_messages_callback, delivery_status_callback = get_apis()
+    delivery_status_callback, received_text_messages_callback = get_apis()
 
     return render_template(
         'views/api/callbacks.html',

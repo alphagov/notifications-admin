@@ -8,6 +8,7 @@ from unittest.mock import call
 
 from tests import validate_route_permission
 from tests.conftest import (
+    fake_uuid,
     mock_get_service,
     mock_get_live_service,
     mock_get_service_with_letters,
@@ -467,7 +468,7 @@ def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_s
         _follow_redirects=True,
     )
 
-    assert normalize_spaces(page.select_one('h1').text) == "Callback for delivery receipts"
+    assert normalize_spaces(page.select_one('h1').text) == "Callbacks for delivery receipts"
 
 
 @pytest.mark.parametrize('has_inbound_sms, expected_link', [
@@ -639,21 +640,52 @@ def test_update_delivery_status_and_receive_text_message_callbacks_without_chang
         assert mock_update_service_callback_api.called is False
 
 
+@pytest.mark.parametrize('service_callback_api, delivery_url, expected_1st_table_row', [
+    (
+        None, {},
+        'Callbacks for delivery receipts Not set Change'
+    ),
+    (
+        fake_uuid(), {'url': 'https://delivery.receipts'},
+        'Callbacks for delivery receipts https://delivery.receipts Change'
+    ),
+])
+@pytest.mark.parametrize('inbound_api, inbound_url, expected_2nd_table_row', [
+    (
+        None, {},
+        'Callbacks for received text messages Not set Change'
+    ),
+    (
+        fake_uuid(), {'url': 'https://inbound.sms'},
+        'Callbacks for received text messages https://inbound.sms Change'
+    ),
+])
 def test_callbacks_page_works_when_no_apis_set(
-        client_request,
-        service_one,
-        mocker
+    client_request,
+    service_one,
+    mocker,
+    service_callback_api,
+    delivery_url,
+    expected_1st_table_row,
+    inbound_api,
+    inbound_url,
+    expected_2nd_table_row,
 ):
     service_one['permissions'] = ['inbound_sms']
-    mocker.patch('app.service_api_client.get_service_callback_api', side_effect={})
-    mocker.patch('app.service_api_client.get_service_inbound_api', side_effect={})
+    service_one['inbound_api'] = inbound_api
+    service_one['service_callback_api'] = service_callback_api
+
+    mocker.patch('app.service_api_client.get_service_callback_api', return_value=delivery_url)
+    mocker.patch('app.service_api_client.get_service_inbound_api', return_value=inbound_url)
 
     page = client_request.get('main.api_callbacks',
                               service_id=service_one['id'],
                               _follow_redirects=True)
-    expected_rows = ['Delivery status callback URL Not set Change',
-                     'Received text messages callback URL Not set Change']
-    rows = page.select('tr')
-    assert len(rows) == 3
+    expected_rows = [
+        expected_1st_table_row,
+        expected_2nd_table_row,
+    ]
+    rows = page.select('tbody tr')
+    assert len(rows) == 2
     for index, row in enumerate(expected_rows):
-        assert row == " ".join(rows[index + 1].text.split())
+        assert row == normalize_spaces(rows[index].text)
