@@ -1,59 +1,68 @@
-body.with-fullscreen {
-
-  #global-header,
-  #global-header-bar {
-    display: none;
-  }
-
-  #footer {
-    height: 0;
-    overflow: hidden;
-    border-color: $white;
-  }
-
-  .shim {
-    margin-bottom: 5px;
-  }
-
-  &::-webkit-scrollbar {
-    -webkit-appearance: none;
-  }
-
-  &::-webkit-scrollbar:vertical {
-    width: 11px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border-radius: 8px;
-    border: 2px solid $white;
-    background-color: rgba(0, 0, 0, .5);
-  }
-
-  &::-webkit-scrollbar-track {
-    background-color: $white;
-    border-radius: 8px;
-  }
-
-}
-
-
 .fullscreen {
-
-  &-header {
-    padding: $gutter-half $gutter-half 0 $gutter-half;
-    margin-top: -$gutter-half;
-  }
 
   &-content {
 
-    width: 100%;
     background: $white;
     z-index: 10;
-    overflow-x: scroll;
     overflow-y: hidden;
     box-sizing: border-box;
     position: absolute;
-    padding-left: $gutter-half;
+    margin: 5px 0 $gutter 0;
+    padding: 0 0 0 0;
+    overflow: hidden;
+    border-bottom: 1px solid $border-colour;
+
+    .table {
+
+      margin-bottom: 0;
+
+      tr:last-child {
+        td {
+          border-bottom: 1px solid $white;
+        }
+      }
+
+    }
+
+    th,
+    .table-field-error-label,
+    .table-field-center-aligned {
+      white-space: nowrap;
+    }
+
+  }
+
+  &-right-shadow {
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    z-index: 200;
+
+    &.visible {
+      transition: box-shadow 0.3s ease-in-out;
+      box-shadow: inset -1px 0 0 0 $border-colour, inset -3px 0 0 0 rgba($border-colour, 0.2);
+    }
+
+  }
+
+  &-scrollable-table {
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    .table-field-heading-first,
+    .table-field-index {
+      display: none;
+    }
+
+    .table-field-center-aligned {
+      position: relative;
+      z-index: 150;
+      background: $white;
+    }
 
     &::-webkit-scrollbar {
       -webkit-appearance: none;
@@ -61,6 +70,7 @@ body.with-fullscreen {
 
     &::-webkit-scrollbar:horizontal {
       height: 11px;
+      background-color: $white;
     }
 
     &::-webkit-scrollbar-thumb {
@@ -74,24 +84,43 @@ body.with-fullscreen {
       border-radius: 8px;
     }
 
-    .banner-dangerous {
-      margin: $gutter-half $gutter-half 0 $gutter-half;
-      position: sticky;
-      left: 0;
+  }
+
+  &-fixed-table {
+
+    position: absolute;
+    top: 0;
+    overflow: hidden;
+
+    .table-field-heading {
+      visibility: hidden;
     }
 
-    .table {
-      border-right: $gutter-half solid $white;  // border used as padding
+    .table-field-center-aligned {
+      width: 0;
+      position: relative;
+      z-index: 100;
+      visibility: hidden;
     }
 
-    th,
-    .table-field-error-label {
-      white-space: nowrap;
+    .table-field-heading-first,
+    .table-field-index {
+      transition: none;
+      position: relative;
+      z-index: 200;
+      background: $white;
     }
 
-    .table-show-more-link {
-      border: none;
-      text-align: left;
+  }
+
+  &-scrolled-table {
+
+    padding-bottom: 20px;
+
+    .table-field-heading-first,
+    .table-field-index {
+      transition: box-shadow 0.3s ease-in-out;
+      box-shadow: 1px 0 0 0 $border-colour, 3px 0 0 0 rgba($border-colour, 0.2);
     }
 
   }
@@ -100,25 +129,6 @@ body.with-fullscreen {
     width: 100%;
     position: relative;
     z-index: 9;
-    background: $white;
-  }
-
-  &-sticky-bar {
-
-    z-index: 20;
-    padding-right: 0;
-
-    .page-footer-back-link {
-      position: absolute;
-      right: $gutter-half;
-      top: 20px;
-    }
-
-    .file-upload-button,
-    .file-upload-button-cancel {
-      margin: 0 0 0 $gutter-half;
-    }
-
   }
 
 }

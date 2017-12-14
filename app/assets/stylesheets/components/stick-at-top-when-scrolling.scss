@@ -16,9 +16,24 @@
     margin-bottom: 20px;
   }
 
+  .back-to-top-link {
+
+    position: absolute;
+    top: $gutter;
+    right: $gutter-half;
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+
+    @include ie-lte(8) {
+      display: none;
+    }
+
+  }
+
 }
 
 .content-fixed {
+
   position: fixed;
   top: 0;
   background: $white;
@@ -28,6 +43,12 @@
   border-bottom: 1px solid $border-colour;
   box-shadow: 0 2px 0 0 rgba($border-colour, 0.2);
   transition: background 0.6s ease-in-out, margin-top 0.4s ease-out;
+
+  .back-to-top-link {
+    opacity: 1;
+    transition: opacity 0.6s ease-in-out;
+  }
+
 }
 
 .shim {
