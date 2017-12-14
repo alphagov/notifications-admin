@@ -39,6 +39,10 @@ def test_logged_in_user_redirects_to_choose_service(
     '+4407700900460',
     '+1800-555-555',
 ])
+@pytest.mark.parametrize('password', [
+    'the quick brown fox',
+    '   the   quick   brown   fox   ',
+])
 def test_register_creates_new_user_and_redirects_to_continue_page(
     client,
     mock_send_verify_code,
@@ -48,11 +52,12 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
     mock_send_verify_email,
     mock_login,
     phone_number_to_register_with,
+    password,
 ):
     user_data = {'name': 'Some One Valid',
                  'email_address': 'notfound@example.gov.uk',
                  'mobile_number': phone_number_to_register_with,
-                 'password': 'validPassword!',
+                 'password': password,
                  'auth_type': 'sms_auth'
                  }
 

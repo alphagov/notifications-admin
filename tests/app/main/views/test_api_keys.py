@@ -351,8 +351,8 @@ def test_should_update_whitelist(
     service_id = str(uuid.uuid4())
     data = OrderedDict([
         ('email_addresses-1', 'test@example.com'),
-        ('email_addresses-3', 'test@example.com'),
-        ('phone_numbers-0', '07900900000'),
+        ('email_addresses-3', '  test@example.com  '),
+        ('phone_numbers-0', '07900900000           '),
         ('phone_numbers-2', '+1800-555-555'),
     ])
 
