@@ -135,12 +135,14 @@ def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
 
     free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year)
+    units = billing_api_client.get_billable_units(service_id, year)
+    yearly_usage = billing_api_client.get_service_usage(service_id, year)
     return render_template(
         'views/usage.html',
         months=list(get_free_paid_breakdown_for_billable_units(
             year,
             free_sms_allowance,
-            billing_api_client.get_billable_units(service_id, year)
+            units
         )),
         selected_year=year,
         years=get_tuples_of_financial_years(
@@ -148,7 +150,7 @@ def usage(service_id):
             start=current_financial_year - 1,
             end=current_financial_year + 1,
         ),
-        **calculate_usage(billing_api_client.get_service_usage(service_id, year),
+        **calculate_usage(yearly_usage,
                           free_sms_allowance)
     )
 
@@ -396,18 +398,24 @@ def get_sum_billing_units(billing_units, month=None):
 
 def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, billing_units):
     cumulative = 0
+    letter_cumulative = 0
+    sms_units = [x for x in billing_units if x['notification_type'] == 'sms']
+    letter_units = [x for x in billing_units if x['notification_type'] == 'letter']
     for month in get_months_for_financial_year(year):
         previous_cumulative = cumulative
-        monthly_usage = get_sum_billing_units(billing_units, month)
+        monthly_usage = get_sum_billing_units(sms_units, month)
         cumulative += monthly_usage
         breakdown = get_free_paid_breakdown_for_month(
             free_sms_fragment_limit, cumulative, previous_cumulative,
-            [billing_month for billing_month in billing_units if billing_month['month'] == month]
+            [billing_month for billing_month in sms_units if billing_month['month'] == month]
         )
+        letter_billing = [(x['billing_units'], x['rate']) for x in letter_units if x['month'] == month]
         yield {
             'name': month,
+            # 'total': sms + letter
             'paid': breakdown['paid'],
-            'free': breakdown['free']
+            'free': breakdown['free'],
+            'letters': letter_billing
         }
 
 

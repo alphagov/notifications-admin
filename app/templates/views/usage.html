@@ -81,7 +81,7 @@
                 currency="£",
                 smallest=True
               ) }}
-              <ul>
+          <ul>
               {% if month.free %}
                 <li class="tabular-numbers">{{ "{:,}".format(month.free) }} free text messages</li>
               {% endif %}
@@ -93,6 +93,15 @@
                 <li aria-hidden="true">–</li>
               {% endif %}
               </ul>
+             <ul>
+               {{ month.letters }}
+              {% for letter in month.letters%}
+                {% if letter[0] %}
+                <li class="tabular-numbers">{{ letter[0]}} letters at {{ ' {:.0f}p'.format(letter[1] * 100) }}
+                </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
             {% endcall %}
           {% endcall %}
         </div>
