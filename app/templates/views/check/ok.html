@@ -80,11 +80,7 @@
 
   {% if count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
-      {% if row_errors and not recipients.missing_column_headers %}
-        Only showing the first {{ count_of_displayed_recipients }} rows with errors
-      {% else %}
-        Only showing the first {{ count_of_displayed_recipients }} rows
-      {% endif %}
+      Only showing the first {{ count_of_displayed_recipients }} rows
     </p>
   {% endif %}
 
