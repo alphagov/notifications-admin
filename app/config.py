@@ -96,6 +96,7 @@ class Config(object):
         r"acas\.org\.uk",
         r"gov\.wales",
         r"biglotteryfund\.org\.uk",
+        r"marinemanagement\.org\.uk",
     ]
 
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
