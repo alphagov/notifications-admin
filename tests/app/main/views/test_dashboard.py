@@ -601,7 +601,7 @@ def test_usage_page(
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    cols = page.find_all('div', {'class': 'column-half'})
+    cols = page.find_all('div', {'class': 'column-one-third'})
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
     nav_links = nav.find_all('a')
 
@@ -616,14 +616,14 @@ def test_usage_page(
     assert '249,860 free text messages' in table
     assert '40 free text messages' in table
     assert '960 text messages at 1.65p' in table
-
     assert 'April' in table
     assert 'February' in table
     assert 'March' in table
-    assert '£15.84' in table
+    assert '£18.94' in table
     assert '140 free text messages' in table
     assert '£20.30' in table
     assert '1,230 text messages at 1.65p' in table
+    assert '10 letters at 31p' in table
 
 
 def test_usage_page_with_year_argument(
@@ -986,18 +986,18 @@ def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_mont
             ]
         )
         assert list(billing_units) == [
-            {'free': 100000, 'name': 'April', 'paid': 0},
-            {'free': 100000, 'name': 'May', 'paid': 0},
-            {'free': 50000, 'name': 'June', 'paid': 50000},
-            {'free': 0, 'name': 'July', 'paid': 0},
-            {'free': 0, 'name': 'August', 'paid': 0},
-            {'free': 0, 'name': 'September', 'paid': 0},
-            {'free': 0, 'name': 'October', 'paid': 0},
-            {'free': 0, 'name': 'November', 'paid': 0},
-            {'free': 0, 'name': 'December', 'paid': 0},
-            {'free': 0, 'name': 'January', 'paid': 0},
-            {'free': 0, 'name': 'February', 'paid': 2000},
-            {'free': 0, 'name': 'March', 'paid': 0}
+            {'free': 100000, 'name': 'April', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
+            {'free': 100000, 'name': 'May', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
+            {'free': 50000, 'name': 'June', 'paid': 50000, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
+            {'free': 0, 'name': 'July', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
+            {'free': 0, 'name': 'August', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
+            {'free': 0, 'name': 'September', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
+            {'free': 0, 'name': 'October', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
+            {'free': 0, 'name': 'November', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
+            {'free': 0, 'name': 'December', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
+            {'free': 0, 'name': 'January', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
+            {'free': 0, 'name': 'February', 'paid': 2000, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
+            {'free': 0, 'name': 'March', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0}
         ][:expected_number_of_months]
 
 
