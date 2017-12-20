@@ -601,6 +601,49 @@ def test_usage_page(
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
+    cols = page.find_all('div', {'class': 'column-half'})
+    nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
+    nav_links = nav.find_all('a')
+
+    assert normalize_spaces(nav_links[0].text) == '2010 to 2011 financial year'
+    assert normalize_spaces(nav.find('li', {'aria-selected': 'true'}).text) == '2011 to 2012 financial year'
+    assert normalize_spaces(nav_links[1].text) == '2012 to 2013 financial year'
+    assert '252,190' in cols[1].text
+    assert 'Text messages' in cols[1].text
+
+    table = page.find('table').text.strip()
+
+    assert '249,860 free text messages' in table
+    assert '40 free text messages' in table
+    assert '960 text messages at 1.65p' in table
+    assert 'April' in table
+    assert 'February' in table
+    assert 'March' in table
+    assert '£15.84' in table
+    assert '140 free text messages' in table
+    assert '£20.30' in table
+    assert '1,230 text messages at 1.65p' in table
+
+
+@freeze_time("2012-03-31 12:12:12")
+def test_usage_page_with_letters(
+    logged_in_client,
+    service_one,
+    mock_get_usage,
+    mock_get_billable_units,
+    mock_get_free_sms_fragment_limit
+):
+    service_one['permissions'].append('letter')
+    response = logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID))
+
+    assert response.status_code == 200
+
+    mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2011)
+    mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
+    mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
+
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
     cols = page.find_all('div', {'class': 'column-one-third'})
     nav = page.find('ul', {'class': 'pill', 'role': 'tablist'})
     nav_links = nav.find_all('a')
