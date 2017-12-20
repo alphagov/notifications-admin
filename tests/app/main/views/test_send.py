@@ -353,6 +353,16 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         )
     ),
     (
+        """
+            phone number, name
+        """,
+        (
+            'Your file is missing some rows '
+            'It needs at least one row of data. '
+            'Skip to file contents'
+        )
+    ),
+    (
         "+447700900986",
         (
             'Your file is missing some rows '
