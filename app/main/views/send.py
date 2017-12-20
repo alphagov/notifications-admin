@@ -521,20 +521,21 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
         choose_time_form = ChooseTimeForm()
 
-    try:
-        template.values = recipients[preview_row]
-    except IndexError:
-        if preview_row > 0:
-            abort(404)
+    count_of_recipients = len(list(recipients.rows))
 
-    session['upload_data']['notification_count'] = len(list(recipients.rows))
+    if preview_row < count_of_recipients:
+        template.values = recipients[preview_row]
+    elif preview_row > 0:
+        abort(404)
+
+    session['upload_data']['notification_count'] = count_of_recipients
     session['upload_data']['valid'] = not recipients.has_errors
     return dict(
         recipients=recipients,
         template=template,
         errors=recipients.has_errors,
         row_errors=get_errors_for_csv(recipients, template.template_type),
-        count_of_recipients=session['upload_data']['notification_count'],
+        count_of_recipients=count_of_recipients,
         count_of_displayed_recipients=(
             len(list(recipients.initial_annotated_rows_with_errors))
             if any(recipients.rows_with_errors) and not recipients.missing_column_headers else
