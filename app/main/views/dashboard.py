@@ -135,12 +135,18 @@ def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
 
     free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year)
+    units = billing_api_client.get_billable_units(service_id, year)
+    yearly_usage = billing_api_client.get_service_usage(service_id, year)
+
+    usage_template = 'views/usage.html'
+    if 'letter' in current_service['permissions']:
+        usage_template = 'views/usage-with-letters.html'
     return render_template(
-        'views/usage.html',
+        usage_template,
         months=list(get_free_paid_breakdown_for_billable_units(
             year,
             free_sms_allowance,
-            billing_api_client.get_billable_units(service_id, year)
+            units
         )),
         selected_year=year,
         years=get_tuples_of_financial_years(
@@ -148,7 +154,7 @@ def usage(service_id):
             start=current_financial_year - 1,
             end=current_financial_year + 1,
         ),
-        **calculate_usage(billing_api_client.get_service_usage(service_id, year),
+        **calculate_usage(yearly_usage,
                           free_sms_allowance)
     )
 
@@ -335,6 +341,11 @@ def calculate_usage(usage, free_sms_fragment_limit):
     emails = [breakdown["billing_units"] for breakdown in usage if breakdown['notification_type'] == 'email']
     emails_sent = 0 if len(emails) == 0 else emails[0]
 
+    letters = [(breakdown["billing_units"], breakdown['letter_total']) for breakdown in usage if
+               breakdown['notification_type'] == 'letter']
+    letter_sent = 0 if len(letters) == 0 else letters[0][0]
+    letter_cost = 0 if len(letters) == 0 else letters[0][1]
+
     return {
         'emails_sent': emails_sent,
         'sms_free_allowance': sms_free_allowance,
@@ -342,6 +353,8 @@ def calculate_usage(usage, free_sms_fragment_limit):
         'sms_allowance_remaining': max(0, (sms_free_allowance - sms_sent)),
         'sms_chargeable': max(0, sms_sent - sms_free_allowance),
         'sms_rate': sms_rate,
+        'letter_sent': letter_sent,
+        'letter_cost': letter_cost
     }
 
 
@@ -396,18 +409,30 @@ def get_sum_billing_units(billing_units, month=None):
 
 def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, billing_units):
     cumulative = 0
+    letter_cumulative = 0
+    sms_units = [x for x in billing_units if x['notification_type'] == 'sms']
+    letter_units = [x for x in billing_units if x['notification_type'] == 'letter']
     for month in get_months_for_financial_year(year):
         previous_cumulative = cumulative
-        monthly_usage = get_sum_billing_units(billing_units, month)
+        monthly_usage = get_sum_billing_units(sms_units, month)
         cumulative += monthly_usage
         breakdown = get_free_paid_breakdown_for_month(
             free_sms_fragment_limit, cumulative, previous_cumulative,
-            [billing_month for billing_month in billing_units if billing_month['month'] == month]
+            [billing_month for billing_month in sms_units if billing_month['month'] == month]
         )
+        letter_billing = [(x['billing_units'], x['rate'], (x['billing_units'] * x['rate']))
+                          for x in letter_units if x['month'] == month]
+        letter_total = 0
+        for x in letter_billing:
+            letter_total += x[2]
+            letter_cumulative += letter_total
         yield {
             'name': month,
+            'letter_total': letter_total,
+            'letter_cumulative': letter_cumulative,
             'paid': breakdown['paid'],
-            'free': breakdown['free']
+            'free': breakdown['free'],
+            'letters': letter_billing
         }
 
 

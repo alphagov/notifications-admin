@@ -17,14 +17,14 @@
     </div>
     <div id='pill-selected-item'>
       <div class='grid-row'>
-        <div class='column-half'>
+        <div class='column-one-third'>
           <h2 class='heading-small'>Emails</h2>
           <div class="keyline-block">
             {{ big_number(emails_sent, 'sent', smaller=True) }}
             {{ big_number("Unlimited", 'free allowance', smaller=True) }}
           </div>
         </div>
-        <div class='column-half'>
+        <div class='column-one-third'>
           <h2 class='heading-small'>Text messages</h2>
           <div class="keyline-block">
             {{ big_number(sms_sent, 'sent', smaller=True) }}
@@ -39,15 +39,21 @@
             {% endif %}
           </div>
         </div>
+        <div class='column-one-third'>
+          <h2 class='heading-small'>Letters</h2>
+          <div class="keyline-block">
+            {{ big_number(letter_sent, 'sent', smaller=True) }}
+          </div>
+        </div>
       </div>
 
       <div class='grid-row'>
-        <div class='column-half'>
+        <div class='column-one-third'>
           <div class="keyline-block">
             &nbsp;
           </div>
         </div>
-        <div class='column-half'>
+        <div class='column-one-third'>
           <div class="keyline-block">
             {{ big_number(
               (sms_chargeable * sms_rate),
@@ -57,6 +63,17 @@
             ) }}
           </div>
         </div>
+        <div class='column-one-third'>
+          <div class="keyline-block">
+            {{ big_number(
+                letter_cost,
+                'spent',
+                currency="£",
+                smaller=True
+              ) }}
+          </div>
+        </div>
+
       </div>
 
       {% if months %}
@@ -77,11 +94,11 @@
             {% endcall %}
             {% call field(align='left') %}
               {{ big_number(
-                sms_rate * month.paid,
+                (sms_rate * month.paid) + month.letter_total,
                 currency="£",
                 smallest=True
               ) }}
-              <ul>
+          <ul>
               {% if month.free %}
                 <li class="tabular-numbers">{{ "{:,}".format(month.free) }} free text messages</li>
               {% endif %}
@@ -93,6 +110,14 @@
                 <li aria-hidden="true">–</li>
               {% endif %}
               </ul>
+             <ul>
+              {% for letter in month.letters%}
+                {% if letter[0] %}
+                <li class="tabular-numbers">{{ "{:,}".format(letter[0])}} letters at {{ '{:.0f}p'.format(letter[1] * 100) }}
+                </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
             {% endcall %}
           {% endcall %}
         </div>
