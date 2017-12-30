@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from flask import (
     abort,
     render_template,
     jsonify,
     request,
     url_for,
-)
+    Response, stream_with_context)
 from flask_login import login_required
 
 from app import (
     notification_api_client,
     job_api_client,
-    current_service
-)
+    current_service,
+    format_date_numeric)
 from app.main import main
 from app.template_previews import TemplatePreview
 from app.utils import (
@@ -23,7 +25,7 @@ from app.utils import (
     get_letter_timings,
     FAILURE_STATUSES,
     DELIVERED_STATUSES,
-)
+    generate_notifications_csv, parse_filter_args, set_status_filters)
 
 
 @main.route("/services/<service_id>/notification/<uuid:notification_id>")
@@ -134,3 +136,31 @@ def get_all_personalisation_from_notification(notification):
         notification['personalisation']['phone_number'] = notification['to']
 
     return notification['personalisation']
+
+
+@main.route("/services/<service_id>/download-notifications.csv")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
+def download_notifications_csv(service_id):
+    filter_args = parse_filter_args(request.args)
+    filter_args['status'] = set_status_filters(filter_args)
+
+    return Response(
+        stream_with_context(
+            generate_notifications_csv(
+                service_id=service_id,
+                job_id=None,
+                status=filter_args.get('status'),
+                page=request.args.get('page', 1),
+                page_size=5000,
+                format_for_csv=True
+            )
+        ),
+        mimetype='text/csv',
+        headers={
+            'Content-Disposition': 'inline; filename="{} - {} - {} report.csv"'.format(
+                format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
+                filter_args['message_type'][0],
+                current_service['name'])
+        }
+    )

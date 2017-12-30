@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from orderedset import OrderedSet
-from itertools import chain
 
 from flask import (
     render_template,
@@ -18,7 +16,6 @@ from notifications_utils.template import (
     Template,
     WithSubjectTemplate,
 )
-from werkzeug.datastructures import MultiDict
 
 from app import (
     job_api_client,
@@ -35,37 +32,9 @@ from app.utils import (
     user_has_permissions,
     generate_notifications_csv,
     get_time_left,
-    REQUESTED_STATUSES,
-    FAILURE_STATUSES,
-    SENDING_STATUSES,
-    DELIVERED_STATUSES,
     get_letter_timings,
-)
+    parse_filter_args, set_status_filters)
 from app.statistics_utils import add_rate_to_job
-
-
-def _parse_filter_args(filter_dict):
-    if not isinstance(filter_dict, MultiDict):
-        filter_dict = MultiDict(filter_dict)
-
-    return MultiDict(
-        (
-            key,
-            (','.join(filter_dict.getlist(key))).split(',')
-        )
-        for key in filter_dict.keys()
-        if ''.join(filter_dict.getlist(key))
-    )
-
-
-def _set_status_filters(filter_args):
-    status_filters = filter_args.get('status', [])
-    return list(OrderedSet(chain(
-        (status_filters or REQUESTED_STATUSES),
-        DELIVERED_STATUSES if 'delivered' in status_filters else [],
-        SENDING_STATUSES if 'sending' in status_filters else [],
-        FAILURE_STATUSES if 'failed' in status_filters else []
-    )))
 
 
 @main.route("/services/<service_id>/jobs")
@@ -104,8 +73,8 @@ def view_job(service_id, job_id):
     if job['job_status'] == 'cancelled':
         abort(404)
 
-    filter_args = _parse_filter_args(request.args)
-    filter_args['status'] = _set_status_filters(filter_args)
+    filter_args = parse_filter_args(request.args)
+    filter_args['status'] = set_status_filters(filter_args)
 
     total_notifications = job.get('notification_count', 0)
     processed_notifications = job.get('notifications_delivered', 0) + job.get('notifications_failed', 0)
@@ -146,8 +115,8 @@ def view_job_csv(service_id, job_id):
         template_id=job['template'],
         version=job['template_version']
     )['data']
-    filter_args = _parse_filter_args(request.args)
-    filter_args['status'] = _set_status_filters(filter_args)
+    filter_args = parse_filter_args(request.args)
+    filter_args['status'] = set_status_filters(filter_args)
 
     return Response(
         stream_with_context(
@@ -206,6 +175,12 @@ def view_notifications(service_id, message_type):
         page=request.args.get('page', 1),
         to=request.form.get('to', ''),
         search_form=SearchNotificationsForm(to=request.form.get('to', '')),
+        download_link=url_for(
+            '.download_notifications_csv',
+            service_id=current_service['id'],
+            message_type=message_type,
+            status=request.args.get('status')
+        )
     )
 
 
@@ -226,8 +201,8 @@ def get_notifications(service_id, message_type, status_override=None):
         abort(404, "Invalid page argument ({}) reverting to page 1.".format(request.args['page'], None))
     if message_type not in ['email', 'sms', 'letter']:
         abort(404)
-    filter_args = _parse_filter_args(request.args)
-    filter_args['status'] = _set_status_filters(filter_args)
+    filter_args = parse_filter_args(request.args)
+    filter_args['status'] = set_status_filters(filter_args)
     if request.path.endswith('csv'):
         return Response(
             generate_notifications_csv(
@@ -250,7 +225,6 @@ def get_notifications(service_id, message_type, status_override=None):
         limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'],
         to=request.form.get('to', ''),
     )
-
     url_args = {
         'message_type': message_type,
         'status': request.args.get('status')
@@ -361,8 +335,8 @@ def _get_job_counts(job):
 
 
 def get_job_partials(job, template):
-    filter_args = _parse_filter_args(request.args)
-    filter_args['status'] = _set_status_filters(filter_args)
+    filter_args = parse_filter_args(request.args)
+    filter_args['status'] = set_status_filters(filter_args)
     notifications = notification_api_client.get_notifications_for_service(
         job['service'], job['id'], status=filter_args['status']
     )
