@@ -97,7 +97,7 @@ def test_should_show_page_for_one_job(
         job_id=fake_uuid,
         status=status_argument,
     )
-    csv_link = page.find('a', {'download': 'download'})
+    csv_link = page.select_one('a[download]')
     assert csv_link['href'] == url_for(
         'main.view_job_csv',
         service_id=service_one['id'],
