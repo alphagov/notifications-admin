@@ -19,9 +19,6 @@ BUILD_URL ?=
 
 DOCKER_CONTAINER_PREFIX = ${USER}-${BUILD_TAG}
 
-CODEDEPLOY_PREFIX ?= notifications-admin
-CODEDEPLOY_APP_NAME ?= notify-admin
-
 CF_API ?= api.cloud.service.gov.uk
 CF_ORG ?= govuk-notify
 CF_SPACE ?= ${DEPLOY_ENV}
@@ -42,32 +39,25 @@ venv/bin/activate:
 .PHONY: check-env-vars
 check-env-vars: ## Check mandatory environment variables
 	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
-	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
-	$(if ${AWS_ACCESS_KEY_ID},,$(error Must specify AWS_ACCESS_KEY_ID))
-	$(if ${AWS_SECRET_ACCESS_KEY},,$(error Must specify AWS_SECRET_ACCESS_KEY))
 
 .PHONY: sandbox
 sandbox: ## Set environment to sandbox
 	$(eval export DEPLOY_ENV=sandbox)
-	$(eval export DNS_NAME="cloudapps.digital")
 	@true
 
 .PHONY: preview
 preview: ## Set environment to preview
 	$(eval export DEPLOY_ENV=preview)
-	$(eval export DNS_NAME="notify.works")
 	@true
 
 .PHONY: staging
 staging: ## Set environment to staging
 	$(eval export DEPLOY_ENV=staging)
-	$(eval export DNS_NAME="staging-notify.works")
 	@true
 
 .PHONY: production
 production: ## Set environment to production
 	$(eval export DEPLOY_ENV=production)
-	$(eval export DNS_NAME="notifications.service.gov.uk")
 	@true
 
 .PHONY: dependencies
@@ -87,54 +77,21 @@ build: dependencies generate-version-file ## Build project
 	npm run build
 	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel install -r requirements.txt
 
-.PHONY: cf-build
-cf-build: dependencies generate-version-file ## Build project
-	npm run build
-
-.PHONY: build-codedeploy-artifact
-build-codedeploy-artifact: ## Build the deploy artifact for CodeDeploy
+.PHONY: build-paas-artifact
+build-paas-artifact: ## Build the deploy artifact for PaaS
 	rm -rf target
 	mkdir -p target
 	zip -y -q -r -x@deploy-exclude.lst target/notifications-admin.zip ./
-
-.PHONY: upload-codedeploy-artifact ## Upload the deploy artifact for CodeDeploy
-upload-codedeploy-artifact: check-env-vars
-	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
-	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-admin.zip s3://${DNS_NAME}-codedeploy/${CODEDEPLOY_PREFIX}-${DEPLOY_BUILD_NUMBER}.zip
-
-.PHONY: build-paas-artifact
-build-paas-artifact: build-codedeploy-artifact ## Build the deploy artifact for PaaS
 
 .PHONY: upload-paas-artifact ## Upload the deploy artifact for PaaS
 upload-paas-artifact:
 	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
 	$(if ${JENKINS_S3_BUCKET},,$(error Must specify JENKINS_S3_BUCKET))
-	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-admin.zip s3://${JENKINS_S3_BUCKET}/build/${CODEDEPLOY_PREFIX}/${DEPLOY_BUILD_NUMBER}.zip
+	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-admin.zip s3://${JENKINS_S3_BUCKET}/build/notifications-admin/${DEPLOY_BUILD_NUMBER}.zip
 
 .PHONY: test
 test: venv ## Run tests
 	./scripts/run_tests.sh
-
-.PHONY: deploy
-deploy: check-env-vars ## Upload deploy artifacts to S3 and trigger CodeDeploy
-	aws deploy create-deployment --application-name ${CODEDEPLOY_APP_NAME} --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name ${CODEDEPLOY_APP_NAME} --s3-location bucket=${DNS_NAME}-codedeploy,key=${CODEDEPLOY_PREFIX}-${DEPLOY_BUILD_NUMBER}.zip,bundleType=zip --region eu-west-1
-
-.PHONY: check-aws-vars
-check-aws-vars: ## Check if AWS access keys are set
-	$(if ${AWS_ACCESS_KEY_ID},,$(error Must specify AWS_ACCESS_KEY_ID))
-	$(if ${AWS_SECRET_ACCESS_KEY},,$(error Must specify AWS_SECRET_ACCESS_KEY))
-
-.PHONY: deploy-suspend-autoscaling-processes
-deploy-suspend-autoscaling-processes: check-aws-vars ## Suspend launch and terminate processes for the auto-scaling group
-	aws autoscaling suspend-processes --region eu-west-1 --auto-scaling-group-name ${CODEDEPLOY_APP_NAME} --scaling-processes "Launch" "Terminate"
-
-.PHONY: deploy-resume-autoscaling-processes
-deploy-resume-autoscaling-processes: check-aws-vars ## Resume launch and terminate processes for the auto-scaling group
-	aws autoscaling resume-processes --region eu-west-1 --auto-scaling-group-name ${CODEDEPLOY_APP_NAME} --scaling-processes "Launch" "Terminate"
-
-.PHONY: deploy-check-autoscaling-processes
-deploy-check-autoscaling-processes: check-aws-vars ## Returns with the number of instances with active autoscaling events
-	@aws autoscaling describe-auto-scaling-groups --region eu-west-1 --auto-scaling-group-names ${CODEDEPLOY_APP_NAME} | jq '.AutoScalingGroups[0].Instances|map(select(.LifecycleState != "InService"))|length'
 
 .PHONY: coverage
 coverage: venv ## Create coverage report
@@ -179,10 +136,6 @@ endef
 .PHONY: build-with-docker
 build-with-docker: prepare-docker-build-image ## Build inside a Docker container
 	$(call run_docker_container,build,gosu hostuser make build)
-
-.PHONY: cf-build-with-docker
-cf-build-with-docker: prepare-docker-build-image ## Build inside a Docker container
-	$(call run_docker_container,build,gosu hostuser make cf-build)
 
 .PHONY: test-with-docker
 test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
