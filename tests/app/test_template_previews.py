@@ -45,20 +45,22 @@ def test_from_database_object_makes_request(
     client,
     partial_call,
     expected_url,
+    mock_get_service_letter_template
 ):
     resp = Mock(content='a', status_code='b', headers={'c': 'd'})
     request_mock = mocker.patch('app.template_previews.requests.post', return_value=resp)
     mocker.patch('app.template_previews.current_service', __getitem__=Mock(return_value='123'))
+    template = mock_get_service_letter_template('123', '456')['data']
 
-    ret = partial_call(template='foo')
+    ret = partial_call(template=template)
 
     assert ret[0] == 'a'
     assert ret[1] == 'b'
     assert list(ret[2]) == [('c', 'd')]
 
     data = {
-        'letter_contact_block': '123',
-        'template': 'foo',
+        'letter_contact_block': None,
+        'template': template,
         'values': None,
         'dvla_org_id': '123',
     }
