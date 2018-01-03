@@ -170,3 +170,30 @@ def test_should_attempt_redirect_when_user_is_pending(
             'password': 'val1dPassw0rd!'})
     assert response.location == url_for('main.resend_email_verification', _external=True)
     assert response.status_code == 302
+
+
+def test_email_address_is_treated_case_insensitively_when_signing_in_as_invited_user(
+    client,
+    mocker,
+    mock_verify_password,
+    api_user_active,
+    sample_invite,
+    mock_accept_invite,
+    mock_send_verify_code
+):
+    sample_invite['email_address'] = 'TEST@user.gov.uk'
+
+    mocker.patch('app.user_api_client.get_user_by_email_or_none', return_value=api_user_active)
+    mocker.patch('app.main.views.sign_in._get_and_verify_user', return_value=api_user_active)
+
+    with client.session_transaction() as session:
+        session['invited_user'] = sample_invite
+
+    response = client.post(
+        url_for('main.sign_in'), data={
+            'email_address': 'test@user.gov.uk',
+            'password': 'val1dPassw0rd!'})
+
+    assert mock_accept_invite.called
+    assert response.status_code == 302
+    assert mock_send_verify_code.called

@@ -9,6 +9,7 @@ class InviteApiClient(NotifyAdminAPIClient):
 
     def init_app(self, app):
         self.base_url = app.config['API_HOST_NAME']
+        self.admin_url = app.config['ADMIN_BASE_URL']
         self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.api_key = app.config['ADMIN_CLIENT_SECRET']
 
@@ -18,7 +19,8 @@ class InviteApiClient(NotifyAdminAPIClient):
             'email_address': email_address,
             'from_user': invite_from_id,
             'permissions': permissions,
-            'auth_type': auth_type
+            'auth_type': auth_type,
+            'invite_link_host': self.admin_url,
         }
         data = _attach_current_user(data)
         resp = self.post(url='/service/{}/invite'.format(service_id), data=data)

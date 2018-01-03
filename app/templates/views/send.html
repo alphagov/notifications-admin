@@ -40,7 +40,7 @@
     {% endcall %}
   </div>
   <p class="table-show-more-link">
-    <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example</a>
+    <a href="{{ url_for('.get_example_csv', service_id=current_service.id, template_id=template.id) }}" download>Download this example</a>
   </p>
 
   <h2 class="heading-medium">Your file will populate this template ({{ template.name }})</h2>
