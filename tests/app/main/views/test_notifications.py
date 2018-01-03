@@ -109,13 +109,19 @@ def test_notification_page_doesnt_link_to_template_in_tour(
 
 
 @freeze_time("2016-01-01 01:01")
-def test_notification_page_shows_status_of_letter_notification(
+def test_notification_page_shows_page_for_letter_notification(
     client_request,
     mocker,
     fake_uuid,
 ):
 
+    count_of_pages = 3
+
     mock_get_notification(mocker, fake_uuid, template_type='letter')
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=count_of_pages
+    )
 
     page = client_request.get(
         'main.view_notification',
@@ -130,6 +136,15 @@ def test_notification_page_shows_status_of_letter_notification(
         'Estimated delivery date: 6 January'
     )
     assert page.select('p.notification-status') == []
+
+    letter_images = page.select('main img')
+
+    assert len(letter_images) == count_of_pages
+
+    for index in range(1, count_of_pages + 1):
+        assert page.select('img')[index]['src'].endswith(
+            '.png?page={}'.format(index)
+        )
 
 
 @pytest.mark.parametrize('filetype', [
@@ -193,6 +208,10 @@ def test_notification_page_has_link_to_send_another_for_sms(
 
     service_one['permissions'] = service_permissions
     mock_get_notification(mocker, fake_uuid, template_type=template_type)
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1
+    )
 
     page = client_request.get(
         'main.view_notification',
@@ -237,6 +256,10 @@ def test_notification_page_has_link_to_download_letter(
 ):
 
     mock_get_notification(mocker, fake_uuid, template_type=template_type)
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1
+    )
 
     page = client_request.get(
         'main.view_notification',
