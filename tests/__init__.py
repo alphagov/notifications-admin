@@ -368,7 +368,6 @@ def validate_route_permission(mocker,
             else:
                 pytest.fail("Invalid method call {}".format(method))
             if resp.status_code != response_code:
-                print(resp.status_code)
                 pytest.fail("Invalid permissions set for endpoint {}".format(route))
     return resp
 
@@ -403,6 +402,5 @@ def validate_route_permission_with_client(mocker,
     else:
         pytest.fail("Invalid method call {}".format(method))
     if resp.status_code != response_code:
-        print(resp.status_code)
         pytest.fail("Invalid permissions set for endpoint {}".format(route))
     return resp
