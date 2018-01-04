@@ -39,25 +39,30 @@ venv/bin/activate:
 .PHONY: check-env-vars
 check-env-vars: ## Check mandatory environment variables
 	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
+	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
 
 .PHONY: sandbox
 sandbox: ## Set environment to sandbox
 	$(eval export DEPLOY_ENV=sandbox)
+	$(eval export DNS_NAME="cloudapps.digital")
 	@true
 
 .PHONY: preview
 preview: ## Set environment to preview
 	$(eval export DEPLOY_ENV=preview)
+	$(eval export DNS_NAME="notify.works")
 	@true
 
 .PHONY: staging
 staging: ## Set environment to staging
 	$(eval export DEPLOY_ENV=staging)
+	$(eval export DNS_NAME="staging-notify.works")
 	@true
 
 .PHONY: production
 production: ## Set environment to production
 	$(eval export DEPLOY_ENV=production)
+	$(eval export DNS_NAME="notifications.service.gov.uk")
 	@true
 
 .PHONY: dependencies
@@ -173,9 +178,8 @@ cf-deploy: ## Deploys the app to Cloud Foundry
 	cf delete -f notify-admin-rollback
 
 .PHONY: cf-deploy-prototype
-cf-deploy-prototype: ## Deploys the app to Cloud Foundry
+cf-deploy-prototype: cf-target ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
-	cf target -s ${CF_SPACE}
 	cf push -f manifest-prototype-${CF_SPACE}.yml
 
 .PHONY: cf-rollback
@@ -188,3 +192,23 @@ cf-rollback: ## Rollbacks the app to the previous release
 .PHONY: cf-push
 cf-push:
 	cf push -f manifest-${CF_SPACE}.yml
+
+.PHONY: cf-target
+cf-target: check-env-vars
+	@cf target -o ${CF_ORG} -s ${CF_SPACE}
+
+.PHONY: cf-failwhale-deployed
+cf-failwhale-deployed:
+	@cf app notify-admin-failwhale --guid || (echo "notify-admin-failwhale is not deployed on ${CF_SPACE}" && exit 1)
+
+.PHONY: enable-failwhale
+enable-failwhale: cf-target cf-failwhale-deployed ## Enable the failwhale app and disable admin
+	@cf map-route notify-admin-failwhale ${DNS_NAME} --hostname www
+	@cf unmap-route notify-admin ${DNS_NAME} --hostname www
+	@echo "Failwhale is enabled"
+
+.PHONY: disable-failwhale
+disable-failwhale: cf-target cf-failwhale-deployed ## Disable the failwhale app and enable admin
+	@cf map-route notify-admin ${DNS_NAME} --hostname www
+	@cf unmap-route notify-admin-failwhale ${DNS_NAME} --hostname www
+	@echo "Failwhale is disabled"
