@@ -97,6 +97,7 @@ class Config(object):
         r"gov\.wales",
         r"biglotteryfund\.org\.uk",
         r"marinemanagement\.org\.uk",
+        r"britishmuseum\.org",
     ]
 
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
