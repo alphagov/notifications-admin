@@ -19,7 +19,7 @@ and to disable it
     make <environment> disable-failwhale
 
 
-Where <environment> is any of
+Where `<environment>` is any of
 
 - preview
 - staging
