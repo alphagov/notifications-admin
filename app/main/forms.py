@@ -1,8 +1,10 @@
 import re
 import pytz
+import weakref
 
 from flask_wtf import FlaskForm as Form
 from datetime import datetime, timedelta
+from itertools import chain
 
 from notifications_utils.recipients import (
     validate_phone_number,
@@ -98,6 +100,12 @@ def email_address(label='Email address', gov_user=True):
     return EmailField(label, validators)
 
 
+def strip_whitespace(value):
+    if value is not None and hasattr(value, 'strip'):
+        return value.strip()
+    return value
+
+
 class UKMobileNumber(TelField):
     def pre_validate(self, form):
         try:
@@ -154,7 +162,31 @@ def organisation_type():
     )
 
 
-class LoginForm(Form):
+class StripWhitespaceForm(Form):
+    class Meta:
+        def bind_field(self, form, unbound_field, options):
+            # FieldList simply doesn't support filters.
+            # @see: https://github.com/wtforms/wtforms/issues/148
+            no_filter_fields = (FieldList, PasswordField)
+            filters = [strip_whitespace] if not issubclass(unbound_field.field_class, no_filter_fields) else []
+            filters += unbound_field.kwargs.get('filters', [])
+            bound = unbound_field.bind(form=form, filters=filters, **options)
+            bound.get_form = weakref.ref(form)  # GC won't collect the form if we don't use a weakref
+            return bound
+
+
+class StripWhitespaceStringField(StringField):
+    def __init__(self, label=None, **kwargs):
+        kwargs['filters'] = tuple(chain(
+            kwargs.get('filters', ()),
+            (
+                strip_whitespace,
+            ),
+        ))
+        super(StringField, self).__init__(label, **kwargs)
+
+
+class LoginForm(StripWhitespaceForm):
     email_address = StringField('Email address', validators=[
         Length(min=5, max=255),
         DataRequired(message='Can’t be empty'),
@@ -165,7 +197,7 @@ class LoginForm(Form):
     ])
 
 
-class RegisterUserForm(Form):
+class RegisterUserForm(StripWhitespaceForm):
     name = StringField('Full name',
                        validators=[DataRequired(message='Can’t be empty')])
     email_address = email_address()
@@ -175,7 +207,7 @@ class RegisterUserForm(Form):
     auth_type = HiddenField('auth_type', default='sms_auth')
 
 
-class RegisterUserFromInviteForm(Form):
+class RegisterUserFromInviteForm(StripWhitespaceForm):
     def __init__(self, invited_user):
         super().__init__(
             service=invited_user['service'],
@@ -198,7 +230,7 @@ class RegisterUserFromInviteForm(Form):
             raise ValidationError('Can’t be empty')
 
 
-class PermissionsForm(Form):
+class PermissionsForm(StripWhitespaceForm):
     send_messages = BooleanField("Send messages from existing templates")
     manage_templates = BooleanField("Add and edit templates")
     manage_service = BooleanField("Modify this service and its team")
@@ -225,7 +257,7 @@ class InviteUserForm(PermissionsForm):
             raise ValidationError("You can’t send an invitation to yourself")
 
 
-class TwoFactorForm(Form):
+class TwoFactorForm(StripWhitespaceForm):
     def __init__(self, validate_code_func, *args, **kwargs):
         '''
         Keyword arguments:
@@ -242,15 +274,15 @@ class TwoFactorForm(Form):
             raise ValidationError(reason)
 
 
-class EmailNotReceivedForm(Form):
+class EmailNotReceivedForm(StripWhitespaceForm):
     email_address = email_address()
 
 
-class TextNotReceivedForm(Form):
+class TextNotReceivedForm(StripWhitespaceForm):
     mobile_number = international_phone_number()
 
 
-class RenameServiceForm(Form):
+class RenameServiceForm(StripWhitespaceForm):
     name = StringField(
         u'Service name',
         validators=[
@@ -258,7 +290,7 @@ class RenameServiceForm(Form):
         ])
 
 
-class CreateServiceForm(Form):
+class CreateServiceForm(StripWhitespaceForm):
     name = StringField(
         u'What’s your service called?',
         validators=[
@@ -267,11 +299,11 @@ class CreateServiceForm(Form):
     organisation_type = organisation_type()
 
 
-class OrganisationTypeForm(Form):
+class OrganisationTypeForm(StripWhitespaceForm):
     organisation_type = organisation_type()
 
 
-class FreeSMSAllowance(Form):
+class FreeSMSAllowance(StripWhitespaceForm):
     free_sms_allowance = IntegerField(
         'Numbers of text message fragments per year',
         validators=[
@@ -280,7 +312,7 @@ class FreeSMSAllowance(Form):
     )
 
 
-class ConfirmPasswordForm(Form):
+class ConfirmPasswordForm(StripWhitespaceForm):
     def __init__(self, validate_password_func, *args, **kwargs):
         self.validate_password_func = validate_password_func
         super(ConfirmPasswordForm, self).__init__(*args, **kwargs)
@@ -292,7 +324,7 @@ class ConfirmPasswordForm(Form):
             raise ValidationError('Invalid password')
 
 
-class BaseTemplateForm(Form):
+class BaseTemplateForm(StripWhitespaceForm):
     name = StringField(
         u'Template name',
         validators=[DataRequired(message="Can’t be empty")])
@@ -341,15 +373,15 @@ class LetterTemplateForm(EmailTemplateForm):
     )
 
 
-class ForgotPasswordForm(Form):
+class ForgotPasswordForm(StripWhitespaceForm):
     email_address = email_address(gov_user=False)
 
 
-class NewPasswordForm(Form):
+class NewPasswordForm(StripWhitespaceForm):
     new_password = password()
 
 
-class ChangePasswordForm(Form):
+class ChangePasswordForm(StripWhitespaceForm):
     def __init__(self, validate_password_func, *args, **kwargs):
         self.validate_password_func = validate_password_func
         super(ChangePasswordForm, self).__init__(*args, **kwargs)
@@ -362,16 +394,16 @@ class ChangePasswordForm(Form):
             raise ValidationError('Invalid password')
 
 
-class CsvUploadForm(Form):
+class CsvUploadForm(StripWhitespaceForm):
     file = FileField('Add recipients', validators=[DataRequired(
         message='Please pick a file'), CsvFileValidator()])
 
 
-class ChangeNameForm(Form):
+class ChangeNameForm(StripWhitespaceForm):
     new_name = StringField(u'Your name')
 
 
-class ChangeEmailForm(Form):
+class ChangeEmailForm(StripWhitespaceForm):
     def __init__(self, validate_email_func, *args, **kwargs):
         self.validate_email_func = validate_email_func
         super(ChangeEmailForm, self).__init__(*args, **kwargs)
@@ -384,11 +416,11 @@ class ChangeEmailForm(Form):
             raise ValidationError("The email address is already in use")
 
 
-class ChangeMobileNumberForm(Form):
+class ChangeMobileNumberForm(StripWhitespaceForm):
     mobile_number = international_phone_number()
 
 
-class ConfirmMobileNumberForm(Form):
+class ConfirmMobileNumberForm(StripWhitespaceForm):
     def __init__(self, validate_code_func, *args, **kwargs):
         self.validate_code_func = validate_code_func
         super(ConfirmMobileNumberForm, self).__init__(*args, **kwargs)
@@ -401,7 +433,7 @@ class ConfirmMobileNumberForm(Form):
             raise ValidationError(msg)
 
 
-class ChooseTimeForm(Form):
+class ChooseTimeForm(StripWhitespaceForm):
 
     def __init__(self, *args, **kwargs):
         super(ChooseTimeForm, self).__init__(*args, **kwargs)
@@ -421,7 +453,7 @@ class ChooseTimeForm(Form):
     )
 
 
-class CreateKeyForm(Form):
+class CreateKeyForm(StripWhitespaceForm):
     def __init__(self, existing_key_names=[], *args, **kwargs):
         self.existing_key_names = [x.lower() for x in existing_key_names]
         super(CreateKeyForm, self).__init__(*args, **kwargs)
@@ -442,7 +474,7 @@ class CreateKeyForm(Form):
             raise ValidationError('A key with this name already exists')
 
 
-class SupportType(Form):
+class SupportType(StripWhitespaceForm):
     support_type = RadioField(
         'How can we help you?',
         choices=[
@@ -453,7 +485,7 @@ class SupportType(Form):
     )
 
 
-class Feedback(Form):
+class Feedback(StripWhitespaceForm):
     name = StringField('Name')
     email_address = StringField('Email address')
     feedback = TextAreaField('Your message', validators=[DataRequired(message="Can’t be empty")])
@@ -463,7 +495,7 @@ class Problem(Feedback):
     email_address = email_address(label='Email address', gov_user=False)
 
 
-class Triage(Form):
+class Triage(StripWhitespaceForm):
     severe = RadioField(
         'Is it an emergency?',
         choices=[
@@ -474,7 +506,7 @@ class Triage(Form):
     )
 
 
-class RequestToGoLiveForm(Form):
+class RequestToGoLiveForm(StripWhitespaceForm):
     mou = RadioField(
         (
             'Has your organisation accepted the GOV.UK&nbsp;Notify data sharing and financial '
@@ -513,16 +545,16 @@ class RequestToGoLiveForm(Form):
     )
 
 
-class ProviderForm(Form):
+class ProviderForm(StripWhitespaceForm):
     priority = IntegerField('Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")])
 
 
-class ServiceReplyToEmailForm(Form):
+class ServiceReplyToEmailForm(StripWhitespaceForm):
     email_address = email_address(label='Email reply to address')
     is_default = BooleanField("Make this email address the default")
 
 
-class ServiceSmsSenderForm(Form):
+class ServiceSmsSenderForm(StripWhitespaceForm):
     sms_sender = StringField(
         'Text message sender',
         validators=[
@@ -537,11 +569,11 @@ class ServiceSmsSenderForm(Form):
             raise ValidationError('Use letters and numbers only')
 
 
-class ServiceEditInboundNumberForm(Form):
+class ServiceEditInboundNumberForm(StripWhitespaceForm):
     is_default = BooleanField("Make this text message sender the default")
 
 
-class ServiceLetterContactBlockForm(Form):
+class ServiceLetterContactBlockForm(StripWhitespaceForm):
     letter_contact_block = TextAreaField(
         validators=[
             DataRequired(message="Can’t be empty"),
@@ -558,7 +590,7 @@ class ServiceLetterContactBlockForm(Form):
             )
 
 
-class ServiceBrandingOrg(Form):
+class ServiceBrandingOrg(StripWhitespaceForm):
 
     def __init__(self, organisations=[], *args, **kwargs):
         self.organisation.choices = organisations
@@ -585,7 +617,7 @@ class ServiceBrandingOrg(Form):
     )
 
 
-class ServiceSelectOrg(Form):
+class ServiceSelectOrg(StripWhitespaceForm):
 
     def __init__(self, organisations=[], *args, **kwargs):
         self.organisation.choices = organisations
@@ -599,7 +631,7 @@ class ServiceSelectOrg(Form):
     )
 
 
-class ServiceManageOrg(Form):
+class ServiceManageOrg(StripWhitespaceForm):
 
     name = StringField('Name')
 
@@ -607,7 +639,7 @@ class ServiceManageOrg(Form):
     file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
 
 
-class LetterBranding(Form):
+class LetterBranding(StripWhitespaceForm):
 
     def __init__(self, choices=[], *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -621,7 +653,15 @@ class LetterBranding(Form):
     )
 
 
-class Whitelist(Form):
+class EmailFieldInWhitelist(EmailField, StripWhitespaceStringField):
+    pass
+
+
+class InternationalPhoneNumberInWhitelist(InternationalPhoneNumber, StripWhitespaceStringField):
+    pass
+
+
+class Whitelist(StripWhitespaceForm):
 
     def populate(self, email_addresses, phone_numbers):
         for form_field, existing_whitelist in (
@@ -632,7 +672,7 @@ class Whitelist(Form):
                 form_field[index].data = value
 
     email_addresses = FieldList(
-        EmailField(
+        EmailFieldInWhitelist(
             '',
             validators=[
                 Optional(),
@@ -646,7 +686,7 @@ class Whitelist(Form):
     )
 
     phone_numbers = FieldList(
-        InternationalPhoneNumber(
+        InternationalPhoneNumberInWhitelist(
             '',
             validators=[
                 Optional()
@@ -659,13 +699,13 @@ class Whitelist(Form):
     )
 
 
-class DateFilterForm(Form):
+class DateFilterForm(StripWhitespaceForm):
     start_date = DateField("Start Date", [validators.optional()])
     end_date = DateField("End Date", [validators.optional()])
     include_from_test_key = BooleanField("Include test keys", default="checked", false_values={"N"})
 
 
-class ChooseTemplateType(Form):
+class ChooseTemplateType(StripWhitespaceForm):
 
     template_type = RadioField(
         'What kind of template do you want to add?',
@@ -685,17 +725,17 @@ class ChooseTemplateType(Form):
         ])
 
 
-class SearchTemplatesForm(Form):
+class SearchTemplatesForm(StripWhitespaceForm):
 
     search = SearchField('Search by name')
 
 
-class SearchNotificationsForm(Form):
+class SearchNotificationsForm(StripWhitespaceForm):
 
     to = SearchField('Search by phone number or email address')
 
 
-class PlaceholderForm(Form):
+class PlaceholderForm(StripWhitespaceForm):
 
     pass
 
@@ -704,7 +744,7 @@ class PasswordFieldShowHasContent(StringField):
     widget = widgets.PasswordInput(hide_value=False)
 
 
-class ServiceInboundNumberForm(Form):
+class ServiceInboundNumberForm(StripWhitespaceForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.inbound_number.choices = kwargs['inbound_number_choices']
@@ -717,18 +757,33 @@ class ServiceInboundNumberForm(Form):
     )
 
 
-class ServiceInboundApiForm(Form):
-    url = StringField("Callback URL",
-                      validators=[DataRequired(message='Can’t be empty'),
-                                  Regexp(regex="^https.*",
-                                         message='Must be a valid https URL')]
-                      )
-    bearer_token = PasswordFieldShowHasContent("Bearer token",
-                                               validators=[DataRequired(message='Can’t be empty'),
-                                                           Length(min=10, message='Must be at least 10 characters')])
+class ServiceReceiveMessagesCallbackForm(StripWhitespaceForm):
+    url = StringField(
+        "URL",
+        validators=[DataRequired(message='Can’t be empty'),
+                    Regexp(regex="^https.*", message='Must be a valid https URL')]
+    )
+    bearer_token = PasswordFieldShowHasContent(
+        "Bearer token",
+        validators=[DataRequired(message='Can’t be empty'),
+                    Length(min=10, message='Must be at least 10 characters')]
+    )
 
 
-class InternationalSMSForm(Form):
+class ServiceDeliveryStatusCallbackForm(StripWhitespaceForm):
+    url = StringField(
+        "URL",
+        validators=[DataRequired(message='Can’t be empty'),
+                    Regexp(regex="^https.*", message='Must be a valid https URL')]
+    )
+    bearer_token = PasswordFieldShowHasContent(
+        "Bearer token",
+        validators=[DataRequired(message='Can’t be empty'),
+                    Length(min=10, message='Must be at least 10 characters')]
+    )
+
+
+class InternationalSMSForm(StripWhitespaceForm):
     enabled = RadioField(
         'Send text messages to international phone numbers',
         choices=[
@@ -738,7 +793,7 @@ class InternationalSMSForm(Form):
     )
 
 
-class SMSPrefixForm(Form):
+class SMSPrefixForm(StripWhitespaceForm):
     enabled = RadioField(
         '',
         choices=[
@@ -776,7 +831,7 @@ def get_placeholder_form_instance(
     )
 
 
-class SetSenderForm(Form):
+class SetSenderForm(StripWhitespaceForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

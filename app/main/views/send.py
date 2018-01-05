@@ -2,7 +2,6 @@ import itertools
 from string import ascii_uppercase
 
 from orderedset import OrderedSet
-from contextlib import suppress
 from zipfile import BadZipFile
 from xlrd.biffh import XLRDError
 from werkzeug.routing import RequestRedirect
@@ -21,7 +20,6 @@ from flask import (
 from flask_login import login_required, current_user
 
 from notifications_python_client.errors import HTTPError
-from notifications_utils.columns import Columns
 from notifications_utils.recipients import (
     RecipientCSV,
     first_column_headings,
@@ -461,7 +459,7 @@ def send_test_preview(service_id, template_id, filetype):
     return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
 
 
-def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
+def _check_messages(service_id, template_type, upload_id, preview_row, letters_as_pdf=False):
 
     if not session.get('upload_data'):
         # if we just return a `redirect` (302) object here, we'll get errors when we try and unpack in the
@@ -497,6 +495,7 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
             template_type=template_type,
             upload_id=upload_id,
             filetype='png',
+            row_index=preview_row,
         ) if not letters_as_pdf else None,
         email_reply_to=email_reply_to,
         sms_sender=sms_sender
@@ -522,23 +521,21 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
         choose_time_form = ChooseTimeForm()
 
-    with suppress(StopIteration):
-        first_recipient = None
-        template.values = next(recipients.rows)
-        first_recipient = template.values.get(
-            Columns.make_key(recipients.recipient_column_headers[0]),
-            ''
-        )
+    count_of_recipients = len(list(recipients.rows))
 
-    session['upload_data']['notification_count'] = len(list(recipients.rows))
+    if preview_row < count_of_recipients:
+        template.values = recipients[preview_row]
+    elif preview_row > 0:
+        abort(404)
+
+    session['upload_data']['notification_count'] = count_of_recipients
     session['upload_data']['valid'] = not recipients.has_errors
     return dict(
         recipients=recipients,
-        first_recipient=first_recipient,
         template=template,
         errors=recipients.has_errors,
         row_errors=get_errors_for_csv(recipients, template.template_type),
-        count_of_recipients=session['upload_data']['notification_count'],
+        count_of_recipients=count_of_recipients,
         count_of_displayed_recipients=(
             len(list(recipients.initial_annotated_rows_with_errors))
             if any(recipients.rows_with_errors) and not recipients.missing_column_headers else
@@ -561,11 +558,12 @@ def _check_messages(service_id, template_type, upload_id, letters_as_pdf=False):
 
 
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['GET'])
+@main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>", methods=['GET'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
-def check_messages(service_id, template_type, upload_id):
+def check_messages(service_id, template_type, upload_id, row_index=0):
 
-    data = _check_messages(service_id, template_type, upload_id)
+    data = _check_messages(service_id, template_type, upload_id, row_index)
 
     if (
         data['recipients'].too_many_rows or
@@ -588,22 +586,24 @@ def check_messages(service_id, template_type, upload_id):
 
 
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>.<filetype>", methods=['GET'])
+@main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>.<filetype>", methods=['GET'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
-def check_messages_preview(service_id, template_type, upload_id, filetype):
+def check_messages_preview(service_id, template_type, upload_id, filetype, row_index=0):
     if filetype not in ('pdf', 'png'):
         abort(404)
 
     template = _check_messages(
-        service_id, template_type, upload_id, letters_as_pdf=True
+        service_id, template_type, upload_id, row_index, letters_as_pdf=True
     )['template']
     return TemplatePreview.from_utils_template(template, filetype)
 
 
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['POST'])
+@main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>", methods=['POST'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
-def recheck_messages(service_id, template_type, upload_id):
+def recheck_messages(service_id, template_type, upload_id, row_index=0):
 
     if not session.get('upload_data'):
         return redirect(url_for('main.choose_template', service_id=service_id))

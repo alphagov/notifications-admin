@@ -209,10 +209,9 @@
 .table-show-more-link {
   @include core-16;
   color: $secondary-text-colour;
-  margin-top: -30px;
   margin-bottom: $gutter * 1.3333;
   border-bottom: 1px solid $border-colour;
-  padding: 0.75em 0 0.5625em 0;
+  padding: 10px 0 10px 0;
   text-align: center;
 }
 

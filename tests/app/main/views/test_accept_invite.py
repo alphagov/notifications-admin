@@ -315,6 +315,29 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
     assert mock_accept_invite.call_count == 0
 
 
+def test_accept_invite_does_not_treat_email_addresses_as_case_sensitive(
+    logged_in_client,
+    mocker,
+    api_user_active,
+    sample_invite,
+    service_one,
+    mock_accept_invite,
+    mock_get_user_by_email
+):
+    mocker.patch('app.main.views.invites.check_token')
+
+    # the email address of api_user_active is 'test@user.gov.uk'
+    sample_invite['email_address'] = 'TEST@user.gov.uk'
+    invite = InvitedUser(**sample_invite)
+    mocker.patch('app.invite_api_client.check_token', return_value=invite)
+    mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
+
+    response = logged_in_client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_dashboard', service_id=service_one['id'], _external=True)
+
+
 def test_new_invited_user_verifies_and_added_to_service(
     client,
     service_one,

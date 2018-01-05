@@ -99,6 +99,8 @@ def _gen_mock_field(x):
     'test@bbsrc.ac.uk',
     'test@acas.org.uk',
     'test@biglotteryfund.org.uk',
+    'test@marinemanagement.org.uk',
+    'test@britishmuseum.org',
 ])
 def test_valid_list_of_white_list_email_domains(
     client,
@@ -149,7 +151,7 @@ def test_for_commas_in_placeholders(
 ):
     with pytest.raises(ValidationError) as error:
         NoCommasInPlaceHolders()(None, _gen_mock_field('Hello ((name,date))'))
-    assert str(error.value) == 'You can’t have commas in your fields'
+    assert str(error.value) == 'You can’t put commas between double brackets'
     NoCommasInPlaceHolders()(None, _gen_mock_field('Hello ((name))'))
 
 

@@ -53,6 +53,7 @@ def service_json(
     created_at=None,
     letter_contact_block=None,
     inbound_api=None,
+    service_callback_api=None,
     permissions=None,
     organisation_type='central',
     free_sms_fragment_limit=250000,
@@ -84,6 +85,7 @@ def service_json(
         'dvla_organisation': '001',
         'permissions': permissions,
         'inbound_api': inbound_api,
+        'service_callback_api': service_callback_api,
         'prefix_sms': prefix_sms,
     }
 
@@ -366,7 +368,6 @@ def validate_route_permission(mocker,
             else:
                 pytest.fail("Invalid method call {}".format(method))
             if resp.status_code != response_code:
-                print(resp.status_code)
                 pytest.fail("Invalid permissions set for endpoint {}".format(route))
     return resp
 
@@ -401,6 +402,5 @@ def validate_route_permission_with_client(mocker,
     else:
         pytest.fail("Invalid method call {}".format(method))
     if resp.status_code != response_code:
-        print(resp.status_code)
         pytest.fail("Invalid permissions set for endpoint {}".format(route))
     return resp

@@ -39,7 +39,7 @@
       {% if template.template_type != 'letter' or not request.args.from_test %}
       <input type="submit" class="button" value="Send {{ count_of_recipients }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}" />
       {% else %}
-        <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_type=template.template_type, upload_id=upload_id, filetype='pdf') }}" download="download" class="button">Download as a printable PDF</a>
+        <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_type=template.template_type, upload_id=upload_id, filetype='pdf') }}" download class="button">Download as a printable PDF</a>
       {% endif %}
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
     </form>
@@ -49,42 +49,40 @@
 
     <h2 class="heading-medium" id="{{ file_contents_header_id }}">{{ original_file_name }}</h2>
 
-    {% call(item, row_number) list_table(
-      recipients.initial_annotated_rows_with_errors if row_errors and not recipients.missing_column_headers else recipients.initial_annotated_rows,
-      caption=original_file_name,
-      caption_visible=False,
-      field_headings=[
-        '<span class="visually-hidden">Row in file</span><span aria-hidden="true">1</span>'|safe
-      ] + recipients.column_headers
-    ) %}
-      {% call index_field() %}
-        <span class="{% if item.index in recipients.rows_with_errors %}table-field-error{% endif %}">
-          {{ item.index + 2 }}
-        </span>
-      {% endcall %}
-      {% for column in recipients.column_headers %}
-        {% if item['columns'][column].ignore %}
-          {{ text_field(item['columns'][column].data or '', status='default') }}
-        {% else %}
-          {{ text_field(item['columns'][column].data or '') }}
-        {% endif %}
-      {% endfor %}
-      {% if item['columns'].get(None) %}
-        {% for column in item['columns'][None].data %}
-          {{ text_field(column, status='default') }}
+    <div class="fullscreen-content" data-module="fullscreen-table">
+      {% call(item, row_number) list_table(
+        recipients.initial_annotated_rows_with_errors if row_errors and not recipients.missing_column_headers else recipients.initial_annotated_rows,
+        caption=original_file_name,
+        caption_visible=False,
+        field_headings=[
+          '<span class="visually-hidden">Row in file</span><span aria-hidden="true">1</span>'|safe
+        ] + recipients.column_headers
+      ) %}
+        {% call index_field() %}
+          <span class="{% if item.index in recipients.rows_with_errors %}table-field-error{% endif %}">
+            {{ item.index + 2 }}
+          </span>
+        {% endcall %}
+        {% for column in recipients.column_headers %}
+          {% if item['columns'][column].ignore %}
+            {{ text_field(item['columns'][column].data or '', status='default') }}
+          {% else %}
+            {{ text_field(item['columns'][column].data or '') }}
+          {% endif %}
         {% endfor %}
-      {% endif %}
-    {% endcall %}
+        {% if item['columns'].get(None) %}
+          {% for column in item['columns'][None].data %}
+            {{ text_field(column, status='default') }}
+          {% endfor %}
+        {% endif %}
+      {% endcall %}
+    </div>
 
   {% endif %}
 
   {% if count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
-      {% if row_errors and not recipients.missing_column_headers %}
-        Only showing the first {{ count_of_displayed_recipients }} rows with errors
-      {% else %}
-        Only showing the first {{ count_of_displayed_recipients }} rows
-      {% endif %}
+      Only showing the first {{ count_of_displayed_recipients }} rows
     </p>
   {% endif %}
 

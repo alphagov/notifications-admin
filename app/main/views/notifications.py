@@ -14,7 +14,7 @@ from app import (
     current_service
 )
 from app.main import main
-from app.template_previews import TemplatePreview
+from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     user_has_permissions,
     get_help_argument,
@@ -40,6 +40,7 @@ def view_notification(service_id, notification_id):
             notification_id=notification_id,
             filetype='png',
         ),
+        page_count=get_page_count_for_letter(notification['template']),
         show_recipient=True,
         redact_missing_personalisation=True,
     )

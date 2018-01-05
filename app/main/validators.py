@@ -1,5 +1,5 @@
 from wtforms import ValidationError
-from notifications_utils.template import Template
+from notifications_utils.field import Field
 from notifications_utils.gsm import get_non_gsm_compatible_characters
 
 from app import formatted_list
@@ -45,11 +45,11 @@ class ValidGovEmail:
 
 class NoCommasInPlaceHolders:
 
-    def __init__(self, message='You can’t have commas in your fields'):
+    def __init__(self, message='You can’t put commas between double brackets'):
         self.message = message
 
     def __call__(self, form, field):
-        if ',' in ''.join(Template({'content': field.data}).placeholders):
+        if ',' in ''.join(Field(field.data).placeholders):
             raise ValidationError(self.message)
 
 

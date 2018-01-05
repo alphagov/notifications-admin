@@ -77,6 +77,10 @@ def test_logged_in_user_redirects_to_choose_service(
     assert response.location == url_for('main.choose_service', _external=True)
 
 
+@pytest.mark.parametrize('email_address, password', [
+    ('valid@example.gov.uk', 'val1dPassw0rd!'),
+    (' valid@example.gov.uk  ', '  val1dPassw0rd!  '),
+])
 def test_process_sms_auth_sign_in_return_2fa_template(
     client,
     api_user_active,
@@ -84,14 +88,17 @@ def test_process_sms_auth_sign_in_return_2fa_template(
     mock_get_user,
     mock_get_user_by_email,
     mock_verify_password,
+    email_address,
+    password,
 ):
     response = client.post(
         url_for('main.sign_in'), data={
-            'email_address': 'valid@example.gov.uk',
-            'password': 'val1dPassw0rd!'})
+            'email_address': email_address,
+            'password': password})
     assert response.status_code == 302
     assert response.location == url_for('.two_factor', _external=True)
-    mock_verify_password.assert_called_with(api_user_active.id, 'val1dPassw0rd!')
+    mock_verify_password.assert_called_with(api_user_active.id, password)
+    mock_get_user_by_email.assert_called_with('valid@example.gov.uk')
 
 
 def test_process_email_auth_sign_in_return_2fa_template(
@@ -163,3 +170,30 @@ def test_should_attempt_redirect_when_user_is_pending(
             'password': 'val1dPassw0rd!'})
     assert response.location == url_for('main.resend_email_verification', _external=True)
     assert response.status_code == 302
+
+
+def test_email_address_is_treated_case_insensitively_when_signing_in_as_invited_user(
+    client,
+    mocker,
+    mock_verify_password,
+    api_user_active,
+    sample_invite,
+    mock_accept_invite,
+    mock_send_verify_code
+):
+    sample_invite['email_address'] = 'TEST@user.gov.uk'
+
+    mocker.patch('app.user_api_client.get_user_by_email_or_none', return_value=api_user_active)
+    mocker.patch('app.main.views.sign_in._get_and_verify_user', return_value=api_user_active)
+
+    with client.session_transaction() as session:
+        session['invited_user'] = sample_invite
+
+    response = client.post(
+        url_for('main.sign_in'), data={
+            'email_address': 'test@user.gov.uk',
+            'password': 'val1dPassw0rd!'})
+
+    assert mock_accept_invite.called
+    assert response.status_code == 302
+    assert mock_send_verify_code.called

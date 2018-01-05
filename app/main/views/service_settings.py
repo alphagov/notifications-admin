@@ -1,5 +1,3 @@
-from urllib.parse import urlparse
-
 import requests
 from flask import (
     render_template,
@@ -33,7 +31,6 @@ from app.main.forms import (
     ServiceLetterContactBlockForm,
     ServiceBrandingOrg,
     LetterBranding,
-    ServiceInboundApiForm,
     InternationalSMSForm,
     OrganisationTypeForm,
     FreeSMSAllowance,
@@ -42,17 +39,6 @@ from app.main.forms import (
 )
 from app import user_api_client, current_service, organisations_client, inbound_number_client, billing_api_client
 from notifications_utils.formatters import formatted_list
-
-
-dummy_bearer_token = 'bearer_token_set'
-
-
-def get_inbound_api():
-    if current_service['inbound_api']:
-        return service_api_client.get_service_inbound_api(
-            current_service['id'],
-            current_service.get('inbound_api')[0]
-        )
 
 
 @main.route("/services/<service_id>/service-settings")
@@ -64,14 +50,6 @@ def service_settings(service_id):
         organisation = organisations_client.get_organisation(current_service['organisation'])['organisation']
     else:
         organisation = None
-
-    inbound_api = get_inbound_api()
-    if inbound_api:
-        parsed_url = urlparse(inbound_api.get('url')) if inbound_api else ''
-        inbound_api_url = '{uri.scheme}://{uri.netloc}{elide_token}'.format(
-            uri=parsed_url, elide_token='...' if parsed_url.path else '')
-    else:
-        inbound_api_url = ''
 
     inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)
     disp_inbound_number = inbound_number['data'].get('number', '')
@@ -100,7 +78,6 @@ def service_settings(service_id):
             current_service.get('dvla_organisation', '001')
         ),
         can_receive_inbound=('inbound_sms' in current_service['permissions']),
-        inbound_api_url=inbound_api_url,
         inbound_number=disp_inbound_number,
         default_reply_to_email_address=default_reply_to_email_address,
         reply_to_email_address_count=reply_to_email_address_count,
@@ -807,41 +784,3 @@ def get_branding_as_dict(organisations):
             'colour': organisation['colour']
         } for organisation in organisations
     }
-
-
-@main.route("/services/<service_id>/service-settings/set-inbound-api", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions('manage_settings', admin_override=True)
-def service_set_inbound_api(service_id):
-    if 'inbound_sms' not in current_service['permissions']:
-        abort(403)
-
-    inbound_api = get_inbound_api()
-    form = ServiceInboundApiForm(
-        url=inbound_api.get('url') if inbound_api else '',
-        bearer_token=dummy_bearer_token if inbound_api else ''
-    )
-
-    if form.validate_on_submit():
-        if inbound_api:
-            if inbound_api.get('url') != form.url.data or form.bearer_token.data != dummy_bearer_token:
-                service_api_client.update_service_inbound_api(
-                    service_id,
-                    url=form.url.data,
-                    bearer_token=form.bearer_token.data if form.bearer_token.data != dummy_bearer_token else '',
-                    user_id=current_user.id,
-                    inbound_api_id=inbound_api.get('id')
-                )
-        else:
-            service_api_client.create_service_inbound_api(
-                service_id,
-                url=form.url.data,
-                bearer_token=form.bearer_token.data,
-                user_id=current_user.id
-            )
-        return redirect(url_for('.service_settings', service_id=service_id))
-
-    return render_template(
-        'views/service-settings/set-inbound-api.html',
-        form=form,
-    )

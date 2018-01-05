@@ -1,0 +1,39 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Callbacks for delivery receipts
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <h1 class="heading-large">Callbacks for delivery receipts</h1>
+      <p>
+        When you send an email or text message, we can tell you if Notify was able to deliver it.
+        Check the <a href="{{ url_for('.callbacks') }}"> callback documentation </a> for more information.
+      </p>
+
+      <form method="post">
+        {{ textbox(
+          form.url,
+          width='1-1',
+          hint='Must start with https://'
+        ) }}
+        {{ textbox(
+          form.bearer_token,
+          width='1-1',
+          hint='At least 10 characters',
+          autocomplete='new-password'
+        ) }}
+          {{ page_footer(
+          'Save',
+          back_link=url_for(back_link, service_id=current_service.id),
+          back_link_text='Back to settings'
+      ) }}
+      </form>
+    </div>
+  </div>
+
+{% endblock %}

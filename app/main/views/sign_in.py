@@ -30,6 +30,7 @@ def sign_in():
         return redirect(url_for('main.choose_service'))
 
     form = LoginForm()
+
     if form.validate_on_submit():
 
         user = user_api_client.get_user_by_email_or_none(form.email_address.data)
@@ -39,7 +40,7 @@ def sign_in():
 
         if user and session.get('invited_user'):
             invited_user = session.get('invited_user')
-            if user.email_address != invited_user['email_address']:
+            if user.email_address.lower() != invited_user['email_address'].lower():
                 flash("You can't accept an invite for another person.")
                 session.pop('invited_user', None)
                 abort(403)
