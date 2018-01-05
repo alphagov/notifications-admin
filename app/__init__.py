@@ -38,7 +38,6 @@ from werkzeug.local import LocalProxy
 from app import proxy_fix
 from app.config import configs
 from app.asset_fingerprinter import AssetFingerprinter
-from app.its_dangerous_session import ItsdangerousSessionInterface
 from app.notify_client.service_api_client import ServiceAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.invite_api_client import InviteApiClient
@@ -124,8 +123,6 @@ def create_app(application):
 
     proxy_fix.init_app(application)
 
-    application.session_interface = ItsdangerousSessionInterface()
-
     add_template_filters(application)
 
     register_errorhandlers(application)
@@ -138,6 +135,16 @@ def init_app(application):
     application.after_request(save_service_after_request)
     application.before_request(load_service_before_request)
     application.before_request(request_helper.check_proxy_header_before_request)
+
+    @application.before_request
+    def make_session_permanent():
+        # this is dumb. You'd think, given that there's `config['PERMANENT_SESSION_LIFETIME']`, that you'd enable
+        # permanent sessions in the config too - but no, you have to declare it for each request.
+        # https://stackoverflow.com/questions/34118093/flask-permanent-session-where-to-define-them
+        # session.permanent is also, helpfully, a way of saying that the session isn't permanent - in that, it will
+        # expire on its own, as opposed to being controlled by the browser's session. Because session is a proxy, it's
+        # only accessible from within a request context, so we need to set this before every request :rolls_eyes:
+        session.permanent = True
 
     @application.context_processor
     def _attach_current_service():
