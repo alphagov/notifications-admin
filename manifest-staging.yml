@@ -7,11 +7,6 @@ routes:
   - route: www.staging-notify.works
 
 services:
-  - notify-aws
-  - notify-config
-  - notify-template-preview
-  - hosted-graphite
-  - deskpro
   - logit-ssl-syslog-drain
 
 instances: 2

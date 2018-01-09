@@ -25,6 +25,9 @@ CF_SPACE ?= ${DEPLOY_ENV}
 CF_HOME ?= ${HOME}
 $(eval export CF_HOME)
 
+CF_MANIFEST_FILE ?= manifest-${CF_SPACE}.yml
+NOTIFY_CREDENTIALS ?= ~/.notify-credentials
+
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -167,12 +170,21 @@ cf-login: ## Log in to Cloud Foundry
 	@echo "Logging in to Cloud Foundry on ${CF_API}"
 	@cf login -a "${CF_API}" -u ${CF_USERNAME} -p "${CF_PASSWORD}" -o "${CF_ORG}" -s "${CF_SPACE}"
 
+.PHONY: generate-manifest
+generate-manifest:
+	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
+	$(if $(shell which gpg2), $(eval export GPG=gpg2), $(eval export GPG=gpg))
+	$(if ${GPG_PASSPHRASE_TXT}, $(eval export DECRYPT_CMD=echo -n $$$${GPG_PASSPHRASE_TXT} | ${GPG} --quiet --batch --passphrase-fd 0 --pinentry-mode loopback -d), $(eval export DECRYPT_CMD=${GPG} --quiet --batch -d))
+
+	@./scripts/generate_manifest.py ${CF_MANIFEST_FILE} \
+	    <(${DECRYPT_CMD} ${NOTIFY_CREDENTIALS}/credentials/${CF_SPACE}/paas/environment-variables.gpg)
+
 .PHONY: cf-deploy
 cf-deploy: ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
 	@cf app --guid notify-admin || exit 1
 	cf rename notify-admin notify-admin-rollback
-	cf push -f manifest-${CF_SPACE}.yml
+	cf push -f <(make -s generate-manifest)
 	cf scale -i $$(cf curl /v2/apps/$$(cf app --guid notify-admin-rollback) | jq -r ".entity.instances" 2>/dev/null || echo "1") notify-admin
 	cf stop notify-admin-rollback
 	cf delete -f notify-admin-rollback
@@ -180,7 +192,7 @@ cf-deploy: ## Deploys the app to Cloud Foundry
 .PHONY: cf-deploy-prototype
 cf-deploy-prototype: cf-target ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
-	cf push -f manifest-prototype-${CF_SPACE}.yml
+	cf push -f <(make -s CF_MANIFEST_FILE=manifest-prototype-${CF_SPACE}.yml generate-manifest)
 
 .PHONY: cf-rollback
 cf-rollback: ## Rollbacks the app to the previous release
@@ -191,7 +203,7 @@ cf-rollback: ## Rollbacks the app to the previous release
 
 .PHONY: cf-push
 cf-push:
-	cf push -f manifest-${CF_SPACE}.yml
+	cf push -f <(make -s generate-manifest)
 
 .PHONY: cf-target
 cf-target: check-env-vars
