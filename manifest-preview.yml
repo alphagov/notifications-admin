@@ -3,11 +3,6 @@
 inherit: manifest-base.yml
 
 services:
-  - notify-aws
-  - notify-config
-  - notify-template-preview
-  - hosted-graphite
-  - deskpro
   - logit-ssl-syslog-drain
 
 routes:
