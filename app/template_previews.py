@@ -8,7 +8,7 @@ class TemplatePreview:
     @classmethod
     def from_database_object(cls, template, filetype, values=None, page=None):
         data = {
-            'letter_contact_block': current_service['letter_contact_block'],
+            'letter_contact_block': template.get('reply_to_text', ''),
             'template': template,
             'values': values,
             'dvla_org_id': current_service['dvla_organisation'],

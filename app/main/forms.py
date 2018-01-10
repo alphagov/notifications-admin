@@ -839,3 +839,13 @@ class SetSenderForm(StripWhitespaceForm):
         self.sender.label.text = kwargs['sender_label']
 
     sender = RadioField()
+
+
+class SetTemplateSenderForm(StripWhitespaceForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.sender.choices = kwargs['sender_choices']
+        self.sender.label.text = 'Select your sender'
+
+    sender = RadioField()

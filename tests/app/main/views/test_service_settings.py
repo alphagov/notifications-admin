@@ -908,6 +908,34 @@ def test_add_letter_contact(
     )
 
 
+def test_add_letter_contact_when_coming_from_template(
+    no_letter_contact_blocks,
+    client_request,
+    mock_add_letter_contact,
+    fake_uuid,
+    mock_get_service_letter_template,
+):
+    data = {
+        'letter_contact_block': "1 Example Street"
+    }
+
+    page = client_request.post(
+        'main.service_add_letter_contact',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        from_template=fake_uuid,
+        _follow_redirects=True
+    )
+
+    mock_add_letter_contact.assert_called_once_with(
+        SERVICE_ONE_ID,
+        contact_block="1 Example Street",
+        is_default=True
+    )
+
+    assert page.find('h1').text == 'Set letter contact block'
+
+
 @pytest.mark.parametrize('fixture, data, api_default_args', [
     (no_sms_senders, {}, True),
     (multiple_sms_senders, {}, False),

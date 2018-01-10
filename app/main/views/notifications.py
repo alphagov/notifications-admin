@@ -31,6 +31,8 @@ from app.utils import (
 @user_has_permissions('view_activity', admin_override=True)
 def view_notification(service_id, notification_id):
     notification = notification_api_client.get_notification(service_id, str(notification_id))
+    notification['template'].update({'reply_to_text': notification['reply_to_text']})
+
     template = get_template(
         notification['template'],
         current_service,
@@ -82,6 +84,7 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
         abort(404)
 
     notification = notification_api_client.get_notification(service_id, notification_id)
+    notification['template'].update({'reply_to_text': notification['reply_to_text']})
 
     template = get_template(
         notification['template'],
