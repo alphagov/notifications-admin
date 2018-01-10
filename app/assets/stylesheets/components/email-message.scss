@@ -2,6 +2,8 @@ $white-50-opaque: rgba($white, 0.5);
 $button-bottom-border-colour: rgba(0, 0, 0, 0.17);
 $email-message-gutter: $gutter * 2;
 
+// sass-lint:disable no-important
+
 .email-message {
 
   margin-bottom: $gutter;
@@ -52,6 +54,21 @@ $email-message-gutter: $gutter * 2;
     clear: both;
     position: relative;
     word-wrap: break-word;
+
+    table {
+      margin: 0 0 20px 0;
+
+      td {
+        border: 0;
+        padding: 0;
+        font-family: inherit !important;
+      }
+
+      li:first-child {
+        margin-top: 0 !important;
+      }
+
+    }
 
     &-wrapper {
 
