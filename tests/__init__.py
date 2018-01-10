@@ -100,6 +100,9 @@ def template_json(service_id,
                   archived=False,
                   process_type='normal',
                   redact_personalisation=None,
+                  service_letter_contact=None,
+                  reply_to=None,
+                  reply_to_text=None,
                   ):
     template = {
         'id': id_,
@@ -111,6 +114,9 @@ def template_json(service_id,
         'updated_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
         'archived': archived,
         'process_type': process_type,
+        'service_letter_contact': service_letter_contact,
+        'reply_to': reply_to,
+        'reply_to_text': reply_to_text,
     }
     if content is None:
         template['content'] = "template content"
@@ -236,6 +242,7 @@ def notification_json(
     rows=5,
     personalisation=None,
     template_type=None,
+    reply_to_text=None
 ):
     if template is None:
         template = template_json(service_id, str(generate_uuid()), type_=template_type)
@@ -283,6 +290,7 @@ def notification_json(
             'template_version': template['version'],
             'personalisation': personalisation or {},
             'notification_type': template_type,
+            'reply_to_text': reply_to_text,
         } for i in range(rows)],
         'total': rows,
         'page_size': 50,
@@ -368,7 +376,6 @@ def validate_route_permission(mocker,
             else:
                 pytest.fail("Invalid method call {}".format(method))
             if resp.status_code != response_code:
-                print(resp.status_code)
                 pytest.fail("Invalid permissions set for endpoint {}".format(route))
     return resp
 
@@ -403,6 +410,5 @@ def validate_route_permission_with_client(mocker,
     else:
         pytest.fail("Invalid method call {}".format(method))
     if resp.status_code != response_code:
-        print(resp.status_code)
         pytest.fail("Invalid permissions set for endpoint {}".format(route))
     return resp

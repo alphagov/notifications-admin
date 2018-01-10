@@ -553,6 +553,10 @@ def service_add_letter_contact(service_id):
             contact_block=form.letter_contact_block.data.replace('\r', '') or None,
             is_default=first_contact_block if first_contact_block else form.is_default.data
         )
+        if request.args.get('from_template'):
+            return redirect(
+                url_for('.set_template_sender', service_id=service_id, template_id=request.args.get('from_template'))
+            )
         return redirect(url_for('.service_letter_contact_details', service_id=service_id))
     return render_template(
         'views/service-settings/letter-contact/add.html',

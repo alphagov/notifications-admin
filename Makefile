@@ -19,14 +19,14 @@ BUILD_URL ?=
 
 DOCKER_CONTAINER_PREFIX = ${USER}-${BUILD_TAG}
 
-CODEDEPLOY_PREFIX ?= notifications-admin
-CODEDEPLOY_APP_NAME ?= notify-admin
-
 CF_API ?= api.cloud.service.gov.uk
 CF_ORG ?= govuk-notify
 CF_SPACE ?= ${DEPLOY_ENV}
 CF_HOME ?= ${HOME}
 $(eval export CF_HOME)
+
+CF_MANIFEST_FILE ?= manifest-${CF_SPACE}.yml
+NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 
 .PHONY: help
 help:
@@ -43,8 +43,6 @@ venv/bin/activate:
 check-env-vars: ## Check mandatory environment variables
 	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
 	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
-	$(if ${AWS_ACCESS_KEY_ID},,$(error Must specify AWS_ACCESS_KEY_ID))
-	$(if ${AWS_SECRET_ACCESS_KEY},,$(error Must specify AWS_SECRET_ACCESS_KEY))
 
 .PHONY: sandbox
 sandbox: ## Set environment to sandbox
@@ -87,54 +85,21 @@ build: dependencies generate-version-file ## Build project
 	npm run build
 	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel install -r requirements.txt
 
-.PHONY: cf-build
-cf-build: dependencies generate-version-file ## Build project
-	npm run build
-
-.PHONY: build-codedeploy-artifact
-build-codedeploy-artifact: ## Build the deploy artifact for CodeDeploy
+.PHONY: build-paas-artifact
+build-paas-artifact: ## Build the deploy artifact for PaaS
 	rm -rf target
 	mkdir -p target
 	zip -y -q -r -x@deploy-exclude.lst target/notifications-admin.zip ./
-
-.PHONY: upload-codedeploy-artifact ## Upload the deploy artifact for CodeDeploy
-upload-codedeploy-artifact: check-env-vars
-	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
-	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-admin.zip s3://${DNS_NAME}-codedeploy/${CODEDEPLOY_PREFIX}-${DEPLOY_BUILD_NUMBER}.zip
-
-.PHONY: build-paas-artifact
-build-paas-artifact: build-codedeploy-artifact ## Build the deploy artifact for PaaS
 
 .PHONY: upload-paas-artifact ## Upload the deploy artifact for PaaS
 upload-paas-artifact:
 	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
 	$(if ${JENKINS_S3_BUCKET},,$(error Must specify JENKINS_S3_BUCKET))
-	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-admin.zip s3://${JENKINS_S3_BUCKET}/build/${CODEDEPLOY_PREFIX}/${DEPLOY_BUILD_NUMBER}.zip
+	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-admin.zip s3://${JENKINS_S3_BUCKET}/build/notifications-admin/${DEPLOY_BUILD_NUMBER}.zip
 
 .PHONY: test
 test: venv ## Run tests
 	./scripts/run_tests.sh
-
-.PHONY: deploy
-deploy: check-env-vars ## Upload deploy artifacts to S3 and trigger CodeDeploy
-	aws deploy create-deployment --application-name ${CODEDEPLOY_APP_NAME} --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name ${CODEDEPLOY_APP_NAME} --s3-location bucket=${DNS_NAME}-codedeploy,key=${CODEDEPLOY_PREFIX}-${DEPLOY_BUILD_NUMBER}.zip,bundleType=zip --region eu-west-1
-
-.PHONY: check-aws-vars
-check-aws-vars: ## Check if AWS access keys are set
-	$(if ${AWS_ACCESS_KEY_ID},,$(error Must specify AWS_ACCESS_KEY_ID))
-	$(if ${AWS_SECRET_ACCESS_KEY},,$(error Must specify AWS_SECRET_ACCESS_KEY))
-
-.PHONY: deploy-suspend-autoscaling-processes
-deploy-suspend-autoscaling-processes: check-aws-vars ## Suspend launch and terminate processes for the auto-scaling group
-	aws autoscaling suspend-processes --region eu-west-1 --auto-scaling-group-name ${CODEDEPLOY_APP_NAME} --scaling-processes "Launch" "Terminate"
-
-.PHONY: deploy-resume-autoscaling-processes
-deploy-resume-autoscaling-processes: check-aws-vars ## Resume launch and terminate processes for the auto-scaling group
-	aws autoscaling resume-processes --region eu-west-1 --auto-scaling-group-name ${CODEDEPLOY_APP_NAME} --scaling-processes "Launch" "Terminate"
-
-.PHONY: deploy-check-autoscaling-processes
-deploy-check-autoscaling-processes: check-aws-vars ## Returns with the number of instances with active autoscaling events
-	@aws autoscaling describe-auto-scaling-groups --region eu-west-1 --auto-scaling-group-names ${CODEDEPLOY_APP_NAME} | jq '.AutoScalingGroups[0].Instances|map(select(.LifecycleState != "InService"))|length'
 
 .PHONY: coverage
 coverage: venv ## Create coverage report
@@ -180,10 +145,6 @@ endef
 build-with-docker: prepare-docker-build-image ## Build inside a Docker container
 	$(call run_docker_container,build,gosu hostuser make build)
 
-.PHONY: cf-build-with-docker
-cf-build-with-docker: prepare-docker-build-image ## Build inside a Docker container
-	$(call run_docker_container,build,gosu hostuser make cf-build)
-
 .PHONY: test-with-docker
 test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
 	$(call run_docker_container,test,gosu hostuser make test)
@@ -209,21 +170,29 @@ cf-login: ## Log in to Cloud Foundry
 	@echo "Logging in to Cloud Foundry on ${CF_API}"
 	@cf login -a "${CF_API}" -u ${CF_USERNAME} -p "${CF_PASSWORD}" -o "${CF_ORG}" -s "${CF_SPACE}"
 
+.PHONY: generate-manifest
+generate-manifest:
+	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
+	$(if $(shell which gpg2), $(eval export GPG=gpg2), $(eval export GPG=gpg))
+	$(if ${GPG_PASSPHRASE_TXT}, $(eval export DECRYPT_CMD=echo -n $$$${GPG_PASSPHRASE_TXT} | ${GPG} --quiet --batch --passphrase-fd 0 --pinentry-mode loopback -d), $(eval export DECRYPT_CMD=${GPG} --quiet --batch -d))
+
+	@./scripts/generate_manifest.py ${CF_MANIFEST_FILE} \
+	    <(${DECRYPT_CMD} ${NOTIFY_CREDENTIALS}/credentials/${CF_SPACE}/paas/environment-variables.gpg)
+
 .PHONY: cf-deploy
 cf-deploy: ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
 	@cf app --guid notify-admin || exit 1
 	cf rename notify-admin notify-admin-rollback
-	cf push -f manifest-${CF_SPACE}.yml
+	cf push -f <(make -s generate-manifest)
 	cf scale -i $$(cf curl /v2/apps/$$(cf app --guid notify-admin-rollback) | jq -r ".entity.instances" 2>/dev/null || echo "1") notify-admin
 	cf stop notify-admin-rollback
 	cf delete -f notify-admin-rollback
 
 .PHONY: cf-deploy-prototype
-cf-deploy-prototype: ## Deploys the app to Cloud Foundry
+cf-deploy-prototype: cf-target ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
-	cf target -s ${CF_SPACE}
-	cf push -f manifest-prototype-${CF_SPACE}.yml
+	cf push -f <(make -s CF_MANIFEST_FILE=manifest-prototype-${CF_SPACE}.yml generate-manifest)
 
 .PHONY: cf-rollback
 cf-rollback: ## Rollbacks the app to the previous release
@@ -234,4 +203,24 @@ cf-rollback: ## Rollbacks the app to the previous release
 
 .PHONY: cf-push
 cf-push:
-	cf push -f manifest-${CF_SPACE}.yml
+	cf push -f <(make -s generate-manifest)
+
+.PHONY: cf-target
+cf-target: check-env-vars
+	@cf target -o ${CF_ORG} -s ${CF_SPACE}
+
+.PHONY: cf-failwhale-deployed
+cf-failwhale-deployed:
+	@cf app notify-admin-failwhale --guid || (echo "notify-admin-failwhale is not deployed on ${CF_SPACE}" && exit 1)
+
+.PHONY: enable-failwhale
+enable-failwhale: cf-target cf-failwhale-deployed ## Enable the failwhale app and disable admin
+	@cf map-route notify-admin-failwhale ${DNS_NAME} --hostname www
+	@cf unmap-route notify-admin ${DNS_NAME} --hostname www
+	@echo "Failwhale is enabled"
+
+.PHONY: disable-failwhale
+disable-failwhale: cf-target cf-failwhale-deployed ## Disable the failwhale app and enable admin
+	@cf map-route notify-admin ${DNS_NAME} --hostname www
+	@cf unmap-route notify-admin-failwhale ${DNS_NAME} --hostname www
+	@echo "Failwhale is disabled"

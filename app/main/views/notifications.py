@@ -16,7 +16,7 @@ from app import (
     current_service,
     format_date_numeric)
 from app.main import main
-from app.template_previews import TemplatePreview
+from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     user_has_permissions,
     get_help_argument,
@@ -33,6 +33,8 @@ from app.utils import (
 @user_has_permissions('view_activity', admin_override=True)
 def view_notification(service_id, notification_id):
     notification = notification_api_client.get_notification(service_id, str(notification_id))
+    notification['template'].update({'reply_to_text': notification['reply_to_text']})
+
     template = get_template(
         notification['template'],
         current_service,
@@ -42,6 +44,7 @@ def view_notification(service_id, notification_id):
             notification_id=notification_id,
             filetype='png',
         ),
+        page_count=get_page_count_for_letter(notification['template']),
         show_recipient=True,
         redact_missing_personalisation=True,
     )
@@ -83,6 +86,7 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
         abort(404)
 
     notification = notification_api_client.get_notification(service_id, notification_id)
+    notification['template'].update({'reply_to_text': notification['reply_to_text']})
 
     template = get_template(
         notification['template'],

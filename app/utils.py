@@ -318,11 +318,12 @@ def get_template(
                 template,
                 image_url=letter_preview_url,
                 page_count=int(page_count),
+                contact_block=template['reply_to_text']
             )
         else:
             return LetterPreviewTemplate(
                 template,
-                contact_block=service['letter_contact_block'],
+                contact_block=template['reply_to_text'],
                 admin_base_url=current_app.config['ADMIN_BASE_URL'],
                 redact_missing_personalisation=redact_missing_personalisation,
             )
