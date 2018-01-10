@@ -101,6 +101,7 @@ def _gen_mock_field(x):
     'test@biglotteryfund.org.uk',
     'test@marinemanagement.org.uk',
     'test@britishmuseum.org',
+    'test@derrystrabane.com',
 ])
 def test_valid_list_of_white_list_email_domains(
     client,
@@ -136,7 +137,6 @@ def test_valid_list_of_white_list_email_domains(
     'test@police.test.uk',
     'test@ucds.com',
     'test@123bl.uk',
-    'test@derrystrabane.com',
 ])
 def test_invalid_list_of_white_list_email_domains(
     client,
