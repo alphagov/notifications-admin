@@ -98,6 +98,7 @@ class Config(object):
         r"biglotteryfund\.org\.uk",
         r"marinemanagement\.org\.uk",
         r"britishmuseum\.org",
+        r"derrystrabane\.com",
     ]
 
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
