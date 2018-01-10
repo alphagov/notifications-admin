@@ -187,6 +187,16 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             ),
         )
 
+    def update_service_template_sender(self, service_id, template_id, reply_to):
+        data = {
+            'reply_to': reply_to,
+        }
+        data = _attach_current_user(data)
+        return self.post(
+            "/service/{0}/template/{1}".format(service_id, template_id),
+            data
+        )
+
     def get_service_template(self, service_id, template_id, version=None, *params):
         """
         Retrieve a service template.
