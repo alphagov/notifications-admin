@@ -12,7 +12,9 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from dateutil.parser import parse
+from markupsafe import Markup
 
+from notifications_utils.formatters import nl2br
 from notifications_utils.recipients import first_column_headings
 from notifications_utils.template import LetterDVLATemplate
 from notifications_python_client.errors import HTTPError
@@ -26,8 +28,9 @@ from app.main.forms import (
     EmailTemplateForm,
     LetterTemplateForm,
     SearchTemplatesForm,
+    SetTemplateSenderForm,
 )
-from app.main.views.send import get_example_csv_rows
+from app.main.views.send import get_example_csv_rows, get_sender_details
 from app import service_api_client, current_service, template_statistics_client
 
 
@@ -181,6 +184,7 @@ def view_letter_template_preview(service_id, template_id, filetype):
         abort(404)
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
+
     return TemplatePreview.from_database_object(db_template, filetype, page=request.args.get('page'))
 
 
@@ -373,7 +377,8 @@ def edit_service_template(service_id, template_id):
             'subject': subject,
             'template_type': template['template_type'],
             'id': template['id'],
-            'process_type': form.process_type.data
+            'process_type': form.process_type.data,
+            'reply_to_text': template['reply_to_text']
         }, current_service)
         template_change = get_template(template, current_service).compare_to(new_template)
         if template_change.placeholders_added and not request.form.get('confirm'):
@@ -562,6 +567,65 @@ def view_template_versions(service_id, template_id):
             for template in service_api_client.get_service_template_versions(service_id, template_id)['data']
         ]
     )
+
+
+@main.route('/services/<service_id>/templates/<template_id>/set-template-sender', methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_templates', admin_override=True)
+def set_template_sender(service_id, template_id):
+    template = service_api_client.get_service_template(service_id, template_id)['data']
+    sender_details = get_template_sender_form_dict(service_id, template)
+    no_senders = sender_details.get('no_senders', False)
+
+    form = SetTemplateSenderForm(
+        sender=sender_details['current_choice'],
+        sender_choices=sender_details['value_and_label'],
+    )
+    option_hints = {sender_details['default_sender']: '(Default)'}
+
+    if form.validate_on_submit():
+        service_api_client.update_service_template_sender(
+            service_id,
+            template_id,
+            form.sender.data if form.sender.data else None,
+        )
+        return redirect(url_for('.view_template', service_id=service_id, template_id=template_id))
+
+    return render_template(
+        'views/templates/set-template-sender.html',
+        form=form,
+        template_id=template_id,
+        no_senders=no_senders,
+        option_hints=option_hints
+    )
+
+
+def get_template_sender_form_dict(service_id, template):
+    context = {
+        'email': {
+            'field_name': 'email_address'
+        },
+        'letter': {
+            'field_name': 'contact_block'
+        },
+        'sms': {
+            'field_name': 'sms_sender'
+        }
+    }[template['template_type']]
+
+    sender_format = context['field_name']
+    service_senders = get_sender_details(service_id, template['template_type'])
+    context['default_sender'] = next(
+        (x['id'] for x in service_senders if x['is_default']), "Not set"
+    )
+    if not service_senders:
+        context['no_senders'] = True
+
+    context['value_and_label'] = [(sender['id'], Markup(nl2br(sender[sender_format]))) for sender in service_senders]
+    context['value_and_label'].insert(0, ('', 'Blank'))  # Add blank option to start of list
+
+    context['current_choice'] = template['service_letter_contact'] if template['service_letter_contact'] else ''
+    return context
 
 
 def get_last_use_message(template_name, template_statistics):

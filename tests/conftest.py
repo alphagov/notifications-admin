@@ -1030,6 +1030,17 @@ def mock_redact_template(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_update_service_template_sender(mocker):
+    def _update(service_id, template_id, reply_to):
+        return
+
+    return mocker.patch(
+        'app.service_api_client.update_service_template_sender',
+        side_effect=_update
+    )
+
+
+@pytest.fixture(scope='function')
 def api_user_pending(fake_uuid):
     from app.notify_client.user_api_client import User
     user_data = {'id': fake_uuid,

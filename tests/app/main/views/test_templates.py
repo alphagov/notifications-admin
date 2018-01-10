@@ -11,6 +11,8 @@ from tests.conftest import (
     mock_get_service_email_template,
     mock_get_service_letter_template,
     mock_get_service_template,
+    no_letter_contact_blocks,
+    single_letter_contact_block,
     normalize_spaces,
     SERVICE_ONE_ID,
     active_user_with_permissions,
@@ -198,31 +200,7 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
     assert rendered_msg in response.get_data(as_text=True)
 
 
-def test_should_let_letter_contact_block_be_edited_if_a_letter_contact_block_exists(
-    mocker,
-    mock_get_service_letter_template,
-    single_letter_contact_block,
-    client_request,
-    service_one,
-    fake_uuid,
-):
-    service_one['permissions'].append('letter')
-    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
-
-    page = client_request.get(
-        'main.view_template',
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid
-    )
-
-    assert page.find('a', {'class': 'edit-template-link-letter-contact'})['href'] == url_for(
-        '.service_edit_letter_contact',
-        service_id=service_one['id'],
-        letter_contact_id='1234',
-        from_template=fake_uuid)
-
-
-def test_should_let_letter_contact_block_be_added_if_no_letter_contact_blocks_exist(
+def test_should_let_letter_contact_block_be_changed_for_the_template(
     mocker,
     mock_get_service_letter_template,
     no_letter_contact_blocks,
@@ -240,9 +218,10 @@ def test_should_let_letter_contact_block_be_added_if_no_letter_contact_blocks_ex
     )
 
     assert page.find('a', {'class': 'edit-template-link-letter-contact'})['href'] == url_for(
-        '.service_add_letter_contact',
-        service_id=service_one['id'],
-        from_template=fake_uuid)
+        'main.set_template_sender',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
 
 
 def test_should_show_page_template_with_priority_select_if_platform_admin(
@@ -1286,3 +1265,51 @@ def test_should_show_letter_template_as_dvla_markup(
     ))
 
     assert response.status_code == expected_response_code
+
+
+def test_set_template_sender(
+    client_request,
+    fake_uuid,
+    mock_update_service_template_sender,
+    mock_get_service_letter_template,
+    single_letter_contact_block
+):
+    data = {
+        'sender': '1234',
+    }
+
+    client_request.post(
+        'main.set_template_sender',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data=data,
+    )
+
+    mock_update_service_template_sender.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        '1234',
+    )
+
+
+@pytest.mark.parametrize('fixture, add_button_is_on_page', [
+    (no_letter_contact_blocks, True),
+    (single_letter_contact_block, False),
+])
+def test_add_sender_link_only_appears_on_services_with_no_senders(
+    client_request,
+    fake_uuid,
+    mocker,
+    fixture,
+    add_button_is_on_page,
+    mock_get_service_letter_template,
+    no_letter_contact_blocks
+):
+    fixture(mocker)
+    page = client_request.get(
+        'main.set_template_sender',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert (page.select_one('.column-three-quarters form > a') is not None) == add_button_is_on_page
