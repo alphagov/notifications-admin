@@ -153,7 +153,6 @@ def service_request_to_go_live(service_id):
     form = RequestToGoLiveForm()
 
     if form.validate_on_submit():
-
         data = {
             'person_email': current_user.email_address,
             'person_name': current_user.name,
@@ -161,13 +160,17 @@ def service_request_to_go_live(service_id):
             'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
             'subject': 'Request to go live - {}'.format(current_service['name']),
             'message': (
-                'On behalf of {} ({})\n\nExpected usage\n---'
+                'On behalf of {} ({})\n'
+                '\n---'
+                '\nOrganisation type: {} ({:,} free text messages)'
                 '\nMOU in place: {}'
                 '\nChannel: {}\nStart date: {}\nStart volume: {}'
                 '\nPeak volume: {}\nUpload or API: {}'
             ).format(
                 current_service['name'],
                 url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
+                current_service['organisation_type'],
+                current_service['free_sms_fragment_limit'],
                 form.mou.data,
                 formatted_list(filter(None, (
                     'email' if form.channel_email.data else None,
