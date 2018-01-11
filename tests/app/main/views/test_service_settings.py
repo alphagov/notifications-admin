@@ -434,6 +434,14 @@ def test_should_show_request_to_go_live(
         assert normalize_spaces(
             page.select_one('label[for=channel_{}]'.format(channel)).text
         ) == label
+    for feature, label in (
+        ('one_off', 'One at a time'),
+        ('upload', 'Upload a spreadsheet of recipients'),
+        ('api', 'Integrate with the GOV.UK Notify API'),
+    ):
+        assert normalize_spaces(
+            page.select_one('label[for=method_{}]'.format(feature)).text
+        ) == label
 
 
 def test_should_redirect_after_request_to_go_live(
@@ -459,7 +467,9 @@ def test_should_redirect_after_request_to_go_live(
             'start_date': '01/01/2017',
             'start_volume': '100,000',
             'peak_volume': '2,000,000',
-            'upload_or_api': 'API'
+            'method_one_off': 'y',
+            'method_upload': 'y',
+            'method_api': 'y',
         },
         _follow_redirects=True
     )
@@ -483,7 +493,7 @@ def test_should_redirect_after_request_to_go_live(
     assert 'Start date: 01/01/2017' in returned_message
     assert 'Start volume: 100,000' in returned_message
     assert 'Peak volume: 2,000,000' in returned_message
-    assert 'Upload or API: API' in returned_message
+    assert 'Features: one off, file upload and API' in returned_message
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'We’ve received your request to go live'

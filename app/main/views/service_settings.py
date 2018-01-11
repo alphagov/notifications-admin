@@ -165,7 +165,8 @@ def service_request_to_go_live(service_id):
                 '\nOrganisation type: {} ({:,} free text messages)'
                 '\nMOU in place: {}'
                 '\nChannel: {}\nStart date: {}\nStart volume: {}'
-                '\nPeak volume: {}\nUpload or API: {}'
+                '\nPeak volume: {}'
+                '\nFeatures: {}'
             ).format(
                 current_service['name'],
                 url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
@@ -180,7 +181,11 @@ def service_request_to_go_live(service_id):
                 form.start_date.data,
                 form.start_volume.data,
                 form.peak_volume.data,
-                form.upload_or_api.data
+                formatted_list(filter(None, (
+                    'one off' if form.method_one_off.data else None,
+                    'file upload' if form.method_upload.data else None,
+                    'API' if form.method_api.data else None,
+                )), before_each='', after_each='')
 
             )
         }
