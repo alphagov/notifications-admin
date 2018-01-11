@@ -1,3 +1,4 @@
+from itertools import chain
 from flask_login import UserMixin, AnonymousUserMixin
 from flask import session
 
@@ -8,6 +9,8 @@ roles = {
     'manage_service': ['manage_users', 'manage_settings'],
     'manage_api_keys': ['manage_api_keys']
 }
+
+all_permissions = set(chain.from_iterable(roles.values())) | {'view_activity'}
 
 
 class User(UserMixin):
@@ -100,6 +103,11 @@ class User(UserMixin):
         raise AttributeError("Read only property")
 
     def has_permissions(self, *permissions, any_=False, admin_override=False):
+
+        unknown_permissions = set(permissions) - all_permissions
+
+        if unknown_permissions:
+            raise TypeError('{} are not valid permissions'.format(unknown_permissions))
 
         # Only available to the platform admin user
         if admin_override and self.platform_admin:

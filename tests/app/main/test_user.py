@@ -1,3 +1,4 @@
+import pytest
 from app.notify_client.user_api_client import User
 
 
@@ -25,3 +26,6 @@ def test_user():
     # set failed logins to threshold
     user.failed_login_count = 3
     assert user.is_locked()
+
+    with pytest.raises(TypeError):
+        user.has_permissions('to_do_bad_things')
