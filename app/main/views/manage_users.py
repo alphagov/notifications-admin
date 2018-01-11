@@ -20,15 +20,8 @@ from app.main.forms import (
     PermissionsForm
 )
 from app import (user_api_client, current_service, service_api_client, invite_api_client)
+from app.notify_client.models import roles
 from app.utils import user_has_permissions
-
-
-roles = {
-    'send_messages': ['send_texts', 'send_emails', 'send_letters'],
-    'manage_templates': ['manage_templates'],
-    'manage_service': ['manage_users', 'manage_settings'],
-    'manage_api_keys': ['manage_api_keys']
-}
 
 
 @main.route("/services/<service_id>/users")

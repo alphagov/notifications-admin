@@ -2,6 +2,14 @@ from flask_login import UserMixin, AnonymousUserMixin
 from flask import session
 
 
+roles = {
+    'send_messages': ['send_texts', 'send_emails', 'send_letters'],
+    'manage_templates': ['manage_templates'],
+    'manage_service': ['manage_users', 'manage_settings'],
+    'manage_api_keys': ['manage_api_keys']
+}
+
+
 class User(UserMixin):
     def __init__(self, fields, max_failed_login_count=3):
         self._id = fields.get('id')
