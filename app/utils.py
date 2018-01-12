@@ -1,5 +1,7 @@
 import re
 import csv
+from itertools import chain
+
 import pytz
 from io import StringIO
 from os import path
@@ -28,7 +30,8 @@ from notifications_utils.template import (
     LetterImageTemplate,
     LetterPreviewTemplate,
 )
-
+from orderedset._orderedset import OrderedSet
+from werkzeug.datastructures import MultiDict
 
 SENDING_STATUSES = ['created', 'pending', 'sending']
 DELIVERED_STATUSES = ['delivered', 'sent']
@@ -125,33 +128,52 @@ def get_errors_for_csv(recipients, template_type):
 
 def generate_notifications_csv(**kwargs):
     from app import notification_api_client
+    fieldnames, list_of_keys = _create_key_and_fieldnames_for_csv(kwargs)
 
     if 'page' not in kwargs:
         kwargs['page'] = 1
-    fieldnames = ['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
     yield ','.join(fieldnames) + '\n'
 
     while kwargs['page']:
         notifications_resp = notification_api_client.get_notifications_for_service(**kwargs)
         notifications = notifications_resp['notifications']
+
         for notification in notifications:
-            values = [
-                notification['row_number'],
-                notification['recipient'],
-                notification['template_name'],
-                notification['template_type'],
-                notification['job_name'],
-                notification['status'],
-                notification['created_at']
-            ]
+            values = [notification[x] for x in list_of_keys]
             line = ','.join(str(i) for i in values) + '\n'
             yield line
-
         if notifications_resp['links'].get('next'):
             kwargs['page'] += 1
         else:
             return
     raise Exception("Should never reach here")
+
+
+def _create_key_and_fieldnames_for_csv(kwargs):
+    # if job_id then response looks different
+    if kwargs['job_id']:
+        list_of_keys = [
+            'row_number',
+            'recipient',
+            'template_name',
+            'template_type',
+            'job_name',
+            'status',
+            'created_at'
+        ]
+        fieldnames = ['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
+    else:
+        list_of_keys = [
+            'recipient',
+            'template_name',
+            'template_type',
+            'job_name',
+            'status',
+            'created_at',
+            'updated_at'
+        ]
+        fieldnames = ['Recipient', 'Template', 'Type', 'Job', 'Status', 'Time', 'Completed at']
+    return fieldnames, list_of_keys
 
 
 def get_page_from_request():
@@ -382,3 +404,27 @@ def get_cdn_domain():
     domain = parsed_uri.netloc[len(subdomain + '.'):]
 
     return "static-logos.{}".format(domain)
+
+
+def parse_filter_args(filter_dict):
+    if not isinstance(filter_dict, MultiDict):
+        filter_dict = MultiDict(filter_dict)
+
+    return MultiDict(
+        (
+            key,
+            (','.join(filter_dict.getlist(key))).split(',')
+        )
+        for key in filter_dict.keys()
+        if ''.join(filter_dict.getlist(key))
+    )
+
+
+def set_status_filters(filter_args):
+    status_filters = filter_args.get('status', [])
+    return list(OrderedSet(chain(
+        (status_filters or REQUESTED_STATUSES),
+        DELIVERED_STATUSES if 'delivered' in status_filters else [],
+        SENDING_STATUSES if 'sending' in status_filters else [],
+        FAILURE_STATUSES if 'failed' in status_filters else []
+    )))

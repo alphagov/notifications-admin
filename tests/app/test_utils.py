@@ -15,6 +15,7 @@ from app.utils import (
     get_letter_timings,
     get_cdn_domain
 )
+from tests.conftest import fake_uuid
 
 
 def _get_notifications_csv(
@@ -28,7 +29,8 @@ def _get_notifications_csv(
     status='Delivered',
     created_at='Thursday 19 April at 12:00',
     rows=1,
-    with_links=False
+    with_links=False,
+    job_id=fake_uuid
 ):
     links = {}
     if with_links:
@@ -58,7 +60,8 @@ def _get_notifications_csv(
 @pytest.fixture(scope='function')
 def _get_notifications_csv_mock(
     mocker,
-    api_user_active
+    api_user_active,
+    job_id=fake_uuid
 ):
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
@@ -122,13 +125,13 @@ def test_can_create_spreadsheet_from_dict_with_filename():
 
 
 def test_generate_notifications_csv_returns_correct_csv_file(_get_notifications_csv_mock):
-    csv_content = generate_notifications_csv(service_id='1234')
+    csv_content = generate_notifications_csv(service_id='1234', job_id=fake_uuid)
     csv_file = DictReader(StringIO('\n'.join(csv_content)))
     assert csv_file.fieldnames == ['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
 
 
 def test_generate_notifications_csv_only_calls_once_if_no_next_link(_get_notifications_csv_mock):
-    list(generate_notifications_csv(service_id='1234'))
+    list(generate_notifications_csv(service_id='1234', job_id=fake_uuid))
 
     assert _get_notifications_csv_mock.call_count == 1
 
@@ -146,7 +149,7 @@ def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
         ]
     )
 
-    csv_content = generate_notifications_csv(service_id=service_id)
+    csv_content = generate_notifications_csv(service_id=service_id, job_id=fake_uuid)
     csv = DictReader(StringIO('\n'.join(csv_content)))
 
     assert len(list(csv)) == 10
