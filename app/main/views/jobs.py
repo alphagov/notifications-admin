@@ -33,7 +33,8 @@ from app.utils import (
     generate_notifications_csv,
     get_time_left,
     get_letter_timings,
-    parse_filter_args, set_status_filters)
+    parse_filter_args, set_status_filters
+)
 from app.statistics_utils import add_rate_to_job
 
 
