@@ -43,12 +43,15 @@ def _get_notifications_csv(
     data = {
         'notifications': [{
             "row_number": row_number,
+            "to": recipient,
             "recipient": recipient,
             "template_name": template_name,
             "template_type": template_type,
+            "template": {"name": template_name, "template_type": template_type},
             "job_name": job_name,
             "status": status,
-            "created_at": created_at
+            "created_at": created_at,
+            "updated_at": None
         } for i in range(rows)],
         'total': rows,
         'page_size': 50,
@@ -136,7 +139,8 @@ def test_generate_notifications_csv_only_calls_once_if_no_next_link(_get_notific
     assert _get_notifications_csv_mock.call_count == 1
 
 
-def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
+@pytest.mark.parametrize("job_id", ["some", None])
+def test_generate_notifications_csv_calls_twice_if_next_link(mocker, job_id):
     service_id = '1234'
     response_with_links = _get_notifications_csv(service_id, rows=7, with_links=True)
     response_with_no_links = _get_notifications_csv(service_id, rows=3, with_links=False)
@@ -149,7 +153,7 @@ def test_generate_notifications_csv_calls_twice_if_next_link(mocker):
         ]
     )
 
-    csv_content = generate_notifications_csv(service_id=service_id, job_id=fake_uuid)
+    csv_content = generate_notifications_csv(service_id=service_id, job_id=fake_uuid if job_id else None)
     csv = DictReader(StringIO('\n'.join(csv_content)))
 
     assert len(list(csv)) == 10

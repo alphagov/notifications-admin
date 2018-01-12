@@ -128,52 +128,52 @@ def get_errors_for_csv(recipients, template_type):
 
 def generate_notifications_csv(**kwargs):
     from app import notification_api_client
-    fieldnames, list_of_keys = _create_key_and_fieldnames_for_csv(kwargs)
-
     if 'page' not in kwargs:
         kwargs['page'] = 1
+
+    if kwargs['job_id']:
+        fieldnames = ['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
+    else:
+        fieldnames = ['Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
+
     yield ','.join(fieldnames) + '\n'
 
     while kwargs['page']:
+        # if job_id then response looks different
         notifications_resp = notification_api_client.get_notifications_for_service(**kwargs)
         notifications = notifications_resp['notifications']
-
-        for notification in notifications:
-            values = [notification[x] for x in list_of_keys]
-            line = ','.join(str(i) for i in values) + '\n'
-            yield line
+        if kwargs['job_id']:
+            for notification in notifications:
+                    values = [
+                        notification['row_number'],
+                        notification['recipient'],
+                        notification['template_name'],
+                        notification['template_type'],
+                        notification['job_name'],
+                        notification['status'],
+                        notification['created_at']
+                    ]
+                    line = ','.join(str(i) for i in values) + '\n'
+                    yield line
+        else:
+            # Change here
+            for notification in notifications:
+                values = [
+                    notification['to'],
+                    notification['template']['name'],
+                    notification['template']['template_type'],
+                    notification.get('job_name', None),
+                    notification['status'],
+                    notification['created_at'],
+                    notification['updated_at']
+                ]
+                line = ','.join(str(i) for i in values) + '\n'
+                yield line
         if notifications_resp['links'].get('next'):
             kwargs['page'] += 1
         else:
             return
     raise Exception("Should never reach here")
-
-
-def _create_key_and_fieldnames_for_csv(kwargs):
-    # if job_id then response looks different
-    if kwargs['job_id']:
-        list_of_keys = [
-            'row_number',
-            'recipient',
-            'template_name',
-            'template_type',
-            'job_name',
-            'status',
-            'created_at'
-        ]
-        fieldnames = ['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
-    else:
-        list_of_keys = [
-            'recipient',
-            'template_name',
-            'template_type',
-            'job_name',
-            'status',
-            'created_at',
-            'updated_at'
-        ]
-        fieldnames = ['Recipient', 'Template', 'Type', 'Job', 'Status', 'Time', 'Completed at']
-    return fieldnames, list_of_keys
 
 
 def get_page_from_request():
