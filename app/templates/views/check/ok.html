@@ -60,10 +60,10 @@
       ) %}
         {% call index_field() %}
           <span>
-            {% if item.index == preview_row %}
+            {% if (item.index + 2) == preview_row %}
               {{ item.index + 2 }}
             {% else %}
-              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_type=template.template_type, upload_id=upload_id, row_index=(item.index)) }}">{{ item.index + 2 }}</a>
+              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_type=template.template_type, upload_id=upload_id, row_index=(item.index + 2)) }}">{{ item.index + 2 }}</a>
             {% endif %}
           </span>
         {% endcall %}

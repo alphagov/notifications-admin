@@ -472,13 +472,13 @@ def test_upload_valid_csv_redirects_to_check_page(
         'Test Service: A, Template <em>content</em> with & entity',
     ),
     (
-        {'row_index': 0},
+        {'row_index': 2},
         None,
         'To: 07700900001',
         'Test Service: A, Template <em>content</em> with & entity',
     ),
     (
-        {'row_index': 2},
+        {'row_index': 4},
         True,
         'To: 07700900003',
         'Test Service: C, Template <em>content</em> with & entity',
@@ -524,7 +524,7 @@ def test_upload_valid_csv_shows_preview_and_table(
 
     if expected_link_in_first_row:
         assert page.select_one('.table-field-index a')['href'] == url_for(
-            'main.check_messages', service_id=SERVICE_ONE_ID, template_type='sms', upload_id=fake_uuid, row_index=0
+            'main.check_messages', service_id=SERVICE_ONE_ID, template_type='sms', upload_id=fake_uuid, row_index=2
         )
     else:
         assert not page.select_one('.table-field-index').select_one('a')
@@ -546,9 +546,12 @@ def test_upload_valid_csv_shows_preview_and_table(
 
 
 @pytest.mark.parametrize('row_index, expected_status', [
-    (0, 200),
+    (0, 404),
+    (1, 404),
     (2, 200),
-    (3, 404),
+    (3, 200),
+    (4, 200),
+    (5, 404),
 ])
 def test_404_for_previewing_a_row_out_of_range(
     client_request,
@@ -1480,11 +1483,11 @@ def test_can_start_letters_job(
         {'postcode': 'abc123', 'addressline1': '123 street'},
     ),
     (
-        {'row_index': 0},
+        {'row_index': 2},
         {'postcode': 'abc123', 'addressline1': '123 street'},
     ),
     (
-        {'row_index': 1},
+        {'row_index': 3},
         {'postcode': 'cba321', 'addressline1': '321 avenue'},
     ),
 ])
