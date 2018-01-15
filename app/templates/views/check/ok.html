@@ -60,7 +60,11 @@
       ) %}
         {% call index_field() %}
           <span>
-            {{ item.index + 2 }}
+            {% if item.index == preview_row %}
+              {{ item.index + 2 }}
+            {% else %}
+              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_type=template.template_type, upload_id=upload_id, row_index=(item.index)) }}">{{ item.index + 2 }}</a>
+            {% endif %}
           </span>
         {% endcall %}
         {% for column in recipients.column_headers %}
