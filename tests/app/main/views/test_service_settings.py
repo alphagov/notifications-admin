@@ -11,6 +11,7 @@ from app.utils import email_safe
 from tests import validate_route_permission, service_json
 from tests.conftest import (
     active_user_with_permissions,
+    active_user_no_api_key_permission,
     platform_admin_user,
     normalize_spaces,
     multiple_reply_to_email_addresses,
@@ -236,16 +237,27 @@ def test_escapes_letter_contact_block(
 
 
 def test_should_show_service_name(
-        logged_in_client,
-        service_one,
+    client_request,
 ):
-    response = logged_in_client.get(url_for(
-        'main.service_name_change', service_id=service_one['id']))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get('main.service_name_change', service_id=SERVICE_ONE_ID)
     assert page.find('h1').text == 'Change your service name'
     assert page.find('input', attrs={"type": "text"})['value'] == 'service one'
-    app.service_api_client.get_service.assert_called_with(service_one['id'])
+    assert page.select_one('main p').text == 'Users will see your service name:'
+    assert normalize_spaces(page.select_one('main ul').text) == (
+        'at the start of every text message, eg ‘service one: This is an example message’ '
+        'as your email sender name'
+    )
+    app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
+
+
+def test_should_show_service_name_with_no_prefixing(
+    client_request,
+    service_one,
+):
+    service_one['prefix_sms'] = False
+    page = client_request.get('main.service_name_change', service_id=SERVICE_ONE_ID)
+    assert page.find('h1').text == 'Change your service name'
+    assert page.select_one('main p').text == 'Users will see your service name as your email sender name.'
 
 
 def test_should_redirect_after_change_service_name(
@@ -1914,6 +1926,41 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
         'main.service_set_inbound_sms', service_id=service_one['id']
     ))
     assert response.status_code == 200
+
+
+@pytest.mark.parametrize('user, expected_paragraphs', [
+    (active_user_with_permissions, [
+        'Your service can receive text messages sent to 07700900123.',
+        'If you want to turn this feature off, get in touch with the GOV.UK Notify team.',
+        'You can set up callbacks for received text messages on the API integration page.',
+    ]),
+    (active_user_no_api_key_permission, [
+        'Your service can receive text messages sent to 07700900123.',
+        'If you want to turn this feature off, get in touch with the GOV.UK Notify team.',
+    ]),
+])
+def test_set_inbound_sms_when_inbound_number_is_set(
+    client,
+    service_one,
+    mocker,
+    fake_uuid,
+    user,
+    expected_paragraphs,
+):
+    service_one['permissions'] = ['inbound_sms']
+    mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service', return_value={
+        'data': {'number': '07700900123'}
+    })
+    client.login(user(fake_uuid), mocker, service_one)
+    response = client.get(url_for(
+        'main.service_set_inbound_sms', service_id=SERVICE_ONE_ID
+    ))
+    paragraphs = BeautifulSoup(response.data.decode('utf-8'), 'html.parser').select('main p')
+
+    assert len(paragraphs) == len(expected_paragraphs)
+
+    for index, p in enumerate(expected_paragraphs):
+        assert normalize_spaces(paragraphs[index].text) == p
 
 
 def test_empty_letter_contact_block_returns_error(

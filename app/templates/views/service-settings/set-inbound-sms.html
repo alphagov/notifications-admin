@@ -19,6 +19,12 @@
           If you want to turn this feature off,
           <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
         </p>
+        {% if current_user.has_permissions(['manage_api_keys'], admin_override=True) %}
+          <p>
+            You can set up callbacks for received text messages on the
+            <a href="{{ url_for('.api_callbacks', service_id=current_service.id) }}">API integration page</a>.
+          </p>
+        {% endif %}
       {% else %}
         <p>
           Receiving text messages from your users is an

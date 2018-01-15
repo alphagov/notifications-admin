@@ -42,8 +42,16 @@
       <input type="hidden" name="to" value="{{ search_form.to.data }}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     </form>
+  {% else %}
+    <form id="search-form" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    </form>
   {% endif %}
-
+    <!--<p class="bottom-gutter">-->
+       <!--<a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>-->
+       <!--&emsp;-->
+       <!--Data available for 7 days-->
+    <!--</p>-->
   {{ ajax_block(
     partials,
     url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status, page=page),

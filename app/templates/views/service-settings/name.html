@@ -10,13 +10,16 @@
 
   <h1 class="heading-large">Change your service name</h1>
 
-
   <div class="form-group">
-    <p>Users will see your service name:</p>
-    <ul class="list-bullet">
-      <li>at the start of every text message, eg ‘Vehicle tax: we received your payment, thank you’</li>
-      <li>as your email sender name</li>
-    </ul>
+    {% if current_service.prefix_sms %}
+      <p>Users will see your service name:</p>
+      <ul class="list-bullet">
+        <li>at the start of every text message, eg ‘{{ current_service.name }}: This is an example message’</li>
+        <li>as your email sender name</li>
+      </ul>
+    {% else %}
+      <p>Users will see your service name as your email sender name.</p>
+    {% endif %}
   </div>
 
   <form method="post">
