@@ -52,7 +52,8 @@
             'height': this.nativeHeight,
             'top': this.topOffset
           })
-        );
+        )
+        .css('position', 'absolute');
 
       this.$scrollableTable = this.$component.find('.fullscreen-scrollable-table');
       this.$fixedTable = this.$component.find('.fullscreen-fixed-table');
@@ -99,6 +100,11 @@
           'visible',
           this.$scrollableTable.scrollLeft() < (this.$table.width() - this.$scrollableTable.width())
         );
+
+      setTimeout(
+        () => this.$component.find('.fullscreen-right-shadow').addClass('with-transition'),
+        3000
+      );
 
     };
 
