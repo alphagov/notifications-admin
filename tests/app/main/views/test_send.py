@@ -517,7 +517,7 @@ def test_upload_valid_csv_shows_preview_and_table(
     assert page.select_one('.sms-message-wrapper').text.strip() == expected_message
 
     for index, cell in enumerate([
-        '<td class="table-field-index"> <span class=""> 2 </span> </td>',
+        '<td class="table-field-index"> <span> 2 </span> </td>',
         '<td class="table-field-center-aligned "> <div class=""> 07700900001 </div> </td>',
         '<td class="table-field-center-aligned "> <div class=""> A </div> </td>',
         (
