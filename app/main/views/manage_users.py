@@ -20,15 +20,8 @@ from app.main.forms import (
     PermissionsForm
 )
 from app import (user_api_client, current_service, service_api_client, invite_api_client)
+from app.notify_client.models import roles
 from app.utils import user_has_permissions
-
-
-roles = {
-    'send_messages': ['send_texts', 'send_emails', 'send_letters'],
-    'manage_templates': ['manage_templates'],
-    'manage_service': ['manage_users', 'manage_settings'],
-    'manage_api_keys': ['manage_api_keys']
-}
 
 
 @main.route("/services/<service_id>/users")
@@ -92,10 +85,9 @@ def edit_user_permissions(service_id, user_id):
     user_has_no_mobile_number = user.mobile_number is None
 
     form = PermissionsForm(
-        **{role: user.has_permissions(permissions=permissions) for role, permissions in roles.items()},
+        **{role: user.has_permissions(*permissions) for role, permissions in roles.items()},
         login_authentication=user.auth_type
     )
-
     if form.validate_on_submit():
         user_api_client.set_user_permissions(
             user_id, service_id,
@@ -122,7 +114,7 @@ def remove_user_from_service(service_id, user_id):
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
     form = PermissionsForm(**{
-        role: user.has_permissions(permissions=permissions) for role, permissions in roles.items()
+        role: user.has_permissions(*permissions) for role, permissions in roles.items()
     })
 
     if request.method == 'POST':

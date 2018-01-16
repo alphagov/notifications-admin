@@ -38,7 +38,7 @@ def test_user_has_permissions_on_endpoint_fail(
     _test_permissions(
         client,
         user,
-        ['something'],
+        ['send_texts'],
         '',
         False)
 
@@ -66,7 +66,7 @@ def test_user_has_permissions_or(
     _test_permissions(
         client,
         user,
-        ['something', 'manage_users'],
+        ['send_texts', 'manage_users'],
         '',
         True,
         any_=True)

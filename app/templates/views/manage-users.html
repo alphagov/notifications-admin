@@ -23,7 +23,7 @@
         Team members
       </h1>
     </div>
-    {% if current_user.has_permissions(['manage_users'], admin_override=True) %}
+    {% if current_user.has_permissions('manage_users', admin_override=True) %}
       <div class="column-one-third">
         <a href="{{ url_for('.invite_user', service_id=current_service.id) }}" class="button align-with-heading">Invite team member</a>
       </div>
@@ -48,19 +48,19 @@
         <ul class="tick-cross-list">
           <div class="tick-cross-list-permissions">
             {{ tick_cross(
-              user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']),
+              user.has_permissions('send_texts', 'send_emails', 'send_letters'),
               'Send messages'
             ) }}
             {{ tick_cross(
-              user.has_permissions(permissions=['manage_templates']),
+              user.has_permissions('manage_templates'),
               'Add and edit templates'
             ) }}
             {{ tick_cross(
-              user.has_permissions(permissions=['manage_users', 'manage_settings']),
+              user.has_permissions('manage_users', 'manage_settings'),
               'Manage service'
             ) }}
             {{ tick_cross(
-              user.has_permissions(permissions=['manage_api_keys']),
+              user.has_permissions('manage_api_keys'),
               'Access API keys'
             ) }}
             {% if 'email_auth' in current_service['permissions'] %}
@@ -73,7 +73,7 @@
               </div>
             {% endif %}
           </div>
-          {% if current_user.has_permissions(['manage_users'], admin_override=True) %}
+          {% if current_user.has_permissions('manage_users', admin_override=True) %}
             {% if current_user.id != user.id %}
               <li class="tick-cross-list-edit-link">
                 <a href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Edit permissions</a>
@@ -98,19 +98,19 @@
           <ul class="tick-cross-list">
             <div class="tick-cross-list-permissions">
               {{ tick_cross(
-                user.has_permissions(permissions=['send_texts', 'send_emails', 'send_letters']),
+                user.has_permissions('send_texts', 'send_emails', 'send_letters'),
                 'Send messages'
               ) }}
               {{ tick_cross(
-                user.has_permissions(permissions=['manage_templates']),
+                user.has_permissions('manage_templates'),
                 'Add and edit templates'
               ) }}
               {{ tick_cross(
-                user.has_permissions(permissions=['manage_users', 'manage_settings']),
+                user.has_permissions('manage_users', 'manage_settings'),
                 'Manage service'
               ) }}
               {{ tick_cross(
-                user.has_permissions(permissions=['manage_api_keys']),
+                user.has_permissions('manage_api_keys'),
                 'Access API keys'
               ) }}
             {% if 'email_auth' in current_service['permissions'] %}
@@ -124,7 +124,7 @@
             {% endif %}
             </div>
             <li class="tick-cross-list-edit-link">
-              {% if user.status == 'pending' and current_user.has_permissions(['manage_users']) %}
+              {% if user.status == 'pending' and current_user.has_permissions('manage_users') %}
                 <a href="{{ url_for('.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Cancel invitation</a>
               {% else %}
                 {{ user.status|title }}

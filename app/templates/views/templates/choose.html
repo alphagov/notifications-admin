@@ -14,7 +14,7 @@
 
     <h1 class="heading-large">Templates</h1>
 
-    {% if current_user.has_permissions(permissions=['manage_templates'], any_=True) %}
+    {% if current_user.has_permissions('manage_templates', any_=True) %}
        <p class="bottom-gutter">
          You need a template before you can send
          {% if 'letter' in current_service.permissions %}
@@ -41,7 +41,7 @@
       <div class="column-two-thirds">
         <h1 class="heading-large">Templates</h1>
       </div>
-      {% if current_user.has_permissions(permissions=['manage_templates'], admin_override=True) %}
+      {% if current_user.has_permissions('manage_templates', admin_override=True) %}
         <div class="column-one-third">
           <a href="{{ url_for('.add_template_by_type', service_id=current_service.id) }}" class="button align-with-heading">Add new template</a>
         </div>

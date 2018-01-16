@@ -1,5 +1,16 @@
+from itertools import chain
 from flask_login import UserMixin, AnonymousUserMixin
 from flask import session
+
+
+roles = {
+    'send_messages': ['send_texts', 'send_emails', 'send_letters'],
+    'manage_templates': ['manage_templates'],
+    'manage_service': ['manage_users', 'manage_settings'],
+    'manage_api_keys': ['manage_api_keys']
+}
+
+all_permissions = set(chain.from_iterable(roles.values())) | {'view_activity'}
 
 
 class User(UserMixin):
@@ -91,7 +102,13 @@ class User(UserMixin):
     def permissions(self, permissions):
         raise AttributeError("Read only property")
 
-    def has_permissions(self, permissions=[], any_=False, admin_override=False):
+    def has_permissions(self, *permissions, any_=False, admin_override=False):
+
+        unknown_permissions = set(permissions) - all_permissions
+
+        if unknown_permissions:
+            raise TypeError('{} are not valid permissions'.format(unknown_permissions))
+
         # Only available to the platform admin user
         if admin_override and self.platform_admin:
             return True
@@ -166,7 +183,7 @@ class InvitedUser(object):
         self.created_at = created_at
         self.auth_type = auth_type
 
-    def has_permissions(self, permissions):
+    def has_permissions(self, *permissions):
         return set(self.permissions) > set(permissions)
 
     def __eq__(self, other):
