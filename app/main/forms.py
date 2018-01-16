@@ -534,15 +534,9 @@ class RequestToGoLiveForm(StripWhitespaceForm):
         'Will the number of messages increase and when will that start?',
         validators=[DataRequired(message='Can’t be empty')]
     )
-    upload_or_api = RadioField(
-        'How are you going to send messages?',
-        choices=[
-            ('File upload', 'Upload a spreadsheet of recipients'),
-            ('API', 'Integrate with the GOV.UK Notify API'),
-            ('API and file upload', 'Both')
-        ],
-        validators=[DataRequired()]
-    )
+    method_one_off = BooleanField('One at a time')
+    method_upload = BooleanField('Upload a spreadsheet of recipients')
+    method_api = BooleanField('Integrate with the GOV.UK Notify API')
 
 
 class ProviderForm(StripWhitespaceForm):
