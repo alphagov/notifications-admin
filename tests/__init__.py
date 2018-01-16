@@ -56,7 +56,6 @@ def service_json(
     service_callback_api=None,
     permissions=None,
     organisation_type='central',
-    free_sms_fragment_limit=250000,
     prefix_sms=True,
 ):
     if users is None:
@@ -70,7 +69,6 @@ def service_json(
         'name': name,
         'users': users,
         'message_limit': message_limit,
-        'free_sms_fragment_limit': free_sms_fragment_limit,
         'active': active,
         'restricted': restricted,
         'email_from': email_from,
