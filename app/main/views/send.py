@@ -523,9 +523,12 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
 
     count_of_recipients = len(list(recipients.rows))
 
-    if preview_row < count_of_recipients:
-        template.values = recipients[preview_row]
-    elif preview_row > 0:
+    if preview_row < 2:
+        abort(404)
+
+    if preview_row < count_of_recipients + 2:
+        template.values = recipients[preview_row - 2]
+    elif preview_row > 2:
         abort(404)
 
     session['upload_data']['notification_count'] = count_of_recipients
@@ -553,7 +556,8 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
             template.template_type == 'letter',
             not request.args.get('from_test'),
         )),
-        required_recipient_columns=OrderedSet(recipients.recipient_column_headers) - optional_address_columns
+        required_recipient_columns=OrderedSet(recipients.recipient_column_headers) - optional_address_columns,
+        preview_row=preview_row,
     )
 
 
@@ -561,7 +565,7 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>", methods=['GET'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
-def check_messages(service_id, template_type, upload_id, row_index=0):
+def check_messages(service_id, template_type, upload_id, row_index=2):
 
     data = _check_messages(service_id, template_type, upload_id, row_index)
 
@@ -589,7 +593,7 @@ def check_messages(service_id, template_type, upload_id, row_index=0):
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>.<filetype>", methods=['GET'])
 @login_required
 @user_has_permissions('send_texts', 'send_emails', 'send_letters')
-def check_messages_preview(service_id, template_type, upload_id, filetype, row_index=0):
+def check_messages_preview(service_id, template_type, upload_id, filetype, row_index=2):
     if filetype not in ('pdf', 'png'):
         abort(404)
 

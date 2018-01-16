@@ -464,19 +464,22 @@ def test_upload_valid_csv_redirects_to_check_page(
     )
 
 
-@pytest.mark.parametrize('extra_args, expected_recipient, expected_message', [
+@pytest.mark.parametrize('extra_args, expected_link_in_first_row, expected_recipient, expected_message', [
     (
         {},
-        'To: 07700900001',
-        'Test Service: A, Template <em>content</em> with & entity',
-    ),
-    (
-        {'row_index': 0},
+        None,
         'To: 07700900001',
         'Test Service: A, Template <em>content</em> with & entity',
     ),
     (
         {'row_index': 2},
+        None,
+        'To: 07700900001',
+        'Test Service: A, Template <em>content</em> with & entity',
+    ),
+    (
+        {'row_index': 4},
+        True,
         'To: 07700900003',
         'Test Service: C, Template <em>content</em> with & entity',
     ),
@@ -490,6 +493,7 @@ def test_upload_valid_csv_shows_preview_and_table(
     mock_get_detailed_service_for_today,
     fake_uuid,
     extra_args,
+    expected_link_in_first_row,
     expected_recipient,
     expected_message,
 ):
@@ -516,8 +520,16 @@ def test_upload_valid_csv_shows_preview_and_table(
     assert page.select_one('.sms-message-recipient').text.strip() == expected_recipient
     assert page.select_one('.sms-message-wrapper').text.strip() == expected_message
 
+    assert page.select_one('.table-field-index').text.strip() == '2'
+
+    if expected_link_in_first_row:
+        assert page.select_one('.table-field-index a')['href'] == url_for(
+            'main.check_messages', service_id=SERVICE_ONE_ID, template_type='sms', upload_id=fake_uuid, row_index=2
+        )
+    else:
+        assert not page.select_one('.table-field-index').select_one('a')
+
     for index, cell in enumerate([
-        '<td class="table-field-index"> <span class=""> 2 </span> </td>',
         '<td class="table-field-center-aligned "> <div class=""> 07700900001 </div> </td>',
         '<td class="table-field-center-aligned "> <div class=""> A </div> </td>',
         (
@@ -530,13 +542,16 @@ def test_upload_valid_csv_shows_preview_and_table(
             '</td>'
         ),
     ]):
-        assert normalize_spaces(str(page.select('table tbody td')[index])) == cell
+        assert normalize_spaces(str(page.select('table tbody td')[index + 1])) == cell
 
 
 @pytest.mark.parametrize('row_index, expected_status', [
-    (0, 200),
+    (0, 404),
+    (1, 404),
     (2, 200),
-    (3, 404),
+    (3, 200),
+    (4, 200),
+    (5, 404),
 ])
 def test_404_for_previewing_a_row_out_of_range(
     client_request,
@@ -1468,11 +1483,11 @@ def test_can_start_letters_job(
         {'postcode': 'abc123', 'addressline1': '123 street'},
     ),
     (
-        {'row_index': 0},
+        {'row_index': 2},
         {'postcode': 'abc123', 'addressline1': '123 street'},
     ),
     (
-        {'row_index': 1},
+        {'row_index': 3},
         {'postcode': 'cba321', 'addressline1': '321 avenue'},
     ),
 ])
