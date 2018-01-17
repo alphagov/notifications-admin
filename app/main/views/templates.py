@@ -354,7 +354,7 @@ def add_service_template(service_id, template_type):
 
 
 def abort_403_if_not_admin_user():
-    if not current_user.has_permissions([], admin_override=True):
+    if not current_user.has_permissions(admin_override=True):
         abort(403)
 
 

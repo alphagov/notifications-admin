@@ -11,6 +11,7 @@ from app.utils import email_safe
 from tests import validate_route_permission, service_json
 from tests.conftest import (
     active_user_with_permissions,
+    active_user_no_api_key_permission,
     platform_admin_user,
     normalize_spaces,
     multiple_reply_to_email_addresses,
@@ -433,6 +434,14 @@ def test_should_show_request_to_go_live(
         assert normalize_spaces(
             page.select_one('label[for=channel_{}]'.format(channel)).text
         ) == label
+    for feature, label in (
+        ('one_off', 'One at a time'),
+        ('upload', 'Upload a spreadsheet of recipients'),
+        ('api', 'Integrate with the GOV.UK Notify API'),
+    ):
+        assert normalize_spaces(
+            page.select_one('label[for=method_{}]'.format(feature)).text
+        ) == label
 
 
 def test_should_redirect_after_request_to_go_live(
@@ -458,7 +467,9 @@ def test_should_redirect_after_request_to_go_live(
             'start_date': '01/01/2017',
             'start_volume': '100,000',
             'peak_volume': '2,000,000',
-            'upload_or_api': 'API'
+            'method_one_off': 'y',
+            'method_upload': 'y',
+            'method_api': 'y',
         },
         _follow_redirects=True
     )
@@ -476,11 +487,13 @@ def test_should_redirect_after_request_to_go_live(
     )
 
     returned_message = mock_post.call_args[1]['data']['message']
+    assert 'On behalf of service one' in returned_message
+    assert 'Organisation type: central' in returned_message
     assert 'Channel: email and text messages' in returned_message
     assert 'Start date: 01/01/2017' in returned_message
     assert 'Start volume: 100,000' in returned_message
     assert 'Peak volume: 2,000,000' in returned_message
-    assert 'Upload or API: API' in returned_message
+    assert 'Features: one off, file upload and API' in returned_message
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'We’ve received your request to go live'
@@ -1925,6 +1938,41 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
         'main.service_set_inbound_sms', service_id=service_one['id']
     ))
     assert response.status_code == 200
+
+
+@pytest.mark.parametrize('user, expected_paragraphs', [
+    (active_user_with_permissions, [
+        'Your service can receive text messages sent to 07700900123.',
+        'If you want to turn this feature off, get in touch with the GOV.UK Notify team.',
+        'You can set up callbacks for received text messages on the API integration page.',
+    ]),
+    (active_user_no_api_key_permission, [
+        'Your service can receive text messages sent to 07700900123.',
+        'If you want to turn this feature off, get in touch with the GOV.UK Notify team.',
+    ]),
+])
+def test_set_inbound_sms_when_inbound_number_is_set(
+    client,
+    service_one,
+    mocker,
+    fake_uuid,
+    user,
+    expected_paragraphs,
+):
+    service_one['permissions'] = ['inbound_sms']
+    mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service', return_value={
+        'data': {'number': '07700900123'}
+    })
+    client.login(user(fake_uuid), mocker, service_one)
+    response = client.get(url_for(
+        'main.service_set_inbound_sms', service_id=SERVICE_ONE_ID
+    ))
+    paragraphs = BeautifulSoup(response.data.decode('utf-8'), 'html.parser').select('main p')
+
+    assert len(paragraphs) == len(expected_paragraphs)
+
+    for index, p in enumerate(expected_paragraphs):
+        assert normalize_spaces(paragraphs[index].text) == p
 
 
 def test_empty_letter_contact_block_returns_error(
