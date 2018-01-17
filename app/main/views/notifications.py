@@ -157,7 +157,8 @@ def download_notifications_csv(service_id):
                 status=filter_args.get('status'),
                 page=request.args.get('page', 1),
                 page_size=5000,
-                format_for_csv=True
+                format_for_csv=True,
+                template_type=filter_args.get('message_type')
             )
         ),
         mimetype='text/csv',
