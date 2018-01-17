@@ -1,10 +1,9 @@
 import uuid
-from unittest.mock import call, ANY, Mock
+from unittest.mock import call, ANY
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
-from werkzeug.exceptions import InternalServerError
 
 import app
 from app.utils import email_safe
@@ -453,10 +452,7 @@ def test_should_redirect_after_request_to_go_live(
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
-    mock_post = mocker.patch(
-        'app.main.views.feedback.requests.post',
-        return_value=Mock(status_code=201),
-    )
+    mock_post = mocker.patch('app.main.views.service_settings.deskpro_client.create_ticket')
     page = client_request.post(
         'main.service_request_to_go_live',
         service_id=SERVICE_ONE_ID,
@@ -474,19 +470,13 @@ def test_should_redirect_after_request_to_go_live(
         _follow_redirects=True
     )
     mock_post.assert_called_with(
-        ANY,
-        data={
-            'subject': 'Request to go live - service one',
-            'department_id': ANY,
-            'agent_team_id': ANY,
-            'message': ANY,
-            'person_name': active_user_with_permissions.name,
-            'person_email': active_user_with_permissions.email_address
-        },
-        headers=ANY
+        subject='Request to go live - service one',
+        message=ANY,
+        user_name=active_user_with_permissions.name,
+        user_email=active_user_with_permissions.email_address
     )
 
-    returned_message = mock_post.call_args[1]['data']['message']
+    returned_message = mock_post.call_args[1]['message']
     assert 'On behalf of service one' in returned_message
     assert 'Organisation type: central' in returned_message
     assert 'Channel: email and text messages' in returned_message
@@ -500,40 +490,6 @@ def test_should_redirect_after_request_to_go_live(
     )
     assert normalize_spaces(page.select_one('h1').text) == (
         'Settings'
-    )
-
-
-def test_log_error_on_request_to_go_live(
-        app_,
-        logged_in_client,
-        service_one,
-        mocker,
-):
-    mock_post = mocker.patch(
-        'app.main.views.service_settings.requests.post',
-        return_value=Mock(
-            status_code=401,
-            json=lambda: {
-                'error_code': 'invalid_auth',
-                'error_message': 'Please provide a valid API key or token'
-            }
-        )
-    )
-    mock_logger = mocker.patch.object(app_.logger, 'error')
-    with pytest.raises(InternalServerError):
-        logged_in_client.post(
-            url_for('main.service_request_to_go_live', service_id=service_one['id']),
-            data={
-                'mou': 'yes',
-                'channel': 'emails',
-                'start_date': 'start_date',
-                'start_volume': 'start_volume',
-                'peak_volume': 'peak_volume',
-                'upload_or_api': 'API'
-            }
-        )
-    mock_logger.assert_called_with(
-        "Deskpro create ticket request failed with {} '{}'".format(mock_post().status_code, mock_post().json())
     )
 
 

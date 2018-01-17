@@ -1,11 +1,13 @@
-import requests
 import pytz
-from flask import render_template, url_for, redirect, current_app, abort, request, session
+from flask import render_template, url_for, redirect, abort, request, session
 from flask_login import current_user
-from app import convert_to_boolean, current_service, service_api_client
+from notifications_utils.clients import DeskproError
+
+from app import convert_to_boolean, current_service, service_api_client, deskpro_client
 from app.main import main
 from app.main.forms import SupportType, Feedback, Problem, Triage
 from datetime import datetime
+
 
 QUESTION_TICKET_TYPE = 'ask-question-give-feedback'
 PROBLEM_TICKET_TYPE = "report-problem"
@@ -113,31 +115,17 @@ def feedback(ticket_type):
             '' if user_email else '{} (no email address supplied)'.format(form.name.data),
             form.feedback.data
         )
-        data = {
-            'person_email': user_email or current_app.config.get('DESKPRO_PERSON_EMAIL'),
-            'person_name': user_name,
-            'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
-            'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
-            'subject': 'Notify feedback {}'.format(user_name),
-            'message': feedback_msg,
-            'label': ticket_type,
-            'urgency': 10 if urgent else 1,
-        }
-        headers = {
-            "X-DeskPRO-API-Key": current_app.config.get('DESKPRO_API_KEY'),
-            'Content-Type': "application/x-www-form-urlencoded"
-        }
-        resp = requests.post(
-            current_app.config.get('DESKPRO_API_HOST') + '/api/tickets',
-            data=data,
-            headers=headers)
-        if resp.status_code != 201:
-            current_app.logger.error(
-                "Deskpro create ticket request failed with {} '{}'".format(
-                    resp.status_code,
-                    resp.json()
-                )
+
+        try:
+            deskpro_client.create_ticket(
+                subject='Notify feedback {}'.format(user_name),
+                message=feedback_msg,
+                ticket_type=ticket_type,
+                urgency=10 if urgent else 1,
+                user_email=user_email,
+                user_name=user_name
             )
+        except DeskproError:
             abort(500, "Feedback submission failed")
         return redirect(url_for('.thanks', urgent=urgent, anonymous=anonymous))
 
