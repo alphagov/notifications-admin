@@ -3,8 +3,9 @@ from functools import partial
 import pytest
 from flask import url_for
 from werkzeug.exceptions import InternalServerError
-from unittest.mock import Mock, ANY
+from unittest.mock import ANY
 from freezegun import freeze_time
+from notifications_utils.clients import DeskproError
 from tests.conftest import (
     mock_get_services,
     mock_get_services_with_no_services,
@@ -80,10 +81,7 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
 @freeze_time('2016-12-12 12:00:00.000000')
 @pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
 def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_type):
-    mock_post = mocker.patch(
-        'app.main.views.feedback.requests.post',
-        return_value=Mock(status_code=201)
-    )
+    mock_post = mocker.patch('app.main.views.feedback.deskpro_client.create_ticket')
 
     data = {'feedback': 'blah', 'name': 'Steve Irwin', 'email_address': 'rip@gmail.com'}
 
@@ -95,18 +93,12 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
     assert resp.status_code == 302
     assert resp.location == url_for('main.thanks', urgent=True, anonymous=False, _external=True)
     mock_post.assert_called_with(
-        ANY,
-        data={
-            'department_id': ANY,
-            'agent_team_id': ANY,
-            'subject': 'Notify feedback {}'.format(data['name']),
-            'message': 'Environment: http://localhost/\n\nblah',
-            'person_email': 'rip@gmail.com',
-            'person_name': 'Steve Irwin',
-            'label': ticket_type,
-            'urgency': ANY,
-        },
-        headers=ANY
+        subject='Notify feedback {}'.format(data['name']),
+        message='Environment: http://localhost/\n\nblah',
+        user_email='rip@gmail.com',
+        user_name='Steve Irwin',
+        ticket_type=ticket_type,
+        urgency=ANY,
     )
 
 
@@ -122,10 +114,7 @@ def test_passes_user_details_through_flow(
     ticket_type,
     data
 ):
-    mock_post = mocker.patch(
-        'app.main.views.feedback.requests.post',
-        return_value=Mock(status_code=201)
-    )
+    mock_post = mocker.patch('app.main.views.feedback.deskpro_client.create_ticket')
 
     resp = logged_in_client.post(
         url_for('main.feedback', ticket_type=ticket_type),
@@ -135,20 +124,14 @@ def test_passes_user_details_through_flow(
     assert resp.status_code == 302
     assert resp.location == url_for('main.thanks', urgent=True, anonymous=False, _external=True)
     mock_post.assert_called_with(
-        ANY,
-        data={
-            'department_id': ANY,
-            'agent_team_id': ANY,
-            'subject': 'Notify feedback Test User',
-            'message': ANY,
-            'person_email': 'test@user.gov.uk',
-            'person_name': 'Test User',
-            'label': ticket_type,
-            'urgency': ANY,
-        },
-        headers=ANY
+        subject='Notify feedback Test User',
+        message=ANY,
+        user_email='test@user.gov.uk',
+        user_name='Test User',
+        ticket_type=ticket_type,
+        urgency=ANY,
     )
-    assert mock_post.call_args[1]['data']['message'] == '\n'.join([
+    assert mock_post.call_args[1]['message'] == '\n'.join([
         'Environment: http://localhost/',
         'Service "service one": {}'.format(url_for(
             'main.service_dashboard',
@@ -178,10 +161,7 @@ def test_email_address_required_for_problems(
     things_expected_in_url,
     expected_error
 ):
-    mocker.patch(
-        'app.main.views.feedback.requests.post',
-        return_value=Mock(status_code=201)
-    )
+    mocker.patch('app.main.views.feedback.deskpro_client')
     response = client.post(
         url_for('main.feedback', ticket_type=ticket_type),
         data=data,
@@ -221,14 +201,14 @@ def test_urgency(
     is_urgent,
 ):
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=is_in_business_hours)
-    mock_post = mocker.patch('app.main.views.feedback.requests.post', return_value=Mock(status_code=201))
+    mock_post = mocker.patch('app.main.views.feedback.deskpro_client.create_ticket')
     response = logged_in_client.post(
         url_for('main.feedback', ticket_type=ticket_type, severe=severe),
         data={'feedback': 'blah', 'email_address': 'test@example.com'},
     )
     assert response.status_code == 302
     assert response.location == url_for('main.thanks', urgent=is_urgent, anonymous=False, _external=True)
-    assert mock_post.call_args[1]['data']['urgency'] == numeric_urgency
+    assert mock_post.call_args[1]['urgency'] == numeric_urgency
 
 
 ids, params = zip(*[
@@ -466,22 +446,16 @@ def test_bat_email_page(
 @pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
 def test_log_error_on_post(app_, mocker, ticket_type):
     mock_post = mocker.patch(
-        'app.main.views.feedback.requests.post',
-        return_value=Mock(
-            status_code=401,
-            json=lambda: {
-                'error_code': 'invalid_auth',
-                'error_message': 'Please provide a valid API key or token'}))
+        'app.main.views.feedback.deskpro_client.create_ticket',
+        side_effect=DeskproError
+    )
     with app_.test_request_context():
-        mock_logger = mocker.patch.object(app_.logger, 'error')
         with app_.test_client() as client:
             with pytest.raises(InternalServerError):
                 client.post(
                     url_for('main.feedback', ticket_type=ticket_type),
                     data={'feedback': "blah", 'name': "Steve Irwin", 'email_address': 'rip@gmail.com'})
             assert mock_post.called
-            mock_logger.assert_called_with(
-                "Deskpro create ticket request failed with {} '{}'".format(mock_post().status_code, mock_post().json()))
 
 
 @pytest.mark.parametrize('logged_in', [True, False])

@@ -1,4 +1,3 @@
-import requests
 from flask import (
     render_template,
     redirect,
@@ -7,7 +6,6 @@ from flask import (
     session,
     flash,
     abort,
-    current_app
 )
 
 from flask_login import (
@@ -16,9 +14,10 @@ from flask_login import (
 )
 
 from notifications_utils.field import Field
+from notifications_utils.clients import DeskproError
 from notifications_python_client.errors import HTTPError
 
-from app import service_api_client
+from app import service_api_client, deskpro_client
 from app.main import main
 from app.utils import user_has_permissions, email_safe, get_cdn_domain
 from app.main.forms import (
@@ -153,57 +152,40 @@ def service_request_to_go_live(service_id):
     form = RequestToGoLiveForm()
 
     if form.validate_on_submit():
-        data = {
-            'person_email': current_user.email_address,
-            'person_name': current_user.name,
-            'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
-            'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
-            'subject': 'Request to go live - {}'.format(current_service['name']),
-            'message': (
-                'On behalf of {} ({})\n'
-                '\n---'
-                '\nOrganisation type: {} ({:,} free text messages)'
-                '\nMOU in place: {}'
-                '\nChannel: {}\nStart date: {}\nStart volume: {}'
-                '\nPeak volume: {}'
-                '\nFeatures: {}'
-            ).format(
-                current_service['name'],
-                url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
-                current_service['organisation_type'],
-                current_service['free_sms_fragment_limit'],
-                form.mou.data,
-                formatted_list(filter(None, (
-                    'email' if form.channel_email.data else None,
-                    'text messages' if form.channel_sms.data else None,
-                    'letters' if form.channel_letter.data else None,
-                )), before_each='', after_each=''),
-                form.start_date.data,
-                form.start_volume.data,
-                form.peak_volume.data,
-                formatted_list(filter(None, (
-                    'one off' if form.method_one_off.data else None,
-                    'file upload' if form.method_upload.data else None,
-                    'API' if form.method_api.data else None,
-                )), before_each='', after_each='')
-
+        try:
+            deskpro_client.create_ticket(
+                subject='Request to go live - {}'.format(current_service['name']),
+                message=(
+                    'On behalf of {} ({})\n'
+                    '\n---'
+                    '\nOrganisation type: {}'
+                    '\nMOU in place: {}'
+                    '\nChannel: {}\nStart date: {}\nStart volume: {}'
+                    '\nPeak volume: {}'
+                    '\nFeatures: {}'
+                ).format(
+                    current_service['name'],
+                    url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
+                    current_service['organisation_type'],
+                    form.mou.data,
+                    formatted_list(filter(None, (
+                        'email' if form.channel_email.data else None,
+                        'text messages' if form.channel_sms.data else None,
+                        'letters' if form.channel_letter.data else None,
+                    )), before_each='', after_each=''),
+                    form.start_date.data,
+                    form.start_volume.data,
+                    form.peak_volume.data,
+                    formatted_list(filter(None, (
+                        'one off' if form.method_one_off.data else None,
+                        'file upload' if form.method_upload.data else None,
+                        'API' if form.method_api.data else None,
+                    )), before_each='', after_each='')
+                ),
+                user_email=current_user.email_address,
+                user_name=current_user.name
             )
-        }
-        headers = {
-            "X-DeskPRO-API-Key": current_app.config.get('DESKPRO_API_KEY'),
-            'Content-Type': "application/x-www-form-urlencoded"
-        }
-        resp = requests.post(
-            current_app.config.get('DESKPRO_API_HOST') + '/api/tickets',
-            data=data,
-            headers=headers
-        )
-        if resp.status_code != 201:
-            current_app.logger.error(
-                "Deskpro create ticket request failed with {} '{}'".format(
-                    resp.status_code,
-                    resp.json())
-            )
+        except DeskproError:
             abort(500, "Request to go live submission failed")
 
         flash('We’ve received your request to go live', 'default')

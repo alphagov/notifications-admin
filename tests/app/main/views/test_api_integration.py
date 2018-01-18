@@ -11,6 +11,7 @@ from tests.conftest import (
     mock_get_service,
     mock_get_live_service,
     mock_get_service_with_letters,
+    mock_get_notifications,
     normalize_spaces,
     SERVICE_ONE_ID,
     mock_get_valid_service_callback_api,
@@ -64,6 +65,29 @@ def test_should_show_api_page_with_no_notifications(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     rows = page.find_all('div', {'class': 'api-notifications-item'})
     assert 'When you send messages via the API they’ll appear here.' in rows[len(rows) - 1].text.strip()
+
+
+@pytest.mark.parametrize('template_type, has_links', [
+    ('sms', False),
+    ('letter', True),
+])
+def test_letter_notifications_should_have_link_to_view_letter(
+    client_request,
+    api_user_active,
+    fake_uuid,
+    mock_has_permissions,
+    mocker,
+    template_type,
+    has_links
+):
+    mock_get_notifications(mocker, api_user_active, diff_template_type=template_type)
+
+    page = client_request.get(
+        'main.api_integration',
+        service_id=fake_uuid,
+    )
+
+    assert (page.select_one('details a') is not None) == has_links
 
 
 def test_should_show_api_page_for_live_service(
