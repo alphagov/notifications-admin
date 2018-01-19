@@ -584,6 +584,17 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
             )
 
 
+class ServiceSwitchLettersForm(StripWhitespaceForm):
+
+    enabled = RadioField(
+        'Send letters',
+        choices=[
+            ('on', 'On'),
+            ('off', 'Off'),
+        ],
+    )
+
+
 class ServiceBrandingOrg(StripWhitespaceForm):
 
     def __init__(self, organisations=[], *args, **kwargs):

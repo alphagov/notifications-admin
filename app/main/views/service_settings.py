@@ -35,6 +35,7 @@ from app.main.forms import (
     FreeSMSAllowance,
     ServiceEditInboundNumberForm,
     SMSPrefixForm,
+    ServiceSwitchLettersForm,
 )
 from app import user_api_client, current_service, organisations_client, inbound_number_client, billing_api_client
 from notifications_utils.formatters import formatted_list
@@ -502,12 +503,25 @@ def service_set_inbound_sms(service_id):
     )
 
 
-@main.route("/services/<service_id>/service-settings/set-letters", methods=['GET'])
+@main.route("/services/<service_id>/service-settings/set-letters", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_set_letters(service_id):
+    form = ServiceSwitchLettersForm(
+        enabled='on' if 'letter' in current_service['permissions'] else 'off'
+    )
+    if form.validate_on_submit():
+        force_service_permission(
+            service_id,
+            'letter',
+            on=(form.enabled.data == 'on'),
+        )
+        return redirect(
+            url_for(".service_settings", service_id=service_id)
+        )
     return render_template(
         'views/service-settings/set-letters.html',
+        form=form,
     )
 
 

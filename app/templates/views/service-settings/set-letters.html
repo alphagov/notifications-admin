@@ -1,34 +1,26 @@
 {% extends "withnav_template.html" %}
-{% from "components/textbox.html" import textbox %}
+{% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-  Text message sender
+  Send letters
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">Letters</h1>
-      {% if 'letter' in current_service.permissions %} 
-        <p>
-          Your service can send letters.
-        </p>
-        <p>
-          If you want to stop your service from sending letters,
-          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
-        </p>
-      {% else %}
-        <p>
-          Using GOV.UK Notify to send letters is an invitation&#8209;only feature.
-        </p>
-        <p>
-          If you want to try it out,
-          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
-        </p>
-      {% endif %}
+      <h1 class="heading-large">Send letters</h1>
+      <p>
+        It costs between 30p and 45p to send a letter using Notify.
+      </p>
+      <p>
+        See <a href="{{ url_for(".pricing", _anchor="letters") }}">pricing</a> for the list
+        of rates.
+      </p>
+      {{ radios(form.enabled) }}
       {{ page_footer(
+        'Save',
         back_link=url_for('.service_settings', service_id=current_service.id),
         back_link_text='Back to settings'
       ) }}
