@@ -1,11 +1,13 @@
-import requests
 import pytz
-from flask import render_template, url_for, redirect, current_app, abort, request, session
+from flask import render_template, url_for, redirect, abort, request, session
 from flask_login import current_user
-from app import convert_to_boolean, current_service, service_api_client
+from notifications_utils.clients import DeskproError
+
+from app import convert_to_boolean, current_service, service_api_client, deskpro_client
 from app.main import main
 from app.main.forms import SupportType, Feedback, Problem, Triage
 from datetime import datetime
+
 
 QUESTION_TICKET_TYPE = 'ask-question-give-feedback'
 PROBLEM_TICKET_TYPE = "report-problem"
@@ -113,31 +115,17 @@ def feedback(ticket_type):
             '' if user_email else '{} (no email address supplied)'.format(form.name.data),
             form.feedback.data
         )
-        data = {
-            'person_email': user_email or current_app.config.get('DESKPRO_PERSON_EMAIL'),
-            'person_name': user_name,
-            'department_id': current_app.config.get('DESKPRO_DEPT_ID'),
-            'agent_team_id': current_app.config.get('DESKPRO_ASSIGNED_AGENT_TEAM_ID'),
-            'subject': 'Notify feedback {}'.format(user_name),
-            'message': feedback_msg,
-            'label': ticket_type,
-            'urgency': 10 if urgent else 1,
-        }
-        headers = {
-            "X-DeskPRO-API-Key": current_app.config.get('DESKPRO_API_KEY'),
-            'Content-Type': "application/x-www-form-urlencoded"
-        }
-        resp = requests.post(
-            current_app.config.get('DESKPRO_API_HOST') + '/api/tickets',
-            data=data,
-            headers=headers)
-        if resp.status_code != 201:
-            current_app.logger.error(
-                "Deskpro create ticket request failed with {} '{}'".format(
-                    resp.status_code,
-                    resp.json()
-                )
+
+        try:
+            deskpro_client.create_ticket(
+                subject='Notify feedback {}'.format(user_name),
+                message=feedback_msg,
+                ticket_type=ticket_type,
+                urgency=10 if urgent else 1,
+                user_email=user_email,
+                user_name=user_name
             )
+        except DeskproError:
             abort(500, "Feedback submission failed")
         return redirect(url_for('.thanks', urgent=urgent, anonymous=anonymous))
 
@@ -191,25 +179,40 @@ def is_weekend(time):
 
 
 def is_bank_holiday(time):
-    return time.strftime('%d/%m/%Y') in {
-        # taken from
-        # https://github.com/alphagov/calendars/blob/7f6512b0a95d77aa22accef105860074c19f1ec0/lib/data/bank-holidays.json
-        "01/01/2016",
-        "25/03/2016",
-        "28/03/2016",
-        "02/05/2016",
-        "30/05/2016",
-        "29/08/2016",
-        "26/12/2016",
-        "27/12/2016",
-        "02/01/2017",
-        "14/04/2017",
-        "17/04/2017",
-        "01/05/2017",
-        "29/05/2017",
-        "28/08/2017",
-        "25/12/2017",
-        "26/12/2017",
+    return time.strftime('%Y-%m-%d') in {
+        # taken from https://www.gov.uk/bank-holidays.json
+        "2016-01-01",
+        "2016-03-25",
+        "2016-03-28",
+        "2016-05-02",
+        "2016-05-30",
+        "2016-08-29",
+        "2016-12-26",
+        "2016-12-27",
+        "2017-01-02",
+        "2017-04-14",
+        "2017-04-17",
+        "2017-05-01",
+        "2017-05-29",
+        "2017-08-28",
+        "2017-12-25",
+        "2017-12-26",
+        "2018-01-01",
+        "2018-03-30",
+        "2018-04-02",
+        "2018-05-07",
+        "2018-05-28",
+        "2018-08-27",
+        "2018-12-25",
+        "2018-12-26",
+        "2019-01-01",
+        "2019-04-19",
+        "2019-04-22",
+        "2019-05-06",
+        "2019-05-27",
+        "2019-08-26",
+        "2019-12-25",
+        "2019-12-26",
     }
 
 
