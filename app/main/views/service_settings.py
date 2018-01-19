@@ -253,27 +253,11 @@ def update_service_permissions(service_id, permissions, sms_sender=None):
     service_api_client.update_service_with_properties(service_id, data)
 
 
-@main.route("/services/<service_id>/service-settings/can-send-letters")
-@login_required
-@user_has_permissions(admin_override=True)
-def service_switch_can_send_letters(service_id):
-    switch_service_permissions(service_id, 'letter')
-    return redirect(url_for('.service_settings', service_id=service_id))
-
-
 @main.route("/services/<service_id>/service-settings/send-letters-as-pdf")
 @login_required
 @user_has_permissions(admin_override=True)
 def service_switch_send_letters_as_pdf(service_id):
     switch_service_permissions(service_id, 'letters_as_pdf')
-    return redirect(url_for('.service_settings', service_id=service_id))
-
-
-@main.route("/services/<service_id>/service-settings/can-send-international-sms")
-@login_required
-@user_has_permissions(admin_override=True)
-def service_switch_can_send_international_sms(service_id):
-    switch_service_permissions(service_id, 'international_sms')
     return redirect(url_for('.service_settings', service_id=service_id))
 
 

@@ -31,9 +31,6 @@ def get_service_settings_page(
     ({'permissions': ['email']}, '.service_switch_can_send_email', {}, 'Stop sending emails'),
     ({'permissions': []}, '.service_switch_can_send_email', {}, 'Allow to send emails'),
 
-    ({'permissions': ['letter']}, '.service_switch_can_send_letters', {}, 'Stop sending letters'),
-    ({'permissions': []}, '.service_switch_can_send_letters', {}, 'Allow to send letters'),
-
     ({'permissions': ['sms']}, '.service_switch_can_send_sms', {}, 'Stop sending sms'),
     ({'permissions': []}, '.service_switch_can_send_sms', {}, 'Allow to send sms'),
 
