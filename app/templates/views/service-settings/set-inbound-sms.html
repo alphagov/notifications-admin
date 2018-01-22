@@ -27,16 +27,15 @@
         {% endif %}
       {% else %}
         <p>
-          Receiving text messages from your users is an
-          invitation&#8209;only feature.
+          If you want to be able to receive text messages from your users, please
+          <a href="{{ url_for('.support') }}">get in touch</a>.
         </p>
         <p>
-          If you want to try it out,
-          <a href="{{ url_for('.support') }}">get in touch with the GOV.UK Notify team</a>.
-        </p>
-        <p>
-          We’ll set you up with a special phone number, and you’ll be able to see
+          We’ll create a special phone number for your users to contact. You'll be able to see
           the messages on your dashboard, or get them using the API.
+        </p>
+          It doesn’t cost you anything to receive messages. Users will pay their normal rate for
+          messaging a mobile number.
         </p>
       {% endif %}
       {{ page_footer(
