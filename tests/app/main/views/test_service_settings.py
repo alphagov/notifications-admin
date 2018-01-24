@@ -1821,7 +1821,7 @@ def test_cant_resume_active_service(
         'main.service_set_inbound_sms',
         ['sms'],
         (
-            'Receiving text messages from your users is an invitation‑only feature.'
+            'If you want to be able to receive text messages from your users, please get in touch.'
         )
     ),
     (
