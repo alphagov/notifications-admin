@@ -18,12 +18,14 @@
         See <a href="{{ url_for(".pricing", _anchor="letters") }}">pricing</a> for the list
         of rates.
       </p>
-      {{ radios(form.enabled) }}
-      {{ page_footer(
-        'Save',
-        back_link=url_for('.service_settings', service_id=current_service.id),
-        back_link_text='Back to settings'
-      ) }}
+      <form method="post">
+        {{ radios(form.enabled) }}
+        {{ page_footer(
+          'Save',
+          back_link=url_for('.service_settings', service_id=current_service.id),
+          back_link_text='Back to settings'
+        ) }}
+      </form>
     </div>
   </div>
 
