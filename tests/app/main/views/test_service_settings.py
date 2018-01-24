@@ -530,8 +530,6 @@ def test_route_permissions(
     'main.service_request_to_go_live',
     'main.service_switch_live',
     'main.service_switch_research_mode',
-    'main.service_switch_can_send_letters',
-    'main.service_switch_can_send_international_sms',
     'main.archive_service',
 ])
 def test_route_invalid_permissions(
@@ -584,8 +582,6 @@ def test_route_for_platform_admin(
 @pytest.mark.parametrize('route', [
     'main.service_switch_live',
     'main.service_switch_research_mode',
-    'main.service_switch_can_send_letters',
-    'main.service_switch_can_send_international_sms',
 ])
 def test_route_for_platform_admin_update_service(
         mocker,
@@ -1557,38 +1553,48 @@ def test_should_set_sms_allowance(
     )
 
 
+@pytest.mark.parametrize((
+    'expected_initial_value,'
+    'posted_value,'
+    'initial_permissions,'
+    'expected_updated_permissions'
+), [
+    ('off', 'on', ['email', 'sms'], ['email', 'sms', 'letter']),
+    ('on', 'off', ['email', 'sms', 'letter'], ['email', 'sms']),
+])
 def test_switch_service_enable_letters(
-    logged_in_platform_admin_client,
+    client_request,
     service_one,
     mocker,
+    expected_initial_value,
+    posted_value,
+    initial_permissions,
+    expected_updated_permissions,
 ):
     mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
+    service_one['permissions'] = initial_permissions
 
-    response = logged_in_platform_admin_client.get(
-        url_for('main.service_switch_can_send_letters', service_id=service_one['id'])
+    page = client_request.get(
+        'main.service_set_letters',
+        service_id=service_one['id'],
     )
 
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    assert 'letter' in mocked_fn.call_args[0][1]['permissions']
+    assert page.select_one('input[checked]')['value'] == expected_initial_value
+    assert len(page.select('input[checked]')) == 1
+
+    client_request.post(
+        'main.service_set_letters',
+        service_id=service_one['id'],
+        _data={'enabled': posted_value},
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=service_one['id'],
+            _external=True
+        )
+    )
+
+    assert set(mocked_fn.call_args[0][1]['permissions']) == set(expected_updated_permissions)
     assert mocked_fn.call_args[0][0] == service_one['id']
-
-
-def test_switch_service_disable_letters(
-    logged_in_platform_admin_client,
-    service_one,
-    mocker,
-):
-    service_one['permissions'] = ['letter']
-    mocked_fn = mocker.patch('app.service_api_client.update_service_with_properties', return_value=service_one)
-
-    response = logged_in_platform_admin_client.get(
-        url_for('main.service_switch_can_send_letters', service_id=service_one['id'])
-    )
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
-    assert mocked_fn.call_args == call(service_one['id'], {"permissions": []})
 
 
 @pytest.mark.parametrize('permissions, expected_checked', [
@@ -1802,21 +1808,6 @@ def test_cant_resume_active_service(
 
 
 @pytest.mark.parametrize('endpoint, permissions, expected_p', [
-    (
-        'main.service_set_letters',
-        [],
-        (
-            'Using GOV.UK Notify to send letters is an invitation‑only '
-            'feature.'
-        )
-    ),
-    (
-        'main.service_set_letters',
-        ['letter'],
-        (
-            'Your service can send letters.'
-        )
-    ),
     (
         'main.service_set_inbound_sms',
         ['sms'],
