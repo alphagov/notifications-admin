@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/api-key.html" import api_key %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table %}
+{% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
 
 {% block service_page_title %}
   Sender addresses
@@ -15,9 +15,11 @@
         Sender addresses
       </h1>
     </div>
-   <div class="column-one-third">
-     <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id) }}" class="button align-with-heading">Add a new address</a>
-   </div>
+    {% if current_user.has_permissions('manage_settings', admin_override=True) %}
+      <div class="column-one-third">
+        <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id) }}" class="button align-with-heading">Add a new address</a>
+      </div>
+    {% endif %}
   </div>
   <div class="user-list">
     {% if not letter_contact_details %}
@@ -35,8 +37,9 @@
             (default)
           {% endif %}
         </p>
-
+        {% if current_user.has_permissions('manage_settings', admin_override=True) %}
         <a class="user-list-edit-link" href="{{ url_for('.service_edit_letter_contact', service_id =current_service.id, letter_contact_id = item.id) }}">Change</a>
+        {% endif %}
         {% if letter_contact_details|length  > 1 %}
           {{ api_key(item.id, thing="ID") }}
         {% endif %}

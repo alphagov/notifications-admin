@@ -18,7 +18,7 @@ from flask import (
 )
 from flask._compat import string_types
 from flask.globals import _lookup_req_object, _request_ctx_stack
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
 from functools import partial
@@ -152,6 +152,10 @@ def init_app(application):
     @application.context_processor
     def _attach_current_service():
         return {'current_service': current_service}
+
+    @application.context_processor
+    def _attach_current_user():
+        return{'current_user': current_user}
 
     @application.before_request
     def record_start_time():
