@@ -82,6 +82,7 @@ a {
   .heading-large,
   > .heading-medium {
     margin: 10px 0 15px 0;
+    word-wrap: break-word;
   }
 
   > .grid-row:first-child  {
@@ -89,6 +90,7 @@ a {
     .heading-large,
     .heading-medium {
       margin: 10px 0 15px 0;
+      word-wrap: break-word;
     }
 
   }
