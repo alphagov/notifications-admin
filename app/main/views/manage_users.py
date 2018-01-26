@@ -28,15 +28,18 @@ from app.utils import user_has_permissions
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def manage_users(service_id):
-    users = user_api_client.get_users_for_service(service_id=service_id)
-    invited_users = [invite for invite in invite_api_client.get_invites_for_service(service_id=service_id)
-                     if invite.status != 'accepted']
+    users = (
+        user_api_client.get_users_for_service(service_id=service_id) +
+        [
+            invite for invite in invite_api_client.get_invites_for_service(service_id=service_id)
+            if invite.status != 'accepted'
+        ]
+    )
 
     return render_template(
         'views/manage-users.html',
         users=users,
         current_user=current_user,
-        invited_users=invited_users
     )
 
 
