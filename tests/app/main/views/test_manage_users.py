@@ -1,3 +1,4 @@
+import copy
 import pytest
 from flask import url_for
 from bs4 import BeautifulSoup
@@ -15,13 +16,18 @@ from tests.conftest import (
 )
 
 
-@pytest.mark.parametrize('user, expected_text', [
+@pytest.mark.parametrize('user, expected_self_text, expected_coworker_text', [
     (
         active_user_with_permissions,
         (
             'Test User (you) '
             'Can Send messages Can Add and edit templates Can Manage service Can Access API keys'
         ),
+        (
+            'ZZZZZZZZ zzzzzzz@example.gov.uk '
+            'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys '
+            'Edit permissions'
+        )
     ),
     (
         active_user_view_permissions,
@@ -29,6 +35,10 @@ from tests.conftest import (
             'Test User With Permissions (you) '
             'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
         ),
+        (
+            'ZZZZZZZZ zzzzzzz@example.gov.uk '
+            'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
+        )
     ),
     (
         active_user_manage_template_permission,
@@ -36,6 +46,10 @@ from tests.conftest import (
             'Test User With Permissions (you) '
             'Can’t Send messages Can Add and edit templates Can’t Manage service Can’t Access API keys'
         ),
+        (
+            'ZZZZZZZZ zzzzzzz@example.gov.uk '
+            'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
+        )
     ),
 ])
 def test_should_show_overview_page(
@@ -44,15 +58,28 @@ def test_should_show_overview_page(
     mock_get_invites_for_service,
     fake_uuid,
     user,
-    expected_text,
+    expected_self_text,
+    expected_coworker_text,
+    active_user_view_permissions,
 ):
-    mocker.patch('app.user_api_client.get_users_for_service', return_value=[user(fake_uuid)])
+    current_user = user(fake_uuid)
+    other_user = copy.deepcopy(active_user_view_permissions)
+    other_user.email_address = 'zzzzzzz@example.gov.uk'
+    other_user.name = 'ZZZZZZZZ'
+    other_user.id = 'zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz'
+
+    mocker.patch('app.user_api_client.get_user', return_value=current_user)
+    mocker.patch('app.user_api_client.get_users_for_service', return_value=[
+        current_user,
+        other_user,
+    ])
+
     page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one('h1').text) == 'Team members'
-    assert normalize_spaces(page.select_one('.user-list-item').text) == (
-        expected_text
-    )
+    assert normalize_spaces(page.select('.user-list-item')[0].text) == expected_self_text
+    # [1:5] are invited users
+    assert normalize_spaces(page.select('.user-list-item')[6].text) == expected_coworker_text
     app.user_api_client.get_users_for_service.assert_called_once_with(service_id=SERVICE_ONE_ID)
 
 
@@ -447,25 +474,34 @@ def test_cancel_invited_user_cancels_user_invitations(
     assert response.location == url_for('main.manage_users', service_id=service['id'], _external=True)
 
 
+@pytest.mark.parametrize('invite_status, expected_text', [
+    ('pending', (
+        'invited_user@test.gov.uk (invited) '
+        'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can Access API keys '
+        'Cancel invitation'
+    )),
+    ('cancelled', (
+        'invited_user@test.gov.uk (cancelled invite) '
+        'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
+    )),
+])
 def test_manage_users_shows_invited_user(
     client_request,
     mocker,
     active_user_with_permissions,
     sample_invite,
+    invite_status,
+    expected_text,
 ):
+    sample_invite['status'] = invite_status
     data = [InvitedUser(**sample_invite)]
 
     mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
 
     page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
-
     assert page.h1.string.strip() == 'Team members'
-    assert normalize_spaces(page.select('.user-list-item')[0].text) == (
-        'invited_user@test.gov.uk (invited) '
-        'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can Access API keys '
-        'Cancel invitation'
-    )
+    assert normalize_spaces(page.select('.user-list-item')[0].text) == expected_text
 
 
 def test_manage_users_does_not_show_accepted_invite(
