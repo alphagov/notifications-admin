@@ -130,9 +130,16 @@
   }
 
   &-shim {
+
     width: 100%;
     position: relative;
     z-index: 9;
+    margin-bottom: 30px;
+
+    & + .table-show-more-link {
+      margin-top: -28px;
+    }
+
   }
 
 }
