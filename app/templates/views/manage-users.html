@@ -39,7 +39,7 @@
           {%- endif -%}
           <span class="hint">
             {%- if user.status == 'pending' -%}
-              {{ user.email_address }} (pending)
+              {{ user.email_address }} (invited)
             {%- elif user.status == 'cancelled' -%}
               {{ user.email_address }} (cancelled invite)
             {%- elif user.email_address == current_user.email_address -%}

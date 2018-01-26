@@ -462,7 +462,7 @@ def test_manage_users_shows_invited_user(
 
     assert page.h1.string.strip() == 'Team members'
     assert normalize_spaces(page.select('.user-list-item')[1].text) == (
-        'invited_user@test.gov.uk (pending) '
+        'invited_user@test.gov.uk (invited) '
         'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can Access API keys '
         'Cancel invitation'
     )
