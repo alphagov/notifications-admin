@@ -28,12 +28,12 @@ from app.utils import user_has_permissions
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
 def manage_users(service_id):
-    users = (
-        user_api_client.get_users_for_service(service_id=service_id) +
-        [
+    users = sorted(
+        user_api_client.get_users_for_service(service_id=service_id) + [
             invite for invite in invite_api_client.get_invites_for_service(service_id=service_id)
             if invite.status != 'accepted'
-        ]
+        ],
+        key=lambda user: user.email_address,
     )
 
     return render_template(

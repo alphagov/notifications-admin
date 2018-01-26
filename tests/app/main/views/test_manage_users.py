@@ -461,7 +461,7 @@ def test_manage_users_shows_invited_user(
     page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
 
     assert page.h1.string.strip() == 'Team members'
-    assert normalize_spaces(page.select('.user-list-item')[1].text) == (
+    assert normalize_spaces(page.select('.user-list-item')[0].text) == (
         'invited_user@test.gov.uk (invited) '
         'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can Access API keys '
         'Cancel invitation'
