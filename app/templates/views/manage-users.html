@@ -2,6 +2,7 @@
 {% from "components/table.html" import list_table, row, field, hidden_field_heading %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/tick-cross.html" import tick_cross %}
+{% from "components/textbox.html" import textbox %}
 
 {% set table_options = {
   'field_headings': [
@@ -29,6 +30,17 @@
       </div>
     {% endif %}
   </div>
+
+  {% if show_search_box %}
+    <div data-module="autofocus">
+      <div class="live-search" data-module="live-search" data-targets=".user-list-item">
+        {{ textbox(
+          form.search,
+          width='1-1'
+        ) }}
+      </div>
+    </div>
+  {% endif %}
 
   <div class="user-list">
     {% for user in users %}

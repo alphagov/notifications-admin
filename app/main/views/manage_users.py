@@ -17,7 +17,8 @@ from notifications_python_client.errors import HTTPError
 from app.main import main
 from app.main.forms import (
     InviteUserForm,
-    PermissionsForm
+    PermissionsForm,
+    SearchUsersForm,
 )
 from app import (user_api_client, current_service, service_api_client, invite_api_client)
 from app.notify_client.models import roles
@@ -40,6 +41,8 @@ def manage_users(service_id):
         'views/manage-users.html',
         users=users,
         current_user=current_user,
+        show_search_box=(len(users) > 7),
+        form=SearchUsersForm(),
     )
 
 
