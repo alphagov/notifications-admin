@@ -184,6 +184,8 @@ class InvitedUser(object):
         self.auth_type = auth_type
 
     def has_permissions(self, *permissions):
+        if self.status == 'cancelled':
+            return False
         return set(self.permissions) > set(permissions)
 
     def __eq__(self, other):
