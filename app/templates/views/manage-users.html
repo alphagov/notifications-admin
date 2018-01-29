@@ -2,6 +2,7 @@
 {% from "components/table.html" import list_table, row, field, hidden_field_heading %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/tick-cross.html" import tick_cross %}
+{% from "components/textbox.html" import textbox %}
 
 {% set table_options = {
   'field_headings': [
@@ -30,15 +31,30 @@
     {% endif %}
   </div>
 
-  <h2 class="visually-hidden">
-    Active
-  </h2>
+  {% if show_search_box %}
+    <div data-module="autofocus">
+      <div class="live-search" data-module="live-search" data-targets=".user-list-item">
+        {{ textbox(
+          form.search,
+          width='1-1'
+        ) }}
+      </div>
+    </div>
+  {% endif %}
+
   <div class="user-list">
     {% for user in users %}
       <div class="user-list-item">
         <h3>
-          <span class="heading-small">{{ user.name }}</span>&ensp;<span class="hint">
-            {%- if user.email_address == current_user.email_address -%}
+          {%- if user.name -%}
+            <span class="heading-small">{{ user.name }}</span>&ensp;
+          {%- endif -%}
+          <span class="hint">
+            {%- if user.status == 'pending' -%}
+              {{ user.email_address }} (invited)
+            {%- elif user.status == 'cancelled' -%}
+              {{ user.email_address }} (cancelled invite)
+            {%- elif user.email_address == current_user.email_address -%}
               (you)
             {% else %}
               {{ user.email_address }}
@@ -74,66 +90,17 @@
             {% endif %}
           </div>
           {% if current_user.has_permissions('manage_users', admin_override=True) %}
-            {% if current_user.id != user.id %}
-              <li class="tick-cross-list-edit-link">
+            <li class="tick-cross-list-edit-link">
+              {% if user.status == 'pending' %}
+                <a href="{{ url_for('.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Cancel invitation</a>
+              {% elif user.status == 'active' and current_user.id != user.id %}
                 <a href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Edit permissions</a>
-              </li>
-            {% endif %}
+              {% endif %}
+            </li>
           {% endif %}
         </ul>
       </div>
     {% endfor %}
   </div>
-
-  {% if invited_users %}
-    <h2 class="heading-medium">
-      Invited
-    </h2>
-    <div class="user-list">
-      {% for user in invited_users %}
-        <div class="user-list-item">
-          <h3>
-            <span style="font-weight: bold">{{ user.email_address }}</span>
-          </h3>
-          <ul class="tick-cross-list">
-            <div class="tick-cross-list-permissions">
-              {{ tick_cross(
-                user.has_permissions('send_texts', 'send_emails', 'send_letters'),
-                'Send messages'
-              ) }}
-              {{ tick_cross(
-                user.has_permissions('manage_templates'),
-                'Add and edit templates'
-              ) }}
-              {{ tick_cross(
-                user.has_permissions('manage_users', 'manage_settings'),
-                'Manage service'
-              ) }}
-              {{ tick_cross(
-                user.has_permissions('manage_api_keys'),
-                'Access API keys'
-              ) }}
-            {% if 'email_auth' in current_service['permissions'] %}
-              <div class="tick-cross-list-hint">
-                {% if user.auth_type == 'sms_auth' %}
-                  Signs in with a text message code
-                {% else %}
-                  Signs in with an email link
-                {% endif %}
-              </div>
-            {% endif %}
-            </div>
-            <li class="tick-cross-list-edit-link">
-              {% if user.status == 'pending' and current_user.has_permissions('manage_users') %}
-                <a href="{{ url_for('.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Cancel invitation</a>
-              {% else %}
-                {{ user.status|title }}
-              {% endif %}
-            </li>
-          </ul>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
 
 {% endblock %}

@@ -735,6 +735,11 @@ class SearchTemplatesForm(StripWhitespaceForm):
     search = SearchField('Search by name')
 
 
+class SearchUsersForm(StripWhitespaceForm):
+
+    search = SearchField('Search by name or email address')
+
+
 class SearchNotificationsForm(StripWhitespaceForm):
 
     to = SearchField('Search by phone number or email address')
