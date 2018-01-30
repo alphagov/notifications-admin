@@ -99,6 +99,7 @@ class Config(object):
         r"marinemanagement\.org\.uk",
         r"britishmuseum\.org",
         r"derrystrabane\.com",
+        r"highwaysengland\.co\.uk",
     ]
 
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
