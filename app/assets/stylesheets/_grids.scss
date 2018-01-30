@@ -95,6 +95,10 @@
   text-align: right;
 }
 
+.align-with-big-number-hint {
+  margin-top: $gutter / 0.6;
+}
+
 .global-cookie-message {
   p {
     @extend %site-width-container;
