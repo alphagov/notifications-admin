@@ -1,4 +1,3 @@
-import re
 import pytz
 import weakref
 
@@ -30,7 +29,14 @@ from wtforms.fields.html5 import EmailField, TelField, SearchField
 from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
 from flask_wtf.file import FileField as FileField_wtf, FileAllowed
 
-from app.main.validators import (Blacklist, CsvFileValidator, ValidGovEmail, NoCommasInPlaceHolders, OnlyGSMCharacters)
+from app.main.validators import (
+    Blacklist,
+    CsvFileValidator,
+    ValidGovEmail,
+    NoCommasInPlaceHolders,
+    OnlyGSMCharacters,
+    LettersAndNumbersOnly,
+)
 
 
 def get_time_value_and_label(future_time):
@@ -553,14 +559,11 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
         'Text message sender',
         validators=[
             DataRequired(message="Can’t be empty"),
-            Length(max=11, message="Enter 11 characters or fewer")
+            Length(max=11, message="Enter 11 characters or fewer"),
+            LettersAndNumbersOnly(),
         ]
     )
     is_default = BooleanField("Make this text message sender the default")
-
-    def validate_sms_sender(self, field):
-        if field.data and not re.match(r'^[a-zA-Z0-9\s]+$', field.data):
-            raise ValidationError('Use letters and numbers only')
 
 
 class ServiceEditInboundNumberForm(StripWhitespaceForm):

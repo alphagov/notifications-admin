@@ -1,3 +1,4 @@
+import re
 from wtforms import ValidationError
 from notifications_utils.field import Field
 from notifications_utils.gsm import get_non_gsm_compatible_characters
@@ -63,3 +64,15 @@ class OnlyGSMCharacters:
                     ('It' if len(non_gsm_characters) == 1 else 'They')
                 )
             )
+
+
+class LettersAndNumbersOnly:
+
+    regex = re.compile(r'^[a-zA-Z0-9\s]+$')
+
+    def __init__(self, message='Use letters and numbers only'):
+        self.message = message
+
+    def __call__(self, form, field):
+        if field.data and not re.match(self.regex, field.data):
+            raise ValidationError(self.message)
