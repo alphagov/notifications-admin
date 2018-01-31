@@ -809,24 +809,35 @@ def test_incorrect_letter_contact_block_input(
 
 
 @pytest.mark.parametrize('sms_sender_input, expected_error', [
+    ('elevenchars', None),
     ('', 'Can’t be empty'),
     ('abcdefghijkhgkg', 'Enter 11 characters or fewer'),
     (' ¯\_(ツ)_/¯ ', 'Use letters and numbers only'),
+    ('blood.co.uk', 'Use letters and numbers only'),
 ])
 def test_incorrect_sms_sender_input(
     sms_sender_input,
     expected_error,
     client_request,
-    no_sms_senders
+    no_sms_senders,
+    mock_add_sms_sender,
 ):
     page = client_request.post(
         'main.service_add_sms_sender',
         service_id=SERVICE_ONE_ID,
         _data={'sms_sender': sms_sender_input},
-        _expected_status=200
+        _expected_status=(200 if expected_error else 302)
     )
 
-    assert normalize_spaces(page.select_one('.error-message').text) == expected_error
+    error_message = page.select_one('.error-message')
+    count_of_api_calls = len(mock_add_sms_sender.call_args_list)
+
+    if not expected_error:
+        assert not error_message
+        assert count_of_api_calls == 1
+    else:
+        assert normalize_spaces(error_message.text) == expected_error
+        assert count_of_api_calls == 0
 
 
 @pytest.mark.parametrize('fixture, data, api_default_args', [
