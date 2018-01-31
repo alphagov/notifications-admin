@@ -66,9 +66,9 @@ class OnlyGSMCharacters:
             )
 
 
-class LettersAndNumbersOnly:
+class LettersNumbersAndFullStopsOnly:
 
-    regex = re.compile(r'^[a-zA-Z0-9\s]+$')
+    regex = re.compile(r'^[a-zA-Z0-9\s\.]+$')
 
     def __init__(self, message='Use letters and numbers only'):
         self.message = message

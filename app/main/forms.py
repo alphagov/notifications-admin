@@ -35,7 +35,7 @@ from app.main.validators import (
     ValidGovEmail,
     NoCommasInPlaceHolders,
     OnlyGSMCharacters,
-    LettersAndNumbersOnly,
+    LettersNumbersAndFullStopsOnly,
 )
 
 
@@ -560,7 +560,7 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
         validators=[
             DataRequired(message="Can’t be empty"),
             Length(max=11, message="Enter 11 characters or fewer"),
-            LettersAndNumbersOnly(),
+            LettersNumbersAndFullStopsOnly(),
         ]
     )
     is_default = BooleanField("Make this text message sender the default")
