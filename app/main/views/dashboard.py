@@ -227,15 +227,17 @@ def get_inbox_partials(service_id):
     if 'inbound_sms' not in current_service['permissions']:
         abort(403)
 
-    messages_to_show = list()
     inbound_messages = service_api_client.get_inbound_sms(service_id)
 
+    messages_to_show = {}
+    # get the most recent message for each number
     for message in inbound_messages:
-        if format_phone_number_human_readable(message['user_number']) not in {
-            format_phone_number_human_readable(message['user_number'])
-            for message in messages_to_show
-        }:
-            messages_to_show.append(message)
+        human_readable = format_phone_number_human_readable(message['user_number'])
+        if human_readable not in messages_to_show:
+            messages_to_show[human_readable] = message
+
+    count_of_users = len(messages_to_show)
+    messages_to_show = sorted(messages_to_show.values(), key=lambda x: x['created_at'], reverse=True)
 
     if not inbound_messages:
         inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)['data']['number']
@@ -244,9 +246,9 @@ def get_inbox_partials(service_id):
 
     return {'messages': render_template(
         'views/dashboard/_inbox_messages.html',
-        messages=messages_to_show,
+        messages=list(messages_to_show),
         count_of_messages=len(inbound_messages),
-        count_of_users=len(messages_to_show),
+        count_of_users=count_of_users,
         inbound_number=inbound_number,
     )}
 
