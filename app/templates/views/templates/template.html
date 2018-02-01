@@ -23,7 +23,7 @@
         </ul>
         <form method='post'>
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <input type="submit" class="button" name="delete" value="Confirm" />
+          <button type="submit" class="button" name="delete">Confirm</button>
         </form>
       {% endcall %}
     </div>
@@ -37,7 +37,7 @@
         {% endif %}
         <form method='post'>
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <input type="submit" class="button" name="delete" value="Confirm" />
+          <button type="submit" class="button" name="delete">Confirm</button>
         </form>
       {% endcall %}
     </div>

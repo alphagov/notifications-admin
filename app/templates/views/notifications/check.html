@@ -51,7 +51,7 @@
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       {% if not error %}
         {% if template.template_type != 'letter' or not request.args.from_test %}
-        <input type="submit" class="button" value="Send 1 {{ message_count_label(1, template.template_type, suffix='') }}" />
+        <button type="submit" class="button">Send 1 {{ message_count_label(1, template.template_type, suffix='') }}</button>
         {% else %}
           <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_type=template.template_type, upload_id=upload_id, filetype='pdf') }}" download class="button">Download as a printable PDF</a>
         {% endif %}
