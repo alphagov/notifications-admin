@@ -237,7 +237,7 @@ def get_inbox_partials(service_id):
             messages_to_show[human_readable] = message
 
     count_of_users = len(messages_to_show)
-    messages_to_show = reversed(sorted(messages_to_show.values(), key=lambda x: x['created_at']))
+    messages_to_show = sorted(messages_to_show.values(), key=lambda x: x['created_at'], reverse=True)
 
     if not inbound_messages:
         inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)['data']['number']
