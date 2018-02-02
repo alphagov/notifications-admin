@@ -13,7 +13,7 @@
     {% if delete_button %}
       <form method='post'>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        <input type="submit" class="button" name="delete" value="{{ delete_button }}" />
+        <button type="submit" class="button" name="delete">{{ delete_button }}</button
       </form>
     {% endif %}
   </div>

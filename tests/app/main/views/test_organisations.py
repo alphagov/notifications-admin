@@ -148,7 +148,7 @@ def test_shows_temp_logo_after_uploading_logo(request_post_manage_org_redirect):
 
 def test_save_enabled_after_uploading_logo(request_post_manage_org_redirect):
     page, _ = request_post_manage_org_redirect
-    assert not page.select_one('div.page-footer input.button').has_attr('disabled')
+    assert not page.select_one('div.page-footer button.button').has_attr('disabled')
 
 
 def test_deletes_previous_temp_logo_after_uploading_logo(logged_in_platform_admin_client, mocker, fake_uuid):

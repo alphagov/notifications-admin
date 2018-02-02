@@ -26,6 +26,6 @@
     {% endif %}
     <label class="file-upload-filename" for="{{ field.name }}"></label>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-    <input type="submit" class="file-upload-submit" value="Submit" />
+    <button type="submit" class="file-upload-submit">Submit</button>
   </form>
 {% endmacro %}

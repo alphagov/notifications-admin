@@ -611,7 +611,7 @@ def test_send_test_doesnt_show_file_contents(
     assert page.select('h1')[0].text.strip() == 'Preview of Two week reminder'
     assert len(page.select('table')) == 0
     assert len(page.select('.banner-dangerous')) == 0
-    assert page.select('input[type=submit]')[0]['value'].strip() == 'Send 1 text message'
+    assert page.select_one('button[type=submit]').text.strip() == 'Send 1 text message'
 
 
 @pytest.mark.parametrize('endpoint, template_mock, expected_recipient', [

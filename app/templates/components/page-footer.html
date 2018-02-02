@@ -11,7 +11,7 @@
   <div class="page-footer">
     {% if button_text %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <input type="submit" class="button{% if destructive %}-destructive{% endif %}" value="{{ button_text }}" />
+      <button type="submit" class="button{% if destructive %}-destructive{% endif %}">{{ button_text }}</button>
     {% endif %}
     {% if back_link %}
       <a class="page-footer-back-link" href="{{ back_link }}">{{ back_link_text }}</a>
