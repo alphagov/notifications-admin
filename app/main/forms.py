@@ -516,7 +516,7 @@ class RequestToGoLiveForm(StripWhitespaceForm):
     mou = RadioField(
         (
             'Has your organisation accepted the GOV.UK&nbsp;Notify data sharing and financial '
-            'agreement (Memorandum of Understanding)?'
+            'agreement?'
         ),
         choices=[
             ('yes', 'Yes'),
