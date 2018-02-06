@@ -445,31 +445,33 @@ class GovernmentDomain:
 
     with open('{}/domains.yml'.format(_dir_path)) as domains:
         domains = yaml.safe_load(domains)
+        domain_names = sorted(domains.keys(), key=len)
 
     def __init__(self, email_address_or_domain):
 
         try:
-            self._match = sorted(
-                (
-                    domain for domain in self.domains.keys()
-                    if self._domain_matches(email_address_or_domain, domain)
-                ),
-                key=len
-            )[0]
-        except IndexError:
+            self._match = next(filter(
+                self.get_matching_function(email_address_or_domain),
+                self.domain_names,
+            ))
+        except StopIteration:
             raise NotGovernmentDomain()
 
         self.owner, self.sector, self.agreement_signed = self._get_details_of_domain()
 
     @staticmethod
-    def _domain_matches(email_address_or_domain, domain):
+    def get_matching_function(email_address_or_domain):
 
         email_address_or_domain = email_address_or_domain.lower()
 
-        return (email_address_or_domain == domain) or re.search(
-            "[\.|@]({})$".format(domain.replace(".", "\.")),
-            email_address_or_domain
-        )
+        def fn(domain):
+
+            return (email_address_or_domain == domain) or re.search(
+                "[\.|@]({})$".format(domain.replace(".", "\.")),
+                email_address_or_domain
+            )
+
+        return fn
 
     def _get_details_of_domain(self):
 
