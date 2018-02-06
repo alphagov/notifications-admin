@@ -335,3 +335,26 @@ def test_get_valid_government_domain_some_known_details():
     assert government_domain.sector is None
     assert government_domain.owner == "Marine Management Organisation"
     assert government_domain.agreement_signed is False
+
+
+def test_validate_government_domain_data():
+
+    for domain in GovernmentDomain.domains.keys():
+
+        government_domain = GovernmentDomain(domain)
+
+        assert government_domain.sector in {
+            'local', 'central', None
+        }
+
+        assert (
+            government_domain.owner is None
+        ) or (
+            isinstance(government_domain.owner, str)
+        )
+
+        assert (
+            government_domain.agreement_signed is True
+        ) or (
+            government_domain.agreement_signed is False
+        )

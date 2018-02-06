@@ -1,0 +1,43 @@
+---
+gov.uk:
+mod.uk:
+mil.uk:
+ddc-mod.org:
+slc.co.uk:
+  owner: Student Loans Company
+gov.scot:
+parliament.uk:
+  owner: Parliament
+nhs.uk:
+  owner: NHS
+nhs.net: nhs.uk
+police.uk:
+communities.gsi.gov.uk:
+  owner: "Ministry of Housing, Communities & Local Government"
+dclgdatamart.co.uk: communities.gsi.gov.uk
+dwp.gov.uk:
+  owner: Deparment for Work and Pensions
+dwp.gsi.gov.uk: dwp.gov.uk
+ucds.email: dwp.gov.uk
+naturalengland.org.uk:
+  Owner: Natural England
+hmcts.net:
+  owner: Her Majesty’s Courts and Tribunals Service
+scotent.co.uk:
+assembly.wales:
+cjsm.net:
+cqc.org.uk:
+bl.uk:
+  owner: British Library
+stfc.ac.uk:
+wmfs.net:
+bbsrc.ac.uk:
+acas.org.uk:
+gov.wales:
+biglotteryfund.org.uk:
+marinemanagement.org.uk:
+  owner: Marine Management Organisation
+britishmuseum.org:
+  owner: British Museum
+derrystrabane.com:
+highwaysengland.co.uk:

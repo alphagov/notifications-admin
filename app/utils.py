@@ -1,5 +1,8 @@
+import os
 import re
 import csv
+import yaml
+
 from itertools import chain
 
 import pytz
@@ -438,75 +441,10 @@ class NotGovernmentDomain(Exception):
 
 class GovernmentDomain:
 
-    domains = {
-        "gov.uk": None,
-        "mod.uk": None,
-        "mil.uk": None,
-        "ddc-mod.org": None,
-        "slc.co.uk": {
-            "owner": "Student Loans Company",
-            "sector": None,
-            "agreement_signed": False,
-        },
-        "gov.scot": None,
-        "parliament.uk": {
-            "owner": "Parliament",
-            "sector": None,
-            "agreement_signed": False,
-        },
-        "nhs.uk": {
-            "owner": "NHS",
-            "sector": None,
-            "agreement_signed": False,
-        },
-        "nhs.net": "nhs.uk",
-        "police.uk": None,
-        "dclgdatamart.co.uk": {
-            "owner": None,
-            "sector": None,
-            "agreement_signed": False,
-        },
-        "dwp.gov.uk": {
-            "owner": "Deparment for Work and Pensions",
-            "sector": None,
-            "agreement_signed": False,
-        },
-        "dwp.gsi.gov.uk": "dwp.gov.uk",
-        "ucds.email": "dwp.gov.uk",
-        "naturalengland.org.uk": {
-            "Owner": "Natural England",
-            "sector": None,
-            "agreement_signed": False,
-        },
-        "hmcts.net": {
-            "owner": "Her Majesty’s Courts and Tribunals Service",
-            "sector": None,
-            "agreement_signed": False,
-        },
-        "scotent.co.uk": None,
-        "assembly.wales": None,
-        "cjsm.net": None,
-        "cqc.org.uk": None,
-        "bl.uk": {
-            "owner": "British Library",
-            "sector": None,
-            "agreement_signed": False,
-        },
-        "stfc.ac.uk": None,
-        "wmfs.net": None,
-        "bbsrc.ac.uk": None,
-        "acas.org.uk": None,
-        "gov.wales": None,
-        "biglotteryfund.org.uk": None,
-        "marinemanagement.org.uk": {
-            "owner": "Marine Management Organisation",
-        },
-        "britishmuseum.org": {
-            "owner": "British Museum",
-        },
-        "derrystrabane.com": None,
-        "highwaysengland.co.uk": None,
-    }
+    _dir_path = os.path.dirname(os.path.realpath(__file__))
+
+    with open('{}/domains.yml'.format(_dir_path)) as domains:
+        domains = yaml.safe_load(domains)
 
     def __init__(self, email_address_or_domain):
 
