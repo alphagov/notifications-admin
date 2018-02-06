@@ -334,7 +334,7 @@ def test_get_valid_government_domain_some_known_details():
     government_domain = GovernmentDomain("marinemanagement.org.uk")
     assert government_domain.sector is None
     assert government_domain.owner == "Marine Management Organisation"
-    assert government_domain.agreement_signed is False
+    assert government_domain.agreement_signed is True
 
 
 def test_validate_government_domain_data():
