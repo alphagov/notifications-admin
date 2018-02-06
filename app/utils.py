@@ -438,41 +438,128 @@ class NotGovernmentDomain(Exception):
 
 class GovernmentDomain:
 
-    domains = [
-        "gov.uk",
-        "mod.uk",
-        "mil.uk",
-        "ddc-mod.org",
-        "slc.co.uk",
-        "gov.scot",
-        "parliament.uk",
-        "nhs.uk",
-        "nhs.net",
-        "police.uk",
-        "dclgdatamart.co.uk",
-        "ucds.email",
-        "naturalengland.org.uk",
-        "hmcts.net",
-        "scotent.co.uk",
-        "assembly.wales",
-        "cjsm.net",
-        "cqc.org.uk",
-        "bl.uk",
-        "stfc.ac.uk",
-        "wmfs.net",
-        "bbsrc.ac.uk",
-        "acas.org.uk",
-        "gov.wales",
-        "biglotteryfund.org.uk",
-        "marinemanagement.org.uk",
-        "britishmuseum.org",
-        "derrystrabane.com",
-        "highwaysengland.co.uk",
-    ]
+    domains = {
+        "gov.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "mod.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "mil.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "ddc-mod.org": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "slc.co.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "gov.scot": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "parliament.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "nhs.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "nhs.net": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "police.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "dclgdatamart.co.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "ucds.email": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "naturalengland.org.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "hmcts.net": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "scotent.co.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "assembly.wales": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "cjsm.net": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "cqc.org.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "bl.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "stfc.ac.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "wmfs.net": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "bbsrc.ac.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "acas.org.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "gov.wales": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "biglotteryfund.org.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "marinemanagement.org.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "britishmuseum.org": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "derrystrabane.com": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+        "highwaysengland.co.uk": {
+            "sector": None,
+            "agreement_signed": False,
+        },
+    }
 
     def __init__(self, email_address_or_domain):
 
-        for domain in self.domains:
+        for domain, attributes in self.domains.items():
             if re.search(
                 "[\.|@]({})$".format(domain.replace(".", "\.")),
                 email_address_or_domain.lower()
