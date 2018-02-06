@@ -466,9 +466,12 @@ class GovernmentDomain:
 
         def fn(domain):
 
-            return (email_address_or_domain == domain) or re.search(
-                "[\.|@]({})$".format(domain.replace(".", "\.")),
-                email_address_or_domain
+            return (
+                email_address_or_domain == domain
+            ) or (
+                email_address_or_domain.endswith("@{}".format(domain))
+            ) or (
+                email_address_or_domain.endswith(".{}".format(domain))
             )
 
         return fn
