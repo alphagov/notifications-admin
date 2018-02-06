@@ -438,9 +438,41 @@ class NotGovernmentDomain(Exception):
 
 class GovernmentDomain:
 
+    domains = [
+        r"gov\.uk",
+        r"mod\.uk",
+        r"mil\.uk",
+        r"ddc-mod\.org",
+        r"slc\.co\.uk",
+        r"gov\.scot",
+        r"parliament\.uk",
+        r"nhs\.uk",
+        r"nhs\.net",
+        r"police\.uk",
+        r"dclgdatamart\.co\.uk",
+        r"ucds\.email",
+        r"naturalengland\.org\.uk",
+        r"hmcts\.net",
+        r"scotent\.co\.uk",
+        r"assembly\.wales",
+        r"cjsm\.net",
+        r"cqc\.org\.uk",
+        r"bl\.uk",
+        r"stfc\.ac\.uk",
+        r"wmfs\.net",
+        r"bbsrc\.ac\.uk",
+        r"acas\.org\.uk",
+        r"gov\.wales",
+        r"biglotteryfund\.org\.uk",
+        r"marinemanagement\.org\.uk",
+        r"britishmuseum\.org",
+        r"derrystrabane\.com",
+        r"highwaysengland\.co\.uk",
+    ]
+
     def __init__(self, email_address_or_domain):
 
-        for domain in current_app.config['EMAIL_DOMAIN_REGEXES']:
+        for domain in self.domains:
             if re.search(
                 r"[\.|@]({})$".format(domain),
                 email_address_or_domain.lower()
