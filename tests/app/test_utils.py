@@ -311,13 +311,13 @@ def test_get_cdn_domain_on_non_localhost(client, mocker):
 
 
 @pytest.mark.parametrize("domain_or_email_address", (
-    "test@ucds.email", "test@dwp.gsi.gov.uk", "test@dwp.gov.uk", "dwp.gov.uk",
+    "test@dclgdatamart.co.uk", "test@communities.gsi.gov.uk", "test@communities.gov.uk",
 ))
 def test_get_valid_government_domain_known_details(domain_or_email_address):
     government_domain = GovernmentDomain(domain_or_email_address)
-    assert government_domain.sector is None
-    assert government_domain.owner is None
-    assert government_domain.agreement_signed is False
+    assert government_domain.crown_status is None
+    assert government_domain.owner == "Ministry of Housing, Communities & Local Government"
+    assert government_domain.agreement_signed is True
 
 
 @pytest.mark.parametrize("domain_or_email_address", (
@@ -325,14 +325,14 @@ def test_get_valid_government_domain_known_details(domain_or_email_address):
 ))
 def test_get_valid_government_domain_unknown_details(domain_or_email_address):
     government_domain = GovernmentDomain(domain_or_email_address)
-    assert government_domain.sector is None
+    assert government_domain.crown_status is None
     assert government_domain.owner is None
-    assert government_domain.agreement_signed is False
+    assert government_domain.agreement_signed is None
 
 
 def test_get_valid_government_domain_some_known_details():
     government_domain = GovernmentDomain("marinemanagement.org.uk")
-    assert government_domain.sector is None
+    assert government_domain.crown_status is None
     assert government_domain.owner == "Marine Management Organisation"
     assert government_domain.agreement_signed is True
 
@@ -340,34 +340,31 @@ def test_get_valid_government_domain_some_known_details():
 def test_get_valid_government_domain_gets_most_specific_first():
 
     generic = GovernmentDomain("gov.uk")
-    assert generic.sector is None
+    assert generic.crown_status is None
     assert generic.owner is None
-    assert generic.agreement_signed is False
+    assert generic.agreement_signed is None
 
     specific = GovernmentDomain("dacorum.gov.uk")
-    assert specific.sector is None
-    assert specific.owner is None
-    assert specific.agreement_signed is False
+    assert specific.crown_status is False
+    assert specific.owner == 'Dacorum Borough Council'
+    assert specific.agreement_signed is True
 
 
-def test_validate_government_domain_data():
+@pytest.mark.parametrize('domain', GovernmentDomain.domains.keys())
+def test_validate_government_domain_data(domain):
 
-    for domain in GovernmentDomain.domains.keys():
+    government_domain = GovernmentDomain(domain)
 
-        government_domain = GovernmentDomain(domain)
+    assert government_domain.crown_status in {
+        True, False, None
+    }
 
-        assert government_domain.sector in {
-            'local', 'central', None
-        }
+    assert (
+        government_domain.owner is None
+    ) or (
+        isinstance(government_domain.owner, str)
+    )
 
-        assert (
-            government_domain.owner is None
-        ) or (
-            isinstance(government_domain.owner, str)
-        )
-
-        assert (
-            government_domain.agreement_signed is True
-        ) or (
-            government_domain.agreement_signed is False
-        )
+    assert government_domain.agreement_signed in {
+        True, False, None
+    }

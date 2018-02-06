@@ -284,9 +284,9 @@ def get_help_argument():
 
 def is_gov_user(email_address):
     try:
-        GovernmentDomain(email_address, domain_list='email_domain_names')
+        GovernmentEmailDomain(email_address)
         return True
-    except NotGovernmentDomain:
+    except NotGovernmentEmailDomain:
         return False
 
 
@@ -435,33 +435,27 @@ def set_status_filters(filter_args):
     )))
 
 
-class NotGovernmentDomain(Exception):
-    pass
+_dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
 class GovernmentDomain:
 
-    _dir_path = os.path.dirname(os.path.realpath(__file__))
-
     with open('{}/domains.yml'.format(_dir_path)) as domains:
         domains = yaml.safe_load(domains)
-        domain_names = sorted(domains.keys(), key=len)
+        domain_names = sorted(domains.keys(), key=len, reverse=True)
 
-    with open('{}/email_domains.yml'.format(_dir_path)) as email_domains:
-        email_domain_names = yaml.safe_load(email_domains)
+    def __init__(self, email_address_or_domain):
 
-    def __init__(self, email_address_or_domain, domain_list='domain_names'):
+        self._match = next(filter(
+            self.get_matching_function(email_address_or_domain),
+            self.domain_names,
+        ), None)
 
-        try:
-            self._match = next(filter(
-                self.get_matching_function(email_address_or_domain),
-                getattr(self, domain_list),
-            ))
-        except StopIteration:
-            raise NotGovernmentDomain()
-
-        if domain_list == 'domain_names':
-            self.owner, self.sector, self.agreement_signed = self._get_details_of_domain()
+        (
+            self.owner,
+            self.crown_status,
+            self.agreement_signed
+        ) = self._get_details_of_domain()
 
     @staticmethod
     def get_matching_function(email_address_or_domain):
@@ -482,7 +476,7 @@ class GovernmentDomain:
 
     def _get_details_of_domain(self):
 
-        details = self.domains[self._match]
+        details = self.domains.get(self._match) or {}
 
         if isinstance(details, str):
             return GovernmentDomain(details)._get_details_of_domain()
@@ -490,13 +484,25 @@ class GovernmentDomain:
         elif isinstance(details, dict):
             return(
                 details.get("owner"),
-                details.get("sector"),
-                bool(details.get("agreement_signed")),
+                details.get("crown"),
+                details.get("agreement_signed"),
             )
 
-        else:
-            return(
-                None,
-                None,
-                False,
-            )
+
+class NotGovernmentEmailDomain(Exception):
+    pass
+
+
+class GovernmentEmailDomain(GovernmentDomain):
+
+    with open('{}/email_domains.yml'.format(_dir_path)) as email_domains:
+        domain_names = yaml.safe_load(email_domains)
+
+    def __init__(self, email_address_or_domain):
+        try:
+            self._match = next(filter(
+                self.get_matching_function(email_address_or_domain),
+                self.domain_names,
+            ))
+        except StopIteration:
+            raise NotGovernmentEmailDomain()

@@ -7,48 +7,20 @@ ddc-mod.org:
 slc.co.uk:
   owner: Student Loans Company
   agreement_signed: true
-gov.scot:
-parliament.uk:
-  owner: Parliament
-nhs.uk:
-  owner: NHS
-nhs.net: nhs.uk
-police.uk:
 dclgdatamart.co.uk: communities.gov.uk
 communities.gsi.gov.uk: communities.gov.uk
 communities.gov.uk:
   owner: "Ministry of Housing, Communities & Local Government"
   agreement_signed: true
-dwp.gov.uk:
-  owner: Deparment for Work and Pensions
-dwp.gsi.gov.uk: dwp.gov.uk
-ucds.email: dwp.gov.uk
-naturalengland.org.uk:
-  Owner: Natural England
 hmcts.net:
   owner: Her Majesty’s Courts and Tribunals Service
   agreement_signed: true
-scotent.co.uk:
-assembly.wales:
-cjsm.net:
 cqc.org.uk:
   owner: Care Quality Commission
   agreement_signed: true
-bl.uk:
-  owner: British Library
-stfc.ac.uk:
-wmfs.net:
-bbsrc.ac.uk:
-acas.org.uk:
-gov.wales:
-biglotteryfund.org.uk:
 marinemanagement.org.uk:
   owner: Marine Management Organisation
   agreement_signed: true
-britishmuseum.org:
-  owner: British Museum
-derrystrabane.com:
-highwaysengland.co.uk:
 cabinet-office.gov.uk:
   owner: Cabinet Office
   agreement_signed: true
@@ -74,6 +46,7 @@ foodstandards.gov.uk:
 gla.gsi.gov.uk: gla.gov.uk
 gla.gov.uk:
   owner: The Gangmasters and Labour Abuse Authority
+  agreement_signed: true
 governmentlegal.gov.uk:
   owner: Government Legal Department
   agreement_signed: true
@@ -177,6015 +150,6015 @@ rpa.gov.uk:
 
 # Local Government
 abbotslangley-pc.gov.uk:
-  sector: local
   owner: Abbots Langley Parish Council
+  crown: false
 aberdeencityandshire-sdpa.gov.uk:
-  sector: local
   owner: Aberdeen City Council
+  crown: false
 aberdeencity.gov.uk:
-  sector: local
   owner: Aberdeen City Council
+  crown: false
 aberdeenshire.gov.uk:
-  sector: local
   owner: Aberdeenshire Council
+  crown: false
 aberford-pc.gov.uk:
-  sector: local
   owner: Aberford & District Parish Council
+  crown: false
 AbergavennyTownCouncil.gov.uk:
-  sector: local
   owner: Abergavenny Town Council
+  crown: false
 aberporthcommunitycouncil.gov.uk:
-  sector: local
   owner: Aberporth Community Council
+  crown: false
 abertilleryandllanhilleth-wcc.gov.uk:
-  sector: local
   owner: Abertilly and Llanhilleth Community Council
+  crown: false
 aberystwyth.gov.uk:
-  sector: local
   owner: Aberystwyth Town Council
+  crown: false
 abingdon.gov.uk:
-  sector: local
   owner: Abingdon Town Council
+  crown: false
 abinger-pc.gov.uk:
-  sector: local
   owner: Mole Valley District Council
+  crown: false
 acastermalbis-pc.gov.uk:
-  sector: local
   owner: Acaster Malbis Parish Council
+  crown: false
 ackworthparishcouncil.gov.uk:
-  sector: local
   owner: Ackworth Parish Council
+  crown: false
 actoncommunitycouncil.gov.uk:
-  sector: local
   owner: Acton Community Council
+  crown: false
 addingham-pc.gov.uk:
-  sector: local
   owner: Addingham Parish Council
+  crown: false
 adurdc.gov.uk:
-  sector: local
   owner: Adur District Council
+  crown: false
 adur.gov.uk:
-  sector: local
   owner: Adur District Council
+  crown: false
 adur-worthing.gov.uk:
-  sector: local
   owner: Adur District Council
+  crown: false
 aiskewleemingbar-pc.gov.uk:
-  sector: local
   owner: Aiskew and Leeming Bar Parish Council
+  crown: false
 akeleyparishcouncil.gov.uk:
-  sector: local
   owner: Akeley Parish Council
+  crown: false
 AlbrightonParishCouncil.gov.uk:
-  sector: local
   owner: Albrighton Parish Council
+  crown: false
 alcester-tc.gov.uk:
-  sector: local
   owner: Alcester Town Council
+  crown: false
 alconburyparishcouncil.gov.uk:
-  sector: local
   owner: Alconbury Parish Council
+  crown: false
 aldenham-pc.gov.uk:
-  sector: local
   owner: Aldenham Parish Council
+  crown: false
 alderburyparishcouncil.gov.uk:
-  sector: local
   owner: Alderbury Parish Council
+  crown: false
 aldercarandlangleymillparishcouncil.gov.uk:
-  sector: local
   owner: Aldercar and Langley Mill Parish Council
+  crown: false
 alderholtparishcouncil.gov.uk:
-  sector: local
   owner: Alderholt Parish Council
+  crown: false
 alderleyedge-pc.gov.uk:
-  sector: local
   owner: Alderley Edge Parish Council
+  crown: false
 alderminster-pc.gov.uk:
-  sector: local
   owner: Alderminster Parish Council
+  crown: false
 aldwickparishcouncil.gov.uk:
-  sector: local
   owner: Aldwick Parish Council
+  crown: false
 alkboroughwalcotparishcouncil.gov.uk:
-  sector: local
   owner: Alkborough and Walcot Parish Council
+  crown: false
 allbrookandnorthboyatt-pc.gov.uk:
-  sector: local
   owner: Allbrook and North Boyatt Parish Council
+  crown: false
 allerdale.gov.uk:
-  sector: local
   owner: Allerdale Borough Council
+  crown: false
 allhallowskent-pc.gov.uk:
-  sector: local
   owner: Allhallows Parish Council
+  crown: false
 almondsburyparishcouncil.gov.uk:
-  sector: local
   owner: Almondsbury Parish Council
+  crown: false
 alnwick-tc.gov.uk:
-  sector: local
   owner: Alnwick Town Council
+  crown: false
 alton.gov.uk:
-  sector: local
   owner: Alton Town Council
+  crown: false
 alvechurch.gov.uk:
-  sector: local
   owner: Alvechurch Parish Council
+  crown: false
 ambervalley.gov.uk:
-  sector: local
   owner: Amber Valley Borough Council
+  crown: false
 amble.gov.uk:
-  sector: local
   owner: Amble Town Council
+  crown: false
 amersham-tc.gov.uk:
-  sector: local
   owner: Amersham Town Council
+  crown: false
 amesburytowncouncil.gov.uk:
-  sector: local
   owner: Amesbury Town Council
+  crown: false
 amotherby-pc.gov.uk:
-  sector: local
   owner: Amotherby Parish Council
+  crown: false
 andover-tc.gov.uk:
-  sector: local
   owner: Andover Town Council
+  crown: false
 anglesey.gov.uk:
-  sector: local
   owner: Isle of Anglesey County Council
+  crown: false
 angleseystaffs-pc.gov.uk:
-  sector: local
   owner: Anglesey Parish Council
+  crown: false
 angliarevenues.gov.uk:
-  sector: local
   owner: St Edmundsbury Borough Council
+  crown: false
 angmeringparishcouncil.gov.uk:
-  sector: local
   owner: Angmering Parish Council
+  crown: false
 angmering-pc.gov.uk:
-  sector: local
   owner: Angmering Parish Council
+  crown: false
 angus.gov.uk:
-  sector: local
   owner: Angus Council
+  crown: false
 anston.gov.uk:
-  sector: local
   owner: Anston Parish Council
+  crown: false
 anstystaplefield-pc.gov.uk:
-  sector: local
   owner: Ansty and Staplefield Parish Council
+  crown: false
 antrimandnewtownabbey.gov.uk:
-  sector: local
   owner: Antrim Borough Council
+  crown: false
 antrim.gov.uk:
-  sector: local
   owner: Antrim Borough Council
+  crown: false
 appletonroebuckandacasterselby-pc.gov.uk:
-  sector: local
   owner: Appleton Roebuck and Acaster Selby Parish Council
+  crown: false
 apprenticeships.gov.uk:
-  sector: local
   owner: Learning and Skills Council
+  crown: false
 archifaugwent.gov.uk:
-  sector: local
   owner: Blaenau Gwent County Borough Council
+  crown: false
 archifaumorgannwg.gov.uk:
-  sector: local
   owner: Cardiff Council
+  crown: false
 arclidparishcouncil.gov.uk:
-  sector: local
   owner: Arclid Parish Council
+  crown: false
 ardsandnorthdown.gov.uk:
-  sector: local
   owner: North Down Borough Council
+  crown: false
 argoedcommunitycouncil.gov.uk:
-  sector: local
   owner: Argoed Community Council
+  crown: false
 argyll-bute.gov.uk:
-  sector: local
   owner: Argyll and Bute Council
+  crown: false
 armaghbanbridgecraigavon.gov.uk:
-  sector: local
   owner: Armagh City and District Council
+  crown: false
 arundeltowncouncil.gov.uk:
-  sector: local
   owner: Arundel Town Council
+  crown: false
 arun.gov.uk:
-  sector: local
   owner: Arun District Council
+  crown: false
 ashbournetowncouncil.gov.uk:
-  sector: local
   owner: Ashbourne Town Council
+  crown: false
 ashfield-dc.gov.uk:
-  sector: local
   owner: Ashfield District Council
+  crown: false
 ashfield.gov.uk:
-  sector: local
   owner: Ashfield District Council
+  crown: false
 ashford.gov.uk:
-  sector: local
   owner: Ashford Borough Council
+  crown: false
 ashford-in-the-water-pc.gov.uk:
-  sector: local
   owner: Ashford-In-The-Water Parish Council
+  crown: false
 ashingtontowncouncil.gov.uk:
-  sector: local
   owner: Ashington Town Council
+  crown: false
 ashmansworth-pc.gov.uk:
-  sector: local
   owner: Ashmansworth Parish Council
+  crown: false
 ashover-pc.gov.uk:
-  sector: local
   owner: Ashover Parish Council
+  crown: false
 ashpcsurrey.gov.uk:
-  sector: local
   owner: Ash Parish Council
+  crown: false
 ashurstandcolbury-pc.gov.uk:
-  sector: local
   owner: Ashurst and Colbury Parish Council
+  crown: false
 ashurstwood-vc.gov.uk:
-  sector: local
   owner: Ashurst Wood Village Council
+  crown: false
 ashwell.gov.uk:
-  sector: local
   owner: Ashwell Parish Council
+  crown: false
 askderbyshire.gov.uk:
-  sector: local
   owner: North East Derbyshire District Council
+  crown: false
 aspatria-tc.gov.uk:
-  sector: local
   owner: Aspatria Town Council
+  crown: false
 aspleyguiseparishcouncil.gov.uk:
-  sector: local
   owner: Aspley Guise Parish Council
+  crown: false
 aston-cum-aughton-pc.gov.uk:
-  sector: local
   owner: Aston-cum-Aughton Parish Council
+  crown: false
 astonlewallsparishcouncil.gov.uk:
-  sector: local
   owner: Aston le Walls Parish Council
+  crown: false
 atherstone-tc.gov.uk:
-  sector: local
   owner: Atherstone Town Council
+  crown: false
 avening-pc.gov.uk:
-  sector: local
   owner: Avening Parish Council
+  crown: false
 aws.gov.uk:
-  sector: local
   owner: Worthing Borough Council
+  crown: false
 axbridge-tc.gov.uk:
-  sector: local
   owner: Axbridge Town Council
+  crown: false
 axminstertowncouncil.gov.uk:
-  sector: local
   owner: Axminster Town Council
+  crown: false
 aylesbury.gov.uk:
-  sector: local
   owner: Aylesbury Vale District Council
+  crown: false
 aylesburytowncouncil.gov.uk:
-  sector: local
   owner: Aylesbury Town Council
+  crown: false
 aylesburyvaledc.gov.uk:
-  sector: local
   owner: Aylesbury Vale District Council
+  crown: false
 aylesburyvale.gov.uk:
-  sector: local
   owner: Aylesbury Vale District Council
+  crown: false
 aylsham-tc.gov.uk:
-  sector: local
   owner: Aylsham Town Council
+  crown: false
 ayrshire.gov.uk:
-  sector: local
   owner: South Ayrshire Council
+  crown: false
 ayrshire-jsu.gov.uk:
-  sector: local
   owner: South Ayrshire Council
+  crown: false
 babergh.gov.uk:
-  sector: local
   owner: Babergh District Council
+  crown: false
 baberghmidsuffolk.gov.uk:
-  sector: local
   owner: Babergh District Council
+  crown: false
 backwell-pc.gov.uk:
-  sector: local
   owner: Backwell Parish Council
+  crown: false
 bagilltcommunitycouncil.gov.uk:
-  sector: local
   owner: Bagillt Community Council
+  crown: false
 baildontowncouncil.gov.uk:
-  sector: local
   owner: Baildon Town Council
+  crown: false
 bakewelltowncouncil.gov.uk:
-  sector: local
   owner: Bakewell Town Council
+  crown: false
 baldertonparishcouncil.gov.uk:
-  sector: local
   owner: Balderton Parish Council
+  crown: false
 ballymoney.gov.uk:
-  sector: local
   owner: Ballymoney Borough Council
+  crown: false
 bamptonoxon-parishcouncil.gov.uk:
-  sector: local
   owner: Bampton Parish Council
+  crown: false
 bamptontowncouncil.gov.uk:
-  sector: local
   owner: BamptonTown Council
+  crown: false
 banbury.gov.uk:
-  sector: local
   owner: Banbury Town Council
+  crown: false
 bardneygroup-pc.gov.uk:
-  sector: local
   owner: Bardney Group Parish Council
+  crown: false
 barking-dagenham.gov.uk:
-  sector: local
   owner: Barking & Dagenham London Borough Council
+  crown: false
 barlestoneparishcouncil.gov.uk:
-  sector: local
   owner: Barlestone Parish Council
+  crown: false
 barlingmagna-pc.gov.uk:
-  sector: local
   owner: Barling Magna Parish Council
+  crown: false
 barmouthtowncouncil.gov.uk:
-  sector: local
   owner: Barmouth Town Council
+  crown: false
 BarnardCastleTownCouncil.gov.uk:
-  sector: local
   owner: Barnard Castle Town Council
+  crown: false
 barnoldswicktowncouncil.gov.uk:
-  sector: local
   owner: Barnoldswick Town Council
+  crown: false
 barnsley.gov.uk:
-  sector: local
   owner: Barnsley Metropolitan Borough Council
+  crown: false
 barrowbc.gov.uk:
-  sector: local
   owner: Barrow in Furness Borough Council
+  crown: false
 barrytowncouncil.gov.uk:
-  sector: local
   owner: Vale of Glamorgan Council
+  crown: false
 bartestreewithlugwardinegroup-pc.gov.uk:
-  sector: local
   owner: Bartestree with Lugwardine Group Parish Council
+  crown: false
 basildon-berks-pc.gov.uk:
-  sector: local
   owner: Basildon Parish Council
+  crown: false
 basildon.gov.uk:
-  sector: local
   owner: Basildon District Council
+  crown: false
 basingstoke.gov.uk:
-  sector: local
   owner: Basingstoke and Deane Borough Council
+  crown: false
 bassetlaw.gov.uk:
-  sector: local
   owner: Bassetlaw District Council
+  crown: false
 batchworth-ecc.gov.uk:
-  sector: local
   owner: Batchworth Community Council
+  crown: false
 batchworth-pc.gov.uk:
-  sector: local
   owner: Batchworth Community Council
+  crown: false
 bathnes.gov.uk:
-  sector: local
   owner: Bath and North East Somerset Council
+  crown: false
   agreement_signed: true
 battletowncouncil.gov.uk:
-  sector: local
   owner: Battle Town Council
+  crown: false
 baughurst-pc.gov.uk:
-  sector: local
   owner: Baughurst Parish Council
+  crown: false
 beaconsfieldtowncouncil.gov.uk:
-  sector: local
   owner: Beaconsfield Town Council
+  crown: false
 beaminster-tc.gov.uk:
-  sector: local
   owner: Beaminster Town Council
+  crown: false
 bearstedparishcouncil.gov.uk:
-  sector: local
   owner: Bearsted Parish Council
+  crown: false
 beaumaristowncouncil.gov.uk:
-  sector: local
   owner: Beaumaris Town Council
+  crown: false
 beckley-and-stowood-pc.gov.uk:
-  sector: local
   owner: Beckley and Stowood Parish Council
+  crown: false
 bedale-tc.gov.uk:
-  sector: local
   owner: Bedale Town Council
+  crown: false
 bedford.gov.uk:
-  sector: local
   owner: Bedford Borough Council
+  crown: false
 bedscc.gov.uk:
-  sector: local
   owner: Bedford Borough Council
+  crown: false
 bedsparishes.gov.uk:
-  sector: local
   owner: Bedford Borough Council
+  crown: false
 belfastcity.gov.uk:
-  sector: local
   owner: Belfast City Council
+  crown: false
 belmontrural-pc.gov.uk:
-  sector: local
   owner: Belmont Rural Parish Council
+  crown: false
 belpertowncouncil.gov.uk:
-  sector: local
   owner: Belper Town Council
+  crown: false
 beltonparishcouncil.gov.uk:
-  sector: local
   owner: Belton Parish Council
+  crown: false
 berinsfield-pc.gov.uk:
-  sector: local
   owner: Berinsfield Parish Council
+  crown: false
 berkeley-tc.gov.uk:
-  sector: local
   owner: Berkeley Town Council
+  crown: false
 berkhamstedtowncouncil.gov.uk:
-  sector: local
   owner: Berkhamsted Town Council
+  crown: false
 berkswich-pc.gov.uk:
-  sector: local
   owner: Berkswich Parish Council
+  crown: false
 berrow-somerset-pc.gov.uk:
-  sector: local
   owner: Berrow Parish Town Council
+  crown: false
 bersted-pc.gov.uk:
-  sector: local
   owner: Bersted Parish Council
+  crown: false
 berwick-tc.gov.uk:
-  sector: local
   owner: Berwick-upon-Tweed Town Council
+  crown: false
 betchworth-pc.gov.uk:
-  sector: local
   owner: Mole Valley District Council
+  crown: false
 beverley.gov.uk:
-  sector: local
   owner: Beverley Town Council
+  crown: false
 bewerleyparishcouncil.gov.uk:
-  sector: local
   owner: Bewerley Parish Council
+  crown: false
 bexley.gov.uk:
-  sector: local
   owner: Bexley London Borough Council
+  crown: false
 bicester.gov.uk:
-  sector: local
   owner: Bicester Town Council
+  crown: false
 bickleigh.gov.uk:
-  sector: local
   owner: Bickleigh Parish Council
+  crown: false
 biddenden.gov.uk:
-  sector: local
   owner: Biddenden Parish Council
+  crown: false
 biddenhamparishcouncil.gov.uk:
-  sector: local
   owner: Biddenden Parish Council
+  crown: false
 bideford-tc.gov.uk:
-  sector: local
   owner: Bideford Town Council
+  crown: false
 bidfordonavon-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 biggleswadetowncouncil.gov.uk:
-  sector: local
   owner: Biggleswade Town Council
+  crown: false
 bilbrookparishcouncil.gov.uk:
-  sector: local
   owner: Bilbrook Parish Council
+  crown: false
 billericaytowncouncil.gov.uk:
-  sector: local
   owner: Billericay Town Council
+  crown: false
 billingeparishcouncil.gov.uk:
-  sector: local
   owner: Parish Council of Billinge Chapel End
+  crown: false
 billingshurst.gov.uk:
-  sector: local
   owner: Billingshurst Parish Council
+  crown: false
 billingsley-pc.gov.uk:
-  sector: local
   owner: Billingsley Parish Council
+  crown: false
 biltoninainstywithbickerton-pc.gov.uk:
-  sector: local
   owner: Bilton in Ainsty with Bickerton Parish Council
+  crown: false
 binfieldparishcouncil.gov.uk:
-  sector: local
   owner: Binfield Parish Council
+  crown: false
 bingham-tc.gov.uk:
-  sector: local
   owner: Bingham Town Council
+  crown: false
 bingleytowncouncil.gov.uk:
-  sector: local
   owner: Bingley Town Council
+  crown: false
 birchington-pc.gov.uk:
-  sector: local
   owner: birchington parish council
+  crown: false
 birmingham.gov.uk:
-  sector: local
   owner: Birmingham City Council
+  crown: false
 birminghamprepared.gov.uk:
-  sector: local
   owner: Birmingham City Council
+  crown: false
 bishopauckland-tc.gov.uk:
-  sector: local
   owner: Bishop Auckland Town Council
+  crown: false
 bishopmiddleham-pc.gov.uk:
-  sector: local
   owner: Bishop Middleham & Mainsforth Parish Council
+  crown: false
 bishopscanningsparishcouncil.gov.uk:
-  sector: local
   owner: Bishops Cannings Parish Council
+  crown: false
 bishopsitchington-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 bishopsstortfordtc.gov.uk:
-  sector: local
   owner: Bishop's Stortford Town Council
+  crown: false
 bishopswaltham-pc.gov.uk:
-  sector: local
   owner: Bishop's Waltham Parish Council
+  crown: false
 bisley-with-lypiatt.gov.uk:
-  sector: local
   owner: Bisley-with-Lypiatt Parish Council
+  crown: false
 blaby.gov.uk:
-  sector: local
   owner: Blaby District Council
+  crown: false
 blackbirdleysparishcouncil.gov.uk:
-  sector: local
   owner: Blackbird Leys Parish Council
+  crown: false
 blackburn.gov.uk:
-  sector: local
   owner: Blackburn with Darwen Borough Council
+  crown: false
 blacknotley-pc.gov.uk:
-  sector: local
   owner: Black Notley Parish Council
+  crown: false
 blackpool.gov.uk:
-  sector: local
   owner: Blackpool Council
+  crown: false
 blackwaterandhawleytowncouncil.gov.uk:
-  sector: local
   owner: Blackwater and Hawley Town Council
+  crown: false
 blaenau-gwent.gov.uk:
-  sector: local
   owner: Blaenau Gwent County Borough Council
+  crown: false
   agreement_signed: true
 blaenhonddan-wcc.gov.uk:
-  sector: local
   owner: Blaenhonddan Community Council
+  crown: false
 blandfordforum-tc.gov.uk:
-  sector: local
   owner: Blandford Forum Town Council
+  crown: false
 bleadonparishcouncil.gov.uk:
-  sector: local
   owner: Bleadon Parish Council
+  crown: false
 bletchleyfennystratford-tc.gov.uk:
-  sector: local
   owner: Bletchley and Fenny Stratford Town Council
+  crown: false
 bodfaricommunitycouncil.gov.uk:
-  sector: local
   owner: Bodfari Community Council
+  crown: false
 bodmin.gov.uk:
-  sector: local
   owner: Bodmin Town Council
+  crown: false
 bognorregis.gov.uk:
-  sector: local
   owner: Bognor Regis Town Council
+  crown: false
 boldreparishcouncil.gov.uk:
-  sector: local
   owner: Boldre Parish Council
+  crown: false
 bollington-tc.gov.uk:
-  sector: local
   owner: Bollington Town Council
+  crown: false
 bolsover.gov.uk:
-  sector: local
   owner: Bolsover District Council
+  crown: false
 bolton.gov.uk:
-  sector: local
   owner: Bolton Metropolitan Borough Council
+  crown: false
 bonbyparishcouncil.gov.uk:
-  sector: local
   owner: Bonby Parish Council
+  crown: false
 boroughgreen.gov.uk:
-  sector: local
   owner: Borough Green Parish Council
+  crown: false
 bostockparishcouncil.gov.uk:
-  sector: local
   owner: Bostock Parish Council
+  crown: false
 boston.gov.uk:
-  sector: local
   owner: Boston Borough Council
+  crown: false
 bournemouth.gov.uk:
-  sector: local
   owner: Bournemouth Borough Council
+  crown: false
 bournheath-pc.gov.uk:
-  sector: local
   owner: Bournheath Parish Council
+  crown: false
 boveytracey.gov.uk:
-  sector: local
   owner: Bovey Tracey Town Council
+  crown: false
 bozeatparishcouncil.gov.uk:
-  sector: local
   owner: Bozeat Parish Council
+  crown: false
 bracklacommunitycouncil.gov.uk:
-  sector: local
   owner: Brackla Community Council
+  crown: false
 brackleynorthants-tc.gov.uk:
-  sector: local
   owner: Brackley Town Council
+  crown: false
 bracknell-forest.gov.uk: bracknell.gov.uk
 bracknellforest.gov.uk: bracknell.gov.uk
 bracknell.gov.uk:
-  sector: local
   owner: Bracknell Forest Borough Council
+  crown: false
   agreement_signed: true
 bracknelltowncouncil.gov.uk:
-  sector: local
   owner: Bracknell Town Council
+  crown: false
 bradfield-yorks-pc.gov.uk:
-  sector: local
   owner: Bradfield Parish Council
+  crown: false
 bradford.gov.uk:
-  sector: local
   owner: City of Bradford Metropolitan District Council
+  crown: false
 bradfordonavontowncouncil.gov.uk:
-  sector: local
   owner: Bradford on Avon Town Council
+  crown: false
 brading.gov.uk:
-  sector: local
   owner: Brading Town Council
+  crown: false
 bradleystoke.gov.uk:
-  sector: local
   owner: Bradley Stoke Town Council
+  crown: false
 bradninch-tc.gov.uk:
-  sector: local
   owner: Bradninch Town Council
+  crown: false
 bradwell-pc.gov.uk:
-  sector: local
   owner: Bradwell Parish Council
+  crown: false
 braintree.gov.uk:
-  sector: local
   owner: Braintree District Council
+  crown: false
 brampton-cambs-pc.gov.uk:
-  sector: local
   owner: Brampton Parish Council
+  crown: false
 bramshaw.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 bramshottandliphook-pc.gov.uk:
-  sector: local
   owner: Bramshott and Liphook Parish Council
+  crown: false
 brandonandbyshottlesparishcouncil.gov.uk:
-  sector: local
   owner: Brandon & Byshottles Parish Council
+  crown: false
 bransgore-parish.gov.uk:
-  sector: local
   owner: Bransgore Parish Council
+  crown: false
 brauntonparishcouncil.gov.uk:
-  sector: local
   owner: Braunton Parish Council
+  crown: false
 brayparishcouncil.gov.uk:
-  sector: local
   owner: Bray Parish Council
+  crown: false
 breamore.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 breckland.gov.uk:
-  sector: local
   owner: Breckland District Council
+  crown: false
 breckland-sholland.gov.uk:
-  sector: local
   owner: Breckland District Council
+  crown: false
 bredenburygroup-pc.gov.uk:
-  sector: local
   owner: Bredenbury & District Group Parish Council
+  crown: false
 brent.gov.uk:
-  sector: local
   owner: Brent London Borough Council
+  crown: false
 brentwood.gov.uk:
-  sector: local
   owner: Brentwood Borough Council
+  crown: false
 brickhillparishcouncil.gov.uk:
-  sector: local
   owner: Brickhill Parish Council
+  crown: false
 bridgend.gov.uk:
-  sector: local
   owner: Bridgend County Borough Council
+  crown: false
 bridgendtowncouncil.gov.uk:
-  sector: local
   owner: Bridgend Town Council
+  crown: false
 bridgnorthtowncouncil.gov.uk:
-  sector: local
   owner: Bridgnorth Town Council
+  crown: false
 bridgwatertowncouncil.gov.uk:
-  sector: local
   owner: Bridgwater Town Council
+  crown: false
 bridgwaterwithout-pc.gov.uk:
-  sector: local
   owner: Bridgwater Without Parish Council
+  crown: false
 bridlington.gov.uk:
-  sector: local
   owner: Bridlington Town Council
+  crown: false
 bridport-tc.gov.uk:
-  sector: local
   owner: Bridport Town Council
+  crown: false
 Brierfield.gov.uk:
-  sector: local
   owner: Brierfield Town Council
+  crown: false
 brighton-hove.gov.uk:
-  sector: local
   owner: Brighton & Hove City Council
+  crown: false
 bringtons-pc.gov.uk:
-  sector: local
   owner: Bringtons and Nobottle Parish Council
+  crown: false
 brinkworthparishcouncil.gov.uk:
-  sector: local
   owner: Brinkworth Parish Council
+  crown: false
 brinsworthparishcouncil.gov.uk:
-  sector: local
   owner: Brinsworth Parish Council
+  crown: false
 bristol-city.gov.uk:
-  sector: local
   owner: Bristol City Council
+  crown: false
 bristol.gov.uk:
-  sector: local
   owner: Bristol City Council
+  crown: false
 brixhamtowncouncil.gov.uk:
-  sector: local
   owner: Brixham Town Council
+  crown: false
 broadbridgeheath-pc.gov.uk:
-  sector: local
   owner: Broadbridge Heath Parish Council
+  crown: false
 broadland.gov.uk:
-  sector: local
   owner: Broadland District Council
+  crown: false
 broadstairs.gov.uk:
-  sector: local
   owner: Broadstairs and St Peters Town Council
+  crown: false
 broadwindsorgroup.gov.uk:
-  sector: local
   owner: Broadwindsor Group Parish Council
+  crown: false
 brockenhurst.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 brockworth-pc.gov.uk:
-  sector: local
   owner: Brockworth Parish Council
+  crown: false
 bromorgannwg.gov.uk:
-  sector: local
   owner: Vale of Glamorgan Council
+  crown: false
 bromsgroveandredditch.gov.uk:
-  sector: local
   owner: Bromsgrove District Council
+  crown: false
 bromsgrove.gov.uk:
-  sector: local
   owner: Bromsgrove District Council
+  crown: false
 bromyardandwinslow-tc.gov.uk:
-  sector: local
   owner: Bromley and Winslow Town Council
+  crown: false
 broughtonandbrettoncommunitycouncil.gov.uk:
-  sector: local
   owner: Broughton and Bretton Community Council
+  crown: false
 broughtonandmkv-pc.gov.uk:
-  sector: local
   owner: Broughton and Milton Keynes Parish Council
+  crown: false
 broughton-astley.gov.uk:
-  sector: local
   owner: Broughton Astley Parish Council
+  crown: false
 broughtonwrexhamcommunitycouncil.gov.uk:
-  sector: local
   owner: Broughton Community Council
+  crown: false
 broxbourne.gov.uk:
-  sector: local
   owner: Broxbourne Borough Council
+  crown: false
 broxtowe.gov.uk:
-  sector: local
   owner: Broxtowe Borough Council
+  crown: false
 brutontowncouncil.gov.uk:
-  sector: local
   owner: Bruton Town Council
+  crown: false
 brymptonparishcouncil.gov.uk:
-  sector: local
   owner: Brympton Parish Council
+  crown: false
 brynfordcommunitycouncil.gov.uk:
-  sector: local
   owner: Brynford Community Council
+  crown: false
 buckfastleigh.gov.uk:
-  sector: local
   owner: Buckfastleigh Town Council
+  crown: false
 buckhursthillpc.gov.uk:
-  sector: local
   owner: Buckhurst Hill Parish Council
+  crown: false
 buckinghampark-pc.gov.uk:
-  sector: local
   owner: Buckingham Park Parish Council
+  crown: false
 buckingham-tc.gov.uk:
-  sector: local
   owner: Buckingham Town Council
+  crown: false
 bucksandsurreytradingstandards.gov.uk:
-  sector: local
   owner: Surrey County Council
+  crown: false
 buckinghamshirepartnership.gov.uk: buckscc.gov.uk
 bucksalc.gov.uk: buckscc.gov.uk
 buckscc.gov.uk:
-  sector: local
   owner: Buckinghamshire County Council
+  crown: false
   agreement_signed: true
 buckshomechoice.gov.uk:
-  sector: local
   owner: Aylesbury Vale District Council
+  crown: false
 bude-stratton.gov.uk:
-  sector: local
   owner: Bude Stratton Town Council
+  crown: false
 budleighsaltertontowncouncil.gov.uk:
-  sector: local
   owner: Budleigh Salterton Town Council
+  crown: false
 buildingcontrolpartnershiphants.gov.uk:
-  sector: local
   owner: Fareham Borough Council
+  crown: false
 bungaytowncouncil.gov.uk:
-  sector: local
   owner: Bungay Town Council
+  crown: false
 buntingford-tc.gov.uk:
-  sector: local
   owner: Buntingford Town Council
+  crown: false
 burgesshill.gov.uk:
-  sector: local
   owner: Burgess Hill Town Council
+  crown: false
 burghfieldparishcouncil.gov.uk:
-  sector: local
   owner: Burghfield Parish Council
+  crown: false
 burlescombe-pc.gov.uk:
-  sector: local
   owner: Burlescombe Parish Council
+  crown: false
 burleyparishcouncil.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 burnhamoncrouchtowncouncil.gov.uk:
-  sector: local
   owner: Burnham-On-Crouch Town Council
+  crown: false
 burnhamparish.gov.uk:
-  sector: local
   owner: Burnham Parish Council
+  crown: false
 burnley.gov.uk:
-  sector: local
   owner: Burnley Borough Council
+  crown: false
 burntwood-tc.gov.uk:
-  sector: local
   owner: Burntwood Town Council
+  crown: false
 burrator.gov.uk:
-  sector: local
   owner: Burrator Parish Council
+  crown: false
 burringhamparishcouncil.gov.uk:
-  sector: local
   owner: Burringham Parish Council
+  crown: false
 bursledon-pc.gov.uk:
-  sector: local
   owner: Bursledon Parish Council
+  crown: false
 burtondassett-pc.gov.uk:
-  sector: local
   owner: Burton Dassett Parish Council
+  crown: false
 burton-in-kendal-pc.gov.uk:
-  sector: local
   owner: Burton Parish Council
+  crown: false
 burtonparishcouncil.gov.uk:
-  sector: local
   owner: Burton Parish Council
+  crown: false
 burwarton-pc.gov.uk:
-  sector: local
   owner: Burwarton Parish Council
+  crown: false
 burwellparishcouncil.gov.uk:
-  sector: local
   owner: Burwell Parish Council
+  crown: false
 bury.gov.uk:
-  sector: local
   owner: Bury Metropolitan Borough Council
+  crown: false
 burystedmunds-tc.gov.uk:
-  sector: local
   owner: St Edmundsbury Borough Council
+  crown: false
 caerdydd.gov.uk:
-  sector: local
   owner: Cardiff Council
+  crown: false
 caerffili.gov.uk:
-  sector: local
   owner: Caerphilly County Borough Council
+  crown: false
 caernarfontowncouncil.gov.uk:
-  sector: local
   owner: Caernarfon Royal Town Council
+  crown: false
 caerphilly.gov.uk:
-  sector: local
   owner: Caerphilly County Borough Council
+  crown: false
 caiapark.gov.uk:
-  sector: local
   owner: Caia Park Community Council
+  crown: false
 cainscross-pc.gov.uk:
-  sector: local
   owner: Stroud District Council
+  crown: false
 caldecote.gov.uk:
-  sector: local
   owner: Caldecote Parish Council
+  crown: false
 caldecott-pc.gov.uk:
-  sector: local
   owner: Caldecote Parish Council
+  crown: false
 calderdale.gov.uk:
-  sector: local
   owner: Calderdale Metropolitan Borough Council
+  crown: false
 callington-tc.gov.uk:
-  sector: local
   owner: Callington Town Council
+  crown: false
 calne.gov.uk:
-  sector: local
   owner: Calne Town Council
+  crown: false
 camborne-tc.gov.uk:
-  sector: local
   owner: Camborne Town Council
+  crown: false
 cambourneparishcouncil.gov.uk:
-  sector: local
   owner: Cambourne Parish Council
+  crown: false
 cambridge.gov.uk:
-  sector: local
   owner: Cambridge City Council
+  crown: false
 cambridgeshire.gov.uk:
-  sector: local
   owner: Cambridgeshire County Council
+  crown: false
   agreement_signed: true
 camden.gov.uk:
-  sector: local
   owner: Camden Council
+  crown: false
 camelford-tc.gov.uk:
-  sector: local
   owner: Camelford Town Council
+  crown: false
 CamParishCouncil.gov.uk:
-  sector: local
   owner: Cam Parish Council
+  crown: false
 campbell-park.gov.uk:
-  sector: local
   owner: Campbell Park Parish Council
+  crown: false
 candm-pc.gov.uk:
-  sector: local
   owner: Corhampton & Meonstoke Parish Council
+  crown: false
 cannockchasedc.gov.uk:
-  sector: local
   owner: Cannock Chase District Council
+  crown: false
 canterbury.gov.uk:
-  sector: local
   owner: Canterbury City Council
+  crown: false
 canveyisland-tc.gov.uk:
-  sector: local
   owner: Canvey Island Town Council
+  crown: false
 capel-pc.gov.uk:
-  sector: local
   owner: Mole Valley District Council
+  crown: false
 cardiff.gov.uk:
-  sector: local
   owner: Cardiff Council
+  crown: false
 carlisle.gov.uk:
-  sector: local
   owner: Carlisle City Council
+  crown: false
 carltoncolvilletowncouncil.gov.uk:
-  sector: local
   owner: Carlton Colville Town Council
+  crown: false
 carlyon-pc.gov.uk:
-  sector: local
   owner: carlyon Parish Council
+  crown: false
 carmarthenshire.gov.uk:
-  sector: local
   owner: Carmarthenshire County Council
+  crown: false
 carmarthentowncouncil.gov.uk:
-  sector: local
   owner: Carmarthenshire County Council
+  crown: false
 carnbreaparishcouncil.gov.uk:
-  sector: local
   owner: Carn Brea Parish Council
+  crown: false
 carterton-tc.gov.uk:
-  sector: local
   owner: Carterton Town Council
+  crown: false
 castlebromwichpc.gov.uk:
-  sector: local
   owner: Castle Bromwich Parish Council
+  crown: false
 castleedenparishcouncil.gov.uk:
-  sector: local
   owner: Castle Eden Parish Council
+  crown: false
 castlepoint.gov.uk:
-  sector: local
   owner: Castle Point Borough Council
+  crown: false
 castonparishcouncil.gov.uk:
-  sector: local
   owner: Caston Parish Council
+  crown: false
 catcottparishcouncil.gov.uk:
-  sector: local
   owner: Catcott Parish Council
+  crown: false
 catshillandnorthmarlbrook-pc.gov.uk:
-  sector: local
   owner: Catshill & North Marlbrook Parish Council
+  crown: false
 causewaycoastandglens.gov.uk:
-  sector: local
   owner: Coleraine Borough Council
+  crown: false
 centralbedfordshire.gov.uk:
-  sector: local
   owner: Central Bedfordshire Council
+  crown: false
 centralswindonnorth-pc.gov.uk:
-  sector: local
   owner: Central Swindon North Parish Council
+  crown: false
 ceredigion.gov.uk:
-  sector: local
   owner: Ceredigion County Council
+  crown: false
 chacombeparishcouncil.gov.uk:
-  sector: local
   owner: Chacombe Parish Council
+  crown: false
 chalfontstgiles-pc.gov.uk:
-  sector: local
   owner: Chalfont St. Giles Parish Council
+  crown: false
 chalfontstpeter-pc.gov.uk:
-  sector: local
   owner: Chalfont St. Peter Parish Council
+  crown: false
 chalford-glos.gov.uk:
-  sector: local
   owner: Chalford Parish Council
+  crown: false
 chalford-pc.gov.uk:
-  sector: local
   owner: Stroud District Council
+  crown: false
 chandlersford-pc.gov.uk:
-  sector: local
   owner: Chandlersford Parish Council
+  crown: false
 chapel-en-le-frithparishcouncil.gov.uk:
-  sector: local
   owner: Chapel en le Frith Parish Council
+  crown: false
 chard.gov.uk:
-  sector: local
   owner: Chard Town Council
+  crown: false
 CharltonKingsParishCouncil.gov.uk:
-  sector: local
   owner: Charlton Kings Parish Council
+  crown: false
 charlwoodparishcouncil.gov.uk:
-  sector: local
   owner: Charlwood Parish Council
+  crown: false
 charmouthparishcouncil.gov.uk:
-  sector: local
   owner: Charmouth Parish Council
+  crown: false
 charnwood.gov.uk:
-  sector: local
   owner: Charnwood Borough Council
+  crown: false
 chedzoyparishcouncil.gov.uk:
-  sector: local
   owner: Chedzoy Parish Council
+  crown: false
 chelmsford.gov.uk:
-  sector: local
   owner: Chelmsford City Council
+  crown: false
 chelmsleywood-tc.gov.uk:
-  sector: local
   owner: Chelmsley Wood Town Council
+  crown: false
 chelshamandfarleigh-pc.gov.uk:
-  sector: local
   owner: Chelsham and Farleigh Parish Council
+  crown: false
 cheltenham.gov.uk:
-  sector: local
   owner: Cheltenham Borough Council
+  crown: false
 chelveston-pc.gov.uk:
-  sector: local
   owner: Chelveston-cum-Caldecott Parish Council
+  crown: false
 cherwellandsouthnorthants.gov.uk:
-  sector: local
   owner: South Northamptonshire Council
+  crown: false
 cherwell-dc.gov.uk:
-  sector: local
   owner: Cherwell District Council
+  crown: false
 cherwell.gov.uk:
-  sector: local
   owner: Cherwell District Council
+  crown: false
 chesham.gov.uk:
-  sector: local
   owner: Chesham Town Council
+  crown: false
 cheshireeast.gov.uk:
-  sector: local
   owner: Cheshire East Council
+  crown: false
 cheshire.gov.uk:
-  sector: local
   owner: Cheshire West and Chester Council
+  crown: false
 cheshireprepared.gov.uk:
-  sector: local
   owner: Cheshire West and Chester Council
+  crown: false
 cheshiresharedservices.gov.uk:
-  sector: local
   owner: Crewe & Nantwich Borough Council
+  crown: false
 cheshirewestandchester.gov.uk:
-  sector: local
   owner: Cheshire West and Chester Council
+  crown: false
 cheshirewest.gov.uk:
-  sector: local
   owner: Cheshire West and Chester Council
+  crown: false
 chesterfield.gov.uk:
-  sector: local
   owner: Chesterfield Borough Council
+  crown: false
 chester.gov.uk:
-  sector: local
   owner: Cheshire West and Chester Council
+  crown: false
 chestfieldparishcouncil.gov.uk:
-  sector: local
   owner: Chestfield Parish Council
+  crown: false
 cheswickgreen-pc.gov.uk:
-  sector: local
   owner: Cheswick Green Parish Council
+  crown: false
 chetnoleandstockwood-pc.gov.uk:
-  sector: local
   owner: Chetnole and Stockwood Parish Council
+  crown: false
 cheveningparishcouncil.gov.uk:
-  sector: local
   owner: Cheevening Parish Council
+  crown: false
 chichestercity.gov.uk:
-  sector: local
   owner: Chichester City Council
+  crown: false
 chichester.gov.uk:
-  sector: local
   owner: Chichester District Council
+  crown: false
 chickerell-tc.gov.uk:
-  sector: local
   owner: Chickerell Town Council
+  crown: false
 chiddingfold-pc.gov.uk:
-  sector: local
   owner: Chiddingfold Parish Council
+  crown: false
 chiddingly.gov.uk:
-  sector: local
   owner: Chiddingly Parish Council
+  crown: false
 chigwellparishcouncil.gov.uk:
-  sector: local
   owner: Chigwell Parish Council
+  crown: false
 chilhamparishcouncil.gov.uk:
-  sector: local
   owner: Chilham Parish Council
+  crown: false
 chiltern.gov.uk:
-  sector: local
   owner: Chiltern District Council
+  crown: false
 chiltondurham-tc.gov.uk:
-  sector: local
   owner: Chilton Town Council
+  crown: false
 chiltonpolden-pc.gov.uk:
-  sector: local
   owner: Chilton Polden Parish Council
+  crown: false
 chineham.gov.uk:
-  sector: local
   owner: Chineham Parish Council
+  crown: false
 chinleybuxworthbrownside-pc.gov.uk:
-  sector: local
   owner: Chinley Buxworth and Brownside Parish Council
+  crown: false
 chippenham.gov.uk:
-  sector: local
   owner: Chippenham Town Council
+  crown: false
 chippenhamwithoutparishcouncil.gov.uk:
-  sector: local
   owner: Chippenham Without Parish Council
+  crown: false
 chipperfieldparishcouncil.gov.uk:
-  sector: local
   owner: Chipperfield Parish Council
+  crown: false
 chiseldon-pc.gov.uk:
-  sector: local
   owner: Chiseldon Parish Council
+  crown: false
 cholmondestonandwettenhall-pc.gov.uk:
-  sector: local
   owner: Cholmondeston and Wettenhall Parish Council
+  crown: false
 chorley.gov.uk:
-  sector: local
   owner: Chorley Borough Council
+  crown: false
 chorleywood-pc.gov.uk:
-  sector: local
   owner: Chorleywood Parish Council
+  crown: false
 christchurchandeastdorset.gov.uk:
-  sector: local
   owner: Christchurch Borough Council
+  crown: false
 christchurch.gov.uk:
-  sector: local
   owner: Christchurch Borough Council
+  crown: false
 christleton-pc.gov.uk:
-  sector: local
   owner: Christleton Parish Council
+  crown: false
 christowparishcouncil.gov.uk:
-  sector: local
   owner: Christow Parish Council
+  crown: false
 chudleigh-tc.gov.uk:
-  sector: local
   owner: Chudleigh Town Council
+  crown: false
 churchaston-pc.gov.uk:
-  sector: local
   owner: Telford & Wrekin Council
+  crown: false
 churchdown-pc.gov.uk:
-  sector: local
   owner: Churchdown Parish Council
+  crown: false
 churchillandblakedown-pc.gov.uk:
-  sector: local
   owner: Churchill and Blakedown Parish Council
+  crown: false
 churchknowle-pc.gov.uk:
-  sector: local
   owner: Church Knowle Parish Council
+  crown: false
 churchpreen-hughley-kenley-pc.gov.uk:
-  sector: local
   owner: Church Preen, Hughley and Kenley Parish Council
+  crown: false
 churchstretton-tc.gov.uk:
-  sector: local
   owner: Church Stretton Town Council
+  crown: false
 churchwithchapelbrampton-pc.gov.uk:
-  sector: local
   owner: Church with Chapel Brampton Parish Council
+  crown: false
 cilcaincommunitycouncil.gov.uk:
-  sector: local
   owner: Cilcain Community Council
+  crown: false
 cinderfordtowncouncil.gov.uk:
-  sector: local
   owner: Cinderford Town Council
+  crown: false
 cirencester.gov.uk:
-  sector: local
   owner: Cirencester Town Council
+  crown: false
 cityofworcester.gov.uk:
-  sector: local
   owner: City of Worcester Council
+  crown: false
 clacks.gov.uk:
-  sector: local
   owner: Clackmannanshire Council
+  crown: false
 claybrookemagnaparishcouncil.gov.uk:
-  sector: local
   owner: Claybrooke Magna Parish Council
+  crown: false
 claycross.gov.uk:
-  sector: local
   owner: Clay Cross Parish Council
+  crown: false
 claygateparishcouncil.gov.uk:
-  sector: local
   owner: Claygate Parish Council
+  crown: false
 clayton-pc.gov.uk:
-  sector: local
   owner: Clayton Parish Council
+  crown: false
 clenchwarton-pc.gov.uk:
-  sector: local
   owner: Clenchwarton Parish Council
+  crown: false
 clentparishcouncil.gov.uk:
-  sector: local
   owner: Clent Parish Council
+  crown: false
 clevedon.gov.uk:
-  sector: local
   owner: Clevedon Town Council
+  crown: false
 cliffeandcliffewoods-pc.gov.uk:
-  sector: local
   owner: Cliffe and Cliffe Woods Parish Council
+  crown: false
 clitheroetowncouncil.gov.uk:
-  sector: local
   owner: Clitheroe Town Council
+  crown: false
 clophill-pc.gov.uk:
-  sector: local
   owner: Clophill Parish Council
+  crown: false
 cmktowncouncil.gov.uk:
-  sector: local
   owner: Central Milton Keynes Town Council
+  crown: false
 cncbuildingcontrol.gov.uk:
-  sector: local
   owner: South Norfolk Council
+  crown: false
 coastalwight.gov.uk:
-  sector: local
   owner: Isle of Wight Council
+  crown: false
 cobham-kent-pc.gov.uk:
-  sector: local
   owner: Cobham Parish Council, Kent
+  crown: false
 cockshuttcumpetton-pc.gov.uk:
-  sector: local
   owner: Cockshutt-cum Petton Parish Council
+  crown: false
 coedffranc-wcc.gov.uk:
-  sector: local
   owner: Coedffranc Community Council
+  crown: false
 cogenhoeandwhiston-pc.gov.uk:
-  sector: local
   owner: Cogenhoe and Whiston Parish Council
+  crown: false
 coggeshall-pc.gov.uk:
-  sector: local
   owner: Coggeshall Parish Council
+  crown: false
 colby-banningham-pc.gov.uk:
-  sector: local
   owner: Colby & Banningham Parish Council
+  crown: false
 colchester.gov.uk:
-  sector: local
   owner: Colchester Borough Council
+  crown: false
 coldencommon-pc.gov.uk:
-  sector: local
   owner: Colden Common Parish Council
+  crown: false
 coldharbour-pc.gov.uk:
-  sector: local
   owner: Coldharbour Parish Council
+  crown: false
 coldhigham-pc.gov.uk:
-  sector: local
   owner: Cold Higham Parish Council
+  crown: false
 colefordtowncouncil.gov.uk:
-  sector: local
   owner: Coleford Town Council
+  crown: false
 colehill.gov.uk:
-  sector: local
   owner: Colehill Parish Council
+  crown: false
 colerainebc.gov.uk:
-  sector: local
   owner: Coleraine Borough Council
+  crown: false
 colerne-pc.gov.uk:
-  sector: local
   owner: Colerne Parish Council
+  crown: false
 coleshilltowncouncil.gov.uk:
-  sector: local
   owner: Coleshill Town Council
+  crown: false
 colnbrookwithpoyle-pc.gov.uk:
-  sector: local
   owner: Colnbrook with Poyle Parish Council
+  crown: false
 colneyheathparishcouncil.gov.uk:
-  sector: local
   owner: Colney Heath Parish Council
+  crown: false
 colwichparishcouncil.gov.uk:
-  sector: local
   owner: Colwich Parish Council
+  crown: false
 colwyn-tc.gov.uk:
-  sector: local
   owner: Bay of Colwyn Town Council
+  crown: false
 combemartin-pc.gov.uk:
-  sector: local
   owner: Combe Martin Parish Council
+  crown: false
 comeytrowe-pc.gov.uk:
-  sector: local
   owner: Comeytrowe Parish Council
+  crown: false
 comptondundon-pc.gov.uk:
-  sector: local
   owner: Compton Dundon Parish Council
+  crown: false
 comptonshawford-pc.gov.uk:
-  sector: local
   owner: Compton and Shawford Parish Council
+  crown: false
 congleton-tc.gov.uk:
-  sector: local
   owner: Congleton Town Council
+  crown: false
 congresbury-pc.gov.uk:
-  sector: local
   owner: Congresbury Parish Council
+  crown: false
 conwy.gov.uk:
-  sector: local
   owner: Conwy County Borough Council
+  crown: false
 conwytowncouncil.gov.uk:
-  sector: local
   owner: Conwy Town Council
+  crown: false
 cookstown.gov.uk:
-  sector: local
   owner: Cookstown District Council
+  crown: false
 copelandbc.gov.uk:
-  sector: local
   owner: Copeland Borough Council
+  crown: false
 copeland.gov.uk:
-  sector: local
   owner: Copeland Borough Council
+  crown: false
 corby.gov.uk:
-  sector: local
   owner: Corby Borough Council
+  crown: false
 corfemullen-pc.gov.uk:
-  sector: local
   owner: Corfe Mullen Parish Council
+  crown: false
 cornwall-aonb.gov.uk:
-  sector: local
   owner: Cornwall Council
+  crown: false
 cornwall.gov.uk:
-  sector: local
   owner: Cornwall Council
+  crown: false
 corsham.gov.uk:
-  sector: local
   owner: Corsham Town Council
+  crown: false
 cossingtonparishcouncil.gov.uk:
-  sector: local
   owner: Cossington Parish Council
+  crown: false
 cotgrave-tc.gov.uk:
-  sector: local
   owner: Cotgrave Town Council
+  crown: false
 cotswold.gov.uk:
-  sector: local
   owner: Cotswold District Council
+  crown: false
 coventry.gov.uk:
-  sector: local
   owner: Coventry City Council
+  crown: false
 cowbridge-tc.gov.uk:
-  sector: local
   owner: Cowbridge (Ancient Borough) and Llanblethian Town Council
+  crown: false
 cowfold-pc.gov.uk:
-  sector: local
   owner: Cowfold Parish Council
+  crown: false
 coxgreen.gov.uk:
-  sector: local
   owner: Cox Green Parish Council
+  crown: false
 coxhoeparishcouncil.gov.uk:
-  sector: local
   owner: Coxhoe Parish Council
+  crown: false
 cramlingtontowncouncil.gov.uk:
-  sector: local
   owner: Cramlington Town Council
+  crown: false
 cranbrooktowncouncil.gov.uk:
-  sector: local
   owner: Cranbrook Town Council
+  crown: false
 cravendc.gov.uk:
-  sector: local
   owner: Craven District Council
+  crown: false
 crawley.gov.uk:
-  sector: local
   owner: Crawley Borough Council
+  crown: false
 crediton.gov.uk:
-  sector: local
   owner: Credition Town Council
+  crown: false
 crewetowncouncil.gov.uk:
-  sector: local
   owner: Crewe Town Council
+  crown: false
 crewkerne-tc.gov.uk:
-  sector: local
   owner: Crewkerne Town Council
+  crown: false
 crich-pc.gov.uk:
-  sector: local
   owner: Crich Parish Council
+  crown: false
 cricklade-tc.gov.uk:
-  sector: local
   owner: Cricklade Town Council
+  crown: false
 crickladetowncouncil.gov.uk:
-  sector: local
   owner: Cricklade Town Council
+  crown: false
 cringlefordparishcouncil.gov.uk:
-  sector: local
   owner: Cringleford Parich Council
+  crown: false
 cromer-tc.gov.uk:
-  sector: local
   owner: Cromer Town Council
+  crown: false
 CRONDALL-PC.gov.uk:
-  sector: local
   owner: Crondall Parish Council
+  crown: false
 cropwellbishop-pc.gov.uk:
-  sector: local
   owner: Cropwell Bishop Parish Council
+  crown: false
 crowan-pc.gov.uk:
-  sector: local
   owner: Crowan Parish Council
+  crown: false
 crowboroughtowncouncil.gov.uk:
-  sector: local
   owner: Crowborough Town Council
+  crown: false
 croxleygreen-pc.gov.uk:
-  sector: local
   owner: Croxley Green Parish Council
+  crown: false
 crudwell-pc.gov.uk:
-  sector: local
   owner: Crudwell Parish Council
+  crown: false
 cst.gov.uk:
-  sector: local
   owner: Council for Science and Technology
+  crown: false
 cuckfield.gov.uk:
-  sector: local
   owner: Cuckfield Parish Council
+  crown: false
 cullingworthparishcouncil.gov.uk:
-  sector: local
   owner: Cullingworth Parish Council
+  crown: false
 cullomptontowncouncil.gov.uk:
-  sector: local
   owner: Cullompton Town Council
+  crown: false
 culturalpropertyadvice.gov.uk:
-  sector: local
   owner: Arts Council England
+  crown: false
 cumbriacc.gov.uk:
-  sector: local
   owner: Cumbria County Council
+  crown: false
 cumbriafire.gov.uk:
-  sector: local
   owner: Cumbria County Council
+  crown: false
 cumbria.gov.uk:
-  sector: local
   owner: Cumbria County Council
+  crown: false
 curdridge-pc.gov.uk:
-  sector: local
   owner: Curdridge Parish Council
+  crown: false
 currie-scc.gov.uk:
-  sector: local
   owner: Currie Community Council
+  crown: false
 cwmbran.gov.uk:
-  sector: local
   owner: Torfaen County Borough Council
+  crown: false
 cyngortrefcaerfyrddin.gov.uk:
-  sector: local
   owner: Carmarthenshire County Council
+  crown: false
 cyngortrefrhuthun.gov.uk:
-  sector: local
   owner: Ruthin Town Council
+  crown: false
 cyngortrefybarri.gov.uk:
-  sector: local
   owner: Vale of Glamorgan Council
+  crown: false
 dab-vjb.gov.uk:
-  sector: local
   owner: West Dunbartonshire Council
+  crown: false
 dacorum.gov.uk:
-  sector: local
   owner: Dacorum Borough Council
+  crown: false
   agreement_signed: true
 dalburyleesparishcouncil.gov.uk:
-  sector: local
   owner: Dalbury Lees Parish Council
+  crown: false
 danbury-essex.gov.uk:
-  sector: local
   owner: Danbury Parish Council
+  crown: false
 darleydale.gov.uk:
-  sector: local
   owner: Darley Dale Town Council
+  crown: false
 darlington.gov.uk:
-  sector: local
   owner: Darlington Borough Council
+  crown: false
 dartford.gov.uk:
-  sector: local
   owner: Dartford Borough Council
+  crown: false
 datchetparishcouncil.gov.uk:
-  sector: local
   owner: Datchet Parish Council
+  crown: false
 dauntseyparishcouncil.gov.uk:
-  sector: local
   owner: Dauntsey Parish Council
+  crown: false
 daventrydc.gov.uk:
-  sector: local
   owner: Daventry District Council
+  crown: false
 daventrytowncouncil.gov.uk:
-  sector: local
   owner: Daventry Town Council
+  crown: false
 dawlish.gov.uk:
-  sector: local
   owner: Dawlish Town Council
+  crown: false
 deal.gov.uk:
-  sector: local
   owner: Deal Town Council
+  crown: false
 denbighshire.gov.uk:
-  sector: local
   owner: Denbighshire County Council
+  crown: false
 denbightowncouncil.gov.uk:
-  sector: local
   owner: Denbighshire County Council
+  crown: false
 denbyparishcouncil.gov.uk:
-  sector: local
   owner: Denby Parish Council
+  crown: false
 denham-bucks-pc.gov.uk:
-  sector: local
   owner: Denham Parish Council
+  crown: false
 denhambucks-pc.gov.uk:
-  sector: local
   owner: Denham Parish Council
+  crown: false
 dennylodgeparishcouncil.gov.uk:
-  sector: local
   owner: Denny Lodge Parish Council
+  crown: false
 derby.gov.uk:
-  sector: local
   owner: Derby City Council
+  crown: false
 derbyshirealc.gov.uk:
-  sector: local
   owner: Derbyshire Association of Local Councils
+  crown: false
 derbyshiredales.gov.uk:
-  sector: local
   owner: Derbyshire Dales District Council
+  crown: false
 derbyshire.gov.uk:
-  sector: local
   owner: Derbyshire County Council
+  crown: false
 derbyshirepartnership.gov.uk:
-  sector: local
   owner: Derbyshire County Council
+  crown: false
 desboroughtowncouncil.gov.uk:
-  sector: local
   owner: Desborough Town Council
+  crown: false
 devizes-tc.gov.uk:
-  sector: local
   owner: Devizes Town Council
+  crown: false
 devonaudit.gov.uk:
-  sector: local
   owner: Devon County Council
+  crown: false
 devonebiz.gov.uk:
-  sector: local
   owner: Devon County Council
+  crown: false
 devon.gov.uk:
-  sector: local
   owner: Devon County Council
+  crown: false
 devonjobs.gov.uk:
-  sector: local
   owner: Devon County Council
+  crown: false
 didcot.gov.uk:
-  sector: local
   owner: Didcot Town Council
+  crown: false
 dingley-pc.gov.uk:
-  sector: local
   owner: Dingley Parish Council
+  crown: false
 DinningtonParishCouncil.gov.uk:
-  sector: local
   owner: Dinnington Parish Council
+  crown: false
 diss.gov.uk:
-  sector: local
   owner: Diss Town Council
+  crown: false
 ditchling-pc.gov.uk:
-  sector: local
   owner: Ditchling Parish Council
+  crown: false
 dittishamparishcouncil.gov.uk:
-  sector: local
   owner: Dittisham Parish Council
+  crown: false
 dittonparishcouncil.gov.uk:
-  sector: local
   owner: Ditton Parish Council
+  crown: false
 doddinghurst-pc.gov.uk:
-  sector: local
   owner: Doddinghurst Parish Council
+  crown: false
 doncaster.gov.uk:
-  sector: local
   owner: Doncaster Metropolitan Borough Council
+  crown: false
 dorchester-tc.gov.uk:
-  sector: local
   owner: Dorchester Town Council
+  crown: false
 dormingtonmordifordgroup-pc.gov.uk:
-  sector: local
   owner: Dormington and Mordiford Group Parish Council
+  crown: false
 dorset-aptc.gov.uk:
-  sector: local
   owner: Dorset Association of Parish & Town Councils
+  crown: false
 dorsetcc.gov.uk:
-  sector: local
   owner: Dorset County Council
+  crown: false
 dorsetforyou.gov.uk:
-  sector: local
   owner: Weymouth and Portland Borough Council
+  crown: false
 dorset.gov.uk:
-  sector: local
   owner: West Dorset District Council
+  crown: false
 dorsetwastepartnership.gov.uk:
-  sector: local
   owner: Dorset County Council
+  crown: false
 dover.gov.uk:
-  sector: local
   owner: Dover District Council
+  crown: false
 DoverTownCouncil.gov.uk:
-  sector: local
   owner: Dover Town Council
+  crown: false
 downdc.gov.uk:
-  sector: local
   owner: Down District Council
+  crown: false
 DowntonParishCouncil.gov.uk:
-  sector: local
   owner: Downton Parish Council
+  crown: false
 doxeyparishcouncil.gov.uk:
-  sector: local
   owner: Doxey Parish Council
+  crown: false
 droitwichspa.gov.uk:
-  sector: local
   owner: Droitwich Spa Town Council
+  crown: false
 dronfield.gov.uk:
-  sector: local
   owner: Dronfield Town Council
+  crown: false
 ducklingtonparishcouncil.gov.uk:
-  sector: local
   owner: Ducklington Parish Council
+  crown: false
 dudley.gov.uk:
-  sector: local
   owner: Dudley Metropolitan Borough Council
+  crown: false
 duffieldparishcouncil.gov.uk:
-  sector: local
   owner: Duffield Parish Council
+  crown: false
 dumgal.gov.uk:
-  sector: local
   owner: Dumfries and Galloway Council
+  crown: false
 dummerparishcouncil.gov.uk:
-  sector: local
   owner: Dummer Parish Council
+  crown: false
 dundeecity.gov.uk:
-  sector: local
   owner: Dundee City Council
+  crown: false
 dungannon.gov.uk:
-  sector: local
   owner: Dungannon and South Tyrone Borough Council
+  crown: false
 dunstable.gov.uk:
-  sector: local
   owner: Dunstable Town Council
+  crown: false
 durhamcity.gov.uk:
-  sector: local
   owner: Durham County Council
+  crown: false
 durham.gov.uk:
-  sector: local
   owner: Durham County Council
+  crown: false
 durringtontowncouncil.gov.uk:
-  sector: local
   owner: Durrington Town Council
+  crown: false
 dursleytowncouncil.gov.uk:
-  sector: local
   owner: Dursley Town Council
+  crown: false
 duston-pc.gov.uk:
-  sector: local
   owner: Duston Parish Council
+  crown: false
 ealing.gov.uk:
-  sector: local
   owner: Ealing Council
+  crown: false
 eardington-pc.gov.uk:
-  sector: local
   owner: Eardington Parish Council
+  crown: false
 earley-tc.gov.uk:
-  sector: local
   owner: Earley Town Council
+  crown: false
 earlsbarton.gov.uk:
-  sector: local
   owner: Earls Barton Parish Council
+  crown: false
 easingwold.gov.uk:
-  sector: local
   owner: Easingwold Town Council
+  crown: false
 east-ayrshire.gov.uk:
-  sector: local
   owner: East Ayrshire Council
+  crown: false
 eastboldre-pc.gov.uk:
-  sector: local
   owner: East Boldre Parish Council
+  crown: false
 eastbourne.gov.uk:
-  sector: local
   owner: Eastbourne Borough Council
+  crown: false
 eastbudleigh-pc.gov.uk:
-  sector: local
   owner: East Budleigh & Bicton Parish Council
+  crown: false
 eastcambs.gov.uk:
-  sector: local
   owner: East Cambridgeshire District Council
+  crown: false
 eastdevon.gov.uk:
-  sector: local
   owner: East Devon District Council
+  crown: false
 eastdorsetdc.gov.uk:
-  sector: local
   owner: East Dorset District Council
+  crown: false
 eastdorset.gov.uk:
-  sector: local
   owner: East Dorset District Council
+  crown: false
 eastdunbarton.gov.uk:
-  sector: local
   owner: East Dunbartonshire Council
+  crown: false
 eastgarston-pc.gov.uk:
-  sector: local
   owner: East Garston Parish Council
+  crown: false
 eastgrinstead.gov.uk:
-  sector: local
   owner: East Grinstead Town Council
+  crown: false
 easthants.gov.uk:
-  sector: local
   owner: East Hampshire District Council
+  crown: false
 eastherts.gov.uk:
-  sector: local
   owner: East Herts District Council
+  crown: false
 easthuntspillparishcouncil.gov.uk:
-  sector: local
   owner: East Huntspill Parish Council
+  crown: false
 eastilsley-pc.gov.uk:
-  sector: local
   owner: East Ilsley Parish Council
+  crown: false
 eastington-pc.gov.uk:
-  sector: local
   owner: Eastington Parish Council
+  crown: false
 eastkent.gov.uk:
-  sector: local
   owner: Thanet District Council
+  crown: false
 east-leake.gov.uk:
-  sector: local
   owner: East Leak Parish Council
+  crown: false
 eastleigh.gov.uk:
-  sector: local
   owner: Eastleigh Borough Council
+  crown: false
 eastlindsey.gov.uk:
-  sector: local
   owner: East Lindsey District Council
+  crown: false
 eastlothian.gov.uk:
-  sector: local
   owner: East Lothian Council
+  crown: false
 east-northamptonshire.gov.uk:
-  sector: local
   owner: East Northamptonshire Council
+  crown: false
 eastpeckham-pc.gov.uk:
-  sector: local
   owner: East Peckham Parish Council
+  crown: false
 eastrenfrewshire.gov.uk:
-  sector: local
   owner: East Renfrewshire Council
+  crown: false
 eastriding.gov.uk:
-  sector: local
   owner: East Riding of Yorkshire Council
+  crown: false
 eaststaffsbc.gov.uk:
-  sector: local
   owner: East Staffordshire Borough Council
+  crown: false
 eastsuffolk.gov.uk:
-  sector: local
   owner: Waveney District Council
+  crown: false
 eastsussexcc.gov.uk:
-  sector: local
   owner: East Sussex County Council
+  crown: false
 eastsussex.gov.uk:
-  sector: local
   owner: East Sussex County Council
+  crown: false
 eastwoodhay-pc.gov.uk:
-  sector: local
   owner: East Woodhay Parish Council
+  crown: false
 ecchinswell-pc.gov.uk:
-  sector: local
   owner: Ecchinswell, Sydmonton and Bishops Green Parish Council
+  crown: false
 ecclesfield-pc.gov.uk:
-  sector: local
   owner: Ecclesfield Parish Council
+  crown: false
 e-chorley.gov.uk:
-  sector: local
   owner: Chorley Borough Council
+  crown: false
 eckington-pc.gov.uk:
-  sector: local
   owner: Eckington Parish Council
+  crown: false
 edenbridgetowncouncil.gov.uk:
-  sector: local
   owner: Edenbridge Town Council
+  crown: false
 eden.gov.uk:
-  sector: local
   owner: Eden District Council
+  crown: false
 edinburgh.gov.uk:
-  sector: local
   owner: The City of Edinburgh Council
+  crown: false
 edingtonsomersetparishcouncil.gov.uk:
-  sector: local
   owner: Edington Parish Council
+  crown: false
 edlesborough-pc.gov.uk:
-  sector: local
   owner: Edlesborough Parish Council
+  crown: false
 EffinghamParishCouncil.gov.uk:
-  sector: local
   owner: Effingham Parish Council
+  crown: false
 eldc.gov.uk:
-  sector: local
   owner: East Lindsey District Council
+  crown: false
 e-lindsey.gov.uk:
-  sector: local
   owner: East Lindsey District Council
+  crown: false
 ellesmererural-pc.gov.uk:
-  sector: local
   owner: Ellesmere Rural Parish Council
+  crown: false
 ellesmere-tc.gov.uk:
-  sector: local
   owner: Ellesmere Town Council
+  crown: false
 ellisfield.gov.uk:
-  sector: local
   owner: Ellisfield Parish Council
+  crown: false
 elloughtonbrough-pc.gov.uk:
-  sector: local
   owner: Elloughton cum Brough Parish Council
+  crown: false
 elmbridge.gov.uk:
-  sector: local
   owner: Elmbridge Borough Council
+  crown: false
 elstead-pc.gov.uk:
-  sector: local
   owner: Elstead Parish Council
+  crown: false
 elstreeborehamwood-tc.gov.uk:
-  sector: local
   owner: Elstree & Borehamwood Town Council
+  crown: false
 elswickparishcouncil.gov.uk:
-  sector: local
   owner: Elswick Parish Council
+  crown: false
 emergencynorthyorks.gov.uk:
-  sector: local
   owner: North Yorkshire County Council
+  crown: false
 emersonsgreen-tc.gov.uk:
-  sector: local
   owner: Emersons Green Town Council
+  crown: false
 encor.gov.uk:
-  sector: local
   owner: Corby Borough Council
+  crown: false
 enfield.gov.uk:
-  sector: local
   owner: Enfield London Borough Council
+  crown: false
 eppingforestdc.gov.uk:
-  sector: local
   owner: Epping Forest District Council
+  crown: false
 eppingtowncouncil.gov.uk:
-  sector: local
   owner: Epping Town Council
+  crown: false
 epsom-ewell.gov.uk:
-  sector: local
   owner: Epsom and Ewell Borough Council
+  crown: false
 ercallmagnaparishcouncil.gov.uk:
-  sector: local
   owner: Ercall Magna Parish Council
+  crown: false
 erewash.gov.uk:
-  sector: local
   owner: Erewash Borough Council
+  crown: false
 eshparishcouncil.gov.uk:
-  sector: local
   owner: Esh Parish Council
+  crown: false
 essexcc.gov.uk:
-  sector: local
   owner: Essex County Council
+  crown: false
 essex.gov.uk:
-  sector: local
   owner: Essex County Council
+  crown: false
 essexlegalservices.gov.uk:
-  sector: local
   owner: Essex County Council
+  crown: false
 essingtonparishcouncil.gov.uk:
-  sector: local
   owner: Essington Parish Council
+  crown: false
 eveshamtowncouncil.gov.uk:
-  sector: local
   owner: Evesham Town Council
+  crown: false
 exeterandeastdevon.gov.uk:
-  sector: local
   owner: East Devon District Council
+  crown: false
 exeter.gov.uk:
-  sector: local
   owner: Exeter City Council
+  crown: false
 exminsterparishcouncil.gov.uk:
-  sector: local
   owner: Exminster Parish Council
+  crown: false
 exmouth.gov.uk:
-  sector: local
   owner: Exmouth Town Council
+  crown: false
 exning-pc.gov.uk:
-  sector: local
   owner: Exning Parish Council
+  crown: false
 eynsham-pc.gov.uk:
-  sector: local
   owner: Eynsham Parish Council
+  crown: false
 fairfieldparishcouncil.gov.uk:
-  sector: local
   owner: Fairfield Parish Council
+  crown: false
 fairfordtowncouncil.gov.uk:
-  sector: local
   owner: Fairford Town Council
+  crown: false
 fairoak-pc.gov.uk:
-  sector: local
   owner: Fair Oak & Horton Heath Parish Council
+  crown: false
 falkirk-council.gov.uk: falkirk.gov.uk
 falkirk.gov.uk:
-  sector: local
   owner: Falkirk Council
+  crown: false
   agreement_signed: true
 falstoneparishcouncil.gov.uk:
-  sector: local
   owner: Falstone Parish Council
+  crown: false
 fareham.gov.uk:
-  sector: local
   owner: Fareham Borough Council
+  crown: false
 faringdontowncouncil.gov.uk:
-  sector: local
   owner: Faringdon Town Council
+  crown: false
 farnham.gov.uk:
-  sector: local
   owner: Farnham Town Council
+  crown: false
 farnhamroyal-pc.gov.uk:
-  sector: local
   owner: Farnham Royal Parish Council
+  crown: false
 farrier-reg.gov.uk:
-  sector: local
   owner: The Farriers Registration Council
+  crown: false
 favershamtowncouncil.gov.uk:
-  sector: local
   owner: Faversham Town Council
+  crown: false
 fdean.gov.uk:
-  sector: local
   owner: Forest Of Dean District Council
+  crown: false
 featherstoneandbrinsfordparishcouncil.gov.uk:
-  sector: local
   owner: Featherstone and Brinsford Parish Council
+  crown: false
 featherstone-tc.gov.uk:
-  sector: local
   owner: Featherstone Town Council
+  crown: false
 felixstowe.gov.uk:
-  sector: local
   owner: Felixstowe Town Council
+  crown: false
 felphampc.gov.uk:
-  sector: local
   owner: Felpham Parish Council
+  crown: false
 felsted-pc.gov.uk:
-  sector: local
   owner: Felsted Parish Council
+  crown: false
 fenland.gov.uk:
-  sector: local
   owner: Fenland District Council
+  crown: false
 fennycompton-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 ferndown.gov.uk:
-  sector: local
   owner: Ferndown Town Council
+  crown: false
 fernhurst-wsx-pc.gov.uk:
-  sector: local
   owner: Chichester District Council
+  crown: false
 ferryhill.gov.uk:
-  sector: local
   owner: Ferryhill Town Council
+  crown: false
 fife.gov.uk:
-  sector: local
   owner: Fife Council
+  crown: false
 FiltonTownCouncil.gov.uk:
-  sector: local
   owner: Filton Town Council
+  crown: false
 finchampstead-pc.gov.uk:
-  sector: local
   owner: Finchampstead Parish Council
+  crown: false
 finchingfield-pc.gov.uk:
-  sector: local
   owner: Finchingfield Parish Council
+  crown: false
 finedonparishcouncil.gov.uk:
-  sector: local
   owner: Finedon Parish Council
+  crown: false
 fishbourne-pc.gov.uk:
-  sector: local
   owner: Chichester District Council
+  crown: false
 flamborough-pc.gov.uk:
-  sector: local
   owner: East Riding of Yorkshire Council
+  crown: false
 fleet-tc.gov.uk:
-  sector: local
   owner: Fleet Town Council
+  crown: false
 flintshire.gov.uk:
-  sector: local
   owner: Flintshire County Council
+  crown: false
 flitwick.gov.uk:
-  sector: local
   owner: Flitwick Town Council
+  crown: false
 folkestone-tc.gov.uk:
-  sector: local
   owner: Shepway District Council
+  crown: false
 fordingbridge.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 fordwestsussex-pc.gov.uk:
-  sector: local
   owner: Ford Parish Council
+  crown: false
 forest-heath.gov.uk:
-  sector: local
   owner: St Edmundsbury Borough Council
+  crown: false
 forestofdean.gov.uk:
-  sector: local
   owner: Forest Of Dean District Council
+  crown: false
 forestrow.gov.uk:
-  sector: local
   owner: Forest Row Parish Council
+  crown: false
 foweytowncouncil.gov.uk:
-  sector: local
   owner: Restormel Borough Council
+  crown: false
 foxtonparishcouncil.gov.uk:
-  sector: local
   owner: Foxton Parish Council
+  crown: false
 framptononsevern-pc.gov.uk:
-  sector: local
   owner: Frampton on Severn Parish Council
+  crown: false
 fremingtonparishcouncil.gov.uk:
-  sector: local
   owner: Fremington Parish Council
+  crown: false
 frensham-pc.gov.uk:
-  sector: local
   owner: Frensham Parish Council
+  crown: false
 frindsburyextra-pc.gov.uk:
-  sector: local
   owner: Frindsbury Extra Parish Council
+  crown: false
 frodsham.gov.uk:
-  sector: local
   owner: Frodsham Town Council
+  crown: false
 frometowncouncil.gov.uk:
-  sector: local
   owner: Frome Town Council
+  crown: false
 fylde.gov.uk:
-  sector: local
   owner: Fylde Borough Council
+  crown: false
 galleywoodparishcouncil.gov.uk:
-  sector: local
   owner: Galleywood Parish Council
+  crown: false
 galwgofal.gov.uk:
-  sector: local
   owner: Conwy County Borough Council
+  crown: false
 gamlingay-pc.gov.uk:
-  sector: local
   owner: Gamlingay Parish Council
+  crown: false
 gateshead.gov.uk:
-  sector: local
   owner: Gateshead Metropolitan Borough Council
+  crown: false
 gedling.gov.uk:
-  sector: local
   owner: Gedling Borough Council
+  crown: false
 georgehamparishcouncil.gov.uk:
-  sector: local
   owner: Georgeham Parish Council
+  crown: false
 gerrardscross.gov.uk:
-  sector: local
   owner: Gerrards Cross Parish Council
+  crown: false
 gillinghamdorset-tc.gov.uk:
-  sector: local
   owner: Gillingham Town Council
+  crown: false
 gilmortonparishcouncil.gov.uk:
-  sector: local
   owner: Gilmorton Parish Council
+  crown: false
 glamarchives.gov.uk:
-  sector: local
   owner: Cardiff Council
+  crown: false
 glasgow.gov.uk:
-  sector: local
   owner: Glasgow City Council
+  crown: false
 glastonbury.gov.uk:
-  sector: local
   owner: Glastonbury Town Council
+  crown: false
 gloscc.gov.uk:
-  sector: local
   owner: Gloucestershire County Council
+  crown: false
 gloucester.gov.uk:
-  sector: local
   owner: Gloucester City Council
+  crown: false
 gloucestershire.gov.uk:
-  sector: local
   owner: Gloucestershire County Council
+  crown: false
 glynneathtowncouncil.gov.uk:
-  sector: local
   owner: Glynneath Town Council
+  crown: false
 godalming-jbc.gov.uk:
-  sector: local
   owner: Godalming Town Council
+  crown: false
 godalming-tc.gov.uk:
-  sector: local
   owner: Waverley Borough Council
+  crown: false
 godstone-pc.gov.uk:
-  sector: local
   owner: Godstone Parish Council
+  crown: false
 goole-tc.gov.uk:
-  sector: local
   owner: Goole Town Council
+  crown: false
 GorseinonTownCouncil.gov.uk:
-  sector: local
   owner: Gorseinon Town Council
+  crown: false
 gosfordandwatereaton-pc.gov.uk:
-  sector: local
   owner: Gosford and Water Eaton Parish Council
+  crown: false
 gosport.gov.uk:
-  sector: local
   owner: Gosport Borough Council
+  crown: false
 goytre.gov.uk:
-  sector: local
   owner: Goetre Fawr Community Council
+  crown: false
 grampiancaredata.gov.uk:
-  sector: local
   owner: Aberdeenshire Council
+  crown: false
 grangeoversandstowncouncil.gov.uk:
-  sector: local
   owner: Grange Over Sands Town Council
+  crown: false
 gravesham.gov.uk:
-  sector: local
   owner: Gravesham Borough Council
+  crown: false
   agreement_signed: true
 greatalne-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 greatamwellparishcouncil.gov.uk:
-  sector: local
   owner: Great Amwell Parish Council
+  crown: false
 great-aycliffe.gov.uk:
-  sector: local
   owner: Great Aycliffe Town Council
+  crown: false
 greatbardfield-pc.gov.uk:
-  sector: local
   owner: Great Bardfield Parish Council
+  crown: false
 greatbursteadsouthgreenparishcouncil.gov.uk:
-  sector: local
   owner: Great Burstead and South Green Village Council
+  crown: false
 greatchesterford-pc.gov.uk:
-  sector: local
   owner: Great Chesterford Parish Council
+  crown: false
 greatdunmow-tc.gov.uk:
-  sector: local
   owner: Great Dunmow Town Council
+  crown: false
 greatglen-pc.gov.uk:
-  sector: local
   owner: Great Glen Parish Council
+  crown: false
 greathorkesley-pc.gov.uk:
-  sector: local
   owner: Great Horkesley Parish Council
+  crown: false
 great-linford.gov.uk:
-  sector: local
   owner: Great Linford Parish Council
+  crown: false
 greatshelfordparishcouncil.gov.uk:
-  sector: local
   owner: Great Shelford Parish Council
+  crown: false
 great-torringtontowncouncil.gov.uk:
-  sector: local
   owner: Great Torrington Town Council
+  crown: false
 greatwakering-pc.gov.uk:
-  sector: local
   owner: Great Wakering Parish Council
+  crown: false
 great-yarmouth.gov.uk:
-  sector: local
   owner: Great Yarmouth Borough Council
+  crown: false
 greenham.gov.uk:
-  sector: local
   owner: Greenham Parish Council
+  crown: false
 guildenmorden.gov.uk:
-  sector: local
   owner: Guilden Morden Parish Council
+  crown: false
 guildford.gov.uk:
-  sector: local
   owner: Guildford Borough Council
+  crown: false
 GwentArchives.gov.uk:
-  sector: local
   owner: Blaenau Gwent County Borough Council
+  crown: false
 gwineargwithian-pc.gov.uk:
-  sector: local
   owner: Gwinear-Gwithian Parish Council
+  crown: false
 gwynedd.gov.uk:
-  sector: local
   owner: Gwynedd County Council
+  crown: false
   agreement_signed: true
 hackletonparishcouncil.gov.uk:
-  sector: local
   owner: Hackleton Parish Council
+  crown: false
 hackney.gov.uk:
-  sector: local
   owner: Hackney London Borough Council
+  crown: false
 Haddenham-bucks-pc.gov.uk:
-  sector: local
   owner: Haddenham Parish Council
+  crown: false
 hagleyparishcouncil.gov.uk:
-  sector: local
   owner: Hagley Parish Council
+  crown: false
 hailsham-tc.gov.uk:
-  sector: local
   owner: Hailsham Town Council
+  crown: false
 halchereford.gov.uk:
-  sector: local
   owner: Herefordshire Association of Local Councils
+  crown: false
 halesandheckingham-pc.gov.uk:
-  sector: local
   owner: Hales and Heckingham Parish Council
+  crown: false
 halewoodtowncouncil.gov.uk:
-  sector: local
   owner: Halewood Town Council
+  crown: false
 halton-borough.gov.uk:
-  sector: local
   owner: Halton Borough Council
+  crown: false
 halton.gov.uk:
-  sector: local
   owner: Halton Borough Council
+  crown: false
 haltwhistle-tc.gov.uk:
-  sector: local
   owner: Haltwhistle Town Council
+  crown: false
 hambledon-pc.gov.uk:
-  sector: local
   owner: Hambledon Parish Council
+  crown: false
 hambleparishcouncil.gov.uk:
-  sector: local
   owner: Hamble Parish Council
+  crown: false
 hambleton.gov.uk:
-  sector: local
   owner: Hambleton District Council
+  crown: false
 hampshire.gov.uk:
-  sector: local
   owner: Hampshire County Council
+  crown: false
 hamptonbishopparishcouncil.gov.uk:
-  sector: local
   owner: Hampton Bishop Parish Council
+  crown: false
 hanborough-pc.gov.uk:
-  sector: local
   owner: Hanborough Parish Council
+  crown: false
 hantsdirect.gov.uk:
-  sector: local
   owner: Hampshire County Council
+  crown: false
 hants.gov.uk:
-  sector: local
   owner: Hampshire County Council
+  crown: false
 hantsiowcaddie.gov.uk:
-  sector: local
   owner: Hampshire County Council
+  crown: false
 hantsnet.gov.uk:
-  sector: local
   owner: Hampshire County Council
+  crown: false
 hantsweb.gov.uk:
-  sector: local
   owner: Hampshire County Council
+  crown: false
 harborough.gov.uk:
-  sector: local
   owner: Harborough District Council
+  crown: false
 harbury-pc.gov.uk:
-  sector: local
   owner: Harbury Parish Council
+  crown: false
 hardenparishcouncil.gov.uk:
-  sector: local
   owner: Harden Parish Council
+  crown: false
 hardingstoneparishcouncil.gov.uk:
-  sector: local
   owner: Hardington Parish Council
+  crown: false
 hardwickepc.gov.uk:
-  sector: local
   owner: Hardwicke Parish Council
+  crown: false
 haringey.gov.uk:
-  sector: local
   owner: Haringey London Borough Council
+  crown: false
 harlington-pc.gov.uk:
-  sector: local
   owner: Harlington Parish Council
+  crown: false
 harlow.gov.uk:
-  sector: local
   owner: Harlow District Council
+  crown: false
 harpenden.gov.uk:
-  sector: local
   owner: Harpenden Town Council
+  crown: false
 harrogate.gov.uk:
-  sector: local
   owner: Harrogate Borough Council
+  crown: false
 harrow.gov.uk:
-  sector: local
   owner: Harrow London Borough Council
+  crown: false
 hart.gov.uk:
-  sector: local
   owner: Hampshire County Council
+  crown: false
 hartlepool.gov.uk:
-  sector: local
   owner: Hartlepool Borough Council
+  crown: false
 hartwellparishcouncil.gov.uk:
-  sector: local
   owner: Hartwell Parish Council
+  crown: false
 hassocks-pc.gov.uk:
-  sector: local
   owner: Hassocks Parish Council
+  crown: false
 hastings.gov.uk:
-  sector: local
   owner: Hastings Borough Council
+  crown: false
 hatfield.gov.uk:
-  sector: local
   owner: Welwyn Hatfield Borough Council
+  crown: false
 hatfield-herts.gov.uk:
-  sector: local
   owner: Hatfield Town Council
+  crown: false
 hathersageparishcouncil.gov.uk:
-  sector: local
   owner: Hathersage Parish Council
+  crown: false
 havant.gov.uk:
-  sector: local
   owner: Havant District Council
+  crown: false
 haverhill-tc.gov.uk:
-  sector: local
   owner: Haverhill Town Council
+  crown: false
 hawardencommunitycouncil.gov.uk:
-  sector: local
   owner: Hawarden Community Council
+  crown: false
 hawkesbury-pc.gov.uk:
-  sector: local
   owner: Hawkesbury Parish Council
+  crown: false
 hawkinge-tc.gov.uk:
-  sector: local
   owner: Hawkinge Town Council
+  crown: false
 hawkwellparishcouncil.gov.uk:
-  sector: local
   owner: Hawkwell Parish Council
+  crown: false
 haworthcrossroadsstanbury-pc.gov.uk:
-  sector: local
   owner: Haworth, Cross Roads & Stanbury Parish Council
+  crown: false
 haworthparishcouncil.gov.uk:
-  sector: local
   owner: Haworth, Cross Roads & Stanbury Parish Council
+  crown: false
 haxbytowncouncil.gov.uk:
-  sector: local
   owner: Haxby Town Council
+  crown: false
 haydonwick.gov.uk:
-  sector: local
   owner: Haydon Wick Parish Council
+  crown: false
 hayfield-pc.gov.uk:
-  sector: local
   owner: Hayfield Parish Council
+  crown: false
 haytowncouncil.gov.uk:
-  sector: local
   owner: Hay Town Council
+  crown: false
 haywardsheath.gov.uk:
-  sector: local
   owner: Haywards Heath Town Council
+  crown: false
 headley-pc.gov.uk:
-  sector: local
   owner: Mole Valley District Council
+  crown: false
 heathandholmewood-pc.gov.uk:
-  sector: local
   owner: Heath & Holmewood Parish Council
+  crown: false
 hedgeend-tc.gov.uk:
-  sector: local
   owner: Hedge End Town Council
+  crown: false
 hednesford-tc.gov.uk:
-  sector: local
   owner: Hednesford Town Council
+  crown: false
 hedon.gov.uk:
-  sector: local
   owner: Hedon Town Council
+  crown: false
 helionsbumpsteadparishcouncil.gov.uk:
-  sector: local
   owner: Helions Bumpstead Parish Council
+  crown: false
 hellesdon-pc.gov.uk:
-  sector: local
   owner: Hellesdon Parish Council
+  crown: false
 helston-tc.gov.uk:
-  sector: local
   owner: Helston Town Council
+  crown: false
 hemingfordgreyparishcouncil.gov.uk:
-  sector: local
   owner: Hemingford Grey Parish Council
+  crown: false
 henfield.gov.uk:
-  sector: local
   owner: Henfield Parish Council
+  crown: false
 henley-in-arden-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 henleytowncouncil.gov.uk:
-  sector: local
   owner: Henley-on-Thames Town Council
+  crown: false
 henlow-pc.gov.uk:
-  sector: local
   owner: Henlow Parish Council
+  crown: false
 heps.gov.uk:
-  sector: local
   owner: East Riding of Yorkshire Council
+  crown: false
 herefordcitycouncil.gov.uk:
-  sector: local
   owner: Hereford City Council
+  crown: false
 herefordshire.gov.uk:
-  sector: local
   owner: Herefordshire Council
+  crown: false
 herriard-pc.gov.uk:
-  sector: local
   owner: Herriard Parish Council
+  crown: false
 hertford.gov.uk:
-  sector: local
   owner: Hertford Town Council
+  crown: false
 hertfordheath.gov.uk:
-  sector: local
   owner: Hertford Heath Parish Council
+  crown: false
 hertfordshire.gov.uk:
-  sector: local
   owner: Hertfordshire County Council
+  crown: false
 hertscc.gov.uk:
-  sector: local
   owner: Hertfordshire County Council
+  crown: false
 hertsfire.gov.uk:
-  sector: local
   owner: Hertfordshire County Council
+  crown: false
 hertsmere.gov.uk:
-  sector: local
   owner: Hertsmere Borough Council
+  crown: false
 Hertspartnership-ala.gov.uk:
-  sector: local
   owner: East Herts District Council
+  crown: false
 hessletowncouncil.gov.uk:
-  sector: local
   owner: Hessle Town Council
+  crown: false
 hettontowncouncil.gov.uk:
-  sector: local
   owner: Hetton Town Council
+  crown: false
 hexhamtowncouncil.gov.uk:
-  sector: local
   owner: Hexham Town Council
+  crown: false
 heybridgeparishcouncil.gov.uk:
-  sector: local
   owner: Heybridge Parish Council
+  crown: false
 highamferrers-tc.gov.uk:
-  sector: local
   owner: Higham Ferrers Town Council
+  crown: false
 higham-kent-pc.gov.uk:
-  sector: local
   owner: Higham Parish Council
+  crown: false
 highhalstow-pc.gov.uk:
-  sector: local
   owner: High Halstow Parish Council
+  crown: false
 highland.gov.uk:
-  sector: local
   owner: The Highland Council
+  crown: false
 highleghparishcouncil.gov.uk:
-  sector: local
   owner: High Legh Parish Council
+  crown: false
 highpeak.gov.uk:
-  sector: local
   owner: High Peak Borough Council
+  crown: false
 highworthtowncouncil.gov.uk:
-  sector: local
   owner: Highworth Town Council
+  crown: false
 hinckley-bosworth.gov.uk:
-  sector: local
   owner: Hinckley & Bosworth Borough Council
+  crown: false
 hinstock-pc.gov.uk:
-  sector: local
   owner: Hinstock Parish Council
+  crown: false
 hiow.gov.uk:
-  sector: local
   owner: Hampshire County Council
+  crown: false
 hixon.gov.uk:
-  sector: local
   owner: Hixon Parish Council
+  crown: false
 hockley-essex.gov.uk:
-  sector: local
   owner: Hockley Essex Parish Council
+  crown: false
 holbeton-pc.gov.uk:
-  sector: local
   owner: Holbeton Parish Council
+  crown: false
 holcomberogus-pc.gov.uk:
-  sector: local
   owner: Holcombe Rogus Parish Council
+  crown: false
 holford-pc.gov.uk:
-  sector: local
   owner: Holford Parish Council
+  crown: false
 holmeschapelparishcouncil.gov.uk:
-  sector: local
   owner: Holmes Chapel Parish Council
+  crown: false
 holmevalleyparishcouncil.gov.uk:
-  sector: local
   owner: Holme Valley Parish Council
+  crown: false
 holme-westmorland-pc.gov.uk:
-  sector: local
   owner: Holme Parish Council
+  crown: false
 holmwoodparishcouncil.gov.uk:
-  sector: local
   owner: Holmwood Parish Council
+  crown: false
 holmwood-pc.gov.uk:
-  sector: local
   owner: Mole Valley District Council
+  crown: false
 holsworthytowncouncil.gov.uk:
-  sector: local
   owner: Holsworthy Town Council
+  crown: false
 holtparishcouncil.gov.uk:
-  sector: local
   owner: Holt Parish Council
+  crown: false
 holwellparishcouncil.gov.uk:
-  sector: local
   owner: Holwell Parish Council
+  crown: false
 holywell-town.gov.uk:
-  sector: local
   owner: Holywell Town Council
+  crown: false
 honiton.gov.uk:
-  sector: local
   owner: Honiton Town Council
+  crown: false
 hook.gov.uk:
-  sector: local
   owner: Hook Parish Council
+  crown: false
 hoosaintwerburgh-pc.gov.uk:
-  sector: local
   owner: Hoo St Werburgh Parish Council (Medway)
+  crown: false
 hopecommunitycouncil.gov.uk:
-  sector: local
   owner: Hope Community Council
+  crown: false
 hordenparishcouncil.gov.uk:
-  sector: local
   owner: Horden Parish Council
+  crown: false
 hordleparishcouncil.gov.uk:
-  sector: local
   owner: Hordle Parish Council
+  crown: false
 horleysurrey-tc.gov.uk:
-  sector: local
   owner: Horley Town Council
+  crown: false
 horndeanpc-hants.gov.uk:
-  sector: local
   owner: Horndean Parish Council
+  crown: false
 hornsea.gov.uk:
-  sector: local
   owner: Hornsea Town Council
+  crown: false
 horrabridge-pc.gov.uk:
-  sector: local
   owner: Horrabridge Parish Council
+  crown: false
 horsforthtowncouncil.gov.uk:
-  sector: local
   owner: Horsforth Town Council
+  crown: false
 horsham.gov.uk:
-  sector: local
   owner: Horsham District Council
+  crown: false
 horsmonden-pc.gov.uk:
-  sector: local
   owner: Horsmonden Parish Council
+  crown: false
 hortonparishcouncil.gov.uk:
-  sector: local
   owner: Horton Parish Council
+  crown: false
 horwich.gov.uk:
-  sector: local
   owner: Horwich Town Council
+  crown: false
 houndparishcouncil.gov.uk:
-  sector: local
   owner: Hound Parish Council
+  crown: false
 howden-tc.gov.uk:
-  sector: local
   owner: Howden Town Council
+  crown: false
 hucclecotepc.gov.uk:
-  sector: local
   owner: Hucclecote Parish Council
+  crown: false
 hucklow-pc.gov.uk:
-  sector: local
   owner: Great Hucklow, Little Hucklow & Grindlow Parish Council
+  crown: false
 hullcc.gov.uk:
-  sector: local
   owner: Kingston Upon Hull City Council
+  crown: false
 hull.gov.uk:
-  sector: local
   owner: Kingston Upon Hull City Council
+  crown: false
 humberlrf.gov.uk:
-  sector: local
   owner: East Riding of Yorkshire Council
+  crown: false
 huncote-pc.gov.uk:
-  sector: local
   owner: Huncote Parish Council
+  crown: false
 hungerford-tc.gov.uk:
-  sector: local
   owner: Hungerford Town Council
+  crown: false
 hunningtonparishcouncil.gov.uk:
-  sector: local
   owner: Hunnington Parish Council
+  crown: false
 hunstantontowncouncil.gov.uk:
-  sector: local
   owner: Hunstanton Town Council
+  crown: false
 huntingdonshire.gov.uk:
-  sector: local
   owner: Huntingdonshire District Council
+  crown: false
 huntingdontown.gov.uk:
-  sector: local
   owner: Huntingdon Town Council
+  crown: false
 huntsdc.gov.uk:
-  sector: local
   owner: Huntingdonshire District Council
+  crown: false
 hyde-pc.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 hyndburnbc.gov.uk:
-  sector: local
   owner: Hyndburn Borough Council
+  crown: false
 hyndburn.gov.uk:
-  sector: local
   owner: Hyndburn Borough Council
+  crown: false
 hytheanddibden.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 hythe-tc.gov.uk:
-  sector: local
   owner: Hythe Town Council
+  crown: false
 hythetowncouncil.gov.uk:
-  sector: local
   owner: Hythe Town Council
+  crown: false
 IlchesterParishCouncil.gov.uk:
-  sector: local
   owner: Ilchester Parish Council
+  crown: false
 ilfracombetowncouncil.gov.uk:
-  sector: local
   owner: Ilfracombe Town Council
+  crown: false
 IlloganParishCouncil.gov.uk:
-  sector: local
   owner: Illogan Parish Council
+  crown: false
 ilminster.gov.uk:
-  sector: local
   owner: Ilminster Town Council
+  crown: false
 immingham-tc.gov.uk:
-  sector: local
   owner: Immingham Town Council
+  crown: false
 ingatestone-fryerningpc.gov.uk:
-  sector: local
   owner: Ingatestone And Fryerning Parish Council
+  crown: false
 internalauditscotland.gov.uk:
-  sector: local
   owner: West Dunbartonshire Council
+  crown: false
 inverclyde.gov.uk:
-  sector: local
   owner: Inverclyde Council
+  crown: false
 iow.gov.uk:
-  sector: local
   owner: Isle of Wight Council
+  crown: false
 ipplepenparishcouncil.gov.uk:
-  sector: local
   owner: Ipplepen Parish Council
+  crown: false
 ipswich.gov.uk:
-  sector: local
   owner: Ipswich Borough Council
+  crown: false
 irthlingborough-tc.gov.uk:
-  sector: local
   owner: Irthlingborough Town Council
+  crown: false
 isycoedcommunitycouncil.gov.uk:
-  sector: local
   owner: Isycoed Community Council
+  crown: false
 itchenstokeandovington-pc.gov.uk:
-  sector: local
   owner: Itchen Stoke and Ovington Parish Council
+  crown: false
 itchingfieldparishcouncil.gov.uk:
-  sector: local
   owner: Itchingfield Parish Council
+  crown: false
 iverparishcouncil.gov.uk:
-  sector: local
   owner: Iver Parish Council
+  crown: false
 ivybridge.gov.uk:
-  sector: local
   owner: Ivybridge Town Council
+  crown: false
 keighley.gov.uk:
-  sector: local
   owner: Keighley Town Council
+  crown: false
 kelvedonhatch-pc.gov.uk:
-  sector: local
   owner: Kelvedon Hatch Parish Council
+  crown: false
 kendaltowncouncil.gov.uk:
-  sector: local
   owner: Kendal Town Council
+  crown: false
 kennington-pc.gov.uk:
-  sector: local
   owner: Kennington Parish Council
+  crown: false
 kensworthparishcouncil.gov.uk:
-  sector: local
   owner: Kensworth Parish Council
+  crown: false
 kentalc.gov.uk:
-  sector: local
   owner: Kent Association of Local Councils
+  crown: false
 kentconnects.gov.uk:
-  sector: local
   owner: Kent County Council
+  crown: false
 kent.gov.uk:
-  sector: local
   owner: Kent County Council
+  crown: false
 kentparishes.gov.uk:
-  sector: local
   owner: Kent County Council
+  crown: false
 kenwynparishcouncil.gov.uk:
-  sector: local
   owner: Kenwyn Parish Council
+  crown: false
 keresley-pc.gov.uk:
-  sector: local
   owner: Keresely Parish Council
+  crown: false
 kerrier.gov.uk:
-  sector: local
   owner: Cornwall Council
+  crown: false
 kerrycommunitycouncil.gov.uk:
-  sector: local
   owner: Kerry Community Council
+  crown: false
 keswicktowncouncil.gov.uk:
-  sector: local
   owner: Keswick Town Council
+  crown: false
 kettering.gov.uk:
-  sector: local
   owner: Kettering Borough Council
+  crown: false
 kettlewell-starbotton-pc.gov.uk:
-  sector: local
   owner: Kettlewell-with-Starbotton Parish Council
+  crown: false
 keynsham-tc.gov.uk:
-  sector: local
   owner: Keynsham Town Council
+  crown: false
 kidderminstertowncouncil.gov.uk:
-  sector: local
   owner: Kidderminster Town Council
+  crown: false
 kidlington-pc.gov.uk:
-  sector: local
   owner: Kidlington Parish Council
+  crown: false
 kidsgrovetowncouncil.gov.uk:
-  sector: local
   owner: Kidsgrove Town Council
+  crown: false
 kidwelly.gov.uk:
-  sector: local
   owner: Kidwelly Town Council
+  crown: false
 kilkhampton-pc.gov.uk:
-  sector: local
   owner: Kilkhampton Parish Council
+  crown: false
 killamarsh-pc.gov.uk:
-  sector: local
   owner: Killamarsh Parish Council
+  crown: false
 kimberley-tc.gov.uk:
-  sector: local
   owner: Kimberley Town Council
+  crown: false
 kimboltonandstonely-pc.gov.uk:
-  sector: local
   owner: Kimbolton and Stonely Parish Council
+  crown: false
 kingsbridge.gov.uk:
-  sector: local
   owner: Kingsbridge Town Council
+  crown: false
 kingshillparish.gov.uk:
-  sector: local
   owner: Kings Hill Parish Council
+  crown: false
 kingslangley-pc.gov.uk:
-  sector: local
   owner: Kings Langley Parish Council
+  crown: false
 kingsteignton.gov.uk:
-  sector: local
   owner: Kingsteignton Parish Council
+  crown: false
 kingswearparishcouncil.gov.uk:
-  sector: local
   owner: Kingswear Parish Council
+  crown: false
 kingswoodparishcouncil.gov.uk:
-  sector: local
   owner: Kingswood Parish Council
+  crown: false
 kingtontowncouncil.gov.uk:
-  sector: local
   owner: KIngton Town Council
+  crown: false
 kippaxparishcouncil.gov.uk:
-  sector: local
   owner: Kippax Parish Council
+  crown: false
 kirdford-pc.gov.uk:
-  sector: local
   owner: Kirdford Parish Council
+  crown: false
 kirkbymoorsidetowncouncil.gov.uk:
-  sector: local
   owner: Kirkbymoorside Town Council
+  crown: false
 kirklees.gov.uk:
-  sector: local
   owner: Kirklees Council
+  crown: false
 kirtoninlindseytowncouncil.gov.uk:
-  sector: local
   owner: Kirton in Lindsey Town Council
+  crown: false
 KnaresboroughTownCouncil.gov.uk:
-  sector: local
   owner: Knaresborough Town Council
+  crown: false
 knebworthparishcouncil.gov.uk:
-  sector: local
   owner: Knebworth Parish Council
+  crown: false
 knowsley.gov.uk:
-  sector: local
   owner: Knowsley Metropolitan Borough Council
+  crown: false
 knowsleytowncouncil.gov.uk:
-  sector: local
   owner: Knowsley Town Council
+  crown: false
 knutsfordtowncouncil.gov.uk:
-  sector: local
   owner: Knutsford Town Council
+  crown: false
 lacockparishcouncil.gov.uk:
-  sector: local
   owner: Lacock Parish Council
+  crown: false
 lalestoncommunitycouncil.gov.uk:
-  sector: local
   owner: Laleston Community Council
+  crown: false
 lambeth.gov.uk:
-  sector: local
   owner: Lambeth London Borough Council
+  crown: false
 lampeter-tc.gov.uk:
-  sector: local
   owner: Lampeter Town Council
+  crown: false
 lancashire.gov.uk:
-  sector: local
   owner: Lancashire County Council
+  crown: false
 lancaster.gov.uk:
-  sector: local
   owner: Lancaster County Council
+  crown: false
 lancingparishcouncil.gov.uk:
-  sector: local
   owner: Lancing Parish Council
+  crown: false
 landrakeparishcouncil.gov.uk:
-  sector: local
   owner: Landrake with St. Erney Parish Council
+  crown: false
 langwithparishcouncil.gov.uk:
-  sector: local
   owner: Langwith Parish Council
+  crown: false
 lanivetparishcouncil.gov.uk:
-  sector: local
   owner: Lanivet Parish Council
+  crown: false
 lanliveryparishcouncil.gov.uk:
-  sector: local
   owner: Lanlivery Parish Council
+  crown: false
 laugharnetownship-wcc.gov.uk:
-  sector: local
   owner: Laugharne Township Community Council
+  crown: false
 launceston-tc.gov.uk:
-  sector: local
   owner: Launceston Town Council
+  crown: false
 launton-pc.gov.uk:
-  sector: local
   owner: Launton Parish Council
+  crown: false
 lawhf.gov.uk:
-  sector: local
   owner: Telford & Wrekin Council
+  crown: false
 lawleyoverdale-pc.gov.uk:
-  sector: local
   owner: Telford & Wrekin Council
+  crown: false
 lbbd.gov.uk:
-  sector: local
   owner: Barking & Dagenham London Borough Council
+  crown: false
 lbhf.gov.uk:
-  sector: local
   owner: Hammersmith and Fulham London Borough Council
+  crown: false
 lbwf.gov.uk:
-  sector: local
   owner: Waltham Forest London Borough Council
+  crown: false
 leacottam-pc.gov.uk:
-  sector: local
   owner: Lea and Cottam Parish Council
+  crown: false
 leamingtonspatowncouncil.gov.uk:
-  sector: local
   owner: Royal Leamington Spa Town Council
+  crown: false
 ledburytowncouncil.gov.uk:
-  sector: local
   owner: Ledbury Town Council
+  crown: false
 ledshamparishcouncil.gov.uk:
-  sector: local
   owner: Ledsham Parish Council
+  crown: false
 leeds.gov.uk:
-  sector: local
   owner: Leeds City Council
+  crown: false
 leek-tc.gov.uk:
-  sector: local
   owner: Leek Town Council
+  crown: false
 leektowncouncil.gov.uk:
-  sector: local
   owner: Leek Town Council
+  crown: false
 leicester.gov.uk:
-  sector: local
   owner: Leicester City Council
+  crown: false
   agreement_signed: true
 leicestershireandrutlandalc.gov.uk:
-  sector: local
   owner: Leicestershire and Rutland Association of Local Councils
+  crown: false
 leicestershire-fire.gov.uk:
-  sector: local
   owner: Leicestershire County Council
+  crown: false
 leicestershire.gov.uk:
-  sector: local
   owner: Leicestershire County Council
+  crown: false
 leics.gov.uk:
-  sector: local
   owner: Leicestershire County Council
+  crown: false
 leighonseatowncouncil.gov.uk:
-  sector: local
   owner: Leigh-on-Sea Town Council
+  crown: false
 leightonlinslade-tc.gov.uk:
-  sector: local
   owner: Leighton Linslade Town Council
+  crown: false
 leistontowncouncil.gov.uk:
-  sector: local
   owner: Leiston-cum-Sizewell Town Council
+  crown: false
 leominstertowncouncil.gov.uk:
-  sector: local
   owner: Leominster Town Council
+  crown: false
 lewes-eastbourne.gov.uk:
-  sector: local
   owner: Eastbourne Borough Council
+  crown: false
 lewes.gov.uk:
-  sector: local
   owner: Lewes District Council
+  crown: false
 lewes-tc.gov.uk:
-  sector: local
   owner: Lewes Town Council
+  crown: false
 lg-em.gov.uk:
-  sector: local
   owner: East Midlands Councils
+  crown: false
 lgyh.gov.uk:
-  sector: local
   owner: Wakefield City Council
+  crown: false
 lichfielddc.gov.uk:
-  sector: local
   owner: Lichfield District Council
+  crown: false
 lichfield.gov.uk:
-  sector: local
   owner: Lichfield City Council
+  crown: false
 limavady.gov.uk:
-  sector: local
   owner: Limavady Borough Council
+  crown: false
 lincoln.gov.uk:
-  sector: local
   owner: Lincoln City Council
+  crown: false
 lincolnshire.gov.uk:
-  sector: local
   owner: Lincolnshire County Council
+  crown: false
 lincsbc.gov.uk:
-  sector: local
   owner: East Lindsey District Council
+  crown: false
 lindfieldparishcouncil.gov.uk:
-  sector: local
   owner: Lindfield Parish Council
+  crown: false
 lingfieldparishcouncil.gov.uk:
-  sector: local
   owner: Lingfield Parish Council
+  crown: false
 lintoncambridgeshire-pc.gov.uk:
-  sector: local
   owner: Linton Parish Council
+  crown: false
 lintonpc-herefordshire.gov.uk:
-  sector: local
   owner: Linton Parish Council
+  crown: false
 lisburncastlereagh.gov.uk:
-  sector: local
   owner: Lisburn City Council
+  crown: false
 lisburncityandcastlereagh.gov.uk:
-  sector: local
   owner: Lisburn City Council
+  crown: false
 liskeard.gov.uk:
-  sector: local
   owner: Liskeard Town Council
+  crown: false
 lissparishcouncil.gov.uk:
-  sector: local
   owner: Liss Parish Council
+  crown: false
 littlealtcar-pc.gov.uk:
-  sector: local
   owner: Little Altcar Parish Council
+  crown: false
 littlechalfontparishcouncil.gov.uk:
-  sector: local
   owner: Chiltern District Council
+  crown: false
 littlechalfont-pc.gov.uk:
-  sector: local
   owner: Chiltern District Council
+  crown: false
 littledunham-pc.gov.uk:
-  sector: local
   owner: Little Dunham Parish Council
+  crown: false
 littlehadham-pc.gov.uk:
-  sector: local
   owner: Little Hadham Parish Council
+  crown: false
 littlehampton-tc.gov.uk:
-  sector: local
   owner: Littlehampton Town Council
+  crown: false
 LittleHarrowdenParishCouncil.gov.uk:
-  sector: local
   owner: Little Harrowden Parish Council
+  crown: false
 littlehoughtonparishcouncilnorthants.gov.uk:
-  sector: local
   owner: Little Houghton Parish Council
+  crown: false
 littlemoreparishcouncil.gov.uk:
-  sector: local
   owner: Littlemore Parish Council
+  crown: false
 littleportparishcouncil.gov.uk:
-  sector: local
   owner: Littleport Parish Council
+  crown: false
 littlesomerfordparishcouncil.gov.uk:
-  sector: local
   owner: Little Somerford Parish Council
+  crown: false
 littlestanney-pc.gov.uk:
-  sector: local
   owner: Little Stanney & District Parish Council
+  crown: false
 liverpoolcityregion-ca.gov.uk:
-  sector: local
   owner: Knowsley Metropolitan Borough Council
+  crown: false
 liverpool.gov.uk:
-  sector: local
   owner: Liverpool City Council
+  crown: false
 llanasacommunitycouncil.gov.uk:
-  sector: local
   owner: Llanasa Community Council
+  crown: false
 llandeilo.gov.uk:
-  sector: local
   owner: Llandeilo Town Council
+  crown: false
 llandudno.gov.uk:
-  sector: local
   owner: Cyngor Tref Llandudno Town Council
+  crown: false
 llanelli-rural.gov.uk:
-  sector: local
   owner: Llanelli Rural Council
+  crown: false
 llanellitowncouncil.gov.uk:
-  sector: local
   owner: Llanelli Town Council
+  crown: false
 llanfaelogcommunitycouncil.gov.uk:
-  sector: local
   owner: Llanfaelog Community Council
+  crown: false
 llanfaircommunitycouncil.gov.uk:
-  sector: local
   owner: Llanfair Community Council
+  crown: false
 llangennechcommunitycouncil.gov.uk:
-  sector: local
   owner: Llangennech Community Council
+  crown: false
 llangollentowncouncil.gov.uk:
-  sector: local
   owner: Llangollen Town Council
+  crown: false
 llantwitmajortowncouncil.gov.uk:
-  sector: local
   owner: Llantwit Major Town Council
+  crown: false
 LlwchwrTownCouncil.gov.uk:
-  sector: local
   owner: Llwchwr Town Council
+  crown: false
 localgovernmentjobsni.gov.uk:
-  sector: local
   owner: North Down Borough Council
+  crown: false
 londoncareplacements.gov.uk:
-  sector: local
   owner: London Councils
+  crown: false
 londoncolney-pc.gov.uk:
-  sector: local
   owner: London Colney Parish Council
+  crown: false
 londoncouncils.gov.uk:
-  sector: local
   owner: London Councils
+  crown: false
 londontribunals.gov.uk:
-  sector: local
   owner: London Councils
+  crown: false
 longashtonparishcouncil.gov.uk:
-  sector: local
   owner: Long Ashton Parish Council
+  crown: false
 longborough-pc.gov.uk:
-  sector: local
   owner: Longborough Parish Council
+  crown: false
 longcompton-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 longdonworcs-pc.gov.uk:
-  sector: local
   owner: Longdon, Queenhill and Holdfast Parish Council
+  crown: false
 longmelford-pc.gov.uk:
-  sector: local
   owner: Long Melford Parish Council
+  crown: false
 longridge-tc.gov.uk:
-  sector: local
   owner: Longridge Town Council
+  crown: false
 longstratton-pc.gov.uk:
-  sector: local
   owner: Long Stratton Parish Council
+  crown: false
 looetowncouncil.gov.uk:
-  sector: local
   owner: Looe Town Council
+  crown: false
 lookinglocal.gov.uk:
-  sector: local
   owner: Kirklees Council
+  crown: false
 loose-pc.gov.uk:
-  sector: local
   owner: Loose Parish Council
+  crown: false
 loppingtonparishcouncil.gov.uk:
-  sector: local
   owner: Loppington Parish Council
+  crown: false
 lostwithieltowncouncil.gov.uk:
-  sector: local
   owner: Lostwithiel Town Council
+  crown: false
 loughton-tc.gov.uk:
-  sector: local
   owner: Loughton Town Council
+  crown: false
 louthtowncouncil.gov.uk:
-  sector: local
   owner: Louth Town Council
+  crown: false
 lowestofttowncouncil.gov.uk:
-  sector: local
   owner: Lowestoft Town Council
+  crown: false
 luddesdown-pc.gov.uk:
-  sector: local
   owner: Luddesdown Parish Council
+  crown: false
 ludlow.gov.uk:
-  sector: local
   owner: Ludlow Town Council
+  crown: false
 lustonparishes.gov.uk:
-  sector: local
   owner: Luston Group Parish Council
+  crown: false
 luton.gov.uk:
-  sector: local
   owner: Luton Borough Council
+  crown: false
 lutton-pc.gov.uk:
-  sector: local
   owner: Lutton Parish Council
+  crown: false
 lydiardmillicent-pc.gov.uk:
-  sector: local
   owner: Lydiard Millicent Parish Council
+  crown: false
 lydiateparishcouncil.gov.uk:
-  sector: local
   owner: Lydiate Parish Council
+  crown: false
 lymeregistowncouncil.gov.uk:
-  sector: local
   owner: Lyme Regis Town Council
+  crown: false
 lymingtonandpennington-tc.gov.uk:
-  sector: local
   owner: Lymington and Pennington Town Council
+  crown: false
 lymmparishcouncil.gov.uk:
-  sector: local
   owner: Lymm Parish Council
+  crown: false
 lytchettminsterandupton-tc.gov.uk:
-  sector: local
   owner: Lytchett Minster & Upton Town Council
+  crown: false
 macclesfield-tc.gov.uk:
-  sector: local
   owner: Macclesfield Town Council
+  crown: false
 madeleytowncouncil.gov.uk:
-  sector: local
   owner: Madeley Parish Council
+  crown: false
 maethugogleddcymru.gov.uk:
-  sector: local
   owner: Flintshire County Council
+  crown: false
 maghull-tc.gov.uk:
-  sector: local
   owner: Maghull Town Council
+  crown: false
 maiden.gov.uk:
-  sector: local
   owner: Gloucestershire County Council
+  crown: false
 maidennewton-pc.gov.uk:
-  sector: local
   owner: Maiden Newton Parish Council
+  crown: false
 maidstone.gov.uk:
-  sector: local
   owner: Maidstone Borough Council
+  crown: false
 maldon.gov.uk:
-  sector: local
   owner: Maldon District Council
+  crown: false
 maldontowncouncil.gov.uk:
-  sector: local
   owner: Maldon Town Council
+  crown: false
 malmesbury.gov.uk:
-  sector: local
   owner: Malmesbury Town Council
+  crown: false
 malton-tc.gov.uk:
-  sector: local
   owner: Malton Town Council
+  crown: false
 malvernhills.gov.uk:
-  sector: local
   owner: Malvern Hills District Council
+  crown: false
 malvernwells-pc.gov.uk:
-  sector: local
   owner: Malvern Wells Parish Council
+  crown: false
 manchester.gov.uk:
-  sector: local
   owner: Manchester City Council
+  crown: false
 manea-pc.gov.uk:
-  sector: local
   owner: Manea Parish Council
+  crown: false
 mansfield-dc.gov.uk:
-  sector: local
   owner: Mansfield District Council
+  crown: false
 mansfield.gov.uk:
-  sector: local
   owner: Mansfield District Council
+  crown: false
 marchamparishcouncil.gov.uk:
-  sector: local
   owner: Marcham Parish Council
+  crown: false
 marchtowncouncil.gov.uk:
-  sector: local
   owner: March Town Council
+  crown: false
 mardenkent-pc.gov.uk:
-  sector: local
   owner: Marden Parish Council
+  crown: false
 marhamchurch-pc.gov.uk:
-  sector: local
   owner: Marhamchurch Parish Council
+  crown: false
 marketbosworth-pc.gov.uk:
-  sector: local
   owner: Market Bosworth Parish Council
+  crown: false
 marketdrayton.gov.uk:
-  sector: local
   owner: Market Drayton Town Council
+  crown: false
 marketweightontowncouncil.gov.uk:
-  sector: local
   owner: East Riding of Yorkshire Council
+  crown: false
 markyateparishcouncil.gov.uk:
-  sector: local
   owner: Markyate Parish Council
+  crown: false
 marlborough-tc.gov.uk:
-  sector: local
   owner: Marlborough Town Council
+  crown: false
 marlboroughtowncouncil.gov.uk:
-  sector: local
   owner: Marlborough Town Council
+  crown: false
 marlow-tc.gov.uk:
-  sector: local
   owner: Marlow Town Council
+  crown: false
 marshgibbon-pc.gov.uk:
-  sector: local
   owner: Marsh Gibbon Parish Council
+  crown: false
 marstonsicca-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 martham.gov.uk:
-  sector: local
   owner: Martham Parish Council
+  crown: false
 martock-pc.gov.uk:
-  sector: local
   owner: Martock Parish Council
+  crown: false
 maryporttowncouncil.gov.uk:
-  sector: local
   owner: Maryport Town Council
+  crown: false
 matlockbathparishcouncil.gov.uk:
-  sector: local
   owner: Parish Council of Matlock Bath
+  crown: false
 matlock.gov.uk:
-  sector: local
   owner: Matlock Town Council
+  crown: false
 meashamparishcouncil.gov.uk:
-  sector: local
   owner: Measham Parish Council
+  crown: false
 medway.gov.uk:
-  sector: local
   owner: Medway Council
+  crown: false
 melthamtowncouncil.gov.uk:
-  sector: local
   owner: Meltham Town Council
+  crown: false
 melton.gov.uk:
-  sector: local
   owner: Melton Borough Council
+  crown: false
 melton-suffolk-pc.gov.uk:
-  sector: local
   owner: Melton Parish Council
+  crown: false
 mendip.gov.uk:
-  sector: local
   owner: Mendip District Council
+  crown: false
 merthyr.gov.uk:
-  sector: local
   owner: Merthyr Tydfil County Borough Council
+  crown: false
 metheringham-pc.gov.uk:
-  sector: local
   owner: Metheringham Parish Council
+  crown: false
 micklefield-pc.gov.uk:
-  sector: local
   owner: Micklefield Parish Council
+  crown: false
 midandeastantrim.gov.uk:
-  sector: local
   owner: Mid and East Antrim Borough Council
+  crown: false
 middevon.gov.uk:
-  sector: local
   owner: Mid Devon District Council
+  crown: false
 middlesbrough.gov.uk:
-  sector: local
   owner: Middlesbrough Council
+  crown: false
 middletonbywirksworth-pc.gov.uk:
-  sector: local
   owner: Middleton by Wirksworth Parish Council
+  crown: false
 middleton-northants-pc.gov.uk:
-  sector: local
   owner: Middleton Parish Council
+  crown: false
 midhurst-tc.gov.uk:
-  sector: local
   owner: Midhurst Town Council
+  crown: false
 midkent.gov.uk:
-  sector: local
   owner: Swale Borough Council
+  crown: false
 midlothian.gov.uk:
-  sector: local
   owner: Midlothian Council
+  crown: false
 midsuffolk.gov.uk:
-  sector: local
   owner: Mid Suffolk District Council
+  crown: false
 midsussex.gov.uk:
-  sector: local
   owner: Mid Sussex District Council
+  crown: false
 milland-wsx-pc.gov.uk:
-  sector: local
   owner: Chichester District Council
+  crown: false
 millbrook-pc.gov.uk:
-  sector: local
   owner: Millbrook Parish Council
+  crown: false
 milton-keynes.gov.uk: miltonkeynes.gov.uk
 miltonkeynes.gov.uk:
-  sector: local
   owner: Milton Keynes Council
+  crown: false
   agreement_signed: true
 milton-pc.gov.uk:
-  sector: local
   owner: Milton Parish Council
+  crown: false
 miltonunderwychwood-pc.gov.uk:
-  sector: local
   owner: Milton-under-Wychwood Parish Council
+  crown: false
 minchinhampton-pc.gov.uk:
-  sector: local
   owner: Minchinhampton Parish Council
+  crown: false
 minstead.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 minsterlovell-pc.gov.uk:
-  sector: local
   owner: Minster Lovell Parish Council
+  crown: false
 minternemagnaparishcouncil.gov.uk:
-  sector: local
   owner: Minterne Magna Parish Council
+  crown: false
 mirfieldtowncouncil.gov.uk:
-  sector: local
   owner: Mirfield Town Council
+  crown: false
 miserden-pc.gov.uk:
-  sector: local
   owner: Miserden Parish Council
+  crown: false
 misterton-notts-pc.gov.uk:
-  sector: local
   owner: Misterton Parish Council
+  crown: false
 mitfordparishcouncil.gov.uk:
-  sector: local
   owner: Mitford Parish Council
+  crown: false
 molescroft-pc.gov.uk:
-  sector: local
   owner: Molescroft Parish Council
+  crown: false
 mole-valley.gov.uk:
-  sector: local
   owner: Mole Valley District Council
+  crown: false
 molevalley.gov.uk:
-  sector: local
   owner: Mole Valley District Council
+  crown: false
 mollingtonoxon-pc.gov.uk:
-  sector: local
   owner: Mollington Parish Council
+  crown: false
 monkhesledenparishcouncil.gov.uk:
-  sector: local
   owner: Monk Hesleden Parish Council
+  crown: false
 monksherborne-pc.gov.uk:
-  sector: local
   owner: Monk Sherborne Parish Council
+  crown: false
 monmouth.gov.uk:
-  sector: local
   owner: Monmouth Town Council
+  crown: false
 monmouthshire.gov.uk:
-  sector: local
   owner: Monmouthshire County Council
+  crown: false
 moray-edunet.gov.uk:
-  sector: local
   owner: Moray Council
+  crown: false
 moray.gov.uk:
-  sector: local
   owner: Moray Council
+  crown: false
 morecambe.gov.uk:
-  sector: local
   owner: Morecambe Town Council
+  crown: false
 moretonvalence-pc.gov.uk:
-  sector: local
   owner: Moreton Valence Parish Council
+  crown: false
 morley.gov.uk:
-  sector: local
   owner: Morley Town Council
+  crown: false
 Morpeth-tc.gov.uk:
-  sector: local
   owner: Morpeth Town Council
+  crown: false
 morville-pc.gov.uk:
-  sector: local
   owner: Morville Parish Council
+  crown: false
 mossanddistrict-pc.gov.uk:
-  sector: local
   owner: Moss and District Parish Council
+  crown: false
 mostyncommunitycouncil.gov.uk:
-  sector: local
   owner: Mostyn Community Council
+  crown: false
 moultonnorthants-pc.gov.uk:
-  sector: local
   owner: Moulton Parish Council
+  crown: false
 muchwenlock-tc.gov.uk:
-  sector: local
   owner: Much Wenlock Town Council
+  crown: false
 mudfordparishcouncil.gov.uk:
-  sector: local
   owner: Mudford Parish Council
+  crown: false
 mumbles.gov.uk:
-  sector: local
   owner: Mumbles Community Council
+  crown: false
 myddleandbroughton-pc.gov.uk:
-  sector: local
   owner: Myddle and Broughton Parish Council
+  crown: false
 mynottingham.gov.uk:
-  sector: local
   owner: Nottingham City Council
+  crown: false
 myoxfordshire.gov.uk:
-  sector: local
   owner: Oxfordshire County Council
+  crown: false
 nafn.gov.uk:
-  sector: local
   owner: Tameside Metropolitan Borough Council
+  crown: false
 nailseatowncouncil.gov.uk:
-  sector: local
   owner: Nailsea Town Council
+  crown: false
 nailsworthtowncouncil.gov.uk:
-  sector: local
   owner: Nailsworth Town Council
+  crown: false
 nalc.gov.uk:
-  sector: local
   owner: National Association of Local Councils
+  crown: false
 nantwichtowncouncil.gov.uk:
-  sector: local
   owner: Nantwich Town Council
+  crown: false
 narboroughparishcouncil.gov.uk:
-  sector: local
   owner: Narborough Parish Council
+  crown: false
 nash-bucks-pc.gov.uk:
-  sector: local
   owner: Nash Parish Council
+  crown: false
 NashMillsParishCouncil.gov.uk:
-  sector: local
   owner: Nash Mills Parish Council
+  crown: false
 neath-porttalbot.gov.uk:
-  sector: local
   owner: Neath Port Talbot County Borough Council
+  crown: false
 neathtowncouncil.gov.uk:
-  sector: local
   owner: Neath Town Council
+  crown: false
 ne-derbyshire.gov.uk:
-  sector: local
   owner: North East Derbyshire District Council
+  crown: false
 ne-ifca.gov.uk:
-  sector: local
   owner: East Riding of Yorkshire Council
+  crown: false
 nelincs.gov.uk:
-  sector: local
   owner: North East Lincolnshire Council
+  crown: false
 nelson-mid-glam.gov.uk:
-  sector: local
   owner: Nelson Community Council
+  crown: false
 nelsontowncouncil.gov.uk:
-  sector: local
   owner: Nelson Town Council
+  crown: false
 netherstowey-pc.gov.uk:
-  sector: local
   owner: Nether Stowey Parish Council
+  crown: false
 netleymarsh-pc.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 nettleham-pc.gov.uk:
-  sector: local
   owner: Nettleham Parish Council
+  crown: false
 newark.gov.uk:
-  sector: local
   owner: Newark Town Council
+  crown: false
 newark-sherwooddc.gov.uk:
-  sector: local
   owner: Newark & Sherwood District Council
+  crown: false
 newbiggintowncouncil.gov.uk:
-  sector: local
   owner: Newbiggin Town Council
+  crown: false
 newbradwell-pc.gov.uk:
-  sector: local
   owner: New Bradwell Parish Council
+  crown: false
 newbury.gov.uk:
-  sector: local
   owner: Newbury Town Council
+  crown: false
 NewcastleEmlynTownCouncil.gov.uk:
-  sector: local
   owner: Newcastle Emlyn Town Council
+  crown: false
 newcastle.gov.uk:
-  sector: local
   owner: Newcastle upon Tyne City Council
+  crown: false
   agreement_signed: true
 newcastle-staffs.gov.uk:
-  sector: local
   owner: Newcastle under Lyme Borough Council
+  crown: false
 newdigateparishcouncil.gov.uk:
-  sector: local
   owner: Newdigate Parish Council
+  crown: false
 newenttowncouncil.gov.uk:
-  sector: local
   owner: Newent Town Council
+  crown: false
 newforestcouncil.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 newforestdc.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 newforestdistrict.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 newforest.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 newfrankleyinbirminghamparishcouncil.gov.uk:
-  sector: local
   owner: Newfrankley in Birmingham Parish Council
+  crown: false
 newhaventowncouncil.gov.uk:
-  sector: local
   owner: Newhaven Town Council
+  crown: false
 newhollandparishcouncil.gov.uk:
-  sector: local
   owner: New Holland Parish Council
+  crown: false
 newlandparishcouncil.gov.uk:
-  sector: local
   owner: Newland Parish Council
+  crown: false
 newmarket.gov.uk:
-  sector: local
   owner: Newmarket Town Council
+  crown: false
 newmillstowncouncil.gov.uk:
-  sector: local
   owner: New Mills Town Council
+  crown: false
 newmiltontowncouncil.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 newport.gov.uk:
-  sector: local
   owner: Newport City Council
+  crown: false
 newportshropshire-tc.gov.uk:
-  sector: local
   owner: Newport Town Council
+  crown: false
 newtonabbot-tc.gov.uk:
-  sector: local
   owner: Newton Abbot Town Council
+  crown: false
 newtonandnoss-pc.gov.uk:
-  sector: local
   owner: Newton & Noss Parish Council
+  crown: false
 newton-cambridge-pc.gov.uk:
-  sector: local
   owner: Newton Parish Council
+  crown: false
 newtownabbey.gov.uk:
-  sector: local
   owner: Newtownabbey Borough Council
+  crown: false
 nfdc.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 n-kesteven.gov.uk:
-  sector: local
   owner: North Kesteven District Council
+  crown: false
 norfolkalc.gov.uk:
-  sector: local
   owner: Norfolk Association of Local Councils
+  crown: false
 norfolkedunet.gov.uk:
-  sector: local
   owner: Norfolk County Council
+  crown: false
 norfolkfireservice.gov.uk:
-  sector: local
   owner: Norfolk County Council
+  crown: false
 norfolk.gov.uk:
-  sector: local
   owner: Norfolk County Council
+  crown: false
 norfolkparishes.gov.uk:
-  sector: local
   owner: Norfolk County Council
+  crown: false
 norfolkprepared.gov.uk:
-  sector: local
   owner: Norfolk County Council
+  crown: false
 normandyparishcouncil.gov.uk:
-  sector: local
   owner: Normandy Parish Council
+  crown: false
 NorthallertonTownCouncil.gov.uk:
-  sector: local
   owner: Northallerton Town Council
+  crown: false
 northampton.gov.uk:
-  sector: local
   owner: Northampton Borough Council
+  crown: false
 northamptonshire.gov.uk:
-  sector: local
   owner: Northamptonshire County Council
+  crown: false
 northamtowncouncil.gov.uk:
-  sector: local
   owner: Northam Town Council
+  crown: false
 northandmiddlelittleton-pc.gov.uk:
-  sector: local
   owner: North and Middle Littleton Parish Council
+  crown: false
 northants-ecl.gov.uk:
-  sector: local
   owner: Northamptonshire County Council
+  crown: false
 northantslicensing.gov.uk:
-  sector: local
   owner: East Northamptonshire Council
+  crown: false
 north-ayrshire.gov.uk:
-  sector: local
   owner: North Ayrshire Council
+  crown: false
 northcave-pc.gov.uk:
-  sector: local
   owner: North Cave Parish Council
+  crown: false
 northclainesparishcouncil.gov.uk:
-  sector: local
   owner: North Claines Parish Council
+  crown: false
 northcrawley-pc.gov.uk:
-  sector: local
   owner: North Crawley Parish Council
+  crown: false
 northdevon.gov.uk:
-  sector: local
   owner: North Devon Council
+  crown: false
 north-dorset.gov.uk:
-  sector: local
   owner: North Dorset District Council
+  crown: false
 northeastca.gov.uk:
-  sector: local
   owner: Newcastle upon Tyne City Council
+  crown: false
 northeastcouncils.gov.uk:
-  sector: local
   owner: Association of North East Councils Limited
+  crown: false
 northeast-tadu.gov.uk:
-  sector: local
   owner: Gateshead Metropolitan Borough Council
+  crown: false
 north-herts.gov.uk:
-  sector: local
   owner: North Hertfordshire District Council
+  crown: false
 northhinksey-pc.gov.uk:
-  sector: local
   owner: North Hinksey Parish Council
+  crown: false
 northhorsham-pc.gov.uk:
-  sector: local
   owner: North Horsham Parish Council
+  crown: false
 northhykehamtowncouncil.gov.uk:
-  sector: local
   owner: North Hykeham Town Council
+  crown: false
 northingtonparishcouncil.gov.uk:
-  sector: local
   owner: Northington Parish Council
+  crown: false
 northkilworthparishcouncil.gov.uk:
-  sector: local
   owner: North Kilworth Parish Council
+  crown: false
 northlanarkshire.gov.uk:
-  sector: local
   owner: North Lanarkshire Council
+  crown: false
 northlan.gov.uk:
-  sector: local
   owner: North Lanarkshire Council
+  crown: false
 northleach.gov.uk:
-  sector: local
   owner: Northleach with Eastington Town Council
+  crown: false
 northlincs.gov.uk:
-  sector: local
   owner: North Lincolnshire Council
+  crown: false
   agreement_signed: true
 north-norfolk.gov.uk:
-  sector: local
   owner: North Norfolk District Council
+  crown: false
 northsomerset.gov.uk:
-  sector: local
   owner: North Somerset Council
+  crown: false
 northtyneside.gov.uk:
-  sector: local
   owner: North Tyneside Metropolitan Borough Council
+  crown: false
 northumberland.gov.uk:
-  sector: local
   owner: Northumberland County Council
+  crown: false
 northwalesadoption.gov.uk:
-  sector: local
   owner: Wrexham County Borough Council
+  crown: false
 northwalesfostering.gov.uk:
-  sector: local
   owner: Flintshire County Council
+  crown: false
 northwarks.gov.uk:
-  sector: local
   owner: North Warwickshire Borough Council
+  crown: false
 northweald-pc.gov.uk:
-  sector: local
   owner: North Weald Bassett Parish Council
+  crown: false
 northwestvotes.gov.uk:
-  sector: local
   owner: Manchester City Council
+  crown: false
 northwichtowncouncil.gov.uk:
-  sector: local
   owner: Northwich Town Council
+  crown: false
 northyorks.gov.uk:
-  sector: local
   owner: North Yorkshire County Council
+  crown: false
   agreement_signed: true
 norwich.gov.uk:
-  sector: local
   owner: Norwich City Council
+  crown: false
 nottinghamcity.gov.uk:
-  sector: local
   owner: Nottingham City Council
+  crown: false
 nottingham.gov.uk:
-  sector: local
   owner: Nottingham City Council
+  crown: false
 nottinghamshire.gov.uk:
-  sector: local
   owner: Nottinghamshire County Council
+  crown: false
 nottscc.gov.uk:
-  sector: local
   owner: Nottinghamshire County Council
+  crown: false
 npt.gov.uk:
-  sector: local
   owner: Neath Port Talbot County Borough Council
+  crown: false
 n-somerset.gov.uk:
-  sector: local
   owner: North Somerset Council
+  crown: false
 nuneatonandbedworth.gov.uk:
-  sector: local
   owner: Nuneaton and Bedworth Borough Council
+  crown: false
 nwleicestershire.gov.uk:
-  sector: local
   owner: North West Leicestershire District Council
+  crown: false
 nwleicsdc.gov.uk:
-  sector: local
   owner: North West Leicestershire District Council
+  crown: false
 nwleics.gov.uk:
-  sector: local
   owner: North West Leicestershire District Council
+  crown: false
 nytheeldeneliden-pc.gov.uk:
-  sector: local
   owner: Nythe, Eldene and Liden Parish Council
+  crown: false
 oadby-wigston.gov.uk:
-  sector: local
   owner: Oadby and Wigston Borough Council
+  crown: false
 oakengates-tc.gov.uk:
-  sector: local
   owner: Telford & Wrekin Council
+  crown: false
 oakhamtowncouncil.gov.uk:
-  sector: local
   owner: Oakham Town Council
+  crown: false
 oakleydeane-pc.gov.uk:
-  sector: local
   owner: Oakley and Deane Parish Council
+  crown: false
 oclepychardgroup-pc.gov.uk:
-  sector: local
   owner: Ocle Pychard Parish Council Group
+  crown: false
 odcombeparishcouncil.gov.uk:
-  sector: local
   owner: Odcombe Parish Council
+  crown: false
 offacommunitycouncil.gov.uk:
-  sector: local
   owner: Offa Community Council
+  crown: false
 offords-pc.gov.uk:
-  sector: local
   owner: Offord Cluny and Offord D'Arcy Parish Council
+  crown: false
 okefordfitzpaine-pc.gov.uk:
-  sector: local
   owner: Okeford Fitzpaine Parish Council
+  crown: false
 okehampton.gov.uk:
-  sector: local
   owner: Okehampton Town Council
+  crown: false
 okehamptonhamlets-pc.gov.uk:
-  sector: local
   owner: Okehampton Hamlets Parish Council
+  crown: false
 oldbasing.gov.uk:
-  sector: local
   owner: Old Basing & Lychpit Parish Council
+  crown: false
 oldbolsovertowncouncil.gov.uk:
-  sector: local
   owner: Old Bolsover Town Council
+  crown: false
 oldham.gov.uk:
-  sector: local
   owner: Oldham Metropolitan Borough Council
+  crown: false
 oldmarston-pc.gov.uk:
-  sector: local
   owner: Old Marston Parish Council
+  crown: false
 ollerton-tc.gov.uk:
-  sector: local
   owner: Ollerton & Boughton Town Council
+  crown: false
 olneytowncouncil.gov.uk:
-  sector: local
   owner: Olney Town Council
+  crown: false
 olvestonparishcouncil.gov.uk:
-  sector: local
   owner: Olveston Parish Council
+  crown: false
 omagh.gov.uk:
-  sector: local
   owner: Omagh District Council
+  crown: false
 ongartowncouncil.gov.uk:
-  sector: local
   owner: Ongar Town Council
+  crown: false
 orchardpark.gov.uk:
-  sector: local
   owner: Orchard Park Community Council
+  crown: false
 orgreaveparishcouncil.gov.uk:
-  sector: local
   owner: Orgreave Parish Council
+  crown: false
 orkney.gov.uk:
-  sector: local
   owner: Orkney Islands Council
+  crown: false
 oswestryrural-pc.gov.uk:
-  sector: local
   owner: Oswestry Rural Parish Council
+  crown: false
 oswestry-tc.gov.uk:
-  sector: local
   owner: Oswestry Town Council
+  crown: false
 otleytowncouncil.gov.uk:
-  sector: local
   owner: Otley Town Council
+  crown: false
 otterystmary-tc.gov.uk:
-  sector: local
   owner: Ottery St. Mary Town Council
+  crown: false
 oultonbroadparishcouncil.gov.uk:
-  sector: local
   owner: Oulton Broad Parish Council
+  crown: false
 oundle.gov.uk:
-  sector: local
   owner: Oundle Town Council
+  crown: false
 overstone-pc.gov.uk:
-  sector: local
   owner: Overstone Parish Council
+  crown: false
 overtonparishcouncil.gov.uk:
-  sector: local
   owner: Overton Parish Council
+  crown: false
 oxenhopeparishcouncil.gov.uk:
-  sector: local
   owner: Oxenhope Parish Council
+  crown: false
 oxford.gov.uk:
-  sector: local
   owner: Oxford City Council
+  crown: false
 oxfordshire.gov.uk:
-  sector: local
   owner: Oxfordshire County Council
+  crown: false
 oxfordshire-online.gov.uk:
-  sector: local
   owner: Oxfordshire County Council
+  crown: false
 oxfordshireonline.gov.uk:
-  sector: local
   owner: Oxfordshire County Council
+  crown: false
 oxon.gov.uk:
-  sector: local
   owner: Oxfordshire County Council
+  crown: false
 padihamtowncouncil.gov.uk:
-  sector: local
   owner: Padiham Town Council
+  crown: false
 padstow-tc.gov.uk:
-  sector: local
   owner: Padstow Town Council
+  crown: false
 padworthparishcouncil.gov.uk:
-  sector: local
   owner: Padworth Parish Council
+  crown: false
 paessex.gov.uk:
-  sector: local
   owner: Essex County Council
+  crown: false
 paghamparishcouncil.gov.uk:
-  sector: local
   owner: Pagham Parish Council
+  crown: false
 painswick-pc.gov.uk:
-  sector: local
   owner: Painswick Parish Council
+  crown: false
 pamber-pc.gov.uk:
-  sector: local
   owner: Pamber Parish Council
+  crown: false
 pancrasweekparishcouncil.gov.uk:
-  sector: local
   owner: Pancrasweek Parish Council
+  crown: false
 pangbourne-pc.gov.uk:
-  sector: local
   owner: Pangbourne Parish Council
+  crown: false
 pannalandburnbridge-pc.gov.uk:
-  sector: local
   owner: Pannal and Burn Bridge Parish Council
+  crown: false
 parbold-pc.gov.uk:
-  sector: local
   owner: Parbold Parish Council
+  crown: false
 patchwaytowncouncil.gov.uk:
-  sector: local
   owner: Patchway Town Council
+  crown: false
 peacehaventowncouncil.gov.uk:
-  sector: local
   owner: Peacehaven Town Council
+  crown: false
 peasedownstjohnparishcouncil.gov.uk:
-  sector: local
   owner: Peasedown St John Parish Council
+  crown: false
 pegswood-pc.gov.uk:
-  sector: local
   owner: Pegswood Parish Council
+  crown: false
 peltonparishcouncil.gov.uk:
-  sector: local
   owner: Pelton Parish Council
+  crown: false
 pembreyburryport-tc.gov.uk:
-  sector: local
   owner: Pembrey & Burry Port Town Council
+  crown: false
 pembridgeparishcouncil.gov.uk:
-  sector: local
   owner: Pembridge Parish Council
+  crown: false
 pembrokeshire.gov.uk:
-  sector: local
   owner: Pembrokeshire County Council
+  crown: false
   agreement_signed: true
 PenarthTownCouncil.gov.uk:
-  sector: local
   owner: Penarth Town Council
+  crown: false
 pencoedtowncouncil.gov.uk:
-  sector: local
   owner: Pencoed Town Council
+  crown: false
 pendle.gov.uk:
-  sector: local
   owner: Pendle Borough Council
+  crown: false
 penistonetowncouncil.gov.uk:
-  sector: local
   owner: Penistone Town Council
+  crown: false
 penworthamtowncouncil.gov.uk:
-  sector: local
   owner: Penwortham Town Council
+  crown: false
 peoplesnetwork.gov.uk:
-  sector: local
   owner: Arts Council England
+  crown: false
 perranzabuloe-pc.gov.uk:
-  sector: local
   owner: Perranzabuloe Parish Council
+  crown: false
 pershore-tc.gov.uk:
-  sector: local
   owner: Pershore Town Council
+  crown: false
 PershoreTownCouncil.gov.uk:
-  sector: local
   owner: Pershore Town Council
+  crown: false
 pertonparishcouncil.gov.uk:
-  sector: local
   owner: Perton Parish Council
+  crown: false
 peterborough.gov.uk:
-  sector: local
   owner: Peterborough City Council
+  crown: false
 peterlee.gov.uk:
-  sector: local
   owner: Peterlee Town Council
+  crown: false
 petersfield-tc.gov.uk:
-  sector: local
   owner: Petersfield Town Council
+  crown: false
 petworth-tc.gov.uk:
-  sector: local
   owner: Petworth Town Council
+  crown: false
 pevenseyparishcouncil.gov.uk:
-  sector: local
   owner: Pevensey Parish Council
+  crown: false
 pewsey-pc.gov.uk:
-  sector: local
   owner: Pewsey Parish Council
+  crown: false
 pickering.gov.uk:
-  sector: local
   owner: Pickering Town Council
+  crown: false
 pitchcombe-pc.gov.uk:
-  sector: local
   owner: Stroud District Council
+  crown: false
 pkc.gov.uk:
-  sector: local
   owner: Perth & Kinross Council
+  crown: false
 plymouth.gov.uk:
-  sector: local
   owner: Plymouth City Council
+  crown: false
 plymouthmuseum.gov.uk:
-  sector: local
   owner: Plymouth City Council
+  crown: false
 pocklington.gov.uk:
-  sector: local
   owner: Pocklington Town Council
+  crown: false
 polegatetowncouncil.gov.uk:
-  sector: local
   owner: Polegate Town Council
+  crown: false
 polperrocommunitycouncil.gov.uk:
-  sector: local
   owner: Polperro Community Council
+  crown: false
 PontarddulaisTownCouncil.gov.uk:
-  sector: local
   owner: Pontarddulais Town Council
+  crown: false
 ponteland-tc.gov.uk:
-  sector: local
   owner: Ponteland Town Council
+  crown: false
 ponthircommunitycouncil.gov.uk:
-  sector: local
   owner: Ponthir Community Council
+  crown: false
 pontypoolcc.gov.uk:
-  sector: local
   owner: Torfaen County Borough Council
+  crown: false
 pontypriddtowncouncil.gov.uk:
-  sector: local
   owner: Pontypridd Town Council
+  crown: false
 poolparishcouncil.gov.uk:
-  sector: local
   owner: Pool in Wharfedale Parish Council
+  crown: false
 poringlandparishcouncil.gov.uk:
-  sector: local
   owner: Poringland Parish Council
+  crown: false
 portishead.gov.uk:
-  sector: local
   owner: Portishead & North Weston Town Council
+  crown: false
 portlandtowncouncil.gov.uk:
-  sector: local
   owner: Portland Town Council
+  crown: false
 portsmouthcc.gov.uk:
-  sector: local
   owner: Portsmouth City Council
+  crown: false
 portsmouth.gov.uk:
-  sector: local
   owner: Portsmouth City Council
+  crown: false
 powys.gov.uk:
-  sector: local
   owner: Powys County Council
+  crown: false
 PoyntonTownCouncil.gov.uk:
-  sector: local
   owner: Poynton Town Council
+  crown: false
 prescot-tc.gov.uk:
-  sector: local
   owner: Prescot Town Council
+  crown: false
 prestatyntowncouncil.gov.uk:
-  sector: local
   owner: Prestatyn Town Council
+  crown: false
 prestonbrookparishcouncil.gov.uk:
-  sector: local
   owner: Preston Brook Parish Council
+  crown: false
 preston.gov.uk:
-  sector: local
   owner: Preston City Council
+  crown: false
 prestonpatrick-pc.gov.uk:
-  sector: local
   owner: Preston Patrick Parish Council
+  crown: false
 probusparishcouncil.gov.uk:
-  sector: local
   owner: Probus Parish Council
+  crown: false
 publow-with-pensford-pc.gov.uk:
-  sector: local
   owner: Publow with Pensford Parish Council
+  crown: false
 pulboroughparishcouncil.gov.uk:
-  sector: local
   owner: Pulborough Parish Council
+  crown: false
 purbeck-dc.gov.uk:
-  sector: local
   owner: Purbeck District Council
+  crown: false
 purbeck.gov.uk:
-  sector: local
   owner: Purbeck District Council
+  crown: false
 puritonparishcouncil.gov.uk:
-  sector: local
   owner: Puriton Parish Council
+  crown: false
 purleyonthames-pc.gov.uk:
-  sector: local
   owner: Purley on Thames Parish Council
+  crown: false
 purtonparishcouncil.gov.uk:
-  sector: local
   owner: Purton Parish Council
+  crown: false
 push.gov.uk:
-  sector: local
   owner: Hampshire County Council
+  crown: false
 puttenham-pc.gov.uk:
-  sector: local
   owner: Puttenham Parish Council
+  crown: false
 quarndon-pc.gov.uk:
-  sector: local
   owner: Quarndon Parish Council
+  crown: false
 quedgeley-pc.gov.uk:
-  sector: local
   owner: Quedgeley Parish Council
+  crown: false
 queensferrycommunitycouncil.gov.uk:
-  sector: local
   owner: Queensferry and District Community Council
+  crown: false
 queensparkcommunitycouncil.gov.uk:
-  sector: local
   owner: Queens Park Community Council
+  crown: false
 queenthorneparishcouncil.gov.uk:
-  sector: local
   owner: Queen Thorne Parish Council
+  crown: false
 quethiockparishcouncil.gov.uk:
-  sector: local
   owner: Quethiock Parish Council
+  crown: false
 Radstock-tc.gov.uk:
-  sector: local
   owner: Radstock Town Council
+  crown: false
 ramseyparkeston-pc.gov.uk:
-  sector: local
   owner: Ramsey and Parkestone Parish Council
+  crown: false
 ramseytowncouncil.gov.uk:
-  sector: local
   owner: Ramsey Town Council
+  crown: false
 randwickandwestrip-pc.gov.uk:
-  sector: local
   owner: Randwick and Westrip Parish Council
+  crown: false
 ratleyandupton-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 raunds-tc.gov.uk:
-  sector: local
   owner: Raunds Town Council
+  crown: false
 ravenfieldparishcouncil.gov.uk:
-  sector: local
   owner: Ravenfield Parish Council
+  crown: false
 rawcliffeparishcouncil.gov.uk:
-  sector: local
   owner: Rawcliffe Parish Council
+  crown: false
 rawdonparishcouncil.gov.uk:
-  sector: local
   owner: Rawdon Parish Council
+  crown: false
 rayleightowncouncil.gov.uk:
-  sector: local
   owner: Rayleigh Town Council
+  crown: false
 rayne-essex.gov.uk:
-  sector: local
   owner: Rayne Parish Council
+  crown: false
 rbkc.gov.uk:
-  sector: local
   owner: Royal Borough of Kensington and Chelsea
+  crown: false
   agreement_signed: true
 rctcbc.gov.uk:
-  sector: local
   owner: Rhondda Cynon Taf County Borough Council
+  crown: false
 reading.gov.uk:
-  sector: local
   owner: Reading Borough Council
+  crown: false
 readydumgal.gov.uk:
-  sector: local
   owner: Dumfries and Galloway Council
+  crown: false
 redbourneparishcouncil.gov.uk:
-  sector: local
   owner: Redbourne Parish Council
+  crown: false
 RedbournParishCouncil.gov.uk:
-  sector: local
   owner: Redbourn Parish Council
+  crown: false
 redcar-cleveland.gov.uk:
-  sector: local
   owner: Redcar and Cleveland Borough Council
+  crown: false
 redditchbc.gov.uk:
-  sector: local
   owner: Redditch Borough Council
+  crown: false
 redruth-tc.gov.uk:
-  sector: local
   owner: Redruth Town Council
+  crown: false
 reephamnorfolk-tc.gov.uk:
-  sector: local
   owner: Reepham Town Council
+  crown: false
 reigate-banstead.gov.uk:
-  sector: local
   owner: Reigate and Banstead Borough Council
+  crown: false
 renfrewshire.gov.uk:
-  sector: local
   owner: Renfrewshire Council
+  crown: false
 repton-pc.gov.uk:
-  sector: local
   owner: Repton Parish Council
+  crown: false
 rhondda-cynon-taff.gov.uk:
-  sector: local
   owner: Rhondda Cynon Taf County Borough Council
+  crown: false
 rhondda-cynon-taf.gov.uk:
-  sector: local
   owner: Rhondda Cynon Taf County Borough Council
+  crown: false
 rhosdducommunitycouncil.gov.uk:
-  sector: local
   owner: Rhosddu Community Council
+  crown: false
 rhuddlantowncouncil.gov.uk:
-  sector: local
   owner: Denbighshire County Council
+  crown: false
 ribblevalley.gov.uk:
-  sector: local
   owner: Ribblevalley Borough Council
+  crown: false
 richmondshire.gov.uk:
-  sector: local
   owner: Richmondshire District Council
+  crown: false
 ringmerparishcouncil.gov.uk:
-  sector: local
   owner: Ringmer Parish Council
+  crown: false
 ringmoreparishcouncil.gov.uk:
-  sector: local
   owner: Ringmore Parish Council
+  crown: false
 ringwood.gov.uk:
-  sector: local
   owner: Ringwood Town Council
+  crown: false
 ripleyparishcouncil.gov.uk:
-  sector: local
   owner: Ripley Parish Council
+  crown: false
 ripleytowncouncil.gov.uk:
-  sector: local
   owner: Ripley Town Council
+  crown: false
 riponcity.gov.uk:
-  sector: local
   owner: Ripon City Council
+  crown: false
 rippondenparishcouncil.gov.uk:
-  sector: local
   owner: Ripponden Parish Council
+  crown: false
 roadeparishcouncil.gov.uk:
-  sector: local
   owner: Roade Parish Council
+  crown: false
 rochdale.gov.uk:
-  sector: local
   owner: Rochdale Metropolitan Borough Council
+  crown: false
 rocheparishcouncil.gov.uk:
-  sector: local
   owner: Roche Parish Council
+  crown: false
 rochford.gov.uk:
-  sector: local
   owner: Rochford District Council
+  crown: false
 rochfordparishcouncil.gov.uk:
-  sector: local
   owner: Rochford Parish Council
+  crown: false
 rodborough.gov.uk:
-  sector: local
   owner: Rodborough Parish Council
+  crown: false
 rogateparishcouncil.gov.uk:
-  sector: local
   owner: Rogate Parish Council
+  crown: false
 romanby-pc.gov.uk:
-  sector: local
   owner: Romanby Parish Council
+  crown: false
 romsleyparishcouncil.gov.uk:
-  sector: local
   owner: Romsley Parish Council
+  crown: false
 rossendalebc.gov.uk:
-  sector: local
   owner: Rossendale Borough Council
+  crown: false
 rossendale.gov.uk:
-  sector: local
   owner: Rossendale Borough Council
+  crown: false
 rosstc-herefordshire.gov.uk:
-  sector: local
   owner: Ross-on-Wye Town Council
+  crown: false
 rother.gov.uk:
-  sector: local
   owner: Rother District Council
+  crown: false
 rotherham.gov.uk:
-  sector: local
   owner: Rotherham Borough Council
+  crown: false
 rottingdean-pc.gov.uk:
-  sector: local
   owner: Rottingdean Parish Council
+  crown: false
 roundwayparishcouncil.gov.uk:
-  sector: local
   owner: Roundway Parish Council
+  crown: false
 royalwoottonbassett.gov.uk:
-  sector: local
   owner: Wootton Bassett Town Council
+  crown: false
 roystontowncouncil.gov.uk:
-  sector: local
   owner: Royston Town Council
+  crown: false
 ruckinge-pc.gov.uk:
-  sector: local
   owner: Ruckinge Parish Council
+  crown: false
 ruddingtonparishcouncil.gov.uk:
-  sector: local
   owner: Ruddington Parish Council
+  crown: false
 rufforthwithknapton-pc.gov.uk:
-  sector: local
   owner: Rufforth with Knapton Parish Council
+  crown: false
 rugby.gov.uk:
-  sector: local
   owner: Rugby Borough Council
+  crown: false
 rugeleytowncouncil.gov.uk:
-  sector: local
   owner: Rugeley Town Council
+  crown: false
 runnymede.gov.uk:
-  sector: local
   owner: Runnymede Borough Council
+  crown: false
 rushcliffe.gov.uk:
-  sector: local
   owner: Rushcliffe Borough Council
+  crown: false
 rushdentowncouncil.gov.uk:
-  sector: local
   owner: Rushden Town Council
+  crown: false
 rushmoor.gov.uk:
-  sector: local
   owner: Rushmoor Borough Council
+  crown: false
 ruthintowncouncil.gov.uk:
-  sector: local
   owner: Ruthin Town Council
+  crown: false
 rutland.gov.uk:
-  sector: local
   owner: Rutland County Council
+  crown: false
 rydetowncouncil.gov.uk:
-  sector: local
   owner: Ryde Town Council
+  crown: false
 ryedale.gov.uk:
-  sector: local
   owner: Ryedale District Council
+  crown: false
 ryetowncouncil.gov.uk:
-  sector: local
   owner: Rye Town Council
+  crown: false
 saferderbyshire.gov.uk:
-  sector: local
   owner: Derbyshire County Council
+  crown: false
 saffronwalden.gov.uk:
-  sector: local
   owner: Saffron Walden Town Council
+  crown: false
 salcombetowncouncil.gov.uk:
-  sector: local
   owner: Salcombe Town Council
+  crown: false
 salford.gov.uk:
-  sector: local
   owner: Salford City Council
+  crown: false
 salfordpriors.gov.uk:
-  sector: local
   owner: Salford Priors Parish Council
+  crown: false
 salisburycitycouncil.gov.uk:
-  sector: local
   owner: Salisbury City Council
+  crown: false
 saltash.gov.uk:
-  sector: local
   owner: Saltash Town Council
+  crown: false
 saltfordparishcouncil.gov.uk:
-  sector: local
   owner: Saltford Parish Council
+  crown: false
 saltneytowncouncil.gov.uk:
-  sector: local
   owner: Saltney Town Council
+  crown: false
 sampfordarundel-pc.gov.uk:
-  sector: local
   owner: Sampford Arundel Parish Council
+  crown: false
 sampfordcourtenay-pc.gov.uk:
-  sector: local
   owner: Sampford Courtenay Parish Council
+  crown: false
 sanctonparishcouncil.gov.uk:
-  sector: local
   owner: Sancton Parish Council
+  crown: false
 sandbach.gov.uk:
-  sector: local
   owner: Sandbach Town Council
+  crown: false
 sandfordparishcouncil.gov.uk:
-  sector: local
   owner: Sandford Parish Council
+  crown: false
 sandhurst.gov.uk:
-  sector: local
   owner: Sandhurst Town Council
+  crown: false
 sandhurst-kent-pc.gov.uk:
-  sector: local
   owner: Sandhurst Parish Council
+  crown: false
 sandleheath.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 sandowntowncouncil.gov.uk:
-  sector: local
   owner: Sandown Town Council
+  crown: false
 sandridge-pc.gov.uk:
-  sector: local
   owner: Sandridge Parish Council
+  crown: false
 sandwell.gov.uk:
-  sector: local
   owner: Sandwell Metropolitan Borough Council
+  crown: false
 sandwichtowncouncil.gov.uk:
-  sector: local
   owner: Sandwich Town Council
+  crown: false
 sandymoorparishcouncil.gov.uk:
-  sector: local
   owner: Sandymoor Parish Council
+  crown: false
 sandytowncouncil.gov.uk:
-  sector: local
   owner: Sandy Town Council
+  crown: false
 satleyparishcouncil.gov.uk:
-  sector: local
   owner: Satley Parish Council
+  crown: false
 saughall.gov.uk:
-  sector: local
   owner: Saughall and Shotwick Park Parish Council
+  crown: false
 sawbridgeworth-tc.gov.uk:
-  sector: local
   owner: Sawbridgeworth Town Council
+  crown: false
 sawtry-pc.gov.uk:
-  sector: local
   owner: Sawtry Parish Council
+  crown: false
 saxbyallsaints-pc.gov.uk:
-  sector: local
   owner: Saxby All Saints Parish Council
+  crown: false
 saxilbyparishcouncil.gov.uk:
-  sector: local
   owner: Saxilby with Ingleby Parish Council
+  crown: false
 scambs.gov.uk:
-  sector: local
   owner: South Cambridgeshire District Council
+  crown: false
 scarborough.gov.uk:
-  sector: local
   owner: Scarborough Borough Council
+  crown: false
 scilly.gov.uk:
-  sector: local
   owner: Council of the Isles of Scilly
+  crown: false
 scotborders.gov.uk:
-  sector: local
   owner: Scottish Borders Council
+  crown: false
 seafordtowncouncil.gov.uk:
-  sector: local
   owner: Seaford Town Council
+  crown: false
 seagryparishcouncil.gov.uk:
-  sector: local
   owner: Seagry Parish Council
+  crown: false
 seaham.gov.uk:
-  sector: local
   owner: Seaham Town Council
+  crown: false
 sealandcommunitycouncil.gov.uk:
-  sector: local
   owner: Sealand Community Council
+  crown: false
 seaton.gov.uk:
-  sector: local
   owner: Seaton Town Council
+  crown: false
 seatonvalleycommunitycouncil.gov.uk:
-  sector: local
   owner: Seaton Valley Council
+  crown: false
 secouncils.gov.uk:
-  sector: local
   owner: Surrey County Council
+  crown: false
 sedgefieldtowncouncil.gov.uk:
-  sector: local
   owner: Sedgefield Town Council
+  crown: false
 sedgemoor.gov.uk:
-  sector: local
   owner: Sedgemoor District Council
+  crown: false
 seergreenparishcouncil.gov.uk:
-  sector: local
   owner: Seer Green Parish Council
+  crown: false
 sefton.gov.uk:
-  sector: local
   owner: Sefton Metropolitan Borough Council
+  crown: false
 selborneparishcouncil.gov.uk:
-  sector: local
   owner: Selborne Parish Council
+  crown: false
 selby.gov.uk:
-  sector: local
   owner: Selby District Council
+  crown: false
 selbytowncouncil.gov.uk:
-  sector: local
   owner: Selby District Council
+  crown: false
 sellindge-pc.gov.uk:
-  sector: local
   owner: Sellindge Parish Council
+  crown: false
 selseytowncouncil.gov.uk:
-  sector: local
   owner: Selsey Town Council
+  crown: false
 sendparishcouncil.gov.uk:
-  sector: local
   owner: Send Parish Council
+  crown: false
 sesplan.gov.uk:
-  sector: local
   owner: The City of Edinburgh Council
+  crown: false
 sevenoaks.gov.uk:
-  sector: local
   owner: Sevenoaks District Council
+  crown: false
 sevenoakstown.gov.uk:
-  sector: local
   owner: Sevenoaks Town Council
+  crown: false
 sewta.gov.uk:
-  sector: local
   owner: Vale of Glamorgan Council
+  crown: false
 shaftesbury-tc.gov.uk:
-  sector: local
   owner: Shaftesbury Town Council
+  crown: false
 sharedresourceservicewales.gov.uk:
-  sector: local
   owner: Torfaen County Borough Council
+  crown: false
 shaughpriorparish.gov.uk:
-  sector: local
   owner: Shaugh Prior Parish Council
+  crown: false
 shawbury-pc.gov.uk:
-  sector: local
   owner: Shawbury Parish Council
+  crown: false
 shearsbyparishcouncil.gov.uk:
-  sector: local
   owner: Shearsby Parish Council
+  crown: false
 sheetparishcouncil.gov.uk:
-  sector: local
   owner: Sheet Parish Council
+  crown: false
 sheffield.gov.uk:
-  sector: local
   owner: Sheffield City Council
+  crown: false
 shenleybrookend-pc.gov.uk:
-  sector: local
   owner: Shenley Brook End & Tattenhoe Parish Council
+  crown: false
 shenley-pc.gov.uk:
-  sector: local
   owner: Shenley Parish Council
+  crown: false
 shenstone-staffs.gov.uk:
-  sector: local
   owner: Shenstone Parish Council
+  crown: false
 sheptonmallettowncouncil.gov.uk:
-  sector: local
   owner: Shepton Mallet Town Council
+  crown: false
 shepway.gov.uk:
-  sector: local
   owner: Shepway District Council
+  crown: false
 sherbornestjohn-pc.gov.uk:
-  sector: local
   owner: Sherborne St. John Parish Council
+  crown: false
 sherborne-tc.gov.uk:
-  sector: local
   owner: Sherborne Town Council
+  crown: false
 sherburninelmet-pc.gov.uk:
-  sector: local
   owner: Sherburn in Elmet Parish Council
+  crown: false
 shereparishcouncil.gov.uk:
-  sector: local
   owner: Shere Parish Council
+  crown: false
 sherfieldonloddon-pc.gov.uk:
-  sector: local
   owner: Sherfield on Loddon Parish Council
+  crown: false
 sherfieldparkparishcouncil.gov.uk:
-  sector: local
   owner: Sherfield Park Parish Council
+  crown: false
 shetland.gov.uk:
-  sector: local
   owner: Shetland Islands Council
+  crown: false
 shetland-library.gov.uk:
-  sector: local
   owner: Shetland Islands Council
+  crown: false
 shevingtonpc.gov.uk:
-  sector: local
   owner: Shevington Parish Council
+  crown: false
 shifnaltowncouncil.gov.uk:
-  sector: local
   owner: Shifnal Town Council
+  crown: false
 shildon.gov.uk:
-  sector: local
   owner: Shildon Town Council
+  crown: false
 shinfieldparish.gov.uk:
-  sector: local
   owner: Shinfield Parish Council
+  crown: false
 shirebrooktowncouncil.gov.uk:
-  sector: local
   owner: Shirebrook Town Council
+  crown: false
 sholland.gov.uk:
-  sector: local
   owner: South Holland District Council
+  crown: false
 shorehamparishcouncil.gov.uk:
-  sector: local
   owner: Shoreham Parish Council
+  crown: false
 shottonparishcouncil.gov.uk:
-  sector: local
   owner: Shotton Parish Council
+  crown: false
 shrewsburytowncouncil.gov.uk:
-  sector: local
   owner: Shrewsbury Town Council
+  crown: false
 shropshire.gov.uk:
-  sector: local
   owner: Shropshire Council
+  crown: false
 sidmouth.gov.uk:
-  sector: local
   owner: Sidmouth Town Council
+  crown: false
 sigoma.gov.uk:
-  sector: local
   owner: Barnsley Metropolitan Borough Council
+  crown: false
 silchester-pc.gov.uk:
-  sector: local
   owner: Silchester Parish Council
+  crown: false
 silkstoneparishcouncil.gov.uk:
-  sector: local
   owner: Silkstone Parish Council
+  crown: false
 silloth-on-solway-tc.gov.uk:
-  sector: local
   owner: Silloth-on-Solway Town Council
+  crown: false
 silverdale-pc-lancs.gov.uk:
-  sector: local
   owner: Silverdale Parish Council
+  crown: false
 silverendparishcouncil.gov.uk:
-  sector: local
   owner: Silver End Parish Council
+  crown: false
 sir-benfro.gov.uk:
-  sector: local
   owner: Pembrokeshire County Council
+  crown: false
 sirddinbych.gov.uk:
-  sector: local
   owner: Denbighshire County Council
+  crown: false
 sirfynwy.gov.uk:
-  sector: local
   owner: Monmouthshire County Council
+  crown: false
 sirgaerfyrddin.gov.uk:
-  sector: local
   owner: Carmarthenshire County Council
+  crown: false
 sirgar.gov.uk:
-  sector: local
   owner: Carmarthenshire County Council
+  crown: false
 siryfflint.gov.uk:
-  sector: local
   owner: Flintshire County Council
+  crown: false
 sitlingtonparishcouncil.gov.uk:
-  sector: local
   owner: Sitlington Parish Council
+  crown: false
 skegness.gov.uk:
-  sector: local
   owner: Skegness Town Council
+  crown: false
 skelton-york.gov.uk:
-  sector: local
   owner: Skelton Parish Council
+  crown: false
 skiptontowncouncil.gov.uk:
-  sector: local
   owner: Skipton Town Council
+  crown: false
 sleaford.gov.uk:
-  sector: local
   owner: Sleaford Town Council
+  crown: false
 slimbridge-pc.gov.uk:
-  sector: local
   owner: Slimbridge Parish Council
+  crown: false
 SlindonParishCouncil.gov.uk:
-  sector: local
   owner: Slindon Parish Council
+  crown: false
 slinfold-pc.gov.uk:
-  sector: local
   owner: Slinfold Parish Council
+  crown: false
 slough.gov.uk:
-  sector: local
   owner: Slough Borough Council
+  crown: false
 snaintonparishcouncil.gov.uk:
-  sector: local
   owner: Snainton Parish Council
+  crown: false
 s-norfolk.gov.uk:
-  sector: local
   owner: South Norfolk Council
+  crown: false
 sodburytowncouncil.gov.uk:
-  sector: local
   owner: Sodbury Town Council
+  crown: false
 soham-tc.gov.uk:
-  sector: local
   owner: Soham Town Council
+  crown: false
 solihull.gov.uk:
-  sector: local
   owner: Solihull Metropolitan Borough Council
+  crown: false
 somerset.gov.uk:
-  sector: local
   owner: Somerset County Council
+  crown: false
 somersham-pc.gov.uk:
-  sector: local
   owner: Somersham Parish Council
+  crown: false
 somertontowncouncil.gov.uk:
-  sector: local
   owner: Somerton Town Council
+  crown: false
 sonning-pc.gov.uk:
-  sector: local
   owner: Sonning Parish Council
+  crown: false
 sopley.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 southamcouncil-warks.gov.uk:
-  sector: local
   owner: Southam Town Council
+  crown: false
 southampton.gov.uk:
-  sector: local
   owner: Southampton City Council
+  crown: false
 southandvale.gov.uk:
-  sector: local
   owner: Vale of White Horse District Council
+  crown: false
 south-ayrshire.gov.uk:
-  sector: local
   owner: South Ayrshire Council
+  crown: false
 southbrent.gov.uk:
-  sector: local
   owner: South Brent Parish council
+  crown: false
 southbucks.gov.uk:
-  sector: local
   owner: South Buckinghamshire District Council
+  crown: false
 southcavepc.gov.uk:
-  sector: local
   owner: South Cave Parish Council
+  crown: false
 south-derbys.gov.uk:
-  sector: local
   owner: South Derbyshire District Council
+  crown: false
 southend.gov.uk:
-  sector: local
   owner: Southend-on-Sea Borough Council
+  crown: false
 southernuplandway.gov.uk:
-  sector: local
   owner: Dumfries and Galloway Council
+  crown: false
 southferribyparishcouncil.gov.uk:
-  sector: local
   owner: South Ferriby Parish Council
+  crown: false
 southglos.gov.uk:
-  sector: local
   owner: South Gloucestershire Council
+  crown: false
 south-hams-dc.gov.uk:
-  sector: local
   owner: South Hams District Council
+  crown: false
 southhams.gov.uk:
-  sector: local
   owner: South Hams District Council
+  crown: false
 south-hill-pc.gov.uk:
-  sector: local
   owner: South Hill Parish Council
+  crown: false
 southkesteven.gov.uk:
-  sector: local
   owner: South Kesteven District Council
+  crown: false
 southkirkbyandmoorthorpetowncouncil.gov.uk:
-  sector: local
   owner: South Kirkby and Moorthorpe Town Council
+  crown: false
 southlakeland.gov.uk:
-  sector: local
   owner: South Lakeland District Council
+  crown: false
 southlanarkshire.gov.uk:
-  sector: local
   owner: South Lanarkshire Council
+  crown: false
 south-norfolk.gov.uk:
-  sector: local
   owner: South Norfolk Council
+  crown: false
 southnormantonparishcouncil.gov.uk:
-  sector: local
   owner: South Normanton Parish Council
+  crown: false
 southnorthants.gov.uk:
-  sector: local
   owner: South Northamptonshire Council
+  crown: false
 southoxon.gov.uk:
-  sector: local
   owner: South Oxfordshire District Council
+  crown: false
 southpethertonparishcouncil.gov.uk:
-  sector: local
   owner: South Petherton Parish Council
+  crown: false
 southribble.gov.uk:
-  sector: local
   owner: South Ribble Borough Council
+  crown: false
 southribbletourism.gov.uk:
-  sector: local
   owner: South Ribble Borough Council
+  crown: false
 southsomerset.gov.uk:
-  sector: local
   owner: South Somerset District Council
+  crown: false
 southswindon-pc.gov.uk:
-  sector: local
   owner: Central Swindon South Parish Council
+  crown: false
 southtyneside.gov.uk:
-  sector: local
   owner: South Tyneside Council
+  crown: false
 southwark.gov.uk:
-  sector: local
   owner: Southwark London Borough Council
+  crown: false
 southwater-pc.gov.uk:
-  sector: local
   owner: Southwater Parish Council
+  crown: false
 southwell-tc.gov.uk:
-  sector: local
   owner: Southwell Town Council
+  crown: false
 southwest-ra.gov.uk:
-  sector: local
   owner: Somerset County Council
+  crown: false
 southwick-widley-pc.gov.uk:
-  sector: local
   owner: Southwick and Widley Parish Council
+  crown: false
 southwingfieldparishcouncil.gov.uk:
-  sector: local
   owner: South Wingfield Parish Council
+  crown: false
 southwoodhamferrerstc.gov.uk:
-  sector: local
   owner: South Woodham Ferrers Town Council
+  crown: false
 southworcestershirebuildingcontrol.gov.uk:
-  sector: local
   owner: Malvern Hills District Council
+  crown: false
 southworcestershirerevenues.gov.uk:
-  sector: local
   owner: Wychavon District Council
+  crown: false
 spaldingtonparishcouncil.gov.uk:
-  sector: local
   owner: Spaldington Parish Council
+  crown: false
 speldhurstparishcouncil.gov.uk:
-  sector: local
   owner: Speldhurst Parish Council
+  crown: false
 spelthorne.gov.uk:
-  sector: local
   owner: Spelthorne Borough Council
+  crown: false
 spennymoor-tc.gov.uk:
-  sector: local
   owner: Spennymoor Town Council
+  crown: false
 sprowston-tc.gov.uk:
-  sector: local
   owner: Sprowston Town Council
+  crown: false
 spurstow-pc.gov.uk:
-  sector: local
   owner: Spurstow Parish Council
+  crown: false
 sstaffs.gov.uk:
-  sector: local
   owner: South Staffordshire District Council
+  crown: false
 staffordbc.gov.uk:
-  sector: local
   owner: Stafford Borough Council
+  crown: false
 staffordshire.gov.uk:
-  sector: local
   owner: Staffordshire County Council
+  crown: false
 staffordshireprepared.gov.uk:
-  sector: local
   owner: Staffordshire County Council
+  crown: false
 staffs.gov.uk:
-  sector: local
   owner: Staffordshire County Council
+  crown: false
 staffslc.gov.uk:
-  sector: local
   owner: Staffordshire County Council
+  crown: false
 staffsmoorlands.gov.uk:
-  sector: local
   owner: Staffordshire Moorlands District Council
+  crown: false
 stagnes-pc.gov.uk:
-  sector: local
   owner: St.Agnes Parish Council
+  crown: false
 stainforthtowncouncil.gov.uk:
-  sector: local
   owner: Stainforth Town Council
+  crown: false
 stainingparishcouncil.gov.uk:
-  sector: local
   owner: Staining Parish Council
+  crown: false
 stalbans.gov.uk:
-  sector: local
   owner: St Albans District Council
+  crown: false
 stalbridgetowncouncil.gov.uk:
-  sector: local
   owner: Stalbridge Town Council
+  crown: false
 stallenparishcouncil.gov.uk:
-  sector: local
   owner: St Allen Parish Council
+  crown: false
 stamfordbridge-pc.gov.uk:
-  sector: local
   owner: Stamford Bridge Parish Council
+  crown: false
 stamfordtowncouncil.gov.uk:
-  sector: local
   owner: Stamford Town Council
+  crown: false
 stanbridgeparishcouncil.gov.uk:
-  sector: local
   owner: Stanbridge Parish Council
+  crown: false
 stanfordrivers-pc.gov.uk:
-  sector: local
   owner: Stanford Rivers Parish Council
+  crown: false
 stanley-tc.gov.uk:
-  sector: local
   owner: Stanley Town Council
+  crown: false
 stannesonthesea-tc.gov.uk:
-  sector: local
   owner: St. Annes on the Sea Town Council
+  crown: false
 stansteadabbottsparishcouncil.gov.uk:
-  sector: local
   owner: Stanstead Abbotts Parish Council
+  crown: false
 stansted-pc.gov.uk:
-  sector: local
   owner: Stansted Parish Council
+  crown: false
 stantononthewoldsparishcouncil.gov.uk:
-  sector: local
   owner: Parish Council of Stanton on the Wolds
+  crown: false
 stapeleyparishcouncil.gov.uk:
-  sector: local
   owner: Stapeley and District Parish Council
+  crown: false
 stapenhillparishcouncil.gov.uk:
-  sector: local
   owner: Stapenhill Parish Council
+  crown: false
 star-procurement.gov.uk:
-  sector: local
   owner: Trafford Metropolitan Borough Council
+  crown: false
 stasaphcitycouncil.gov.uk:
-  sector: local
   owner: St Asaph City Council
+  crown: false
 staustell-tc.gov.uk:
-  sector: local
   owner: St Austell Town Council
+  crown: false
 staveleytowncouncil.gov.uk:
-  sector: local
   owner: Staveley Town Council
+  crown: false
 stbriavels-pc.gov.uk:
-  sector: local
   owner: St Briavels Parish Council
+  crown: false
 stcleerparishcouncil.gov.uk:
-  sector: local
   owner: St Cleer Parish Council
+  crown: false
 stcolumbmajor-tc.gov.uk:
-  sector: local
   owner: St Columb Major Town Council
+  crown: false
 stdavids.gov.uk:
-  sector: local
   owner: St. David's City Council
+  crown: false
 stdonats-cc.gov.uk:
-  sector: local
   owner: St Donats communitiy Council
+  crown: false
 stedhamwithiping-pc.gov.uk:
-  sector: local
   owner: Stedham with Iping Parish Council
+  crown: false
 stedmundsbury.gov.uk:
-  sector: local
   owner: St Edmundsbury Borough Council
+  crown: false
 stedsbc.gov.uk:
-  sector: local
   owner: St Edmundsbury Borough Council
+  crown: false
 steeplebumpstead-pc.gov.uk:
-  sector: local
   owner: Steeple Bumpstead Parish Council
+  crown: false
 steepleclaydonparishcouncil.gov.uk:
-  sector: local
   owner: Steeple Claydon Parish Council
+  crown: false
 steep-pc.gov.uk:
-  sector: local
   owner: Steep Parish Council
+  crown: false
 steeton-with-eastburnparishcouncil.gov.uk:
-  sector: local
   owner: Steeton-with-Eastburn Parish Council
+  crown: false
 sterth-pc.gov.uk:
-  sector: local
   owner: St Erth Parish Council
+  crown: false
 stevenage.gov.uk:
-  sector: local
   owner: Stevenage Borough Council
+  crown: false
 steyningpc.gov.uk:
-  sector: local
   owner: Steyning Parish Council
+  crown: false
 stgeorgesandpriorslee-pc.gov.uk:
-  sector: local
   owner: St Georges and Priorslee Parish Council
+  crown: false
 stharmoncommunitycouncil.gov.uk:
-  sector: local
   owner: St Harmon Community Council
+  crown: false
 sthelens.gov.uk:
-  sector: local
   owner: St Helens Metropolitan Borough Council
+  crown: false
 stirchleyandbrooksideparishcouncil.gov.uk:
-  sector: local
   owner: Stirchley and Brookside Parish Council
+  crown: false
 stirling.gov.uk:
-  sector: local
   owner: Stirling Council
+  crown: false
 st-ive-parishcouncil.gov.uk:
-  sector: local
   owner: St Ive Parish Council
+  crown: false
 stives-tc.gov.uk:
-  sector: local
   owner: St Ives Town Council - Cornwall
+  crown: false
 stivestowncouncil-cornwall.gov.uk:
-  sector: local
   owner: St Ives Town Council - Cornwall
+  crown: false
 stivestowncouncil.gov.uk:
-  sector: local
   owner: St Ives Town Council
+  crown: false
 stjamesisleofgrain-pc.gov.uk:
-  sector: local
   owner: St James Isle of Grain Parish Council
+  crown: false
 stmartinsparishcouncil.gov.uk:
-  sector: local
   owner: St Martin's Parish Council
+  crown: false
 stmarybourne-pc.gov.uk:
-  sector: local
   owner: Basingstoke and Deane Borough Council
+  crown: false
 stmaryhoo-pc.gov.uk:
-  sector: local
   owner: St Mary Hoo Parish Council
+  crown: false
 stmellion-pc.gov.uk:
-  sector: local
   owner: St Mellion Parish Council
+  crown: false
 stneots-tc.gov.uk:
-  sector: local
   owner: St Neots Town Council
+  crown: false
 stock-pc.gov.uk:
-  sector: local
   owner: Stock Village Council
+  crown: false
 stockport.gov.uk:
-  sector: local
   owner: Stockport Metropolitan Borough Council
+  crown: false
 stockportmbc.gov.uk:
-  sector: local
   owner: Stockport Metropolitan Borough Council
+  crown: false
 stockton.gov.uk:
-  sector: local
   owner: Stockton-on-Tees Borough Council
+  crown: false
 stockton-warks-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 stokeandhurleston-pc.gov.uk:
-  sector: local
   owner: Stoke & Hurleston Parish Council
+  crown: false
 stoke.gov.uk:
-  sector: local
   owner: Stoke-on-Trent City Council
+  crown: false
 stokelodgeandthecommon-pc.gov.uk:
-  sector: local
   owner: Stoke Lodge & The Common Parish Council
+  crown: false
 stokenham-pc.gov.uk:
-  sector: local
   owner: Stokenham Parish Council
+  crown: false
 stoke-pc-worcs.gov.uk:
-  sector: local
   owner: Stoke Parish Council
+  crown: false
 stokepogesparishcouncil.gov.uk:
-  sector: local
   owner: Stoke Poges Parish Council
+  crown: false
 stondon-pc.gov.uk:
-  sector: local
   owner: Stondon Parish Council
+  crown: false
 stonetowncouncil.gov.uk:
-  sector: local
   owner: Stone Town Council
+  crown: false
 stonystratford.gov.uk:
-  sector: local
   owner: Stony Stratford Town Council
+  crown: false
 stoploansharks.gov.uk:
-  sector: local
   owner: Birmingham City Council
+  crown: false
 storrington-pc.gov.uk:
-  sector: local
   owner: Storrington & Sullington Parish Council
+  crown: false
 stosyth.gov.uk:
-  sector: local
   owner: St Osyth Parish Council
+  crown: false
 stotfoldtowncouncil.gov.uk:
-  sector: local
   owner: Stotfold Town Council
+  crown: false
 stourporttowncouncil.gov.uk:
-  sector: local
   owner: Stourport-on-Severn Town Council
+  crown: false
 stowe-by-chartley-pc.gov.uk:
-  sector: local
   owner: Stowe by Chartley Parish Council
+  crown: false
 stowmaries-pc.gov.uk:
-  sector: local
   owner: Stow Maries Parish Council
+  crown: false
 stowonthewold-tc.gov.uk:
-  sector: local
   owner: Stow-on-the-Wold Town Council
+  crown: false
 stratfield-mortimer.gov.uk:
-  sector: local
   owner: Stratfield Mortimer Parish Council
+  crown: false
 stratford-dc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 stratford.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 stratford-tc.gov.uk:
-  sector: local
   owner: Stratford-upon-Avon Town Council
+  crown: false
 strattonstmargaret.gov.uk:
-  sector: local
   owner: Stratton St Margaret Parish Council
+  crown: false
 street-pc.gov.uk:
-  sector: local
   owner: Street Parish Council
+  crown: false
 stroud.gov.uk:
-  sector: local
   owner: Stroud District Council
+  crown: false
 stroud-pc.gov.uk:
-  sector: local
   owner: Stroud Parish Council
+  crown: false
 stroudtown.gov.uk:
-  sector: local
   owner: Stroud Town Council
+  crown: false
 ststephenparishcouncil.gov.uk:
-  sector: local
   owner: St Stephen Parish Council
+  crown: false
 stteathparishcouncil.gov.uk:
-  sector: local
   owner: St Teath Parish Council
+  crown: false
 sturminstermarshall-pc.gov.uk:
-  sector: local
   owner: Sturminster Marshall Parish Council
+  crown: false
 sturminsternewton-tc.gov.uk:
-  sector: local
   owner: Sturminster Newton Town Council
+  crown: false
 sturry-pc.gov.uk:
-  sector: local
   owner: Sturry Parish Council
+  crown: false
 s-tyneside-mbc.gov.uk:
-  sector: local
   owner: South Tyneside Council
+  crown: false
 suffolkcc.gov.uk:
-  sector: local
   owner: Suffolk County Council
+  crown: false
 suffolkcoastal.gov.uk:
-  sector: local
   owner: Suffolk County Council
+  crown: false
 suffolk.gov.uk:
-  sector: local
   owner: Suffolk County Council
+  crown: false
 Sullington-pc.gov.uk:
-  sector: local
   owner: Storrington & Sullington Parish Council
+  crown: false
 sunderland.gov.uk:
-  sector: local
   owner: Sunderland City Metropolitan Borough Council
+  crown: false
 supportwithconfidence.gov.uk:
-  sector: local
   owner: Surrey County Council
+  crown: false
 surreycc.gov.uk:
-  sector: local
   owner: Surrey County Council
+  crown: false
 surreycoroner.gov.uk:
-  sector: local
   owner: Surrey County Council
+  crown: false
 surreycountycouncil.gov.uk:
-  sector: local
   owner: Surrey County Council
+  crown: false
 surrey-fire.gov.uk:
-  sector: local
   owner: Surrey County Council
+  crown: false
 surrey.gov.uk:
-  sector: local
   owner: Surrey County Council
+  crown: false
 surreyheath.gov.uk:
-  sector: local
   owner: Surrey Heath Borough Council
+  crown: false
 surreyheath-online.gov.uk:
-  sector: local
   owner: Surrey Heath Borough Council
+  crown: false
 surreyheathonline.gov.uk:
-  sector: local
   owner: Surrey Heath Borough Council
+  crown: false
 surreyi.gov.uk:
-  sector: local
   owner: Surrey County Council
+  crown: false
 surreylocalgovernment.gov.uk:
-  sector: local
   owner: Woking Borough Council
+  crown: false
 sussexsaferroads.gov.uk:
-  sector: local
   owner: West Sussex County Council
+  crown: false
 suttonbengerparishcouncil.gov.uk:
-  sector: local
   owner: Sutton Benger Parish Council
+  crown: false
 suttoncoldfieldtowncouncil.gov.uk:
-  sector: local
   owner: Sutton Coldfield Town Council
+  crown: false
 suttoncourtenay-pc.gov.uk:
-  sector: local
   owner: Sutton Courtenay Parish Council
+  crown: false
 sutton.gov.uk:
-  sector: local
   owner: Sutton London Borough Council
+  crown: false
 suttonparishcouncil.gov.uk:
-  sector: local
   owner: Sutton Parish Council
+  crown: false
 suttonunderwhitestonecliffeparishcouncil.gov.uk:
-  sector: local
   owner: Sutton under Whitestonecliffe Parish Council
+  crown: false
 swaffhamtowncouncil.gov.uk:
-  sector: local
   owner: Swaffham Town Council
+  crown: false
 swale.gov.uk:
-  sector: local
   owner: Swale Borough Council
+  crown: false
 swallowfieldpc.gov.uk:
-  sector: local
   owner: Swallowfield Parish Council
+  crown: false
 swanage.gov.uk:
-  sector: local
   owner: Swanage Town Council
+  crown: false
 swanleytowncouncil.gov.uk:
-  sector: local
   owner: Swanley Town Council
+  crown: false
 swanscombeandgreenhithetowncouncil.gov.uk:
-  sector: local
   owner: Swanscombe & Greenhithe Town Council
+  crown: false
 sway-pc.gov.uk:
-  sector: local
   owner: New Forest District Council
+  crown: false
 swdevon.gov.uk:
-  sector: local
   owner: South Hams District Council
+  crown: false
 swillingtonparishcouncil.gov.uk:
-  sector: local
   owner: Swillington Parish Council
+  crown: false
 swindon.gov.uk:
-  sector: local
   owner: Swindon Borough Council
+  crown: false
 swinfordparishcouncil.gov.uk:
-  sector: local
   owner: Swinford Parish Council
+  crown: false
 tadleytowncouncil.gov.uk:
-  sector: local
   owner: Tadley Town Council
+  crown: false
 tameside.gov.uk:
-  sector: local
   owner: Tameside Metropolitan Borough Council
+  crown: false
 tamworth.gov.uk:
-  sector: local
   owner: Tamworth Borough Council
+  crown: false
 tandridgedc.gov.uk:
-  sector: local
   owner: Tandridge District Council
+  crown: false
 tandridge.gov.uk:
-  sector: local
   owner: Tandridge District Council
+  crown: false
 tarleton-pc.gov.uk:
-  sector: local
   owner: Tarleton Parish Council
+  crown: false
 tauntondeane.gov.uk:
-  sector: local
   owner: Taunton Deane Borough Council
+  crown: false
 tavistock.gov.uk:
-  sector: local
   owner: Tavistock Town Council
+  crown: false
 tayplan-sdpa.gov.uk:
-  sector: local
   owner: Dundee City Council
+  crown: false
 taysideprocurement.gov.uk:
-  sector: local
   owner: Dundee City Council
+  crown: false
 teesvalley-ca.gov.uk:
-  sector: local
   owner: Stockton-on-Tees Borough Council
+  crown: false
 teesvalleyunlimited.gov.uk:
-  sector: local
   owner: Stockton-on-Tees Borough Council
+  crown: false
 teignbridge.gov.uk:
-  sector: local
   owner: Teignbridge District Council
+  crown: false
 teignmouth-devon.gov.uk:
-  sector: local
   owner: Teignmouth Town Council
+  crown: false
 telford.gov.uk:
-  sector: local
   owner: Telford & Wrekin Council
+  crown: false
 telscombetowncouncil.gov.uk:
-  sector: local
   owner: Telscombe Town Council
+  crown: false
 tendringdc.gov.uk:
-  sector: local
   owner: Tendring District Council
+  crown: false
 tenterdentowncouncil.gov.uk:
-  sector: local
   owner: Tenterden Town Council
+  crown: false
 testvalley.gov.uk:
-  sector: local
   owner: Test Valley Borough Council
+  crown: false
 tetbury.gov.uk:
-  sector: local
   owner: Tetbury Town Council
+  crown: false
 tewkesburybc.gov.uk:
-  sector: local
   owner: Tewkesbury Borough Council
+  crown: false
 tewkesbury.gov.uk:
-  sector: local
   owner: Tewkesbury Borough Council
+  crown: false
 tewkesburytowncouncil.gov.uk:
-  sector: local
   owner: Tewkesbury Town Council
+  crown: false
 thametowncouncil.gov.uk:
-  sector: local
   owner: Thame Town Council
+  crown: false
 thanet.gov.uk:
-  sector: local
   owner: Thanet District Council
+  crown: false
 thanington-pc.gov.uk:
-  sector: local
   owner: Thanington Without Parish Council
+  crown: false
 thatchamtowncouncil.gov.uk:
-  sector: local
   owner: Thatcham Town Council
+  crown: false
 thealeparishcouncil.gov.uk:
-  sector: local
   owner: Theale Parish Council
+  crown: false
 thegorgeparishcouncil.gov.uk:
-  sector: local
   owner: The Gorge Parish Council
+  crown: false
 themcmanus-dundee.gov.uk:
-  sector: local
   owner: Dundee City Council
+  crown: false
 thestukeleys-pc.gov.uk:
-  sector: local
   owner: The Stukeleys Parish Council
+  crown: false
 thetfordtowncouncil.gov.uk:
-  sector: local
   owner: Thetford Town Council
+  crown: false
 thirsk-tc.gov.uk:
-  sector: local
   owner: Thirsk Town Council
+  crown: false
 thornabytowncouncil.gov.uk:
-  sector: local
   owner: Thornaby Town Council
+  crown: false
 thornburytowncouncil.gov.uk:
-  sector: local
   owner: Thornbury Town Council
+  crown: false
 thorne-moorends.gov.uk:
-  sector: local
   owner: Thorne Moorends Town Council
+  crown: false
 thornley-pc.gov.uk:
-  sector: local
   owner: Thornley Parish Council
+  crown: false
 thorpestandrew-tc.gov.uk:
-  sector: local
   owner: Thorpe St Andrew Town Council
+  crown: false
 thrapstontowncouncil.gov.uk:
-  sector: local
   owner: Thrapston Town Council
+  crown: false
 threerivers.gov.uk:
-  sector: local
   owner: Three Rivers District Council
+  crown: false
 thurmastonpc.gov.uk:
-  sector: local
   owner: Thurmaston Parish Council
+  crown: false
 thurrockfostering.gov.uk:
-  sector: local
   owner: Thurrock Council
+  crown: false
 thurrock.gov.uk:
-  sector: local
   owner: Thurrock Council
+  crown: false
 thursley-pc.gov.uk:
-  sector: local
   owner: Thursley Parish Council
+  crown: false
 thurstonparishcouncil.gov.uk:
-  sector: local
   owner: Thurston Parish Council
+  crown: false
 tibshelfparishcouncil.gov.uk:
-  sector: local
   owner: Tibshelf Parish Council
+  crown: false
 tidworthtowncouncil.gov.uk:
-  sector: local
   owner: Tidworth Town Council
+  crown: false
 tintagelparishcouncil.gov.uk:
-  sector: local
   owner: Tintagel Parish Council
+  crown: false
 tiptreeparishcouncil.gov.uk:
-  sector: local
   owner: Tiptree Parish Council
+  crown: false
 tisbury-wiltshire-pc.gov.uk:
-  sector: local
   owner: Tisbury Parish Council
+  crown: false
 titleygroup-pc.gov.uk:
-  sector: local
   owner: Titley & District Group Parish Council
+  crown: false
 tivertontowncouncil.gov.uk:
-  sector: local
   owner: Tiverton Town Council
+  crown: false
 tmbc.gov.uk:
-  sector: local
   owner: Tonbridge & Malling Borough Council
+  crown: false
 tobaccoregisterni.gov.uk:
-  sector: local
   owner: Belfast City Council
+  crown: false
 tockenhamparishcouncil.gov.uk:
-  sector: local
   owner: Tockenham Parish Council
+  crown: false
 tockwith.gov.uk:
-  sector: local
   owner: Tockwith with Wilstrop Parish Council
+  crown: false
 tollertonparishcouncil.gov.uk:
-  sector: local
   owner: Tollerton Parish Council
+  crown: false
 torbay.gov.uk:
-  sector: local
   owner: Torbay Council
+  crown: false
 torfaen.gov.uk:
-  sector: local
   owner: Torfaen County Borough Council
+  crown: false
 tormarton-pc.gov.uk:
-  sector: local
   owner: Tormarton Parish Council
+  crown: false
 torpointtowncouncil.gov.uk:
-  sector: local
   owner: Torpoint Town Council
+  crown: false
 torridge.gov.uk:
-  sector: local
   owner: Torridge District Council
+  crown: false
 totnestowncouncil.gov.uk:
-  sector: local
   owner: Totnes Town Council
+  crown: false
 totton-and-eling-tc.gov.uk:
-  sector: local
   owner: Totton and Eling Town Council
+  crown: false
 towcester-tc.gov.uk:
-  sector: local
   owner: Towcester Town Council
+  crown: false
 towednackparishcouncil.gov.uk:
-  sector: local
   owner: Towednack Parish Council
+  crown: false
 towerhamlets.gov.uk:
-  sector: local
   owner: Tower Hamlets London Borough Council
+  crown: false
 towynkinmelbay-tc.gov.uk:
-  sector: local
   owner: Towyn and Kinmel Bay Town Council
+  crown: false
 tracc.gov.uk:
-  sector: local
   owner: Powys County Council
+  crown: false
 trafford.gov.uk:
-  sector: local
   owner: Trafford Metropolitan Borough Council
+  crown: false
 traffordparishes.gov.uk:
-  sector: local
   owner: Trafford Metropolitan Borough Council
+  crown: false
 treetonparishcouncil.gov.uk:
-  sector: local
   owner: Treeton Parish Council
+  crown: false
 trimdonfoundry-pc.gov.uk:
-  sector: local
   owner: Trimdon Foundry Parish Council
+  crown: false
 trimdonparishcouncil.gov.uk:
-  sector: local
   owner: Trimdon Parish Council
+  crown: false
 tring.gov.uk:
-  sector: local
   owner: Tring Town Council
+  crown: false
 trowbridge.gov.uk:
-  sector: local
   owner: Trowbridge Town Council
+  crown: false
 truro-city.gov.uk:
-  sector: local
   owner: Truro City Council
+  crown: false
 truro.gov.uk:
-  sector: local
   owner: Truro City Council
+  crown: false
 tunbridgewells.gov.uk:
-  sector: local
   owner: Tunbridge Wells Borough Council
+  crown: false
   agreement_signed: true
 tupton-pc.gov.uk:
-  sector: local
   owner: Tupton Parish Council
+  crown: false
 tuxford-pc.gov.uk:
-  sector: local
   owner: Tuxford Parish Council
+  crown: false
 twict.gov.uk:
-  sector: local
   owner: Sunderland City Metropolitan Borough Council
+  crown: false
 twineham-pc.gov.uk:
-  sector: local
   owner: Twineham Parish Council
+  crown: false
 twyford-bucks-pc.gov.uk:
-  sector: local
   owner: Twyford Parish Council
+  crown: false
 twyfordparishcouncil.gov.uk:
-  sector: local
   owner: Twyford Parish Council
+  crown: false
 tyneandwearltp.gov.uk:
-  sector: local
   owner: Newcastle upon Tyne City Council
+  crown: false
 tywardreathandparparishcouncil.gov.uk:
-  sector: local
   owner: Tywardreath and Par Parish Council
+  crown: false
 uckfieldtc.gov.uk:
-  sector: local
   owner: Uckfield Town Council
+  crown: false
 ugboroughparishcouncil.gov.uk:
-  sector: local
   owner: Ugborough Parish Council
+  crown: false
 uleyparishcouncil.gov.uk:
-  sector: local
   owner: uleyparishcouncil.gov.uk
+  crown: false
 uphollandpc.gov.uk:
-  sector: local
   owner: Up Holland Parish Council
+  crown: false
 upperbeeding-pc.gov.uk:
-  sector: local
   owner: Upper Beeding Parish Council
+  crown: false
 upperrissington-pc.gov.uk:
-  sector: local
   owner: Upper Rissington Parish Council
+  crown: false
 uppinghamtowncouncil.gov.uk:
-  sector: local
   owner: Uppingham Town Council
+  crown: false
 upton-pc.gov.uk:
-  sector: local
   owner: Upton Parish Council
+  crown: false
 uptonstleonards-pc.gov.uk:
-  sector: local
   owner: Stroud District Council
+  crown: false
 urchfont-pc.gov.uk:
-  sector: local
   owner: Urchfont Parish Council
+  crown: false
 uttlesford.gov.uk:
-  sector: local
   owner: Uttlesford District Council
+  crown: false
 valeofglamorgan.gov.uk:
-  sector: local
   owner: Vale of Glamorgan Council
+  crown: false
 verwood.gov.uk:
-  sector: local
   owner: Verwood Town Council
+  crown: false
 visitsaffronwalden.gov.uk:
-  sector: local
   owner: Saffron Walden Town Council
+  crown: false
 visitsouthribble.gov.uk:
-  sector: local
   owner: South Ribble Borough Council
+  crown: false
 waddesdonparishcouncil.gov.uk:
-  sector: local
   owner: Waddesdon Parish Council
+  crown: false
 waddingham.gov.uk:
-  sector: local
   owner: Waddingham Parish Council
+  crown: false
 wadebridge-tc.gov.uk:
-  sector: local
   owner: Wadebridge Town Council
+  crown: false
 wadhurst-pc.gov.uk:
-  sector: local
   owner: Wadhurst Parish Council
+  crown: false
 wakefield.gov.uk:
-  sector: local
   owner: Wakefield City Council
+  crown: false
 wallingfordtowncouncil.gov.uk:
-  sector: local
   owner: Wallingford Town Council
+  crown: false
 wall-pc.gov.uk:
-  sector: local
   owner: Wall Parish Council
+  crown: false
 walsall.gov.uk:
-  sector: local
   owner: Walsall Metropolitan Borough Council
+  crown: false
 walthamabbey-tc.gov.uk:
-  sector: local
   owner: Waltham Abbey Town Council
+  crown: false
 walthamforestclass.gov.uk:
-  sector: local
   owner: Waltham Forest London Borough Council
+  crown: false
 walthamforest.gov.uk:
-  sector: local
   owner: Waltham Forest London Borough Council
+  crown: false
 waltoncommunitycouncil.gov.uk:
-  sector: local
   owner: Walton Community Council
+  crown: false
 walton-pc.gov.uk:
-  sector: local
   owner: Walton Parish Council
+  crown: false
 wantagetowncouncil.gov.uk:
-  sector: local
   owner: Wantage Town Council
+  crown: false
 wareham-tc.gov.uk:
-  sector: local
   owner: Wareham Town Council
+  crown: false
 waretowncouncil.gov.uk:
-  sector: local
   owner: Ware Town Council
+  crown: false
 warfieldparishcouncil.gov.uk:
-  sector: local
   owner: Warfield Parish Council
+  crown: false
 warminster-tc.gov.uk:
-  sector: local
   owner: Warminster Town Council
+  crown: false
 warrington.gov.uk:
-  sector: local
   owner: Warrington Borough Council
+  crown: false
 warton-pc.gov.uk:
-  sector: local
   owner: Warton Parish Council
+  crown: false
 warwick-dc.gov.uk:
-  sector: local
   owner: Warwick District Council
+  crown: false
 warwickdc.gov.uk:
-  sector: local
   owner: Warwick District Council
+  crown: false
 warwick.gov.uk:
-  sector: local
   owner: Warwick District Council
+  crown: false
 warwickshire.gov.uk:
-  sector: local
   owner: Warwickshire County Council
+  crown: false
 warwicktowncouncil.gov.uk:
-  sector: local
   owner: Warwick Town Council
+  crown: false
 watermead-pc.gov.uk:
-  sector: local
   owner: Watermead Parish Council
+  crown: false
 watford-council.gov.uk:
-  sector: local
   owner: Watford Borough Council
+  crown: false
 watford.gov.uk:
-  sector: local
   owner: Watford Borough Council
+  crown: false
 watlington-oxon-pc.gov.uk:
-  sector: local
   owner: Watlington Parish Council
+  crown: false
 wattontowncouncil.gov.uk:
-  sector: local
   owner: Watton Town Council
+  crown: false
 waveney.gov.uk:
-  sector: local
   owner: Waveney District Council
+  crown: false
 waverley.gov.uk:
-  sector: local
   owner: Waverley Borough Council
+  crown: false
 wealden.gov.uk:
-  sector: local
   owner: Wealden District Council
+  crown: false
 welfordonavon-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 welhat.gov.uk:
-  sector: local
   owner: Welwyn Hatfield Borough Council
+  crown: false
 wellingborough.gov.uk:
-  sector: local
   owner: Wellingborough Borough Council
+  crown: false
 wellington-shropshire.gov.uk:
-  sector: local
   owner: Wellington Town Council
+  crown: false
 wells.gov.uk:
-  sector: local
   owner: Wells City Council
+  crown: false
 welshamptonandlyneal-pc.gov.uk:
-  sector: local
   owner: Welshampton and Lyneal Parish Council
+  crown: false
 welshpooltowncouncil.gov.uk:
-  sector: local
   owner: Welshpool Town Council
+  crown: false
 welton-by-lincoln-pc.gov.uk:
-  sector: local
   owner: Welton Parish Council
+  crown: false
 welton-pc.gov.uk:
-  sector: local
   owner: Welton Parish Council
+  crown: false
 welwyn.gov.uk:
-  sector: local
   owner: Welwyn Hatfield Borough Council
+  crown: false
 wem.gov.uk:
-  sector: local
   owner: Wem Town Council
+  crown: false
 wemrural-pc.gov.uk:
-  sector: local
   owner: Wem Rural Parish Council
+  crown: false
 wendover-pc.gov.uk:
-  sector: local
   owner: Wendover Parish Council
+  crown: false
 westberks.gov.uk:
-  sector: local
   owner: West Berkshire Council
+  crown: false
 westbletchleycouncil.gov.uk:
-  sector: local
   owner: West Bletchley Council
+  crown: false
 westburysubmendip-pc.gov.uk:
-  sector: local
   owner: Westbury Sub Mendip Parish Council
+  crown: false
 westburytowncouncil.gov.uk:
-  sector: local
   owner: Westbury Town Council
+  crown: false
 westcottparishcouncil.gov.uk:
-  sector: local
   owner: Westcott Parish Council
+  crown: false
 westcumbria.gov.uk:
-  sector: local
   owner: Allerdale Borough Council
+  crown: false
 westdevon.gov.uk:
-  sector: local
   owner: West Devon Borough Council
+  crown: false
 westdorset-dc.gov.uk:
-  sector: local
   owner: West Dorset District Council
+  crown: false
 westdorset-weymouth.gov.uk:
-  sector: local
   owner: West Dorset District Council
+  crown: false
 west-dunbarton.gov.uk:
-  sector: local
   owner: West Dunbartonshire Council
+  crown: false
 westend-pc.gov.uk:
-  sector: local
   owner: West End Parish Council
+  crown: false
 westerhamtowncouncil.gov.uk:
-  sector: local
   owner: Westerham Town Council
+  crown: false
 westgateonsea.gov.uk:
-  sector: local
   owner: Westgate-On-Sea Town Council
+  crown: false
 westgrinstead-pc.gov.uk:
-  sector: local
   owner: West Grinstead Parish Council
+  crown: false
 westhillparishcouncil.gov.uk:
-  sector: local
   owner: West Hill Parish Council
+  crown: false
 westhoathly.gov.uk:
-  sector: local
   owner: West Hoathly Parish Council
+  crown: false
 westlancashire.gov.uk:
-  sector: local
   owner: West Lancashire District Council
+  crown: false
 westlancsdc.gov.uk:
-  sector: local
   owner: West Lancashire District Council
+  crown: false
 westlancs.gov.uk:
-  sector: local
   owner: West Lancashire District Council
+  crown: false
 westleigh-devon.gov.uk:
-  sector: local
   owner: Westleigh Parish Council
+  crown: false
 west-lindsey.gov.uk:
-  sector: local
   owner: West Lindsey District Council
+  crown: false
 westlothian.gov.uk:
-  sector: local
   owner: West Lothian Council
+  crown: false
 westmidlandsca.gov.uk:
-  sector: local
   owner: Wolverhampton City Council
+  crown: false
 westminster.gov.uk:
-  sector: local
   owner: Westminster City Council
+  crown: false
 westmoors-pc.gov.uk:
-  sector: local
   owner: West Moors Parish Council
+  crown: false
 west-norfolk.gov.uk:
-  sector: local
   owner: Borough Council of King's Lynn & West Norfolk
+  crown: false
 westofengland-ca.gov.uk:
-  sector: local
   owner: Bath and North East Somerset Council
+  crown: false
 westonbywellandparishcouncil.gov.uk:
-  sector: local
   owner: Weston by Welland Parish Council
+  crown: false
 westononthegreen-pc.gov.uk:
-  sector: local
   owner: Weston on the Green Parish Council
+  crown: false
 westoxon.gov.uk:
-  sector: local
   owner: West Oxfordshire District Council
+  crown: false
 westparley-pc.gov.uk:
-  sector: local
   owner: West Parley Parish Council
+  crown: false
 westsomerset.gov.uk:
-  sector: local
   owner: West Somerset District Council
+  crown: false
 westsomersetonline.gov.uk:
-  sector: local
   owner: West Somerset District Council
+  crown: false
 westsuffolk.gov.uk:
-  sector: local
   owner: St Edmundsbury Borough Council
+  crown: false
   agreement_signed: true
 westsussex.gov.uk:
-  sector: local
   owner: West Sussex County Council
+  crown: false
 westswindon-pc.gov.uk:
-  sector: local
   owner: West Swindon Parish Council
+  crown: false
 westwey.gov.uk:
-  sector: local
   owner: Weymouth and Portland Borough Council
+  crown: false
 westwitteringparishcouncil.gov.uk:
-  sector: local
   owner: West Wittering Parish Council
+  crown: false
 westyorkshire-pcp.gov.uk:
-  sector: local
   owner: Wakefield City Council
+  crown: false
 weymouth.gov.uk:
-  sector: local
   owner: Weymouth and Portland Borough Council
+  crown: false
 wheathampstead-pc.gov.uk:
-  sector: local
   owner: Wheathampstead Parish Council
+  crown: false
 wheatleyparishcouncil.gov.uk:
-  sector: local
   owner: Wheatley Parish Council
+  crown: false
 WheatonAstonParishCouncil.gov.uk:
-  sector: local
   owner: Lapley, Stretton & Wheaton Aston Parish Council
+  crown: false
 wheldrake-pc.gov.uk:
-  sector: local
   owner: Wheldrake Parish Council
+  crown: false
 whiston-tc.gov.uk:
-  sector: local
   owner: Whiston Town Council
+  crown: false
 whitbytowncouncil.gov.uk:
-  sector: local
   owner: Whitby Town Council
+  crown: false
 whitchurch-hampshire-tc.gov.uk:
-  sector: local
   owner: Whitchurch Town Council
+  crown: false
 whitehilltowncouncil.gov.uk:
-  sector: local
   owner: Whitehill Town Council
+  crown: false
 whitehorsedc.gov.uk:
-  sector: local
   owner: Vale of White Horse District Council
+  crown: false
 whiteshillandruscombe-pc.gov.uk:
-  sector: local
   owner: Whiteshill and Ruscombe Parish Council
+  crown: false
 whitnashtowncouncil.gov.uk:
-  sector: local
   owner: Whitnash Town Council
+  crown: false
 whitwell-pc.gov.uk:
-  sector: local
   owner: Whitwell Parish Council
+  crown: false
 whitworth.gov.uk:
-  sector: local
   owner: Whitworth Town Council
+  crown: false
 wigan.gov.uk:
-  sector: local
   owner: Wigan Metropolitan Borough Council
+  crown: false
 wiganmbc.gov.uk:
-  sector: local
   owner: Wigan Metropolitan Borough Council
+  crown: false
 wilbarstonparishcouncil.gov.uk:
-  sector: local
   owner: Wilbarston Parish Council
+  crown: false
 wilcotandhuish-pc.gov.uk:
-  sector: local
   owner: Wilcot and Huish Parish Council
+  crown: false
 willinghamparishcouncil.gov.uk:
-  sector: local
   owner: Willingham Parish Council
+  crown: false
 wilsdenparishcouncil.gov.uk:
-  sector: local
   owner: Wilsden Parish Council
+  crown: false
 wiltontowncouncil.gov.uk:
-  sector: local
   owner: Wilton Town Council
+  crown: false
 wiltshire.gov.uk:
-  sector: local
   owner: The Wiltshire Council
+  crown: false
 wimborne.gov.uk:
-  sector: local
   owner: Wimborne Minster Town Council
+  crown: false
 winchester.gov.uk:
-  sector: local
   owner: Winchester City Council
+  crown: false
 windermere-tc.gov.uk:
-  sector: local
   owner: Windermere Town Council
+  crown: false
 windleshampc.gov.uk:
-  sector: local
   owner: Windlesham Parish Council
+  crown: false
 winkfieldparishcouncil.gov.uk:
-  sector: local
   owner: Winkfield Parish Council
+  crown: false
 winnersh.gov.uk:
-  sector: local
   owner: Winnersh Parish Council
+  crown: false
 winsford.gov.uk:
-  sector: local
   owner: Winsford Town Council
+  crown: false
 winslowtowncouncil.gov.uk:
-  sector: local
   owner: Winslow Town Council
+  crown: false
 winteringham-pc.gov.uk:
-  sector: local
   owner: Winteringham Parish Council
+  crown: false
 wirksworth.gov.uk:
-  sector: local
   owner: Wirksworth Town Council
+  crown: false
 wirksworthtowncouncil.gov.uk:
-  sector: local
   owner: Wirksworth Town Council
+  crown: false
 wirral-mbc.gov.uk: wirral.gov.uk
 wirral.gov.uk:
-  sector: local
   owner: Wirral Metropolitan Borough Council
+  crown: false
   agreement_signed: true
 wisbechtowncouncil.gov.uk:
-  sector: local
   owner: Wisbech Town Council
+  crown: false
 witham.gov.uk:
-  sector: local
   owner: Witham Town Council
+  crown: false
 witherleyparishcouncil.gov.uk:
-  sector: local
   owner: Witherley Parish Council
+  crown: false
 witley-pc.gov.uk:
-  sector: local
   owner: Witley Parish Council
+  crown: false
 witney-tc.gov.uk:
-  sector: local
   owner: Witney Town Council
+  crown: false
 wivenhoe.gov.uk:
-  sector: local
   owner: Wivenhoe Town Council
+  crown: false
 wixford-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 wmortimerhazeleigh-pc.gov.uk:
-  sector: local
   owner: Woodham Mortimer with Hazeleigh Parish Council
+  crown: false
 woking.gov.uk:
-  sector: local
   owner: Woking Borough Council
+  crown: false
 wokingham.gov.uk:
-  sector: local
   owner: Wokingham Borough Council
+  crown: false
   agreement_signed: true
 wokingham-tc.gov.uk:
-  sector: local
   owner: Wokingham Town Council
+  crown: false
 wokinghamwithoutparishcouncil.gov.uk:
-  sector: local
   owner: Wokingham Without Parish Council
+  crown: false
 wokinghamwithout-pc.gov.uk:
-  sector: local
   owner: Wokingham Without Parish Council
+  crown: false
 wollastonparishcouncil.gov.uk:
-  sector: local
   owner: Wollaston Parish Council
+  crown: false
 wolverhampton.gov.uk:
-  sector: local
   owner: Wolverhampton City Council
+  crown: false
 wolvertonandgreenleystowncouncil.gov.uk:
-  sector: local
   owner: Wolverton and Greenleys Town Council
+  crown: false
 womersleyparishcouncil.gov.uk:
-  sector: local
   owner: Womersley Parish Council
+  crown: false
 wooburnparish.gov.uk:
-  sector: local
   owner: Wooburn Parish Council
+  crown: false
 woodbridge-suffolk.gov.uk:
-  sector: local
   owner: Woodbridge Town Council
+  crown: false
 woodchurch-pc.gov.uk:
-  sector: local
   owner: Woodchurch Parish Council
+  crown: false
 woodgreen-pc.gov.uk:
-  sector: local
   owner: Woodgreen Parish Council
+  crown: false
 woodley.gov.uk:
-  sector: local
   owner: Woodley Town Council
+  crown: false
 woodsettsparishcouncil.gov.uk:
-  sector: local
   owner: Woodsetts Parish Council
+  crown: false
 woodstock-tc.gov.uk:
-  sector: local
   owner: Woodstock Town Council
+  crown: false
 woodvilleparishcouncil.gov.uk:
-  sector: local
   owner: Woodville Parish Council
+  crown: false
 woolley-pc.gov.uk:
-  sector: local
   owner: Woolley Parish Council
+  crown: false
 woolston-pc.gov.uk:
-  sector: local
   owner: Woolston Parish Council
+  crown: false
 woottonbassett.gov.uk:
-  sector: local
   owner: Wootton Bassett Town Council
+  crown: false
 woottonparishcouncil.gov.uk:
-  sector: local
   owner: Wootton Parish Council
+  crown: false
 woottonwawen-pc.gov.uk:
-  sector: local
   owner: Stratford-on-Avon District Council
+  crown: false
 worcester.gov.uk:
-  sector: local
   owner: City of Worcester Council
+  crown: false
 worcestershire.gov.uk:
-  sector: local
   owner: Worcestershire County Council
+  crown: false
 worcestershirehub.gov.uk:
-  sector: local
   owner: Worcestershire County Council
+  crown: false
 worcestershirets.gov.uk:
-  sector: local
   owner: Worcestershire County Council
+  crown: false
 worcsregservices.gov.uk:
-  sector: local
   owner: Bromsgrove District Council
+  crown: false
 workingtontowncouncil.gov.uk:
-  sector: local
   owner: Workington Town Council
+  crown: false
 worlestondistrict-pc.gov.uk:
-  sector: local
   owner: Worleston & District Parish Council
+  crown: false
 worplesdon-pc.gov.uk:
-  sector: local
   owner: Worplesdon Parish Council
+  crown: false
 worthing.gov.uk:
-  sector: local
   owner: Worthing Borough Council
+  crown: false
 woughtoncommunitycouncil.gov.uk:
-  sector: local
   owner: Woughton Parish Council
+  crown: false
 wraxallandfailand-pc.gov.uk:
-  sector: local
   owner: Wraxall and Failand Parish Council
+  crown: false
 wraysburyparishcouncil.gov.uk:
-  sector: local
   owner: Wraysbury Parish Council
+  crown: false
 wrecsam.gov.uk:
-  sector: local
   owner: Wrexham County Borough Council
+  crown: false
 wrestlingworthandcockaynehatley-pc.gov.uk:
-  sector: local
   owner: Wrestlingworth & Cockayne Hatley Parish Council
+  crown: false
 wrexham.gov.uk:
-  sector: local
   owner: Wrexham County Borough Council
+  crown: false
 wringtonparishcouncil.gov.uk:
-  sector: local
   owner: Wrington Parish Council
+  crown: false
 wroseparishcouncil.gov.uk:
-  sector: local
   owner: Wrose Parish Council
+  crown: false
 wroughton.gov.uk:
-  sector: local
   owner: Wroughton Parish Council
+  crown: false
 wsm-tc.gov.uk:
-  sector: local
   owner: Weston-super-Mare Town Council
+  crown: false
 wsx-donnington-pc.gov.uk:
-  sector: local
   owner: Chichester District Council
+  crown: false
 wychavon.gov.uk:
-  sector: local
   owner: Wychavon District Council
+  crown: false
 wycombe.gov.uk:
-  sector: local
   owner: Wycombe District Council
+  crown: false
 wyrebc.gov.uk:
-  sector: local
   owner: Wyre Borough Council
+  crown: false
 wyreforestdc.gov.uk:
-  sector: local
   owner: Wyre Forest District Council
+  crown: false
 wyreforest.gov.uk:
-  sector: local
   owner: Wyre Forest District Council
+  crown: false
 wyre.gov.uk:
-  sector: local
   owner: Wyre Council
+  crown: false
 YaldingParishCouncil.gov.uk:
-  sector: local
   owner: Yalding Parish Council
+  crown: false
 yaptonpc.gov.uk:
-  sector: local
   owner: Yapton Parish Council
+  crown: false
 yateley-tc.gov.uk:
-  sector: local
   owner: Yateley Town Council
+  crown: false
 yatetowncouncil.gov.uk:
-  sector: local
   owner: Yate Town Council
+  crown: false
 yatton-pc.gov.uk:
-  sector: local
   owner: Yatton Parish Council
+  crown: false
 yealmpton-pc.gov.uk:
-  sector: local
   owner: Yealmpton Parish Council
+  crown: false
 yelvertoft-pc.gov.uk:
-  sector: local
   owner: Yelvertoft Parish Council
+  crown: false
 yeovil.gov.uk:
-  sector: local
   owner: South Somerset District Council
+  crown: false
 yeoviltonparishcouncil.gov.uk:
-  sector: local
   owner: Yeovil Town Council
+  crown: false
 yeovilwithoutparishcouncil.gov.uk:
-  sector: local
   owner: Yeovil Without Parish Council
+  crown: false
 yetminsterparishes.gov.uk:
-  sector: local
   owner: Yetminster and Ryme Intrinseca Parish Council
+  crown: false
 ynysmon.gov.uk:
-  sector: local
   owner: Isle of Anglesey County Council
+  crown: false
   agreement_signed: true
 york.gov.uk:
-  sector: local
   owner: City of York Council
+  crown: false
 yorkshirelca.gov.uk:
-  sector: local
   owner: Yorkshire Local Councils Associations
+  crown: false
 zennorparishcouncil.gov.uk:
-  sector: local
   owner: Zennor Parish Council
+  crown: false
