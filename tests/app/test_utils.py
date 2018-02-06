@@ -337,6 +337,19 @@ def test_get_valid_government_domain_some_known_details():
     assert government_domain.agreement_signed is True
 
 
+def test_get_valid_government_domain_gets_most_specific_first():
+
+    generic = GovernmentDomain("gov.uk")
+    assert generic.sector is None
+    assert generic.owner is None
+    assert generic.agreement_signed is False
+
+    specific = GovernmentDomain("dacorum.gov.uk")
+    assert specific.sector is None
+    assert specific.owner is None
+    assert specific.agreement_signed is False
+
+
 def test_validate_government_domain_data():
 
     for domain in GovernmentDomain.domains.keys():
