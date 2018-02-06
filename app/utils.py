@@ -280,9 +280,11 @@ def get_help_argument():
 
 
 def is_gov_user(email_address):
-    valid_domains = current_app.config['EMAIL_DOMAIN_REGEXES']
-    email_regex = (r"[\.|@]({})$".format("|".join(valid_domains)))
-    return bool(re.search(email_regex, email_address.lower()))
+    try:
+        GovernmentDomain(email_address)
+        return True
+    except NotGovernmentDomain:
+        return False
 
 
 def get_template(
@@ -428,3 +430,21 @@ def set_status_filters(filter_args):
         SENDING_STATUSES if 'sending' in status_filters else [],
         FAILURE_STATUSES if 'failed' in status_filters else []
     )))
+
+
+class NotGovernmentDomain(Exception):
+    pass
+
+
+class GovernmentDomain:
+
+    def __init__(self, email_address_or_domain):
+
+        for domain in current_app.config['EMAIL_DOMAIN_REGEXES']:
+            if re.search(
+                r"[\.|@]({})$".format(domain),
+                email_address_or_domain.lower()
+            ):
+                return
+
+        raise NotGovernmentDomain()
