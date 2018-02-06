@@ -5,6 +5,7 @@ mil.uk:
 ddc-mod.org:
 slc.co.uk:
   owner: Student Loans Company
+  agreement_signed: true
 gov.scot:
 parliament.uk:
   owner: Parliament
@@ -12,9 +13,11 @@ nhs.uk:
   owner: NHS
 nhs.net: nhs.uk
 police.uk:
-communities.gsi.gov.uk:
+dclgdatamart.co.uk: communities.gov.uk
+communities.gsi.gov.uk: communities.gov.uk
+communities.gov.uk:
   owner: "Ministry of Housing, Communities & Local Government"
-dclgdatamart.co.uk: communities.gsi.gov.uk
+  agreement_signed: true
 dwp.gov.uk:
   owner: Deparment for Work and Pensions
 dwp.gsi.gov.uk: dwp.gov.uk
@@ -23,10 +26,13 @@ naturalengland.org.uk:
   Owner: Natural England
 hmcts.net:
   owner: Her Majesty’s Courts and Tribunals Service
+  agreement_signed: true
 scotent.co.uk:
 assembly.wales:
 cjsm.net:
 cqc.org.uk:
+  owner: Care Quality Commission
+  agreement_signed: true
 bl.uk:
   owner: British Library
 stfc.ac.uk:
@@ -37,7 +43,133 @@ gov.wales:
 biglotteryfund.org.uk:
 marinemanagement.org.uk:
   owner: Marine Management Organisation
+  agreement_signed: true
 britishmuseum.org:
   owner: British Museum
 derrystrabane.com:
 highwaysengland.co.uk:
+cabinet-office.gov.uk:
+  owner: Cabinet Office
+  agreement_signed: true
+cica.gsi.gov.uk: cica.gov.uk
+cica.gov.uk:
+  owner: Criminal Injuries Compensation Authority
+  agreement_signed: true
+dbs.gsi.gov.uk: dbs.gov.uk
+dbs.gov.uk:
+  agreement_signed: true
+dvla.gsi.gov.uk: dvla.gov.uk
+dvla.gov.uk:
+  owner: Driver and Vehicle Licensing Agency
+  agreement_signed: true
+environment-agency.gsi.gov.uk: environment-agency.gov.uk
+environment-agency.gov.uk:
+  owner: Environment Agency
+  agreement_signed: true
+foodstandards.gsi.gov.uk: foodstandards.gov.uk
+foodstandards.gov.uk:
+  owner: Food Standards Agency
+  agreement_signed: true
+gla.gsi.gov.uk: gla.gov.uk
+gla.gov.uk:
+  owner: The Gangmasters and Labour Abuse Authority
+governmentlegal.gov.uk:
+  owner: Government Legal Department
+  agreement_signed: true
+innovateuk.gsi.gov.uk: innovateuk.gov.uk
+innovateuk.gov.uk:
+  owner: Innovate UK
+  agreement_signed: true
+ncsc.gov.uk:
+  owner: National Cyber Security Center
+  agreement_signed: true
+nhsdigital.nhs.uk: digital.nhs.uk
+digital.nhs.uk:
+  owner: NHS Digital
+  agreement_signed: true
+ofsted.gsi.gov.uk: ofsted.gov.uk
+ofsted.gov.uk:
+  owner: Ofsted
+  agreement_signed: true
+ons.gsi.gov.uk: ons.gov.uk
+ons.gov.uk:
+  owner: Office for National Statistics
+  agreement_signed: true
+publicguardian.gsi.gov.uk: publicguardian.gov.uk
+publicguardian.gov.uk:
+  owner: Office of the Public Guardian
+  agreement_signed: true
+srft.nhs.uk:
+  owner: Salford Royal NHS Trust
+  agreement_signed: true
+nationalarchives.gsi.gov.uk: nationalarchives.gov.uk
+nationalarchives.gov.uk:
+  owner: National Archives
+  agreement_signed: true
+voa.gsi.gov.uk: voa.gov.uk
+voa.gov.uk:
+  owner: Valuation Office Agency
+  agreement_signed: true
+daera-ni.gov.uk:
+  owner: Department of Agriculture Environment and Rural Affairs
+  agreement_signed: true
+beis.gsi.gov.uk: beis.gov.uk
+beis.gov.uk:
+  owner: Department for Business, Energy and Industrial Strategy
+  agreement_signed: true
+education.gsi.gov.uk: education.gov.uk
+education.gov.uk:
+  owner: Department for Education
+  agreement_signed: true
+dwp.gsi.gov.uk: dwp.gov.uk
+dwp.gov.uk:
+  owner: Department for Work and Pensions
+  agreement_signed: true
+gad.gsi.gov.uk: gad.gov.uk
+gad.gov.uk:
+  owner: Government Actuary's Department
+  agreement_signed: true
+landregistry.gsi.gov.uk: landregistry.gov.uk
+landregistry.gov.uk:
+  owner: HM Land Registry
+  agreement_signed: true
+legalaid.gsi.gov.uk: legalaid.gov.uk
+legalaid.gov.uk:
+  owner: Legal Aid Agency
+  agreement_signed: true
+phe.gsi.gov.uk: phe.gov.uk
+phe.gov.uk:
+  owner: Public Health England
+  agreement_signed: true
+ssro.gsi.gov.uk: ssro.gov.uk
+ssro.gov.uk:
+  owner: Single Source Regulations Office
+  agreement_signed: true
+vmd.defra.gsi.gov.uk: vmd.defra.gov.uk
+vmd.defra.gov.uk:
+  owner: Vetinary Medicines Directorate
+  agreement_signed: true
+companieshouse.gsi.gov.uk: companieshouse.gov.uk
+companieshouse.gov.uk:
+  owner: Companies House
+  agreement_signed: true
+trade.gsi.gov.uk: trade.gov.uk
+trade.gov.uk:
+  owner: Department for International Trade
+  agreement_signed: true
+homeoffice.gsi.gov.uk: homeoffice.gov.uk
+homeoffice.gov.uk:
+  owner: Home Office
+  agreement_signed: true
+ipo.gsi.gov.uk: ipo.gov.uk
+ipo.gov.uk:
+  owner: Intellectual Property Office
+  agreement_signed: true
+justice.gsi.gov.uk: justice.gov.uk
+justice.gov.uk:
+  owner: Ministry of Justice
+  agreement_signed: true
+rpa.gsi.gov.uk: rpa.gov.uk
+rpa.gov.uk:
+  owner: Rural Payments Agency
+  agreement_signed: true
