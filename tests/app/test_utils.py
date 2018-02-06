@@ -13,7 +13,8 @@ from app.utils import (
     generate_next_dict,
     Spreadsheet,
     get_letter_timings,
-    get_cdn_domain
+    get_cdn_domain,
+    GovernmentDomain,
 )
 from tests.conftest import fake_uuid
 
@@ -307,3 +308,30 @@ def test_get_cdn_domain_on_non_localhost(client, mocker):
     mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'https://some.admintest.com'})
     domain = get_cdn_domain()
     assert domain == 'static-logos.admintest.com'
+
+
+@pytest.mark.parametrize("domain_or_email_address", (
+    "test@ucds.email", "test@dwp.gsi.gov.uk", "test@dwp.gov.uk", "dwp.gov.uk",
+))
+def test_get_valid_government_domain_known_details(domain_or_email_address):
+    government_domain = GovernmentDomain(domain_or_email_address)
+    assert government_domain.sector is None
+    assert government_domain.owner is None
+    assert government_domain.agreement_signed is False
+
+
+@pytest.mark.parametrize("domain_or_email_address", (
+    "test@police.gov.uk", "police.gov.uk",
+))
+def test_get_valid_government_domain_unknown_details(domain_or_email_address):
+    government_domain = GovernmentDomain(domain_or_email_address)
+    assert government_domain.sector is None
+    assert government_domain.owner is None
+    assert government_domain.agreement_signed is False
+
+
+def test_get_valid_government_domain_some_known_details():
+    government_domain = GovernmentDomain("marinemanagement.org.uk")
+    assert government_domain.sector is None
+    assert government_domain.owner == "Marine Management Organisation"
+    assert government_domain.agreement_signed is False
