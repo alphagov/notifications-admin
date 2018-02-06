@@ -284,7 +284,7 @@ def get_help_argument():
 
 def is_gov_user(email_address):
     try:
-        GovernmentDomain(email_address)
+        GovernmentDomain(email_address, domain_list='email_domain_names')
         return True
     except NotGovernmentDomain:
         return False
@@ -447,17 +447,21 @@ class GovernmentDomain:
         domains = yaml.safe_load(domains)
         domain_names = sorted(domains.keys(), key=len)
 
-    def __init__(self, email_address_or_domain):
+    with open('{}/email_domains.yml'.format(_dir_path)) as email_domains:
+        email_domain_names = yaml.safe_load(email_domains)
+
+    def __init__(self, email_address_or_domain, domain_list='domain_names'):
 
         try:
             self._match = next(filter(
                 self.get_matching_function(email_address_or_domain),
-                self.domain_names,
+                getattr(self, domain_list),
             ))
         except StopIteration:
             raise NotGovernmentDomain()
 
-        self.owner, self.sector, self.agreement_signed = self._get_details_of_domain()
+        if domain_list == 'domain_names':
+            self.owner, self.sector, self.agreement_signed = self._get_details_of_domain()
 
     @staticmethod
     def get_matching_function(email_address_or_domain):
