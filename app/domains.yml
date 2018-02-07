@@ -149,9 +149,6 @@ rpa.gov.uk:
   agreement_signed: true
 
 # Local Government
-abbotslangley-pc.gov.uk:
-  owner: Abbots Langley Parish Council
-  crown: false
 aberdeencityandshire-sdpa.gov.uk:
   owner: Aberdeen City Council
   crown: false
@@ -160,9 +157,6 @@ aberdeencity.gov.uk:
   crown: false
 aberdeenshire.gov.uk:
   owner: Aberdeenshire Council
-  crown: false
-aberford-pc.gov.uk:
-  owner: Aberford & District Parish Council
   crown: false
 AbergavennyTownCouncil.gov.uk:
   owner: Abergavenny Town Council
@@ -182,17 +176,8 @@ abingdon.gov.uk:
 abinger-pc.gov.uk:
   owner: Mole Valley District Council
   crown: false
-acastermalbis-pc.gov.uk:
-  owner: Acaster Malbis Parish Council
-  crown: false
-ackworthparishcouncil.gov.uk:
-  owner: Ackworth Parish Council
-  crown: false
 actoncommunitycouncil.gov.uk:
   owner: Acton Community Council
-  crown: false
-addingham-pc.gov.uk:
-  owner: Addingham Parish Council
   crown: false
 adurdc.gov.uk:
   owner: Adur District Council
@@ -203,65 +188,17 @@ adur.gov.uk:
 adur-worthing.gov.uk:
   owner: Adur District Council
   crown: false
-aiskewleemingbar-pc.gov.uk:
-  owner: Aiskew and Leeming Bar Parish Council
-  crown: false
-akeleyparishcouncil.gov.uk:
-  owner: Akeley Parish Council
-  crown: false
-AlbrightonParishCouncil.gov.uk:
-  owner: Albrighton Parish Council
-  crown: false
 alcester-tc.gov.uk:
   owner: Alcester Town Council
   crown: false
-alconburyparishcouncil.gov.uk:
-  owner: Alconbury Parish Council
-  crown: false
-aldenham-pc.gov.uk:
-  owner: Aldenham Parish Council
-  crown: false
-alderburyparishcouncil.gov.uk:
-  owner: Alderbury Parish Council
-  crown: false
-aldercarandlangleymillparishcouncil.gov.uk:
-  owner: Aldercar and Langley Mill Parish Council
-  crown: false
-alderholtparishcouncil.gov.uk:
-  owner: Alderholt Parish Council
-  crown: false
-alderleyedge-pc.gov.uk:
-  owner: Alderley Edge Parish Council
-  crown: false
-alderminster-pc.gov.uk:
-  owner: Alderminster Parish Council
-  crown: false
-aldwickparishcouncil.gov.uk:
-  owner: Aldwick Parish Council
-  crown: false
-alkboroughwalcotparishcouncil.gov.uk:
-  owner: Alkborough and Walcot Parish Council
-  crown: false
-allbrookandnorthboyatt-pc.gov.uk:
-  owner: Allbrook and North Boyatt Parish Council
-  crown: false
 allerdale.gov.uk:
   owner: Allerdale Borough Council
-  crown: false
-allhallowskent-pc.gov.uk:
-  owner: Allhallows Parish Council
-  crown: false
-almondsburyparishcouncil.gov.uk:
-  owner: Almondsbury Parish Council
   crown: false
 alnwick-tc.gov.uk:
   owner: Alnwick Town Council
   crown: false
 alton.gov.uk:
   owner: Alton Town Council
-  crown: false
-alvechurch.gov.uk:
-  owner: Alvechurch Parish Council
   crown: false
 ambervalley.gov.uk:
   owner: Amber Valley Borough Council
@@ -275,44 +212,23 @@ amersham-tc.gov.uk:
 amesburytowncouncil.gov.uk:
   owner: Amesbury Town Council
   crown: false
-amotherby-pc.gov.uk:
-  owner: Amotherby Parish Council
-  crown: false
 andover-tc.gov.uk:
   owner: Andover Town Council
   crown: false
 anglesey.gov.uk:
   owner: Isle of Anglesey County Council
   crown: false
-angleseystaffs-pc.gov.uk:
-  owner: Anglesey Parish Council
-  crown: false
 angliarevenues.gov.uk:
   owner: St Edmundsbury Borough Council
   crown: false
-angmeringparishcouncil.gov.uk:
-  owner: Angmering Parish Council
-  crown: false
-angmering-pc.gov.uk:
-  owner: Angmering Parish Council
-  crown: false
 angus.gov.uk:
   owner: Angus Council
-  crown: false
-anston.gov.uk:
-  owner: Anston Parish Council
-  crown: false
-anstystaplefield-pc.gov.uk:
-  owner: Ansty and Staplefield Parish Council
   crown: false
 antrimandnewtownabbey.gov.uk:
   owner: Antrim Borough Council
   crown: false
 antrim.gov.uk:
   owner: Antrim Borough Council
-  crown: false
-appletonroebuckandacasterselby-pc.gov.uk:
-  owner: Appleton Roebuck and Acaster Selby Parish Council
   crown: false
 apprenticeships.gov.uk:
   owner: Learning and Skills Council
@@ -322,9 +238,6 @@ archifaugwent.gov.uk:
   crown: false
 archifaumorgannwg.gov.uk:
   owner: Cardiff Council
-  crown: false
-arclidparishcouncil.gov.uk:
-  owner: Arclid Parish Council
   crown: false
 ardsandnorthdown.gov.uk:
   owner: North Down Borough Council
@@ -356,29 +269,11 @@ ashfield.gov.uk:
 ashford.gov.uk:
   owner: Ashford Borough Council
   crown: false
-ashford-in-the-water-pc.gov.uk:
-  owner: Ashford-In-The-Water Parish Council
-  crown: false
 ashingtontowncouncil.gov.uk:
   owner: Ashington Town Council
   crown: false
-ashmansworth-pc.gov.uk:
-  owner: Ashmansworth Parish Council
-  crown: false
-ashover-pc.gov.uk:
-  owner: Ashover Parish Council
-  crown: false
-ashpcsurrey.gov.uk:
-  owner: Ash Parish Council
-  crown: false
-ashurstandcolbury-pc.gov.uk:
-  owner: Ashurst and Colbury Parish Council
-  crown: false
 ashurstwood-vc.gov.uk:
   owner: Ashurst Wood Village Council
-  crown: false
-ashwell.gov.uk:
-  owner: Ashwell Parish Council
   crown: false
 askderbyshire.gov.uk:
   owner: North East Derbyshire District Council
@@ -386,20 +281,8 @@ askderbyshire.gov.uk:
 aspatria-tc.gov.uk:
   owner: Aspatria Town Council
   crown: false
-aspleyguiseparishcouncil.gov.uk:
-  owner: Aspley Guise Parish Council
-  crown: false
-aston-cum-aughton-pc.gov.uk:
-  owner: Aston-cum-Aughton Parish Council
-  crown: false
-astonlewallsparishcouncil.gov.uk:
-  owner: Aston le Walls Parish Council
-  crown: false
 atherstone-tc.gov.uk:
   owner: Atherstone Town Council
-  crown: false
-avening-pc.gov.uk:
-  owner: Avening Parish Council
   crown: false
 aws.gov.uk:
   owner: Worthing Borough Council
@@ -437,9 +320,6 @@ babergh.gov.uk:
 baberghmidsuffolk.gov.uk:
   owner: Babergh District Council
   crown: false
-backwell-pc.gov.uk:
-  owner: Backwell Parish Council
-  crown: false
 bagilltcommunitycouncil.gov.uk:
   owner: Bagillt Community Council
   crown: false
@@ -449,14 +329,8 @@ baildontowncouncil.gov.uk:
 bakewelltowncouncil.gov.uk:
   owner: Bakewell Town Council
   crown: false
-baldertonparishcouncil.gov.uk:
-  owner: Balderton Parish Council
-  crown: false
 ballymoney.gov.uk:
   owner: Ballymoney Borough Council
-  crown: false
-bamptonoxon-parishcouncil.gov.uk:
-  owner: Bampton Parish Council
   crown: false
 bamptontowncouncil.gov.uk:
   owner: BamptonTown Council
@@ -464,17 +338,8 @@ bamptontowncouncil.gov.uk:
 banbury.gov.uk:
   owner: Banbury Town Council
   crown: false
-bardneygroup-pc.gov.uk:
-  owner: Bardney Group Parish Council
-  crown: false
 barking-dagenham.gov.uk:
   owner: Barking & Dagenham London Borough Council
-  crown: false
-barlestoneparishcouncil.gov.uk:
-  owner: Barlestone Parish Council
-  crown: false
-barlingmagna-pc.gov.uk:
-  owner: Barling Magna Parish Council
   crown: false
 barmouthtowncouncil.gov.uk:
   owner: Barmouth Town Council
@@ -493,12 +358,6 @@ barrowbc.gov.uk:
   crown: false
 barrytowncouncil.gov.uk:
   owner: Vale of Glamorgan Council
-  crown: false
-bartestreewithlugwardinegroup-pc.gov.uk:
-  owner: Bartestree with Lugwardine Group Parish Council
-  crown: false
-basildon-berks-pc.gov.uk:
-  owner: Basildon Parish Council
   crown: false
 basildon.gov.uk:
   owner: Basildon District Council
@@ -522,23 +381,14 @@ bathnes.gov.uk:
 battletowncouncil.gov.uk:
   owner: Battle Town Council
   crown: false
-baughurst-pc.gov.uk:
-  owner: Baughurst Parish Council
-  crown: false
 beaconsfieldtowncouncil.gov.uk:
   owner: Beaconsfield Town Council
   crown: false
 beaminster-tc.gov.uk:
   owner: Beaminster Town Council
   crown: false
-bearstedparishcouncil.gov.uk:
-  owner: Bearsted Parish Council
-  crown: false
 beaumaristowncouncil.gov.uk:
   owner: Beaumaris Town Council
-  crown: false
-beckley-and-stowood-pc.gov.uk:
-  owner: Beckley and Stowood Parish Council
   crown: false
 bedale-tc.gov.uk:
   owner: Bedale Town Council
@@ -555,32 +405,14 @@ bedsparishes.gov.uk:
 belfastcity.gov.uk:
   owner: Belfast City Council
   crown: false
-belmontrural-pc.gov.uk:
-  owner: Belmont Rural Parish Council
-  crown: false
 belpertowncouncil.gov.uk:
   owner: Belper Town Council
-  crown: false
-beltonparishcouncil.gov.uk:
-  owner: Belton Parish Council
-  crown: false
-berinsfield-pc.gov.uk:
-  owner: Berinsfield Parish Council
   crown: false
 berkeley-tc.gov.uk:
   owner: Berkeley Town Council
   crown: false
 berkhamstedtowncouncil.gov.uk:
   owner: Berkhamsted Town Council
-  crown: false
-berkswich-pc.gov.uk:
-  owner: Berkswich Parish Council
-  crown: false
-berrow-somerset-pc.gov.uk:
-  owner: Berrow Parish Town Council
-  crown: false
-bersted-pc.gov.uk:
-  owner: Bersted Parish Council
   crown: false
 berwick-tc.gov.uk:
   owner: Berwick-upon-Tweed Town Council
@@ -591,23 +423,11 @@ betchworth-pc.gov.uk:
 beverley.gov.uk:
   owner: Beverley Town Council
   crown: false
-bewerleyparishcouncil.gov.uk:
-  owner: Bewerley Parish Council
-  crown: false
 bexley.gov.uk:
   owner: Bexley London Borough Council
   crown: false
 bicester.gov.uk:
   owner: Bicester Town Council
-  crown: false
-bickleigh.gov.uk:
-  owner: Bickleigh Parish Council
-  crown: false
-biddenden.gov.uk:
-  owner: Biddenden Parish Council
-  crown: false
-biddenhamparishcouncil.gov.uk:
-  owner: Biddenden Parish Council
   crown: false
 bideford-tc.gov.uk:
   owner: Bideford Town Council
@@ -618,35 +438,14 @@ bidfordonavon-pc.gov.uk:
 biggleswadetowncouncil.gov.uk:
   owner: Biggleswade Town Council
   crown: false
-bilbrookparishcouncil.gov.uk:
-  owner: Bilbrook Parish Council
-  crown: false
 billericaytowncouncil.gov.uk:
   owner: Billericay Town Council
-  crown: false
-billingeparishcouncil.gov.uk:
-  owner: Parish Council of Billinge Chapel End
-  crown: false
-billingshurst.gov.uk:
-  owner: Billingshurst Parish Council
-  crown: false
-billingsley-pc.gov.uk:
-  owner: Billingsley Parish Council
-  crown: false
-biltoninainstywithbickerton-pc.gov.uk:
-  owner: Bilton in Ainsty with Bickerton Parish Council
-  crown: false
-binfieldparishcouncil.gov.uk:
-  owner: Binfield Parish Council
   crown: false
 bingham-tc.gov.uk:
   owner: Bingham Town Council
   crown: false
 bingleytowncouncil.gov.uk:
   owner: Bingley Town Council
-  crown: false
-birchington-pc.gov.uk:
-  owner: birchington parish council
   crown: false
 birmingham.gov.uk:
   owner: Birmingham City Council
@@ -657,35 +456,17 @@ birminghamprepared.gov.uk:
 bishopauckland-tc.gov.uk:
   owner: Bishop Auckland Town Council
   crown: false
-bishopmiddleham-pc.gov.uk:
-  owner: Bishop Middleham & Mainsforth Parish Council
-  crown: false
-bishopscanningsparishcouncil.gov.uk:
-  owner: Bishops Cannings Parish Council
-  crown: false
 bishopsitchington-pc.gov.uk:
   owner: Stratford-on-Avon District Council
   crown: false
 bishopsstortfordtc.gov.uk:
   owner: Bishop's Stortford Town Council
   crown: false
-bishopswaltham-pc.gov.uk:
-  owner: Bishop's Waltham Parish Council
-  crown: false
-bisley-with-lypiatt.gov.uk:
-  owner: Bisley-with-Lypiatt Parish Council
-  crown: false
 blaby.gov.uk:
   owner: Blaby District Council
   crown: false
-blackbirdleysparishcouncil.gov.uk:
-  owner: Blackbird Leys Parish Council
-  crown: false
 blackburn.gov.uk:
   owner: Blackburn with Darwen Borough Council
-  crown: false
-blacknotley-pc.gov.uk:
-  owner: Black Notley Parish Council
   crown: false
 blackpool.gov.uk:
   owner: Blackpool Council
@@ -703,9 +484,6 @@ blaenhonddan-wcc.gov.uk:
 blandfordforum-tc.gov.uk:
   owner: Blandford Forum Town Council
   crown: false
-bleadonparishcouncil.gov.uk:
-  owner: Bleadon Parish Council
-  crown: false
 bletchleyfennystratford-tc.gov.uk:
   owner: Bletchley and Fenny Stratford Town Council
   crown: false
@@ -718,9 +496,6 @@ bodmin.gov.uk:
 bognorregis.gov.uk:
   owner: Bognor Regis Town Council
   crown: false
-boldreparishcouncil.gov.uk:
-  owner: Boldre Parish Council
-  crown: false
 bollington-tc.gov.uk:
   owner: Bollington Town Council
   crown: false
@@ -730,29 +505,14 @@ bolsover.gov.uk:
 bolton.gov.uk:
   owner: Bolton Metropolitan Borough Council
   crown: false
-bonbyparishcouncil.gov.uk:
-  owner: Bonby Parish Council
-  crown: false
-boroughgreen.gov.uk:
-  owner: Borough Green Parish Council
-  crown: false
-bostockparishcouncil.gov.uk:
-  owner: Bostock Parish Council
-  crown: false
 boston.gov.uk:
   owner: Boston Borough Council
   crown: false
 bournemouth.gov.uk:
   owner: Bournemouth Borough Council
   crown: false
-bournheath-pc.gov.uk:
-  owner: Bournheath Parish Council
-  crown: false
 boveytracey.gov.uk:
   owner: Bovey Tracey Town Council
-  crown: false
-bozeatparishcouncil.gov.uk:
-  owner: Bozeat Parish Council
   crown: false
 bracklacommunitycouncil.gov.uk:
   owner: Brackla Community Council
@@ -769,9 +529,6 @@ bracknell.gov.uk:
 bracknelltowncouncil.gov.uk:
   owner: Bracknell Town Council
   crown: false
-bradfield-yorks-pc.gov.uk:
-  owner: Bradfield Parish Council
-  crown: false
 bradford.gov.uk:
   owner: City of Bradford Metropolitan District Council
   crown: false
@@ -787,32 +544,11 @@ bradleystoke.gov.uk:
 bradninch-tc.gov.uk:
   owner: Bradninch Town Council
   crown: false
-bradwell-pc.gov.uk:
-  owner: Bradwell Parish Council
-  crown: false
 braintree.gov.uk:
   owner: Braintree District Council
   crown: false
-brampton-cambs-pc.gov.uk:
-  owner: Brampton Parish Council
-  crown: false
 bramshaw.gov.uk:
   owner: New Forest District Council
-  crown: false
-bramshottandliphook-pc.gov.uk:
-  owner: Bramshott and Liphook Parish Council
-  crown: false
-brandonandbyshottlesparishcouncil.gov.uk:
-  owner: Brandon & Byshottles Parish Council
-  crown: false
-bransgore-parish.gov.uk:
-  owner: Bransgore Parish Council
-  crown: false
-brauntonparishcouncil.gov.uk:
-  owner: Braunton Parish Council
-  crown: false
-brayparishcouncil.gov.uk:
-  owner: Bray Parish Council
   crown: false
 breamore.gov.uk:
   owner: New Forest District Council
@@ -823,17 +559,11 @@ breckland.gov.uk:
 breckland-sholland.gov.uk:
   owner: Breckland District Council
   crown: false
-bredenburygroup-pc.gov.uk:
-  owner: Bredenbury & District Group Parish Council
-  crown: false
 brent.gov.uk:
   owner: Brent London Borough Council
   crown: false
 brentwood.gov.uk:
   owner: Brentwood Borough Council
-  crown: false
-brickhillparishcouncil.gov.uk:
-  owner: Brickhill Parish Council
   crown: false
 bridgend.gov.uk:
   owner: Bridgend County Borough Council
@@ -847,9 +577,6 @@ bridgnorthtowncouncil.gov.uk:
 bridgwatertowncouncil.gov.uk:
   owner: Bridgwater Town Council
   crown: false
-bridgwaterwithout-pc.gov.uk:
-  owner: Bridgwater Without Parish Council
-  crown: false
 bridlington.gov.uk:
   owner: Bridlington Town Council
   crown: false
@@ -862,15 +589,6 @@ Brierfield.gov.uk:
 brighton-hove.gov.uk:
   owner: Brighton & Hove City Council
   crown: false
-bringtons-pc.gov.uk:
-  owner: Bringtons and Nobottle Parish Council
-  crown: false
-brinkworthparishcouncil.gov.uk:
-  owner: Brinkworth Parish Council
-  crown: false
-brinsworthparishcouncil.gov.uk:
-  owner: Brinsworth Parish Council
-  crown: false
 bristol-city.gov.uk:
   owner: Bristol City Council
   crown: false
@@ -880,23 +598,14 @@ bristol.gov.uk:
 brixhamtowncouncil.gov.uk:
   owner: Brixham Town Council
   crown: false
-broadbridgeheath-pc.gov.uk:
-  owner: Broadbridge Heath Parish Council
-  crown: false
 broadland.gov.uk:
   owner: Broadland District Council
   crown: false
 broadstairs.gov.uk:
   owner: Broadstairs and St Peters Town Council
   crown: false
-broadwindsorgroup.gov.uk:
-  owner: Broadwindsor Group Parish Council
-  crown: false
 brockenhurst.gov.uk:
   owner: New Forest District Council
-  crown: false
-brockworth-pc.gov.uk:
-  owner: Brockworth Parish Council
   crown: false
 bromorgannwg.gov.uk:
   owner: Vale of Glamorgan Council
@@ -913,12 +622,6 @@ bromyardandwinslow-tc.gov.uk:
 broughtonandbrettoncommunitycouncil.gov.uk:
   owner: Broughton and Bretton Community Council
   crown: false
-broughtonandmkv-pc.gov.uk:
-  owner: Broughton and Milton Keynes Parish Council
-  crown: false
-broughton-astley.gov.uk:
-  owner: Broughton Astley Parish Council
-  crown: false
 broughtonwrexhamcommunitycouncil.gov.uk:
   owner: Broughton Community Council
   crown: false
@@ -931,20 +634,11 @@ broxtowe.gov.uk:
 brutontowncouncil.gov.uk:
   owner: Bruton Town Council
   crown: false
-brymptonparishcouncil.gov.uk:
-  owner: Brympton Parish Council
-  crown: false
 brynfordcommunitycouncil.gov.uk:
   owner: Brynford Community Council
   crown: false
 buckfastleigh.gov.uk:
   owner: Buckfastleigh Town Council
-  crown: false
-buckhursthillpc.gov.uk:
-  owner: Buckhurst Hill Parish Council
-  crown: false
-buckinghampark-pc.gov.uk:
-  owner: Buckingham Park Parish Council
   crown: false
 buckingham-tc.gov.uk:
   owner: Buckingham Town Council
@@ -979,50 +673,17 @@ buntingford-tc.gov.uk:
 burgesshill.gov.uk:
   owner: Burgess Hill Town Council
   crown: false
-burghfieldparishcouncil.gov.uk:
-  owner: Burghfield Parish Council
-  crown: false
-burlescombe-pc.gov.uk:
-  owner: Burlescombe Parish Council
-  crown: false
 burleyparishcouncil.gov.uk:
   owner: New Forest District Council
   crown: false
 burnhamoncrouchtowncouncil.gov.uk:
   owner: Burnham-On-Crouch Town Council
   crown: false
-burnhamparish.gov.uk:
-  owner: Burnham Parish Council
-  crown: false
 burnley.gov.uk:
   owner: Burnley Borough Council
   crown: false
 burntwood-tc.gov.uk:
   owner: Burntwood Town Council
-  crown: false
-burrator.gov.uk:
-  owner: Burrator Parish Council
-  crown: false
-burringhamparishcouncil.gov.uk:
-  owner: Burringham Parish Council
-  crown: false
-bursledon-pc.gov.uk:
-  owner: Bursledon Parish Council
-  crown: false
-burtondassett-pc.gov.uk:
-  owner: Burton Dassett Parish Council
-  crown: false
-burton-in-kendal-pc.gov.uk:
-  owner: Burton Parish Council
-  crown: false
-burtonparishcouncil.gov.uk:
-  owner: Burton Parish Council
-  crown: false
-burwarton-pc.gov.uk:
-  owner: Burwarton Parish Council
-  crown: false
-burwellparishcouncil.gov.uk:
-  owner: Burwell Parish Council
   crown: false
 bury.gov.uk:
   owner: Bury Metropolitan Borough Council
@@ -1048,12 +709,6 @@ caiapark.gov.uk:
 cainscross-pc.gov.uk:
   owner: Stroud District Council
   crown: false
-caldecote.gov.uk:
-  owner: Caldecote Parish Council
-  crown: false
-caldecott-pc.gov.uk:
-  owner: Caldecote Parish Council
-  crown: false
 calderdale.gov.uk:
   owner: Calderdale Metropolitan Borough Council
   crown: false
@@ -1065,9 +720,6 @@ calne.gov.uk:
   crown: false
 camborne-tc.gov.uk:
   owner: Camborne Town Council
-  crown: false
-cambourneparishcouncil.gov.uk:
-  owner: Cambourne Parish Council
   crown: false
 cambridge.gov.uk:
   owner: Cambridge City Council
@@ -1081,15 +733,6 @@ camden.gov.uk:
   crown: false
 camelford-tc.gov.uk:
   owner: Camelford Town Council
-  crown: false
-CamParishCouncil.gov.uk:
-  owner: Cam Parish Council
-  crown: false
-campbell-park.gov.uk:
-  owner: Campbell Park Parish Council
-  crown: false
-candm-pc.gov.uk:
-  owner: Corhampton & Meonstoke Parish Council
   crown: false
 cannockchasedc.gov.uk:
   owner: Cannock Chase District Council
@@ -1112,38 +755,17 @@ carlisle.gov.uk:
 carltoncolvilletowncouncil.gov.uk:
   owner: Carlton Colville Town Council
   crown: false
-carlyon-pc.gov.uk:
-  owner: carlyon Parish Council
-  crown: false
 carmarthenshire.gov.uk:
   owner: Carmarthenshire County Council
   crown: false
 carmarthentowncouncil.gov.uk:
   owner: Carmarthenshire County Council
   crown: false
-carnbreaparishcouncil.gov.uk:
-  owner: Carn Brea Parish Council
-  crown: false
 carterton-tc.gov.uk:
   owner: Carterton Town Council
   crown: false
-castlebromwichpc.gov.uk:
-  owner: Castle Bromwich Parish Council
-  crown: false
-castleedenparishcouncil.gov.uk:
-  owner: Castle Eden Parish Council
-  crown: false
 castlepoint.gov.uk:
   owner: Castle Point Borough Council
-  crown: false
-castonparishcouncil.gov.uk:
-  owner: Caston Parish Council
-  crown: false
-catcottparishcouncil.gov.uk:
-  owner: Catcott Parish Council
-  crown: false
-catshillandnorthmarlbrook-pc.gov.uk:
-  owner: Catshill & North Marlbrook Parish Council
   crown: false
 causewaycoastandglens.gov.uk:
   owner: Coleraine Borough Council
@@ -1151,50 +773,17 @@ causewaycoastandglens.gov.uk:
 centralbedfordshire.gov.uk:
   owner: Central Bedfordshire Council
   crown: false
-centralswindonnorth-pc.gov.uk:
-  owner: Central Swindon North Parish Council
-  crown: false
 ceredigion.gov.uk:
   owner: Ceredigion County Council
-  crown: false
-chacombeparishcouncil.gov.uk:
-  owner: Chacombe Parish Council
-  crown: false
-chalfontstgiles-pc.gov.uk:
-  owner: Chalfont St. Giles Parish Council
-  crown: false
-chalfontstpeter-pc.gov.uk:
-  owner: Chalfont St. Peter Parish Council
-  crown: false
-chalford-glos.gov.uk:
-  owner: Chalford Parish Council
   crown: false
 chalford-pc.gov.uk:
   owner: Stroud District Council
   crown: false
-chandlersford-pc.gov.uk:
-  owner: Chandlersford Parish Council
-  crown: false
-chapel-en-le-frithparishcouncil.gov.uk:
-  owner: Chapel en le Frith Parish Council
-  crown: false
 chard.gov.uk:
   owner: Chard Town Council
   crown: false
-CharltonKingsParishCouncil.gov.uk:
-  owner: Charlton Kings Parish Council
-  crown: false
-charlwoodparishcouncil.gov.uk:
-  owner: Charlwood Parish Council
-  crown: false
-charmouthparishcouncil.gov.uk:
-  owner: Charmouth Parish Council
-  crown: false
 charnwood.gov.uk:
   owner: Charnwood Borough Council
-  crown: false
-chedzoyparishcouncil.gov.uk:
-  owner: Chedzoy Parish Council
   crown: false
 chelmsford.gov.uk:
   owner: Chelmsford City Council
@@ -1202,14 +791,8 @@ chelmsford.gov.uk:
 chelmsleywood-tc.gov.uk:
   owner: Chelmsley Wood Town Council
   crown: false
-chelshamandfarleigh-pc.gov.uk:
-  owner: Chelsham and Farleigh Parish Council
-  crown: false
 cheltenham.gov.uk:
   owner: Cheltenham Borough Council
-  crown: false
-chelveston-pc.gov.uk:
-  owner: Chelveston-cum-Caldecott Parish Council
   crown: false
 cherwellandsouthnorthants.gov.uk:
   owner: South Northamptonshire Council
@@ -1247,18 +830,6 @@ chesterfield.gov.uk:
 chester.gov.uk:
   owner: Cheshire West and Chester Council
   crown: false
-chestfieldparishcouncil.gov.uk:
-  owner: Chestfield Parish Council
-  crown: false
-cheswickgreen-pc.gov.uk:
-  owner: Cheswick Green Parish Council
-  crown: false
-chetnoleandstockwood-pc.gov.uk:
-  owner: Chetnole and Stockwood Parish Council
-  crown: false
-cheveningparishcouncil.gov.uk:
-  owner: Cheevening Parish Council
-  crown: false
 chichestercity.gov.uk:
   owner: Chichester City Council
   crown: false
@@ -1268,53 +839,17 @@ chichester.gov.uk:
 chickerell-tc.gov.uk:
   owner: Chickerell Town Council
   crown: false
-chiddingfold-pc.gov.uk:
-  owner: Chiddingfold Parish Council
-  crown: false
-chiddingly.gov.uk:
-  owner: Chiddingly Parish Council
-  crown: false
-chigwellparishcouncil.gov.uk:
-  owner: Chigwell Parish Council
-  crown: false
-chilhamparishcouncil.gov.uk:
-  owner: Chilham Parish Council
-  crown: false
 chiltern.gov.uk:
   owner: Chiltern District Council
   crown: false
 chiltondurham-tc.gov.uk:
   owner: Chilton Town Council
   crown: false
-chiltonpolden-pc.gov.uk:
-  owner: Chilton Polden Parish Council
-  crown: false
-chineham.gov.uk:
-  owner: Chineham Parish Council
-  crown: false
-chinleybuxworthbrownside-pc.gov.uk:
-  owner: Chinley Buxworth and Brownside Parish Council
-  crown: false
 chippenham.gov.uk:
   owner: Chippenham Town Council
   crown: false
-chippenhamwithoutparishcouncil.gov.uk:
-  owner: Chippenham Without Parish Council
-  crown: false
-chipperfieldparishcouncil.gov.uk:
-  owner: Chipperfield Parish Council
-  crown: false
-chiseldon-pc.gov.uk:
-  owner: Chiseldon Parish Council
-  crown: false
-cholmondestonandwettenhall-pc.gov.uk:
-  owner: Cholmondeston and Wettenhall Parish Council
-  crown: false
 chorley.gov.uk:
   owner: Chorley Borough Council
-  crown: false
-chorleywood-pc.gov.uk:
-  owner: Chorleywood Parish Council
   crown: false
 christchurchandeastdorset.gov.uk:
   owner: Christchurch Borough Council
@@ -1322,35 +857,14 @@ christchurchandeastdorset.gov.uk:
 christchurch.gov.uk:
   owner: Christchurch Borough Council
   crown: false
-christleton-pc.gov.uk:
-  owner: Christleton Parish Council
-  crown: false
-christowparishcouncil.gov.uk:
-  owner: Christow Parish Council
-  crown: false
 chudleigh-tc.gov.uk:
   owner: Chudleigh Town Council
   crown: false
 churchaston-pc.gov.uk:
   owner: Telford & Wrekin Council
   crown: false
-churchdown-pc.gov.uk:
-  owner: Churchdown Parish Council
-  crown: false
-churchillandblakedown-pc.gov.uk:
-  owner: Churchill and Blakedown Parish Council
-  crown: false
-churchknowle-pc.gov.uk:
-  owner: Church Knowle Parish Council
-  crown: false
-churchpreen-hughley-kenley-pc.gov.uk:
-  owner: Church Preen, Hughley and Kenley Parish Council
-  crown: false
 churchstretton-tc.gov.uk:
   owner: Church Stretton Town Council
-  crown: false
-churchwithchapelbrampton-pc.gov.uk:
-  owner: Church with Chapel Brampton Parish Council
   crown: false
 cilcaincommunitycouncil.gov.uk:
   owner: Cilcain Community Council
@@ -1367,35 +881,11 @@ cityofworcester.gov.uk:
 clacks.gov.uk:
   owner: Clackmannanshire Council
   crown: false
-claybrookemagnaparishcouncil.gov.uk:
-  owner: Claybrooke Magna Parish Council
-  crown: false
-claycross.gov.uk:
-  owner: Clay Cross Parish Council
-  crown: false
-claygateparishcouncil.gov.uk:
-  owner: Claygate Parish Council
-  crown: false
-clayton-pc.gov.uk:
-  owner: Clayton Parish Council
-  crown: false
-clenchwarton-pc.gov.uk:
-  owner: Clenchwarton Parish Council
-  crown: false
-clentparishcouncil.gov.uk:
-  owner: Clent Parish Council
-  crown: false
 clevedon.gov.uk:
   owner: Clevedon Town Council
   crown: false
-cliffeandcliffewoods-pc.gov.uk:
-  owner: Cliffe and Cliffe Woods Parish Council
-  crown: false
 clitheroetowncouncil.gov.uk:
   owner: Clitheroe Town Council
-  crown: false
-clophill-pc.gov.uk:
-  owner: Clophill Parish Council
   crown: false
 cmktowncouncil.gov.uk:
   owner: Central Milton Keynes Town Council
@@ -1406,80 +896,26 @@ cncbuildingcontrol.gov.uk:
 coastalwight.gov.uk:
   owner: Isle of Wight Council
   crown: false
-cobham-kent-pc.gov.uk:
-  owner: Cobham Parish Council, Kent
-  crown: false
-cockshuttcumpetton-pc.gov.uk:
-  owner: Cockshutt-cum Petton Parish Council
-  crown: false
 coedffranc-wcc.gov.uk:
   owner: Coedffranc Community Council
-  crown: false
-cogenhoeandwhiston-pc.gov.uk:
-  owner: Cogenhoe and Whiston Parish Council
-  crown: false
-coggeshall-pc.gov.uk:
-  owner: Coggeshall Parish Council
-  crown: false
-colby-banningham-pc.gov.uk:
-  owner: Colby & Banningham Parish Council
   crown: false
 colchester.gov.uk:
   owner: Colchester Borough Council
   crown: false
-coldencommon-pc.gov.uk:
-  owner: Colden Common Parish Council
-  crown: false
-coldharbour-pc.gov.uk:
-  owner: Coldharbour Parish Council
-  crown: false
-coldhigham-pc.gov.uk:
-  owner: Cold Higham Parish Council
-  crown: false
 colefordtowncouncil.gov.uk:
   owner: Coleford Town Council
-  crown: false
-colehill.gov.uk:
-  owner: Colehill Parish Council
   crown: false
 colerainebc.gov.uk:
   owner: Coleraine Borough Council
   crown: false
-colerne-pc.gov.uk:
-  owner: Colerne Parish Council
-  crown: false
 coleshilltowncouncil.gov.uk:
   owner: Coleshill Town Council
-  crown: false
-colnbrookwithpoyle-pc.gov.uk:
-  owner: Colnbrook with Poyle Parish Council
-  crown: false
-colneyheathparishcouncil.gov.uk:
-  owner: Colney Heath Parish Council
-  crown: false
-colwichparishcouncil.gov.uk:
-  owner: Colwich Parish Council
   crown: false
 colwyn-tc.gov.uk:
   owner: Bay of Colwyn Town Council
   crown: false
-combemartin-pc.gov.uk:
-  owner: Combe Martin Parish Council
-  crown: false
-comeytrowe-pc.gov.uk:
-  owner: Comeytrowe Parish Council
-  crown: false
-comptondundon-pc.gov.uk:
-  owner: Compton Dundon Parish Council
-  crown: false
-comptonshawford-pc.gov.uk:
-  owner: Compton and Shawford Parish Council
-  crown: false
 congleton-tc.gov.uk:
   owner: Congleton Town Council
-  crown: false
-congresbury-pc.gov.uk:
-  owner: Congresbury Parish Council
   crown: false
 conwy.gov.uk:
   owner: Conwy County Borough Council
@@ -1499,9 +935,6 @@ copeland.gov.uk:
 corby.gov.uk:
   owner: Corby Borough Council
   crown: false
-corfemullen-pc.gov.uk:
-  owner: Corfe Mullen Parish Council
-  crown: false
 cornwall-aonb.gov.uk:
   owner: Cornwall Council
   crown: false
@@ -1510,9 +943,6 @@ cornwall.gov.uk:
   crown: false
 corsham.gov.uk:
   owner: Corsham Town Council
-  crown: false
-cossingtonparishcouncil.gov.uk:
-  owner: Cossington Parish Council
   crown: false
 cotgrave-tc.gov.uk:
   owner: Cotgrave Town Council
@@ -1525,15 +955,6 @@ coventry.gov.uk:
   crown: false
 cowbridge-tc.gov.uk:
   owner: Cowbridge (Ancient Borough) and Llanblethian Town Council
-  crown: false
-cowfold-pc.gov.uk:
-  owner: Cowfold Parish Council
-  crown: false
-coxgreen.gov.uk:
-  owner: Cox Green Parish Council
-  crown: false
-coxhoeparishcouncil.gov.uk:
-  owner: Coxhoe Parish Council
   crown: false
 cramlingtontowncouncil.gov.uk:
   owner: Cramlington Town Council
@@ -1556,9 +977,6 @@ crewetowncouncil.gov.uk:
 crewkerne-tc.gov.uk:
   owner: Crewkerne Town Council
   crown: false
-crich-pc.gov.uk:
-  owner: Crich Parish Council
-  crown: false
 cricklade-tc.gov.uk:
   owner: Cricklade Town Council
   crown: false
@@ -1571,32 +989,11 @@ cringlefordparishcouncil.gov.uk:
 cromer-tc.gov.uk:
   owner: Cromer Town Council
   crown: false
-CRONDALL-PC.gov.uk:
-  owner: Crondall Parish Council
-  crown: false
-cropwellbishop-pc.gov.uk:
-  owner: Cropwell Bishop Parish Council
-  crown: false
-crowan-pc.gov.uk:
-  owner: Crowan Parish Council
-  crown: false
 crowboroughtowncouncil.gov.uk:
   owner: Crowborough Town Council
   crown: false
-croxleygreen-pc.gov.uk:
-  owner: Croxley Green Parish Council
-  crown: false
-crudwell-pc.gov.uk:
-  owner: Crudwell Parish Council
-  crown: false
 cst.gov.uk:
   owner: Council for Science and Technology
-  crown: false
-cuckfield.gov.uk:
-  owner: Cuckfield Parish Council
-  crown: false
-cullingworthparishcouncil.gov.uk:
-  owner: Cullingworth Parish Council
   crown: false
 cullomptontowncouncil.gov.uk:
   owner: Cullompton Town Council
@@ -1612,9 +1009,6 @@ cumbriafire.gov.uk:
   crown: false
 cumbria.gov.uk:
   owner: Cumbria County Council
-  crown: false
-curdridge-pc.gov.uk:
-  owner: Curdridge Parish Council
   crown: false
 currie-scc.gov.uk:
   owner: Currie Community Council
@@ -1638,12 +1032,6 @@ dacorum.gov.uk:
   owner: Dacorum Borough Council
   crown: false
   agreement_signed: true
-dalburyleesparishcouncil.gov.uk:
-  owner: Dalbury Lees Parish Council
-  crown: false
-danbury-essex.gov.uk:
-  owner: Danbury Parish Council
-  crown: false
 darleydale.gov.uk:
   owner: Darley Dale Town Council
   crown: false
@@ -1652,12 +1040,6 @@ darlington.gov.uk:
   crown: false
 dartford.gov.uk:
   owner: Dartford Borough Council
-  crown: false
-datchetparishcouncil.gov.uk:
-  owner: Datchet Parish Council
-  crown: false
-dauntseyparishcouncil.gov.uk:
-  owner: Dauntsey Parish Council
   crown: false
 daventrydc.gov.uk:
   owner: Daventry District Council
@@ -1676,18 +1058,6 @@ denbighshire.gov.uk:
   crown: false
 denbightowncouncil.gov.uk:
   owner: Denbighshire County Council
-  crown: false
-denbyparishcouncil.gov.uk:
-  owner: Denby Parish Council
-  crown: false
-denham-bucks-pc.gov.uk:
-  owner: Denham Parish Council
-  crown: false
-denhambucks-pc.gov.uk:
-  owner: Denham Parish Council
-  crown: false
-dennylodgeparishcouncil.gov.uk:
-  owner: Denny Lodge Parish Council
   crown: false
 derby.gov.uk:
   owner: Derby City Council
@@ -1725,38 +1095,14 @@ devonjobs.gov.uk:
 didcot.gov.uk:
   owner: Didcot Town Council
   crown: false
-dingley-pc.gov.uk:
-  owner: Dingley Parish Council
-  crown: false
-DinningtonParishCouncil.gov.uk:
-  owner: Dinnington Parish Council
-  crown: false
 diss.gov.uk:
   owner: Diss Town Council
-  crown: false
-ditchling-pc.gov.uk:
-  owner: Ditchling Parish Council
-  crown: false
-dittishamparishcouncil.gov.uk:
-  owner: Dittisham Parish Council
-  crown: false
-dittonparishcouncil.gov.uk:
-  owner: Ditton Parish Council
-  crown: false
-doddinghurst-pc.gov.uk:
-  owner: Doddinghurst Parish Council
   crown: false
 doncaster.gov.uk:
   owner: Doncaster Metropolitan Borough Council
   crown: false
 dorchester-tc.gov.uk:
   owner: Dorchester Town Council
-  crown: false
-dormingtonmordifordgroup-pc.gov.uk:
-  owner: Dormington and Mordiford Group Parish Council
-  crown: false
-dorset-aptc.gov.uk:
-  owner: Dorset Association of Parish & Town Councils
   crown: false
 dorsetcc.gov.uk:
   owner: Dorset County Council
@@ -1779,32 +1125,17 @@ DoverTownCouncil.gov.uk:
 downdc.gov.uk:
   owner: Down District Council
   crown: false
-DowntonParishCouncil.gov.uk:
-  owner: Downton Parish Council
-  crown: false
-doxeyparishcouncil.gov.uk:
-  owner: Doxey Parish Council
-  crown: false
 droitwichspa.gov.uk:
   owner: Droitwich Spa Town Council
   crown: false
 dronfield.gov.uk:
   owner: Dronfield Town Council
   crown: false
-ducklingtonparishcouncil.gov.uk:
-  owner: Ducklington Parish Council
-  crown: false
 dudley.gov.uk:
   owner: Dudley Metropolitan Borough Council
   crown: false
-duffieldparishcouncil.gov.uk:
-  owner: Duffield Parish Council
-  crown: false
 dumgal.gov.uk:
   owner: Dumfries and Galloway Council
-  crown: false
-dummerparishcouncil.gov.uk:
-  owner: Dummer Parish Council
   crown: false
 dundeecity.gov.uk:
   owner: Dundee City Council
@@ -1827,20 +1158,11 @@ durringtontowncouncil.gov.uk:
 dursleytowncouncil.gov.uk:
   owner: Dursley Town Council
   crown: false
-duston-pc.gov.uk:
-  owner: Duston Parish Council
-  crown: false
 ealing.gov.uk:
   owner: Ealing Council
   crown: false
-eardington-pc.gov.uk:
-  owner: Eardington Parish Council
-  crown: false
 earley-tc.gov.uk:
   owner: Earley Town Council
-  crown: false
-earlsbarton.gov.uk:
-  owner: Earls Barton Parish Council
   crown: false
 easingwold.gov.uk:
   owner: Easingwold Town Council
@@ -1848,14 +1170,8 @@ easingwold.gov.uk:
 east-ayrshire.gov.uk:
   owner: East Ayrshire Council
   crown: false
-eastboldre-pc.gov.uk:
-  owner: East Boldre Parish Council
-  crown: false
 eastbourne.gov.uk:
   owner: Eastbourne Borough Council
-  crown: false
-eastbudleigh-pc.gov.uk:
-  owner: East Budleigh & Bicton Parish Council
   crown: false
 eastcambs.gov.uk:
   owner: East Cambridgeshire District Council
@@ -1872,9 +1188,6 @@ eastdorset.gov.uk:
 eastdunbarton.gov.uk:
   owner: East Dunbartonshire Council
   crown: false
-eastgarston-pc.gov.uk:
-  owner: East Garston Parish Council
-  crown: false
 eastgrinstead.gov.uk:
   owner: East Grinstead Town Council
   crown: false
@@ -1884,20 +1197,8 @@ easthants.gov.uk:
 eastherts.gov.uk:
   owner: East Herts District Council
   crown: false
-easthuntspillparishcouncil.gov.uk:
-  owner: East Huntspill Parish Council
-  crown: false
-eastilsley-pc.gov.uk:
-  owner: East Ilsley Parish Council
-  crown: false
-eastington-pc.gov.uk:
-  owner: Eastington Parish Council
-  crown: false
 eastkent.gov.uk:
   owner: Thanet District Council
-  crown: false
-east-leake.gov.uk:
-  owner: East Leak Parish Council
   crown: false
 eastleigh.gov.uk:
   owner: Eastleigh Borough Council
@@ -1910,9 +1211,6 @@ eastlothian.gov.uk:
   crown: false
 east-northamptonshire.gov.uk:
   owner: East Northamptonshire Council
-  crown: false
-eastpeckham-pc.gov.uk:
-  owner: East Peckham Parish Council
   crown: false
 eastrenfrewshire.gov.uk:
   owner: East Renfrewshire Council
@@ -1932,20 +1230,8 @@ eastsussexcc.gov.uk:
 eastsussex.gov.uk:
   owner: East Sussex County Council
   crown: false
-eastwoodhay-pc.gov.uk:
-  owner: East Woodhay Parish Council
-  crown: false
-ecchinswell-pc.gov.uk:
-  owner: Ecchinswell, Sydmonton and Bishops Green Parish Council
-  crown: false
-ecclesfield-pc.gov.uk:
-  owner: Ecclesfield Parish Council
-  crown: false
 e-chorley.gov.uk:
   owner: Chorley Borough Council
-  crown: false
-eckington-pc.gov.uk:
-  owner: Eckington Parish Council
   crown: false
 edenbridgetowncouncil.gov.uk:
   owner: Edenbridge Town Council
@@ -1956,44 +1242,20 @@ eden.gov.uk:
 edinburgh.gov.uk:
   owner: The City of Edinburgh Council
   crown: false
-edingtonsomersetparishcouncil.gov.uk:
-  owner: Edington Parish Council
-  crown: false
-edlesborough-pc.gov.uk:
-  owner: Edlesborough Parish Council
-  crown: false
-EffinghamParishCouncil.gov.uk:
-  owner: Effingham Parish Council
-  crown: false
 eldc.gov.uk:
   owner: East Lindsey District Council
   crown: false
 e-lindsey.gov.uk:
   owner: East Lindsey District Council
   crown: false
-ellesmererural-pc.gov.uk:
-  owner: Ellesmere Rural Parish Council
-  crown: false
 ellesmere-tc.gov.uk:
   owner: Ellesmere Town Council
-  crown: false
-ellisfield.gov.uk:
-  owner: Ellisfield Parish Council
-  crown: false
-elloughtonbrough-pc.gov.uk:
-  owner: Elloughton cum Brough Parish Council
   crown: false
 elmbridge.gov.uk:
   owner: Elmbridge Borough Council
   crown: false
-elstead-pc.gov.uk:
-  owner: Elstead Parish Council
-  crown: false
 elstreeborehamwood-tc.gov.uk:
   owner: Elstree & Borehamwood Town Council
-  crown: false
-elswickparishcouncil.gov.uk:
-  owner: Elswick Parish Council
   crown: false
 emergencynorthyorks.gov.uk:
   owner: North Yorkshire County Council
@@ -2016,14 +1278,8 @@ eppingtowncouncil.gov.uk:
 epsom-ewell.gov.uk:
   owner: Epsom and Ewell Borough Council
   crown: false
-ercallmagnaparishcouncil.gov.uk:
-  owner: Ercall Magna Parish Council
-  crown: false
 erewash.gov.uk:
   owner: Erewash Borough Council
-  crown: false
-eshparishcouncil.gov.uk:
-  owner: Esh Parish Council
   crown: false
 essexcc.gov.uk:
   owner: Essex County Council
@@ -2034,9 +1290,6 @@ essex.gov.uk:
 essexlegalservices.gov.uk:
   owner: Essex County Council
   crown: false
-essingtonparishcouncil.gov.uk:
-  owner: Essington Parish Council
-  crown: false
 eveshamtowncouncil.gov.uk:
   owner: Evesham Town Council
   crown: false
@@ -2046,35 +1299,17 @@ exeterandeastdevon.gov.uk:
 exeter.gov.uk:
   owner: Exeter City Council
   crown: false
-exminsterparishcouncil.gov.uk:
-  owner: Exminster Parish Council
-  crown: false
 exmouth.gov.uk:
   owner: Exmouth Town Council
   crown: false
-exning-pc.gov.uk:
-  owner: Exning Parish Council
-  crown: false
-eynsham-pc.gov.uk:
-  owner: Eynsham Parish Council
-  crown: false
-fairfieldparishcouncil.gov.uk:
-  owner: Fairfield Parish Council
-  crown: false
 fairfordtowncouncil.gov.uk:
   owner: Fairford Town Council
-  crown: false
-fairoak-pc.gov.uk:
-  owner: Fair Oak & Horton Heath Parish Council
   crown: false
 falkirk-council.gov.uk: falkirk.gov.uk
 falkirk.gov.uk:
   owner: Falkirk Council
   crown: false
   agreement_signed: true
-falstoneparishcouncil.gov.uk:
-  owner: Falstone Parish Council
-  crown: false
 fareham.gov.uk:
   owner: Fareham Borough Council
   crown: false
@@ -2083,9 +1318,6 @@ faringdontowncouncil.gov.uk:
   crown: false
 farnham.gov.uk:
   owner: Farnham Town Council
-  crown: false
-farnhamroyal-pc.gov.uk:
-  owner: Farnham Royal Parish Council
   crown: false
 farrier-reg.gov.uk:
   owner: The Farriers Registration Council
@@ -2096,20 +1328,11 @@ favershamtowncouncil.gov.uk:
 fdean.gov.uk:
   owner: Forest Of Dean District Council
   crown: false
-featherstoneandbrinsfordparishcouncil.gov.uk:
-  owner: Featherstone and Brinsford Parish Council
-  crown: false
 featherstone-tc.gov.uk:
   owner: Featherstone Town Council
   crown: false
 felixstowe.gov.uk:
   owner: Felixstowe Town Council
-  crown: false
-felphampc.gov.uk:
-  owner: Felpham Parish Council
-  crown: false
-felsted-pc.gov.uk:
-  owner: Felsted Parish Council
   crown: false
 fenland.gov.uk:
   owner: Fenland District Council
@@ -2132,15 +1355,6 @@ fife.gov.uk:
 FiltonTownCouncil.gov.uk:
   owner: Filton Town Council
   crown: false
-finchampstead-pc.gov.uk:
-  owner: Finchampstead Parish Council
-  crown: false
-finchingfield-pc.gov.uk:
-  owner: Finchingfield Parish Council
-  crown: false
-finedonparishcouncil.gov.uk:
-  owner: Finedon Parish Council
-  crown: false
 fishbourne-pc.gov.uk:
   owner: Chichester District Council
   crown: false
@@ -2162,35 +1376,14 @@ folkestone-tc.gov.uk:
 fordingbridge.gov.uk:
   owner: New Forest District Council
   crown: false
-fordwestsussex-pc.gov.uk:
-  owner: Ford Parish Council
-  crown: false
 forest-heath.gov.uk:
   owner: St Edmundsbury Borough Council
   crown: false
 forestofdean.gov.uk:
   owner: Forest Of Dean District Council
   crown: false
-forestrow.gov.uk:
-  owner: Forest Row Parish Council
-  crown: false
 foweytowncouncil.gov.uk:
   owner: Restormel Borough Council
-  crown: false
-foxtonparishcouncil.gov.uk:
-  owner: Foxton Parish Council
-  crown: false
-framptononsevern-pc.gov.uk:
-  owner: Frampton on Severn Parish Council
-  crown: false
-fremingtonparishcouncil.gov.uk:
-  owner: Fremington Parish Council
-  crown: false
-frensham-pc.gov.uk:
-  owner: Frensham Parish Council
-  crown: false
-frindsburyextra-pc.gov.uk:
-  owner: Frindsbury Extra Parish Council
   crown: false
 frodsham.gov.uk:
   owner: Frodsham Town Council
@@ -2201,14 +1394,8 @@ frometowncouncil.gov.uk:
 fylde.gov.uk:
   owner: Fylde Borough Council
   crown: false
-galleywoodparishcouncil.gov.uk:
-  owner: Galleywood Parish Council
-  crown: false
 galwgofal.gov.uk:
   owner: Conwy County Borough Council
-  crown: false
-gamlingay-pc.gov.uk:
-  owner: Gamlingay Parish Council
   crown: false
 gateshead.gov.uk:
   owner: Gateshead Metropolitan Borough Council
@@ -2216,17 +1403,8 @@ gateshead.gov.uk:
 gedling.gov.uk:
   owner: Gedling Borough Council
   crown: false
-georgehamparishcouncil.gov.uk:
-  owner: Georgeham Parish Council
-  crown: false
-gerrardscross.gov.uk:
-  owner: Gerrards Cross Parish Council
-  crown: false
 gillinghamdorset-tc.gov.uk:
   owner: Gillingham Town Council
-  crown: false
-gilmortonparishcouncil.gov.uk:
-  owner: Gilmorton Parish Council
   crown: false
 glamarchives.gov.uk:
   owner: Cardiff Council
@@ -2255,17 +1433,11 @@ godalming-jbc.gov.uk:
 godalming-tc.gov.uk:
   owner: Waverley Borough Council
   crown: false
-godstone-pc.gov.uk:
-  owner: Godstone Parish Council
-  crown: false
 goole-tc.gov.uk:
   owner: Goole Town Council
   crown: false
 GorseinonTownCouncil.gov.uk:
   owner: Gorseinon Town Council
-  crown: false
-gosfordandwatereaton-pc.gov.uk:
-  owner: Gosford and Water Eaton Parish Council
   crown: false
 gosport.gov.uk:
   owner: Gosport Borough Council
@@ -2286,50 +1458,20 @@ gravesham.gov.uk:
 greatalne-pc.gov.uk:
   owner: Stratford-on-Avon District Council
   crown: false
-greatamwellparishcouncil.gov.uk:
-  owner: Great Amwell Parish Council
-  crown: false
 great-aycliffe.gov.uk:
   owner: Great Aycliffe Town Council
-  crown: false
-greatbardfield-pc.gov.uk:
-  owner: Great Bardfield Parish Council
   crown: false
 greatbursteadsouthgreenparishcouncil.gov.uk:
   owner: Great Burstead and South Green Village Council
   crown: false
-greatchesterford-pc.gov.uk:
-  owner: Great Chesterford Parish Council
-  crown: false
 greatdunmow-tc.gov.uk:
   owner: Great Dunmow Town Council
-  crown: false
-greatglen-pc.gov.uk:
-  owner: Great Glen Parish Council
-  crown: false
-greathorkesley-pc.gov.uk:
-  owner: Great Horkesley Parish Council
-  crown: false
-great-linford.gov.uk:
-  owner: Great Linford Parish Council
-  crown: false
-greatshelfordparishcouncil.gov.uk:
-  owner: Great Shelford Parish Council
   crown: false
 great-torringtontowncouncil.gov.uk:
   owner: Great Torrington Town Council
   crown: false
-greatwakering-pc.gov.uk:
-  owner: Great Wakering Parish Council
-  crown: false
 great-yarmouth.gov.uk:
   owner: Great Yarmouth Borough Council
-  crown: false
-greenham.gov.uk:
-  owner: Greenham Parish Council
-  crown: false
-guildenmorden.gov.uk:
-  owner: Guilden Morden Parish Council
   crown: false
 guildford.gov.uk:
   owner: Guildford Borough Council
@@ -2337,33 +1479,18 @@ guildford.gov.uk:
 GwentArchives.gov.uk:
   owner: Blaenau Gwent County Borough Council
   crown: false
-gwineargwithian-pc.gov.uk:
-  owner: Gwinear-Gwithian Parish Council
-  crown: false
 gwynedd.gov.uk:
   owner: Gwynedd County Council
   crown: false
   agreement_signed: true
-hackletonparishcouncil.gov.uk:
-  owner: Hackleton Parish Council
-  crown: false
 hackney.gov.uk:
   owner: Hackney London Borough Council
-  crown: false
-Haddenham-bucks-pc.gov.uk:
-  owner: Haddenham Parish Council
-  crown: false
-hagleyparishcouncil.gov.uk:
-  owner: Hagley Parish Council
   crown: false
 hailsham-tc.gov.uk:
   owner: Hailsham Town Council
   crown: false
 halchereford.gov.uk:
   owner: Herefordshire Association of Local Councils
-  crown: false
-halesandheckingham-pc.gov.uk:
-  owner: Hales and Heckingham Parish Council
   crown: false
 halewoodtowncouncil.gov.uk:
   owner: Halewood Town Council
@@ -2377,23 +1504,11 @@ halton.gov.uk:
 haltwhistle-tc.gov.uk:
   owner: Haltwhistle Town Council
   crown: false
-hambledon-pc.gov.uk:
-  owner: Hambledon Parish Council
-  crown: false
-hambleparishcouncil.gov.uk:
-  owner: Hamble Parish Council
-  crown: false
 hambleton.gov.uk:
   owner: Hambleton District Council
   crown: false
 hampshire.gov.uk:
   owner: Hampshire County Council
-  crown: false
-hamptonbishopparishcouncil.gov.uk:
-  owner: Hampton Bishop Parish Council
-  crown: false
-hanborough-pc.gov.uk:
-  owner: Hanborough Parish Council
   crown: false
 hantsdirect.gov.uk:
   owner: Hampshire County Council
@@ -2413,23 +1528,8 @@ hantsweb.gov.uk:
 harborough.gov.uk:
   owner: Harborough District Council
   crown: false
-harbury-pc.gov.uk:
-  owner: Harbury Parish Council
-  crown: false
-hardenparishcouncil.gov.uk:
-  owner: Harden Parish Council
-  crown: false
-hardingstoneparishcouncil.gov.uk:
-  owner: Hardington Parish Council
-  crown: false
-hardwickepc.gov.uk:
-  owner: Hardwicke Parish Council
-  crown: false
 haringey.gov.uk:
   owner: Haringey London Borough Council
-  crown: false
-harlington-pc.gov.uk:
-  owner: Harlington Parish Council
   crown: false
 harlow.gov.uk:
   owner: Harlow District Council
@@ -2449,12 +1549,6 @@ hart.gov.uk:
 hartlepool.gov.uk:
   owner: Hartlepool Borough Council
   crown: false
-hartwellparishcouncil.gov.uk:
-  owner: Hartwell Parish Council
-  crown: false
-hassocks-pc.gov.uk:
-  owner: Hassocks Parish Council
-  crown: false
 hastings.gov.uk:
   owner: Hastings Borough Council
   crown: false
@@ -2463,9 +1557,6 @@ hatfield.gov.uk:
   crown: false
 hatfield-herts.gov.uk:
   owner: Hatfield Town Council
-  crown: false
-hathersageparishcouncil.gov.uk:
-  owner: Hathersage Parish Council
   crown: false
 havant.gov.uk:
   owner: Havant District Council
@@ -2476,29 +1567,11 @@ haverhill-tc.gov.uk:
 hawardencommunitycouncil.gov.uk:
   owner: Hawarden Community Council
   crown: false
-hawkesbury-pc.gov.uk:
-  owner: Hawkesbury Parish Council
-  crown: false
 hawkinge-tc.gov.uk:
   owner: Hawkinge Town Council
   crown: false
-hawkwellparishcouncil.gov.uk:
-  owner: Hawkwell Parish Council
-  crown: false
-haworthcrossroadsstanbury-pc.gov.uk:
-  owner: Haworth, Cross Roads & Stanbury Parish Council
-  crown: false
-haworthparishcouncil.gov.uk:
-  owner: Haworth, Cross Roads & Stanbury Parish Council
-  crown: false
 haxbytowncouncil.gov.uk:
   owner: Haxby Town Council
-  crown: false
-haydonwick.gov.uk:
-  owner: Haydon Wick Parish Council
-  crown: false
-hayfield-pc.gov.uk:
-  owner: Hayfield Parish Council
   crown: false
 haytowncouncil.gov.uk:
   owner: Hay Town Council
@@ -2509,9 +1582,6 @@ haywardsheath.gov.uk:
 headley-pc.gov.uk:
   owner: Mole Valley District Council
   crown: false
-heathandholmewood-pc.gov.uk:
-  owner: Heath & Holmewood Parish Council
-  crown: false
 hedgeend-tc.gov.uk:
   owner: Hedge End Town Council
   crown: false
@@ -2521,29 +1591,14 @@ hednesford-tc.gov.uk:
 hedon.gov.uk:
   owner: Hedon Town Council
   crown: false
-helionsbumpsteadparishcouncil.gov.uk:
-  owner: Helions Bumpstead Parish Council
-  crown: false
-hellesdon-pc.gov.uk:
-  owner: Hellesdon Parish Council
-  crown: false
 helston-tc.gov.uk:
   owner: Helston Town Council
-  crown: false
-hemingfordgreyparishcouncil.gov.uk:
-  owner: Hemingford Grey Parish Council
-  crown: false
-henfield.gov.uk:
-  owner: Henfield Parish Council
   crown: false
 henley-in-arden-pc.gov.uk:
   owner: Stratford-on-Avon District Council
   crown: false
 henleytowncouncil.gov.uk:
   owner: Henley-on-Thames Town Council
-  crown: false
-henlow-pc.gov.uk:
-  owner: Henlow Parish Council
   crown: false
 heps.gov.uk:
   owner: East Riding of Yorkshire Council
@@ -2554,14 +1609,8 @@ herefordcitycouncil.gov.uk:
 herefordshire.gov.uk:
   owner: Herefordshire Council
   crown: false
-herriard-pc.gov.uk:
-  owner: Herriard Parish Council
-  crown: false
 hertford.gov.uk:
   owner: Hertford Town Council
-  crown: false
-hertfordheath.gov.uk:
-  owner: Hertford Heath Parish Council
   crown: false
 hertfordshire.gov.uk:
   owner: Hertfordshire County Council
@@ -2587,23 +1636,11 @@ hettontowncouncil.gov.uk:
 hexhamtowncouncil.gov.uk:
   owner: Hexham Town Council
   crown: false
-heybridgeparishcouncil.gov.uk:
-  owner: Heybridge Parish Council
-  crown: false
 highamferrers-tc.gov.uk:
   owner: Higham Ferrers Town Council
   crown: false
-higham-kent-pc.gov.uk:
-  owner: Higham Parish Council
-  crown: false
-highhalstow-pc.gov.uk:
-  owner: High Halstow Parish Council
-  crown: false
 highland.gov.uk:
   owner: The Highland Council
-  crown: false
-highleghparishcouncil.gov.uk:
-  owner: High Legh Parish Council
   crown: false
 highpeak.gov.uk:
   owner: High Peak Borough Council
@@ -2614,38 +1651,8 @@ highworthtowncouncil.gov.uk:
 hinckley-bosworth.gov.uk:
   owner: Hinckley & Bosworth Borough Council
   crown: false
-hinstock-pc.gov.uk:
-  owner: Hinstock Parish Council
-  crown: false
 hiow.gov.uk:
   owner: Hampshire County Council
-  crown: false
-hixon.gov.uk:
-  owner: Hixon Parish Council
-  crown: false
-hockley-essex.gov.uk:
-  owner: Hockley Essex Parish Council
-  crown: false
-holbeton-pc.gov.uk:
-  owner: Holbeton Parish Council
-  crown: false
-holcomberogus-pc.gov.uk:
-  owner: Holcombe Rogus Parish Council
-  crown: false
-holford-pc.gov.uk:
-  owner: Holford Parish Council
-  crown: false
-holmeschapelparishcouncil.gov.uk:
-  owner: Holmes Chapel Parish Council
-  crown: false
-holmevalleyparishcouncil.gov.uk:
-  owner: Holme Valley Parish Council
-  crown: false
-holme-westmorland-pc.gov.uk:
-  owner: Holme Parish Council
-  crown: false
-holmwoodparishcouncil.gov.uk:
-  owner: Holmwood Parish Council
   crown: false
 holmwood-pc.gov.uk:
   owner: Mole Valley District Council
@@ -2653,44 +1660,20 @@ holmwood-pc.gov.uk:
 holsworthytowncouncil.gov.uk:
   owner: Holsworthy Town Council
   crown: false
-holtparishcouncil.gov.uk:
-  owner: Holt Parish Council
-  crown: false
-holwellparishcouncil.gov.uk:
-  owner: Holwell Parish Council
-  crown: false
 holywell-town.gov.uk:
   owner: Holywell Town Council
   crown: false
 honiton.gov.uk:
   owner: Honiton Town Council
   crown: false
-hook.gov.uk:
-  owner: Hook Parish Council
-  crown: false
-hoosaintwerburgh-pc.gov.uk:
-  owner: Hoo St Werburgh Parish Council (Medway)
-  crown: false
 hopecommunitycouncil.gov.uk:
   owner: Hope Community Council
-  crown: false
-hordenparishcouncil.gov.uk:
-  owner: Horden Parish Council
-  crown: false
-hordleparishcouncil.gov.uk:
-  owner: Hordle Parish Council
   crown: false
 horleysurrey-tc.gov.uk:
   owner: Horley Town Council
   crown: false
-horndeanpc-hants.gov.uk:
-  owner: Horndean Parish Council
-  crown: false
 hornsea.gov.uk:
   owner: Hornsea Town Council
-  crown: false
-horrabridge-pc.gov.uk:
-  owner: Horrabridge Parish Council
   crown: false
 horsforthtowncouncil.gov.uk:
   owner: Horsforth Town Council
@@ -2698,26 +1681,11 @@ horsforthtowncouncil.gov.uk:
 horsham.gov.uk:
   owner: Horsham District Council
   crown: false
-horsmonden-pc.gov.uk:
-  owner: Horsmonden Parish Council
-  crown: false
-hortonparishcouncil.gov.uk:
-  owner: Horton Parish Council
-  crown: false
 horwich.gov.uk:
   owner: Horwich Town Council
   crown: false
-houndparishcouncil.gov.uk:
-  owner: Hound Parish Council
-  crown: false
 howden-tc.gov.uk:
   owner: Howden Town Council
-  crown: false
-hucclecotepc.gov.uk:
-  owner: Hucclecote Parish Council
-  crown: false
-hucklow-pc.gov.uk:
-  owner: Great Hucklow, Little Hucklow & Grindlow Parish Council
   crown: false
 hullcc.gov.uk:
   owner: Kingston Upon Hull City Council
@@ -2728,14 +1696,8 @@ hull.gov.uk:
 humberlrf.gov.uk:
   owner: East Riding of Yorkshire Council
   crown: false
-huncote-pc.gov.uk:
-  owner: Huncote Parish Council
-  crown: false
 hungerford-tc.gov.uk:
   owner: Hungerford Town Council
-  crown: false
-hunningtonparishcouncil.gov.uk:
-  owner: Hunnington Parish Council
   crown: false
 hunstantontowncouncil.gov.uk:
   owner: Hunstanton Town Council
@@ -2767,23 +1729,14 @@ hythe-tc.gov.uk:
 hythetowncouncil.gov.uk:
   owner: Hythe Town Council
   crown: false
-IlchesterParishCouncil.gov.uk:
-  owner: Ilchester Parish Council
-  crown: false
 ilfracombetowncouncil.gov.uk:
   owner: Ilfracombe Town Council
-  crown: false
-IlloganParishCouncil.gov.uk:
-  owner: Illogan Parish Council
   crown: false
 ilminster.gov.uk:
   owner: Ilminster Town Council
   crown: false
 immingham-tc.gov.uk:
   owner: Immingham Town Council
-  crown: false
-ingatestone-fryerningpc.gov.uk:
-  owner: Ingatestone And Fryerning Parish Council
   crown: false
 internalauditscotland.gov.uk:
   owner: West Dunbartonshire Council
@@ -2794,9 +1747,6 @@ inverclyde.gov.uk:
 iow.gov.uk:
   owner: Isle of Wight Council
   crown: false
-ipplepenparishcouncil.gov.uk:
-  owner: Ipplepen Parish Council
-  crown: false
 ipswich.gov.uk:
   owner: Ipswich Borough Council
   crown: false
@@ -2806,32 +1756,14 @@ irthlingborough-tc.gov.uk:
 isycoedcommunitycouncil.gov.uk:
   owner: Isycoed Community Council
   crown: false
-itchenstokeandovington-pc.gov.uk:
-  owner: Itchen Stoke and Ovington Parish Council
-  crown: false
-itchingfieldparishcouncil.gov.uk:
-  owner: Itchingfield Parish Council
-  crown: false
-iverparishcouncil.gov.uk:
-  owner: Iver Parish Council
-  crown: false
 ivybridge.gov.uk:
   owner: Ivybridge Town Council
   crown: false
 keighley.gov.uk:
   owner: Keighley Town Council
   crown: false
-kelvedonhatch-pc.gov.uk:
-  owner: Kelvedon Hatch Parish Council
-  crown: false
 kendaltowncouncil.gov.uk:
   owner: Kendal Town Council
-  crown: false
-kennington-pc.gov.uk:
-  owner: Kennington Parish Council
-  crown: false
-kensworthparishcouncil.gov.uk:
-  owner: Kensworth Parish Council
   crown: false
 kentalc.gov.uk:
   owner: Kent Association of Local Councils
@@ -2845,12 +1777,6 @@ kent.gov.uk:
 kentparishes.gov.uk:
   owner: Kent County Council
   crown: false
-kenwynparishcouncil.gov.uk:
-  owner: Kenwyn Parish Council
-  crown: false
-keresley-pc.gov.uk:
-  owner: Keresely Parish Council
-  crown: false
 kerrier.gov.uk:
   owner: Cornwall Council
   crown: false
@@ -2863,17 +1789,11 @@ keswicktowncouncil.gov.uk:
 kettering.gov.uk:
   owner: Kettering Borough Council
   crown: false
-kettlewell-starbotton-pc.gov.uk:
-  owner: Kettlewell-with-Starbotton Parish Council
-  crown: false
 keynsham-tc.gov.uk:
   owner: Keynsham Town Council
   crown: false
 kidderminstertowncouncil.gov.uk:
   owner: Kidderminster Town Council
-  crown: false
-kidlington-pc.gov.uk:
-  owner: Kidlington Parish Council
   crown: false
 kidsgrovetowncouncil.gov.uk:
   owner: Kidsgrove Town Council
@@ -2881,44 +1801,14 @@ kidsgrovetowncouncil.gov.uk:
 kidwelly.gov.uk:
   owner: Kidwelly Town Council
   crown: false
-kilkhampton-pc.gov.uk:
-  owner: Kilkhampton Parish Council
-  crown: false
-killamarsh-pc.gov.uk:
-  owner: Killamarsh Parish Council
-  crown: false
 kimberley-tc.gov.uk:
   owner: Kimberley Town Council
-  crown: false
-kimboltonandstonely-pc.gov.uk:
-  owner: Kimbolton and Stonely Parish Council
   crown: false
 kingsbridge.gov.uk:
   owner: Kingsbridge Town Council
   crown: false
-kingshillparish.gov.uk:
-  owner: Kings Hill Parish Council
-  crown: false
-kingslangley-pc.gov.uk:
-  owner: Kings Langley Parish Council
-  crown: false
-kingsteignton.gov.uk:
-  owner: Kingsteignton Parish Council
-  crown: false
-kingswearparishcouncil.gov.uk:
-  owner: Kingswear Parish Council
-  crown: false
-kingswoodparishcouncil.gov.uk:
-  owner: Kingswood Parish Council
-  crown: false
 kingtontowncouncil.gov.uk:
   owner: KIngton Town Council
-  crown: false
-kippaxparishcouncil.gov.uk:
-  owner: Kippax Parish Council
-  crown: false
-kirdford-pc.gov.uk:
-  owner: Kirdford Parish Council
   crown: false
 kirkbymoorsidetowncouncil.gov.uk:
   owner: Kirkbymoorside Town Council
@@ -2932,9 +1822,6 @@ kirtoninlindseytowncouncil.gov.uk:
 KnaresboroughTownCouncil.gov.uk:
   owner: Knaresborough Town Council
   crown: false
-knebworthparishcouncil.gov.uk:
-  owner: Knebworth Parish Council
-  crown: false
 knowsley.gov.uk:
   owner: Knowsley Metropolitan Borough Council
   crown: false
@@ -2943,9 +1830,6 @@ knowsleytowncouncil.gov.uk:
   crown: false
 knutsfordtowncouncil.gov.uk:
   owner: Knutsford Town Council
-  crown: false
-lacockparishcouncil.gov.uk:
-  owner: Lacock Parish Council
   crown: false
 lalestoncommunitycouncil.gov.uk:
   owner: Laleston Community Council
@@ -2962,29 +1846,11 @@ lancashire.gov.uk:
 lancaster.gov.uk:
   owner: Lancaster County Council
   crown: false
-lancingparishcouncil.gov.uk:
-  owner: Lancing Parish Council
-  crown: false
-landrakeparishcouncil.gov.uk:
-  owner: Landrake with St. Erney Parish Council
-  crown: false
-langwithparishcouncil.gov.uk:
-  owner: Langwith Parish Council
-  crown: false
-lanivetparishcouncil.gov.uk:
-  owner: Lanivet Parish Council
-  crown: false
-lanliveryparishcouncil.gov.uk:
-  owner: Lanlivery Parish Council
-  crown: false
 laugharnetownship-wcc.gov.uk:
   owner: Laugharne Township Community Council
   crown: false
 launceston-tc.gov.uk:
   owner: Launceston Town Council
-  crown: false
-launton-pc.gov.uk:
-  owner: Launton Parish Council
   crown: false
 lawhf.gov.uk:
   owner: Telford & Wrekin Council
@@ -3001,17 +1867,11 @@ lbhf.gov.uk:
 lbwf.gov.uk:
   owner: Waltham Forest London Borough Council
   crown: false
-leacottam-pc.gov.uk:
-  owner: Lea and Cottam Parish Council
-  crown: false
 leamingtonspatowncouncil.gov.uk:
   owner: Royal Leamington Spa Town Council
   crown: false
 ledburytowncouncil.gov.uk:
   owner: Ledbury Town Council
-  crown: false
-ledshamparishcouncil.gov.uk:
-  owner: Ledsham Parish Council
   crown: false
 leeds.gov.uk:
   owner: Leeds City Council
@@ -3083,18 +1943,6 @@ lincolnshire.gov.uk:
 lincsbc.gov.uk:
   owner: East Lindsey District Council
   crown: false
-lindfieldparishcouncil.gov.uk:
-  owner: Lindfield Parish Council
-  crown: false
-lingfieldparishcouncil.gov.uk:
-  owner: Lingfield Parish Council
-  crown: false
-lintoncambridgeshire-pc.gov.uk:
-  owner: Linton Parish Council
-  crown: false
-lintonpc-herefordshire.gov.uk:
-  owner: Linton Parish Council
-  crown: false
 lisburncastlereagh.gov.uk:
   owner: Lisburn City Council
   crown: false
@@ -3104,44 +1952,14 @@ lisburncityandcastlereagh.gov.uk:
 liskeard.gov.uk:
   owner: Liskeard Town Council
   crown: false
-lissparishcouncil.gov.uk:
-  owner: Liss Parish Council
-  crown: false
-littlealtcar-pc.gov.uk:
-  owner: Little Altcar Parish Council
-  crown: false
 littlechalfontparishcouncil.gov.uk:
   owner: Chiltern District Council
   crown: false
 littlechalfont-pc.gov.uk:
   owner: Chiltern District Council
   crown: false
-littledunham-pc.gov.uk:
-  owner: Little Dunham Parish Council
-  crown: false
-littlehadham-pc.gov.uk:
-  owner: Little Hadham Parish Council
-  crown: false
 littlehampton-tc.gov.uk:
   owner: Littlehampton Town Council
-  crown: false
-LittleHarrowdenParishCouncil.gov.uk:
-  owner: Little Harrowden Parish Council
-  crown: false
-littlehoughtonparishcouncilnorthants.gov.uk:
-  owner: Little Houghton Parish Council
-  crown: false
-littlemoreparishcouncil.gov.uk:
-  owner: Littlemore Parish Council
-  crown: false
-littleportparishcouncil.gov.uk:
-  owner: Littleport Parish Council
-  crown: false
-littlesomerfordparishcouncil.gov.uk:
-  owner: Little Somerford Parish Council
-  crown: false
-littlestanney-pc.gov.uk:
-  owner: Little Stanney & District Parish Council
   crown: false
 liverpoolcityregion-ca.gov.uk:
   owner: Knowsley Metropolitan Borough Council
@@ -3188,47 +2006,23 @@ localgovernmentjobsni.gov.uk:
 londoncareplacements.gov.uk:
   owner: London Councils
   crown: false
-londoncolney-pc.gov.uk:
-  owner: London Colney Parish Council
-  crown: false
 londoncouncils.gov.uk:
   owner: London Councils
   crown: false
 londontribunals.gov.uk:
   owner: London Councils
   crown: false
-longashtonparishcouncil.gov.uk:
-  owner: Long Ashton Parish Council
-  crown: false
-longborough-pc.gov.uk:
-  owner: Longborough Parish Council
-  crown: false
 longcompton-pc.gov.uk:
   owner: Stratford-on-Avon District Council
   crown: false
-longdonworcs-pc.gov.uk:
-  owner: Longdon, Queenhill and Holdfast Parish Council
-  crown: false
-longmelford-pc.gov.uk:
-  owner: Long Melford Parish Council
-  crown: false
 longridge-tc.gov.uk:
   owner: Longridge Town Council
-  crown: false
-longstratton-pc.gov.uk:
-  owner: Long Stratton Parish Council
   crown: false
 looetowncouncil.gov.uk:
   owner: Looe Town Council
   crown: false
 lookinglocal.gov.uk:
   owner: Kirklees Council
-  crown: false
-loose-pc.gov.uk:
-  owner: Loose Parish Council
-  crown: false
-loppingtonparishcouncil.gov.uk:
-  owner: Loppington Parish Council
   crown: false
 lostwithieltowncouncil.gov.uk:
   owner: Lostwithiel Town Council
@@ -3242,26 +2036,11 @@ louthtowncouncil.gov.uk:
 lowestofttowncouncil.gov.uk:
   owner: Lowestoft Town Council
   crown: false
-luddesdown-pc.gov.uk:
-  owner: Luddesdown Parish Council
-  crown: false
 ludlow.gov.uk:
   owner: Ludlow Town Council
   crown: false
-lustonparishes.gov.uk:
-  owner: Luston Group Parish Council
-  crown: false
 luton.gov.uk:
   owner: Luton Borough Council
-  crown: false
-lutton-pc.gov.uk:
-  owner: Lutton Parish Council
-  crown: false
-lydiardmillicent-pc.gov.uk:
-  owner: Lydiard Millicent Parish Council
-  crown: false
-lydiateparishcouncil.gov.uk:
-  owner: Lydiate Parish Council
   crown: false
 lymeregistowncouncil.gov.uk:
   owner: Lyme Regis Town Council
@@ -3269,17 +2048,11 @@ lymeregistowncouncil.gov.uk:
 lymingtonandpennington-tc.gov.uk:
   owner: Lymington and Pennington Town Council
   crown: false
-lymmparishcouncil.gov.uk:
-  owner: Lymm Parish Council
-  crown: false
 lytchettminsterandupton-tc.gov.uk:
   owner: Lytchett Minster & Upton Town Council
   crown: false
 macclesfield-tc.gov.uk:
   owner: Macclesfield Town Council
-  crown: false
-madeleytowncouncil.gov.uk:
-  owner: Madeley Parish Council
   crown: false
 maethugogleddcymru.gov.uk:
   owner: Flintshire County Council
@@ -3289,9 +2062,6 @@ maghull-tc.gov.uk:
   crown: false
 maiden.gov.uk:
   owner: Gloucestershire County Council
-  crown: false
-maidennewton-pc.gov.uk:
-  owner: Maiden Newton Parish Council
   crown: false
 maidstone.gov.uk:
   owner: Maidstone Borough Council
@@ -3311,14 +2081,8 @@ malton-tc.gov.uk:
 malvernhills.gov.uk:
   owner: Malvern Hills District Council
   crown: false
-malvernwells-pc.gov.uk:
-  owner: Malvern Wells Parish Council
-  crown: false
 manchester.gov.uk:
   owner: Manchester City Council
-  crown: false
-manea-pc.gov.uk:
-  owner: Manea Parish Council
   crown: false
 mansfield-dc.gov.uk:
   owner: Mansfield District Council
@@ -3326,29 +2090,14 @@ mansfield-dc.gov.uk:
 mansfield.gov.uk:
   owner: Mansfield District Council
   crown: false
-marchamparishcouncil.gov.uk:
-  owner: Marcham Parish Council
-  crown: false
 marchtowncouncil.gov.uk:
   owner: March Town Council
-  crown: false
-mardenkent-pc.gov.uk:
-  owner: Marden Parish Council
-  crown: false
-marhamchurch-pc.gov.uk:
-  owner: Marhamchurch Parish Council
-  crown: false
-marketbosworth-pc.gov.uk:
-  owner: Market Bosworth Parish Council
   crown: false
 marketdrayton.gov.uk:
   owner: Market Drayton Town Council
   crown: false
 marketweightontowncouncil.gov.uk:
   owner: East Riding of Yorkshire Council
-  crown: false
-markyateparishcouncil.gov.uk:
-  owner: Markyate Parish Council
   crown: false
 marlborough-tc.gov.uk:
   owner: Marlborough Town Council
@@ -3359,29 +2108,14 @@ marlboroughtowncouncil.gov.uk:
 marlow-tc.gov.uk:
   owner: Marlow Town Council
   crown: false
-marshgibbon-pc.gov.uk:
-  owner: Marsh Gibbon Parish Council
-  crown: false
 marstonsicca-pc.gov.uk:
   owner: Stratford-on-Avon District Council
-  crown: false
-martham.gov.uk:
-  owner: Martham Parish Council
-  crown: false
-martock-pc.gov.uk:
-  owner: Martock Parish Council
   crown: false
 maryporttowncouncil.gov.uk:
   owner: Maryport Town Council
   crown: false
-matlockbathparishcouncil.gov.uk:
-  owner: Parish Council of Matlock Bath
-  crown: false
 matlock.gov.uk:
   owner: Matlock Town Council
-  crown: false
-meashamparishcouncil.gov.uk:
-  owner: Measham Parish Council
   crown: false
 medway.gov.uk:
   owner: Medway Council
@@ -3392,20 +2126,11 @@ melthamtowncouncil.gov.uk:
 melton.gov.uk:
   owner: Melton Borough Council
   crown: false
-melton-suffolk-pc.gov.uk:
-  owner: Melton Parish Council
-  crown: false
 mendip.gov.uk:
   owner: Mendip District Council
   crown: false
 merthyr.gov.uk:
   owner: Merthyr Tydfil County Borough Council
-  crown: false
-metheringham-pc.gov.uk:
-  owner: Metheringham Parish Council
-  crown: false
-micklefield-pc.gov.uk:
-  owner: Micklefield Parish Council
   crown: false
 midandeastantrim.gov.uk:
   owner: Mid and East Antrim Borough Council
@@ -3415,12 +2140,6 @@ middevon.gov.uk:
   crown: false
 middlesbrough.gov.uk:
   owner: Middlesbrough Council
-  crown: false
-middletonbywirksworth-pc.gov.uk:
-  owner: Middleton by Wirksworth Parish Council
-  crown: false
-middleton-northants-pc.gov.uk:
-  owner: Middleton Parish Council
   crown: false
 midhurst-tc.gov.uk:
   owner: Midhurst Town Council
@@ -3440,61 +2159,22 @@ midsussex.gov.uk:
 milland-wsx-pc.gov.uk:
   owner: Chichester District Council
   crown: false
-millbrook-pc.gov.uk:
-  owner: Millbrook Parish Council
-  crown: false
 milton-keynes.gov.uk: miltonkeynes.gov.uk
 miltonkeynes.gov.uk:
   owner: Milton Keynes Council
   crown: false
   agreement_signed: true
-milton-pc.gov.uk:
-  owner: Milton Parish Council
-  crown: false
-miltonunderwychwood-pc.gov.uk:
-  owner: Milton-under-Wychwood Parish Council
-  crown: false
-minchinhampton-pc.gov.uk:
-  owner: Minchinhampton Parish Council
-  crown: false
 minstead.gov.uk:
   owner: New Forest District Council
   crown: false
-minsterlovell-pc.gov.uk:
-  owner: Minster Lovell Parish Council
-  crown: false
-minternemagnaparishcouncil.gov.uk:
-  owner: Minterne Magna Parish Council
-  crown: false
 mirfieldtowncouncil.gov.uk:
   owner: Mirfield Town Council
-  crown: false
-miserden-pc.gov.uk:
-  owner: Miserden Parish Council
-  crown: false
-misterton-notts-pc.gov.uk:
-  owner: Misterton Parish Council
-  crown: false
-mitfordparishcouncil.gov.uk:
-  owner: Mitford Parish Council
-  crown: false
-molescroft-pc.gov.uk:
-  owner: Molescroft Parish Council
   crown: false
 mole-valley.gov.uk:
   owner: Mole Valley District Council
   crown: false
 molevalley.gov.uk:
   owner: Mole Valley District Council
-  crown: false
-mollingtonoxon-pc.gov.uk:
-  owner: Mollington Parish Council
-  crown: false
-monkhesledenparishcouncil.gov.uk:
-  owner: Monk Hesleden Parish Council
-  crown: false
-monksherborne-pc.gov.uk:
-  owner: Monk Sherborne Parish Council
   crown: false
 monmouth.gov.uk:
   owner: Monmouth Town Council
@@ -3511,38 +2191,20 @@ moray.gov.uk:
 morecambe.gov.uk:
   owner: Morecambe Town Council
   crown: false
-moretonvalence-pc.gov.uk:
-  owner: Moreton Valence Parish Council
-  crown: false
 morley.gov.uk:
   owner: Morley Town Council
   crown: false
 Morpeth-tc.gov.uk:
   owner: Morpeth Town Council
   crown: false
-morville-pc.gov.uk:
-  owner: Morville Parish Council
-  crown: false
-mossanddistrict-pc.gov.uk:
-  owner: Moss and District Parish Council
-  crown: false
 mostyncommunitycouncil.gov.uk:
   owner: Mostyn Community Council
-  crown: false
-moultonnorthants-pc.gov.uk:
-  owner: Moulton Parish Council
   crown: false
 muchwenlock-tc.gov.uk:
   owner: Much Wenlock Town Council
   crown: false
-mudfordparishcouncil.gov.uk:
-  owner: Mudford Parish Council
-  crown: false
 mumbles.gov.uk:
   owner: Mumbles Community Council
-  crown: false
-myddleandbroughton-pc.gov.uk:
-  owner: Myddle and Broughton Parish Council
   crown: false
 mynottingham.gov.uk:
   owner: Nottingham City Council
@@ -3565,15 +2227,6 @@ nalc.gov.uk:
 nantwichtowncouncil.gov.uk:
   owner: Nantwich Town Council
   crown: false
-narboroughparishcouncil.gov.uk:
-  owner: Narborough Parish Council
-  crown: false
-nash-bucks-pc.gov.uk:
-  owner: Nash Parish Council
-  crown: false
-NashMillsParishCouncil.gov.uk:
-  owner: Nash Mills Parish Council
-  crown: false
 neath-porttalbot.gov.uk:
   owner: Neath Port Talbot County Borough Council
   crown: false
@@ -3595,14 +2248,8 @@ nelson-mid-glam.gov.uk:
 nelsontowncouncil.gov.uk:
   owner: Nelson Town Council
   crown: false
-netherstowey-pc.gov.uk:
-  owner: Nether Stowey Parish Council
-  crown: false
 netleymarsh-pc.gov.uk:
   owner: New Forest District Council
-  crown: false
-nettleham-pc.gov.uk:
-  owner: Nettleham Parish Council
   crown: false
 newark.gov.uk:
   owner: Newark Town Council
@@ -3612,9 +2259,6 @@ newark-sherwooddc.gov.uk:
   crown: false
 newbiggintowncouncil.gov.uk:
   owner: Newbiggin Town Council
-  crown: false
-newbradwell-pc.gov.uk:
-  owner: New Bradwell Parish Council
   crown: false
 newbury.gov.uk:
   owner: Newbury Town Council
@@ -3628,9 +2272,6 @@ newcastle.gov.uk:
   agreement_signed: true
 newcastle-staffs.gov.uk:
   owner: Newcastle under Lyme Borough Council
-  crown: false
-newdigateparishcouncil.gov.uk:
-  owner: Newdigate Parish Council
   crown: false
 newenttowncouncil.gov.uk:
   owner: Newent Town Council
@@ -3647,17 +2288,8 @@ newforestdistrict.gov.uk:
 newforest.gov.uk:
   owner: New Forest District Council
   crown: false
-newfrankleyinbirminghamparishcouncil.gov.uk:
-  owner: Newfrankley in Birmingham Parish Council
-  crown: false
 newhaventowncouncil.gov.uk:
   owner: Newhaven Town Council
-  crown: false
-newhollandparishcouncil.gov.uk:
-  owner: New Holland Parish Council
-  crown: false
-newlandparishcouncil.gov.uk:
-  owner: Newland Parish Council
   crown: false
 newmarket.gov.uk:
   owner: Newmarket Town Council
@@ -3676,12 +2308,6 @@ newportshropshire-tc.gov.uk:
   crown: false
 newtonabbot-tc.gov.uk:
   owner: Newton Abbot Town Council
-  crown: false
-newtonandnoss-pc.gov.uk:
-  owner: Newton & Noss Parish Council
-  crown: false
-newton-cambridge-pc.gov.uk:
-  owner: Newton Parish Council
   crown: false
 newtownabbey.gov.uk:
   owner: Newtownabbey Borough Council
@@ -3710,9 +2336,6 @@ norfolkparishes.gov.uk:
 norfolkprepared.gov.uk:
   owner: Norfolk County Council
   crown: false
-normandyparishcouncil.gov.uk:
-  owner: Normandy Parish Council
-  crown: false
 NorthallertonTownCouncil.gov.uk:
   owner: Northallerton Town Council
   crown: false
@@ -3725,9 +2348,6 @@ northamptonshire.gov.uk:
 northamtowncouncil.gov.uk:
   owner: Northam Town Council
   crown: false
-northandmiddlelittleton-pc.gov.uk:
-  owner: North and Middle Littleton Parish Council
-  crown: false
 northants-ecl.gov.uk:
   owner: Northamptonshire County Council
   crown: false
@@ -3736,15 +2356,6 @@ northantslicensing.gov.uk:
   crown: false
 north-ayrshire.gov.uk:
   owner: North Ayrshire Council
-  crown: false
-northcave-pc.gov.uk:
-  owner: North Cave Parish Council
-  crown: false
-northclainesparishcouncil.gov.uk:
-  owner: North Claines Parish Council
-  crown: false
-northcrawley-pc.gov.uk:
-  owner: North Crawley Parish Council
   crown: false
 northdevon.gov.uk:
   owner: North Devon Council
@@ -3764,20 +2375,8 @@ northeast-tadu.gov.uk:
 north-herts.gov.uk:
   owner: North Hertfordshire District Council
   crown: false
-northhinksey-pc.gov.uk:
-  owner: North Hinksey Parish Council
-  crown: false
-northhorsham-pc.gov.uk:
-  owner: North Horsham Parish Council
-  crown: false
 northhykehamtowncouncil.gov.uk:
   owner: North Hykeham Town Council
-  crown: false
-northingtonparishcouncil.gov.uk:
-  owner: Northington Parish Council
-  crown: false
-northkilworthparishcouncil.gov.uk:
-  owner: North Kilworth Parish Council
   crown: false
 northlanarkshire.gov.uk:
   owner: North Lanarkshire Council
@@ -3812,9 +2411,6 @@ northwalesfostering.gov.uk:
   crown: false
 northwarks.gov.uk:
   owner: North Warwickshire Borough Council
-  crown: false
-northweald-pc.gov.uk:
-  owner: North Weald Bassett Parish Council
   crown: false
 northwestvotes.gov.uk:
   owner: Manchester City Council
@@ -3859,9 +2455,6 @@ nwleicsdc.gov.uk:
 nwleics.gov.uk:
   owner: North West Leicestershire District Council
   crown: false
-nytheeldeneliden-pc.gov.uk:
-  owner: Nythe, Eldene and Liden Parish Council
-  crown: false
 oadby-wigston.gov.uk:
   owner: Oadby and Wigston Borough Council
   crown: false
@@ -3871,32 +2464,11 @@ oakengates-tc.gov.uk:
 oakhamtowncouncil.gov.uk:
   owner: Oakham Town Council
   crown: false
-oakleydeane-pc.gov.uk:
-  owner: Oakley and Deane Parish Council
-  crown: false
-oclepychardgroup-pc.gov.uk:
-  owner: Ocle Pychard Parish Council Group
-  crown: false
-odcombeparishcouncil.gov.uk:
-  owner: Odcombe Parish Council
-  crown: false
 offacommunitycouncil.gov.uk:
   owner: Offa Community Council
   crown: false
-offords-pc.gov.uk:
-  owner: Offord Cluny and Offord D'Arcy Parish Council
-  crown: false
-okefordfitzpaine-pc.gov.uk:
-  owner: Okeford Fitzpaine Parish Council
-  crown: false
 okehampton.gov.uk:
   owner: Okehampton Town Council
-  crown: false
-okehamptonhamlets-pc.gov.uk:
-  owner: Okehampton Hamlets Parish Council
-  crown: false
-oldbasing.gov.uk:
-  owner: Old Basing & Lychpit Parish Council
   crown: false
 oldbolsovertowncouncil.gov.uk:
   owner: Old Bolsover Town Council
@@ -3904,17 +2476,11 @@ oldbolsovertowncouncil.gov.uk:
 oldham.gov.uk:
   owner: Oldham Metropolitan Borough Council
   crown: false
-oldmarston-pc.gov.uk:
-  owner: Old Marston Parish Council
-  crown: false
 ollerton-tc.gov.uk:
   owner: Ollerton & Boughton Town Council
   crown: false
 olneytowncouncil.gov.uk:
   owner: Olney Town Council
-  crown: false
-olvestonparishcouncil.gov.uk:
-  owner: Olveston Parish Council
   crown: false
 omagh.gov.uk:
   owner: Omagh District Council
@@ -3925,14 +2491,8 @@ ongartowncouncil.gov.uk:
 orchardpark.gov.uk:
   owner: Orchard Park Community Council
   crown: false
-orgreaveparishcouncil.gov.uk:
-  owner: Orgreave Parish Council
-  crown: false
 orkney.gov.uk:
   owner: Orkney Islands Council
-  crown: false
-oswestryrural-pc.gov.uk:
-  owner: Oswestry Rural Parish Council
   crown: false
 oswestry-tc.gov.uk:
   owner: Oswestry Town Council
@@ -3943,20 +2503,8 @@ otleytowncouncil.gov.uk:
 otterystmary-tc.gov.uk:
   owner: Ottery St. Mary Town Council
   crown: false
-oultonbroadparishcouncil.gov.uk:
-  owner: Oulton Broad Parish Council
-  crown: false
 oundle.gov.uk:
   owner: Oundle Town Council
-  crown: false
-overstone-pc.gov.uk:
-  owner: Overstone Parish Council
-  crown: false
-overtonparishcouncil.gov.uk:
-  owner: Overton Parish Council
-  crown: false
-oxenhopeparishcouncil.gov.uk:
-  owner: Oxenhope Parish Council
   crown: false
 oxford.gov.uk:
   owner: Oxford City Council
@@ -3979,32 +2527,8 @@ padihamtowncouncil.gov.uk:
 padstow-tc.gov.uk:
   owner: Padstow Town Council
   crown: false
-padworthparishcouncil.gov.uk:
-  owner: Padworth Parish Council
-  crown: false
 paessex.gov.uk:
   owner: Essex County Council
-  crown: false
-paghamparishcouncil.gov.uk:
-  owner: Pagham Parish Council
-  crown: false
-painswick-pc.gov.uk:
-  owner: Painswick Parish Council
-  crown: false
-pamber-pc.gov.uk:
-  owner: Pamber Parish Council
-  crown: false
-pancrasweekparishcouncil.gov.uk:
-  owner: Pancrasweek Parish Council
-  crown: false
-pangbourne-pc.gov.uk:
-  owner: Pangbourne Parish Council
-  crown: false
-pannalandburnbridge-pc.gov.uk:
-  owner: Pannal and Burn Bridge Parish Council
-  crown: false
-parbold-pc.gov.uk:
-  owner: Parbold Parish Council
   crown: false
 patchwaytowncouncil.gov.uk:
   owner: Patchway Town Council
@@ -4012,20 +2536,8 @@ patchwaytowncouncil.gov.uk:
 peacehaventowncouncil.gov.uk:
   owner: Peacehaven Town Council
   crown: false
-peasedownstjohnparishcouncil.gov.uk:
-  owner: Peasedown St John Parish Council
-  crown: false
-pegswood-pc.gov.uk:
-  owner: Pegswood Parish Council
-  crown: false
-peltonparishcouncil.gov.uk:
-  owner: Pelton Parish Council
-  crown: false
 pembreyburryport-tc.gov.uk:
   owner: Pembrey & Burry Port Town Council
-  crown: false
-pembridgeparishcouncil.gov.uk:
-  owner: Pembridge Parish Council
   crown: false
 pembrokeshire.gov.uk:
   owner: Pembrokeshire County Council
@@ -4049,17 +2561,11 @@ penworthamtowncouncil.gov.uk:
 peoplesnetwork.gov.uk:
   owner: Arts Council England
   crown: false
-perranzabuloe-pc.gov.uk:
-  owner: Perranzabuloe Parish Council
-  crown: false
 pershore-tc.gov.uk:
   owner: Pershore Town Council
   crown: false
 PershoreTownCouncil.gov.uk:
   owner: Pershore Town Council
-  crown: false
-pertonparishcouncil.gov.uk:
-  owner: Perton Parish Council
   crown: false
 peterborough.gov.uk:
   owner: Peterborough City Council
@@ -4072,12 +2578,6 @@ petersfield-tc.gov.uk:
   crown: false
 petworth-tc.gov.uk:
   owner: Petworth Town Council
-  crown: false
-pevenseyparishcouncil.gov.uk:
-  owner: Pevensey Parish Council
-  crown: false
-pewsey-pc.gov.uk:
-  owner: Pewsey Parish Council
   crown: false
 pickering.gov.uk:
   owner: Pickering Town Council
@@ -4118,12 +2618,6 @@ pontypoolcc.gov.uk:
 pontypriddtowncouncil.gov.uk:
   owner: Pontypridd Town Council
   crown: false
-poolparishcouncil.gov.uk:
-  owner: Pool in Wharfedale Parish Council
-  crown: false
-poringlandparishcouncil.gov.uk:
-  owner: Poringland Parish Council
-  crown: false
 portishead.gov.uk:
   owner: Portishead & North Weston Town Council
   crown: false
@@ -4148,23 +2642,8 @@ prescot-tc.gov.uk:
 prestatyntowncouncil.gov.uk:
   owner: Prestatyn Town Council
   crown: false
-prestonbrookparishcouncil.gov.uk:
-  owner: Preston Brook Parish Council
-  crown: false
 preston.gov.uk:
   owner: Preston City Council
-  crown: false
-prestonpatrick-pc.gov.uk:
-  owner: Preston Patrick Parish Council
-  crown: false
-probusparishcouncil.gov.uk:
-  owner: Probus Parish Council
-  crown: false
-publow-with-pensford-pc.gov.uk:
-  owner: Publow with Pensford Parish Council
-  crown: false
-pulboroughparishcouncil.gov.uk:
-  owner: Pulborough Parish Council
   crown: false
 purbeck-dc.gov.uk:
   owner: Purbeck District Council
@@ -4172,26 +2651,8 @@ purbeck-dc.gov.uk:
 purbeck.gov.uk:
   owner: Purbeck District Council
   crown: false
-puritonparishcouncil.gov.uk:
-  owner: Puriton Parish Council
-  crown: false
-purleyonthames-pc.gov.uk:
-  owner: Purley on Thames Parish Council
-  crown: false
-purtonparishcouncil.gov.uk:
-  owner: Purton Parish Council
-  crown: false
 push.gov.uk:
   owner: Hampshire County Council
-  crown: false
-puttenham-pc.gov.uk:
-  owner: Puttenham Parish Council
-  crown: false
-quarndon-pc.gov.uk:
-  owner: Quarndon Parish Council
-  crown: false
-quedgeley-pc.gov.uk:
-  owner: Quedgeley Parish Council
   crown: false
 queensferrycommunitycouncil.gov.uk:
   owner: Queensferry and District Community Council
@@ -4199,23 +2660,11 @@ queensferrycommunitycouncil.gov.uk:
 queensparkcommunitycouncil.gov.uk:
   owner: Queens Park Community Council
   crown: false
-queenthorneparishcouncil.gov.uk:
-  owner: Queen Thorne Parish Council
-  crown: false
-quethiockparishcouncil.gov.uk:
-  owner: Quethiock Parish Council
-  crown: false
 Radstock-tc.gov.uk:
   owner: Radstock Town Council
   crown: false
-ramseyparkeston-pc.gov.uk:
-  owner: Ramsey and Parkestone Parish Council
-  crown: false
 ramseytowncouncil.gov.uk:
   owner: Ramsey Town Council
-  crown: false
-randwickandwestrip-pc.gov.uk:
-  owner: Randwick and Westrip Parish Council
   crown: false
 ratleyandupton-pc.gov.uk:
   owner: Stratford-on-Avon District Council
@@ -4223,20 +2672,8 @@ ratleyandupton-pc.gov.uk:
 raunds-tc.gov.uk:
   owner: Raunds Town Council
   crown: false
-ravenfieldparishcouncil.gov.uk:
-  owner: Ravenfield Parish Council
-  crown: false
-rawcliffeparishcouncil.gov.uk:
-  owner: Rawcliffe Parish Council
-  crown: false
-rawdonparishcouncil.gov.uk:
-  owner: Rawdon Parish Council
-  crown: false
 rayleightowncouncil.gov.uk:
   owner: Rayleigh Town Council
-  crown: false
-rayne-essex.gov.uk:
-  owner: Rayne Parish Council
   crown: false
 rbkc.gov.uk:
   owner: Royal Borough of Kensington and Chelsea
@@ -4250,12 +2687,6 @@ reading.gov.uk:
   crown: false
 readydumgal.gov.uk:
   owner: Dumfries and Galloway Council
-  crown: false
-redbourneparishcouncil.gov.uk:
-  owner: Redbourne Parish Council
-  crown: false
-RedbournParishCouncil.gov.uk:
-  owner: Redbourn Parish Council
   crown: false
 redcar-cleveland.gov.uk:
   owner: Redcar and Cleveland Borough Council
@@ -4275,9 +2706,6 @@ reigate-banstead.gov.uk:
 renfrewshire.gov.uk:
   owner: Renfrewshire Council
   crown: false
-repton-pc.gov.uk:
-  owner: Repton Parish Council
-  crown: false
 rhondda-cynon-taff.gov.uk:
   owner: Rhondda Cynon Taf County Borough Council
   crown: false
@@ -4296,17 +2724,8 @@ ribblevalley.gov.uk:
 richmondshire.gov.uk:
   owner: Richmondshire District Council
   crown: false
-ringmerparishcouncil.gov.uk:
-  owner: Ringmer Parish Council
-  crown: false
-ringmoreparishcouncil.gov.uk:
-  owner: Ringmore Parish Council
-  crown: false
 ringwood.gov.uk:
   owner: Ringwood Town Council
-  crown: false
-ripleyparishcouncil.gov.uk:
-  owner: Ripley Parish Council
   crown: false
 ripleytowncouncil.gov.uk:
   owner: Ripley Town Council
@@ -4314,35 +2733,11 @@ ripleytowncouncil.gov.uk:
 riponcity.gov.uk:
   owner: Ripon City Council
   crown: false
-rippondenparishcouncil.gov.uk:
-  owner: Ripponden Parish Council
-  crown: false
-roadeparishcouncil.gov.uk:
-  owner: Roade Parish Council
-  crown: false
 rochdale.gov.uk:
   owner: Rochdale Metropolitan Borough Council
   crown: false
-rocheparishcouncil.gov.uk:
-  owner: Roche Parish Council
-  crown: false
 rochford.gov.uk:
   owner: Rochford District Council
-  crown: false
-rochfordparishcouncil.gov.uk:
-  owner: Rochford Parish Council
-  crown: false
-rodborough.gov.uk:
-  owner: Rodborough Parish Council
-  crown: false
-rogateparishcouncil.gov.uk:
-  owner: Rogate Parish Council
-  crown: false
-romanby-pc.gov.uk:
-  owner: Romanby Parish Council
-  crown: false
-romsleyparishcouncil.gov.uk:
-  owner: Romsley Parish Council
   crown: false
 rossendalebc.gov.uk:
   owner: Rossendale Borough Council
@@ -4359,26 +2754,11 @@ rother.gov.uk:
 rotherham.gov.uk:
   owner: Rotherham Borough Council
   crown: false
-rottingdean-pc.gov.uk:
-  owner: Rottingdean Parish Council
-  crown: false
-roundwayparishcouncil.gov.uk:
-  owner: Roundway Parish Council
-  crown: false
 royalwoottonbassett.gov.uk:
   owner: Wootton Bassett Town Council
   crown: false
 roystontowncouncil.gov.uk:
   owner: Royston Town Council
-  crown: false
-ruckinge-pc.gov.uk:
-  owner: Ruckinge Parish Council
-  crown: false
-ruddingtonparishcouncil.gov.uk:
-  owner: Ruddington Parish Council
-  crown: false
-rufforthwithknapton-pc.gov.uk:
-  owner: Rufforth with Knapton Parish Council
   crown: false
 rugby.gov.uk:
   owner: Rugby Borough Council
@@ -4425,41 +2805,20 @@ salcombetowncouncil.gov.uk:
 salford.gov.uk:
   owner: Salford City Council
   crown: false
-salfordpriors.gov.uk:
-  owner: Salford Priors Parish Council
-  crown: false
 salisburycitycouncil.gov.uk:
   owner: Salisbury City Council
   crown: false
 saltash.gov.uk:
   owner: Saltash Town Council
   crown: false
-saltfordparishcouncil.gov.uk:
-  owner: Saltford Parish Council
-  crown: false
 saltneytowncouncil.gov.uk:
   owner: Saltney Town Council
-  crown: false
-sampfordarundel-pc.gov.uk:
-  owner: Sampford Arundel Parish Council
-  crown: false
-sampfordcourtenay-pc.gov.uk:
-  owner: Sampford Courtenay Parish Council
-  crown: false
-sanctonparishcouncil.gov.uk:
-  owner: Sancton Parish Council
   crown: false
 sandbach.gov.uk:
   owner: Sandbach Town Council
   crown: false
-sandfordparishcouncil.gov.uk:
-  owner: Sandford Parish Council
-  crown: false
 sandhurst.gov.uk:
   owner: Sandhurst Town Council
-  crown: false
-sandhurst-kent-pc.gov.uk:
-  owner: Sandhurst Parish Council
   crown: false
 sandleheath.gov.uk:
   owner: New Forest District Council
@@ -4467,38 +2826,17 @@ sandleheath.gov.uk:
 sandowntowncouncil.gov.uk:
   owner: Sandown Town Council
   crown: false
-sandridge-pc.gov.uk:
-  owner: Sandridge Parish Council
-  crown: false
 sandwell.gov.uk:
   owner: Sandwell Metropolitan Borough Council
   crown: false
 sandwichtowncouncil.gov.uk:
   owner: Sandwich Town Council
   crown: false
-sandymoorparishcouncil.gov.uk:
-  owner: Sandymoor Parish Council
-  crown: false
 sandytowncouncil.gov.uk:
   owner: Sandy Town Council
   crown: false
-satleyparishcouncil.gov.uk:
-  owner: Satley Parish Council
-  crown: false
-saughall.gov.uk:
-  owner: Saughall and Shotwick Park Parish Council
-  crown: false
 sawbridgeworth-tc.gov.uk:
   owner: Sawbridgeworth Town Council
-  crown: false
-sawtry-pc.gov.uk:
-  owner: Sawtry Parish Council
-  crown: false
-saxbyallsaints-pc.gov.uk:
-  owner: Saxby All Saints Parish Council
-  crown: false
-saxilbyparishcouncil.gov.uk:
-  owner: Saxilby with Ingleby Parish Council
   crown: false
 scambs.gov.uk:
   owner: South Cambridgeshire District Council
@@ -4514,9 +2852,6 @@ scotborders.gov.uk:
   crown: false
 seafordtowncouncil.gov.uk:
   owner: Seaford Town Council
-  crown: false
-seagryparishcouncil.gov.uk:
-  owner: Seagry Parish Council
   crown: false
 seaham.gov.uk:
   owner: Seaham Town Council
@@ -4539,14 +2874,8 @@ sedgefieldtowncouncil.gov.uk:
 sedgemoor.gov.uk:
   owner: Sedgemoor District Council
   crown: false
-seergreenparishcouncil.gov.uk:
-  owner: Seer Green Parish Council
-  crown: false
 sefton.gov.uk:
   owner: Sefton Metropolitan Borough Council
-  crown: false
-selborneparishcouncil.gov.uk:
-  owner: Selborne Parish Council
   crown: false
 selby.gov.uk:
   owner: Selby District Council
@@ -4554,14 +2883,8 @@ selby.gov.uk:
 selbytowncouncil.gov.uk:
   owner: Selby District Council
   crown: false
-sellindge-pc.gov.uk:
-  owner: Sellindge Parish Council
-  crown: false
 selseytowncouncil.gov.uk:
   owner: Selsey Town Council
-  crown: false
-sendparishcouncil.gov.uk:
-  owner: Send Parish Council
   crown: false
 sesplan.gov.uk:
   owner: The City of Edinburgh Council
@@ -4581,29 +2904,8 @@ shaftesbury-tc.gov.uk:
 sharedresourceservicewales.gov.uk:
   owner: Torfaen County Borough Council
   crown: false
-shaughpriorparish.gov.uk:
-  owner: Shaugh Prior Parish Council
-  crown: false
-shawbury-pc.gov.uk:
-  owner: Shawbury Parish Council
-  crown: false
-shearsbyparishcouncil.gov.uk:
-  owner: Shearsby Parish Council
-  crown: false
-sheetparishcouncil.gov.uk:
-  owner: Sheet Parish Council
-  crown: false
 sheffield.gov.uk:
   owner: Sheffield City Council
-  crown: false
-shenleybrookend-pc.gov.uk:
-  owner: Shenley Brook End & Tattenhoe Parish Council
-  crown: false
-shenley-pc.gov.uk:
-  owner: Shenley Parish Council
-  crown: false
-shenstone-staffs.gov.uk:
-  owner: Shenstone Parish Council
   crown: false
 sheptonmallettowncouncil.gov.uk:
   owner: Shepton Mallet Town Council
@@ -4611,23 +2913,8 @@ sheptonmallettowncouncil.gov.uk:
 shepway.gov.uk:
   owner: Shepway District Council
   crown: false
-sherbornestjohn-pc.gov.uk:
-  owner: Sherborne St. John Parish Council
-  crown: false
 sherborne-tc.gov.uk:
   owner: Sherborne Town Council
-  crown: false
-sherburninelmet-pc.gov.uk:
-  owner: Sherburn in Elmet Parish Council
-  crown: false
-shereparishcouncil.gov.uk:
-  owner: Shere Parish Council
-  crown: false
-sherfieldonloddon-pc.gov.uk:
-  owner: Sherfield on Loddon Parish Council
-  crown: false
-sherfieldparkparishcouncil.gov.uk:
-  owner: Sherfield Park Parish Council
   crown: false
 shetland.gov.uk:
   owner: Shetland Islands Council
@@ -4635,29 +2922,17 @@ shetland.gov.uk:
 shetland-library.gov.uk:
   owner: Shetland Islands Council
   crown: false
-shevingtonpc.gov.uk:
-  owner: Shevington Parish Council
-  crown: false
 shifnaltowncouncil.gov.uk:
   owner: Shifnal Town Council
   crown: false
 shildon.gov.uk:
   owner: Shildon Town Council
   crown: false
-shinfieldparish.gov.uk:
-  owner: Shinfield Parish Council
-  crown: false
 shirebrooktowncouncil.gov.uk:
   owner: Shirebrook Town Council
   crown: false
 sholland.gov.uk:
   owner: South Holland District Council
-  crown: false
-shorehamparishcouncil.gov.uk:
-  owner: Shoreham Parish Council
-  crown: false
-shottonparishcouncil.gov.uk:
-  owner: Shotton Parish Council
   crown: false
 shrewsburytowncouncil.gov.uk:
   owner: Shrewsbury Town Council
@@ -4671,20 +2946,8 @@ sidmouth.gov.uk:
 sigoma.gov.uk:
   owner: Barnsley Metropolitan Borough Council
   crown: false
-silchester-pc.gov.uk:
-  owner: Silchester Parish Council
-  crown: false
-silkstoneparishcouncil.gov.uk:
-  owner: Silkstone Parish Council
-  crown: false
 silloth-on-solway-tc.gov.uk:
   owner: Silloth-on-Solway Town Council
-  crown: false
-silverdale-pc-lancs.gov.uk:
-  owner: Silverdale Parish Council
-  crown: false
-silverendparishcouncil.gov.uk:
-  owner: Silver End Parish Council
   crown: false
 sir-benfro.gov.uk:
   owner: Pembrokeshire County Council
@@ -4704,14 +2967,8 @@ sirgar.gov.uk:
 siryfflint.gov.uk:
   owner: Flintshire County Council
   crown: false
-sitlingtonparishcouncil.gov.uk:
-  owner: Sitlington Parish Council
-  crown: false
 skegness.gov.uk:
   owner: Skegness Town Council
-  crown: false
-skelton-york.gov.uk:
-  owner: Skelton Parish Council
   crown: false
 skiptontowncouncil.gov.uk:
   owner: Skipton Town Council
@@ -4719,20 +2976,8 @@ skiptontowncouncil.gov.uk:
 sleaford.gov.uk:
   owner: Sleaford Town Council
   crown: false
-slimbridge-pc.gov.uk:
-  owner: Slimbridge Parish Council
-  crown: false
-SlindonParishCouncil.gov.uk:
-  owner: Slindon Parish Council
-  crown: false
-slinfold-pc.gov.uk:
-  owner: Slinfold Parish Council
-  crown: false
 slough.gov.uk:
   owner: Slough Borough Council
-  crown: false
-snaintonparishcouncil.gov.uk:
-  owner: Snainton Parish Council
   crown: false
 s-norfolk.gov.uk:
   owner: South Norfolk Council
@@ -4749,14 +2994,8 @@ solihull.gov.uk:
 somerset.gov.uk:
   owner: Somerset County Council
   crown: false
-somersham-pc.gov.uk:
-  owner: Somersham Parish Council
-  crown: false
 somertontowncouncil.gov.uk:
   owner: Somerton Town Council
-  crown: false
-sonning-pc.gov.uk:
-  owner: Sonning Parish Council
   crown: false
 sopley.gov.uk:
   owner: New Forest District Council
@@ -4773,14 +3012,8 @@ southandvale.gov.uk:
 south-ayrshire.gov.uk:
   owner: South Ayrshire Council
   crown: false
-southbrent.gov.uk:
-  owner: South Brent Parish council
-  crown: false
 southbucks.gov.uk:
   owner: South Buckinghamshire District Council
-  crown: false
-southcavepc.gov.uk:
-  owner: South Cave Parish Council
   crown: false
 south-derbys.gov.uk:
   owner: South Derbyshire District Council
@@ -4791,9 +3024,6 @@ southend.gov.uk:
 southernuplandway.gov.uk:
   owner: Dumfries and Galloway Council
   crown: false
-southferribyparishcouncil.gov.uk:
-  owner: South Ferriby Parish Council
-  crown: false
 southglos.gov.uk:
   owner: South Gloucestershire Council
   crown: false
@@ -4802,9 +3032,6 @@ south-hams-dc.gov.uk:
   crown: false
 southhams.gov.uk:
   owner: South Hams District Council
-  crown: false
-south-hill-pc.gov.uk:
-  owner: South Hill Parish Council
   crown: false
 southkesteven.gov.uk:
   owner: South Kesteven District Council
@@ -4821,17 +3048,11 @@ southlanarkshire.gov.uk:
 south-norfolk.gov.uk:
   owner: South Norfolk Council
   crown: false
-southnormantonparishcouncil.gov.uk:
-  owner: South Normanton Parish Council
-  crown: false
 southnorthants.gov.uk:
   owner: South Northamptonshire Council
   crown: false
 southoxon.gov.uk:
   owner: South Oxfordshire District Council
-  crown: false
-southpethertonparishcouncil.gov.uk:
-  owner: South Petherton Parish Council
   crown: false
 southribble.gov.uk:
   owner: South Ribble Borough Council
@@ -4842,29 +3063,17 @@ southribbletourism.gov.uk:
 southsomerset.gov.uk:
   owner: South Somerset District Council
   crown: false
-southswindon-pc.gov.uk:
-  owner: Central Swindon South Parish Council
-  crown: false
 southtyneside.gov.uk:
   owner: South Tyneside Council
   crown: false
 southwark.gov.uk:
   owner: Southwark London Borough Council
   crown: false
-southwater-pc.gov.uk:
-  owner: Southwater Parish Council
-  crown: false
 southwell-tc.gov.uk:
   owner: Southwell Town Council
   crown: false
 southwest-ra.gov.uk:
   owner: Somerset County Council
-  crown: false
-southwick-widley-pc.gov.uk:
-  owner: Southwick and Widley Parish Council
-  crown: false
-southwingfieldparishcouncil.gov.uk:
-  owner: South Wingfield Parish Council
   crown: false
 southwoodhamferrerstc.gov.uk:
   owner: South Woodham Ferrers Town Council
@@ -4875,12 +3084,6 @@ southworcestershirebuildingcontrol.gov.uk:
 southworcestershirerevenues.gov.uk:
   owner: Wychavon District Council
   crown: false
-spaldingtonparishcouncil.gov.uk:
-  owner: Spaldington Parish Council
-  crown: false
-speldhurstparishcouncil.gov.uk:
-  owner: Speldhurst Parish Council
-  crown: false
 spelthorne.gov.uk:
   owner: Spelthorne Borough Council
   crown: false
@@ -4889,9 +3092,6 @@ spennymoor-tc.gov.uk:
   crown: false
 sprowston-tc.gov.uk:
   owner: Sprowston Town Council
-  crown: false
-spurstow-pc.gov.uk:
-  owner: Spurstow Parish Council
   crown: false
 sstaffs.gov.uk:
   owner: South Staffordshire District Council
@@ -4914,14 +3114,8 @@ staffslc.gov.uk:
 staffsmoorlands.gov.uk:
   owner: Staffordshire Moorlands District Council
   crown: false
-stagnes-pc.gov.uk:
-  owner: St.Agnes Parish Council
-  crown: false
 stainforthtowncouncil.gov.uk:
   owner: Stainforth Town Council
-  crown: false
-stainingparishcouncil.gov.uk:
-  owner: Staining Parish Council
   crown: false
 stalbans.gov.uk:
   owner: St Albans District Council
@@ -4929,41 +3123,14 @@ stalbans.gov.uk:
 stalbridgetowncouncil.gov.uk:
   owner: Stalbridge Town Council
   crown: false
-stallenparishcouncil.gov.uk:
-  owner: St Allen Parish Council
-  crown: false
-stamfordbridge-pc.gov.uk:
-  owner: Stamford Bridge Parish Council
-  crown: false
 stamfordtowncouncil.gov.uk:
   owner: Stamford Town Council
-  crown: false
-stanbridgeparishcouncil.gov.uk:
-  owner: Stanbridge Parish Council
-  crown: false
-stanfordrivers-pc.gov.uk:
-  owner: Stanford Rivers Parish Council
   crown: false
 stanley-tc.gov.uk:
   owner: Stanley Town Council
   crown: false
 stannesonthesea-tc.gov.uk:
   owner: St. Annes on the Sea Town Council
-  crown: false
-stansteadabbottsparishcouncil.gov.uk:
-  owner: Stanstead Abbotts Parish Council
-  crown: false
-stansted-pc.gov.uk:
-  owner: Stansted Parish Council
-  crown: false
-stantononthewoldsparishcouncil.gov.uk:
-  owner: Parish Council of Stanton on the Wolds
-  crown: false
-stapeleyparishcouncil.gov.uk:
-  owner: Stapeley and District Parish Council
-  crown: false
-stapenhillparishcouncil.gov.uk:
-  owner: Stapenhill Parish Council
   crown: false
 star-procurement.gov.uk:
   owner: Trafford Metropolitan Borough Council
@@ -4977,12 +3144,6 @@ staustell-tc.gov.uk:
 staveleytowncouncil.gov.uk:
   owner: Staveley Town Council
   crown: false
-stbriavels-pc.gov.uk:
-  owner: St Briavels Parish Council
-  crown: false
-stcleerparishcouncil.gov.uk:
-  owner: St Cleer Parish Council
-  crown: false
 stcolumbmajor-tc.gov.uk:
   owner: St Columb Major Town Council
   crown: false
@@ -4992,38 +3153,14 @@ stdavids.gov.uk:
 stdonats-cc.gov.uk:
   owner: St Donats communitiy Council
   crown: false
-stedhamwithiping-pc.gov.uk:
-  owner: Stedham with Iping Parish Council
-  crown: false
 stedmundsbury.gov.uk:
   owner: St Edmundsbury Borough Council
   crown: false
 stedsbc.gov.uk:
   owner: St Edmundsbury Borough Council
   crown: false
-steeplebumpstead-pc.gov.uk:
-  owner: Steeple Bumpstead Parish Council
-  crown: false
-steepleclaydonparishcouncil.gov.uk:
-  owner: Steeple Claydon Parish Council
-  crown: false
-steep-pc.gov.uk:
-  owner: Steep Parish Council
-  crown: false
-steeton-with-eastburnparishcouncil.gov.uk:
-  owner: Steeton-with-Eastburn Parish Council
-  crown: false
-sterth-pc.gov.uk:
-  owner: St Erth Parish Council
-  crown: false
 stevenage.gov.uk:
   owner: Stevenage Borough Council
-  crown: false
-steyningpc.gov.uk:
-  owner: Steyning Parish Council
-  crown: false
-stgeorgesandpriorslee-pc.gov.uk:
-  owner: St Georges and Priorslee Parish Council
   crown: false
 stharmoncommunitycouncil.gov.uk:
   owner: St Harmon Community Council
@@ -5031,14 +3168,8 @@ stharmoncommunitycouncil.gov.uk:
 sthelens.gov.uk:
   owner: St Helens Metropolitan Borough Council
   crown: false
-stirchleyandbrooksideparishcouncil.gov.uk:
-  owner: Stirchley and Brookside Parish Council
-  crown: false
 stirling.gov.uk:
   owner: Stirling Council
-  crown: false
-st-ive-parishcouncil.gov.uk:
-  owner: St Ive Parish Council
   crown: false
 stives-tc.gov.uk:
   owner: St Ives Town Council - Cornwall
@@ -5049,20 +3180,8 @@ stivestowncouncil-cornwall.gov.uk:
 stivestowncouncil.gov.uk:
   owner: St Ives Town Council
   crown: false
-stjamesisleofgrain-pc.gov.uk:
-  owner: St James Isle of Grain Parish Council
-  crown: false
-stmartinsparishcouncil.gov.uk:
-  owner: St Martin's Parish Council
-  crown: false
 stmarybourne-pc.gov.uk:
   owner: Basingstoke and Deane Borough Council
-  crown: false
-stmaryhoo-pc.gov.uk:
-  owner: St Mary Hoo Parish Council
-  crown: false
-stmellion-pc.gov.uk:
-  owner: St Mellion Parish Council
   crown: false
 stneots-tc.gov.uk:
   owner: St Neots Town Council
@@ -5082,26 +3201,8 @@ stockton.gov.uk:
 stockton-warks-pc.gov.uk:
   owner: Stratford-on-Avon District Council
   crown: false
-stokeandhurleston-pc.gov.uk:
-  owner: Stoke & Hurleston Parish Council
-  crown: false
 stoke.gov.uk:
   owner: Stoke-on-Trent City Council
-  crown: false
-stokelodgeandthecommon-pc.gov.uk:
-  owner: Stoke Lodge & The Common Parish Council
-  crown: false
-stokenham-pc.gov.uk:
-  owner: Stokenham Parish Council
-  crown: false
-stoke-pc-worcs.gov.uk:
-  owner: Stoke Parish Council
-  crown: false
-stokepogesparishcouncil.gov.uk:
-  owner: Stoke Poges Parish Council
-  crown: false
-stondon-pc.gov.uk:
-  owner: Stondon Parish Council
   crown: false
 stonetowncouncil.gov.uk:
   owner: Stone Town Council
@@ -5112,29 +3213,14 @@ stonystratford.gov.uk:
 stoploansharks.gov.uk:
   owner: Birmingham City Council
   crown: false
-storrington-pc.gov.uk:
-  owner: Storrington & Sullington Parish Council
-  crown: false
-stosyth.gov.uk:
-  owner: St Osyth Parish Council
-  crown: false
 stotfoldtowncouncil.gov.uk:
   owner: Stotfold Town Council
   crown: false
 stourporttowncouncil.gov.uk:
   owner: Stourport-on-Severn Town Council
   crown: false
-stowe-by-chartley-pc.gov.uk:
-  owner: Stowe by Chartley Parish Council
-  crown: false
-stowmaries-pc.gov.uk:
-  owner: Stow Maries Parish Council
-  crown: false
 stowonthewold-tc.gov.uk:
   owner: Stow-on-the-Wold Town Council
-  crown: false
-stratfield-mortimer.gov.uk:
-  owner: Stratfield Mortimer Parish Council
   crown: false
 stratford-dc.gov.uk:
   owner: Stratford-on-Avon District Council
@@ -5145,35 +3231,14 @@ stratford.gov.uk:
 stratford-tc.gov.uk:
   owner: Stratford-upon-Avon Town Council
   crown: false
-strattonstmargaret.gov.uk:
-  owner: Stratton St Margaret Parish Council
-  crown: false
-street-pc.gov.uk:
-  owner: Street Parish Council
-  crown: false
 stroud.gov.uk:
   owner: Stroud District Council
-  crown: false
-stroud-pc.gov.uk:
-  owner: Stroud Parish Council
   crown: false
 stroudtown.gov.uk:
   owner: Stroud Town Council
   crown: false
-ststephenparishcouncil.gov.uk:
-  owner: St Stephen Parish Council
-  crown: false
-stteathparishcouncil.gov.uk:
-  owner: St Teath Parish Council
-  crown: false
-sturminstermarshall-pc.gov.uk:
-  owner: Sturminster Marshall Parish Council
-  crown: false
 sturminsternewton-tc.gov.uk:
   owner: Sturminster Newton Town Council
-  crown: false
-sturry-pc.gov.uk:
-  owner: Sturry Parish Council
   crown: false
 s-tyneside-mbc.gov.uk:
   owner: South Tyneside Council
@@ -5186,9 +3251,6 @@ suffolkcoastal.gov.uk:
   crown: false
 suffolk.gov.uk:
   owner: Suffolk County Council
-  crown: false
-Sullington-pc.gov.uk:
-  owner: Storrington & Sullington Parish Council
   crown: false
 sunderland.gov.uk:
   owner: Sunderland City Metropolitan Borough Council
@@ -5229,32 +3291,17 @@ surreylocalgovernment.gov.uk:
 sussexsaferroads.gov.uk:
   owner: West Sussex County Council
   crown: false
-suttonbengerparishcouncil.gov.uk:
-  owner: Sutton Benger Parish Council
-  crown: false
 suttoncoldfieldtowncouncil.gov.uk:
   owner: Sutton Coldfield Town Council
   crown: false
-suttoncourtenay-pc.gov.uk:
-  owner: Sutton Courtenay Parish Council
-  crown: false
 sutton.gov.uk:
   owner: Sutton London Borough Council
-  crown: false
-suttonparishcouncil.gov.uk:
-  owner: Sutton Parish Council
-  crown: false
-suttonunderwhitestonecliffeparishcouncil.gov.uk:
-  owner: Sutton under Whitestonecliffe Parish Council
   crown: false
 swaffhamtowncouncil.gov.uk:
   owner: Swaffham Town Council
   crown: false
 swale.gov.uk:
   owner: Swale Borough Council
-  crown: false
-swallowfieldpc.gov.uk:
-  owner: Swallowfield Parish Council
   crown: false
 swanage.gov.uk:
   owner: Swanage Town Council
@@ -5271,14 +3318,8 @@ sway-pc.gov.uk:
 swdevon.gov.uk:
   owner: South Hams District Council
   crown: false
-swillingtonparishcouncil.gov.uk:
-  owner: Swillington Parish Council
-  crown: false
 swindon.gov.uk:
   owner: Swindon Borough Council
-  crown: false
-swinfordparishcouncil.gov.uk:
-  owner: Swinford Parish Council
   crown: false
 tadleytowncouncil.gov.uk:
   owner: Tadley Town Council
@@ -5294,9 +3335,6 @@ tandridgedc.gov.uk:
   crown: false
 tandridge.gov.uk:
   owner: Tandridge District Council
-  crown: false
-tarleton-pc.gov.uk:
-  owner: Tarleton Parish Council
   crown: false
 tauntondeane.gov.uk:
   owner: Taunton Deane Borough Council
@@ -5355,23 +3393,11 @@ thametowncouncil.gov.uk:
 thanet.gov.uk:
   owner: Thanet District Council
   crown: false
-thanington-pc.gov.uk:
-  owner: Thanington Without Parish Council
-  crown: false
 thatchamtowncouncil.gov.uk:
   owner: Thatcham Town Council
   crown: false
-thealeparishcouncil.gov.uk:
-  owner: Theale Parish Council
-  crown: false
-thegorgeparishcouncil.gov.uk:
-  owner: The Gorge Parish Council
-  crown: false
 themcmanus-dundee.gov.uk:
   owner: Dundee City Council
-  crown: false
-thestukeleys-pc.gov.uk:
-  owner: The Stukeleys Parish Council
   crown: false
 thetfordtowncouncil.gov.uk:
   owner: Thetford Town Council
@@ -5388,9 +3414,6 @@ thornburytowncouncil.gov.uk:
 thorne-moorends.gov.uk:
   owner: Thorne Moorends Town Council
   crown: false
-thornley-pc.gov.uk:
-  owner: Thornley Parish Council
-  crown: false
 thorpestandrew-tc.gov.uk:
   owner: Thorpe St Andrew Town Council
   crown: false
@@ -5400,38 +3423,14 @@ thrapstontowncouncil.gov.uk:
 threerivers.gov.uk:
   owner: Three Rivers District Council
   crown: false
-thurmastonpc.gov.uk:
-  owner: Thurmaston Parish Council
-  crown: false
 thurrockfostering.gov.uk:
   owner: Thurrock Council
   crown: false
 thurrock.gov.uk:
   owner: Thurrock Council
   crown: false
-thursley-pc.gov.uk:
-  owner: Thursley Parish Council
-  crown: false
-thurstonparishcouncil.gov.uk:
-  owner: Thurston Parish Council
-  crown: false
-tibshelfparishcouncil.gov.uk:
-  owner: Tibshelf Parish Council
-  crown: false
 tidworthtowncouncil.gov.uk:
   owner: Tidworth Town Council
-  crown: false
-tintagelparishcouncil.gov.uk:
-  owner: Tintagel Parish Council
-  crown: false
-tiptreeparishcouncil.gov.uk:
-  owner: Tiptree Parish Council
-  crown: false
-tisbury-wiltshire-pc.gov.uk:
-  owner: Tisbury Parish Council
-  crown: false
-titleygroup-pc.gov.uk:
-  owner: Titley & District Group Parish Council
   crown: false
 tivertontowncouncil.gov.uk:
   owner: Tiverton Town Council
@@ -5442,23 +3441,11 @@ tmbc.gov.uk:
 tobaccoregisterni.gov.uk:
   owner: Belfast City Council
   crown: false
-tockenhamparishcouncil.gov.uk:
-  owner: Tockenham Parish Council
-  crown: false
-tockwith.gov.uk:
-  owner: Tockwith with Wilstrop Parish Council
-  crown: false
-tollertonparishcouncil.gov.uk:
-  owner: Tollerton Parish Council
-  crown: false
 torbay.gov.uk:
   owner: Torbay Council
   crown: false
 torfaen.gov.uk:
   owner: Torfaen County Borough Council
-  crown: false
-tormarton-pc.gov.uk:
-  owner: Tormarton Parish Council
   crown: false
 torpointtowncouncil.gov.uk:
   owner: Torpoint Town Council
@@ -5475,9 +3462,6 @@ totton-and-eling-tc.gov.uk:
 towcester-tc.gov.uk:
   owner: Towcester Town Council
   crown: false
-towednackparishcouncil.gov.uk:
-  owner: Towednack Parish Council
-  crown: false
 towerhamlets.gov.uk:
   owner: Tower Hamlets London Borough Council
   crown: false
@@ -5492,15 +3476,6 @@ trafford.gov.uk:
   crown: false
 traffordparishes.gov.uk:
   owner: Trafford Metropolitan Borough Council
-  crown: false
-treetonparishcouncil.gov.uk:
-  owner: Treeton Parish Council
-  crown: false
-trimdonfoundry-pc.gov.uk:
-  owner: Trimdon Foundry Parish Council
-  crown: false
-trimdonparishcouncil.gov.uk:
-  owner: Trimdon Parish Council
   crown: false
 tring.gov.uk:
   owner: Tring Town Council
@@ -5518,59 +3493,20 @@ tunbridgewells.gov.uk:
   owner: Tunbridge Wells Borough Council
   crown: false
   agreement_signed: true
-tupton-pc.gov.uk:
-  owner: Tupton Parish Council
-  crown: false
-tuxford-pc.gov.uk:
-  owner: Tuxford Parish Council
-  crown: false
 twict.gov.uk:
   owner: Sunderland City Metropolitan Borough Council
-  crown: false
-twineham-pc.gov.uk:
-  owner: Twineham Parish Council
-  crown: false
-twyford-bucks-pc.gov.uk:
-  owner: Twyford Parish Council
-  crown: false
-twyfordparishcouncil.gov.uk:
-  owner: Twyford Parish Council
   crown: false
 tyneandwearltp.gov.uk:
   owner: Newcastle upon Tyne City Council
   crown: false
-tywardreathandparparishcouncil.gov.uk:
-  owner: Tywardreath and Par Parish Council
-  crown: false
 uckfieldtc.gov.uk:
   owner: Uckfield Town Council
-  crown: false
-ugboroughparishcouncil.gov.uk:
-  owner: Ugborough Parish Council
-  crown: false
-uleyparishcouncil.gov.uk:
-  owner: uleyparishcouncil.gov.uk
-  crown: false
-uphollandpc.gov.uk:
-  owner: Up Holland Parish Council
-  crown: false
-upperbeeding-pc.gov.uk:
-  owner: Upper Beeding Parish Council
-  crown: false
-upperrissington-pc.gov.uk:
-  owner: Upper Rissington Parish Council
   crown: false
 uppinghamtowncouncil.gov.uk:
   owner: Uppingham Town Council
   crown: false
-upton-pc.gov.uk:
-  owner: Upton Parish Council
-  crown: false
 uptonstleonards-pc.gov.uk:
   owner: Stroud District Council
-  crown: false
-urchfont-pc.gov.uk:
-  owner: Urchfont Parish Council
   crown: false
 uttlesford.gov.uk:
   owner: Uttlesford District Council
@@ -5587,26 +3523,14 @@ visitsaffronwalden.gov.uk:
 visitsouthribble.gov.uk:
   owner: South Ribble Borough Council
   crown: false
-waddesdonparishcouncil.gov.uk:
-  owner: Waddesdon Parish Council
-  crown: false
-waddingham.gov.uk:
-  owner: Waddingham Parish Council
-  crown: false
 wadebridge-tc.gov.uk:
   owner: Wadebridge Town Council
-  crown: false
-wadhurst-pc.gov.uk:
-  owner: Wadhurst Parish Council
   crown: false
 wakefield.gov.uk:
   owner: Wakefield City Council
   crown: false
 wallingfordtowncouncil.gov.uk:
   owner: Wallingford Town Council
-  crown: false
-wall-pc.gov.uk:
-  owner: Wall Parish Council
   crown: false
 walsall.gov.uk:
   owner: Walsall Metropolitan Borough Council
@@ -5623,9 +3547,6 @@ walthamforest.gov.uk:
 waltoncommunitycouncil.gov.uk:
   owner: Walton Community Council
   crown: false
-walton-pc.gov.uk:
-  owner: Walton Parish Council
-  crown: false
 wantagetowncouncil.gov.uk:
   owner: Wantage Town Council
   crown: false
@@ -5635,17 +3556,11 @@ wareham-tc.gov.uk:
 waretowncouncil.gov.uk:
   owner: Ware Town Council
   crown: false
-warfieldparishcouncil.gov.uk:
-  owner: Warfield Parish Council
-  crown: false
 warminster-tc.gov.uk:
   owner: Warminster Town Council
   crown: false
 warrington.gov.uk:
   owner: Warrington Borough Council
-  crown: false
-warton-pc.gov.uk:
-  owner: Warton Parish Council
   crown: false
 warwick-dc.gov.uk:
   owner: Warwick District Council
@@ -5662,17 +3577,11 @@ warwickshire.gov.uk:
 warwicktowncouncil.gov.uk:
   owner: Warwick Town Council
   crown: false
-watermead-pc.gov.uk:
-  owner: Watermead Parish Council
-  crown: false
 watford-council.gov.uk:
   owner: Watford Borough Council
   crown: false
 watford.gov.uk:
   owner: Watford Borough Council
-  crown: false
-watlington-oxon-pc.gov.uk:
-  owner: Watlington Parish Council
   crown: false
 wattontowncouncil.gov.uk:
   owner: Watton Town Council
@@ -5701,17 +3610,8 @@ wellington-shropshire.gov.uk:
 wells.gov.uk:
   owner: Wells City Council
   crown: false
-welshamptonandlyneal-pc.gov.uk:
-  owner: Welshampton and Lyneal Parish Council
-  crown: false
 welshpooltowncouncil.gov.uk:
   owner: Welshpool Town Council
-  crown: false
-welton-by-lincoln-pc.gov.uk:
-  owner: Welton Parish Council
-  crown: false
-welton-pc.gov.uk:
-  owner: Welton Parish Council
   crown: false
 welwyn.gov.uk:
   owner: Welwyn Hatfield Borough Council
@@ -5719,26 +3619,14 @@ welwyn.gov.uk:
 wem.gov.uk:
   owner: Wem Town Council
   crown: false
-wemrural-pc.gov.uk:
-  owner: Wem Rural Parish Council
-  crown: false
-wendover-pc.gov.uk:
-  owner: Wendover Parish Council
-  crown: false
 westberks.gov.uk:
   owner: West Berkshire Council
   crown: false
 westbletchleycouncil.gov.uk:
   owner: West Bletchley Council
   crown: false
-westburysubmendip-pc.gov.uk:
-  owner: Westbury Sub Mendip Parish Council
-  crown: false
 westburytowncouncil.gov.uk:
   owner: Westbury Town Council
-  crown: false
-westcottparishcouncil.gov.uk:
-  owner: Westcott Parish Council
   crown: false
 westcumbria.gov.uk:
   owner: Allerdale Borough Council
@@ -5755,23 +3643,11 @@ westdorset-weymouth.gov.uk:
 west-dunbarton.gov.uk:
   owner: West Dunbartonshire Council
   crown: false
-westend-pc.gov.uk:
-  owner: West End Parish Council
-  crown: false
 westerhamtowncouncil.gov.uk:
   owner: Westerham Town Council
   crown: false
 westgateonsea.gov.uk:
   owner: Westgate-On-Sea Town Council
-  crown: false
-westgrinstead-pc.gov.uk:
-  owner: West Grinstead Parish Council
-  crown: false
-westhillparishcouncil.gov.uk:
-  owner: West Hill Parish Council
-  crown: false
-westhoathly.gov.uk:
-  owner: West Hoathly Parish Council
   crown: false
 westlancashire.gov.uk:
   owner: West Lancashire District Council
@@ -5781,9 +3657,6 @@ westlancsdc.gov.uk:
   crown: false
 westlancs.gov.uk:
   owner: West Lancashire District Council
-  crown: false
-westleigh-devon.gov.uk:
-  owner: Westleigh Parish Council
   crown: false
 west-lindsey.gov.uk:
   owner: West Lindsey District Council
@@ -5797,26 +3670,14 @@ westmidlandsca.gov.uk:
 westminster.gov.uk:
   owner: Westminster City Council
   crown: false
-westmoors-pc.gov.uk:
-  owner: West Moors Parish Council
-  crown: false
 west-norfolk.gov.uk:
   owner: Borough Council of King's Lynn & West Norfolk
   crown: false
 westofengland-ca.gov.uk:
   owner: Bath and North East Somerset Council
   crown: false
-westonbywellandparishcouncil.gov.uk:
-  owner: Weston by Welland Parish Council
-  crown: false
-westononthegreen-pc.gov.uk:
-  owner: Weston on the Green Parish Council
-  crown: false
 westoxon.gov.uk:
   owner: West Oxfordshire District Council
-  crown: false
-westparley-pc.gov.uk:
-  owner: West Parley Parish Council
   crown: false
 westsomerset.gov.uk:
   owner: West Somerset District Council
@@ -5831,32 +3692,14 @@ westsuffolk.gov.uk:
 westsussex.gov.uk:
   owner: West Sussex County Council
   crown: false
-westswindon-pc.gov.uk:
-  owner: West Swindon Parish Council
-  crown: false
 westwey.gov.uk:
   owner: Weymouth and Portland Borough Council
-  crown: false
-westwitteringparishcouncil.gov.uk:
-  owner: West Wittering Parish Council
   crown: false
 westyorkshire-pcp.gov.uk:
   owner: Wakefield City Council
   crown: false
 weymouth.gov.uk:
   owner: Weymouth and Portland Borough Council
-  crown: false
-wheathampstead-pc.gov.uk:
-  owner: Wheathampstead Parish Council
-  crown: false
-wheatleyparishcouncil.gov.uk:
-  owner: Wheatley Parish Council
-  crown: false
-WheatonAstonParishCouncil.gov.uk:
-  owner: Lapley, Stretton & Wheaton Aston Parish Council
-  crown: false
-wheldrake-pc.gov.uk:
-  owner: Wheldrake Parish Council
   crown: false
 whiston-tc.gov.uk:
   owner: Whiston Town Council
@@ -5873,14 +3716,8 @@ whitehilltowncouncil.gov.uk:
 whitehorsedc.gov.uk:
   owner: Vale of White Horse District Council
   crown: false
-whiteshillandruscombe-pc.gov.uk:
-  owner: Whiteshill and Ruscombe Parish Council
-  crown: false
 whitnashtowncouncil.gov.uk:
   owner: Whitnash Town Council
-  crown: false
-whitwell-pc.gov.uk:
-  owner: Whitwell Parish Council
   crown: false
 whitworth.gov.uk:
   owner: Whitworth Town Council
@@ -5890,18 +3727,6 @@ wigan.gov.uk:
   crown: false
 wiganmbc.gov.uk:
   owner: Wigan Metropolitan Borough Council
-  crown: false
-wilbarstonparishcouncil.gov.uk:
-  owner: Wilbarston Parish Council
-  crown: false
-wilcotandhuish-pc.gov.uk:
-  owner: Wilcot and Huish Parish Council
-  crown: false
-willinghamparishcouncil.gov.uk:
-  owner: Willingham Parish Council
-  crown: false
-wilsdenparishcouncil.gov.uk:
-  owner: Wilsden Parish Council
   crown: false
 wiltontowncouncil.gov.uk:
   owner: Wilton Town Council
@@ -5918,23 +3743,11 @@ winchester.gov.uk:
 windermere-tc.gov.uk:
   owner: Windermere Town Council
   crown: false
-windleshampc.gov.uk:
-  owner: Windlesham Parish Council
-  crown: false
-winkfieldparishcouncil.gov.uk:
-  owner: Winkfield Parish Council
-  crown: false
-winnersh.gov.uk:
-  owner: Winnersh Parish Council
-  crown: false
 winsford.gov.uk:
   owner: Winsford Town Council
   crown: false
 winslowtowncouncil.gov.uk:
   owner: Winslow Town Council
-  crown: false
-winteringham-pc.gov.uk:
-  owner: Winteringham Parish Council
   crown: false
 wirksworth.gov.uk:
   owner: Wirksworth Town Council
@@ -5953,12 +3766,6 @@ wisbechtowncouncil.gov.uk:
 witham.gov.uk:
   owner: Witham Town Council
   crown: false
-witherleyparishcouncil.gov.uk:
-  owner: Witherley Parish Council
-  crown: false
-witley-pc.gov.uk:
-  owner: Witley Parish Council
-  crown: false
 witney-tc.gov.uk:
   owner: Witney Town Council
   crown: false
@@ -5967,9 +3774,6 @@ wivenhoe.gov.uk:
   crown: false
 wixford-pc.gov.uk:
   owner: Stratford-on-Avon District Council
-  crown: false
-wmortimerhazeleigh-pc.gov.uk:
-  owner: Woodham Mortimer with Hazeleigh Parish Council
   crown: false
 woking.gov.uk:
   owner: Woking Borough Council
@@ -5981,59 +3785,23 @@ wokingham.gov.uk:
 wokingham-tc.gov.uk:
   owner: Wokingham Town Council
   crown: false
-wokinghamwithoutparishcouncil.gov.uk:
-  owner: Wokingham Without Parish Council
-  crown: false
-wokinghamwithout-pc.gov.uk:
-  owner: Wokingham Without Parish Council
-  crown: false
-wollastonparishcouncil.gov.uk:
-  owner: Wollaston Parish Council
-  crown: false
 wolverhampton.gov.uk:
   owner: Wolverhampton City Council
   crown: false
 wolvertonandgreenleystowncouncil.gov.uk:
   owner: Wolverton and Greenleys Town Council
   crown: false
-womersleyparishcouncil.gov.uk:
-  owner: Womersley Parish Council
-  crown: false
-wooburnparish.gov.uk:
-  owner: Wooburn Parish Council
-  crown: false
 woodbridge-suffolk.gov.uk:
   owner: Woodbridge Town Council
-  crown: false
-woodchurch-pc.gov.uk:
-  owner: Woodchurch Parish Council
-  crown: false
-woodgreen-pc.gov.uk:
-  owner: Woodgreen Parish Council
   crown: false
 woodley.gov.uk:
   owner: Woodley Town Council
   crown: false
-woodsettsparishcouncil.gov.uk:
-  owner: Woodsetts Parish Council
-  crown: false
 woodstock-tc.gov.uk:
   owner: Woodstock Town Council
   crown: false
-woodvilleparishcouncil.gov.uk:
-  owner: Woodville Parish Council
-  crown: false
-woolley-pc.gov.uk:
-  owner: Woolley Parish Council
-  crown: false
-woolston-pc.gov.uk:
-  owner: Woolston Parish Council
-  crown: false
 woottonbassett.gov.uk:
   owner: Wootton Bassett Town Council
-  crown: false
-woottonparishcouncil.gov.uk:
-  owner: Wootton Parish Council
   crown: false
 woottonwawen-pc.gov.uk:
   owner: Stratford-on-Avon District Council
@@ -6056,41 +3824,14 @@ worcsregservices.gov.uk:
 workingtontowncouncil.gov.uk:
   owner: Workington Town Council
   crown: false
-worlestondistrict-pc.gov.uk:
-  owner: Worleston & District Parish Council
-  crown: false
-worplesdon-pc.gov.uk:
-  owner: Worplesdon Parish Council
-  crown: false
 worthing.gov.uk:
   owner: Worthing Borough Council
-  crown: false
-woughtoncommunitycouncil.gov.uk:
-  owner: Woughton Parish Council
-  crown: false
-wraxallandfailand-pc.gov.uk:
-  owner: Wraxall and Failand Parish Council
-  crown: false
-wraysburyparishcouncil.gov.uk:
-  owner: Wraysbury Parish Council
   crown: false
 wrecsam.gov.uk:
   owner: Wrexham County Borough Council
   crown: false
-wrestlingworthandcockaynehatley-pc.gov.uk:
-  owner: Wrestlingworth & Cockayne Hatley Parish Council
-  crown: false
 wrexham.gov.uk:
   owner: Wrexham County Borough Council
-  crown: false
-wringtonparishcouncil.gov.uk:
-  owner: Wrington Parish Council
-  crown: false
-wroseparishcouncil.gov.uk:
-  owner: Wrose Parish Council
-  crown: false
-wroughton.gov.uk:
-  owner: Wroughton Parish Council
   crown: false
 wsm-tc.gov.uk:
   owner: Weston-super-Mare Town Council
@@ -6116,38 +3857,17 @@ wyreforest.gov.uk:
 wyre.gov.uk:
   owner: Wyre Council
   crown: false
-YaldingParishCouncil.gov.uk:
-  owner: Yalding Parish Council
-  crown: false
-yaptonpc.gov.uk:
-  owner: Yapton Parish Council
-  crown: false
 yateley-tc.gov.uk:
   owner: Yateley Town Council
   crown: false
 yatetowncouncil.gov.uk:
   owner: Yate Town Council
   crown: false
-yatton-pc.gov.uk:
-  owner: Yatton Parish Council
-  crown: false
-yealmpton-pc.gov.uk:
-  owner: Yealmpton Parish Council
-  crown: false
-yelvertoft-pc.gov.uk:
-  owner: Yelvertoft Parish Council
-  crown: false
 yeovil.gov.uk:
   owner: South Somerset District Council
   crown: false
 yeoviltonparishcouncil.gov.uk:
   owner: Yeovil Town Council
-  crown: false
-yeovilwithoutparishcouncil.gov.uk:
-  owner: Yeovil Without Parish Council
-  crown: false
-yetminsterparishes.gov.uk:
-  owner: Yetminster and Ryme Intrinseca Parish Council
   crown: false
 ynysmon.gov.uk:
   owner: Isle of Anglesey County Council
@@ -6158,7 +3878,4 @@ york.gov.uk:
   crown: false
 yorkshirelca.gov.uk:
   owner: Yorkshire Local Councils Associations
-  crown: false
-zennorparishcouncil.gov.uk:
-  owner: Zennor Parish Council
   crown: false
