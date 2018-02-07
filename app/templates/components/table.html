@@ -1,6 +1,6 @@
 {% from "components/big-number.html" import big_number %}
 
-{% macro mapping_table(caption='', field_headings=[], field_headings_visible=True, caption_visible=True) -%}
+{% macro mapping_table(caption='', field_headings=[], field_headings_visible=True, caption_visible=True, equal_length=False) -%}
   <table class="table table-font-xsmall">
     <caption class="heading-medium table-heading{{ ' visuallyhidden' if not caption_visible}}">
       {{ caption }}
@@ -8,7 +8,7 @@
     <thead class="table-field-headings{% if field_headings_visible %}-visible{% endif %}">
       <tr>
         {% for field_heading in field_headings %}
-          <th scope="col" class="table-field-heading{% if loop.first %}-first{% endif %}">
+          <th scope="col" class="table-field-heading{% if loop.first %}-first{% endif %}" width="{% if equal_length %}{{ (100 / field_headings|length)|int }}%{% endif %}">
             {% if field_headings_visible %}
               {{ field_heading }}
             {% else %}
@@ -24,10 +24,10 @@
   </table>
 {%- endmacro %}
 
-{% macro list_table(items, caption='', empty_message='', field_headings=[], field_headings_visible=True, caption_visible=True) -%}
+{% macro list_table(items, caption='', empty_message='', field_headings=[], field_headings_visible=True, caption_visible=True, equal_length=False) -%}
   {% set parent_caller = caller %}
 
-  {% call mapping_table(caption, field_headings, field_headings_visible, caption_visible) %}
+  {% call mapping_table(caption, field_headings, field_headings_visible, caption_visible, equal_length) %}
     {% for item in items %}
       {% call row(item.id) %}
         {{ parent_caller(item, loop.index + 1) }}

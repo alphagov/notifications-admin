@@ -419,6 +419,36 @@ def test_anyone_can_see_monthly_breakdown(
     )
 
 
+def test_monthly_shows_letters_in_breakdown(
+    client_request,
+    service_one,
+    mock_get_monthly_notification_stats,
+):
+    page = client_request.get(
+        'main.monthly',
+        service_id=service_one['id']
+    )
+
+    columns = page.select('.table-field-center-aligned .big-number-label')
+
+    assert normalize_spaces(columns[0].text) == 'emails'
+    assert normalize_spaces(columns[1].text) == 'text messages'
+    assert normalize_spaces(columns[2].text) == 'letters'
+
+
+def test_monthly_has_equal_length_tables(
+    client_request,
+    service_one,
+    mock_get_monthly_notification_stats,
+):
+    page = client_request.get(
+        'main.monthly',
+        service_id=service_one['id']
+    )
+
+    assert page.select_one('.table-field-headings th').get('width') == "25%"
+
+
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_upcoming_jobs_on_dashboard(
     logged_in_client,
