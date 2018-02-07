@@ -545,6 +545,7 @@ batchworth-pc.gov.uk:
 bathnes.gov.uk:
     sector: local
     owner: Bath and North East Somerset Council
+    agreement_signed: true
 battletowncouncil.gov.uk:
     sector: local
     owner: Battle Town Council
@@ -722,6 +723,7 @@ blackwaterandhawleytowncouncil.gov.uk:
 blaenau-gwent.gov.uk:
     sector: local
     owner: Blaenau Gwent County Borough Council
+    agreement_signed: true
 blaenhonddan-wcc.gov.uk:
     sector: local
     owner: Blaenhonddan Community Council
@@ -790,6 +792,7 @@ bracknellforest.gov.uk: bracknell.gov.uk
 bracknell.gov.uk:
     sector: local
     owner: Bracknell Forest Borough Council
+    agreement_signed: true
 bracknelltowncouncil.gov.uk:
     sector: local
     owner: Bracknell Town Council
@@ -983,6 +986,7 @@ bucksandsurreytradingstandards.gov.uk:
 buckscc.gov.uk:
     sector: local
     owner: Buckinghamshire County Council
+    agreement_signed: true
 buckshomechoice.gov.uk:
     sector: local
     owner: Aylesbury Vale District Council
@@ -1100,6 +1104,7 @@ cambridge.gov.uk:
 cambridgeshire.gov.uk:
     sector: local
     owner: Cambridgeshire County Council
+    agreement_signed: true
 camden.gov.uk:
     sector: local
     owner: Camden Council
@@ -1661,6 +1666,7 @@ dab-vjb.gov.uk:
 dacorum.gov.uk:
     sector: local
     owner: Dacorum Borough Council
+    agreement_signed: true
 dalburyleesparishcouncil.gov.uk:
     sector: local
     owner: Dalbury Lees Parish Council
@@ -2094,6 +2100,7 @@ falkirk-council.gov.uk: falkirk.gov.uk
 falkirk.gov.uk:
     sector: local
     owner: Falkirk Council
+    agreement_signed: true
 falstoneparishcouncil.gov.uk:
     sector: local
     owner: Falstone Parish Council
@@ -2304,6 +2311,7 @@ grangeoversandstowncouncil.gov.uk:
 gravesham.gov.uk:
     sector: local
     owner: Gravesham Borough Council
+    agreement_signed: true
 greatalne-pc.gov.uk:
     sector: local
     owner: Stratford-on-Avon District Council
@@ -2364,6 +2372,7 @@ gwineargwithian-pc.gov.uk:
 gwynedd.gov.uk:
     sector: local
     owner: Gwynedd County Council
+    agreement_signed: true
 hackletonparishcouncil.gov.uk:
     sector: local
     owner: Hackleton Parish Council
@@ -3045,6 +3054,7 @@ leektowncouncil.gov.uk:
 leicester.gov.uk:
     sector: local
     owner: Leicester City Council
+    agreement_signed: true
 leicestershireandrutlandalc.gov.uk:
     sector: local
     owner: Leicestershire and Rutland Association of Local Councils
@@ -3466,6 +3476,7 @@ milton-keynes.gov.uk: miltonkeynes.gov.uk
 miltonkeynes.gov.uk:
     sector: local
     owner: Milton Keynes Council
+    agreement_signed: true
 milton-pc.gov.uk:
     sector: local
     owner: Milton Parish Council
@@ -3643,6 +3654,7 @@ NewcastleEmlynTownCouncil.gov.uk:
 newcastle.gov.uk:
     sector: local
     owner: Newcastle upon Tyne City Council
+    agreement_signed: true
 newcastle-staffs.gov.uk:
     sector: local
     owner: Newcastle under Lyme Borough Council
@@ -3808,6 +3820,7 @@ northleach.gov.uk:
 northlincs.gov.uk:
     sector: local
     owner: North Lincolnshire Council
+    agreement_signed: true
 north-norfolk.gov.uk:
     sector: local
     owner: North Norfolk District Council
@@ -3841,6 +3854,7 @@ northwichtowncouncil.gov.uk:
 northyorks.gov.uk:
     sector: local
     owner: North Yorkshire County Council
+    agreement_signed: true
 norwich.gov.uk:
     sector: local
     owner: Norwich City Council
@@ -4045,6 +4059,7 @@ pembridgeparishcouncil.gov.uk:
 pembrokeshire.gov.uk:
     sector: local
     owner: Pembrokeshire County Council
+    agreement_signed: true
 PenarthTownCouncil.gov.uk:
     sector: local
     owner: Penarth Town Council
@@ -4255,6 +4270,7 @@ rayne-essex.gov.uk:
 rbkc.gov.uk:
     sector: local
     owner: Royal Borough of Kensington and Chelsea
+    agreement_signed: true
 rctcbc.gov.uk:
     sector: local
     owner: Rhondda Cynon Taf County Borough Council
@@ -5530,6 +5546,7 @@ truro.gov.uk:
 tunbridgewells.gov.uk:
     sector: local
     owner: Tunbridge Wells Borough Council
+    agreement_signed: true
 tupton-pc.gov.uk:
     sector: local
     owner: Tupton Parish Council
@@ -5839,6 +5856,7 @@ westsomersetonline.gov.uk:
 westsuffolk.gov.uk:
     sector: local
     owner: St Edmundsbury Borough Council
+    agreement_signed: true
 westsussex.gov.uk:
     sector: local
     owner: West Sussex County Council
@@ -5957,6 +5975,7 @@ wirral-mbc.gov.uk: wirral.gov.uk
 wirral.gov.uk:
     sector: local
     owner: Wirral Metropolitan Borough Council
+    agreement_signed: true
 wisbechtowncouncil.gov.uk:
     sector: local
     owner: Wisbech Town Council
@@ -5987,6 +6006,7 @@ woking.gov.uk:
 wokingham.gov.uk:
     sector: local
     owner: Wokingham Borough Council
+    agreement_signed: true
 wokingham-tc.gov.uk:
     sector: local
     owner: Wokingham Town Council
@@ -6161,6 +6181,7 @@ yetminsterparishes.gov.uk:
 ynysmon.gov.uk:
     sector: local
     owner: Isle of Anglesey County Council
+    agreement_signed: true
 york.gov.uk:
     sector: local
     owner: City of York Council
