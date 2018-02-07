@@ -194,6 +194,11 @@ cf-deploy-prototype: cf-target ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
 	cf push -f <(make -s CF_MANIFEST_FILE=manifest-prototype-${CF_SPACE}.yml generate-manifest)
 
+.PHONY: cf-deploy-prototype-2
+cf-deploy-prototype-2: cf-target ## Deploys the app to Cloud Foundry
+	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
+	cf push -f <(make -s CF_MANIFEST_FILE=manifest-prototype-2-${CF_SPACE}.yml generate-manifest)
+
 .PHONY: cf-rollback
 cf-rollback: ## Rollbacks the app to the previous release
 	@cf app --guid notify-admin-rollback || exit 1

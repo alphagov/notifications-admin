@@ -1,0 +1,31 @@
+---
+
+buildpack: python_buildpack
+command: scripts/run_app_paas.sh gunicorn -w 5 -b 0.0.0.0:$PORT application
+instances: 1
+memory: 1G
+env:
+  NOTIFY_APP_NAME: admin
+
+  # Credentials variables
+  ADMIN_CLIENT_SECRET: null
+  ADMIN_BASE_URL: null
+  API_HOST_NAME: null
+  DANGEROUS_SALT: null
+  SECRET_KEY: null
+  ROUTE_SECRET_KEY_1: null
+  ROUTE_SECRET_KEY_2: null
+
+  AWS_ACCESS_KEY_ID: null
+  AWS_SECRET_ACCESS_KEY: null
+
+  STATSD_PREFIX: null
+
+  DESKPRO_API_HOST: null
+  DESKPRO_API_KEY: null
+
+  TEMPLATE_PREVIEW_API_HOST: null
+  TEMPLATE_PREVIEW_API_KEY: null
+
+applications:
+  - name: notify-admin-prototype-2
