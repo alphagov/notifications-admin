@@ -28,7 +28,7 @@ from app.main.forms import (
     ServiceInboundNumberForm,
     ServiceSmsSenderForm,
     ServiceLetterContactBlockForm,
-    ServiceBrandingOrg,
+    ServiceSetBranding,
     LetterBranding,
     InternationalSMSForm,
     OrganisationTypeForm,
@@ -37,7 +37,7 @@ from app.main.forms import (
     SMSPrefixForm,
     ServiceSwitchLettersForm,
 )
-from app import user_api_client, current_service, organisations_client, inbound_number_client, billing_api_client
+from app import user_api_client, current_service, email_branding_client, inbound_number_client, billing_api_client
 from notifications_utils.formatters import formatted_list
 
 
@@ -45,11 +45,11 @@ from notifications_utils.formatters import formatted_list
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def service_settings(service_id):
-    letter_branding_organisations = organisations_client.get_letter_organisations()
-    if current_service['organisation']:
-        organisation = organisations_client.get_organisation(current_service['organisation'])['organisation']
+    letter_branding_organisations = email_branding_client.get_letter_email_branding()
+    if current_service['email_branding']:
+        email_branding = email_branding_client.get_email_branding(current_service['email_branding'])['email_branding']
     else:
-        organisation = None
+        email_branding = None
 
     inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)
     disp_inbound_number = inbound_number['data'].get('number', '')
@@ -73,7 +73,7 @@ def service_settings(service_id):
 
     return render_template(
         'views/service-settings.html',
-        organisation=organisation,
+        email_branding=email_branding,
         letter_branding=letter_branding_organisations.get(
             current_service.get('dvla_organisation', '001')
         ),
@@ -711,32 +711,32 @@ def set_free_sms_allowance(service_id):
     )
 
 
-@main.route("/services/<service_id>/service-settings/set-branding-and-org", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/set-email-branding", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions(admin_override=True)
-def service_set_branding_and_org(service_id):
-    organisations = organisations_client.get_organisations()
+def service_set_email_branding(service_id):
+    email_branding = email_branding_client.get_all_email_branding()
 
-    form = ServiceBrandingOrg(branding_type=current_service.get('branding'))
+    form = ServiceSetBranding(branding_type=current_service.get('branding'))
 
     # dynamically create org choices, including the null option
-    form.organisation.choices = [('None', 'None')] + get_branding_as_value_and_label(organisations)
+    form.branding_style.choices = [('None', 'None')] + get_branding_as_value_and_label(email_branding)
 
     if form.validate_on_submit():
-        organisation = None if form.organisation.data == 'None' else form.organisation.data
+        branding_style = None if form.branding_style.data == 'None' else form.branding_style.data
         service_api_client.update_service(
             service_id,
             branding=form.branding_type.data,
-            organisation=organisation
+            email_branding=branding_style
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 
-    form.organisation.data = current_service['organisation'] or 'None'
+    form.branding_style.data = current_service['email_branding'] or 'None'
 
     return render_template(
-        'views/service-settings/set-branding-and-org.html',
+        'views/service-settings/set-email-branding.html',
         form=form,
-        branding_dict=get_branding_as_dict(organisations)
+        branding_dict=get_branding_as_dict(email_branding)
     )
 
 
@@ -745,7 +745,7 @@ def service_set_branding_and_org(service_id):
 @user_has_permissions(admin_override=True)
 def set_letter_branding(service_id):
 
-    form = LetterBranding(choices=organisations_client.get_letter_organisations().items())
+    form = LetterBranding(choices=email_branding_client.get_letter_email_branding().items())
 
     if form.validate_on_submit():
         service_api_client.update_service(
@@ -762,17 +762,17 @@ def set_letter_branding(service_id):
     )
 
 
-def get_branding_as_value_and_label(organisations):
+def get_branding_as_value_and_label(email_branding):
     return [
-        (organisation['id'], organisation['name'])
-        for organisation in organisations
+        (branding['id'], branding['name'])
+        for branding in email_branding
     ]
 
 
-def get_branding_as_dict(organisations):
+def get_branding_as_dict(email_branding):
     return {
-        organisation['id']: {
-            'logo': 'https://{}/{}'.format(get_cdn_domain(), organisation['logo']),
-            'colour': organisation['colour']
-        } for organisation in organisations
+        branding['id']: {
+            'logo': 'https://{}/{}'.format(get_cdn_domain(), branding['logo']),
+            'colour': branding['colour']
+        } for branding in email_branding
     }

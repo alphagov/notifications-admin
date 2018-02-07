@@ -1,0 +1,134 @@
+from flask import current_app, redirect, render_template, session, url_for
+from flask_login import login_required
+
+from app import email_branding_client
+from app.main import main
+from app.main.forms import (
+    ServiceSelectEmailBranding,
+    ServiceUpdateEmailBranding,
+    ServiceCreateEmailBranding
+)
+from app.utils import user_has_permissions, get_cdn_domain
+from app.main.s3_client import (
+    TEMP_TAG,
+    upload_logo,
+    delete_temp_file,
+    delete_temp_files_created_by,
+    persist_logo
+)
+from app.main.views.service_settings import get_branding_as_value_and_label, get_branding_as_dict
+
+
+@main.route("/email-branding", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions(admin_override=True)
+def email_branding():
+    brandings = email_branding_client.get_all_email_branding()
+
+    form = ServiceSelectEmailBranding()
+    form.email_branding.choices = get_branding_as_value_and_label(brandings) + [('None', 'Create a new email branding')]
+
+    if form.validate_on_submit():
+        if form.email_branding.data != 'None':
+            return redirect(url_for('.update_email_branding', branding_id=form.email_branding.data))
+        else:
+            return redirect(url_for('.create_email_branding'))
+
+    return render_template(
+        'views/email-branding/select-branding.html',
+        form=form,
+        branding_dict=get_branding_as_dict(brandings),
+    )
+
+
+@main.route("/email-branding/<branding_id>/edit", methods=['GET', 'POST'])
+@main.route("/email-branding/<branding_id>/edit/<logo>", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions(admin_override=True)
+def update_email_branding(branding_id, logo=None):
+    email_branding = email_branding_client.get_email_branding(branding_id)['email_branding']
+
+    form = ServiceUpdateEmailBranding()
+
+    logo = logo if logo else email_branding.get('logo') if email_branding else None
+
+    if form.validate_on_submit():
+        if form.file.data:
+            upload_filename = upload_logo(
+                form.file.data.filename,
+                form.file.data,
+                current_app.config['AWS_REGION'],
+                user_id=session["user_id"]
+            )
+
+            if logo and logo.startswith(TEMP_TAG.format(user_id=session['user_id'])):
+                delete_temp_file(logo)
+
+            return redirect(url_for('.update_email_branding', branding_id=branding_id, logo=upload_filename))
+
+        if logo:
+            logo = persist_logo(logo, session["user_id"])
+
+        delete_temp_files_created_by(session["user_id"])
+
+        email_branding_client.update_email_branding(
+            branding_id=branding_id,
+            logo=logo,
+            name=form.name.data,
+            colour=form.colour.data
+        )
+
+        return redirect(url_for('.email_branding', branding_id=branding_id))
+
+    form.name.data = email_branding['name']
+    form.colour.data = email_branding['colour']
+
+    return render_template(
+        'views/email-branding/manage-branding.html',
+        form=form,
+        email_branding=email_branding,
+        cdn_url=get_cdn_domain(),
+        logo=logo
+    )
+
+
+@main.route("/email-branding/create", methods=['GET', 'POST'])
+@main.route("/email-branding/create/<logo>", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions(admin_override=True)
+def create_email_branding(logo=None):
+    form = ServiceCreateEmailBranding()
+
+    if form.validate_on_submit():
+        if form.file.data:
+            upload_filename = upload_logo(
+                form.file.data.filename,
+                form.file.data,
+                current_app.config['AWS_REGION'],
+                user_id=session["user_id"]
+            )
+
+            if logo and logo.startswith(TEMP_TAG.format(user_id=session['user_id'])):
+                delete_temp_file(logo)
+
+            return redirect(url_for('.create_email_branding', logo=upload_filename))
+
+        if logo:
+            logo = persist_logo(logo, session["user_id"])
+
+        delete_temp_files_created_by(session["user_id"])
+
+        email_branding_client.create_email_branding(
+            logo=logo,
+            name=form.name.data,
+            colour=form.colour.data
+        )
+
+        return redirect(url_for('.email_branding'))
+
+    return render_template(
+        'views/email-branding/manage-branding.html',
+        form=form,
+        cdn_url=get_cdn_domain(),
+        logo=logo
+    )

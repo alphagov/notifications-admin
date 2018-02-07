@@ -3,7 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-  Set branding and organisation
+  Set email branding
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -13,7 +13,7 @@
     <div class="column-three-quarters">
       <form method="post">
         {{ radios(form.branding_type) }}
-        {{ branding_radios(form.organisation, branding_dict=branding_dict) }}
+        {{ branding_radios(form.branding_style, branding_dict=branding_dict) }}
         {{ page_footer(
           'Save',
           back_link=url_for('.service_settings', service_id=current_service.id),

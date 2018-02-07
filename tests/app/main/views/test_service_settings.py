@@ -33,7 +33,7 @@ from freezegun import freeze_time
 
 @pytest.fixture
 def mock_get_service_settings_page_common(
-    mock_get_letter_organisations,
+    mock_get_letter_email_branding,
     mock_get_inbound_number_for_service,
     mock_get_free_sms_fragment_limit,
 ):
@@ -169,7 +169,7 @@ def test_should_show_overview_for_service_with_more_things_set(
         single_reply_to_email_address,
         single_letter_contact_block,
         single_sms_sender,
-        mock_get_organisation,
+        mock_get_email_branding,
         mock_get_service_settings_page_common,
         permissions,
         expected_rows
@@ -589,7 +589,7 @@ def test_route_for_platform_admin_update_service(
         client,
         platform_admin_user,
         service_one,
-        mock_get_letter_organisations,
+        mock_get_letter_email_branding,
         route,
 ):
     mocker.patch('app.service_api_client.archive_service')
@@ -1342,7 +1342,7 @@ def test_set_letter_branding_platform_admin_only(
 def test_set_letter_branding_prepopulates(
     logged_in_platform_admin_client,
     service_one,
-    mock_get_letter_organisations,
+    mock_get_letter_email_branding,
     current_dvla_org_id,
     expected_selected,
 ):
@@ -1358,7 +1358,7 @@ def test_set_letter_branding_saves(
     logged_in_platform_admin_client,
     service_one,
     mock_update_service,
-    mock_get_letter_organisations,
+    mock_get_letter_email_branding,
 ):
     response = logged_in_platform_admin_client.post(
         url_for('main.set_letter_branding', service_id=service_one['id']),
@@ -1372,11 +1372,11 @@ def test_set_letter_branding_saves(
 def test_should_show_branding(
     logged_in_platform_admin_client,
     service_one,
-    mock_get_organisations,
-    mock_get_letter_organisations,
+    mock_get_all_email_branding,
+    mock_get_letter_email_branding,
 ):
     response = logged_in_platform_admin_client.get(url_for(
-        'main.service_set_branding_and_org', service_id=service_one['id']
+        'main.service_set_email_branding', service_id=service_one['id']
     ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -1391,17 +1391,17 @@ def test_should_show_branding(
     assert 'checked' not in page.find('input', attrs={"id": "branding_type-2"}).attrs
     assert 'checked' not in page.find('input', attrs={"id": "branding_type-3"}).attrs
 
-    app.organisations_client.get_organisations.assert_called_once_with()
+    app.email_branding_client.get_all_email_branding.assert_called_once_with()
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
 
 
 def test_should_show_organisations(
     logged_in_platform_admin_client,
     service_one,
-    mock_get_organisations,
+    mock_get_all_email_branding,
 ):
     response = logged_in_platform_admin_client.get(url_for(
-        'main.service_set_branding_and_org', service_id=service_one['id']
+        'main.service_set_email_branding', service_id=service_one['id']
     ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -1416,33 +1416,33 @@ def test_should_show_organisations(
     assert 'checked' not in page.find('input', attrs={"id": "branding_type-2"}).attrs
     assert 'checked' not in page.find('input', attrs={"id": "branding_type-3"}).attrs
 
-    app.organisations_client.get_organisations.assert_called_once_with()
+    app.email_branding_client.get_all_email_branding.assert_called_once_with()
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
 
 
 def test_should_set_branding_and_organisations(
     logged_in_platform_admin_client,
     service_one,
-    mock_get_organisations,
+    mock_get_all_email_branding,
     mock_update_service,
 ):
     response = logged_in_platform_admin_client.post(
         url_for(
-            'main.service_set_branding_and_org', service_id=service_one['id']
+            'main.service_set_email_branding', service_id=service_one['id']
         ),
         data={
             'branding_type': 'org',
-            'organisation': 'organisation-id'
+            'organisation': '1'
         }
     )
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
 
-    mock_get_organisations.assert_called_once_with()
+    mock_get_all_email_branding.assert_called_once_with()
     mock_update_service.assert_called_once_with(
         service_one['id'],
         branding='org',
-        organisation='organisation-id'
+        email_branding=None
     )
 
 
@@ -1873,7 +1873,7 @@ def test_service_settings_when_inbound_number_is_not_set(
     single_letter_contact_block,
     single_sms_sender,
     mocker,
-    mock_get_letter_organisations,
+    mock_get_letter_email_branding,
     mock_get_free_sms_fragment_limit,
 ):
     mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service',
@@ -1890,7 +1890,7 @@ def test_set_inbound_sms_when_inbound_number_is_not_set(
     single_reply_to_email_address,
     single_letter_contact_block,
     mocker,
-    mock_get_letter_organisations,
+    mock_get_letter_email_branding,
 ):
     mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service',
                  return_value={'data': {}})

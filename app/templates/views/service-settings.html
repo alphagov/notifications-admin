@@ -211,14 +211,14 @@
             {% if current_service.branding == 'govuk' %}
               GOV.UK
             {% elif current_service.branding == 'both' %}
-              GOV.UK and {{ organisation.name if organisation else None }}
+              GOV.UK and {{ email_branding.name if email_branding else None }}
             {% elif current_service.branding == 'org' %}
-              Only {{ organisation.name if organisation else None }}
+              Only {{ email_branding.name if email_branding else None }}
             {% elif current_service.branding == 'org_banner' %}
-              Only {{ organisation.name if organisation else None }} banner
+              Only {{ email_branding.name if email_branding else None }} banner
             {% endif %}
           {% endcall %}
-          {{ edit_field('Change', url_for('.service_set_branding_and_org', service_id=current_service.id)) }}
+          {{ edit_field('Change', url_for('.service_set_email_branding', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}
           {{ text_field('Letter branding')}}
