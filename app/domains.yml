@@ -1,9 +1,5 @@
 ---
 # Central and NHS
-gov.uk:
-mod.uk:
-mil.uk:
-ddc-mod.org:
 slc.co.uk:
   owner: Student Loans Company
   agreement_signed: true
@@ -94,10 +90,6 @@ beis.gov.uk:
 education.gsi.gov.uk: education.gov.uk
 education.gov.uk:
   owner: Department for Education
-  agreement_signed: true
-dwp.gsi.gov.uk: dwp.gov.uk
-dwp.gov.uk:
-  owner: Department for Work and Pensions
   agreement_signed: true
 gad.gsi.gov.uk: gad.gov.uk
 gad.gov.uk:
