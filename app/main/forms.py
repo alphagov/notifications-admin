@@ -665,6 +665,11 @@ class ServiceCreateEmailBranding(StripWhitespaceForm):
     file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
 
 
+class CreateOrUpdateOrganisation(StripWhitespaceForm):
+
+    name = StringField('Name', validators=[DataRequired()])
+
+
 class LetterBranding(StripWhitespaceForm):
 
     def __init__(self, choices=[], *args, **kwargs):
