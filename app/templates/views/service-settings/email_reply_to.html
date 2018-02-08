@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/api-key.html" import api_key %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table %}
+{% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
 
 {% block service_page_title %}
   Email reply to addresses
@@ -15,9 +15,11 @@
         Email reply to addresses
       </h1>
     </div>
-	 <div class="column-one-third">
-	   <a href="{{ url_for('.service_add_email_reply_to', service_id=current_service.id) }}" class="button align-with-heading">Add email address</a>
-	 </div>
+  {% if current_user.has_permissions('manage_settings', admin_override=True) %}
+	  <div class="column-one-third">
+	    <a href="{{ url_for('.service_add_email_reply_to', service_id=current_service.id) }}" class="button align-with-heading">Add email address</a>
+	  </div>
+  {% endif %}
   </div>
   <div class="user-list">
     {% if not reply_to_email_addresses %}
@@ -34,11 +36,9 @@
             {% endif %}
           </span>
         </h3>
-        <ul class="tick-cross-list">
-          <li class="tick-cross-list-edit-link">
-            <a href="{{ url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id) }}">Change</a>
-          </li>
-        </ul>
+        {% if current_user.has_permissions('manage_settings', admin_override=True) %}
+          <a class="user-list-edit-link" href="{{ url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id) }}">Change</a>
+        {% endif %}
         {% if reply_to_email_addresses|length  > 1 %}
           {{ api_key(item.id, thing="ID") }}
         {% endif %}

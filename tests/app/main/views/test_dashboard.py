@@ -827,14 +827,12 @@ def test_menu_manage_api_keys(
             api_user_active,
             service_one,
             ['view_activity', 'manage_api_keys'])
-        page = resp.get_data(as_text=True)
-        assert url_for(
-            'main.choose_template',
-            service_id=service_one['id'],
-        ) in page
-        assert url_for('main.manage_users', service_id=service_one['id']) in page
-        assert url_for('main.service_settings', service_id=service_one['id']) not in page
 
+        page = resp.get_data(as_text=True)
+
+        assert url_for('main.choose_template', service_id=service_one['id'],) in page
+        assert url_for('main.manage_users', service_id=service_one['id']) in page
+        assert url_for('main.service_settings', service_id=service_one['id']) in page
         assert url_for('main.api_integration', service_id=service_one['id']) in page
 
 

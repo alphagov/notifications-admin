@@ -1,5 +1,5 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/table.html" import mapping_table, row, text_field, edit_field, field %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
 {% from "components/sub-navigation.html" import sub_navigation %}
 
 {% block per_page_title %}
@@ -81,5 +81,5 @@
 
     <h2 class="heading-medium">Reliable and resilient</h2>
     <p>Notify sends messages through multiple providers. If one provider fails, Notify automatically switches to another so that your messages aren’t affected.</p>
-    
+
 {% endblock %}

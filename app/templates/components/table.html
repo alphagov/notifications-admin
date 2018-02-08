@@ -105,9 +105,11 @@
   {% endcall %}
 {%- endmacro %}
 
-{% macro edit_field(text, link) -%}
+{% macro edit_field(text, link, permissions=[]) -%}
   {% call field(align='right') %}
-    <a href="{{ link }}">{{ text }}</a>
+    {% if current_user.has_permissions(*permissions, **{'any_':True, 'admin_override': True}) or not permissions %}
+      <a href="{{ link }}">{{ text }}</a>
+    {% endif %}
   {% endcall %}
 {%- endmacro %}
 
