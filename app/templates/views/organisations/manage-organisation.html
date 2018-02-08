@@ -2,6 +2,10 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox, colour_textbox %}
 
+{% block per_page_title %}
+  {{ '{} an organisations'.format('Update' if organisation else 'Create')}}
+{% endblock %}
+
 {% block service_page_title %}
   {{ '{} an organisations'.format('Update' if organisation else 'Create')}}
 {% endblock %}
