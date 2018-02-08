@@ -350,21 +350,22 @@ def test_get_valid_government_domain_gets_most_specific_first():
     assert specific.agreement_signed is True
 
 
-@pytest.mark.parametrize('domain', GovernmentDomain.domains.keys())
-def test_validate_government_domain_data(domain):
+def test_validate_government_domain_data():
 
-    government_domain = GovernmentDomain(domain)
+    for domain in GovernmentDomain.domains.keys():
 
-    assert government_domain.crown_status in {
-        True, False, None
-    }
+        government_domain = GovernmentDomain(domain)
 
-    assert (
-        government_domain.owner is None
-    ) or (
-        isinstance(government_domain.owner, str)
-    )
+        assert government_domain.crown_status in {
+            True, False, None
+        }
 
-    assert government_domain.agreement_signed in {
-        True, False, None
-    }
+        assert (
+            government_domain.owner is None
+        ) or (
+            isinstance(government_domain.owner, str)
+        )
+
+        assert government_domain.agreement_signed in {
+            True, False, None
+        }
