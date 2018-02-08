@@ -31,10 +31,30 @@ def test_organisation_page_shows_all_organisations(
     ) == "Organisations"
 
     for index, org in enumerate(orgs):
-        assert (page.select('a.browse-list-link')[index]).text == org['name']
+        assert page.select('a.browse-list-link')[index].text == org['name']
         if not org['active']:
-            assert (page.select_one('.table-field-status-default,heading-medium')).text == '- archived'
+            assert page.select_one('.table-field-status-default,heading-medium').text == '- archived'
     assert normalize_spaces((page.select('a.browse-list-link')[-1]).text) == 'Create an organisation'
+
+
+def test_view_organisation_shows_the_correct_organisation(
+    logged_in_platform_admin_client,
+    fake_uuid,
+    mocker
+):
+    org = {'id': fake_uuid, 'name': 'Test 1', 'active': True}
+    mocker.patch(
+        'app.organisations_client.get_organisation', return_value=org
+    )
+
+    response = logged_in_platform_admin_client.get(
+        url_for('.view_organisation', org_id=fake_uuid)
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert page.select_one('.heading-large div').text == org['name']
 
 
 def test_edit_organisation_shows_the_correct_organisation(

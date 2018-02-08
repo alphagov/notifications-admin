@@ -19,6 +19,18 @@ def organisations():
     )
 
 
+@main.route("/organisation/<org_id>", methods=['GET'])
+@login_required
+@user_has_permissions(admin_override=True)
+def view_organisation(org_id):
+    org = organisations_client.get_organisation(org_id)
+
+    return render_template(
+        'views/organisations/view-organisation.html',
+        organisation=org
+    )
+
+
 @main.route("/organisation/<org_id>/edit", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions(admin_override=True)

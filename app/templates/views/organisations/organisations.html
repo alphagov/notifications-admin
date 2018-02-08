@@ -18,7 +18,7 @@
     <div class="column-three-quarters">
       {% for org in organisations %}
         <div>
-          <a href="{{ url_for('main.update_organisation', org_id=org['id']) }}" class="browse-list-link">{{ org['name'] }}</a>
+          <a href="{{ url_for('main.view_organisation', org_id=org['id']) }}" class="browse-list-link">{{ org['name'] }}</a>
           {% if not org['active'] %}
             <span class="table-field-status-default heading-medium">- archived</span>
           {% endif %}
