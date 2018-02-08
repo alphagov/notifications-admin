@@ -57,3 +57,29 @@
     {% endif %}
   </div>
 {% endmacro %}
+
+{% macro colour_textbox(
+  field,
+  width='2-3',
+  colour='#FFFFFF'
+) %}
+  <div class="form-group{% if field.errors %} form-group-error{% endif %}">
+    <label class="form-label" for="{{ field.name }}">
+      {{ field.label.text }}
+      {% if field.errors %}
+        <span class="error-message" data-module="track-error" data-error-type="{{ field.errors[0] }}" data-error-label="{{ field.name }}">
+          {{ field.errors[0] }}
+        </span>
+      {% endif %}
+    </label>
+    {% set field_class = 'form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else '') %}
+    {% set field_class = 'form-control ' + field_class + (' form-control-error' if field.errors else '') %}
+    {{ field(
+      class=field_class,
+      data_module='',
+      rows='1',
+      **kwargs
+    ) }}
+    <span class="textbox-colour-preview" style="background:{{ colour }}"></span>
+  </div>
+{% endmacro %}

@@ -2246,49 +2246,78 @@ def mock_send_already_registered_email(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_organisations(mocker):
-    def _get_organisations():
+def mock_get_all_email_branding(mocker):
+    def _get_all_email_branding():
         return [
-            {
-                'logo': 'example.png',
-                'name': 'Organisation name',
-                'id': 'organisation-id',
-                'colour': '#f00'
-            }
+            {'id': '1', 'name': 'org 1', 'colour': 'red', 'logo': 'logo1.png'},
+            {'id': '2', 'name': 'org 2', 'colour': 'orange', 'logo': 'logo2.png'},
+            {'id': '3', 'name': None, 'colour': None, 'logo': 'logo3.png'},
+            {'id': '4', 'name': 'org 4', 'colour': None, 'logo': 'logo4.png'},
+            {'id': '5', 'name': None, 'colour': 'blue', 'logo': 'logo5.png'},
         ]
 
     return mocker.patch(
-        'app.organisations_client.get_organisations', side_effect=_get_organisations
+        'app.email_branding_client.get_all_email_branding', side_effect=_get_all_email_branding
     )
 
 
 @pytest.fixture(scope='function')
-def mock_get_letter_organisations(mocker):
-    def _get_organisations():
+def mock_get_letter_email_branding(mocker):
+    def _get_letter_email_branding():
         return {
             '001': 'HM Government',
             '500': 'Land Registry',
         }
 
     return mocker.patch(
-        'app.organisations_client.get_letter_organisations', side_effect=_get_organisations
+        'app.email_branding_client.get_letter_email_branding', side_effect=_get_letter_email_branding
     )
 
 
 @pytest.fixture(scope='function')
-def mock_get_organisation(mocker):
-    def _get_organisation(id):
+def mock_no_email_branding(mocker):
+    def _get_email_branding():
+        return []
+
+    return mocker.patch(
+        'app.email_branding_client.get_letter_email_branding', side_effect=_get_email_branding
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_email_branding(mocker, fake_uuid):
+    def _get_email_branding(id):
         return {
-            'organisation': {
+            'email_branding': {
                 'logo': 'example.png',
                 'name': 'Organisation name',
-                'id': 'organisation-id',
+                'id': fake_uuid,
                 'colour': '#f00'
             }
         }
 
     return mocker.patch(
-        'app.organisations_client.get_organisation', side_effect=_get_organisation
+        'app.email_branding_client.get_email_branding', side_effect=_get_email_branding
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_create_email_branding(mocker):
+    def _create_email_branding(logo, name, colour):
+        return
+
+    return mocker.patch(
+        'app.email_branding_client.create_email_branding', side_effect=_create_email_branding
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_update_email_branding(mocker):
+    def _update_email_branding(branding_id, logo, name, colour):
+        return
+
+    return mocker.patch(
+        'app.email_branding_client.update_email_branding', side_effect=_update_email_branding
     )
 
 

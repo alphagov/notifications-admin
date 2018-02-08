@@ -598,52 +598,70 @@ class ServiceSwitchLettersForm(StripWhitespaceForm):
     )
 
 
-class ServiceBrandingOrg(StripWhitespaceForm):
+class ServiceSetBranding(StripWhitespaceForm):
 
-    def __init__(self, organisations=[], *args, **kwargs):
-        self.organisation.choices = organisations
-        super(ServiceBrandingOrg, self).__init__(*args, **kwargs)
+    def __init__(self, email_branding=[], *args, **kwargs):
+        self.branding_style.choices = email_branding
+        super(ServiceSetBranding, self).__init__(*args, **kwargs)
 
     branding_type = RadioField(
-        'Branding',
+        'Branding type',
         choices=[
             ('govuk', 'GOV.UK only'),
-            ('both', 'GOV.UK and organisation'),
-            ('org', 'Organisation only'),
-            ('org_banner', 'Organisation banner')
+            ('both', 'GOV.UK and branding'),
+            ('org', 'Branding only'),
+            ('org_banner', 'Branding banner')
         ],
         validators=[
             DataRequired()
         ]
     )
 
-    organisation = RadioField(
-        'Organisation',
+    branding_style = RadioField(
+        'Branding style',
         validators=[
             DataRequired()
         ]
     )
 
 
-class ServiceSelectOrg(StripWhitespaceForm):
+class ServiceSelectEmailBranding(StripWhitespaceForm):
 
-    def __init__(self, organisations=[], *args, **kwargs):
-        self.organisation.choices = organisations
-        super(ServiceSelectOrg, self).__init__(*args, **kwargs)
+    def __init__(self, email_brandings=[], *args, **kwargs):
+        self.email_branding.choices = email_brandings
+        super(ServiceSelectEmailBranding, self).__init__(*args, **kwargs)
 
-    organisation = RadioField(
-        'Organisation',
+    email_branding = RadioField(
+        'Email branding',
         validators=[
             DataRequired()
         ]
     )
 
 
-class ServiceManageOrg(StripWhitespaceForm):
+class ServiceUpdateEmailBranding(StripWhitespaceForm):
 
     name = StringField('Name')
+    colour = StringField(
+        'Colour',
+        render_kw={'onchange': 'update_colour(this)'},
+        validators=[
+            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')
+        ]
+    )
+    file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
 
-    colour = StringField('Colour', render_kw={'onkeyup': 'update_colour_span()', 'onblur': 'update_colour_span()'})
+
+class ServiceCreateEmailBranding(StripWhitespaceForm):
+
+    name = StringField('Name')
+    colour = StringField(
+        'Colour',
+        render_kw={'onchange': 'update_colour(this)'},
+        validators=[
+            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')
+        ]
+    )
     file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
 
 

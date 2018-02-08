@@ -28,7 +28,7 @@ from app.main.views import (  # noqa
     providers,
     platform_admin,
     letter_jobs,
-    organisations,
+    email_branding,
     conversation,
     notifications,
     inbound_number

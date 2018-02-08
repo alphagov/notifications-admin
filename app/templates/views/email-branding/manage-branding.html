@@ -1,0 +1,45 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/textbox.html" import textbox, colour_textbox %}
+
+{% block service_page_title %}
+  {{ '{} email branding'.format('Update' if email_branding else 'Create')}}
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-large">{{ '{} email branding'.format('Update' if email_branding else 'Create')}}</h1>
+  <div class="grid-row">
+    <div class="column-three-quarters">
+
+      {% if logo %}
+        <div id="logo-img">
+          <img src="https://{{ cdn_url }}/{{ logo }}"/>
+        </div>
+      {% endif %}
+      {{ file_upload(form.file, button_text='{} logo'.format('Update' if email_branding else 'Upload')) }}
+      <form method="post">
+        <div class="form-group">
+          <div style='margin-top:15px;'>{{textbox(form.name)}}</div>
+          {{colour_textbox(form.colour, width='1-4', colour=email_branding.colour if email_branding)}}
+          {{ page_footer(
+            'Save',
+            back_link=url_for('.email_branding'),
+            back_link_text='Back to email branding selection',
+          ) }}
+        </div>
+      </form>
+    </div>
+  </div>
+  <script type="text/javascript">
+    function update_colour(element){
+      colour_preview = document.getElementsByClassName("textbox-colour-preview")[0];
+      if (element.value.match(/^#[0-9A-F]{6}$/i)) {
+        colour_preview.style.background = element.value;
+      } else {
+        colour_preview.style.background = '#FFFFFF';
+      }
+    }
+  </script>
+{% endblock %}
