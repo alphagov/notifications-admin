@@ -56,10 +56,10 @@ def update_organisation(org_id):
     )
 
 
-@main.route("/organisations/create", methods=['GET', 'POST'])
+@main.route("/organisations/add", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions(admin_override=True)
-def create_organisation():
+def add_organisation():
     form = CreateOrUpdateOrganisation()
 
     if form.validate_on_submit():

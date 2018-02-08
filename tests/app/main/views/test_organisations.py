@@ -89,7 +89,7 @@ def test_create_new_organisation(
     org = {'name': 'new name'}
 
     logged_in_platform_admin_client.post(
-        url_for('.create_organisation'),
+        url_for('.add_organisation'),
         content_type='multipart/form-data',
         data=org
     )
