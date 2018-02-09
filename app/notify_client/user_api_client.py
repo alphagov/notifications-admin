@@ -16,9 +16,8 @@ class UserApiClient(NotifyAdminAPIClient):
         super().__init__("a" * 73, "b")
 
     def init_app(self, app):
-        self.base_url = app.config['API_HOST_NAME']
-        self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
-        self.api_key = app.config['ADMIN_CLIENT_SECRET']
+        super().init_app(app)
+
         self.max_failed_login_count = app.config["MAX_FAILED_LOGIN_COUNT"]
         self.admin_url = app.config['ADMIN_BASE_URL']
 

@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pytest
 import werkzeug
 from tests import service_json
-from tests.conftest import api_user_active, platform_admin_user
+from tests.conftest import api_user_active, platform_admin_user, set_config
 
 from app.notify_client import NotifyAdminAPIClient
 
@@ -76,23 +76,29 @@ def test_inactive_service_can_be_modified_by_platform_admin(app_, platform_admin
     assert ret == request.return_value
 
 
-def test_generate_headers_sets_standard_headers():
+def test_generate_headers_sets_standard_headers(app_):
     api_client = NotifyAdminAPIClient(SAMPLE_API_KEY, 'base_url')
+    with set_config(app_, 'ROUTE_SECRET_KEY_1', 'proxy-secret'):
+        api_client.init_app(app_)
 
     # with patch('app.notify_client.has_request_context', return_value=False):
     headers = api_client.generate_headers('api_token')
 
-    assert set(headers.keys()) == {'Authorization', 'Content-type', 'User-agent'}
+    assert set(headers.keys()) == {'Authorization', 'Content-type', 'User-agent', 'X-Custom-Forwarder'}
     assert headers['Authorization'] == 'Bearer api_token'
     assert headers['Content-type'] == 'application/json'
     assert headers['User-agent'].startswith('NOTIFY-API-PYTHON-CLIENT')
+    assert headers['X-Custom-Forwarder'] == 'proxy-secret'
 
 
 def test_generate_headers_sets_request_id_if_in_request_context(app_):
     api_client = NotifyAdminAPIClient(SAMPLE_API_KEY, 'base_url')
+    api_client.init_app(app_)
 
     with app_.test_request_context() as request_context:
         headers = api_client.generate_headers('api_token')
 
-    assert set(headers.keys()) == {'Authorization', 'Content-type', 'User-agent', 'NotifyRequestID'}
+    assert set(headers.keys()) == {
+        'Authorization', 'Content-type', 'User-agent', 'X-Custom-Forwarder', 'NotifyRequestID'
+    }
     assert headers['NotifyRequestID'] == request_context.request.request_id
