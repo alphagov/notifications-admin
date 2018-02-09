@@ -20,6 +20,7 @@ class UserApiClient(NotifyAdminAPIClient):
         self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
         self.api_key = app.config['ADMIN_CLIENT_SECRET']
         self.max_failed_login_count = app.config["MAX_FAILED_LOGIN_COUNT"]
+        self.admin_url = app.config['ADMIN_BASE_URL']
 
     def register_user(self, name, email_address, mobile_number, password, auth_type):
         data = {
@@ -93,6 +94,8 @@ class UserApiClient(NotifyAdminAPIClient):
         data = {'to': to}
         if next_string:
             data['next'] = next_string
+        if code_type == 'email':
+            data['email_auth_link_host'] = self.admin_url
         endpoint = '/user/{0}/{1}-code'.format(user_id, code_type)
         self.post(endpoint, data=data)
 

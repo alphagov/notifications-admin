@@ -1,5 +1,6 @@
 import pytest
 
+from app import user_api_client
 from app.notify_client.user_api_client import UserApiClient
 
 
@@ -52,3 +53,21 @@ def test_client_doesnt_activate_if_already_active(mocker, api_user_active):
     client.activate_user(api_user_active)
 
     assert not mock_post.called
+
+
+def test_client_passes_admin_url_when_sending_email_auth(
+    app_,
+    mocker,
+    fake_uuid,
+):
+    mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post')
+
+    user_api_client.send_verify_code(fake_uuid, 'email', 'ignored@example.com')
+
+    mock_post.assert_called_once_with(
+        '/user/{}/email-code'.format(fake_uuid),
+        data={
+            'to': 'ignored@example.com',
+            'email_auth_link_host': 'http://localhost:6012',
+        }
+    )
