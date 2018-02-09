@@ -3,29 +3,22 @@
 {% from "components/textbox.html" import textbox, colour_textbox %}
 
 {% block per_page_title %}
-  {{ '{} an organisations'.format('Update' if organisation else 'Create')}}
+  {{ '{} an organisation'.format('Update' if organisation else 'Create')}}
 {% endblock %}
 
 {% block service_page_title %}
-  {{ '{} an organisations'.format('Update' if organisation else 'Create')}}
+  {{ '{} an organisation'.format('Update' if organisation else 'Create')}}
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-large">{{ '{} an organisation'.format('Update' if organisation else 'Create')}}</h1>
-  <div class="grid-row">
-    <div class="column-three-quarters">
-
-      <form method="post">
-        <div class="form-group">
-          <div style='margin-top:15px;'>{{textbox(form.name)}}</div>
-          {{ page_footer(
-            'Save',
-            back_link=url_for('.organisations'),
-            back_link_text='Back to organisations',
-          ) }}
-        </div>
-      </form>
-    </div>
-  </div>
+  <form method="post">
+      {{textbox(form.name)}}
+      {{ page_footer(
+        'Save',
+        back_link=url_for('.organisations'),
+        back_link_text='Back to organisations',
+      ) }}
+  </form>
 {% endblock %}

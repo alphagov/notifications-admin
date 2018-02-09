@@ -2,31 +2,32 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block per_page_title %}
-  Show organisations
+  Organisations
 {% endblock %}
 
 {% block service_page_title %}
-  Show organisations
+  Organisations
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-large">
-    <div>Organisations</div>
+    Organisations
   </h1>
-  <div class="grid-row">
-    <div class="column-three-quarters">
+  <nav class="browse-list">
+      <ul>
       {% for org in organisations %}
-        <div>
+        <li class="browse-list-item">
           <a href="{{ url_for('main.view_organisation', org_id=org['id']) }}" class="browse-list-link">{{ org['name'] }}</a>
           {% if not org['active'] %}
             <span class="table-field-status-default heading-medium">- archived</span>
           {% endif %}
-        </div>
+        </li>
       {% endfor %}
-        <br/>
-        <div><a href="{{ url_for('main.add_organisation') }}" class="browse-list-link">Create an organisation</a></div>
-    </div>
+      </ul>
+  </nav>
+  <div>
+    <a href="{{ url_for('main.add_organisation') }}" class="browse-list-link">Create an organisation</a>
   </div>
 
 {% endblock %}
