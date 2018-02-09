@@ -117,6 +117,7 @@ def test_process_email_auth_sign_in_return_2fa_template(
             'password': 'val1dPassw0rd!'})
     assert response.status_code == 302
     assert response.location == url_for('.two_factor_email_sent', _external=True)
+    mock_send_verify_code.assert_called_with(api_user_active_email_auth.id, 'email', None)
     mock_verify_password.assert_called_with(api_user_active_email_auth.id, 'val1dPassw0rd!')
 
 
