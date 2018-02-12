@@ -14,7 +14,7 @@ pytz==2017.3
 gunicorn==19.7.1
 whitenoise==3.3.1  #manages static assets
 eventlet==0.22
-notifications-python-client==4.7.1
+notifications-python-client==4.7.2
 
 # PaaS
 awscli==1.14.22
