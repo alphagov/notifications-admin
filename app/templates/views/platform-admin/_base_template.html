@@ -11,10 +11,11 @@
         Platform admin
       </p>
       <nav class="navigation">
-        {% for link_text, url in [
+          {% for link_text, url in [
           ('Summary', url_for('main.platform_admin')),
           ('Live services', url_for('main.live_services')),
           ('Trial mode services', url_for('main.trial_services')),
+          ('Organisations', url_for('main.organisations')),
           ('Providers', url_for('main.view_providers')),
           ('Email branding', url_for('main.email_branding')),
           ('Letter jobs', url_for('main.letter_jobs')),

@@ -30,6 +30,7 @@ from app.main.views import (  # noqa
     letter_jobs,
     email_branding,
     conversation,
+    organisations,
     notifications,
     inbound_number
 )
