@@ -54,7 +54,7 @@ def test_view_organisation_shows_the_correct_organisation(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert page.select_one('.heading-large div').text == org['name']
+    assert normalize_spaces(page.select_one('.heading-large').text) == org['name']
 
 
 def test_edit_organisation_shows_the_correct_organisation(

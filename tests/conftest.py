@@ -2631,3 +2631,62 @@ def mock_update_service_callback_api(mocker):
         return
 
     return mocker.patch('app.service_api_client.update_service_callback_api', side_effect=_update_service_callback_api)
+
+
+@pytest.fixture(scope='function')
+def mock_get_organisations(mocker):
+    def _get_organisations():
+        return [
+            {
+                'name': 'Org 1',
+                'id': '7aa5d4e9-4385-4488-a489-07812ba13383',
+                'active': True
+            },
+            {
+                'name': 'Org 2',
+                'id': '7aa5d4e9-4385-4488-a489-07812ba13384',
+                'active': True
+            },
+            {
+                'name': 'Org 3',
+                'id': '7aa5d4e9-4385-4488-a489-07812ba13385',
+                'active': True
+            }
+        ]
+
+    return mocker.patch('app.organisations_client.get_organisations', side_effect=_get_organisations)
+
+
+@pytest.fixture(scope='function')
+def mock_get_organisation(mocker):
+    def _get_organisation(organisation_id):
+        return {
+            'name': 'Org 1',
+            'id': organisation_id,
+            'active': True
+        }
+
+    return mocker.patch('app.organisations_client.get_organisation', side_effect=_get_organisation)
+
+
+@pytest.fixture(scope='function')
+def mock_get_service_organisation(mocker):
+    def _get_service_organisation(service_id):
+        return {
+            'name': 'Org 1',
+            'id': '7aa5d4e9-4385-4488-a489-07812ba13383',
+            'active': True
+        }
+
+    return mocker.patch('app.organisations_client.get_service_organisation', side_effect=_get_service_organisation)
+
+
+@pytest.fixture(scope='function')
+def mock_update_service_organisation(mocker):
+    def _update_service_organisation(service_id, organisation_id):
+        return
+
+    return mocker.patch(
+        'app.organisations_client.update_service_organisation',
+        side_effect=_update_service_organisation
+    )

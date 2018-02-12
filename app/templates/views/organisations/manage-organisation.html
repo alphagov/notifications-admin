@@ -14,11 +14,12 @@
 
   <h1 class="heading-large">{{ '{} an organisation'.format('Update' if organisation else 'Create')}}</h1>
   <form method="post">
-      {{textbox(form.name)}}
-      {{ page_footer(
-        'Save',
-        back_link=url_for('.organisations'),
-        back_link_text='Back to organisations',
-      ) }}
+    {{textbox(form.name)}}
+    {{ page_footer(
+      'Save',
+      back_link=url_for('.organisations'),
+      back_link_text='Back to organisations',
+    ) }}
   </form>
+
 {% endblock %}

@@ -17,7 +17,6 @@ from notifications_utils.field import Field
 from notifications_utils.clients import DeskproError
 from notifications_python_client.errors import HTTPError
 
-from app import service_api_client, deskpro_client
 from app.main import main
 from app.utils import user_has_permissions, email_safe, get_cdn_domain
 from app.main.forms import (
@@ -36,8 +35,18 @@ from app.main.forms import (
     ServiceEditInboundNumberForm,
     SMSPrefixForm,
     ServiceSwitchLettersForm,
+    LinkOrganisationsForm,
 )
-from app import user_api_client, current_service, email_branding_client, inbound_number_client, billing_api_client
+from app import (
+    service_api_client,
+    deskpro_client,
+    user_api_client,
+    current_service,
+    email_branding_client,
+    inbound_number_client,
+    billing_api_client,
+    organisations_client,
+)
 from notifications_utils.formatters import formatted_list
 
 
@@ -46,6 +55,8 @@ from notifications_utils.formatters import formatted_list
 @user_has_permissions('manage_settings', 'manage_api_keys', admin_override=True, any_=True)
 def service_settings(service_id):
     letter_branding_organisations = email_branding_client.get_letter_email_branding()
+    organisation = organisations_client.get_service_organisation(service_id).get('name', None)
+
     if current_service['email_branding']:
         email_branding = email_branding_client.get_email_branding(current_service['email_branding'])['email_branding']
     else:
@@ -87,6 +98,7 @@ def service_settings(service_id):
         sms_sender_count=sms_sender_count,
         free_sms_fragment_limit=free_sms_fragment_limit,
         prefix_sms=current_service['prefix_sms'],
+        organisation=organisation,
     )
 
 
@@ -762,6 +774,33 @@ def set_letter_branding(service_id):
     )
 
 
+@main.route("/services/<service_id>/service-settings/link-service-to-organisation", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions(admin_override=True)
+def link_service_to_organisation(service_id):
+
+    organisations = organisations_client.get_organisations()
+    current_organisation = organisations_client.get_service_organisation(service_id).get('id', None)
+
+    form = LinkOrganisationsForm(
+        choices=convert_dictionary_to_wtforms_choices_format(organisations, 'id', 'name'),
+        organisations=current_organisation
+    )
+
+    if form.validate_on_submit():
+        if form.organisations.data != current_organisation:
+            organisations_client.update_service_organisation(
+                service_id,
+                form.organisations.data
+            )
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/link-service-to-organisation.html',
+        form=form,
+    )
+
+
 def get_branding_as_value_and_label(email_branding):
     return [
         (branding['id'], branding['name'])
@@ -776,3 +815,9 @@ def get_branding_as_dict(email_branding):
             'colour': branding['colour']
         } for branding in email_branding
     }
+
+
+def convert_dictionary_to_wtforms_choices_format(dictionary, value, label):
+    return [
+        (item[value], item[label]) for item in dictionary
+    ]

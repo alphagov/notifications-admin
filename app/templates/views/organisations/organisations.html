@@ -15,7 +15,7 @@
     Organisations
   </h1>
   <nav class="browse-list">
-      <ul>
+    <ul>
       {% for org in organisations %}
         <li class="browse-list-item">
           <a href="{{ url_for('main.view_organisation', org_id=org['id']) }}" class="browse-list-link">{{ org['name'] }}</a>
@@ -24,7 +24,7 @@
           {% endif %}
         </li>
       {% endfor %}
-      </ul>
+    </ul>
   </nav>
   <div>
     <a href="{{ url_for('main.add_organisation') }}" class="browse-list-link">Create an organisation</a>
