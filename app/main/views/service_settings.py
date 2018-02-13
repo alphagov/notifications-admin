@@ -100,7 +100,7 @@ def service_name_change(service_id):
         form.name.data = current_service.get('name')
 
     if form.validate_on_submit():
-        unique_name = service_api_client.is_service_name_unique(form.name.data, email_safe(form.name.data))
+        unique_name = service_api_client.is_service_name_unique(service_id, form.name.data, email_safe(form.name.data))
         if not unique_name:
             form.name.errors.append("This service name is already in use")
             return render_template('views/service-settings/name.html', form=form)

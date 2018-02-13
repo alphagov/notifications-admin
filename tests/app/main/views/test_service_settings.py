@@ -357,7 +357,7 @@ def test_should_not_allow_duplicate_names(
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
     assert 'This service name is already in use' in resp_data
-    app.service_api_client.is_service_name_unique.assert_called_once_with('SErvICE TWO', 'service.two')
+    app.service_api_client.is_service_name_unique.assert_called_once_with(service_id, 'SErvICE TWO', 'service.two')
 
 
 def test_should_show_service_name_confirmation(
