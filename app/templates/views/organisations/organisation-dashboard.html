@@ -1,17 +1,17 @@
 {% extends "org_template.html" %}
 
 {% block per_page_title %}
-  {{ organisation['name'] }}
+  {{ current_org.name }}
 {% endblock %}
 
 {% block service_page_title %}
-  {{ organisation['name'] }}
+  {{ current_org.name }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    {{ organisation['name'] }}
+    {{ current_org.name }}
   </h1>
   <ul>
   {% for service in organisation_services %}

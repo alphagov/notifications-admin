@@ -142,6 +142,7 @@ def init_app(application):
     application.after_request(useful_headers_after_request)
     application.after_request(save_service_after_request)
     application.before_request(load_service_before_request)
+    application.before_request(load_organisation_before_request)
     application.before_request(request_helper.check_proxy_header_before_request)
 
     @application.before_request
@@ -399,6 +400,29 @@ def load_service_before_request():
                 _request_ctx_stack.top.service = service_api_client.get_service(service_id)['data']
             except HTTPError as exc:
                 # if service id isn't real, then 404 rather than 500ing later because we expect service to be set
+                if exc.status_code == 404:
+                    abort(404)
+                else:
+                    raise
+
+
+def load_organisation_before_request():
+    if '/static/' in request.url:
+        _request_ctx_stack.top.organisation = None
+        return
+    if _request_ctx_stack.top is not None:
+        _request_ctx_stack.top.organisation = None
+
+        if request.view_args:
+            org_id = request.view_args.get('org_id', session.get('org_id'))
+        else:
+            org_id = session.get('org_id')
+
+        if org_id:
+            try:
+                _request_ctx_stack.top.organisation = organisations_client.get_organisation(org_id)
+            except HTTPError as exc:
+                # if org id isn't real, then 404 rather than 500ing later because we expect org to be set
                 if exc.status_code == 404:
                     abort(404)
                 else:

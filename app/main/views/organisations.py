@@ -23,12 +23,10 @@ def organisations():
 @login_required
 @user_has_permissions(admin_override=True)
 def organisation_dashboard(org_id):
-    org = organisations_client.get_organisation(org_id)
     organisation_services = organisations_client.get_organisation_services(org_id)
 
     return render_template(
         'views/organisations/organisation-dashboard.html',
-        organisation=org,
         organisation_services=organisation_services
     )
 
