@@ -430,7 +430,6 @@ def useful_headers_after_request(response):
 
 def register_errorhandlers(application):  # noqa (C901 too complex)
     def _error_response(error_code):
-        application.logger.exception('Admin app errored with %s', error_code)
         resp = make_response(render_template("error/{0}.html".format(error_code)), error_code)
         return useful_headers_after_request(resp)
 
@@ -469,19 +468,6 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
     def handle_no_permissions(error):
         return _error_response(401)
 
-    @application.errorhandler(500)
-    def handle_exception(error):
-        if current_app.config.get('DEBUG', None):
-            raise error
-        return _error_response(500)
-
-    @application.errorhandler(Exception)
-    def handle_bad_request(error):
-        # We want the Flask in browser stacktrace
-        if current_app.config.get('DEBUG', None):
-            raise error
-        return _error_response(500)
-
     @application.errorhandler(BadSignature)
     def handle_bad_token(error):
         # if someone has a malformed token
@@ -508,6 +494,15 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             message=['Something went wrong, please go back and try again.']
         ), 400)
         return useful_headers_after_request(resp)
+
+    @application.errorhandler(500)
+    @application.errorhandler(Exception)
+    def handle_bad_request(error):
+        current_app.logger.exception(error)
+        # We want the Flask in browser stacktrace
+        if current_app.config.get('DEBUG', None):
+            raise error
+        return _error_response(500)
 
 
 def setup_event_handlers():
