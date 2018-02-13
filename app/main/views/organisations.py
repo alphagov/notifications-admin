@@ -19,15 +19,17 @@ def organisations():
     )
 
 
-@main.route("/organisation/<org_id>", methods=['GET'])
+@main.route("/organisation/<org_id>/dashboard", methods=['GET'])
 @login_required
 @user_has_permissions(admin_override=True)
-def view_organisation(org_id):
+def organisation_dashboard(org_id):
     org = organisations_client.get_organisation(org_id)
+    organisation_services = organisations_client.get_organisation_services(org_id)
 
     return render_template(
-        'views/organisations/view-organisation.html',
-        organisation=org
+        'views/organisations/organisation-dashboard.html',
+        organisation=org,
+        organisation_services=organisation_services
     )
 
 

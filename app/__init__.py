@@ -84,6 +84,8 @@ billing_api_client = BillingAPIClient()
 # The current service attached to the request stack.
 current_service = LocalProxy(partial(_lookup_req_object, 'service'))
 
+# The current organisation attached to the request stack.
+current_organisation = LocalProxy(partial(_lookup_req_object, 'organisation'))
 
 def create_app(application):
     setup_commands(application)
@@ -155,6 +157,10 @@ def init_app(application):
     @application.context_processor
     def _attach_current_service():
         return {'current_service': current_service}
+
+    @application.context_processor
+    def _attach_current_organisation():
+        return {'current_org': current_organisation}
 
     @application.context_processor
     def _attach_current_user():

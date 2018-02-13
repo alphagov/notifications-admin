@@ -1,0 +1,24 @@
+{% extends "org_template.html" %}
+
+{% block per_page_title %}
+  {{ organisation['name'] }}
+{% endblock %}
+
+{% block service_page_title %}
+  {{ organisation['name'] }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    {{ organisation['name'] }}
+  </h1>
+  <ul>
+  {% for service in organisation_services %}
+    <li class="browse-list-item">
+      <a href="{{ url_for('main.service_dashboard', service_id=service['id']) }}" class="browse-list-link">{{ service['name'] }}</a>
+    </li>
+  {% endfor %}
+  </ul>
+
+{% endblock %}
