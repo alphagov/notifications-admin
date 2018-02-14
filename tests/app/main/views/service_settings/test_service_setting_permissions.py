@@ -37,12 +37,6 @@ def get_service_settings_page(
 
     ({'permissions': ['sms']}, '.service_set_inbound_number', {'set_inbound_sms': True}, 'Allow inbound sms'),
 
-    (
-        {'permissions': ['letter', 'letters_as_pdf']},
-        '.service_switch_send_letters_as_pdf', {}, 'Stop sending letters as PDF'
-    ),
-    ({'permissions': ['letter']}, '.service_switch_send_letters_as_pdf', {}, 'Send letters as PDF'),
-
     ({'active': True}, '.archive_service', {}, 'Archive service'),
     ({'active': True}, '.suspend_service', {}, 'Suspend service'),
     ({'active': False}, '.resume_service', {}, 'Resume service'),

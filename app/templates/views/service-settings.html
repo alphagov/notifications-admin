@@ -310,13 +310,6 @@
             {{ 'Stop sending emails' if 'email' in current_service.permissions else 'Allow to send emails' }}
           </a>
         </li>
-        {% if 'letter' in current_service.permissions %}
-          <li class="bottom-gutter">
-            <a href="{{ url_for('.service_switch_send_letters_as_pdf', service_id=current_service.id) }}" class="button">
-              {{ 'Stop sending letters as PDF' if 'letters_as_pdf' in current_service.permissions else 'Send letters as PDF' }}
-            </a>
-          </li>
-        {% endif %}
         <li class="bottom-gutter">
           <a href="{{ url_for('.service_switch_can_send_sms', service_id=current_service.id) }}" class="button">
             {{ 'Stop sending sms' if 'sms' in current_service.permissions else 'Allow to send sms' }}
