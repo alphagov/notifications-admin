@@ -42,6 +42,19 @@ stub_template_stats = [
 ]
 
 
+def test_redirect_from_old_dashboard(
+    logged_in_client
+):
+
+    expected_location = 'http://localhost/services/{}'.format(SERVICE_ONE_ID)
+
+    response = logged_in_client.get('/services/{}/dashboard'.format(SERVICE_ONE_ID))
+
+    assert response.status_code == 302
+    assert response.location == expected_location
+    assert expected_location == url_for('main.service_dashboard', service_id=SERVICE_ONE_ID, _external=True)
+
+
 def test_get_started(
     logged_in_client,
     mocker,
