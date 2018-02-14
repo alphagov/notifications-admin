@@ -26,7 +26,7 @@ from wtforms import (
     DateField,
 )
 from wtforms.fields.html5 import EmailField, TelField, SearchField
-from wtforms.validators import (DataRequired, Email, Length, Regexp, Optional)
+from wtforms.validators import (DataRequired, Length, Regexp, Optional)
 from flask_wtf.file import FileField as FileField_wtf, FileAllowed
 
 from app.main.validators import (
@@ -36,6 +36,7 @@ from app.main.validators import (
     NoCommasInPlaceHolders,
     OnlyGSMCharacters,
     LettersNumbersAndFullStopsOnly,
+    ValidEmail
 )
 
 
@@ -98,7 +99,7 @@ def email_address(label='Email address', gov_user=True):
     validators = [
         Length(min=5, max=255),
         DataRequired(message='Can’t be empty'),
-        Email(message='Enter a valid email address')
+        ValidEmail()
     ]
 
     if gov_user:
@@ -196,7 +197,7 @@ class LoginForm(StripWhitespaceForm):
     email_address = StringField('Email address', validators=[
         Length(min=5, max=255),
         DataRequired(message='Can’t be empty'),
-        Email(message='Enter a valid email address')
+        ValidEmail()
     ])
     password = PasswordField('Password', validators=[
         DataRequired(message='Enter your password')
@@ -707,7 +708,7 @@ class Whitelist(StripWhitespaceForm):
             '',
             validators=[
                 Optional(),
-                Email(message='Enter valid email addresses')
+                ValidEmail()
             ],
             default=''
         ),
