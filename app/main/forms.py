@@ -885,3 +885,17 @@ class SetTemplateSenderForm(StripWhitespaceForm):
         self.sender.label.text = 'Select your sender'
 
     sender = RadioField()
+
+
+class LinkOrganisationsForm(StripWhitespaceForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.organisations.choices = kwargs['choices']
+
+    organisations = RadioField(
+        'Select an organisation',
+        validators=[
+            DataRequired()
+        ]
+    )

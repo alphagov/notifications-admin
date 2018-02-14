@@ -83,6 +83,7 @@ def mock_get_service_settings_page_common(
         'Send letters Off Change',
 
         'Label Value Action',
+        'Organisation Org 1 Change',
         'Organisation type Central Change',
         'Free text message allowance 250,000 Change',
         'Email branding GOV.UK Change',
@@ -97,6 +98,7 @@ def test_should_show_overview(
         fake_uuid,
         no_reply_to_email_addresses,
         no_letter_contact_blocks,
+        mock_get_service_organisation,
         single_sms_sender,
         user,
         expected_rows,
@@ -169,6 +171,7 @@ def test_should_show_overview_for_service_with_more_things_set(
         single_reply_to_email_address,
         single_letter_contact_block,
         single_sms_sender,
+        mock_get_service_organisation,
         mock_get_email_branding,
         mock_get_service_settings_page_common,
         permissions,
@@ -201,6 +204,7 @@ def test_letter_contact_block_shows_none_if_not_set(
         mocker,
         single_reply_to_email_address,
         no_letter_contact_blocks,
+        mock_get_service_organisation,
         single_sms_sender,
         mock_get_service_settings_page_common,
 ):
@@ -221,6 +225,7 @@ def test_escapes_letter_contact_block(
         mocker,
         single_reply_to_email_address,
         single_sms_sender,
+        mock_get_service_organisation,
         injected_letter_contact_block,
         mock_get_service_settings_page_common,
 ):
@@ -281,6 +286,7 @@ def test_show_restricted_service(
         service_one,
         single_reply_to_email_address,
         single_letter_contact_block,
+        mock_get_service_organisation,
         single_sms_sender,
         mock_get_service_settings_page_common,
 ):
@@ -315,6 +321,7 @@ def test_show_live_service(
         mock_get_live_service,
         single_reply_to_email_address,
         single_letter_contact_block,
+        mock_get_service_organisation,
         single_sms_sender,
         mock_get_service_settings_page_common,
 ):
@@ -449,6 +456,7 @@ def test_should_redirect_after_request_to_go_live(
     active_user_with_permissions,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
@@ -508,6 +516,7 @@ def test_route_permissions(
         service_one,
         single_reply_to_email_address,
         single_letter_contact_block,
+        mock_get_service_organisation,
         single_sms_sender,
         route,
         mock_get_service_settings_page_common,
@@ -565,6 +574,7 @@ def test_route_for_platform_admin(
         service_one,
         single_reply_to_email_address,
         single_letter_contact_block,
+        mock_get_service_organisation,
         single_sms_sender,
         route,
         mock_get_service_settings_page_common,
@@ -635,6 +645,7 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         service_one,
         multiple_reply_to_email_addresses,
         multiple_letter_contact_blocks,
+        mock_get_service_organisation,
         multiple_sms_senders,
         mock_get_service_settings_page_common,
 ):
@@ -664,6 +675,7 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
     client_request,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     single_sms_sender,
     sender_list_page,
     expected_output
@@ -1218,6 +1230,7 @@ def test_shows_research_mode_indicator(
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -1237,6 +1250,7 @@ def test_does_not_show_research_mode_indicator(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -1684,6 +1698,7 @@ def test_archive_service_prompts_user(
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -1702,6 +1717,7 @@ def test_cant_archive_inactive_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
@@ -1735,6 +1751,7 @@ def test_suspend_service_prompts_user(
     mocker,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -1754,6 +1771,7 @@ def test_cant_suspend_inactive_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
@@ -1771,6 +1789,7 @@ def test_resume_service_after_confirm(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     mocker,
     mock_get_inbound_number_for_service,
 ):
@@ -1789,6 +1808,7 @@ def test_resume_service_prompts_user(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     single_sms_sender,
     mocker,
     mock_get_service_settings_page_common,
@@ -1810,6 +1830,7 @@ def test_cant_resume_active_service(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
@@ -1871,6 +1892,7 @@ def test_service_settings_when_inbound_number_is_not_set(
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
+    mock_get_service_organisation,
     single_sms_sender,
     mocker,
     mock_get_letter_email_branding,
@@ -1993,3 +2015,58 @@ def test_updates_sms_prefixing(
         service_id=SERVICE_ONE_ID,
         prefix_sms=expected_api_argument,
     )
+
+
+def test_select_organisation(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_get_service_organisation,
+    mock_get_organisations
+):
+    response = logged_in_platform_admin_client.get(
+        url_for('.link_service_to_organisation', service_id=service_one['id']),
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert len(page.select('.multiple-choice')) == 3
+    for i in range(0, 3):
+        assert normalize_spaces(
+            page.select('.multiple-choice label')[i].text
+        ) == 'Org {}'.format(i + 1)
+
+
+def test_update_service_organisation(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_get_service_organisation,
+    mock_get_organisations,
+    mock_update_service_organisation,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for('.link_service_to_organisation', service_id=service_one['id']),
+        data={'organisations': '7aa5d4e9-4385-4488-a489-07812ba13384'},
+    )
+
+    assert response.status_code == 302
+    mock_update_service_organisation.assert_called_once_with(
+        service_one['id'],
+        '7aa5d4e9-4385-4488-a489-07812ba13384'
+    )
+
+
+def test_update_service_organisation_does_not_update_if_same_value(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_get_service_organisation,
+    mock_get_organisations,
+    mock_update_service_organisation,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for('.link_service_to_organisation', service_id=service_one['id']),
+        data={'organisations': '7aa5d4e9-4385-4488-a489-07812ba13383'},
+    )
+
+    assert response.status_code == 302
+    mock_update_service_organisation.called is False
