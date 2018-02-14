@@ -22,6 +22,7 @@ def test_form_class_not_mutated(app_):
 
     (False, 'email address', '', 'Can’t be empty'),
     (False, 'email address', '12345', 'Enter a valid email address'),
+    (False, 'email address', '“bad”@email-address.com', 'Enter a valid email address'),
     (False, 'email address', 'test@example.com', None),
     (False, 'email address', 'test@example.gov.uk', None),
 

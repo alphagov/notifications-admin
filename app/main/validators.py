@@ -1,7 +1,10 @@
 import re
+
 from wtforms import ValidationError
+from wtforms.validators import Email
 from notifications_utils.field import Field
 from notifications_utils.gsm import get_non_gsm_compatible_characters
+from notifications_utils.recipients import validate_email_address, InvalidEmailError
 
 from app import formatted_list
 from app.main._blacklisted_passwords import blacklisted_passwords
@@ -42,6 +45,19 @@ class ValidGovEmail:
             ' <a href="{}">contact us</a>').format(url_for('main.support'))
         if not is_gov_user(field.data.lower()):
             raise ValidationError(message)
+
+
+class ValidEmail(Email):
+
+    def __init__(self):
+        super().__init__('Enter a valid email address')
+
+    def __call__(self, form, field):
+        try:
+            validate_email_address(field.data)
+        except InvalidEmailError:
+            raise ValidationError(self.message)
+        return super().__call__(form, field)
 
 
 class NoCommasInPlaceHolders:
