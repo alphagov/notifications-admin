@@ -87,6 +87,7 @@ current_service = LocalProxy(partial(_lookup_req_object, 'service'))
 # The current organisation attached to the request stack.
 current_organisation = LocalProxy(partial(_lookup_req_object, 'organisation'))
 
+
 def create_app(application):
     setup_commands(application)
 

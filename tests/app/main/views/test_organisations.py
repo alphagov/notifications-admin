@@ -46,9 +46,12 @@ def test_view_organisation_shows_the_correct_organisation(
     mocker.patch(
         'app.organisations_client.get_organisation', return_value=org
     )
+    mocker.patch(
+        'app.organisations_client.get_organisation_services', return_value=[]
+    )
 
     response = logged_in_platform_admin_client.get(
-        url_for('.view_organisation', org_id=fake_uuid)
+        url_for('.organisation_dashboard', org_id=fake_uuid)
     )
 
     assert response.status_code == 200
@@ -122,3 +125,29 @@ def test_update_organisation(
         org_id=fake_uuid,
         name=org['name']
     )
+
+
+def test_organisation_services_show(
+    logged_in_platform_admin_client,
+    mock_get_organisation,
+    mock_get_organisation_services,
+    mocker,
+    fake_uuid,
+):
+    response = logged_in_platform_admin_client.get(
+        url_for('.organisation_dashboard', org_id=mock_get_organisation['id']),
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert len(page.select('.browse-list-item')) == 3
+
+    for i in range(0, 3):
+        service_name = mock_get_organisation_services(mock_get_organisation['id'])[i]['name']
+        service_id = mock_get_organisation_services(mock_get_organisation['id'])[i]['id']
+
+        assert normalize_spaces(page.select('.browse-list-item')[i].text) == service_name
+        assert normalize_spaces(
+            page.select('.browse-list-item a')[i]['href']
+        ) == '/services/{}/dashboard'.format(service_id)
