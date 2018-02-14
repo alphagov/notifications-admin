@@ -59,7 +59,7 @@ def test_should_login_user_and_should_redirect_to_next_url(
         session['user_details'] = {
             'id': api_user_active.id,
             'email': api_user_active.email_address}
-    response = client.post(url_for('main.two_factor', next='/services/{}/dashboard'.format(SERVICE_ONE_ID)),
+    response = client.post(url_for('main.two_factor', next='/services/{}'.format(SERVICE_ONE_ID)),
                            data={'sms_code': '12345'})
     assert response.status_code == 302
     assert response.location == url_for(

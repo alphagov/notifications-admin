@@ -51,6 +51,13 @@ def temp_service_history(service_id):
 @main.route("/services/<service_id>/dashboard")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
+def old_service_dashboard(service_id):
+    return redirect(url_for('.service_dashboard', service_id=service_id))
+
+
+@main.route("/services/<service_id>")
+@login_required
+@user_has_permissions('view_activity', admin_override=True)
 def service_dashboard(service_id):
 
     if session.get('invited_user'):
