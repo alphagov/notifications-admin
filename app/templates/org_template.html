@@ -1,7 +1,7 @@
 {% extends "admin_template.html" %}
 
 {% block per_page_title %}
-  {% block service_page_title %}{% endblock %} – {{ current_service.name }}
+  {% block org_page_title %}{% endblock %} – {{ current_org.name }}
 {% endblock %}
 
 {% block fullwidth_content %}
@@ -13,18 +13,10 @@
       <a href="{{ url_for('main.choose_service') }}" class="navigation-service-switch">Switch service</a>
     </div>
     <div class="grid-row">
-      {% if help %}
-        <div class="column-one-third">
-      {% else %}
-        <div class="column-one-quarter">
-      {% endif %}
+      <div class="column-one-quarter">
         {% include "org_nav.html" %}
       </div>
-      {% if help %}
-        <main role="main" class="column-two-thirds column-main">
-      {% else %}
-        <main role="main" class="column-three-quarters column-main">
-      {% endif %}
+      <main role="main" class="column-three-quarters column-main">
         {% include 'flash_messages.html' %}
         {% block maincolumn_content %}{% endblock %}
       </main>

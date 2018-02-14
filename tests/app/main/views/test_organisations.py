@@ -150,4 +150,4 @@ def test_organisation_services_show(
         assert normalize_spaces(page.select('.browse-list-item')[i].text) == service_name
         assert normalize_spaces(
             page.select('.browse-list-item a')[i]['href']
-        ) == '/services/{}/dashboard'.format(service_id)
+        ) == '/services/{}'.format(service_id)

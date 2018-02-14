@@ -14,9 +14,13 @@
         Link service to organisation
       </h1>
       <form method="post">
-        {{ radios(form.organisations) }}
+        {% if has_organisations %}
+          {{ radios(form.organisations) }}
+        {% else %}
+        <p> No organisations </p>
+        {% endif %}
         {{ page_footer(
-          'Save',
+          'Save' if has_organisations,
           back_link=url_for('.service_settings', service_id=current_service.id),
           back_link_text='Back to settings'
         ) }}
