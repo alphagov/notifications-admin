@@ -265,14 +265,6 @@ def update_service_permissions(service_id, permissions, sms_sender=None):
     service_api_client.update_service_with_properties(service_id, data)
 
 
-@main.route("/services/<service_id>/service-settings/send-letters-as-pdf")
-@login_required
-@user_has_permissions(admin_override=True)
-def service_switch_send_letters_as_pdf(service_id):
-    switch_service_permissions(service_id, 'letters_as_pdf')
-    return redirect(url_for('.service_settings', service_id=service_id))
-
-
 @main.route("/services/<service_id>/service-settings/can-send-email")
 @login_required
 @user_has_permissions(admin_override=True)
