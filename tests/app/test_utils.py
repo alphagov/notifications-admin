@@ -43,7 +43,7 @@ def _get_notifications_csv(
 
     data = {
         'notifications': [{
-            "row_number": row_number,
+            "row_number": row_number + i,
             "to": recipient,
             "recipient": recipient,
             "template_name": template_name,
@@ -128,23 +128,78 @@ def test_can_create_spreadsheet_from_dict_with_filename():
     assert Spreadsheet.from_dict({}, filename='empty.csv').as_dict['file_name'] == "empty.csv"
 
 
-def test_generate_notifications_csv_returns_correct_csv_file(_get_notifications_csv_mock):
-    csv_content = generate_notifications_csv(service_id='1234', job_id=fake_uuid)
+@pytest.mark.parametrize('original_file_contents, expected_column_headers, expected_1st_row', [
+    (
+        """
+            phone_number
+            07700900123
+        """,
+        ['Row number', 'phone_number', 'Template', 'Type', 'Job', 'Status', 'Time'],
+        ['1', '07700900123', 'foo', 'sms', 'bar.csv', 'Delivered', 'Thursday 19 April at 12:00'],
+    ),
+    (
+        """
+            phone_number, a, b, c
+            07700900123,  🐜,🐝,🦀
+        """,
+        ['Row number', 'phone_number', 'a', 'b', 'c', 'Template', 'Type', 'Job', 'Status', 'Time'],
+        ['1', '07700900123', '🐜', '🐝', '🦀', 'foo', 'sms', 'bar.csv', 'Delivered', 'Thursday 19 April at 12:00'],
+    ),
+])
+def test_generate_notifications_csv_returns_correct_csv_file(
+    app_,
+    mocker,
+    _get_notifications_csv_mock,
+    original_file_contents,
+    expected_column_headers,
+    expected_1st_row,
+):
+    mocker.patch(
+        'app.main.s3_client.s3download',
+        return_value=original_file_contents,
+    )
+    csv_content = generate_notifications_csv(service_id='1234', job_id=fake_uuid, template_type='sms')
     csv_file = DictReader(StringIO('\n'.join(csv_content)))
-    assert csv_file.fieldnames == ['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
+    assert csv_file.fieldnames == expected_column_headers
+    assert next(csv_file) == dict(zip(expected_column_headers, expected_1st_row))
 
 
-def test_generate_notifications_csv_only_calls_once_if_no_next_link(_get_notifications_csv_mock):
-    list(generate_notifications_csv(service_id='1234', job_id=fake_uuid))
+def test_generate_notifications_csv_only_calls_once_if_no_next_link(
+    app_,
+    _get_notifications_csv_mock,
+):
+    list(generate_notifications_csv(service_id='1234'))
 
     assert _get_notifications_csv_mock.call_count == 1
 
 
 @pytest.mark.parametrize("job_id", ["some", None])
-def test_generate_notifications_csv_calls_twice_if_next_link(mocker, job_id):
+def test_generate_notifications_csv_calls_twice_if_next_link(
+    app_,
+    mocker,
+    job_id,
+):
+
+    mocker.patch(
+        'app.main.s3_client.s3download',
+        return_value="""
+            phone_number
+            07700900000
+            07700900001
+            07700900002
+            07700900003
+            07700900004
+            07700900005
+            07700900006
+            07700900007
+            07700900008
+            07700900009
+        """
+    )
+
     service_id = '1234'
     response_with_links = _get_notifications_csv(service_id, rows=7, with_links=True)
-    response_with_no_links = _get_notifications_csv(service_id, rows=3, with_links=False)
+    response_with_no_links = _get_notifications_csv(service_id, rows=3, row_number=8, with_links=False)
 
     mock_get_notifications = mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
@@ -154,10 +209,16 @@ def test_generate_notifications_csv_calls_twice_if_next_link(mocker, job_id):
         ]
     )
 
-    csv_content = generate_notifications_csv(service_id=service_id, job_id=fake_uuid if job_id else None)
-    csv = DictReader(StringIO('\n'.join(csv_content)))
+    csv_content = generate_notifications_csv(
+        service_id=service_id,
+        job_id=job_id or fake_uuid,
+        template_type='sms',
+    )
+    csv = list(DictReader(StringIO('\n'.join(csv_content))))
 
-    assert len(list(csv)) == 10
+    assert len(csv) == 10
+    assert csv[0]['phone_number'] == '07700900000'
+    assert csv[9]['phone_number'] == '07700900009'
     assert mock_get_notifications.call_count == 2
     # mock_calls[0][2] is the kwargs from first call
     assert mock_get_notifications.mock_calls[0][2]['page'] == 1
