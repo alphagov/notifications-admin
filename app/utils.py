@@ -141,27 +141,21 @@ def generate_notifications_csv(**kwargs):
 
     while kwargs['page']:
         notifications_resp = notification_api_client.get_notifications_for_service(**kwargs)
-        notifications = notifications_resp['notifications']
-
-        if kwargs.get('job_id'):
-            for notification in notifications:
-                original_row = original_upload[notification['row_number'] - 1]
+        for notification in notifications_resp['notifications']:
+            if kwargs.get('job_id'):
                 values = [
                     notification['row_number'],
                 ] + [
-                    original_row.get(header)
+                    original_upload[notification['row_number'] - 1].get(header)
                     for header in original_column_headers
                 ] + [
                     notification['template_name'],
                     notification['template_type'],
                     notification['job_name'],
                     notification['status'],
-                    notification['created_at']
+                    notification['created_at'],
                 ]
-                yield ','.join(map(str, values)) + '\n'
-        else:
-            # Change here
-            for notification in notifications:
+            else:
                 values = [
                     notification['to'],
                     notification['template']['name'],
@@ -171,8 +165,8 @@ def generate_notifications_csv(**kwargs):
                     notification['created_at'],
                     notification['updated_at']
                 ]
-                line = ','.join(str(i) for i in values) + '\n'
-                yield line
+            yield ','.join(map(str, values)) + '\n'
+
         if notifications_resp['links'].get('next'):
             kwargs['page'] += 1
         else:
