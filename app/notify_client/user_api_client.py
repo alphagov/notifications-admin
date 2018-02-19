@@ -131,10 +131,19 @@ class UserApiClient(NotifyAdminAPIClient):
         resp = self.get(endpoint)
         return [User(data) for data in resp['data']]
 
+    def get_users_for_organisation(self, org_id):
+        endpoint = '/organisations/{}/users'.format(org_id)
+        resp = self.get(endpoint)
+        return [User(data) for data in resp['data']]
+
     def add_user_to_service(self, service_id, user_id, permissions):
         endpoint = '/service/{}/users/{}'.format(service_id, user_id)
         data = [{'permission': x} for x in permissions]
         resp = self.post(endpoint, data=data)
+        return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
+
+    def add_user_to_organisation(self, org_id, user_id):
+        resp = self.post('/organisations/{}/users/{}'.format(org_id, user_id), data={})
         return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
 
     def set_user_permissions(self, user_id, service_id, permissions):
@@ -147,10 +156,10 @@ class UserApiClient(NotifyAdminAPIClient):
         data = {'email': email_address}
         self.post(endpoint, data=data)
 
-    def is_email_unique(self, email_address):
+    def is_email_already_in_use(self, email_address):
         if self.get_user_by_email_or_none(email_address):
-            return False
-        return True
+            return True
+        return False
 
     def activate_user(self, user):
         if user.state == 'pending':

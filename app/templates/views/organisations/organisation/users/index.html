@@ -1,4 +1,8 @@
 {% extends "org_template.html" %}
+{% from "components/table.html" import list_table, row, field, hidden_field_heading %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/tick-cross.html" import tick_cross %}
+{% from "components/textbox.html" import textbox %}
 
 {% block org_page_title %}
   Team members
@@ -12,6 +16,54 @@
         Team members
       </h1>
     </div>
+    <div class="column-one-third">
+      <a href="{{ url_for('.invite_org_user', org_id=current_org.id) }}" class="button align-with-heading">Invite team member</a>
+    </div>
+  </div>
+
+  {% if show_search_box %}
+    <div data-module="autofocus">
+      <div class="live-search" data-module="live-search" data-targets=".user-list-item">
+        {{ textbox(
+          form.search,
+          width='1-1'
+        ) }}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="user-list">
+    {% for user in users %}
+      <div class="user-list-item">
+        <h3>
+          {%- if user.name -%}
+            <span class="heading-small">{{ user.name }}</span>&ensp;
+          {%- endif -%}
+          <span class="hint">
+            {%- if user.status == 'pending' -%}
+              {{ user.email_address }} (invited)
+            {%- elif user.status == 'cancelled' -%}
+              {{ user.email_address }} (cancelled invite)
+            {%- elif user.id == current_user.id -%}
+              (you)
+            {% else %}
+              {{ user.email_address }}
+            {% endif %}
+          </span>
+        </h3>
+        <ul class="tick-cross-list">
+          <li class="tick-cross-list-edit-link">
+            {% if user.status == 'pending' %}
+              <a href="{{ url_for('.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Cancel invitation</a>
+            {% elif user.state == 'active' and current_user.id != user.id %}
+              <a href="{{ url_for('.edit_user_org_permissions', org_id=current_org.id, user_id=user.id)}}">Edit permissions</a>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    {% endfor %}
   </div>
 
 {% endblock %}
+
+

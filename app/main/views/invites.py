@@ -4,38 +4,23 @@ from flask import (
     session,
     flash,
     render_template,
-    abort,
-    current_app
+    abort
 )
-from itsdangerous import SignatureExpired
 from markupsafe import Markup
-from notifications_utils.url_safe_token import check_token
 from flask_login import current_user
 
 from app.main import main
 from app import (
     invite_api_client,
+    org_invite_api_client,
     user_api_client,
+    organisations_client,
     service_api_client
 )
 
 
 @main.route("/invitation/<token>")
 def accept_invite(token):
-    try:
-        check_token(
-            token,
-            current_app.config['SECRET_KEY'],
-            current_app.config['DANGEROUS_SALT'],
-            current_app.config['INVITATION_EXPIRY_SECONDS']
-        )
-    except SignatureExpired:
-        errors = [
-            'Your invitation to GOV.UK Notify has expired. '
-            'Please ask the person that invited you to send you another one'
-        ]
-        return render_template("error/400.html", message=errors), 400
-
     invited_user = invite_api_client.check_token(token)
 
     if not current_user.is_anonymous and current_user.email_address.lower() != invited_user.email_address.lower():
@@ -88,3 +73,44 @@ def accept_invite(token):
             return redirect(url_for('main.service_dashboard', service_id=invited_user.service))
     else:
         return redirect(url_for('main.register_from_invite'))
+
+
+@main.route("/organisation-invitation/<token>")
+def accept_org_invite(token):
+    invited_org_user = org_invite_api_client.check_token(token)
+    if not current_user.is_anonymous and current_user.email_address.lower() != invited_org_user.email_address.lower():
+        message = Markup("""
+            You’re signed in as {}.
+            This invite is for another email address.
+            <a href={}>Sign out</a> and click the link again to accept this invite.
+            """.format(
+            current_user.email_address,
+            url_for("main.sign_out", _external=True)))
+
+        flash(message=message)
+
+        abort(403)
+
+    if invited_org_user.status == 'cancelled':
+        invited_by = user_api_client.get_user(invited_org_user.invited_by)
+        organisation = organisations_client.get_organisation(invited_org_user.organisation)
+        return render_template('views/cancelled-invitation.html',
+                               from_user=invited_by.name,
+                               organisation_name=organisation['name'])
+
+    if invited_org_user.status == 'accepted':
+        session.pop('invited_org_user', None)
+        return redirect(url_for('main.organisation_dashboard', org_id=invited_org_user.organisation))
+
+    session['invited_org_user'] = invited_org_user.serialize()
+
+    existing_user = user_api_client.get_user_by_email_or_none(invited_org_user.email_address)
+    organisation_users = user_api_client.get_users_for_organisation(invited_org_user.organisation)
+
+    if existing_user:
+        org_invite_api_client.accept_invite(invited_org_user.organisation, invited_org_user.id)
+        if existing_user not in organisation_users:
+            user_api_client.add_user_to_organisation(invited_org_user.organisation, existing_user.id)
+        return redirect(url_for('main.organisation_dashboard', org_id=invited_org_user.organisation))
+    else:
+        return redirect(url_for('main.register_from_org_invite'))

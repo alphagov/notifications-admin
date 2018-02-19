@@ -48,7 +48,7 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
     mock_send_verify_code,
     mock_register_user,
     mock_get_user_by_email_not_found,
-    mock_is_email_unique,
+    mock_email_is_not_already_in_use,
     mock_send_verify_email,
     mock_login,
     phone_number_to_register_with,
@@ -122,7 +122,7 @@ def test_should_add_user_details_to_session(
     mock_register_user,
     mock_get_user,
     mock_get_user_by_email_not_found,
-    mock_is_email_unique,
+    mock_email_is_not_already_in_use,
     mock_send_verify_email,
     mock_login,
 ):
@@ -176,7 +176,7 @@ def test_register_with_existing_email_sends_emails(
 def test_register_from_invite(
     client,
     fake_uuid,
-    mock_is_email_unique,
+    mock_email_is_not_already_in_use,
     mock_register_user,
     mock_send_verify_code,
     mock_accept_invite,
@@ -237,7 +237,7 @@ def test_register_from_invite_when_user_registers_in_another_browser(
 def test_register_from_email_auth_invite(
     client,
     sample_invite,
-    mock_is_email_unique,
+    mock_email_is_not_already_in_use,
     mock_register_user,
     mock_get_user,
     mock_send_verify_email,
@@ -285,7 +285,7 @@ def test_register_from_email_auth_invite(
 def test_can_register_email_auth_without_phone_number(
     client,
     sample_invite,
-    mock_is_email_unique,
+    mock_email_is_not_already_in_use,
     mock_register_user,
     mock_get_user,
     mock_send_verify_email,

@@ -1,0 +1,33 @@
+{% extends "org_template.html" %}
+
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Invite a team member
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    Invite a team member
+  </h1>
+  <div class="grid-row">
+	  <form method="post" class="column-three-quarters" novalidate>
+	    {{ textbox(form.email_address, width='1-1', safe_error_message=True) }}
+
+	    <div class="bottom-gutter">
+			  <p class="form-label">
+			    All team members can see:
+			  </p>
+			  <ul class="list list-bullet">
+			    <li>dashboard</li>
+			    <li>who the other team members are</li>
+			  </ul>
+			</div>
+
+	    {{ page_footer('Send invitation email') }}
+	  </form>
+  </div>
+
+{% endblock %}

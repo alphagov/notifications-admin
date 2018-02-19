@@ -27,6 +27,7 @@ class User(UserMixin):
         self.max_failed_login_count = max_failed_login_count
         self.platform_admin = fields.get('platform_admin')
         self.current_session_id = fields.get('current_session_id')
+        self.organisations = fields.get('organisations', [])
 
     def get_id(self):
         return self.id
@@ -155,6 +156,7 @@ class User(UserMixin):
             "state": self.state,
             "failed_login_count": self.failed_login_count,
             "permissions": [x for x in self._permissions],
+            "organisations": self.organisations,
             "current_session_id": self.current_session_id
         }
         if hasattr(self, '_password'):
@@ -163,6 +165,14 @@ class User(UserMixin):
 
     def set_password(self, pwd):
         self._password = pwd
+
+    @property
+    def organisations(self):
+        return self._organisations
+
+    @organisations.setter
+    def organisations(self, organisations):
+        self._organisations = organisations
 
 
 class InvitedUser(object):
@@ -214,6 +224,38 @@ class InvitedUser(object):
             data['permissions'] = ','.join(self.permissions)
         else:
             data['permissions'] = self.permissions
+        return data
+
+
+class InvitedOrgUser(object):
+
+    def __init__(self, id, organisation, invited_by, email_address, status, created_at):
+        self.id = id
+        self.organisation = str(organisation)
+        self.invited_by = invited_by
+        self.email_address = email_address
+        self.status = status
+        self.created_at = created_at
+
+    def __eq__(self, other):
+        return ((self.id,
+                self.organisation,
+                self.invited_by,
+                self.email_address,
+                self.status) == (other.id,
+                other.organisation,
+                other.invited_by,
+                other.email_address,
+                other.status))
+
+    def serialize(self, permissions_as_string=False):
+        data = {'id': self.id,
+                'organisation': self.organisation,
+                'invited_by': self.invited_by,
+                'email_address': self.email_address,
+                'status': self.status,
+                'created_at': str(self.created_at)
+                }
         return data
 
 

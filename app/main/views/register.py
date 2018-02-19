@@ -17,13 +17,15 @@ from app.main import main
 
 from app.main.forms import (
     RegisterUserForm,
-    RegisterUserFromInviteForm
+    RegisterUserFromInviteForm,
+    RegisterUserFromOrgInviteForm
 )
 from app.main.views.verify import activate_user
 
 from app import (
     user_api_client,
-    invite_api_client
+    invite_api_client,
+    org_invite_api_client
 )
 
 
@@ -65,20 +67,42 @@ def register_from_invite():
     return render_template('views/register-from-invite.html', invited_user=invited_user, form=form)
 
 
-def _do_registration(form, send_sms=True, send_email=True):
-    if user_api_client.is_email_unique(form.email_address.data):
+@main.route('/register-from-org-invite', methods=['GET', 'POST'])
+def register_from_org_invite():
+    invited_org_user = session.get('invited_org_user')
+    if not invited_org_user:
+        abort(404)
+
+    form = RegisterUserFromOrgInviteForm(
+        invited_org_user,
+    )
+    form.auth_type.data = 'sms_auth'
+
+    if form.validate_on_submit():
+        if (form.organisation.data != invited_org_user['organisation'] or
+                form.email_address.data != invited_org_user['email_address']):
+            abort(400)
+        _do_registration(form, send_email=False, send_sms=True, organisation_id=invited_org_user['organisation'])
+        org_invite_api_client.accept_invite(invited_org_user['organisation'], invited_org_user['id'])
+        user_api_client.add_user_to_organisation(invited_org_user['organisation'], session['user_details']['id'])
+
+        return redirect(url_for('main.verify'))
+    return render_template('views/register-from-org-invite.html', invited_org_user=invited_org_user, form=form)
+
+
+def _do_registration(form, send_sms=True, send_email=True, organisation_id=None):
+    if user_api_client.is_email_already_in_use(form.email_address.data):
+        user = user_api_client.get_user_by_email(form.email_address.data)
+        if send_email:
+            user_api_client.send_already_registered_email(user.id, user.email_address)
+        session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
+        session['user_details'] = {"email": user.email_address, "id": user.id}
+    else:
         user = user_api_client.register_user(form.name.data,
                                              form.email_address.data,
                                              form.mobile_number.data or None,
                                              form.password.data,
                                              form.auth_type.data)
-
-        # TODO possibly there should be some exception handling
-        # for sending sms and email codes.
-        # How do we report to the user there is a problem with
-        # sending codes apart from service unavailable?
-        # at the moment i believe http 500 is fine.
-
         if send_email:
             user_api_client.send_verify_email(user.id, user.email_address)
 
@@ -86,12 +110,8 @@ def _do_registration(form, send_sms=True, send_email=True):
             user_api_client.send_verify_code(user.id, 'sms', user.mobile_number)
         session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
         session['user_details'] = {"email": user.email_address, "id": user.id}
-    else:
-        user = user_api_client.get_user_by_email(form.email_address.data)
-        if send_email:
-            user_api_client.send_already_registered_email(user.id, user.email_address)
-        session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
-        session['user_details'] = {"email": user.email_address, "id": user.id}
+    if organisation_id:
+        session['organisation_id'] = organisation_id
 
 
 @main.route('/registration-continue')
