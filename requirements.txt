@@ -17,7 +17,7 @@ eventlet==0.22
 notifications-python-client==4.7.2
 
 # PaaS
-awscli==1.14.22
+awscli==1.14.42
 awscli-cwlogs>=1.4,<1.5
 
 git+https://github.com/alphagov/notifications-utils.git@23.6.2#egg=notifications-utils==23.6.2
