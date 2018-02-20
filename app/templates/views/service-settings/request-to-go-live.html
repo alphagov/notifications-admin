@@ -10,33 +10,34 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-
-    <h1 class="heading-large">Request to go live</h1>
-
-    <p>
-      Before you request to go live, make sure you’ve:
-    </p>
-    <ul class="list list-bullet bottom-gutter">
-      <li>
-        read our <a href="{{ url_for('.terms') }}">terms of use</a>
-      </li>
-      <li>
-        added <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a> to your account
-      </li>
-      <li>
-        specified your reply to email address or text message sender in your
-        <a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">settings</a> page
-      </li>
-      <li>
-        added the templates you want to start with, making sure they follow the GOV.UK Service Manual standards for
-        <a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a>
-      </li>
-    </ul>
-    <p>
-      Once you’ve made the request, we’ll put your service live within one working day.
-    </p>
-    <p>
-      <a href="{{ url_for('main.submit_request_to_go_live', service_id=current_service.id) }}" class="button">Next</a>
-    </p>
-
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <h1 class="heading-large">Request to go live</h1>
+      <p>
+        Before you request to go live, make sure you’ve:
+      </p>
+      <ul class="list list-bullet bottom-gutter">
+        <li>
+          read our <a href="{{ url_for('.terms') }}">terms of use</a>
+        </li>
+        <li>
+          added <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a> to your account
+        </li>
+        <li>
+          specified your reply to email address or text message sender in your
+          <a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">settings</a> page
+        </li>
+        <li>
+          added the templates you want to start with, making sure they follow the GOV.UK Service Manual standards for
+          <a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a>
+        </li>
+      </ul>
+      <p>
+        Once you’ve made the request, we’ll put your service live within one working day.
+      </p>
+      <p>
+        <a href="{{ url_for('main.submit_request_to_go_live', service_id=current_service.id) }}" class="button">Next</a>
+      </p>
+    </div>
+  </div>
 {% endblock %}
