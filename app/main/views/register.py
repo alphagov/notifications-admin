@@ -1,32 +1,16 @@
-from datetime import (
-    datetime,
-    timedelta
-)
+from datetime import datetime, timedelta
 
-from flask import (
-    render_template,
-    redirect,
-    session,
-    abort,
-    url_for
-)
-
+from flask import abort, redirect, render_template, session, url_for
 from flask_login import current_user
 
+from app import invite_api_client, org_invite_api_client, user_api_client
 from app.main import main
-
 from app.main.forms import (
     RegisterUserForm,
     RegisterUserFromInviteForm,
-    RegisterUserFromOrgInviteForm
+    RegisterUserFromOrgInviteForm,
 )
 from app.main.views.verify import activate_user
-
-from app import (
-    user_api_client,
-    invite_api_client,
-    org_invite_api_client
-)
 
 
 @main.route('/register', methods=['GET', 'POST'])

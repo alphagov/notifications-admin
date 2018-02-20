@@ -1,7 +1,7 @@
-from flask import Response, url_for
-from flask_wtf.csrf import CSRFError
 import pytest
 from bs4 import BeautifulSoup
+from flask import Response, url_for
+from flask_wtf.csrf import CSRFError
 from notifications_python_client.errors import HTTPError
 
 

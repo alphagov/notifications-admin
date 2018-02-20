@@ -1,41 +1,40 @@
 # -*- coding: utf-8 -*-
 
 from flask import (
-    render_template,
-    abort,
-    jsonify,
-    request,
-    url_for,
-    current_app,
-    redirect,
     Response,
-    stream_with_context
+    abort,
+    current_app,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    stream_with_context,
+    url_for,
 )
 from flask_login import login_required
-from notifications_utils.template import (
-    Template,
-    WithSubjectTemplate,
-)
+from notifications_utils.template import Template, WithSubjectTemplate
 
 from app import (
+    current_service,
+    format_datetime_short,
     job_api_client,
     notification_api_client,
     service_api_client,
-    current_service,
-    format_datetime_short)
+)
 from app.main import main
 from app.main.forms import SearchNotificationsForm
-from app.utils import (
-    get_page_from_request,
-    generate_next_dict,
-    generate_previous_dict,
-    user_has_permissions,
-    generate_notifications_csv,
-    get_time_left,
-    get_letter_timings,
-    parse_filter_args, set_status_filters
-)
 from app.statistics_utils import add_rate_to_job
+from app.utils import (
+    generate_next_dict,
+    generate_notifications_csv,
+    generate_previous_dict,
+    get_letter_timings,
+    get_page_from_request,
+    get_time_left,
+    parse_filter_args,
+    set_status_filters,
+    user_has_permissions,
+)
 
 
 @main.route("/services/<service_id>/jobs")

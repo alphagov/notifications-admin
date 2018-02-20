@@ -1,4 +1,5 @@
 import pytest
+
 from app.notify_client.user_api_client import User
 
 

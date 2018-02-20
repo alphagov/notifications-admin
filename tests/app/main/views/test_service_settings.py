@@ -1,35 +1,35 @@
 import uuid
-from unittest.mock import call, ANY
+from unittest.mock import ANY, call
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
+from tests import service_json, validate_route_permission
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    active_user_no_api_key_permission,
+    active_user_no_settings_permission,
+    active_user_with_permissions,
+    get_default_letter_contact_block,
+    get_default_reply_to_email_address,
+    get_default_sms_sender,
+    get_inbound_number_sms_sender,
+    get_non_default_letter_contact_block,
+    get_non_default_reply_to_email_address,
+    get_non_default_sms_sender,
+    multiple_letter_contact_blocks,
+    multiple_reply_to_email_addresses,
+    multiple_sms_senders,
+    no_letter_contact_blocks,
+    no_reply_to_email_addresses,
+    no_sms_senders,
+    normalize_spaces,
+    platform_admin_user,
+)
 
 import app
 from app.utils import email_safe
-from tests import validate_route_permission, service_json
-from tests.conftest import (
-    active_user_with_permissions,
-    active_user_no_api_key_permission,
-    active_user_no_settings_permission,
-    platform_admin_user,
-    normalize_spaces,
-    multiple_reply_to_email_addresses,
-    multiple_letter_contact_blocks,
-    multiple_sms_senders,
-    no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    no_sms_senders,
-    get_default_reply_to_email_address,
-    get_non_default_reply_to_email_address,
-    get_default_letter_contact_block,
-    get_non_default_letter_contact_block,
-    get_default_sms_sender,
-    get_non_default_sms_sender,
-    get_inbound_number_sms_sender,
-    SERVICE_ONE_ID
-)
-from freezegun import freeze_time
 
 
 @pytest.fixture

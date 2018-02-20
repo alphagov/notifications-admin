@@ -1,33 +1,18 @@
-from flask import (
-    render_template,
-    redirect,
-    session,
-    url_for,
-    current_app
-)
-
-from flask_login import (
-    current_user,
-    login_required
-)
+from flask import current_app, redirect, render_template, session, url_for
+from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
 from werkzeug.exceptions import abort
 
+from app import (
+    billing_api_client,
+    invite_api_client,
+    service_api_client,
+    user_api_client,
+)
 from app.main import main
 from app.main.forms import CreateServiceForm
 from app.notify_client.models import InvitedUser
-
-from app import (
-    invite_api_client,
-    user_api_client,
-    service_api_client,
-    billing_api_client
-)
-
-from app.utils import (
-    email_safe,
-    is_gov_user
-)
+from app.utils import email_safe, is_gov_user
 
 
 def _add_invited_user_to_service(invited_user):

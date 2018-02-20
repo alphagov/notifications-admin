@@ -1,37 +1,27 @@
+import csv
 import os
 import re
-import csv
-import yaml
-
-from itertools import chain
-
-import pytz
-from io import StringIO
-from os import path
-from functools import wraps
 import unicodedata
-from urllib.parse import urlparse
 from collections import namedtuple
 from datetime import datetime, timedelta, timezone
+from functools import wraps
+from io import StringIO
+from itertools import chain
+from os import path
+from urllib.parse import urlparse
 
-import dateutil
 import ago
-from flask import (
-    abort,
-    current_app,
-    redirect,
-    request,
-    session,
-    url_for
-)
-from flask_login import current_user
+import dateutil
 import pyexcel
-
+import pytz
+import yaml
+from flask import abort, current_app, redirect, request, session, url_for
+from flask_login import current_user
 from notifications_utils.template import (
-    SMSPreviewTemplate,
     EmailPreviewTemplate,
     LetterImageTemplate,
     LetterPreviewTemplate,
+    SMSPreviewTemplate,
 )
 from orderedset._orderedset import OrderedSet
 from werkzeug.datastructures import MultiDict

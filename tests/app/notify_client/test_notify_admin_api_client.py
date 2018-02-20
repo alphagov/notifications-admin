@@ -1,13 +1,12 @@
 import uuid
-import pytest
 from unittest.mock import patch
 
+import pytest
 import werkzeug
-
 from tests import service_json
 from tests.conftest import api_user_active, platform_admin_user
-from app.notify_client import NotifyAdminAPIClient
 
+from app.notify_client import NotifyAdminAPIClient
 
 SAMPLE_API_KEY = '{}-{}'.format('a' * 36, 's' * 36)
 

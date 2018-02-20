@@ -1,29 +1,31 @@
-import json
-from functools import partial
 import copy
-from unittest.mock import call, ANY
+import json
+from datetime import datetime
+from functools import partial
+from unittest.mock import ANY, call
 
-from flask import url_for
 import pytest
 from bs4 import BeautifulSoup
+from flask import url_for
 from freezegun import freeze_time
-from datetime import datetime
-
-from app.main.views.dashboard import (
-    get_dashboard_totals,
-    format_monthly_stats_to_list,
-    get_free_paid_breakdown_for_billable_units,
-    aggregate_status_types,
-    format_template_stats_to_list,
-    get_tuples_of_financial_years
+from tests import (
+    validate_route_permission,
+    validate_route_permission_with_client,
 )
-
-from tests import validate_route_permission, validate_route_permission_with_client
 from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_inbound_sms_summary,
     mock_get_inbound_sms_summary_with_no_messages,
     normalize_spaces,
+)
+
+from app.main.views.dashboard import (
+    aggregate_status_types,
+    format_monthly_stats_to_list,
+    format_template_stats_to_list,
+    get_dashboard_totals,
+    get_free_paid_breakdown_for_billable_units,
+    get_tuples_of_financial_years,
 )
 
 stub_template_stats = [

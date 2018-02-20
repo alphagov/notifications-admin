@@ -1,14 +1,11 @@
-import pytest
-
 from datetime import datetime
-from bs4 import BeautifulSoup
 from unittest.mock import ANY
 
-from flask import (
-    url_for,
-    session
-)
+import pytest
+from bs4 import BeautifulSoup
+from flask import session, url_for
 from flask_login import current_user
+
 from app.notify_client.models import InvitedUser
 
 

@@ -1,5 +1,5 @@
-from app.main.forms import TwoFactorForm
 from app import user_api_client
+from app.main.forms import TwoFactorForm
 
 
 def test_form_is_valid_returns_no_errors(

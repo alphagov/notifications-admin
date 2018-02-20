@@ -1,8 +1,9 @@
 import pytest
-from app.utils import user_has_permissions
-from app.main.views.index import index
-from werkzeug.exceptions import Forbidden, Unauthorized
 from flask import request
+from werkzeug.exceptions import Forbidden, Unauthorized
+
+from app.main.views.index import index
+from app.utils import user_has_permissions
 
 
 def _test_permissions(

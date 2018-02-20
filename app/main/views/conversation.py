@@ -1,18 +1,13 @@
-from flask import (
-    jsonify,
-    session,
-    redirect,
-    render_template,
-    url_for,
-)
+from flask import jsonify, redirect, render_template, session, url_for
 from flask_login import login_required
+from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import format_phone_number_human_readable
 from notifications_utils.template import SMSPreviewTemplate
+
+from app import notification_api_client, service_api_client
 from app.main import main
 from app.main.forms import SearchTemplatesForm
 from app.utils import user_has_permissions
-from app import notification_api_client, service_api_client
-from notifications_python_client.errors import HTTPError
 
 
 @main.route("/services/<service_id>/conversation/<notification_id>")

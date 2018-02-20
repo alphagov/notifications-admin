@@ -1,4 +1,4 @@
-from app.notify_client import _attach_current_user, NotifyAdminAPIClient
+from app.notify_client import NotifyAdminAPIClient, _attach_current_user
 
 
 class NotificationApiClient(NotifyAdminAPIClient):

@@ -1,9 +1,4 @@
-from flask import (
-    redirect,
-    url_for,
-    session
-)
-
+from flask import redirect, session, url_for
 from flask_login import logout_user
 
 from app.main import main

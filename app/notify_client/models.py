@@ -1,7 +1,7 @@
 from itertools import chain
-from flask_login import UserMixin, AnonymousUserMixin
-from flask import request, session
 
+from flask import request, session
+from flask_login import AnonymousUserMixin, UserMixin
 
 roles = {
     'send_messages': ['send_texts', 'send_emails', 'send_letters'],

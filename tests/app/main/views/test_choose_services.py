@@ -1,5 +1,5 @@
-from flask import url_for
 from bs4 import BeautifulSoup
+from flask import url_for
 
 
 def test_should_show_choose_services_page(

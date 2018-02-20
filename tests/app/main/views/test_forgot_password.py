@@ -1,6 +1,5 @@
 import pytest
-
-from flask import url_for, Response
+from flask import Response, url_for
 from notifications_python_client.errors import HTTPError
 from tests.conftest import api_user_active as create_active_user
 

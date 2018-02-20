@@ -1,5 +1,5 @@
-import hashlib
 import codecs
+import hashlib
 
 
 class AssetFingerprinter(object):

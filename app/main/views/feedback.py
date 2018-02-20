@@ -1,13 +1,18 @@
+from datetime import datetime
+
 import pytz
-from flask import render_template, url_for, redirect, abort, request, session
+from flask import abort, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_utils.clients import DeskproError
 
-from app import convert_to_boolean, current_service, service_api_client, deskpro_client
+from app import (
+    convert_to_boolean,
+    current_service,
+    deskpro_client,
+    service_api_client,
+)
 from app.main import main
-from app.main.forms import SupportType, Feedback, Problem, Triage
-from datetime import datetime
-
+from app.main.forms import Feedback, Problem, SupportType, Triage
 
 QUESTION_TICKET_TYPE = 'ask-question-give-feedback'
 PROBLEM_TICKET_TYPE = "report-problem"

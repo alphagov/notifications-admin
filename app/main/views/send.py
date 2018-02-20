@@ -1,52 +1,52 @@
 import itertools
 from string import ascii_uppercase
-
-from orderedset import OrderedSet
 from zipfile import BadZipFile
-from xlrd.biffh import XLRDError
-from werkzeug.routing import RequestRedirect
 
 from flask import (
-    request,
-    render_template,
-    redirect,
-    url_for,
-    flash,
     abort,
-    session,
     current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
 )
-
-from flask_login import login_required, current_user
-
+from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import (
     RecipientCSV,
     first_column_headings,
     optional_address_columns,
 )
+from orderedset import OrderedSet
+from werkzeug.routing import RequestRedirect
+from xlrd.biffh import XLRDError
 
+from app import (
+    current_service,
+    job_api_client,
+    notification_api_client,
+    service_api_client,
+    user_api_client,
+)
 from app.main import main
 from app.main.forms import (
-    CsvUploadForm,
     ChooseTimeForm,
+    CsvUploadForm,
     SetSenderForm,
-    get_placeholder_form_instance
+    get_placeholder_form_instance,
 )
-from app.main.s3_client import (
-    s3upload,
-    s3download
-)
-from app import job_api_client, service_api_client, current_service, user_api_client, notification_api_client
+from app.main.s3_client import s3download, s3upload
+from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
-    user_has_permissions,
-    get_errors_for_csv,
     Spreadsheet,
+    email_or_sms_not_enabled,
+    get_errors_for_csv,
     get_help_argument,
     get_template,
-    email_or_sms_not_enabled,
+    user_has_permissions,
 )
-from app.template_previews import TemplatePreview, get_page_count_for_letter
 
 
 def get_page_headings(template_type):

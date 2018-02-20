@@ -1,6 +1,7 @@
 from enum import IntEnum
-from flask import url_for
+
 from bs4 import BeautifulSoup
+from flask import url_for
 
 from app import format_datetime_short
 

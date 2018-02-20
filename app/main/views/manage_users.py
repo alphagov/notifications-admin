@@ -1,26 +1,17 @@
 from itertools import chain
-from flask import (
-    request,
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    abort
-)
 
-from flask_login import (
-    login_required,
-    current_user
-)
-
+from flask import abort, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
-from app.main import main
-from app.main.forms import (
-    InviteUserForm,
-    PermissionsForm,
-    SearchUsersForm,
+
+from app import (
+    current_service,
+    invite_api_client,
+    service_api_client,
+    user_api_client,
 )
-from app import (user_api_client, current_service, service_api_client, invite_api_client)
+from app.main import main
+from app.main.forms import InviteUserForm, PermissionsForm, SearchUsersForm
 from app.notify_client.models import roles
 from app.utils import user_has_permissions
 

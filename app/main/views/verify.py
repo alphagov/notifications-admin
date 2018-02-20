@@ -1,26 +1,22 @@
 import json
 
 from flask import (
-    render_template,
-    redirect,
-    session,
-    url_for,
+    abort,
     current_app,
     flash,
-    abort
+    redirect,
+    render_template,
+    session,
+    url_for,
 )
-
-from itsdangerous import SignatureExpired
-
 from flask_login import login_user
-
+from itsdangerous import SignatureExpired
 from notifications_utils.url_safe_token import check_token
 
+from app import user_api_client
 from app.main import main
 from app.main.forms import TwoFactorForm
 from app.utils import redirect_to_sign_in
-
-from app import user_api_client
 
 
 @main.route('/verify', methods=['GET', 'POST'])

@@ -1,15 +1,16 @@
 from collections import namedtuple
 from unittest.mock import call
+
 import pytest
 
 from app.main.s3_client import (
-    upload_logo,
-    persist_logo,
+    LOGO_LOCATION_STRUCTURE,
+    TEMP_TAG,
     delete_temp_file,
     delete_temp_files_created_by,
     get_temp_truncated_filename,
-    LOGO_LOCATION_STRUCTURE,
-    TEMP_TAG
+    persist_logo,
+    upload_logo,
 )
 
 bucket = 'test_bucket'

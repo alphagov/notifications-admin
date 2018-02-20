@@ -1,8 +1,8 @@
 import uuid
 
 import pytest
-from flask import url_for
 from bs4 import BeautifulSoup
+from flask import url_for
 
 
 def test_render_sign_in_template_for_new_user(

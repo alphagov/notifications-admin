@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
 from flask import url_for
+
+from app.notify_client import NotifyAdminAPIClient, _attach_current_user
 from app.utils import BrowsableItem
-from app.notify_client import _attach_current_user, NotifyAdminAPIClient
 
 
 class ServiceAPIClient(NotifyAdminAPIClient):

@@ -1,15 +1,17 @@
 import datetime
+from unittest.mock import ANY
 
-from flask import url_for
 import pytest
 from bs4 import BeautifulSoup
-
-from tests.conftest import mock_get_user, normalize_spaces
+from flask import url_for
 from tests import service_json
+from tests.conftest import mock_get_user, normalize_spaces
 
-from app.main.views.platform_admin import format_stats_by_service, create_global_stats, sum_service_usage
-
-from unittest.mock import ANY
+from app.main.views.platform_admin import (
+    create_global_stats,
+    format_stats_by_service,
+    sum_service_usage,
+)
 
 
 @pytest.mark.parametrize('endpoint', [

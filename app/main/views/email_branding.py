@@ -4,19 +4,22 @@ from flask_login import login_required
 from app import email_branding_client
 from app.main import main
 from app.main.forms import (
+    ServiceCreateEmailBranding,
     ServiceSelectEmailBranding,
     ServiceUpdateEmailBranding,
-    ServiceCreateEmailBranding
 )
-from app.utils import user_has_permissions, get_cdn_domain
 from app.main.s3_client import (
     TEMP_TAG,
-    upload_logo,
     delete_temp_file,
     delete_temp_files_created_by,
-    persist_logo
+    persist_logo,
+    upload_logo,
 )
-from app.main.views.service_settings import get_branding_as_value_and_label, get_branding_as_dict
+from app.main.views.service_settings import (
+    get_branding_as_dict,
+    get_branding_as_value_and_label,
+)
+from app.utils import get_cdn_domain, user_has_permissions
 
 
 @main.route("/email-branding", methods=['GET', 'POST'])

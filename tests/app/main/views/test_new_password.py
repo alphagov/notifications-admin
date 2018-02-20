@@ -1,8 +1,8 @@
 import json
 from datetime import datetime
 
-from itsdangerous import SignatureExpired
 from flask import url_for
+from itsdangerous import SignatureExpired
 from notifications_utils.url_safe_token import generate_token
 
 

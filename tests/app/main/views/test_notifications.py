@@ -1,10 +1,14 @@
-from freezegun import freeze_time
-from flask import url_for
 from functools import partial
-import pytest
 
+import pytest
+from flask import url_for
+from freezegun import freeze_time
 from notifications_utils.template import LetterImageTemplate
-from tests.conftest import mock_get_notification, SERVICE_ONE_ID, normalize_spaces
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    mock_get_notification,
+    normalize_spaces,
+)
 
 
 @pytest.mark.parametrize('notification_status, expected_status', [

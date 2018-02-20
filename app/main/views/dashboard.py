@@ -1,37 +1,38 @@
 import calendar
 from datetime import datetime
 from functools import partial
+
 from flask import (
-    render_template,
-    url_for,
-    session,
-    jsonify,
-    request,
-    abort,
     Response,
+    abort,
+    jsonify,
+    render_template,
+    request,
+    session,
+    url_for,
 )
 from flask_login import login_required
 from notifications_utils.recipients import format_phone_number_human_readable
 from werkzeug.utils import redirect
 
-from app.main import main
 from app import (
-    current_service,
     billing_api_client,
+    current_service,
+    format_date_numeric,
+    format_datetime_numeric,
+    inbound_number_client,
     job_api_client,
     service_api_client,
     template_statistics_client,
-    inbound_number_client,
-    format_date_numeric,
-    format_datetime_numeric,
 )
-from app.statistics_utils import get_formatted_percentage, add_rate_to_job
+from app.main import main
+from app.statistics_utils import add_rate_to_job, get_formatted_percentage
 from app.utils import (
-    user_has_permissions,
-    get_current_financial_year,
     FAILURE_STATUSES,
     REQUESTED_STATUSES,
     Spreadsheet,
+    get_current_financial_year,
+    user_has_permissions,
 )
 
 

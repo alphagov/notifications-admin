@@ -1,42 +1,42 @@
-import pytz
 import weakref
-
-from flask_wtf import FlaskForm as Form
 from datetime import datetime, timedelta
 from itertools import chain
 
-from notifications_utils.recipients import (
-    validate_phone_number,
-    InvalidPhoneError
-)
+import pytz
+from flask_wtf import FlaskForm as Form
+from flask_wtf.file import FileAllowed
+from flask_wtf.file import FileField as FileField_wtf
 from notifications_utils.columns import Columns
+from notifications_utils.recipients import (
+    InvalidPhoneError,
+    validate_phone_number,
+)
 from wtforms import (
-    widgets,
-    validators,
-    StringField,
-    PasswordField,
-    ValidationError,
-    TextAreaField,
-    FileField,
     BooleanField,
+    DateField,
+    FieldList,
+    FileField,
     HiddenField,
     IntegerField,
+    PasswordField,
     RadioField,
-    FieldList,
-    DateField,
+    StringField,
+    TextAreaField,
+    ValidationError,
+    validators,
+    widgets,
 )
-from wtforms.fields.html5 import EmailField, TelField, SearchField
-from wtforms.validators import (DataRequired, Length, Regexp, Optional)
-from flask_wtf.file import FileField as FileField_wtf, FileAllowed
+from wtforms.fields.html5 import EmailField, SearchField, TelField
+from wtforms.validators import DataRequired, Length, Optional, Regexp
 
 from app.main.validators import (
     Blacklist,
     CsvFileValidator,
-    ValidGovEmail,
+    LettersNumbersAndFullStopsOnly,
     NoCommasInPlaceHolders,
     OnlyGSMCharacters,
-    LettersNumbersAndFullStopsOnly,
-    ValidEmail
+    ValidEmail,
+    ValidGovEmail,
 )
 
 

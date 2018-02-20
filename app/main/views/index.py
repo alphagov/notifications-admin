@@ -1,12 +1,13 @@
-from flask import (render_template, url_for, redirect, request)
-from app.main import main
-from app import convert_to_boolean
-from app.main.forms import SearchTemplatesForm
-from flask_login import (login_required, current_user)
-
+from flask import redirect, render_template, request, url_for
+from flask_login import current_user, login_required
+from notifications_utils.international_billing_rates import (
+    INTERNATIONAL_BILLING_RATES,
+)
 from notifications_utils.template import HTMLEmailTemplate
-from notifications_utils.international_billing_rates import INTERNATIONAL_BILLING_RATES
 
+from app import convert_to_boolean
+from app.main import main
+from app.main.forms import SearchTemplatesForm
 from app.main.views.sub_navigation_dictionaries import features_nav
 
 

@@ -1,5 +1,5 @@
 import pytest
-from flask import url_for, session
+from flask import session, url_for
 
 from app.utils import is_gov_user
 

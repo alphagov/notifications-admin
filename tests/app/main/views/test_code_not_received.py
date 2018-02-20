@@ -1,6 +1,6 @@
 import pytest
-from flask import url_for
 from bs4 import BeautifulSoup
+from flask import url_for
 
 
 def test_should_render_email_verification_resend_show_email_address_and_resend_verify_email(

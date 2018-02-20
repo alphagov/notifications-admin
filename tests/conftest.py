@@ -1,40 +1,35 @@
-from contextlib import contextmanager
+import json
 import os
+from contextlib import contextmanager
 from datetime import date, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
-from notifications_python_client.errors import HTTPError
-from flask import url_for, Flask
 from bs4 import BeautifulSoup
+from flask import Flask, url_for
+from notifications_python_client.errors import HTTPError
+from notifications_utils.url_safe_token import generate_token
 
 from app import create_app
-from app.notify_client.models import (
-    User,
-    InvitedUser,
-    InvitedOrgUser
-)
+from app.notify_client.models import InvitedOrgUser, InvitedUser, User
 
 from . import (
-    service_json,
-    organisation_json,
-    user_json,
-    invited_user,
     TestClient,
-    template_json,
-    template_version_json,
     api_key_json,
+    generate_uuid,
+    invite_json,
+    invited_user,
     job_json,
     notification_json,
-    invite_json,
+    org_invite_json,
+    organisation_json,
     sample_uuid,
-    generate_uuid,
+    service_json,
     single_notification_json,
-    org_invite_json
+    template_json,
+    template_version_json,
+    user_json,
 )
-
-from notifications_utils.url_safe_token import generate_token
-import json
 
 
 @pytest.fixture

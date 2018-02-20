@@ -27,9 +27,12 @@ fi
 flake8 .
 display_result $? 1 "Code style check"
 
+isort --check-only -rc ./app ./tests
+display_result $? 2 "Import order check"
+
 npm test
-display_result $? 2 "Front end code style check"
+display_result $? 3 "Front end code style check"
 
 ## Code coverage
 py.test -n4 --maxfail=10 --cov=app --cov-report=term-missing tests/ --junitxml=test_results.xml --strict
-display_result $? 3 "Code coverage"
+display_result $? 4 "Code coverage"
