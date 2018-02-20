@@ -429,7 +429,7 @@ def test_should_show_request_to_go_live(
     client_request,
 ):
     page = client_request.get(
-        'main.service_request_to_go_live', service_id=SERVICE_ONE_ID
+        'main.request_to_go_live', service_id=SERVICE_ONE_ID
     )
     assert page.h1.text == 'Request to go live'
     for channel, label in (
@@ -462,7 +462,7 @@ def test_should_redirect_after_request_to_go_live(
 ):
     mock_post = mocker.patch('app.main.views.service_settings.deskpro_client.create_ticket')
     page = client_request.post(
-        'main.service_request_to_go_live',
+        'main.request_to_go_live',
         service_id=SERVICE_ONE_ID,
         _data={
             'mou': 'yes',
@@ -505,7 +505,7 @@ def test_should_redirect_after_request_to_go_live(
     'main.service_settings',
     'main.service_name_change',
     'main.service_name_change_confirm',
-    'main.service_request_to_go_live',
+    'main.request_to_go_live',
     'main.archive_service'
 ])
 def test_route_permissions(
@@ -536,7 +536,7 @@ def test_route_permissions(
     'main.service_settings',
     'main.service_name_change',
     'main.service_name_change_confirm',
-    'main.service_request_to_go_live',
+    'main.request_to_go_live',
     'main.service_switch_live',
     'main.service_switch_research_mode',
     'main.archive_service',
@@ -564,7 +564,7 @@ def test_route_invalid_permissions(
     'main.service_settings',
     'main.service_name_change',
     'main.service_name_change_confirm',
-    'main.service_request_to_go_live',
+    'main.request_to_go_live',
 ])
 def test_route_for_platform_admin(
         mocker,

@@ -161,7 +161,7 @@ def service_name_change_confirm(service_id):
 @main.route("/services/<service_id>/service-settings/request-to-go-live", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
-def service_request_to_go_live(service_id):
+def request_to_go_live(service_id):
     form = RequestToGoLiveForm()
 
     if form.validate_on_submit():
