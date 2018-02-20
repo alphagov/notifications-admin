@@ -25,7 +25,13 @@
     <h2 id="trial-mode" class="heading-medium">Trial mode</h2>
     <p>When you sign up to GOV.UK Notify, you’ll start in trial mode. In trial mode, you can send up to 50 text messages and emails a day. You can only send them to yourself and other people in your team.</p>
     <p>You can’t send letters in trial mode.</p>
-    <p>When you request to go live on Notify, we’ll remove these restrictions.</p>
+    <p>When you
+      {% if current_service and current_service.restricted %}
+        <a href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">request to go live</a>
+      {% else %}
+        request to go live
+      {% endif %}
+    on Notify, we’ll remove these restrictions.</p>
 
     <h2 id="messagedeliveryandfailure" class="heading-medium">Sending messages</h2>
     <p>When you send a message, it moves through different states in Notify.</p>
