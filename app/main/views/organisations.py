@@ -14,20 +14,39 @@ def organisations():
     orgs = organisations_client.get_organisations()
 
     return render_template(
-        'views/organisations/organisations.html',
+        'views/organisations/index.html',
         organisations=orgs
+    )
+
+
+@main.route("/organisations/add", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions(admin_override=True)
+def add_organisation():
+    form = CreateOrUpdateOrganisation()
+
+    if form.validate_on_submit():
+        organisations_client.create_organisation(
+            name=form.name.data,
+        )
+
+        return redirect(url_for('.organisations'))
+
+    return render_template(
+        'views/organisations/add-organisation.html',
+        form=form
     )
 
 
 @main.route("/organisation/<org_id>", methods=['GET'])
 @login_required
 @user_has_permissions(admin_override=True)
-def view_organisation(org_id):
-    org = organisations_client.get_organisation(org_id)
+def organisation_dashboard(org_id):
+    organisation_services = organisations_client.get_organisation_services(org_id)
 
     return render_template(
-        'views/organisations/view-organisation.html',
-        organisation=org
+        'views/organisations/organisation/index.html',
+        organisation_services=organisation_services
     )
 
 
@@ -50,26 +69,17 @@ def update_organisation(org_id):
     form.name.data = org['name']
 
     return render_template(
-        'views/organisations/manage-organisation.html',
+        'views/organisations/organisation/update-organisation.html',
         form=form,
         organisation=org
     )
 
 
-@main.route("/organisations/add", methods=['GET', 'POST'])
+@main.route("/organisation/<org_id>/users", methods=['GET'])
 @login_required
 @user_has_permissions(admin_override=True)
-def add_organisation():
-    form = CreateOrUpdateOrganisation()
-
-    if form.validate_on_submit():
-        organisations_client.create_organisation(
-            name=form.name.data,
-        )
-
-        return redirect(url_for('.organisations'))
+def organisation_users(org_id):
 
     return render_template(
-        'views/organisations/manage-organisation.html',
-        form=form
+        'views/organisations/organisation/users/index.html',
     )

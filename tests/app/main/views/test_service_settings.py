@@ -2037,6 +2037,25 @@ def test_select_organisation(
         ) == 'Org {}'.format(i + 1)
 
 
+def test_select_organisation_shows_message_if_no_orgs(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_get_service_organisation,
+    mocker
+):
+    mocker.patch('app.organisations_client.get_organisations', return_value=[])
+
+    response = logged_in_platform_admin_client.get(
+        url_for('.link_service_to_organisation', service_id=service_one['id']),
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.select_one('main p').text) == "No organisations"
+    assert not page.select_one('main button')
+
+
 def test_update_service_organisation(
     logged_in_platform_admin_client,
     service_one,

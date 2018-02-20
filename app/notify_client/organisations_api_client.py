@@ -32,11 +32,14 @@ class OrganisationsClient(NotifyAdminAPIClient):
     def get_service_organisation(self, service_id):
         return self.get(url="/service/{}/organisation".format(service_id))
 
-    def update_service_organisation(self, service_id, organisation_id):
+    def update_service_organisation(self, service_id, org_id):
         data = {
             'service_id': service_id
         }
         return self.post(
-            url="/organisations/{}/service".format(organisation_id),
+            url="/organisations/{}/service".format(org_id),
             data=data
         )
+
+    def get_organisation_services(self, org_id):
+        return self.get(url="/organisations/{}/services".format(org_id))

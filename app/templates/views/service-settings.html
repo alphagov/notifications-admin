@@ -248,7 +248,6 @@
     {% if current_user.has_permissions(admin_override=True) %}
 
       <h2 class="heading-medium">Platform admin settings</h2>
-
       {% call mapping_table(
         caption='Settings',
         field_headings=['Label', 'Value', 'Action'],
@@ -257,7 +256,7 @@
       ) %}
         {% call row() %}
           {{ text_field('Organisation')}}
-          {{ optional_text_field(organisation or 'Not Set') }}
+          {{ optional_text_field(organisation or None) }}
           {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}

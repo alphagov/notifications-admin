@@ -3,16 +3,16 @@
 {% from "components/textbox.html" import textbox, colour_textbox %}
 
 {% block per_page_title %}
-  {{ '{} an organisation'.format('Update' if organisation else 'Create')}}
+  Update an organisation
 {% endblock %}
 
-{% block service_page_title %}
-  {{ '{} an organisation'.format('Update' if organisation else 'Create')}}
+{% block org_page_title %}
+  Update an organisation
 {% endblock %}
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-large">{{ '{} an organisation'.format('Update' if organisation else 'Create')}}</h1>
+  <h1 class="heading-large">Update an organisation</h1>
   <form method="post">
     {{textbox(form.name)}}
     {{ page_footer(

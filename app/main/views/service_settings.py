@@ -789,6 +789,7 @@ def link_service_to_organisation(service_id):
 
     return render_template(
         'views/service-settings/link-service-to-organisation.html',
+        has_organisations=organisations,
         form=form,
     )
 

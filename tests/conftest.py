@@ -2690,3 +2690,18 @@ def mock_update_service_organisation(mocker):
         'app.organisations_client.update_service_organisation',
         side_effect=_update_service_organisation
     )
+
+
+@pytest.fixture(scope='function')
+def mock_get_organisation_services(mocker):
+    def _get_organisation_services(organisation_id):
+        return [
+            service_json('12345', 'service one'),
+            service_json('67890', 'service two'),
+            service_json('09876', 'service three')
+        ]
+
+    return mocker.patch(
+        'app.organisations_client.get_organisation_services',
+        side_effect=_get_organisation_services
+    )
