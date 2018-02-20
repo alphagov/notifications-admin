@@ -11,54 +11,29 @@
 
 {% block maincolumn_content %}
 
-      <h1 class="heading-large">Request to go live</h1>
+    <h1 class="heading-large">Request to go live</h1>
 
-      <p>
-        Before you request to go live, make sure you’ve:
-      </p>
-      <ul class="list list-bullet bottom-gutter">
-        <li>read our <a href="{{ url_for('.terms') }}">terms of use</a></li>
-        <li>added <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a> to your account</li>
-        <li>
-          specified your reply to email address or text message sender in your
-          <a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">settings</a> page</li>
-        <li>
-          added the templates you want to start with, making sure they follow the GOV.UK Service Manual standards for 
-          <a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a></li>
-      </ul>
-
-      <form method="post">
-        <div class="form-group">
-          <p>We need permission to process your data before we can make your service live.</p>
-          {{ radios(form.mou, option_hints={
-            'no': 'We’ll send you a copy',
-            'don’t know': 'We’ll check for you',
-          }) }}
-        </div>
-        {{ checkbox_group('What kind of messages will you be sending?', [
-          form.channel_email,
-          form.channel_sms,
-          form.channel_letter
-        ]) }}
-        <div class="form-group">
-          {{ textbox(form.start_date, width='1-1') }}
-          {{ textbox(form.start_volume, width='1-1', hint='For example, ‘1,000 per month’.') }}
-          {{ textbox(form.peak_volume, width='1-1', hint='For example, ‘Messages will increase to 20,000 per month in January’.') }}
-        </div>
-        {{ checkbox_group('How are you going to send messages?', [
-          form.method_one_off,
-          form.method_upload,
-          form.method_api
-        ]) }}
-        <p>
-          Once you’ve completed the tasks needed to set up, we’ll make your service live. We’ll do this within one working day.
-        </p>
-        <p>
-          By requesting to go live you’re agreeing to our <a href="{{ url_for('.terms') }}">terms of use</a>.
-        </p>
-
-        {{ page_footer('Request to go live') }}
-      </form>
-
+    <p>
+      Before you request to go live, make sure you’ve:
+    </p>
+    <ul class="list list-bullet bottom-gutter">
+      <li>
+        read our <a href="{{ url_for('.terms') }}">terms of use</a>
+      </li>
+      <li>
+        added <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a> to your account
+      </li>
+      <li>
+        specified your reply to email address or text message sender in your
+        <a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">settings</a> page
+      </li>
+      <li>
+        added the templates you want to start with, making sure they follow the GOV.UK Service Manual standards for
+        <a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a>
+      </li>
+    </ul>
+    <p>
+      <a href="{{ url_for('main.submit_request_to_go_live', service_id=current_service.id) }}" class="button">Next</a>
+    </p>
 
 {% endblock %}
