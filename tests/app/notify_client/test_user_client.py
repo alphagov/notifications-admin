@@ -1,6 +1,27 @@
 import pytest
 
 from app import user_api_client
+from tests.conftest import SERVICE_ONE_ID
+
+
+def test_client_gets_all_users_for_service(
+    mocker,
+    fake_uuid,
+):
+
+    user_api_client.max_failed_login_count = 99  # doesn't matter for this test
+    mock_get = mocker.patch(
+        'app.notify_client.user_api_client.UserApiClient.get',
+        return_value={'data': [
+            {'id': fake_uuid},
+        ]}
+    )
+
+    users = user_api_client.get_users_for_service(SERVICE_ONE_ID)
+
+    mock_get.assert_called_once_with('/service/{}/users'.format(SERVICE_ONE_ID))
+    assert len(users) == 1
+    assert users[0].id == fake_uuid
 
 
 def test_client_uses_correct_find_by_email(mocker, api_user_active):
