@@ -1,6 +1,69 @@
 import pytest
-
+from unittest.mock import call
 from app import user_api_client
+from app.notify_client.models import User
+from tests.conftest import SERVICE_ONE_ID
+
+
+def test_client_gets_all_users_for_service(
+    mocker,
+    fake_uuid,
+):
+
+    user_api_client.max_failed_login_count = 99  # doesn't matter for this test
+    mock_get = mocker.patch(
+        'app.notify_client.user_api_client.UserApiClient.get',
+        return_value={'data': [
+            {'id': fake_uuid},
+        ]}
+    )
+
+    users = user_api_client.get_users_for_service(SERVICE_ONE_ID)
+
+    mock_get.assert_called_once_with('/service/{}/users'.format(SERVICE_ONE_ID))
+    assert len(users) == 1
+    assert users[0].id == fake_uuid
+
+
+def test_client_returns_count_of_users_with_manage_service(
+    app_,
+    client,
+    mocker,
+    fake_uuid,
+):
+
+    def _service_one_user_with_permissions(*permissions):
+        return User({'permissions': {SERVICE_ONE_ID: list(permissions)}})
+
+    mock_get_users = mocker.patch(
+        'app.notify_client.user_api_client.UserApiClient.get_users_for_service',
+        return_value=[
+            _service_one_user_with_permissions('manage_settings', 'view_activity'),
+            _service_one_user_with_permissions('manage_settings'),
+            _service_one_user_with_permissions('view_activity'),
+            _service_one_user_with_permissions('manage_templates'),
+        ]
+    )
+
+    mocker.patch(
+        'app.notify_client.models._get_service_id_from_view_args',
+        return_value=SERVICE_ONE_ID,
+    )
+
+    assert user_api_client.get_count_of_users_with_permission(
+        SERVICE_ONE_ID,
+        'manage_settings'
+    ) == 2
+
+    assert user_api_client.get_count_of_users_with_permission(
+        SERVICE_ONE_ID,
+        'manage_templates'
+    ) == 1
+
+    assert mock_get_users.call_args_list == [
+        call(SERVICE_ONE_ID),
+        call(SERVICE_ONE_ID)
+    ]
 
 
 def test_client_uses_correct_find_by_email(mocker, api_user_active):
