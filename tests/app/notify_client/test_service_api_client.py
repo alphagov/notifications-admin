@@ -1,7 +1,8 @@
 import pytest
 
+from app import service_api_client
 from app.notify_client.service_api_client import ServiceAPIClient
-from tests.conftest import fake_uuid
+from tests.conftest import fake_uuid, SERVICE_ONE_ID
 
 
 def test_client_posts_archived_true_when_deleting_template(mocker):
@@ -78,3 +79,57 @@ def test_client_creates_service_with_correct_data(
             email_from='test@example.com',
         ),
     )
+
+
+@pytest.mark.parametrize('template_data, extra_args, expected_count', (
+    (
+        [],
+        {},
+        0,
+    ),
+    (
+        [],
+        {'template_type': 'email'},
+        0,
+    ),
+    (
+        [
+            {'template_type': 'email'},
+            {'template_type': 'sms'},
+        ],
+        {},
+        2,
+    ),
+    (
+        [
+            {'template_type': 'email'},
+            {'template_type': 'sms'},
+        ],
+        {'template_type': 'email'},
+        1,
+    ),
+    (
+        [
+            {'template_type': 'email'},
+            {'template_type': 'sms'},
+        ],
+        {'template_type': 'letter'},
+        0,
+    ),
+))
+def test_client_returns_count_of_service_templates(
+    app_,
+    mocker,
+    template_data,
+    extra_args,
+    expected_count,
+):
+
+    mocker.patch(
+        'app.service_api_client.get_service_templates',
+        return_value={'data': template_data}
+    )
+
+    assert service_api_client.count_service_templates(
+        SERVICE_ONE_ID, **extra_args
+    ) == expected_count
