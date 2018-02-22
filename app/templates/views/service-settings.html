@@ -227,9 +227,14 @@
       </ul>
 
       <p>
-        To remove these restrictions
-        <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
-      </p>
+        {% if current_user.has_permissions('manage_settings') %}
+          To remove these restrictions
+          <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
+        {% else %}
+          Your service manager can ask to have these restrictions removed.
+        {% endif %}
+        </p>
+
     {% else %}
       <h2 class="heading-medium">Your service is live</h2>
 
@@ -328,7 +333,7 @@
             <a href="{{ url_for('.service_switch_can_send_precompiled_letter', service_id=current_service.id) }}" class="button">
               {{ 'Stop sending precompiled letters' if 'precompiled_letter' in current_service.permissions else 'Allow to send precompiled letters' }}
             </a>
-          </li>  
+          </li>
         {% endif %}
         <li class="bottom-gutter">
           <a href="{{ url_for('.service_switch_email_auth', service_id=current_service.id) }}" class="button">
