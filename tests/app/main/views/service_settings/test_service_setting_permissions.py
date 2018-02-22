@@ -35,6 +35,11 @@ def get_service_settings_page(
     ({'permissions': ['sms']}, '.service_switch_can_send_sms', {}, 'Stop sending sms'),
     ({'permissions': []}, '.service_switch_can_send_sms', {}, 'Allow to send sms'),
 
+    ({'permissions': ['letter', 'precompiled_letter']},
+        '.service_switch_can_send_precompiled_letter', {}, 'Stop sending precompiled letters'),
+    ({'permissions': ['letter']},
+        '.service_switch_can_send_precompiled_letter', {}, 'Allow to send precompiled letters'),
+
     ({'permissions': ['sms']}, '.service_set_inbound_number', {'set_inbound_sms': True}, 'Allow inbound sms'),
 
     ({'active': True}, '.archive_service', {}, 'Archive service'),
@@ -48,32 +53,23 @@ def test_service_setting_toggles_show(get_service_settings_page, service_one, se
     assert page.find('a', {'class': 'button', 'href': button_url}).text.strip() == text
 
 
-@pytest.mark.parametrize('permissions', [
-    ['inbound_sms'], []
+@pytest.mark.parametrize('permissions,permissions_text', [
+    ('inbound_sms', 'inbound sms'),                 # no sms parent permission
+    ('precompiled_letter', 'precompiled letters'),  # no letter parent permission
+    # also test no permissions set
+    ('', 'inbound sms'),
+    ('', 'precompiled letters')
 ])
-def test_service_settings_doesnt_show_inbound_options_if_sms_disabled(
+def test_service_settings_doesnt_show_option_if_parent_permission_disabled(
     get_service_settings_page,
     service_one,
-    permissions
+    permissions,
+    permissions_text
 ):
-    service_one['permissions'] = permissions
+    service_one['permissions'] = [permissions]
     page = get_service_settings_page()
     toggles = page.find_all('a', {'class': 'button'})
-    assert not any(button for button in toggles if 'inbound sms' in button.text)
-
-
-@pytest.mark.parametrize('permissions', [
-    ['letters_as_pdf'], []
-])
-def test_service_settings_doesnt_show_letters_as_pdf_options_if_letters_disabled(
-    get_service_settings_page,
-    service_one,
-    permissions
-):
-    service_one['permissions'] = permissions
-    page = get_service_settings_page()
-    toggles = page.find_all('a', {'class': 'button'})
-    assert not any(button for button in toggles if 'letters as PDF' in button.text)
+    assert not any(button for button in toggles if permissions_text in button.text)
 
 
 @pytest.mark.parametrize('service_fields, hidden_button_text', [

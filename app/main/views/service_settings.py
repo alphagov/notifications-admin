@@ -296,6 +296,14 @@ def service_switch_email_auth(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
+@main.route("/services/<service_id>/service-settings/can-send-precompiled-letter")
+@login_required
+@user_has_permissions(admin_override=True)
+def service_switch_can_send_precompiled_letter(service_id):
+    switch_service_permissions(service_id, 'precompiled_letter')
+    return redirect(url_for('.service_settings', service_id=service_id))
+
+
 @main.route("/services/<service_id>/service-settings/archive", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)

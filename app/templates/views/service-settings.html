@@ -323,6 +323,13 @@
           {% endif %}
           </li>
         {% endif %}
+        {% if 'letter' in current_service.permissions %}
+          <li class="bottom-gutter">
+            <a href="{{ url_for('.service_switch_can_send_precompiled_letter', service_id=current_service.id) }}" class="button">
+              {{ 'Stop sending precompiled letters' if 'precompiled_letter' in current_service.permissions else 'Allow to send precompiled letters' }}
+            </a>
+          </li>  
+        {% endif %}
         <li class="bottom-gutter">
           <a href="{{ url_for('.service_switch_email_auth', service_id=current_service.id) }}" class="button">
             {{ 'Stop editing user auth' if 'email_auth' in current_service.permissions else 'Allow editing user auth' }}
