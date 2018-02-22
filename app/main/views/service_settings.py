@@ -158,10 +158,17 @@ def service_name_change_confirm(service_id):
         form=form)
 
 
-@main.route("/services/<service_id>/service-settings/request-to-go-live", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/request-to-go-live")
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
-def service_request_to_go_live(service_id):
+def request_to_go_live(service_id):
+    return render_template('views/service-settings/request-to-go-live.html')
+
+
+@main.route("/services/<service_id>/service-settings/submit-request-to-go-live", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_settings', admin_override=True)
+def submit_request_to_go_live(service_id):
     form = RequestToGoLiveForm()
 
     if form.validate_on_submit():
@@ -204,7 +211,7 @@ def service_request_to_go_live(service_id):
         flash('We’ve received your request to go live', 'default')
         return redirect(url_for('.service_settings', service_id=service_id))
 
-    return render_template('views/service-settings/request-to-go-live.html', form=form)
+    return render_template('views/service-settings/submit-request-to-go-live.html', form=form)
 
 
 @main.route("/services/<service_id>/service-settings/switch-live")
