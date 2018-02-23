@@ -207,7 +207,6 @@ def test_register_from_invite(
 def test_register_from_invite_when_user_registers_in_another_browser(
     client,
     api_user_active,
-    mock_is_email_not_unique,
     mock_get_user_by_email,
     mock_accept_invite,
 ):

@@ -1,7 +1,7 @@
 import pytest
 
 from bs4 import BeautifulSoup
-from flask import url_for, Response
+from flask import url_for
 
 from datetime import (
     datetime,
@@ -11,10 +11,8 @@ from datetime import (
 from tests.conftest import (
     normalize_spaces
 )
-from unittest.mock import ANY, Mock
+from unittest.mock import ANY
 from app.notify_client.models import InvitedOrgUser
-
-from notifications_python_client.errors import HTTPError
 
 
 def test_organisation_page_shows_all_organisations(
