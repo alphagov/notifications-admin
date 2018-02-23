@@ -1377,6 +1377,19 @@ def mock_get_user(mocker, user=None):
 
 
 @pytest.fixture(scope='function')
+def mock_get_organisation_user(mocker, user=None):
+    if user is None:
+        user = api_user_active(fake_uuid())
+
+    def _get_user(id_):
+        user.id = id_
+        return user
+
+    return mocker.patch(
+        'app.user_api_client.get_user', side_effect=_get_user)
+
+
+@pytest.fixture(scope='function')
 def mock_get_locked_user(mocker, api_user_locked):
     return mock_get_user(mocker, user=api_user_locked)
 
@@ -2778,9 +2791,8 @@ def mock_check_org_invite_token(mocker, sample_org_invite):
 
 @pytest.fixture(scope='function')
 def mock_check_org_cancelled_invite_token(mocker, sample_org_invite):
-    sample_org_invite['status'] = 'cancelled'
-
     def _check_org_token(token):
+        sample_org_invite['status'] = 'cancelled'
         return InvitedOrgUser(**sample_org_invite)
 
     return mocker.patch('app.org_invite_api_client.check_token', side_effect=_check_org_token)

@@ -11,7 +11,7 @@ from datetime import (
 from tests.conftest import (
     normalize_spaces
 )
-from unittest.mock import ANY
+from unittest.mock import ANY, Mock
 from app.notify_client.models import InvitedOrgUser
 
 from notifications_python_client.errors import HTTPError
@@ -244,19 +244,6 @@ def test_invite_org_user_errors_when_same_email_as_inviter(
 # Broken
 
 
-def test_accept_invite_with_invalid_token(
-    client,
-    mocker
-):
-    mocker.patch(
-        'app.org_invite_api_client.check_token',
-        side_effect=HTTPError(Response(status=400), {'result': 'error', 'message': 'default error message'})
-    )
-
-    response = client.get(url_for('main.accept_org_invite', token='thisisnotarealtoken'))
-    assert response.status_code == 400
-
-
 def test_accepted_invite_when_user_already_logged_in(
     logged_in_client,
     mock_check_org_invite_token
@@ -318,6 +305,7 @@ def test_existing_user_invite_already_is_member_of_organisation(
     mock_get_user_by_email,
     mock_get_users_for_organisation,
     mock_accept_org_invite,
+    mock_add_user_to_organisation,
     fake_uuid
 ):
     response = client.get(url_for('main.accept_org_invite', token='thisisnotarealtoken'))
@@ -329,12 +317,12 @@ def test_existing_user_invite_already_is_member_of_organisation(
         _external=True
     )
 
-    mock_accept_org_invite.assert_called_once_with('596364a0-858e-42c8-9062-a8fe822260af', fake_uuid)
+    mock_accept_org_invite.assert_called_once_with('596364a0-858e-42c8-9062-a8fe822260af', ANY)
     mock_get_user_by_email.assert_called_once_with('invited_user@test.gov.uk')
     mock_get_users_for_organisation.assert_called_once_with('596364a0-858e-42c8-9062-a8fe822260af')
 
 
-def test_exisiting_user_invite_not_a_member_of_organisation(
+def test_existing_user_invite_not_a_member_of_organisation(
     client,
     mock_check_org_invite_token,
     mock_get_user_by_email,
