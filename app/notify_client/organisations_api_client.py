@@ -1,4 +1,4 @@
-from app.notify_client import NotifyAdminAPIClient
+from app.notify_client import _attach_current_user, NotifyAdminAPIClient
 
 
 class OrganisationsClient(NotifyAdminAPIClient):
@@ -43,3 +43,10 @@ class OrganisationsClient(NotifyAdminAPIClient):
 
     def get_organisation_services(self, org_id):
         return self.get(url="/organisations/{}/services".format(org_id))
+
+    def remove_user_from_organisation(self, org_id, user_id):
+        endpoint = '/organisations/{}/users/{}'.format(
+            org_id=org_id,
+            user_id=user_id)
+        data = _attach_current_user({})
+        return self.delete(endpoint, data)

@@ -5,6 +5,9 @@ from datetime import datetime, timedelta, timezone
 from flask.testing import FlaskClient
 from flask import url_for
 from flask_login import login_user
+from app.notify_client.models import (
+    InvitedOrgUser,
+)
 
 
 class TestClient(FlaskClient):
@@ -35,6 +38,85 @@ def generate_uuid():
 
 def created_by_json(id_, name='', email_address=''):
     return {'id': id_, 'name': name, 'email_address': email_address}
+
+
+def user_json(
+    id_='1234',
+    name='Test User',
+    email_address='test@gov.uk',
+    mobile_number='+447700900986',
+    password_changed_at=None,
+    permissions={generate_uuid(): [
+        'send_texts',
+        'send_emails',
+        'send_letters',
+        'manage_users',
+        'manage_templates',
+        'manage_settings',
+        'manage_api_keys']
+    },
+    auth_type='sms_auth',
+    failed_login_count=0,
+    state='active',
+    max_failed_login_count=3,
+    platform_admin=False,
+    current_session_id='1234',
+    organisations=[],
+
+):
+    return {
+        'id': id_,
+        'name': name,
+        'email_address': email_address,
+        'mobile_number': mobile_number,
+        'password_changed_at': password_changed_at,
+        'permissions': permissions,
+        'auth_type': auth_type,
+        'failed_login_count': failed_login_count,
+        'state': state,
+        'max_failed_login_count': max_failed_login_count,
+        'platform_admin': platform_admin,
+        'current_session_id': current_session_id,
+        'organisations': organisations
+    }
+
+
+def invited_user(
+    _id='1234',
+    service=None,
+    from_user='1234',
+    email_address='testinviteduser@gov.uk',
+    permissions=None,
+    status='pending',
+    created_at=datetime.utcnow(),
+    auth_type='sms_auth',
+    organisation=None
+):
+    org_user = organisation is not None
+    data = {
+        'id': _id,
+        'from_user': from_user,
+        'email_address': email_address,
+        'status': status,
+        'created_at': created_at,
+        'auth_type': auth_type,
+    }
+    if service:
+        data['service'] = service
+    if permissions:
+        data['permissions'] = permissions
+    if organisation:
+        data['organisation'] = organisation
+
+    if org_user:
+        return InvitedOrgUser(
+            data['id'],
+            data['organisation'],
+            data['from_user'],
+            data['email_address'],
+            data['status'],
+            data['created_at']
+        )
 
 
 def service_json(
@@ -85,6 +167,28 @@ def service_json(
         'inbound_api': inbound_api,
         'service_callback_api': service_callback_api,
         'prefix_sms': prefix_sms,
+    }
+
+
+def organisation_json(
+    id_='1234',
+    name='Test Organisation',
+    users=None,
+    active=True,
+    created_at=None,
+    services=None
+):
+    if users is None:
+        users = []
+    if services is None:
+        services = []
+    return {
+        'id': id_,
+        'name': name,
+        'active': active,
+        'users': users,
+        'services': services,
+        'created_at': created_at or str(datetime.utcnow())
     }
 
 
@@ -163,6 +267,17 @@ def invite_json(id_, from_user, service_id, email_address, permissions, created_
         'permissions': permissions,
         'created_at': created_at,
         'auth_type': auth_type
+    }
+
+
+def org_invite_json(id_, invited_by, org_id, email_address, created_at, status):
+    return {
+        'id': id_,
+        'invited_by': invited_by,
+        'organisation': org_id,
+        'email_address': email_address,
+        'status': status,
+        'created_at': created_at,
     }
 
 
