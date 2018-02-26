@@ -69,39 +69,6 @@ class Config(object):
     STATSD_HOST = "statsd.hostedgraphite.com"
     STATSD_PORT = 8125
     NOTIFY_ENVIRONMENT = 'development'
-
-    EMAIL_DOMAIN_REGEXES = [
-        r"gov\.uk",
-        r"mod\.uk",
-        r"mil\.uk",
-        r"ddc-mod\.org",
-        r"slc\.co\.uk",
-        r"gov\.scot",
-        r"parliament\.uk",
-        r"nhs\.uk",
-        r"nhs\.net",
-        r"police\.uk",
-        r"dclgdatamart\.co\.uk",
-        r"ucds\.email",
-        r"naturalengland\.org\.uk",
-        r"hmcts\.net",
-        r"scotent\.co\.uk",
-        r"assembly\.wales",
-        r"cjsm\.net",
-        r"cqc\.org\.uk",
-        r"bl\.uk",
-        r"stfc\.ac\.uk",
-        r"wmfs\.net",
-        r"bbsrc\.ac\.uk",
-        r"acas\.org\.uk",
-        r"gov\.wales",
-        r"biglotteryfund\.org\.uk",
-        r"marinemanagement\.org\.uk",
-        r"britishmuseum\.org",
-        r"derrystrabane\.com",
-        r"highwaysengland\.co\.uk",
-    ]
-
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-local'
     ROUTE_SECRET_KEY_1 = os.environ.get('ROUTE_SECRET_KEY_1', '')
     ROUTE_SECRET_KEY_2 = os.environ.get('ROUTE_SECRET_KEY_2', '')
