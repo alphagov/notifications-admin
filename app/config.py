@@ -48,7 +48,7 @@ class Config(object):
     HTTP_PROTOCOL = 'http'
     MAX_FAILED_LOGIN_COUNT = 10
     NOTIFY_APP_NAME = 'admin'
-    NOTIFY_LOG_LEVEL = 'ERROR'
+    NOTIFY_LOG_LEVEL = 'DEBUG'
     PERMANENT_SESSION_LIFETIME = 20 * 60 * 60  # 20 hours
     SEND_FILE_MAX_AGE_DEFAULT = 365 * 24 * 60 * 60  # 1 year
     SESSION_COOKIE_HTTPONLY = True

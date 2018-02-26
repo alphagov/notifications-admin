@@ -170,10 +170,6 @@ class User(UserMixin):
     def organisations(self):
         return self._organisations
 
-    @organisations.setter
-    def organisations(self, organisations):
-        self._organisations = organisations
-
 
 class InvitedUser(object):
 
