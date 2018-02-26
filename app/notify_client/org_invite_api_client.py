@@ -30,7 +30,7 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
         return invited_users
 
     def check_token(self, token):
-        resp = self.get(url='/organisation-invitation/{}'.format(token))
+        resp = self.get(url='/invite/organisation/{}'.format(token))
         return InvitedOrgUser(**resp['data'])
 
     def cancel_invited_user(self, org_id, invited_user_id):
