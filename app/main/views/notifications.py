@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import base64
-import json
 from collections import ItemsView
 from datetime import datetime
 
@@ -22,7 +21,7 @@ from app import (
     notification_api_client,
 )
 from app.main import main
-from app.template_previews import TemplatePreview, get_page_count_for_letter
+from app.template_previews import get_page_count_for_letter
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -121,6 +120,7 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
     )
 
     return base64.b64decode(preview['content']), preview['status'], ItemsView(dict(preview['headers']))
+
 
 @main.route("/services/<service_id>/notification/<notification_id>.json")
 @user_has_permissions('view_activity', admin_override=True)
