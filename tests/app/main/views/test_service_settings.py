@@ -455,30 +455,46 @@ def test_should_raise_duplicate_name_handled(
     assert mock_verify_password.called
 
 
-@pytest.mark.parametrize('count_of_users_with_manage_service, expected_checklist_item', [
+@pytest.mark.parametrize('count_of_users_with_manage_service, expected_user_checklist_item', [
     (1, 'Not done: Another person in your team has the ‘Manage service’ permission'),
     (2, 'Done: Another person in your team has the ‘Manage service’ permission'),
+])
+@pytest.mark.parametrize('count_of_templates, expected_templates_checklist_item', [
+    (0, 'Not done: You’ve added some templates'),
+    (1, 'Done: You’ve added some templates'),
+    (2, 'Done: You’ve added some templates'),
 ])
 def test_should_show_request_to_go_live_checklist(
     client_request,
     mocker,
     count_of_users_with_manage_service,
-    expected_checklist_item,
+    expected_user_checklist_item,
+    count_of_templates,
+    expected_templates_checklist_item,
 ):
     mock_count_users = mocker.patch(
         'app.main.views.service_settings.user_api_client.get_count_of_users_with_permission',
         return_value=count_of_users_with_manage_service
     )
+    mock_count_templates = mocker.patch(
+        'app.main.views.service_settings.service_api_client.count_service_templates',
+        return_value=count_of_templates
+    )
+
     page = client_request.get(
         'main.request_to_go_live', service_id=SERVICE_ONE_ID
     )
     assert page.h1.text == 'Request to go live'
-    assert normalize_spaces(page.select('main ul li')[0].text) == expected_checklist_item
+
+    assert normalize_spaces(page.select('main ul li')[0].text) == expected_user_checklist_item
+    assert normalize_spaces(page.select('main ul li')[1].text) == expected_templates_checklist_item
+
     assert page.select_one('main .button')['href'] == url_for(
         'main.submit_request_to_go_live',
         service_id=SERVICE_ONE_ID,
     )
     mock_count_users.assert_called_once_with(SERVICE_ONE_ID, 'manage_settings')
+    mock_count_templates.assert_called_once_with(SERVICE_ONE_ID)
 
 
 def test_should_show_request_to_go_live(
@@ -577,6 +593,7 @@ def test_route_permissions(
         single_sms_sender,
         route,
         mock_get_service_settings_page_common,
+        mock_get_service_templates,
 ):
     validate_route_permission(
         mocker,
@@ -606,6 +623,7 @@ def test_route_invalid_permissions(
         api_user_active,
         service_one,
         route,
+        mock_get_service_templates,
 ):
     validate_route_permission(
         mocker,
@@ -637,6 +655,7 @@ def test_route_for_platform_admin(
         single_sms_sender,
         route,
         mock_get_service_settings_page_common,
+        mock_get_service_templates,
 ):
     validate_route_permission(mocker,
                               app_,

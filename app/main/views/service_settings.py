@@ -169,6 +169,9 @@ def request_to_go_live(service_id):
                 service_id, 'manage_settings'
             ) > 1
         ),
+        has_templates=(
+            service_api_client.count_service_templates(service_id) > 0
+        ),
     )
 
 
