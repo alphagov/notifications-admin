@@ -11,6 +11,7 @@ from tests import (
     template_json,
     validate_route_permission,
 )
+from tests.conftest import service_one as create_sample_service
 from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_service_email_template,
@@ -18,9 +19,8 @@ from tests.conftest import (
     mock_get_service_template,
     no_letter_contact_blocks,
     normalize_spaces,
+    single_letter_contact_block,
 )
-from tests.conftest import service_one as create_sample_service
-from tests.conftest import single_letter_contact_block
 
 from app.main.views.templates import (
     get_human_readable_delta,
