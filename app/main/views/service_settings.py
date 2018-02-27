@@ -162,7 +162,14 @@ def service_name_change_confirm(service_id):
 @login_required
 @user_has_permissions('manage_settings', admin_override=True)
 def request_to_go_live(service_id):
-    return render_template('views/service-settings/request-to-go-live.html')
+    return render_template(
+        'views/service-settings/request-to-go-live.html',
+        has_team_members=(
+            user_api_client.get_count_of_users_with_permission(
+                service_id, 'manage_settings'
+            ) > 1
+        ),
+    )
 
 
 @main.route("/services/<service_id>/service-settings/submit-request-to-go-live", methods=['GET', 'POST'])
