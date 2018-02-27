@@ -1,0 +1,28 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  {{ user.name or user.email_localpart }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    {{ user.name or user.email_localpart }}
+  </h1>
+
+  <p>
+    {{ user.email_address }}
+  </p>
+  <form method="post" class="column-three-quarters">
+      {{ page_footer(
+        'Save',
+        back_link=url_for('.manage_org_users', org_id=current_org.id),
+        back_link_text="Back",
+        delete_link=url_for('.remove_user_from_organisation', org_id=current_org.id, user_id=user.id) if user or None,
+        delete_link_text='Remove user from organisation'
+      ) }}
+  </form>
+
+{% endblock %}

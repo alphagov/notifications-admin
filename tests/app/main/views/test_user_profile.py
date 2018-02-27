@@ -30,6 +30,7 @@ def test_should_redirect_after_name_change(
     logged_in_client,
     api_user_active,
     mock_update_user_attribute,
+    mock_email_is_not_already_in_use
 ):
     new_name = 'New Name'
     data = {'new_name': new_name}
@@ -54,7 +55,7 @@ def test_should_show_email_page(
 def test_should_redirect_after_email_change(
     logged_in_client,
     mock_login,
-    mock_is_email_unique,
+    mock_email_is_not_already_in_use,
 ):
     data = {'email_address': 'new_notify@notify.gov.uk'}
     response = logged_in_client.post(

@@ -1,7 +1,6 @@
 from flask import url_for
 from bs4 import BeautifulSoup
 from unittest.mock import ANY
-from itsdangerous import SignatureExpired
 
 import app
 from app.notify_client.models import InvitedUser
@@ -22,8 +21,6 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     mock_get_service,
     mocker,
 ):
-    mocker.patch('app.main.views.invites.check_token')
-
     expected_service = service_one['id']
     expected_permissions = ['send_messages', 'manage_service', 'manage_api_keys']
 
@@ -50,8 +47,6 @@ def test_existing_user_with_no_permissions_accept_invite(
     mock_add_user_to_service,
     mock_get_service,
 ):
-    mocker.patch('app.main.views.invites.check_token')
-
     expected_service = service_one['id']
     sample_invite['permissions'] = ''
     expected_permissions = []
@@ -69,8 +64,6 @@ def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(
     sample_invite,
     mock_get_service,
 ):
-    mocker.patch('app.main.views.invites.check_token')
-
     sample_invite['status'] = 'accepted'
     invite = InvitedUser(**sample_invite)
     mocker.patch('app.invite_api_client.check_token', return_value=invite)
@@ -96,7 +89,6 @@ def test_existing_user_of_service_get_redirected_to_signin(
     mock_get_user_by_email,
     mock_accept_invite,
 ):
-    mocker.patch('app.main.views.invites.check_token')
     sample_invite['email_address'] = api_user_active.email_address
     invite = InvitedUser(**sample_invite)
     mocker.patch('app.invite_api_client.check_token', return_value=invite)
@@ -128,8 +120,6 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
     mock_get_service,
     mocker,
 ):
-    mocker.patch('app.main.views.invites.check_token')
-
     expected_service = service_one['id']
     expected_permissions = ['send_messages', 'manage_service', 'manage_api_keys']
 
@@ -161,8 +151,6 @@ def test_new_user_accept_invite_calls_api_and_redirects_to_registration(
     mock_get_service,
     mocker,
 ):
-    mocker.patch('app.main.views.invites.check_token')
-
     expected_redirect_location = 'http://localhost/register-from-invite'
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
@@ -184,8 +172,6 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(
     mock_get_service,
     mocker,
 ):
-    mocker.patch('app.main.views.invites.check_token')
-
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
 
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
@@ -219,7 +205,6 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
     mock_get_user,
     mock_get_service,
 ):
-    mocker.patch('app.main.views.invites.check_token')
     cancelled_invitation = create_sample_invite(mocker, service_one, status='cancelled')
     mock_check_token_invite(mocker, cancelled_invitation)
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
@@ -237,7 +222,7 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     api_user_active,
     mock_check_invite_token,
     mock_dont_get_user_by_email,
-    mock_is_email_unique,
+    mock_email_is_not_already_in_use,
     mock_register_user,
     mock_send_verify_code,
     mock_accept_invite,
@@ -246,8 +231,6 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     mock_get_service,
     mocker,
 ):
-    mocker.patch('app.main.views.invites.check_token')
-
     expected_service = service_one['id']
     expected_email = sample_invite['email_address']
     expected_from_user = service_one['users'][0]
@@ -297,7 +280,6 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
     mock_accept_invite,
     mock_get_service,
 ):
-    mocker.patch('app.main.views.invites.check_token')
     invite = InvitedUser(**sample_invite)
     mocker.patch('app.invite_api_client.check_token', return_value=invite)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[api_user_active])
@@ -324,8 +306,6 @@ def test_accept_invite_does_not_treat_email_addresses_as_case_sensitive(
     mock_accept_invite,
     mock_get_user_by_email
 ):
-    mocker.patch('app.main.views.invites.check_token')
-
     # the email address of api_user_active is 'test@user.gov.uk'
     sample_invite['email_address'] = 'TEST@user.gov.uk'
     invite = InvitedUser(**sample_invite)
@@ -345,7 +325,7 @@ def test_new_invited_user_verifies_and_added_to_service(
     api_user_active,
     mock_check_invite_token,
     mock_dont_get_user_by_email,
-    mock_is_email_unique,
+    mock_email_is_not_already_in_use,
     mock_register_user,
     mock_send_verify_code,
     mock_check_verify_code,
@@ -363,8 +343,6 @@ def test_new_invited_user_verifies_and_added_to_service(
     mock_get_usage,
     mocker,
 ):
-    mocker.patch('app.main.views.invites.check_token')
-
     # visit accept token page
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
     assert response.status_code == 302
@@ -404,24 +382,6 @@ def test_new_invited_user_verifies_and_added_to_service(
     assert page.find('h1').text == 'Dashboard'
 
 
-def test_gives_message_if_token_has_expired(
-    app_,
-    client,
-    mock_check_invite_token,
-    mocker,
-):
-    check_token = mocker.patch('app.main.views.invites.check_token', side_effect=SignatureExpired('this is too old'))
-
-    response = client.get(url_for('main.accept_invite', token='a really old token'))
-    raw_html = response.data.decode('utf-8')
-    page = BeautifulSoup(raw_html, 'html.parser')
-
-    check_token.assert_called_once_with(ANY, ANY, ANY, 3600 * 24 * 2)
-    assert response.status_code == 400
-    assert 'Your invitation to GOV.UK Notify has expired' in page.find('h1').text
-    assert not mock_check_invite_token.called
-
-
 def test_existing_user_accepts_and_sets_email_auth(
     client_request,
     api_user_active,
@@ -434,7 +394,6 @@ def test_existing_user_accepts_and_sets_email_auth(
     mock_add_user_to_service,
     mocker
 ):
-    mocker.patch('app.main.views.invites.check_token')
     sample_invite['email_address'] = api_user_active.email_address
 
     service_one['permissions'].append('email_auth')
@@ -465,7 +424,6 @@ def test_existing_user_doesnt_get_auth_changed_by_service_without_permission(
     mock_add_user_to_service,
     mocker
 ):
-    mocker.patch('app.main.views.invites.check_token')
     sample_invite['email_address'] = api_user_active.email_address
 
     assert 'email_auth' not in service_one['permissions']
@@ -495,7 +453,6 @@ def test_existing_email_auth_user_without_phone_cannot_set_sms_auth(
     mock_add_user_to_service,
     mocker
 ):
-    mocker.patch('app.main.views.invites.check_token')
     sample_invite['email_address'] = api_user_active.email_address
 
     service_one['permissions'].append('email_auth')
@@ -529,7 +486,6 @@ def test_existing_email_auth_user_with_phone_can_set_sms_auth(
     mock_add_user_to_service,
     mocker
 ):
-    mocker.patch('app.main.views.invites.check_token')
     sample_invite['email_address'] = api_user_active.email_address
 
     service_one['permissions'].append('email_auth')

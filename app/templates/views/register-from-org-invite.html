@@ -1,0 +1,28 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block per_page_title %}
+Create an account
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-two-thirds">
+    <h1 class="heading-large">Create an account</h1>
+    <p>Your account will be created with this email: {{invited_org_user.email_address}}</p>
+    <form method="post" autocomplete="off">
+      {{ textbox(form.name, width='3-4') }}
+      <div class="extra-tracking">
+        {{ textbox(form.mobile_number, width='3-4', hint='We’ll send you a security code by text message') }}
+      </div>
+      {{ textbox(form.password, hint="At least 8 characters", width='3-4') }}
+      {{ page_footer("Continue") }}
+      {{form.organisation}}
+      {{form.email_address}}
+    </form>
+  </div>
+</div>
+
+{% endblock %}

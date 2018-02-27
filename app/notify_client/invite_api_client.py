@@ -34,7 +34,7 @@ class InviteApiClient(NotifyAdminAPIClient):
         return invited_users
 
     def check_token(self, token):
-        resp = self.get(url='/invite/{}'.format(token))
+        resp = self.get(url='/invite/service/{}'.format(token))
         return InvitedUser(**resp['data'])
 
     def cancel_invited_user(self, service_id, invited_user_id):

@@ -237,6 +237,25 @@ class RegisterUserFromInviteForm(StripWhitespaceForm):
             raise ValidationError('Can’t be empty')
 
 
+class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
+    def __init__(self, invited_org_user):
+        super().__init__(
+            organisation=invited_org_user['organisation'],
+            email_address=invited_org_user['email_address'],
+        )
+
+    name = StringField(
+        'Full name',
+        validators=[DataRequired(message='Can’t be empty')]
+    )
+
+    mobile_number = InternationalPhoneNumber('Mobile number', validators=[DataRequired(message='Can’t be empty')])
+    password = password()
+    organisation = HiddenField('organisation')
+    email_address = HiddenField('email_address')
+    auth_type = HiddenField('auth_type', validators=[DataRequired()])
+
+
 class PermissionsForm(StripWhitespaceForm):
     send_messages = BooleanField("Send messages from existing templates")
     manage_templates = BooleanField("Add and edit templates")
@@ -257,6 +276,18 @@ class InviteUserForm(PermissionsForm):
 
     def __init__(self, invalid_email_address, *args, **kwargs):
         super(InviteUserForm, self).__init__(*args, **kwargs)
+        self.invalid_email_address = invalid_email_address.lower()
+
+    def validate_email_address(self, field):
+        if field.data.lower() == self.invalid_email_address:
+            raise ValidationError("You can’t send an invitation to yourself")
+
+
+class InviteOrgUserForm(StripWhitespaceForm):
+    email_address = email_address(gov_user=False)
+
+    def __init__(self, invalid_email_address, *args, **kwargs):
+        super(InviteOrgUserForm, self).__init__(*args, **kwargs)
         self.invalid_email_address = invalid_email_address.lower()
 
     def validate_email_address(self, field):
@@ -419,7 +450,7 @@ class ChangeEmailForm(StripWhitespaceForm):
 
     def validate_email_address(self, field):
         is_valid = self.validate_email_func(field.data)
-        if not is_valid:
+        if is_valid:
             raise ValidationError("The email address is already in use")
 
 

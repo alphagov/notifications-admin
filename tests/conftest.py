@@ -11,11 +11,15 @@ from bs4 import BeautifulSoup
 from app import create_app
 from app.notify_client.models import (
     User,
-    InvitedUser
+    InvitedUser,
+    InvitedOrgUser
 )
 
 from . import (
     service_json,
+    organisation_json,
+    user_json,
+    invited_user,
     TestClient,
     template_json,
     template_version_json,
@@ -25,7 +29,8 @@ from . import (
     invite_json,
     sample_uuid,
     generate_uuid,
-    single_notification_json
+    single_notification_json,
+    org_invite_json
 )
 
 from notifications_utils.url_safe_token import generate_token
@@ -1050,7 +1055,8 @@ def api_user_pending(fake_uuid):
                  'mobile_number': '07700 900762',
                  'state': 'pending',
                  'failed_login_count': 0,
-                 'permissions': {}
+                 'permissions': {},
+                 'organisations': []
                  }
     user = User(user_data)
     return user
@@ -1075,7 +1081,8 @@ def platform_admin_user(fake_uuid):
                                                   'manage_api_keys',
                                                   'view_activity']},
                  'platform_admin': True,
-                 'auth_type': 'sms_auth'
+                 'auth_type': 'sms_auth',
+                 'organisations': []
                  }
     user = User(user_data)
     return user
@@ -1094,7 +1101,8 @@ def api_user_active(fake_uuid, email_address='test@user.gov.uk'):
                  'permissions': {},
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
-                 'password_changed_at': str(datetime.utcnow())
+                 'password_changed_at': str(datetime.utcnow()),
+                 'organisations': []
                  }
     user = User(user_data)
     return user
@@ -1113,7 +1121,8 @@ def api_user_active_email_auth(fake_uuid, email_address='test@user.gov.uk'):
                  'permissions': {},
                  'platform_admin': False,
                  'auth_type': 'email_auth',
-                 'password_changed_at': str(datetime.utcnow())
+                 'password_changed_at': str(datetime.utcnow()),
+                 'organisations': []
                  }
     user = User(user_data)
     return user
@@ -1132,7 +1141,8 @@ def api_nongov_user_active(fake_uuid):
                  'permissions': {},
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
-                 'password_changed_at': str(datetime.utcnow())
+                 'password_changed_at': str(datetime.utcnow()),
+                 'organisations': []
                  }
     user = User(user_data)
     return user
@@ -1159,7 +1169,8 @@ def active_user_with_permissions(fake_uuid):
                                                   'manage_api_keys',
                                                   'view_activity']},
                  'platform_admin': False,
-                 'auth_type': 'sms_auth'
+                 'auth_type': 'sms_auth',
+                 'organisations': []
                  }
     user = User(user_data)
     return user
@@ -1186,7 +1197,8 @@ def active_user_no_mobile(fake_uuid):
                                                   'manage_api_keys',
                                                   'view_activity']},
                  'platform_admin': False,
-                 'auth_type': 'email_auth'
+                 'auth_type': 'email_auth',
+                 'organisations': []
                  }
     user = User(user_data)
     return user
@@ -1206,7 +1218,8 @@ def active_user_view_permissions(fake_uuid):
                  'failed_login_count': 0,
                  'permissions': {SERVICE_ONE_ID: ['view_activity']},
                  'platform_admin': False,
-                 'auth_type': 'sms_auth'
+                 'auth_type': 'sms_auth',
+                 'organisations': []
                  }
     user = User(user_data)
     return user
@@ -1230,7 +1243,8 @@ def active_user_manage_template_permission(fake_uuid):
             'view_activity',
         ]},
         'platform_admin': False,
-        'auth_type': 'sms_auth'
+        'auth_type': 'sms_auth',
+        'organisations': []
     }
     user = User(user_data)
     return user
@@ -1255,7 +1269,8 @@ def active_user_no_api_key_permission(fake_uuid):
             'view_activity',
         ]},
         'platform_admin': False,
-        'auth_type': 'sms_auth'
+        'auth_type': 'sms_auth',
+        'organisations': []
     }
     user = User(user_data)
     return user
@@ -1297,7 +1312,8 @@ def api_user_locked(fake_uuid):
                  'state': 'active',
                  'failed_login_count': 5,
                  'permissions': {},
-                 'auth_type': 'sms_auth'
+                 'auth_type': 'sms_auth',
+                 'organisations': []
                  }
     user = User(user_data)
     return user
@@ -1315,7 +1331,8 @@ def api_user_request_password_reset(fake_uuid):
                  'failed_login_count': 5,
                  'permissions': {},
                  'password_changed_at': None,
-                 'auth_type': 'sms_auth'
+                 'auth_type': 'sms_auth',
+                 'organisations': []
                  }
     user = User(user_data)
     return user
@@ -1333,7 +1350,8 @@ def api_user_changed_password(fake_uuid):
                  'failed_login_count': 5,
                  'permissions': {},
                  'auth_type': 'sms_auth',
-                 'password_changed_at': str(datetime.utcnow() + timedelta(minutes=1))
+                 'password_changed_at': str(datetime.utcnow() + timedelta(minutes=1)),
+                 'organisations': []
                  }
     user = User(user_data)
     return user
@@ -1372,6 +1390,19 @@ def mock_get_non_govuser(mocker, user=None):
 
 @pytest.fixture(scope='function')
 def mock_get_user(mocker, user=None):
+    if user is None:
+        user = api_user_active(fake_uuid())
+
+    def _get_user(id_):
+        user.id = id_
+        return user
+
+    return mocker.patch(
+        'app.user_api_client.get_user', side_effect=_get_user)
+
+
+@pytest.fixture(scope='function')
+def mock_get_organisation_user(mocker, user=None):
     if user is None:
         user = api_user_active(fake_uuid())
 
@@ -1520,13 +1551,13 @@ def mock_activate_user(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_is_email_unique(mocker):
-    return mocker.patch('app.user_api_client.is_email_unique', return_value=True)
+def mock_email_is_already_in_use(mocker):
+    return mocker.patch('app.user_api_client.is_email_already_in_use', return_value=True)
 
 
 @pytest.fixture(scope='function')
-def mock_is_email_not_unique(mocker):
-    return mocker.patch('app.user_api_client.is_email_unique', return_value=False)
+def mock_email_is_not_already_in_use(mocker):
+    return mocker.patch('app.user_api_client.is_email_already_in_use', return_value=False)
 
 
 @pytest.fixture(scope='function')
@@ -1925,14 +1956,14 @@ def mock_get_users_by_service(mocker):
                                                   'manage_users',
                                                   'manage_templates',
                                                   'manage_settings',
-                                                  'manage_api_keys',
-                                                  'access_developer_docs']},
+                                                  'manage_api_keys']},
                  'state': 'active',
                  'password_changed_at': None,
                  'name': 'Test User',
                  'email_address': 'notify@digital.cabinet-office.gov.uk',
                  'auth_type': 'sms_auth',
-                 'failed_login_count': 0}]
+                 'failed_login_count': 0,
+                 'organisations': []}]
         return [User(data[0])]
 
     return mocker.patch('app.user_api_client.get_users_for_service', side_effect=_get_users_for_service, autospec=True)
@@ -2659,6 +2690,11 @@ def mock_update_service_callback_api(mocker):
 
 
 @pytest.fixture(scope='function')
+def organisation_one(api_user_active):
+    return organisation_json('596364a0-858e-42c8-9062-a8fe822260af', 'organisation one', [api_user_active.id])
+
+
+@pytest.fixture(scope='function')
 def mock_get_organisations(mocker):
     def _get_organisations():
         return [
@@ -2684,10 +2720,10 @@ def mock_get_organisations(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_organisation(mocker):
-    def _get_organisation(organisation_id):
+    def _get_organisation(org_id):
         return {
             'name': 'Org 1',
-            'id': organisation_id,
+            'id': org_id,
             'active': True
         }
 
@@ -2730,3 +2766,84 @@ def mock_get_organisation_services(mocker):
         'app.organisations_client.get_organisation_services',
         side_effect=_get_organisation_services
     )
+
+
+@pytest.fixture(scope='function')
+def mock_get_users_for_organisation(mocker):
+    def _get_users_for_organisation(org_id):
+        return [
+            User(user_json(id_='1234', name='Test User 1')),
+            User(user_json(id_='5678', name='Test User 2', email_address='testt@gov.uk'))
+        ]
+
+    return mocker.patch(
+        'app.user_api_client.get_users_for_organisation',
+        side_effect=_get_users_for_organisation
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_invited_users_for_organisation(mocker):
+    def _get_invited_invited_users_for_organisation(org_id):
+        return [
+            invited_user(organisation='1234')
+        ]
+
+    return mocker.patch(
+        'app.org_invite_api_client.get_invites_for_organisation',
+        side_effect=_get_invited_invited_users_for_organisation
+    )
+
+
+@pytest.fixture(scope='function')
+def sample_org_invite(mocker, organisation_one, status='pending'):
+    id_ = str(generate_uuid())
+    invited_by = organisation_one['users'][0]
+    email_address = 'invited_user@test.gov.uk'
+    organisation = organisation_one['id']
+    created_at = str(datetime.utcnow())
+
+    return org_invite_json(id_, invited_by, organisation, email_address, created_at, status)
+
+
+@pytest.fixture(scope='function')
+def mock_check_org_invite_token(mocker, sample_org_invite):
+    def _check_org_token(token):
+        return InvitedOrgUser(**sample_org_invite)
+
+    return mocker.patch('app.org_invite_api_client.check_token', side_effect=_check_org_token)
+
+
+@pytest.fixture(scope='function')
+def mock_check_org_cancelled_invite_token(mocker, sample_org_invite):
+    def _check_org_token(token):
+        sample_org_invite['status'] = 'cancelled'
+        return InvitedOrgUser(**sample_org_invite)
+
+    return mocker.patch('app.org_invite_api_client.check_token', side_effect=_check_org_token)
+
+
+@pytest.fixture(scope='function')
+def mock_check_org_accepted_invite_token(mocker, sample_org_invite):
+    sample_org_invite['status'] = 'accepted'
+
+    def _check_org_token(token):
+        return InvitedOrgUser(**sample_org_invite)
+
+    return mocker.patch('app.org_invite_api_client.check_token', side_effect=_check_org_token)
+
+
+@pytest.fixture(scope='function')
+def mock_accept_org_invite(mocker, sample_org_invite):
+    def _accept(organisation_id, invite_id):
+        return InvitedOrgUser(**sample_org_invite)
+
+    return mocker.patch('app.org_invite_api_client.accept_invite', side_effect=_accept)
+
+
+@pytest.fixture(scope='function')
+def mock_add_user_to_organisation(mocker, organisation_one, api_user_active):
+    def _add_user(organisation_id, user_id):
+        return api_user_active
+
+    return mocker.patch('app.user_api_client.add_user_to_organisation', side_effect=_add_user)

@@ -52,6 +52,7 @@ from app.notify_client.provider_client import ProviderClient
 from app.notify_client.email_branding_client import EmailBrandingClient
 from app.notify_client.models import AnonymousUser
 from app.notify_client.organisations_api_client import OrganisationsClient
+from app.notify_client.org_invite_api_client import OrgInviteApiClient
 from app.notify_client.letter_jobs_client import LetterJobsClient
 from app.notify_client.inbound_number_client import InboundNumberClient
 from app.notify_client.billing_api_client import BillingAPIClient
@@ -74,6 +75,7 @@ events_api_client = EventsApiClient()
 provider_client = ProviderClient()
 email_branding_client = EmailBrandingClient()
 organisations_client = OrganisationsClient()
+org_invite_api_client = OrgInviteApiClient()
 asset_fingerprinter = AssetFingerprinter()
 statsd_client = StatsdClient()
 deskpro_client = DeskproClient()
@@ -109,6 +111,7 @@ def create_app(application):
     notification_api_client.init_app(application)
     status_api_client.init_app(application)
     invite_api_client.init_app(application)
+    org_invite_api_client.init_app(application)
     template_statistics_client.init_app(application)
     events_api_client.init_app(application)
     provider_client.init_app(application)
