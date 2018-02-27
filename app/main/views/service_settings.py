@@ -43,7 +43,12 @@ from app.main.forms import (
     ServiceSwitchLettersForm,
     SMSPrefixForm,
 )
-from app.utils import email_safe, get_cdn_domain, user_has_permissions
+from app.utils import (
+    email_safe,
+    get_cdn_domain,
+    user_has_permissions,
+    user_is_platform_admin,
+)
 
 
 @main.route("/services/<service_id>/service-settings")
@@ -212,7 +217,7 @@ def submit_request_to_go_live(service_id):
 
 @main.route("/services/<service_id>/service-settings/switch-live")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_live(service_id):
     service_api_client.update_service(
         current_service['id'],
@@ -226,7 +231,7 @@ def service_switch_live(service_id):
 
 @main.route("/services/<service_id>/service-settings/research-mode")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_research_mode(service_id):
     service_api_client.update_service_with_properties(
         service_id,
@@ -270,7 +275,7 @@ def update_service_permissions(service_id, permissions, sms_sender=None):
 
 @main.route("/services/<service_id>/service-settings/can-send-email")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_can_send_email(service_id):
     switch_service_permissions(service_id, 'email')
     return redirect(url_for('.service_settings', service_id=service_id))
@@ -278,7 +283,7 @@ def service_switch_can_send_email(service_id):
 
 @main.route("/services/<service_id>/service-settings/can-send-sms")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_can_send_sms(service_id):
     switch_service_permissions(service_id, 'sms')
     return redirect(url_for('.service_settings', service_id=service_id))
@@ -286,7 +291,7 @@ def service_switch_can_send_sms(service_id):
 
 @main.route("/services/<service_id>/service-settings/email-auth")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_email_auth(service_id):
     switch_service_permissions(service_id, 'email_auth')
     return redirect(url_for('.service_settings', service_id=service_id))
@@ -294,7 +299,7 @@ def service_switch_email_auth(service_id):
 
 @main.route("/services/<service_id>/service-settings/can-send-precompiled-letter")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_can_send_precompiled_letter(service_id):
     switch_service_permissions(service_id, 'precompiled_letter')
     return redirect(url_for('.service_settings', service_id=service_id))
@@ -690,7 +695,7 @@ def service_set_letter_contact_block(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-organisation-type", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def set_organisation_type(service_id):
 
     form = OrganisationTypeForm(organisation_type=current_service.get('organisation_type'))
@@ -715,7 +720,7 @@ def set_organisation_type(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-free-sms-allowance", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def set_free_sms_allowance(service_id):
 
     form = FreeSMSAllowance(free_sms_allowance=billing_api_client.get_free_sms_fragment_limit_for_year(service_id))
@@ -733,7 +738,7 @@ def set_free_sms_allowance(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-email-branding", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_set_email_branding(service_id):
     email_branding = email_branding_client.get_all_email_branding()
 
@@ -762,7 +767,7 @@ def service_set_email_branding(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-letter-branding", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def set_letter_branding(service_id):
 
     form = LetterBranding(choices=email_branding_client.get_letter_email_branding().items())
@@ -784,7 +789,7 @@ def set_letter_branding(service_id):
 
 @main.route("/services/<service_id>/service-settings/link-service-to-organisation", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def link_service_to_organisation(service_id):
 
     organisations = organisations_client.get_organisations()

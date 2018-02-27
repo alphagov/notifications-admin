@@ -3,6 +3,7 @@ import copy
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from tests.conftest import service_one as create_sample_service
 from tests.conftest import (
     SERVICE_ONE_ID,
     active_user_manage_template_permission,
@@ -11,7 +12,6 @@ from tests.conftest import (
     active_user_with_permissions,
     normalize_spaces,
 )
-from tests.conftest import service_one as create_sample_service
 
 import app
 from app.notify_client.models import InvitedUser

@@ -78,6 +78,17 @@ def user_has_permissions(*permissions, admin_override=False, any_=False):
     return wrap
 
 
+def user_is_platform_admin(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        if not current_user.is_authenticated:
+            abort(401)
+        if not current_user.platform_admin:
+            abort(403)
+        return f(*args, **kwargs)
+    return wrapped
+
+
 def redirect_to_sign_in(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
