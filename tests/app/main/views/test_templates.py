@@ -139,7 +139,7 @@ def test_should_be_able_to_view_a_template_with_links(
     permissions,
     links_to_be_shown,
 ):
-    active_user_with_permissions._permissions[service_one['id']] = permissions
+    active_user_with_permissions._permissions[service_one['id']] = permissions + ['view_activity']
     client.login(active_user_with_permissions, mocker, service_one)
 
     response = client.get(url_for(

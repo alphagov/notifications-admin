@@ -14,7 +14,7 @@
 
     <h1 class="heading-large">Templates</h1>
 
-    {% if current_user.has_permissions('manage_templates', any_=True) %}
+    {% if current_user.has_permissions('manage_templates') %}
        <p class="bottom-gutter">
          You need a template before you can send
          {% if 'letter' in current_service.permissions %}

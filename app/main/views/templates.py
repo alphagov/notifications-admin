@@ -43,11 +43,7 @@ page_headings = {
 @login_required
 @user_has_permissions(
     'view_activity',
-    'send_texts',
-    'send_emails',
-    'manage_templates',
-    'manage_api_keys',
-    admin_override=True, any_=True
+    admin_override=True,
 )
 def view_template(service_id, template_id):
     template = service_api_client.get_service_template(service_id, str(template_id))['data']
@@ -81,11 +77,7 @@ def view_template(service_id, template_id):
 @login_required
 @user_has_permissions(
     'view_activity',
-    'send_texts',
-    'send_emails',
-    'manage_templates',
-    'manage_api_keys',
-    admin_override=True, any_=True
+    admin_override=True,
 )
 def start_tour(service_id, template_id):
 
@@ -110,12 +102,7 @@ def start_tour(service_id, template_id):
 @login_required
 @user_has_permissions(
     'view_activity',
-    'send_texts',
-    'send_emails',
-    'manage_templates',
-    'manage_api_keys',
     admin_override=True,
-    any_=True,
 )
 def choose_template(service_id, template_type='all'):
     templates = service_api_client.get_service_templates(service_id)['data']
@@ -181,12 +168,7 @@ def _view_template_version(service_id, template_id, version, letters_as_pdf=Fals
 @login_required
 @user_has_permissions(
     'view_activity',
-    'send_texts',
-    'send_emails',
-    'manage_templates',
-    'manage_api_keys',
     admin_override=True,
-    any_=True
 )
 def view_template_version(service_id, template_id, version):
     return render_template(
@@ -199,12 +181,7 @@ def view_template_version(service_id, template_id, version):
 @login_required
 @user_has_permissions(
     'view_activity',
-    'send_texts',
-    'send_emails',
-    'manage_templates',
-    'manage_api_keys',
     admin_override=True,
-    any_=True
 )
 def view_template_version_preview(service_id, template_id, version, filetype):
     db_template = service_api_client.get_service_template(service_id, template_id, version=version)['data']
@@ -515,12 +492,7 @@ def redact_template(service_id, template_id):
 @login_required
 @user_has_permissions(
     'view_activity',
-    'send_texts',
-    'send_emails',
-    'manage_templates',
-    'manage_api_keys',
     admin_override=True,
-    any_=True
 )
 def view_template_versions(service_id, template_id):
     return render_template(
