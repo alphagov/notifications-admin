@@ -1,6 +1,6 @@
 from itertools import chain
 from flask_login import UserMixin, AnonymousUserMixin
-from flask import session
+from flask import request, session
 
 
 roles = {
@@ -11,6 +11,10 @@ roles = {
 }
 
 all_permissions = set(chain.from_iterable(roles.values())) | {'view_activity'}
+
+
+def _get_service_id_from_view_args():
+    return request.view_args.get('service_id', None)
 
 
 class User(UserMixin):
@@ -27,7 +31,7 @@ class User(UserMixin):
         self.max_failed_login_count = max_failed_login_count
         self.platform_admin = fields.get('platform_admin')
         self.current_session_id = fields.get('current_session_id')
-        self.organisations = fields.get('organisations', [])
+        self._organisations = fields.get('organisations', [])
 
     def get_id(self):
         return self.id
@@ -118,9 +122,8 @@ class User(UserMixin):
         if admin_override and not permissions:
             return False
 
-        from flask import request
         # Service id is always set on the request for service specific views.
-        service_id = request.view_args.get('service_id', None)
+        service_id = _get_service_id_from_view_args()
         if service_id in self._permissions:
             if any_:
                 return any([x in self._permissions[service_id] for x in permissions])

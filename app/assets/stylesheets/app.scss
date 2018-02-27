@@ -45,12 +45,6 @@
 
 }
 
-.beta-badge {
-  @include phase-tag();
-  margin: 10px 0 0 0;
-}
-
-
 @include media(desktop) {
   #proposition-menu {
     float: right;
@@ -170,11 +164,6 @@ details summary {
     border-top: 0;
   }
 
-}
-
-.phase-banner-beta {
-  border: 0;
-  margin-bottom: -$gutter + 2px;
 }
 
 .body-copy-table {

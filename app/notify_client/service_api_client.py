@@ -226,6 +226,16 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             service_id=service_id)
         return self.get(endpoint, *params)
 
+    def count_service_templates(self, service_id, template_type=None):
+        return len([
+            template for template in
+            self.get_service_templates(service_id)['data']
+            if (
+                not template_type
+                or template['template_type'] == template_type
+            )
+        ])
+
     def delete_service_template(self, service_id, template_id):
         """
         Set a service template's archived flag to True

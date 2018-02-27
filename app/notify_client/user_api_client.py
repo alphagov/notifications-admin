@@ -131,6 +131,12 @@ class UserApiClient(NotifyAdminAPIClient):
         resp = self.get(endpoint)
         return [User(data) for data in resp['data']]
 
+    def get_count_of_users_with_permission(self, service_id, permission):
+        return len([
+            user for user in self.get_users_for_service(service_id)
+            if user.has_permissions(permission, any_=True)
+        ])
+
     def get_users_for_organisation(self, org_id):
         endpoint = '/organisations/{}/users'.format(org_id)
         resp = self.get(endpoint)

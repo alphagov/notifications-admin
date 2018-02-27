@@ -11,6 +11,7 @@ from tests import validate_route_permission, service_json
 from tests.conftest import (
     active_user_with_permissions,
     active_user_no_api_key_permission,
+    active_user_no_settings_permission,
     platform_admin_user,
     normalize_spaces,
     multiple_reply_to_email_addresses,
@@ -281,19 +282,48 @@ def test_should_redirect_after_change_service_name(
     assert mock_service_name_is_unique.called
 
 
+@pytest.mark.parametrize('user, expected_text, expected_link', [
+    (
+        active_user_with_permissions,
+        'To remove these restrictions request to go live.',
+        True,
+    ),
+    (
+        active_user_no_settings_permission,
+        'Your service manager can ask to have these restrictions removed.',
+        False,
+    ),
+])
 def test_show_restricted_service(
-        logged_in_client,
-        service_one,
-        single_reply_to_email_address,
-        single_letter_contact_block,
-        mock_get_service_organisation,
-        single_sms_sender,
-        mock_get_service_settings_page_common,
+    client,
+    mocker,
+    fake_uuid,
+    service_one,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_service_organisation,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+    user,
+    expected_text,
+    expected_link,
 ):
-    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    client.login(user(fake_uuid), mocker, service_one)
+    response = client.get(url_for('main.service_settings', service_id=service_one['id']))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find('h1').text == 'Settings'
     assert page.find_all('h2')[0].text == 'Your service is in trial mode'
+
+    request_to_live = page.select_one('main p')
+    request_to_live_link = request_to_live.select_one('a')
+
+    assert normalize_spaces(request_to_live.text) == expected_text
+
+    if expected_link:
+        assert request_to_live_link.text.strip() == 'request to go live'
+        assert request_to_live_link['href'] == url_for('main.request_to_go_live', service_id=service_one['id'])
+    else:
+        assert not request_to_live_link
 
 
 def test_switch_service_to_live(

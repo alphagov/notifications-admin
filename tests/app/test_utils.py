@@ -13,7 +13,8 @@ from app.utils import (
     generate_next_dict,
     Spreadsheet,
     get_letter_timings,
-    get_cdn_domain
+    get_cdn_domain,
+    GovernmentDomain,
 )
 from tests.conftest import fake_uuid
 
@@ -307,3 +308,64 @@ def test_get_cdn_domain_on_non_localhost(client, mocker):
     mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'https://some.admintest.com'})
     domain = get_cdn_domain()
     assert domain == 'static-logos.admintest.com'
+
+
+@pytest.mark.parametrize("domain_or_email_address", (
+    "test@dclgdatamart.co.uk", "test@communities.gsi.gov.uk", "test@communities.gov.uk",
+))
+def test_get_valid_government_domain_known_details(domain_or_email_address):
+    government_domain = GovernmentDomain(domain_or_email_address)
+    assert government_domain.crown_status is None
+    assert government_domain.owner == "Ministry of Housing, Communities & Local Government"
+    assert government_domain.agreement_signed is True
+
+
+@pytest.mark.parametrize("domain_or_email_address", (
+    "test@police.gov.uk", "police.gov.uk",
+))
+def test_get_valid_government_domain_unknown_details(domain_or_email_address):
+    government_domain = GovernmentDomain(domain_or_email_address)
+    assert government_domain.crown_status is None
+    assert government_domain.owner is None
+    assert government_domain.agreement_signed is None
+
+
+def test_get_valid_government_domain_some_known_details():
+    government_domain = GovernmentDomain("marinemanagement.org.uk")
+    assert government_domain.crown_status is None
+    assert government_domain.owner == "Marine Management Organisation"
+    assert government_domain.agreement_signed is True
+
+
+def test_get_valid_government_domain_gets_most_specific_first():
+
+    generic = GovernmentDomain("gov.uk")
+    assert generic.crown_status is None
+    assert generic.owner is None
+    assert generic.agreement_signed is None
+
+    specific = GovernmentDomain("dacorum.gov.uk")
+    assert specific.crown_status is False
+    assert specific.owner == 'Dacorum Borough Council'
+    assert specific.agreement_signed is True
+
+
+def test_validate_government_domain_data():
+
+    for domain in GovernmentDomain.domains.keys():
+
+        government_domain = GovernmentDomain(domain)
+
+        assert government_domain.crown_status in {
+            True, False, None
+        }
+
+        assert (
+            government_domain.owner is None
+        ) or (
+            isinstance(government_domain.owner, str)
+        )
+
+        assert government_domain.agreement_signed in {
+            True, False, None
+        }
