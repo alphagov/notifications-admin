@@ -26,6 +26,14 @@
           has_templates,
           'You’ve added some templates',
         ) }}
+        {% if has_email_templates %}
+          {{ tick_cross_done_not_done(
+            has_email_reply_to_address,
+            'You’ve added an email reply to address on the <a href="{}">settings</a> page'.format(
+              url_for('main.service_settings', service_id=current_service.id)
+            )|safe,
+          ) }}
+        {% endif %}
       </ul>
       <p>
         You also need to:
@@ -33,10 +41,6 @@
       <ul class="list list-bullet bottom-gutter">
         <li>
           read our <a href="{{ url_for('.terms') }}">terms of use</a>
-        </li>
-        <li>
-          specify your reply to email address or text message sender in your
-          <a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">settings</a> page
         </li>
         <li>
           make sure your messages follow the GOV.UK Service Manual standards for

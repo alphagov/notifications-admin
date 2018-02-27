@@ -172,6 +172,12 @@ def request_to_go_live(service_id):
         has_templates=(
             service_api_client.count_service_templates(service_id) > 0
         ),
+        has_email_templates=(
+            service_api_client.count_service_templates(service_id, template_type='email') > 0
+        ),
+        has_email_reply_to_address=bool(
+            service_api_client.get_reply_to_email_addresses(service_id)
+        )
     )
 
 

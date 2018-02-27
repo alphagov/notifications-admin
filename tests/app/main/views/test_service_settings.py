@@ -464,6 +464,12 @@ def test_should_raise_duplicate_name_handled(
     (1, 'Done: You’ve added some templates'),
     (2, 'Done: You’ve added some templates'),
 ])
+@pytest.mark.parametrize('count_of_email_templates, reply_to_email_addresses, expected_reply_to_checklist_item', [
+    pytest.mark.xfail((0, [], ''), raises=IndexError),
+    pytest.mark.xfail((0, [{}], ''), raises=IndexError),
+    (1, [], 'Not done: You’ve added an email reply to address on the settings page'),
+    (1, [{}], 'Done: You’ve added an email reply to address on the settings page'),
+])
 def test_should_show_request_to_go_live_checklist(
     client_request,
     mocker,
@@ -471,14 +477,27 @@ def test_should_show_request_to_go_live_checklist(
     expected_user_checklist_item,
     count_of_templates,
     expected_templates_checklist_item,
+    count_of_email_templates,
+    reply_to_email_addresses,
+    expected_reply_to_checklist_item,
 ):
+
+    def _count_templates(service_id, template_type=None):
+        return {
+            'email': count_of_email_templates
+        }.get(template_type, count_of_templates)
+
     mock_count_users = mocker.patch(
         'app.main.views.service_settings.user_api_client.get_count_of_users_with_permission',
         return_value=count_of_users_with_manage_service
     )
     mock_count_templates = mocker.patch(
         'app.main.views.service_settings.service_api_client.count_service_templates',
-        return_value=count_of_templates
+        side_effect=_count_templates
+    )
+    mock_get_reply_to_email_addresses = mocker.patch(
+        'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
+        return_value=reply_to_email_addresses
     )
 
     page = client_request.get(
@@ -486,15 +505,25 @@ def test_should_show_request_to_go_live_checklist(
     )
     assert page.h1.text == 'Request to go live'
 
-    assert normalize_spaces(page.select('main ul li')[0].text) == expected_user_checklist_item
-    assert normalize_spaces(page.select('main ul li')[1].text) == expected_templates_checklist_item
+    checklist_items = page.select('main ul[class=bottom-gutter] li')
+
+    assert normalize_spaces(checklist_items[0].text) == expected_user_checklist_item
+    assert normalize_spaces(checklist_items[1].text) == expected_templates_checklist_item
+    assert normalize_spaces(checklist_items[2].text) == expected_reply_to_checklist_item
 
     assert page.select_one('main .button')['href'] == url_for(
         'main.submit_request_to_go_live',
         service_id=SERVICE_ONE_ID,
     )
+
     mock_count_users.assert_called_once_with(SERVICE_ONE_ID, 'manage_settings')
-    mock_count_templates.assert_called_once_with(SERVICE_ONE_ID)
+    assert mock_count_templates.call_args_list == [
+        call(SERVICE_ONE_ID),
+        call(SERVICE_ONE_ID, template_type='email'),
+    ]
+
+    if count_of_email_templates:
+        mock_get_reply_to_email_addresses.assert_called_once_with(SERVICE_ONE_ID)
 
 
 def test_should_show_request_to_go_live(
