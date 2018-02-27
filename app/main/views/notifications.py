@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import base64
+import json
+from collections import ItemsView
 from datetime import datetime
 
 from flask import (
@@ -88,6 +91,8 @@ def view_notification(service_id, notification_id):
 @user_has_permissions('view_activity', admin_override=True)
 def view_letter_notification_as_preview(service_id, notification_id, filetype):
 
+    print("\n\nview_letter_notification_as_preview\n\n")
+
     if filetype not in ('pdf', 'png'):
         abort(404)
 
@@ -107,8 +112,15 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
 
     template.values = notification['personalisation']
 
-    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
+    preview = notification_api_client.get_notification_letter_preview(
+        service_id,
+        template.id,
+        notification_id,
+        filetype,
+        page=request.args.get('page')
+    )
 
+    return base64.b64decode(preview['content']), preview['status'], ItemsView(dict(preview['headers']))
 
 @main.route("/services/<service_id>/notification/<notification_id>.json")
 @user_has_permissions('view_activity', admin_override=True)
