@@ -57,7 +57,6 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
             '((day of week)) and my favourite colour is ((colour)).'
         ),
         101,
-        process_type='priority',
     )
     assert session['service_id'] == 101
     assert response.status_code == 302
