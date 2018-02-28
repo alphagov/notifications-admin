@@ -163,9 +163,14 @@ def test_should_show_image_of_letter_notification(
 
     mock_get_notification(mocker, fake_uuid, template_type='letter')
 
-    mocked_preview = mocker.patch(
-        'app.main.views.templates.TemplatePreview.from_utils_template',
-        return_value='foo'
+    import base64
+    mocked_api_client = mocker.patch(
+        'app.notify_client.notification_api_client.NotificationApiClient.get',
+        return_value={
+            'content': base64.b64encode(b'foo').decode('utf-8'),
+            'status': 200, 
+            'headers': [{'test': 'test', 'test1': 'test1'}]
+        }
     )
 
     response = logged_in_client.get(url_for(
@@ -177,8 +182,7 @@ def test_should_show_image_of_letter_notification(
 
     assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
-    assert isinstance(mocked_preview.call_args[0][0], LetterImageTemplate)
-    assert mocked_preview.call_args[0][1] == filetype
+    assert mocked_api_client.called
 
 
 def test_should_404_for_unknown_extension(
