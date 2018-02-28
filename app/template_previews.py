@@ -1,5 +1,5 @@
-from flask import current_app, json
 import requests
+from flask import current_app, json
 
 from app import current_service
 

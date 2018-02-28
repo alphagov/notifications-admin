@@ -1,19 +1,21 @@
 import copy
+
 import pytest
-from flask import url_for
 from bs4 import BeautifulSoup
+from flask import url_for
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    active_user_manage_template_permission,
+    active_user_no_mobile,
+    active_user_view_permissions,
+    active_user_with_permissions,
+    normalize_spaces,
+)
+from tests.conftest import service_one as create_sample_service
+
 import app
 from app.notify_client.models import InvitedUser
 from app.utils import is_gov_user
-from tests.conftest import service_one as create_sample_service
-from tests.conftest import (
-    normalize_spaces,
-    SERVICE_ONE_ID,
-    active_user_with_permissions,
-    active_user_view_permissions,
-    active_user_no_mobile,
-    active_user_manage_template_permission,
-)
 
 
 @pytest.mark.parametrize('user, expected_self_text, expected_coworker_text', [

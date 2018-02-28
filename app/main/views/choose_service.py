@@ -1,7 +1,8 @@
-from flask import (render_template, redirect, url_for, session)
-from flask_login import login_required, current_user
-from app.main import main
+from flask import redirect, render_template, session, url_for
+from flask_login import current_user, login_required
+
 from app import service_api_client
+from app.main import main
 from app.notify_client.service_api_client import ServicesBrowsableItem
 from app.utils import is_gov_user
 

@@ -1,7 +1,8 @@
-from flask import jsonify, request, current_app
-from app import (version, status_api_client)
-from app.status import status
+from flask import current_app, jsonify, request
 from notifications_python_client.errors import HTTPError
+
+from app import status_api_client, version
+from app.status import status
 
 
 @status.route('/_status', methods=['GET'])

@@ -1,17 +1,24 @@
-from bs4 import BeautifulSoup, element
 from functools import partial
-import pytest
-from flask import url_for
-from werkzeug.exceptions import InternalServerError
 from unittest.mock import ANY
+
+import pytest
+from bs4 import BeautifulSoup, element
+from flask import url_for
 from freezegun import freeze_time
 from notifications_utils.clients import DeskproError
 from tests.conftest import (
     mock_get_services,
     mock_get_services_with_no_services,
-    mock_get_services_with_one_service
+    mock_get_services_with_one_service,
 )
-from app.main.views.feedback import has_live_services, in_business_hours, PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
+from werkzeug.exceptions import InternalServerError
+
+from app.main.views.feedback import (
+    PROBLEM_TICKET_TYPE,
+    QUESTION_TICKET_TYPE,
+    has_live_services,
+    in_business_hours,
+)
 
 
 def no_redirect():

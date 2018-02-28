@@ -1,7 +1,7 @@
 import pytest
+from freezegun import freeze_time
 
 from app.main.forms import ChooseTimeForm
-from freezegun import freeze_time
 
 
 @freeze_time("2016-01-01 11:09:00.061258")

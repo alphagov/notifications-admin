@@ -1,6 +1,7 @@
 from datetime import datetime
-from dateutil import parser
 from functools import reduce
+
+from dateutil import parser
 
 
 def sum_of_statistics(delivery_statistics):

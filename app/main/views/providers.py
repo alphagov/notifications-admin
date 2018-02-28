@@ -1,14 +1,11 @@
-from flask import (
-    render_template,
-    url_for
-)
-
+from flask import render_template, url_for
 from flask_login import login_required
 from werkzeug.utils import redirect
+
+from app import provider_client
 from app.main import main
 from app.main.forms import ProviderForm
 from app.utils import user_has_permissions
-from app import provider_client
 
 
 @main.route("/providers")

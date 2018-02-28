@@ -1,7 +1,14 @@
-from datetime import datetime
 import json
+from datetime import datetime
 
-from flask import (render_template, url_for, redirect, flash, session, current_app)
+from flask import (
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    session,
+    url_for,
+)
 from itsdangerous import SignatureExpired
 from notifications_utils.url_safe_token import check_token
 

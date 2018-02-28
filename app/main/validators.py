@@ -1,17 +1,17 @@
 import re
 
-from wtforms import ValidationError
-from wtforms.validators import Email
 from notifications_utils.field import Field
 from notifications_utils.gsm import get_non_gsm_compatible_characters
-from notifications_utils.recipients import validate_email_address, InvalidEmailError
+from notifications_utils.recipients import (
+    InvalidEmailError,
+    validate_email_address,
+)
+from wtforms import ValidationError
+from wtforms.validators import Email
 
 from app import formatted_list
 from app.main._blacklisted_passwords import blacklisted_passwords
-from app.utils import (
-    Spreadsheet,
-    is_gov_user
-)
+from app.utils import Spreadsheet, is_gov_user
 
 
 class Blacklist:

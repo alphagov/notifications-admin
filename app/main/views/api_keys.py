@@ -1,15 +1,33 @@
-from flask import request, render_template, redirect, url_for, flash, Markup, abort
-from flask_login import login_required, current_user
+from flask import (
+    Markup,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_login import current_user, login_required
+
+from app import (
+    api_key_api_client,
+    current_service,
+    notification_api_client,
+    service_api_client,
+)
 from app.main import main
 from app.main.forms import (
     CreateKeyForm,
-    Whitelist,
+    ServiceDeliveryStatusCallbackForm,
     ServiceReceiveMessagesCallbackForm,
-    ServiceDeliveryStatusCallbackForm
+    Whitelist,
 )
-from app import api_key_api_client, service_api_client, notification_api_client, current_service
-from app.utils import user_has_permissions, email_safe
-from app.notify_client.api_key_api_client import KEY_TYPE_NORMAL, KEY_TYPE_TEST, KEY_TYPE_TEAM
+from app.notify_client.api_key_api_client import (
+    KEY_TYPE_NORMAL,
+    KEY_TYPE_TEAM,
+    KEY_TYPE_TEST,
+)
+from app.utils import email_safe, user_has_permissions
 
 dummy_bearer_token = 'bearer_token_set'
 

@@ -1,36 +1,41 @@
 # -*- coding: utf-8 -*-
 import uuid
-from io import BytesIO
-from os import path
-from glob import glob
-from itertools import repeat
 from functools import partial
+from glob import glob
+from io import BytesIO
+from itertools import repeat
+from os import path
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from notifications_python_client.errors import HTTPError
-from notifications_utils.template import LetterPreviewTemplate, LetterImageTemplate
 from notifications_utils.recipients import RecipientCSV
-
-from tests import validate_route_permission, validate_route_permission_with_client
+from notifications_utils.template import (
+    LetterImageTemplate,
+    LetterPreviewTemplate,
+)
+from tests import (
+    validate_route_permission,
+    validate_route_permission_with_client,
+)
 from tests.conftest import (
+    SERVICE_ONE_ID,
     fake_uuid,
+    mock_get_international_service,
+    mock_get_live_service,
+    mock_get_service,
+    mock_get_service_email_template,
+    mock_get_service_letter_template,
     mock_get_service_template,
     mock_get_service_template_with_placeholders,
-    mock_get_service_letter_template,
-    mock_get_service,
-    mock_get_international_service,
-    mock_get_service_email_template,
-    normalize_spaces,
-    SERVICE_ONE_ID,
-    mock_get_live_service,
     multiple_reply_to_email_addresses,
-    no_reply_to_email_addresses,
     multiple_sms_senders,
-    no_sms_senders,
+    multiple_sms_senders_no_inbound,
     multiple_sms_senders_with_diff_default,
-    multiple_sms_senders_no_inbound
+    no_reply_to_email_addresses,
+    no_sms_senders,
+    normalize_spaces,
 )
 
 template_types = ['email', 'sms']

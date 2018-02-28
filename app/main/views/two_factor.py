@@ -1,20 +1,22 @@
 import json
+
 from flask import (
-    render_template,
+    current_app,
+    flash,
     redirect,
+    render_template,
+    request,
     session,
     url_for,
-    request,
-    current_app,
-    flash
 )
-from flask_login import login_user, current_user
+from flask_login import current_user, login_user
+from itsdangerous import SignatureExpired
+from notifications_utils.url_safe_token import check_token
+
+from app import service_api_client, user_api_client
 from app.main import main
 from app.main.forms import TwoFactorForm
-from app import service_api_client, user_api_client
 from app.utils import redirect_to_sign_in
-from notifications_utils.url_safe_token import check_token
-from itsdangerous import SignatureExpired
 
 
 @main.route('/two-factor-email-sent', methods=['GET'])

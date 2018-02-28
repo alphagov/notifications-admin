@@ -1,7 +1,8 @@
+from functools import partial
+
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
-from functools import partial
 
 letters_urls = [
     partial(url_for, 'main.add_service_template', template_type='letter'),

@@ -1,8 +1,10 @@
-import pytest
 from unittest.mock import call
+
+import pytest
+from tests.conftest import SERVICE_ONE_ID
+
 from app import user_api_client
 from app.notify_client.models import User
-from tests.conftest import SERVICE_ONE_ID
 
 
 def test_client_gets_all_users_for_service(

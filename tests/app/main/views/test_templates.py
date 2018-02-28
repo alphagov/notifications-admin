@@ -1,26 +1,33 @@
 from datetime import datetime
-from unittest.mock import Mock, ANY
+from unittest.mock import ANY, Mock
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
-from tests.conftest import service_one as create_sample_service
+from tests import (
+    single_notification_json,
+    template_json,
+    validate_route_permission,
+)
 from tests.conftest import (
+    SERVICE_ONE_ID,
+    active_user_with_permissions,
     mock_get_service_email_template,
     mock_get_service_letter_template,
     mock_get_service_template,
     no_letter_contact_blocks,
-    single_letter_contact_block,
     normalize_spaces,
-    SERVICE_ONE_ID,
-    active_user_with_permissions,
     platform_admin_user,
 )
-from tests import validate_route_permission, template_json, single_notification_json
+from tests.conftest import service_one as create_sample_service
+from tests.conftest import single_letter_contact_block
 
-from app.main.views.templates import get_last_use_message, get_human_readable_delta
+from app.main.views.templates import (
+    get_human_readable_delta,
+    get_last_use_message,
+)
 
 
 @pytest.mark.parametrize('extra_args, expected_nav_links, expected_templates', [

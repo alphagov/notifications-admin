@@ -1,38 +1,40 @@
 from datetime import datetime, timedelta
 from string import ascii_uppercase
 
-from flask import (
-    request,
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    abort,
-    Response,
-)
-from flask_login import login_required, current_user
 from dateutil.parser import parse
+from flask import (
+    Response,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_login import current_user, login_required
 from markupsafe import Markup
-
+from notifications_python_client.errors import HTTPError
 from notifications_utils.formatters import nl2br
 from notifications_utils.recipients import first_column_headings
 from notifications_utils.template import LetterDVLATemplate
-from notifications_python_client.errors import HTTPError
 
+from app import current_service, service_api_client, template_statistics_client
 from app.main import main
-from app.utils import user_has_permissions, get_template, email_or_sms_not_enabled
-from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.main.forms import (
     ChooseTemplateType,
-    SMSTemplateForm,
     EmailTemplateForm,
     LetterTemplateForm,
     SearchTemplatesForm,
     SetTemplateSenderForm,
+    SMSTemplateForm,
 )
 from app.main.views.send import get_example_csv_rows, get_sender_details
-from app import service_api_client, current_service, template_statistics_client
-
+from app.template_previews import TemplatePreview, get_page_count_for_letter
+from app.utils import (
+    email_or_sms_not_enabled,
+    get_template,
+    user_has_permissions,
+)
 
 form_objects = {
     'email': EmailTemplateForm,

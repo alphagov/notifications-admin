@@ -1,12 +1,16 @@
 import json
 
 import pytest
-from flask import url_for
 from bs4 import BeautifulSoup
+from flask import url_for
+from freezegun import freeze_time
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    mock_get_notifications,
+    normalize_spaces,
+)
 
 from app.main.views.jobs import get_time_left
-from tests.conftest import SERVICE_ONE_ID, normalize_spaces, mock_get_notifications
-from freezegun import freeze_time
 
 
 def test_get_jobs_should_return_list_of_all_real_jobs(

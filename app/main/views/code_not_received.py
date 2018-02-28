@@ -1,9 +1,4 @@
-from flask import (
-    render_template,
-    redirect,
-    session,
-    url_for
-)
+from flask import redirect, render_template, session, url_for
 
 from app import user_api_client
 from app.main import main

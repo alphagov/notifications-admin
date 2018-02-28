@@ -2,29 +2,26 @@ import json
 
 from flask import (
     abort,
-    render_template,
+    current_app,
     redirect,
-    url_for,
+    render_template,
     session,
-    current_app)
-
-from flask_login import login_required, current_user
+    url_for,
+)
+from flask_login import current_user, login_required
 from notifications_utils.url_safe_token import check_token
 
+from app import user_api_client
 from app.main import main
-
 from app.main.forms import (
-    ChangePasswordForm,
-    ChangeNameForm,
     ChangeEmailForm,
     ChangeMobileNumberForm,
+    ChangeNameForm,
+    ChangePasswordForm,
     ConfirmMobileNumberForm,
-    ConfirmPasswordForm
+    ConfirmPasswordForm,
 )
-
 from app.utils import is_gov_user
-
-from app import user_api_client
 
 NEW_EMAIL = 'new-email'
 NEW_MOBILE = 'new-mob'

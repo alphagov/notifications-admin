@@ -1,22 +1,22 @@
-from pathlib import Path
-from io import StringIO
 from collections import OrderedDict
 from csv import DictReader
+from io import StringIO
+from pathlib import Path
 
-from freezegun import freeze_time
 import pytest
+from freezegun import freeze_time
+from tests.conftest import fake_uuid
 
 from app.utils import (
+    GovernmentDomain,
+    Spreadsheet,
     email_safe,
+    generate_next_dict,
     generate_notifications_csv,
     generate_previous_dict,
-    generate_next_dict,
-    Spreadsheet,
-    get_letter_timings,
     get_cdn_domain,
-    GovernmentDomain,
+    get_letter_timings,
 )
-from tests.conftest import fake_uuid
 
 
 def _get_notifications_csv(

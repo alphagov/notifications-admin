@@ -1,10 +1,9 @@
 import uuid
 
 import pytest
+from tests import notification_json, single_notification_json
 
 from app.notify_client.notification_api_client import NotificationApiClient
-
-from tests import single_notification_json, notification_json
 
 
 @pytest.mark.parametrize("arguments,expected_call", [

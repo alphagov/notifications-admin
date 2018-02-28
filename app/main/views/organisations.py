@@ -1,30 +1,16 @@
-from flask import (
-    redirect,
-    render_template,
-    url_for,
-    flash,
-    request
-)
-from flask_login import (
-    login_required,
-    current_user
-)
-
-from app import (
-    organisations_client,
-    org_invite_api_client,
-    user_api_client,
-)
-from app.main.forms import (
-    SearchUsersForm,
-    InviteOrgUserForm,
-)
-from app.main import main
-from app.main.forms import CreateOrUpdateOrganisation
-from app.utils import user_has_permissions
-
+from flask import flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
 from werkzeug.exceptions import abort
+
+from app import org_invite_api_client, organisations_client, user_api_client
+from app.main import main
+from app.main.forms import (
+    CreateOrUpdateOrganisation,
+    InviteOrgUserForm,
+    SearchUsersForm,
+)
+from app.utils import user_has_permissions
 
 
 @main.route("/organisations", methods=['GET'])

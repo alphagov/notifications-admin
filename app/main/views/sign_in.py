@@ -1,25 +1,16 @@
 from flask import (
-    render_template,
-    redirect,
-    url_for,
-    session,
-    flash,
-    request,
+    Markup,
     abort,
-    Markup
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
 )
+from flask_login import current_user
 
-from flask_login import (
-    current_user,
-)
-
-from app import (
-    login_manager,
-    user_api_client,
-    invite_api_client
-)
-
-
+from app import invite_api_client, login_manager, user_api_client
 from app.main import main
 from app.main.forms import LoginForm
 

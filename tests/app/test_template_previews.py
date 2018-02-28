@@ -1,7 +1,7 @@
-import pytest
-
 from functools import partial
 from unittest.mock import Mock
+
+import pytest
 from notifications_utils.template import LetterPreviewTemplate
 
 from app.template_previews import TemplatePreview, get_page_count_for_letter

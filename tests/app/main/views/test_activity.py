@@ -1,18 +1,18 @@
 import json
 import uuid
-from urllib.parse import urlparse, quote, parse_qs
+from urllib.parse import parse_qs, quote, urlparse
 
 import pytest
-from flask import url_for
 from bs4 import BeautifulSoup
-
-from app.main.views.jobs import get_time_left, get_status_filters
+from flask import url_for
+from freezegun import freeze_time
 from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_notifications,
     normalize_spaces,
 )
-from freezegun import freeze_time
+
+from app.main.views.jobs import get_status_filters, get_time_left
 
 
 @pytest.mark.parametrize(

@@ -1,8 +1,8 @@
 import pytest
+from tests.conftest import SERVICE_ONE_ID, fake_uuid
 
 from app import service_api_client
 from app.notify_client.service_api_client import ServiceAPIClient
-from tests.conftest import fake_uuid, SERVICE_ONE_ID
 
 
 def test_client_posts_archived_true_when_deleting_template(mocker):

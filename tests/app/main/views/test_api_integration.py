@@ -1,21 +1,20 @@
 import uuid
 from collections import OrderedDict
-
-import pytest
-from flask import url_for
-from bs4 import BeautifulSoup
 from unittest.mock import call
 
+import pytest
+from bs4 import BeautifulSoup
+from flask import url_for
 from tests import validate_route_permission
 from tests.conftest import (
-    mock_get_service,
-    mock_get_live_service,
-    mock_get_service_with_letters,
-    mock_get_notifications,
-    normalize_spaces,
     SERVICE_ONE_ID,
+    mock_get_live_service,
+    mock_get_notifications,
+    mock_get_service,
+    mock_get_service_with_letters,
     mock_get_valid_service_callback_api,
     mock_get_valid_service_inbound_api,
+    normalize_spaces,
 )
 
 

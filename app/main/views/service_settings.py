@@ -1,53 +1,48 @@
 from flask import (
-    render_template,
-    redirect,
-    request,
-    url_for,
-    session,
-    flash,
     abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
 )
-
-from flask_login import (
-    login_required,
-    current_user
-)
-
-from notifications_utils.field import Field
-from notifications_utils.clients import DeskproError
+from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
+from notifications_utils.clients import DeskproError
+from notifications_utils.field import Field
+from notifications_utils.formatters import formatted_list
 
-from app.main import main
-from app.utils import user_has_permissions, email_safe, get_cdn_domain
-from app.main.forms import (
-    ConfirmPasswordForm,
-    RenameServiceForm,
-    RequestToGoLiveForm,
-    ServiceReplyToEmailForm,
-    ServiceInboundNumberForm,
-    ServiceSmsSenderForm,
-    ServiceLetterContactBlockForm,
-    ServiceSetBranding,
-    LetterBranding,
-    InternationalSMSForm,
-    OrganisationTypeForm,
-    FreeSMSAllowance,
-    ServiceEditInboundNumberForm,
-    SMSPrefixForm,
-    ServiceSwitchLettersForm,
-    LinkOrganisationsForm,
-)
 from app import (
-    service_api_client,
-    deskpro_client,
-    user_api_client,
+    billing_api_client,
     current_service,
+    deskpro_client,
     email_branding_client,
     inbound_number_client,
-    billing_api_client,
     organisations_client,
+    service_api_client,
+    user_api_client,
 )
-from notifications_utils.formatters import formatted_list
+from app.main import main
+from app.main.forms import (
+    ConfirmPasswordForm,
+    FreeSMSAllowance,
+    InternationalSMSForm,
+    LetterBranding,
+    LinkOrganisationsForm,
+    OrganisationTypeForm,
+    RenameServiceForm,
+    RequestToGoLiveForm,
+    ServiceEditInboundNumberForm,
+    ServiceInboundNumberForm,
+    ServiceLetterContactBlockForm,
+    ServiceReplyToEmailForm,
+    ServiceSetBranding,
+    ServiceSmsSenderForm,
+    ServiceSwitchLettersForm,
+    SMSPrefixForm,
+)
+from app.utils import email_safe, get_cdn_domain, user_has_permissions
 
 
 @main.route("/services/<service_id>/service-settings")

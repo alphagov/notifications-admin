@@ -1,8 +1,7 @@
 from unittest.mock import ANY
 
-from flask import url_for
 from bs4 import BeautifulSoup
-
+from flask import url_for
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, set_config
 
 

@@ -1,17 +1,14 @@
 import itertools
-
 from datetime import datetime
-from flask import (
-    render_template,
-    request
-)
+
+from flask import render_template, request
 from flask_login import login_required
 
 from app import service_api_client
 from app.main import main
 from app.main.forms import DateFilterForm
-from app.utils import user_has_permissions
 from app.statistics_utils import get_formatted_percentage
+from app.utils import user_has_permissions
 
 
 @main.route("/platform-admin")

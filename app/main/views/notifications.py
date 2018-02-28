@@ -2,30 +2,36 @@
 from datetime import datetime
 
 from flask import (
+    Response,
     abort,
-    render_template,
     jsonify,
+    render_template,
     request,
+    stream_with_context,
     url_for,
-    Response, stream_with_context)
+)
 from flask_login import login_required
 
 from app import (
-    notification_api_client,
-    job_api_client,
     current_service,
-    format_date_numeric)
+    format_date_numeric,
+    job_api_client,
+    notification_api_client,
+)
 from app.main import main
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
-    user_has_permissions,
+    DELIVERED_STATUSES,
+    FAILURE_STATUSES,
+    generate_notifications_csv,
     get_help_argument,
+    get_letter_timings,
     get_template,
     get_time_left,
-    get_letter_timings,
-    FAILURE_STATUSES,
-    DELIVERED_STATUSES,
-    generate_notifications_csv, parse_filter_args, set_status_filters)
+    parse_filter_args,
+    set_status_filters,
+    user_has_permissions,
+)
 
 
 @main.route("/services/<service_id>/notification/<uuid:notification_id>")

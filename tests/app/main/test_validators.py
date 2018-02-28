@@ -1,8 +1,14 @@
-import pytest
-from app.main.forms import RegisterUserForm, ServiceSmsSenderForm
-from app.main.validators import ValidGovEmail, NoCommasInPlaceHolders, OnlyGSMCharacters
-from wtforms import ValidationError
 from unittest.mock import Mock
+
+import pytest
+from wtforms import ValidationError
+
+from app.main.forms import RegisterUserForm, ServiceSmsSenderForm
+from app.main.validators import (
+    NoCommasInPlaceHolders,
+    OnlyGSMCharacters,
+    ValidGovEmail,
+)
 
 
 @pytest.mark.parametrize('password', [
