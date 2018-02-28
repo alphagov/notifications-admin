@@ -86,7 +86,7 @@ def api_keys(service_id):
 
 @main.route("/services/<service_id>/api/keys/create", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_api_keys')
+@user_has_permissions('manage_api_keys', restrict_admin_usage=True)
 def create_api_key(service_id):
     key_names = [
         key['name'] for key in api_key_api_client.get_api_keys(service_id=service_id)['apiKeys']

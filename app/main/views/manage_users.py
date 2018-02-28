@@ -80,7 +80,7 @@ def edit_user_permissions(service_id, user_id):
     user_has_no_mobile_number = user.mobile_number is None
 
     form = PermissionsForm(
-        **{role: user.has_permissions(role) for role in roles.keys()},
+        **{role: user.has_permission_for_service(service_id, role) for role in roles.keys()},
         login_authentication=user.auth_type
     )
     if form.validate_on_submit():
@@ -109,7 +109,7 @@ def remove_user_from_service(service_id, user_id):
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
     form = PermissionsForm(**{
-        role: user.has_permissions(role) for role in roles.keys()
+        role: user.has_permission_for_service(service_id, role) for role in roles.keys()
     })
 
     if request.method == 'POST':

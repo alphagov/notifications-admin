@@ -601,7 +601,7 @@ def check_messages(service_id, template_type, upload_id, row_index=2):
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>.<filetype>", methods=['GET'])
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>.<filetype>", methods=['GET'])
 @login_required
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_messages_preview(service_id, template_type, upload_id, filetype, row_index=2):
     if filetype not in ('pdf', 'png'):
         abort(404)
@@ -615,7 +615,7 @@ def check_messages_preview(service_id, template_type, upload_id, filetype, row_i
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['POST'])
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>", methods=['POST'])
 @login_required
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def recheck_messages(service_id, template_type, upload_id, row_index=0):
 
     if not session.get('upload_data'):
@@ -626,7 +626,7 @@ def recheck_messages(service_id, template_type, upload_id, row_index=0):
 
 @main.route("/services/<service_id>/start-job/<upload_id>", methods=['POST'])
 @login_required
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def start_job(service_id, upload_id):
     upload_data = session['upload_data']
 
@@ -658,7 +658,7 @@ def start_job(service_id, upload_id):
 
 @main.route("/services/<service_id>/end-tour/<example_template_id>")
 @login_required
-@user_has_permissions('manage_templates')
+@user_has_permissions('manage_templates', admin_override=True)
 def go_to_dashboard_after_tour(service_id, example_template_id):
 
     service_api_client.delete_service_template(service_id, example_template_id)
@@ -767,7 +767,7 @@ def get_back_link(service_id, template_id, step_index):
 
 @main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['GET'])
 @login_required
-@user_has_permissions('send_messages')
+@user_has_permissions('send_messages', admin_override=True)
 def check_notification(service_id, template_id):
     return _check_notification(service_id, template_id)
 

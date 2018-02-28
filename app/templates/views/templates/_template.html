@@ -6,7 +6,7 @@
   {% else %}
     <div class="bottom-gutter-2-3">
       <div class="grid-row">
-        {% if current_user.has_permissions('send_messages') %}
+        {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
         <div class="{{ 'column-half' if template.template_type == 'letter' else 'column-third' }}">
           <a href="{{ url_for(".send_messages", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
             Upload recipients

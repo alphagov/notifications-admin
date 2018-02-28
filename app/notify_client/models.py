@@ -159,28 +159,29 @@ class User(UserMixin):
     def permissions(self, permissions):
         raise AttributeError("Read only property")
 
-    def has_permissions(self, *permissions, any_=False, admin_override=False):
-
+    def has_permissions(self, *permissions, any_=False, admin_override=None, restrict_admin_usage=False):
         unknown_permissions = set(permissions) - all_permissions
 
         if unknown_permissions:
             raise TypeError('{} are not valid permissions'.format(list(unknown_permissions)))
 
-        # Only available to the platform admin user
-        if admin_override and self.platform_admin:
+        # platform admins should be able to do most things (except eg send messages, or create api keys)
+        if self.platform_admin and not restrict_admin_usage:
             return True
-        # Not available to the non platform admin users.
-        # For example the list all-services page is only available to platform admin users and is not service specific
-        if admin_override and not permissions:
-            return False
 
         # Service id is always set on the request for service specific views.
         service_id = _get_service_id_from_view_args()
         if service_id in self._permissions:
             if any_:
-                return any([x in self._permissions[service_id] for x in permissions])
-            return set(self._permissions[service_id]) >= set(permissions)
+                has_permissions = any(x in self._permissions[service_id] for x in permissions)
+            else:
+                has_permissions = set(self._permissions[service_id]) >= set(permissions)
+
+            return has_permissions
         return False
+
+    def has_permission_for_service(self, service_id, permission):
+        return permission in self._permissions.get(service_id, [])
 
     @property
     def auth_type(self):
@@ -248,6 +249,9 @@ class InvitedUser(object):
         if self.status == 'cancelled':
             return False
         return set(self.permissions) > set(permissions)
+
+    def has_permission_for_service(self, service_id, permission):
+        return self.status != 'cancelled' and self.service == service_id and permission in self.permissions
 
     def __eq__(self, other):
         return ((self.id,

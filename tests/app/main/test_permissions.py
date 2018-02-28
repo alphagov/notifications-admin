@@ -14,16 +14,16 @@ def _test_permissions(
     client,
     usr,
     permissions,
-    service_id,
     will_succeed,
-    any_=False,
-    admin_override=False,
+    kwargs={}
 ):
-    request.view_args.update({'service_id': service_id})
+    request.view_args.update({'service_id': 'foo'})
     if usr:
         client.login(usr)
-    decorator = user_has_permissions(*permissions, any_=any_, admin_override=admin_override)
+
+    decorator = user_has_permissions(*permissions, **kwargs)
     decorated_index = decorator(index)
+
     if will_succeed:
         decorated_index()
     else:
@@ -44,7 +44,6 @@ def test_user_has_permissions_on_endpoint_fail(
         client,
         user,
         ['send_messages'],
-        '',
         False)
 
 
@@ -58,7 +57,6 @@ def test_user_has_permissions_success(
         client,
         user,
         ['manage_service'],
-        '',
         True)
 
 
@@ -72,9 +70,8 @@ def test_user_has_permissions_or(
         client,
         user,
         ['send_messages', 'manage_service'],
-        '',
         True,
-        any_=True)
+        kwargs={'any_': True})
 
 
 def test_user_has_permissions_multiple(
@@ -87,7 +84,6 @@ def test_user_has_permissions_multiple(
         client,
         user,
         ['manage_templates', 'manage_service'],
-        '',
         will_succeed=True)
 
 
@@ -101,7 +97,6 @@ def test_exact_permissions(
         client,
         user,
         ['manage_service', 'manage_templates'],
-        '',
         True)
 
 
@@ -115,9 +110,8 @@ def test_platform_admin_user_can_access_page(
         client,
         platform_admin_user,
         [],
-        '',
         will_succeed=True,
-        admin_override=True)
+        kwargs={'admin_override': True})
 
 
 def test_platform_admin_user_can_not_access_page(
@@ -130,9 +124,8 @@ def test_platform_admin_user_can_not_access_page(
         client,
         platform_admin_user,
         [],
-        '',
         will_succeed=False,
-        admin_override=False)
+        kwargs={'restrict_admin_usage': True})
 
 
 def test_no_user_returns_401_unauth(
@@ -144,7 +137,6 @@ def test_no_user_returns_401_unauth(
         client,
         None,
         [],
-        '',
         will_succeed=False)
 
 
@@ -158,7 +150,7 @@ def _user_with_permissions():
                  'mobile_number': '+4412341234',
                  'state': 'active',
                  'failed_login_count': 0,
-                 'permissions': {'': ['manage_users', 'manage_templates', 'manage_settings']},
+                 'permissions': {'foo': ['manage_users', 'manage_templates', 'manage_settings']},
                  'platform_admin': False
                  }
     user = User(user_data)

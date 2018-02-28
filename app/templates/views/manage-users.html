@@ -64,19 +64,19 @@
         <ul class="tick-cross-list">
           <div class="tick-cross-list-permissions">
             {{ tick_cross(
-              user.has_permissions('send_messages'),
+              user.has_permission_for_service(current_service.id, 'send_messages'),
               'Send messages'
             ) }}
             {{ tick_cross(
-              user.has_permissions('manage_templates'),
+              user.has_permission_for_service(current_service.id, 'manage_templates'),
               'Add and edit templates'
             ) }}
             {{ tick_cross(
-              user.has_permissions('manage_service'),
+              user.has_permission_for_service(current_service.id, 'manage_service'),
               'Manage service'
             ) }}
             {{ tick_cross(
-              user.has_permissions('manage_api_keys'),
+              user.has_permission_for_service(current_service.id, 'manage_api_keys'),
               'Access API keys'
             ) }}
             {% if 'email_auth' in current_service['permissions'] %}
