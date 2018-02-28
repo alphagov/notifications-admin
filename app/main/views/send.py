@@ -22,6 +22,7 @@ from notifications_utils.recipients import (
 from orderedset import OrderedSet
 from werkzeug.routing import RequestRedirect
 from xlrd.biffh import XLRDError
+from xlrd.xldate import XLDateError
 
 from app import (
     current_service,
@@ -135,6 +136,13 @@ def send_messages(service_id, template_id):
                                     template_type=template.template_type))
         except (UnicodeDecodeError, BadZipFile, XLRDError):
             flash('Couldn’t read {}. Try using a different file format.'.format(
+                form.file.data.filename
+            ))
+        except (XLDateError):
+            flash((
+                '{} contains numbers or dates that Notify can’t understand. '
+                'Try formatting all columns as ‘text’ or export your file as CSV.'
+            ).format(
                 form.file.data.filename
             ))
 
