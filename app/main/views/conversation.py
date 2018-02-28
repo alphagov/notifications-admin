@@ -39,7 +39,7 @@ def conversation_updates(service_id, notification_id):
 
 @main.route("/services/<service_id>/conversation/<notification_id>/reply-with")
 @login_required
-@user_has_permissions('send_texts', admin_override=True)
+@user_has_permissions('send_messages', admin_override=True)
 def conversation_reply(
     service_id,
     notification_id,
@@ -63,7 +63,7 @@ def conversation_reply(
 
 @main.route("/services/<service_id>/conversation/<notification_id>/reply-with/<template_id>")
 @login_required
-@user_has_permissions('send_texts', admin_override=True)
+@user_has_permissions('send_messages', admin_override=True)
 def conversation_reply_with_template(
     service_id,
     notification_id,

@@ -43,7 +43,7 @@ def test_user_has_permissions_on_endpoint_fail(
     _test_permissions(
         client,
         user,
-        ['send_texts'],
+        ['send_messages'],
         '',
         False)
 
@@ -57,7 +57,7 @@ def test_user_has_permissions_success(
     _test_permissions(
         client,
         user,
-        ['manage_users'],
+        ['manage_service'],
         '',
         True)
 
@@ -71,7 +71,7 @@ def test_user_has_permissions_or(
     _test_permissions(
         client,
         user,
-        ['send_texts', 'manage_users'],
+        ['send_messages', 'manage_service'],
         '',
         True,
         any_=True)
@@ -86,7 +86,7 @@ def test_user_has_permissions_multiple(
     _test_permissions(
         client,
         user,
-        ['manage_templates', 'manage_users'],
+        ['manage_templates', 'manage_service'],
         '',
         will_succeed=True)
 
@@ -100,7 +100,7 @@ def test_exact_permissions(
     _test_permissions(
         client,
         user,
-        ['manage_users', 'manage_templates', 'manage_settings'],
+        ['manage_service', 'manage_templates'],
         '',
         True)
 

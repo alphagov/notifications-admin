@@ -48,10 +48,10 @@
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id) }}">Templates</a></li>
   {% endif %}
   <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>
-  {% if current_user.has_permissions('manage_users', 'manage_settings', admin_override=True) %}
+  {% if current_user.has_permissions('manage_service', admin_override=True) %}
     <li><a href="{{ url_for('.usage', service_id=current_service.id) }}">Usage</a></li>
   {% endif %}
-  {% if current_user.has_permissions('manage_api_keys', 'manage_settings', admin_override=True, any_=True) %}
+  {% if current_user.has_permissions('manage_api_keys', 'manage_service', admin_override=True, any_=True) %}
     <li><a href="{{ url_for('.service_settings', service_id=current_service.id) }}">Settings</a></li>
   {% endif %}
   {% if current_user.has_permissions('manage_api_keys', admin_override=True) %}

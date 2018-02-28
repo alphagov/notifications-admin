@@ -21,7 +21,7 @@ def test_client_creates_invite(
     )
 
     invite_api_client.create_invite(
-        '12345', '67890', 'test@example.com', 'send_messages', 'sms_auth'
+        '12345', '67890', 'test@example.com', {'send_messages'}, 'sms_auth'
     )
 
     mock_post.assert_called_once_with(
@@ -32,7 +32,7 @@ def test_client_creates_invite(
             'from_user': '12345',
             'service': '67890',
             'created_by': ANY,
-            'permissions': 'send_messages',
+            'permissions': 'send_emails,send_letters,send_texts',
             'invite_link_host': 'http://localhost:6012',
         }
     )

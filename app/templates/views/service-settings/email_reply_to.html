@@ -15,7 +15,7 @@
         Email reply to addresses
       </h1>
     </div>
-  {% if current_user.has_permissions('manage_settings', admin_override=True) %}
+  {% if current_user.has_permissions('manage_service', admin_override=True) %}
 	  <div class="column-one-third">
 	    <a href="{{ url_for('.service_add_email_reply_to', service_id=current_service.id) }}" class="button align-with-heading">Add email address</a>
 	  </div>
@@ -36,7 +36,7 @@
             {% endif %}
           </span>
         </h3>
-        {% if current_user.has_permissions('manage_settings', admin_override=True) %}
+        {% if current_user.has_permissions('manage_service', admin_override=True) %}
           <a class="user-list-edit-link" href="{{ url_for('.service_edit_email_reply_to', service_id =current_service.id, reply_to_email_id = item.id) }}">Change</a>
         {% endif %}
         {% if reply_to_email_addresses|length  > 1 %}

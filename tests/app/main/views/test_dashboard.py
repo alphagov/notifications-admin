@@ -778,7 +778,7 @@ def test_menu_send_messages(
             app_,
             api_user_active,
             service_one,
-            ['view_activity', 'send_texts', 'send_emails', 'send_letters'])
+            ['view_activity', 'send_messages'])
         page = resp.get_data(as_text=True)
         assert url_for(
             'main.choose_template',
@@ -810,7 +810,7 @@ def test_menu_manage_service(
             app_,
             api_user_active,
             service_one,
-            ['view_activity', 'manage_users', 'manage_templates', 'manage_settings'])
+            ['view_activity', 'manage_templates', 'manage_service'])
         page = resp.get_data(as_text=True)
         assert url_for(
             'main.choose_template',

@@ -37,7 +37,7 @@ def manage_users(service_id):
 
 @main.route("/services/<service_id>/users/invite", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_users', admin_override=True)
+@user_has_permissions('manage_service', admin_override=True)
 def invite_user(service_id):
 
     form = InviteUserForm(
@@ -71,7 +71,7 @@ def invite_user(service_id):
 
 @main.route("/services/<service_id>/users/<user_id>", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_users', admin_override=True)
+@user_has_permissions('manage_service', admin_override=True)
 def edit_user_permissions(service_id, user_id):
     service_has_email_auth = 'email_auth' in current_service['permissions']
     # TODO we should probably using the service id here in the get user
@@ -103,7 +103,7 @@ def edit_user_permissions(service_id, user_id):
 
 @main.route("/services/<service_id>/users/<user_id>/delete", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_users', admin_override=True)
+@user_has_permissions('manage_service', admin_override=True)
 def remove_user_from_service(service_id, user_id):
     user = user_api_client.get_user(user_id)
     # Need to make the email address read only, or a disabled field?
@@ -139,7 +139,7 @@ def remove_user_from_service(service_id, user_id):
 
 
 @main.route("/services/<service_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
-@user_has_permissions('manage_users', admin_override=True)
+@user_has_permissions('manage_service', admin_override=True)
 def cancel_invited_user(service_id, invited_user_id):
     invite_api_client.cancel_invited_user(service_id=service_id, invited_user_id=invited_user_id)
 

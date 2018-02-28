@@ -1752,7 +1752,7 @@ def test_route_permissions(
             service_id=service_one['id'],
             template_id=fake_uuid
         ),
-        ['view_activity', 'send_texts', 'send_emails', 'send_letters'],
+        ['view_activity', 'send_messages'],
         api_user_active,
         service_one)
 
@@ -1787,7 +1787,7 @@ def test_route_permissions_send_check_notifications(
             service_id=service_one['id'],
             template_id=fake_uuid
         ),
-        ['send_texts', 'send_emails', 'send_letters'],
+        ['send_messages'],
         api_user_active,
         service_one
     )

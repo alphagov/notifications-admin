@@ -14,7 +14,7 @@
         Text message senders
       </h1>
     </div>
-    {% if current_user.has_permissions('manage_settings', admin_override=True) %}
+    {% if current_user.has_permissions('manage_service', admin_override=True) %}
   	<div class="column-one-third">
   	  <a href="{{ url_for('.service_add_sms_sender', service_id=current_service.id) }}" class="button align-with-heading">Add text message sender</a>
   	</div>
@@ -37,7 +37,7 @@
             </span>
           {% endif %}
         </h3>
-        {% if current_user.has_permissions('manage_settings', admin_override=True) %}
+        {% if current_user.has_permissions('manage_service', admin_override=True) %}
           <a class="user-list-edit-link" href="{{ url_for('.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">Change</a>
         {% endif %}
         {% if sms_senders|length  > 1 %}

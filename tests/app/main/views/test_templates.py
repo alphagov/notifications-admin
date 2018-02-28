@@ -120,11 +120,11 @@ def test_should_show_page_for_one_template(
         ['.edit_service_template']
     ),
     (
-        ['send_texts', 'send_emails', 'send_letters'],
+        ['send_messages'],
         ['.send_messages', '.set_sender']
     ),
     (
-        ['send_texts', 'send_emails', 'send_letters', 'manage_templates'],
+        ['send_messages', 'manage_templates'],
         ['.send_messages', '.set_sender', '.edit_service_template']
     ),
 ])

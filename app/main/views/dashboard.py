@@ -138,7 +138,7 @@ def template_usage(service_id):
 
 @main.route("/services/<service_id>/usage")
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service', admin_override=True)
 def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
 
