@@ -217,6 +217,10 @@ def test_sms_sender_form_validation(
     form.validate()
     assert 'Enter 3 characters or more' == form.errors['sms_sender'][0]
 
-    form.sms_sender.data = '000'
+    form.sms_sender.data = '111'
     form.validate()
     assert not form.errors
+
+    form.sms_sender.data = '00111222333'
+    form.validate()
+    assert "Can't start with 00" == form.errors['sms_sender'][0]

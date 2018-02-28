@@ -32,6 +32,7 @@ from wtforms.validators import DataRequired, Length, Optional, Regexp
 from app.main.validators import (
     Blacklist,
     CsvFileValidator,
+    DoesNotStartWithDoubleZero,
     LettersNumbersAndFullStopsOnly,
     NoCommasInPlaceHolders,
     OnlyGSMCharacters,
@@ -594,6 +595,7 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
             Length(max=11, message="Enter 11 characters or fewer"),
             Length(min=3, message="Enter 3 characters or more"),
             LettersNumbersAndFullStopsOnly(),
+            DoesNotStartWithDoubleZero(),
         ]
     )
     is_default = BooleanField("Make this text message sender the default")

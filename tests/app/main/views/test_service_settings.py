@@ -873,6 +873,7 @@ def test_incorrect_letter_contact_block_input(
     ('abcdefghijkhgkg', 'Enter 11 characters or fewer'),
     (' ¯\_(ツ)_/¯ ', 'Use letters and numbers only'),
     ('blood.co.uk', None),
+    ('00123', "Can't start with 00")
 ])
 def test_incorrect_sms_sender_input(
     sms_sender_input,
