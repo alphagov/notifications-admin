@@ -47,6 +47,7 @@ def user_json(
     mobile_number='+447700900986',
     password_changed_at=None,
     permissions={generate_uuid(): [
+        'view_activity',
         'send_texts',
         'send_emails',
         'send_letters',

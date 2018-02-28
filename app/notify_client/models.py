@@ -10,11 +10,44 @@ roles = {
     'manage_api_keys': ['manage_api_keys']
 }
 
-all_permissions = set(chain.from_iterable(roles.values())) | {'view_activity'}
+# same dict as above, but flipped round (and with view_activity)
+roles_by_permission = {
+    'send_texts': 'send_messages',
+    'send_emails': 'send_messages',
+    'send_letters': 'send_messages',
+
+    'manage_users': 'manage_service',
+    'manage_settings': 'manage_service',
+
+    'manage_templates': 'manage_templates',
+
+    'manage_api_keys': 'manage_api_keys',
+    'view_activity': 'view_activity',
+}
+
+all_permissions = set(roles_by_permission.values())
 
 
 def _get_service_id_from_view_args():
     return request.view_args.get('service_id', None)
+
+
+def translate_permissions_from_db_to_admin_roles(permissions):
+    """
+    Given a list of database permissions, return a set of roles
+
+    look them up in roles_by_permission, falling back to just passing through from the api if they aren't in the dict
+    """
+    return {roles_by_permission.get(permission, permission) for permission in permissions}
+
+
+def translate_permissions_from_admin_roles_to_db(permissions):
+    """
+    Given a list of admin roles (ie: checkboxes on a permissions edit page for example), return a set of db permissions
+
+    Looks them up in the roles dict, falling back to just passing through if they're not recognised.
+    """
+    return set(chain.from_iterable(roles.get(permission, [permission]) for permission in permissions))
 
 
 class User(UserMixin):
@@ -24,7 +57,7 @@ class User(UserMixin):
         self._email_address = fields.get('email_address')
         self._mobile_number = fields.get('mobile_number')
         self._password_changed_at = fields.get('password_changed_at')
-        self._permissions = fields.get('permissions')
+        self._set_permissions(fields.get('permissions', {}))
         self._auth_type = fields.get('auth_type')
         self._failed_login_count = fields.get('failed_login_count')
         self._state = fields.get('state')
@@ -32,6 +65,25 @@ class User(UserMixin):
         self.platform_admin = fields.get('platform_admin')
         self.current_session_id = fields.get('current_session_id')
         self._organisations = fields.get('organisations', [])
+
+    def _set_permissions(self, permissions_by_service):
+        """
+        Permissions is a dict {'service_id': ['permission a', 'permission b', 'permission c']}
+
+        The api currently returns some granular permissions that we don't set or use separately (but may want
+        to in the future):
+        * send_texts, send_letters and send_emails become send_messages
+        * manage_user and manage_settings become
+        users either have all three permissions for a service or none of them, they're not helpful to distinguish
+        between on the front end. So lets collapse them into "send_messages" and "manage_service". If we want to split
+        them out later, we'll need to rework this function.
+        """
+
+        self._permissions = {
+            service: translate_permissions_from_db_to_admin_roles(permissions)
+            for service, permissions
+            in permissions_by_service.items()
+        }
 
     def get_id(self):
         return self.id
@@ -112,7 +164,7 @@ class User(UserMixin):
         unknown_permissions = set(permissions) - all_permissions
 
         if unknown_permissions:
-            raise TypeError('{} are not valid permissions'.format(unknown_permissions))
+            raise TypeError('{} are not valid permissions'.format(list(unknown_permissions)))
 
         # Only available to the platform admin user
         if admin_override and self.platform_admin:

@@ -1,7 +1,10 @@
 from notifications_python_client.errors import HTTPError
 
 from app.notify_client import NotifyAdminAPIClient
-from app.notify_client.models import User
+from app.notify_client.models import (
+    User,
+    translate_permissions_from_admin_roles_to_db,
+)
 
 ALLOWED_ATTRIBUTES = {
     'name',
@@ -142,8 +145,9 @@ class UserApiClient(NotifyAdminAPIClient):
         return [User(data) for data in resp['data']]
 
     def add_user_to_service(self, service_id, user_id, permissions):
+        # permissions passed in are the combined admin roles, not db permissions
         endpoint = '/service/{}/users/{}'.format(service_id, user_id)
-        data = [{'permission': x} for x in permissions]
+        data = [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)]
         resp = self.post(endpoint, data=data)
         return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
 
@@ -152,7 +156,8 @@ class UserApiClient(NotifyAdminAPIClient):
         return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
 
     def set_user_permissions(self, user_id, service_id, permissions):
-        data = [{'permission': x} for x in permissions]
+        # permissions passed in are the combined admin roles, not db permissions
+        data = [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)]
         endpoint = '/user/{}/service/{}/permission'.format(user_id, service_id)
         self.post(endpoint, data=data)
 

@@ -3,6 +3,10 @@ from flask import request
 from werkzeug.exceptions import Forbidden, Unauthorized
 
 from app.main.views.index import index
+from app.notify_client.models import (
+    translate_permissions_from_admin_roles_to_db,
+    translate_permissions_from_db_to_admin_roles,
+)
 from app.utils import user_has_permissions
 
 
@@ -159,3 +163,15 @@ def _user_with_permissions():
                  }
     user = User(user_data)
     return user
+
+
+def test_translate_permissions_from_db_to_admin_roles():
+    db_perms = ['send_texts', 'send_emails', 'send_letters', 'manage_templates', 'some_unknown_permission']
+    roles = translate_permissions_from_db_to_admin_roles(db_perms)
+    assert roles == {'send_messages', 'manage_templates', 'some_unknown_permission'}
+
+
+def test_translate_permissions_from_admin_roles_to_db():
+    roles = ['send_messages', 'manage_templates', 'some_unknown_permission']
+    db_perms = translate_permissions_from_admin_roles_to_db(roles)
+    assert db_perms == {'send_texts', 'send_emails', 'send_letters', 'manage_templates', 'some_unknown_permission'}

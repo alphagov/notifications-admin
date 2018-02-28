@@ -1,5 +1,3 @@
-from itertools import chain
-
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
@@ -52,7 +50,7 @@ def invite_user(service_id):
 
     if form.validate_on_submit():
         email_address = form.email_address.data
-        permissions = ','.join(sorted(get_permissions_from_form(form)))
+        permissions = get_permissions_from_form(form)
         invited_user = invite_api_client.create_invite(
             current_user.id,
             service_id,
@@ -82,7 +80,7 @@ def edit_user_permissions(service_id, user_id):
     user_has_no_mobile_number = user.mobile_number is None
 
     form = PermissionsForm(
-        **{role: user.has_permissions(*permissions) for role, permissions in roles.items()},
+        **{role: user.has_permissions(role) for role in roles.keys()},
         login_authentication=user.auth_type
     )
     if form.validate_on_submit():
@@ -111,7 +109,7 @@ def remove_user_from_service(service_id, user_id):
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
     form = PermissionsForm(**{
-        role: user.has_permissions(*permissions) for role, permissions in roles.items()
+        role: user.has_permissions(role) for role in roles.keys()
     })
 
     if request.method == 'POST':
@@ -152,11 +150,6 @@ def get_permissions_from_form(form):
     # view_activity is a default role to be added to all users.
     # All users will have at minimum view_activity to allow users to see notifications,
     # templates, team members but no update privileges
-    selected_permissions = [
-        permissions
-        for role, permissions in roles.items()
-        if form[role].data is True
-    ]
-    selected_permissions = list(chain.from_iterable(selected_permissions))
-    selected_permissions.append('view_activity')
-    return selected_permissions
+    selected_roles = {role for role in roles.keys() if form[role].data is True}
+    selected_roles.add('view_activity')
+    return selected_roles
