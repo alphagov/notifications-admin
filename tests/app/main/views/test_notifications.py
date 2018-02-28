@@ -167,9 +167,7 @@ def test_should_show_image_of_letter_notification(
     mocked_api_client = mocker.patch(
         'app.notify_client.notification_api_client.NotificationApiClient.get',
         return_value={
-            'content': base64.b64encode(b'foo').decode('utf-8'),
-            'status': 200, 
-            'headers': [{'test': 'test', 'test1': 'test1'}]
+            'content': base64.b64encode(b'foo').decode('utf-8')
         }
     )
 

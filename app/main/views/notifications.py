@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import base64
-from collections import ItemsView
 from datetime import datetime
 
 from flask import (
@@ -116,7 +115,6 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
         page=request.args.get('page')
     )
 
-    # return base64.b64decode(preview['content']), preview['status'], ItemsView(dict(preview['headers']))
     return base64.b64decode(preview['content'])
 
 
