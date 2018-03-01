@@ -44,7 +44,7 @@ def test_user_has_permissions_on_endpoint_fail(
         client,
         user,
         ['send_messages'],
-        False)
+        will_succeed=False)
 
 
 def test_user_has_permissions_success(
@@ -57,7 +57,7 @@ def test_user_has_permissions_success(
         client,
         user,
         ['manage_service'],
-        True)
+        will_succeed=True)
 
 
 def test_user_has_permissions_or(
@@ -70,7 +70,7 @@ def test_user_has_permissions_or(
         client,
         user,
         ['send_messages', 'manage_service'],
-        True)
+        will_succeed=True)
 
 
 def test_user_has_permissions_multiple(
@@ -96,7 +96,7 @@ def test_exact_permissions(
         client,
         user,
         ['manage_service', 'manage_templates'],
-        True)
+        will_succeed=True)
 
 
 def test_platform_admin_user_can_access_page_that_has_no_permissions(
@@ -109,7 +109,7 @@ def test_platform_admin_user_can_access_page_that_has_no_permissions(
         client,
         platform_admin_user,
         [],
-        True)
+        will_succeed=True)
 
 
 def test_platform_admin_user_can_not_access_page(
@@ -138,6 +138,43 @@ def test_no_user_returns_401_unauth(
         will_succeed=False)
 
 
+def test_user_has_permissions_for_organisation(
+    client,
+    mocker,
+):
+    user = _user_with_permissions()
+    user.organisations = ['org_1', 'org_2']
+    mocker.patch('app.user_api_client.get_user', return_value=user)
+    client.login(user)
+
+    request.view_args = {'org_id': 'org_2'}
+
+    @user_has_permissions()
+    def index():
+        pass
+
+    index()
+
+
+def test_user_doesnt_have_permissions_for_organisation(
+    client,
+    mocker,
+):
+    user = _user_with_permissions()
+    user.organisations = ['org_1', 'org_2']
+    mocker.patch('app.user_api_client.get_user', return_value=user)
+    client.login(user)
+
+    request.view_args = {'org_id': 'org_3'}
+
+    @user_has_permissions()
+    def index():
+        pass
+
+    with pytest.raises(Forbidden):
+        index()
+
+
 def _user_with_permissions():
     from app.notify_client.user_api_client import User
 
@@ -149,7 +186,8 @@ def _user_with_permissions():
                  'state': 'active',
                  'failed_login_count': 0,
                  'permissions': {'foo': ['manage_users', 'manage_templates', 'manage_settings']},
-                 'platform_admin': False
+                 'platform_admin': False,
+                 'organisations': ['org_1', 'org_2'],
                  }
     user = User(user_data)
     return user

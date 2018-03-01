@@ -418,19 +418,17 @@ def load_organisation_before_request():
         _request_ctx_stack.top.organisation = None
 
         if request.view_args:
-            org_id = request.view_args.get('org_id', session.get('org_id'))
-        else:
-            org_id = session.get('org_id')
+            org_id = request.view_args.get('org_id')
 
-        if org_id:
-            try:
-                _request_ctx_stack.top.organisation = organisations_client.get_organisation(org_id)
-            except HTTPError as exc:
-                # if org id isn't real, then 404 rather than 500ing later because we expect org to be set
-                if exc.status_code == 404:
-                    abort(404)
-                else:
-                    raise
+            if org_id:
+                try:
+                    _request_ctx_stack.top.organisation = organisations_client.get_organisation(org_id)
+                except HTTPError as exc:
+                    # if org id isn't real, then 404 rather than 500ing later because we expect org to be set
+                    if exc.status_code == 404:
+                        abort(404)
+                    else:
+                        raise
 
 
 def save_service_after_request(response):

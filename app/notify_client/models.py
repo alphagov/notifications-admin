@@ -32,6 +32,10 @@ def _get_service_id_from_view_args():
     return request.view_args.get('service_id', None)
 
 
+def _get_org_id_from_view_args():
+    return request.view_args.get('org_id', None)
+
+
 def translate_permissions_from_db_to_admin_roles(permissions):
     """
     Given a list of database permissions, return a set of roles
@@ -123,9 +127,14 @@ class User(UserMixin):
 
         # Service id is always set on the request for service specific views.
         service_id = _get_service_id_from_view_args()
-        if service_id in self._permissions:
-            return any(x in self._permissions[service_id] for x in permissions)
-        return False
+        org_id = _get_org_id_from_view_args()
+
+        if org_id:
+            return org_id in self.organisations
+        elif service_id:
+            return any(x in self._permissions.get(service_id, []) for x in permissions)
+        else:
+            return False
 
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])
