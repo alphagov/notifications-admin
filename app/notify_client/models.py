@@ -183,6 +183,7 @@ class InvitedUser(object):
         self.status = status
         self.created_at = created_at
         self.auth_type = auth_type
+        self.permissions = translate_permissions_from_db_to_admin_roles(self.permissions)
 
     def has_permissions(self, *permissions):
         if self.status == 'cancelled':
@@ -217,7 +218,7 @@ class InvitedUser(object):
         if permissions_as_string:
             data['permissions'] = ','.join(self.permissions)
         else:
-            data['permissions'] = self.permissions
+            data['permissions'] = sorted(self.permissions)
         return data
 
 
