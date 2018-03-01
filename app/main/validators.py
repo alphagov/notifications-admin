@@ -92,3 +92,13 @@ class LettersNumbersAndFullStopsOnly:
     def __call__(self, form, field):
         if field.data and not re.match(self.regex, field.data):
             raise ValidationError(self.message)
+
+
+class DoesNotStartWithDoubleZero:
+
+    def __init__(self, message="Can't start with 00"):
+        self.message = message
+
+    def __call__(self, form, field):
+        if field.data and field.data.startswith("00"):
+            raise ValidationError(self.message)
