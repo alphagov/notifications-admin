@@ -1,14 +1,16 @@
 import base64
+from functools import partial
+from unittest.mock import mock_open
 
 import pytest
 from flask import url_for
 from freezegun import freeze_time
-from functools import partial
-import pytest
-from unittest.mock import mock_open
-
 from notifications_python_client.errors import APIError
-from tests.conftest import mock_get_notification, SERVICE_ONE_ID, normalize_spaces
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    mock_get_notification,
+    normalize_spaces,
+)
 
 
 @pytest.mark.parametrize('notification_status, expected_status', [
