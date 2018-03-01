@@ -63,12 +63,6 @@ in a separate terminal from the app
 ```
 echo "
 export NOTIFY_ENVIRONMENT='development'
-export ADMIN_CLIENT_SECRET='notify-secret-key'
-export API_HOST_NAME='http://localhost:6011'
-export DANGEROUS_SALT='dev-notify-salt'
-export SECRET_KEY='notify-secret-key'
-export DESKPRO_API_HOST="some-host"
-export DESKPRO_API_KEY="some-key"
 export FLASK_APP=application.py
 export FLASK_DEBUG=1
 export WERKZEUG_DEBUG_PIN=off
