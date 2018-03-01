@@ -24,7 +24,7 @@
         Team members
       </h1>
     </div>
-    {% if current_user.has_permissions('manage_service', admin_override=True) %}
+    {% if current_user.has_permissions('manage_service') %}
       <div class="column-one-third">
         <a href="{{ url_for('.invite_user', service_id=current_service.id) }}" class="button align-with-heading">Invite team member</a>
       </div>
@@ -89,7 +89,7 @@
               </div>
             {% endif %}
           </div>
-          {% if current_user.has_permissions('manage_service', admin_override=True) %}
+          {% if current_user.has_permissions('manage_service') %}
             <li class="tick-cross-list-edit-link">
               {% if user.status == 'pending' %}
                 <a href="{{ url_for('.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Cancel invitation</a>

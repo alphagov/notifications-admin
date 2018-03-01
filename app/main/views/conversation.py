@@ -12,7 +12,7 @@ from app.utils import user_has_permissions
 
 @main.route("/services/<service_id>/conversation/<notification_id>")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def conversation(service_id, notification_id):
 
     user_number = get_user_number(service_id, notification_id)
@@ -28,7 +28,7 @@ def conversation(service_id, notification_id):
 
 @main.route("/services/<service_id>/conversation/<notification_id>.json")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def conversation_updates(service_id, notification_id):
 
     return jsonify(get_conversation_partials(
@@ -39,7 +39,7 @@ def conversation_updates(service_id, notification_id):
 
 @main.route("/services/<service_id>/conversation/<notification_id>/reply-with")
 @login_required
-@user_has_permissions('send_messages', admin_override=True)
+@user_has_permissions('send_messages')
 def conversation_reply(
     service_id,
     notification_id,
@@ -63,7 +63,7 @@ def conversation_reply(
 
 @main.route("/services/<service_id>/conversation/<notification_id>/reply-with/<template_id>")
 @login_required
-@user_has_permissions('send_messages', admin_override=True)
+@user_has_permissions('send_messages')
 def conversation_reply_with_template(
     service_id,
     notification_id,

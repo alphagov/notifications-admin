@@ -159,7 +159,7 @@ class User(UserMixin):
     def permissions(self, permissions):
         raise AttributeError("Read only property")
 
-    def has_permissions(self, *permissions, any_=False, admin_override=None, restrict_admin_usage=False):
+    def has_permissions(self, *permissions, any_=False, restrict_admin_usage=False):
         unknown_permissions = set(permissions) - all_permissions
 
         if unknown_permissions:

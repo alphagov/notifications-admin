@@ -658,7 +658,7 @@ def start_job(service_id, upload_id):
 
 @main.route("/services/<service_id>/end-tour/<example_template_id>")
 @login_required
-@user_has_permissions('manage_templates', admin_override=True)
+@user_has_permissions('manage_templates')
 def go_to_dashboard_after_tour(service_id, example_template_id):
 
     service_api_client.delete_service_template(service_id, example_template_id)
@@ -767,7 +767,7 @@ def get_back_link(service_id, template_id, step_index):
 
 @main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['GET'])
 @login_required
-@user_has_permissions('send_messages', admin_override=True)
+@user_has_permissions('send_messages')
 def check_notification(service_id, template_id):
     return _check_notification(service_id, template_id)
 

@@ -15,11 +15,11 @@
   <div class="dashboard">
 
     <h1 class="visuallyhidden">Dashboard</h1>
-    {% if current_user.has_permissions('manage_templates', admin_override=True) %}
+    {% if current_user.has_permissions('manage_templates') %}
       {% if not templates %}
         {% include 'views/dashboard/write-first-messages.html' %}
       {% endif %}
-    {% elif not current_user.has_permissions('send_messages', 'manage_api_keys', any_=True, admin_override=True) %}
+    {% elif not current_user.has_permissions('send_messages', 'manage_api_keys', any_=True) %}
       {% include 'views/dashboard/no-permissions-banner.html' %}
     {% endif %}
 

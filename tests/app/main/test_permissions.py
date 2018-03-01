@@ -100,7 +100,7 @@ def test_exact_permissions(
         True)
 
 
-def test_platform_admin_user_can_access_page(
+def test_platform_admin_user_can_access_page_that_has_no_permissions(
     client,
     platform_admin_user,
     mocker,
@@ -110,8 +110,7 @@ def test_platform_admin_user_can_access_page(
         client,
         platform_admin_user,
         [],
-        will_succeed=True,
-        kwargs={'admin_override': True})
+        True)
 
 
 def test_platform_admin_user_can_not_access_page(
