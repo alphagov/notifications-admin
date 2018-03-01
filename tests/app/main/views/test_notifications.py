@@ -1,8 +1,9 @@
-from functools import partial
+import base64
 
 import pytest
 from flask import url_for
 from freezegun import freeze_time
+from functools import partial
 from notifications_utils.template import LetterImageTemplate
 from tests.conftest import (
     SERVICE_ONE_ID,
@@ -163,7 +164,6 @@ def test_should_show_image_of_letter_notification(
 
     mock_get_notification(mocker, fake_uuid, template_type='letter')
 
-    import base64
     mocked_api_client = mocker.patch(
         'app.notify_client.notification_api_client.NotificationApiClient.get',
         return_value={
@@ -180,7 +180,6 @@ def test_should_show_image_of_letter_notification(
 
     assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
-    assert mocked_api_client.called
 
 
 def test_should_404_for_unknown_extension(
