@@ -107,7 +107,7 @@
 
 {% macro edit_field(text, link, permissions=[]) -%}
   {% call field(align='right') %}
-    {% if current_user.has_permissions(*permissions) or not permissions %}
+    {% if not permissions or current_user.has_permissions(*permissions) %}
       <a href="{{ link }}">{{ text }}</a>
     {% endif %}
   {% endcall %}

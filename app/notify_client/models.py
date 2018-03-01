@@ -121,20 +121,23 @@ class User(UserMixin):
         if unknown_permissions:
             raise TypeError('{} are not valid permissions'.format(list(unknown_permissions)))
 
-        # platform admins should be able to do most things (except eg send messages, or create api keys)
-        if self.platform_admin and not restrict_admin_usage:
-            return True
-
         # Service id is always set on the request for service specific views.
         service_id = _get_service_id_from_view_args()
         org_id = _get_org_id_from_view_args()
+
+        if not service_id and not org_id:
+            # we shouldn't have any pages that require permissions, but don't specify a service or organisation.
+            # use @user_is_platform_admin for platform admin only pages
+            raise NotImplementedError
+
+        # platform admins should be able to do most things (except eg send messages, or create api keys)
+        if self.platform_admin and not restrict_admin_usage:
+            return True
 
         if org_id:
             return org_id in self.organisations
         elif service_id:
             return any(x in self._permissions.get(service_id, []) for x in permissions)
-        else:
-            return False
 
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])
