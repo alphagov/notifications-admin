@@ -95,21 +95,21 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
     if filetype not in ('pdf', 'png'):
         abort(404)
 
-    notification = notification_api_client.get_notification(service_id, notification_id)
-    notification['template'].update({'reply_to_text': notification['reply_to_text']})
+    # notification = notification_api_client.get_notification(service_id, notification_id)
+    # notification['template'].update({'reply_to_text': notification['reply_to_text']})
 
-    template = get_template(
-        notification['template'],
-        current_service,
-        letter_preview_url=url_for(
-            '.view_letter_notification_as_preview',
-            service_id=service_id,
-            notification_id=notification_id,
-            filetype='png',
-        ),
-    )
+    # template = get_template(
+    #     notification['template'],
+    #     current_service,
+    #     letter_preview_url=url_for(
+    #         '.view_letter_notification_as_preview',
+    #         service_id=service_id,
+    #         notification_id=notification_id,
+    #         filetype='png',
+    #     ),
+    # )
 
-    template.values = notification['personalisation']
+    # template.values = notification['personalisation']
 
     try:
         preview = notification_api_client.get_notification_letter_preview(
