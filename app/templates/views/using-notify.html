@@ -13,25 +13,17 @@
   </div>
   <div class="column-two-thirds">
 
-    <h1 class="heading-large">Using Notify</h1>
-
-    <h2 class="heading-medium">Writing and sending text messages, emails and letters</h2>
-    <p><a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">Check the Service Manual</a> for guidance on how to:</p>
-    <ul class="list list-bullet">
-      <li>plan and write text messages and emails</li>
-      <li>send emails in a way that protects users from spam and phishing</li>
-    </ul>
-
     <h2 id="trial-mode" class="heading-medium">Trial mode</h2>
-    <p>When you sign up to GOV.UK Notify, you’ll start in trial mode. In trial mode, you can send up to 50 text messages and emails a day. You can only send them to yourself and other people in your team.</p>
-    <p>You can’t send letters in trial mode.</p>
-    <p>When you
-      {% if current_service and current_service.restricted %}
-        <a href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">request to go live</a>
-      {% else %}
-        request to go live
-      {% endif %}
-    on Notify, we’ll remove these restrictions.</p>
+    <p>When you create a GOV.UK Notify account, you’ll start in trial mode. This lets you try out the service, but has some restrictions in place.</p>
+    <p>You can remove these restrictions by going live.</p>
+    
+    <h3 class="heading-small">Restrictions in trial mode</h3>
+    <p>In trial mode, you can:</p>
+    <ul class="list list-bullet">
+      <li>send up to 50 text messages and emails per day</li>
+      <li>send messages to yourself and other people in your team</li>
+      <li>draft letters (but not send them)</li>
+    </ul>
 
     <h2 id="messagedeliveryandfailure" class="heading-medium">Sending messages</h2>
     <p>When you send a message, it moves through different states in Notify.</p>
@@ -71,6 +63,19 @@
     <p>When you’ve done this, users will be able to reply to text messages you send them. They’ll also be able to start an interaction by sending you a text message.</p>
     <p>You’ll be able to see and reply to text messages you receive. You can also create automated processes to manage replies.</p>
     <p>You’ll still need to have a manual process in place for any messages that can’t be dealt with automatically.</p>
+    
+    <h2 class="heading-medium">Multiple services in one organisation</h2>
+    <p>If your organisation offers multiple services, you can have a different Notify account for each of them.</p>
+    <p>Each service:</p>
+    <ul class="list list-bullet">
+      <li>gets its own free message allowance</li>
+      <li>has to request to go live separately</li>
+    </ul>
+    
+    <h2 class="heading-medium">Letters</h2>
+    <p>Letters can be up to 6 pages long (3 sides of paper, double-sided).</p> 
+    <p>Notify sends letters in C5 size envelopes, with a window.</p>
+    
   </div>
 </div>
 
