@@ -13,8 +13,8 @@ from flask import (
     url_for,
 )
 from flask_login import login_required
-from notifications_python_client.errors import APIError
 
+from notifications_python_client.errors import APIError
 from app import (
     current_service,
     format_date_numeric,
@@ -57,7 +57,6 @@ def view_notification(service_id, notification_id):
         show_recipient=True,
         redact_missing_personalisation=True,
     )
-
     template.values = get_all_personalisation_from_notification(notification)
     if notification['job']:
         job = job_api_client.get_job(service_id, notification['job']['id'])['data']
@@ -87,6 +86,12 @@ def view_notification(service_id, notification_id):
     )
 
 
+def get_preview_error_image():
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "images", "preview_error.png")
+    with open(path, "rb") as file:
+        return file.read()
+
+
 @main.route("/services/<service_id>/notification/<uuid:notification_id>.<filetype>")
 @login_required
 @user_has_permissions('view_activity', admin_override=True)
@@ -94,22 +99,6 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
 
     if filetype not in ('pdf', 'png'):
         abort(404)
-
-    # notification = notification_api_client.get_notification(service_id, notification_id)
-    # notification['template'].update({'reply_to_text': notification['reply_to_text']})
-
-    # template = get_template(
-    #     notification['template'],
-    #     current_service,
-    #     letter_preview_url=url_for(
-    #         '.view_letter_notification_as_preview',
-    #         service_id=service_id,
-    #         notification_id=notification_id,
-    #         filetype='png',
-    #     ),
-    # )
-
-    # template.values = notification['personalisation']
 
     try:
         preview = notification_api_client.get_notification_letter_preview(
@@ -121,8 +110,7 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
 
         display_file = base64.b64decode(preview['content'])
     except APIError:
-        with open(os.path.join(os.path.dirname(__file__), "../../assets/images/preview_error.png"), "rb") as file:
-            display_file = file.read()
+        display_file = get_preview_error_image()
 
     return display_file
 

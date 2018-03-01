@@ -4,12 +4,11 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 from functools import partial
-from notifications_utils.template import LetterImageTemplate
-from tests.conftest import (
-    SERVICE_ONE_ID,
-    mock_get_notification,
-    normalize_spaces,
-)
+import pytest
+from unittest.mock import mock_open
+
+from notifications_python_client.errors import APIError
+from tests.conftest import mock_get_notification, SERVICE_ONE_ID, normalize_spaces
 
 
 @pytest.mark.parametrize('notification_status, expected_status', [
@@ -164,7 +163,7 @@ def test_should_show_image_of_letter_notification(
 
     mock_get_notification(mocker, fake_uuid, template_type='letter')
 
-    mocked_api_client = mocker.patch(
+    mocker.patch(
         'app.notify_client.notification_api_client.NotificationApiClient.get',
         return_value={
             'content': base64.b64encode(b'foo').decode('utf-8')
@@ -180,6 +179,32 @@ def test_should_show_image_of_letter_notification(
 
     assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
+
+
+def test_should_show_preview_error_image_letter_notification_on_preview_error(
+    logged_in_client,
+    fake_uuid,
+    mocker,
+):
+
+    mock_get_notification(mocker, fake_uuid, template_type='letter')
+
+    mocker.patch(
+        'app.notify_client.notification_api_client.NotificationApiClient.get',
+        side_effect=APIError
+    )
+
+    mocker.patch("builtins.open", mock_open(read_data="preview error image"))
+
+    response = logged_in_client.get(url_for(
+        'main.view_letter_notification_as_preview',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        filetype='png'
+    ))
+
+    assert response.status_code == 200
+    assert response.get_data(as_text=True) == 'preview error image'
 
 
 def test_should_404_for_unknown_extension(
