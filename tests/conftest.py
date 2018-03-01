@@ -1432,7 +1432,7 @@ def mock_get_user_by_email(mocker, user=None):
         user = api_user_active(fake_uuid())
 
     def _get_user(email_address):
-        user._email_address = email_address
+        user.email_address = email_address
         return user
 
     return mocker.patch('app.user_api_client.get_user_by_email', side_effect=_get_user)

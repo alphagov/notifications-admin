@@ -52,19 +52,19 @@ def translate_permissions_from_admin_roles_to_db(permissions):
 
 class User(UserMixin):
     def __init__(self, fields, max_failed_login_count=3):
-        self._id = fields.get('id')
-        self._name = fields.get('name')
-        self._email_address = fields.get('email_address')
-        self._mobile_number = fields.get('mobile_number')
-        self._password_changed_at = fields.get('password_changed_at')
+        self.id = fields.get('id')
+        self.name = fields.get('name')
+        self.email_address = fields.get('email_address')
+        self.mobile_number = fields.get('mobile_number')
+        self.password_changed_at = fields.get('password_changed_at')
         self._set_permissions(fields.get('permissions', {}))
-        self._auth_type = fields.get('auth_type')
-        self._failed_login_count = fields.get('failed_login_count')
-        self._state = fields.get('state')
+        self.auth_type = fields.get('auth_type')
+        self.failed_login_count = fields.get('failed_login_count')
+        self.state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
         self.platform_admin = fields.get('platform_admin')
         self.current_session_id = fields.get('current_session_id')
-        self._organisations = fields.get('organisations', [])
+        self.organisations = fields.get('organisations', [])
 
     def _set_permissions(self, permissions_by_service):
         """
@@ -104,54 +104,6 @@ class User(UserMixin):
         )
 
     @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, id):
-        self._id = id
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, name):
-        self._name = name
-
-    @property
-    def email_address(self):
-        return self._email_address
-
-    @email_address.setter
-    def email_address(self, email_address):
-        self._email_address = email_address
-
-    @property
-    def mobile_number(self):
-        return self._mobile_number
-
-    @mobile_number.setter
-    def mobile_number(self, mobile_number):
-        self._mobile_number = mobile_number
-
-    @property
-    def password_changed_at(self):
-        return self._password_changed_at
-
-    @password_changed_at.setter
-    def password_changed_at(self, password_changed_at):
-        self._password_changed_at = password_changed_at
-
-    @property
-    def state(self):
-        return self._state
-
-    @state.setter
-    def state(self, state):
-        self._state = state
-
-    @property
     def permissions(self):
         return self._permissions
 
@@ -178,22 +130,6 @@ class User(UserMixin):
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])
 
-    @property
-    def auth_type(self):
-        return self._auth_type
-
-    @auth_type.setter
-    def auth_type(self, auth_type):
-        self._auth_type = auth_type
-
-    @property
-    def failed_login_count(self):
-        return self._failed_login_count
-
-    @failed_login_count.setter
-    def failed_login_count(self, num):
-        self._failed_login_count += num
-
     def is_locked(self):
         return self.failed_login_count >= self.max_failed_login_count
 
@@ -216,10 +152,6 @@ class User(UserMixin):
 
     def set_password(self, pwd):
         self._password = pwd
-
-    @property
-    def organisations(self):
-        return self._organisations
 
 
 class InvitedUser(object):

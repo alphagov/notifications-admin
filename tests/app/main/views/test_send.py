@@ -1948,7 +1948,7 @@ def test_check_messages_shows_too_many_messages_errors(
 ):
     # csv with 100 phone numbers
     mocker.patch('app.main.views.send.s3download', return_value=',\n'.join(
-        ['phone number'] + ([mock_get_users_by_service(None)[0]._mobile_number] * 100)
+        ['phone number'] + ([mock_get_users_by_service(None)[0].mobile_number] * 100)
     ))
     mocker.patch('app.service_api_client.get_detailed_service_for_today', return_value={
         'data': {
