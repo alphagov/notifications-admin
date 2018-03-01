@@ -15,71 +15,64 @@
   <div class="column-two-thirds">
 
     <h1 class="heading-large">Features</h1>
-    <p>GOV.UK Notify helps government services to:</p>
+    <p>With GOV.UK Notify, you can:</p>
     <ul class="list list-bullet">
       <li>send emails</li>
       <li>send and receive text messages (UK and internationally)</li>
       <li>send letters</li>
     </ul>
-    <p>You can use Notify if you’re running a service in:</p>
-    <ul class="list list-bullet">
-      <li>central government</li>
-      <li>a local authority</li>
-      <li>the NHS</li>
-    </ul>
     <p>You don’t need any technical knowledge to use Notify.</p>
     <p><a href="{{ url_for('main.register') }}">Create an account</a> for free and try it yourself.</p>
 
-    <h2 class="heading-medium"> Customise your messages</h2>
-    <p>With Notify, you control the content and format of your messages. You can:</p>
+    <h2 class="heading-medium">Create messages quickly and easily</h2>
+    <p>Without any technical knowledge, you can:</p>
     <ul class="list list-bullet">
-      <li>customise the content of your messages</li>
-      <li>change the formatting of emails and letters</li>
-      <li>create and update templates in real time</li>
-      <li>add your own branding</li>
-      <li>choose your text message sender name</li>
-      <li>choose an email account for users to reply to</li>
+      <li>create your own message templates</li>
+      <li>change how messages are formatted</li>
       <li>preview messages before you send them</li>
     </ul>
 
-    <h2 class="heading-medium">Send messages when you want to</h2>
-    <p>You can send messages straight away, or schedule them in advance.</p>
-    <h3 class="heading-small">Service levels</h3>
-    <p>Notify commits to:</p>
+    <h2 class="heading-medium">Customise your branding</h2>
+    <p>You control how your messages look when you send them through Notify. You can:</p>
     <ul class="list list-bullet">
-      <li>sending 95% of emails and text messages within 10 seconds</li>
-      <li>sending letters by 3pm the next working day (if you submit it through Notify before 5pm)</li>
+      <li>use your organisation’s own branding</li>
+      <li>choose the name that emails and text messages come from</li>
+      <li>choose the email address that users reply to</li>
+      <li>get a unique phone number for text message replies</li>
     </ul>
-
-    <h2 class="heading-medium">See your activity</h2>
+    
+    <h2 class="heading-medium">Send messages in bulk or individually</h2>
+    <p>With Notify, you can:</p>
+    <ul class="list list-bullet">
+      <li>send bulk messages to lots of users</li>
+      <li>send personalised messages to individual users</li>
+      <li>schedule messages to be sent at a particular time</li>
+      <li>send messages automatically <a href="/documentation">through our API</a></li>
+    </ul>
+    
+    <h2 class="heading-medium">Track your activity</h2>
     <p>Through the Notify dashboard, you can:</p>
     <ul class="list list-bullet">
       <li>check the delivery status of any emails and text messages</li>
       <li>see a real-time dashboard of your activity</li>
       <li>view your usage and reports</li>
     </ul>
-
-    <h2 class="heading-medium">Send messages in bulk or individually</h2>
-    <p>With Notify, you can:</p>
-    <ul class="list list-bullet">
-      <li>upload files with all your user data</li>
-      <li>send bulk messages to users</li>
-      <li>send messages to specific users</li>
-    </ul>
-
-    <h2 class="heading-medium">Manage user permissions</h2>
+    
+    <h2 class="heading-medium">Manage your team</h2>
     <p>Through the Notify dashboard, you can:</p>
     <ul class="list list-bullet">
-      <li>set different permission levels for different team members</li>
-      <li>invite contractors to use Notify</li>
+      <li>set permission levels for different team members</li>
+      <li>invite new users (including people without a government email address)</li>
+    </ul>
+    
+    <h2 class="heading-medium">Send messages reliably</h2>
+    <p>Notify commits to:</p>
+    <ul class="list list-bullet">
+      <li>sending 95% of emails and text messages within 10 seconds</li>
+      <li>sending letters by 3pm the next working day (if you submit it through Notify before 5pm)</li>
     </ul>
 
-    <h2 class="heading-medium">Automate your messages</h2>
-    <p>You can integrate with our API to automatically send messages through Notify when relevant data changes in your systems.</p>
-    <p>This means you don’t have to manually download data from your system and upload it to Notify to send a message.</p>
-    <p><a href="{{ url_for('main.documentation') }}">Check our code libraries</a> for more information on how to integrate with Notify.</p>
-
-    <h2 class="heading-medium">Reliable and resilient</h2>
     <p>Notify sends messages through multiple providers. If one provider fails, Notify automatically switches to another so that your messages aren’t affected.</p>
-
+    
+    <p>You can <a href="https://www.gov.uk/performance/govuk-notify">check how Notify is performing</a>.</p>
 {% endblock %}
