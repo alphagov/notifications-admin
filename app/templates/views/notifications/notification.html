@@ -35,11 +35,17 @@
         Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
       </p>
       <p class="bottom-gutter">
-        <a href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
-      </p>
+          {% if not error %}
+            <a href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification_id, filetype='pdf') }}" download>Download as a PDF</a>
+          {% endif %}
+          </p>
     {% endif %}
 
-    {{ template|string }}
+    {% if error %}
+        Error Creating PDF Preview
+    {% else %}
+        {{ template|string }}
+    {% endif %}
 
     {% if template.template_type != 'letter' %}
       {{ ajax_block(partials, updates_url, 'status', finished=finished) }}

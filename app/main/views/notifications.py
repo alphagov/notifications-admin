@@ -2,6 +2,7 @@
 import base64
 from datetime import datetime
 
+import os
 from flask import (
     Response,
     abort,
@@ -12,6 +13,7 @@ from flask import (
     url_for,
 )
 from flask_login import login_required
+from notifications_python_client.errors import APIError
 
 from app import (
     current_service,
@@ -55,6 +57,7 @@ def view_notification(service_id, notification_id):
         show_recipient=True,
         redact_missing_personalisation=True,
     )
+
     template.values = get_all_personalisation_from_notification(notification)
     if notification['job']:
         job = job_api_client.get_job(service_id, notification['job']['id'])['data']
@@ -108,14 +111,20 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
 
     template.values = notification['personalisation']
 
-    preview = notification_api_client.get_notification_letter_preview(
-        service_id,
-        notification_id,
-        filetype,
-        page=request.args.get('page')
-    )
+    try:
+        preview = notification_api_client.get_notification_letter_preview(
+            service_id,
+            notification_id,
+            filetype,
+            page=request.args.get('page')
+        )
 
-    return base64.b64decode(preview['content'])
+        display_file = base64.b64decode(preview['content'])
+    except APIError:
+        with open(os.path.join(os.path.dirname(__file__), "../../assets/images/preview_error.png"), "rb") as file:
+            display_file = file.read()
+
+    return display_file
 
 
 @main.route("/services/<service_id>/notification/<notification_id>.json")
