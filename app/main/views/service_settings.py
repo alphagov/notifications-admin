@@ -53,7 +53,7 @@ from app.utils import (
 
 @main.route("/services/<service_id>/service-settings")
 @login_required
-@user_has_permissions('manage_service', 'manage_api_keys', any_=True)
+@user_has_permissions('manage_service', 'manage_api_keys')
 def service_settings(service_id):
     letter_branding_organisations = email_branding_client.get_letter_email_branding()
     organisation = organisations_client.get_service_organisation(service_id).get('name', None)
@@ -360,7 +360,7 @@ def service_set_reply_to_email(service_id):
 
 @main.route("/services/<service_id>/service-settings/email-reply-to", methods=['GET'])
 @login_required
-@user_has_permissions('manage_service', 'manage_api_keys', any_=True)
+@user_has_permissions('manage_service', 'manage_api_keys')
 def service_email_reply_to(service_id):
     reply_to_email_addresses = service_api_client.get_reply_to_email_addresses(service_id)
     return render_template(
@@ -540,7 +540,7 @@ def service_set_auth_type(service_id):
 
 @main.route("/services/<service_id>/service-settings/letter-contacts", methods=['GET'])
 @login_required
-@user_has_permissions('manage_service', 'manage_api_keys', any_=True)
+@user_has_permissions('manage_service', 'manage_api_keys')
 def service_letter_contact_details(service_id):
     letter_contact_details = service_api_client.get_letter_contacts(service_id)
     return render_template(
@@ -596,7 +596,7 @@ def service_edit_letter_contact(service_id, letter_contact_id):
 
 @main.route("/services/<service_id>/service-settings/sms-sender", methods=['GET'])
 @login_required
-@user_has_permissions('manage_service', 'manage_api_keys', any_=True)
+@user_has_permissions('manage_service', 'manage_api_keys')
 def service_sms_senders(service_id):
 
     def attach_hint(sender):

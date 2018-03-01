@@ -51,7 +51,7 @@
   {% if current_user.has_permissions('manage_service') %}
     <li><a href="{{ url_for('.usage', service_id=current_service.id) }}">Usage</a></li>
   {% endif %}
-  {% if current_user.has_permissions('manage_api_keys', 'manage_service', any_=True) %}
+  {% if current_user.has_permissions('manage_api_keys', 'manage_service') %}
     <li><a href="{{ url_for('.service_settings', service_id=current_service.id) }}">Settings</a></li>
   {% endif %}
   {% if current_user.has_permissions('manage_api_keys') %}

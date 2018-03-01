@@ -159,7 +159,7 @@ class User(UserMixin):
     def permissions(self, permissions):
         raise AttributeError("Read only property")
 
-    def has_permissions(self, *permissions, any_=False, restrict_admin_usage=False):
+    def has_permissions(self, *permissions, restrict_admin_usage=False):
         unknown_permissions = set(permissions) - all_permissions
 
         if unknown_permissions:
@@ -172,12 +172,7 @@ class User(UserMixin):
         # Service id is always set on the request for service specific views.
         service_id = _get_service_id_from_view_args()
         if service_id in self._permissions:
-            if any_:
-                has_permissions = any(x in self._permissions[service_id] for x in permissions)
-            else:
-                has_permissions = set(self._permissions[service_id]) >= set(permissions)
-
-            return has_permissions
+            return any(x in self._permissions[service_id] for x in permissions)
         return False
 
     def has_permission_for_service(self, service_id, permission):

@@ -70,8 +70,7 @@ def test_user_has_permissions_or(
         client,
         user,
         ['send_messages', 'manage_service'],
-        True,
-        kwargs={'any_': True})
+        True)
 
 
 def test_user_has_permissions_multiple(

@@ -159,7 +159,7 @@ def send_messages(service_id, template_id):
 
 @main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
 @login_required
-@user_has_permissions('send_messages', 'manage_templates', any_=True)
+@user_has_permissions('send_messages', 'manage_templates')
 def get_example_csv(service_id, template_id):
     template = get_template(
         service_api_client.get_service_template(service_id, template_id)['data'], current_service
