@@ -5,6 +5,7 @@ from glob import glob
 from io import BytesIO
 from itertools import repeat
 from os import path
+from zipfile import BadZipFile
 
 import pytest
 from bs4 import BeautifulSoup
@@ -36,6 +37,13 @@ from tests.conftest import (
     no_reply_to_email_addresses,
     no_sms_senders,
     normalize_spaces,
+)
+from xlrd.biffh import XLRDError
+from xlrd.xldate import (
+    XLDateAmbiguous,
+    XLDateError,
+    XLDateNegative,
+    XLDateTooLarge,
 )
 
 template_types = ['email', 'sms']
@@ -278,6 +286,7 @@ def test_upload_files_in_different_formats(
             data={'file': (BytesIO(uploaded.read()), filename)},
             content_type='multipart/form-data'
         )
+        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     if acceptable_file:
         assert mock_s3_upload.call_args[0][1]['data'].strip() == (
@@ -288,9 +297,64 @@ def test_upload_files_in_different_formats(
         )
     else:
         assert not mock_s3_upload.called
-        assert (
+        assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
             'Couldn’t read {}. Try using a different file format.'.format(filename)
-        ) in response.get_data(as_text=True)
+        )
+
+
+@pytest.mark.parametrize('exception, expected_error_message', [
+    (partial(UnicodeDecodeError, 'codec', b'', 1, 2, 'reason'), (
+        'Couldn’t read example.xlsx. Try using a different file format.'
+    )),
+    (BadZipFile, (
+        'Couldn’t read example.xlsx. Try using a different file format.'
+    )),
+    (XLRDError, (
+        'Couldn’t read example.xlsx. Try using a different file format.'
+    )),
+    (XLDateError, (
+        'example.xlsx contains numbers or dates that Notify can’t understand. '
+        'Try formatting all columns as ‘text’ or export your file as CSV.'
+    )),
+    (XLDateNegative, (
+        'example.xlsx contains numbers or dates that Notify can’t understand. '
+        'Try formatting all columns as ‘text’ or export your file as CSV.'
+    )),
+    (XLDateAmbiguous, (
+        'example.xlsx contains numbers or dates that Notify can’t understand. '
+        'Try formatting all columns as ‘text’ or export your file as CSV.'
+    )),
+    (XLDateTooLarge, (
+        'example.xlsx contains numbers or dates that Notify can’t understand. '
+        'Try formatting all columns as ‘text’ or export your file as CSV.'
+    )),
+])
+def test_shows_error_if_parsing_exception(
+    logged_in_client,
+    mocker,
+    mock_get_service_template,
+    exception,
+    expected_error_message,
+):
+
+    def _raise_exception_or_partial_exception(file_content, filename):
+        raise exception()
+
+    mocker.patch(
+        'app.main.views.send.Spreadsheet.from_file',
+        side_effect=_raise_exception_or_partial_exception
+    )
+
+    response = logged_in_client.post(
+        url_for('main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid),
+        data={'file': (BytesIO(b'example'), 'example.xlsx')},
+        content_type='multipart/form-data'
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        expected_error_message
+    )
 
 
 def test_upload_csvfile_with_errors_shows_check_page_with_errors(
