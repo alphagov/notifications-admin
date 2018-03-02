@@ -12,10 +12,17 @@ def _attach_current_user(data):
 
 
 class NotifyAdminAPIClient(BaseAPIClient):
+    def init_app(self, app):
+        self.base_url = app.config['API_HOST_NAME']
+        self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
+        self.api_key = app.config['ADMIN_CLIENT_SECRET']
+        self.route_secret = app.config['ROUTE_SECRET_KEY_1']
+
     def generate_headers(self, api_token):
         headers = {
             "Content-type": "application/json",
             "Authorization": "Bearer {}".format(api_token),
+            "X-Custom-Forwarder": self.route_secret,
             "User-agent": "NOTIFY-API-PYTHON-CLIENT/{}".format(__version__)
         }
         return self._add_request_id_header(headers)

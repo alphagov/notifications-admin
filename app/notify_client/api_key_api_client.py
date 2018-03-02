@@ -10,11 +10,6 @@ class ApiKeyApiClient(NotifyAdminAPIClient):
     def __init__(self):
         super().__init__("a" * 73, "b")
 
-    def init_app(self, app):
-        self.base_url = app.config['API_HOST_NAME']
-        self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
-        self.api_key = app.config['ADMIN_CLIENT_SECRET']
-
     def get_api_keys(self, service_id, key_id=None):
         if key_id:
             return self.get(url='/service/{}/api-keys/{}'.format(service_id, key_id))

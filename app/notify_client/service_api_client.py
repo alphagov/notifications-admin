@@ -12,11 +12,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def __init__(self):
         super().__init__("a" * 73, "b")
 
-    def init_app(self, application):
-        self.base_url = application.config['API_HOST_NAME']
-        self.service_id = application.config['ADMIN_CLIENT_USER_NAME']
-        self.api_key = application.config['ADMIN_CLIENT_SECRET']
-
     def create_service(
         self,
         service_name,
