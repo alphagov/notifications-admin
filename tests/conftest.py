@@ -2404,6 +2404,8 @@ def mock_get_notification(
     notification_status='delivered',
     redact_personalisation=False,
     template_type=None,
+    template_name='sample template',
+    is_precompiled_letter=False
 ):
     def _get_notification(
         service_id,
@@ -2430,6 +2432,8 @@ def mock_get_notification(
             subject='blah',
             redact_personalisation=redact_personalisation,
             type_=template_type,
+            is_precompiled_letter=is_precompiled_letter,
+            name=template_name
         )
         return noti
 
