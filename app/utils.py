@@ -17,6 +17,7 @@ import pytz
 import yaml
 from flask import abort, current_app, redirect, request, session, url_for
 from flask_login import current_user
+from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import (
     EmailPreviewTemplate,
     LetterImageTemplate,
@@ -121,36 +122,40 @@ def get_errors_for_csv(recipients, template_type):
 
 def generate_notifications_csv(**kwargs):
     from app import notification_api_client
+    from app.main.s3_client import s3download
     if 'page' not in kwargs:
         kwargs['page'] = 1
 
-    if kwargs['job_id']:
-        fieldnames = ['Row number', 'Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
+    if kwargs.get('job_id'):
+        original_file_contents = s3download(kwargs['service_id'], kwargs['job_id'])
+        original_upload = RecipientCSV(
+            original_file_contents,
+            template_type=kwargs['template_type'],
+        )
+        original_column_headers = original_upload.column_headers
+        fieldnames = ['Row number'] + original_column_headers + ['Template', 'Type', 'Job', 'Status', 'Time']
     else:
         fieldnames = ['Recipient', 'Template', 'Type', 'Job', 'Status', 'Time']
 
     yield ','.join(fieldnames) + '\n'
 
     while kwargs['page']:
-        # if job_id then response looks different
         notifications_resp = notification_api_client.get_notifications_for_service(**kwargs)
-        notifications = notifications_resp['notifications']
-        if kwargs['job_id']:
-            for notification in notifications:
-                    values = [
-                        notification['row_number'],
-                        notification['recipient'],
-                        notification['template_name'],
-                        notification['template_type'],
-                        notification['job_name'],
-                        notification['status'],
-                        notification['created_at']
-                    ]
-                    line = ','.join(str(i) for i in values) + '\n'
-                    yield line
-        else:
-            # Change here
-            for notification in notifications:
+        for notification in notifications_resp['notifications']:
+            if kwargs.get('job_id'):
+                values = [
+                    notification['row_number'],
+                ] + [
+                    original_upload[notification['row_number'] - 1].get(header)
+                    for header in original_column_headers
+                ] + [
+                    notification['template_name'],
+                    notification['template_type'],
+                    notification['job_name'],
+                    notification['status'],
+                    notification['created_at'],
+                ]
+            else:
                 values = [
                     notification['to'],
                     notification['template']['name'],
@@ -160,8 +165,8 @@ def generate_notifications_csv(**kwargs):
                     notification['created_at'],
                     notification['updated_at']
                 ]
-                line = ','.join(str(i) for i in values) + '\n'
-                yield line
+            yield ','.join(map(str, values)) + '\n'
+
         if notifications_resp['links'].get('next'):
             kwargs['page'] += 1
         else:
