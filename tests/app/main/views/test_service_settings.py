@@ -1554,7 +1554,7 @@ def test_should_show_page_to_set_organisation_type(
     ('central', 250000),
     ('local', 25000),
     ('nhs', 25000),
-    (pytest.mark.xfail('private sector'), 1000)
+    pytest.mark.xfail(('private sector', 1000))
 ])
 def test_should_set_organisation_type(
     logged_in_platform_admin_client,
