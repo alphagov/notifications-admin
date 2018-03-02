@@ -581,6 +581,7 @@ def check_messages(service_id, template_type, upload_id, row_index=2):
         data['recipients'].too_many_rows or
         not data['count_of_recipients'] or
         not data['recipients'].has_recipient_columns or
+        data['recipients'].duplicate_recipient_column_headers or
         data['recipients'].missing_column_headers
     ):
         return render_template('views/check/column-errors.html', **data)

@@ -69,6 +69,21 @@
           ) }}.
         </p>
 
+      {% elif recipients.duplicate_recipient_column_headers %}
+
+        <h1 class='banner-title' data-module="track-error" data-error-type="Duplicate recipient columns" data-error-label="{{ upload_id }}">
+          Your file has more than one column called {{ (
+            recipients.duplicate_recipient_column_headers
+          ) | formatted_list(
+            conjunction='or',
+            prefix='',
+            prefix_plural=''
+          ) }}
+        </h1>
+        <p>
+          Delete or rename one of these columns and try again.
+        </p>
+
       {% elif recipients.missing_column_headers %}
 
         <h1 class='banner-title' data-module="track-error" data-error-type="Missing placeholder columns" data-error-label="{{ upload_id }}">
@@ -128,6 +143,8 @@
 
   {% if not request.args.from_test %}
 
+    {% set column_headers = recipients._raw_column_headers if recipients.duplicate_recipient_column_headers else recipients.column_headers %}
+
     <h2 class="heading-medium" id="{{ file_contents_header_id }}">{{ original_file_name }}</h2>
 
     <div class="fullscreen-content" data-module="fullscreen-table">
@@ -137,14 +154,14 @@
         caption_visible=False,
         field_headings=[
           '<span class="visually-hidden">Row in file</span><span aria-hidden="true">1</span>'|safe
-        ] + recipients.column_headers
+        ] + column_headers
       ) %}
         {% call index_field() %}
           <span>
             {{ item.index + 2 }}
           </span>
         {% endcall %}
-        {% for column in recipients.column_headers %}
+        {% for column in column_headers %}
           {% if item['columns'][column].error and not recipients.missing_column_headers %}
             {% call field() %}
               <span>
