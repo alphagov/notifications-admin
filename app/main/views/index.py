@@ -1,7 +1,8 @@
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from notifications_utils.international_billing_rates import \
-    INTERNATIONAL_BILLING_RATES
+from notifications_utils.international_billing_rates import (
+    INTERNATIONAL_BILLING_RATES,
+)
 from notifications_utils.template import HTMLEmailTemplate
 
 from app import convert_to_boolean

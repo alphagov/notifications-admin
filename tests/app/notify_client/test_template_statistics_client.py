@@ -1,7 +1,8 @@
 import uuid
 
-from app.notify_client.template_statistics_api_client import \
-    TemplateStatisticsApiClient
+from app.notify_client.template_statistics_api_client import (
+    TemplateStatisticsApiClient,
+)
 
 
 def test_template_statistics_client_calls_correct_api_endpoint_for_service(mocker, api_user_active):
