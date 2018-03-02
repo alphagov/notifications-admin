@@ -1,5 +1,6 @@
 from flask import (
     abort,
+    current_app,
     flash,
     redirect,
     render_template,
@@ -695,10 +696,15 @@ def set_organisation_type(service_id):
     form = OrganisationTypeForm(organisation_type=current_service.get('organisation_type'))
 
     if form.validate_on_submit():
+        free_sms_fragment_limit = current_app.config['DEFAULT_FREE_SMS_FRAGMENT_LIMITS'].get(
+            form.organisation_type.data)
+
         service_api_client.update_service(
             service_id,
             organisation_type=form.organisation_type.data,
         )
+        billing_api_client.create_or_update_free_sms_fragment_limit(service_id, free_sms_fragment_limit)
+
         return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(

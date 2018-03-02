@@ -1560,6 +1560,7 @@ def test_should_set_organisation_type(
     logged_in_platform_admin_client,
     mock_update_service,
     organisation_type,
+    mock_create_or_update_free_sms_fragment_limit
 ):
     response = logged_in_platform_admin_client.post(
         url_for(
