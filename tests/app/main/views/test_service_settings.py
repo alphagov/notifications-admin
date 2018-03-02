@@ -1550,16 +1550,18 @@ def test_should_show_page_to_set_organisation_type(
         assert normalize_spaces(labels[index].text) == expected
 
 
-@pytest.mark.parametrize('organisation_type', [
-    'central',
-    'local',
-    'nhs',
-    pytest.mark.xfail('private sector'),
+@pytest.mark.parametrize('organisation_type, free_allowance', [
+    ('central', 250000),
+    ('local', 25000),
+    ('nhs', 25000),
+    pytest.mark.xfail(('private sector', 1000))
 ])
 def test_should_set_organisation_type(
     logged_in_platform_admin_client,
     mock_update_service,
     organisation_type,
+    free_allowance,
+    mock_create_or_update_free_sms_fragment_limit
 ):
     response = logged_in_platform_admin_client.post(
         url_for(
@@ -1578,6 +1580,7 @@ def test_should_set_organisation_type(
         SERVICE_ONE_ID,
         organisation_type=organisation_type,
     )
+    mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(SERVICE_ONE_ID, free_allowance)
 
 
 def test_should_show_page_to_set_sms_allowance(
