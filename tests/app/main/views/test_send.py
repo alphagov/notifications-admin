@@ -423,6 +423,17 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     ),
     (
         """
+            phone number, phone number, PHONE_NUMBER
+            +447700900111,+447700900222,+447700900333,
+        """,
+        (
+            'Your file has more than one column called ‘phone number’ or ‘PHONE_NUMBER’ '
+            'Delete or rename one of these columns and try again. '
+            'Skip to file contents'
+        )
+    ),
+    (
+        """
             phone number, name
         """,
         (
@@ -612,6 +623,40 @@ def test_upload_valid_csv_shows_preview_and_table(
         ),
     ]):
         assert normalize_spaces(str(page.select('table tbody td')[index + 1])) == cell
+
+
+def test_show_all_columns_if_there_are_duplicate_recipient_columns(
+    client_request,
+    mocker,
+    mock_get_live_service,
+    mock_get_service_template_with_placeholders,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    fake_uuid,
+):
+
+    with client_request.session_transaction() as session:
+        session['upload_data'] = {'template_id': fake_uuid}
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        phone number, phone_number, PHONENUMBER
+        07700900001,  07700900002,  07700900003
+    """)
+
+    page = client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_type='sms',
+        upload_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('thead').text) == (
+        'Row in file1 phone number phone_number PHONENUMBER'
+    )
+    assert normalize_spaces(page.select_one('tbody').text) == (
+        '2 07700900003 07700900003 07700900003'
+    )
 
 
 @pytest.mark.parametrize('row_index, expected_status', [
