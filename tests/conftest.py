@@ -704,6 +704,7 @@ def mock_update_service_raise_httperror_duplicate_name(mocker):
 
 SERVICE_ONE_ID = "596364a0-858e-42c8-9062-a8fe822260eb"
 SERVICE_TWO_ID = "147ad62a-2951-4fa1-9ca0-093cd1a52c52"
+ORGANISATION_ID = "c011fa40-4cbe-4524-b415-dde2f421bd9c"
 
 
 @pytest.fixture(scope='function')
@@ -1165,7 +1166,7 @@ def active_user_with_permissions(fake_uuid):
                                                   'view_activity']},
                  'platform_admin': False,
                  'auth_type': 'sms_auth',
-                 'organisations': []
+                 'organisations': [ORGANISATION_ID]
                  }
     user = User(user_data)
     return user
@@ -2692,7 +2693,7 @@ def mock_update_service_callback_api(mocker):
 
 @pytest.fixture(scope='function')
 def organisation_one(api_user_active):
-    return organisation_json('596364a0-858e-42c8-9062-a8fe822260af', 'organisation one', [api_user_active.id])
+    return organisation_json(ORGANISATION_ID, 'organisation one', [api_user_active.id])
 
 
 @pytest.fixture(scope='function')
