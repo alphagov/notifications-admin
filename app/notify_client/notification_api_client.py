@@ -73,3 +73,14 @@ class NotificationApiClient(NotifyAdminAPIClient):
             if notification['notification_type'] == 'letter' and notification['status'] in ('created', 'sending'):
                 notification['status'] = 'accepted'
         return notifications
+
+    def get_notification_letter_preview(self, service_id, notification_id, file_type, page=None):
+
+        get_url = '/service/{}/template/preview/{}/{}{}'.format(
+            service_id,
+            notification_id,
+            file_type,
+            '?page={}'.format(page) if page else ''
+        )
+
+        return self.get(url=get_url)
