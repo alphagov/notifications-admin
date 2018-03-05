@@ -40,6 +40,19 @@ stub_template_stats = [
         'template_name': 'two',
         'template_id': 'id-2',
         'count': 200
+    },
+    {
+        'template_type': 'letter',
+        'template_name': 'three',
+        'template_id': 'id-3',
+        'count': 300
+    },
+    {
+        'template_type': 'letter',
+        'template_name': 'four',
+        'template_id': 'id-4',
+        'count': 400,
+        'is_precompiled_letter': True
     }
 ]
 
@@ -358,15 +371,23 @@ def test_should_show_recent_templates_on_dashboard(
 
     table_rows = page.find_all('tbody')[1].find_all('tr')
 
-    assert len(table_rows) == 2
+    assert len(table_rows) == 4
 
-    assert 'two' in table_rows[0].find_all('th')[0].text
-    assert 'Email template' in table_rows[0].find_all('th')[0].text
-    assert '200' in table_rows[0].find_all('td')[0].text
+    assert 'Provided as PDF' in table_rows[0].find_all('th')[0].text
+    assert 'Letter' in table_rows[0].find_all('th')[0].text
+    assert '400' in table_rows[0].find_all('td')[0].text
 
-    assert 'one' in table_rows[1].find_all('th')[0].text
-    assert 'Text message template' in table_rows[1].find_all('th')[0].text
-    assert '100' in table_rows[1].find_all('td')[0].text
+    assert 'three' in table_rows[1].find_all('th')[0].text
+    assert 'Letter template' in table_rows[1].find_all('th')[0].text
+    assert '300' in table_rows[1].find_all('td')[0].text
+
+    assert 'two' in table_rows[2].find_all('th')[0].text
+    assert 'Email template' in table_rows[2].find_all('th')[0].text
+    assert '200' in table_rows[2].find_all('td')[0].text
+
+    assert 'one' in table_rows[3].find_all('th')[0].text
+    assert 'Text message template' in table_rows[3].find_all('th')[0].text
+    assert '100' in table_rows[3].find_all('td')[0].text
 
 
 @freeze_time("2016-07-01 12:00")  # 4 months into 2016 financial year
@@ -910,15 +931,23 @@ def test_aggregate_template_stats():
     from app.main.views.dashboard import aggregate_usage
     expected = aggregate_usage(copy.deepcopy(stub_template_stats))
 
-    assert len(expected) == 2
-    assert expected[0]['template_name'] == 'two'
-    assert expected[0]['count'] == 200
-    assert expected[0]['template_id'] == 'id-2'
-    assert expected[0]['template_type'] == 'email'
-    assert expected[1]['template_name'] == 'one'
-    assert expected[1]['count'] == 100
-    assert expected[1]['template_id'] == 'id-1'
-    assert expected[1]['template_type'] == 'sms'
+    assert len(expected) == 4
+    assert expected[0]['template_name'] == 'four'
+    assert expected[0]['count'] == 400
+    assert expected[0]['template_id'] == 'id-4'
+    assert expected[0]['template_type'] == 'letter'
+    assert expected[1]['template_name'] == 'three'
+    assert expected[1]['count'] == 300
+    assert expected[1]['template_id'] == 'id-3'
+    assert expected[1]['template_type'] == 'letter'
+    assert expected[2]['template_name'] == 'two'
+    assert expected[2]['count'] == 200
+    assert expected[2]['template_id'] == 'id-2'
+    assert expected[2]['template_type'] == 'email'
+    assert expected[3]['template_name'] == 'one'
+    assert expected[3]['count'] == 100
+    assert expected[3]['template_id'] == 'id-1'
+    assert expected[3]['template_type'] == 'sms'
 
 
 def test_service_dashboard_updates_gets_dashboard_totals(

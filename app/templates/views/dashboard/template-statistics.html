@@ -17,10 +17,17 @@
   ) %}
 
     {% call row_heading() %}
+      {% if item.is_precompiled_letter %}
+      Provided as PDF
+      <span class="file-list-hint">
+        Letter
+      </span>
+      {% else %}
       <a class="file-list-filename" href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template_id) }}">{{ item.template_name }}</a>
       <span class="file-list-hint">
         {{ message_count_label(1, item.template_type, suffix='template')|capitalize }}
       </span>
+      {% endif %}
     {% endcall %}
     {% if template_statistics|length > 1 %}
       {{ spark_bar_field(item.count, most_used_template_count, id=item.template_id) }}
