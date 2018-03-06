@@ -24,18 +24,22 @@
       <div class="dashboard-table bottom-gutter-3-2">
     {% endif %}
 
-      {% if template.template_type != 'letter' %}
+      {% if template.template_type == 'letter' %}
+        <div class="keyline-block bottom-gutter-1-2">
+      {% endif %}
         {% if percentage_complete < 100 %}
-          <p class="bottom-gutter hint">
+          <p class="{% if template.template_type != 'letter' %}bottom-gutter{% endif %} hint">
             Report is {{ "{:.0f}%".format(percentage_complete * 0.99) }} complete…
           </p>
         {% elif notifications %}
-          <p class="bottom-gutter">
+          <p class="{% if template.template_type != 'letter' %}bottom-gutter{% endif %}">
             <a href="{{ download_link }}" download class="heading-small">Download this report</a>
             &emsp;
             <span id="time-left">{{ time_left }}</span>
           </p>
         {% endif %}
+      {% if template.template_type == 'letter' %}
+        </div>
       {% endif %}
 
       {% call(item, row_number) list_table(
