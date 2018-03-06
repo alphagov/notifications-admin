@@ -18,7 +18,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
         }
         return self.post(url="/organisations", data=data)
 
-    def update_organisation(self, org_id, name):
+    def update_organisation_name(self, org_id, name):
         data = {
             "name": name
         }
@@ -45,3 +45,9 @@ class OrganisationsClient(NotifyAdminAPIClient):
             user_id=user_id)
         data = _attach_current_user({})
         return self.delete(endpoint, data)
+
+    def is_organisation_name_unique(self, org_id, name):
+        return self.get(
+            url="/organisations/unique",
+            params={"org_id": org_id, "name": name}
+        )["result"]

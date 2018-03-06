@@ -329,6 +329,14 @@ class RenameServiceForm(StripWhitespaceForm):
         ])
 
 
+class RenameOrganisationForm(StripWhitespaceForm):
+    name = StringField(
+        u'Organisation name',
+        validators=[
+            DataRequired(message='Can’t be empty')
+        ])
+
+
 class CreateServiceForm(StripWhitespaceForm):
     name = StringField(
         u'What’s your service called?',
