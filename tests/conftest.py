@@ -1432,7 +1432,7 @@ def mock_get_user_by_email(mocker, user=None):
         user = api_user_active(fake_uuid())
 
     def _get_user(email_address):
-        user._email_address = email_address
+        user.email_address = email_address
         return user
 
     return mocker.patch('app.user_api_client.get_user_by_email', side_effect=_get_user)
@@ -1931,7 +1931,7 @@ def mock_no_inbound_number_for_service(mocker):
 
 @pytest.fixture(scope='function')
 def mock_has_permissions(mocker):
-    def _has_permission(*permissions, any_=False, admin_override=False):
+    def _has_permission(*permissions, restrict_admin_usage=False):
         return True
 
     return mocker.patch(
@@ -2052,7 +2052,7 @@ def mock_accept_invite(mocker, sample_invite):
 @pytest.fixture(scope='function')
 def mock_add_user_to_service(mocker, service_one, api_user_active):
     def _add_user(service_id, user_id, permissions):
-        return api_user_active
+        return
 
     return mocker.patch('app.user_api_client.add_user_to_service', side_effect=_add_user)
 

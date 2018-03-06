@@ -90,7 +90,7 @@ def get_example_letter_address(key):
 
 @main.route("/services/<service_id>/send/<template_id>/csv", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_messages(service_id, template_id):
     session['sender_id'] = None
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
@@ -159,7 +159,7 @@ def send_messages(service_id, template_id):
 
 @main.route("/services/<service_id>/send/<template_id>.csv", methods=['GET'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters', 'manage_templates', any_=True)
+@user_has_permissions('send_messages', 'manage_templates')
 def get_example_csv(service_id, template_id):
     template = get_template(
         service_api_client.get_service_template(service_id, template_id)['data'], current_service
@@ -175,7 +175,7 @@ def get_example_csv(service_id, template_id):
 
 @main.route("/services/<service_id>/send/<template_id>/set-sender", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def set_sender(service_id, template_id):
     session['sender_id'] = None
     redirect_to_one_off = redirect(
@@ -198,8 +198,7 @@ def set_sender(service_id, template_id):
         sender_choices=sender_context['value_and_label'],
         sender_label=sender_context['description']
     )
-    option_hints = {sender_context['default_id']: '(Default)',
-                    }
+    option_hints = {sender_context['default_id']: '(Default)'}
     if sender_context.get('receives_text_message', None):
         option_hints.update({sender_context['receives_text_message']: '(Receives replies)'})
     if sender_context.get('default_and_receives', None):
@@ -265,7 +264,7 @@ def get_sender_details(service_id, template_type):
 @main.route("/services/<service_id>/send/<template_id>/test", endpoint='send_test')
 @main.route("/services/<service_id>/send/<template_id>/one-off", endpoint='send_one_off')
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_test(service_id, template_id):
     session['recipient'] = None
     session['placeholders'] = {}
@@ -319,7 +318,7 @@ def get_notification_check_endpoint(service_id, template):
     endpoint='send_one_off_step',
 )
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_test_step(service_id, template_id, step_index):
     if {'recipient', 'placeholders'} - set(session.keys()):
         return redirect(url_for(
@@ -443,7 +442,7 @@ def send_test_step(service_id, template_id, step_index):
 
 @main.route("/services/<service_id>/send/<template_id>/test.<filetype>", methods=['GET'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+@user_has_permissions('send_messages')
 def send_test_preview(service_id, template_id, filetype):
 
     if filetype not in ('pdf', 'png'):
@@ -572,7 +571,7 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['GET'])
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>", methods=['GET'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_messages(service_id, template_type, upload_id, row_index=2):
 
     data = _check_messages(service_id, template_type, upload_id, row_index)
@@ -601,7 +600,7 @@ def check_messages(service_id, template_type, upload_id, row_index=2):
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>.<filetype>", methods=['GET'])
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>.<filetype>", methods=['GET'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+@user_has_permissions('send_messages')
 def check_messages_preview(service_id, template_type, upload_id, filetype, row_index=2):
     if filetype not in ('pdf', 'png'):
         abort(404)
@@ -615,7 +614,7 @@ def check_messages_preview(service_id, template_type, upload_id, filetype, row_i
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['POST'])
 @main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>", methods=['POST'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def recheck_messages(service_id, template_type, upload_id, row_index=0):
 
     if not session.get('upload_data'):
@@ -626,7 +625,7 @@ def recheck_messages(service_id, template_type, upload_id, row_index=0):
 
 @main.route("/services/<service_id>/start-job/<upload_id>", methods=['POST'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def start_job(service_id, upload_id):
     upload_data = session['upload_data']
 
@@ -767,7 +766,7 @@ def get_back_link(service_id, template_id, step_index):
 
 @main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['GET'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_notification(service_id, template_id):
     return _check_notification(service_id, template_id)
 
@@ -831,7 +830,7 @@ def get_template_error_dict(exception):
 
 @main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['POST'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters')
+@user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_notification(service_id, template_id):
     if {'recipient', 'placeholders'} - set(session.keys()):
         return redirect(url_for(

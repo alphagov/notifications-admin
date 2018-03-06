@@ -22,7 +22,7 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     mocker,
 ):
     expected_service = service_one['id']
-    expected_permissions = ['send_messages', 'manage_service', 'manage_api_keys']
+    expected_permissions = {'send_messages', 'manage_service', 'manage_api_keys'}
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
 
@@ -49,7 +49,7 @@ def test_existing_user_with_no_permissions_accept_invite(
 ):
     expected_service = service_one['id']
     sample_invite['permissions'] = ''
-    expected_permissions = []
+    expected_permissions = set()
     mocker.patch('app.invite_api_client.accept_invite', return_value=sample_invite)
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
@@ -121,7 +121,7 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
     mocker,
 ):
     expected_service = service_one['id']
-    expected_permissions = ['send_messages', 'manage_service', 'manage_api_keys']
+    expected_permissions = {'send_messages', 'manage_service', 'manage_api_keys'}
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
 
@@ -368,7 +368,7 @@ def test_new_invited_user_verifies_and_added_to_service(
 
     # when they post codes back to admin user should be added to
     # service and sent on to dash board
-    expected_permissions = ['send_messages', 'manage_service', 'manage_api_keys']
+    expected_permissions = {'send_messages', 'manage_service', 'manage_api_keys'}
 
     with client.session_transaction() as session:
         new_user_id = session['user_id']

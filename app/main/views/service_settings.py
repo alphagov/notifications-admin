@@ -43,12 +43,17 @@ from app.main.forms import (
     ServiceSwitchLettersForm,
     SMSPrefixForm,
 )
-from app.utils import email_safe, get_cdn_domain, user_has_permissions
+from app.utils import (
+    email_safe,
+    get_cdn_domain,
+    user_has_permissions,
+    user_is_platform_admin,
+)
 
 
 @main.route("/services/<service_id>/service-settings")
 @login_required
-@user_has_permissions('manage_settings', 'manage_api_keys', admin_override=True, any_=True)
+@user_has_permissions('manage_service', 'manage_api_keys')
 def service_settings(service_id):
     letter_branding_organisations = email_branding_client.get_letter_email_branding()
     organisation = organisations_client.get_service_organisation(service_id).get('name', None)
@@ -100,7 +105,7 @@ def service_settings(service_id):
 
 @main.route("/services/<service_id>/service-settings/name", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_name_change(service_id):
     form = RenameServiceForm()
 
@@ -122,7 +127,7 @@ def service_name_change(service_id):
 
 @main.route("/services/<service_id>/service-settings/name/confirm", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_name_change_confirm(service_id):
     # Validate password for form
     def _check_password(pwd):
@@ -156,14 +161,14 @@ def service_name_change_confirm(service_id):
 
 @main.route("/services/<service_id>/service-settings/request-to-go-live")
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def request_to_go_live(service_id):
     return render_template('views/service-settings/request-to-go-live.html')
 
 
 @main.route("/services/<service_id>/service-settings/submit-request-to-go-live", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def submit_request_to_go_live(service_id):
     form = RequestToGoLiveForm()
 
@@ -212,7 +217,7 @@ def submit_request_to_go_live(service_id):
 
 @main.route("/services/<service_id>/service-settings/switch-live")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_live(service_id):
     service_api_client.update_service(
         current_service['id'],
@@ -226,7 +231,7 @@ def service_switch_live(service_id):
 
 @main.route("/services/<service_id>/service-settings/research-mode")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_research_mode(service_id):
     service_api_client.update_service_with_properties(
         service_id,
@@ -270,7 +275,7 @@ def update_service_permissions(service_id, permissions, sms_sender=None):
 
 @main.route("/services/<service_id>/service-settings/can-send-email")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_can_send_email(service_id):
     switch_service_permissions(service_id, 'email')
     return redirect(url_for('.service_settings', service_id=service_id))
@@ -278,7 +283,7 @@ def service_switch_can_send_email(service_id):
 
 @main.route("/services/<service_id>/service-settings/can-send-sms")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_can_send_sms(service_id):
     switch_service_permissions(service_id, 'sms')
     return redirect(url_for('.service_settings', service_id=service_id))
@@ -286,7 +291,7 @@ def service_switch_can_send_sms(service_id):
 
 @main.route("/services/<service_id>/service-settings/email-auth")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_email_auth(service_id):
     switch_service_permissions(service_id, 'email_auth')
     return redirect(url_for('.service_settings', service_id=service_id))
@@ -294,7 +299,7 @@ def service_switch_email_auth(service_id):
 
 @main.route("/services/<service_id>/service-settings/can-send-precompiled-letter")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_switch_can_send_precompiled_letter(service_id):
     switch_service_permissions(service_id, 'precompiled_letter')
     return redirect(url_for('.service_settings', service_id=service_id))
@@ -302,7 +307,7 @@ def service_switch_can_send_precompiled_letter(service_id):
 
 @main.route("/services/<service_id>/service-settings/archive", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def archive_service(service_id):
     if request.method == 'POST':
         service_api_client.archive_service(service_id)
@@ -314,7 +319,7 @@ def archive_service(service_id):
 
 @main.route("/services/<service_id>/service-settings/suspend", methods=["GET", "POST"])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def suspend_service(service_id):
     if request.method == 'POST':
         service_api_client.suspend_service(service_id)
@@ -327,7 +332,7 @@ def suspend_service(service_id):
 
 @main.route("/services/<service_id>/service-settings/resume", methods=["GET", "POST"])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def resume_service(service_id):
     if request.method == 'POST':
         service_api_client.resume_service(service_id)
@@ -339,7 +344,7 @@ def resume_service(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-email", methods=['GET'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_set_email(service_id):
     return render_template(
         'views/service-settings/set-email.html',
@@ -348,14 +353,14 @@ def service_set_email(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-reply-to-email", methods=['GET'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_set_reply_to_email(service_id):
     return redirect(url_for('.service_email_reply_to', service_id=service_id))
 
 
 @main.route("/services/<service_id>/service-settings/email-reply-to", methods=['GET'])
 @login_required
-@user_has_permissions('manage_settings', 'manage_api_keys', admin_override=True, any_=True)
+@user_has_permissions('manage_service', 'manage_api_keys')
 def service_email_reply_to(service_id):
     reply_to_email_addresses = service_api_client.get_reply_to_email_addresses(service_id)
     return render_template(
@@ -365,7 +370,7 @@ def service_email_reply_to(service_id):
 
 @main.route("/services/<service_id>/service-settings/email-reply-to/add", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_add_email_reply_to(service_id):
     form = ServiceReplyToEmailForm()
     reply_to_email_address_count = len(service_api_client.get_reply_to_email_addresses(service_id))
@@ -385,7 +390,7 @@ def service_add_email_reply_to(service_id):
 
 @main.route("/services/<service_id>/service-settings/email-reply-to/<reply_to_email_id>/edit", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_edit_email_reply_to(service_id, reply_to_email_id):
     form = ServiceReplyToEmailForm()
     reply_to_email_address = service_api_client.get_reply_to_email_address(service_id, reply_to_email_id)
@@ -408,7 +413,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
 
 @main.route("/services/<service_id>/service-settings/set-inbound-number", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_set_inbound_number(service_id):
     available_inbound_numbers = inbound_number_client.get_available_inbound_sms_numbers()
     service_has_inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)['data'] != {}
@@ -438,7 +443,7 @@ def service_set_inbound_number(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-sms", methods=['GET'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_set_sms(service_id):
     return render_template(
         'views/service-settings/set-sms.html',
@@ -447,7 +452,7 @@ def service_set_sms(service_id):
 
 @main.route("/services/<service_id>/service-settings/sms-prefix", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_set_sms_prefix(service_id):
 
     form = SMSPrefixForm(enabled=(
@@ -471,7 +476,7 @@ def service_set_sms_prefix(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-international-sms", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_set_international_sms(service_id):
     form = InternationalSMSForm(
         enabled='on' if 'international_sms' in current_service['permissions'] else 'off'
@@ -493,7 +498,7 @@ def service_set_international_sms(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-inbound-sms", methods=['GET'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_set_inbound_sms(service_id):
     number = inbound_number_client.get_inbound_sms_number_for_service(service_id)['data'].get('number', '')
     return render_template(
@@ -504,7 +509,7 @@ def service_set_inbound_sms(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-letters", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_set_letters(service_id):
     form = ServiceSwitchLettersForm(
         enabled='on' if 'letter' in current_service['permissions'] else 'off'
@@ -526,7 +531,7 @@ def service_set_letters(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-auth-type", methods=['GET'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_set_auth_type(service_id):
     return render_template(
         'views/service-settings/set-auth-type.html',
@@ -535,7 +540,7 @@ def service_set_auth_type(service_id):
 
 @main.route("/services/<service_id>/service-settings/letter-contacts", methods=['GET'])
 @login_required
-@user_has_permissions('manage_settings', 'manage_api_keys', admin_override=True, any_=True)
+@user_has_permissions('manage_service', 'manage_api_keys')
 def service_letter_contact_details(service_id):
     letter_contact_details = service_api_client.get_letter_contacts(service_id)
     return render_template(
@@ -545,7 +550,7 @@ def service_letter_contact_details(service_id):
 
 @main.route("/services/<service_id>/service-settings/letter-contact/add", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_add_letter_contact(service_id):
     form = ServiceLetterContactBlockForm()
     letter_contact_blocks_count = len(service_api_client.get_letter_contacts(service_id))
@@ -569,7 +574,7 @@ def service_add_letter_contact(service_id):
 
 @main.route("/services/<service_id>/service-settings/letter-contact/<letter_contact_id>/edit", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_edit_letter_contact(service_id, letter_contact_id):
     letter_contact_block = service_api_client.get_letter_contact(service_id, letter_contact_id)
     form = ServiceLetterContactBlockForm(letter_contact_block=letter_contact_block['contact_block'])
@@ -591,7 +596,7 @@ def service_edit_letter_contact(service_id, letter_contact_id):
 
 @main.route("/services/<service_id>/service-settings/sms-sender", methods=['GET'])
 @login_required
-@user_has_permissions('manage_settings', 'manage_api_keys', admin_override=True, any_=True)
+@user_has_permissions('manage_service', 'manage_api_keys')
 def service_sms_senders(service_id):
 
     def attach_hint(sender):
@@ -616,7 +621,7 @@ def service_sms_senders(service_id):
 
 @main.route("/services/<service_id>/service-settings/sms-sender/add", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_add_sms_sender(service_id):
     form = ServiceSmsSenderForm()
     sms_sender_count = len(service_api_client.get_sms_senders(service_id))
@@ -636,7 +641,7 @@ def service_add_sms_sender(service_id):
 
 @main.route("/services/<service_id>/service-settings/sms-sender/<sms_sender_id>/edit", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_edit_sms_sender(service_id, sms_sender_id):
     sms_sender = service_api_client.get_sms_sender(service_id, sms_sender_id)
     is_inbound_number = sms_sender['inbound_number_id']
@@ -665,7 +670,7 @@ def service_edit_sms_sender(service_id, sms_sender_id):
 
 @main.route("/services/<service_id>/service-settings/set-letter-contact-block", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def service_set_letter_contact_block(service_id):
 
     if 'letter' not in current_service['permissions']:
@@ -690,7 +695,7 @@ def service_set_letter_contact_block(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-organisation-type", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def set_organisation_type(service_id):
 
     form = OrganisationTypeForm(organisation_type=current_service.get('organisation_type'))
@@ -715,7 +720,7 @@ def set_organisation_type(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-free-sms-allowance", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def set_free_sms_allowance(service_id):
 
     form = FreeSMSAllowance(free_sms_allowance=billing_api_client.get_free_sms_fragment_limit_for_year(service_id))
@@ -733,7 +738,7 @@ def set_free_sms_allowance(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-email-branding", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def service_set_email_branding(service_id):
     email_branding = email_branding_client.get_all_email_branding()
 
@@ -762,7 +767,7 @@ def service_set_email_branding(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-letter-branding", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def set_letter_branding(service_id):
 
     form = LetterBranding(choices=email_branding_client.get_letter_email_branding().items())
@@ -784,7 +789,7 @@ def set_letter_branding(service_id):
 
 @main.route("/services/<service_id>/service-settings/link-service-to-organisation", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def link_service_to_organisation(service_id):
 
     organisations = organisations_client.get_organisations()

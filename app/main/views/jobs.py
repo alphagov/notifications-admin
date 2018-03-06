@@ -39,7 +39,7 @@ from app.utils import (
 
 @main.route("/services/<service_id>/jobs")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def view_jobs(service_id):
     page = int(request.args.get('page', 1))
     # all but scheduled and cancelled
@@ -67,7 +67,7 @@ def view_jobs(service_id):
 
 @main.route("/services/<service_id>/jobs/<job_id>")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def view_job(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
     if job['job_status'] == 'cancelled':
@@ -107,7 +107,7 @@ def view_job(service_id, job_id):
 
 @main.route("/services/<service_id>/jobs/<job_id>.csv")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def view_job_csv(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
     template = service_api_client.get_service_template(
@@ -142,14 +142,14 @@ def view_job_csv(service_id, job_id):
 
 @main.route("/services/<service_id>/jobs/<job_id>", methods=['POST'])
 @login_required
-@user_has_permissions('send_texts', 'send_emails', 'send_letters', admin_override=True)
+@user_has_permissions('send_messages')
 def cancel_job(service_id, job_id):
     job_api_client.cancel_job(service_id, job_id)
     return redirect(url_for('main.service_dashboard', service_id=service_id))
 
 
 @main.route("/services/<service_id>/jobs/<job_id>.json")
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def view_job_updates(service_id, job_id):
 
     job = job_api_client.get_job(service_id, job_id)['data']
@@ -166,7 +166,7 @@ def view_job_updates(service_id, job_id):
 
 @main.route('/services/<service_id>/notifications/<message_type>', methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def view_notifications(service_id, message_type):
     return render_template(
         'views/notifications.html',
@@ -186,7 +186,7 @@ def view_notifications(service_id, message_type):
 
 
 @main.route('/services/<service_id>/notifications/<message_type>.json', methods=['GET', 'POST'])
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def get_notifications_as_json(service_id, message_type):
     return jsonify(get_notifications(
         service_id, message_type, status_override=request.args.get('status')
@@ -194,7 +194,7 @@ def get_notifications_as_json(service_id, message_type):
 
 
 @main.route('/services/<service_id>/notifications/<message_type>.csv', endpoint="view_notifications_csv")
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def get_notifications(service_id, message_type, status_override=None):
     # TODO get the api to return count of pages as well.
     page = get_page_from_request()

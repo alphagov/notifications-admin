@@ -1,6 +1,8 @@
-
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user
-from app.notify_client.models import InvitedUser
+from app.notify_client.models import (
+    InvitedUser,
+    translate_permissions_from_admin_roles_to_db,
+)
 
 
 class InviteApiClient(NotifyAdminAPIClient):
@@ -17,7 +19,7 @@ class InviteApiClient(NotifyAdminAPIClient):
             'service': str(service_id),
             'email_address': email_address,
             'from_user': invite_from_id,
-            'permissions': permissions,
+            'permissions': ','.join(sorted(translate_permissions_from_admin_roles_to_db(permissions))),
             'auth_type': auth_type,
             'invite_link_host': self.admin_url,
         }

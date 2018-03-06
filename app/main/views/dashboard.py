@@ -51,14 +51,14 @@ def temp_service_history(service_id):
 
 @main.route("/services/<service_id>/dashboard")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def old_service_dashboard(service_id):
     return redirect(url_for('.service_dashboard', service_id=service_id))
 
 
 @main.route("/services/<service_id>")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def service_dashboard(service_id):
 
     if session.get('invited_user'):
@@ -74,14 +74,14 @@ def service_dashboard(service_id):
 
 
 @main.route("/services/<service_id>/dashboard.json")
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def service_dashboard_updates(service_id):
     return jsonify(**get_dashboard_partials(service_id))
 
 
 @main.route("/services/<service_id>/template-activity")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def template_history(service_id):
 
     return redirect(url_for('main.template_usage', service_id=service_id), code=301)
@@ -89,7 +89,7 @@ def template_history(service_id):
 
 @main.route("/services/<service_id>/template-usage")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def template_usage(service_id):
 
     year, current_financial_year = requested_and_current_financial_year(request)
@@ -138,7 +138,7 @@ def template_usage(service_id):
 
 @main.route("/services/<service_id>/usage")
 @login_required
-@user_has_permissions('manage_settings', admin_override=True)
+@user_has_permissions('manage_service')
 def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
 
@@ -169,7 +169,7 @@ def usage(service_id):
 
 @main.route("/services/<service_id>/monthly")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def monthly(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
     return render_template(
@@ -187,7 +187,7 @@ def monthly(service_id):
 
 @main.route("/services/<service_id>/inbox")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def inbox(service_id):
 
     return render_template(
@@ -199,7 +199,7 @@ def inbox(service_id):
 
 @main.route("/services/<service_id>/inbox.json")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def inbox_updates(service_id):
 
     return jsonify(get_inbox_partials(service_id))
@@ -207,7 +207,7 @@ def inbox_updates(service_id):
 
 @main.route("/services/<service_id>/inbox.csv")
 @login_required
-@user_has_permissions('view_activity', admin_override=True)
+@user_has_permissions('view_activity')
 def inbox_download(service_id):
     return Response(
         Spreadsheet.from_rows(

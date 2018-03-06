@@ -34,7 +34,7 @@ dummy_bearer_token = 'bearer_token_set'
 
 @main.route("/services/<service_id>/api")
 @login_required
-@user_has_permissions('manage_api_keys', admin_override=True)
+@user_has_permissions('manage_api_keys')
 def api_integration(service_id):
     callbacks_link = (
         '.api_callbacks' if 'inbound_sms' in current_service['permissions']
@@ -49,14 +49,14 @@ def api_integration(service_id):
 
 @main.route("/services/<service_id>/api/documentation")
 @login_required
-@user_has_permissions('manage_api_keys', admin_override=True)
+@user_has_permissions('manage_api_keys')
 def api_documentation(service_id):
     return redirect(url_for('.documentation'), code=301)
 
 
 @main.route("/services/<service_id>/api/whitelist", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_api_keys', admin_override=True)
+@user_has_permissions('manage_api_keys')
 def whitelist(service_id):
     form = Whitelist()
     if form.validate_on_submit():
@@ -76,7 +76,7 @@ def whitelist(service_id):
 
 @main.route("/services/<service_id>/api/keys")
 @login_required
-@user_has_permissions('manage_api_keys', admin_override=True)
+@user_has_permissions('manage_api_keys')
 def api_keys(service_id):
     return render_template(
         'views/api/keys.html',
@@ -86,7 +86,7 @@ def api_keys(service_id):
 
 @main.route("/services/<service_id>/api/keys/create", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_api_keys')
+@user_has_permissions('manage_api_keys', restrict_admin_usage=True)
 def create_api_key(service_id):
     key_names = [
         key['name'] for key in api_key_api_client.get_api_keys(service_id=service_id)['apiKeys']
@@ -130,7 +130,7 @@ def create_api_key(service_id):
 
 @main.route("/services/<service_id>/api/keys/revoke/<key_id>", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_api_keys', admin_override=True)
+@user_has_permissions('manage_api_keys')
 def revoke_api_key(service_id, key_id):
     key_name = api_key_api_client.get_api_keys(service_id=service_id, key_id=key_id)['apiKeys'][0]['name']
     if request.method == 'GET':

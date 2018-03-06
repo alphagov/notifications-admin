@@ -10,28 +10,84 @@ roles = {
     'manage_api_keys': ['manage_api_keys']
 }
 
-all_permissions = set(chain.from_iterable(roles.values())) | {'view_activity'}
+# same dict as above, but flipped round (and with view_activity)
+roles_by_permission = {
+    'send_texts': 'send_messages',
+    'send_emails': 'send_messages',
+    'send_letters': 'send_messages',
+
+    'manage_users': 'manage_service',
+    'manage_settings': 'manage_service',
+
+    'manage_templates': 'manage_templates',
+
+    'manage_api_keys': 'manage_api_keys',
+    'view_activity': 'view_activity',
+}
+
+all_permissions = set(roles_by_permission.values())
 
 
 def _get_service_id_from_view_args():
     return request.view_args.get('service_id', None)
 
 
+def _get_org_id_from_view_args():
+    return request.view_args.get('org_id', None)
+
+
+def translate_permissions_from_db_to_admin_roles(permissions):
+    """
+    Given a list of database permissions, return a set of roles
+
+    look them up in roles_by_permission, falling back to just passing through from the api if they aren't in the dict
+    """
+    return {roles_by_permission.get(permission, permission) for permission in permissions}
+
+
+def translate_permissions_from_admin_roles_to_db(permissions):
+    """
+    Given a list of admin roles (ie: checkboxes on a permissions edit page for example), return a set of db permissions
+
+    Looks them up in the roles dict, falling back to just passing through if they're not recognised.
+    """
+    return set(chain.from_iterable(roles.get(permission, [permission]) for permission in permissions))
+
+
 class User(UserMixin):
     def __init__(self, fields, max_failed_login_count=3):
-        self._id = fields.get('id')
-        self._name = fields.get('name')
-        self._email_address = fields.get('email_address')
-        self._mobile_number = fields.get('mobile_number')
-        self._password_changed_at = fields.get('password_changed_at')
-        self._permissions = fields.get('permissions')
-        self._auth_type = fields.get('auth_type')
-        self._failed_login_count = fields.get('failed_login_count')
-        self._state = fields.get('state')
+        self.id = fields.get('id')
+        self.name = fields.get('name')
+        self.email_address = fields.get('email_address')
+        self.mobile_number = fields.get('mobile_number')
+        self.password_changed_at = fields.get('password_changed_at')
+        self._set_permissions(fields.get('permissions', {}))
+        self.auth_type = fields.get('auth_type')
+        self.failed_login_count = fields.get('failed_login_count')
+        self.state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
         self.platform_admin = fields.get('platform_admin')
         self.current_session_id = fields.get('current_session_id')
-        self._organisations = fields.get('organisations', [])
+        self.organisations = fields.get('organisations', [])
+
+    def _set_permissions(self, permissions_by_service):
+        """
+        Permissions is a dict {'service_id': ['permission a', 'permission b', 'permission c']}
+
+        The api currently returns some granular permissions that we don't set or use separately (but may want
+        to in the future):
+        * send_texts, send_letters and send_emails become send_messages
+        * manage_user and manage_settings become
+        users either have all three permissions for a service or none of them, they're not helpful to distinguish
+        between on the front end. So lets collapse them into "send_messages" and "manage_service". If we want to split
+        them out later, we'll need to rework this function.
+        """
+
+        self._permissions = {
+            service: translate_permissions_from_db_to_admin_roles(permissions)
+            for service, permissions
+            in permissions_by_service.items()
+        }
 
     def get_id(self):
         return self.id
@@ -52,54 +108,6 @@ class User(UserMixin):
         )
 
     @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, id):
-        self._id = id
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, name):
-        self._name = name
-
-    @property
-    def email_address(self):
-        return self._email_address
-
-    @email_address.setter
-    def email_address(self, email_address):
-        self._email_address = email_address
-
-    @property
-    def mobile_number(self):
-        return self._mobile_number
-
-    @mobile_number.setter
-    def mobile_number(self, mobile_number):
-        self._mobile_number = mobile_number
-
-    @property
-    def password_changed_at(self):
-        return self._password_changed_at
-
-    @password_changed_at.setter
-    def password_changed_at(self, password_changed_at):
-        self._password_changed_at = password_changed_at
-
-    @property
-    def state(self):
-        return self._state
-
-    @state.setter
-    def state(self, state):
-        self._state = state
-
-    @property
     def permissions(self):
         return self._permissions
 
@@ -107,44 +115,32 @@ class User(UserMixin):
     def permissions(self, permissions):
         raise AttributeError("Read only property")
 
-    def has_permissions(self, *permissions, any_=False, admin_override=False):
-
+    def has_permissions(self, *permissions, restrict_admin_usage=False):
         unknown_permissions = set(permissions) - all_permissions
 
         if unknown_permissions:
-            raise TypeError('{} are not valid permissions'.format(unknown_permissions))
-
-        # Only available to the platform admin user
-        if admin_override and self.platform_admin:
-            return True
-        # Not available to the non platform admin users.
-        # For example the list all-services page is only available to platform admin users and is not service specific
-        if admin_override and not permissions:
-            return False
+            raise TypeError('{} are not valid permissions'.format(list(unknown_permissions)))
 
         # Service id is always set on the request for service specific views.
         service_id = _get_service_id_from_view_args()
-        if service_id in self._permissions:
-            if any_:
-                return any([x in self._permissions[service_id] for x in permissions])
-            return set(self._permissions[service_id]) >= set(permissions)
-        return False
+        org_id = _get_org_id_from_view_args()
 
-    @property
-    def auth_type(self):
-        return self._auth_type
+        if not service_id and not org_id:
+            # we shouldn't have any pages that require permissions, but don't specify a service or organisation.
+            # use @user_is_platform_admin for platform admin only pages
+            raise NotImplementedError
 
-    @auth_type.setter
-    def auth_type(self, auth_type):
-        self._auth_type = auth_type
+        # platform admins should be able to do most things (except eg send messages, or create api keys)
+        if self.platform_admin and not restrict_admin_usage:
+            return True
 
-    @property
-    def failed_login_count(self):
-        return self._failed_login_count
+        if org_id:
+            return org_id in self.organisations
+        elif service_id:
+            return any(x in self._permissions.get(service_id, []) for x in permissions)
 
-    @failed_login_count.setter
-    def failed_login_count(self, num):
-        self._failed_login_count += num
+    def has_permission_for_service(self, service_id, permission):
+        return permission in self._permissions.get(service_id, [])
 
     def is_locked(self):
         return self.failed_login_count >= self.max_failed_login_count
@@ -169,10 +165,6 @@ class User(UserMixin):
     def set_password(self, pwd):
         self._password = pwd
 
-    @property
-    def organisations(self):
-        return self._organisations
-
 
 class InvitedUser(object):
 
@@ -191,11 +183,15 @@ class InvitedUser(object):
         self.status = status
         self.created_at = created_at
         self.auth_type = auth_type
+        self.permissions = translate_permissions_from_db_to_admin_roles(self.permissions)
 
     def has_permissions(self, *permissions):
         if self.status == 'cancelled':
             return False
         return set(self.permissions) > set(permissions)
+
+    def has_permission_for_service(self, service_id, permission):
+        return self.status != 'cancelled' and self.service == service_id and permission in self.permissions
 
     def __eq__(self, other):
         return ((self.id,
@@ -222,7 +218,7 @@ class InvitedUser(object):
         if permissions_as_string:
             data['permissions'] = ','.join(self.permissions)
         else:
-            data['permissions'] = self.permissions
+            data['permissions'] = sorted(self.permissions)
         return data
 
 

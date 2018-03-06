@@ -3,12 +3,12 @@ from flask_login import login_required
 
 from app import letter_jobs_client
 from app.main import main
-from app.utils import user_has_permissions
+from app.utils import user_is_platform_admin
 
 
 @main.route("/letter-jobs", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def letter_jobs():
     letter_jobs_list = letter_jobs_client.get_letter_jobs()
 

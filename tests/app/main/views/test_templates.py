@@ -120,11 +120,11 @@ def test_should_show_page_for_one_template(
         ['.edit_service_template']
     ),
     (
-        ['send_texts', 'send_emails', 'send_letters'],
+        ['send_messages'],
         ['.send_messages', '.set_sender']
     ),
     (
-        ['send_texts', 'send_emails', 'send_letters', 'manage_templates'],
+        ['send_messages', 'manage_templates'],
         ['.send_messages', '.set_sender', '.edit_service_template']
     ),
 ])
@@ -139,7 +139,7 @@ def test_should_be_able_to_view_a_template_with_links(
     permissions,
     links_to_be_shown,
 ):
-    active_user_with_permissions._permissions[service_one['id']] = permissions
+    active_user_with_permissions._permissions[service_one['id']] = permissions + ['view_activity']
     client.login(active_user_with_permissions, mocker, service_one)
 
     response = client.get(url_for(

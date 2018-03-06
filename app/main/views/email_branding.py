@@ -19,12 +19,12 @@ from app.main.views.service_settings import (
     get_branding_as_dict,
     get_branding_as_value_and_label,
 )
-from app.utils import get_cdn_domain, user_has_permissions
+from app.utils import get_cdn_domain, user_is_platform_admin
 
 
 @main.route("/email-branding", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def email_branding():
     brandings = email_branding_client.get_all_email_branding()
 
@@ -47,7 +47,7 @@ def email_branding():
 @main.route("/email-branding/<branding_id>/edit", methods=['GET', 'POST'])
 @main.route("/email-branding/<branding_id>/edit/<logo>", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def update_email_branding(branding_id, logo=None):
     email_branding = email_branding_client.get_email_branding(branding_id)['email_branding']
 
@@ -98,7 +98,7 @@ def update_email_branding(branding_id, logo=None):
 @main.route("/email-branding/create", methods=['GET', 'POST'])
 @main.route("/email-branding/create/<logo>", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def create_email_branding(logo=None):
     form = ServiceCreateEmailBranding()
 

@@ -1,8 +1,6 @@
 <nav class="navigation">
   <ul>
   	<li><a href="{{ url_for('.organisation_dashboard', org_id=current_org.id) }}">Dashboard</a></li>
-    {% if current_user.has_permissions(admin_override=True) %}
-      <li><a href="{{ url_for('.manage_org_users', org_id=current_org.id) }}">Team members</a></li>
-    {% endif %}
+    <li><a href="{{ url_for('.manage_org_users', org_id=current_org.id) }}">Team members</a></li>
   </ul>
 </nav>

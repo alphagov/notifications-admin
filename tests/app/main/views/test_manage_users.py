@@ -248,12 +248,9 @@ def test_edit_user_permissions(
         str(active_user_with_permissions.id),
         service['id'],
         permissions={
-            'send_texts',
-            'send_emails',
-            'send_letters',
-            'manage_users',
+            'send_messages',
+            'manage_service',
             'manage_templates',
-            'manage_settings',
             'manage_api_keys',
             'view_activity'
         }
@@ -289,9 +286,7 @@ def test_edit_some_user_permissions(
         str(active_user_with_permissions.id),
         service_id,
         permissions={
-            'send_texts',
-            'send_emails',
-            'send_letters',
+            'send_messages',
             'view_activity'
         }
     )
@@ -330,12 +325,9 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
         str(active_user_with_permissions.id),
         service_one['id'],
         permissions={
-            'send_texts',
-            'send_emails',
-            'send_letters',
-            'manage_users',
+            'send_messages',
             'manage_templates',
-            'manage_settings',
+            'manage_service',
             'manage_api_keys',
             'view_activity'
         }
@@ -399,7 +391,7 @@ def test_invite_user(
     flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
     assert flash_banner == 'Invite sent to test@example.gov.uk'
 
-    expected_permissions = 'manage_api_keys,manage_settings,manage_templates,manage_users,send_emails,send_letters,send_texts,view_activity'  # noqa
+    expected_permissions = {'manage_api_keys', 'manage_service', 'manage_templates', 'send_messages', 'view_activity'}
 
     app.invite_api_client.create_invite.assert_called_once_with(sample_invite['from_user'],
                                                                 sample_invite['service'],
@@ -451,7 +443,7 @@ def test_invite_user_with_email_auth_service(
     flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
     assert flash_banner == 'Invite sent to test@example.gov.uk'
 
-    expected_permissions = 'manage_api_keys,manage_settings,manage_templates,manage_users,send_emails,send_letters,send_texts,view_activity'  # noqa
+    expected_permissions = {'manage_api_keys', 'manage_service', 'manage_templates', 'send_messages', 'view_activity'}
 
     app.invite_api_client.create_invite.assert_called_once_with(sample_invite['from_user'],
                                                                 sample_invite['service'],
@@ -479,12 +471,19 @@ def test_cancel_invited_user_cancels_user_invitations(
 @pytest.mark.parametrize('invite_status, expected_text', [
     ('pending', (
         'invited_user@test.gov.uk (invited) '
-        'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can Access API keys '
+        'Can Send messages '
+        'Can’t Add and edit templates '
+        'Can Manage service '
+        'Can Access API keys '
         'Cancel invitation'
     )),
     ('cancelled', (
         'invited_user@test.gov.uk (cancelled invite) '
-        'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
+        # all permissions are greyed out
+        'Can’t Send messages '
+        'Can’t Add and edit templates '
+        'Can’t Manage service '
+        'Can’t Access API keys'
     )),
 ])
 def test_manage_users_shows_invited_user(

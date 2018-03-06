@@ -15,7 +15,7 @@
         Sender addresses
       </h1>
     </div>
-    {% if current_user.has_permissions('manage_settings', admin_override=True) %}
+    {% if current_user.has_permissions('manage_service') %}
       <div class="column-one-third">
         <a href="{{ url_for('.service_add_letter_contact', service_id=current_service.id) }}" class="button align-with-heading">Add a new address</a>
       </div>
@@ -37,7 +37,7 @@
             (default)
           {% endif %}
         </p>
-        {% if current_user.has_permissions('manage_settings', admin_override=True) %}
+        {% if current_user.has_permissions('manage_service') %}
         <a class="user-list-edit-link" href="{{ url_for('.service_edit_letter_contact', service_id =current_service.id, letter_contact_id = item.id) }}">Change</a>
         {% endif %}
         {% if letter_contact_details|length  > 1 %}

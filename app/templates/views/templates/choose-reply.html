@@ -14,7 +14,7 @@
 
   {% if not templates %}
 
-    {% if current_user.has_permissions('manage_templates', any_=True) %}
+    {% if current_user.has_permissions('manage_templates') %}
        <p class="bottom-gutter">
          You need a template before you can send text messages.
        </p>

@@ -8,12 +8,12 @@ from app import service_api_client
 from app.main import main
 from app.main.forms import DateFilterForm
 from app.statistics_utils import get_formatted_percentage
-from app.utils import user_has_permissions
+from app.utils import user_is_platform_admin
 
 
 @main.route("/platform-admin")
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def platform_admin():
     form = DateFilterForm(request.args)
     api_args = {'detailed': True,
@@ -41,7 +41,7 @@ def platform_admin():
 @main.route("/platform-admin/live-services", endpoint='live_services')
 @main.route("/platform-admin/trial-services", endpoint='trial_services')
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def platform_admin_services():
     form = DateFilterForm(request.args)
     api_args = {'detailed': True,

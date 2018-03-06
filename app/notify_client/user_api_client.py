@@ -1,7 +1,10 @@
 from notifications_python_client.errors import HTTPError
 
 from app.notify_client import NotifyAdminAPIClient
-from app.notify_client.models import User
+from app.notify_client.models import (
+    User,
+    translate_permissions_from_admin_roles_to_db,
+)
 
 ALLOWED_ATTRIBUTES = {
     'name',
@@ -133,7 +136,7 @@ class UserApiClient(NotifyAdminAPIClient):
     def get_count_of_users_with_permission(self, service_id, permission):
         return len([
             user for user in self.get_users_for_service(service_id)
-            if user.has_permissions(permission, any_=True)
+            if user.has_permission_for_service(service_id, permission)
         ])
 
     def get_users_for_organisation(self, org_id):
@@ -142,17 +145,18 @@ class UserApiClient(NotifyAdminAPIClient):
         return [User(data) for data in resp['data']]
 
     def add_user_to_service(self, service_id, user_id, permissions):
+        # permissions passed in are the combined admin roles, not db permissions
         endpoint = '/service/{}/users/{}'.format(service_id, user_id)
-        data = [{'permission': x} for x in permissions]
-        resp = self.post(endpoint, data=data)
-        return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
+        data = [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)]
+        self.post(endpoint, data=data)
 
     def add_user_to_organisation(self, org_id, user_id):
         resp = self.post('/organisations/{}/users/{}'.format(org_id, user_id), data={})
         return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
 
     def set_user_permissions(self, user_id, service_id, permissions):
-        data = [{'permission': x} for x in permissions]
+        # permissions passed in are the combined admin roles, not db permissions
+        data = [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)]
         endpoint = '/user/{}/service/{}/permission'.format(user_id, service_id)
         self.post(endpoint, data=data)
 

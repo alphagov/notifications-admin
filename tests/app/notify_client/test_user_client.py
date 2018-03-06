@@ -40,8 +40,8 @@ def test_client_returns_count_of_users_with_manage_service(
     mock_get_users = mocker.patch(
         'app.notify_client.user_api_client.UserApiClient.get_users_for_service',
         return_value=[
-            _service_one_user_with_permissions('manage_settings', 'view_activity'),
-            _service_one_user_with_permissions('manage_settings'),
+            _service_one_user_with_permissions('manage_service', 'view_activity'),
+            _service_one_user_with_permissions('manage_service'),
             _service_one_user_with_permissions('view_activity'),
             _service_one_user_with_permissions('manage_templates'),
         ]
@@ -54,7 +54,7 @@ def test_client_returns_count_of_users_with_manage_service(
 
     assert user_api_client.get_count_of_users_with_permission(
         SERVICE_ONE_ID,
-        'manage_settings'
+        'manage_service'
     ) == 2
 
     assert user_api_client.get_count_of_users_with_permission(
@@ -131,3 +131,29 @@ def test_client_passes_admin_url_when_sending_email_auth(
             'email_auth_link_host': 'http://localhost:6012',
         }
     )
+
+
+def test_client_converts_admin_permissions_to_db_permissions_on_edit(app_, mocker):
+    mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post')
+
+    user_api_client.set_user_permissions('user_id', 'service_id', permissions={'send_messages', 'view_activity'})
+
+    assert sorted(mock_post.call_args[1]['data'], key=lambda x: x['permission']) == sorted([
+        {'permission': 'send_texts'},
+        {'permission': 'send_emails'},
+        {'permission': 'send_letters'},
+        {'permission': 'view_activity'},
+    ], key=lambda x: x['permission'])
+
+
+def test_client_converts_admin_permissions_to_db_permissions_on_add_to_service(app_, mocker):
+    mock_post = mocker.patch('app.notify_client.user_api_client.UserApiClient.post', return_value={'data': {}})
+
+    user_api_client.add_user_to_service('service_id', 'user_id', permissions={'send_messages', 'view_activity'})
+
+    assert sorted(mock_post.call_args[1]['data'], key=lambda x: x['permission']) == sorted([
+        {'permission': 'send_texts'},
+        {'permission': 'send_emails'},
+        {'permission': 'send_letters'},
+        {'permission': 'view_activity'},
+    ], key=lambda x: x['permission'])

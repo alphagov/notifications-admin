@@ -59,15 +59,14 @@ class BrowsableItem(object):
         pass
 
 
-def user_has_permissions(*permissions, admin_override=False, any_=False):
+def user_has_permissions(*permissions, **permission_kwargs):
     def wrap(func):
         @wraps(func)
         def wrap_func(*args, **kwargs):
             if current_user and current_user.is_authenticated:
                 if current_user.has_permissions(
                     *permissions,
-                    admin_override=admin_override,
-                    any_=any_
+                    **permission_kwargs
                 ):
                     return func(*args, **kwargs)
                 else:
@@ -76,6 +75,17 @@ def user_has_permissions(*permissions, admin_override=False, any_=False):
                 abort(401)
         return wrap_func
     return wrap
+
+
+def user_is_platform_admin(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        if not current_user.is_authenticated:
+            abort(401)
+        if not current_user.platform_admin:
+            abort(403)
+        return f(*args, **kwargs)
+    return wrapped
 
 
 def redirect_to_sign_in(f):

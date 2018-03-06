@@ -571,7 +571,7 @@ def test_route_permissions(
         "GET",
         200,
         url_for(route, service_id=service_one['id']),
-        ['manage_settings'],
+        ['manage_service'],
         api_user_active,
         service_one)
 

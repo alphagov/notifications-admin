@@ -10,12 +10,12 @@ from app.main.forms import (
     InviteOrgUserForm,
     SearchUsersForm,
 )
-from app.utils import user_has_permissions
+from app.utils import user_is_platform_admin
 
 
 @main.route("/organisations", methods=['GET'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def organisations():
     orgs = organisations_client.get_organisations()
 
@@ -27,7 +27,7 @@ def organisations():
 
 @main.route("/organisations/add", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def add_organisation():
     form = CreateOrUpdateOrganisation()
 
@@ -46,7 +46,7 @@ def add_organisation():
 
 @main.route("/organisations/<org_id>", methods=['GET'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def organisation_dashboard(org_id):
     organisation_services = organisations_client.get_organisation_services(org_id)
 
@@ -58,7 +58,7 @@ def organisation_dashboard(org_id):
 
 @main.route("/organisations/<org_id>/edit", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def update_organisation(org_id):
     org = organisations_client.get_organisation(org_id)
 
@@ -83,7 +83,7 @@ def update_organisation(org_id):
 
 @main.route("/organisations/<org_id>/users", methods=['GET'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def manage_org_users(org_id):
     users = sorted(
         user_api_client.get_users_for_organisation(org_id=org_id) + [
@@ -103,7 +103,7 @@ def manage_org_users(org_id):
 
 @main.route("/organisations/<org_id>/users/invite", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def invite_org_user(org_id):
     form = InviteOrgUserForm(
         invalid_email_address=current_user.email_address
@@ -127,7 +127,7 @@ def invite_org_user(org_id):
 
 @main.route("/organisations/<org_id>/users/<user_id>", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def edit_user_org_permissions(org_id, user_id):
     user = user_api_client.get_user(user_id)
 
@@ -139,7 +139,7 @@ def edit_user_org_permissions(org_id, user_id):
 
 @main.route("/organisations/<org_id>/users/<user_id>/delete", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def remove_user_from_organisation(org_id, user_id):
     user = user_api_client.get_user(user_id)
     if request.method == 'POST':
@@ -169,7 +169,7 @@ def remove_user_from_organisation(org_id, user_id):
 
 @main.route("/organisations/<org_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
 @login_required
-@user_has_permissions(admin_override=True)
+@user_is_platform_admin
 def cancel_invited_org_user(org_id, invited_user_id):
     org_invite_api_client.cancel_invited_user(org_id=org_id, invited_user_id=invited_user_id)
 
