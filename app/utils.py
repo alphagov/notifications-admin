@@ -175,7 +175,7 @@ def generate_notifications_csv(**kwargs):
                     notification['created_at'],
                     notification['updated_at']
                 ]
-            yield ','.join(map(str, values)) + '\n'
+            yield Spreadsheet.from_rows([map(str, values)]).as_csv_data
 
         if notifications_resp['links'].get('next'):
             kwargs['page'] += 1
