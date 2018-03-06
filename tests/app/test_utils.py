@@ -145,6 +145,14 @@ def test_can_create_spreadsheet_from_dict_with_filename():
         ['Row number', 'phone_number', 'a', 'b', 'c', 'Template', 'Type', 'Job', 'Status', 'Time'],
         ['1', '07700900123', '🐜', '🐝', '🦀', 'foo', 'sms', 'bar.csv', 'Delivered', 'Thursday 19 April at 12:00'],
     ),
+    (
+        """
+            "phone_number", "a", "b", "c"
+            "07700900123","🐜,🐜","🐝,🐝","🦀"
+        """,
+        ['Row number', 'phone_number', 'a', 'b', 'c', 'Template', 'Type', 'Job', 'Status', 'Time'],
+        ['1', '07700900123', '🐜,🐜', '🐝,🐝', '🦀', 'foo', 'sms', 'bar.csv', 'Delivered', 'Thursday 19 April at 12:00'],
+    ),
 ])
 def test_generate_notifications_csv_returns_correct_csv_file(
     app_,
