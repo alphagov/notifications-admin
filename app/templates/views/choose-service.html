@@ -11,8 +11,25 @@
     Choose service
   </h1>
 
-  {{ browse_list(services) }}
+  {% for org in organisations %}
+    <div class="keyline-block">&nbsp;</div>
+    <div>
+      <div>
+        {{ browse_list([org]) }}
+      </div>
+      <div style="margin-left: 30px">
+          {{ browse_list(org.services) }}
+      </div>
+    </div>
+  {% endfor %}
+  {% if services_without_organisations %}
+    <div class="keyline-block">&nbsp;</div>
+    <div>
+        {{ browse_list(services_without_organisations) }}
+    </div>
+  {% endif %}
   {% if can_add_service %}
+    <div class="keyline-block">&nbsp;</div>
     {{ browse_list([
       {
         'title': 'Add a new service…',
