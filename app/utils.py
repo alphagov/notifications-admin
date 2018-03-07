@@ -33,14 +33,14 @@ FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure', 'technic
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
 
-class BrowsableItem(object):
+class BrowsableItem:
     """
     Maps for the template browse-list.
     """
 
     def __init__(self, item, *args, **kwargs):
+        print(self, item)
         self._item = item
-        super(BrowsableItem, self).__init__()
 
     @property
     def title(self):

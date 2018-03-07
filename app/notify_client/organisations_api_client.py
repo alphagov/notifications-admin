@@ -1,4 +1,7 @@
+from flask import url_for
+
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user
+from app.notify_client.service_api_client import ServicesBrowsableItem
 
 
 class OrganisationsClient(NotifyAdminAPIClient):
@@ -51,3 +54,12 @@ class OrganisationsClient(NotifyAdminAPIClient):
             url="/organisations/unique",
             params={"org_id": org_id, "name": name}
         )["result"]
+
+class OrganisationBrowsableItem(ServicesBrowsableItem):
+    def __init__(self, organisation):
+        self.services = [ServicesBrowsableItem(x) for x in organisation['services']]
+        super().__init__(organisation)
+
+    @property
+    def link(self):
+        return url_for('main.organisation_dashboard', org_id=self._item['id'])

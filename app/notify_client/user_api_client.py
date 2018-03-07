@@ -185,3 +185,7 @@ class UserApiClient(NotifyAdminAPIClient):
         endpoint = '/user/{}/change-email-verification'.format(user_id)
         data = {'email': new_email}
         self.post(endpoint, data)
+
+    def get_organisations_and_services_for_user(self, user):
+        endpoint = '/user/{}/organisations-and-services'.format(user.id)
+        return self.get(endpoint)
