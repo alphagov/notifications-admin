@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import base64
+import os
 from datetime import datetime
 
 from flask import (
@@ -11,6 +13,7 @@ from flask import (
     url_for,
 )
 from flask_login import login_required
+from notifications_python_client.errors import APIError
 
 from app import (
     current_service,
@@ -19,7 +22,7 @@ from app import (
     notification_api_client,
 )
 from app.main import main
-from app.template_previews import TemplatePreview, get_page_count_for_letter
+from app.template_previews import get_page_count_for_letter
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -83,6 +86,12 @@ def view_notification(service_id, notification_id):
     )
 
 
+def get_preview_error_image():
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "static", "images", "preview_error.png")
+    with open(path, "rb") as file:
+        return file.read()
+
+
 @main.route("/services/<service_id>/notification/<uuid:notification_id>.<filetype>")
 @login_required
 @user_has_permissions('view_activity')
@@ -91,23 +100,19 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
     if filetype not in ('pdf', 'png'):
         abort(404)
 
-    notification = notification_api_client.get_notification(service_id, notification_id)
-    notification['template'].update({'reply_to_text': notification['reply_to_text']})
+    try:
+        preview = notification_api_client.get_notification_letter_preview(
+            service_id,
+            notification_id,
+            filetype,
+            page=request.args.get('page')
+        )
 
-    template = get_template(
-        notification['template'],
-        current_service,
-        letter_preview_url=url_for(
-            '.view_letter_notification_as_preview',
-            service_id=service_id,
-            notification_id=notification_id,
-            filetype='png',
-        ),
-    )
+        display_file = base64.b64decode(preview['content'])
+    except APIError:
+        display_file = get_preview_error_image()
 
-    template.values = notification['personalisation']
-
-    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
+    return display_file
 
 
 @main.route("/services/<service_id>/notification/<notification_id>.json")
