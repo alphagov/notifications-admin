@@ -33,32 +33,6 @@ FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure', 'technic
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
 
-class BrowsableItem:
-    """
-    Maps for the template browse-list.
-    """
-
-    def __init__(self, item, *args, **kwargs):
-        print(self, item)
-        self._item = item
-
-    @property
-    def title(self):
-        pass
-
-    @property
-    def link(self):
-        pass
-
-    @property
-    def hint(self):
-        pass
-
-    @property
-    def destructive(self):
-        pass
-
-
 def user_has_permissions(*permissions, **permission_kwargs):
     def wrap(func):
         @wraps(func)

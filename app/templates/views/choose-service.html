@@ -1,5 +1,4 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/browse-list.html" import browse_list %}
 
 {% block per_page_title %}
   Choose service
@@ -14,29 +13,41 @@
   {% for org in organisations %}
     <div class="keyline-block">&nbsp;</div>
     <div>
-      <div>
-        {{ browse_list([org]) }}
-      </div>
-      <div style="margin-left: 30px">
-          {{ browse_list(org.services) }}
-      </div>
+      <nav>
+        <div class="browse-list-item">
+          <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
+        </div>
+        <div style="margin-left: 30px" class="browse-list">
+          <ul>
+            {% for item in org.services %}
+              <li class="browse-list-item">
+                <a href="{{ url_for('.service_dashboard', service_id=item.id) }}" class="browse-list-link">{{ item.name }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </nav>
     </div>
   {% endfor %}
   {% if services_without_organisations %}
     <div class="keyline-block">&nbsp;</div>
-    <div>
-        {{ browse_list(services_without_organisations) }}
-    </div>
+    <nav class="browse-list">
+      <ul>
+        {% for item in services_without_organisations %}
+          <li class="browse-list-item">
+            <a href="{{ url_for('.service_dashboard', service_id=item.id) }}" class="browse-list-link">{{ item.name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
   {% endif %}
   {% if can_add_service %}
     <div class="keyline-block">&nbsp;</div>
-    {{ browse_list([
-      {
-        'title': 'Add a new service…',
-        'link': url_for('.add_service')
-      },
-    ]) }}
+    <nav class="browse-list">
+      <div class="browse-list-item">
+          <a href="{{ url_for('.add_service') }}" class="browse-list-link">Add a new service…</a>
+      </div>
+    </nav>
   {% endif %}
-
 
 {% endblock %}
