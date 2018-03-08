@@ -462,6 +462,14 @@ class GovernmentDomain:
             self.agreement_signed
         ) = self._get_details_of_domain()
 
+    @classmethod
+    def from_user(cls, user):
+        return cls(user.email_address if user.is_authenticated else '')
+
+    @classmethod
+    def from_current_user(cls):
+        return cls.from_user(current_user)
+
     @staticmethod
     def get_matching_function(email_address_or_domain):
 
