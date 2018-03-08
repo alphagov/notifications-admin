@@ -6,21 +6,21 @@ from app.main import main
 from app.utils import is_gov_user
 
 
-@main.route("/services")
+@main.route("/accounts")
 @login_required
-def choose_service():
+def choose_account():
     orgs_and_services = user_api_client.get_organisations_and_services_for_user(current_user)
 
     return render_template(
-        'views/choose-service.html',
+        'views/choose-account.html',
         organisations=orgs_and_services['organisations'],
         services_without_organisations=orgs_and_services['services_without_organisations'],
         can_add_service=is_gov_user(current_user.email_address)
     )
 
 
-@main.route("/services-or-dashboard")
-def show_all_services_or_dashboard():
+@main.route("/accounts-or-dashboard")
+def show_accounts_or_dashboard():
 
     if not current_user.is_authenticated:
         return redirect(url_for('.index'))
@@ -39,4 +39,4 @@ def show_all_services_or_dashboard():
     if len(current_user.organisations) == 1 and not current_user.services:
         return redirect(url_for('.organisation_dashboard', org_id=current_user.organisations[0]))
 
-    return redirect(url_for('.choose_service'))
+    return redirect(url_for('.choose_account'))

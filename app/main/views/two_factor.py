@@ -117,4 +117,4 @@ def redirect_when_logged_in(user_id):
     if len(services) == 1:
         return redirect(url_for('main.service_dashboard', service_id=services[0]['id']))
     else:
-        return redirect(url_for('main.choose_service'))
+        return redirect(url_for('main.choose_account'))

@@ -2867,3 +2867,17 @@ def mock_update_organisation_name(mocker):
         return
 
     return mocker.patch('app.organisations_client.update_organisation_name', side_effect=_update_org_name)
+
+
+@pytest.fixture
+def mock_get_organisations_and_services_for_user(mocker, organisation_one, api_user_active):
+    def _get_orgs_and_services(user_id):
+        return {
+            'organisations': [],
+            'services_without_organisations': []
+        }
+
+    return mocker.patch(
+        'app.user_api_client.get_organisations_and_services_for_user',
+        side_effect=_get_orgs_and_services
+    )

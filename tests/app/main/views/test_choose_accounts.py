@@ -2,14 +2,14 @@ from bs4 import BeautifulSoup
 from flask import url_for
 
 
-def test_should_show_choose_services_page(
+def test_should_show_choose_accounts_page(
     logged_in_client,
     mock_login,
     mock_get_user,
     api_user_active,
     mock_get_services,
 ):
-    response = logged_in_client.get(url_for('main.choose_service'))
+    response = logged_in_client.get(url_for('main.choose_account'))
 
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
@@ -20,14 +20,14 @@ def test_should_show_choose_services_page(
     assert services['data'][1]['name'] in resp_data
 
 
-def test_should_show_choose_services_page_if_no_services(
+def test_should_show_choose_accounts_page_if_no_services(
     logged_in_client,
     mock_login,
     api_user_active,
 ):
     # if users last service has been archived there'll be no services
     # mock_login already patches get_services to return no data
-    response = logged_in_client.get(url_for('main.choose_service'))
+    response = logged_in_client.get(url_for('main.choose_account'))
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
     assert 'Choose service' in resp_data
@@ -40,7 +40,7 @@ def test_redirect_if_only_one_service(
     api_user_active,
     mock_get_services_with_one_service,
 ):
-    response = logged_in_client.get(url_for('main.show_all_services_or_dashboard'))
+    response = logged_in_client.get(url_for('main.show_accounts_or_dashboard'))
 
     service = mock_get_services_with_one_service.side_effect()['data'][0]
     assert response.status_code == 302
@@ -52,10 +52,10 @@ def test_redirect_if_multiple_services(
     mock_login,
     api_user_active,
 ):
-    response = logged_in_client.get(url_for('main.show_all_services_or_dashboard'))
+    response = logged_in_client.get(url_for('main.show_accounts_or_dashboard'))
 
     assert response.status_code == 302
-    assert response.location == url_for('main.choose_service', _external=True)
+    assert response.location == url_for('main.choose_account', _external=True)
 
 
 def test_redirect_if_service_in_session(
@@ -67,7 +67,7 @@ def test_redirect_if_service_in_session(
 ):
     with logged_in_client.session_transaction() as session:
         session['service_id'] = '147ad62a-2951-4fa1-9ca0-093cd1a52c52'
-    response = logged_in_client.get(url_for('main.show_all_services_or_dashboard'))
+    response = logged_in_client.get(url_for('main.show_accounts_or_dashboard'))
 
     assert response.status_code == 302
     assert response.location == url_for(
@@ -81,7 +81,7 @@ def test_should_redirect_if_not_logged_in(
     logged_in_client,
     app_
 ):
-    response = logged_in_client.get(url_for('main.show_all_services_or_dashboard'))
+    response = logged_in_client.get(url_for('main.show_accounts_or_dashboard'))
     assert response.status_code == 302
     assert url_for('main.index', _external=True) in response.location
 
@@ -89,12 +89,12 @@ def test_should_redirect_if_not_logged_in(
 def test_should_show_back_to_service_link(
     logged_in_client
 ):
-    response = logged_in_client.get(url_for('main.choose_service'))
+    response = logged_in_client.get(url_for('main.choose_account'))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select('.navigation-service a')[0]['href'] == (
-        url_for('main.show_all_services_or_dashboard')
+        url_for('main.show_accounts_or_dashboard')
     )
 
 
@@ -105,7 +105,7 @@ def test_should_not_show_back_to_service_link_if_no_service_in_session(
     mock_get_services_with_no_services,
 ):
     client.login(api_user_active)
-    response = client.get(url_for('main.choose_service'))
+    response = client.get(url_for('main.choose_account'))
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
