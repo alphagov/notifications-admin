@@ -530,6 +530,7 @@ def test_should_redirect_after_request_to_go_live(
     returned_message = mock_post.call_args[1]['message']
     assert 'On behalf of service one' in returned_message
     assert 'Organisation type: central' in returned_message
+    assert 'Agreement signed: None (None)' in returned_message
     assert 'Channel: email and text messages' in returned_message
     assert 'Start date: 01/01/2017' in returned_message
     assert 'Start volume: 100,000' in returned_message
