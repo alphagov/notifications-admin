@@ -206,6 +206,7 @@ def template_json(service_id,
                   service_letter_contact=None,
                   reply_to=None,
                   reply_to_text=None,
+                  is_precompiled_letter=False,
                   ):
     template = {
         'id': id_,
@@ -220,6 +221,7 @@ def template_json(service_id,
         'service_letter_contact': service_letter_contact,
         'reply_to': reply_to,
         'reply_to_text': reply_to_text,
+        'is_precompiled_letter': is_precompiled_letter,
     }
     if content is None:
         template['content'] = "template content"

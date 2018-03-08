@@ -305,3 +305,37 @@ def test_notification_page_has_link_to_download_letter(
         download_link = None
 
     assert download_link == expected_link(notification_id=fake_uuid)
+
+
+@pytest.mark.parametrize('is_precompiled_letter, has_template_link', [
+    (True, False),
+    (False, True),
+])
+def test_notification_page_has_expected_template_link_for_letter(
+    client_request,
+    mocker,
+    fake_uuid,
+    service_one,
+    is_precompiled_letter,
+    has_template_link
+):
+
+    mock_get_notification(
+        mocker, fake_uuid, template_type='letter', is_precompiled_letter=is_precompiled_letter)
+    mocker.patch(
+        'app.main.views.notifications.get_page_count_for_letter',
+        return_value=1
+    )
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    link = page.select_one('main > p:nth-of-type(1) > a')
+
+    if has_template_link:
+        assert link
+    else:
+        assert link is None
