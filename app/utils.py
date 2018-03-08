@@ -470,6 +470,26 @@ class GovernmentDomain:
     def from_current_user(cls):
         return cls.from_user(current_user)
 
+    @property
+    def as_human_readable(self):
+        if self.agreement_signed:
+            return 'Yes, on behalf of {}'.format(self.owner)
+        elif self.owner:
+            return '{} (organisation is {}, {})'.format(
+                {
+                    False: 'No',
+                    None: 'Can’t tell',
+                }.get(self.agreement_signed),
+                self.owner,
+                {
+                    True: 'a crown body',
+                    False: 'a non-crown body',
+                    None: 'crown status unknown',
+                }.get(self.crown_status),
+            )
+        else:
+            return 'Can’t tell'
+
     @staticmethod
     def get_matching_function(email_address_or_domain):
 
