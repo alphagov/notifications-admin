@@ -488,7 +488,7 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
 
     @application.errorhandler(HTTPError)
     def render_http_error(error):
-        application.logger.error("API {} failed with status {} message {}".format(
+        application.logger.warning("API {} failed with status {} message {}".format(
             error.response.url if error.response else 'unknown',
             error.status_code,
             error.message
@@ -501,7 +501,13 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
                 msg = list(itertools.chain(*[error.message[x] for x in error.message.keys()]))
             resp = make_response(render_template("error/400.html", message=msg))
             return useful_headers_after_request(resp)
-        elif error_code not in [401, 404, 403, 410, 500]:
+        elif error_code not in [401, 404, 403, 410]:
+            # probably a 500 or 503
+            application.logger.exception("API {} failed with status {} message {}".format(
+                error.response.url if error.response else 'unknown',
+                error.status_code,
+                error.message
+            ))
             error_code = 500
         return _error_response(error_code)
 
