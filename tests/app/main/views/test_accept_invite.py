@@ -1,8 +1,10 @@
-from unittest.mock import ANY
+from unittest.mock import ANY, Mock
 
 from bs4 import BeautifulSoup
 from flask import url_for
+from notifications_python_client.errors import HTTPError
 from tests.conftest import mock_check_invite_token as mock_check_token_invite
+from tests.conftest import normalize_spaces
 from tests.conftest import sample_invite as create_sample_invite
 
 import app
@@ -213,6 +215,36 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'The invitation you were sent has been cancelled'
+
+
+def test_new_user_accept_invite_with_malformed_token(
+    client,
+    service_one,
+    mocker,
+):
+    mocker.patch('app.invite_api_client.check_token', side_effect=HTTPError(
+        response=Mock(
+            status_code=400,
+            json={
+                'result': 'error',
+                'message': {
+                    'invitation': {
+                        'Something’s wrong with this link. Make sure you’ve copied the whole thing.'
+                    }
+                }
+            }
+        ),
+        message={'invitation': 'Something’s wrong with this link. Make sure you’ve copied the whole thing.'}
+    ))
+
+    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(
+        page.select_one('.banner-dangerous').text
+    ) == 'Something’s wrong with this link. Make sure you’ve copied the whole thing.'
 
 
 def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(

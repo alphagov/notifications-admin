@@ -1,6 +1,7 @@
 from flask import abort, flash, redirect, render_template, session, url_for
 from flask_login import current_user
 from markupsafe import Markup
+from notifications_python_client.errors import HTTPError
 
 from app import (
     invite_api_client,
@@ -14,7 +15,14 @@ from app.main import main
 
 @main.route("/invitation/<token>")
 def accept_invite(token):
-    invited_user = invite_api_client.check_token(token)
+    try:
+        invited_user = invite_api_client.check_token(token)
+    except HTTPError as e:
+        if e.status_code == 400 and 'invitation' in e.message:
+            flash(e.message['invitation'])
+            return redirect(url_for('main.sign_in'))
+        else:
+            raise e
 
     if not current_user.is_anonymous and current_user.email_address.lower() != invited_user.email_address.lower():
         message = Markup("""
