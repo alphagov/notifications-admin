@@ -1,0 +1,21 @@
+{% extends "withoutnav_template.html" %}
+{% block per_page_title %}File too big{% endblock %}
+{% block maincolumn_content %}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        <h1 class="heading-large">
+          The file you uploaded was too big
+        </h1>
+        <div class="grid-row">
+          <div class="column-two-thirds">
+            <p>
+              Files must be smaller than 5 MB.
+            </p>
+            <p>
+              <a href="javascript: history.go(-1)">Go back and try again.</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

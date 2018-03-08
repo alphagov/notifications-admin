@@ -1,4 +1,4 @@
-from flask import redirect, render_template, request, url_for
+from flask import redirect, render_template, request, url_for, abort
 from flask_login import current_user, login_required
 from notifications_utils.international_billing_rates import (
     INTERNATIONAL_BILLING_RATES,
@@ -16,6 +16,11 @@ def index():
     if current_user and current_user.is_authenticated:
         return redirect(url_for('main.choose_service'))
     return render_template('views/signedout.html')
+
+
+@main.route('/error/<int:status_code>')
+def error(status_code):
+    abort(status_code)
 
 
 @main.route("/verify-mobile")
