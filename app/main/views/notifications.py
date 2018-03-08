@@ -87,7 +87,7 @@ def view_notification(service_id, notification_id):
 
 
 def get_preview_error_image():
-    path = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "images", "preview_error.png")
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "static", "images", "preview_error.png")
     with open(path, "rb") as file:
         return file.read()
 
