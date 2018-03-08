@@ -15,9 +15,18 @@ Terms of use
   <div class="column-two-thirds">
 
     <h1 class="heading-large">Terms of use</h1>
-    <p>To go live on GOV.UK Notify, you must accept our data sharing and financial agreement.</p>
-    <p><a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback')}}">Contact us</a> to get a copy of the agreement or find out if your organisation has already accepted it.</p>
-    <p>To accept these terms of use, you must be the service manager for your service.</p>
+
+    <p>By using GOV.UK Notify, you agree to follow our terms of use.</p>
+    <p>The service manager for your service has to accept the terms of use when you request to go live on Notify.</p>
+
+    <h2 class="heading-medium">Data sharing and financial agreement</h2>
+
+    {% if agreement_info.agreement_signed %}
+      <p>Your organisation ({{ agreement_info.owner }}) has already accepted the GOV.UK&nbsp;Notify data sharing and financial agreement.</p>
+    {% else %}
+      <p>For your service to go live on Notify, your organisation must accept our data sharing and financial agreement.</p>
+      <p><a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback')}}">Contact us</a> to get a copy of the agreement or find out if your organisation has already accepted it.</p>
+    {% endif %}
 
     <h2 class="heading-medium">Notify’s side of the agreement</h2>
     <p>We agree to:</p>
