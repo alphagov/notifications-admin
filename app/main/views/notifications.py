@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import base64
+import io
 import os
 from datetime import datetime
 
@@ -14,6 +15,7 @@ from flask import (
 )
 from flask_login import login_required
 from notifications_python_client.errors import APIError
+from notifications_utils.pdf import pdf_page_count
 
 from app import (
     current_service,
@@ -44,6 +46,12 @@ def view_notification(service_id, notification_id):
     notification = notification_api_client.get_notification(service_id, str(notification_id))
     notification['template'].update({'reply_to_text': notification['reply_to_text']})
 
+    if notification['template']['is_precompiled_letter']:
+        file_contents = view_letter_notification_as_preview(service_id, notification_id, "pdf")
+        page_count = pdf_page_count(io.BytesIO(file_contents))
+    else:
+        page_count = get_page_count_for_letter(notification['template'])
+
     template = get_template(
         notification['template'],
         current_service,
@@ -53,7 +61,7 @@ def view_notification(service_id, notification_id):
             notification_id=notification_id,
             filetype='png',
         ),
-        page_count=get_page_count_for_letter(notification['template']),
+        page_count=page_count,
         show_recipient=True,
         redact_missing_personalisation=True,
     )

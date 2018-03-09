@@ -166,7 +166,7 @@ def test_should_show_image_of_letter_notification(
     mock_get_notification(mocker, fake_uuid, template_type='letter')
 
     mocker.patch(
-        'app.notify_client.notification_api_client.NotificationApiClient.get',
+        'app.main.views.notifications.notification_api_client.get_notification_letter_preview',
         return_value={
             'content': base64.b64encode(b'foo').decode('utf-8')
         }
@@ -192,7 +192,7 @@ def test_should_show_preview_error_image_letter_notification_on_preview_error(
     mock_get_notification(mocker, fake_uuid, template_type='letter')
 
     mocker.patch(
-        'app.notify_client.notification_api_client.NotificationApiClient.get',
+        'app.main.views.notifications.notification_api_client.get_notification_letter_preview',
         side_effect=APIError
     )
 
@@ -320,8 +320,19 @@ def test_notification_page_has_expected_template_link_for_letter(
     has_template_link
 ):
 
+    mocker.patch(
+        'app.main.views.notifications.view_letter_notification_as_preview',
+        return_value=b'foo'
+    )
+
+    mocker.patch(
+        'app.main.views.notifications.pdf_page_count',
+        return_value=1
+    )
+
     mock_get_notification(
         mocker, fake_uuid, template_type='letter', is_precompiled_letter=is_precompiled_letter)
+
     mocker.patch(
         'app.main.views.notifications.get_page_count_for_letter',
         return_value=1
@@ -339,3 +350,35 @@ def test_notification_page_has_expected_template_link_for_letter(
         assert link
     else:
         assert link is None
+
+
+def test_should_show_image_of_precompiled_letter_notification(
+    logged_in_client,
+    fake_uuid,
+    mocker,
+):
+
+    mock_get_notification(mocker, fake_uuid, template_type='letter', is_precompiled_letter=True)
+
+    mock_pdf_page_count = mocker.patch(
+        'app.main.views.notifications.pdf_page_count',
+        return_value=1
+    )
+
+    mocker.patch(
+        'app.main.views.notifications.notification_api_client.get_notification_letter_preview',
+        return_value={
+            'content': base64.b64encode(b'foo').decode('utf-8')
+        }
+    )
+
+    response = logged_in_client.get(url_for(
+        'main.view_letter_notification_as_preview',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        filetype="png"
+    ))
+
+    assert response.status_code == 200
+    assert response.get_data(as_text=True) == 'foo'
+    assert mock_pdf_page_count.called_once()
