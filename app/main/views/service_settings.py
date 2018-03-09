@@ -44,7 +44,7 @@ from app.main.forms import (
     SMSPrefixForm,
 )
 from app.utils import (
-    GovernmentDomain,
+    AgreementInfo,
     email_safe,
     get_cdn_domain,
     user_has_permissions,
@@ -205,7 +205,7 @@ def submit_request_to_go_live(service_id):
                     current_service['name'],
                     url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
                     current_service['organisation_type'],
-                    GovernmentDomain.from_current_user().as_human_readable,
+                    AgreementInfo.from_current_user().as_human_readable,
                     formatted_list(filter(None, (
                         'email' if form.channel_email.data else None,
                         'text messages' if form.channel_sms.data else None,

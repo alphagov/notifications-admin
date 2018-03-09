@@ -8,7 +8,7 @@ from freezegun import freeze_time
 from tests.conftest import fake_uuid
 
 from app.utils import (
-    GovernmentDomain,
+    AgreementInfo,
     Spreadsheet,
     email_safe,
     generate_next_dict,
@@ -382,12 +382,12 @@ def test_get_cdn_domain_on_non_localhost(client, mocker):
 @pytest.mark.parametrize("domain_or_email_address", (
     "test@dclgdatamart.co.uk", "test@communities.gsi.gov.uk", "test@communities.gov.uk",
 ))
-def test_get_valid_government_domain_known_details(domain_or_email_address):
-    government_domain = GovernmentDomain(domain_or_email_address)
-    assert government_domain.crown_status is None
-    assert government_domain.owner == "Ministry of Housing, Communities & Local Government"
-    assert government_domain.agreement_signed is True
-    assert government_domain.as_human_readable == (
+def test_get_valid_agreement_info_known_details(domain_or_email_address):
+    agreement_info = AgreementInfo(domain_or_email_address)
+    assert agreement_info.crown_status is None
+    assert agreement_info.owner == "Ministry of Housing, Communities & Local Government"
+    assert agreement_info.agreement_signed is True
+    assert agreement_info.as_human_readable == (
         'Yes, on behalf of Ministry of Housing, Communities & Local Government'
     )
 
@@ -395,46 +395,46 @@ def test_get_valid_government_domain_known_details(domain_or_email_address):
 @pytest.mark.parametrize("domain_or_email_address", (
     "test@police.gov.uk", "police.gov.uk",
 ))
-def test_get_valid_government_domain_unknown_details(domain_or_email_address):
-    government_domain = GovernmentDomain(domain_or_email_address)
+def test_get_valid_agreement_info_unknown_details(domain_or_email_address):
+    government_domain = AgreementInfo(domain_or_email_address)
     assert government_domain.crown_status is None
     assert government_domain.owner is None
     assert government_domain.agreement_signed is None
     assert government_domain.as_human_readable == 'Can’t tell'
 
 
-def test_get_valid_government_domain_only_org_known():
-    government_domain = GovernmentDomain('nhs.net')
+def test_get_valid_agreement_info_only_org_known():
+    agreement_info = AgreementInfo('nhs.net')
     # Some parts of the NHS are Crown, some aren’t
-    assert government_domain.crown_status is None
-    assert government_domain.owner == 'NHS'
-    assert government_domain.agreement_signed is None
-    assert government_domain.as_human_readable == 'Can’t tell (organisation is NHS, crown status unknown)'
+    assert agreement_info.crown_status is None
+    assert agreement_info.owner == 'NHS'
+    assert agreement_info.agreement_signed is None
+    assert agreement_info.as_human_readable == 'Can’t tell (organisation is NHS, crown status unknown)'
 
 
-def test_get_valid_government_domain_some_known_details():
-    government_domain = GovernmentDomain("marinemanagement.org.uk")
-    assert government_domain.crown_status is None
-    assert government_domain.owner == "Marine Management Organisation"
-    assert government_domain.agreement_signed is True
-    assert government_domain.as_human_readable == (
+def test_get_valid_agreement_info_some_known_details():
+    agreement_info = AgreementInfo("marinemanagement.org.uk")
+    assert agreement_info.crown_status is None
+    assert agreement_info.owner == "Marine Management Organisation"
+    assert agreement_info.agreement_signed is True
+    assert agreement_info.as_human_readable == (
         'Yes, on behalf of Marine Management Organisation'
     )
 
 
-def test_get_valid_local_government_domain_some_known_details():
-    government_domain = GovernmentDomain("aberdeenshire.gov.uk")
-    assert government_domain.crown_status is False
-    assert government_domain.owner == "Aberdeenshire Council"
-    assert government_domain.agreement_signed is False
-    assert government_domain.as_human_readable == (
+def test_get_valid_local_agreement_info_some_known_details():
+    agreement_info = AgreementInfo("aberdeenshire.gov.uk")
+    assert agreement_info.crown_status is False
+    assert agreement_info.owner == "Aberdeenshire Council"
+    assert agreement_info.agreement_signed is False
+    assert agreement_info.as_human_readable == (
         'No (organisation is Aberdeenshire Council, a non-crown body)'
     )
 
 
 def test_get_valid_government_domain_gets_most_specific_first():
 
-    generic = GovernmentDomain("gov.uk")
+    generic = AgreementInfo("gov.uk")
     assert generic.crown_status is None
     assert generic.owner is None
     assert generic.agreement_signed is None
@@ -442,7 +442,7 @@ def test_get_valid_government_domain_gets_most_specific_first():
         'Can’t tell'
     )
 
-    specific = GovernmentDomain("dacorum.gov.uk")
+    specific = AgreementInfo("dacorum.gov.uk")
     assert specific.crown_status is False
     assert specific.owner == 'Dacorum Borough Council'
     assert specific.agreement_signed is True
@@ -453,20 +453,20 @@ def test_get_valid_government_domain_gets_most_specific_first():
 
 def test_validate_government_domain_data():
 
-    for domain in GovernmentDomain.domains.keys():
+    for domain in AgreementInfo.domains.keys():
 
-        government_domain = GovernmentDomain(domain)
+        agreement_info = AgreementInfo(domain)
 
-        assert government_domain.crown_status in {
+        assert agreement_info.crown_status in {
             True, False, None
         }
 
         assert (
-            government_domain.owner is None
+            agreement_info.owner is None
         ) or (
-            isinstance(government_domain.owner, str)
+            isinstance(agreement_info.owner, str)
         )
 
-        assert government_domain.agreement_signed in {
+        assert agreement_info.agreement_signed in {
             True, False, None
         }

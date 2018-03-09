@@ -9,7 +9,7 @@ from app import convert_to_boolean
 from app.main import main
 from app.main.forms import SearchTemplatesForm
 from app.main.views.sub_navigation_dictionaries import features_nav
-from app.utils import GovernmentDomain
+from app.utils import AgreementInfo
 
 
 @main.route('/')
@@ -154,7 +154,7 @@ def terms():
     return render_template(
         'views/terms-of-use.html',
         navigation_links=features_nav(),
-        agreement_info=GovernmentDomain.from_current_user(),
+        agreement_info=AgreementInfo.from_current_user(),
     )
 
 
