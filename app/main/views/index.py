@@ -20,6 +20,8 @@ def index():
 
 @main.route('/error/<int:status_code>')
 def error(status_code):
+    if status_code >= 500:
+        abort(404)
     abort(status_code)
 
 
