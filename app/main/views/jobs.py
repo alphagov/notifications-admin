@@ -399,6 +399,8 @@ def add_preview_of_content_to_notifications(notifications):
                 **notification
             )
         else:
+            if notification['template']['is_precompiled_letter']:
+                notification['template']['subject'] = 'Provided as PDF'
             yield dict(
                 preview_of_content=(
                     WithSubjectTemplate(
