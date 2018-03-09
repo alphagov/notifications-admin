@@ -102,7 +102,7 @@ def get_errors_for_csv(recipients, template_type):
 
     errors = []
 
-    if recipients.rows_with_bad_recipients:
+    if any(recipients.rows_with_bad_recipients):
         number_of_bad_recipients = len(list(recipients.rows_with_bad_recipients))
         if 'sms' == template_type:
             if 1 == number_of_bad_recipients:
@@ -120,7 +120,7 @@ def get_errors_for_csv(recipients, template_type):
             else:
                 errors.append("fix {} addresses".format(number_of_bad_recipients))
 
-    if recipients.rows_with_missing_data:
+    if any(recipients.rows_with_missing_data):
         number_of_rows_with_missing_data = len(list(recipients.rows_with_missing_data))
         if 1 == number_of_rows_with_missing_data:
             errors.append("enter missing data in 1 row")
@@ -156,7 +156,7 @@ def generate_notifications_csv(**kwargs):
                 values = [
                     notification['row_number'],
                 ] + [
-                    original_upload[notification['row_number'] - 1].get(header)
+                    original_upload[notification['row_number'] - 1].get(header).data
                     for header in original_column_headers
                 ] + [
                     notification['template_name'],

@@ -51,7 +51,7 @@
 
     <div class="fullscreen-content" data-module="fullscreen-table">
       {% call(item, row_number) list_table(
-        recipients.initial_annotated_rows_with_errors if row_errors and not recipients.missing_column_headers else recipients.initial_annotated_rows,
+        recipients.displayed_rows,
         caption=original_file_name,
         caption_visible=False,
         field_headings=[
@@ -68,14 +68,14 @@
           </span>
         {% endcall %}
         {% for column in recipients.column_headers %}
-          {% if item['columns'][column].ignore %}
-            {{ text_field(item['columns'][column].data or '', status='default') }}
+          {% if item[column].ignore %}
+            {{ text_field(item[column].data or '', status='default') }}
           {% else %}
-            {{ text_field(item['columns'][column].data or '') }}
+            {{ text_field(item[column].data or '') }}
           {% endif %}
         {% endfor %}
-        {% if item['columns'].get(None) %}
-          {% for column in item['columns'][None].data %}
+        {% if item[None].data %}
+          {% for column in item[None].data %}
             {{ text_field(column, status='default') }}
           {% endfor %}
         {% endif %}

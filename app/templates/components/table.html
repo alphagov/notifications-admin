@@ -83,7 +83,9 @@
     {% if text is iterable and text is not string %}
       <ul class="list list-bullet">
         {% for item in text %}
-          <li>{{ item }}</li>
+          {% if item %}
+            <li>{{ item }}</li>
+          {% endif %}
         {% endfor %}
       </ul>
     {% else %}
