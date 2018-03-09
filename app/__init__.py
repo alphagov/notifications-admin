@@ -356,17 +356,32 @@ def format_notification_status_as_time(status, created, updated):
     }.get(status, updated)
 
 
-def format_notification_status_as_field_status(status):
+def format_notification_status_as_field_status(status, notification_type):
     return {
-        'failed': 'error',
-        'technical-failure': 'error',
-        'temporary-failure': 'error',
-        'permanent-failure': 'error',
-        'delivered': None,
-        'sent': None,
-        'sending': 'default',
-        'created': 'default'
-    }.get(status, 'error')
+        'letter': {
+            'failed': 'error',
+            'technical-failure': 'error',
+            'temporary-failure': 'error',
+            'permanent-failure': 'error',
+            'delivered': None,
+            'sent': None,
+            'sending': None,
+            'created': None,
+            'accepted': None,
+        }
+    }.get(
+        notification_type,
+        {
+            'failed': 'error',
+            'technical-failure': 'error',
+            'temporary-failure': 'error',
+            'permanent-failure': 'error',
+            'delivered': None,
+            'sent': None,
+            'sending': 'default',
+            'created': 'default'
+        }
+    ).get(status, 'error')
 
 
 def format_notification_status_as_url(status):

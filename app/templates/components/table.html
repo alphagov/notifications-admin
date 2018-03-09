@@ -130,7 +130,10 @@
   {% if not notification %}
     {% call field(align='right') %}{% endcall %}
   {% else %}
-    {% call field(status=notification.status|format_notification_status_as_field_status, align='right') %}
+    {% call field(
+      status=notification.status|format_notification_status_as_field_status(notification.notification_type),
+      align='right'
+    ) %}
       {% if notification.status in ['created', 'sending', 'delivered'] %}<span class="align-with-message-body">{% endif %}
       {% if notification.status|format_notification_status_as_url %}
         <a href="{{ notification.status|format_notification_status_as_url }}">
