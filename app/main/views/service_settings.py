@@ -44,6 +44,7 @@ from app.main.forms import (
     SMSPrefixForm,
 )
 from app.utils import (
+    GovernmentDomain,
     email_safe,
     get_cdn_domain,
     user_has_permissions,
@@ -196,6 +197,7 @@ def submit_request_to_go_live(service_id):
                     'On behalf of {} ({})\n'
                     '\n---'
                     '\nOrganisation type: {}'
+                    '\nAgreement signed: {}'
                     '\nMOU in place: {}'
                     '\nChannel: {}\nStart date: {}\nStart volume: {}'
                     '\nPeak volume: {}'
@@ -204,6 +206,7 @@ def submit_request_to_go_live(service_id):
                     current_service['name'],
                     url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
                     current_service['organisation_type'],
+                    GovernmentDomain.from_current_user().as_human_readable,
                     form.mou.data,
                     formatted_list(filter(None, (
                         'email' if form.channel_email.data else None,

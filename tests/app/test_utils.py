@@ -387,6 +387,9 @@ def test_get_valid_government_domain_known_details(domain_or_email_address):
     assert government_domain.crown_status is None
     assert government_domain.owner == "Ministry of Housing, Communities & Local Government"
     assert government_domain.agreement_signed is True
+    assert government_domain.as_human_readable == (
+        'Yes, on behalf of Ministry of Housing, Communities & Local Government'
+    )
 
 
 @pytest.mark.parametrize("domain_or_email_address", (
@@ -397,6 +400,16 @@ def test_get_valid_government_domain_unknown_details(domain_or_email_address):
     assert government_domain.crown_status is None
     assert government_domain.owner is None
     assert government_domain.agreement_signed is None
+    assert government_domain.as_human_readable == 'Can’t tell'
+
+
+def test_get_valid_government_domain_only_org_known():
+    government_domain = GovernmentDomain('nhs.net')
+    # Some parts of the NHS are Crown, some aren’t
+    assert government_domain.crown_status is None
+    assert government_domain.owner == 'NHS'
+    assert government_domain.agreement_signed is None
+    assert government_domain.as_human_readable == 'Can’t tell (organisation is NHS, crown status unknown)'
 
 
 def test_get_valid_government_domain_some_known_details():
@@ -404,6 +417,19 @@ def test_get_valid_government_domain_some_known_details():
     assert government_domain.crown_status is None
     assert government_domain.owner == "Marine Management Organisation"
     assert government_domain.agreement_signed is True
+    assert government_domain.as_human_readable == (
+        'Yes, on behalf of Marine Management Organisation'
+    )
+
+
+def test_get_valid_local_government_domain_some_known_details():
+    government_domain = GovernmentDomain("aberdeenshire.gov.uk")
+    assert government_domain.crown_status is False
+    assert government_domain.owner == "Aberdeenshire Council"
+    assert government_domain.agreement_signed is False
+    assert government_domain.as_human_readable == (
+        'No (organisation is Aberdeenshire Council, a non-crown body)'
+    )
 
 
 def test_get_valid_government_domain_gets_most_specific_first():
@@ -412,11 +438,17 @@ def test_get_valid_government_domain_gets_most_specific_first():
     assert generic.crown_status is None
     assert generic.owner is None
     assert generic.agreement_signed is None
+    assert generic.as_human_readable == (
+        'Can’t tell'
+    )
 
     specific = GovernmentDomain("dacorum.gov.uk")
     assert specific.crown_status is False
     assert specific.owner == 'Dacorum Borough Council'
     assert specific.agreement_signed is True
+    assert specific.as_human_readable == (
+        'Yes, on behalf of Dacorum Borough Council'
+    )
 
 
 def test_validate_government_domain_data():

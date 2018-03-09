@@ -53,6 +53,8 @@ innovateuk.gov.uk:
 ncsc.gov.uk:
   owner: National Cyber Security Center
   agreement_signed: true
+nhs.net:
+  owner: NHS
 nhsdigital.nhs.uk: digital.nhs.uk
 digital.nhs.uk:
   owner: NHS Digital
