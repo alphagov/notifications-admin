@@ -9,45 +9,33 @@
   <h1 class="heading-large">
     Choose account
   </h1>
-
-  {% for org in organisations %}
-    <div class="keyline-block">&nbsp;</div>
-    <div>
-      <nav>
-        <div class="browse-list-item">
+  <nav class="browse-list">
+    <ul>
+      {% for org in organisations %}
+        <li class="browse-list-item">
           <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
-        </div>
-        <div style="margin-left: 30px" class="browse-list">
-          <ul>
-            {% for item in org.services %}
-              <li class="browse-list-item">
-                <a href="{{ url_for('.service_dashboard', service_id=item.id) }}" class="browse-list-link">{{ item.name }}</a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-      </nav>
-    </div>
-  {% endfor %}
-  {% if services_without_organisations %}
-    <div class="keyline-block">&nbsp;</div>
-    <nav class="browse-list">
-      <ul>
+          {% if org.services %}
+            <ul class="browse-sub-list">
+              {% for item in org.services %}
+                <li class="browse-list-sub-item">
+                  <a href="{{ url_for('.service_dashboard', service_id=item.id) }}" class="browse-list-link">{{ item.name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+        <div class ="keyline-block"></div>
+      {% endfor %}
+      {% if services_without_organisations %}
         {% for item in services_without_organisations %}
           <li class="browse-list-item">
             <a href="{{ url_for('.service_dashboard', service_id=item.id) }}" class="browse-list-link">{{ item.name }}</a>
           </li>
         {% endfor %}
-      </ul>
-    </nav>
-  {% endif %}
+        <div class ="keyline-block"></div>
+      {% endif %}
   {% if can_add_service %}
-    <div class="keyline-block">&nbsp;</div>
-    <nav class="browse-list">
-      <div class="browse-list-item">
-          <a href="{{ url_for('.add_service') }}" class="browse-list-link">Add a new service…</a>
-      </div>
-    </nav>
+    <a href="{{ url_for('.add_service') }}" class="browse-list-link">Add a new service…</a>
   {% endif %}
 
 {% endblock %}
