@@ -503,6 +503,10 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
     def handle_gone(error):
         return _error_response(410)
 
+    @application.errorhandler(413)
+    def handle_payload_too_large(error):
+        return _error_response(413)
+
     @application.errorhandler(404)
     def handle_not_found(error):
         return _error_response(404)
