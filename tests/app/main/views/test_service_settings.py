@@ -516,7 +516,7 @@ def test_should_show_request_to_go_live_checklist(
         service_id=SERVICE_ONE_ID,
     )
 
-    mock_count_users.assert_called_once_with(SERVICE_ONE_ID, 'manage_settings')
+    mock_count_users.assert_called_once_with(SERVICE_ONE_ID, 'manage_service')
     assert mock_count_templates.call_args_list == [
         call(SERVICE_ONE_ID),
         call(SERVICE_ONE_ID, template_type='email'),

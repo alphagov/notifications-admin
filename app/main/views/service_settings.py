@@ -167,7 +167,7 @@ def request_to_go_live(service_id):
         'views/service-settings/request-to-go-live.html',
         has_team_members=(
             user_api_client.get_count_of_users_with_permission(
-                service_id, 'manage_settings'
+                service_id, 'manage_service'
             ) > 1
         ),
         has_templates=(
