@@ -7,10 +7,9 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
         super().__init__("a" * 73, "b")
 
     def init_app(self, app):
-        self.base_url = app.config['API_HOST_NAME']
+        super().init_app(app)
+
         self.admin_url = app.config['ADMIN_BASE_URL']
-        self.service_id = app.config['ADMIN_CLIENT_USER_NAME']
-        self.api_key = app.config['ADMIN_CLIENT_SECRET']
 
     def create_invite(self, invite_from_id, org_id, email_address):
         data = {
