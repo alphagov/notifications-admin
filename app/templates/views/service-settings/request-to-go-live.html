@@ -4,6 +4,7 @@
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/banner.html" import banner_wrapper %}
+{% from "components/tick-cross.html" import tick_cross_done_not_done %}
 
 {% block service_page_title %}
   Request to go live
@@ -14,21 +15,35 @@
     <div class="column-five-sixths">
       <h1 class="heading-large">Request to go live</h1>
       <p>
-        Before you request to go live, make sure you’ve:
+        Before you request to go live, make sure that:
+      </p>
+      <ul class='bottom-gutter'>
+        {{ tick_cross_done_not_done(
+          has_team_members,
+          'Another person in your team has the ‘Manage service’ permission',
+        ) }}
+        {{ tick_cross_done_not_done(
+          has_templates,
+          'You’ve added some templates',
+        ) }}
+        {% if has_email_templates %}
+          {{ tick_cross_done_not_done(
+            has_email_reply_to_address,
+            'You’ve added an email reply to address on the <a href="{}">settings</a> page'.format(
+              url_for('main.service_settings', service_id=current_service.id)
+            )|safe,
+          ) }}
+        {% endif %}
+      </ul>
+      <p>
+        You also need to:
       </p>
       <ul class="list list-bullet bottom-gutter">
         <li>
           read our <a href="{{ url_for('.terms') }}">terms of use</a>
         </li>
         <li>
-          added <a href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a> to your account
-        </li>
-        <li>
-          specified your reply to email address or text message sender in your
-          <a href="{{ url_for('main.service_settings', service_id=current_service.id) }}">settings</a> page
-        </li>
-        <li>
-          added the templates you want to start with, making sure they follow the GOV.UK Service Manual standards for
+          make sure your messages follow the GOV.UK Service Manual standards for
           <a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a>
         </li>
       </ul>

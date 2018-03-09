@@ -1,15 +1,20 @@
-{% macro tick_cross(yes, label) %}
+{% macro tick_cross(yes, label, truthy_hint='Can', falsey_hint='Can’t') %}
   <li>
     {% if yes %}
       <span class="tick-cross-tick">
-        <span class="visually-hidden">Can</span>
+        <span class="visually-hidden">{{ truthy_hint }}</span>
         {{ label}}
       </span>
     {% else %}
       <span class="tick-cross-cross">
-        <span class="visually-hidden">Can’t</span>
+        <span class="visually-hidden">{{ falsey_hint }}</span>
         {{ label}}
       </span>
     {% endif %}
   </li>
+{% endmacro %}
+
+
+{% macro tick_cross_done_not_done(yes, label) %}
+  {{ tick_cross(yes, label, truthy_hint='Done: ', falsey_hint='Not done: ') }}
 {% endmacro %}

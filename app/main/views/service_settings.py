@@ -163,7 +163,23 @@ def service_name_change_confirm(service_id):
 @login_required
 @user_has_permissions('manage_service')
 def request_to_go_live(service_id):
-    return render_template('views/service-settings/request-to-go-live.html')
+    return render_template(
+        'views/service-settings/request-to-go-live.html',
+        has_team_members=(
+            user_api_client.get_count_of_users_with_permission(
+                service_id, 'manage_settings'
+            ) > 1
+        ),
+        has_templates=(
+            service_api_client.count_service_templates(service_id) > 0
+        ),
+        has_email_templates=(
+            service_api_client.count_service_templates(service_id, template_type='email') > 0
+        ),
+        has_email_reply_to_address=bool(
+            service_api_client.get_reply_to_email_addresses(service_id)
+        )
+    )
 
 
 @main.route("/services/<service_id>/service-settings/submit-request-to-go-live", methods=['GET', 'POST'])
