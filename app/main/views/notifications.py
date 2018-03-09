@@ -46,9 +46,8 @@ def view_notification(service_id, notification_id):
     notification = notification_api_client.get_notification(service_id, str(notification_id))
     notification['template'].update({'reply_to_text': notification['reply_to_text']})
 
-    file_contents = view_letter_notification_as_preview(service_id, notification_id, "pdf")
-
     if notification['template']['is_precompiled_letter']:
+        file_contents = view_letter_notification_as_preview(service_id, notification_id, "pdf")
         page_count = pdf_page_count(io.BytesIO(file_contents))
     else:
         page_count = get_page_count_for_letter(notification['template'])

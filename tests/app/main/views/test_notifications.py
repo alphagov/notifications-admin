@@ -166,7 +166,7 @@ def test_should_show_image_of_letter_notification(
     mock_get_notification(mocker, fake_uuid, template_type='letter')
 
     mocker.patch(
-        'app.notify_client.notification_api_client.NotificationApiClient.get',
+        'app.main.views.notifications.notification_api_client.get_notification_letter_preview',
         return_value={
             'content': base64.b64encode(b'foo').decode('utf-8')
         }
@@ -192,7 +192,7 @@ def test_should_show_preview_error_image_letter_notification_on_preview_error(
     mock_get_notification(mocker, fake_uuid, template_type='letter')
 
     mocker.patch(
-        'app.notify_client.notification_api_client.NotificationApiClient.get',
+        'app.main.views.notifications.notification_api_client.get_notification_letter_preview',
         side_effect=APIError
     )
 
@@ -366,7 +366,7 @@ def test_should_show_image_of_precompiled_letter_notification(
     )
 
     mocker.patch(
-        'app.notify_client.notification_api_client.NotificationApiClient.get',
+        'app.main.views.notifications.notification_api_client.get_notification_letter_preview',
         return_value={
             'content': base64.b64encode(b'foo').decode('utf-8')
         }
