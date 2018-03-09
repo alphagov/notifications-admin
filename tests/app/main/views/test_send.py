@@ -585,7 +585,7 @@ def test_upload_valid_csv_shows_preview_and_table(
         phone number,name,thing,thing,thing
         07700900001, A,   foo,  foo,  foo
         07700900002, B,   foo,  foo,  foo
-        07700900003, C,   foo,  foo,  foo
+        07700900003, C,   foo,  foo,
     """)
 
     page = client_request.get(
@@ -609,20 +609,50 @@ def test_upload_valid_csv_shows_preview_and_table(
     else:
         assert not page.select_one('.table-field-index').select_one('a')
 
-    for index, cell in enumerate([
-        '<td class="table-field-center-aligned "> <div class=""> 07700900001 </div> </td>',
-        '<td class="table-field-center-aligned "> <div class=""> A </div> </td>',
+    for row_index, row in enumerate([
         (
-            '<td class="table-field-center-aligned "> '
-            '<div class="table-field-status-default"> '
-            '<ul class="list list-bullet"> '
-            '<li>foo</li> <li>foo</li> <li>foo</li> '
-            '</ul> '
-            '</div> '
-            '</td>'
+            '<td class="table-field-center-aligned "> <div class=""> 07700900001 </div> </td>',
+            '<td class="table-field-center-aligned "> <div class=""> A </div> </td>',
+            (
+                '<td class="table-field-center-aligned "> '
+                '<div class="table-field-status-default"> '
+                '<ul class="list list-bullet"> '
+                '<li>foo</li> <li>foo</li> <li>foo</li> '
+                '</ul> '
+                '</div> '
+                '</td>'
+            )
+        ),
+        (
+            '<td class="table-field-center-aligned "> <div class=""> 07700900002 </div> </td>',
+            '<td class="table-field-center-aligned "> <div class=""> B </div> </td>',
+            (
+                '<td class="table-field-center-aligned "> '
+                '<div class="table-field-status-default"> '
+                '<ul class="list list-bullet"> '
+                '<li>foo</li> <li>foo</li> <li>foo</li> '
+                '</ul> '
+                '</div> '
+                '</td>'
+            )
+        ),
+        (
+            '<td class="table-field-center-aligned "> <div class=""> 07700900003 </div> </td>',
+            '<td class="table-field-center-aligned "> <div class=""> C </div> </td>',
+            (
+                '<td class="table-field-center-aligned "> '
+                '<div class="table-field-status-default"> '
+                '<ul class="list list-bullet"> '
+                '<li>foo</li> <li>foo</li> '
+                '</ul> '
+                '</div> '
+                '</td>'
+            )
         ),
     ]):
-        assert normalize_spaces(str(page.select('table tbody td')[index + 1])) == cell
+        for index, cell in enumerate(row):
+            row = page.select('table tbody tr')[row_index]
+            assert normalize_spaces(str(row.select('td')[index + 1])) == cell
 
 
 def test_show_all_columns_if_there_are_duplicate_recipient_columns(
