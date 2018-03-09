@@ -1,5 +1,5 @@
 <div class="ajax-block-container">
-  <p class="notification-status {{ notification.status|format_notification_status_as_field_status }}">
+  <p class="notification-status {{ notification.status|format_notification_status_as_field_status(notification.notification_type) }}">
     {% if notification.status|format_notification_status_as_url %}
       <a href="{{ notification.status|format_notification_status_as_url }}">
     {% endif %}
