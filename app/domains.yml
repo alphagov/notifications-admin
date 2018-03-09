@@ -3605,7 +3605,7 @@ roystontowncouncil.gov.uk:
 rugby.gov.uk:
   owner: Rugby Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 rugeleytowncouncil.gov.uk:
   owner: Rugeley Town Council
   crown: false
