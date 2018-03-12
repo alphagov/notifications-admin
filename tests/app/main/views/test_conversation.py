@@ -79,7 +79,7 @@ def test_view_conversation(
     mock_get_inbound_sms
 ):
 
-    mock_get_notifications(
+    mock = mock_get_notifications(
         mocker,
         api_user_active,
         template_content='Hello ((name))',
@@ -157,6 +157,8 @@ def test_view_conversation(
             normalize_spaces(messages[index].text),
             normalize_spaces(statuses[index].text),
         ) == expected
+
+    mock.assert_called_once_with(SERVICE_ONE_ID, to='07123 456789', template_type='sms')
 
 
 def test_view_conversation_updates(
