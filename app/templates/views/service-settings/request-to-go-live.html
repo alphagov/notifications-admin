@@ -12,46 +12,41 @@
 
 {% block maincolumn_content %}
   <div class="grid-row">
-    <div class="column-five-sixths">
+    <div class="column-whole">
       <h1 class="heading-large">Request to go live</h1>
       <p>
-        Before you request to go live, make sure that:
+        Before your service can go live on Notify, you’ll need to:
       </p>
       <ul class='bottom-gutter'>
         {{ tick_cross_done_not_done(
           has_team_members,
-          'Another person in your team has the ‘Manage service’ permission',
+          'Have more than one <a href="{}">team member</a> with the ‘Manage service’ permission'.format(
+            url_for('main.manage_users', service_id=current_service.id)
+          )|safe,
         ) }}
         {{ tick_cross_done_not_done(
           has_templates,
-          'You’ve added some templates',
+          'Create some <a href="{}">templates</a>'.format(
+            url_for('main.choose_template', service_id=current_service.id)
+          )|safe,
         ) }}
         {% if has_email_templates %}
           {{ tick_cross_done_not_done(
             has_email_reply_to_address,
-            'You’ve added an email reply to address on the <a href="{}">settings</a> page'.format(
-              url_for('main.service_settings', service_id=current_service.id)
+            'Add an <a href="{}">email reply to address</a>'.format(
+              url_for('main.service_email_reply_to', service_id=current_service.id)
             )|safe,
           ) }}
         {% endif %}
       </ul>
       <p>
-        You also need to:
+        You also need to accept our <a href="{{ url_for('.terms') }}">terms of use</a>.
       </p>
-      <ul class="list list-bullet bottom-gutter">
-        <li>
-          read our <a href="{{ url_for('.terms') }}">terms of use</a>
-        </li>
-        <li>
-          make sure your messages follow the GOV.UK Service Manual standards for
-          <a href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a>
-        </li>
-      </ul>
-      <p>
-        Once you’ve made the request, we’ll put your service live within one working day.
+      <p class="bottom-gutter">
+        We’ll make your service live within one working day.
       </p>
       <p>
-        <a href="{{ url_for('main.submit_request_to_go_live', service_id=current_service.id) }}" class="button">Next</a>
+        <a href="{{ url_for('main.submit_request_to_go_live', service_id=current_service.id) }}" class="button">Continue</a>
       </p>
     </div>
   </div>
