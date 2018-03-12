@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
-from unittest.mock import ANY
+from unittest.mock import ANY, Mock
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from notifications_python_client.errors import HTTPError
 from tests.conftest import normalize_spaces
 
 from app.notify_client.models import InvitedOrgUser
@@ -63,26 +64,6 @@ def test_view_organisation_shows_the_correct_organisation(
     assert normalize_spaces(page.select_one('.heading-large').text) == org['name']
 
 
-def test_edit_organisation_shows_the_correct_organisation(
-    logged_in_platform_admin_client,
-    fake_uuid,
-    mocker
-):
-    org = {'id': fake_uuid, 'name': 'Test 1', 'active': True}
-    mocker.patch(
-        'app.organisations_client.get_organisation', return_value=org
-    )
-
-    response = logged_in_platform_admin_client.get(
-        url_for('.update_organisation', org_id=fake_uuid)
-    )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert page.select_one('#name').attrs.get('value') == org['name']
-
-
 def test_create_new_organisation(
     logged_in_platform_admin_client,
     mocker,
@@ -101,33 +82,6 @@ def test_create_new_organisation(
     )
 
     mock_create_organisation.assert_called_once_with(name=org['name'])
-
-
-def test_update_organisation(
-    logged_in_platform_admin_client,
-    mocker,
-    fake_uuid,
-):
-    org = {'name': 'new name'}
-
-    mocker.patch(
-        'app.organisations_client.get_organisation', return_value=org
-    )
-    mock_update_organisation = mocker.patch(
-        'app.organisations_client.update_organisation'
-    )
-
-    logged_in_platform_admin_client.post(
-        url_for('.update_organisation', org_id=fake_uuid),
-        content_type='multipart/form-data',
-        data=org
-    )
-
-    assert mock_update_organisation.called
-    mock_update_organisation.assert_called_once_with(
-        org_id=fake_uuid,
-        name=org['name']
-    )
 
 
 def test_organisation_services_show(
@@ -232,8 +186,6 @@ def test_invite_org_user_errors_when_same_email_as_inviter(
 
     assert mock_invite_org_user.called is False
     assert normalize_spaces(page.select_one('.error-message').text) == 'You can’t send an invitation to yourself'
-
-# Broken
 
 
 def test_accepted_invite_when_user_already_logged_in(
@@ -515,3 +467,171 @@ def test_verified_org_user_redirects_to_dashboard(
         org_id=invited_org_user['organisation'],
         _external=True
     )
+
+
+def test_organisation_settings(
+    logged_in_platform_admin_client,
+    mock_get_organisation,
+    organisation_one
+):
+    expected_rows = [
+        'Label Value Action',
+        'Organisation name Org 1 Change',
+    ]
+
+    response = logged_in_platform_admin_client.get(url_for('.organisation_settings', org_id=organisation_one['id']))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert page.find('h1').text == 'Organisation settings'
+    rows = page.select('tr')
+    assert len(rows) == len(expected_rows)
+    for index, row in enumerate(expected_rows):
+        assert row == " ".join(rows[index].text.split())
+    mock_get_organisation.assert_called_with(organisation_one['id'])
+
+
+def test_update_organisation_name(
+    logged_in_platform_admin_client,
+    organisation_one,
+    mock_get_organisation,
+    mock_organisation_name_is_unique
+):
+    response = logged_in_platform_admin_client.post(
+        url_for('.edit_organisation_name', org_id=organisation_one['id']),
+        data={'name': 'TestNewOrgName'}
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        '.confirm_edit_organisation_name',
+        org_id=organisation_one['id'],
+        _external=True
+    )
+    assert mock_organisation_name_is_unique.called
+
+
+def test_update_organisation_with_incorrect_input(
+    logged_in_platform_admin_client,
+    organisation_one,
+    mock_get_organisation,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for('.edit_organisation_name', org_id=organisation_one['id']),
+        data={'name': ''}
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(
+        page.select_one('.error-message').text
+    ) == "Can’t be empty"
+
+
+def test_update_organisation_with_non_unique_name(
+    logged_in_platform_admin_client,
+    organisation_one,
+    mock_get_organisation,
+    mock_organisation_name_is_not_unique
+):
+    response = logged_in_platform_admin_client.post(
+        url_for('.edit_organisation_name', org_id=organisation_one['id']),
+        data={'name': 'TestNewOrgName'}
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(
+        page.select_one('.error-message').text
+    ) == 'This organisation name is already in use'
+
+    assert mock_organisation_name_is_not_unique.called
+
+
+def test_confirm_update_organisation(
+    logged_in_platform_admin_client,
+    organisation_one,
+    mock_get_organisation,
+    mock_verify_password,
+    mock_update_organisation_name,
+    mocker
+):
+    with logged_in_platform_admin_client.session_transaction() as session:
+        session['organisation_name_change'] = 'newName'
+
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            '.confirm_edit_organisation_name',
+            org_id=organisation_one['id'],
+            data={'password', 'validPassword'}
+        )
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for('.organisation_settings', org_id=organisation_one['id'], _external=True)
+
+    mock_update_organisation_name.assert_called_with(
+        organisation_one['id'],
+        name=session['organisation_name_change']
+    )
+
+
+def test_confirm_update_organisation_with_incorrect_password(
+    logged_in_platform_admin_client,
+    organisation_one,
+    mock_get_organisation,
+    mocker
+):
+    with logged_in_platform_admin_client.session_transaction() as session:
+        session['organisation_name_change'] = 'newName'
+
+    mocker.patch('app.user_api_client.verify_password', return_value=False)
+
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            '.confirm_edit_organisation_name',
+            org_id=organisation_one['id']
+        )
+    )
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(
+        page.select_one('.error-message').text
+    ) == 'Invalid password'
+
+
+def test_confirm_update_organisation_with_name_already_in_use(
+    logged_in_platform_admin_client,
+    organisation_one,
+    mock_get_organisation,
+    mock_verify_password,
+    mocker
+):
+    with logged_in_platform_admin_client.session_transaction() as session:
+        session['organisation_name_change'] = 'newName'
+
+    mocker.patch(
+        'app.organisations_client.update_organisation_name',
+        side_effect=HTTPError(
+            response=Mock(
+                status_code=400,
+                json={'result': 'error', 'message': 'Organisation name already exists'}
+            ),
+            message="Organisation name already exists"
+        )
+    )
+
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            '.confirm_edit_organisation_name',
+            org_id=organisation_one['id']
+        )
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.edit_organisation_name', org_id=organisation_one['id'], _external=True)

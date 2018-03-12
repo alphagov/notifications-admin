@@ -2846,3 +2846,21 @@ def mock_add_user_to_organisation(mocker, organisation_one, api_user_active):
         return api_user_active
 
     return mocker.patch('app.user_api_client.add_user_to_organisation', side_effect=_add_user)
+
+
+@pytest.fixture(scope='function')
+def mock_organisation_name_is_not_unique(mocker):
+    return mocker.patch('app.organisations_client.is_organisation_name_unique', return_value=False)
+
+
+@pytest.fixture(scope='function')
+def mock_organisation_name_is_unique(mocker):
+    return mocker.patch('app.organisations_client.is_organisation_name_unique', return_value=True)
+
+
+@pytest.fixture(scope='function')
+def mock_update_organisation_name(mocker):
+    def _update_org_name(organisation_id, name):
+        return
+
+    return mocker.patch('app.organisations_client.update_organisation_name', side_effect=_update_org_name)
