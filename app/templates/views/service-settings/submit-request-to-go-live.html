@@ -14,13 +14,6 @@
       <h1 class="heading-large">Request to go live</h1>
 
       <form method="post">
-        <div class="form-group">
-          <p>We need permission to process your data before we can make your service live.</p>
-          {{ radios(form.mou, option_hints={
-            'no': 'We’ll send you a copy',
-            'don’t know': 'We’ll check for you',
-          }) }}
-        </div>
         {{ checkbox_group('What kind of messages will you be sending?', [
           form.channel_email,
           form.channel_sms,

@@ -554,18 +554,6 @@ class Triage(StripWhitespaceForm):
 
 
 class RequestToGoLiveForm(StripWhitespaceForm):
-    mou = RadioField(
-        (
-            'Has your organisation accepted the GOV.UK&nbsp;Notify data sharing and financial '
-            'agreement?'
-        ),
-        choices=[
-            ('yes', 'Yes'),
-            ('no', 'No'),
-            ('don’t know', 'I don’t know')
-        ],
-        validators=[DataRequired()]
-    )
     channel_email = BooleanField('Emails')
     channel_sms = BooleanField('Text messages')
     channel_letter = BooleanField('Letters')

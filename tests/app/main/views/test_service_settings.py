@@ -566,7 +566,6 @@ def test_should_redirect_after_request_to_go_live(
         'main.submit_request_to_go_live',
         service_id=SERVICE_ONE_ID,
         _data={
-            'mou': 'yes',
             'channel_email': 'y',
             'channel_sms': 'y',
             'start_date': '01/01/2017',
