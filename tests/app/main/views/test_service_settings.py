@@ -456,19 +456,19 @@ def test_should_raise_duplicate_name_handled(
 
 
 @pytest.mark.parametrize('count_of_users_with_manage_service, expected_user_checklist_item', [
-    (1, 'Not done: Another person in your team has the ‘Manage service’ permission'),
-    (2, 'Done: Another person in your team has the ‘Manage service’ permission'),
+    (1, 'Not done: Have more than one team member with the ‘Manage service’ permission'),
+    (2, 'Done: Have more than one team member with the ‘Manage service’ permission'),
 ])
 @pytest.mark.parametrize('count_of_templates, expected_templates_checklist_item', [
-    (0, 'Not done: You’ve added some templates'),
-    (1, 'Done: You’ve added some templates'),
-    (2, 'Done: You’ve added some templates'),
+    (0, 'Not done: Create some templates'),
+    (1, 'Done: Create some templates'),
+    (2, 'Done: Create some templates'),
 ])
 @pytest.mark.parametrize('count_of_email_templates, reply_to_email_addresses, expected_reply_to_checklist_item', [
     pytest.mark.xfail((0, [], ''), raises=IndexError),
     pytest.mark.xfail((0, [{}], ''), raises=IndexError),
-    (1, [], 'Not done: You’ve added an email reply to address on the settings page'),
-    (1, [{}], 'Done: You’ve added an email reply to address on the settings page'),
+    (1, [], 'Not done: Add an email reply to address'),
+    (1, [{}], 'Done: Add an email reply to address'),
 ])
 def test_should_show_request_to_go_live_checklist(
     client_request,
