@@ -102,7 +102,9 @@ def get_user_number(service_id, notification_id):
 def get_sms_thread(service_id, user_number):
 
     for notification in sorted((
-        notification_api_client.get_notifications_for_service(service_id, to=user_number)['notifications'] +
+        notification_api_client.get_notifications_for_service(service_id,
+                                                              to=user_number,
+                                                              template_type='sms')['notifications'] +
         service_api_client.get_inbound_sms(service_id, user_number=user_number)
     ), key=lambda notification: notification['created_at']):
 
