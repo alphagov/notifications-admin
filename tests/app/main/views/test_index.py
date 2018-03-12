@@ -96,11 +96,9 @@ def test_terms_is_generic_if_user_is_not_logged_in(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert normalize_spaces(page.select('main p')[2].text) == (
-        'For your service to go live on Notify, your organisation must accept our data sharing and financial agreement.'
-    )
-    assert normalize_spaces(page.select('main p')[3].text) == (
-        'Contact us to get a copy of the agreement or find out if your organisation has already accepted it.'
+    assert normalize_spaces(page.select('main p')[1].text) == (
+        'Your organisation must also accept our data sharing and '
+        'financial agreement. Contact us to get a copy.'
     )
 
 
@@ -113,10 +111,18 @@ def test_terms_is_generic_if_user_is_not_logged_in(
         ),
     ),
     (
+        'test@aylesburytowncouncil.gov.uk',
+        (
+            'Your organisation (Aylesbury Town Council) must also '
+            'accept our data sharing and financial agreement. Contact '
+            'us to get a copy.'
+        ),
+    ),
+    (
         'larry@downing-street.gov.uk',
         (
-            'For your service to go live on Notify, your organisation '
-            'must accept our data sharing and financial agreement.'
+            'Your organisation must also accept our data sharing and '
+            'financial agreement. Contact us to get a copy.'
         ),
     ),
 ])
@@ -131,4 +137,4 @@ def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
     user.email_address = email_address
     mocker.patch('app.user_api_client.get_user', return_value=user)
     page = client_request.get('main.terms')
-    assert normalize_spaces(page.select('main p')[2].text) == expected_first_paragraph
+    assert normalize_spaces(page.select('main p')[1].text) == expected_first_paragraph

@@ -16,31 +16,28 @@ Terms of use
 
     <h1 class="heading-large">Terms of use</h1>
 
-    <p>By using GOV.UK Notify, you agree to follow our terms of use.</p>
-    <p>The service manager for your service has to accept the terms of use when you request to go live on Notify.</p>
-
-    <h2 class="heading-medium">Data sharing and financial agreement</h2>
+    <p>
+      These terms apply to your service’s use of GOV.UK&nbsp;Notify. You must be the service manager to accept them.
+    </p>
 
     {% if agreement_info.agreement_signed %}
       <p>Your organisation ({{ agreement_info.owner }}) has already accepted the GOV.UK&nbsp;Notify data sharing and financial agreement.</p>
     {% else %}
-      <p>For your service to go live on Notify, your organisation must accept our data sharing and financial agreement.</p>
-      <p><a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback')}}">Contact us</a> to get a copy of the agreement or find out if your organisation has already accepted it.</p>
+      <p>
+        Your organisation
+        {% if agreement_info.owner %}
+          ({{ agreement_info.owner }})
+          must also accept our data sharing and financial agreement.
+          <a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback', body='Please send me a copy of the GOV.UK Notify data sharing and financial agreement for {} to sign.'.format(agreement_info.owner)) }}">Contact us</a> to get a copy.
+        {% else %}
+          must also accept our data sharing and financial agreement.
+          <a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback', body='Please send me a copy of the GOV.UK Notify data sharing and financial agreement.') }}">Contact us</a> to get a copy.
+        {% endif %}
+      </p>
     {% endif %}
 
-    <h2 class="heading-medium">Notify’s side of the agreement</h2>
-    <p>We agree to:</p>
-    <ul class="list list-bullet">
-      <li>send all the messages you pass to us, as long as they meet our guidelines</li>
-      <li>
-        show how Notify is performing (through our <a href="https://www.gov.uk/performance/govuk-notify">performance</a> and <a href="https://status.notifications.service.gov.uk/">status</a> pages)
-      </li>
-      <li>keep your data <a href="{{ url_for('.security') }}">secure</a></li>
-      <li>give you one month’s notice by email if we change our terms of use or delivery providers</li>
-    </ul>
-
-    <h2 class="heading-medium">Your side of the agreement</h2>
-    <p>You agree to:</p>
+    <h2 class="heading-medium">When using Notify</h2>
+    <p>You must:</p>
     <ul class="list list-bullet">
       <li>complete your organisation’s information assurance process (you don’t need to include Notify or our delivery partners, we’ve already done that)</li>
       <li>tell us immediately if you have any security breaches</li>
@@ -52,7 +49,17 @@ Terms of use
       <li>not send messages containing any personally or commercially sensitive information</li>
       <li>check that the data you add to Notify is accurate and complies with Data Protection Act principles</li>
     </ul>
-    <p>If you don’t keep to your side of the agreement, we might have to stop sending your messages.</p>
+    <p>If you don’t keep to these terms, we might have to stop sending your messages.</p>
+
+    <p>Notify will:</p>
+    <ul class="list list-bullet">
+      <li>send all the messages you pass to us, as long as they meet our guidelines</li>
+      <li>
+        show how Notify is performing (through our <a href="https://www.gov.uk/performance/govuk-notify">performance</a> and <a href="https://status.notifications.service.gov.uk/">status</a> pages)
+      </li>
+      <li>keep your data <a href="{{ url_for('.security') }}">secure</a></li>
+      <li>give you one month’s notice by email if we change our terms of use or delivery providers</li>
+    </ul>
 
     <h2 class="heading-medium">Leaving Notify</h2>
     <p>You can leave Notify at any time. Just <a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback')}}">contact us</a> and we’ll close your account.</p>
