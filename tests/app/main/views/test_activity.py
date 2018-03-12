@@ -404,3 +404,29 @@ def test_sending_status_hint_does_not_include_status_for_letters(
         assert normalize_spaces(page.select(".align-with-message-body")[0].text) == "27 September at 5:30pm"
     else:
         assert normalize_spaces(page.select(".align-with-message-body")[0].text) == "Delivered 27 September at 5:31pm"
+
+
+@pytest.mark.parametrize("is_precompiled_letter,expected_hint", [
+    (True, "Provided as PDF"),
+    (False, "template subject")
+])
+def test_should_expected_hint_for_letters(
+    logged_in_client,
+    service_one,
+    active_user_with_permissions,
+    mock_get_detailed_service,
+    mocker,
+    fake_uuid,
+    is_precompiled_letter,
+    expected_hint
+):
+    mock_get_notifications(
+        mocker, active_user_with_permissions, is_precompiled_letter=is_precompiled_letter)
+
+    response = logged_in_client.get(url_for(
+        'main.view_notifications',
+        service_id=SERVICE_ONE_ID,
+        message_type='letter'
+    ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('p', {'class': 'file-list-hint'}).text.strip() == expected_hint

@@ -1763,6 +1763,7 @@ def mock_get_notifications(
     diff_template_type=None,
     personalisation=None,
     redact_personalisation=False,
+    is_precompiled_letter=False,
 ):
     def _get_notifications(
         service_id,
@@ -1787,6 +1788,7 @@ def mock_get_notifications(
                 type_=diff_template_type or template_type[0],
                 content=template_content,
                 redact_personalisation=redact_personalisation,
+                is_precompiled_letter=is_precompiled_letter,
             )
         else:
             template = template_json(
