@@ -63,31 +63,6 @@ def organisation_dashboard(org_id):
     )
 
 
-@main.route("/organisations/<org_id>/edit", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions()
-def update_organisation(org_id):
-    org = organisations_client.get_organisation(org_id)
-
-    form = CreateOrUpdateOrganisation()
-
-    if form.validate_on_submit():
-        organisations_client.update_organisation(
-            org_id=org_id,
-            name=form.name.data
-        )
-
-        return redirect(url_for('.organisations'))
-
-    form.name.data = org['name']
-
-    return render_template(
-        'views/organisations/organisation/update-organisation.html',
-        form=form,
-        organisation=org
-    )
-
-
 @main.route("/organisations/<org_id>/users", methods=['GET'])
 @login_required
 @user_has_permissions()
