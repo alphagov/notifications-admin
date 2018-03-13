@@ -110,22 +110,31 @@ def test_should_show_page_for_one_template(
     mock_get_service_template.assert_called_with(service_one['id'], template_id)
 
 
-@pytest.mark.parametrize('permissions, links_to_be_shown', [
+@pytest.mark.parametrize('permissions, links_to_be_shown, permissions_warning_to_be_shown', [
     (
         ['view_activity'],
-        []
+        [],
+        'If you need to send this text message or edit this template, contact your manager.'
+    ),
+    (
+        ['manage_api_keys'],
+        [],
+        None,
     ),
     (
         ['manage_templates'],
-        ['.edit_service_template']
+        ['.edit_service_template'],
+        None,
     ),
     (
         ['send_messages'],
-        ['.send_messages', '.set_sender']
+        ['.send_messages', '.set_sender'],
+        None,
     ),
     (
         ['send_messages', 'manage_templates'],
-        ['.send_messages', '.set_sender', '.edit_service_template']
+        ['.send_messages', '.set_sender', '.edit_service_template'],
+        None,
     ),
 ])
 def test_should_be_able_to_view_a_template_with_links(
@@ -138,6 +147,7 @@ def test_should_be_able_to_view_a_template_with_links(
     fake_uuid,
     permissions,
     links_to_be_shown,
+    permissions_warning_to_be_shown,
 ):
     active_user_with_permissions._permissions[service_one['id']] = permissions + ['view_activity']
     client.login(active_user_with_permissions, mocker, service_one)
@@ -160,6 +170,10 @@ def test_should_be_able_to_view_a_template_with_links(
             service_id=service_one['id'],
             template_id=fake_uuid,
         )
+
+    assert normalize_spaces(page.select_one('main p').text) == (
+        permissions_warning_to_be_shown or 'To: phone number'
+    )
 
 
 def test_should_show_template_id_on_template_page(
