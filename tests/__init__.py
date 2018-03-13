@@ -64,7 +64,7 @@ def user_json(
     platform_admin=False,
     current_session_id='1234',
     organisations=[],
-    services=[]
+    services=None
 
 ):
     return {
@@ -81,7 +81,7 @@ def user_json(
         'platform_admin': platform_admin,
         'current_session_id': current_session_id,
         'organisations': organisations,
-        'services': services or permissions.keys()
+        'services': list(permissions.keys()) if services is None else services
     }
 
 

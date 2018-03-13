@@ -1,8 +1,9 @@
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
+from tests import user_json
 from tests.conftest import normalize_spaces
 
+from app.notify_client.models import User
 
 SAMPLE_DATA = {
     'organisations': [
@@ -36,6 +37,14 @@ SAMPLE_DATA = {
 }
 
 
+def user_with_orgs_and_services(num_orgs, num_services):
+    return User(user_json(
+        name='leo',
+        organisations=['org{}'.format(i) for i in range(1, num_orgs + 1)],
+        services=['service{}'.format(i) for i in range(1, num_services + 1)]
+    ))
+
+
 @pytest.fixture
 def mock_get_orgs_and_services(mocker):
     return mocker.patch(
@@ -52,6 +61,34 @@ def test_choose_account_should_show_choose_accounts_page(
     page = resp.find('div', {'id': 'content'}).main
 
     assert normalize_spaces(page.h1.text) == 'Choose account'
+    outer_list_items = page.nav.ul.find_all('li', recursive=False)
+
+    assert len(outer_list_items) == 6
+
+    # first org
+    assert outer_list_items[0].a.text == 'org_1'
+    assert outer_list_items[0].a['href'] == url_for('.organisation_dashboard', org_id='o1')
+    outer_list_orgs = outer_list_items[0].ul
+    assert ' '.join(outer_list_orgs.stripped_strings) == 'org_service_1 org_service_2 org_service_3'
+
+    # second org
+    assert outer_list_items[1].a.text == 'org_2'
+    assert outer_list_items[1].a['href'] == url_for('.organisation_dashboard', org_id='o2')
+    outer_list_orgs = outer_list_items[1].ul
+    assert ' '.join(outer_list_orgs.stripped_strings) == 'org_service_4'
+
+    # third org
+    assert outer_list_items[2].a.text == 'org_3'
+    assert outer_list_items[2].a['href'] == url_for('.organisation_dashboard', org_id='o3')
+    assert not outer_list_items[2].ul  # org 3 has no services
+
+    # orphaned services
+    assert outer_list_items[3].a.text == 'service_1'
+    assert outer_list_items[3].a['href'] == url_for('.service_dashboard', service_id='s1')
+    assert outer_list_items[4].a.text == 'service_2'
+    assert outer_list_items[4].a['href'] == url_for('.service_dashboard', service_id='s2')
+    assert outer_list_items[5].a.text == 'service_3'
+    assert outer_list_items[5].a['href'] == url_for('.service_dashboard', service_id='s3')
 
 
 def test_choose_account_should_show_choose_accounts_page_if_no_services(
@@ -98,51 +135,99 @@ def test_choose_account_should_not_show_back_to_service_link_if_no_service_in_se
     assert len(page.select('.navigation-service a')) == 0
 
 
-def test_show_accounts_or_dashboard_redirects_if_only_one_service(
-    logged_in_client,
-    mock_login,
-    api_user_active,
-    mock_get_services_with_one_service,
-):
-    response = logged_in_client.get(url_for('main.show_accounts_or_dashboard'))
+###############################
 
-    service = mock_get_services_with_one_service.side_effect()['data'][0]
+@pytest.mark.parametrize('num_orgs,num_services,endpoint,endpoint_kwargs', [
+    (0, 0, '.choose_account', {}),
+    (0, 2, '.choose_account', {}),
+    (1, 1, '.choose_account', {}),
+    (2, 0, '.choose_account', {}),
+    (0, 1, '.service_dashboard', {'service_id': 'service1'}),
+    (1, 0, '.organisation_dashboard', {'org_id': 'org1'}),
+])
+def test_show_accounts_or_dashboard_redirects_to_choose_account_or_service_dashboard(
+    client,
+    mocker,
+    num_orgs,
+    num_services,
+    endpoint,
+    endpoint_kwargs
+):
+    client.login(user_with_orgs_and_services(num_orgs=num_orgs, num_services=num_services), mocker=mocker)
+
+    response = client.get(url_for('main.show_accounts_or_dashboard'))
+
     assert response.status_code == 302
-    assert response.location == url_for('main.service_dashboard', service_id=service['id'], _external=True)
+    assert response.location == url_for(endpoint, _external=True, **endpoint_kwargs)
 
 
-def test_show_accounts_or_dashboard_redirects_if_multiple_services(
-    logged_in_client,
-    mock_login,
-    api_user_active,
+def test_show_accounts_or_dashboard_redirects_if_service_in_session(client, mocker, mock_get_service):
+    client.login(user_with_orgs_and_services(num_orgs=1, num_services=1), mocker=mocker)
+    with client.session_transaction() as session:
+        session['service_id'] = 'service1'
+        session['organisation_id'] = None
+
+    response = client.get(url_for('.show_accounts_or_dashboard'))
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.service_dashboard',
+        service_id='service1',
+        _external=True
+    )
+
+
+def test_show_accounts_or_dashboard_redirects_if_org_in_session(client, mocker):
+    client.login(user_with_orgs_and_services(num_orgs=1, num_services=1), mocker=mocker)
+    with client.session_transaction() as session:
+        session['service_id'] = None
+        session['organisation_id'] = 'org1'
+
+    response = client.get(url_for('.show_accounts_or_dashboard'))
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.organisation_dashboard',
+        org_id='org1',
+        _external=True
+    )
+
+
+def test_show_accounts_or_dashboard_doesnt_redirect_to_service_dashboard_if_user_not_part_of_service_in_session(
+    client,
+    mocker,
+    mock_get_service
 ):
-    response = logged_in_client.get(url_for('main.show_accounts_or_dashboard'))
+    client.login(user_with_orgs_and_services(num_orgs=1, num_services=1), mocker=mocker)
+    with client.session_transaction() as session:
+        session['service_id'] = 'service2'
+        session['organisation_id'] = None
+
+    response = client.get(url_for('.show_accounts_or_dashboard'))
 
     assert response.status_code == 302
     assert response.location == url_for('main.choose_account', _external=True)
 
 
-def test_show_accounts_or_dashboard_redirects_if_service_in_session(
-    logged_in_client,
-    mock_login,
-    api_user_active,
+def test_show_accounts_or_dashboard_doesnt_redirect_to_org_dashboard_if_user_not_part_of_org_in_session(
+    client,
+    mocker
 ):
-    with logged_in_client.session_transaction() as session:
-        session['service_id'] = '147ad62a-2951-4fa1-9ca0-093cd1a52c52'
-    response = logged_in_client.get(url_for('main.show_accounts_or_dashboard'))
+    client.login(user_with_orgs_and_services(num_orgs=1, num_services=1), mocker=mocker)
+    with client.session_transaction() as session:
+        session['service_id'] = None
+        session['organisation_id'] = 'org2'
+
+    response = client.get(url_for('.show_accounts_or_dashboard'))
 
     assert response.status_code == 302
-    assert response.location == url_for(
-        'main.service_dashboard',
-        service_id='147ad62a-2951-4fa1-9ca0-093cd1a52c52',
-        _external=True
-    )
+    assert response.location == url_for('main.choose_account', _external=True)
 
 
 def test_show_accounts_or_dashboard_redirects_if_not_logged_in(
-    logged_in_client,
+    client,
     app_
 ):
-    response = logged_in_client.get(url_for('main.show_accounts_or_dashboard'))
+    response = client.get(url_for('main.show_accounts_or_dashboard'))
     assert response.status_code == 302
-    assert url_for('main.index', _external=True) in response.location
+    assert response.location == url_for('main.index', _external=True)
