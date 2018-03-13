@@ -2516,6 +2516,7 @@ def client_request(logged_in_client):
             endpoint,
             _expected_status=200,
             _follow_redirects=False,
+            _expected_redirect=None,
             _test_page_title=True,
             **endpoint_kwargs
         ):
@@ -2524,6 +2525,8 @@ def client_request(logged_in_client):
                 follow_redirects=_follow_redirects,
             )
             assert resp.status_code == _expected_status
+            if _expected_redirect:
+                assert resp.location == _expected_redirect
             page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
             if _test_page_title:
                 page_title, h1 = (
