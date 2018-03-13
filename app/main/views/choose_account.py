@@ -26,11 +26,11 @@ def show_accounts_or_dashboard():
         return redirect(url_for('.index'))
 
     service_id = session.get('service_id')
-    if any(service_id == x for x in current_user.services):
+    if service_id and (service_id in current_user.services or current_user.platform_admin):
         return redirect(url_for('.service_dashboard', service_id=service_id))
 
     organisation_id = session.get('organisation_id')
-    if any(organisation_id == x for x in current_user.organisations):
+    if organisation_id and (organisation_id in current_user.organisations or current_user.platform_admin):
         return redirect(url_for('.organisation_dashboard', org_id=organisation_id))
 
     if len(current_user.services) == 1 and not current_user.organisations:
