@@ -13,7 +13,7 @@
 
       <h1 class="heading-large">Request to go live</h1>
 
-      <form method="post">
+      <form method="post" class="top-gutter">
         {{ checkbox_group('What kind of messages will you be sending?', [
           form.channel_email,
           form.channel_sms,
@@ -29,7 +29,7 @@
           form.method_upload,
           form.method_api
         ]) }}
-        <p>
+        <p class="bottom-gutter">
           By requesting to go live you’re agreeing to our <a href="{{ url_for('.terms') }}">terms of use</a>.
         </p>
 
