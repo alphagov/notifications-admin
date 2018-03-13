@@ -77,6 +77,41 @@ def test_redirect_if_service_in_session(
     )
 
 
+def test_dont_redirect_if_wrong_service(
+    logged_in_client,
+    mock_login,
+    api_user_active,
+    mock_get_services,
+    mock_get_service,
+):
+    with logged_in_client.session_transaction() as session:
+        session['service_id'] = 'nope-nope-nope-nope'
+    response = logged_in_client.get(url_for('main.show_all_services_or_dashboard'))
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.choose_service',
+        _external=True
+    )
+
+
+def test_redirect_to_non_owned_service_if_platform_admin(
+    logged_in_platform_admin_client,
+    mock_get_services,
+    mock_get_service,
+):
+    with logged_in_platform_admin_client.session_transaction() as session:
+        session['service_id'] = 'yes-yes-yes-yes'
+    response = logged_in_platform_admin_client.get(url_for('main.show_all_services_or_dashboard'))
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        'main.service_dashboard',
+        service_id='yes-yes-yes-yes',
+        _external=True,
+    )
+
+
 def test_should_redirect_if_not_logged_in(
     logged_in_client,
     app_

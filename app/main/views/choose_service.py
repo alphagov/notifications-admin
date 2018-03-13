@@ -30,6 +30,6 @@ def show_all_services_or_dashboard():
         return redirect(url_for('.service_dashboard', service_id=services[0]['id']))
     else:
         service_id = session.get('service_id', None)
-        if any([service_id == x['id'] for x in services]):
+        if any([service_id == x['id'] for x in services]) or current_user.platform_admin:
             return redirect(url_for('.service_dashboard', service_id=service_id))
         return redirect(url_for('.choose_service'))
