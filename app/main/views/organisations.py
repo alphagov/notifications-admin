@@ -160,7 +160,7 @@ def cancel_invited_org_user(org_id, invited_user_id):
 
 @main.route("/organisations/<org_id>/settings/", methods=['GET'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def organisation_settings(org_id):
     return render_template(
         'views/organisations/organisation/settings/index.html',
@@ -169,7 +169,7 @@ def organisation_settings(org_id):
 
 @main.route("/organisations/<org_id>/settings/edit-name", methods=['GET', 'POST'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def edit_organisation_name(org_id):
     form = RenameOrganisationForm()
 
@@ -192,7 +192,7 @@ def edit_organisation_name(org_id):
 
 @main.route("/organisations/<org_id>/settings/edit-name/confirm", methods=['GET', 'POST'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def confirm_edit_organisation_name(org_id):
     # Validate password for form
     def _check_password(pwd):
