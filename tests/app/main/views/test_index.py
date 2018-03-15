@@ -1,6 +1,7 @@
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from tests.conftest import active_user_with_permissions, normalize_spaces
 
 
 def test_non_logged_in_user_can_see_homepage(
@@ -86,3 +87,54 @@ def test_old_static_pages_redirect(
         'main.{}'.format(expected_view),
         _external=True
     )
+
+
+def test_terms_is_generic_if_user_is_not_logged_in(
+    client
+):
+    response = client.get(url_for('main.terms'))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert normalize_spaces(page.select('main p')[1].text) == (
+        'Your organisation must also accept our data sharing and '
+        'financial agreement. Contact us to get a copy.'
+    )
+
+
+@pytest.mark.parametrize('email_address, expected_first_paragraph', [
+    (
+        'test@cabinet-office.gov.uk',
+        (
+            'Your organisation (Cabinet Office) has already accepted '
+            'the GOV.UK Notify data sharing and financial agreement.'
+        ),
+    ),
+    (
+        'test@aylesburytowncouncil.gov.uk',
+        (
+            'Your organisation (Aylesbury Town Council) must also '
+            'accept our data sharing and financial agreement. Contact '
+            'us to get a copy.'
+        ),
+    ),
+    (
+        'larry@downing-street.gov.uk',
+        (
+            'Your organisation must also accept our data sharing and '
+            'financial agreement. Contact us to get a copy.'
+        ),
+    ),
+])
+def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
+    mocker,
+    fake_uuid,
+    client_request,
+    email_address,
+    expected_first_paragraph,
+):
+    user = active_user_with_permissions(fake_uuid)
+    user.email_address = email_address
+    mocker.patch('app.user_api_client.get_user', return_value=user)
+    page = client_request.get('main.terms')
+    assert normalize_spaces(page.select('main p')[1].text) == expected_first_paragraph

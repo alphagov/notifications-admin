@@ -134,6 +134,9 @@ def feedback(ticket_type):
             abort(500, "Feedback submission failed")
         return redirect(url_for('.thanks', urgent=urgent, anonymous=anonymous))
 
+    if not form.feedback.data:
+        form.feedback.data = request.args.get('body', '')
+
     return render_template(
         'views/support/{}.html'.format(ticket_type),
         form=form,
