@@ -532,7 +532,7 @@ def test_should_show_request_to_go_live(
     page = client_request.get(
         'main.submit_request_to_go_live', service_id=SERVICE_ONE_ID
     )
-    assert page.h1.text == 'Request to go live'
+    assert page.h1.text == 'How do you plan to use Notify?'
     for channel, label in (
         ('email', 'Emails'),
         ('sms', 'Text messages'),
@@ -566,7 +566,6 @@ def test_should_redirect_after_request_to_go_live(
         'main.submit_request_to_go_live',
         service_id=SERVICE_ONE_ID,
         _data={
-            'mou': 'yes',
             'channel_email': 'y',
             'channel_sms': 'y',
             'start_date': '01/01/2017',

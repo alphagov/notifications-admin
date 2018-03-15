@@ -6,21 +6,14 @@
 {% from "components/banner.html" import banner_wrapper %}
 
 {% block service_page_title %}
-  Request to go live
+  How do you plan to use Notify?
 {% endblock %}
 
 {% block maincolumn_content %}
 
-      <h1 class="heading-large">Request to go live</h1>
+      <h1 class="heading-large">How do you plan to use Notify?</h1>
 
-      <form method="post">
-        <div class="form-group">
-          <p>We need permission to process your data before we can make your service live.</p>
-          {{ radios(form.mou, option_hints={
-            'no': 'We’ll send you a copy',
-            'don’t know': 'We’ll check for you',
-          }) }}
-        </div>
+      <form method="post" class="top-gutter">
         {{ checkbox_group('What kind of messages will you be sending?', [
           form.channel_email,
           form.channel_sms,
@@ -36,7 +29,7 @@
           form.method_upload,
           form.method_api
         ]) }}
-        <p>
+        <p class="bottom-gutter">
           By requesting to go live you’re agreeing to our <a href="{{ url_for('.terms') }}">terms of use</a>.
         </p>
 

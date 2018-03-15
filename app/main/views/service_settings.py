@@ -198,7 +198,6 @@ def submit_request_to_go_live(service_id):
                     '\n---'
                     '\nOrganisation type: {}'
                     '\nAgreement signed: {}'
-                    '\nMOU in place: {}'
                     '\nChannel: {}\nStart date: {}\nStart volume: {}'
                     '\nPeak volume: {}'
                     '\nFeatures: {}'
@@ -207,7 +206,6 @@ def submit_request_to_go_live(service_id):
                     url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
                     current_service['organisation_type'],
                     GovernmentDomain.from_current_user().as_human_readable,
-                    form.mou.data,
                     formatted_list(filter(None, (
                         'email' if form.channel_email.data else None,
                         'text messages' if form.channel_sms.data else None,
