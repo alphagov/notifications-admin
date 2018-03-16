@@ -52,6 +52,7 @@ def pricing():
             for cc, country in INTERNATIONAL_BILLING_RATES.items()
         ], key=lambda x: x[0]),
         search_form=SearchTemplatesForm(),
+        agreement_info=AgreementInfo.from_current_user(),
     )
 
 

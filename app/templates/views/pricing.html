@@ -30,11 +30,11 @@
       <li>25,000 free text messages for other public sector services</li>
     </ul>
     <p>It costs 1.58 pence (plus VAT) for each text message you send after your free allowance.</p>
-    
+
     <h3 class="heading-small">Multiple services</h3>
     <p>If your organisation offers multiple services, you can have a different Notify account for each of them.</p>
     <p>Each service will get its own free message allowance.</p>
-    
+
     <h3 class="heading-small">Long text messages</h3>
     <p>If a text message is beyond a certain length, it’ll be charged as more than one message:</p>
     <div class="bottom-gutter-3-2">
@@ -124,8 +124,18 @@
 
     <h2 class="heading-medium" id="paying">How to pay</h2>
     <p>You can find details of how to pay for Notify in our data sharing and financial agreement.</p>
-    <p><a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback')}}">Contact us</a> to get a copy of the agreement or find out if we already have one in place with your organisation.</p>
-    
+    <p>
+      <a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback', body='Please send me a copy of the GOV.UK Notify data sharing and financial agreement.')}}">Contact us</a> to get a copy of the agreement
+      {% if agreement_info.agreement_signed %}
+        ({{ agreement_info.owner }} has already accepted it).
+      {% else %}
+        {% if agreement_info.owner and agreement_info.agreement_signed != None %}
+          ({{ agreement_info.owner }} hasn’t accepted it yet).
+        {% else %}
+          or find out if we already have one in place with your organisation.
+        {% endif %}
+      {% endif %}
+    </p>
   </div>
 </div>
 
