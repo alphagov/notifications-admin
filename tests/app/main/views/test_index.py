@@ -102,12 +102,16 @@ def test_terms_is_generic_if_user_is_not_logged_in(
     )
 
 
-@pytest.mark.parametrize('email_address, expected_first_paragraph', [
+@pytest.mark.parametrize('email_address, expected_terms_paragraph, expected_pricing_paragraph', [
     (
         'test@cabinet-office.gov.uk',
         (
             'Your organisation (Cabinet Office) has already accepted '
             'the GOV.UK Notify data sharing and financial agreement.'
+        ),
+        (
+            'Contact us to get a copy of the agreement '
+            '(Cabinet Office has already accepted it).'
         ),
     ),
     (
@@ -117,12 +121,20 @@ def test_terms_is_generic_if_user_is_not_logged_in(
             'accept our data sharing and financial agreement. Contact '
             'us to get a copy.'
         ),
+        (
+            'Contact us to get a copy of the agreement '
+            '(Aylesbury Town Council hasn’t accepted it yet).'
+        ),
     ),
     (
         'larry@downing-street.gov.uk',
         (
             'Your organisation must also accept our data sharing and '
             'financial agreement. Contact us to get a copy.'
+        ),
+        (
+            'Contact us to get a copy of the agreement or find out if '
+            'we already have one in place with your organisation.'
         ),
     ),
 ])
@@ -131,10 +143,13 @@ def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
     fake_uuid,
     client_request,
     email_address,
-    expected_first_paragraph,
+    expected_terms_paragraph,
+    expected_pricing_paragraph,
 ):
     user = active_user_with_permissions(fake_uuid)
     user.email_address = email_address
     mocker.patch('app.user_api_client.get_user', return_value=user)
-    page = client_request.get('main.terms')
-    assert normalize_spaces(page.select('main p')[1].text) == expected_first_paragraph
+    terms_page = client_request.get('main.terms')
+    pricing_page = client_request.get('main.pricing')
+    assert normalize_spaces(terms_page.select('main p')[1].text) == expected_terms_paragraph
+    assert normalize_spaces(pricing_page.select('main p')[-1].text) == expected_pricing_paragraph
