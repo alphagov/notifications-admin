@@ -464,6 +464,12 @@ class AgreementInfo:
         else:
             return 'Can’t tell'
 
+    @property
+    def crown_status_or_404(self):
+        if self.crown_status is None:
+            abort(404)
+        return self.crown_status
+
     def as_request_for_agreement(self, with_owner=False):
         if with_owner and self.owner:
             return (

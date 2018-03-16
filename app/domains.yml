@@ -21,6 +21,7 @@ marinemanagement.org.uk:
   agreement_signed: true
 cabinet-office.gov.uk:
   owner: Cabinet Office
+  crown: true
   agreement_signed: true
 cica.gsi.gov.uk: cica.gov.uk
 cica.gov.uk:

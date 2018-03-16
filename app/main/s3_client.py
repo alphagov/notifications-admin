@@ -61,6 +61,26 @@ def s3download(service_id, upload_id):
     return contents
 
 
+def get_mou(organisation_is_crown):
+    bucket = current_app.config['MOU_BUCKET_NAME']
+    filename = 'crown.pdf' if organisation_is_crown else 'non-crown.pdf'
+    attachment_filename = 'GOV.UK Notify data sharing and financial agreement{}.pdf'.format(
+        '' if organisation_is_crown else ' (non-crown)'
+    )
+    try:
+        key = get_s3_object(bucket, filename)
+        return {
+            'filename_or_fp': key.get()['Body'],
+            'attachment_filename': attachment_filename,
+            'as_attachment': True,
+        }
+    except botocore.exceptions.ClientError as exception:
+        current_app.logger.error("Unable to download s3 file {}/{}".format(
+            bucket, filename
+        ))
+        raise exception
+
+
 def upload_logo(filename, filedata, region, user_id):
     upload_file_name = LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=user_id),
