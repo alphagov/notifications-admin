@@ -443,7 +443,7 @@ def set_status_filters(filter_args):
 _dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
-class GovernmentDomain:
+class AgreementInfo:
 
     with open('{}/domains.yml'.format(_dir_path)) as domains:
         domains = yaml.safe_load(domains)
@@ -460,7 +460,7 @@ class GovernmentDomain:
             self.owner,
             self.crown_status,
             self.agreement_signed
-        ) = self._get_details_of_domain()
+        ) = self._get_info()
 
     @classmethod
     def from_user(cls, user):
@@ -507,12 +507,12 @@ class GovernmentDomain:
 
         return fn
 
-    def _get_details_of_domain(self):
+    def _get_info(self):
 
         details = self.domains.get(self._match) or {}
 
         if isinstance(details, str):
-            return GovernmentDomain(details)._get_details_of_domain()
+            return AgreementInfo(details)._get_info()
 
         elif isinstance(details, dict):
             return(
@@ -526,7 +526,7 @@ class NotGovernmentEmailDomain(Exception):
     pass
 
 
-class GovernmentEmailDomain(GovernmentDomain):
+class GovernmentEmailDomain(AgreementInfo):
 
     with open('{}/email_domains.yml'.format(_dir_path)) as email_domains:
         domain_names = yaml.safe_load(email_domains)
