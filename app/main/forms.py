@@ -873,13 +873,20 @@ class SMSPrefixForm(StripWhitespaceForm):
 def get_placeholder_form_instance(
     placeholder_name,
     dict_to_populate_from,
+    template_type,
     optional_placeholder=False,
     allow_international_phone_numbers=False,
 ):
 
-    if Columns.make_key(placeholder_name) == 'emailaddress':
+    if (
+        Columns.make_key(placeholder_name) == 'emailaddress' and
+        template_type == 'email'
+    ):
         field = email_address(label=placeholder_name, gov_user=False)
-    elif Columns.make_key(placeholder_name) == 'phonenumber':
+    elif (
+        Columns.make_key(placeholder_name) == 'phonenumber' and
+        template_type == 'sms'
+    ):
         if allow_international_phone_numbers:
             field = international_phone_number(label=placeholder_name)
         else:
