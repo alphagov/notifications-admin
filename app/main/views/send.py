@@ -379,6 +379,7 @@ def send_test_step(service_id, template_id, step_index):
     form = get_placeholder_form_instance(
         current_placeholder,
         dict_to_populate_from=get_normalised_placeholders_from_session(),
+        template_type=template.template_type,
         optional_placeholder=optional_placeholder,
         allow_international_phone_numbers='international_sms' in current_service['permissions'],
     )
