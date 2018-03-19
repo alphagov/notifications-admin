@@ -1,5 +1,3 @@
-from unittest.mock import ANY
-
 from bs4 import BeautifulSoup
 from flask import url_for
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, set_config
@@ -21,38 +19,12 @@ def test_should_render_two_factor_page(
     assert '''We’ve sent you a text message with a security code.''' in response.get_data(as_text=True)
 
 
-def test_should_login_user_and_redirect_to_service_dashboard(
-    client,
-    api_user_active,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_check_verify_code,
-    mock_get_services_with_one_service,
-    mock_events,
-):
-    with client.session_transaction() as session:
-        session['user_details'] = {
-            'id': api_user_active.id,
-            'email': api_user_active.email_address}
-    response = client.post(url_for('main.two_factor'),
-                           data={'sms_code': '12345'})
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.service_dashboard',
-        service_id=SERVICE_ONE_ID,
-        _external=True
-    )
-
-    mock_events.assert_called_with('sucessful_login', ANY)
-
-
 def test_should_login_user_and_should_redirect_to_next_url(
     client,
     api_user_active,
     mock_get_user,
     mock_get_user_by_email,
     mock_check_verify_code,
-    mock_get_services,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -83,20 +55,15 @@ def test_should_login_user_and_not_redirect_to_external_url(
     response = client.post(url_for('main.two_factor', next='http://www.google.com'),
                            data={'sms_code': '12345'})
     assert response.status_code == 302
-    assert response.location == url_for(
-        'main.service_dashboard',
-        service_id=SERVICE_ONE_ID,
-        _external=True
-    )
+    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
 
 
-def test_should_login_user_and_redirect_to_choose_accounts(
+def test_should_login_user_and_redirect_to_show_accounts(
     client,
     api_user_active,
     mock_get_user,
     mock_get_user_by_email,
     mock_check_verify_code,
-    mock_get_services,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -106,7 +73,7 @@ def test_should_login_user_and_redirect_to_choose_accounts(
                            data={'sms_code': '12345'})
 
     assert response.status_code == 302
-    assert response.location == url_for('main.choose_account', _external=True)
+    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
 
 
 def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(
@@ -159,11 +126,8 @@ def test_two_factor_should_set_password_when_new_password_exists_in_session(
     response = client.post(url_for('main.two_factor'),
                            data={'sms_code': '12345'})
     assert response.status_code == 302
-    assert response.location == url_for(
-        'main.service_dashboard',
-        service_id=SERVICE_ONE_ID,
-        _external=True
-    )
+    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
+
     mock_update_user_password.assert_called_once_with(api_user_active.id, password='changedpassword')
 
 
@@ -230,7 +194,7 @@ def test_valid_two_factor_email_link_logs_in_user(
     )
 
     assert response.status_code == 302
-    assert response.location == url_for('main.service_dashboard', service_id=SERVICE_ONE_ID, _external=True)
+    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
 
 
 def test_two_factor_email_link_has_expired(
@@ -321,4 +285,4 @@ def test_two_factor_email_link_used_when_user_already_logged_in(
         url_for('main.two_factor_email', token=valid_token)
     )
     assert response.status_code == 302
-    assert response.location == url_for('main.choose_account', _external=True)
+    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
