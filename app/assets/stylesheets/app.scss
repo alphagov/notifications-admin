@@ -230,3 +230,14 @@ details .arrow {
 .heading-inline {
   display: inline-block;
 }
+
+.branding-radio {
+
+  img {
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.3) 25%, transparent 25%, transparent 75%, rgba(0, 0, 0, 0.3) 75%, rgba(0, 0, 0, 0.3) 0), linear-gradient(45deg, rgba(0, 0, 0, 0.3) 25%, transparent 25%, transparent 75%, rgba(0, 0, 0, 0.3) 75%, rgba(0, 0, 0, 0.3) 0), $white;
+    background-repeat: repeat, repeat;
+    background-position: 0px 0, 5px 5px;
+    background-size: 10px 10px, 10px 10px;
+  }
+
+}
