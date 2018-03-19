@@ -358,7 +358,8 @@ def notification_json(
     rows=5,
     personalisation=None,
     template_type=None,
-    reply_to_text=None
+    reply_to_text=None,
+    client_reference=None,
 ):
     if template is None:
         template = template_json(service_id, str(generate_uuid()), type_=template_type)
@@ -407,6 +408,7 @@ def notification_json(
             'personalisation': personalisation or {},
             'notification_type': template_type,
             'reply_to_text': reply_to_text,
+            'client_reference': client_reference,
         } for i in range(rows)],
         'total': rows,
         'page_size': 50,

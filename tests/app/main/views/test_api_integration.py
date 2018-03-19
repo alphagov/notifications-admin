@@ -89,6 +89,34 @@ def test_letter_notifications_should_have_link_to_view_letter(
     assert (page.select_one('details a') is not None) == has_links
 
 
+@pytest.mark.parametrize('client_reference, shows_ref', [
+    ('foo', True),
+    (None, False),
+])
+def test_letter_notifications_should_show_client_reference(
+    client_request,
+    api_user_active,
+    fake_uuid,
+    mock_has_permissions,
+    mocker,
+    client_reference,
+    shows_ref
+):
+    mock_get_notifications(mocker, api_user_active, client_reference=client_reference)
+
+    page = client_request.get(
+        'main.api_integration',
+        service_id=fake_uuid,
+    )
+    dt_arr = [p.text for p in page.select('dt')]
+
+    if shows_ref:
+        assert 'client_reference:' in dt_arr
+        assert page.select_one('dd:nth-of-type(2)').text == 'foo'
+    else:
+        assert 'client_reference:' not in dt_arr
+
+
 def test_should_show_api_page_for_live_service(
     logged_in_client,
     mock_login,
