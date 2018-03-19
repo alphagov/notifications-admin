@@ -100,7 +100,7 @@ def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
     response = client.post(url_for('.new_password', token=token), data={'new_password': 'a-new_password'})
 
     assert response.status_code == 302
-    assert response.location == url_for('.choose_account', _external=True)
+    assert response.location == url_for('.show_accounts_or_dashboard', _external=True)
     assert mock_get_user_by_email_request_password_reset.called
     assert mock_reset_failed_login_count.called
 

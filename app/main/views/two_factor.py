@@ -13,7 +13,7 @@ from flask_login import current_user, login_user
 from itsdangerous import SignatureExpired
 from notifications_utils.url_safe_token import check_token
 
-from app import service_api_client, user_api_client
+from app import user_api_client
 from app.main import main
 from app.main.forms import TwoFactorForm
 from app.utils import redirect_to_sign_in
@@ -112,9 +112,4 @@ def redirect_when_logged_in(user_id):
     if current_user.platform_admin:
         return redirect(url_for('main.platform_admin'))
 
-    services = service_api_client.get_active_services({'user_id': str(user_id)}).get('data', [])
-
-    if len(services) == 1:
-        return redirect(url_for('main.service_dashboard', service_id=services[0]['id']))
-    else:
-        return redirect(url_for('main.choose_account'))
+    return redirect(url_for('main.show_accounts_or_dashboard'))
