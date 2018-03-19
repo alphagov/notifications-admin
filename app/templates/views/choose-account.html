@@ -1,0 +1,42 @@
+{% extends "withoutnav_template.html" %}
+
+{% block per_page_title %}
+  Choose service
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">
+    Choose service
+  </h1>
+  <nav class="browse-list">
+    <ul>
+      {% for org in organisations %}
+        <li class="browse-list-item">
+          <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="browse-list-link">{{ org.name }}</a>
+          {% if org.services %}
+            <ul class="browse-sub-list">
+              {% for item in org.services %}
+                <li class="browse-list-sub-item">
+                  <a href="{{ url_for('.service_dashboard', service_id=item.id) }}" class="browse-list-link">{{ item.name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+        <div class ="keyline-block"></div>
+      {% endfor %}
+      {% if services_without_organisations %}
+        {% for item in services_without_organisations %}
+          <li class="browse-list-item">
+            <a href="{{ url_for('.service_dashboard', service_id=item.id) }}" class="browse-list-link">{{ item.name }}</a>
+          </li>
+        {% endfor %}
+        <div class ="keyline-block"></div>
+      {% endif %}
+    </ul>
+  {% if can_add_service %}
+    <a href="{{ url_for('.add_service') }}" class="browse-list-link">Add a new service…</a>
+  {% endif %}
+
+{% endblock %}

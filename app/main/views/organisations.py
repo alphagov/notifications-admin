@@ -17,7 +17,7 @@ from app.main.forms import (
     RenameOrganisationForm,
     SearchUsersForm,
 )
-from app.utils import user_is_platform_admin
+from app.utils import user_has_permissions, user_is_platform_admin
 
 
 @main.route("/organisations", methods=['GET'])
@@ -53,7 +53,7 @@ def add_organisation():
 
 @main.route("/organisations/<org_id>", methods=['GET'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def organisation_dashboard(org_id):
     organisation_services = organisations_client.get_organisation_services(org_id)
 
@@ -65,7 +65,7 @@ def organisation_dashboard(org_id):
 
 @main.route("/organisations/<org_id>/users", methods=['GET'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def manage_org_users(org_id):
     users = sorted(
         user_api_client.get_users_for_organisation(org_id=org_id) + [
@@ -85,7 +85,7 @@ def manage_org_users(org_id):
 
 @main.route("/organisations/<org_id>/users/invite", methods=['GET', 'POST'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def invite_org_user(org_id):
     form = InviteOrgUserForm(
         invalid_email_address=current_user.email_address
@@ -109,7 +109,7 @@ def invite_org_user(org_id):
 
 @main.route("/organisations/<org_id>/users/<user_id>", methods=['GET', 'POST'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def edit_user_org_permissions(org_id, user_id):
     user = user_api_client.get_user(user_id)
 
@@ -121,7 +121,7 @@ def edit_user_org_permissions(org_id, user_id):
 
 @main.route("/organisations/<org_id>/users/<user_id>/delete", methods=['GET', 'POST'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def remove_user_from_organisation(org_id, user_id):
     user = user_api_client.get_user(user_id)
     if request.method == 'POST':
@@ -151,7 +151,7 @@ def remove_user_from_organisation(org_id, user_id):
 
 @main.route("/organisations/<org_id>/cancel-invited-user/<invited_user_id>", methods=['GET'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def cancel_invited_org_user(org_id, invited_user_id):
     org_invite_api_client.cancel_invited_user(org_id=org_id, invited_user_id=invited_user_id)
 
@@ -160,7 +160,7 @@ def cancel_invited_org_user(org_id, invited_user_id):
 
 @main.route("/organisations/<org_id>/settings/", methods=['GET'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def organisation_settings(org_id):
     return render_template(
         'views/organisations/organisation/settings/index.html',
@@ -169,7 +169,7 @@ def organisation_settings(org_id):
 
 @main.route("/organisations/<org_id>/settings/edit-name", methods=['GET', 'POST'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def edit_organisation_name(org_id):
     form = RenameOrganisationForm()
 
@@ -192,7 +192,7 @@ def edit_organisation_name(org_id):
 
 @main.route("/organisations/<org_id>/settings/edit-name/confirm", methods=['GET', 'POST'])
 @login_required
-@user_is_platform_admin
+@user_has_permissions()
 def confirm_edit_organisation_name(org_id):
     # Validate password for form
     def _check_password(pwd):

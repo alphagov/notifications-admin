@@ -68,6 +68,7 @@ class User(UserMixin):
         self.max_failed_login_count = max_failed_login_count
         self.platform_admin = fields.get('platform_admin')
         self.current_session_id = fields.get('current_session_id')
+        self.services = fields.get('services', [])
         self.organisations = fields.get('organisations', [])
 
     def _set_permissions(self, permissions_by_service):

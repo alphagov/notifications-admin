@@ -18,7 +18,7 @@ def test_render_register_returns_template_with_form(client):
     assert 'Create an account' in response.get_data(as_text=True)
 
 
-def test_logged_in_user_redirects_to_choose_service(
+def test_logged_in_user_redirects_to_choose_account(
     logged_in_client,
     api_user_active,
     mock_get_user_by_email,
@@ -29,7 +29,7 @@ def test_logged_in_user_redirects_to_choose_service(
     assert response.status_code == 302
 
     response = logged_in_client.get(url_for('main.sign_in', follow_redirects=True))
-    assert response.location == url_for('main.choose_service', _external=True)
+    assert response.location == url_for('main.choose_account', _external=True)
 
 
 @pytest.mark.parametrize('phone_number_to_register_with', [
@@ -78,7 +78,7 @@ def test_register_continue_handles_missing_session_sensibly(
     # session is not set
     response = client.get(url_for('main.registration_continue'))
     assert response.status_code == 302
-    assert response.location == url_for('main.show_all_services_or_dashboard', _external=True)
+    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
 
 
 def test_process_register_returns_200_when_mobile_number_is_invalid(

@@ -38,12 +38,15 @@ def test_sign_in_explains_other_browser(logged_in_client, api_user_active, mocke
     assert 'We signed you out because you logged in to Notify on another device' in response.get_data(as_text=True)
 
 
-def test_doesnt_redirect_to_sign_in_if_no_session_info(logged_in_client, api_user_active):
+def test_doesnt_redirect_to_sign_in_if_no_session_info(
+    logged_in_client, api_user_active
+):
     assert api_user_active.current_session_id is None
+
     with logged_in_client.session_transaction() as session:
         session['current_session_id'] = None
 
-    response = logged_in_client.get(url_for('main.choose_service'))
+    response = logged_in_client.get(url_for('main.add_service'))
     assert response.status_code == 200
 
 
@@ -65,16 +68,16 @@ def test_redirect_to_sign_in_if_logged_in_from_other_browser(
     with logged_in_client.session_transaction() as session:
         session['current_session_id'] = str(cookie_sess_id)
 
-    response = logged_in_client.get(url_for('main.choose_service'))
+    response = logged_in_client.get(url_for('main.choose_account'))
     assert response.status_code == 302
-    assert response.location == url_for('main.sign_in', next='/services', _external=True)
+    assert response.location == url_for('main.sign_in', next='/accounts', _external=True)
 
 
-def test_logged_in_user_redirects_to_choose_service(
+def test_logged_in_user_redirects_to_choose_account(
     logged_in_client
 ):
     response = logged_in_client.get(url_for('main.sign_in'))
-    assert response.location == url_for('main.choose_service', _external=True)
+    assert response.location == url_for('main.choose_account', _external=True)
 
 
 @pytest.mark.parametrize('email_address, password', [

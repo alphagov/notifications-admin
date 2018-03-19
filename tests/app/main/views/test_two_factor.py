@@ -90,7 +90,7 @@ def test_should_login_user_and_not_redirect_to_external_url(
     )
 
 
-def test_should_login_user_and_redirect_to_choose_services(
+def test_should_login_user_and_redirect_to_choose_accounts(
     client,
     api_user_active,
     mock_get_user,
@@ -106,7 +106,7 @@ def test_should_login_user_and_redirect_to_choose_services(
                            data={'sms_code': '12345'})
 
     assert response.status_code == 302
-    assert response.location == url_for('main.choose_service', _external=True)
+    assert response.location == url_for('main.choose_account', _external=True)
 
 
 def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(
@@ -321,4 +321,4 @@ def test_two_factor_email_link_used_when_user_already_logged_in(
         url_for('main.two_factor_email', token=valid_token)
     )
     assert response.status_code == 302
-    assert response.location == url_for('main.choose_service', _external=True)
+    assert response.location == url_for('main.choose_account', _external=True)

@@ -20,7 +20,7 @@ from app.main.views import (  # noqa
     new_password,
     styleguide,
     user_profile,
-    choose_service,
+    choose_account,
     api_keys,
     manage_users,
     invites,

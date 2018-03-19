@@ -144,7 +144,7 @@ def create_app(application):
 
 def init_app(application):
     application.after_request(useful_headers_after_request)
-    application.after_request(save_service_after_request)
+    application.after_request(save_service_or_org_after_request)
     application.before_request(load_service_before_request)
     application.before_request(load_organisation_before_request)
     application.before_request(request_helper.check_proxy_header_before_request)
@@ -446,11 +446,17 @@ def load_organisation_before_request():
                         raise
 
 
-def save_service_after_request(response):
+def save_service_or_org_after_request(response):
     # Only save the current session if the request is 200
     service_id = request.view_args.get('service_id', None) if request.view_args else None
-    if response.status_code == 200 and service_id:
-        session['service_id'] = service_id
+    organisation_id = request.view_args.get('org_id', None) if request.view_args else None
+    if response.status_code == 200:
+        if service_id:
+            session['service_id'] = service_id
+            session['organisation_id'] = None
+        elif organisation_id:
+            session['service_id'] = None
+            session['organisation_id'] = organisation_id
     return response
 
 
@@ -482,7 +488,7 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
 
     @application.errorhandler(HTTPError)
     def render_http_error(error):
-        application.logger.error("API {} failed with status {} message {}".format(
+        application.logger.warning("API {} failed with status {} message {}".format(
             error.response.url if error.response else 'unknown',
             error.status_code,
             error.message
@@ -495,7 +501,13 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
                 msg = list(itertools.chain(*[error.message[x] for x in error.message.keys()]))
             resp = make_response(render_template("error/400.html", message=msg))
             return useful_headers_after_request(resp)
-        elif error_code not in [401, 404, 403, 410, 500]:
+        elif error_code not in [401, 404, 403, 410]:
+            # probably a 500 or 503
+            application.logger.exception("API {} failed with status {} message {}".format(
+                error.response.url if error.response else 'unknown',
+                error.status_code,
+                error.message
+            ))
             error_code = 500
         return _error_response(error_code)
 

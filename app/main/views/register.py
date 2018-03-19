@@ -16,7 +16,7 @@ from app.main.views.verify import activate_user
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user and current_user.is_authenticated:
-        return redirect(url_for('main.choose_service'))
+        return redirect(url_for('main.choose_account'))
 
     form = RegisterUserForm()
     if form.validate_on_submit():
@@ -101,5 +101,5 @@ def _do_registration(form, send_sms=True, send_email=True, organisation_id=None)
 @main.route('/registration-continue')
 def registration_continue():
     if not session.get('user_details'):
-        return redirect(url_for('.show_all_services_or_dashboard'))
+        return redirect(url_for('.show_accounts_or_dashboard'))
     return render_template('views/registration-continue.html')

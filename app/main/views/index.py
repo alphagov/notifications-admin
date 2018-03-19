@@ -15,7 +15,7 @@ from app.utils import AgreementInfo
 @main.route('/')
 def index():
     if current_user and current_user.is_authenticated:
-        return redirect(url_for('main.choose_service'))
+        return redirect(url_for('main.choose_account'))
     return render_template('views/signedout.html')
 
 

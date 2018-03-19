@@ -5,7 +5,7 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from notifications_python_client.errors import HTTPError
-from tests.conftest import normalize_spaces
+from tests.conftest import ORGANISATION_ID, normalize_spaces
 
 from app.notify_client.models import InvitedOrgUser
 
@@ -42,11 +42,10 @@ def test_organisation_page_shows_all_organisations(
 
 
 def test_view_organisation_shows_the_correct_organisation(
-    logged_in_platform_admin_client,
-    fake_uuid,
+    logged_in_client,
     mocker
 ):
-    org = {'id': fake_uuid, 'name': 'Test 1', 'active': True}
+    org = {'id': ORGANISATION_ID, 'name': 'Test 1', 'active': True}
     mocker.patch(
         'app.organisations_client.get_organisation', return_value=org
     )
@@ -54,8 +53,8 @@ def test_view_organisation_shows_the_correct_organisation(
         'app.organisations_client.get_organisation_services', return_value=[]
     )
 
-    response = logged_in_platform_admin_client.get(
-        url_for('.organisation_dashboard', org_id=fake_uuid)
+    response = logged_in_client.get(
+        url_for('.organisation_dashboard', org_id=ORGANISATION_ID)
     )
 
     assert response.status_code == 200
@@ -85,14 +84,14 @@ def test_create_new_organisation(
 
 
 def test_organisation_services_show(
-    logged_in_platform_admin_client,
+    logged_in_client,
     mock_get_organisation,
     mock_get_organisation_services,
     mocker,
     fake_uuid,
 ):
-    response = logged_in_platform_admin_client.get(
-        url_for('.organisation_dashboard', org_id=mock_get_organisation['id']),
+    response = logged_in_client.get(
+        url_for('.organisation_dashboard', org_id=ORGANISATION_ID),
     )
 
     assert response.status_code == 200
@@ -111,15 +110,15 @@ def test_organisation_services_show(
 
 
 def test_view_team_members(
-    logged_in_platform_admin_client,
+    logged_in_client,
     mocker,
     mock_get_organisation,
     mock_get_users_for_organisation,
     mock_get_invited_users_for_organisation,
     fake_uuid
 ):
-    response = logged_in_platform_admin_client.get(
-        url_for('.manage_org_users', org_id=fake_uuid),
+    response = logged_in_client.get(
+        url_for('.manage_org_users', org_id=ORGANISATION_ID),
     )
 
     assert response.status_code == 200
@@ -136,11 +135,10 @@ def test_view_team_members(
 
 
 def test_invite_org_user(
-    logged_in_platform_admin_client,
+    logged_in_client,
     mocker,
     mock_get_organisation,
     sample_org_invite,
-    fake_uuid
 ):
 
     mock_invite_org_user = mocker.patch(
@@ -148,27 +146,26 @@ def test_invite_org_user(
         return_value=InvitedOrgUser(**sample_org_invite)
     )
 
-    logged_in_platform_admin_client.post(
-        url_for('.invite_org_user', org_id=mock_get_organisation['id']),
+    logged_in_client.post(
+        url_for('.invite_org_user', org_id=ORGANISATION_ID),
         data={'email_address': 'test@example.gov.uk'}
     )
 
     mock_invite_org_user.assert_called_once_with(
         sample_org_invite['invited_by'],
-        '{}'.format(mock_get_organisation['id']),
+        '{}'.format(ORGANISATION_ID),
         'test@example.gov.uk',
     )
 
 
 def test_invite_org_user_errors_when_same_email_as_inviter(
-    logged_in_platform_admin_client,
+    client_request,
     mocker,
     mock_get_organisation,
     sample_org_invite,
-    fake_uuid
 ):
     new_org_user_data = {
-        'email_address': 'platform@admin.gov.uk',
+        'email_address': 'test@user.gov.uk',
     }
 
     mock_invite_org_user = mocker.patch(
@@ -176,13 +173,12 @@ def test_invite_org_user_errors_when_same_email_as_inviter(
         return_value=InvitedOrgUser(**sample_org_invite)
     )
 
-    response = logged_in_platform_admin_client.post(
-        url_for('.invite_org_user', org_id=mock_get_organisation['id']),
-        data=new_org_user_data
+    page = client_request.post(
+        '.invite_org_user',
+        org_id=ORGANISATION_ID,
+        _data=new_org_user_data,
+        _follow_redirects=True
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert mock_invite_org_user.called is False
     assert normalize_spaces(page.select_one('.error-message').text) == 'You can’t send an invitation to yourself'
@@ -226,7 +222,7 @@ def test_cancelled_invite_opened_by_user(
     ) == 'If you need access to Org 1, you’ll have to ask them to invite you again.'
 
     mock_get_user.assert_called_once_with(fake_uuid)
-    mock_get_organisation.assert_called_once_with('596364a0-858e-42c8-9062-a8fe822260af')
+    mock_get_organisation.assert_called_once_with(ORGANISATION_ID)
 
 
 def test_user_invite_already_accepted(
@@ -238,7 +234,7 @@ def test_user_invite_already_accepted(
     assert response.status_code == 302
     assert response.location == url_for(
         'main.organisation_dashboard',
-        org_id='596364a0-858e-42c8-9062-a8fe822260af',
+        org_id=ORGANISATION_ID,
         _external=True
     )
 
@@ -250,20 +246,19 @@ def test_existing_user_invite_already_is_member_of_organisation(
     mock_get_users_for_organisation,
     mock_accept_org_invite,
     mock_add_user_to_organisation,
-    fake_uuid
 ):
     response = client.get(url_for('main.accept_org_invite', token='thisisnotarealtoken'))
 
     assert response.status_code == 302
     assert response.location == url_for(
         'main.organisation_dashboard',
-        org_id='596364a0-858e-42c8-9062-a8fe822260af',
+        org_id=ORGANISATION_ID,
         _external=True
     )
 
-    mock_accept_org_invite.assert_called_once_with('596364a0-858e-42c8-9062-a8fe822260af', ANY)
+    mock_accept_org_invite.assert_called_once_with(ORGANISATION_ID, ANY)
     mock_get_user_by_email.assert_called_once_with('invited_user@test.gov.uk')
-    mock_get_users_for_organisation.assert_called_once_with('596364a0-858e-42c8-9062-a8fe822260af')
+    mock_get_users_for_organisation.assert_called_once_with(ORGANISATION_ID)
 
 
 def test_existing_user_invite_not_a_member_of_organisation(
@@ -273,22 +268,21 @@ def test_existing_user_invite_not_a_member_of_organisation(
     mock_get_users_for_organisation,
     mock_accept_org_invite,
     mock_add_user_to_organisation,
-    fake_uuid
 ):
     response = client.get(url_for('main.accept_org_invite', token='thisisnotarealtoken'))
 
     assert response.status_code == 302
     assert response.location == url_for(
         'main.organisation_dashboard',
-        org_id='596364a0-858e-42c8-9062-a8fe822260af',
+        org_id=ORGANISATION_ID,
         _external=True
     )
 
-    mock_accept_org_invite.assert_called_once_with('596364a0-858e-42c8-9062-a8fe822260af', ANY)
+    mock_accept_org_invite.assert_called_once_with(ORGANISATION_ID, ANY)
     mock_get_user_by_email.assert_called_once_with('invited_user@test.gov.uk')
-    mock_get_users_for_organisation.assert_called_once_with('596364a0-858e-42c8-9062-a8fe822260af')
+    mock_get_users_for_organisation.assert_called_once_with(ORGANISATION_ID)
     mock_add_user_to_organisation.assert_called_once_with(
-        '596364a0-858e-42c8-9062-a8fe822260af',
+        ORGANISATION_ID,
         '6ce466d0-fd6a-11e5-82f5-e0accb9d11a6'
     )
 
@@ -306,7 +300,7 @@ def test_user_accepts_invite(
 
     mock_check_org_invite_token.assert_called_once_with('thisisnotarealtoken')
     mock_dont_get_user_by_email.assert_called_once_with('invited_user@test.gov.uk')
-    mock_get_users_for_organisation.assert_called_once_with('596364a0-858e-42c8-9062-a8fe822260af')
+    mock_get_users_for_organisation.assert_called_once_with(ORGANISATION_ID)
 
 
 def test_registration_from_org_invite_404s_if_user_not_in_session(

@@ -23,7 +23,7 @@ def test_non_logged_in_user_can_see_homepage(
     )
 
 
-def test_logged_in_user_redirects_to_choose_service(
+def test_logged_in_user_redirects_to_choose_account(
     logged_in_client,
     api_user_active,
     mock_get_user,
@@ -34,7 +34,7 @@ def test_logged_in_user_redirects_to_choose_service(
     assert response.status_code == 302
 
     response = logged_in_client.get(url_for('main.sign_in', follow_redirects=True))
-    assert response.location == url_for('main.choose_service', _external=True)
+    assert response.location == url_for('main.choose_account', _external=True)
 
 
 @pytest.mark.parametrize('view', [
