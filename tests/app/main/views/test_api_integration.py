@@ -89,6 +89,27 @@ def test_letter_notifications_should_have_link_to_view_letter(
     assert (page.select_one('details a') is not None) == has_links
 
 
+@pytest.mark.parametrize('status', [
+    'pending-virus-check', 'virus-scan-failed'
+])
+def test_should_not_have_link_to_view_letter_for_precompiled_letters_in_virus_states(
+    client_request,
+    api_user_active,
+    fake_uuid,
+    mock_has_permissions,
+    mocker,
+    status
+):
+    mock_get_notifications(mocker, api_user_active, noti_status=status)
+
+    page = client_request.get(
+        'main.api_integration',
+        service_id=fake_uuid,
+    )
+
+    assert not page.select_one('details a')
+
+
 @pytest.mark.parametrize('client_reference, shows_ref', [
     ('foo', True),
     (None, False),

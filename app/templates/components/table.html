@@ -140,7 +140,7 @@
       {% if notification.status|format_notification_status_as_url %}
         <a href="{{ notification.status|format_notification_status_as_url }}">
       {% endif %}
-      {% if notification['notification_type'] != "letter" %}
+      {% if notification['notification_type'] != "letter" or notification.status == 'virus-scan-failed' %}
         {{ notification.status|format_notification_status(
           notification.template.template_type
         ) }}

@@ -344,7 +344,9 @@ def format_notification_status(status, template_type):
             'delivered': 'Delivered',
             'sending': 'Sending',
             'created': 'Sending',
-            'sent': 'Delivered'
+            'sent': 'Delivered',
+            'pending-virus-check': 'Pending virus check',
+            'virus-scan-failed': 'Virus detected',
         }
     }[template_type].get(status, status)
 
@@ -368,6 +370,8 @@ def format_notification_status_as_field_status(status, notification_type):
             'sending': None,
             'created': None,
             'accepted': None,
+            'pending-virus-check': None,
+            'virus-scan-failed': 'error',
         }
     }.get(
         notification_type,

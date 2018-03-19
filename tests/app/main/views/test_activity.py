@@ -26,14 +26,14 @@ from app.main.views.jobs import get_status_filters, get_time_left
         (
             '',
             [
-                'created', 'pending', 'sending',
+                'created', 'pending', 'sending', 'pending-virus-check',
                 'delivered', 'sent',
-                'failed', 'temporary-failure', 'permanent-failure', 'technical-failure',
+                'failed', 'temporary-failure', 'permanent-failure', 'technical-failure', 'virus-scan-failed',
             ]
         ),
         (
             'sending',
-            ['sending', 'created', 'pending']
+            ['sending', 'created', 'pending', 'pending-virus-check']
         ),
         (
             'delivered',
@@ -41,7 +41,7 @@ from app.main.views.jobs import get_status_filters, get_time_left
         ),
         (
             'failed',
-            ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+            ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure', 'virus-scan-failed']
         )
     ]
 )
@@ -133,6 +133,60 @@ def test_can_show_notifications(
     ))
     json_content = json.loads(json_response.get_data(as_text=True))
     assert json_content.keys() == {'counts', 'notifications'}
+
+
+def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
+    mocker,
+    active_user_with_permissions,
+    logged_in_client,
+    service_one,
+    mock_get_detailed_service,
+):
+    mock_get_notifications(
+        mocker,
+        active_user_with_permissions,
+        is_precompiled_letter=True,
+        noti_status='virus-scan-failed'
+    )
+    response = logged_in_client.get(url_for(
+        'main.view_notifications',
+        service_id=service_one['id'],
+        message_type='letter',
+        status='',
+    ))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    error_description = page.find('div', attrs={'class': 'table-field-status-error'}).text.strip()
+    assert 'Virus detected\n' in error_description
+
+
+@pytest.mark.parametrize('letter_status', [
+    'pending-virus-check', 'virus-scan-failed'
+])
+def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
+    mocker,
+    active_user_with_permissions,
+    logged_in_client,
+    service_one,
+    mock_get_detailed_service,
+    letter_status,
+):
+    mock_get_notifications(
+        mocker,
+        active_user_with_permissions,
+        is_precompiled_letter=True,
+        noti_status=letter_status
+    )
+    response = logged_in_client.get(url_for(
+        'main.view_notifications',
+        service_id=service_one['id'],
+        message_type='letter',
+        status='',
+    ))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert not page.find('a', attrs={'class': 'file-list-filename'})
 
 
 def test_shows_message_when_no_notifications(

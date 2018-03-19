@@ -27,9 +27,9 @@ from notifications_utils.template import (
 from orderedset._orderedset import OrderedSet
 from werkzeug.datastructures import MultiDict
 
-SENDING_STATUSES = ['created', 'pending', 'sending']
+SENDING_STATUSES = ['created', 'pending', 'sending', 'pending-virus-check']
 DELIVERED_STATUSES = ['delivered', 'sent']
-FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure', 'virus-scan-failed']
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
 
