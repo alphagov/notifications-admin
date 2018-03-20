@@ -144,6 +144,9 @@ rpa.gsi.gov.uk: rpa.gov.uk
 rpa.gov.uk:
   owner: Rural Payments Agency
   agreement_signed: true
+mcga.gov.uk:
+  owner: Maritime and Coastguard Agency
+  agreement_signed: true  
 
 # Local Government
 aberdeencityandshire-sdpa.gov.uk:
