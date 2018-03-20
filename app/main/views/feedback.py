@@ -13,9 +13,24 @@ from app import (
 )
 from app.main import main
 from app.main.forms import Feedback, Problem, SupportType, Triage
+from app.utils import AgreementInfo
 
 QUESTION_TICKET_TYPE = 'ask-question-give-feedback'
 PROBLEM_TICKET_TYPE = "report-problem"
+
+
+def get_prefilled_message():
+    agreement_info = AgreementInfo.from_current_user()
+    return {
+        'agreement': (
+            agreement_info.as_request_for_agreement()
+        ),
+        'agreement-with-owner': (
+            agreement_info.as_request_for_agreement(with_owner=True)
+        ),
+    }.get(
+        request.args.get('body'), ''
+    )
 
 
 @main.route('/feedback', methods=['GET'])
@@ -135,7 +150,7 @@ def feedback(ticket_type):
         return redirect(url_for('.thanks', urgent=urgent, anonymous=anonymous))
 
     if not form.feedback.data:
-        form.feedback.data = request.args.get('body', '')
+        form.feedback.data = get_prefilled_message()
 
     return render_template(
         'views/support/{}.html'.format(ticket_type),

@@ -125,7 +125,7 @@
     <h2 class="heading-medium" id="paying">How to pay</h2>
     <p>You can find details of how to pay for Notify in our data sharing and financial agreement.</p>
     <p>
-      <a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback', body='Please send me a copy of the GOV.UK Notify data sharing and financial agreement.')}}">Contact us</a> to get a copy of the agreement
+      <a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement')}}">Contact us</a> to get a copy of the agreement
       {% if agreement_info.agreement_signed %}
         ({{ agreement_info.owner }} has already accepted it).
       {% else %}

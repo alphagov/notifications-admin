@@ -28,10 +28,10 @@ Terms of use
         {% if agreement_info.owner %}
           ({{ agreement_info.owner }})
           must also accept our data sharing and financial agreement.
-          <a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback', body='Please send me a copy of the GOV.UK Notify data sharing and financial agreement for {} to sign.'.format(agreement_info.owner)) }}">Contact us</a> to get a copy.
+          <a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement-with-owner') }}">Contact us</a> to get a copy.
         {% else %}
           must also accept our data sharing and financial agreement.
-          <a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback', body='Please send me a copy of the GOV.UK Notify data sharing and financial agreement.') }}">Contact us</a> to get a copy.
+          <a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement') }}">Contact us</a> to get a copy.
         {% endif %}
       </p>
     {% endif %}
