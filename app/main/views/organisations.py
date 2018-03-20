@@ -56,6 +56,9 @@ def add_organisation():
 @user_has_permissions()
 def organisation_dashboard(org_id):
     organisation_services = organisations_client.get_organisation_services(org_id)
+    for service in organisation_services:
+        has_permission = current_user.has_permission_for_service(service['id'], 'view_activity')
+        service.update({'has_permission_to_view': has_permission})
 
     return render_template(
         'views/organisations/organisation/index.html',

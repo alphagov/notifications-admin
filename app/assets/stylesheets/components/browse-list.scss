@@ -11,6 +11,7 @@
 
   &-item,
   &-sub-item {
+    @include bold-24;
     list-style: none;
     margin-bottom: $gutter-half;
   }

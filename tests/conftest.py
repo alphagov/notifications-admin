@@ -2756,12 +2756,12 @@ def mock_update_service_organisation(mocker):
 
 
 @pytest.fixture(scope='function')
-def mock_get_organisation_services(mocker):
+def mock_get_organisation_services(mocker, api_user_active):
     def _get_organisation_services(organisation_id):
         return [
             service_json('12345', 'service one'),
             service_json('67890', 'service two'),
-            service_json('09876', 'service three')
+            service_json(SERVICE_ONE_ID, 'service one', [api_user_active.id])
         ]
 
     return mocker.patch(
