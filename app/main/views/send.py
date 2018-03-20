@@ -126,10 +126,14 @@ def send_messages(service_id, template_id):
                 Spreadsheet.from_file(form.file.data, filename=form.file.data.filename).as_dict,
                 current_app.config['AWS_REGION']
             )
-            session['upload_data'] = {
-                "template_id": template_id,
-                "original_file_name": form.file.data.filename
-            }
+            if 'file_uploads' not in session:
+                session['file_uploads'] = {}
+            session['file_uploads'].update({
+                upload_id: {
+                    "template_id": template_id,
+                    "original_file_name": form.file.data.filename
+                }
+            })
             return redirect(url_for('.check_messages',
                                     service_id=service_id,
                                     upload_id=upload_id,
@@ -469,7 +473,7 @@ def send_test_preview(service_id, template_id, filetype):
 
 def _check_messages(service_id, template_type, upload_id, preview_row, letters_as_pdf=False):
 
-    if not session.get('upload_data'):
+    if not session.get('file_uploads', {}).get(upload_id):
         # if we just return a `redirect` (302) object here, we'll get errors when we try and unpack in the
         # check_messages route - so raise a werkzeug.routing redirect to ensure that doesn't happen.
 
@@ -493,7 +497,7 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
     template = get_template(
         service_api_client.get_service_template(
             service_id,
-            session['upload_data'].get('template_id')
+            session['file_uploads'][upload_id].get('template_id')
         )['data'],
         current_service,
         show_recipient=True,
@@ -537,8 +541,8 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
     elif preview_row > 2:
         abort(404)
 
-    session['upload_data']['notification_count'] = len(recipients)
-    session['upload_data']['valid'] = not recipients.has_errors
+    session['file_uploads'][upload_id]['notification_count'] = len(recipients)
+    session['file_uploads'][upload_id]['valid'] = not recipients.has_errors
     return dict(
         recipients=recipients,
         template=template,
@@ -546,7 +550,7 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
         row_errors=get_errors_for_csv(recipients, template.template_type),
         count_of_recipients=len(recipients),
         count_of_displayed_recipients=len(list(recipients.displayed_rows)),
-        original_file_name=session['upload_data'].get('original_file_name'),
+        original_file_name=session['file_uploads'][upload_id].get('original_file_name'),
         upload_id=upload_id,
         form=CsvUploadForm(),
         remaining_messages=remaining_messages,
@@ -611,24 +615,26 @@ def check_messages_preview(service_id, template_type, upload_id, filetype, row_i
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def recheck_messages(service_id, template_type, upload_id, row_index=0):
+    if not session.get('file_uploads', {}).get(upload_id):
+        return redirect(url_for('main.choose_template', service_id=service_id), code=301)
 
-    if not session.get('upload_data'):
-        return redirect(url_for('main.choose_template', service_id=service_id))
-
-    return send_messages(service_id, session['upload_data'].get('template_id'))
+    return send_messages(service_id, session['file_uploads'][upload_id].get('template_id'))
 
 
 @main.route("/services/<service_id>/start-job/<upload_id>", methods=['POST'])
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def start_job(service_id, upload_id):
-    upload_data = session['upload_data']
+    try:
+        upload_data = session['file_uploads'][upload_id]
+    except KeyError:
+        return redirect(url_for('main.choose_template', service_id=service_id), code=301)
 
     if request.files or not upload_data.get('valid'):
         # The csv was invalid, validate the csv again
         return send_messages(service_id, upload_data.get('template_id'))
 
-    session.pop('upload_data')
+    session['file_uploads'].pop(upload_id)
 
     job_api_client.create_job(
         upload_id,
@@ -701,7 +707,9 @@ def make_and_upload_csv_file(service_id, template):
         ).as_dict,
         current_app.config['AWS_REGION'],
     )
-    session['upload_data'] = {
+    if 'file_uploads' not in session:
+        session['file_uploads'] = {}
+    session['file_uploads'][upload_id] = {
         "template_id": template.id,
         "original_file_name": current_app.config['TEST_MESSAGE_FILENAME']
     }
