@@ -66,10 +66,12 @@
         <div>
           <dl id="notification-{{ notification.id }}" class="api-notifications-item-data bottom-gutter-1-2">
             {% for key in [
-              'id', 'notification_type', 'created_at', 'updated_at', 'sent_at', 'status'
+              'id', 'client_reference', 'notification_type', 'created_at', 'updated_at', 'sent_at', 'status'
             ] %}
-              <dt>{{ key }}:</dt>
-              <dd class="api-notifications-item-data-item">{{ notification[key] }}</dd>
+              {% if notification[key] %}
+                <dt>{{ key }}:</dt>
+                <dd class="api-notifications-item-data-item">{{ notification[key] }}</dd>
+              {% endif %}
             {% endfor %}
             {% if notification['notification_type'] == 'letter' %}
               <a href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View letter</a>
