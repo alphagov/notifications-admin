@@ -8,7 +8,9 @@ communities.gsi.gov.uk: communities.gov.uk
 communities.gov.uk:
   owner: "Ministry of Housing, Communities & Local Government"
   agreement_signed: true
-hmcts.net:
+hmcts.net: hmcts.gov.uk
+hmcts.gsi.gov.uk: hmcts.gov.uk
+hmcts.gov.uk:
   owner: Her Majesty’s Courts and Tribunals Service
   agreement_signed: true
 cqc.org.uk:
