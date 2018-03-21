@@ -251,19 +251,15 @@ def format_time_24h(date):
 
 def get_human_day(time):
 
-    #  Add 1 hour to get ‘midnight today’ instead of ‘midnight tomorrow’
-    time_as_day = (gmt_timezones(time) - timedelta(hours=1)).strftime('%A')
-    six_days_ago = gmt_timezones((datetime.utcnow() + timedelta(days=-6)).isoformat())
-
-    if gmt_timezones(time) < six_days_ago:
-        return format_date_short(time)
-    if time_as_day == (datetime.utcnow() + timedelta(days=1)).strftime('%A'):
+    #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
+    date = (gmt_timezones(time) - timedelta(minutes=1)).date()
+    if date == (datetime.utcnow() + timedelta(days=1)).date():
         return 'tomorrow'
-    if time_as_day == datetime.utcnow().strftime('%A'):
+    if date == datetime.utcnow().date():
         return 'today'
-    if time_as_day == (datetime.utcnow() + timedelta(days=-1)).strftime('%A'):
+    if date == (datetime.utcnow() - timedelta(days=1)).date():
         return 'yesterday'
-    return format_date_short(time)
+    return _format_datetime_short(date)
 
 
 def format_time(date):
@@ -285,7 +281,11 @@ def format_date_normal(date):
 
 
 def format_date_short(date):
-    return gmt_timezones(date).strftime('%d %B').lstrip('0')
+    return _format_datetime_short(gmt_timezones(date))
+
+
+def _format_datetime_short(datetime):
+    return datetime.strftime('%d %B').lstrip('0')
 
 
 def format_delta(date):
