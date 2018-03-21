@@ -49,14 +49,14 @@ def test_get_jobs_shows_page_links(
         (
             '',
             [
-                'created', 'pending', 'sending',
+                'created', 'pending', 'sending', 'pending-virus-check',
                 'delivered', 'sent',
-                'failed', 'temporary-failure', 'permanent-failure', 'technical-failure',
+                'failed', 'temporary-failure', 'permanent-failure', 'technical-failure', 'virus-scan-failed',
             ]
         ),
         (
             'sending',
-            ['sending', 'created', 'pending']
+            ['sending', 'created', 'pending', 'pending-virus-check']
         ),
         (
             'delivered',
@@ -64,7 +64,7 @@ def test_get_jobs_shows_page_links(
         ),
         (
             'failed',
-            ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure']
+            ['failed', 'temporary-failure', 'permanent-failure', 'technical-failure', 'virus-scan-failed']
         )
     ]
 )
@@ -200,12 +200,14 @@ def test_should_show_letter_job(
             'created',
             'pending',
             'sending',
+            'pending-virus-check',
             'delivered',
             'sent',
             'failed',
             'temporary-failure',
             'permanent-failure',
             'technical-failure',
+            'virus-scan-failed',
         ],
     )
 

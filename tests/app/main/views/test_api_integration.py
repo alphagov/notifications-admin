@@ -8,6 +8,7 @@ from flask import url_for
 from tests import validate_route_permission
 from tests.conftest import (
     SERVICE_ONE_ID,
+    fake_uuid,
     mock_get_live_service,
     mock_get_notifications,
     mock_get_service,
@@ -87,6 +88,27 @@ def test_letter_notifications_should_have_link_to_view_letter(
     )
 
     assert (page.select_one('details a') is not None) == has_links
+
+
+@pytest.mark.parametrize('status', [
+    'pending-virus-check', 'virus-scan-failed'
+])
+def test_should_not_have_link_to_view_letter_for_precompiled_letters_in_virus_states(
+    client_request,
+    api_user_active,
+    fake_uuid,
+    mock_has_permissions,
+    mocker,
+    status
+):
+    mock_get_notifications(mocker, api_user_active, noti_status=status)
+
+    page = client_request.get(
+        'main.api_integration',
+        service_id=fake_uuid,
+    )
+
+    assert not page.select_one('details a')
 
 
 @pytest.mark.parametrize('client_reference, shows_ref', [
@@ -689,3 +711,54 @@ def test_update_delivery_status_and_receive_text_message_callbacks_without_chang
         assert mock_update_service_inbound_api.called is False
     else:
         assert mock_update_service_callback_api.called is False
+
+
+@pytest.mark.parametrize('service_callback_api, delivery_url, expected_1st_table_row', [
+    (
+        None, {},
+        'Callbacks for delivery receipts Not set Change'
+    ),
+    (
+        fake_uuid(), {'url': 'https://delivery.receipts'},
+        'Callbacks for delivery receipts https://delivery.receipts Change'
+    ),
+])
+@pytest.mark.parametrize('inbound_api, inbound_url, expected_2nd_table_row', [
+    (
+        None, {},
+        'Callbacks for received text messages Not set Change'
+    ),
+    (
+        fake_uuid(), {'url': 'https://inbound.sms'},
+        'Callbacks for received text messages https://inbound.sms Change'
+    ),
+])
+def test_callbacks_page_works_when_no_apis_set(
+    client_request,
+    service_one,
+    mocker,
+    service_callback_api,
+    delivery_url,
+    expected_1st_table_row,
+    inbound_api,
+    inbound_url,
+    expected_2nd_table_row,
+):
+    service_one['permissions'] = ['inbound_sms']
+    service_one['inbound_api'] = inbound_api
+    service_one['service_callback_api'] = service_callback_api
+
+    mocker.patch('app.service_api_client.get_service_callback_api', return_value=delivery_url)
+    mocker.patch('app.service_api_client.get_service_inbound_api', return_value=inbound_url)
+
+    page = client_request.get('main.api_callbacks',
+                              service_id=service_one['id'],
+                              _follow_redirects=True)
+    expected_rows = [
+        expected_1st_table_row,
+        expected_2nd_table_row,
+    ]
+    rows = page.select('tbody tr')
+    assert len(rows) == 2
+    for index, row in enumerate(expected_rows):
+        assert row == normalize_spaces(rows[index].text)

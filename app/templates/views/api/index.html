@@ -73,7 +73,7 @@
                 <dd class="api-notifications-item-data-item">{{ notification[key] }}</dd>
               {% endif %}
             {% endfor %}
-            {% if notification['notification_type'] == 'letter' %}
+            {% if notification['notification_type'] == 'letter' and notification.status not in ('pending-virus-check', 'virus-scan-failed') %}
               <a href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View letter</a>
             {% endif %}
           </dl>
