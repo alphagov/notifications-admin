@@ -99,14 +99,17 @@ def test_organisation_services_show(
 
     assert len(page.select('.browse-list-item')) == 3
 
-    for i in range(0, 3):
+    for i in range(0, 2):
         service_name = mock_get_organisation_services(mock_get_organisation['id'])[i]['name']
         service_id = mock_get_organisation_services(mock_get_organisation['id'])[i]['id']
 
         assert normalize_spaces(page.select('.browse-list-item')[i].text) == service_name
-        assert normalize_spaces(
-            page.select('.browse-list-item a')[i]['href']
-        ) == '/services/{}'.format(service_id)
+        if i > 1:
+            assert normalize_spaces(
+                page.select('.browse-list-item a')[i]['href']
+            ) == '/services/{}'.format(service_id)
+        else:
+            assert page.select('.browse-list-item')[i].find('a') is None
 
 
 def test_view_team_members(
