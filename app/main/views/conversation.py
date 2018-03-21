@@ -105,7 +105,7 @@ def get_sms_thread(service_id, user_number):
         notification_api_client.get_notifications_for_service(service_id,
                                                               to=user_number,
                                                               template_type='sms')['notifications'] +
-        service_api_client.get_inbound_sms(service_id, user_number=user_number)
+        service_api_client.get_inbound_sms(service_id, user_number=user_number)['data']
     ), key=lambda notification: notification['created_at']):
 
         is_inbound = ('notify_number' in notification)
