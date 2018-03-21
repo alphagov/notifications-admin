@@ -1860,14 +1860,18 @@ def mock_get_inbound_sms(mocker):
     def _get_inbound_sms(
         service_id,
         user_number=None,
+        page=1
     ):
-        return [{
-            'user_number': '0790090000' + str(i),
-            'notify_number': '07900000002',
-            'content': 'message-{}'.format(index + 1),
-            'created_at': (datetime.utcnow() - timedelta(minutes=60 * (i + 1), seconds=index)).isoformat(),
-            'id': sample_uuid(),
-        } for index, i in enumerate([0, 0, 0, 2, 4, 6, 8, 8])]
+        return {
+            'has_next': True,
+            'data': [{
+                'user_number': '0790090000' + str(i),
+                'notify_number': '07900000002',
+                'content': 'message-{}'.format(index + 1),
+                'created_at': (datetime.utcnow() - timedelta(minutes=60 * (i + 1), seconds=index)).isoformat(),
+                'id': sample_uuid(),
+            } for index, i in enumerate([0, 0, 0, 2, 4, 6, 8, 8])]
+        }
 
     return mocker.patch(
         'app.service_api_client.get_inbound_sms',
@@ -1879,8 +1883,13 @@ def mock_get_inbound_sms(mocker):
 def mock_get_inbound_sms_with_no_messages(mocker):
     def _get_inbound_sms(
         service_id,
+        user_number=None,
+        page=1
     ):
-        return []
+        return {
+            'has_next': False,
+            'data': []
+        }
 
     return mocker.patch(
         'app.service_api_client.get_inbound_sms',

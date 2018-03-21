@@ -31,6 +31,8 @@ from app.utils import (
     FAILURE_STATUSES,
     REQUESTED_STATUSES,
     Spreadsheet,
+    generate_next_dict,
+    generate_previous_dict,
     get_current_financial_year,
     user_has_permissions,
 )
@@ -193,7 +195,7 @@ def inbox(service_id):
     return render_template(
         'views/dashboard/inbox.html',
         partials=get_inbox_partials(service_id),
-        updates_url=url_for('.inbox_updates', service_id=service_id),
+        updates_url=url_for('.inbox_updates', service_id=service_id, page=request.args.get('page')),
     )
 
 
@@ -219,7 +221,7 @@ def inbox_download(service_id):
                 message['user_number'],
                 message['content'].lstrip(('=+-@')),
                 format_datetime_numeric(message['created_at']),
-            ] for message in service_api_client.get_inbound_sms(service_id)]
+            ] for message in service_api_client.get_inbound_sms(service_id)['data']]
         ).as_csv_data,
         mimetype='text/csv',
         headers={
@@ -231,11 +233,12 @@ def inbox_download(service_id):
 
 
 def get_inbox_partials(service_id):
-
+    page = int(request.args.get('page', 1))
     if 'inbound_sms' not in current_service['permissions']:
         abort(403)
 
-    inbound_messages = service_api_client.get_inbound_sms(service_id)
+    inbound_messages_data = service_api_client.get_inbound_sms(service_id, page=page)
+    inbound_messages = inbound_messages_data['data']
 
     messages_to_show = {}
     # get the most recent message for each number
@@ -252,12 +255,22 @@ def get_inbox_partials(service_id):
     else:
         inbound_number = None
 
+    prev_page = None
+    if page > 1:
+        prev_page = generate_previous_dict('main.inbox', service_id, page)
+    next_page = None
+    if inbound_messages_data['has_next']:
+        next_page = generate_next_dict('main.inbox', service_id, page)
+
     return {'messages': render_template(
         'views/dashboard/_inbox_messages.html',
         messages=list(messages_to_show),
         count_of_messages=len(inbound_messages),
         count_of_users=count_of_users,
         inbound_number=inbound_number,
+        prev_page=prev_page,
+        next_page=next_page
+
     )}
 
 
