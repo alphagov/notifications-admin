@@ -464,6 +464,17 @@ class AgreementInfo:
         else:
             return 'Can’t tell'
 
+    def as_request_for_agreement(self, with_owner=False):
+        if with_owner and self.owner:
+            return (
+                'Please send me a copy of the GOV.UK Notify data sharing '
+                'and financial agreement for {} to sign.'.format(self.owner)
+            )
+        return (
+            'Please send me a copy of the GOV.UK Notify data sharing '
+            'and financial agreement.'
+        )
+
     @staticmethod
     def get_matching_function(email_address_or_domain):
 
