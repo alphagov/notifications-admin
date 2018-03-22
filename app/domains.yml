@@ -3553,6 +3553,12 @@ ribblevalley.gov.uk:
   owner: Ribblevalley Borough Council
   crown: false
   agreement_signed: false
+richmond.gov.uk: richmondandwandsworth.gov.uk
+wandsworth.gov.uk: richmondandwandsworth.gov.uk
+richmondandwandsworth.gov.uk:
+  owner: London Boroughs of Richmond and Wandsworth
+  crown: false
+  agreement_signed: true
 richmondshire.gov.uk:
   owner: Richmondshire District Council
   crown: false
