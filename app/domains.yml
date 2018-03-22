@@ -71,6 +71,11 @@ statistics.gov.uk: ons.gov.uk
 ons.gov.uk:
   owner: Office for National Statistics
   agreement_signed: true
+pins.gsi.gov.uk: pins.gov.uk
+pins.gov.uk:
+  owner: The Planning Inspectorate
+  agreement_signed: true
+  crown: true
 publicguardian.gsi.gov.uk: publicguardian.gov.uk
 publicguardian.gov.uk:
   owner: Office of the Public Guardian
