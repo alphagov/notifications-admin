@@ -37,6 +37,7 @@ environment-agency.gsi.gov.uk: environment-agency.gov.uk
 environment-agency.gov.uk:
   owner: Environment Agency
   agreement_signed: true
+food.gov.uk: foodstandards.gov.uk
 foodstandards.gsi.gov.uk: foodstandards.gov.uk
 foodstandards.gov.uk:
   owner: Food Standards Agency
