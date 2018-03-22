@@ -49,6 +49,10 @@ gla.gov.uk:
 governmentlegal.gov.uk:
   owner: Government Legal Department
   agreement_signed: true
+gov.scot:
+  owner: Scottish Government
+  crown: false
+  agreement_signed: false
 innovateuk.gsi.gov.uk: innovateuk.gov.uk
 innovateuk.gov.uk:
   owner: Innovate UK
