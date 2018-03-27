@@ -20,21 +20,12 @@ Terms of use
       These terms apply to your service’s use of GOV.UK&nbsp;Notify. You must be the service manager to accept them.
     </p>
 
-    {% if agreement_info.agreement_signed %}
-      <p>Your organisation ({{ agreement_info.owner }}) has already accepted the GOV.UK&nbsp;Notify data sharing and financial agreement.</p>
-    {% else %}
-      <p>
-        Your organisation
-        {% if agreement_info.owner %}
-          ({{ agreement_info.owner }})
-          must also accept our data sharing and financial agreement.
-          <a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement-with-owner') }}">Contact us</a> to get a copy.
-        {% else %}
-          must also accept our data sharing and financial agreement.
-          <a href="{{ url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement') }}">Contact us</a> to get a copy.
-        {% endif %}
-      </p>
-    {% endif %}
+    <p>
+      {{ agreement_info.as_terms_of_use_paragraph(
+        download_link=url_for('.agreement'),
+        contact_link=url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement-with-owner')
+      )}}
+    </p>
 
     <h2 class="heading-medium">When using Notify</h2>
     <p>You must:</p>

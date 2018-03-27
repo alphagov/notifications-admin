@@ -15,7 +15,15 @@ import dateutil
 import pyexcel
 import pytz
 import yaml
-from flask import abort, current_app, redirect, request, session, url_for
+from flask import (
+    Markup,
+    abort,
+    current_app,
+    redirect,
+    request,
+    session,
+    url_for,
+)
 from flask_login import current_user
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import (
@@ -463,6 +471,36 @@ class AgreementInfo:
             )
         else:
             return 'Can’t tell'
+
+    def as_terms_of_use_paragraph(self, **kwargs):
+        return Markup(self._as_terms_of_use_paragraph(**kwargs))
+
+    def _as_terms_of_use_paragraph(self, download_link, contact_link):
+
+        if self.agreement_signed:
+            return (
+                'Your organisation ({}) has already accepted the '
+                'GOV.UK&nbsp;Notify data sharing and financial '
+                'agreement.'.format(self.owner)
+            )
+
+        if self.crown_status is not None:
+            return ((
+                '{} <a href="{}">Download a copy</a>.'
+            ).format(self._acceptance_required, download_link))
+
+        return ((
+            '{} <a href="{}">Contact us</a> to get a copy.'
+        ).format(self._acceptance_required, contact_link))
+
+    @property
+    def _acceptance_required(self):
+        return (
+            'Your organisation {} must also accept our data sharing '
+            'and financial agreement.'.format(
+                '({})'.format(self.owner) if self.owner else '',
+            )
+        )
 
     @property
     def crown_status_or_404(self):

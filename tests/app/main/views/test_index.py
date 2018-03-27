@@ -1,3 +1,5 @@
+from functools import partial
+
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
@@ -102,13 +104,19 @@ def test_terms_is_generic_if_user_is_not_logged_in(
     )
 
 
-@pytest.mark.parametrize('email_address, expected_terms_paragraph, expected_pricing_paragraph', [
+@pytest.mark.parametrize((
+    'email_address,'
+    'expected_terms_paragraph,'
+    'expected_terms_link,'
+    'expected_pricing_paragraph'
+), [
     (
         'test@cabinet-office.gov.uk',
         (
             'Your organisation (Cabinet Office) has already accepted '
             'the GOV.UK Notify data sharing and financial agreement.'
         ),
+        None,
         (
             'Contact us to get a copy of the agreement '
             '(Cabinet Office has already accepted it).'
@@ -118,8 +126,12 @@ def test_terms_is_generic_if_user_is_not_logged_in(
         'test@aylesburytowncouncil.gov.uk',
         (
             'Your organisation (Aylesbury Town Council) must also '
-            'accept our data sharing and financial agreement. Contact '
-            'us to get a copy.'
+            'accept our data sharing and financial agreement. Download '
+            'a copy.'
+        ),
+        partial(
+            url_for,
+            'main.agreement',
         ),
         (
             'Contact us to get a copy of the agreement '
@@ -131,6 +143,12 @@ def test_terms_is_generic_if_user_is_not_logged_in(
         (
             'Your organisation must also accept our data sharing and '
             'financial agreement. Contact us to get a copy.'
+        ),
+        partial(
+            url_for,
+            'main.feedback',
+            ticket_type='ask-question-give-feedback',
+            body='agreement-with-owner',
         ),
         (
             'Contact us to get a copy of the agreement or find out if '
@@ -144,6 +162,7 @@ def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
     client_request,
     email_address,
     expected_terms_paragraph,
+    expected_terms_link,
     expected_pricing_paragraph,
 ):
     user = active_user_with_permissions(fake_uuid)
@@ -152,4 +171,8 @@ def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
     terms_page = client_request.get('main.terms')
     pricing_page = client_request.get('main.pricing')
     assert normalize_spaces(terms_page.select('main p')[1].text) == expected_terms_paragraph
+    if expected_terms_link:
+        assert terms_page.select_one('main p a')['href'] == expected_terms_link()
+    else:
+        assert not terms_page.select_one('main p').select('a')
     assert normalize_spaces(pricing_page.select('main p')[-1].text) == expected_pricing_paragraph
