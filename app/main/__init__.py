@@ -32,5 +32,6 @@ from app.main.views import (  # noqa
     conversation,
     organisations,
     notifications,
-    inbound_number
+    inbound_number,
+    agreement,
 )

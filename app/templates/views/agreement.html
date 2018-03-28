@@ -1,0 +1,37 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/sub-navigation.html" import sub_navigation %}
+
+{% block per_page_title %}
+  Download the GOV.UK Notify data sharing and financial agreement
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-one-third">
+    {{ sub_navigation(navigation_links) }}
+  </div>
+  <div class="column-two-thirds">
+
+    <h1 class="heading-large">
+      Download the GOV.UK Notify data sharing and financial agreement
+    </h1>
+
+    <p>
+      This agreement needs to be signed by someone who has the authority to do so on behalf of your whole organisation. Typically this is a director of digital or head of finance.
+    </p>
+    <p>
+      Return a signed copy to <span style="white-space: nowrap">notify-support@digital.cabinet-office.gov.uk</span>
+    </p>
+    <p class="panel panel-border-wide bottom-gutter-2-3">
+      The agreement contains commercially sensitive information.<br>
+      Do not share it more widely than you need to.
+    </p>
+    <p>
+      <a href="{{ url_for('main.download_agreement') }}">Download the agreement</a>.
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}

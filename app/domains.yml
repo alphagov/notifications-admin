@@ -22,6 +22,7 @@ marinemanagement.org.uk:
 crowncommercial.gov.uk: cabinet-office.gov.uk
 cabinet-office.gov.uk:
   owner: Cabinet Office
+  crown: true
   agreement_signed: true
 cica.gsi.gov.uk: cica.gov.uk
 cica.gov.uk:
@@ -159,7 +160,11 @@ rpa.gov.uk:
   agreement_signed: true
 mcga.gov.uk:
   owner: Maritime and Coastguard Agency
-  agreement_signed: true  
+  agreement_signed: true
+metoffice.gov.uk:
+  owner: Met Office
+  agreement_signed: false
+  crown: true
 
 # Local Government
 aberdeencityandshire-sdpa.gov.uk:
