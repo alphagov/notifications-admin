@@ -14,11 +14,18 @@
   <div class="column-two-thirds">
 
     <h1 class="heading-large">Using Notify</h1>
-    
+
     <h2 id="trial-mode" class="heading-medium">Trial mode</h2>
     <p>When you create a GOV.UK Notify account, you’ll start in trial mode. This lets you try out the service, but has some restrictions in place.</p>
-    <p>You can remove these restrictions by going live.</p>
-    
+    <p>
+      You can remove these restrictions by
+      {% if current_service and current_service.restricted %}
+        <a href="{{ url_for('.request_to_go_live', service_id=current_service.id) }}">requesting to go live</a>.
+      {% else %}
+        going live.
+      {% endif %}
+    </p>
+
     <h3 class="heading-small">Restrictions in trial mode</h3>
     <p>In trial mode, you can:</p>
     <ul class="list list-bullet">
@@ -65,7 +72,7 @@
     <p>When you’ve done this, users will be able to reply to text messages you send them. They’ll also be able to start an interaction by sending you a text message.</p>
     <p>You’ll be able to see and reply to text messages you receive. You can also create automated processes to manage replies.</p>
     <p>You’ll still need to have a manual process in place for any messages that can’t be dealt with automatically.</p>
-    
+
     <h2 class="heading-medium">Multiple services in one organisation</h2>
     <p>If your organisation offers multiple services, you can have a different Notify account for each of them.</p>
     <p>Each service:</p>
@@ -73,11 +80,11 @@
       <li>gets its own free message allowance</li>
       <li>has to request to go live separately</li>
     </ul>
-    
+
     <h2 class="heading-medium">Letters</h2>
-    <p>Letters can be up to 6 pages long (3 sides of paper, double-sided).</p> 
+    <p>Letters can be up to 6 pages long (3 sides of paper, double-sided).</p>
     <p>Notify sends letters in C5 size envelopes, with a window.</p>
-    
+
   </div>
 </div>
 
