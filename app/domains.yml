@@ -140,6 +140,8 @@ trade.gsi.gov.uk: trade.gov.uk
 trade.gov.uk:
   owner: Department for International Trade
   agreement_signed: true
+ips.gsi.gov.uk: ips.gov.uk
+ips.gov.uk: hmpo.gov.uk
 hmpo.gov.uk: homeoffice.gov.uk
 hmpo.gsi.gov.uk: homeoffice.gov.uk
 homeoffice.gsi.gov.uk: homeoffice.gov.uk
