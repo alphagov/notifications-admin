@@ -159,7 +159,11 @@ rpa.gov.uk:
   agreement_signed: true
 mcga.gov.uk:
   owner: Maritime and Coastguard Agency
-  agreement_signed: true  
+  agreement_signed: true
+metoffice.gov.uk:
+  owner: Met Office
+  agreement_signed: false
+  crown: true
 
 # Local Government
 aberdeencityandshire-sdpa.gov.uk:

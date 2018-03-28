@@ -155,6 +155,23 @@ def test_terms_is_generic_if_user_is_not_logged_in(
             'we already have one in place with your organisation.'
         ),
     ),
+    (
+        'michael.fish@metoffice.gov.uk',
+        (
+            'Your organisation (Met Office) must also accept our data '
+            'sharing and financial agreement. Contact us to get a copy.'
+        ),
+        partial(
+            url_for,
+            'main.feedback',
+            ticket_type='ask-question-give-feedback',
+            body='agreement-with-owner',
+        ),
+        (
+            'Contact us to get a copy of the agreement (Met Office '
+            'hasn’t accepted it yet).'
+        ),
+    ),
 ])
 def test_terms_tells_logged_in_users_what_we_know_about_their_agreement(
     mocker,
