@@ -1,0 +1,27 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/radios.html" import radios, branding_radios %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Select email branding
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-large">
+    <div>Letter branding</div>
+  </h1>
+  {% for id, filename in logos %}
+    <h2 class="heading-small">
+      {{id}}
+    </h2>
+    <p>
+      <img
+        src="{{ url_for('.letter_branding_logo', filename=filename) }}"
+        height="100"
+        class="bottom-gutter"
+      >
+    </p>
+  {% endfor %}
+
+{% endblock %}
