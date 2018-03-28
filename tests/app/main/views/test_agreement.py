@@ -16,7 +16,7 @@ class _MockS3Object():
 
 
 @pytest.mark.parametrize('email_address, expected_status', [
-    ('test@cabinet-office.gov.uk', 404),
+    ('test@cabinet-office.gov.uk', 200),
     ('test@aylesburytowncouncil.gov.uk', 200),
     ('test@unknown.gov.uk', 404),
 ])
@@ -37,11 +37,11 @@ def test_show_agreement_page(
 
 
 @pytest.mark.parametrize('email_address, expected_file_fetched, expected_file_served', [
-    pytest.mark.xfail((
+    (
         'test@cabinet-office.gov.uk',
         'crown.pdf',
         'GOV.UK Notify data sharing and financial agreement.pdf',
-    ), raises=AssertionError),
+    ),
     (
         'test@aylesburytowncouncil.gov.uk',
         'non-crown.pdf',
