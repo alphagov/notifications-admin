@@ -2671,7 +2671,7 @@ ludlow.gov.uk:
 luton.gov.uk:
   owner: Luton Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 lymeregistowncouncil.gov.uk:
   owner: Lyme Regis Town Council
   crown: false
