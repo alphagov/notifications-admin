@@ -135,6 +135,7 @@
     position: relative;
     z-index: 9;
     margin-bottom: 30px;
+    pointer-events: none;
 
     & + .table-show-more-link {
       margin-top: -28px;
