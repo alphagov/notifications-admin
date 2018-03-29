@@ -167,6 +167,11 @@ metoffice.gov.uk:
   owner: Met Office
   agreement_signed: false
   crown: true
+dft.gsi.gov.uk: dft.gov.uk
+dft.gov.uk:
+  owner: Department for Transport
+  agreement_signed: true
+  crown: true  
 
 # Local Government
 aberdeencityandshire-sdpa.gov.uk:
