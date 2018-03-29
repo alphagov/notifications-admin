@@ -135,7 +135,11 @@
       {% if request.args.from_test %}
         <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
       {% else %}
-        {{file_upload(form.file, button_text='Re-upload your file')}}
+        {{ file_upload(
+          form.file,
+          action=url_for('.send_messages', service_id=current_service.id, template_id=template.id),
+          button_text='Re-upload your file'
+        ) }}
       {% endif %}
     </div>
     <a href="#content" class="back-to-top-link">Back to top</a>

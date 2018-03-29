@@ -372,27 +372,22 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
         """
     )
 
-    initial_upload = logged_in_client.post(
+    response = logged_in_client.post(
         url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
         data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
         content_type='multipart/form-data',
         follow_redirects=True
     )
 
-    reupload = logged_in_client.post(
-        url_for('main.check_messages', service_id=service_one['id'], template_type='sms', upload_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
-        content_type='multipart/form-data',
-        follow_redirects=True
-    )
+    with logged_in_client.session_transaction() as session:
+        assert session['file_uploads'] == {}
 
-    for response in [initial_upload, reupload]:
-        assert response.status_code == 200
-        content = response.get_data(as_text=True)
-        assert 'There is a problem with invalid.csv' in content
-        assert '+447700900986' in content
-        assert 'Missing' in content
-        assert 'Re-upload your file' in content
+    assert response.status_code == 200
+    content = response.get_data(as_text=True)
+    assert 'There is a problem with invalid.csv' in content
+    assert '+447700900986' in content
+    assert 'Missing' in content
+    assert 'Re-upload your file' in content
 
 
 @pytest.mark.parametrize('file_contents, expected_error,', [
@@ -483,7 +478,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     ),
 ])
 def test_upload_csvfile_with_missing_columns_shows_error(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_service_template_with_placeholders,
     mock_s3_upload,
@@ -497,15 +492,16 @@ def test_upload_csvfile_with_missing_columns_shows_error(
 
     mocker.patch('app.main.views.send.s3download', return_value=file_contents)
 
-    response = logged_in_client.post(
-        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
-        follow_redirects=True,
+    page = client_request.post(
+        'main.send_messages', service_id=service_one['id'], template_id=fake_uuid,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
+        _follow_redirects=True,
     )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert ' '.join(page.select('.banner-dangerous')[0].text.split()) == expected_error
+    with client_request.session_transaction() as session:
+        assert session['file_uploads'] == {}
+
+    assert normalize_spaces(page.select('.banner-dangerous')[0].text) == expected_error
 
 
 def test_upload_csv_invalid_extension(
@@ -1426,6 +1422,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_get_service_template,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
+    mock_get_live_service,
     service_one,
     fake_uuid,
     mock_s3_upload,
@@ -2785,14 +2782,6 @@ def test_sms_sender_is_previewed(
             'template_type': 'email',
             'upload_id': fake_uuid(),
             'filetype': 'png'
-        }
-    ),
-    (
-        'main.recheck_messages',
-        'POST',
-        {
-            'template_type': 'email',
-            'upload_id': fake_uuid()
         }
     ),
     (

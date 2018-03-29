@@ -47,7 +47,11 @@
 
   <div class="js-stick-at-top-when-scrolling">
     <div class="form-group">
-      {{ file_upload(form.file, button_text='Re-upload your file') }}
+      {{ file_upload(
+        form.file,
+        action=url_for('.send_messages', service_id=current_service.id, template_id=template.id),
+        button_text='Re-upload your file'
+      ) }}
     </div>
     <a href="#content" class="back-to-top-link">Back to top</a>
   </div>

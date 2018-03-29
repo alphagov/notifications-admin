@@ -541,8 +541,14 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
     elif preview_row > 2:
         abort(404)
 
-    session['file_uploads'][upload_id]['notification_count'] = len(recipients)
-    session['file_uploads'][upload_id]['valid'] = not recipients.has_errors
+    original_file_name = session['file_uploads'][upload_id].get('original_file_name')
+
+    if any(recipients) and not recipients.has_errors:
+        session['file_uploads'][upload_id]['notification_count'] = len(recipients)
+        session['file_uploads'][upload_id]['valid'] = True
+    else:
+        session['file_uploads'].pop(upload_id)
+
     return dict(
         recipients=recipients,
         template=template,
@@ -550,7 +556,7 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
         row_errors=get_errors_for_csv(recipients, template.template_type),
         count_of_recipients=len(recipients),
         count_of_displayed_recipients=len(list(recipients.displayed_rows)),
-        original_file_name=session['file_uploads'][upload_id].get('original_file_name'),
+        original_file_name=original_file_name,
         upload_id=upload_id,
         form=CsvUploadForm(),
         remaining_messages=remaining_messages,
@@ -608,17 +614,6 @@ def check_messages_preview(service_id, template_type, upload_id, filetype, row_i
         service_id, template_type, upload_id, row_index, letters_as_pdf=True
     )['template']
     return TemplatePreview.from_utils_template(template, filetype)
-
-
-@main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['POST'])
-@main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>", methods=['POST'])
-@login_required
-@user_has_permissions('send_messages', restrict_admin_usage=True)
-def recheck_messages(service_id, template_type, upload_id, row_index=0):
-    if not session.get('file_uploads', {}).get(upload_id):
-        return redirect(url_for('main.choose_template', service_id=service_id), code=301)
-
-    return send_messages(service_id, session['file_uploads'][upload_id].get('template_id'))
 
 
 @main.route("/services/<service_id>/start-job/<upload_id>", methods=['POST'])
