@@ -20,7 +20,6 @@ from notifications_utils.recipients import (
     optional_address_columns,
 )
 from orderedset import OrderedSet
-from werkzeug.routing import RequestRedirect
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError
 
@@ -126,14 +125,6 @@ def send_messages(service_id, template_id):
                 Spreadsheet.from_file(form.file.data, filename=form.file.data.filename).as_dict,
                 current_app.config['AWS_REGION']
             )
-            if 'file_uploads' not in session:
-                session['file_uploads'] = {}
-            session['file_uploads'].update({
-                upload_id: {
-                    "template_id": template_id,
-                    "original_file_name": form.file.data.filename
-                }
-            })
             return redirect(url_for(
                 '.check_messages',
                 service_id=service_id,
@@ -476,15 +467,6 @@ def send_test_preview(service_id, template_id, filetype):
 
 def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False):
 
-    if not session.get('file_uploads', {}).get(upload_id):
-        # if we just return a `redirect` (302) object here, we'll get errors when we try and unpack in the
-        # check_messages route - so raise a werkzeug.routing redirect to ensure that doesn't happen.
-
-        # NOTE: this is a 301 MOVED PERMANENTLY (httpstatus.es/301), so the browser will cache this redirect, and it'll
-        # *always* happen for that browser. _check_messages is only used by endpoints that contain `upload_id`, which
-        # is a one-time-use id (that ties to a given file in S3 that is already deleted if it's not in the session)
-        raise RequestRedirect(url_for('main.send_messages', service_id=service_id, template_id=template_id))
-
     users = user_api_client.get_users_for_service(service_id=service_id)
 
     statistics = service_api_client.get_detailed_service_for_today(service_id)['data']['statistics']
@@ -499,12 +481,10 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 
     email_reply_to = None
     sms_sender = None
-
     if db_template['template_type'] == 'email':
         email_reply_to = get_email_reply_to_address_from_session(service_id)
     elif db_template['template_type'] == 'sms':
         sms_sender = get_sms_sender_from_session(service_id)
-
     template = get_template(
         service_api_client.get_service_template(
             service_id,
@@ -551,6 +531,10 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         template.values = recipients[preview_row - 2].recipient_and_personalisation
     elif preview_row > 2:
         abort(404)
+
+    if 'file_uploads' not in session:
+        session['file_uploads'] = {}
+    session['file_uploads'][upload_id] = {}
 
     if any(recipients) and not recipients.has_errors:
         session['file_uploads'][upload_id]['notification_count'] = len(recipients)
@@ -719,12 +703,6 @@ def make_and_upload_csv_file(service_id, template):
         ).as_dict,
         current_app.config['AWS_REGION'],
     )
-    if 'file_uploads' not in session:
-        session['file_uploads'] = {}
-    session['file_uploads'][upload_id] = {
-        "template_id": template.id,
-        "original_file_name": current_app.config['TEST_MESSAGE_FILENAME']
-    }
     return redirect(url_for(
         '.check_messages',
         upload_id=upload_id,

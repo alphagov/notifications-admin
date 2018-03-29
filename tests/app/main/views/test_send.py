@@ -1443,9 +1443,10 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         follow_redirects=True
     )
     with logged_in_client.session_transaction() as sess:
-        assert sess['file_uploads'][fake_uuid]['template_id'] == fake_uuid
-        assert 'original_file_name' not in sess['file_uploads']
+        assert 'template_id' not in sess['file_uploads'][fake_uuid]
+        assert 'original_file_name' not in sess['file_uploads'][fake_uuid]
         assert sess['file_uploads'][fake_uuid]['notification_count'] == 53
+        assert sess['file_uploads'][fake_uuid]['valid'] is True
 
     content = response.get_data(as_text=True)
     assert response.status_code == 200
@@ -2344,26 +2345,6 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
     assert page.find('span', class_='table-field-error-label').text == u'Can’t include П, е, т or я'
 
 
-def test_check_messages_redirects_if_no_upload_data(
-    client_request,
-    fake_uuid,
-    mock_get_service_template,
-):
-    client_request.get(
-        'main.check_messages',
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-        upload_id=fake_uuid,
-        _expected_status=301,
-        _expected_redirect=url_for(
-            'main.send_messages',
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-            _external=True,
-        )
-    )
-
-
 @pytest.mark.parametrize('existing_session_items', [
     {},
     {'recipient': '07700900001'},
@@ -2782,23 +2763,6 @@ def test_sms_sender_is_previewed(
 
 
 @pytest.mark.parametrize('endpoint, request_type, extra_args', [
-    (
-        'main.check_messages',
-        'GET',
-        {
-            'template_id': fake_uuid(),
-            'upload_id': fake_uuid(),
-        }
-    ),
-    (
-        'main.check_messages_preview',
-        'GET',
-        {
-            'template_id': fake_uuid(),
-            'upload_id': fake_uuid(),
-            'filetype': 'png'
-        }
-    ),
     (
         'main.start_job',
         'POST',
