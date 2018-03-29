@@ -623,6 +623,7 @@ def start_job(service_id, upload_id):
     try:
         upload_data = session['file_uploads'][upload_id]
     except KeyError:
+        current_app.logger.exception('upload_id not in session')
         return redirect(url_for('main.choose_template', service_id=service_id), code=301)
 
     if request.files or not upload_data.get('valid'):
