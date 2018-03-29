@@ -19,22 +19,22 @@
       {% include 'views/dashboard/write-first-messages.html' %}
     {% endif %}
 
-    {{ ajax_block(partials, updates_url, 'upcoming') }}
+    {{ ajax_block(partials, updates_url, 'upcoming', interval=5) }}
 
     <h2 class="heading-medium">
       In the last 7 days
     </h2>
 
-    {{ ajax_block(partials, updates_url, 'inbox') }}
+    {{ ajax_block(partials, updates_url, 'inbox', interval=5) }}
 
-    {{ ajax_block(partials, updates_url, 'totals') }}
+    {{ ajax_block(partials, updates_url, 'totals', interval=5) }}
     {{ show_more(
       url_for('.monthly', service_id=current_service.id),
       'See messages sent per month'
     ) }}
 
     {% if partials['has_template_statistics'] %}
-      {{ ajax_block(partials, updates_url, 'template-statistics') }}
+      {{ ajax_block(partials, updates_url, 'template-statistics', interval=5) }}
       {{ show_more(
         url_for('.template_usage', service_id=current_service.id),
         'See templates used by month'
@@ -42,7 +42,7 @@
     {% endif %}
 
     {% if partials['has_jobs'] %}
-      {{ ajax_block(partials, updates_url, 'jobs') }}
+      {{ ajax_block(partials, updates_url, 'jobs', interval=5) }}
       {{ show_more(
         url_for('.view_jobs', service_id=current_service.id),
         'See all uploaded files'
