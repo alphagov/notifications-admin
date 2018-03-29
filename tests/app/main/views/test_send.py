@@ -2794,13 +2794,6 @@ def test_sms_sender_is_previewed(
             'template_type': 'email',
             'upload_id': fake_uuid()
         }
-    ),
-    (
-        'main.start_job',
-        'POST',
-        {
-            'upload_id': fake_uuid()
-        }
     )
 ])
 @pytest.mark.parametrize('session_data', [
@@ -2838,3 +2831,26 @@ def test_redirects_to_choose_template_if_no_session_exists_for_upload_id(
             _expected_status=301,
             _expected_redirect=url_for('main.choose_template', service_id=SERVICE_ONE_ID, _external=True)
         )
+
+
+def test_send_message_redirects_to_job_if_no_session(
+    client_request,
+
+):
+    with client_request.session_transaction() as session:
+        session['file_uploads'] = {}
+
+    client_request.post(
+        'main.start_job',
+        service_id=SERVICE_ONE_ID,
+        upload_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a4',
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.view_job',
+            job_id='6ce466d0-fd6a-11e5-82f5-e0accb9d11a4',
+            service_id=SERVICE_ONE_ID,
+            help=None,
+            just_sent='yes',
+            _external=True
+        )
+    )

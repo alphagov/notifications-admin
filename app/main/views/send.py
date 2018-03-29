@@ -628,7 +628,15 @@ def start_job(service_id, upload_id):
     try:
         upload_data = session['file_uploads'][upload_id]
     except KeyError:
-        return redirect(url_for('main.choose_template', service_id=service_id), code=301)
+        return redirect(
+            url_for(
+                'main.view_job',
+                job_id=upload_id,
+                service_id=service_id,
+                help=request.form.get('help'),
+                just_sent='yes',
+            )
+        )
 
     if request.files or not upload_data.get('valid'):
         # The csv was invalid, validate the csv again
