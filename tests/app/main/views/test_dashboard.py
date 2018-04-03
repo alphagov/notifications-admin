@@ -472,6 +472,29 @@ def test_monthly_shows_letters_in_breakdown(
     assert normalize_spaces(columns[2].text) == 'letters'
 
 
+@pytest.mark.parametrize('endpoint', [
+    'main.monthly',
+    'main.template_usage',
+])
+@freeze_time("2015-01-01 15:15:15.000000")
+def test_stats_pages_show_last_3_years(
+    client_request,
+    endpoint,
+    mock_get_monthly_notification_stats,
+    mock_get_monthly_template_usage,
+):
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert normalize_spaces(page.select_one('.pill').text) == (
+        '2012 to 2013 financial year '
+        '2013 to 2014 financial year '
+        '2014 to 2015 financial year'
+    )
+
+
 def test_monthly_has_equal_length_tables(
     client_request,
     service_one,
