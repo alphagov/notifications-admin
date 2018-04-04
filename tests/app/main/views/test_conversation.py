@@ -196,16 +196,13 @@ def test_view_conversation_with_empty_inbound(
 ):
     mock_get_inbound_sms = mocker.patch(
         'app.main.views.conversation.service_api_client.get_inbound_sms',
-        return_value={
-            'has_next': False,
-            'data': [{
-                'user_number': '07900000001',
-                'notify_number': '07900000002',
-                'content': '',
-                'created_at': datetime.utcnow().isoformat(),
-                'id': fake_uuid
-            }]
-        }
+        return_value=[{
+            'user_number': '07900000001',
+            'notify_number': '07900000002',
+            'content': '',
+            'created_at': datetime.utcnow().isoformat(),
+            'id': fake_uuid
+        }]
     )
 
     page = client_request.get(

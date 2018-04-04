@@ -200,27 +200,6 @@ def test_inbox_showing_inbound_messages(
     )
 
 
-def test_get_inbound_sms_shows_page_links(
-    logged_in_client,
-    service_one,
-    mock_get_service_templates_when_no_templates_exist,
-    mock_get_jobs,
-    mock_get_detailed_service,
-    mock_get_template_statistics,
-    mock_get_usage,
-    mock_get_inbound_sms,
-    mock_get_inbound_number_for_service,
-):
-    service_one['permissions'] = ['inbound_sms']
-
-    response = logged_in_client.get(url_for('main.inbox', service_id=SERVICE_ONE_ID, page=2))
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert 'Next page' in page.find('li', {'class': 'next-page'}).text
-    assert 'Previous page' in page.find('li', {'class': 'previous-page'}).text
-
-
 def test_empty_inbox(
     logged_in_client,
     service_one,
@@ -243,8 +222,6 @@ def test_empty_inbox(
         'When users text your service’s phone number (0781239871) you’ll see the messages here'
     )
     assert not page.select('a[download]')
-    assert not page.select('li.next-page')
-    assert not page.select('li.previous-page')
 
 
 @pytest.mark.parametrize('endpoint', [
@@ -356,16 +333,13 @@ def test_download_inbox_strips_formulae(
 
     mocker.patch(
         'app.service_api_client.get_inbound_sms',
-        return_value={
-            'has_next': False,
-            'data': [{
-                'user_number': 'elevenchars',
-                'notify_number': 'foo',
-                'content': message_content,
-                'created_at': datetime.utcnow().isoformat(),
-                'id': fake_uuid,
-            }]
-        },
+        return_value=[{
+            'user_number': 'elevenchars',
+            'notify_number': 'foo',
+            'content': message_content,
+            'created_at': datetime.utcnow().isoformat(),
+            'id': fake_uuid,
+        }],
     )
     response = logged_in_client.get(
         url_for('main.inbox_download', service_id=SERVICE_ONE_ID)
