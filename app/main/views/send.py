@@ -21,7 +21,6 @@ from notifications_utils.recipients import (
     optional_address_columns,
 )
 from orderedset import OrderedSet
-from werkzeug.routing import RequestRedirect
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError
 
@@ -135,18 +134,13 @@ def send_messages(service_id, template_id):
                 Spreadsheet.from_file(form.file.data, filename=form.file.data.filename).as_dict,
                 current_app.config['AWS_REGION']
             )
-            if 'file_uploads' not in session:
-                session['file_uploads'] = {}
-            session['file_uploads'].update({
-                upload_id: {
-                    "template_id": template_id,
-                    "original_file_name": form.file.data.filename
-                }
-            })
-            return redirect(url_for('.check_messages',
-                                    service_id=service_id,
-                                    upload_id=upload_id,
-                                    template_type=template.template_type))
+            return redirect(url_for(
+                '.check_messages',
+                service_id=service_id,
+                upload_id=upload_id,
+                template_id=template.id,
+                original_file_name=form.file.data.filename,
+            ))
         except (UnicodeDecodeError, BadZipFile, XLRDError):
             flash('Couldn’t read {}. Try using a different file format.'.format(
                 form.file.data.filename
@@ -480,16 +474,7 @@ def send_test_preview(service_id, template_id, filetype):
     return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
 
 
-def _check_messages(service_id, template_type, upload_id, preview_row, letters_as_pdf=False):
-
-    if not session.get('file_uploads', {}).get(upload_id):
-        # if we just return a `redirect` (302) object here, we'll get errors when we try and unpack in the
-        # check_messages route - so raise a werkzeug.routing redirect to ensure that doesn't happen.
-
-        # NOTE: this is a 301 MOVED PERMANENTLY (httpstatus.es/301), so the browser will cache this redirect, and it'll
-        # *always* happen for that browser. _check_messages is only used by endpoints that contain `upload_id`, which
-        # is a one-time-use id (that ties to a given file in S3 that is already deleted if it's not in the session)
-        raise RequestRedirect(url_for('main.choose_template', service_id=service_id))
+def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False):
 
     users = user_api_client.get_users_for_service(service_id=service_id)
 
@@ -497,29 +482,35 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
     remaining_messages = (current_service['message_limit'] - sum(stat['requested'] for stat in statistics.values()))
 
     contents = s3download(service_id, upload_id)
+
+    db_template = service_api_client.get_service_template(
+        service_id,
+        str(template_id),
+    )['data']
+
     email_reply_to = None
     sms_sender = None
-    if template_type == 'email':
+    if db_template['template_type'] == 'email':
         email_reply_to = get_email_reply_to_address_from_session(service_id)
-    elif template_type == 'sms':
+    elif db_template['template_type'] == 'sms':
         sms_sender = get_sms_sender_from_session(service_id)
     template = get_template(
         service_api_client.get_service_template(
             service_id,
-            session['file_uploads'][upload_id].get('template_id')
+            str(template_id),
         )['data'],
         current_service,
         show_recipient=True,
         letter_preview_url=url_for(
             '.check_messages_preview',
             service_id=service_id,
-            template_type=template_type,
+            template_id=template_id,
             upload_id=upload_id,
             filetype='png',
             row_index=preview_row,
         ) if not letters_as_pdf else None,
         email_reply_to=email_reply_to,
-        sms_sender=sms_sender
+        sms_sender=sms_sender,
     )
     recipients = RecipientCSV(
         contents,
@@ -550,7 +541,9 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
     elif preview_row > 2:
         abort(404)
 
-    original_file_name = session['file_uploads'][upload_id].get('original_file_name')
+    if 'file_uploads' not in session:
+        session['file_uploads'] = {}
+    session['file_uploads'][upload_id] = {}
 
     if any(recipients) and not recipients.has_errors:
         session['file_uploads'][upload_id]['notification_count'] = len(recipients)
@@ -565,7 +558,7 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
         row_errors=get_errors_for_csv(recipients, template.template_type),
         count_of_recipients=len(recipients),
         count_of_displayed_recipients=len(list(recipients.displayed_rows)),
-        original_file_name=original_file_name,
+        original_file_name=request.args.get('original_file_name'),
         upload_id=upload_id,
         form=CsvUploadForm(),
         remaining_messages=remaining_messages,
@@ -582,13 +575,14 @@ def _check_messages(service_id, template_type, upload_id, preview_row, letters_a
     )
 
 
-@main.route("/services/<service_id>/<template_type>/check/<upload_id>", methods=['GET'])
-@main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>", methods=['GET'])
+@main.route("/services/<service_id>/<uuid:template_id>/check/<upload_id>", methods=['GET'])
+@main.route("/services/<service_id>/<uuid:template_id>/check/<upload_id>/row-<int:row_index>", methods=['GET'])
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
-def check_messages(service_id, template_type, upload_id, row_index=2):
+def check_messages(service_id, template_id, upload_id, row_index=2):
+    db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
-    data = _check_messages(service_id, template_type, upload_id, row_index)
+    data = _check_messages(service_id, db_template['id'], upload_id, row_index)
 
     if (
         data['recipients'].too_many_rows or
@@ -611,16 +605,22 @@ def check_messages(service_id, template_type, upload_id, row_index=2):
     return render_template('views/check/ok.html', **data)
 
 
-@main.route("/services/<service_id>/<template_type>/check/<upload_id>.<filetype>", methods=['GET'])
-@main.route("/services/<service_id>/<template_type>/check/<upload_id>/row-<int:row_index>.<filetype>", methods=['GET'])
+@main.route(
+    "/services/<service_id>/<uuid:template_id>/check/<upload_id>.<filetype>",
+    methods=['GET'],
+)
+@main.route(
+    "/services/<service_id>/<uuid:template_id>/check/<upload_id>/row-<int:row_index>.<filetype>",
+    methods=['GET'],
+)
 @login_required
 @user_has_permissions('send_messages')
-def check_messages_preview(service_id, template_type, upload_id, filetype, row_index=2):
+def check_messages_preview(service_id, template_id, upload_id, filetype, row_index=2):
     if filetype not in ('pdf', 'png'):
         abort(404)
 
     template = _check_messages(
-        service_id, template_type, upload_id, row_index, letters_as_pdf=True
+        service_id, template_id, upload_id, row_index, letters_as_pdf=True
     )['template']
     return TemplatePreview.from_utils_template(template, filetype)
 
@@ -645,7 +645,7 @@ def start_job(service_id, upload_id):
         upload_id,
         service_id,
         upload_data.get('template_id'),
-        upload_data.get('original_file_name'),
+        request.args.get('original_file_name'),
         upload_data.get('notification_count'),
         scheduled_for=request.form.get('scheduled_for', '')
     )
@@ -712,12 +712,6 @@ def make_and_upload_csv_file(service_id, template):
         ).as_dict,
         current_app.config['AWS_REGION'],
     )
-    if 'file_uploads' not in session:
-        session['file_uploads'] = {}
-    session['file_uploads'][upload_id] = {
-        "template_id": template.id,
-        "original_file_name": current_app.config['TEST_MESSAGE_FILENAME']
-    }
     return redirect(url_for(
         '.check_messages',
         upload_id=upload_id,

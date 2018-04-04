@@ -586,7 +586,7 @@ def test_upload_valid_csv_shows_preview_and_table(
     page = client_request.get(
         'main.check_messages',
         service_id=SERVICE_ONE_ID,
-        template_type='sms',
+        template_id=fake_uuid,
         upload_id=fake_uuid,
         **extra_args
     )
@@ -599,7 +599,7 @@ def test_upload_valid_csv_shows_preview_and_table(
 
     if expected_link_in_first_row:
         assert page.select_one('.table-field-index a')['href'] == url_for(
-            'main.check_messages', service_id=SERVICE_ONE_ID, template_type='sms', upload_id=fake_uuid, row_index=2
+            'main.check_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid, upload_id=fake_uuid, row_index=2
         )
     else:
         assert not page.select_one('.table-field-index').select_one('a')
@@ -673,7 +673,7 @@ def test_show_all_columns_if_there_are_duplicate_recipient_columns(
     page = client_request.get(
         'main.check_messages',
         service_id=SERVICE_ONE_ID,
-        template_type='sms',
+        template_id=fake_uuid,
         upload_id=fake_uuid,
         _test_page_title=False,
     )
@@ -721,7 +721,7 @@ def test_404_for_previewing_a_row_out_of_range(
     client_request.get(
         'main.check_messages',
         service_id=SERVICE_ONE_ID,
-        template_type='sms',
+        template_id=fake_uuid,
         upload_id=fake_uuid,
         row_index=row_index,
         _expected_status=expected_status,
@@ -1443,9 +1443,10 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         follow_redirects=True
     )
     with logged_in_client.session_transaction() as sess:
-        assert sess['file_uploads'][fake_uuid]['template_id'] == fake_uuid
-        assert sess['file_uploads'][fake_uuid]['original_file_name'] == 'valid.csv'
+        assert 'template_id' not in sess['file_uploads'][fake_uuid]
+        assert 'original_file_name' not in sess['file_uploads'][fake_uuid]
         assert sess['file_uploads'][fake_uuid]['notification_count'] == 53
+        assert sess['file_uploads'][fake_uuid]['valid'] is True
 
     content = response.get_data(as_text=True)
     assert response.status_code == 200
@@ -1517,7 +1518,7 @@ def test_test_message_can_only_be_sent_now(
         'main.check_messages',
         service_id=service_one['id'],
         upload_id=fake_uuid,
-        template_type='sms',
+        template_id=fake_uuid,
         from_test=True
     ))
 
@@ -1552,7 +1553,7 @@ def test_letter_can_only_be_sent_now(
         'main.check_messages',
         service_id=service_one['id'],
         upload_id=fake_uuid,
-        template_type='letter',
+        template_id=fake_uuid,
         from_test=True
     ))
 
@@ -1583,15 +1584,22 @@ def test_create_job_should_call_api(
     with logged_in_client.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
-                'original_file_name': original_file_name,
                 'template_id': template_id,
                 'notification_count': notification_count,
                 'valid': True
             }
         }
 
-    url = url_for('main.start_job', service_id=service_one['id'], upload_id=job_id)
-    response = logged_in_client.post(url, data={'scheduled_for': when}, follow_redirects=True)
+    response = logged_in_client.post(
+        url_for(
+            'main.start_job',
+            service_id=service_one['id'],
+            upload_id=job_id,
+            original_file_name=original_file_name
+        ),
+        data={'scheduled_for': when},
+        follow_redirects=True,
+    )
 
     assert response.status_code == 200
     assert original_file_name in response.get_data(as_text=True)
@@ -1689,7 +1697,7 @@ def test_should_show_preview_letter_message(
         url_for(
             'main.check_messages_preview',
             service_id=service_id,
-            template_type='letter',
+            template_id=fake_uuid,
             upload_id=fake_uuid,
             filetype=filetype,
             **extra_args
@@ -1716,7 +1724,7 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
         url_for(
             'main.check_messages_preview',
             service_id=service_one['id'],
-            template_type='letter',
+            template_id=fake_uuid,
             upload_id=fake_uuid,
             filetype='blah'
         )
@@ -1931,7 +1939,7 @@ def test_check_messages_back_link(
         'main.check_messages',
         service_id=fake_uuid,
         upload_id=fake_uuid,
-        template_type='sms',
+        template_id=fake_uuid,
         **extra_args
     ))
     assert response.status_code == 200
@@ -2014,7 +2022,6 @@ def test_check_messages_shows_too_many_messages_errors(
     with logged_in_client.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
-                'original_file_name': 'valid.csv',
                 'template_id': fake_uuid,
                 'notification_count': 1,
                 'valid': True
@@ -2024,8 +2031,9 @@ def test_check_messages_shows_too_many_messages_errors(
     response = logged_in_client.get(url_for(
         'main.check_messages',
         service_id=fake_uuid,
-        template_type='sms',
-        upload_id=fake_uuid
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        original_file_name='valid.csv',
     ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -2062,7 +2070,7 @@ def test_check_messages_shows_trial_mode_error(
     response = logged_in_client.get(url_for(
         'main.check_messages',
         service_id=uuid.uuid4(),
-        template_type='sms',
+        template_id=fake_uuid,
         upload_id=fake_uuid
     ))
     assert response.status_code == 200
@@ -2115,7 +2123,7 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     page = client_request.get(
         'main.check_messages',
         service_id=SERVICE_ONE_ID,
-        template_type='letter',
+        template_id=fake_uuid,
         upload_id=fake_uuid,
         _test_page_title=False,
     )
@@ -2158,9 +2166,10 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     page = client_request.get(
         'main.check_messages',
         service_id=SERVICE_ONE_ID,
-        template_type='letter',
+        template_id=fake_uuid,
         upload_id=fake_uuid,
         _test_page_title=False,
+        original_file_name='example.xlsx',
     )
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
@@ -2196,7 +2205,7 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
     page = client_request.get(
         'main.check_messages',
         service_id=SERVICE_ONE_ID,
-        template_type='letter',
+        template_id=fake_uuid,
         upload_id=fake_uuid,
         _test_page_title=False,
     )
@@ -2234,7 +2243,7 @@ def test_generate_test_letter_doesnt_block_in_trial_mode(
     page = client_request.get(
         'main.check_messages',
         service_id=SERVICE_ONE_ID,
-        template_type='letter',
+        template_id=fake_uuid,
         upload_id=fake_uuid,
         from_test=True,
         _test_page_title=False,
@@ -2273,7 +2282,7 @@ def test_check_messages_shows_over_max_row_error(
     response = logged_in_client.get(url_for(
         'main.check_messages',
         service_id=fake_uuid,
-        template_type='sms',
+        template_id=fake_uuid,
         upload_id=fake_uuid
     ))
     assert response.status_code == 200
@@ -2313,15 +2322,15 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
         session['file_uploads'] = {
             fake_uuid: {
                 'template_id': fake_uuid,
-                'original_file_name': 'unicode.csv',
             }
         }
 
     response = logged_in_client.get(url_for(
         'main.check_messages',
         service_id=fake_uuid,
-        template_type='letter',
-        upload_id=fake_uuid
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        original_file_name='unicode.csv'
     ))
 
     assert response.status_code == 200
@@ -2334,18 +2343,6 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
         'Skip to file contents'
     )
     assert page.find('span', class_='table-field-error-label').text == u'Can’t include П, е, т or я'
-
-
-def test_check_messages_redirects_if_no_upload_data(logged_in_client, service_one):
-    response = logged_in_client.get(url_for(
-        'main.check_messages',
-        service_id=service_one['id'],
-        template_type='bar',
-        upload_id='baz'
-    ))
-
-    assert response.status_code == 301
-    assert response.location == url_for('main.choose_template', service_id=service_one['id'], _external=True)
 
 
 @pytest.mark.parametrize('existing_session_items', [
@@ -2660,8 +2657,12 @@ def test_send_notification_shows_email_error_in_trial_mode(
 
 
 @pytest.mark.parametrize('endpoint, extra_args', [
-    ('main.check_messages', {'template_type': 'email', 'upload_id': fake_uuid()}),
-    ('main.send_one_off_step', {'template_id': fake_uuid(), 'step_index': 0}),
+    ('main.check_messages', {
+        'template_id': fake_uuid(), 'upload_id': fake_uuid(), 'original_file_name': 'example.csv'
+    }),
+    ('main.send_one_off_step', {
+        'template_id': fake_uuid(), 'step_index': 0
+    }),
 ])
 @pytest.mark.parametrize('reply_to_address', [
     None,
@@ -2689,12 +2690,7 @@ def test_reply_to_is_previewed_if_chosen(
         session['recipient'] = 'notify@digital.cabinet-office.gov.uk'
         session['placeholders'] = {}
         session['file_uploads'] = {
-            fake_uuid: {
-                'original_file_name': 'example.csv',
-                'template_id': fake_uuid,
-                'notification_count': 1,
-                'valid': True
-            }
+            fake_uuid: {'template_id': fake_uuid}
         }
         session['sender_id'] = reply_to_address
 
@@ -2713,7 +2709,7 @@ def test_reply_to_is_previewed_if_chosen(
 
 
 @pytest.mark.parametrize('endpoint, extra_args', [
-    ('main.check_messages', {'template_type': 'sms', 'upload_id': fake_uuid()}),
+    ('main.check_messages', {'template_id': fake_uuid(), 'upload_id': fake_uuid()}),
     ('main.send_one_off_step', {'template_id': fake_uuid(), 'step_index': 0}),
 ])
 @pytest.mark.parametrize('sms_sender', [
@@ -2768,23 +2764,6 @@ def test_sms_sender_is_previewed(
 
 @pytest.mark.parametrize('endpoint, request_type, extra_args', [
     (
-        'main.check_messages',
-        'GET',
-        {
-            'template_type': 'email',
-            'upload_id': fake_uuid(),
-        }
-    ),
-    (
-        'main.check_messages_preview',
-        'GET',
-        {
-            'template_type': 'email',
-            'upload_id': fake_uuid(),
-            'filetype': 'png'
-        }
-    ),
-    (
         'main.start_job',
         'POST',
         {
@@ -2802,6 +2781,7 @@ def test_sms_sender_is_previewed(
 ])
 def test_redirects_to_choose_template_if_no_session_exists_for_upload_id(
     client_request,
+    mock_get_service_email_template,
     endpoint,
     request_type,
     session_data,
@@ -2817,7 +2797,9 @@ def test_redirects_to_choose_template_if_no_session_exists_for_upload_id(
             service_id=SERVICE_ONE_ID,
             **extra_args,
             _expected_status=301,
-            _expected_redirect=url_for('main.choose_template', service_id=SERVICE_ONE_ID, _external=True)
+            _expected_redirect=url_for(
+                'main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid, _external=True
+            )
         )
     else:
         client_request.post(
@@ -2825,5 +2807,7 @@ def test_redirects_to_choose_template_if_no_session_exists_for_upload_id(
             service_id=SERVICE_ONE_ID,
             **extra_args,
             _expected_status=301,
-            _expected_redirect=url_for('main.choose_template', service_id=SERVICE_ONE_ID, _external=True)
+            _expected_redirect=url_for(
+                'main.choose_template', service_id=SERVICE_ONE_ID, _external=True
+            )
         )

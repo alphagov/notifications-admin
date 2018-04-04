@@ -27,7 +27,7 @@
   {{ template|string }}
 
   <div class="bottom-gutter-3-2">
-    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}" class='page-footer'>
+    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id, original_file_name=original_file_name)}}" class='page-footer'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="hidden" name="help" value="{{ '3' if help else 0 }}" />
       {% if choose_time_form and template.template_type != 'letter' %}
@@ -39,7 +39,7 @@
       {% if template.template_type != 'letter' or not request.args.from_test %}
       <button type="submit" class="button">Send {{ count_of_recipients }} {{ message_count_label(count_of_recipients, template.template_type, suffix='') }}</button>
       {% else %}
-        <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_type=template.template_type, upload_id=upload_id, filetype='pdf') }}" download class="button">Download as a printable PDF</a>
+        <a href="{{ url_for('main.check_messages_preview', service_id=current_service.id, template_id=template.id, upload_id=upload_id, filetype='pdf') }}" download class="button">Download as a printable PDF</a>
       {% endif %}
       <a href="{{ back_link }}" class="page-footer-back-link">Back</a>
     </form>
@@ -63,7 +63,7 @@
             {% if (item.index + 2) == preview_row %}
               {{ item.index + 2 }}
             {% else %}
-              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_type=template.template_type, upload_id=upload_id, row_index=(item.index + 2)) }}">{{ item.index + 2 }}</a>
+              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=(item.index + 2)) }}">{{ item.index + 2 }}</a>
             {% endif %}
           </span>
         {% endcall %}
