@@ -1,4 +1,5 @@
 import itertools
+import json
 from string import ascii_uppercase
 from zipfile import BadZipFile
 
@@ -92,6 +93,14 @@ def get_example_letter_address(key):
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_messages(service_id, template_id):
+    # if there's lots of data in the session, lets log it for debugging purposes
+    # TODO: Remove this once we're confident we have session size under control
+    if len(session.get('file_uploads', {}).keys()) > 2:
+        current_app.logger.info('session contains large file_uploads - json_len {}, keys: {}'.format(
+            len(json.dumps(session['file_uploads'])),
+            session['file_uploads'].keys())
+        )
+
     session['sender_id'] = None
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 

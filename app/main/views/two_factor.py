@@ -100,7 +100,9 @@ def log_in_user(user_id):
         activated_user = user_api_client.activate_user(user)
         login_user(activated_user)
     finally:
+        # get rid of anything in the session that we don't expect to have been set during register/sign in flow
         session.pop("user_details", None)
+        session.pop("file_uploads", None)
 
     return redirect_when_logged_in(user_id)
 
