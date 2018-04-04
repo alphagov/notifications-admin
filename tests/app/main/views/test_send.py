@@ -1443,9 +1443,9 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         follow_redirects=True
     )
     with logged_in_client.session_transaction() as sess:
-        assert 'template_id' not in sess['file_uploads'][fake_uuid]
         assert 'original_file_name' not in sess['file_uploads'][fake_uuid]
         assert sess['file_uploads'][fake_uuid]['notification_count'] == 53
+        assert sess['file_uploads'][fake_uuid]['template_id'] == fake_uuid
         assert sess['file_uploads'][fake_uuid]['valid'] is True
 
     content = response.get_data(as_text=True)
