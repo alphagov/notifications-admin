@@ -272,6 +272,16 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             }
         )
 
+    def get_most_recent_inbound_sms(self, service_id, page=None):
+        return self.get(
+            '/service/{}/inbound-sms/most-recent'.format(
+                service_id,
+            ),
+            params={
+                'page': page
+            }
+        )
+
     def get_inbound_sms_by_id(self, service_id, notification_id):
         return self.get(
             '/service/{}/inbound-sms/{}'.format(
