@@ -261,16 +261,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def update_whitelist(self, service_id, data):
         return self.put(url='/service/{}/whitelist'.format(service_id), data=data)
 
-    def get_inbound_sms(self, service_id, user_number='', page=None):
+    def get_inbound_sms(self, service_id, user_number=''):
         return self.get(
-            '/service/{}/inbound-sms'.format(
+            '/service/{}/inbound-sms?user_number={}'.format(
                 service_id,
-            ),
-            params={
-                'user_number': user_number,
-                'page': page
-            }
-        )
+                user_number,
+            )
+        )['data']
 
     def get_inbound_sms_by_id(self, service_id, notification_id):
         return self.get(
