@@ -547,6 +547,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 
     if any(recipients) and not recipients.has_errors:
         session['file_uploads'][upload_id]['notification_count'] = len(recipients)
+        session['file_uploads'][upload_id]['template_id'] = str(template_id)
         session['file_uploads'][upload_id]['valid'] = True
     else:
         session['file_uploads'].pop(upload_id)
