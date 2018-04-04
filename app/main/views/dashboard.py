@@ -238,7 +238,7 @@ def get_inbox_partials(service_id):
     if 'inbound_sms' not in current_service['permissions']:
         abort(403)
 
-    inbound_messages_data = service_api_client.get_inbound_sms(service_id, page=page)
+    inbound_messages_data = service_api_client.get_most_recent_inbound_sms(service_id, page=page)
     inbound_messages = inbound_messages_data['data']
 
     if not inbound_messages:
