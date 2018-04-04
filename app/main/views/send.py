@@ -2,6 +2,7 @@ import itertools
 import json
 from string import ascii_uppercase
 from zipfile import BadZipFile
+from datetime import datetime, timedelta
 
 from flask import (
     abort,
@@ -182,13 +183,45 @@ def get_example_csv(service_id, template_id):
     }
 
 
-@main.route("/services/<service_id>/send/<template_id>/set-sender", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/send/<template_id>/one-off/", methods=['GET'])
+def start_one_off_flow(service_id, template_id):
+    if 'one_off' not in session:
+        session['one_off'] = {}
+    else:
+        session['one_off'] = {
+            k : v for k,v in session['one_off'].items()
+                if v['created_at'] > datetime.utcnow() - timedelta(minutes=1)
+        }
+
+    one_off_session_id = str(uuid.uuid4())
+    session['one_off'].update({
+        one_off_session_id: {
+            'sender_id': None,
+            'created_at': datetime.utcnow()
+        }
+    })
+
+    return redirect(
+        url_for(
+            '.set_sender',
+            service_id=service_id,
+            template_id=template_id,
+            one_off_id=one_off_session_id
+        )
+    )
+
+
+@main.route("/services/<service_id>/send/<template_id>/one-off/<one_off_id>/set-sender", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
-def set_sender(service_id, template_id):
-    session['sender_id'] = None
+def set_sender(service_id, template_id, one_off_id):
     redirect_to_one_off = redirect(
-        url_for('.send_one_off', service_id=service_id, template_id=template_id)
+        url_for(
+            '.send_one_off',
+            service_id=service_id,
+            template_id=template_id,
+            one_off_id=one_off_id
+        )
     )
 
     template = service_api_client.get_service_template(service_id, template_id)['data']
@@ -207,6 +240,7 @@ def set_sender(service_id, template_id):
         sender_choices=sender_context['value_and_label'],
         sender_label=sender_context['description']
     )
+
     option_hints = {sender_context['default_id']: '(Default)'}
     if sender_context.get('receives_text_message', None):
         option_hints.update({sender_context['receives_text_message']: '(Receives replies)'})
@@ -214,7 +248,8 @@ def set_sender(service_id, template_id):
         option_hints = {sender_context['default_and_receives']: '(Default and receives replies)'}
 
     if form.validate_on_submit():
-        session['sender_id'] = form.sender.data
+        session['one_off'][one_off_id]['sender_id'] = form.sender.data
+
         return redirect(url_for('.send_one_off',
                                 service_id=service_id,
                                 template_id=template_id))
