@@ -164,10 +164,13 @@ def test_inbound_messages_shows_count_of_messages(
 
 @pytest.mark.parametrize('index, expected_row', enumerate([
     '07900 900000 message-1 1 hour ago',
+    '07900 900000 message-2 1 hour ago',
+    '07900 900000 message-3 1 hour ago',
     '07900 900002 message-4 3 hours ago',
     '07900 900004 message-5 5 hours ago',
     '07900 900006 message-6 7 hours ago',
     '07900 900008 message-7 9 hours ago',
+    '07900 900008 message-8 9 hours ago',
 ]))
 def test_inbox_showing_inbound_messages(
     logged_in_client,
@@ -189,11 +192,8 @@ def test_inbox_showing_inbound_messages(
 
     assert response.status_code == 200
     rows = page.select('tbody tr')
-    assert len(rows) == 5
+    assert len(rows) == 8
     assert normalize_spaces(rows[index].text) == expected_row
-    assert normalize_spaces(page.select('.table-show-more-link')) == (
-        '8 messages from 5 users'
-    )
     assert page.select_one('a[download]')['href'] == url_for(
         'main.inbox_download',
         service_id=SERVICE_ONE_ID,

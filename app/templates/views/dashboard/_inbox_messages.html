@@ -34,12 +34,6 @@
       </span>
     {% endcall %}
   {% endcall %}
-  {% if messages %}
-    <p class="table-show-more-link">
-      {{ count_of_messages }} message{{ '' if 1 == count_of_messages else 's' }}
-      from {{ count_of_users }} user{{ '' if 1 == count_of_users else 's' }}
-    </p>
-  {% endif %}
 
   {{ previous_next_navigation(prev_page, next_page) }}
 </div>

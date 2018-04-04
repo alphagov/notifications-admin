@@ -12,7 +12,6 @@ from flask import (
     url_for,
 )
 from flask_login import login_required
-from notifications_utils.recipients import format_phone_number_human_readable
 from werkzeug.utils import redirect
 
 from app import (
@@ -242,16 +241,6 @@ def get_inbox_partials(service_id):
     inbound_messages_data = service_api_client.get_inbound_sms(service_id, page=page)
     inbound_messages = inbound_messages_data['data']
 
-    messages_to_show = {}
-    # get the most recent message for each number
-    for message in inbound_messages:
-        human_readable = format_phone_number_human_readable(message['user_number'])
-        if human_readable not in messages_to_show:
-            messages_to_show[human_readable] = message
-
-    count_of_users = len(messages_to_show)
-    messages_to_show = sorted(messages_to_show.values(), key=lambda x: x['created_at'], reverse=True)
-
     if not inbound_messages:
         inbound_number = inbound_number_client.get_inbound_sms_number_for_service(service_id)['data']['number']
     else:
@@ -266,9 +255,7 @@ def get_inbox_partials(service_id):
 
     return {'messages': render_template(
         'views/dashboard/_inbox_messages.html',
-        messages=list(messages_to_show),
-        count_of_messages=len(inbound_messages),
-        count_of_users=count_of_users,
+        messages=inbound_messages,
         inbound_number=inbound_number,
         prev_page=prev_page,
         next_page=next_page
