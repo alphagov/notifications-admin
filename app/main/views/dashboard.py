@@ -130,6 +130,7 @@ def template_usage(service_id):
         ),
         years=get_tuples_of_financial_years(
             partial(url_for, '.template_usage', service_id=service_id),
+            start=current_financial_year - 2,
             end=current_financial_year,
         ),
         selected_year=year
@@ -179,6 +180,7 @@ def monthly(service_id):
         ),
         years=get_tuples_of_financial_years(
             partial_url=partial(url_for, '.monthly', service_id=service_id),
+            start=current_financial_year - 2,
             end=current_financial_year,
         ),
         selected_year=year,
