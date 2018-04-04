@@ -1170,6 +1170,46 @@ def test_send_test_letter_clears_previous_page_cache(
         assert session['send_test_letter_page_count'] is None
 
 
+def test_send_test_letter_redirects_to_right_url(
+    logged_in_platform_admin_client,
+    fake_uuid,
+    mock_get_service_letter_template,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    mocker,
+):
+
+    with logged_in_platform_admin_client.session_transaction() as session:
+        session['send_test_letter_page_count'] = 1
+        session['recipient'] = ''
+        session['placeholders'] = {
+            'address line 1': 'foo',
+            'address line 2': 'bar',
+            'address line 3': '',
+            'address line 4': '',
+            'address line 5': '',
+            'address line 6': '',
+            'postcode': 'SW1 1AA',
+        }
+
+    response = logged_in_platform_admin_client.get(url_for(
+        'main.send_one_off_step',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=7,  # letter template has 7 placeholders – we’re at the end
+    ))
+
+    assert response.status_code == 302
+    assert response.location.startswith(url_for(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        _external=True,
+    ))
+
+
 def test_send_test_populates_field_from_session(
     logged_in_client,
     mocker,
@@ -1622,7 +1662,6 @@ def test_can_start_letters_job(
     with logged_in_platform_admin_client.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
-                'original_file_name': 'example.csv',
                 'template_id': fake_uuid,
                 'notification_count': 123,
                 'valid': True
@@ -1686,7 +1725,6 @@ def test_should_show_preview_letter_message(
     with logged_in_platform_admin_client.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
-                'original_file_name': 'example.csv',
                 'template_id': fake_uuid,
                 'notification_count': 1,
                 'valid': True
@@ -2740,7 +2778,6 @@ def test_sms_sender_is_previewed(
         session['placeholders'] = {}
         session['file_uploads'] = {
             fake_uuid: {
-                'original_file_name': 'example.csv',
                 'template_id': fake_uuid,
                 'notification_count': 1,
                 'valid': True
