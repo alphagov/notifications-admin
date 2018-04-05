@@ -172,6 +172,10 @@ dft.gov.uk:
   owner: Department for Transport
   agreement_signed: true
   crown: true  
+innovateuk.gov.uk:
+  owner: Innovate UK
+  agreement_signed: false
+  crown: false
 
 # Local Government
 aberdeencityandshire-sdpa.gov.uk:
