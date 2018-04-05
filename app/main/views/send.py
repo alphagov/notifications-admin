@@ -717,7 +717,7 @@ def make_and_upload_csv_file(service_id, template):
         '.check_messages',
         upload_id=upload_id,
         service_id=service_id,
-        template_type=template.template_type,
+        template_id=template.id,
         from_test=True,
         help=2 if get_help_argument() else 0
     ))
