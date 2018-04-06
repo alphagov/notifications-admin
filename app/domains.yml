@@ -171,7 +171,7 @@ dft.gsi.gov.uk: dft.gov.uk
 dft.gov.uk:
   owner: Department for Transport
   agreement_signed: true
-  crown: true  
+  crown: true
 innovateuk.gov.uk:
   owner: Innovate UK
   agreement_signed: false
@@ -5084,13 +5084,10 @@ wyrebc.gov.uk:
   crown: false
   agreement_signed: false
 wyreforestdc.gov.uk:
-  owner: Wyre Forest District Council
-  crown: false
-  agreement_signed: false
 wyreforest.gov.uk:
   owner: Wyre Forest District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 wyre.gov.uk:
   owner: Wyre Council
   crown: false
