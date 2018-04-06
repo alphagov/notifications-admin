@@ -2123,7 +2123,7 @@ def test_updates_sms_prefixing(
         )
     )
     mock_update_service.assert_called_once_with(
-        service_id=SERVICE_ONE_ID,
+        SERVICE_ONE_ID,
         prefix_sms=expected_api_argument,
     )
 
