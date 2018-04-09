@@ -10,9 +10,14 @@ from app.utils import AgreementInfo
 @main.route('/agreement')
 @login_required
 def agreement():
+
+    agreement_info = AgreementInfo.from_current_user()
+
+    agreement_info.crown_status_or_404
+
     return render_template(
         'views/agreement.html',
-        crown_status=AgreementInfo.from_current_user().crown_status_or_404,
+        owner=agreement_info.owner,
         navigation_links=features_nav(),
     )
 
