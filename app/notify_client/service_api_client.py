@@ -127,6 +127,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post('/service/{}/resume'.format(service_id), data=None)
 
     @cache.delete('service')
+    @cache.delete('user', key_from_args=[1])
     def remove_user_from_service(self, service_id, user_id):
         """
         Remove a user from a service

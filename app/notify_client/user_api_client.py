@@ -36,10 +36,12 @@ class UserApiClient(NotifyAdminAPIClient):
         user_data = self.post("/user", data)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
-    def get_user(self, id):
-        url = "/user/{}".format(id)
-        user_data = self.get(url)
-        return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
+    def get_user(self, user_id):
+        return User(self._get_user(user_id)['data'], max_failed_login_count=self.max_failed_login_count)
+
+    @cache.set('user')
+    def _get_user(self, user_id):
+        return self.get("/user/{}".format(user_id))
 
     def get_user_by_email(self, email_address):
         user_data = self.get('/user/email', params={'email': email_address})
@@ -59,6 +61,7 @@ class UserApiClient(NotifyAdminAPIClient):
             users.append(User(user, max_failed_login_count=self.max_failed_login_count))
         return users
 
+    @cache.delete('user')
     def update_user_attribute(self, user_id, **kwargs):
         data = dict(kwargs)
         disallowed_attributes = set(data.keys()) - ALLOWED_ATTRIBUTES
@@ -72,17 +75,20 @@ class UserApiClient(NotifyAdminAPIClient):
         user_data = self.post(url, data=data)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
+    @cache.delete('user')
     def reset_failed_login_count(self, user_id):
         url = "/user/{}/reset-failed-login-count".format(user_id)
         user_data = self.post(url, data={})
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
+    @cache.delete('user')
     def update_password(self, user_id, password):
         data = {"_password": password}
         url = "/user/{}/update-password".format(user_id)
         user_data = self.post(url, data=data)
         return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
 
+    @cache.delete('user')
     def verify_password(self, user_id, password):
         try:
             url = "/user/{}/verify/password".format(user_id)
@@ -112,6 +118,7 @@ class UserApiClient(NotifyAdminAPIClient):
         endpoint = '/user/{0}/email-already-registered'.format(user_id)
         self.post(endpoint, data=data)
 
+    @cache.delete('user')
     def check_verify_code(self, user_id, code, code_type):
         data = {'code_type': code_type, 'code': code}
         endpoint = '/user/{}/verify/code'.format(user_id)
@@ -148,16 +155,19 @@ class UserApiClient(NotifyAdminAPIClient):
         return [User(data) for data in resp['data']]
 
     @cache.delete('service')
+    @cache.delete('user', key_from_args=[1])
     def add_user_to_service(self, service_id, user_id, permissions):
         # permissions passed in are the combined admin roles, not db permissions
         endpoint = '/service/{}/users/{}'.format(service_id, user_id)
         data = [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)]
         self.post(endpoint, data=data)
 
+    @cache.delete('user', key_from_args=[1])
     def add_user_to_organisation(self, org_id, user_id):
         resp = self.post('/organisations/{}/users/{}'.format(org_id, user_id), data={})
         return User(resp['data'], max_failed_login_count=self.max_failed_login_count)
 
+    @cache.delete('user')
     def set_user_permissions(self, user_id, service_id, permissions):
         # permissions passed in are the combined admin roles, not db permissions
         data = [{'permission': x} for x in translate_permissions_from_admin_roles_to_db(permissions)]
@@ -176,11 +186,14 @@ class UserApiClient(NotifyAdminAPIClient):
 
     def activate_user(self, user):
         if user.state == 'pending':
-            url = "/user/{}/activate".format(user.id)
-            user_data = self.post(url, data=None)
+            user_data = self._activate_user(user.id)
             return User(user_data['data'], max_failed_login_count=self.max_failed_login_count)
         else:
             return user
+
+    @cache.delete('user')
+    def _activate_user(self, user_id):
+        return self.post("/user/{}/activate".format(user_id), data=None)
 
     def send_change_email_verification(self, user_id, new_email):
         endpoint = '/user/{}/change-email-verification'.format(user_id)
