@@ -226,7 +226,7 @@ def submit_request_to_go_live(service_id):
         except DeskproError:
             abort(500, "Request to go live submission failed")
 
-        flash('We’ve received your request to go live', 'default')
+        flash('Thanks for your request to go live. We’ll get back to you within one working day.', 'default')
         return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template('views/service-settings/submit-request-to-go-live.html', form=form)

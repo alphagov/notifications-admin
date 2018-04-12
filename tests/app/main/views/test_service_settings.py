@@ -595,7 +595,7 @@ def test_should_redirect_after_request_to_go_live(
     assert 'Features: one off, file upload and API' in returned_message
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (
-        'We’ve received your request to go live'
+        'Thanks for your request to go live. We’ll get back to you within one working day.'
     )
     assert normalize_spaces(page.select_one('h1').text) == (
         'Settings'
