@@ -283,6 +283,8 @@ def test_conversation_reply_redirects_with_phone_number_from_notification(
     fake_uuid,
     mock_get_inbound_sms_by_id_with_no_messages,
     mock_get_notification,
+    mock_get_inbound_number_for_service,
+    multiple_sms_senders,
     mock_get_service_template,
 ):
 

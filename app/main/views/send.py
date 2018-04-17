@@ -1,8 +1,9 @@
 import itertools
 import json
+import uuid
+from datetime import datetime, timedelta
 from string import ascii_uppercase
 from zipfile import BadZipFile
-from datetime import datetime, timedelta
 
 from flask import (
     abort,
@@ -103,7 +104,6 @@ def send_messages(service_id, template_id):
             session['file_uploads'].keys())
         )
 
-    session['sender_id'] = None
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
     if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
@@ -189,14 +189,16 @@ def start_one_off_flow(service_id, template_id):
         session['one_off'] = {}
     else:
         session['one_off'] = {
-            k : v for k,v in session['one_off'].items()
-                if v['created_at'] > datetime.utcnow() - timedelta(minutes=1)
+            k: v for k, v in session['one_off'].items() if v['created_at'] > datetime.utcnow() - timedelta(hours=2)
         }
 
     one_off_session_id = str(uuid.uuid4())
     session['one_off'].update({
         one_off_session_id: {
-            'sender_id': None,
+            'sender': {
+                'sender_id': None,
+                'sender_name': None
+            },
             'created_at': datetime.utcnow()
         }
     })
@@ -248,11 +250,17 @@ def set_sender(service_id, template_id, one_off_id):
         option_hints = {sender_context['default_and_receives']: '(Default and receives replies)'}
 
     if form.validate_on_submit():
-        session['one_off'][one_off_id]['sender_id'] = form.sender.data
+        sender_id = form.sender.data
+        sender_name = next(choice[1] for choice in form.sender.choices if choice[0] == sender_id)
 
+        session['one_off'][one_off_id]['sender'].update({
+            'sender_id': sender_id,
+            'sender_name': sender_name
+        })
         return redirect(url_for('.send_one_off',
                                 service_id=service_id,
-                                template_id=template_id))
+                                template_id=template_id,
+                                one_off_id=one_off_id))
 
     return render_template(
         'views/templates/set-sender.html',
@@ -315,8 +323,6 @@ def send_test(service_id, template_id):
     session['send_test_letter_page_count'] = None
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
-    if db_template['template_type'] == 'letter':
-        session['sender_id'] = None
 
     if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
         return redirect(url_for(
@@ -340,7 +346,7 @@ def send_test(service_id, template_id):
 
 def get_notification_check_endpoint(service_id, template):
     if template.template_type == 'letter':
-        return make_and_upload_csv_file(service_id, template)
+        return make_and_upload_csv_file(service_id, template, one_off_id)
     else:
         return redirect(url_for(
             'main.check_notification',
@@ -371,6 +377,7 @@ def send_test_step(service_id, template_id, step_index):
                 'main.send_one_off_step': '.send_one_off',
             }[request.endpoint],
             service_id=service_id,
+            one_off_id=one_off_id,
             template_id=template_id,
         ))
 
@@ -381,9 +388,9 @@ def send_test_step(service_id, template_id, step_index):
     email_reply_to = None
     sms_sender = None
     if db_template['template_type'] == 'email':
-        email_reply_to = get_email_reply_to_address_from_session(service_id)
+        email_reply_to = get_email_reply_to_address_from_session(service_id, one_off_id)
     elif db_template['template_type'] == 'sms':
-        sms_sender = get_sms_sender_from_session(service_id)
+        sms_sender = get_sms_sender_from_session(service_id, one_off_id)
     template = get_template(
         db_template,
         current_service,
@@ -393,6 +400,7 @@ def send_test_step(service_id, template_id, step_index):
             '.send_test_preview',
             service_id=service_id,
             template_id=template_id,
+            one_off_id=one_off_id,
             filetype='png',
         ),
         page_count=session['send_test_letter_page_count'],
@@ -402,6 +410,7 @@ def send_test_step(service_id, template_id, step_index):
 
     placeholders = fields_to_fill_in(
         template,
+        one_off_id,
         prefill_current_user=(request.endpoint == 'main.send_test_step'),
     )
 
@@ -485,10 +494,10 @@ def send_test_step(service_id, template_id, step_index):
     )
 
 
-@main.route("/services/<service_id>/send/<template_id>/test.<filetype>", methods=['GET'])
+@main.route("/services/<service_id>/send/<template_id>/one_off/<one_off_id>/test/test.<filetype>", methods=['GET'])
 @login_required
 @user_has_permissions('send_messages')
-def send_test_preview(service_id, template_id, filetype):
+def send_test_preview(service_id, template_id, one_off_id, filetype):
 
     if filetype not in ('pdf', 'png'):
         abort(404)
@@ -502,16 +511,17 @@ def send_test_preview(service_id, template_id, filetype):
             '.send_test_preview',
             service_id=service_id,
             template_id=template_id,
+            one_off_id=one_off_id,
             filetype='png',
         ),
     )
 
-    template.values = get_normalised_placeholders_from_session()
+    template.values = get_normalised_placeholders_from_session(one_off_id)
 
     return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
 
 
-def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False, write_metadata=False):
+def _check_messages(service_id, template_id, upload_id, preview_row, one_off_id, letters_as_pdf=False, write_metadata=False):
 
     try:
         # The happy path is that the job doesn’t already exist, so the
@@ -559,6 +569,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
             template_id=template_id,
             upload_id=upload_id,
             filetype='png',
+            one_off_id=one_off_id,
             row_index=preview_row,
         ) if not letters_as_pdf else None,
         email_reply_to=email_reply_to,
@@ -579,7 +590,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 
     if request.args.get('from_test'):
         # only happens if generating a letter preview test
-        back_link = url_for('.send_test', service_id=service_id, template_id=template.id)
+        back_link = url_for('.send_test', service_id=service_id, template_id=template.id, one_off_id=one_off_id)
         choose_time_form = None
     else:
         back_link = url_for('.send_messages', service_id=service_id, template_id=template.id)
@@ -635,8 +646,9 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_messages(service_id, template_id, upload_id, row_index=2):
+    one_off_id = request.args.get('one_off_id', None)
 
-    data = _check_messages(service_id, template_id, upload_id, row_index, write_metadata=True)
+    data = _check_messages(service_id, db_template['id'], upload_id, row_index, one_off_id, write_metadata=True)
 
     if (
         data['recipients'].too_many_rows or
@@ -669,12 +681,12 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
 )
 @login_required
 @user_has_permissions('send_messages')
-def check_messages_preview(service_id, template_id, upload_id, filetype, row_index=2):
+def check_messages_preview(service_id, template_id, upload_id, filetype, one_off_id=None, row_index=2):
     if filetype not in ('pdf', 'png'):
         abort(404)
 
     template = _check_messages(
-        service_id, template_id, upload_id, row_index, letters_as_pdf=True, write_metadata=False,
+        service_id, template_id, upload_id, row_index, one_off_id=one_off_id, letters_as_pdf=True, write_metadata=False,
     )['template']
     return TemplatePreview.from_utils_template(template, filetype)
 
@@ -713,14 +725,17 @@ def go_to_dashboard_after_tour(service_id, example_template_id):
     )
 
 
-def fields_to_fill_in(template, prefill_current_user=False):
+def fields_to_fill_in(template, one_off_id, prefill_current_user=False):
 
     recipient_columns = first_column_headings[template.template_type]
 
     if 'letter' == template.template_type or not prefill_current_user:
         return recipient_columns + list(template.placeholders)
 
-    session['recipient'] = current_user.mobile_number if template.template_type == 'sms' else current_user.email_address
+    if template.template_type == 'sms':
+        session['one_off'][one_off_id]['recipient'] = current_user.mobile_number
+    else:
+        session['one_off'][one_off_id]['recipient'] = current_user.email_address
 
     return list(template.placeholders)
 
@@ -743,11 +758,11 @@ def get_recipient_and_placeholders_from_session(template_type):
     return placeholders
 
 
-def make_and_upload_csv_file(service_id, template):
+def make_and_upload_csv_file(service_id, template, one_off_id):
     upload_id = s3upload(
         service_id,
         Spreadsheet.from_dict(
-            session['placeholders'],
+            session['one_off'][one_off_id]['placeholders'],
             filename=current_app.config['TEST_MESSAGE_FILENAME']
         ).as_dict,
         current_app.config['AWS_REGION'],
@@ -758,8 +773,10 @@ def make_and_upload_csv_file(service_id, template):
         service_id=service_id,
         template_id=template.id,
         from_test=True,
-        help=2 if get_help_argument() else 0
-    ))
+        help=2 if get_help_argument() else 0,
+        one_off_id=one_off_id
+    )
+    )
 
 
 def all_placeholders_in_session(placeholders):
@@ -818,9 +835,9 @@ def _check_notification(service_id, template_id, exception=None):
     email_reply_to = None
     sms_sender = None
     if db_template['template_type'] == 'email':
-        email_reply_to = get_email_reply_to_address_from_session(service_id)
+        email_reply_to = get_email_reply_to_address_from_session(service_id, one_off_id)
     elif db_template['template_type'] == 'sms':
-        sms_sender = get_sms_sender_from_session(service_id)
+        sms_sender = get_sms_sender_from_session(service_id, one_off_id)
     template = get_template(
         db_template,
         current_service,
@@ -842,6 +859,7 @@ def _check_notification(service_id, template_id, exception=None):
     return render_template(
         'views/notifications/check.html',
         template=template,
+        one_off_id=one_off_id,
         back_link=back_link,
         help=get_help_argument(),
 
@@ -884,16 +902,16 @@ def send_notification(service_id, template_id):
         noti = notification_api_client.send_notification(
             service_id,
             template_id=template_id,
-            recipient=session['recipient'],
-            personalisation=session['placeholders'],
-            sender_id=session['sender_id'] if 'sender_id' in session else None
+            recipient=session['one_off'][one_off_id]['recipient'],
+            personalisation=session['one_off'][one_off_id]['placeholders'],
+            sender_id=session['one_off'][one_off_id]['sender'].get('sender_id', None)
         )
     except HTTPError as exception:
         current_app.logger.info('Service {} could not send notification: "{}"'.format(
             current_service['id'],
             exception.message
         ))
-        return _check_notification(service_id, template_id, exception)
+        return _check_notification(service_id, template_id, one_off_id, exception)
 
     session.pop('placeholders')
     session.pop('recipient')
@@ -907,15 +925,36 @@ def send_notification(service_id, template_id):
     ))
 
 
-def get_email_reply_to_address_from_session(service_id):
-    if session.get('sender_id'):
-        return service_api_client.get_reply_to_email_address(
-            service_id, session['sender_id']
-        )['email_address']
+def get_email_reply_to_address_from_session(service_id, one_off_id=None):
+    if one_off_id:
+        if session['one_off'][one_off_id]['sender'].get('sender_name', None):
+            return session['one_off'][one_off_id]['sender']['sender_name']
+        else:
+            reply_to_addresses = service_api_client.get_reply_to_email_addresses(service_id)
+            default_reply_to_address_dict = next(
+                (reply_to['email_address'] for reply_to in reply_to_addresses if reply_to['is_default']), None
+            )
+            return default_reply_to_address_dict
+    else:
+        reply_to_addresses = service_api_client.get_reply_to_email_addresses(service_id)
+        default_reply_to_address_dict = next(
+            (reply_to['email_address'] for reply_to in reply_to_addresses if reply_to['is_default']), None
+        )
+        return default_reply_to_address_dict
 
 
-def get_sms_sender_from_session(service_id):
-    if session.get('sender_id'):
-        return service_api_client.get_sms_sender(
-            service_id=service_id, sms_sender_id=session['sender_id']
-        )['sms_sender']
+def get_sms_sender_from_session(service_id, one_off_id=None):
+    if one_off_id:
+        if session['one_off'][one_off_id]['sender'].get('sender_name', None):
+            return session['one_off'][one_off_id]['sender']['sender_name']
+        else:
+            sms_senders = service_api_client.get_sms_senders(service_id)
+            default_sms_sender_dict = next(
+                (sender['sms_sender'] for sender in sms_senders if sender['is_default']), None
+            )
+            return default_sms_sender_dict
+    else:
+        sms_senders = service_api_client.get_sms_senders(service_id)
+        return next(
+            (sender['sms_sender'] for sender in sms_senders if sender['is_default']), None
+        )

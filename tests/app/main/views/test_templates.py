@@ -3,7 +3,7 @@ from unittest.mock import ANY, Mock
 
 import pytest
 from bs4 import BeautifulSoup
-from flask import url_for
+from flask import session, url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
@@ -128,12 +128,12 @@ def test_should_show_page_for_one_template(
     ),
     (
         ['send_messages'],
-        ['.send_messages', '.set_sender'],
+        ['.send_messages', '.start_one_off_flow'],
         None,
     ),
     (
         ['send_messages', 'manage_templates'],
-        ['.send_messages', '.set_sender', '.edit_service_template'],
+        ['.send_messages', '.start_one_off_flow', '.edit_service_template'],
         None,
     ),
 ])
@@ -396,8 +396,24 @@ def test_should_redirect_to_one_off_if_template_type_is_letter(
 ):
     fixture(mocker)
 
+    one_off_id = '1234'
+    with logged_in_client.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+
     page = logged_in_client.get(
-        url_for('.set_sender', service_id=service_one['id'], template_id=fake_uuid)
+        url_for(
+            '.set_sender',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            one_off_id=one_off_id
+        )
     )
 
     assert page.status_code == expected_status_code
@@ -902,7 +918,7 @@ def test_should_show_page_for_a_deleted_template(
     content = response.get_data(as_text=True)
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert url_for("main.edit_service_template", service_id=fake_uuid, template_id=fake_uuid) not in content
-    assert url_for("main.send_test", service_id=fake_uuid, template_id=fake_uuid) not in content
+    assert url_for("main.start_one_off_flow", service_id=fake_uuid, template_id=fake_uuid) not in content
     assert page.select('p.hint')[0].text.strip() == 'This template was deleted today at 3:00pm.'
     assert 'Delete this template' not in page.select_one('main').text
 
@@ -1151,7 +1167,11 @@ def test_should_show_template_as_first_page_of_tour(
     )
 
     assert page.select('a.button')[0]['href'] == url_for(
-        '.send_test', service_id=SERVICE_ONE_ID, template_id=fake_uuid, help=2
+        '.send_test',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        one_off_id=list(session['one_off'].keys())[0],
+        help=2,
     )
 
 
