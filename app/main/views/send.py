@@ -4,7 +4,6 @@ import uuid
 from datetime import datetime, timedelta
 from string import ascii_uppercase
 from zipfile import BadZipFile
-from datetime import datetime, timedelta
 
 from flask import (
     abort,
@@ -522,7 +521,8 @@ def send_test_preview(service_id, template_id, one_off_id, filetype):
     return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
 
 
-def _check_messages(service_id, template_id, upload_id, preview_row, one_off_id, letters_as_pdf=False, write_metadata=False):
+
+def _check_messages(service_id, template_id, upload_id, preview_row, one_off_id, letters_as_pdf=False):
 
     try:
         # The happy path is that the job doesn’t already exist, so the
@@ -650,6 +650,7 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
     one_off_id = request.args.get('one_off_id', None)
 
     data = _check_messages(service_id, db_template['id'], upload_id, row_index, one_off_id, write_metadata=True)
+
 
     if (
         data['recipients'].too_many_rows or

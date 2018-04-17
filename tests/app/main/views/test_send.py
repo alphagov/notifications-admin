@@ -2066,6 +2066,7 @@ def test_letter_can_only_be_sent_now(
         from_test=True,
         one_off_id=fake_uuid
     )
+
     assert 'name="scheduled_for"' not in content
 
 
