@@ -917,7 +917,7 @@ cainscross-pc.gov.uk:
 calderdale.gov.uk:
   owner: Calderdale Metropolitan Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 callington-tc.gov.uk:
   owner: Callington Town Council
   crown: false
