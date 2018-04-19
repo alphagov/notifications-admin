@@ -9,7 +9,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def __init__(self):
         super().__init__("a" * 73, "b")
 
-    @cache.delete('user', key_from_args=[4])
+    @cache.delete('user', 'user_id')
     def create_service(
         self,
         service_name,
@@ -34,7 +34,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         data = _attach_current_user(data)
         return self.post("/service", data)['data']['id']
 
-    @cache.set('service')
+    @cache.set('service', 'service_id')
     def get_service(self, service_id):
         return self._get_service(service_id, detailed=False, today_only=False)
 
@@ -74,7 +74,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         params_dict['only_active'] = True
         return self.get_services(params_dict)
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def update_service(
         self,
         service_id,
@@ -115,20 +115,20 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def update_service_with_properties(self, service_id, properties):
         return self.update_service(service_id, **properties)
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def archive_service(self, service_id):
         return self.post('/service/{}/archive'.format(service_id), data=None)
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def suspend_service(self, service_id):
         return self.post('/service/{}/suspend'.format(service_id), data=None)
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def resume_service(self, service_id):
         return self.post('/service/{}/resume'.format(service_id), data=None)
 
-    @cache.delete('service')
-    @cache.delete('user', key_from_args=[1])
+    @cache.delete('service', 'service_id')
+    @cache.delete('user', 'user_id')
     def remove_user_from_service(self, service_id, user_id):
         """
         Remove a user from a service
@@ -267,7 +267,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_whitelist(self, service_id):
         return self.get(url='/service/{}/whitelist'.format(service_id))
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def update_whitelist(self, service_id, data):
         return self.put(url='/service/{}/whitelist'.format(service_id), data=data)
 
@@ -305,7 +305,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             '/service/{}/inbound-sms/summary'.format(service_id)
         )
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def create_service_inbound_api(self, service_id, url, bearer_token, user_id):
         data = {
             "url": url,
@@ -314,7 +314,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         }
         return self.post("/service/{}/inbound-api".format(service_id), data)
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def update_service_inbound_api(self, service_id, url, bearer_token, user_id, inbound_api_id):
         data = {
             "url": url,
@@ -346,7 +346,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             )
         )
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def add_reply_to_email_address(self, service_id, email_address, is_default=False):
         return self.post(
             "/service/{}/email-reply-to".format(service_id),
@@ -356,7 +356,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             }
         )
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def update_reply_to_email_address(self, service_id, reply_to_email_id, email_address, is_default=False):
         return self.post(
             "/service/{}/email-reply-to/{}".format(
@@ -375,7 +375,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_letter_contact(self, service_id, letter_contact_id):
         return self.get("/service/{}/letter-contact/{}".format(service_id, letter_contact_id))
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def add_letter_contact(self, service_id, contact_block, is_default=False):
         return self.post(
             "/service/{}/letter-contact".format(service_id),
@@ -385,7 +385,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             }
         )
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def update_letter_contact(self, service_id, letter_contact_id, contact_block, is_default=False):
         return self.post(
             "/service/{}/letter-contact/{}".format(
@@ -411,7 +411,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "/service/{}/sms-sender/{}".format(service_id, sms_sender_id)
         )
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def add_sms_sender(self, service_id, sms_sender, is_default=False, inbound_number_id=None):
         data = {
             "sms_sender": sms_sender,
@@ -421,7 +421,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             data["inbound_number_id"] = inbound_number_id
         return self.post("/service/{}/sms-sender".format(service_id), data=data)
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def update_sms_sender(self, service_id, sms_sender_id, sms_sender, is_default=False):
         return self.post(
             "/service/{}/sms-sender/{}".format(service_id, sms_sender_id),
@@ -438,7 +438,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             )
         )['data']
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def update_service_callback_api(self, service_id, url, bearer_token, user_id, callback_api_id):
         data = {
             "url": url,
@@ -448,7 +448,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             data['bearer_token'] = bearer_token
         return self.post("/service/{}/delivery-receipt-api/{}".format(service_id, callback_api_id), data)
 
-    @cache.delete('service')
+    @cache.delete('service', 'service_id')
     def create_service_callback_api(self, service_id, url, bearer_token, user_id):
         data = {
             "url": url,
