@@ -3,7 +3,7 @@ from unittest.mock import call
 import pytest
 from tests.conftest import SERVICE_ONE_ID, fake_uuid
 
-from app import service_api_client, user_api_client
+from app import invite_api_client, service_api_client, user_api_client
 from app.notify_client.service_api_client import ServiceAPIClient
 
 
@@ -58,12 +58,12 @@ def test_client_creates_service_with_correct_data(
     mocker.patch('app.notify_client.current_user', id='123')
 
     client.create_service(
-        service_name='My first service',
-        organisation_type='central_government',
-        message_limit=1,
-        restricted=True,
-        user_id=fake_uuid,
-        email_from='test@example.com',
+        'My first service',
+        'central_government',
+        1,
+        True,
+        fake_uuid,
+        'test@example.com',
     )
     mock_post.assert_called_once_with(
         '/service',
@@ -221,6 +221,7 @@ def test_returns_value_from_cache(
     (service_api_client, 'update_service_callback_api', [SERVICE_ONE_ID] + [''] * 4, {}),
     (service_api_client, 'create_service_callback_api', [SERVICE_ONE_ID] + [''] * 3, {}),
     (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, fake_uuid(), []], {}),
+    (invite_api_client, 'accept_invite', [SERVICE_ONE_ID, fake_uuid()], {}),
 ])
 def test_deletes_service_cache(
     app_,
