@@ -58,12 +58,12 @@ def test_client_creates_service_with_correct_data(
     mocker.patch('app.notify_client.current_user', id='123')
 
     client.create_service(
-        service_name='My first service',
-        organisation_type='central_government',
-        message_limit=1,
-        restricted=True,
-        user_id=fake_uuid,
-        email_from='test@example.com',
+        'My first service',
+        'central_government',
+        1,
+        True,
+        fake_uuid,
+        'test@example.com',
     )
     mock_post.assert_called_once_with(
         '/service',

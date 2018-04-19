@@ -9,6 +9,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def __init__(self):
         super().__init__("a" * 73, "b")
 
+    @cache.delete('user', key_from_args=[4])
     def create_service(
         self,
         service_name,
