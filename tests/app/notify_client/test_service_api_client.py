@@ -237,7 +237,5 @@ def test_deletes_service_cache(
 
     getattr(client, method)(*extra_args, **extra_kwargs)
 
-    assert mock_redis_delete.call_args_list == [
-        call('service-{}'.format(SERVICE_ONE_ID))
-    ]
+    assert call('service-{}'.format(SERVICE_ONE_ID)) in mock_redis_delete.call_args_list
     assert len(mock_request.call_args_list) == 1

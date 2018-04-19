@@ -1,10 +1,12 @@
 from unittest.mock import call
 
 import pytest
-from tests.conftest import SERVICE_ONE_ID
+from tests.conftest import SERVICE_ONE_ID, api_user_pending, fake_uuid
 
-from app import user_api_client
+from app import service_api_client, user_api_client
 from app.notify_client.models import User
+
+user_id = fake_uuid()
 
 
 def test_client_gets_all_users_for_service(
@@ -157,3 +159,110 @@ def test_client_converts_admin_permissions_to_db_permissions_on_add_to_service(a
         {'permission': 'send_letters'},
         {'permission': 'view_activity'},
     ], key=lambda x: x['permission'])
+
+
+@pytest.mark.parametrize(
+    (
+        'expected_cache_get_calls,'
+        'cache_value,'
+        'expected_api_calls,'
+        'expected_cache_set_calls,'
+        'expected_return_value,'
+    ),
+    [
+        (
+            [
+                call('user-{}'.format(user_id))
+            ],
+            b'{"data": "from cache"}',
+            [],
+            [],
+            'from cache',
+        ),
+        (
+            [
+                call('user-{}'.format(user_id))
+            ],
+            None,
+            [
+                call('/user/{}'.format(user_id))
+            ],
+            [
+                call(
+                    'user-{}'.format(user_id),
+                    '{"data": "from api"}',
+                    ex=86400
+                )
+            ],
+            'from api',
+        ),
+    ]
+)
+def test_returns_value_from_cache(
+    app_,
+    mocker,
+    expected_cache_get_calls,
+    cache_value,
+    expected_return_value,
+    expected_api_calls,
+    expected_cache_set_calls,
+):
+
+    mock_redis_get = mocker.patch(
+        'app.notify_client.RedisClient.get',
+        return_value=cache_value,
+    )
+    mock_api_get = mocker.patch(
+        'app.notify_client.NotifyAdminAPIClient.get',
+        return_value={'data': 'from api'},
+    )
+    mock_redis_set = mocker.patch(
+        'app.notify_client.RedisClient.set',
+    )
+    mock_model = mocker.patch(
+        'app.notify_client.models.User.__init__',
+        return_value=None,
+    )
+
+    user_api_client.get_user(user_id)
+
+    mock_model.assert_called_once_with(
+        expected_return_value,
+        max_failed_login_count=10,
+    )
+    assert mock_redis_get.call_args_list == expected_cache_get_calls
+    assert mock_api_get.call_args_list == expected_api_calls
+    assert mock_redis_set.call_args_list == expected_cache_set_calls
+
+
+@pytest.mark.parametrize('client, method, extra_args, extra_kwargs', [
+    (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, fake_uuid(), []], {}),
+    (user_api_client, 'update_user_attribute', [user_id], {}),
+    (user_api_client, 'reset_failed_login_count', [user_id], {}),
+    (user_api_client, 'update_user_attribute', [user_id], {}),
+    (user_api_client, 'update_password', [user_id, 'hunter2'], {}),
+    (user_api_client, 'verify_password', [user_id, 'hunter2'], {}),
+    (user_api_client, 'check_verify_code', [user_id, '', ''], {}),
+    (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, user_id, []], {}),
+    (user_api_client, 'add_user_to_organisation', [fake_uuid(), user_id], {}),
+    (user_api_client, 'set_user_permissions', [user_id, SERVICE_ONE_ID, []], {}),
+    (user_api_client, 'activate_user', [api_user_pending(fake_uuid())], {}),
+    (service_api_client, 'remove_user_from_service', [SERVICE_ONE_ID, user_id], {}),
+])
+def test_deletes_user_cache(
+    app_,
+    mock_get_user,
+    mocker,
+    client,
+    method,
+    extra_args,
+    extra_kwargs,
+):
+    mocker.patch('app.notify_client.current_user', id='1')
+    mock_redis_delete = mocker.patch('app.notify_client.RedisClient.delete')
+    mock_request = mocker.patch('notifications_python_client.base.BaseAPIClient.request')
+
+    getattr(client, method)(*extra_args, **extra_kwargs)
+
+    assert call('user-{}'.format(user_id)) in mock_redis_delete.call_args_list
+    assert len(mock_request.call_args_list) == 1
