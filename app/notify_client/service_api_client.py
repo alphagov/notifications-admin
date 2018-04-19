@@ -139,6 +139,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         data = _attach_current_user({})
         return self.delete(endpoint, data)
 
+    @cache.delete('templates', 'service_id')
     def create_service_template(self, name, type_, content, service_id, subject=None, process_type='normal'):
         """
         Create a service template.
@@ -158,6 +159,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         endpoint = "/service/{0}/template".format(service_id)
         return self.post(endpoint, data)
 
+    @cache.delete('templates', 'service_id')
+    @cache.delete('template', 'id_')
+    @cache.delete('template_versions', 'id_')
     def update_service_template(self, id_, name, type_, content, service_id, subject=None, process_type=None):
         """
         Update a service template.
@@ -181,6 +185,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
         return self.post(endpoint, data)
 
+    @cache.delete('templates', 'service_id')
+    @cache.delete('template', 'id_')
+    @cache.delete('template_versions', 'id_')
     def redact_service_template(self, service_id, id_):
         return self.post(
             "/service/{}/template/{}".format(service_id, id_),
@@ -189,6 +196,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             ),
         )
 
+    @cache.delete('templates', 'service_id')
+    @cache.delete('template', 'template_id')
+    @cache.delete('template_versions', 'template_id')
     def update_service_template_sender(self, service_id, template_id, reply_to):
         data = {
             'reply_to': reply_to,
@@ -199,6 +209,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             data
         )
 
+    @cache.set('template', 'template_id', 'version')
     def get_service_template(self, service_id, template_id, version=None):
         """
         Retrieve a service template.
@@ -210,6 +221,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             endpoint = '{base}/version/{version}'.format(base=endpoint, version=version)
         return self.get(endpoint)
 
+    @cache.set('template_versions', 'template_id')
     def get_service_template_versions(self, service_id, template_id):
         """
         Retrieve a list of versions for a template
@@ -220,6 +232,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         )
         return self.get(endpoint)
 
+    @cache.set('templates', 'service_id')
     def get_service_templates(self, service_id):
         """
         Retrieve all templates for service.
@@ -228,6 +241,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             service_id=service_id)
         return self.get(endpoint)
 
+    # This doesn’t need caching because it calls through to a method which is cached
     def count_service_templates(self, service_id, template_type=None):
         return len([
             template for template in
@@ -238,6 +252,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             )
         ])
 
+    @cache.delete('templates', 'service_id')
+    @cache.delete('template', 'template_id')
+    @cache.delete('template_versions', 'template_id')
     def delete_service_template(self, service_id, template_id):
         """
         Set a service template's archived flag to True

@@ -12,8 +12,11 @@ def _get_argument(argument_name, args, kwargs, client_method):
     with suppress(KeyError):
         return kwargs[argument_name]
 
-    with suppress(ValueError):
+    with suppress(ValueError, IndexError):
         return args[list(signature(client_method).parameters).index(argument_name) - 1]
+
+    with suppress(KeyError):
+        return signature(client_method).parameters[argument_name].default
 
     raise TypeError("{}() takes no argument called '{}'".format(
         client_method.__name__, argument_name
