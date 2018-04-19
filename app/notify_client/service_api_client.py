@@ -199,7 +199,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             data
         )
 
-    def get_service_template(self, service_id, template_id, version=None, *params):
+    def get_service_template(self, service_id, template_id, version=None):
         """
         Retrieve a service template.
         """
@@ -208,9 +208,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             template_id=template_id)
         if version:
             endpoint = '{base}/version/{version}'.format(base=endpoint, version=version)
-        return self.get(endpoint, *params)
+        return self.get(endpoint)
 
-    def get_service_template_versions(self, service_id, template_id, *params):
+    def get_service_template_versions(self, service_id, template_id):
         """
         Retrieve a list of versions for a template
         """
@@ -218,15 +218,15 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             service_id=service_id,
             template_id=template_id
         )
-        return self.get(endpoint, *params)
+        return self.get(endpoint)
 
-    def get_service_templates(self, service_id, *params):
+    def get_service_templates(self, service_id):
         """
         Retrieve all templates for service.
         """
         endpoint = '/service/{service_id}/template'.format(
             service_id=service_id)
-        return self.get(endpoint, *params)
+        return self.get(endpoint)
 
     def count_service_templates(self, service_id, template_type=None):
         return len([
