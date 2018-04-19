@@ -3,7 +3,7 @@ from unittest.mock import call
 import pytest
 from tests.conftest import SERVICE_ONE_ID, api_user_pending, fake_uuid
 
-from app import service_api_client, user_api_client
+from app import invite_api_client, service_api_client, user_api_client
 from app.notify_client.models import User
 
 user_id = fake_uuid()
@@ -248,6 +248,7 @@ def test_returns_value_from_cache(
     (user_api_client, 'set_user_permissions', [user_id, SERVICE_ONE_ID, []], {}),
     (user_api_client, 'activate_user', [api_user_pending(fake_uuid())], {}),
     (service_api_client, 'remove_user_from_service', [SERVICE_ONE_ID, user_id], {}),
+    (invite_api_client, 'accept_invite', [SERVICE_ONE_ID, user_id], {}),
 ])
 def test_deletes_user_cache(
     app_,

@@ -3,7 +3,7 @@ from unittest.mock import call
 import pytest
 from tests.conftest import SERVICE_ONE_ID, fake_uuid
 
-from app import service_api_client, user_api_client
+from app import invite_api_client, service_api_client, user_api_client
 from app.notify_client.service_api_client import ServiceAPIClient
 
 
@@ -221,6 +221,7 @@ def test_returns_value_from_cache(
     (service_api_client, 'update_service_callback_api', [SERVICE_ONE_ID] + [''] * 4, {}),
     (service_api_client, 'create_service_callback_api', [SERVICE_ONE_ID] + [''] * 3, {}),
     (user_api_client, 'add_user_to_service', [SERVICE_ONE_ID, fake_uuid(), []], {}),
+    (invite_api_client, 'accept_invite', [SERVICE_ONE_ID, fake_uuid()], {}),
 ])
 def test_deletes_service_cache(
     app_,
