@@ -240,6 +240,66 @@ def test_client_returns_count_of_service_templates(
             ],
             {'data_from': 'api'},
         ),
+        (
+            service_api_client.get_service_templates,
+            [SERVICE_ONE_ID],
+            [
+                call('service-{}-templates'.format(SERVICE_ONE_ID))
+            ],
+            b'{"data_from": "cache"}',
+            [],
+            [],
+            {'data_from': 'cache'},
+        ),
+        (
+            service_api_client.get_service_templates,
+            [SERVICE_ONE_ID],
+            [
+                call('service-{}-templates'.format(SERVICE_ONE_ID))
+            ],
+            None,
+            [
+                call('/service/{}/template'.format(SERVICE_ONE_ID))
+            ],
+            [
+                call(
+                    'service-{}-templates'.format(SERVICE_ONE_ID),
+                    '{"data_from": "api"}',
+                    ex=86400
+                )
+            ],
+            {'data_from': 'api'},
+        ),
+        (
+            service_api_client.get_service_template_versions,
+            [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
+            [
+                call('template-{}-versions'.format(FAKE_TEMPLATE_ID))
+            ],
+            b'{"data_from": "cache"}',
+            [],
+            [],
+            {'data_from': 'cache'},
+        ),
+        (
+            service_api_client.get_service_template_versions,
+            [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
+            [
+                call('template-{}-versions'.format(FAKE_TEMPLATE_ID))
+            ],
+            None,
+            [
+                call('/service/{}/template/{}/versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID))
+            ],
+            [
+                call(
+                    'template-{}-versions'.format(FAKE_TEMPLATE_ID),
+                    '{"data_from": "api"}',
+                    ex=86400
+                )
+            ],
+            {'data_from': 'api'},
+        ),
     ]
 )
 def test_returns_value_from_cache(
