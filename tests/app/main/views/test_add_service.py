@@ -43,12 +43,12 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     )
     assert mock_get_services_with_no_services.called
     mock_create_service.assert_called_once_with(
-        'testing the post',
-        'local',
-        app_.config['DEFAULT_SERVICE_LIMIT'],
-        True,
-        api_user_active.id,
-        'testing.the.post'
+        service_name='testing the post',
+        organisation_type='local',
+        message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
+        restricted=True,
+        user_id=api_user_active.id,
+        email_from='testing.the.post'
     )
     mock_create_service_template.assert_called_once_with(
         'Example text message template',
@@ -95,12 +95,12 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     )
     assert mock_get_services.called
     mock_create_service.assert_called_once_with(
-        'testing the post',
-        organisation_type,
-        app_.config['DEFAULT_SERVICE_LIMIT'],
-        True,
-        api_user_active.id,
-        'testing.the.post'
+        service_name='testing the post',
+        organisation_type=organisation_type,
+        message_limit=app_.config['DEFAULT_SERVICE_LIMIT'],
+        restricted=True,
+        user_id=api_user_active.id,
+        email_from='testing.the.post'
     )
     mock_create_or_update_free_sms_fragment_limit.assert_called_once_with(101, free_allowance)
     assert len(mock_create_service_template.call_args_list) == 0
