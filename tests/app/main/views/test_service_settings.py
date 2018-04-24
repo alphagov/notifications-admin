@@ -561,7 +561,7 @@ def test_should_redirect_after_request_to_go_live(
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
-    mock_post = mocker.patch('app.main.views.service_settings.deskpro_client.create_ticket')
+    mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket')
     page = client_request.post(
         'main.submit_request_to_go_live',
         service_id=SERVICE_ONE_ID,

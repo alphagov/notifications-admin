@@ -10,19 +10,19 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
-from notifications_utils.clients import DeskproError
+from notifications_utils.clients.zendesk.zendesk_client import ZendeskError
 from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
 
 from app import (
     billing_api_client,
     current_service,
-    deskpro_client,
     email_branding_client,
     inbound_number_client,
     organisations_client,
     service_api_client,
     user_api_client,
+    zendesk_client,
 )
 from app.main import main
 from app.main.forms import (
@@ -191,7 +191,7 @@ def submit_request_to_go_live(service_id):
 
     if form.validate_on_submit():
         try:
-            deskpro_client.create_ticket(
+            zendesk_client.create_ticket(
                 subject='Request to go live - {}'.format(current_service['name']),
                 message=(
                     'On behalf of {} ({})\n'
@@ -223,7 +223,7 @@ def submit_request_to_go_live(service_id):
                 user_email=current_user.email_address,
                 user_name=current_user.name
             )
-        except DeskproError:
+        except ZendeskError:
             abort(500, "Request to go live submission failed")
 
         flash('Thanks for your request to go live. We’ll get back to you within one working day.', 'default')
