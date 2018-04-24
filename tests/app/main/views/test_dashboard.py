@@ -180,7 +180,7 @@ def test_inbox_showing_inbound_messages(
     mock_get_detailed_service,
     mock_get_template_statistics,
     mock_get_usage,
-    mock_get_inbound_sms,
+    mock_get_most_recent_inbound_sms,
     index,
     expected_row,
 ):
@@ -208,7 +208,7 @@ def test_get_inbound_sms_shows_page_links(
     mock_get_detailed_service,
     mock_get_template_statistics,
     mock_get_usage,
-    mock_get_inbound_sms,
+    mock_get_most_recent_inbound_sms,
     mock_get_inbound_number_for_service,
 ):
     service_one['permissions'] = ['inbound_sms']
@@ -229,7 +229,7 @@ def test_empty_inbox(
     mock_get_detailed_service,
     mock_get_template_statistics,
     mock_get_usage,
-    mock_get_inbound_sms_with_no_messages,
+    mock_get_most_recent_inbound_sms_with_no_messages,
     mock_get_inbound_number_for_service,
 ):
 
@@ -267,7 +267,7 @@ def test_anyone_can_see_inbox(
     api_user_active,
     service_one,
     mocker,
-    mock_get_inbound_sms_with_no_messages,
+    mock_get_most_recent_inbound_sms_with_no_messages,
     mock_get_inbound_number_for_service,
 ):
 
@@ -289,7 +289,7 @@ def test_view_inbox_updates(
     logged_in_client,
     service_one,
     mocker,
-    mock_get_inbound_sms_with_no_messages,
+    mock_get_most_recent_inbound_sms_with_no_messages,
 ):
 
     mock_get_partials = mocker.patch(

@@ -1,16 +1,7 @@
 ---
 
 buildpack: python_buildpack
-command: >
-  scripts/run_app_paas.sh
-  gunicorn
-  -c /home/vcap/app/gunicorn_config.py
-  --error-logfile /home/vcap/logs/gunicorn_error.log
-  -w 5
-  -b 0.0.0.0:$PORT
-  -k eventlet
-  application
-
+command: scripts/run_app_paas.sh gunicorn -w 5 -b 0.0.0.0:$PORT application
 instances: 1
 memory: 1G
 env:
@@ -36,8 +27,5 @@ env:
   TEMPLATE_PREVIEW_API_HOST: null
   TEMPLATE_PREVIEW_API_KEY: null
 
-  REDIS_ENABLED: null
-  REDIS_URL: null
-
 applications:
-  - name: notify-admin
+  - name: notify-admin-prototype-2

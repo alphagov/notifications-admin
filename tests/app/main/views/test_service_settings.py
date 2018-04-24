@@ -460,9 +460,9 @@ def test_should_raise_duplicate_name_handled(
     (2, 'Done: Have more than one team member with the ‘Manage service’ permission'),
 ])
 @pytest.mark.parametrize('count_of_templates, expected_templates_checklist_item', [
-    (0, 'Not done: Create some templates'),
-    (1, 'Done: Create some templates'),
-    (2, 'Done: Create some templates'),
+    (0, 'Not done: Create templates showing the kind of messages you plan to send'),
+    (1, 'Done: Create templates showing the kind of messages you plan to send'),
+    (2, 'Done: Create templates showing the kind of messages you plan to send'),
 ])
 @pytest.mark.parametrize('count_of_email_templates, reply_to_email_addresses, expected_reply_to_checklist_item', [
     pytest.mark.xfail((0, [], ''), raises=IndexError),
@@ -595,7 +595,7 @@ def test_should_redirect_after_request_to_go_live(
     assert 'Features: one off, file upload and API' in returned_message
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (
-        'We’ve received your request to go live'
+        'Thanks for your request to go live. We’ll get back to you within one working day.'
     )
     assert normalize_spaces(page.select_one('h1').text) == (
         'Settings'
@@ -2123,7 +2123,7 @@ def test_updates_sms_prefixing(
         )
     )
     mock_update_service.assert_called_once_with(
-        service_id=SERVICE_ONE_ID,
+        SERVICE_ONE_ID,
         prefix_sms=expected_api_argument,
     )
 
