@@ -36,7 +36,7 @@ from notifications_utils.formatters import formatted_list
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
-from app import proxy_fix
+from app import proxy_fix, navigation
 from app.config import configs
 from app.asset_fingerprinter import AssetFingerprinter
 from app.notify_client.service_api_client import ServiceAPIClient
@@ -170,6 +170,10 @@ def init_app(application):
     @application.context_processor
     def _attach_current_user():
         return{'current_user': current_user}
+
+    @application.context_processor
+    def _nav_selected():
+        return {'nav_selected': navigation.nav_selected}
 
     @application.before_request
     def record_start_time():
