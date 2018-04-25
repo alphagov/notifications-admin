@@ -1,3 +1,4 @@
+import string
 import weakref
 from datetime import datetime, timedelta
 from itertools import chain
@@ -38,6 +39,15 @@ from app.main.validators import (
     OnlyGSMCharacters,
     ValidEmail,
     ValidGovEmail,
+)
+
+OBSCURE_WHITESPACE = (
+    '\u180E'  # Mongolian vowel separator
+    '\u200B'  # zero width space
+    '\u200C'  # zero width non-joiner
+    '\u200D'  # zero width joiner
+    '\u2060'  # word joiner
+    '\uFEFF'  # zero width non-breaking space
 )
 
 
@@ -110,7 +120,7 @@ def email_address(label='Email address', gov_user=True):
 
 def strip_whitespace(value):
     if value is not None and hasattr(value, 'strip'):
-        return value.strip()
+        return value.strip(string.whitespace + OBSCURE_WHITESPACE)
     return value
 
 
