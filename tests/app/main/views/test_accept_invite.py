@@ -3,12 +3,12 @@ from unittest.mock import ANY, Mock
 from bs4 import BeautifulSoup
 from flask import url_for
 from notifications_python_client.errors import HTTPError
-from tests.conftest import mock_check_invite_token as mock_check_token_invite
-from tests.conftest import normalize_spaces
-from tests.conftest import sample_invite as create_sample_invite
 
 import app
 from app.notify_client.models import InvitedUser
+from tests.conftest import mock_check_invite_token as mock_check_token_invite
+from tests.conftest import normalize_spaces
+from tests.conftest import sample_invite as create_sample_invite
 
 
 def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(

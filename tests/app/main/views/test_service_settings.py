@@ -5,6 +5,9 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
+
+import app
+from app.utils import email_safe
 from tests import service_json, validate_route_permission
 from tests.conftest import (
     SERVICE_ONE_ID,
@@ -27,9 +30,6 @@ from tests.conftest import (
     normalize_spaces,
     platform_admin_user,
 )
-
-import app
-from app.utils import email_safe
 
 
 @pytest.fixture

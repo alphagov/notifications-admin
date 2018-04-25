@@ -4,9 +4,9 @@ from unittest.mock import call
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
-from tests.conftest import mock_get_email_branding, normalize_spaces
 
 from app.main.s3_client import LOGO_LOCATION_STRUCTURE, TEMP_TAG
+from tests.conftest import mock_get_email_branding, normalize_spaces
 
 
 def test_email_branding_page_shows_full_branding_list(

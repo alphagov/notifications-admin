@@ -6,6 +6,11 @@ from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
+
+from app.main.views.templates import (
+    get_human_readable_delta,
+    get_last_use_message,
+)
 from tests import (
     single_notification_json,
     template_json,
@@ -21,11 +26,6 @@ from tests.conftest import (
 )
 from tests.conftest import service_one as create_sample_service
 from tests.conftest import single_letter_contact_block
-
-from app.main.views.templates import (
-    get_human_readable_delta,
-    get_last_use_message,
-)
 
 
 @pytest.mark.parametrize('extra_args, expected_nav_links, expected_templates', [

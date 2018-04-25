@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pytest
 from freezegun import freeze_time
-from tests.conftest import fake_uuid
 
 from app import format_datetime_relative
 from app.utils import (
@@ -18,6 +17,7 @@ from app.utils import (
     get_cdn_domain,
     get_letter_timings,
 )
+from tests.conftest import fake_uuid
 
 
 def _get_notifications_csv(

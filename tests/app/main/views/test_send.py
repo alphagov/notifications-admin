@@ -16,6 +16,14 @@ from notifications_utils.template import (
     LetterImageTemplate,
     LetterPreviewTemplate,
 )
+from xlrd.biffh import XLRDError
+from xlrd.xldate import (
+    XLDateAmbiguous,
+    XLDateError,
+    XLDateNegative,
+    XLDateTooLarge,
+)
+
 from tests import (
     validate_route_permission,
     validate_route_permission_with_client,
@@ -37,13 +45,6 @@ from tests.conftest import (
     no_reply_to_email_addresses,
     no_sms_senders,
     normalize_spaces,
-)
-from xlrd.biffh import XLRDError
-from xlrd.xldate import (
-    XLDateAmbiguous,
-    XLDateError,
-    XLDateNegative,
-    XLDateTooLarge,
 )
 
 template_types = ['email', 'sms']

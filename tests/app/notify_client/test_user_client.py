@@ -1,10 +1,10 @@
 from unittest.mock import call
 
 import pytest
-from tests.conftest import SERVICE_ONE_ID, api_user_pending, fake_uuid
 
 from app import invite_api_client, service_api_client, user_api_client
 from app.notify_client.models import User
+from tests.conftest import SERVICE_ONE_ID, api_user_pending, fake_uuid
 
 user_id = fake_uuid()
 

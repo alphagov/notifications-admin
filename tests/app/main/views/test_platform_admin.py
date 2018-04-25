@@ -4,14 +4,14 @@ from unittest.mock import ANY
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
-from tests import service_json
-from tests.conftest import mock_get_user, normalize_spaces
 
 from app.main.views.platform_admin import (
     create_global_stats,
     format_stats_by_service,
     sum_service_usage,
 )
+from tests import service_json
+from tests.conftest import mock_get_user, normalize_spaces
 
 
 @pytest.mark.parametrize('endpoint', [
