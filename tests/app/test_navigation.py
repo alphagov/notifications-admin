@@ -1,7 +1,7 @@
 import pytest
-from tests.conftest import SERVICE_ONE_ID, app_
+from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, app_
 
-from app.navigation import HeaderNavigation, MainNavigation
+from app.navigation import HeaderNavigation, MainNavigation, OrgNavigation
 
 all_endpoints = [
     rule.endpoint for rule in next(app_(None)).url_map.iter_rules()
@@ -11,6 +11,7 @@ all_endpoints = [
 @pytest.mark.parametrize('navigation_instance', [
     MainNavigation(),
     HeaderNavigation(),
+    OrgNavigation(),
 ])
 def test_navigation_items_are_properly_defined(navigation_instance):
     for endpoint in navigation_instance.endpoints_with_navigation:
@@ -38,6 +39,7 @@ def test_navigation_items_are_properly_defined(navigation_instance):
 @pytest.mark.parametrize('navigation_instance', [
     MainNavigation(),
     HeaderNavigation(),
+    OrgNavigation(),
 ])
 def test_excluded_navigation_items_are_properly_defined(navigation_instance):
     for endpoint in navigation_instance.endpoints_without_navigation:
@@ -65,6 +67,7 @@ def test_excluded_navigation_items_are_properly_defined(navigation_instance):
 @pytest.mark.parametrize('navigation_instance', [
     MainNavigation(),
     HeaderNavigation(),
+    OrgNavigation(),
 ])
 def test_all_endpoints_are_covered(navigation_instance):
     for endpoint in all_endpoints:
@@ -80,6 +83,7 @@ def test_all_endpoints_are_covered(navigation_instance):
 @pytest.mark.parametrize('navigation_instance', [
     MainNavigation(),
     HeaderNavigation(),
+    OrgNavigation(),
 ])
 @pytest.mark.xfail(raises=KeyError)
 def test_raises_on_invalid_navigation_item(
@@ -117,5 +121,24 @@ def test_a_page_should_nave_selected_header_navigation_item(
 ):
     page = client_request.get(endpoint, service_id=SERVICE_ONE_ID)
     selected_nav_items = page.select('#proposition-links a.active')
+    assert len(selected_nav_items) == 1
+    assert selected_nav_items[0].text.strip() == selected_nav_item
+
+
+@pytest.mark.parametrize('endpoint, selected_nav_item', [
+    ('main.organisation_dashboard', 'Dashboard'),
+    ('main.manage_org_users', 'Team members'),
+])
+def test_a_page_should_nave_selected_org_navigation_item(
+    client_request,
+    mock_get_organisation,
+    mock_get_organisation_services,
+    mock_get_users_for_organisation,
+    mock_get_invited_users_for_organisation,
+    endpoint,
+    selected_nav_item,
+):
+    page = client_request.get(endpoint, org_id=ORGANISATION_ID)
+    selected_nav_items = page.select('.navigation a.selected')
     assert len(selected_nav_items) == 1
     assert selected_nav_items[0].text.strip() == selected_nav_item
