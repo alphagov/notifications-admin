@@ -175,7 +175,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     'service-{}'.format(SERVICE_ONE_ID),
                     '{"data_from": "api"}',
-                    ex=86400
+                    ex=604800,
                 )
             ],
             {'data_from': 'api'},
@@ -205,7 +205,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     'template-{}-version-None'.format(FAKE_TEMPLATE_ID),
                     '{"data_from": "api"}',
-                    ex=86400
+                    ex=604800,
                 )
             ],
             {'data_from': 'api'},
@@ -235,7 +235,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     'template-{}-version-1'.format(FAKE_TEMPLATE_ID),
                     '{"data_from": "api"}',
-                    ex=86400
+                    ex=604800,
                 )
             ],
             {'data_from': 'api'},
@@ -265,7 +265,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     'service-{}-templates'.format(SERVICE_ONE_ID),
                     '{"data_from": "api"}',
-                    ex=86400
+                    ex=604800,
                 )
             ],
             {'data_from': 'api'},
@@ -295,7 +295,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     'template-{}-versions'.format(FAKE_TEMPLATE_ID),
                     '{"data_from": "api"}',
-                    ex=86400
+                    ex=604800,
                 )
             ],
             {'data_from': 'api'},
