@@ -1,7 +1,7 @@
 import pytest
 from tests.conftest import SERVICE_ONE_ID, app_
 
-from app import navigation
+from app.navigation import MainNavigation
 
 all_endpoints = [
     rule.endpoint for rule in next(app_(None)).url_map.iter_rules()
@@ -9,30 +9,30 @@ all_endpoints = [
 
 
 def test_navigation_items_are_properly_defined():
-    for endpoint in navigation.endpoints_with_navigation:
+    for endpoint in MainNavigation().endpoints_with_navigation:
         assert endpoint in all_endpoints
-        assert endpoint not in navigation.endpoints_without_navigation
-        assert navigation.endpoints_with_navigation.count(endpoint) == 1
+        assert endpoint not in MainNavigation().endpoints_without_navigation
+        assert MainNavigation().endpoints_with_navigation.count(endpoint) == 1
 
 
 def test_excluded_navigation_items_are_properly_defined():
-    for endpoint in navigation.endpoints_without_navigation:
+    for endpoint in MainNavigation().endpoints_without_navigation:
         assert endpoint in all_endpoints
-        assert endpoint not in navigation.endpoints_with_navigation
-        assert navigation.endpoints_without_navigation.count(endpoint) == 1
+        assert endpoint not in MainNavigation().endpoints_with_navigation
+        assert MainNavigation().endpoints_without_navigation.count(endpoint) == 1
 
 
 def test_all_endpoints_are_covered():
     for endpoint in all_endpoints:
         assert endpoint in (
-            navigation.endpoints_with_navigation +
-            navigation.endpoints_without_navigation
+            MainNavigation().endpoints_with_navigation +
+            MainNavigation().endpoints_without_navigation
         )
 
 
 @pytest.mark.xfail(raises=KeyError)
 def test_raises_on_invalid_navigation_item(client_request):
-    navigation.nav_selected('foo')
+    MainNavigation().is_selected('foo')
 
 
 @pytest.mark.parametrize('endpoint, selected_nav_item', [
