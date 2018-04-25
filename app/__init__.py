@@ -39,7 +39,7 @@ from werkzeug.local import LocalProxy
 from app import proxy_fix
 from app.config import configs
 from app.asset_fingerprinter import AssetFingerprinter
-from app.navigation import MainNavigation
+from app.navigation import HeaderNavigation, MainNavigation
 from app.notify_client.service_api_client import ServiceAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.invite_api_client import InviteApiClient
@@ -90,7 +90,10 @@ current_service = LocalProxy(partial(_lookup_req_object, 'service'))
 # The current organisation attached to the request stack.
 current_organisation = LocalProxy(partial(_lookup_req_object, 'organisation'))
 
-main_navigation = MainNavigation()
+navigation = {
+    'main_navigation': MainNavigation(),
+    'header_navigation': HeaderNavigation(),
+}
 
 
 def create_app(application):
@@ -176,7 +179,7 @@ def init_app(application):
 
     @application.context_processor
     def _nav_selected():
-        return {'main_navigation': main_navigation}
+        return navigation
 
     @application.before_request
     def record_start_time():
