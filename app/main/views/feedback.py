@@ -33,11 +33,6 @@ def get_prefilled_message():
     )
 
 
-@main.route('/feedback', methods=['GET'])
-def old_feedback():
-    return redirect(url_for('.support'))
-
-
 @main.route('/support', methods=['GET', 'POST'])
 def support():
     form = SupportType()
@@ -62,21 +57,6 @@ def triage():
         'views/support/triage.html',
         form=form
     )
-
-
-@main.route('/support/submit/<ticket_type>')
-def old_submit_feedback(ticket_type):
-    try:
-        ticket_type = {
-            'problem': PROBLEM_TICKET_TYPE,
-            'question': QUESTION_TICKET_TYPE,
-        }[ticket_type]
-        return redirect(url_for(
-            '.feedback',
-            ticket_type=ticket_type,
-        ), 301)
-    except KeyError:
-        abort(404)
 
 
 @main.route('/support/<ticket_type>', methods=['GET', 'POST'])

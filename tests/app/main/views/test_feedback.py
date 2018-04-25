@@ -543,28 +543,3 @@ def test_thanks(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert ' '.join(page.find('main').find('p').text.split()) == message
-
-
-@pytest.mark.parametrize('view, old_ticket_type, expected_view, new_ticket_type', [
-    ('old_submit_feedback', 'problem', 'feedback', 'report-problem'),
-    ('old_submit_feedback', 'question', 'feedback', 'ask-question-give-feedback'),
-])
-def test_old_problem_and_question_urls_redirect(
-    client,
-    view,
-    old_ticket_type,
-    expected_view,
-    new_ticket_type
-):
-    response = client.get(
-        url_for(
-            'main.{}'.format(view),
-            ticket_type=old_ticket_type,
-        )
-    )
-    assert response.status_code == 301
-    assert response.location == url_for(
-        'main.{}'.format(expected_view),
-        ticket_type=new_ticket_type,
-        _external=True,
-    )
