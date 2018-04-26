@@ -2146,7 +2146,7 @@ highamferrers-tc.gov.uk:
 highland.gov.uk:
   owner: The Highland Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 highpeak.gov.uk:
   owner: High Peak Borough Council
   crown: false
