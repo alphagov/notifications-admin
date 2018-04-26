@@ -4,7 +4,7 @@ from datetime import timedelta
 from functools import wraps
 from inspect import signature
 
-TTL = int(timedelta(hours=24).total_seconds())
+TTL = int(timedelta(days=7).total_seconds())
 
 
 def _get_argument(argument_name, client_method, args, kwargs):
