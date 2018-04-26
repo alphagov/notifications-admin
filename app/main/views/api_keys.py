@@ -208,9 +208,11 @@ def delivery_status_callback(service_id):
     )
 
     if form.validate_on_submit():
-        if delivery_status_callback:
-            if (delivery_status_callback.get('url') != form.url.data
-                    or form.bearer_token.data != dummy_bearer_token):
+        if delivery_status_callback and form.url.data:
+            if (
+                delivery_status_callback.get('url') != form.url.data or
+                form.bearer_token.data != dummy_bearer_token
+            ):
                 service_api_client.update_service_callback_api(
                     service_id,
                     url=form.url.data,
@@ -218,7 +220,12 @@ def delivery_status_callback(service_id):
                     user_id=current_user.id,
                     callback_api_id=delivery_status_callback.get('id')
                 )
-        else:
+        elif delivery_status_callback and not form.url.data:
+            service_api_client.delete_service_callback_api(
+                service_id,
+                delivery_status_callback['id'],
+            )
+        elif form.url.data:
             service_api_client.create_service_callback_api(
                 service_id,
                 url=form.url.data,
@@ -255,9 +262,11 @@ def received_text_messages_callback(service_id):
     )
 
     if form.validate_on_submit():
-        if received_text_messages_callback:
-            if (received_text_messages_callback.get('url') != form.url.data
-                    or form.bearer_token.data != dummy_bearer_token):
+        if received_text_messages_callback and form.url.data:
+            if (
+                received_text_messages_callback.get('url') != form.url.data or
+                form.bearer_token.data != dummy_bearer_token
+            ):
                 service_api_client.update_service_inbound_api(
                     service_id,
                     url=form.url.data,
@@ -265,7 +274,12 @@ def received_text_messages_callback(service_id):
                     user_id=current_user.id,
                     inbound_api_id=received_text_messages_callback.get('id')
                 )
-        else:
+        elif received_text_messages_callback and not form.url.data:
+            service_api_client.delete_service_inbound_api(
+                service_id,
+                received_text_messages_callback['id'],
+            )
+        elif form.url.data:
             service_api_client.create_service_inbound_api(
                 service_id,
                 url=form.url.data,

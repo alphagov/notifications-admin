@@ -2721,11 +2721,35 @@ def mock_get_valid_service_callback_api(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_empty_service_inbound_api(mocker):
+    return mocker.patch(
+        'app.service_api_client.get_service_inbound_api',
+        side_effect=lambda service_id, callback_api_id: None,
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_empty_service_callback_api(mocker):
+    return mocker.patch(
+        'app.service_api_client.get_service_callback_api',
+        side_effect=lambda service_id, callback_api_id: None,
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_create_service_inbound_api(mocker):
     def _create_service_inbound_api(service_id, url, bearer_token, user_id):
         return
 
     return mocker.patch('app.service_api_client.create_service_inbound_api', side_effect=_create_service_inbound_api)
+
+
+@pytest.fixture(scope='function')
+def mock_delete_service_inbound_api(mocker):
+    return mocker.patch(
+        'app.service_api_client.delete_service_callback_api',
+        side_effect=lambda service_id: None
+    )
 
 
 @pytest.fixture(scope='function')
@@ -2742,6 +2766,14 @@ def mock_create_service_callback_api(mocker):
         return
 
     return mocker.patch('app.service_api_client.create_service_callback_api', side_effect=_create_service_callback_api)
+
+
+@pytest.fixture(scope='function')
+def mock_delete_service_callback_api(mocker):
+    return mocker.patch(
+        'app.service_api_client.delete_service_callback_api',
+        side_effect=lambda service_id: None
+    )
 
 
 @pytest.fixture(scope='function')

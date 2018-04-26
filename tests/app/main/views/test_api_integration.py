@@ -10,6 +10,8 @@ from tests import validate_route_permission
 from tests.conftest import (
     SERVICE_ONE_ID,
     fake_uuid,
+    mock_get_empty_service_callback_api,
+    mock_get_empty_service_inbound_api,
     mock_get_live_service,
     mock_get_notifications,
     mock_get_service,
@@ -478,7 +480,7 @@ def test_should_validate_whitelist_items(
     ('main.received_text_messages_callback'),
 ])
 @pytest.mark.parametrize('url, bearer_token, expected_errors', [
-    ("", "", "Can’t be empty Can’t be empty"),
+    ("https://example.com", "", "Can’t be empty"),
     ("http://not_https.com", "1234567890", "Must be a valid https URL"),
     ("https://test.com", "123456789", "Must be at least 10 characters"),
 ])
@@ -507,6 +509,71 @@ def test_callback_forms_validation(
     error_msgs = ' '.join(msg.text.strip() for msg in response.select(".error-message"))
 
     assert error_msgs == expected_errors
+
+
+@pytest.mark.parametrize('existing_values, callback_ids, delete_should_be_called', [
+    ((
+        mock_get_valid_service_callback_api,
+        mock_get_valid_service_inbound_api,
+    ), [fake_uuid()], True),
+    ((
+        mock_get_empty_service_callback_api,
+        mock_get_empty_service_inbound_api,
+    ), [], False),
+])
+@pytest.mark.parametrize('endpoint, expected_delete_url', [
+    (
+        'main.delivery_status_callback',
+        '/service/{}/delivery-receipt-api/{}',
+    ),
+    (
+        'main.received_text_messages_callback',
+        '/service/{}/inbound-api/{}',
+    ),
+])
+def test_callback_forms_can_be_cleared(
+    client_request,
+    service_one,
+    existing_values,
+    callback_ids,
+    delete_should_be_called,
+    endpoint,
+    expected_delete_url,
+    mocker,
+):
+
+    service_one['service_callback_api'] = callback_ids
+    service_one['inbound_api'] = callback_ids
+    mocked_delete = mocker.patch('app.service_api_client.delete')
+    for mock_get_callback in existing_values:
+        mock_get_callback(mocker)
+
+    service_one['permissions'] = ['inbound_sms']
+
+    page = client_request.post(
+        endpoint,
+        service_id=service_one['id'],
+        _data={
+            'url': '',
+            'bearer_token': '',
+        },
+        _expected_redirect=url_for(
+            'main.api_callbacks',
+            service_id=service_one['id'],
+            _external=True,
+        )
+    )
+
+    assert not page.select(".error-message")
+
+    if delete_should_be_called:
+        mocked_delete.assert_called_once_with(
+            expected_delete_url.format(
+                service_one['id'], callback_ids[0]
+            )
+        )
+    else:
+        assert mocked_delete.call_args_list == []
 
 
 @pytest.mark.parametrize('has_inbound_sms, expected_link', [

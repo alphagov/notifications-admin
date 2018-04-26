@@ -332,6 +332,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             )
         )['data']
 
+    @cache.delete('service-{service_id}')
+    def delete_service_inbound_api(self, service_id, callback_api_id):
+        return self.delete("/service/{}/inbound-api/{}".format(
+            service_id, callback_api_id
+        ))
+
     def get_reply_to_email_addresses(self, service_id):
         return self.get(
             "/service/{}/email-reply-to".format(
@@ -462,6 +468,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         if bearer_token:
             data['bearer_token'] = bearer_token
         return self.post("/service/{}/delivery-receipt-api/{}".format(service_id, callback_api_id), data)
+
+    @cache.delete('service-{service_id}')
+    def delete_service_callback_api(self, service_id, callback_api_id):
+        return self.delete("/service/{}/delivery-receipt-api/{}".format(
+            service_id, callback_api_id
+        ))
 
     @cache.delete('service-{service_id}')
     def create_service_callback_api(self, service_id, url, bearer_token, user_id):
