@@ -5,8 +5,6 @@ import pytest
 from bs4 import BeautifulSoup, element
 from flask import url_for
 from freezegun import freeze_time
-from notifications_utils.clients.zendesk.zendesk_client import ZendeskError
-from werkzeug.exceptions import InternalServerError
 
 from app.main.views.feedback import (
     PROBLEM_TICKET_TYPE,
@@ -153,7 +151,7 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
     assert resp.status_code == 302
     assert resp.location == url_for('main.thanks', urgent=True, anonymous=False, _external=True)
     mock_post.assert_called_with(
-        subject='Notify feedback {}'.format(data['name']),
+        subject='Notify feedback',
         message='Environment: http://localhost/\n\nblah',
         user_email='rip@gmail.com',
         user_name='Steve Irwin',
@@ -184,7 +182,7 @@ def test_passes_user_details_through_flow(
     assert resp.status_code == 302
     assert resp.location == url_for('main.thanks', urgent=True, anonymous=False, _external=True)
     mock_post.assert_called_with(
-        subject='Notify feedback Test User',
+        subject='Notify feedback',
         message=ANY,
         user_email='test@user.gov.uk',
         user_name='Test User',
@@ -234,21 +232,21 @@ def test_email_address_required_for_problems(
     assert isinstance(page.find('span', {'class': 'error-message'}), expected_error)
 
 
-@pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, is_p1', [
+@pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, is_urgent, is_p1', [
 
-    # business hours, always urgent
-    (PROBLEM_TICKET_TYPE, 'yes', True, True),
-    (QUESTION_TICKET_TYPE, 'yes', True, True),
-    (PROBLEM_TICKET_TYPE, 'no', True, True),
-    (QUESTION_TICKET_TYPE, 'no', True, True),
+    # business hours, always urgent, never p1
+    (PROBLEM_TICKET_TYPE, 'yes', True, True, False),
+    (QUESTION_TICKET_TYPE, 'yes', True, True, False),
+    (PROBLEM_TICKET_TYPE, 'no', True, True, False),
+    (QUESTION_TICKET_TYPE, 'no', True, True, False),
 
-    # out of hours, non emergency, never urgent
-    (PROBLEM_TICKET_TYPE, 'no', False, False),
-    (QUESTION_TICKET_TYPE, 'no', False, False),
+    # out of hours, non emergency, never urgent, not p1
+    (PROBLEM_TICKET_TYPE, 'no', False, False, False),
+    (QUESTION_TICKET_TYPE, 'no', False, False, False),
 
-    # out of hours, emergency problems are urgent
-    (PROBLEM_TICKET_TYPE, 'yes', False, True),
-    (QUESTION_TICKET_TYPE, 'yes', False, False),
+    # out of hours, emergency problems are urgent and p1
+    (PROBLEM_TICKET_TYPE, 'yes', False, True, True),
+    (QUESTION_TICKET_TYPE, 'yes', False, False, False),
 
 ])
 def test_urgency(
@@ -257,6 +255,7 @@ def test_urgency(
     ticket_type,
     severe,
     is_in_business_hours,
+    is_urgent,
     is_p1,
 ):
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=is_in_business_hours)
@@ -266,7 +265,7 @@ def test_urgency(
         data={'feedback': 'blah', 'email_address': 'test@example.com'},
     )
     assert response.status_code == 302
-    assert response.location == url_for('main.thanks', urgent=is_p1, anonymous=False, _external=True)
+    assert response.location == url_for('main.thanks', urgent=is_urgent, anonymous=False, _external=True)
     assert mock_post.call_args[1]['p1'] == is_p1
 
 
@@ -499,22 +498,6 @@ def test_bat_email_page(
     logged_in_response = client.get(bat_phone_page)
     assert logged_in_response.status_code == 302
     assert logged_in_response.location == url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, _external=True)
-
-
-@freeze_time('2016-12-12 12:00:00.000000')
-@pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
-def test_log_error_on_post(app_, mocker, ticket_type):
-    mock_post = mocker.patch(
-        'app.main.views.feedback.zendesk_client.create_ticket',
-        side_effect=ZendeskError(None)
-    )
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            with pytest.raises(InternalServerError):
-                client.post(
-                    url_for('main.feedback', ticket_type=ticket_type),
-                    data={'feedback': "blah", 'name': "Steve Irwin", 'email_address': 'rip@gmail.com'})
-            assert mock_post.called
 
 
 @pytest.mark.parametrize('logged_in', [True, False])

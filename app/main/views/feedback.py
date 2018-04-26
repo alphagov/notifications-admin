@@ -3,7 +3,6 @@ from datetime import datetime
 import pytz
 from flask import abort, redirect, render_template, request, session, url_for
 from flask_login import current_user
-from notifications_utils.clients.zendesk.zendesk_client import ZendeskError
 
 from app import (
     convert_to_boolean,
@@ -77,10 +76,16 @@ def feedback(ticket_type):
     else:
         severe = None
 
-    urgent = (
-        in_business_hours() or
-        (ticket_type == PROBLEM_TICKET_TYPE and severe)
-    )
+    p1 = False
+    urgent = False
+
+    if in_business_hours():
+        # if we're in the office, it's urgent (aka we'll get back in 30 mins)
+        urgent = True
+    elif ticket_type == PROBLEM_TICKET_TYPE and severe:
+        # out of hours, it's only a p1 and it's only urgent if it's a p1
+        urgent = True
+        p1 = True
 
     anonymous = (
         (not form.email_address.data) and
@@ -116,17 +121,14 @@ def feedback(ticket_type):
             form.feedback.data
         )
 
-        try:
-            zendesk_client.create_ticket(
-                subject='Notify feedback {}'.format(user_name),
-                message=feedback_msg,
-                ticket_type=ticket_type,
-                p1=urgent,
-                user_email=user_email,
-                user_name=user_name
-            )
-        except ZendeskError:
-            abort(500, "Feedback submission failed")
+        zendesk_client.create_ticket(
+            subject='Notify feedback',
+            message=feedback_msg,
+            ticket_type=ticket_type,
+            p1=p1,
+            user_email=user_email,
+            user_name=user_name
+        )
         return redirect(url_for('.thanks', urgent=urgent, anonymous=anonymous))
 
     if not form.feedback.data:
