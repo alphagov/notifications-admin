@@ -1193,9 +1193,9 @@ def test_delete_reply_to_email_address(
     service_one,
     fake_uuid,
     get_non_default_reply_to_email_address,
-    mock_update_reply_to_email_address,
+    mocker,
 ):
-
+    mock_delete = mocker.patch('app.service_api_client.delete_reply_to_email_address')
     client_request.post(
         '.service_delete_email_reply_to',
         service_id=SERVICE_ONE_ID,
@@ -1206,12 +1206,7 @@ def test_delete_reply_to_email_address(
             _external=True,
         )
     )
-
-    mock_update_reply_to_email_address.assert_called_once_with(
-        SERVICE_ONE_ID,
-        active=False,
-        reply_to_email_id=fake_uuid,
-    )
+    mock_delete.assert_called_once_with(service_id=SERVICE_ONE_ID, reply_to_email_id=fake_uuid)
 
 
 @pytest.mark.parametrize('fixture, data, api_default_args', [
@@ -1435,9 +1430,9 @@ def test_delete_sms_sender(
     service_one,
     fake_uuid,
     get_non_default_sms_sender,
-    mock_update_sms_sender,
+    mocker,
 ):
-
+    mock_delete = mocker.patch('app.service_api_client.delete_sms_sender')
     client_request.post(
         '.service_delete_sms_sender',
         service_id=SERVICE_ONE_ID,
@@ -1448,12 +1443,7 @@ def test_delete_sms_sender(
             _external=True,
         )
     )
-
-    mock_update_sms_sender.assert_called_once_with(
-        SERVICE_ONE_ID,
-        active=False,
-        sms_sender_id='1234',
-    )
+    mock_delete.assert_called_once_with(service_id=SERVICE_ONE_ID, sms_sender_id='1234')
 
 
 @pytest.mark.parametrize('fixture, hide_textbox, fixture_sender_id', [

@@ -440,10 +440,9 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
 @login_required
 @user_has_permissions('manage_service')
 def service_delete_email_reply_to(service_id, reply_to_email_id):
-    service_api_client.update_reply_to_email_address(
-        current_service['id'],
+    service_api_client.delete_reply_to_email_address(
+        service_id=current_service['id'],
         reply_to_email_id=reply_to_email_id,
-        active=False,
     )
     return redirect(url_for('.service_email_reply_to', service_id=service_id))
 
@@ -723,10 +722,9 @@ def service_edit_sms_sender(service_id, sms_sender_id):
 @login_required
 @user_has_permissions('manage_service')
 def service_delete_sms_sender(service_id, sms_sender_id):
-    service_api_client.update_sms_sender(
-        current_service['id'],
+    service_api_client.delete_sms_sender(
+        service_id=current_service['id'],
         sms_sender_id=sms_sender_id,
-        active=False,
     )
     return redirect(url_for('.service_sms_senders', service_id=service_id))
 
