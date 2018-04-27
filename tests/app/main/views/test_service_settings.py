@@ -5,6 +5,7 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
+from notifications_utils.clients.zendesk.zendesk_client import ZendeskClient
 
 import app
 from app.utils import email_safe
@@ -561,7 +562,7 @@ def test_should_redirect_after_request_to_go_live(
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
-    mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket')
+    mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
     page = client_request.post(
         'main.submit_request_to_go_live',
         service_id=SERVICE_ONE_ID,
@@ -580,6 +581,7 @@ def test_should_redirect_after_request_to_go_live(
     mock_post.assert_called_with(
         subject='Request to go live - service one',
         message=ANY,
+        ticket_type=ZendeskClient.TYPE_QUESTION,
         user_name=active_user_with_permissions.name,
         user_email=active_user_with_permissions.email_address
     )

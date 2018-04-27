@@ -10,7 +10,6 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
-from notifications_utils.clients.zendesk.zendesk_client import ZendeskError
 from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
 
@@ -190,41 +189,39 @@ def submit_request_to_go_live(service_id):
     form = RequestToGoLiveForm()
 
     if form.validate_on_submit():
-        try:
-            zendesk_client.create_ticket(
-                subject='Request to go live - {}'.format(current_service['name']),
-                message=(
-                    'On behalf of {} ({})\n'
-                    '\n---'
-                    '\nOrganisation type: {}'
-                    '\nAgreement signed: {}'
-                    '\nChannel: {}\nStart date: {}\nStart volume: {}'
-                    '\nPeak volume: {}'
-                    '\nFeatures: {}'
-                ).format(
-                    current_service['name'],
-                    url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
-                    current_service['organisation_type'],
-                    AgreementInfo.from_current_user().as_human_readable,
-                    formatted_list(filter(None, (
-                        'email' if form.channel_email.data else None,
-                        'text messages' if form.channel_sms.data else None,
-                        'letters' if form.channel_letter.data else None,
-                    )), before_each='', after_each=''),
-                    form.start_date.data,
-                    form.start_volume.data,
-                    form.peak_volume.data,
-                    formatted_list(filter(None, (
-                        'one off' if form.method_one_off.data else None,
-                        'file upload' if form.method_upload.data else None,
-                        'API' if form.method_api.data else None,
-                    )), before_each='', after_each='')
-                ),
-                user_email=current_user.email_address,
-                user_name=current_user.name
-            )
-        except ZendeskError:
-            abort(500, "Request to go live submission failed")
+        zendesk_client.create_ticket(
+            subject='Request to go live - {}'.format(current_service['name']),
+            message=(
+                'On behalf of {} ({})\n'
+                '\n---'
+                '\nOrganisation type: {}'
+                '\nAgreement signed: {}'
+                '\nChannel: {}\nStart date: {}\nStart volume: {}'
+                '\nPeak volume: {}'
+                '\nFeatures: {}'
+            ).format(
+                current_service['name'],
+                url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
+                current_service['organisation_type'],
+                AgreementInfo.from_current_user().as_human_readable,
+                formatted_list(filter(None, (
+                    'email' if form.channel_email.data else None,
+                    'text messages' if form.channel_sms.data else None,
+                    'letters' if form.channel_letter.data else None,
+                )), before_each='', after_each=''),
+                form.start_date.data,
+                form.start_volume.data,
+                form.peak_volume.data,
+                formatted_list(filter(None, (
+                    'one off' if form.method_one_off.data else None,
+                    'file upload' if form.method_upload.data else None,
+                    'API' if form.method_api.data else None,
+                )), before_each='', after_each='')
+            ),
+            ticket_type=zendesk_client.TYPE_QUESTION,
+            user_email=current_user.email_address,
+            user_name=current_user.name
+        )
 
         flash('Thanks for your request to go live. We’ll get back to you within one working day.', 'default')
         return redirect(url_for('.service_settings', service_id=service_id))
