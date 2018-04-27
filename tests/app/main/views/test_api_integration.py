@@ -5,6 +5,7 @@ from unittest.mock import call
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+
 from tests import validate_route_permission
 from tests.conftest import (
     SERVICE_ONE_ID,

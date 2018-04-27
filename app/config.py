@@ -12,8 +12,7 @@ class Config(object):
     API_HOST_NAME = os.environ.get('API_HOST_NAME')
     SECRET_KEY = os.environ.get('SECRET_KEY')
     DANGEROUS_SALT = os.environ.get('DANGEROUS_SALT')
-    DESKPRO_API_HOST = os.environ.get('DESKPRO_API_HOST')
-    DESKPRO_API_KEY = os.environ.get('DESKPRO_API_KEY')
+    ZENDESK_API_KEY = os.environ.get('ZENDESK_API_KEY')
 
     # if we're not on cloudfoundry, we can get to this app from localhost. but on cloudfoundry its different
     ADMIN_BASE_URL = os.environ.get('ADMIN_BASE_URL', 'http://localhost:6012')
@@ -27,9 +26,6 @@ class Config(object):
     # Logging
     DEBUG = False
     NOTIFY_LOG_PATH = os.getenv('NOTIFY_LOG_PATH')
-
-    DESKPRO_DEPT_ID = 5
-    DESKPRO_ASSIGNED_AGENT_TEAM_ID = 5
 
     ADMIN_CLIENT_USER_NAME = 'notify-admin'
     ASSETS_DEBUG = False
@@ -60,7 +56,6 @@ class Config(object):
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
-    DESKPRO_PERSON_EMAIL = 'donotreply@notifications.service.gov.uk'
     ACTIVITY_STATS_LIMIT_DAYS = 7
     TEST_MESSAGE_FILENAME = 'Report'
 
@@ -92,8 +87,7 @@ class Development(Config):
     API_HOST_NAME = 'http://localhost:6011'
     DANGEROUS_SALT = 'dev-notify-salt'
     SECRET_KEY = 'dev-notify-secret-key'
-    DESKPRO_API_HOST = "some-host"
-    DESKPRO_API_KEY = "some-key"
+    ZENDESK_API_KEY = "some-key"
 
 
 class Test(Development):

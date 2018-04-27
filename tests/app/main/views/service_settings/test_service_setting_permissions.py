@@ -2,6 +2,7 @@ import functools
 
 import pytest
 from flask import url_for
+
 from tests.conftest import client_request as client_request_factory
 
 

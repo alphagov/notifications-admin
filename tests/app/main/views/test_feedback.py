@@ -5,20 +5,18 @@ import pytest
 from bs4 import BeautifulSoup, element
 from flask import url_for
 from freezegun import freeze_time
-from notifications_utils.clients import DeskproError
-from tests.conftest import (
-    active_user_with_permissions,
-    mock_get_services,
-    mock_get_services_with_no_services,
-    mock_get_services_with_one_service,
-)
-from werkzeug.exceptions import InternalServerError
 
 from app.main.views.feedback import (
     PROBLEM_TICKET_TYPE,
     QUESTION_TICKET_TYPE,
     has_live_services,
     in_business_hours,
+)
+from tests.conftest import (
+    active_user_with_permissions,
+    mock_get_services,
+    mock_get_services_with_no_services,
+    mock_get_services_with_one_service,
 )
 
 
@@ -118,7 +116,7 @@ def test_get_feedback_page_with_prefilled_body(
     user = active_user_with_permissions(fake_uuid)
     user.email_address = 'test@marinemanagement.org.uk'
     mocker.patch('app.user_api_client.get_user', return_value=user)
-    mock_post = mocker.patch('app.main.views.feedback.deskpro_client.create_ticket')
+    mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
     page = client_request.get(
         'main.feedback',
         ticket_type=QUESTION_TICKET_TYPE,
@@ -141,7 +139,7 @@ def test_get_feedback_page_with_prefilled_body(
 @freeze_time('2016-12-12 12:00:00.000000')
 @pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
 def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_type):
-    mock_post = mocker.patch('app.main.views.feedback.deskpro_client.create_ticket')
+    mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
 
     data = {'feedback': 'blah', 'name': 'Steve Irwin', 'email_address': 'rip@gmail.com'}
 
@@ -153,12 +151,12 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
     assert resp.status_code == 302
     assert resp.location == url_for('main.thanks', urgent=True, anonymous=False, _external=True)
     mock_post.assert_called_with(
-        subject='Notify feedback {}'.format(data['name']),
+        subject='Notify feedback',
         message='Environment: http://localhost/\n\nblah',
         user_email='rip@gmail.com',
         user_name='Steve Irwin',
         ticket_type=ticket_type,
-        urgency=ANY,
+        p1=ANY
     )
 
 
@@ -174,7 +172,7 @@ def test_passes_user_details_through_flow(
     ticket_type,
     data
 ):
-    mock_post = mocker.patch('app.main.views.feedback.deskpro_client.create_ticket')
+    mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
 
     resp = logged_in_client.post(
         url_for('main.feedback', ticket_type=ticket_type),
@@ -184,12 +182,12 @@ def test_passes_user_details_through_flow(
     assert resp.status_code == 302
     assert resp.location == url_for('main.thanks', urgent=True, anonymous=False, _external=True)
     mock_post.assert_called_with(
-        subject='Notify feedback Test User',
+        subject='Notify feedback',
         message=ANY,
         user_email='test@user.gov.uk',
         user_name='Test User',
         ticket_type=ticket_type,
-        urgency=ANY,
+        p1=ANY
     )
     assert mock_post.call_args[1]['message'] == '\n'.join([
         'Environment: http://localhost/',
@@ -221,7 +219,7 @@ def test_email_address_required_for_problems(
     things_expected_in_url,
     expected_error
 ):
-    mocker.patch('app.main.views.feedback.deskpro_client')
+    mocker.patch('app.main.views.feedback.zendesk_client')
     response = client.post(
         url_for('main.feedback', ticket_type=ticket_type),
         data=data,
@@ -234,21 +232,21 @@ def test_email_address_required_for_problems(
     assert isinstance(page.find('span', {'class': 'error-message'}), expected_error)
 
 
-@pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, numeric_urgency, is_urgent', [
+@pytest.mark.parametrize('ticket_type, severe, is_in_business_hours, is_urgent, is_p1', [
 
-    # business hours, always urgent
-    (PROBLEM_TICKET_TYPE, 'yes', True, 10, True),
-    (QUESTION_TICKET_TYPE, 'yes', True, 10, True),
-    (PROBLEM_TICKET_TYPE, 'no', True, 10, True),
-    (QUESTION_TICKET_TYPE, 'no', True, 10, True),
+    # business hours, always urgent, never p1
+    (PROBLEM_TICKET_TYPE, 'yes', True, True, False),
+    (QUESTION_TICKET_TYPE, 'yes', True, True, False),
+    (PROBLEM_TICKET_TYPE, 'no', True, True, False),
+    (QUESTION_TICKET_TYPE, 'no', True, True, False),
 
-    # out of hours, non emergency, never urgent
-    (PROBLEM_TICKET_TYPE, 'no', False, 1, False),
-    (QUESTION_TICKET_TYPE, 'no', False, 1, False),
+    # out of hours, non emergency, never urgent, not p1
+    (PROBLEM_TICKET_TYPE, 'no', False, False, False),
+    (QUESTION_TICKET_TYPE, 'no', False, False, False),
 
-    # out of hours, emergency problems are urgent
-    (PROBLEM_TICKET_TYPE, 'yes', False, 10, True),
-    (QUESTION_TICKET_TYPE, 'yes', False, 1, False),
+    # out of hours, emergency problems are urgent and p1
+    (PROBLEM_TICKET_TYPE, 'yes', False, True, True),
+    (QUESTION_TICKET_TYPE, 'yes', False, False, False),
 
 ])
 def test_urgency(
@@ -257,18 +255,18 @@ def test_urgency(
     ticket_type,
     severe,
     is_in_business_hours,
-    numeric_urgency,
     is_urgent,
+    is_p1,
 ):
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=is_in_business_hours)
-    mock_post = mocker.patch('app.main.views.feedback.deskpro_client.create_ticket')
+    mock_post = mocker.patch('app.main.views.feedback.zendesk_client.create_ticket')
     response = logged_in_client.post(
         url_for('main.feedback', ticket_type=ticket_type, severe=severe),
         data={'feedback': 'blah', 'email_address': 'test@example.com'},
     )
     assert response.status_code == 302
     assert response.location == url_for('main.thanks', urgent=is_urgent, anonymous=False, _external=True)
-    assert mock_post.call_args[1]['urgency'] == numeric_urgency
+    assert mock_post.call_args[1]['p1'] == is_p1
 
 
 ids, params = zip(*[
@@ -502,22 +500,6 @@ def test_bat_email_page(
     assert logged_in_response.location == url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, _external=True)
 
 
-@freeze_time('2016-12-12 12:00:00.000000')
-@pytest.mark.parametrize('ticket_type', [PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE])
-def test_log_error_on_post(app_, mocker, ticket_type):
-    mock_post = mocker.patch(
-        'app.main.views.feedback.deskpro_client.create_ticket',
-        side_effect=DeskproError
-    )
-    with app_.test_request_context():
-        with app_.test_client() as client:
-            with pytest.raises(InternalServerError):
-                client.post(
-                    url_for('main.feedback', ticket_type=ticket_type),
-                    data={'feedback': "blah", 'name': "Steve Irwin", 'email_address': 'rip@gmail.com'})
-            assert mock_post.called
-
-
 @pytest.mark.parametrize('logged_in', [True, False])
 @pytest.mark.parametrize('urgent, anonymous, message', [
 
@@ -544,28 +526,3 @@ def test_thanks(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert ' '.join(page.find('main').find('p').text.split()) == message
-
-
-@pytest.mark.parametrize('view, old_ticket_type, expected_view, new_ticket_type', [
-    ('old_submit_feedback', 'problem', 'feedback', 'report-problem'),
-    ('old_submit_feedback', 'question', 'feedback', 'ask-question-give-feedback'),
-])
-def test_old_problem_and_question_urls_redirect(
-    client,
-    view,
-    old_ticket_type,
-    expected_view,
-    new_ticket_type
-):
-    response = client.get(
-        url_for(
-            'main.{}'.format(view),
-            ticket_type=old_ticket_type,
-        )
-    )
-    assert response.status_code == 301
-    assert response.location == url_for(
-        'main.{}'.format(expected_view),
-        ticket_type=new_ticket_type,
-        _external=True,
-    )

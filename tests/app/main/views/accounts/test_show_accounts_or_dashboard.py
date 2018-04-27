@@ -1,8 +1,8 @@
 import pytest
 from flask import url_for
-from tests import user_json
 
 from app.notify_client.models import User
+from tests import user_json
 
 
 def user_with_orgs_and_services(num_orgs, num_services, platform_admin=False):

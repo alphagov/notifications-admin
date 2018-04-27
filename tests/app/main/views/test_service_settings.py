@@ -5,6 +5,9 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
+
+import app
+from app.utils import email_safe
 from tests import service_json, validate_route_permission
 from tests.conftest import (
     SERVICE_ONE_ID,
@@ -27,9 +30,6 @@ from tests.conftest import (
     normalize_spaces,
     platform_admin_user,
 )
-
-import app
-from app.utils import email_safe
 
 
 @pytest.fixture
@@ -561,7 +561,7 @@ def test_should_redirect_after_request_to_go_live(
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
-    mock_post = mocker.patch('app.main.views.service_settings.deskpro_client.create_ticket')
+    mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket')
     page = client_request.post(
         'main.submit_request_to_go_live',
         service_id=SERVICE_ONE_ID,

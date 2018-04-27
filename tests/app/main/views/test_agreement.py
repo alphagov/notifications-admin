@@ -2,6 +2,7 @@ from io import BytesIO
 
 import pytest
 from flask import url_for
+
 from tests.conftest import active_user_with_permissions
 
 
