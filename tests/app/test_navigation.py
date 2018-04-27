@@ -1,7 +1,7 @@
 import pytest
-from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, app_
 
 from app.navigation import HeaderNavigation, MainNavigation, OrgNavigation
+from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, app_
 
 all_endpoints = [
     rule.endpoint for rule in next(app_(None)).url_map.iter_rules()
