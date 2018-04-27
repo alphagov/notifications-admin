@@ -2943,7 +2943,7 @@ ne-ifca.gov.uk:
 nelincs.gov.uk:
   owner: North East Lincolnshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 nelson-mid-glam.gov.uk:
   owner: Nelson Community Council
   crown: false
@@ -3139,7 +3139,7 @@ northleach.gov.uk:
 northlincs.gov.uk:
   owner: North Lincolnshire Council
   crown: false
-  agreement_signed: true
+  agreement_signed: false
 north-norfolk.gov.uk:
   owner: North Norfolk District Council
   crown: false
