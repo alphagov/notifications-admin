@@ -2028,6 +2028,11 @@ def mock_s3_download(mocker, content=None):
 
 
 @pytest.fixture(scope='function')
+def mock_s3_set_metadata(mocker, content=None):
+    return mocker.patch('app.main.views.send.set_metadata_on_csv_upload')
+
+
+@pytest.fixture(scope='function')
 def sample_invite(mocker, service_one, status='pending'):
     id_ = str(generate_uuid())
     from_user = service_one['users'][0]
