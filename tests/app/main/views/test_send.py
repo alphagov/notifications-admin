@@ -565,6 +565,7 @@ def test_upload_valid_csv_shows_preview_and_table(
     mock_get_service_template_with_placeholders,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
+    mock_s3_set_metadata,
     fake_uuid,
     extra_args,
     expected_link_in_first_row,
@@ -590,6 +591,14 @@ def test_upload_valid_csv_shows_preview_and_table(
         template_id=fake_uuid,
         upload_id=fake_uuid,
         **extra_args
+    )
+
+    mock_s3_set_metadata.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        notification_count=3,
+        template_id=fake_uuid,
+        valid=True,
     )
 
     assert page.h1.text.strip() == 'Preview of Two week reminder'
@@ -702,6 +711,7 @@ def test_404_for_previewing_a_row_out_of_range(
     mock_get_service_template_with_placeholders,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
+    mock_s3_set_metadata,
     fake_uuid,
     row_index,
     expected_status,
@@ -1464,6 +1474,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
     mock_get_live_service,
+    mock_s3_set_metadata,
     service_one,
     fake_uuid,
     mock_s3_upload,
@@ -1488,6 +1499,14 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         assert sess['file_uploads'][fake_uuid]['notification_count'] == 53
         assert sess['file_uploads'][fake_uuid]['template_id'] == fake_uuid
         assert sess['file_uploads'][fake_uuid]['valid'] is True
+
+    mock_s3_set_metadata.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        notification_count=53,
+        template_id=fake_uuid,
+        valid=True,
+    )
 
     content = response.get_data(as_text=True)
     assert response.status_code == 200
@@ -1543,6 +1562,7 @@ def test_test_message_can_only_be_sent_now(
     mock_s3_download,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
+    mock_s3_set_metadata,
     fake_uuid
 ):
     with logged_in_client.session_transaction() as session:
@@ -1957,6 +1977,7 @@ def test_check_messages_back_link(
     mock_has_permissions,
     mock_get_detailed_service_for_today,
     mock_s3_download,
+    mock_s3_set_metadata,
     fake_uuid,
     mocker,
     template_mock,
@@ -2138,6 +2159,7 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     mock_has_permissions,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
+    mock_s3_set_metadata,
     fake_uuid,
     mocker,
     service_mock,
@@ -2265,6 +2287,7 @@ def test_generate_test_letter_doesnt_block_in_trial_mode(
     fake_uuid,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
+    mock_s3_set_metadata,
 ):
 
     mocker.patch('app.main.views.send.s3download', return_value="""
@@ -2712,6 +2735,7 @@ def test_reply_to_is_previewed_if_chosen(
     mocker,
     mock_get_service_email_template,
     mock_s3_download,
+    mock_s3_set_metadata,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
     get_default_reply_to_email_address,
@@ -2760,6 +2784,7 @@ def test_sms_sender_is_previewed(
     mocker,
     mock_get_service_template,
     mock_s3_download,
+    mock_s3_set_metadata,
     mock_get_users_by_service,
     mock_get_detailed_service_for_today,
     get_default_sms_sender,

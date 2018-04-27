@@ -38,7 +38,7 @@ from app.main.forms import (
     SetSenderForm,
     get_placeholder_form_instance,
 )
-from app.main.s3_client import s3download, s3upload
+from app.main.s3_client import s3download, s3upload, set_metadata_on_csv_upload
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     Spreadsheet,
@@ -549,6 +549,13 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         session['file_uploads'][upload_id]['notification_count'] = len(recipients)
         session['file_uploads'][upload_id]['template_id'] = str(template_id)
         session['file_uploads'][upload_id]['valid'] = True
+        set_metadata_on_csv_upload(
+            service_id,
+            upload_id,
+            notification_count=len(recipients),
+            template_id=str(template_id),
+            valid=True,
+        )
     else:
         session['file_uploads'].pop(upload_id)
 
