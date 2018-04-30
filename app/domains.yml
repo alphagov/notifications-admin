@@ -176,7 +176,55 @@ innovateuk.gov.uk:
   owner: Innovate UK
   agreement_signed: false
   crown: false
-
+  
+# Crown bodies who haven’t signed the MOU  
+charitycommission.gsi.gov.uk:
+charitycommission.gov.uk:
+  owner: Charity Commission
+  crown: true  
+  agreement_signed: false
+cps.gov.uk:
+  owner: The Crown Prosecution Service
+  crown: true
+  agreement_signed: false
+culture.gov.uk:
+  owner: Department for Digital, Culture, Media & Sport
+  crown: true
+  agreement_signed: false
+dexeu.gov.uk:  
+  owner: Department for Exiting the European Union
+  crown: true
+  agreement_signed: false
+dvsa.gov.uk:
+  owner: Driver & Vehicle Standards Agency
+  crown: true
+  agreement_signed: false
+dfid.gov.uk:
+  owner: Department for International Development
+  crown: true
+  agreement_signed: false      
+fco.gov.uk:
+  owner: Foreign & Commonwealth Office
+  crown: true
+  agreement_signed: false
+hse.gov.uk:
+  owner: Health and Safety Executive
+  crown: true
+  agreement_signed: false
+hmtreasury.gsi.gov.uk:
+hmtreasury.gov.uk:
+  owner: HM Treasury
+  crown: true
+  agreement_signed: false  
+nio.gov.uk:
+  owner: Northern Ireland Office
+  crown: true
+  agreement_signed: false
+ukexportfinance.gov.uk:
+  owner: UK Export Finance
+  crown: true
+  agreement_signed: false
+  
 # Local Government
 aberdeencityandshire-sdpa.gov.uk:
   owner: Aberdeen City Council
