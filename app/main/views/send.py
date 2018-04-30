@@ -1,5 +1,6 @@
 import itertools
 import json
+from contextlib import suppress
 from string import ascii_uppercase
 from zipfile import BadZipFile
 
@@ -21,6 +22,7 @@ from notifications_utils.recipients import (
     optional_address_columns,
 )
 from orderedset import OrderedSet
+from werkzeug.routing import RequestRedirect
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError
 
@@ -476,6 +478,19 @@ def send_test_preview(service_id, template_id, filetype):
 
 
 def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False):
+
+    with suppress(HTTPError):
+        # The happy path is that the job doesn’t already exist, so the
+        # API will return a 404 and the client will raise HTTPError.
+        job_api_client.get_job(service_id, upload_id)
+        # If we just return a `redirect` (302) object here, we'll get
+        # errors when we try and unpack in the check_messages route.
+        # Rasing a werkzeug.routing redirect means that doesn't happen.
+        raise RequestRedirect(url_for(
+            '.send_messages',
+            service_id=service_id,
+            template_id=template_id
+        ))
 
     users = user_api_client.get_users_for_service(service_id=service_id)
 

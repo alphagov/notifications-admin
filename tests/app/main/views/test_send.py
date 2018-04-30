@@ -2819,3 +2819,26 @@ def test_sms_sender_is_previewed(
         assert sms_sender_on_page.text.strip() == 'From: GOVUK'
     else:
         assert not sms_sender_on_page
+
+
+def test_redirects_to_template_if_job_exists_already(
+    client_request,
+    mock_get_service_email_template,
+    mock_get_job,
+    fake_uuid,
+):
+
+    client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        original_file_name='example.csv',
+        _expected_status=301,
+        _expected_redirect=url_for(
+            'main.send_messages',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        )
+    )
