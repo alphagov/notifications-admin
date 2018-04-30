@@ -700,7 +700,7 @@ def test_file_name_truncated_to_fit_in_s3_metadata(
     assert sys.getsizeof(''.join((
         '{}{}'.format(key, value) for key, value in
         mock_s3_set_metadata.call_args_list[0][1].items()
-    )).encode('utf-8')) == 1998
+    )).encode('utf-8')) == 1724
 
 
 def test_show_all_columns_if_there_are_duplicate_recipient_columns(

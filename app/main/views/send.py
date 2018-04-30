@@ -558,7 +558,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
             valid=True,
             original_file_name=unicode_truncate(
                 request.args.get('original_file_name', ''),
-                1872
+                1600,
             ),
         )
     else:
