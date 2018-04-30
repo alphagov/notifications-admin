@@ -6,13 +6,13 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
+
+from app.main.views.jobs import get_status_filters, get_time_left
 from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_notifications,
     normalize_spaces,
 )
-
-from app.main.views.jobs import get_status_filters, get_time_left
 
 
 @pytest.mark.parametrize(

@@ -25,7 +25,7 @@ from functools import partial
 
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging, request_helper, formatters
-from notifications_utils.clients import DeskproClient
+from notifications_utils.clients.zendesk.zendesk_client import ZendeskClient
 from notifications_utils.clients.statsd.statsd_client import StatsdClient
 from notifications_utils.recipients import (
     validate_phone_number,
@@ -39,6 +39,7 @@ from werkzeug.local import LocalProxy
 from app import proxy_fix
 from app.config import configs
 from app.asset_fingerprinter import AssetFingerprinter
+from app.navigation import HeaderNavigation, MainNavigation, OrgNavigation
 from app.notify_client.service_api_client import ServiceAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.invite_api_client import InviteApiClient
@@ -78,7 +79,7 @@ organisations_client = OrganisationsClient()
 org_invite_api_client = OrgInviteApiClient()
 asset_fingerprinter = AssetFingerprinter()
 statsd_client = StatsdClient()
-deskpro_client = DeskproClient()
+zendesk_client = ZendeskClient()
 letter_jobs_client = LetterJobsClient()
 inbound_number_client = InboundNumberClient()
 billing_api_client = BillingAPIClient()
@@ -88,6 +89,12 @@ current_service = LocalProxy(partial(_lookup_req_object, 'service'))
 
 # The current organisation attached to the request stack.
 current_organisation = LocalProxy(partial(_lookup_req_object, 'organisation'))
+
+navigation = {
+    'main_navigation': MainNavigation(),
+    'header_navigation': HeaderNavigation(),
+    'org_navigation': OrgNavigation(),
+}
 
 
 def create_app(application):
@@ -99,7 +106,7 @@ def create_app(application):
 
     init_app(application)
     statsd_client.init_app(application)
-    deskpro_client.init_app(application)
+    zendesk_client.init_app(application)
     logging.init_app(application, statsd_client)
     csrf.init_app(application)
     request_helper.init_app(application)
@@ -170,6 +177,10 @@ def init_app(application):
     @application.context_processor
     def _attach_current_user():
         return{'current_user': current_user}
+
+    @application.context_processor
+    def _nav_selected():
+        return navigation
 
     @application.before_request
     def record_start_time():

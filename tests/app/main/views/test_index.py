@@ -3,6 +3,7 @@ from functools import partial
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+
 from tests.conftest import active_user_with_permissions, normalize_spaces
 
 

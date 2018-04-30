@@ -4,6 +4,7 @@ import uuid
 from bs4 import BeautifulSoup
 from flask import url_for
 from itsdangerous import SignatureExpired
+
 from tests.conftest import normalize_spaces
 
 

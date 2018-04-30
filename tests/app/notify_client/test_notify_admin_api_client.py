@@ -3,10 +3,10 @@ from unittest.mock import patch
 
 import pytest
 import werkzeug
-from tests import service_json
-from tests.conftest import api_user_active, platform_admin_user, set_config
 
 from app.notify_client import NotifyAdminAPIClient
+from tests import service_json
+from tests.conftest import api_user_active, platform_admin_user, set_config
 
 SAMPLE_API_KEY = '{}-{}'.format('a' * 36, 's' * 36)
 

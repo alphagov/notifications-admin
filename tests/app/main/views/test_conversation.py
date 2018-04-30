@@ -5,13 +5,13 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
+
+from app.main.views.conversation import get_user_number
 from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_notifications,
     normalize_spaces,
 )
-
-from app.main.views.conversation import get_user_number
 
 
 def test_get_user_phone_number_when_only_inbound_exists(mocker):

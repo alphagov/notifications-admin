@@ -3,13 +3,12 @@ from datetime import datetime
 import pytz
 from flask import abort, redirect, render_template, request, session, url_for
 from flask_login import current_user
-from notifications_utils.clients import DeskproError
 
 from app import (
     convert_to_boolean,
     current_service,
-    deskpro_client,
     service_api_client,
+    zendesk_client,
 )
 from app.main import main
 from app.main.forms import Feedback, Problem, SupportType, Triage
@@ -31,11 +30,6 @@ def get_prefilled_message():
     }.get(
         request.args.get('body'), ''
     )
-
-
-@main.route('/feedback', methods=['GET'])
-def old_feedback():
-    return redirect(url_for('.support'))
 
 
 @main.route('/support', methods=['GET', 'POST'])
@@ -64,21 +58,6 @@ def triage():
     )
 
 
-@main.route('/support/submit/<ticket_type>')
-def old_submit_feedback(ticket_type):
-    try:
-        ticket_type = {
-            'problem': PROBLEM_TICKET_TYPE,
-            'question': QUESTION_TICKET_TYPE,
-        }[ticket_type]
-        return redirect(url_for(
-            '.feedback',
-            ticket_type=ticket_type,
-        ), 301)
-    except KeyError:
-        abort(404)
-
-
 @main.route('/support/<ticket_type>', methods=['GET', 'POST'])
 def feedback(ticket_type):
     try:
@@ -97,10 +76,16 @@ def feedback(ticket_type):
     else:
         severe = None
 
-    urgent = (
-        in_business_hours() or
-        (ticket_type == PROBLEM_TICKET_TYPE and severe)
-    )
+    p1 = False
+    urgent = False
+
+    if in_business_hours():
+        # if we're in the office, it's urgent (aka we'll get back in 30 mins)
+        urgent = True
+    elif ticket_type == PROBLEM_TICKET_TYPE and severe:
+        # out of hours, it's only a p1 and it's only urgent if it's a p1
+        urgent = True
+        p1 = True
 
     anonymous = (
         (not form.email_address.data) and
@@ -136,17 +121,14 @@ def feedback(ticket_type):
             form.feedback.data
         )
 
-        try:
-            deskpro_client.create_ticket(
-                subject='Notify feedback {}'.format(user_name),
-                message=feedback_msg,
-                ticket_type=ticket_type,
-                urgency=10 if urgent else 1,
-                user_email=user_email,
-                user_name=user_name
-            )
-        except DeskproError:
-            abort(500, "Feedback submission failed")
+        zendesk_client.create_ticket(
+            subject='Notify feedback',
+            message=feedback_msg,
+            ticket_type=ticket_type,
+            p1=p1,
+            user_email=user_email,
+            user_name=user_name
+        )
         return redirect(url_for('.thanks', urgent=urgent, anonymous=anonymous))
 
     if not form.feedback.data:

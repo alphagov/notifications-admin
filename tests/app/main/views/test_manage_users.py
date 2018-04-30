@@ -3,6 +3,10 @@ import copy
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+
+import app
+from app.notify_client.models import InvitedUser
+from app.utils import is_gov_user
 from tests.conftest import (
     SERVICE_ONE_ID,
     active_user_manage_template_permission,
@@ -12,10 +16,6 @@ from tests.conftest import (
     normalize_spaces,
 )
 from tests.conftest import service_one as create_sample_service
-
-import app
-from app.notify_client.models import InvitedUser
-from app.utils import is_gov_user
 
 
 @pytest.mark.parametrize('user, expected_self_text, expected_coworker_text', [

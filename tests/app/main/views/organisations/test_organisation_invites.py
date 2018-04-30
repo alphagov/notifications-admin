@@ -5,9 +5,9 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from notifications_python_client.errors import HTTPError
-from tests.conftest import ORGANISATION_ID, normalize_spaces
 
 from app.notify_client.models import InvitedOrgUser
+from tests.conftest import ORGANISATION_ID, normalize_spaces
 
 
 def test_organisation_page_shows_all_organisations(

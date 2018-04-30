@@ -38,7 +38,7 @@ from app.main.forms import (
     SetSenderForm,
     get_placeholder_form_instance,
 )
-from app.main.s3_client import s3download, s3upload
+from app.main.s3_client import s3download, s3upload, set_metadata_on_csv_upload
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     Spreadsheet,
@@ -46,6 +46,7 @@ from app.utils import (
     get_errors_for_csv,
     get_help_argument,
     get_template,
+    unicode_truncate,
     user_has_permissions,
 )
 
@@ -549,6 +550,17 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         session['file_uploads'][upload_id]['notification_count'] = len(recipients)
         session['file_uploads'][upload_id]['template_id'] = str(template_id)
         session['file_uploads'][upload_id]['valid'] = True
+        set_metadata_on_csv_upload(
+            service_id,
+            upload_id,
+            notification_count=len(recipients),
+            template_id=str(template_id),
+            valid=True,
+            original_file_name=unicode_truncate(
+                request.args.get('original_file_name', ''),
+                1600,
+            ),
+        )
     else:
         session['file_uploads'].pop(upload_id)
 
@@ -581,9 +593,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_messages(service_id, template_id, upload_id, row_index=2):
-    db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
-    data = _check_messages(service_id, db_template['id'], upload_id, row_index)
+    data = _check_messages(service_id, template_id, upload_id, row_index)
 
     if (
         data['recipients'].too_many_rows or

@@ -6,6 +6,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import APIError
+
 from tests.conftest import (
     SERVICE_ONE_ID,
     mock_get_notification,

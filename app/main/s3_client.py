@@ -15,6 +15,17 @@ def get_s3_object(bucket_name, filename):
     return s3.Object(bucket_name, filename)
 
 
+def get_csv_location(service_id, upload_id):
+    return (
+        current_app.config['CSV_UPLOAD_BUCKET_NAME'],
+        FILE_LOCATION_STRUCTURE.format(service_id, upload_id),
+    )
+
+
+def get_csv_upload(service_id, upload_id):
+    return get_s3_object(*get_csv_location(service_id, upload_id))
+
+
 def delete_s3_object(filename):
     bucket_name = current_app.config['LOGO_UPLOAD_BUCKET_NAME']
     get_s3_object(bucket_name, filename).delete()
@@ -39,20 +50,20 @@ def get_temp_truncated_filename(filename, user_id):
 
 def s3upload(service_id, filedata, region):
     upload_id = str(uuid.uuid4())
-    upload_file_name = FILE_LOCATION_STRUCTURE.format(service_id, upload_id)
-    utils_s3upload(filedata=filedata['data'],
-                   region=region,
-                   bucket_name=current_app.config['CSV_UPLOAD_BUCKET_NAME'],
-                   file_location=upload_file_name)
+    bucket_name, file_location = get_csv_location(service_id, upload_id)
+    utils_s3upload(
+        filedata=filedata['data'],
+        region=region,
+        bucket_name=bucket_name,
+        file_location=file_location,
+    )
     return upload_id
 
 
 def s3download(service_id, upload_id):
     contents = ''
     try:
-        bucket_name = current_app.config['CSV_UPLOAD_BUCKET_NAME']
-        upload_file_name = FILE_LOCATION_STRUCTURE.format(service_id, upload_id)
-        key = get_s3_object(bucket_name, upload_file_name)
+        key = get_csv_upload(service_id, upload_id)
         contents = key.get()['Body'].read().decode('utf-8')
     except botocore.exceptions.ClientError as e:
         current_app.logger.error("Unable to download s3 file {}".format(
@@ -121,3 +132,16 @@ def delete_temp_file(filename):
         raise ValueError('Not a temp file: {}'.format(filename))
 
     delete_s3_object(filename)
+
+
+def set_metadata_on_csv_upload(service_id, upload_id, **kwargs):
+    get_csv_upload(
+        service_id, upload_id
+    ).copy_from(
+        CopySource='{}/{}'.format(*get_csv_location(service_id, upload_id)),
+        ServerSideEncryption='AES256',
+        Metadata={
+            key: str(value) for key, value in kwargs.items()
+        },
+        MetadataDirective='REPLACE',
+    )

@@ -1,5 +1,5 @@
 from collections import namedtuple
-from unittest.mock import call
+from unittest.mock import Mock, call
 
 import pytest
 
@@ -10,6 +10,7 @@ from app.main.s3_client import (
     delete_temp_files_created_by,
     get_temp_truncated_filename,
     persist_logo,
+    set_metadata_on_csv_upload,
     upload_logo,
 )
 
@@ -94,3 +95,21 @@ def test_does_not_delete_non_temp_file(client, mocker, fake_uuid):
 
     assert mocked_delete_s3_object.called_with_args(filename)
     assert str(error.value) == 'Not a temp file: {}'.format(filename)
+
+
+def test_sets_metadata(client, mocker):
+    mocked_s3_object = Mock()
+    mocked_get_s3_object = mocker.patch(
+        'app.main.s3_client.get_csv_upload',
+        return_value=mocked_s3_object,
+    )
+
+    set_metadata_on_csv_upload('1234', '5678', foo='bar', baz=True)
+
+    mocked_get_s3_object.assert_called_once_with('1234', '5678')
+    mocked_s3_object.copy_from.assert_called_once_with(
+        CopySource='test-notifications-csv-upload/service-1234-notify/5678.csv',
+        Metadata={'baz': 'True', 'foo': 'bar'},
+        MetadataDirective='REPLACE',
+        ServerSideEncryption='AES256',
+    )

@@ -51,6 +51,10 @@ gulp.task('copy:govuk_template:images', () => gulp.src(paths.template + 'assets/
   .pipe(gulp.dest(paths.dist + 'images/'))
 );
 
+gulp.task('copy:govuk_template:fonts', () => gulp.src(paths.template + 'assets/stylesheets/fonts/**/*')
+  .pipe(gulp.dest(paths.dist + 'fonts/'))
+);
+
 gulp.task('javascripts', () => gulp
   .src([
     paths.toolkit + 'javascripts/govuk/modules.js',
@@ -153,6 +157,7 @@ gulp.task('default',
   [
     'copy:govuk_template:template',
     'copy:govuk_template:images',
+    'copy:govuk_template:fonts',
     'copy:govuk_template:css',
     'copy:govuk_template:js',
     'copy:govuk_template:error_page',
