@@ -568,3 +568,8 @@ class GovernmentEmailDomain(AgreementInfo):
             ))
         except StopIteration:
             raise NotGovernmentEmailDomain()
+
+
+def unicode_truncate(s, length):
+    encoded = s.encode('utf-8')[:length]
+    return encoded.decode('utf-8', 'ignore')

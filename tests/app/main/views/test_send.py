@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 import uuid
 from functools import partial
 from glob import glob
@@ -590,6 +591,7 @@ def test_upload_valid_csv_shows_preview_and_table(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         upload_id=fake_uuid,
+        original_file_name='example.csv',
         **extra_args
     )
 
@@ -599,6 +601,7 @@ def test_upload_valid_csv_shows_preview_and_table(
         notification_count=3,
         template_id=fake_uuid,
         valid=True,
+        original_file_name='example.csv',
     )
 
     assert page.h1.text.strip() == 'Preview of Two week reminder'
@@ -658,6 +661,46 @@ def test_upload_valid_csv_shows_preview_and_table(
         for index, cell in enumerate(row):
             row = page.select('table tbody tr')[row_index]
             assert normalize_spaces(str(row.select('td')[index + 1])) == cell
+
+
+def test_file_name_truncated_to_fit_in_s3_metadata(
+    client_request,
+    mocker,
+    mock_get_live_service,
+    mock_get_service_template_with_placeholders,
+    mock_get_users_by_service,
+    mock_get_detailed_service_for_today,
+    mock_s3_set_metadata,
+    fake_uuid,
+):
+
+    with client_request.session_transaction() as session:
+        session['file_uploads'] = {
+            fake_uuid: {'template_id': fake_uuid}
+        }
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        phone number,name,thing,thing,thing
+        07700900001, A,   foo,  foo,  foo
+    """)
+
+    file_name = 'ü😁' * 2000
+
+    client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        original_file_name=file_name,
+    )
+    assert sys.getsizeof(
+        file_name.encode('utf-8')
+    ) > 2000
+
+    assert sys.getsizeof(''.join((
+        '{}{}'.format(key, value) for key, value in
+        mock_s3_set_metadata.call_args_list[0][1].items()
+    )).encode('utf-8')) == 1724
 
 
 def test_show_all_columns_if_there_are_duplicate_recipient_columns(
@@ -1506,6 +1549,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         notification_count=53,
         template_id=fake_uuid,
         valid=True,
+        original_file_name='valid.csv',
     )
 
     content = response.get_data(as_text=True)
