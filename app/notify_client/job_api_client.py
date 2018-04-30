@@ -60,13 +60,9 @@ class JobApiClient(NotifyAdminAPIClient):
 
         return jobs
 
-    def create_job(self, job_id, service_id, template_id, original_file_name, notification_count, scheduled_for=None):
-        data = {
-            "id": job_id,
-            "template": template_id,
-            "original_file_name": original_file_name,
-            "notification_count": notification_count
-        }
+    def create_job(self, job_id, service_id, scheduled_for=None):
+
+        data = {"id": job_id}
 
         if scheduled_for:
             data.update({'scheduled_for': scheduled_for})

@@ -1711,10 +1711,7 @@ def test_create_job_should_call_api(
     mock_create_job.assert_called_with(
         job_id,
         service_id,
-        template_id,
-        original_file_name,
-        notification_count,
-        scheduled_for=when
+        scheduled_for=when,
     )
 
 

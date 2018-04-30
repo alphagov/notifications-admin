@@ -656,9 +656,6 @@ def start_job(service_id, upload_id):
     job_api_client.create_job(
         upload_id,
         service_id,
-        upload_data.get('template_id'),
-        request.args.get('original_file_name'),
-        upload_data.get('notification_count'),
         scheduled_for=request.form.get('scheduled_for', '')
     )
 

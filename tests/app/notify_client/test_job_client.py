@@ -7,16 +7,10 @@ from app.notify_client.job_api_client import JobApiClient
 def test_client_creates_job_data_correctly(mocker, fake_uuid):
     job_id = fake_uuid
     service_id = fake_uuid
-    template_id = fake_uuid
-    original_file_name = 'test.csv'
-    notification_count = 1
     mocker.patch('app.notify_client.current_user', id='1')
 
     expected_data = {
         "id": job_id,
-        "template": template_id,
-        "original_file_name": original_file_name,
-        "notification_count": 1,
         "created_by": '1'
     }
 
@@ -28,13 +22,7 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
         return_value={'data': dict(statistics=[], **expected_data)}
     )
 
-    result = client.create_job(job_id, service_id, template_id, original_file_name, notification_count)
-
-    assert result['data']['notifications_requested'] == 0
-    assert result['data']['notifications_sent'] == 0
-    assert result['data']['notification_count'] == 1
-    assert result['data']['notifications_failed'] == 0
-
+    client.create_job(service_id, job_id)
     mock_post.assert_called_once_with(url=expected_url, data=expected_data)
 
 
@@ -47,7 +35,7 @@ def test_client_schedules_job(mocker, fake_uuid):
     when = '2016-08-25T13:04:21.767198'
 
     JobApiClient().create_job(
-        fake_uuid, fake_uuid, fake_uuid, fake_uuid, 1, scheduled_for=when
+        fake_uuid, 1, scheduled_for=when
     )
 
     assert mock_post.call_args[1]['data']['scheduled_for'] == when
