@@ -590,6 +590,7 @@ def test_upload_valid_csv_shows_preview_and_table(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         upload_id=fake_uuid,
+        original_file_name='example.csv',
         **extra_args
     )
 
@@ -599,6 +600,7 @@ def test_upload_valid_csv_shows_preview_and_table(
         notification_count=3,
         template_id=fake_uuid,
         valid=True,
+        original_file_name='example.csv',
     )
 
     assert page.h1.text.strip() == 'Preview of Two week reminder'
@@ -1506,6 +1508,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         notification_count=53,
         template_id=fake_uuid,
         valid=True,
+        original_file_name='valid.csv',
     )
 
     content = response.get_data(as_text=True)

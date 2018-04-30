@@ -555,6 +555,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
             notification_count=len(recipients),
             template_id=str(template_id),
             valid=True,
+            original_file_name=request.args.get('original_file_name'),
         )
     else:
         session['file_uploads'].pop(upload_id)
