@@ -382,7 +382,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     )
 
     with logged_in_client.session_transaction() as session:
-        assert session['file_uploads'] == {}
+        assert 'file_uploads' not in session
 
     assert response.status_code == 200
     content = response.get_data(as_text=True)
@@ -501,7 +501,7 @@ def test_upload_csvfile_with_missing_columns_shows_error(
     )
 
     with client_request.session_transaction() as session:
-        assert session['file_uploads'] == {}
+        assert 'file_uploads' not in session
 
     assert normalize_spaces(page.select('.banner-dangerous')[0].text) == expected_error
 
@@ -1537,11 +1537,8 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         content_type='multipart/form-data',
         follow_redirects=True
     )
-    with logged_in_client.session_transaction() as sess:
-        assert 'original_file_name' not in sess['file_uploads'][fake_uuid]
-        assert sess['file_uploads'][fake_uuid]['notification_count'] == 53
-        assert sess['file_uploads'][fake_uuid]['template_id'] == fake_uuid
-        assert sess['file_uploads'][fake_uuid]['valid'] is True
+    with logged_in_client.session_transaction() as session:
+        assert 'file_uploads' not in session
 
     mock_s3_set_metadata.assert_called_once_with(
         SERVICE_ONE_ID,

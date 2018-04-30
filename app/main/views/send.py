@@ -542,14 +542,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     elif preview_row > 2:
         abort(404)
 
-    if 'file_uploads' not in session:
-        session['file_uploads'] = {}
-    session['file_uploads'][upload_id] = {}
-
     if any(recipients) and not recipients.has_errors:
-        session['file_uploads'][upload_id]['notification_count'] = len(recipients)
-        session['file_uploads'][upload_id]['template_id'] = str(template_id)
-        session['file_uploads'][upload_id]['valid'] = True
         set_metadata_on_csv_upload(
             service_id,
             upload_id,
@@ -561,8 +554,6 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
                 1600,
             ),
         )
-    else:
-        session['file_uploads'].pop(upload_id)
 
     return dict(
         recipients=recipients,
