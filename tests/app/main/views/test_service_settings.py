@@ -891,7 +891,6 @@ def test_no_senders_message_shows(
 @pytest.mark.parametrize('reply_to_input, expected_error', [
     ('', 'Can’t be empty'),
     ('testtest', 'Enter a valid email address'),
-    ('test@hello.com', 'Enter a government email address. If you think you should have access contact us')
 ])
 def test_incorrect_reply_to_email_address_input(
     reply_to_input,
@@ -977,7 +976,7 @@ def test_add_reply_to_email_address(
     mock_add_reply_to_email_address
 ):
     fixture(mocker)
-    data['email_address'] = "test@example.gov.uk"
+    data['email_address'] = "test@example.com"
     client_request.post(
         'main.service_add_email_reply_to',
         service_id=SERVICE_ONE_ID,
@@ -986,7 +985,7 @@ def test_add_reply_to_email_address(
 
     mock_add_reply_to_email_address.assert_called_once_with(
         SERVICE_ONE_ID,
-        email_address="test@example.gov.uk",
+        email_address="test@example.com",
         is_default=api_default_args
     )
 
