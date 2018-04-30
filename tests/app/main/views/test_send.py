@@ -1833,48 +1833,6 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
     assert mock_get_service_template.called is False
 
 
-def test_check_messages_should_revalidate_file_when_uploading_file(
-    logged_in_client,
-    service_one,
-    mock_create_job,
-    mock_get_job,
-    mock_get_service_template_with_placeholders,
-    mock_s3_upload,
-    mocker,
-    mock_get_detailed_service_for_today,
-    mock_get_users_by_service,
-    fake_uuid
-):
-
-    mocker.patch(
-        'app.main.views.send.s3download',
-        return_value="""
-            phone number,name,,,
-            +447700900986,,,,
-            +447700900986,,,,
-        """
-    )
-    data = mock_get_job(SERVICE_ONE_ID, fake_uuid)['data']
-    with logged_in_client.session_transaction() as session:
-        session['file_uploads'] = {
-            fake_uuid: {
-                'original_file_name': 'invalid.csv',
-                'template_id': data['template'],
-                'notification_count': data['notification_count'],
-                'valid': True
-            }
-        }
-
-    response = logged_in_client.post(
-        url_for('main.start_job', service_id=SERVICE_ONE_ID, upload_id=data['id']),
-        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
-        content_type='multipart/form-data',
-        follow_redirects=True
-    )
-    assert response.status_code == 200
-    assert 'There is a problem with invalid.csv' in response.get_data(as_text=True)
-
-
 @pytest.mark.parametrize('route, response_code', [
     ('main.choose_template', 200),
     ('main.send_messages', 200),
@@ -2864,54 +2822,3 @@ def test_sms_sender_is_previewed(
         assert sms_sender_on_page.text.strip() == 'From: GOVUK'
     else:
         assert not sms_sender_on_page
-
-
-@pytest.mark.parametrize('endpoint, request_type, extra_args', [
-    (
-        'main.start_job',
-        'POST',
-        {
-            'upload_id': fake_uuid()
-        }
-    )
-])
-@pytest.mark.parametrize('session_data', [
-    {},
-    {
-        '6ce466d0-fd6a-11e5-82f5-e0accb9d11a4': {
-            'template_id': '1234'
-        }
-    }
-])
-def test_redirects_to_choose_template_if_no_session_exists_for_upload_id(
-    client_request,
-    mock_get_service_email_template,
-    endpoint,
-    request_type,
-    session_data,
-    extra_args,
-    fake_uuid
-):
-    with client_request.session_transaction() as session:
-        session['file_uploads'] = session_data
-
-    if request_type == 'GET':
-        client_request.get(
-            endpoint,
-            service_id=SERVICE_ONE_ID,
-            **extra_args,
-            _expected_status=301,
-            _expected_redirect=url_for(
-                'main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid, _external=True
-            )
-        )
-    else:
-        client_request.post(
-            endpoint,
-            service_id=SERVICE_ONE_ID,
-            **extra_args,
-            _expected_status=301,
-            _expected_redirect=url_for(
-                'main.choose_template', service_id=SERVICE_ONE_ID, _external=True
-            )
-        )

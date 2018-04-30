@@ -641,17 +641,6 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def start_job(service_id, upload_id):
-    try:
-        upload_data = session['file_uploads'][upload_id]
-    except KeyError:
-        current_app.logger.exception('upload_id not in session')
-        return redirect(url_for('main.choose_template', service_id=service_id), code=301)
-
-    if request.files or not upload_data.get('valid'):
-        # The csv was invalid, validate the csv again
-        return send_messages(service_id, upload_data.get('template_id'))
-
-    session['file_uploads'].pop(upload_id)
 
     job_api_client.create_job(
         upload_id,
