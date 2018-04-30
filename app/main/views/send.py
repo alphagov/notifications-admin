@@ -46,6 +46,7 @@ from app.utils import (
     get_errors_for_csv,
     get_help_argument,
     get_template,
+    unicode_truncate,
     user_has_permissions,
 )
 
@@ -555,7 +556,10 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
             notification_count=len(recipients),
             template_id=str(template_id),
             valid=True,
-            original_file_name=request.args.get('original_file_name'),
+            original_file_name=unicode_truncate(
+                request.args.get('original_file_name', ''),
+                1872
+            ),
         )
     else:
         session['file_uploads'].pop(upload_id)
