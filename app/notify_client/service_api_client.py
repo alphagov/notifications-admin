@@ -386,6 +386,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             }
         )
 
+    @cache.delete('service-{service_id}')
+    def delete_reply_to_email_address(self, service_id, reply_to_email_id):
+        return self.post(
+            "/service/{}/email-reply-to/{}/archive".format(service_id, reply_to_email_id),
+            data=None
+        )
+
     def get_letter_contacts(self, service_id):
         return self.get("/service/{}/letter-contact".format(service_id))
 
@@ -446,6 +453,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
                 "sms_sender": sms_sender,
                 "is_default": is_default
             }
+        )
+
+    @cache.delete('service-{service_id}')
+    def delete_sms_sender(self, service_id, sms_sender_id):
+        return self.post(
+            "/service/{}/sms-sender/{}/archive".format(service_id, sms_sender_id),
+            data=None
         )
 
     def get_service_callback_api(self, service_id, callback_api_id):

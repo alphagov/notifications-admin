@@ -147,7 +147,7 @@ def mock_add_reply_to_email_address(mocker):
 
 @pytest.fixture(scope='function')
 def mock_update_reply_to_email_address(mocker):
-    def _update_reply_to(service_id, reply_to_email_id, email_address, is_default=False):
+    def _update_reply_to(service_id, reply_to_email_id, email_address=None, active=None, is_default=False):
         return
 
     return mocker.patch('app.service_api_client.update_reply_to_email_address', side_effect=_update_reply_to)
@@ -450,7 +450,7 @@ def mock_add_sms_sender(mocker):
 
 @pytest.fixture(scope='function')
 def mock_update_sms_sender(mocker):
-    def _update_sms_sender(service_id, sms_sender_id, sms_sender, is_default=False):
+    def _update_sms_sender(service_id, sms_sender_id, sms_sender=None, active=None, is_default=False):
         return
 
     return mocker.patch('app.service_api_client.update_sms_sender', side_effect=_update_sms_sender)
