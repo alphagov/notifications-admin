@@ -40,6 +40,11 @@ def get_service_settings_page(
     ({'permissions': ['letter']},
         '.service_switch_can_send_precompiled_letter', {}, 'Allow to send precompiled letters'),
 
+    ({'permissions': ['upload_document']},
+        '.service_switch_can_upload_document', {}, 'Stop uploading documents'),
+    ({'permissions': []},
+        '.service_switch_can_upload_document', {}, 'Allow to upload documents'),
+
     ({'permissions': ['sms']}, '.service_set_inbound_number', {'set_inbound_sms': True}, 'Allow inbound sms'),
 
     ({'active': True}, '.archive_service', {}, 'Archive service'),
