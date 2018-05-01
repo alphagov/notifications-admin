@@ -382,7 +382,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     )
 
     with logged_in_client.session_transaction() as session:
-        assert session['file_uploads'] == {}
+        assert 'file_uploads' not in session
 
     assert response.status_code == 200
     content = response.get_data(as_text=True)
@@ -501,7 +501,7 @@ def test_upload_csvfile_with_missing_columns_shows_error(
     )
 
     with client_request.session_transaction() as session:
-        assert session['file_uploads'] == {}
+        assert 'file_uploads' not in session
 
     assert normalize_spaces(page.select('.banner-dangerous')[0].text) == expected_error
 
@@ -1537,11 +1537,8 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         content_type='multipart/form-data',
         follow_redirects=True
     )
-    with logged_in_client.session_transaction() as sess:
-        assert 'original_file_name' not in sess['file_uploads'][fake_uuid]
-        assert sess['file_uploads'][fake_uuid]['notification_count'] == 53
-        assert sess['file_uploads'][fake_uuid]['template_id'] == fake_uuid
-        assert sess['file_uploads'][fake_uuid]['valid'] is True
+    with logged_in_client.session_transaction() as session:
+        assert 'file_uploads' not in session
 
     mock_s3_set_metadata.assert_called_once_with(
         SERVICE_ONE_ID,
@@ -1711,10 +1708,7 @@ def test_create_job_should_call_api(
     mock_create_job.assert_called_with(
         job_id,
         service_id,
-        template_id,
-        original_file_name,
-        notification_count,
-        scheduled_for=when
+        scheduled_for=when,
     )
 
 
@@ -1834,48 +1828,6 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
     )
     assert resp.status_code == 404
     assert mock_get_service_template.called is False
-
-
-def test_check_messages_should_revalidate_file_when_uploading_file(
-    logged_in_client,
-    service_one,
-    mock_create_job,
-    mock_get_job,
-    mock_get_service_template_with_placeholders,
-    mock_s3_upload,
-    mocker,
-    mock_get_detailed_service_for_today,
-    mock_get_users_by_service,
-    fake_uuid
-):
-
-    mocker.patch(
-        'app.main.views.send.s3download',
-        return_value="""
-            phone number,name,,,
-            +447700900986,,,,
-            +447700900986,,,,
-        """
-    )
-    data = mock_get_job(SERVICE_ONE_ID, fake_uuid)['data']
-    with logged_in_client.session_transaction() as session:
-        session['file_uploads'] = {
-            fake_uuid: {
-                'original_file_name': 'invalid.csv',
-                'template_id': data['template'],
-                'notification_count': data['notification_count'],
-                'valid': True
-            }
-        }
-
-    response = logged_in_client.post(
-        url_for('main.start_job', service_id=SERVICE_ONE_ID, upload_id=data['id']),
-        data={'file': (BytesIO(''.encode('utf-8')), 'invalid.csv')},
-        content_type='multipart/form-data',
-        follow_redirects=True
-    )
-    assert response.status_code == 200
-    assert 'There is a problem with invalid.csv' in response.get_data(as_text=True)
 
 
 @pytest.mark.parametrize('route, response_code', [
@@ -2869,52 +2821,24 @@ def test_sms_sender_is_previewed(
         assert not sms_sender_on_page
 
 
-@pytest.mark.parametrize('endpoint, request_type, extra_args', [
-    (
-        'main.start_job',
-        'POST',
-        {
-            'upload_id': fake_uuid()
-        }
-    )
-])
-@pytest.mark.parametrize('session_data', [
-    {},
-    {
-        '6ce466d0-fd6a-11e5-82f5-e0accb9d11a4': {
-            'template_id': '1234'
-        }
-    }
-])
-def test_redirects_to_choose_template_if_no_session_exists_for_upload_id(
+def test_redirects_to_template_if_job_exists_already(
     client_request,
     mock_get_service_email_template,
-    endpoint,
-    request_type,
-    session_data,
-    extra_args,
-    fake_uuid
+    mock_get_job,
+    fake_uuid,
 ):
-    with client_request.session_transaction() as session:
-        session['file_uploads'] = session_data
 
-    if request_type == 'GET':
-        client_request.get(
-            endpoint,
+    client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        original_file_name='example.csv',
+        _expected_status=301,
+        _expected_redirect=url_for(
+            'main.send_messages',
             service_id=SERVICE_ONE_ID,
-            **extra_args,
-            _expected_status=301,
-            _expected_redirect=url_for(
-                'main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid, _external=True
-            )
+            template_id=fake_uuid,
+            _external=True,
         )
-    else:
-        client_request.post(
-            endpoint,
-            service_id=SERVICE_ONE_ID,
-            **extra_args,
-            _expected_status=301,
-            _expected_redirect=url_for(
-                'main.choose_template', service_id=SERVICE_ONE_ID, _external=True
-            )
-        )
+    )

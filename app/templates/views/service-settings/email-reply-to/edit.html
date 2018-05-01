@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/checkbox.html" import checkbox %}
 {% from "components/page-footer.html" import page_footer %}
@@ -9,9 +10,20 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">
-    Edit email reply to address
-  </h1>
+  {% if confirm_delete %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous', subhead="Are you sure you want to delete this email reply to address?") %}
+        <form method='post'>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="submit" class="button" name="delete" value="Confirm" />
+        </form>
+      {% endcall %}
+    </div>
+  {% else %}
+    <h1 class="heading-large">
+      Edit email reply to address
+    </h1>
+  {% endif %}
   <form method="post">
     {{ textbox(
       form.email_address,
@@ -22,16 +34,23 @@
       <p class="form-group">
         This is the default reply to address for {{ current_service.name }} emails
       </p>
+      {{ page_footer(
+        'Save',
+        back_link=url_for('.service_email_reply_to', service_id=current_service.id),
+        back_link_text='Back'
+      ) }}
     {% else %}
       <div class="form-group">
         {{ checkbox(form.is_default) }}
       </div>
+      {{ page_footer(
+        'Save',
+        back_link=url_for('.service_email_reply_to', service_id=current_service.id),
+        back_link_text='Back',
+        delete_link=url_for('.service_confirm_delete_email_reply_to', service_id=current_service.id, reply_to_email_id=reply_to_email_address_id),
+        delete_link_text='Delete'
+      ) }}
     {% endif %}
-    {{ page_footer(
-      'Save',
-      back_link=url_for('.service_email_reply_to', service_id=current_service.id),
-      back_link_text='Back'
-  ) }}
   </form>
 
 {% endblock %}
