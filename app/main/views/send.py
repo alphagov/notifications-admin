@@ -1,5 +1,6 @@
 import itertools
 import json
+from contextlib import suppress
 from string import ascii_uppercase
 from zipfile import BadZipFile
 
@@ -21,6 +22,7 @@ from notifications_utils.recipients import (
     optional_address_columns,
 )
 from orderedset import OrderedSet
+from werkzeug.routing import RequestRedirect
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError
 
@@ -477,6 +479,19 @@ def send_test_preview(service_id, template_id, filetype):
 
 def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False):
 
+    with suppress(HTTPError):
+        # The happy path is that the job doesn’t already exist, so the
+        # API will return a 404 and the client will raise HTTPError.
+        job_api_client.get_job(service_id, upload_id)
+        # If we just return a `redirect` (302) object here, we'll get
+        # errors when we try and unpack in the check_messages route.
+        # Rasing a werkzeug.routing redirect means that doesn't happen.
+        raise RequestRedirect(url_for(
+            '.send_messages',
+            service_id=service_id,
+            template_id=template_id
+        ))
+
     users = user_api_client.get_users_for_service(service_id=service_id)
 
     statistics = service_api_client.get_detailed_service_for_today(service_id)['data']['statistics']
@@ -542,14 +557,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     elif preview_row > 2:
         abort(404)
 
-    if 'file_uploads' not in session:
-        session['file_uploads'] = {}
-    session['file_uploads'][upload_id] = {}
-
     if any(recipients) and not recipients.has_errors:
-        session['file_uploads'][upload_id]['notification_count'] = len(recipients)
-        session['file_uploads'][upload_id]['template_id'] = str(template_id)
-        session['file_uploads'][upload_id]['valid'] = True
         set_metadata_on_csv_upload(
             service_id,
             upload_id,
@@ -561,8 +569,6 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
                 1600,
             ),
         )
-    else:
-        session['file_uploads'].pop(upload_id)
 
     return dict(
         recipients=recipients,
@@ -641,24 +647,10 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def start_job(service_id, upload_id):
-    try:
-        upload_data = session['file_uploads'][upload_id]
-    except KeyError:
-        current_app.logger.exception('upload_id not in session')
-        return redirect(url_for('main.choose_template', service_id=service_id), code=301)
-
-    if request.files or not upload_data.get('valid'):
-        # The csv was invalid, validate the csv again
-        return send_messages(service_id, upload_data.get('template_id'))
-
-    session['file_uploads'].pop(upload_id)
 
     job_api_client.create_job(
         upload_id,
         service_id,
-        upload_data.get('template_id'),
-        request.args.get('original_file_name'),
-        upload_data.get('notification_count'),
         scheduled_for=request.form.get('scheduled_for', '')
     )
 

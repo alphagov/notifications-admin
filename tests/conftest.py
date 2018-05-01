@@ -1660,15 +1660,12 @@ def mock_check_verify_code_code_expired(mocker):
 
 @pytest.fixture(scope='function')
 def mock_create_job(mocker, api_user_active):
-    def _create(job_id, service_id, template_id, file_name, notification_count, scheduled_for=None):
+    def _create(job_id, service_id, scheduled_for=None):
         return job_json(
             service_id,
             api_user_active,
             job_id=job_id,
-            template_id=template_id,
-            bucket_name='service-{}-notify'.format(job_id),
-            original_file_name='{}.csv'.format(job_id),
-            notification_count=notification_count)
+        )
 
     return mocker.patch('app.job_api_client.create_job', side_effect=_create)
 
