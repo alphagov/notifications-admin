@@ -339,6 +339,11 @@
             {{ 'Stop user auth type editing' if 'email_auth' in current_service.permissions else 'Allow user auth type editing' }}
           </a>
         </li>
+        <li class="bottom-gutter">
+           <a href="{{ url_for('.service_switch_can_upload_document', service_id=current_service.id) }}" class="button">
+             {{ 'Stop uploading documents' if 'upload_document' in current_service.permissions else 'Allow to upload documents' }}
+           </a>
+        </li>
         {% if current_service.active %}
           <li class="bottom-gutter">
             <a href="{{ url_for('.archive_service', service_id=current_service.id) }}" class="button">
