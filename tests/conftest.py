@@ -2923,3 +2923,14 @@ def mock_get_organisations_and_services_for_user(mocker, organisation_one, api_u
         'app.user_api_client.get_organisations_and_services_for_user',
         side_effect=_get_orgs_and_services
     )
+
+
+@pytest.fixture
+def mock_create_event(mocker):
+    """
+    This should be used whenever your code is calling `flask_login.login_user`
+    """
+    def _add_event(event_type, event_data):
+        return
+
+    return mocker.patch('app.events_api_client.create_event', side_effect=_add_event)

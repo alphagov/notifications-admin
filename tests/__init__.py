@@ -1,3 +1,4 @@
+from unittest.mock import patch
 import pytest
 import uuid
 
@@ -18,12 +19,13 @@ class TestClient(FlaskClient):
             session['user_id'] = user.id
         if mocker:
             mocker.patch('app.user_api_client.get_user', return_value=user)
-            mocker.patch('app.events_api_client.create_event')
         if mocker and service:
             with self.session_transaction() as session:
                 session['service_id'] = service['id']
             mocker.patch('app.service_api_client.get_service', return_value={'data': service})
-        login_user(user)
+
+        with patch('app.events_api_client.create_event'):
+            login_user(user)
 
     def logout(self, user):
         self.get(url_for("main.logout"))

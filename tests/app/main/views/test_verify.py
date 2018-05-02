@@ -32,7 +32,8 @@ def test_should_redirect_to_add_service_when_sms_code_is_correct(
     mocker,
     mock_update_user_attribute,
     mock_check_verify_code,
-    fake_uuid
+    mock_create_event,
+    fake_uuid,
 ):
     api_user_active.current_session_id = str(uuid.UUID(int=1))
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
@@ -60,6 +61,7 @@ def test_should_activate_user_after_verify(
     api_user_pending,
     mock_send_verify_code,
     mock_check_verify_code,
+    mock_create_event,
     mock_activate_user,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
