@@ -190,7 +190,7 @@
 
   {% if recipients.too_many_rows %}
     <p class="table-show-more-link">
-      Can’t show the contents of this file
+        Only showing the first {{ count_of_displayed_recipients }} rows
     </p>
   {% elif count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
