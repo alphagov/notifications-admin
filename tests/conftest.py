@@ -1678,6 +1678,14 @@ def mock_get_job(mocker, api_user_active):
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
 
 
+@pytest.fixture
+def mock_get_job_doesnt_exist(mocker):
+    def _get_job(service_id, job_id):
+        raise HTTPError(response=Mock(status_code=404, json={}), message={})
+
+    return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
+
+
 @pytest.fixture(scope='function')
 def mock_get_scheduled_job(mocker, api_user_active):
     def _get_job(service_id, job_id):

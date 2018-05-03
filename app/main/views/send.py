@@ -1,6 +1,5 @@
 import itertools
 import json
-from contextlib import suppress
 from string import ascii_uppercase
 from zipfile import BadZipFile
 
@@ -479,10 +478,12 @@ def send_test_preview(service_id, template_id, filetype):
 
 def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False):
 
-    with suppress(HTTPError):
+    try:
         # The happy path is that the job doesn’t already exist, so the
         # API will return a 404 and the client will raise HTTPError.
         job_api_client.get_job(service_id, upload_id)
+
+        # the job exists already - so go back to the templates page
         # If we just return a `redirect` (302) object here, we'll get
         # errors when we try and unpack in the check_messages route.
         # Rasing a werkzeug.routing redirect means that doesn't happen.
@@ -491,6 +492,9 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
             service_id=service_id,
             template_id=template_id
         ))
+    except HTTPError as e:
+        if e.status_code != 404:
+            raise
 
     users = user_api_client.get_users_for_service(service_id=service_id)
 
