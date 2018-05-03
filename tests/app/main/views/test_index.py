@@ -160,13 +160,11 @@ def test_terms_is_generic_if_user_is_not_logged_in(
         'michael.fish@metoffice.gov.uk',
         (
             'Your organisation (Met Office) must also accept our data '
-            'sharing and financial agreement. Contact us to get a copy.'
+            'sharing and financial agreement. Download a copy.'
         ),
         partial(
             url_for,
-            'main.feedback',
-            ticket_type='ask-question-give-feedback',
-            body='agreement-with-owner',
+            'main.agreement',
         ),
         (
             'Contact us to get a copy of the agreement (Met Office '

@@ -319,6 +319,14 @@ def service_switch_can_send_precompiled_letter(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
+@main.route("/services/<service_id>/service-settings/can-upload-document")
+@login_required
+@user_is_platform_admin
+def service_switch_can_upload_document(service_id):
+    switch_service_permissions(service_id, 'upload_document')
+    return redirect(url_for('.service_settings', service_id=service_id))
+
+
 @main.route("/services/<service_id>/service-settings/archive", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')

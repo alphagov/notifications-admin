@@ -44,6 +44,10 @@ foodstandards.gsi.gov.uk: foodstandards.gov.uk
 foodstandards.gov.uk:
   owner: Food Standards Agency
   agreement_signed: true
+gchq.gov.uk:
+  owner: Government Communications Headquarters
+  crown: true
+  agreement_signed: true    
 gla.gsi.gov.uk: gla.gov.uk
 gla.gov.uk:
   owner: The Gangmasters and Labour Abuse Authority
@@ -59,9 +63,7 @@ innovateuk.gsi.gov.uk: innovateuk.gov.uk
 innovateuk.gov.uk:
   owner: Innovate UK
   agreement_signed: true
-ncsc.gov.uk:
-  owner: National Cyber Security Center
-  agreement_signed: true
+ncsc.gov.uk: gchq.gov.uk
 nhs.net:
   owner: NHS
 nhsdigital.nhs.uk: digital.nhs.uk

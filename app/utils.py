@@ -484,7 +484,7 @@ class AgreementInfo:
                 'agreement.'.format(self.owner)
             )
 
-        if self.crown_status is False:
+        if self.crown_status is not None:
             return ((
                 '{} <a href="{}">Download a copy</a>.'
             ).format(self._acceptance_required, download_link))
@@ -504,7 +504,7 @@ class AgreementInfo:
 
     @property
     def crown_status_or_404(self):
-        if self.crown_status in {None, True}:
+        if self.crown_status is None:
             abort(404)
         return self.crown_status
 
