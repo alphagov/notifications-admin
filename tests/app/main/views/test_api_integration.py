@@ -141,14 +141,17 @@ def test_letter_notifications_should_show_client_reference(
 
 
 def test_should_show_api_page_for_live_service(
-    logged_in_client,
+    client_request,
     mock_login,
     api_user_active,
+    mock_get_notifications,
     mock_get_live_service,
     mock_has_permissions
 ):
-    response = logged_in_client.get(url_for('main.api_integration', service_id=str(uuid.uuid4())))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.api_integration',
+        service_id=uuid.uuid4()
+    )
     assert 'Your service is in trial mode' not in page.find('main').text
 
 
