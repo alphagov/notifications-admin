@@ -1886,6 +1886,20 @@ def mock_get_inbound_sms(mocker):
     )
 
 
+@pytest.fixture
+def mock_get_inbound_sms_by_id_with_no_messages(mocker):
+    def _get_inbound_sms_by_id(
+        service_id,
+        notification_id
+    ):
+        raise HTTPError(response=Mock(status_code=404))
+
+    return mocker.patch(
+        'app.service_api_client.get_inbound_sms_by_id',
+        side_effect=_get_inbound_sms_by_id,
+    )
+
+
 @pytest.fixture(scope='function')
 def mock_get_most_recent_inbound_sms(mocker):
     def _get_most_recent_inbound_sms(

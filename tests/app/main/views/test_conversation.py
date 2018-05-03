@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from unittest.mock import Mock
 
 import pytest
 from flask import url_for
@@ -25,7 +26,7 @@ def test_get_user_phone_number_when_only_inbound_exists(mocker):
     )
     mock_get_notification = mocker.patch(
         'app.main.views.conversation.notification_api_client.get_notification',
-        side_effect=HTTPError,
+        side_effect=HTTPError(response=Mock(status_code=404)),
     )
     assert get_user_number('service', 'notification') == '07900 900123'
     mock_get_inbound_sms.assert_called_once_with('service', 'notification')
@@ -35,7 +36,7 @@ def test_get_user_phone_number_when_only_inbound_exists(mocker):
 def test_get_user_phone_number_when_only_outbound_exists(mocker):
     mock_get_inbound_sms = mocker.patch(
         'app.main.views.conversation.service_api_client.get_inbound_sms_by_id',
-        side_effect=HTTPError,
+        side_effect=HTTPError(response=Mock(status_code=404)),
     )
     mock_get_notification = mocker.patch(
         'app.main.views.conversation.notification_api_client.get_notification',
@@ -51,11 +52,11 @@ def test_get_user_phone_number_when_only_outbound_exists(mocker):
 def test_get_user_phone_number_raises_if_both_api_requests_fail(mocker):
     mock_get_inbound_sms = mocker.patch(
         'app.main.views.conversation.service_api_client.get_inbound_sms_by_id',
-        side_effect=HTTPError,
+        side_effect=HTTPError(response=Mock(status_code=404)),
     )
     mock_get_notification = mocker.patch(
         'app.main.views.conversation.notification_api_client.get_notification',
-        side_effect=HTTPError,
+        side_effect=HTTPError(response=Mock(status_code=404)),
     )
     with pytest.raises(HTTPError):
         get_user_number('service', 'notification')
@@ -72,6 +73,7 @@ def test_view_conversation(
     client_request,
     mocker,
     api_user_active,
+    mock_get_inbound_sms_by_id_with_no_messages,
     mock_get_notification,
     fake_uuid,
     outbound_redacted,
@@ -158,6 +160,7 @@ def test_view_conversation(
             normalize_spaces(statuses[index].text),
         ) == expected
 
+    mock_get_inbound_sms.assert_called_once_with(SERVICE_ONE_ID, user_number='07123 456789')
     mock.assert_called_once_with(SERVICE_ONE_ID, to='07123 456789', template_type='sms')
 
 
@@ -165,9 +168,14 @@ def test_view_conversation_updates(
     logged_in_client,
     mocker,
     fake_uuid,
+    mock_get_inbound_sms_by_id_with_no_messages,
     mock_get_notification,
 ):
 
+    mocker.patch(
+        'app.main.views.conversation.service_api_client.get_inbound_sms_by_id',
+        side_effect=HTTPError(response=Mock(status_code=404)),
+    )
     mock_get_partials = mocker.patch(
         'app.main.views.conversation.get_conversation_partials',
         return_value={'messages': 'foo'}
@@ -190,6 +198,7 @@ def test_view_conversation_with_empty_inbound(
     client_request,
     mocker,
     api_user_active,
+    mock_get_inbound_sms_by_id_with_no_messages,
     mock_get_notification,
     mock_get_notifications_with_no_notifications,
     fake_uuid
@@ -222,6 +231,7 @@ def test_view_conversation_with_empty_inbound(
 def test_conversation_links_to_reply(
     client_request,
     fake_uuid,
+    mock_get_inbound_sms_by_id_with_no_messages,
     mock_get_notification,
     mock_get_notifications,
     mock_get_inbound_sms,
@@ -271,6 +281,7 @@ def test_conversation_reply_shows_templates(
 def test_conversation_reply_redirects_with_phone_number_from_notification(
     client_request,
     fake_uuid,
+    mock_get_inbound_sms_by_id_with_no_messages,
     mock_get_notification,
     mock_get_service_template,
 ):
