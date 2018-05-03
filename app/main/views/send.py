@@ -1,6 +1,7 @@
 import itertools
 import json
 import uuid
+from contextlib import suppress
 from datetime import datetime, timedelta
 from string import ascii_uppercase
 from zipfile import BadZipFile
@@ -313,14 +314,16 @@ def get_sender_details(service_id, template_type):
     return api_call(service_id)
 
 
-@main.route("/services/<service_id>/send/<template_id>/test", endpoint='send_test')
-@main.route("/services/<service_id>/send/<template_id>/one-off", endpoint='send_one_off')
+@main.route("/services/<service_id>/send/<template_id>/test/<one_off_id>", endpoint='send_test')
+@main.route("/services/<service_id>/send/<template_id>/one-off/<one_off_id>", endpoint='send_one_off')
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
-def send_test(service_id, template_id):
-    session['recipient'] = None
-    session['placeholders'] = {}
-    session['send_test_letter_page_count'] = None
+def send_test(service_id, template_id, one_off_id):
+    session['one_off'][one_off_id].update({
+        'recipient': None,
+        'placeholders': {},
+        'send_test_letter_page_count': None
+    })
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
@@ -339,12 +342,13 @@ def send_test(service_id, template_id):
         }[request.endpoint],
         service_id=service_id,
         template_id=template_id,
+        one_off_id=one_off_id,
         step_index=0,
         help=get_help_argument(),
     ))
 
 
-def get_notification_check_endpoint(service_id, template):
+def get_notification_check_endpoint(service_id, template, one_off_id):
     if template.template_type == 'letter':
         return make_and_upload_csv_file(service_id, template, one_off_id)
     else:
@@ -352,25 +356,26 @@ def get_notification_check_endpoint(service_id, template):
             'main.check_notification',
             service_id=service_id,
             template_id=template.id,
+            one_off_id=one_off_id,
             # at check phase we should move to help stage 2 ("the template pulls in the data you provide")
             help='2' if 'help' in request.args else None
         ))
 
 
 @main.route(
-    "/services/<service_id>/send/<template_id>/test/step-<int:step_index>",
+    "/services/<service_id>/send/<template_id>/test/<one_off_id>/step-<int:step_index>",
     methods=['GET', 'POST'],
     endpoint='send_test_step',
 )
 @main.route(
-    "/services/<service_id>/send/<template_id>/one-off/step-<int:step_index>",
+    "/services/<service_id>/send/<template_id>/one-off/<one_off_id>/step-<int:step_index>",
     methods=['GET', 'POST'],
     endpoint='send_one_off_step',
 )
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
-def send_test_step(service_id, template_id, step_index):
-    if {'recipient', 'placeholders'} - set(session.keys()):
+def send_test_step(service_id, template_id, step_index, one_off_id):
+    if {'recipient', 'placeholders'} - set(session['one_off'][one_off_id].keys()):
         return redirect(url_for(
             {
                 'main.send_test_step': '.send_test',
@@ -383,8 +388,8 @@ def send_test_step(service_id, template_id, step_index):
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
-    if not session.get('send_test_letter_page_count'):
-        session['send_test_letter_page_count'] = get_page_count_for_letter(db_template)
+    if not session['one_off'][one_off_id].get('send_test_letter_page_count'):
+        session['one_off'][one_off_id]['send_test_letter_page_count'] = get_page_count_for_letter(db_template)
     email_reply_to = None
     sms_sender = None
     if db_template['template_type'] == 'email':
@@ -403,7 +408,7 @@ def send_test_step(service_id, template_id, step_index):
             one_off_id=one_off_id,
             filetype='png',
         ),
-        page_count=session['send_test_letter_page_count'],
+        page_count=session['one_off'][one_off_id]['send_test_letter_page_count'],
         email_reply_to=email_reply_to,
         sms_sender=sms_sender
     )
@@ -417,8 +422,8 @@ def send_test_step(service_id, template_id, step_index):
     try:
         current_placeholder = placeholders[step_index]
     except IndexError:
-        if all_placeholders_in_session(placeholders):
-            return get_notification_check_endpoint(service_id, template)
+        if all_placeholders_in_session(placeholders, one_off_id):
+            return get_notification_check_endpoint(service_id, template, one_off_id)
         return redirect(url_for(
             {
                 'main.send_test_step': '.send_test',
@@ -426,12 +431,13 @@ def send_test_step(service_id, template_id, step_index):
             }[request.endpoint],
             service_id=service_id,
             template_id=template_id,
+            one_off_id=one_off_id,
         ))
 
     optional_placeholder = (current_placeholder in optional_address_columns)
     form = get_placeholder_form_instance(
         current_placeholder,
-        dict_to_populate_from=get_normalised_placeholders_from_session(),
+        dict_to_populate_from=get_normalised_placeholders_from_session(one_off_id),
         template_type=template.template_type,
         optional_placeholder=optional_placeholder,
         allow_international_phone_numbers='international_sms' in current_service['permissions'],
@@ -446,24 +452,25 @@ def send_test_step(service_id, template_id, step_index):
             template.template_type != 'letter' and
             request.endpoint != 'main.send_test_step'
         ):
-            session['recipient'] = form.placeholder_value.data
+            session['one_off'][one_off_id]['recipient'] = form.placeholder_value.data
 
-        session['placeholders'][current_placeholder] = form.placeholder_value.data
+        session['one_off'][one_off_id]['placeholders'][current_placeholder] = form.placeholder_value.data
 
-        if all_placeholders_in_session(placeholders):
-            return get_notification_check_endpoint(service_id, template)
+        if all_placeholders_in_session(placeholders, one_off_id):
+            return get_notification_check_endpoint(service_id, template, one_off_id)
 
         return redirect(url_for(
             request.endpoint,
             service_id=service_id,
             template_id=template_id,
+            one_off_id=one_off_id,
             step_index=step_index + 1,
             help=get_help_argument(),
         ))
 
-    back_link = get_back_link(service_id, template_id, step_index)
+    back_link = get_back_link(service_id, template_id, one_off_id, step_index)
 
-    template.values = get_recipient_and_placeholders_from_session(template.template_type)
+    template.values = get_recipient_and_placeholders_from_session(template.template_type, one_off_id)
     template.values[current_placeholder] = None
 
     if (
@@ -474,7 +481,12 @@ def send_test_step(service_id, template_id, step_index):
     ):
         skip_link = (
             'Use my {}'.format(first_column_headings[template.template_type][0]),
-            url_for('.send_test', service_id=service_id, template_id=template.id),
+            url_for(
+                '.send_test',
+                service_id=service_id,
+                template_id=template.id,
+                one_off_id=one_off_id,
+            ),
         )
     else:
         skip_link = None
@@ -483,7 +495,7 @@ def send_test_step(service_id, template_id, step_index):
         page_title=get_send_test_page_title(
             template.template_type,
             get_help_argument(),
-            entering_recipient=not session['recipient']
+            entering_recipient=not session['one_off'][one_off_id]['recipient']
         ),
         template=template,
         form=form,
@@ -798,7 +810,7 @@ def get_send_test_page_title(template_type, help_argument, entering_recipient):
     return 'Personalise this message'
 
 
-def get_back_link(service_id, template_id, step_index):
+def get_back_link(service_id, template_id, one_off_id, step_index):
     if get_help_argument():
         # if we're on the check page, redirect back to the beginning. anywhere else, don't return the back link
         if request.endpoint == 'main.check_notification':
@@ -806,6 +818,7 @@ def get_back_link(service_id, template_id, step_index):
                 'main.send_test',
                 service_id=service_id,
                 template_id=template_id,
+                one_off_id=one_off_id,
                 help=get_help_argument()
             )
         else:
@@ -821,18 +834,19 @@ def get_back_link(service_id, template_id, step_index):
             request.endpoint,
             service_id=service_id,
             template_id=template_id,
+            one_off_id=one_off_id,
             step_index=step_index - 1,
         )
 
 
-@main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['GET'])
+@main.route("/services/<service_id>/template/<template_id>/notification/<one_off_id>/check", methods=['GET'])
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
-def check_notification(service_id, template_id):
-    return _check_notification(service_id, template_id)
+def check_notification(service_id, template_id, one_off_id):
+    return _check_notification(service_id, template_id, one_off_id)
 
 
-def _check_notification(service_id, template_id, exception=None):
+def _check_notification(service_id, template_id, one_off_id, exception=None):
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
     email_reply_to = None
     sms_sender = None
@@ -849,15 +863,15 @@ def _check_notification(service_id, template_id, exception=None):
     )
 
     # go back to start of process
-    back_link = get_back_link(service_id, template_id, 0)
+    back_link = get_back_link(service_id, template_id, one_off_id, 0)
 
     if (
-        not session.get('recipient') or
-        not all_placeholders_in_session(template.placeholders)
+        not session['one_off'][one_off_id].get('recipient') or
+        not all_placeholders_in_session(template.placeholders, one_off_id)
     ):
         return redirect(back_link)
 
-    template.values = get_recipient_and_placeholders_from_session(template.template_type)
+    template.values = get_recipient_and_placeholders_from_session(template.template_type, one_off_id)
     return render_template(
         'views/notifications/check.html',
         template=template,
@@ -890,15 +904,16 @@ def get_template_error_dict(exception):
     }
 
 
-@main.route("/services/<service_id>/template/<template_id>/notification/check", methods=['POST'])
+@main.route("/services/<service_id>/template/<template_id>/notification/<one_off_id>/check", methods=['POST'])
 @login_required
 @user_has_permissions('send_messages', restrict_admin_usage=True)
-def send_notification(service_id, template_id):
-    if {'recipient', 'placeholders'} - set(session.keys()):
+def send_notification(service_id, template_id, one_off_id):
+    if {'recipient', 'placeholders'} - set(session['one_off'][one_off_id].keys()):
         return redirect(url_for(
             '.send_one_off',
             service_id=service_id,
             template_id=template_id,
+            one_off_id=one_off_id,
         ))
     try:
         noti = notification_api_client.send_notification(
@@ -915,9 +930,7 @@ def send_notification(service_id, template_id):
         ))
         return _check_notification(service_id, template_id, one_off_id, exception)
 
-    session.pop('placeholders')
-    session.pop('recipient')
-    session.pop('sender_id', None)
+    session['one_off'].pop(one_off_id)
 
     return redirect(url_for(
         '.view_notification',
