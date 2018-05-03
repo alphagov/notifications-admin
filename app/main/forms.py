@@ -205,7 +205,7 @@ class StripWhitespaceStringField(StringField):
 
 
 class LoginForm(StripWhitespaceForm):
-    email_address = StringField('Email address', validators=[
+    email_address = EmailField('Email address', validators=[
         Length(min=5, max=255),
         DataRequired(message='Can’t be empty'),
         ValidEmail()
