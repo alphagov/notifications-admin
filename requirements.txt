@@ -12,7 +12,7 @@ pyexcel-ods3==0.5.2
 pytz==2018.4
 gunicorn==19.8.1
 whitenoise==3.3.1  #manages static assets
-eventlet==0.22.1
+eventlet==0.23.0
 notifications-python-client==4.8.2
 
 # PaaS
