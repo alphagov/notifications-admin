@@ -160,8 +160,15 @@ def password(label='Password'):
                                      Blacklist(message='Choose a password that’s harder to guess')])
 
 
+class SMSCode(StringField):
+    def __call__(self, **kwargs):
+        return super().__call__(
+            type='tel', pattern='[0-9]*', **kwargs
+        )
+
+
 def sms_code():
-    return StringField('Text message code', validators=[
+    return SMSCode('Text message code', validators=[
         DataRequired(message='Can’t be empty'),
         Regexp(regex='^\d+$', message='Numbers only'),
         Length(min=5, message='Not enough numbers'),

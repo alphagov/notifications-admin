@@ -17,7 +17,12 @@ def test_should_render_two_factor_page(
             'email': api_user_active.email_address}
     response = client.get(url_for('main.two_factor'))
     assert response.status_code == 200
-    assert '''We’ve sent you a text message with a security code.''' in response.get_data(as_text=True)
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('main p').text.strip() == (
+        'We’ve sent you a text message with a security code.'
+    )
+    assert page.select_one('input')['type'] == 'tel'
+    assert page.select_one('input')['pattern'] == '[0-9]*'
 
 
 def test_should_login_user_and_should_redirect_to_next_url(
