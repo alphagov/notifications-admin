@@ -493,19 +493,6 @@ class ChangeMobileNumberForm(StripWhitespaceForm):
     mobile_number = international_phone_number()
 
 
-class ConfirmMobileNumberForm(StripWhitespaceForm):
-    def __init__(self, validate_code_func, *args, **kwargs):
-        self.validate_code_func = validate_code_func
-        super(ConfirmMobileNumberForm, self).__init__(*args, **kwargs)
-
-    sms_code = sms_code()
-
-    def validate_sms_code(self, field):
-        is_valid, msg = self.validate_code_func(field.data)
-        if not is_valid:
-            raise ValidationError(msg)
-
-
 class ChooseTimeForm(StripWhitespaceForm):
 
     def __init__(self, *args, **kwargs):
