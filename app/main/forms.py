@@ -161,11 +161,12 @@ def password(label='Password'):
 
 
 def sms_code():
-    verify_code = '^\d{5}$'
-    return StringField('Text message code',
-                       validators=[DataRequired(message='Can’t be empty'),
-                                   Regexp(regex=verify_code,
-                                          message='Code not found')])
+    return StringField('Text message code', validators=[
+        DataRequired(message='Can’t be empty'),
+        Regexp(regex='^\d+$', message='Numbers only'),
+        Length(min=5, message='Not enough numbers'),
+        Length(max=5, message='Too many numbers'),
+    ])
 
 
 def organisation_type():
@@ -317,10 +318,18 @@ class TwoFactorForm(StripWhitespaceForm):
 
     sms_code = sms_code()
 
-    def validate_sms_code(self, field):
-        is_valid, reason = self.validate_code_func(field.data)
+    def validate(self):
+
+        if not self.sms_code.validate(self):
+            return False
+
+        is_valid, reason = self.validate_code_func(self.sms_code.data)
+
         if not is_valid:
-            raise ValidationError(reason)
+            self.sms_code.errors.append(reason)
+            return False
+
+        return True
 
 
 class EmailNotReceivedForm(StripWhitespaceForm):
