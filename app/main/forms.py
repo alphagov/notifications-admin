@@ -161,19 +161,15 @@ def password(label='Password'):
 
 
 class SMSCode(StringField):
-    def __call__(self, **kwargs):
-        return super().__call__(
-            type='tel', pattern='[0-9]*', **kwargs
-        )
-
-
-def sms_code():
-    return SMSCode('Text message code', validators=[
+    validators = [
         DataRequired(message='Can’t be empty'),
         Regexp(regex='^\d+$', message='Numbers only'),
         Length(min=5, message='Not enough numbers'),
         Length(max=5, message='Too many numbers'),
-    ])
+    ]
+
+    def __call__(self, **kwargs):
+        return super().__call__(type='tel', pattern='[0-9]*', **kwargs)
 
 
 def organisation_type():
@@ -323,7 +319,7 @@ class TwoFactorForm(StripWhitespaceForm):
         self.validate_code_func = validate_code_func
         super(TwoFactorForm, self).__init__(*args, **kwargs)
 
-    sms_code = sms_code()
+    sms_code = SMSCode('Text message code')
 
     def validate(self):
 
