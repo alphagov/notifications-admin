@@ -15,8 +15,12 @@
       <p>
         We’ve sent a security code to your new {{ thing }}.
       </p>
-      <form method="post">
-        {{ textbox(form_field) }}
+      <form method="post" autocomplete="off" novalidate>
+        {{ textbox(
+          form_field,
+          width='5em',
+          autofocus=True
+        ) }}
         {{ page_footer(
           'Confirm',
           destructive=destructive,
