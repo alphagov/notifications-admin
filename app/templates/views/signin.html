@@ -30,7 +30,7 @@
       </p>
     {% endif %}
 
-    <form method="post" autocomplete="off" novalidate>
+    <form method="post" novalidate>
       {{ textbox(form.email_address) }}
       {{ textbox(form.password) }}
       {{ page_footer("Continue", secondary_link=url_for('.forgot_password'), secondary_link_text="Forgot your password?") }}
