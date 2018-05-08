@@ -101,7 +101,25 @@ def test_terms_is_generic_if_user_is_not_logged_in(
 
     assert normalize_spaces(page.select('main p')[1].text) == (
         'Your organisation must also accept our data sharing and '
-        'financial agreement. Contact us to get a copy.'
+        'financial agreement. Sign in to download a copy or find out '
+        'if one is already in place.'
+    )
+
+
+def test_pricing_is_generic_if_user_is_not_logged_in(
+    client
+):
+    response = client.get(url_for('main.pricing'))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    last_paragraph = page.select('main p')[-1]
+    assert normalize_spaces(last_paragraph.text) == (
+        'Sign in to download a copy or find out if one is already '
+        'in place with your organisation.'
+    )
+    assert last_paragraph.select_one('a')['href'] == url_for(
+        'main.sign_in',
+        next=url_for('main.pricing', _anchor='paying'),
     )
 
 
@@ -119,7 +137,7 @@ def test_terms_is_generic_if_user_is_not_logged_in(
         ),
         None,
         (
-            'Contact us to get a copy of the agreement '
+            'Download the agreement '
             '(Cabinet Office has already accepted it).'
         ),
     ),
@@ -135,7 +153,7 @@ def test_terms_is_generic_if_user_is_not_logged_in(
             'main.agreement',
         ),
         (
-            'Contact us to get a copy of the agreement '
+            'Download the agreement '
             '(Aylesbury Town Council hasn’t accepted it yet).'
         ),
     ),
@@ -143,16 +161,16 @@ def test_terms_is_generic_if_user_is_not_logged_in(
         'larry@downing-street.gov.uk',
         (
             'Your organisation must also accept our data sharing and '
-            'financial agreement. Contact us to get a copy.'
+            'financial agreement. Download the agreement or contact us '
+            'to find out if we already have one in place with your '
+            'organisation.'
         ),
         partial(
             url_for,
-            'main.feedback',
-            ticket_type='ask-question-give-feedback',
-            body='agreement-with-owner',
+            'main.agreement',
         ),
         (
-            'Contact us to get a copy of the agreement or find out if '
+            'Download the agreement or contact us to find out if '
             'we already have one in place with your organisation.'
         ),
     ),
@@ -167,8 +185,8 @@ def test_terms_is_generic_if_user_is_not_logged_in(
             'main.agreement',
         ),
         (
-            'Contact us to get a copy of the agreement (Met Office '
-            'hasn’t accepted it yet).'
+            'Download the agreement (Met Office hasn’t accepted it '
+            'yet).'
         ),
     ),
 ])

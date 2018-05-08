@@ -12,20 +12,16 @@ from app import (
 )
 from app.main import main
 from app.main.forms import Feedback, Problem, SupportType, Triage
-from app.utils import AgreementInfo
 
 QUESTION_TICKET_TYPE = 'ask-question-give-feedback'
 PROBLEM_TICKET_TYPE = "report-problem"
 
 
 def get_prefilled_message():
-    agreement_info = AgreementInfo.from_current_user()
     return {
         'agreement': (
-            agreement_info.as_request_for_agreement()
-        ),
-        'agreement-with-owner': (
-            agreement_info.as_request_for_agreement(with_owner=True)
+            'Please can you tell me if there’s an agreement in place '
+            'between GOV.UK Notify and my organisation?'
         ),
     }.get(
         request.args.get('body'), ''
