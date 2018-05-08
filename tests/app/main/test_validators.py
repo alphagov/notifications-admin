@@ -109,6 +109,7 @@ def _gen_mock_field(x):
     'test@britishmuseum.org',
     'test@derrystrabane.com',
     'test@highwaysengland.co.uk',
+    'test@mansheadschool.co.uk',
 ])
 def test_valid_list_of_white_list_email_domains(
     client,
