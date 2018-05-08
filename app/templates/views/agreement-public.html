@@ -1,0 +1,27 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/sub-navigation.html" import sub_navigation %}
+
+{% block per_page_title %}
+  Download the GOV.UK Notify data sharing and financial agreement
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="grid-row">
+  <div class="column-two-thirds">
+
+    <h1 class="heading-large">
+      Download the GOV.UK Notify data sharing and financial agreement
+    </h1>
+
+    <p>
+      <a href="{{ download_link }}">Download the agreement</a>{% if owner %} for {{ owner }}{% endif %}.
+    </p>
+    <p>
+      The agreement contains commercially sensitive information, so don’t share it more widely than you need to.
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}
