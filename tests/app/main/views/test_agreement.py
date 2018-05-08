@@ -1,3 +1,4 @@
+from functools import partial
 from io import BytesIO
 
 import pytest
@@ -15,25 +16,46 @@ class _MockS3Object():
         return {'Body': BytesIO(self.data)}
 
 
-@pytest.mark.parametrize('email_address, expected_status', [
-    ('test@cabinet-office.gov.uk', 200),
-    ('test@aylesburytowncouncil.gov.uk', 200),
-    ('test@unknown.gov.uk', 404),
+@pytest.mark.parametrize('email_address, expected_links', [
+    (
+        'test@cabinet-office.gov.uk',
+        [
+            partial(url_for, 'main.download_agreement'),
+            lambda: 'mailto:notify-support@digital.cabinet-office.gov.uk',
+        ]
+    ),
+    (
+        'test@aylesburytowncouncil.gov.uk',
+        [
+            partial(url_for, 'main.download_agreement'),
+            lambda: 'mailto:notify-support@digital.cabinet-office.gov.uk',
+        ]
+    ),
+    (
+        'test@unknown.gov.uk',
+        [
+            partial(url_for, 'main.public_download_agreement', variant='crown'),
+            partial(url_for, 'main.public_download_agreement', variant='non-crown'),
+            partial(url_for, 'main.support'),
+            lambda: 'mailto:notify-support@digital.cabinet-office.gov.uk',
+        ]
+    ),
 ])
 def test_show_agreement_page(
     client_request,
     mocker,
     fake_uuid,
     email_address,
-    expected_status,
+    expected_links,
 ):
     user = active_user_with_permissions(fake_uuid)
     user.email_address = email_address
     mocker.patch('app.user_api_client.get_user', return_value=user)
-    client_request.get(
-        'main.agreement',
-        _expected_status=expected_status,
-    )
+    page = client_request.get('main.agreement')
+    links = page.select('main .column-two-thirds a')
+    assert len(links) == len(expected_links)
+    for index, link in enumerate(links):
+        assert link['href'] == expected_links[index]()
 
 
 @pytest.mark.parametrize('email_address, expected_file_fetched, expected_file_served', [

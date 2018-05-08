@@ -13,7 +13,12 @@ def agreement():
 
     agreement_info = AgreementInfo.from_current_user()
 
-    agreement_info.crown_status_or_404
+    if agreement_info.crown_status is None:
+        return render_template(
+            'views/agreement-choose.html',
+            owner=agreement_info.owner,
+            navigation_links=features_nav(),
+        )
 
     return render_template(
         'views/agreement.html',
