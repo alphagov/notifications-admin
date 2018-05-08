@@ -1,3 +1,5 @@
+from flask import request
+
 from app import events_api_client
 
 
@@ -6,17 +8,15 @@ def on_user_logged_in(sender, user):
 
 
 def _send_event(sender, **kwargs):
-    from flask import request
-    try:
-        event_data = _construct_event_data(request)
-        if kwargs.get('user'):
-            event_data['user_id'] = kwargs.get('user').id
-        if not kwargs.get('event_type'):
-            return
-        events_api_client.create_event(kwargs['event_type'], event_data)
-    except Exception as e:
-        sender.logger.error('Error creating event')
-        sender.logger.error(e)
+    if not kwargs.get('event_type'):
+        return
+
+    event_data = _construct_event_data(request)
+
+    if kwargs.get('user'):
+        event_data['user_id'] = kwargs.get('user').id
+
+    events_api_client.create_event(kwargs['event_type'], event_data)
 
 
 def _construct_event_data(request):

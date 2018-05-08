@@ -26,6 +26,7 @@ def test_should_login_user_and_should_redirect_to_next_url(
     mock_get_user,
     mock_get_user_by_email,
     mock_check_verify_code,
+    mock_create_event,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -48,6 +49,7 @@ def test_should_login_user_and_not_redirect_to_external_url(
     mock_get_user_by_email,
     mock_check_verify_code,
     mock_get_services_with_one_service,
+    mock_create_event,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -65,6 +67,7 @@ def test_should_login_user_and_redirect_to_show_accounts(
     mock_get_user,
     mock_get_user_by_email,
     mock_check_verify_code,
+    mock_create_event,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -100,6 +103,7 @@ def test_should_login_user_when_multiple_valid_codes_exist(
     mock_get_user_by_email,
     mock_check_verify_code,
     mock_get_services_with_one_service,
+    mock_create_event,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -117,6 +121,7 @@ def test_two_factor_should_set_password_when_new_password_exists_in_session(
     mock_check_verify_code,
     mock_get_services_with_one_service,
     mock_update_user_password,
+    mock_create_event,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -166,6 +171,7 @@ def test_two_factor_should_activate_pending_user(
     mocker,
     api_user_pending,
     mock_check_verify_code,
+    mock_create_event,
     mock_activate_user,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
@@ -186,7 +192,8 @@ def test_valid_two_factor_email_link_logs_in_user(
     valid_token,
     mock_get_user,
     mock_get_services_with_one_service,
-    mocker
+    mocker,
+    mock_create_event,
 ):
     mocker.patch('app.user_api_client.check_verify_code', return_value=(True, ''))
 
