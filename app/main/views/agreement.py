@@ -20,6 +20,13 @@ def agreement():
             navigation_links=features_nav(),
         )
 
+    if agreement_info.agreement_signed:
+        return render_template(
+            'views/agreement-signed.html',
+            owner=agreement_info.owner,
+            navigation_links=features_nav(),
+        )
+
     return render_template(
         'views/agreement.html',
         owner=agreement_info.owner,

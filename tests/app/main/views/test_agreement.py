@@ -21,7 +21,6 @@ class _MockS3Object():
         'test@cabinet-office.gov.uk',
         [
             partial(url_for, 'main.download_agreement'),
-            lambda: 'mailto:notify-support@digital.cabinet-office.gov.uk',
         ]
     ),
     (
