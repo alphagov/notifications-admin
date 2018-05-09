@@ -27,20 +27,23 @@ def test_client_posts_archived_true_when_deleting_template(mocker):
     mock_post.assert_called_once_with(expected_url, data=expected_data)
 
 
-@pytest.mark.parametrize(
-    'function,params', [
-        (ServiceAPIClient.get_service, {}),
-        (ServiceAPIClient.get_detailed_service, {'detailed': True}),
-        (ServiceAPIClient.get_detailed_service_for_today, {'detailed': True, 'today_only': True})
-    ],
-    ids=lambda x: x.__name__
-)
-def test_client_gets_service(mocker, function, params):
+def test_client_gets_service(mocker):
     client = ServiceAPIClient()
     mock_get = mocker.patch.object(client, 'get', return_value={})
 
-    function(client, 'foo')
-    mock_get.assert_called_once_with('/service/foo', params=params)
+    client.get_service('foo')
+    mock_get.assert_called_once_with('/service/foo')
+
+
+@pytest.mark.parametrize('today_only', [True, False])
+def test_client_gets_service_statistics(mocker, today_only):
+    client = ServiceAPIClient()
+    mock_get = mocker.patch.object(client, 'get', return_value={'data': {'a': 'b'}})
+
+    ret = client.get_service_statistics('foo', today_only)
+
+    assert ret == {'a': 'b'}
+    mock_get.assert_called_once_with('/service/foo/statistics', params={'today_only': today_only})
 
 
 def test_client_only_updates_allowed_attributes(mocker):
@@ -169,7 +172,7 @@ def test_client_returns_count_of_service_templates(
             ],
             None,
             [
-                call('/service/{}'.format(SERVICE_ONE_ID), params={})
+                call('/service/{}'.format(SERVICE_ONE_ID))
             ],
             [
                 call(

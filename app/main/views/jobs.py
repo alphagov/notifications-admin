@@ -246,7 +246,7 @@ def get_notifications(service_id, message_type, status_override=None):
             status_filters=get_status_filters(
                 current_service,
                 message_type,
-                service_api_client.get_detailed_service(service_id)['data']['statistics']
+                service_api_client.get_service_statistics(service_id, today_only=False)
             )
         ),
         'notifications': render_template(
