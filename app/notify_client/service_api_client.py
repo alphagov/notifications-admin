@@ -36,30 +36,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.set('service-{service_id}')
     def get_service(self, service_id):
-        return self._get_service(service_id, detailed=False, today_only=False)
-
-    def get_detailed_service(self, service_id):
-        return self._get_service(service_id, detailed=True, today_only=False)
-
-    def get_detailed_service_for_today(self, service_id):
-        return self._get_service(service_id, detailed=True, today_only=True)
-
-    def _get_service(self, service_id, detailed, today_only):
         """
         Retrieve a service.
-
-        :param detailed - return additional details, including notification statistics
-        :param today_only - return statistics only for today. No effect if detailed not passed in
         """
-        params = {}
-        if detailed:
-            params['detailed'] = detailed
-        if today_only:
-            params['today_only'] = today_only
+        return self.get('/service/{0}'.format(service_id))
 
-        return self.get(
-            '/service/{0}'.format(service_id),
-            params=params)
+    def get_service_statistics(self, service_id, today_only):
+        return self.get('/service/{0}/statistics'.format(service_id), params={'today_only': today_only})['data']
 
     def get_services(self, params_dict=None):
         """

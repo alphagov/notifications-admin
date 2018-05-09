@@ -287,13 +287,13 @@ def get_dashboard_partials(service_id):
         add_rate_to_job(job)
         for job in job_api_client.get_jobs(service_id, limit_days=7, statuses=statuses_to_display)['data']
     ]
-    service = service_api_client.get_detailed_service(service_id)
+    stats = service_api_client.get_service_statistics(service_id, today_only=False)
     column_width, max_notifiction_count = get_column_properties(
         number_of_columns=(
             3 if 'letter' in current_service['permissions'] else 2
         )
     )
-    dashboard_totals = get_dashboard_totals(service['data']['statistics']),
+    dashboard_totals = get_dashboard_totals(stats),
     highest_notification_count = max(
         sum(
             value[key] for key in {'requested', 'failed', 'delivered'}

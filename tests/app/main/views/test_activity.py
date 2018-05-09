@@ -63,7 +63,7 @@ def test_can_show_notifications(
     logged_in_client,
     service_one,
     mock_get_notifications,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
     message_type,
     page_title,
     status_argument,
@@ -140,7 +140,7 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
     active_user_with_permissions,
     logged_in_client,
     service_one,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
 ):
     mock_get_notifications(
         mocker,
@@ -169,7 +169,7 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     active_user_with_permissions,
     logged_in_client,
     service_one,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
     letter_status,
 ):
     mock_get_notifications(
@@ -191,7 +191,7 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
 
 def test_shows_message_when_no_notifications(
     client_request,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
     mock_get_notifications_with_no_notifications,
 ):
 
@@ -242,7 +242,7 @@ def test_shows_message_when_no_notifications(
 def test_search_recipient_form(
     logged_in_client,
     mock_get_notifications,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
     initial_query_arguments,
     form_post_data,
     expected_search_box_contents,
@@ -280,7 +280,7 @@ def test_should_show_notifications_for_a_service_with_next_previous(
     service_one,
     active_user_with_permissions,
     mock_get_notifications_with_previous_next,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
     mocker,
 ):
     response = logged_in_client.get(url_for(
@@ -360,7 +360,7 @@ def test_html_contains_notification_id(
     service_one,
     active_user_with_permissions,
     mock_get_notifications,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
     mocker,
 ):
     response = logged_in_client.get(url_for(
@@ -380,7 +380,7 @@ def test_redacts_templates_that_should_be_redacted(
     client_request,
     mocker,
     active_user_with_permissions,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
 ):
     mock_get_notifications(
         mocker,
@@ -412,7 +412,7 @@ def test_big_numbers_and_search_dont_show_for_letters(
     service_one,
     mock_get_notifications,
     active_user_with_permissions,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
     message_type,
     tablist_visible,
     search_bar_visible
@@ -441,7 +441,7 @@ def test_sending_status_hint_does_not_include_status_for_letters(
     client_request,
     service_one,
     active_user_with_permissions,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
     message_type,
     hint_status_visible,
     mocker
@@ -468,7 +468,7 @@ def test_should_expected_hint_for_letters(
     logged_in_client,
     service_one,
     active_user_with_permissions,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
     mocker,
     fake_uuid,
     is_precompiled_letter,
