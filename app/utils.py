@@ -472,6 +472,14 @@ class AgreementInfo:
         else:
             return 'Can’t tell'
 
+    @property
+    def as_jinja_template(self):
+        if self.crown_status is None:
+            return 'agreement-choose'
+        if self.agreement_signed:
+            return 'agreement-signed'
+        return 'agreement'
+
     def as_terms_of_use_paragraph(self, **kwargs):
         return Markup(self._as_terms_of_use_paragraph(**kwargs))
 

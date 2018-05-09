@@ -13,22 +13,8 @@ def agreement():
 
     agreement_info = AgreementInfo.from_current_user()
 
-    if agreement_info.crown_status is None:
-        return render_template(
-            'views/agreement-choose.html',
-            owner=agreement_info.owner,
-            navigation_links=features_nav(),
-        )
-
-    if agreement_info.agreement_signed:
-        return render_template(
-            'views/agreement-signed.html',
-            owner=agreement_info.owner,
-            navigation_links=features_nav(),
-        )
-
     return render_template(
-        'views/agreement.html',
+        'views/{}.html'.format(agreement_info.as_jinja_template),
         owner=agreement_info.owner,
         navigation_links=features_nav(),
     )
