@@ -515,10 +515,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     elif db_template['template_type'] == 'sms':
         sms_sender = get_sms_sender_from_session(service_id)
     template = get_template(
-        service_api_client.get_service_template(
-            service_id,
-            str(template_id),
-        )['data'],
+        db_template,
         current_service,
         show_recipient=True,
         letter_preview_url=url_for(
