@@ -2,7 +2,7 @@
 
 {% block head %}
   <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main.css') }}" />
+  <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/document-download/main.css') }}" />
   <!--<![endif]-->
   <style>
       #global-header-bar { background-color: {{header_colour}} }
@@ -16,7 +16,6 @@
   <!--[if IE 8]>
   <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main-ie8.css') }}" />
   <![endif]-->
-  <meta name="google-site-verification" content="niWnSqImOWz6mVQTYqNb5tFK8HaKSB4b3ED4Z9gtUQ0" />
   {% block meta %}
   {% endblock %}
 {% endblock %}
@@ -28,12 +27,6 @@
 {% block content %}
 	<div id="content">
 		<main role="main">
-      <div class="phase-banner">
-        <p>
-          <strong class="phase-tag">ALPHA</strong>
-          <span>This is a new service – your <a href="{{ url_for('main.support') }}">feedback</a> will help us to improve it.</span>
-        </p>
-      </div>
 			{% block fullwidth_content %}{% endblock %}
 		</main>
 	</div>

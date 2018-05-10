@@ -1,4 +1,3 @@
-import string
 import weakref
 from datetime import datetime, timedelta
 from itertools import chain
@@ -8,6 +7,7 @@ from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
 from flask_wtf.file import FileField as FileField_wtf
 from notifications_utils.columns import Columns
+from notifications_utils.formatters import strip_whitespace
 from notifications_utils.recipients import (
     InvalidPhoneError,
     validate_phone_number,
@@ -39,15 +39,6 @@ from app.main.validators import (
     OnlyGSMCharacters,
     ValidEmail,
     ValidGovEmail,
-)
-
-OBSCURE_WHITESPACE = (
-    '\u180E'  # Mongolian vowel separator
-    '\u200B'  # zero width space
-    '\u200C'  # zero width non-joiner
-    '\u200D'  # zero width joiner
-    '\u2060'  # word joiner
-    '\uFEFF'  # zero width non-breaking space
 )
 
 
@@ -118,12 +109,6 @@ def email_address(label='Email address', gov_user=True):
     return EmailField(label, validators)
 
 
-def strip_whitespace(value):
-    if value is not None and hasattr(value, 'strip'):
-        return value.strip(string.whitespace + OBSCURE_WHITESPACE)
-    return value
-
-
 class UKMobileNumber(TelField):
     def pre_validate(self, form):
         try:
@@ -160,12 +145,16 @@ def password(label='Password'):
                                      Blacklist(message='Choose a password that’s harder to guess')])
 
 
-def sms_code():
-    verify_code = '^\d{5}$'
-    return StringField('Text message code',
-                       validators=[DataRequired(message='Can’t be empty'),
-                                   Regexp(regex=verify_code,
-                                          message='Code not found')])
+class SMSCode(StringField):
+    validators = [
+        DataRequired(message='Can’t be empty'),
+        Regexp(regex='^\d+$', message='Numbers only'),
+        Length(min=5, message='Not enough numbers'),
+        Length(max=5, message='Too many numbers'),
+    ]
+
+    def __call__(self, **kwargs):
+        return super().__call__(type='tel', pattern='[0-9]*', **kwargs)
 
 
 def organisation_type():
@@ -205,7 +194,7 @@ class StripWhitespaceStringField(StringField):
 
 
 class LoginForm(StripWhitespaceForm):
-    email_address = StringField('Email address', validators=[
+    email_address = EmailField('Email address', validators=[
         Length(min=5, max=255),
         DataRequired(message='Can’t be empty'),
         ValidEmail()
@@ -315,12 +304,20 @@ class TwoFactorForm(StripWhitespaceForm):
         self.validate_code_func = validate_code_func
         super(TwoFactorForm, self).__init__(*args, **kwargs)
 
-    sms_code = sms_code()
+    sms_code = SMSCode('Text message code')
 
-    def validate_sms_code(self, field):
-        is_valid, reason = self.validate_code_func(field.data)
+    def validate(self):
+
+        if not self.sms_code.validate(self):
+            return False
+
+        is_valid, reason = self.validate_code_func(self.sms_code.data)
+
         if not is_valid:
-            raise ValidationError(reason)
+            self.sms_code.errors.append(reason)
+            return False
+
+        return True
 
 
 class EmailNotReceivedForm(StripWhitespaceForm):
@@ -475,19 +472,6 @@ class ChangeEmailForm(StripWhitespaceForm):
 
 class ChangeMobileNumberForm(StripWhitespaceForm):
     mobile_number = international_phone_number()
-
-
-class ConfirmMobileNumberForm(StripWhitespaceForm):
-    def __init__(self, validate_code_func, *args, **kwargs):
-        self.validate_code_func = validate_code_func
-        super(ConfirmMobileNumberForm, self).__init__(*args, **kwargs)
-
-    sms_code = sms_code()
-
-    def validate_sms_code(self, field):
-        is_valid, msg = self.validate_code_func(field.data)
-        if not is_valid:
-            raise ValidationError(msg)
 
 
 class ChooseTimeForm(StripWhitespaceForm):

@@ -257,7 +257,12 @@ def test_temp_logo_is_shown_after_uploading_logo(
     assert page.select_one('#logo-img > img').attrs['src'].endswith(temp_filename)
 
 
-def test_logo_persisted_when_organisation_saved(logged_in_platform_admin_client, mocker, fake_uuid):
+def test_logo_persisted_when_organisation_saved(
+    logged_in_platform_admin_client,
+    mock_create_email_branding,
+    mocker,
+    fake_uuid
+):
     with logged_in_platform_admin_client.session_transaction() as session:
         user_id = session["user_id"]
 
@@ -268,28 +273,31 @@ def test_logo_persisted_when_organisation_saved(logged_in_platform_admin_client,
     mocked_persist_logo = mocker.patch('app.main.views.email_branding.persist_logo', return_value='test.png')
     mocked_delete_temp_files_by = mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
 
-    logged_in_platform_admin_client.post(
+    resp = logged_in_platform_admin_client.post(
         url_for('.create_email_branding', logo=temp_filename),
         content_type='multipart/form-data'
     )
+
+    assert resp.status_code == 302
 
     assert not mocked_upload_logo.called
     assert mocked_persist_logo.called
     assert mocked_delete_temp_files_by.called
     assert mocked_delete_temp_files_by.call_args == call(user_id)
+    assert mock_create_email_branding.called
 
 
-@pytest.mark.parametrize('colour_hex, form_validates', [
-    ('#FF00FF', True),
-    ('hello', False),
-    ('', True),
+@pytest.mark.parametrize('colour_hex, expected_status_code', [
+    ('#FF00FF', 302),
+    ('hello', 200),
+    ('', 302),
 ])
 def test_colour_regex_validation(
     logged_in_platform_admin_client,
     mocker,
     fake_uuid,
     colour_hex,
-    form_validates,
+    expected_status_code,
     mock_create_email_branding
 ):
     data = {
@@ -306,4 +314,4 @@ def test_colour_regex_validation(
         data=data
     )
 
-    assert (response.status_code == 302) == form_validates
+    assert response.status_code == expected_status_code

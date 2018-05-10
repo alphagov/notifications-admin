@@ -555,13 +555,14 @@ def test_user_cant_invite_themselves(
 
 
 def test_no_permission_manage_users_page(
-    logged_in_client,
+    client_request,
     service_one,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
     api_user_active,
     mocker,
 ):
-    response = logged_in_client.get(url_for('main.manage_users', service_id=service_one['id']))
-    resp_text = response.get_data(as_text=True)
+    resp_text = client_request.get('main.manage_users', service_id=service_one['id'])
     assert url_for('.invite_user', service_id=service_one['id']) not in resp_text
     assert "Edit permission" not in resp_text
     assert "Team members" not in resp_text

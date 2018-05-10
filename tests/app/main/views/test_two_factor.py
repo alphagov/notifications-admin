@@ -17,7 +17,15 @@ def test_should_render_two_factor_page(
             'email': api_user_active.email_address}
     response = client.get(url_for('main.two_factor'))
     assert response.status_code == 200
-    assert '''We’ve sent you a text message with a security code.''' in response.get_data(as_text=True)
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.select_one('main p').text.strip() == (
+        'We’ve sent you a text message with a security code.'
+    )
+    assert page.select_one('label').text.strip(
+        'Text message code'
+    )
+    assert page.select_one('input')['type'] == 'tel'
+    assert page.select_one('input')['pattern'] == '[0-9]*'
 
 
 def test_should_login_user_and_should_redirect_to_next_url(
@@ -26,6 +34,7 @@ def test_should_login_user_and_should_redirect_to_next_url(
     mock_get_user,
     mock_get_user_by_email,
     mock_check_verify_code,
+    mock_create_event,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -48,6 +57,7 @@ def test_should_login_user_and_not_redirect_to_external_url(
     mock_get_user_by_email,
     mock_check_verify_code,
     mock_get_services_with_one_service,
+    mock_create_event,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -65,6 +75,7 @@ def test_should_login_user_and_redirect_to_show_accounts(
     mock_get_user,
     mock_get_user_by_email,
     mock_check_verify_code,
+    mock_create_event,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -100,6 +111,7 @@ def test_should_login_user_when_multiple_valid_codes_exist(
     mock_get_user_by_email,
     mock_check_verify_code,
     mock_get_services_with_one_service,
+    mock_create_event,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -117,6 +129,7 @@ def test_two_factor_should_set_password_when_new_password_exists_in_session(
     mock_check_verify_code,
     mock_get_services_with_one_service,
     mock_update_user_password,
+    mock_create_event,
 ):
     with client.session_transaction() as session:
         session['user_details'] = {
@@ -166,6 +179,7 @@ def test_two_factor_should_activate_pending_user(
     mocker,
     api_user_pending,
     mock_check_verify_code,
+    mock_create_event,
     mock_activate_user,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
@@ -186,7 +200,8 @@ def test_valid_two_factor_email_link_logs_in_user(
     valid_token,
     mock_get_user,
     mock_get_services_with_one_service,
-    mocker
+    mocker,
+    mock_create_event,
 ):
     mocker.patch('app.user_api_client.check_verify_code', return_value=(True, ''))
 

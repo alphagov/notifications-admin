@@ -361,7 +361,8 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     mock_get_service_template_with_placeholders,
     mock_s3_upload,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     fake_uuid,
 ):
 
@@ -485,7 +486,8 @@ def test_upload_csvfile_with_missing_columns_shows_error(
     mock_get_service_template_with_placeholders,
     mock_s3_upload,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     service_one,
     fake_uuid,
     file_contents,
@@ -565,7 +567,8 @@ def test_upload_valid_csv_shows_preview_and_table(
     mock_get_live_service,
     mock_get_service_template_with_placeholders,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
     fake_uuid,
     extra_args,
@@ -669,7 +672,8 @@ def test_file_name_truncated_to_fit_in_s3_metadata(
     mock_get_live_service,
     mock_get_service_template_with_placeholders,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
     fake_uuid,
 ):
@@ -709,7 +713,8 @@ def test_show_all_columns_if_there_are_duplicate_recipient_columns(
     mock_get_live_service,
     mock_get_service_template_with_placeholders,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     fake_uuid,
 ):
 
@@ -753,7 +758,8 @@ def test_404_for_previewing_a_row_out_of_range(
     mock_get_live_service,
     mock_get_service_template_with_placeholders,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
     fake_uuid,
     row_index,
@@ -788,7 +794,7 @@ def test_send_test_doesnt_show_file_contents(
     mock_get_service_template,
     mock_s3_upload,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
     service_one,
     fake_uuid,
 ):
@@ -822,7 +828,7 @@ def test_send_test_doesnt_show_file_contents(
 def test_send_test_step_redirects_if_session_not_setup(
     mocker,
     logged_in_client,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
     mock_get_users_by_service,
     fake_uuid,
     endpoint,
@@ -1054,7 +1060,7 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
     mock_get_service_letter_template,
     mock_s3_upload,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
     mocker,
     endpoint,
     expected_redirect,
@@ -1090,7 +1096,7 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     mock_get_service_email_template,
     mock_s3_download,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
     endpoint,
     expected_redirect,
 ):
@@ -1150,7 +1156,7 @@ def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     mock_get_service_email_template_without_placeholders,
     mock_s3_upload,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
     fake_uuid,
 ):
     with logged_in_client.session_transaction() as session:
@@ -1230,7 +1236,7 @@ def test_send_test_letter_redirects_to_right_url(
     mock_get_service_letter_template,
     mock_s3_upload,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
     mocker,
 ):
 
@@ -1393,7 +1399,7 @@ def test_send_test_sms_message_puts_submitted_data_in_session(
     service_one,
     mock_get_service_template_with_placeholders,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
     fake_uuid,
 ):
     with logged_in_client.session_transaction() as session:
@@ -1428,7 +1434,7 @@ def test_send_test_works_as_letter_preview(
     logged_in_platform_admin_client,
     mock_get_service_letter_template,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
     service_one,
     fake_uuid,
     mocker,
@@ -1515,8 +1521,9 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     logged_in_client,
     mock_get_service_template,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
     mock_get_live_service,
+    mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
     service_one,
     fake_uuid,
@@ -1556,7 +1563,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     assert '07700 900750' not in content
     assert 'Only showing the first 50 rows' in content
 
-    mock_get_detailed_service_for_today.assert_called_once_with(service_one['id'])
+    mock_get_service_statistics.assert_called_once_with(service_one['id'], today_only=True)
 
 
 @pytest.mark.parametrize('service_mock, should_allow_international', [
@@ -1571,7 +1578,8 @@ def test_upload_csvfile_with_international_validates(
     mock_s3_upload,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     fake_uuid,
     service_mock,
     should_allow_international,
@@ -1596,70 +1604,51 @@ def test_upload_csvfile_with_international_validates(
 
 
 def test_test_message_can_only_be_sent_now(
-    logged_in_client,
+    client_request,
     mocker,
     service_one,
     mock_get_service_template,
     mock_s3_download,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
     fake_uuid
 ):
-    with logged_in_client.session_transaction() as session:
-        session['file_uploads'] = {
-            fake_uuid: {
-                'original_file_name': 'Test message',
-                'template_id': fake_uuid,
-                'notification_count': 1,
-                'valid': True
-            }
-        }
-
-    response = logged_in_client.get(url_for(
+    content = client_request.get(
         'main.check_messages',
         service_id=service_one['id'],
         upload_id=fake_uuid,
         template_id=fake_uuid,
         from_test=True
-    ))
+    )
 
-    content = response.get_data(as_text=True)
     assert 'name="scheduled_for"' not in content
 
 
 def test_letter_can_only_be_sent_now(
-    logged_in_client,
+    client_request,
     mocker,
     service_one,
     mock_get_service_letter_template,
-    mock_s3_download,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_s3_set_metadata,
+    mock_get_job_doesnt_exist,
     fake_uuid,
 ):
-
+    mocker.patch('app.main.views.send.s3download', return_value="addressline1, addressline2, postcode\na,b,c")
+    mocker.patch('app.main.views.send.set_metadata_on_csv_upload')
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
-    with logged_in_client.session_transaction() as session:
-        session['file_uploads'] = {
-            fake_uuid: {
-                'original_file_name': 'Test message',
-                'template_id': fake_uuid,
-                'notification_count': 1,
-                'valid': True
-            }
-        }
-
-    response = logged_in_client.get(url_for(
+    content = client_request.get(
         'main.check_messages',
         service_id=service_one['id'],
         upload_id=fake_uuid,
         template_id=fake_uuid,
         from_test=True
-    ))
+    )
 
-    content = response.get_data(as_text=True)
     assert 'name="scheduled_for"' not in content
 
 
@@ -1755,7 +1744,8 @@ def test_should_show_preview_letter_message(
     logged_in_platform_admin_client,
     mock_get_service_letter_template,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     service_one,
     fake_uuid,
     mocker,
@@ -1971,7 +1961,8 @@ def test_check_messages_back_link(
     mock_get_users_by_service,
     mock_get_service,
     mock_has_permissions,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     mock_s3_download,
     mock_s3_set_metadata,
     fake_uuid,
@@ -2057,6 +2048,7 @@ def test_check_messages_shows_too_many_messages_errors(
     mock_get_users_by_service,
     mock_get_service,
     mock_get_service_template,
+    mock_get_job_doesnt_exist,
     mock_has_permissions,
     fake_uuid,
     num_requested,
@@ -2066,13 +2058,9 @@ def test_check_messages_shows_too_many_messages_errors(
     mocker.patch('app.main.views.send.s3download', return_value=',\n'.join(
         ['phone number'] + ([mock_get_users_by_service(None)[0].mobile_number] * 100)
     ))
-    mocker.patch('app.service_api_client.get_detailed_service_for_today', return_value={
-        'data': {
-            'statistics': {
-                'sms': {'requested': num_requested, 'delivered': 0, 'failed': 0},
-                'email': {'requested': 0, 'delivered': 0, 'failed': 0}
-            }
-        }
+    mocker.patch('app.service_api_client.get_service_statistics', return_value={
+        'sms': {'requested': num_requested, 'delivered': 0, 'failed': 0},
+        'email': {'requested': 0, 'delivered': 0, 'failed': 0}
     })
 
     with logged_in_client.session_transaction() as session:
@@ -2108,7 +2096,8 @@ def test_check_messages_shows_trial_mode_error(
     mock_get_service,
     mock_get_service_template,
     mock_has_permissions,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     fake_uuid,
     mocker
 ):
@@ -2154,7 +2143,8 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     mock_get_service_letter_template,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
     fake_uuid,
     mocker,
@@ -2203,8 +2193,9 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     mock_get_service_letter_template,
     mock_has_permissions,
     mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     fake_uuid,
-    mock_get_detailed_service_for_today,
 ):
 
     mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
@@ -2243,7 +2234,8 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
     mock_has_permissions,
     fake_uuid,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
 ):
 
     mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
@@ -2282,7 +2274,8 @@ def test_generate_test_letter_doesnt_block_in_trial_mode(
     mock_has_permissions,
     fake_uuid,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
 ):
 
@@ -2320,7 +2313,8 @@ def test_check_messages_shows_over_max_row_error(
     mock_get_service,
     mock_get_service_template_with_placeholders,
     mock_has_permissions,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     mock_s3_download,
     fake_uuid,
     mocker
@@ -2363,7 +2357,8 @@ def test_non_ascii_characters_in_letter_recipients_file_shows_error(
     mock_get_live_service,
     mock_has_permissions,
     mock_get_service_letter_template,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     fake_uuid,
     mocker
 ):
@@ -2733,7 +2728,8 @@ def test_reply_to_is_previewed_if_chosen(
     mock_s3_download,
     mock_s3_set_metadata,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     get_default_reply_to_email_address,
     fake_uuid,
     endpoint,
@@ -2782,7 +2778,8 @@ def test_sms_sender_is_previewed(
     mock_s3_download,
     mock_s3_set_metadata,
     mock_get_users_by_service,
-    mock_get_detailed_service_for_today,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
     get_default_sms_sender,
     fake_uuid,
     endpoint,

@@ -371,8 +371,9 @@ def test_new_invited_user_verifies_and_added_to_service(
     mock_get_jobs,
     mock_has_permissions,
     mock_get_users_by_service,
-    mock_get_detailed_service,
+    mock_get_service_statistics,
     mock_get_usage,
+    mock_create_event,
     mocker,
 ):
     # visit accept token page

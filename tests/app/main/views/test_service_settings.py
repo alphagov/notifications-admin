@@ -192,14 +192,16 @@ def test_should_show_overview_for_service_with_more_things_set(
 
 
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
-        logged_in_client,
+        client_request,
         service_one,
+        single_reply_to_email_address,
+        no_letter_contact_blocks,
+        mock_get_service_organisation,
+        single_sms_sender,
         mock_get_service_settings_page_common,
 ):
-    response = logged_in_client.get(url_for(
-        'main.service_settings', service_id=service_one['id']
-    ))
-    assert 'Letter contact block' not in response.get_data(as_text=True)
+    response = client_request.get('main.service_settings', service_id=service_one['id'])
+    assert 'Letter contact block' not in response
 
 
 def test_letter_contact_block_shows_none_if_not_set(

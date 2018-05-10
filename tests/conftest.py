@@ -522,40 +522,15 @@ def mock_get_international_service(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
-def mock_get_detailed_service(mocker, api_user_active):
-    def _get(service_id):
+def mock_get_service_statistics(mocker, api_user_active):
+    def _get(service_id, today_only):
         return {
-            'data': {
-                'id': service_id,
-                'free_sms_fragment_limit': 250000,
-                'statistics': {
-                    'email': {'requested': 0, 'delivered': 0, 'failed': 0},
-                    'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
-                    'letter': {'requested': 0, 'delivered': 0, 'failed': 0}
-                },
-                'created_at': str(datetime.utcnow())
-            }
+            'email': {'requested': 0, 'delivered': 0, 'failed': 0},
+            'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
+            'letter': {'requested': 0, 'delivered': 0, 'failed': 0}
         }
 
-    return mocker.patch('app.service_api_client.get_detailed_service', side_effect=_get)
-
-
-@pytest.fixture(scope='function')
-def mock_get_detailed_service_for_today(mocker, api_user_active):
-    def _get(service_id):
-        return {
-            'data': {
-                'id': service_id,
-                'free_sms_fragment_limit': 250000,
-                'statistics': {
-                    'email': {'requested': 0, 'delivered': 0, 'failed': 0},
-                    'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
-                    'letter': {'requested': 0, 'delivered': 0, 'failed': 0}
-                }
-            }
-        }
-
-    return mocker.patch('app.service_api_client.get_detailed_service_for_today', side_effect=_get)
+    return mocker.patch('app.service_api_client.get_service_statistics', side_effect=_get)
 
 
 @pytest.fixture(scope='function')
@@ -1678,6 +1653,14 @@ def mock_get_job(mocker, api_user_active):
     return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
 
 
+@pytest.fixture
+def mock_get_job_doesnt_exist(mocker):
+    def _get_job(service_id, job_id):
+        raise HTTPError(response=Mock(status_code=404, json={}), message={})
+
+    return mocker.patch('app.job_api_client.get_job', side_effect=_get_job)
+
+
 @pytest.fixture(scope='function')
 def mock_get_scheduled_job(mocker, api_user_active):
     def _get_job(service_id, job_id):
@@ -1875,6 +1858,20 @@ def mock_get_inbound_sms(mocker):
     return mocker.patch(
         'app.service_api_client.get_inbound_sms',
         side_effect=_get_inbound_sms,
+    )
+
+
+@pytest.fixture
+def mock_get_inbound_sms_by_id_with_no_messages(mocker):
+    def _get_inbound_sms_by_id(
+        service_id,
+        notification_id
+    ):
+        raise HTTPError(response=Mock(status_code=404))
+
+    return mocker.patch(
+        'app.service_api_client.get_inbound_sms_by_id',
+        side_effect=_get_inbound_sms_by_id,
     )
 
 
@@ -2923,3 +2920,14 @@ def mock_get_organisations_and_services_for_user(mocker, organisation_one, api_u
         'app.user_api_client.get_organisations_and_services_for_user',
         side_effect=_get_orgs_and_services
     )
+
+
+@pytest.fixture
+def mock_create_event(mocker):
+    """
+    This should be used whenever your code is calling `flask_login.login_user`
+    """
+    def _add_event(event_type, event_data):
+        return
+
+    return mocker.patch('app.events_api_client.create_event', side_effect=_add_event)

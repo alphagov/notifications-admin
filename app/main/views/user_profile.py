@@ -18,8 +18,8 @@ from app.main.forms import (
     ChangeMobileNumberForm,
     ChangeNameForm,
     ChangePasswordForm,
-    ConfirmMobileNumberForm,
     ConfirmPasswordForm,
+    TwoFactorForm,
 )
 from app.utils import is_gov_user
 
@@ -169,7 +169,7 @@ def user_profile_mobile_number_confirm():
     if NEW_MOBILE_PASSWORD_CONFIRMED not in session:
         return redirect(url_for('.user_profile_mobile_number'))
 
-    form = ConfirmMobileNumberForm(_check_code)
+    form = TwoFactorForm(_check_code)
 
     if form.validate_on_submit():
         user = user_api_client.get_user(current_user.id)

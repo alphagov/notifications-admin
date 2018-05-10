@@ -102,3 +102,30 @@ def test_agreement_requires_login(
     assert response.status_code == 302
     assert response.location == 'http://localhost/sign-in?next=%2Fagreement.pdf'
     assert mock_get_s3_object.call_args_list == []
+
+
+@pytest.mark.parametrize('endpoint', (
+    'main.public_agreement',
+    'main.public_download_agreement',
+))
+@pytest.mark.parametrize('variant, expected_status', (
+    ('crown', 200),
+    ('non-crown', 200),
+    ('foo', 404),
+))
+def test_show_public_agreement_page(
+    client,
+    mocker,
+    endpoint,
+    variant,
+    expected_status,
+):
+    mocker.patch(
+        'app.main.s3_client.get_s3_object',
+        return_value=_MockS3Object()
+    )
+    response = client.get(url_for(
+        endpoint,
+        variant=variant,
+    ))
+    assert response.status_code == expected_status
