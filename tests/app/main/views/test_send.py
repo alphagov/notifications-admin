@@ -666,6 +666,39 @@ def test_upload_valid_csv_shows_preview_and_table(
             assert normalize_spaces(str(row.select('td')[index + 1])) == cell
 
 
+def test_upload_valid_csv_only_sets_meta_if_filename_known(
+    client_request,
+    mocker,
+    mock_get_live_service,
+    mock_get_service_letter_template,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_s3_set_metadata,
+    fake_uuid,
+):
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        addressline1, addressline2, postcode
+        House       , 1 Street    , SW1A 1AA
+    """)
+    mocker.patch(
+        'app.main.views.send.TemplatePreview.from_utils_template',
+        return_value='foo'
+    )
+
+    client_request.get(
+        'main.check_messages_preview',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        filetype='pdf',
+        _test_page_title=False,
+    )
+
+    assert len(mock_s3_set_metadata.call_args_list) == 0
+
+
 def test_file_name_truncated_to_fit_in_s3_metadata(
     client_request,
     mocker,
