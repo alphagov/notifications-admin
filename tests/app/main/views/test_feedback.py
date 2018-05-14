@@ -88,16 +88,8 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
     (
         'agreement',
         (
-            'Please send me a copy of the GOV.UK Notify data sharing '
-            'and financial agreement.'
-        )
-    ),
-    (
-        'agreement-with-owner',
-        (
-            'Please send me a copy of the GOV.UK Notify data sharing '
-            'and financial agreement for Marine Management '
-            'Organisation to sign.'
+            'Please can you tell me if there’s an agreement in place '
+            'between GOV.UK Notify and my organisation?'
         )
     ),
     (

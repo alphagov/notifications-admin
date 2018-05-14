@@ -125,16 +125,12 @@
     <h2 class="heading-medium" id="paying">How to pay</h2>
     <p>You can find details of how to pay for Notify in our data sharing and financial agreement.</p>
     <p>
-      <a href="{{url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement')}}">Contact us</a> to get a copy of the agreement
-      {% if agreement_info.agreement_signed %}
-        ({{ agreement_info.owner }} has already accepted it).
-      {% else %}
-        {% if agreement_info.owner and agreement_info.agreement_signed != None %}
-          ({{ agreement_info.owner }} hasn’t accepted it yet).
-        {% else %}
-          or find out if we already have one in place with your organisation.
-        {% endif %}
-      {% endif %}
+      {{ agreement_info.as_pricing_paragraph(
+        pricing_link=url_for('main.sign_in', next=url_for('main.pricing', _anchor='paying')),
+        download_link=url_for('main.agreement'),
+        support_link=url_for('.feedback', ticket_type='ask-question-give-feedback', body='agreement'),
+        signed_in=current_user.is_authenticated,
+      ) }}
     </p>
   </div>
 </div>
