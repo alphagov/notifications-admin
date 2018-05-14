@@ -707,7 +707,12 @@ def test_upload_valid_csv_shows_preview_and_table(
 
     if expected_link_in_first_row:
         assert page.select_one('.table-field-index a')['href'] == url_for(
-            'main.check_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid, upload_id=fake_uuid, row_index=2
+            'main.check_messages',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            upload_id=fake_uuid,
+            row_index=2,
+            original_file_name='example.csv'
         )
     else:
         assert not page.select_one('.table-field-index').select_one('a')
@@ -799,6 +804,7 @@ def test_file_name_truncated_to_fit_in_s3_metadata(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    multiple_sms_senders,
     mock_s3_set_metadata,
     fake_uuid,
 ):
@@ -2028,6 +2034,7 @@ def test_test_message_can_only_be_sent_now(
     mock_s3_download,
     mock_get_users_by_service,
     mock_get_service_statistics,
+    multiple_sms_senders,
     mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
     fake_uuid
@@ -2037,6 +2044,7 @@ def test_test_message_can_only_be_sent_now(
         service_id=service_one['id'],
         upload_id=fake_uuid,
         template_id=fake_uuid,
+        one_off_id='1234',
         from_test=True
     )
 

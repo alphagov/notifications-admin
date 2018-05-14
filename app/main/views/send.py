@@ -1,7 +1,6 @@
 import itertools
 import json
 import uuid
-from contextlib import suppress
 from datetime import datetime, timedelta
 from string import ascii_uppercase
 from zipfile import BadZipFile
@@ -533,8 +532,15 @@ def send_test_preview(service_id, template_id, one_off_id, filetype):
     return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
 
 
-
-def _check_messages(service_id, template_id, upload_id, preview_row, one_off_id, letters_as_pdf=False):
+def _check_messages(
+    service_id,
+    template_id,
+    upload_id,
+    preview_row,
+    one_off_id,
+    letters_as_pdf=False,
+    write_metadata=False
+):
 
     try:
         # The happy path is that the job doesn’t already exist, so the
@@ -661,8 +667,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, one_off_id,
 def check_messages(service_id, template_id, upload_id, row_index=2):
     one_off_id = request.args.get('one_off_id', None)
 
-    data = _check_messages(service_id, db_template['id'], upload_id, row_index, one_off_id, write_metadata=True)
-
+    data = _check_messages(service_id, template_id, upload_id, row_index, one_off_id, write_metadata=True)
 
     if (
         data['recipients'].too_many_rows or
@@ -754,20 +759,20 @@ def fields_to_fill_in(template, one_off_id, prefill_current_user=False):
     return list(template.placeholders)
 
 
-def get_normalised_placeholders_from_session():
+def get_normalised_placeholders_from_session(one_off_session_id):
     return {
         key: ''.join(value or [])
-        for key, value in session.get('placeholders', {}).items()
+        for key, value in session['one_off'][one_off_session_id].get('placeholders', {}).items()
     }
 
 
-def get_recipient_and_placeholders_from_session(template_type):
-    placeholders = get_normalised_placeholders_from_session()
+def get_recipient_and_placeholders_from_session(template_type, one_off_session_id):
+    placeholders = get_normalised_placeholders_from_session(one_off_session_id)
 
     if template_type == 'sms':
-        placeholders['phone_number'] = session['recipient']
+        placeholders['phone_number'] = session['one_off'][one_off_session_id]['recipient']
     else:
-        placeholders['email_address'] = session['recipient']
+        placeholders['email_address'] = session['one_off'][one_off_session_id]['recipient']
 
     return placeholders
 
@@ -781,21 +786,22 @@ def make_and_upload_csv_file(service_id, template, one_off_id):
         ).as_dict,
         current_app.config['AWS_REGION'],
     )
-    return redirect(url_for(
-        '.check_messages',
-        upload_id=upload_id,
-        service_id=service_id,
-        template_id=template.id,
-        from_test=True,
-        help=2 if get_help_argument() else 0,
-        one_off_id=one_off_id
-    )
+    return redirect(
+        url_for(
+            '.check_messages',
+            upload_id=upload_id,
+            service_id=service_id,
+            template_id=template.id,
+            from_test=True,
+            help=2 if get_help_argument() else 0,
+            one_off_id=one_off_id
+        )
     )
 
 
-def all_placeholders_in_session(placeholders):
+def all_placeholders_in_session(placeholders, one_off_session_id):
     return all(
-        get_normalised_placeholders_from_session().get(placeholder, False) not in (False, None)
+        get_normalised_placeholders_from_session(one_off_session_id).get(placeholder, False) not in (False, None)
         for placeholder in placeholders
     )
 
