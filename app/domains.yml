@@ -4231,7 +4231,7 @@ sthelens.gov.uk:
 stirling.gov.uk:
   owner: Stirling Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 stives-tc.gov.uk:
   owner: St Ives Town Council - Cornwall
   crown: false
