@@ -2,7 +2,7 @@
 
 <div class="ajax-block">
   {% if inbound_sms_summary != None %}
-    <div class="big-number-meta-wrapper">
+    <div id="total-received" class="big-number-meta-wrapper">
       {{
         big_number_with_status(
           inbound_sms_summary.count,
