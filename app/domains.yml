@@ -4799,7 +4799,7 @@ waverley.gov.uk:
 wealden.gov.uk:
   owner: Wealden District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 welfordonavon-pc.gov.uk:
   owner: Stratford-on-Avon District Council
   crown: false
