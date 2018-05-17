@@ -2181,6 +2181,8 @@ def mock_get_template_statistics_for_template(mocker, service_one):
 def mock_get_usage(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
+            {"international": False, "rate": 0.00, "notification_type": "email",
+             "rate_multiplier": None, "billing_units": 1000},
             {"international": False, "rate": 0.0165, "rate_multiplier": 1,
              "notification_type": "sms", "billing_units": 251500},
             {"international": True, "rate": 0.0165, "rate_multiplier": 1,
@@ -2189,8 +2191,6 @@ def mock_get_usage(mocker, service_one, fake_uuid):
              "notification_type": "sms", "billing_units": 150},
             {"international": True, "rate": 0.0165, "rate_multiplier": 3,
              "notification_type": "sms", "billing_units": 30},
-            {"international": False, "rate": 0.0165, "notification_type": "email",
-             "rate_multiplier": None, "billing_units": 1000}
         ]
 
     return mocker.patch(

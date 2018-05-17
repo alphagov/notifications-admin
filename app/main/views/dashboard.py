@@ -377,10 +377,13 @@ def get_dashboard_totals(statistics):
 
 
 def calculate_usage(usage, free_sms_fragment_limit):
+    sms_breakdowns = [breakdown for breakdown in usage if breakdown['notification_type'] == 'sms']
+
+    # this relies on the assumption: only one SMS rate per financial year.
+    sms_rate = 0 if len(sms_breakdowns) == 0 else sms_breakdowns[0].get("rate", 0)
+    sms_sent = get_sum_billing_units(sms_breakdowns)
     sms_free_allowance = free_sms_fragment_limit
 
-    sms_rate = 0 if len(usage) == 0 else usage[0].get("rate", 0)
-    sms_sent = get_sum_billing_units(breakdown for breakdown in usage if breakdown['notification_type'] == 'sms')
     emails = [breakdown["billing_units"] for breakdown in usage if breakdown['notification_type'] == 'email']
     emails_sent = 0 if len(emails) == 0 else emails[0]
 
