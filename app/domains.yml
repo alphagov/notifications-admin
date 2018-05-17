@@ -488,6 +488,10 @@ BarnardCastleTownCouncil.gov.uk:
   owner: Barnard Castle Town Council
   crown: false
   agreement_signed: false
+barnet.gov.uk:
+  owner: Barnet London Borough Council
+  crown: false
+  agreement_signed: false  
 barnoldswicktowncouncil.gov.uk:
   owner: Barnoldswick Town Council
   crown: false
