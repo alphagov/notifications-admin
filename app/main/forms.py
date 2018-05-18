@@ -931,3 +931,23 @@ class LinkOrganisationsForm(StripWhitespaceForm):
             DataRequired()
         ]
     )
+
+
+branding_options = (
+    ('govuk', 'GOV.UK only'),
+    ('both', 'GOV.UK and logo'),
+    ('org', 'Your logo'),
+    ('org_banner', 'Your logo on a colour'),
+)
+branding_options_dict = dict(branding_options)
+
+
+class BrandingOptionsEmail(StripWhitespaceForm):
+
+    options = RadioField(
+        'Branding options',
+        choices=branding_options,
+        validators=[
+            DataRequired()
+        ],
+    )

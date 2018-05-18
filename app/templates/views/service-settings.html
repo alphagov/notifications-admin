@@ -89,6 +89,17 @@
             }}
           {% endcall %}
 
+          {% call row() %}
+            {{ text_field('Email branding') }}
+            {{ text_field(
+              'GOV.UK' if current_service.branding == 'govuk' else 'Your branding'
+            ) }}
+            {{ edit_field(
+              'Change',
+              url_for('.branding_request', service_id=current_service.id),
+            )}}
+          {% endcall %}
+
         {% endif %}
 
       {% endcall %}

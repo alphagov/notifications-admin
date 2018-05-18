@@ -241,3 +241,13 @@ details .arrow {
   }
 
 }
+
+.bordered-image {
+  padding: 5px;
+  outline: 1px solid $border-colour;
+  max-width: 100%;
+
+  label & {
+    cursor: pointer;
+  }
+}

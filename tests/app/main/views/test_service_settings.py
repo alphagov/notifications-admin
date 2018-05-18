@@ -54,6 +54,7 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Send emails On Change',
         'Email reply to addresses Not set Change',
+        'Email branding GOV.UK Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -75,6 +76,7 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Send emails On Change',
         'Email reply to addresses Not set Change',
+        'Email branding GOV.UK Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -134,6 +136,7 @@ def test_should_show_overview(
         'Label Value Action',
         'Send emails On Change',
         'Email reply to addresses test@example.com Manage',
+        'Email branding GOV.UK Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -154,6 +157,7 @@ def test_should_show_overview(
         'Label Value Action',
         'Send emails On Change',
         'Email reply to addresses test@example.com Manage',
+        'Email branding GOV.UK Change',
 
         'Label Value Action',
         'Send text messages On Change',
@@ -775,8 +779,8 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         )
 
     assert get_row(page, 3) == "Email reply to addresses test@example.com …and 2 more Manage"
-    assert get_row(page, 5) == "Text message sender Example …and 2 more Manage"
-    assert get_row(page, 10) == "Sender addresses 1 Example Street …and 2 more Manage"
+    assert get_row(page, 6) == "Text message sender Example …and 2 more Manage"
+    assert get_row(page, 11) == "Sender addresses 1 Example Street …and 2 more Manage"
 
 
 @pytest.mark.parametrize('sender_list_page, expected_output', [
@@ -2385,3 +2389,73 @@ def test_update_service_organisation_does_not_update_if_same_value(
 
     assert response.status_code == 302
     mock_update_service_organisation.called is False
+
+
+def test_show_email_branding_request_page(
+    client_request,
+):
+    page = client_request.get(
+        '.branding_request', service_id=SERVICE_ONE_ID
+    )
+
+    radios = page.select('input[type=radio]')
+
+    for index, option in enumerate((
+        'govuk',
+        'both',
+        'org',
+        'org_banner',
+    )):
+        assert radios[index]['name'] == 'options'
+        assert radios[index]['value'] == option
+
+
+@pytest.mark.parametrize('choice, requested_branding', (
+    ('govuk', 'GOV.UK only'),
+    ('both', 'GOV.UK and logo'),
+    ('org', 'Your logo'),
+    ('org_banner', 'Your logo on a colour'),
+    pytest.mark.xfail(('foo', 'Nope'), raises=AssertionError),
+))
+def test_submit_email_branding_request(
+    client_request,
+    mocker,
+    choice,
+    requested_branding,
+    mock_get_service_settings_page_common,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    mock_get_service_organisation,
+    single_sms_sender,
+):
+
+    zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.create_ticket',
+        autospec=True,
+    )
+
+    page = client_request.post(
+        '.branding_request', service_id=SERVICE_ONE_ID,
+        _data={
+            'options': choice,
+        },
+        _follow_redirects=True,
+    )
+
+    zendesk.assert_called_once_with(
+        message=(
+            'On behalf of service one '
+            '(http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb)\n'
+            '\n'
+            '---\n'
+            'Branding requested: {}'
+        ).format(requested_branding),
+        subject='Email branding request - service one',
+        ticket_type='question',
+        user_email='test@user.gov.uk',
+        user_name='Test User',
+    )
+    assert normalize_spaces(page.select_one('.banner-default').text) == (
+        'Thanks for your branding request. We’ll get back to you '
+        'within one working day.'
+    )
