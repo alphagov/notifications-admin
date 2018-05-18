@@ -109,6 +109,7 @@ class HeaderNavigation(Navigation):
         'api_integration',
         'api_keys',
         'archive_service',
+        'branding_request',
         'callbacks',
         'cancel_invited_org_user',
         'cancel_invited_user',
@@ -309,6 +310,7 @@ class MainNavigation(Navigation):
             'usage',
         },
         'settings': {
+            'branding_request',
             'link_service_to_organisation',
             'request_to_go_live',
             'service_add_email_reply_to',
@@ -519,6 +521,7 @@ class OrgNavigation(Navigation):
         'api_keys',
         'archive_service',
         'bat_phone',
+        'branding_request',
         'callbacks',
         'cancel_invited_org_user',
         'cancel_invited_user',

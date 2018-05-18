@@ -25,6 +25,7 @@ from app import (
 )
 from app.main import main
 from app.main.forms import (
+    BrandingOptionsEmail,
     ConfirmPasswordForm,
     FreeSMSAllowance,
     InternationalSMSForm,
@@ -41,6 +42,7 @@ from app.main.forms import (
     ServiceSmsSenderForm,
     ServiceSwitchLettersForm,
     SMSPrefixForm,
+    branding_options_dict,
 )
 from app.utils import (
     AgreementInfo,
@@ -880,6 +882,44 @@ def link_service_to_organisation(service_id):
     return render_template(
         'views/service-settings/link-service-to-organisation.html',
         has_organisations=organisations,
+        form=form,
+    )
+
+
+@main.route("/services/<service_id>/branding-request/email", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def branding_request(service_id):
+
+    form = BrandingOptionsEmail(
+        options=current_service['branding']
+    )
+
+    if form.validate_on_submit():
+        zendesk_client.create_ticket(
+            subject='Email branding request - {}'.format(current_service['name']),
+            message=(
+                'On behalf of {} ({})\n'
+                '\n---'
+                '\nBranding requested: {}'
+            ).format(
+                current_service['name'],
+                url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
+                branding_options_dict[form.options.data],
+            ),
+            ticket_type=zendesk_client.TYPE_QUESTION,
+            user_email=current_user.email_address,
+            user_name=current_user.name,
+        )
+
+        flash((
+            'Thanks for your branding request. We’ll get back to you '
+            'within one working day.'
+        ), 'default')
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/branding/email-options.html',
         form=form,
     )
 
