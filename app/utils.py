@@ -472,26 +472,72 @@ class AgreementInfo:
         else:
             return 'Can’t tell'
 
+    @property
+    def as_jinja_template(self):
+        if self.crown_status is None:
+            return 'agreement-choose'
+        if self.agreement_signed:
+            return 'agreement-signed'
+        return 'agreement'
+
     def as_terms_of_use_paragraph(self, **kwargs):
         return Markup(self._as_terms_of_use_paragraph(**kwargs))
 
-    def _as_terms_of_use_paragraph(self, download_link, contact_link):
+    def _as_terms_of_use_paragraph(self, terms_link, download_link, support_link, signed_in):
 
-        if self.agreement_signed:
-            return (
-                'Your organisation ({}) has already accepted the '
-                'GOV.UK&nbsp;Notify data sharing and financial '
-                'agreement.'.format(self.owner)
-            )
+        if not signed_in:
+            return ((
+                '{} <a href="{}">Sign in</a> to download a copy '
+                'or find out if one is already in place.'
+            ).format(self._acceptance_required, terms_link))
 
-        if self.crown_status is not None:
+        if self.agreement_signed is None:
+            return ((
+                '{} <a href="{}">Download the agreement</a> or '
+                '<a href="{}">contact us</a> to find out if we already '
+                'have one in place with your organisation.'
+            ).format(self._acceptance_required, download_link, support_link))
+
+        if self.agreement_signed is False:
             return ((
                 '{} <a href="{}">Download a copy</a>.'
             ).format(self._acceptance_required, download_link))
 
-        return ((
-            '{} <a href="{}">Contact us</a> to get a copy.'
-        ).format(self._acceptance_required, contact_link))
+        return (
+            'Your organisation ({}) has already accepted the '
+            'GOV.UK&nbsp;Notify data sharing and financial '
+            'agreement.'.format(self.owner)
+        )
+
+    def as_pricing_paragraph(self, **kwargs):
+        return Markup(self._as_pricing_paragraph(**kwargs))
+
+    def _as_pricing_paragraph(self, pricing_link, download_link, support_link, signed_in):
+
+        if not signed_in:
+            return ((
+                '<a href="{}">Sign in</a> to download a copy or find '
+                'out if one is already in place with your organisation.'
+            ).format(pricing_link))
+
+        if self.agreement_signed is None:
+            return ((
+                '<a href="{}">Download the agreement</a> or '
+                '<a href="{}">contact us</a> to find out if we already '
+                'have one in place with your organisation.'
+            ).format(download_link, support_link))
+
+        return (
+            '<a href="{}">Download the agreement</a> '
+            '({} {}).'.format(
+                download_link,
+                self.owner,
+                {
+                    True: 'has already accepted it',
+                    False: 'hasn’t accepted it yet'
+                }.get(self.agreement_signed)
+            )
+        )
 
     @property
     def _acceptance_required(self):
@@ -507,17 +553,6 @@ class AgreementInfo:
         if self.crown_status is None:
             abort(404)
         return self.crown_status
-
-    def as_request_for_agreement(self, with_owner=False):
-        if with_owner and self.owner:
-            return (
-                'Please send me a copy of the GOV.UK Notify data sharing '
-                'and financial agreement for {} to sign.'.format(self.owner)
-            )
-        return (
-            'Please send me a copy of the GOV.UK Notify data sharing '
-            'and financial agreement.'
-        )
 
     @staticmethod
     def get_matching_function(email_address_or_domain):

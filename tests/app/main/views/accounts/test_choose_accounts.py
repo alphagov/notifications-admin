@@ -1,7 +1,8 @@
 import pytest
+from bs4 import BeautifulSoup
 from flask import url_for
 
-from tests.conftest import normalize_spaces
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 SAMPLE_DATA = {
     'organisations': [
@@ -123,3 +124,16 @@ def test_choose_account_should_not_show_back_to_service_link_if_no_service_in_se
     page = client_request.get('main.choose_account')
 
     assert len(page.select('.navigation-service a')) == 0
+
+
+def test_choose_account_should_not_show_back_to_service_link_if_not_signed_in(
+    client,
+    mock_get_service,
+):
+    with client.session_transaction() as session:
+        session['service_id'] = SERVICE_ONE_ID
+    response = client.get(url_for('main.sign_in'))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert page.select_one('h1').text == 'Sign in'  # We’re not signed in
+    assert page.select_one('.navigation-service a') is None

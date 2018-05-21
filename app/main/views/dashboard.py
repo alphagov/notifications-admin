@@ -169,6 +169,37 @@ def usage(service_id):
     )
 
 
+@main.route("/services/<service_id>/ft-usage")
+@login_required
+@user_has_permissions('manage_service')
+def ft_usage(service_id):
+    year, current_financial_year = requested_and_current_financial_year(request)
+
+    free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year)
+    units = billing_api_client.get_billable_units_ft(service_id, year)
+    yearly_usage = billing_api_client.get_service_usage_ft(service_id, year)
+
+    usage_template = 'views/usage.html'
+    if 'letter' in current_service['permissions']:
+        usage_template = 'views/usage-with-letters.html'
+    return render_template(
+        usage_template,
+        months=list(get_free_paid_breakdown_for_billable_units(
+            year,
+            free_sms_allowance,
+            units
+        )),
+        selected_year=year,
+        years=get_tuples_of_financial_years(
+            partial(url_for, '.ft_usage', service_id=service_id),
+            start=current_financial_year - 1,
+            end=current_financial_year + 1,
+        ),
+        **calculate_usage(yearly_usage,
+                          free_sms_allowance)
+    )
+
+
 @main.route("/services/<service_id>/monthly")
 @login_required
 @user_has_permissions('view_activity')
@@ -346,10 +377,13 @@ def get_dashboard_totals(statistics):
 
 
 def calculate_usage(usage, free_sms_fragment_limit):
+    sms_breakdowns = [breakdown for breakdown in usage if breakdown['notification_type'] == 'sms']
+
+    # this relies on the assumption: only one SMS rate per financial year.
+    sms_rate = 0 if len(sms_breakdowns) == 0 else sms_breakdowns[0].get("rate", 0)
+    sms_sent = get_sum_billing_units(sms_breakdowns)
     sms_free_allowance = free_sms_fragment_limit
 
-    sms_rate = 0 if len(usage) == 0 else usage[0].get("rate", 0)
-    sms_sent = get_sum_billing_units(breakdown for breakdown in usage if breakdown['notification_type'] == 'sms')
     emails = [breakdown["billing_units"] for breakdown in usage if breakdown['notification_type'] == 'email']
     emails_sent = 0 if len(emails) == 0 else emails[0]
 

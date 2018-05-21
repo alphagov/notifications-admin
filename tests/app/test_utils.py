@@ -5,10 +5,12 @@ from pathlib import Path
 
 import pytest
 from freezegun import freeze_time
+from notifications_utils.recipients import validate_email_address
 
 from app import format_datetime_relative
 from app.utils import (
     AgreementInfo,
+    GovernmentEmailDomain,
     Spreadsheet,
     email_safe,
     generate_next_dict,
@@ -456,6 +458,8 @@ def test_validate_government_domain_data():
 
     for domain in AgreementInfo.domains.keys():
 
+        validate_email_address('test@{}'.format(domain))
+
         agreement_info = AgreementInfo(domain)
 
         assert agreement_info.crown_status in {
@@ -471,6 +475,12 @@ def test_validate_government_domain_data():
         assert agreement_info.agreement_signed in {
             True, False, None
         }
+
+
+def test_validate_email_domain_data():
+
+    for domain in GovernmentEmailDomain.domains.keys():
+        validate_email_address('test@{}'.format(domain))
 
 
 @pytest.mark.parametrize('time, human_readable_datetime', [

@@ -476,7 +476,7 @@ def send_test_preview(service_id, template_id, filetype):
     return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
 
 
-def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False):
+def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False, write_metadata=False):
 
     try:
         # The happy path is that the job doesn’t already exist, so the
@@ -515,10 +515,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     elif db_template['template_type'] == 'sms':
         sms_sender = get_sms_sender_from_session(service_id)
     template = get_template(
-        service_api_client.get_service_template(
-            service_id,
-            str(template_id),
-        )['data'],
+        db_template,
         current_service,
         show_recipient=True,
         letter_preview_url=url_for(
@@ -561,7 +558,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     elif preview_row > 2:
         abort(404)
 
-    if any(recipients) and not recipients.has_errors:
+    if any(recipients) and not recipients.has_errors and write_metadata:
         set_metadata_on_csv_upload(
             service_id,
             upload_id,
@@ -604,7 +601,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_messages(service_id, template_id, upload_id, row_index=2):
 
-    data = _check_messages(service_id, template_id, upload_id, row_index)
+    data = _check_messages(service_id, template_id, upload_id, row_index, write_metadata=True)
 
     if (
         data['recipients'].too_many_rows or
@@ -642,7 +639,7 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
         abort(404)
 
     template = _check_messages(
-        service_id, template_id, upload_id, row_index, letters_as_pdf=True
+        service_id, template_id, upload_id, row_index, letters_as_pdf=True, write_metadata=False,
     )['template']
     return TemplatePreview.from_utils_template(template, filetype)
 

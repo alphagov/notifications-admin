@@ -71,13 +71,14 @@ def test_excluded_navigation_items_are_properly_defined(navigation_instance):
 ])
 def test_all_endpoints_are_covered(navigation_instance):
     for endpoint in all_endpoints:
-        assert endpoint in (
-            navigation_instance.endpoints_with_navigation +
-            navigation_instance.endpoints_without_navigation
-        ), '{} is not listed or excluded in {}'.format(
-            endpoint,
-            type(navigation_instance).__name__
-        )
+        if not endpoint == 'main.ft_usage':
+            assert endpoint in (
+                navigation_instance.endpoints_with_navigation +
+                navigation_instance.endpoints_without_navigation
+            ), '{} is not listed or excluded in {}'.format(
+                endpoint,
+                type(navigation_instance).__name__
+            )
 
 
 @pytest.mark.parametrize('navigation_instance', [

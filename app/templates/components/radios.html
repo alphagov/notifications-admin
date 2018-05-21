@@ -18,27 +18,32 @@
         {% endif %}
       </legend>
       {% for option in field %}
-        <div class="multiple-choice">
-          <input
-            id="{{ option.id }}" name="{{ option.name }}" type="radio" value="{{ option.data }}"
-            {% if option.data in disable %}
-              disabled
-            {% endif %}
-            {% if option.checked %}
-              checked
-            {% endif %}
-          >
-          <label class="block-label" for="{{ option.id }}">
-            {{ option.label.text }}
-            {% if option_hints[option.data] %}
-              <div class="block-label-hint">
-                {{ option_hints[option.data] }}
-              </div>
-            {% endif %}
-          </label>
-        </div>
+        {{ radio(option, disable, option_hints) }}
       {% endfor %}
     </fieldset>
+  </div>
+{% endmacro %}
+
+
+{% macro radio(option, disable=[], option_hints={}) %}
+  <div class="multiple-choice">
+    <input
+      id="{{ option.id }}" name="{{ option.name }}" type="radio" value="{{ option.data }}"
+      {% if option.data in disable %}
+        disabled
+      {% endif %}
+      {% if option.checked %}
+        checked
+      {% endif %}
+    >
+    <label class="block-label" for="{{ option.id }}">
+      {{ option.label.text }}
+      {% if option_hints[option.data] %}
+        <div class="block-label-hint">
+          {{ option_hints[option.data] }}
+        </div>
+      {% endif %}
+    </label>
   </div>
 {% endmacro %}
 

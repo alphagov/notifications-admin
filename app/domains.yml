@@ -488,6 +488,10 @@ BarnardCastleTownCouncil.gov.uk:
   owner: Barnard Castle Town Council
   crown: false
   agreement_signed: false
+barnet.gov.uk:
+  owner: Barnet London Borough Council
+  crown: false
+  agreement_signed: false  
 barnoldswicktowncouncil.gov.uk:
   owner: Barnoldswick Town Council
   crown: false
@@ -4231,7 +4235,7 @@ sthelens.gov.uk:
 stirling.gov.uk:
   owner: Stirling Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 stives-tc.gov.uk:
   owner: St Ives Town Council - Cornwall
   crown: false
@@ -4799,7 +4803,7 @@ waverley.gov.uk:
 wealden.gov.uk:
   owner: Wealden District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 welfordonavon-pc.gov.uk:
   owner: Stratford-on-Avon District Council
   crown: false
