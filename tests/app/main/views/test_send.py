@@ -615,7 +615,12 @@ def test_upload_valid_csv_shows_preview_and_table(
 
     if expected_link_in_first_row:
         assert page.select_one('.table-field-index a')['href'] == url_for(
-            'main.check_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid, upload_id=fake_uuid, row_index=2
+            'main.check_messages',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            upload_id=fake_uuid,
+            row_index=2,
+            original_file_name='example.csv',
         )
     else:
         assert not page.select_one('.table-field-index').select_one('a')

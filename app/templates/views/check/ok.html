@@ -63,7 +63,7 @@
             {% if (item.index + 2) == preview_row %}
               {{ item.index + 2 }}
             {% else %}
-              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=(item.index + 2)) }}">{{ item.index + 2 }}</a>
+              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=(item.index + 2), original_file_name=original_file_name) }}">{{ item.index + 2 }}</a>
             {% endif %}
           </span>
         {% endcall %}

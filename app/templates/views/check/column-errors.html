@@ -168,7 +168,7 @@
               (not errors or recipients.more_rows_than_can_send) and
               displayed_index != preview_row
             ) %}
-              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=displayed_index) }}">{{ displayed_index }}</a>
+              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=displayed_index, original_file_name=original_file_name) }}">{{ displayed_index }}</a>
             {% else %}
               {{ displayed_index }}
             {% endif %}
