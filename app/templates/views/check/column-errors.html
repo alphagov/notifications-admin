@@ -162,7 +162,16 @@
       ) %}
         {% call index_field() %}
           <span>
-            {{ item.index + 2 }}
+            {% set displayed_index = item.index + 2 %}
+            {% if (
+              trying_to_send_letters_in_trial_mode and
+              (not errors or recipients.more_rows_than_can_send) and
+              displayed_index != preview_row
+            ) %}
+              <a href="{{ url_for('.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=displayed_index) }}">{{ displayed_index }}</a>
+            {% else %}
+              {{ displayed_index }}
+            {% endif %}
           </span>
         {% endcall %}
         {% for column in column_headers %}
