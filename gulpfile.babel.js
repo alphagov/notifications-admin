@@ -92,26 +92,19 @@ gulp.task('javascripts', () => gulp
   .pipe(gulp.dest(paths.dist + 'javascripts/'))
 );
 
-gulp.task('sass', () => {
-  const folders = [
-    '/stylesheets/notify/',
-    '/stylesheets/document-download/'
-  ];
-  var tasks = folders.map(function(element){
-    return gulp.src(paths.src + element + 'main*.scss')
-      .pipe(plugins.prettyerror())
-      .pipe(plugins.sass({
-        outputStyle: 'compressed',
-        includePaths: [
-          paths.npm + 'govuk-elements-sass/public/sass/',
-          paths.toolkit + 'stylesheets/'
-        ]
-      }))
-      .pipe(plugins.base64({baseDir: 'app'}))
-      .pipe(gulp.dest(paths.dist + element))
-  });
-  return merge(tasks);
-});
+gulp.task('sass', () => gulp
+  .src(paths.src + '/stylesheets/main*.scss')
+  .pipe(plugins.prettyerror())
+  .pipe(plugins.sass({
+    outputStyle: 'compressed',
+    includePaths: [
+      paths.npm + 'govuk-elements-sass/public/sass/',
+      paths.toolkit + 'stylesheets/'
+    ]
+  }))
+  .pipe(plugins.base64({baseDir: 'app'}))
+  .pipe(gulp.dest(paths.dist + 'stylesheets/'))
+);
 
 
 // Copy images
