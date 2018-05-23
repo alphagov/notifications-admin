@@ -2288,6 +2288,14 @@ def mock_get_billable_units(mocker):
                 'notification_type': 'letter',
                 'rate': 0.31,
                 'billing_units': 10
+            },
+            {
+                'month': 'February',
+                'international': False,
+                'rate_multiplier': 1,
+                'notification_type': 'letter',
+                'rate': 0.33,
+                'billing_units': 5
             }
         ]
 

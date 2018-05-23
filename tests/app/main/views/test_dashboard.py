@@ -777,11 +777,12 @@ def test_usage_page_with_letters(
     assert 'April' in table
     assert 'February' in table
     assert 'March' in table
-    assert '£18.94' in table
+    assert '£20.59' in table
     assert '140 free text messages' in table
     assert '£20.30' in table
     assert '1,230 text messages at 1.65p' in table
     assert '10 letters at 31p' in table
+    assert '5 letters at 33p' in table
 
 
 def test_usage_page_with_year_argument(

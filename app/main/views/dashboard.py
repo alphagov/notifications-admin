@@ -389,8 +389,8 @@ def calculate_usage(usage, free_sms_fragment_limit):
 
     letters = [(breakdown["billing_units"], breakdown['letter_total']) for breakdown in usage if
                breakdown['notification_type'] == 'letter']
-    letter_sent = 0 if len(letters) == 0 else letters[0][0]
-    letter_cost = 0 if len(letters) == 0 else letters[0][1]
+    letter_sent = sum(row[0] for row in letters)
+    letter_cost = sum(row[1] for row in letters)
 
     return {
         'emails_sent': emails_sent,
