@@ -109,6 +109,7 @@
 {% block footer_support_links %}
   <nav class="footer-nav">
     Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service">Government Digital Service</a>
+    <a href="{{ url_for("main.privacy") }}">Privacy</a>    
     <a href="{{ url_for("main.cookies") }}">Cookies</a>
     {% if current_service.research_mode %}
     <span id="research-mode" class="research-mode">research mode</span>

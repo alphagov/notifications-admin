@@ -41,7 +41,7 @@ def test_logged_in_user_redirects_to_choose_account(
 
 
 @pytest.mark.parametrize('view', [
-    'cookies', 'using_notify', 'pricing', 'terms', 'integration_testing', 'roadmap',
+    'cookies', 'privacy', 'using_notify', 'pricing', 'terms', 'integration_testing', 'roadmap',
     'features', 'callbacks', 'documentation', 'security'
 ])
 def test_static_pages(

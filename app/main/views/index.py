@@ -37,6 +37,11 @@ def cookies():
     return render_template('views/cookies.html')
 
 
+@main.route('/privacy')
+def privacy():
+    return render_template('views/privacy.html')
+
+
 @main.route('/trial-mode')
 def trial_mode():
     return redirect(url_for('.using_notify') + '#trial-mode', 301)
