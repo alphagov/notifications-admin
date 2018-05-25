@@ -33,6 +33,7 @@ from notifications_utils.recipients import (
     format_phone_number_human_readable,
 )
 from notifications_utils.formatters import formatted_list
+from notifications_utils.sanitise_text import SanitiseASCII
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
@@ -493,6 +494,8 @@ def useful_headers_after_request(response):
         del response.headers['Cache-Control']
     response.headers.add(
         'Cache-Control', 'no-store, no-cache, private, must-revalidate')
+    for key, value in response.headers:
+        response.headers[key] = SanitiseASCII.encode(value)
     return response
 
 
