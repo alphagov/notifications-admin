@@ -1,11 +1,11 @@
 import re
 
 from notifications_utils.field import Field
-from notifications_utils.gsm import get_non_gsm_compatible_characters
 from notifications_utils.recipients import (
     InvalidEmailError,
     validate_email_address,
 )
+from notifications_utils.sanitise_text import SanitiseGSM
 from wtforms import ValidationError
 from wtforms.validators import Email
 
@@ -72,7 +72,7 @@ class NoCommasInPlaceHolders:
 
 class OnlyGSMCharacters:
     def __call__(self, form, field):
-        non_gsm_characters = sorted(list(get_non_gsm_compatible_characters(field.data)))
+        non_gsm_characters = sorted(list(SanitiseGSM.get_non_compatible_characters(field.data)))
         if non_gsm_characters:
             raise ValidationError(
                 'You can’t use {} in text messages. {} won’t show up properly on everyone’s phones.'.format(
