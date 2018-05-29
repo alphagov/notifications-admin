@@ -138,7 +138,7 @@ def template_usage(service_id):
     )
 
 
-@main.route("/services/<service_id>/usage")
+@main.route("/services/<service_id>/monthly-billing-usage")
 @login_required
 @user_has_permissions('manage_service')
 def usage(service_id):
@@ -169,7 +169,7 @@ def usage(service_id):
     )
 
 
-@main.route("/services/<service_id>/ft-usage")
+@main.route("/services/<service_id>/usage")
 @login_required
 @user_has_permissions('manage_service')
 def ft_usage(service_id):
