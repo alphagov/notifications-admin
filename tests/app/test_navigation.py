@@ -71,7 +71,7 @@ def test_excluded_navigation_items_are_properly_defined(navigation_instance):
 ])
 def test_all_endpoints_are_covered(navigation_instance):
     for endpoint in all_endpoints:
-        if not endpoint == 'main.ft_usage':
+        if not endpoint == 'main.monthly_billing_usage':
             assert endpoint in (
                 navigation_instance.endpoints_with_navigation +
                 navigation_instance.endpoints_without_navigation
