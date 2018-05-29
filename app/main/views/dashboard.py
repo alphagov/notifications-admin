@@ -141,7 +141,7 @@ def template_usage(service_id):
 @main.route("/services/<service_id>/monthly-billing-usage")
 @login_required
 @user_has_permissions('manage_service')
-def usage(service_id):
+def monthly_billing_usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
 
     free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year)
@@ -160,7 +160,7 @@ def usage(service_id):
         )),
         selected_year=year,
         years=get_tuples_of_financial_years(
-            partial(url_for, '.usage', service_id=service_id),
+            partial(url_for, '.monthly_billing_usage', service_id=service_id),
             start=current_financial_year - 1,
             end=current_financial_year + 1,
         ),
@@ -172,7 +172,7 @@ def usage(service_id):
 @main.route("/services/<service_id>/usage")
 @login_required
 @user_has_permissions('manage_service')
-def ft_usage(service_id):
+def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
 
     free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year)
@@ -191,7 +191,7 @@ def ft_usage(service_id):
         )),
         selected_year=year,
         years=get_tuples_of_financial_years(
-            partial(url_for, '.ft_usage', service_id=service_id),
+            partial(url_for, '.usage', service_id=service_id),
             start=current_financial_year - 1,
             end=current_financial_year + 1,
         ),
