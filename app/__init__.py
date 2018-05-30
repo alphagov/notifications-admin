@@ -529,6 +529,10 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             error_code = 500
         return _error_response(error_code)
 
+    @application.errorhandler(400)
+    def handle_400(error):
+        return _error_response(400)
+
     @application.errorhandler(410)
     def handle_gone(error):
         return _error_response(410)
