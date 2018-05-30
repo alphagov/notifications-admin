@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import uuid
+from datetime import datetime, timedelta
 from functools import partial
 from glob import glob
 from io import BytesIO
@@ -11,6 +12,7 @@ from zipfile import BadZipFile
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import (
@@ -82,10 +84,22 @@ def test_show_correct_title_and_description_for_sender_type(
     template_mock(mocker)
     sender_data(mocker)
 
+    one_off_id = '1234'
+    with client_request.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+
     page = client_request.get(
         '.set_sender',
         service_id=service_one['id'],
-        template_id=fake_uuid
+        template_id=fake_uuid,
+        one_off_id=one_off_id,
     )
 
     assert page.select_one('h1').text == expected_title
@@ -118,10 +132,23 @@ def test_default_sender_is_checked_and_has_hint(
 ):
     template_mock(mocker)
     sender_data(mocker)
+
+    one_off_id = '1234'
+    with client_request.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+
     page = client_request.get(
         '.set_sender',
         service_id=service_one['id'],
-        template_id=fake_uuid
+        template_id=fake_uuid,
+        one_off_id=one_off_id,
     )
 
     assert page.select('.multiple-choice input')[0].has_attr('checked')
@@ -136,10 +163,22 @@ def test_default_inbound_sender_is_checked_and_has_hint_with_default_and_receive
     mock_get_service_template,
     multiple_sms_senders
 ):
+    one_off_id = '1234'
+    with client_request.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+
     page = client_request.get(
         '.set_sender',
         service_id=service_one['id'],
-        template_id=fake_uuid
+        template_id=fake_uuid,
+        one_off_id=one_off_id,
     )
 
     assert page.select('.multiple-choice input')[0].has_attr('checked')
@@ -156,10 +195,22 @@ def test_sms_sender_has_receives_replies_hint(
     mock_get_service_template,
     multiple_sms_senders
 ):
+    one_off_id = '1234'
+    with client_request.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+
     page = client_request.get(
         '.set_sender',
         service_id=service_one['id'],
-        template_id=fake_uuid
+        template_id=fake_uuid,
+        one_off_id=one_off_id,
     )
 
     assert page.select('.multiple-choice input')[0].has_attr('checked')
@@ -189,13 +240,33 @@ def test_sender_session_is_present_after_selected(
 ):
     template_mock(mocker)
     sender_data(mocker)
+
+    one_off_id = '1234'
+    with logged_in_client.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+
     logged_in_client.post(
-        url_for('.set_sender', service_id=service_one['id'], template_id=fake_uuid),
+        url_for(
+            '.set_sender',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            one_off_id=one_off_id,
+        ),
         data={'sender': '1234'}
     )
 
     with logged_in_client.session_transaction() as session:
-        assert session['sender_id'] == '1234'
+        assert session['one_off'][one_off_id]['sender']['sender_id'] == '1234'
 
 
 @pytest.mark.parametrize('template_mock, sender_data', [
@@ -218,14 +289,32 @@ def test_set_sender_redirects_if_no_sender_data(
 ):
     template_mock(mocker)
     sender_data(mocker)
+
+    one_off_id = '1234'
+    with logged_in_client.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+
     response = logged_in_client.get(
-        url_for('.set_sender', service_id=service_one['id'], template_id=fake_uuid)
+        url_for(
+            '.set_sender',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            one_off_id=one_off_id
+        )
     )
     assert response.status_code == 302
     expected_url = url_for(
         '.send_one_off',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         _external=True,
     )
     assert response.location == expected_url
@@ -359,6 +448,7 @@ def test_upload_csvfile_with_errors_shows_check_page_with_errors(
     service_one,
     mocker,
     mock_get_service_template_with_placeholders,
+    multiple_sms_senders,
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -488,6 +578,7 @@ def test_upload_csvfile_with_missing_columns_shows_error(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    multiple_sms_senders,
     service_one,
     fake_uuid,
     file_contents,
@@ -570,6 +661,7 @@ def test_upload_valid_csv_shows_preview_and_table(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
+    multiple_sms_senders,
     fake_uuid,
     extra_args,
     expected_link_in_first_row,
@@ -615,7 +707,12 @@ def test_upload_valid_csv_shows_preview_and_table(
 
     if expected_link_in_first_row:
         assert page.select_one('.table-field-index a')['href'] == url_for(
-            'main.check_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid, upload_id=fake_uuid, row_index=2
+            'main.check_messages',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            upload_id=fake_uuid,
+            row_index=2,
+            original_file_name='example.csv'
         )
     else:
         assert not page.select_one('.table-field-index').select_one('a')
@@ -707,6 +804,7 @@ def test_file_name_truncated_to_fit_in_s3_metadata(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    multiple_sms_senders,
     mock_s3_set_metadata,
     fake_uuid,
 ):
@@ -745,6 +843,7 @@ def test_show_all_columns_if_there_are_duplicate_recipient_columns(
     mocker,
     mock_get_live_service,
     mock_get_service_template_with_placeholders,
+    multiple_sms_senders,
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
@@ -794,6 +893,7 @@ def test_404_for_previewing_a_row_out_of_range(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
+    multiple_sms_senders,
     fake_uuid,
     row_index,
     expected_status,
@@ -828,6 +928,7 @@ def test_send_test_doesnt_show_file_contents(
     mock_s3_upload,
     mock_get_users_by_service,
     mock_get_service_statistics,
+    multiple_sms_senders,
     service_one,
     fake_uuid,
 ):
@@ -837,8 +938,27 @@ def test_send_test_doesnt_show_file_contents(
         07700 900 986
     """)
 
+    one_off_id = '1234'
+    with logged_in_client.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+
     response = logged_in_client.get(
-        url_for('main.send_test', service_id=service_one['id'], template_id=fake_uuid),
+        url_for(
+            'main.send_test',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            one_off_id=one_off_id
+        ),
         follow_redirects=True,
     )
 
@@ -863,6 +983,8 @@ def test_send_test_step_redirects_if_session_not_setup(
     logged_in_client,
     mock_get_service_statistics,
     mock_get_users_by_service,
+    multiple_sms_senders,
+    multiple_reply_to_email_addresses,
     fake_uuid,
     endpoint,
     template_mock,
@@ -871,18 +993,36 @@ def test_send_test_step_redirects_if_session_not_setup(
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        assert 'recipient' not in session
-        assert 'placeholders' not in session
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None,
+                    },
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+        assert 'recipient' not in session['one_off'][one_off_id]
+        assert 'placeholders' not in session['one_off'][one_off_id]
 
     response = logged_in_client.get(
-        url_for(endpoint, service_id=SERVICE_ONE_ID, template_id=fake_uuid, step_index=0),
+        url_for(
+            endpoint,
+            service_id=SERVICE_ONE_ID,
+            one_off_id=one_off_id,
+            template_id=fake_uuid,
+            step_index=0
+        ),
         follow_redirects=True
     )
     assert response.status_code == 200
 
     with logged_in_client.session_transaction() as session:
-        assert session['recipient'] == expected_recipient
+        assert session['one_off'][one_off_id]['recipient'] == expected_recipient
 
 
 def test_send_one_off_does_not_send_without_the_correct_permissions(
@@ -894,10 +1034,24 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     template_id = fake_uuid
     service_one['permissions'] = []
 
-    response = logged_in_client.get(url_for(
-        '.send_one_off',
-        service_id=service_one['id'],
-        template_id=template_id),
+    one_off_id = '1234'
+    with logged_in_client.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+
+    response = logged_in_client.get(
+        url_for(
+            '.send_one_off',
+            service_id=service_one['id'],
+            template_id=template_id,
+            one_off_id=one_off_id
+        ),
         follow_redirects=True)
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
@@ -967,16 +1121,31 @@ def test_send_one_off_or_test_has_correct_page_titles(
     fake_uuid,
     mocker,
     template_mock,
+    multiple_sms_senders,
+    single_reply_to_email_address,
     partial_url,
     expected_h1,
     tour_shown,
 ):
+    one_off_id = '1234'
+    with logged_in_client.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None,
+                    },
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
 
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
     response = logged_in_client.get(
-        partial_url(service_id=service_one['id'], template_id=fake_uuid, step_index=0),
+        partial_url(service_id=service_one['id'], template_id=fake_uuid, one_off_id=one_off_id, step_index=0),
         follow_redirects=True,
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -997,6 +1166,8 @@ def test_send_one_off_has_skip_link(
     service_one,
     fake_uuid,
     mock_get_service_email_template,
+    multiple_sms_senders,
+    single_reply_to_email_address,
     mocker,
     template_mock,
     expected_link_text,
@@ -1005,8 +1176,28 @@ def test_send_one_off_has_skip_link(
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
+    one_off_id = '1234'
+    with logged_in_client.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None,
+                    },
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+
     response = logged_in_client.get(
-        url_for('main.send_one_off_step', service_id=service_one['id'], template_id=fake_uuid, step_index=0),
+        url_for(
+            'main.send_one_off_step',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            one_off_id=one_off_id,
+            step_index=0
+        ),
         follow_redirects=True
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -1019,6 +1210,7 @@ def test_send_one_off_has_skip_link(
         assert skip_links[0]['href'] == expected_link_url(
             service_id=service_one['id'],
             template_id=fake_uuid,
+            one_off_id=one_off_id
         )
     else:
         assert not skip_links
@@ -1032,8 +1224,29 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     active_user_with_permissions
 ):
     active_user_with_permissions.mobile_number = None
+
+    one_off_id = '1234'
+    with logged_in_client.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow()
+                }
+            }
+        })
+
     response = logged_in_client.get(
-        url_for('main.send_one_off_step', service_id=service_one['id'], template_id=fake_uuid, step_index=0),
+        url_for(
+            'main.send_one_off_step',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            one_off_id=one_off_id,
+            step_index=0
+        ),
         follow_redirects=True
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
@@ -1061,14 +1274,23 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
     placeholders,
     expected_redirect,
 ):
-
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session['placeholders'] = placeholders
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow(),
+                    'placeholders': placeholders
+                }
+            }
+        })
 
     response = logged_in_client.get(url_for(
         endpoint,
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         step_index=999,
     ))
 
@@ -1077,6 +1299,7 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
         expected_redirect,
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         _external=True,
     )
     assert response.location == expected_url
@@ -1098,15 +1321,24 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
     endpoint,
     expected_redirect,
 ):
-
+    one_off_id = '1234'
     with logged_in_platform_admin_client.session_transaction() as session:
-        session['send_test_letter_page_count'] = 1
-        session['placeholders'] = {'address_line_1': 'foo'}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow(),
+                    'send_test_letter_page_count': 1,
+                    'placeholders': {'address_line_1': 'foo'}
+                }
+            }
+        })
 
     response = logged_in_platform_admin_client.get(url_for(
         endpoint,
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         step_index=7,  # letter template has 7 placeholders – we’re at the end
     ))
     assert response.status_code == 302
@@ -1114,6 +1346,7 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
         expected_redirect,
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         _external=True,
     )
 
@@ -1134,13 +1367,23 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     expected_redirect,
 ):
 
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session['placeholders'] = {'name': 'foo'}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow(),
+                    'placeholders': {'name': 'foo'}
+                }
+            }
+        })
 
     response = logged_in_client.get(url_for(
         endpoint,
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         step_index=999,
     ))
 
@@ -1149,6 +1392,7 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
         expected_redirect,
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         _external=True,
     )
 
@@ -1188,15 +1432,34 @@ def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     service_one,
     mock_get_service_email_template_without_placeholders,
     mock_s3_upload,
+    multiple_reply_to_email_addresses,
     mock_get_users_by_service,
     mock_get_service_statistics,
     fake_uuid,
 ):
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session['recipient'] = 'foo@bar.com'
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None,
+                    },
+                    'created_at': datetime.utcnow(),
+                    'recipient': 'foo@bar.com'
+                }
+            }
+        })
 
     response = logged_in_client.get(
-        url_for('main.send_test', step_index=0, service_id=service_one['id'], template_id=fake_uuid),
+        url_for(
+            'main.send_test',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            one_off_id=one_off_id,
+            step_index=0
+        ),
         follow_redirects=True
     )
     assert response.status_code == 200
@@ -1211,17 +1474,30 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
     mock_login,
     mock_get_service,
     mock_get_service_template_with_placeholders,
+    multiple_sms_senders,
     fake_uuid,
 ):
 
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        assert 'placeholders' not in session
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow(),
+                }
+            }
+        })
 
     response = logged_in_client.get(
         url_for(
             'main.send_test',
             service_id=service_one['id'],
             template_id=fake_uuid,
+            one_off_id=one_off_id
         ),
         follow_redirects=True,
     )
@@ -1236,7 +1512,7 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
         template_id=fake_uuid,
     )
     with logged_in_client.session_transaction() as session:
-        assert session['recipient'] == '07700 900762'
+        assert session['one_off'][one_off_id]['recipient'] == '07700 900762'
 
 
 def test_send_test_letter_clears_previous_page_cache(
@@ -1248,19 +1524,28 @@ def test_send_test_letter_clears_previous_page_cache(
     mock_get_service_letter_template,
     fake_uuid,
 ):
-
+    one_off_id = '1234'
     with logged_in_platform_admin_client.session_transaction() as session:
-        session['send_test_letter_page_count'] = 'WRONG'
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow(),
+                    'send_test_letter_page_count': 'WRONG'
+                }
+            }
+        })
 
     response = logged_in_platform_admin_client.get(url_for(
         'main.send_test',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id
     ))
     assert response.status_code == 302
 
     with logged_in_platform_admin_client.session_transaction() as session:
-        assert session['send_test_letter_page_count'] is None
+        assert session['one_off'][one_off_id]['send_test_letter_page_count'] is None
 
 
 def test_send_test_letter_redirects_to_right_url(
@@ -1273,23 +1558,36 @@ def test_send_test_letter_redirects_to_right_url(
     mocker,
 ):
 
+    one_off_id = '1234'
     with logged_in_platform_admin_client.session_transaction() as session:
-        session['send_test_letter_page_count'] = 1
-        session['recipient'] = ''
-        session['placeholders'] = {
-            'address line 1': 'foo',
-            'address line 2': 'bar',
-            'address line 3': '',
-            'address line 4': '',
-            'address line 5': '',
-            'address line 6': '',
-            'postcode': 'SW1 1AA',
-        }
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow(),
+                    'send_test_letter_page_count': 1,
+                    'recipient': '',
+                    'placeholders': {
+                        'address line 1': 'foo',
+                        'address line 2': 'bar',
+                        'address line 3': '',
+                        'address line 4': '',
+                        'address line 5': '',
+                        'address line 6': '',
+                        'postcode': 'SW1 1AA',
+                    }
+                }
+            }
+        })
 
     response = logged_in_platform_admin_client.get(url_for(
         'main.send_one_off_step',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         step_index=7,  # letter template has 7 placeholders – we’re at the end
     ))
 
@@ -1310,18 +1608,32 @@ def test_send_test_populates_field_from_session(
     mock_login,
     mock_get_service,
     mock_get_service_template_with_placeholders,
+    multiple_sms_senders,
     fake_uuid,
 ):
-
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session['recipient'] = None
-        session['placeholders'] = {}
-        session['placeholders']['name'] = 'Jo'
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow(),
+                    'recipient': None,
+                    'placeholders': {
+                        'name': 'Jo'
+                    }
+                }
+            }
+        })
 
     response = logged_in_client.get(url_for(
         'main.send_test_step',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         step_index=0,
     ))
     assert response.status_code == 200
@@ -1342,16 +1654,28 @@ def test_send_test_caches_page_count(
 
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
+    one_off_id = '1234'
+    with logged_in_client.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow(),
+                }
+            }
+        })
+
     logged_in_client.get(
         url_for(
             'main.send_test',
             service_id=service_one['id'],
+            one_off_id=one_off_id,
             template_id=fake_uuid,
         ),
         follow_redirects=True,
     )
     with logged_in_client.session_transaction() as session:
-        assert session['send_test_letter_page_count'] == 99
+        assert session['one_off'][one_off_id]['send_test_letter_page_count'] == 99
 
 
 def test_send_test_indicates_optional_address_columns(
@@ -1366,14 +1690,24 @@ def test_send_test_indicates_optional_address_columns(
 
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session['recipient'] = None
-        session['placeholders'] = {}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow(),
+                    'recipient': None,
+                    'placeholders': {}
+                }
+            }
+        })
 
     response = logged_in_client.get(url_for(
         'main.send_test_step',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         step_index=3,
     ))
     assert response.status_code == 200
@@ -1387,6 +1721,7 @@ def test_send_test_indicates_optional_address_columns(
         'main.send_test_step',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         step_index=2,
     )
 
@@ -1403,15 +1738,25 @@ def test_send_test_allows_empty_optional_address_columns(
 
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session['recipient'] = None
-        session['placeholders'] = {}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow(),
+                    'recipient': None,
+                    'placeholders': {}
+                }
+            }
+        })
 
     response = logged_in_client.post(
         url_for(
             'main.send_test_step',
             service_id=service_one['id'],
             template_id=fake_uuid,
+            one_off_id=one_off_id,
             step_index=3,
         ),
         # no data here
@@ -1422,6 +1767,7 @@ def test_send_test_allows_empty_optional_address_columns(
         'main.send_test_step',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         step_index=4,
         _external=True,
     )
@@ -1433,17 +1779,31 @@ def test_send_test_sms_message_puts_submitted_data_in_session(
     mock_get_service_template_with_placeholders,
     mock_get_users_by_service,
     mock_get_service_statistics,
+    multiple_sms_senders,
     fake_uuid,
 ):
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session['recipient'] = '07700 900762'
-        session['placeholders'] = {}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow(),
+                    'recipient': '07700 900762',
+                    'placeholders': {}
+                }
+            }
+        })
 
     response = logged_in_client.post(
         url_for(
             'main.send_test_step',
             service_id=service_one['id'],
             template_id=fake_uuid,
+            one_off_id=one_off_id,
             step_index=0,
         ),
         data={'placeholder_value': 'Jo'}
@@ -1453,12 +1813,13 @@ def test_send_test_sms_message_puts_submitted_data_in_session(
         'main.check_notification',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         _external=True
     )
 
     with logged_in_client.session_transaction() as session:
-        assert session['recipient'] == '07700 900762'
-        assert session['placeholders']['name'] == 'Jo'
+        assert session['one_off'][one_off_id]['recipient'] == '07700 900762'
+        assert session['one_off'][one_off_id]['placeholders']['name'] == 'Jo'
 
 
 @pytest.mark.parametrize('filetype', ['pdf', 'png'])
@@ -1475,6 +1836,7 @@ def test_send_test_works_as_letter_preview(
     service_one['permissions'] = ['letter']
     mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
+
     mocked_preview = mocker.patch(
         'app.main.views.send.TemplatePreview.from_utils_template',
         return_value='foo'
@@ -1482,13 +1844,28 @@ def test_send_test_works_as_letter_preview(
 
     service_id = service_one['id']
     template_id = fake_uuid
+
+    one_off_id = '1234'
     with logged_in_platform_admin_client.session_transaction() as session:
-        session['placeholders'] = {'address_line_1': 'Jo Lastname'}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow(),
+                    'placeholders': {'address_line_1': 'Jo Lastname'}
+                }
+            }
+        })
+
     response = logged_in_platform_admin_client.get(
         url_for(
             'main.send_test_preview',
             service_id=service_id,
             template_id=template_id,
+            one_off_id=one_off_id,
             filetype=filetype
         )
     )
@@ -1512,22 +1889,32 @@ def test_send_test_clears_session(
     template = {'data': {'template_type': 'sms'}}
     mocker.patch('app.service_api_client.get_service_template', return_value=template)
 
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session['recipient'] = '07700900001'
-        session['placeholders'] = {'foo': 'bar'}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender_id': None,
+                    'created_at': datetime.utcnow(),
+                    'recipient': '07700900001',
+                    'placeholders': {'foo': 'bar'}
+                }
+            }
+        })
 
     response = logged_in_client.get(
         url_for(
             'main.send_test',
             service_id=service_one['id'],
             template_id=fake_uuid,
+            one_off_id=one_off_id
         ),
     )
     assert response.status_code == 302
 
     with logged_in_client.session_transaction() as session:
-        assert session['recipient'] is None
-        assert session['placeholders'] == {}
+        assert session['one_off'][one_off_id]['recipient'] is None
+        assert session['one_off'][one_off_id]['placeholders'] == {}
 
 
 def test_download_example_csv(
@@ -1558,6 +1945,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_get_live_service,
     mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
+    multiple_sms_senders,
     service_one,
     fake_uuid,
     mock_s3_upload,
@@ -1590,6 +1978,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     )
 
     content = response.get_data(as_text=True)
+
     assert response.status_code == 200
     assert '07700 900701' in content
     assert '07700 900749' in content
@@ -1609,6 +1998,7 @@ def test_upload_csvfile_with_international_validates(
     logged_in_client,
     mock_get_service_template,
     mock_s3_upload,
+    multiple_sms_senders,
     mock_has_permissions,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -1644,6 +2034,7 @@ def test_test_message_can_only_be_sent_now(
     mock_s3_download,
     mock_get_users_by_service,
     mock_get_service_statistics,
+    multiple_sms_senders,
     mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
     fake_uuid
@@ -1653,6 +2044,7 @@ def test_test_message_can_only_be_sent_now(
         service_id=service_one['id'],
         upload_id=fake_uuid,
         template_id=fake_uuid,
+        one_off_id='1234',
         from_test=True
     )
 
@@ -1679,7 +2071,8 @@ def test_letter_can_only_be_sent_now(
         service_id=service_one['id'],
         upload_id=fake_uuid,
         template_id=fake_uuid,
-        from_test=True
+        from_test=True,
+        one_off_id=fake_uuid
     )
 
     assert 'name="scheduled_for"' not in content
@@ -1875,15 +2268,34 @@ def test_route_permissions(
     route,
     response_code,
 ):
-    validate_route_permission(
+    extra_args = {'one_off_id': fake_uuid} if route == 'main.send_test' else {}
+
+    one_off_id = fake_uuid
+    with client.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow(),
+                    'recipient': '07700900001',
+                    'placeholders': {'name': 'a'}
+                }
+            }
+        })
+
+    validate_route_permission_with_client(
         mocker,
-        app_,
+        client,
         "GET",
         response_code,
         url_for(
             route,
             service_id=service_one['id'],
-            template_id=fake_uuid
+            template_id=fake_uuid,
+            **extra_args
         ),
         ['view_activity', 'send_messages'],
         api_user_active,
@@ -1900,6 +2312,7 @@ def test_route_permissions_send_check_notifications(
     client,
     api_user_active,
     service_one,
+    multiple_sms_senders,
     mock_send_notification,
     mock_get_service_template,
     fake_uuid,
@@ -1907,9 +2320,22 @@ def test_route_permissions_send_check_notifications(
     response_code,
     method
 ):
+    one_off_id = '1234'
     with client.session_transaction() as session:
-        session['recipient'] = '07700900001'
-        session['placeholders'] = {'name': 'a'}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow(),
+                    'recipient': '07700900001',
+                    'placeholders': {'name': 'a'}
+                }
+            }
+        })
+
     validate_route_permission_with_client(
         mocker,
         client,
@@ -1918,7 +2344,8 @@ def test_route_permissions_send_check_notifications(
         url_for(
             route,
             service_id=service_one['id'],
-            template_id=fake_uuid
+            template_id=fake_uuid,
+            one_off_id=one_off_id
         ),
         ['send_messages'],
         api_user_active,
@@ -1946,6 +2373,8 @@ def test_route_invalid_permissions(
     fake_uuid,
     route,
 ):
+    extra_args = {'one_off_id': '1234'} if route == 'main.send_test' else {}
+
     validate_route_permission(
         mocker,
         app_,
@@ -1955,7 +2384,9 @@ def test_route_invalid_permissions(
             route,
             service_id=service_one['id'],
             template_type='sms',
-            template_id=fake_uuid),
+            template_id=fake_uuid,
+            **extra_args
+        ),
         ['blah'],
         api_user_active,
         service_one)
@@ -1976,12 +2407,12 @@ def test_route_invalid_permissions(
         ),
         (
             mock_get_service_letter_template,  # No placeholders
-            dict(from_test=True),
+            dict(from_test=True, one_off_id='1234'),
             partial(url_for, '.send_test')
         ),
         (
             mock_get_service_template_with_placeholders,
-            dict(from_test=True),
+            dict(from_test=True, one_off_id='1234'),
             partial(url_for, '.send_test')
         )
     ]
@@ -1996,6 +2427,7 @@ def test_check_messages_back_link(
     mock_has_permissions,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    multiple_sms_senders,
     mock_s3_download,
     mock_s3_set_metadata,
     fake_uuid,
@@ -2024,9 +2456,14 @@ def test_check_messages_back_link(
     ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert (
-        page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
-    ) == expected_url(service_id=fake_uuid, template_id=fake_uuid)
+    if 'one_off_id' in extra_args:
+        assert (
+            page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
+        ) == expected_url(service_id=fake_uuid, template_id=fake_uuid, one_off_id='1234')
+    else:
+        assert (
+            page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
+        ) == expected_url(service_id=fake_uuid, template_id=fake_uuid)
 
 
 def test_shows_link_to_end_tour(
@@ -2080,6 +2517,7 @@ def test_check_messages_shows_too_many_messages_errors(
     mock_login,
     mock_get_users_by_service,
     mock_get_service,
+    multiple_sms_senders,
     mock_get_service_template,
     mock_get_job_doesnt_exist,
     mock_has_permissions,
@@ -2127,6 +2565,7 @@ def test_check_messages_shows_trial_mode_error(
     logged_in_client,
     mock_get_users_by_service,
     mock_get_service,
+    multiple_sms_senders,
     mock_get_service_template,
     mock_has_permissions,
     mock_get_service_statistics,
@@ -2266,6 +2705,7 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
     mock_get_service_letter_template,
     mock_has_permissions,
     fake_uuid,
+    multiple_reply_to_email_addresses,
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
@@ -2331,6 +2771,7 @@ def test_generate_test_letter_doesnt_block_in_trial_mode(
         upload_id=fake_uuid,
         from_test=True,
         _test_page_title=False,
+        one_off_id=fake_uuid,
     )
 
     assert not page.select('.banner-dangerous')
@@ -2348,6 +2789,7 @@ def test_check_messages_shows_over_max_row_error(
     mock_has_permissions,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    multiple_sms_senders,
     mock_s3_download,
     fake_uuid,
     mocker
@@ -2391,16 +2833,31 @@ def test_check_notification_redirects_if_session_not_populated(
     logged_in_client,
     service_one,
     fake_uuid,
+    multiple_sms_senders,
     existing_session_items,
     mock_get_service_template_with_placeholders
 ):
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session.update(existing_session_items)
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    **existing_session_items,
+                    'created_at': datetime.utcnow(),
+                    'placeholders': {}
+                }
+            }
+        })
 
     resp = logged_in_client.get(url_for(
         'main.check_notification',
         service_id=service_one['id'],
-        template_id=fake_uuid
+        template_id=fake_uuid,
+        one_off_id=one_off_id
     ))
 
     assert resp.location == url_for(
@@ -2421,15 +2878,31 @@ def test_check_notification_redirects_with_help_if_session_not_populated(
     service_one,
     fake_uuid,
     existing_session_items,
+    multiple_sms_senders,
     mock_get_service_template_with_placeholders
 ):
+
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session.update(existing_session_items)
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    **existing_session_items,
+                    'created_at': datetime.utcnow(),
+                    'placeholders': {}
+                }
+            }
+        })
 
     resp = logged_in_client.get(url_for(
         'main.check_notification',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         help='2'
     ))
 
@@ -2437,6 +2910,7 @@ def test_check_notification_redirects_with_help_if_session_not_populated(
         'main.send_test',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         help='2',
         _external=True
     )
@@ -2446,16 +2920,31 @@ def test_check_notification_shows_preview(
     client_request,
     service_one,
     fake_uuid,
+    multiple_sms_senders,
     mock_get_service_template
 ):
+
+    one_off_id = '1234'
     with client_request.session_transaction() as session:
-        session['recipient'] = '07700900001'
-        session['placeholders'] = {}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'recipient': '07700900001',
+                    'created_at': datetime.utcnow(),
+                    'placeholders': {}
+                }
+            }
+        })
 
     page = client_request.get(
         'main.check_notification',
         service_id=service_one['id'],
-        template_id=fake_uuid
+        template_id=fake_uuid,
+        one_off_id=one_off_id
     )
 
     assert page.h1.text.strip() == 'Preview of Two week reminder'
@@ -2469,6 +2958,7 @@ def test_check_notification_shows_preview(
         'main.send_notification',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         help='0'
     )
 
@@ -2476,17 +2966,31 @@ def test_check_notification_shows_preview(
 def test_check_notification_shows_help(
     client_request,
     service_one,
+    multiple_sms_senders,
     fake_uuid,
     mock_get_service_template
 ):
+    one_off_id = '1234'
     with client_request.session_transaction() as session:
-        session['recipient'] = '07700900001'
-        session['placeholders'] = {}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'recipient': '07700900001',
+                    'created_at': datetime.utcnow(),
+                    'placeholders': {}
+                }
+            }
+        })
 
     page = client_request.get(
         'main.check_notification',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         help='2'
     )
     assert page.select_one('.banner-tour')
@@ -2494,12 +2998,14 @@ def test_check_notification_shows_help(
         'main.send_notification',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         help='3'
     )
     assert page.select_one('.page-footer-back-link')['href'] == url_for(
         'main.send_test',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         help='2'
     )
 
@@ -2510,14 +3016,28 @@ def test_send_notification_submits_data(
     fake_uuid,
     mock_send_notification,
 ):
+
+    one_off_id = '1234'
     with client_request.session_transaction() as session:
-        session['recipient'] = '07700900001'
-        session['placeholders'] = {'a': 'b'}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'recipient': '07700900001',
+                    'created_at': datetime.utcnow(),
+                    'placeholders': {'a': 'b'}
+                }
+            }
+        })
 
     client_request.post(
         'main.send_notification',
         service_id=service_one['id'],
-        template_id=fake_uuid
+        template_id=fake_uuid,
+        one_off_id=one_off_id
     )
 
     mock_send_notification.assert_called_once_with(
@@ -2535,31 +3055,58 @@ def test_send_notification_clears_session(
     fake_uuid,
     mock_send_notification,
 ):
+
+    one_off_id = '1234'
     with client_request.session_transaction() as session:
-        session['recipient'] = '07700900001'
-        session['placeholders'] = {'a': 'b'}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'recipient': '07700900001',
+                    'created_at': datetime.utcnow(),
+                    'placeholders': {'a': 'b'}
+                }
+            }
+        })
 
     client_request.post(
         'main.send_notification',
         service_id=service_one['id'],
-        template_id=fake_uuid
+        template_id=fake_uuid,
+        one_off_id=one_off_id
     )
 
     with client_request.session_transaction() as session:
-        assert 'recipient' not in session
-        assert 'placeholders' not in session
+        assert one_off_id not in session['one_off']
 
 
 def test_send_notification_redirects_if_missing_data(
     logged_in_client,
     service_one,
+    multiple_sms_senders,
     fake_uuid,
 ):
+
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session['placeholders'] = {'a': 'b'}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow(),
+                    'placeholders': {'a': 'b'}
+                }
+            }
+        })
 
     resp = logged_in_client.post(
-        url_for('main.send_notification', service_id=service_one['id'], template_id=fake_uuid)
+        url_for('main.send_notification', service_id=service_one['id'], template_id=fake_uuid, one_off_id=one_off_id)
     )
 
     assert resp.status_code == 302
@@ -2567,6 +3114,7 @@ def test_send_notification_redirects_if_missing_data(
         '.send_one_off',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         _external=True
     )
 
@@ -2580,15 +3128,35 @@ def test_send_notification_redirects_to_view_page(
     service_one,
     fake_uuid,
     mock_send_notification,
+    multiple_sms_senders,
     extra_args,
     extra_redirect_args
 ):
+
+    one_off_id = '1234'
     with logged_in_client.session_transaction() as session:
-        session['recipient'] = '07700900001'
-        session['placeholders'] = {'a': 'b'}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow(),
+                    'recipient': '07700900001',
+                    'placeholders': {'a': 'b'}
+                }
+            }
+        })
 
     resp = logged_in_client.post(
-        url_for('main.send_notification', service_id=service_one['id'], template_id=fake_uuid, **extra_args)
+        url_for(
+            'main.send_notification',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            one_off_id=one_off_id,
+            **extra_args
+        )
     )
 
     assert resp.status_code == 302
@@ -2632,6 +3200,7 @@ def test_send_notification_shows_error_if_400(
     fake_uuid,
     mocker,
     mock_get_service_template_with_placeholders,
+    multiple_sms_senders,
     exception_msg,
     expected_h1,
     expected_err_details
@@ -2644,14 +3213,28 @@ def test_send_notification_shows_error_if_400(
         'app.notification_api_client.send_notification',
         side_effect=MockHTTPError(),
     )
+
+    one_off_id = '1234'
     with client_request.session_transaction() as session:
-        session['recipient'] = '07700900001'
-        session['placeholders'] = {'name': 'a' * 500}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow(),
+                    'recipient': '07700900001',
+                    'placeholders': {'name': 'a' * 500}
+                }
+            }
+        })
 
     page = client_request.post(
         'main.send_notification',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         _expected_status=200
     )
 
@@ -2665,6 +3248,7 @@ def test_send_notification_shows_email_error_in_trial_mode(
     fake_uuid,
     mocker,
     mock_get_service_email_template,
+    multiple_reply_to_email_addresses
 ):
     class MockHTTPError(HTTPError):
         message = TRIAL_MODE_MSG
@@ -2674,14 +3258,28 @@ def test_send_notification_shows_email_error_in_trial_mode(
         'app.notification_api_client.send_notification',
         side_effect=MockHTTPError(),
     )
+
+    one_off_id = '1234'
     with client_request.session_transaction() as session:
-        session['recipient'] = 'test@example.com'
-        session['placeholders'] = {'date': 'foo', 'thing': 'bar'}
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow(),
+                    'recipient': 'test@example.com',
+                    'placeholders': {'date': 'foo', 'thing': 'bar'}
+                }
+            }
+        })
 
     page = client_request.post(
         'main.send_notification',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+        one_off_id=one_off_id,
         _expected_status=200,
     )
 
@@ -2697,13 +3295,11 @@ def test_send_notification_shows_email_error_in_trial_mode(
     ('main.check_messages', {
         'template_id': fake_uuid(), 'upload_id': fake_uuid(), 'original_file_name': 'example.csv'
     }),
-    ('main.send_one_off_step', {
-        'template_id': fake_uuid(), 'step_index': 0
-    }),
+    ('main.send_one_off_step', {'template_id': fake_uuid(), 'one_off_id': '1234', 'step_index': 0}),
 ])
 @pytest.mark.parametrize('reply_to_address', [
     None,
-    fake_uuid(),
+    {'id': fake_uuid(), 'name': 'address@example.com'},
 ])
 def test_reply_to_is_previewed_if_chosen(
     client_request,
@@ -2714,7 +3310,7 @@ def test_reply_to_is_previewed_if_chosen(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
-    get_default_reply_to_email_address,
+    multiple_reply_to_email_addresses,
     fake_uuid,
     endpoint,
     extra_args,
@@ -2726,12 +3322,24 @@ def test_reply_to_is_previewed_if_chosen(
     """)
 
     with client_request.session_transaction() as session:
-        session['recipient'] = 'notify@digital.cabinet-office.gov.uk'
-        session['placeholders'] = {}
         session['file_uploads'] = {
             fake_uuid: {'template_id': fake_uuid}
         }
-        session['sender_id'] = reply_to_address
+        if endpoint == 'main.send_one_off_step':
+            one_off_id = extra_args['one_off_id']
+            session.update({
+                'one_off': {
+                    one_off_id: {
+                        'created_at': datetime.utcnow(),
+                        'recipient': 'notify@digital.cabinet-office.gov.uk',
+                        'placeholders': {},
+                        'sender': {
+                            'sender_id': reply_to_address['id'] if reply_to_address else None,
+                            'sender_name': reply_to_address['name'] if reply_to_address else None
+                        }
+                    }
+                }
+            })
 
     page = client_request.get(
         endpoint,
@@ -2741,19 +3349,22 @@ def test_reply_to_is_previewed_if_chosen(
 
     email_meta = page.select_one('.email-message-meta').text
 
-    if reply_to_address:
+    if endpoint == 'main.check_messages':
         assert 'test@example.com' in email_meta
     else:
-        assert 'test@example.com' not in email_meta
+        if reply_to_address:
+            assert 'address@example.com' in email_meta
+        else:
+            assert 'test@example.com' in email_meta
 
 
 @pytest.mark.parametrize('endpoint, extra_args', [
-    ('main.check_messages', {'template_id': fake_uuid(), 'upload_id': fake_uuid()}),
-    ('main.send_one_off_step', {'template_id': fake_uuid(), 'step_index': 0}),
+    ('main.check_messages', {'upload_id': fake_uuid(), 'template_id': fake_uuid()}),
+    ('main.send_one_off_step', {'template_id': fake_uuid(), 'one_off_id': '1234', 'step_index': 0}),
 ])
 @pytest.mark.parametrize('sms_sender', [
     None,
-    fake_uuid(),
+    {'sender_id': fake_uuid(), 'sender_name': 'Sender1'},
 ])
 def test_sms_sender_is_previewed(
     client_request,
@@ -2764,6 +3375,7 @@ def test_sms_sender_is_previewed(
     mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
+    multiple_sms_senders,
     get_default_sms_sender,
     fake_uuid,
     endpoint,
@@ -2775,10 +3387,7 @@ def test_sms_sender_is_previewed(
         phone number,date,thing
         7700900986,foo,bar
     """)
-
     with client_request.session_transaction() as session:
-        session['recipient'] = '7700900986'
-        session['placeholders'] = {}
         session['file_uploads'] = {
             fake_uuid: {
                 'template_id': fake_uuid,
@@ -2786,7 +3395,21 @@ def test_sms_sender_is_previewed(
                 'valid': True
             }
         }
-        session['sender_id'] = sms_sender
+        if endpoint == 'main.send_one_off_step':
+            one_off_id = extra_args['one_off_id']
+            session.update({
+                'one_off': {
+                    one_off_id: {
+                        'created_at': datetime.utcnow(),
+                        'recipient': '7700900986',
+                        'placeholders': {},
+                        'sender': {
+                            'sender_id': sms_sender['sender_id'] if sms_sender else None,
+                            'sender_name': sms_sender['sender_name'] if sms_sender else None
+                        }
+                    }
+                }
+            })
 
     page = client_request.get(
         endpoint,
@@ -2796,10 +3419,13 @@ def test_sms_sender_is_previewed(
 
     sms_sender_on_page = page.select_one('.sms-message-sender')
 
-    if sms_sender:
-        assert sms_sender_on_page.text.strip() == 'From: GOVUK'
+    if endpoint == 'main.check_messages':
+        assert sms_sender_on_page.text.strip() == 'From: Example'
     else:
-        assert not sms_sender_on_page
+        if sms_sender:
+            assert sms_sender_on_page.text.strip() == 'From: Sender1'
+        else:
+            assert sms_sender_on_page.text.strip() == 'From: Example'
 
 
 def test_redirects_to_template_if_job_exists_already(
@@ -2823,3 +3449,64 @@ def test_redirects_to_template_if_job_exists_already(
             _external=True,
         )
     )
+
+
+@freeze_time("2012-01-01 00:00:00")
+def test_one_off_session_is_created_correctly(
+    client_request,
+    fake_uuid,
+    multiple_reply_to_email_addresses,
+    mock_get_service_email_template
+):
+    page = client_request.get(
+        'main.start_one_off_flow',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=200,
+        _follow_redirects=True,
+    )
+
+    with client_request.session_transaction() as session:
+        one_off_session = next(iter(session['one_off'].values()))
+        assert 'created_at', 'sender' in one_off_session
+        assert one_off_session['created_at'] == datetime(2012, 1, 1, 0, 0)
+        assert 'sender_id', 'sender_name' in one_off_session['sender']
+
+    assert page.select_one('h1').text == 'Where should replies come back to?'
+
+
+@pytest.mark.parametrize('time, expected_session_items', [(1, 2), (3, 1)])
+def test_old_one_off_sessions_correctly_clear(
+    client_request,
+    fake_uuid,
+    multiple_reply_to_email_addresses,
+    mock_get_service_email_template,
+    time,
+    expected_session_items
+):
+    one_off_id = '1234'
+    with client_request.session_transaction() as session:
+        session.update({
+            'one_off': {
+                one_off_id: {
+                    'sender': {
+                        'sender_id': None,
+                        'sender_name': None
+                    },
+                    'created_at': datetime.utcnow() - timedelta(hours=time),
+                    'recipient': 'test@example.com',
+                    'placeholders': {'date': 'foo', 'thing': 'bar'}
+                }
+            }
+        })
+
+    client_request.get(
+        'main.start_one_off_flow',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=200,
+        _follow_redirects=True,
+    )
+
+    with client_request.session_transaction() as session:
+        assert len(session['one_off']) == expected_session_items

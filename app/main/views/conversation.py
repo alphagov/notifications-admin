@@ -1,3 +1,6 @@
+import uuid
+from datetime import datetime, timedelta
+
 from flask import jsonify, redirect, render_template, session, url_for
 from flask_login import login_required
 from notifications_python_client.errors import HTTPError
@@ -44,7 +47,6 @@ def conversation_reply(
     service_id,
     notification_id,
 ):
-
     templates = [
         template
         for template in service_api_client.get_service_templates(service_id)['data']
@@ -69,14 +71,36 @@ def conversation_reply_with_template(
     notification_id,
     template_id,
 ):
+    if 'one_off' not in session:
+        session['one_off'] = {}
+    else:
+        session['one_off'] = {
+            k: v for k, v in session['one_off'].items() if v['created_at'] > datetime.utcnow() - timedelta(hours=2)
+        }
 
-    session['recipient'] = get_user_number(service_id, notification_id)
-    session['placeholders'] = {'phone number': session['recipient']}
+    recipient = get_user_number(service_id, notification_id)
+    sms_senders = service_api_client.get_sms_senders(service_id)
+    service_inbound_number = next(
+        (sender for sender in sms_senders if sender['inbound_number_id']), None
+    )
+    one_off_session_id = str(uuid.uuid4())
+    session['one_off'].update({
+        one_off_session_id: {
+            'sender': {
+                'sender_id': service_inbound_number['id'],
+                'sender_name': service_inbound_number['sms_sender']
+            },
+            'created_at': datetime.utcnow(),
+            'recipient': recipient,
+            'placeholders': {'phone number': recipient}
+        }
+    })
 
     return redirect(url_for(
         'main.send_one_off_step',
         service_id=service_id,
         template_id=template_id,
+        one_off_id=one_off_session_id,
         step_index=1,
     ))
 

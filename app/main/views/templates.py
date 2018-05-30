@@ -1,8 +1,17 @@
+import uuid
 from datetime import datetime, timedelta
 from string import ascii_uppercase
 
 from dateutil.parser import parse
-from flask import abort, flash, redirect, render_template, request, url_for
+from flask import (
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_login import current_user, login_required
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
@@ -80,6 +89,21 @@ def start_tour(service_id, template_id):
     if template['template_type'] != 'sms':
         abort(404)
 
+    if 'one_off' not in session:
+        session['one_off'] = {}
+    else:
+        session['one_off'] = {
+            k: v for k, v in session['one_off'].items() if v['created_at'] > datetime.utcnow() - timedelta(hours=2)
+        }
+
+    one_off_session_id = str(uuid.uuid4())
+    session['one_off'].update({
+        one_off_session_id: {
+            'sender_id': None,
+            'created_at': datetime.utcnow(),
+        }
+    })
+
     return render_template(
         'views/templates/start-tour.html',
         template=get_template(
@@ -87,6 +111,7 @@ def start_tour(service_id, template_id):
             current_service,
             show_recipient=True,
         ),
+        one_off_id=one_off_session_id,
         help='1',
     )
 
