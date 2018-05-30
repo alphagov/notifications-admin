@@ -36,6 +36,7 @@ from notifications_utils.formatters import formatted_list
 from notifications_utils.sanitise_text import SanitiseASCII
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
+from werkzeug.routing import RequestRedirect
 
 from app import proxy_fix
 from app.config import configs
@@ -579,6 +580,10 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             message=['Something went wrong, please go back and try again.']
         ), 400)
         return useful_headers_after_request(resp)
+
+    @application.errorhandler(RequestRedirect)
+    def handle_301(error):
+        return error
 
     @application.errorhandler(500)
     @application.errorhandler(Exception)
