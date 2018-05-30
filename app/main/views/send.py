@@ -476,7 +476,7 @@ def send_test_preview(service_id, template_id, filetype):
     return TemplatePreview.from_utils_template(template, filetype, page=request.args.get('page'))
 
 
-def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False, write_metadata=False):
+def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False):
 
     try:
         # The happy path is that the job doesn’t already exist, so the
@@ -558,19 +558,6 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     elif preview_row > 2:
         abort(404)
 
-    if any(recipients) and not recipients.has_errors and write_metadata:
-        set_metadata_on_csv_upload(
-            service_id,
-            upload_id,
-            notification_count=len(recipients),
-            template_id=str(template_id),
-            valid=True,
-            original_file_name=unicode_truncate(
-                request.args.get('original_file_name', ''),
-                1600,
-            ),
-        )
-
     return dict(
         recipients=recipients,
         template=template,
@@ -601,7 +588,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def check_messages(service_id, template_id, upload_id, row_index=2):
 
-    data = _check_messages(service_id, template_id, upload_id, row_index, write_metadata=True)
+    data = _check_messages(service_id, template_id, upload_id, row_index)
 
     if (
         data['recipients'].too_many_rows or
@@ -621,6 +608,18 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
     ):
         return render_template('views/check/column-errors.html', **data)
 
+    set_metadata_on_csv_upload(
+        service_id,
+        upload_id,
+        notification_count=data['count_of_recipients'],
+        template_id=str(template_id),
+        valid=True,
+        original_file_name=unicode_truncate(
+            request.args.get('original_file_name', ''),
+            1600,
+        ),
+    )
+
     return render_template('views/check/ok.html', **data)
 
 
@@ -639,7 +638,7 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
         abort(404)
 
     template = _check_messages(
-        service_id, template_id, upload_id, row_index, letters_as_pdf=True, write_metadata=False,
+        service_id, template_id, upload_id, row_index, letters_as_pdf=True
     )['template']
     return TemplatePreview.from_utils_template(template, filetype)
 
