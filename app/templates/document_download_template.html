@@ -1,0 +1,35 @@
+{% extends "govuk_template.html" %}
+
+{% block head %}
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/document-download.css') }}" />
+  <!--<![endif]-->
+  <style>
+      #global-header-bar { background-color: {{header_colour}} }
+  </style>
+  <!--[if IE 6]>
+  <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main-ie6.css') }}" />
+  <![endif]-->
+  <!--[if IE 7]>
+  <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main-ie7.css') }}" />
+  <![endif]-->
+  <!--[if IE 8]>
+  <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main-ie8.css') }}" />
+  <![endif]-->
+  {% block meta %}
+  {% endblock %}
+{% endblock %}
+
+{% block page_title %}
+	GOV.UK - Document download
+{% endblock %}
+
+{% block content %}
+	<div id="content">
+		<main role="main">
+			{% block fullwidth_content %}{% endblock %}
+		</main>
+	</div>
+{% endblock %}
+
+

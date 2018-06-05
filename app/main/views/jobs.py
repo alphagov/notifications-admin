@@ -339,7 +339,9 @@ def get_job_partials(job, template):
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
     notifications = notification_api_client.get_notifications_for_service(
-        job['service'], job['id'], status=filter_args['status']
+        job['service'],
+        job['id'],
+        status=filter_args['status'],
     )
 
     if template['template_type'] == 'letter':

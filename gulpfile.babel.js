@@ -8,6 +8,7 @@
 import gulp from 'gulp';
 import loadPlugins from 'gulp-load-plugins';
 import stylish from 'jshint-stylish';
+import merge from 'merge-stream'
 
 const plugins = loadPlugins(),
 
