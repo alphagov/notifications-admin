@@ -3,13 +3,15 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-  Change link on ‘Download your document’ page
+  {{ 'Change link on' if 'upload_document' in current_service.permissions else 'Add link for' }} ‘Download your document’ page
 {% endblock %}
 
 {% block maincolumn_content %}
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">Change link on ‘Download your document’ page</h1>
+      <h1 class="heading-large">
+        {{ 'Change link on' if 'upload_document' in current_service.permissions else 'Add link for' }} ‘Download your document’ page
+      </h1>
       <p>
         When you send users a document to download, you need to include a link to your service
         on the download page. This is so users can contact you if there’s a problem (for example,
