@@ -2204,6 +2204,39 @@ def test_service_set_contact_link_does_not_update_invalid_link(
     update_mock.assert_not_called()
 
 
+def test_contact_link_is_displayed_with_upload_document_permission(
+    logged_in_client,
+    service_one,
+    mock_get_service_settings_page_common,
+    mock_get_service_organisation,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+):
+    service_one['permissions'] = ['upload_document']
+    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert 'Contact link' in page.text
+
+
+def test_contact_link_is_not_displayed_without_the_upload_document_permission(
+    logged_in_client,
+    service_one,
+    mock_get_service_settings_page_common,
+    mock_get_service_organisation,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+):
+    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert 'Contact link' not in page.text
+
+
 @pytest.mark.parametrize('endpoint, permissions, expected_p', [
     (
         'main.service_set_inbound_sms',
