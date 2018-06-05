@@ -34,6 +34,7 @@ from app.main.forms import (
     OrganisationTypeForm,
     RenameServiceForm,
     RequestToGoLiveForm,
+    ServiceContactLinkForm,
     ServiceEditInboundNumberForm,
     ServiceInboundNumberForm,
     ServiceLetterContactBlockForm,
@@ -364,6 +365,25 @@ def resume_service(service_id):
     else:
         flash("This will resume the service. New api key are required for this service to use the API.", 'resume')
         return service_settings(service_id)
+
+
+@main.route("/services/<service_id>/service-settings/contact-link", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def service_set_contact_link(service_id):
+    form = ServiceContactLinkForm()
+
+    if request.method == 'GET':
+        form.url.data = current_service.get('contact_link')
+
+    if form.validate_on_submit():
+        service_api_client.update_service(
+            current_service['id'],
+            contact_link=form.url.data
+        )
+        return redirect(url_for('.service_settings', service_id=current_service['id']))
+
+    return render_template('views/service-settings/contact_link.html', form=form)
 
 
 @main.route("/services/<service_id>/service-settings/set-email", methods=['GET'])

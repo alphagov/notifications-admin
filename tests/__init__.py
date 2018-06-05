@@ -145,6 +145,7 @@ def service_json(
     permissions=None,
     organisation_type='central',
     prefix_sms=True,
+    contact_link=None,
 ):
     if users is None:
         users = []
