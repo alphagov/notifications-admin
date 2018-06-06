@@ -84,6 +84,7 @@ class HeaderNavigation(Navigation):
             'update_email_branding',
             'view_provider',
             'view_providers',
+            'platform_admin_list_complaints',
         },
         'sign-in': {
             'sign_in',
@@ -418,6 +419,7 @@ class MainNavigation(Navigation):
         'organisation_settings',
         'organisations',
         'platform_admin',
+        'platform_admin_list_complaints',
         'pricing',
         'privacy',
         'public_agreement',
@@ -586,6 +588,7 @@ class OrgNavigation(Navigation):
         'old_using_notify',
         'organisations',
         'platform_admin',
+        'platform_admin_list_complaints',
         'pricing',
         'privacy',
         'public_agreement',

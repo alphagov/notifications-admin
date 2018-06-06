@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import render_template, request
 from flask_login import login_required
 
-from app import service_api_client
+from app import complaint_api_client, service_api_client
 from app.main import main
 from app.main.forms import DateFilterForm
 from app.statistics_utils import get_formatted_percentage
@@ -67,6 +67,18 @@ def platform_admin_services():
             'Trial mode' if request.endpoint == 'main.trial_services' else 'Live'
         ),
         global_stats=create_global_stats(services),
+    )
+
+
+@main.route("/platform-admin/complaints")
+@login_required
+@user_is_platform_admin
+def platform_admin_list_complaints():
+    complaints = complaint_api_client.get_all_complaints()
+    return render_template(
+        'views/platform-admin/complaints.html',
+        complaints=complaints,
+        page_title='All Complaints',
     )
 
 
