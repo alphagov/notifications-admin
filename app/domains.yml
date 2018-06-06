@@ -1031,7 +1031,7 @@ carltoncolvilletowncouncil.gov.uk:
 carmarthenshire.gov.uk:
   owner: Carmarthenshire County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 carmarthentowncouncil.gov.uk:
   owner: Carmarthenshire County Council
   crown: false
