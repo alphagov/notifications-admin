@@ -666,4 +666,4 @@ def test_platform_admin_list_complaints(
     assert response.status_code == 200
     resp_data = response.get_data(as_text=True)
     assert 'Email complaints' in resp_data
-    mock.assert_called_once()
+    assert mock.called
