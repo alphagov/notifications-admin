@@ -1,0 +1,36 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/table.html" import list_table, field, text_field, link_field, right_aligned_field_heading, hidden_field_heading %}
+
+{% block per_page_title %}
+  {{ page_title|capitalize }}
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-large">
+    Email complaints
+  </h1>
+
+
+  {% call(item, row_number) list_table(
+      complaints,
+      caption="Complaints",
+      caption_visible=False,
+      empty_message='No complaints',
+      field_headings=['Notification Id', 'Service', 'Complaint type', 'Complaint Date'],
+      field_headings_visible=True
+  ) %}
+
+      {{ link_field(item.notification_id, url_for('main.view_notification', service_id=item.service_id, notification_id=item.notification_id)) }}
+
+      {{ link_field(item.service_name, url_for('main.service_dashboard', service_id=item.service_id)) }}
+
+      {{ text_field(item.complaint_type) }}
+
+      {{ text_field(item.complaint_date|format_datetime_short) }}
+
+  {% endcall %}
+
+
+{% endblock %}

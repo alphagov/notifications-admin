@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from unittest.mock import ANY
 
 import pytest
@@ -637,3 +638,32 @@ def test_sum_service_usage_with_zeros(fake_uuid):
         sms_failed=0
     )
     assert sum_service_usage(service) == 0
+
+
+def test_platform_admin_list_complaints(
+        client,
+        platform_admin_user,
+        mocker
+):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    complaint = {
+        'id': str(uuid.uuid4()),
+        'notification_id': str(uuid.uuid4()),
+        'service_id': str(uuid.uuid4()),
+        'service_name': 'Sample service',
+        'ses_feedback_id': 'Some ses id',
+        'complaint_type': 'abuse',
+        'complaint_date': '2018-06-05T13:50:30.012354',
+        'created_at': '2018-06-05T13:50:30.012354',
+    }
+    mock = mocker.patch('app.complaint_api_client.get_all_complaints',
+                        return_value=[complaint])
+
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin_list_complaints'))
+
+    assert response.status_code == 200
+    resp_data = response.get_data(as_text=True)
+    assert 'Email complaints' in resp_data
+    mock.assert_called_once()
