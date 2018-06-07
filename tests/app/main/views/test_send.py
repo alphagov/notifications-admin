@@ -615,7 +615,12 @@ def test_upload_valid_csv_shows_preview_and_table(
 
     if expected_link_in_first_row:
         assert page.select_one('.table-field-index a')['href'] == url_for(
-            'main.check_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid, upload_id=fake_uuid, row_index=2
+            'main.check_messages',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            upload_id=fake_uuid,
+            row_index=2,
+            original_file_name='example.csv',
         )
     else:
         assert not page.select_one('.table-field-index').select_one('a')
@@ -2168,7 +2173,8 @@ def test_check_messages_shows_trial_mode_error(
 ])
 @pytest.mark.parametrize('number_of_rows, expected_error_message', [
     (1, 'You can’t send this letter'),
-    (111, 'You can’t send these letters'),
+    (11, 'You can’t send these letters'),  # Less than trial mode limit
+    (111, 'You can’t send these letters'),  # More than trial mode limit
 ])
 def test_check_messages_shows_trial_mode_error_for_letters(
     client_request,
@@ -2219,6 +2225,9 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     else:
         assert not error
 
+    if number_of_rows > 1:
+        assert page.select_one('.table-field-index a').text == '3'
+
 
 def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     mocker,
@@ -2233,6 +2242,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
 
     mocker.patch('app.main.views.send.s3download', return_value='\n'.join(
         ['address_line_1,address_line_2,postcode,'] +
+        ['              ,              ,11SW1 1AA'] +
         ['              ,              ,11SW1 1AA']
     ))
 
@@ -2255,9 +2265,10 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         'There is a problem with example.xlsx '
-        'You need to enter missing data in 1 row '
+        'You need to enter missing data in 2 rows '
         'Skip to file contents'
     )
+    assert not page.select('.table-field-index a')
 
 
 def test_check_messages_column_error_doesnt_show_optional_columns(
