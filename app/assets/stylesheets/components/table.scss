@@ -265,3 +265,9 @@ a.table-show-more-link {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
