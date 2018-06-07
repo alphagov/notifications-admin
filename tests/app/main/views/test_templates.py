@@ -1241,6 +1241,28 @@ def test_should_show_hint_once_template_redacted(
     assert page.select('.hint')[0].text == 'Personalisation is hidden after sending'
 
 
+def test_should_not_show_redaction_stuff_for_letters(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_get_service_letter_template,
+    single_letter_contact_block,
+):
+
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
+
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert page.select('.hint') == []
+    assert 'personalisation' not in ' '.join(
+        link.text.lower() for link in page.select('a')
+    )
+
+
 def test_set_template_sender(
     client_request,
     fake_uuid,
