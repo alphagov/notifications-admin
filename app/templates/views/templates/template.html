@@ -70,12 +70,14 @@
         </span>
         &emsp;
       {% endif %}
-      {% if not template._template.redact_personalisation %}
-        <span class="page-footer-delete-link page-footer-delete-link-without-button">
-          <a href="{{ url_for('.confirm_redact_template', service_id=current_service.id, template_id=template.id) }}">Hide personalisation after sending</a>
-        </span>
-      {% else %}
-        <p class="hint">Personalisation is hidden after sending</p>
+      {% if template.template_type != 'letter' %}
+        {% if not template._template.redact_personalisation %}
+          <span class="page-footer-delete-link page-footer-delete-link-without-button">
+            <a href="{{ url_for('.confirm_redact_template', service_id=current_service.id, template_id=template.id) }}">Hide personalisation after sending</a>
+          </span>
+        {% else %}
+          <p class="hint">Personalisation is hidden after sending</p>
+        {% endif %}
       {% endif %}
     {% endif %}
   </div>
