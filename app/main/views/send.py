@@ -15,6 +15,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
+from notifications_utils.columns import Columns
 from notifications_utils.recipients import (
     RecipientCSV,
     first_column_headings,
@@ -79,7 +80,16 @@ def get_example_csv_rows(template, use_example_as_example=True, submitted_fields
             )
             for key in first_column_headings['letter']
         ]
-    }[template.template_type] + get_example_csv_fields(template.placeholders, use_example_as_example, submitted_fields)
+    }[template.template_type] + get_example_csv_fields(
+        (
+            placeholder for placeholder in template.placeholders
+            if placeholder not in Columns.from_keys(
+                first_column_headings[template.template_type]
+            )
+        ),
+        use_example_as_example,
+        submitted_fields
+    )
 
 
 def get_example_letter_address(key):
@@ -155,7 +165,7 @@ def send_messages(service_id, template_id):
                 form.file.data.filename
             ))
 
-    column_headings = first_column_headings[template.template_type] + list(template.placeholders)
+    column_headings = get_spreadsheet_column_headings_from_template(template)
 
     return render_template(
         'views/send.html',
@@ -174,7 +184,7 @@ def get_example_csv(service_id, template_id):
         service_api_client.get_service_template(service_id, template_id)['data'], current_service
     )
     return Spreadsheet.from_rows([
-        first_column_headings[template.template_type] + list(template.placeholders),
+        get_spreadsheet_column_headings_from_template(template),
         get_example_csv_rows(template)
     ]).as_csv_data, 200, {
         'Content-Type': 'text/csv; charset=utf-8',
@@ -883,3 +893,15 @@ def get_sms_sender_from_session(service_id):
         return service_api_client.get_sms_sender(
             service_id=service_id, sms_sender_id=session['sender_id']
         )['sms_sender']
+
+
+def get_spreadsheet_column_headings_from_template(template):
+    column_headings = []
+
+    for column_heading in (
+        first_column_headings[template.template_type] + list(template.placeholders)
+    ):
+        if column_heading not in Columns.from_keys(column_headings):
+            column_headings.append(column_heading)
+
+    return column_headings
