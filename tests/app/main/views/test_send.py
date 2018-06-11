@@ -262,6 +262,25 @@ def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
     )
 
 
+def test_example_spreadsheet(
+    client_request,
+    mock_get_service_template_with_placeholders_same_as_recipient,
+    fake_uuid,
+):
+
+    page = client_request.get(
+        '.send_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid
+    )
+
+    assert normalize_spaces(
+        page.select_one('tbody tr').text
+    ) == (
+        '1 phone number name date'
+    )
+
+
 @pytest.mark.parametrize(
     "filename, acceptable_file",
     list(zip(test_spreadsheet_files, repeat(True))) +
@@ -1541,7 +1560,7 @@ def test_download_example_csv(
     api_user_active,
     mock_login,
     mock_get_service,
-    mock_get_service_template,
+    mock_get_service_template_with_placeholders_same_as_recipient,
     mock_has_permissions,
     fake_uuid
 ):
@@ -1551,7 +1570,10 @@ def test_download_example_csv(
         follow_redirects=True
     )
     assert response.status_code == 200
-    assert response.get_data(as_text=True) == 'phone number\r\n07700 900321\r\n'
+    assert response.get_data(as_text=True) == (
+        'phone number,name,date\r\n'
+        '07700 900321,example,example\r\n'
+    )
     assert 'text/csv' in response.headers['Content-Type']
 
 
