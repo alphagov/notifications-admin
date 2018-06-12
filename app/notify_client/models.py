@@ -7,22 +7,15 @@ roles = {
     'send_messages': ['send_texts', 'send_emails', 'send_letters'],
     'manage_templates': ['manage_templates'],
     'manage_service': ['manage_users', 'manage_settings'],
-    'manage_api_keys': ['manage_api_keys']
+    'manage_api_keys': ['manage_api_keys'],
+    'view_activity': ['view_activity'],
 }
 
-# same dict as above, but flipped round (and with view_activity)
+# same dict as above, but flipped round
 roles_by_permission = {
-    'send_texts': 'send_messages',
-    'send_emails': 'send_messages',
-    'send_letters': 'send_messages',
-
-    'manage_users': 'manage_service',
-    'manage_settings': 'manage_service',
-
-    'manage_templates': 'manage_templates',
-
-    'manage_api_keys': 'manage_api_keys',
-    'view_activity': 'view_activity',
+    permission: next(
+        role for role, permissions in roles.items() if permission in permissions
+    ) for permission in chain(*list(roles.values()))
 }
 
 all_permissions = set(roles_by_permission.values())
