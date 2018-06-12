@@ -31,6 +31,8 @@ from tests import (
 )
 from tests.conftest import (
     SERVICE_ONE_ID,
+    active_caseworking_user,
+    active_user_with_permissions,
     fake_uuid,
     mock_get_international_service,
     mock_get_live_service,
@@ -49,6 +51,8 @@ from tests.conftest import (
 )
 
 template_types = ['email', 'sms']
+
+unchanging_fake_uuid = uuid.uuid4()
 
 # The * ignores hidden files, eg .DS_Store
 test_spreadsheet_files = glob(path.join('tests', 'spreadsheet_files', '*'))
@@ -845,6 +849,10 @@ def test_404_for_previewing_a_row_out_of_range(
     )
 
 
+@pytest.mark.parametrize('user', (
+    active_user_with_permissions,
+    active_caseworking_user,
+))
 def test_send_test_doesnt_show_file_contents(
     logged_in_client,
     mocker,
@@ -854,8 +862,9 @@ def test_send_test_doesnt_show_file_contents(
     mock_get_service_statistics,
     service_one,
     fake_uuid,
+    user,
 ):
-
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     mocker.patch('app.main.views.send.s3download', return_value="""
         phone number
         07700 900 986
@@ -874,13 +883,49 @@ def test_send_test_doesnt_show_file_contents(
     assert page.select_one('button[type=submit]').text.strip() == 'Send 1 text message'
 
 
-@pytest.mark.parametrize('endpoint, template_mock, expected_recipient', [
-    ('main.send_test_step', mock_get_service_template_with_placeholders, '07700 900762'),
-    ('main.send_test_step', mock_get_service_email_template, 'test@user.gov.uk'),
-    ('main.send_test_step', mock_get_service_letter_template, None),
-    ('main.send_one_off_step', mock_get_service_template, None),
-    ('main.send_one_off_step', mock_get_service_email_template, None),
-    ('main.send_one_off_step', mock_get_service_letter_template, None),
+@pytest.mark.parametrize('user, endpoint, template_mock, expected_recipient', [
+    (
+        active_user_with_permissions,
+        'main.send_test_step',
+        mock_get_service_template_with_placeholders,
+        '07700 900762'
+    ),
+    (
+        active_user_with_permissions,
+        'main.send_test_step',
+        mock_get_service_email_template,
+        'test@user.gov.uk'
+    ),
+    (
+        active_caseworking_user,
+        'main.send_test_step',
+        mock_get_service_email_template,
+        'caseworker@example.gov.uk'
+    ),
+    (
+        active_user_with_permissions,
+        'main.send_test_step',
+        mock_get_service_letter_template,
+        None
+    ),
+    (
+        active_user_with_permissions,
+        'main.send_one_off_step',
+        mock_get_service_template,
+        None
+    ),
+    (
+        active_user_with_permissions,
+        'main.send_one_off_step',
+        mock_get_service_email_template,
+        None
+    ),
+    (
+        active_user_with_permissions,
+        'main.send_one_off_step',
+        mock_get_service_letter_template,
+        None
+    ),
 ])
 def test_send_test_step_redirects_if_session_not_setup(
     mocker,
@@ -891,7 +936,9 @@ def test_send_test_step_redirects_if_session_not_setup(
     endpoint,
     template_mock,
     expected_recipient,
+    user,
 ):
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
@@ -935,6 +982,10 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     )
 
 
+@pytest.mark.parametrize('user', (
+    active_user_with_permissions,
+    active_caseworking_user,
+))
 @pytest.mark.parametrize('template_mock, partial_url, expected_h1, tour_shown', [
     (
         mock_get_service_template_with_placeholders,
@@ -994,8 +1045,9 @@ def test_send_one_off_or_test_has_correct_page_titles(
     partial_url,
     expected_h1,
     tour_shown,
+    user,
 ):
-
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
@@ -1011,6 +1063,10 @@ def test_send_one_off_or_test_has_correct_page_titles(
     assert (len(page.select('.banner-tour')) == 1) == tour_shown
 
 
+@pytest.mark.parametrize('user', (
+    active_user_with_permissions,
+    active_caseworking_user,
+))
 @pytest.mark.parametrize('template_mock, expected_link_text, expected_link_url', [
     (mock_get_service_template, 'Use my phone number', partial(url_for, 'main.send_test')),
     (mock_get_service_email_template, 'Use my email address', partial(url_for, 'main.send_test')),
@@ -1025,7 +1081,9 @@ def test_send_one_off_has_skip_link(
     template_mock,
     expected_link_text,
     expected_link_url,
+    user,
 ):
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     template_mock(mocker)
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=99)
 
@@ -1048,14 +1106,21 @@ def test_send_one_off_has_skip_link(
         assert not skip_links
 
 
+@pytest.mark.parametrize('user', (
+    active_user_with_permissions,
+    active_caseworking_user,
+))
 def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     logged_in_client,
     service_one,
     fake_uuid,
     mock_get_service_template,
-    active_user_with_permissions
+    mocker,
+    user,
 ):
-    active_user_with_permissions.mobile_number = None
+    user = user(fake_uuid)
+    user.mobile_number = None
+    mocker.patch('app.user_api_client.get_user', return_value=user)
     response = logged_in_client.get(
         url_for('main.send_one_off_step', service_id=service_one['id'], template_id=fake_uuid, step_index=0),
         follow_redirects=True
@@ -1065,6 +1130,10 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     assert not skip_links
 
 
+@pytest.mark.parametrize('user', (
+    active_user_with_permissions,
+    active_caseworking_user,
+))
 @pytest.mark.parametrize('endpoint, expected_redirect, placeholders', [
     (
         'main.send_test_step',
@@ -1084,7 +1153,10 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
     endpoint,
     placeholders,
     expected_redirect,
+    mocker,
+    user,
 ):
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
 
     with logged_in_client.session_transaction() as session:
         session['placeholders'] = placeholders
@@ -1106,6 +1178,10 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
     assert response.location == expected_url
 
 
+@pytest.mark.parametrize('user', (
+    active_user_with_permissions,
+    active_caseworking_user,
+))
 @pytest.mark.parametrize('endpoint, expected_redirect', [
     ('main.send_test_step', 'main.send_test'),
     ('main.send_one_off_step', 'main.send_one_off'),
@@ -1121,7 +1197,9 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
     mocker,
     endpoint,
     expected_redirect,
+    user,
 ):
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
 
     with logged_in_platform_admin_client.session_transaction() as session:
         session['send_test_letter_page_count'] = 1
@@ -1142,6 +1220,10 @@ def test_send_test_redirects_to_start_if_you_skip_steps(
     )
 
 
+@pytest.mark.parametrize('user', (
+    active_user_with_permissions,
+    active_caseworking_user,
+))
 @pytest.mark.parametrize('endpoint, expected_redirect', [
     ('main.send_test_step', 'main.send_test'),
     ('main.send_one_off_step', 'main.send_one_off'),
@@ -1156,8 +1238,10 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     mock_get_service_statistics,
     endpoint,
     expected_redirect,
+    mocker,
+    user,
 ):
-
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     with logged_in_client.session_transaction() as session:
         session['placeholders'] = {'name': 'foo'}
 
@@ -1177,6 +1261,10 @@ def test_send_test_redirects_to_start_if_index_out_of_bounds_and_some_placeholde
     )
 
 
+@pytest.mark.parametrize('user', (
+    active_user_with_permissions,
+    active_caseworking_user,
+))
 @pytest.mark.parametrize('endpoint, expected_redirect', [
     ('main.send_test', 'main.send_test_step'),
     ('main.send_one_off', 'main.send_one_off_step'),
@@ -1188,7 +1276,9 @@ def _redirects_with_help_argument(
     fake_uuid,
     endpoint,
     expected_redirect,
+    user,
 ):
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     template = {'data': {'template_type': 'sms'}}
     mocker.patch('app.service_api_client.get_service_template', return_value=template)
 
@@ -1206,6 +1296,10 @@ def _redirects_with_help_argument(
     )
 
 
+@pytest.mark.parametrize('user', (
+    active_user_with_permissions,
+    active_caseworking_user,
+))
 def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     logged_in_client,
     mocker,
@@ -1215,7 +1309,10 @@ def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     mock_get_users_by_service,
     mock_get_service_statistics,
     fake_uuid,
+    user,
 ):
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+
     with logged_in_client.session_transaction() as session:
         session['recipient'] = 'foo@bar.com'
 
@@ -1228,6 +1325,10 @@ def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     assert page.select('h1')[0].text.strip() == 'Preview of Two week reminder'
 
 
+@pytest.mark.parametrize('user, expected_back_link_endpoint, extra_args', (
+    (active_user_with_permissions, 'main.view_template', {'template_id': unchanging_fake_uuid}),
+    (active_caseworking_user, 'main.view_template', {'template_id': unchanging_fake_uuid}),
+))
 def test_send_test_sms_message_with_placeholders_shows_first_field(
     logged_in_client,
     mocker,
@@ -1236,7 +1337,11 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
     mock_get_service,
     mock_get_service_template_with_placeholders,
     fake_uuid,
+    user,
+    expected_back_link_endpoint,
+    extra_args,
 ):
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
 
     with logged_in_client.session_transaction() as session:
         assert 'placeholders' not in session
@@ -1245,7 +1350,7 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
         url_for(
             'main.send_test',
             service_id=service_one['id'],
-            template_id=fake_uuid,
+            template_id=unchanging_fake_uuid,
         ),
         follow_redirects=True,
     )
@@ -1255,9 +1360,9 @@ def test_send_test_sms_message_with_placeholders_shows_first_field(
     assert page.select('label')[0].text.strip() == 'name'
     assert page.select('input')[0]['name'] == 'placeholder_value'
     assert page.select('.page-footer-back-link')[0]['href'] == url_for(
-        'main.view_template',
+        expected_back_link_endpoint,
         service_id=service_one['id'],
-        template_id=fake_uuid,
+        **extra_args
     )
     with logged_in_client.session_transaction() as session:
         assert session['recipient'] == '07700 900762'
@@ -2494,7 +2599,11 @@ def test_check_notification_shows_preview(
     assert page.h1.text.strip() == 'Preview of Two week reminder'
     assert (
         page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
-    ) == url_for('main.view_template', service_id=service_one['id'], template_id=fake_uuid)
+    ) == url_for(
+        'main.view_template',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+    )
 
     # assert tour not visible
     assert not page.select('.banner-tour')

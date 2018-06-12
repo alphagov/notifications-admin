@@ -1,18 +1,32 @@
 import pytest
 
-from app.navigation import HeaderNavigation, MainNavigation, OrgNavigation
-from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, app_
+from app.navigation import (
+    CaseworkNavigation,
+    HeaderNavigation,
+    MainNavigation,
+    OrgNavigation,
+)
+from tests.conftest import (
+    ORGANISATION_ID,
+    SERVICE_ONE_ID,
+    active_caseworking_user,
+    app_,
+    normalize_spaces,
+)
 
 all_endpoints = [
     rule.endpoint for rule in next(app_(None)).url_map.iter_rules()
 ]
 
-
-@pytest.mark.parametrize('navigation_instance', [
+navigation_instances = (
     MainNavigation(),
     HeaderNavigation(),
     OrgNavigation(),
-])
+    CaseworkNavigation(),
+)
+
+
+@pytest.mark.parametrize('navigation_instance', navigation_instances)
 def test_navigation_items_are_properly_defined(navigation_instance):
     for endpoint in navigation_instance.endpoints_with_navigation:
         assert (
@@ -36,11 +50,7 @@ def test_navigation_items_are_properly_defined(navigation_instance):
         )
 
 
-@pytest.mark.parametrize('navigation_instance', [
-    MainNavigation(),
-    HeaderNavigation(),
-    OrgNavigation(),
-])
+@pytest.mark.parametrize('navigation_instance', navigation_instances)
 def test_excluded_navigation_items_are_properly_defined(navigation_instance):
     for endpoint in navigation_instance.endpoints_without_navigation:
         assert (
@@ -64,11 +74,7 @@ def test_excluded_navigation_items_are_properly_defined(navigation_instance):
         )
 
 
-@pytest.mark.parametrize('navigation_instance', [
-    MainNavigation(),
-    HeaderNavigation(),
-    OrgNavigation(),
-])
+@pytest.mark.parametrize('navigation_instance', navigation_instances)
 def test_all_endpoints_are_covered(navigation_instance):
     for endpoint in all_endpoints:
         if not endpoint == 'main.monthly_billing_usage':
@@ -81,11 +87,7 @@ def test_all_endpoints_are_covered(navigation_instance):
             )
 
 
-@pytest.mark.parametrize('navigation_instance', [
-    MainNavigation(),
-    HeaderNavigation(),
-    OrgNavigation(),
-])
+@pytest.mark.parametrize('navigation_instance', navigation_instances)
 @pytest.mark.xfail(raises=KeyError)
 def test_raises_on_invalid_navigation_item(
     client_request, navigation_instance
@@ -143,3 +145,19 @@ def test_a_page_should_nave_selected_org_navigation_item(
     selected_nav_items = page.select('.navigation a.selected')
     assert len(selected_nav_items) == 1
     assert selected_nav_items[0].text.strip() == selected_nav_item
+
+
+def test_caseworkers_get_caseworking_navigation(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_get_service_templates,
+):
+    mocker.patch(
+        'app.user_api_client.get_user',
+        return_value=active_caseworking_user(fake_uuid)
+    )
+    page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
+    assert normalize_spaces(page.select_one('#content nav').text) == (
+        'Send a message'
+    )

@@ -1,53 +1,11 @@
-{% from "components/banner.html" import banner_wrapper %}
-
 {% if help %}
-  {% call banner_wrapper(type='tour') %}
-      <p class="heading-medium">Try sending yourself this example</p>
-      <div class="grid-row bottom-gutter {% if help != '1' %}greyed-out-step{% endif %}">
-        <div class="column-one-sixth">
-          <p class="heading-large" style="float: left;">1.</p>
-        </div>
-        <div class="column-five-sixths">
-          <p>
-            Every message is sent from a template
-          </p>
-        </div>
-      </div>
-      <div class="grid-row bottom-gutter {% if help != '2' %}greyed-out-step{% endif %}">
-        <div class="column-one-sixth">
-          <p class="heading-large">2.</p>
-        </div>
-        <div class="column-five-sixths">
-          <p>
-            The template pulls in the data you provide
-          </p>
-        </div>
-      </div>
-      <div class="grid-row bottom-gutter {% if help != '3' %}greyed-out-step{% endif %}">
-        <div class="column-one-sixth">
-          <p class="heading-large">3.</p>
-        </div>
-        <div class="column-five-sixths">
-          <p>
-            Notify delivers the message
-          </p>
-          {% if help == '3' %}
-            <a href='{{ url_for(".go_to_dashboard_after_tour", service_id=current_service.id, example_template_id=template.id) }}'>
-              Now go to your dashboard
-            </a>
-          {% endif %}
-        </div>
-      </div>
-
-  {% endcall %}
-{% else %}
+  {% include 'partials/tour.html' %}
+{% elif current_user.has_permissions('view_activity') %}
 <nav class="navigation">
   <ul>
     <li><a href="{{ url_for('.service_dashboard', service_id=current_service.id) }}" {{ main_navigation.is_selected('dashboard') }}>Dashboard</a></li>
-  {% if current_user.has_permissions('view_activity') %}
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id) }}" {{ main_navigation.is_selected('templates') }}>Templates</a></li>
-  {% endif %}
-  <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}" {{ main_navigation.is_selected('team-members') }}>Team members</a></li>
+    <li><a href="{{ url_for('.manage_users', service_id=current_service.id) }}" {{ main_navigation.is_selected('team-members') }}>Team members</a></li>
   {% if current_user.has_permissions('manage_service') %}
     <li><a href="{{ url_for('.usage', service_id=current_service.id) }}" {{ main_navigation.is_selected('usage') }}>Usage</a></li>
   {% endif %}
@@ -57,6 +15,12 @@
   {% if current_user.has_permissions('manage_api_keys') %}
     <li><a href="{{ url_for('.api_integration', service_id=current_service.id) }}" {{ main_navigation.is_selected('api-integration') }}>API integration</a></li>
   {% endif %}
+  </ul>
+</nav>
+{% else %}
+<nav class="navigation">
+  <ul>
+    <li><a href="{{ url_for('.choose_template', service_id=current_service.id) }}" {{ casework_navigation.is_selected('send-one-off') }}>Send a message</a></li>
   </ul>
 </nav>
 {% endif %}

@@ -9,6 +9,8 @@ from notifications_python_client.errors import APIError
 
 from tests.conftest import (
     SERVICE_ONE_ID,
+    active_caseworking_user,
+    active_user_with_permissions,
     mock_get_notification,
     normalize_spaces,
 )
@@ -23,15 +25,22 @@ from tests.conftest import (
     ('permanent-failure', 'Phone number doesn’t exist'),
     ('technical-failure', 'Technical failure'),
 ])
+@pytest.mark.parametrize('user', [
+    active_user_with_permissions,
+    active_caseworking_user,
+])
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_notification_status_page_shows_details(
     client_request,
     mocker,
     service_one,
     fake_uuid,
+    user,
     notification_status,
     expected_status,
 ):
+
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
 
     _mock_get_notification = mock_get_notification(
         mocker,

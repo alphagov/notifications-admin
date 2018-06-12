@@ -41,8 +41,12 @@ page_headings = {
 
 @main.route("/services/<service_id>/templates/<uuid:template_id>")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def view_template(service_id, template_id):
+    if not current_user.has_permissions('view_activity'):
+        return redirect(url_for(
+            '.send_one_off', service_id=service_id, template_id=template_id
+        ))
     template = service_api_client.get_service_template(service_id, str(template_id))['data']
     if template["template_type"] == "letter":
         letter_contact_details = service_api_client.get_letter_contacts(service_id)
@@ -94,7 +98,7 @@ def start_tour(service_id, template_id):
 @main.route("/services/<service_id>/templates")
 @main.route("/services/<service_id>/templates/<template_type>")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def choose_template(service_id, template_type='all'):
     templates = service_api_client.get_service_templates(service_id)['data']
 
@@ -117,8 +121,14 @@ def choose_template(service_id, template_type='all'):
         if template_type in ['all', template['template_type']]
     ]
 
+    if current_user.has_permissions('view_activity'):
+        page_title = 'Templates'
+    else:
+        page_title = 'Choose a template'
+
     return render_template(
         'views/templates/choose.html',
+        page_title=page_title,
         templates=templates_on_page,
         show_search_box=(len(templates_on_page) > 7),
         show_template_nav=has_multiple_template_types and (len(templates) > 2),
@@ -130,7 +140,7 @@ def choose_template(service_id, template_type='all'):
 
 @main.route("/services/<service_id>/templates/<template_id>.<filetype>")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def view_letter_template_preview(service_id, template_id, filetype):
     if filetype not in ('pdf', 'png'):
         abort(404)

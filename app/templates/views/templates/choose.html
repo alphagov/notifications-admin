@@ -5,15 +5,14 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Templates
+  {{ page_title }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   {% if not templates %}
 
-    <h1 class="heading-large">Templates</h1>
-
+    <h1 class="heading-large">{{ page_title }}</h1>
     {% if current_user.has_permissions('manage_templates') %}
        <p class="bottom-gutter">
          You need a template before you can send
@@ -39,7 +38,7 @@
 
     <div class="grid-row bottom-gutter-2-3">
       <div class="column-two-thirds">
-        <h1 class="heading-large">Templates</h1>
+        <h1 class="heading-large">{{ page_title }}</h1>
       </div>
       {% if current_user.has_permissions('manage_templates') %}
         <div class="column-one-third">

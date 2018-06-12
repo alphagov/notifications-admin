@@ -40,7 +40,12 @@ from werkzeug.local import LocalProxy
 from app import proxy_fix
 from app.config import configs
 from app.asset_fingerprinter import AssetFingerprinter
-from app.navigation import HeaderNavigation, MainNavigation, OrgNavigation
+from app.navigation import (
+    CaseworkNavigation,
+    HeaderNavigation,
+    MainNavigation,
+    OrgNavigation
+)
 from app.notify_client.service_api_client import ServiceAPIClient
 from app.notify_client.api_key_api_client import ApiKeyApiClient
 from app.notify_client.invite_api_client import InviteApiClient
@@ -96,6 +101,7 @@ current_service = LocalProxy(partial(_lookup_req_object, 'service'))
 current_organisation = LocalProxy(partial(_lookup_req_object, 'organisation'))
 
 navigation = {
+    'casework_navigation': CaseworkNavigation(),
     'main_navigation': MainNavigation(),
     'header_navigation': HeaderNavigation(),
     'org_navigation': OrgNavigation(),

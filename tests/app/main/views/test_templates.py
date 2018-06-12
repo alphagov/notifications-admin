@@ -18,6 +18,7 @@ from tests import (
 )
 from tests.conftest import (
     SERVICE_ONE_ID,
+    active_caseworking_user,
     mock_get_service_email_template,
     mock_get_service_letter_template,
     mock_get_service_template,
@@ -108,6 +109,29 @@ def test_should_show_page_for_one_template(
     assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in response.get_data(as_text=True)
     assert "Use priority queue?" not in response.get_data(as_text=True)
     mock_get_service_template.assert_called_with(service_one['id'], template_id)
+
+
+def test_caseworker_redirected_to_one_off(
+    client_request,
+    mock_get_service_templates,
+    mocker,
+    fake_uuid,
+):
+
+    mocker.patch('app.user_api_client.get_user', return_value=active_caseworking_user(fake_uuid))
+
+    client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.send_one_off',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
+    )
 
 
 @pytest.mark.parametrize('permissions, links_to_be_shown, permissions_warning_to_be_shown', [
