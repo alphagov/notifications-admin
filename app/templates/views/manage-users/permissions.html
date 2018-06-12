@@ -1,26 +1,58 @@
 {% from "components/checkbox.html" import checkbox %}
-{% from "components/radios.html" import radios %}
+{% from "components/radios.html" import radio, radios, radios_wrapper, conditional_radio_panel %}
 
-<fieldset class="form-group">
-  <legend class="form-label">
-    Permissions
-  </legend>
-  {{ checkbox(form.send_messages) }}
-  {{ checkbox(form.manage_templates) }}
-  {{ checkbox(form.manage_service) }}
-  {{ checkbox(form.manage_api_keys) }}
-</fieldset>
-
-<div class="bottom-gutter">
-  <p class="form-label">
-    All team members can see
-  </p>
-  <ul class="list list-bullet">
-    <li>templates</li>
-    <li>history of sent messages</li>
-    <li>who the other team members are</li>
-  </ul>
-</div>
+{% if 'caseworking' in current_service.permissions %}
+  <div data-module="conditional-radios">
+    {% call radios_wrapper(form.user_type, hide_legend=True) %}
+      {% for option in form.user_type %}
+        {{ radio(option) }}
+        {% if option.data == 'admin' %}
+          {% call conditional_radio_panel(option.data) %}
+            <div class="bottom-gutter-1-2">
+              <p class="form-label">
+                All admin users can see
+              </p>
+              <ul class="list list-bullet">
+                <li>templates</li>
+                <li>history of sent messages</li>
+                <li>who the other team members are</li>
+              </ul>
+            </div>
+            <fieldset class="form-group">
+              <legend class="form-label">
+                Permissions
+              </legend>
+              {{ checkbox(form.send_messages) }}
+              {{ checkbox(form.manage_templates) }}
+              {{ checkbox(form.manage_service) }}
+              {{ checkbox(form.manage_api_keys) }}
+            </fieldset>
+          {% endcall %}
+        {% endif %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+{% else %}
+  <fieldset class="form-group">
+    <legend class="form-label">
+      Permissions
+    </legend>
+    {{ checkbox(form.send_messages) }}
+    {{ checkbox(form.manage_templates) }}
+    {{ checkbox(form.manage_service) }}
+    {{ checkbox(form.manage_api_keys) }}
+  </fieldset>
+  <div class="bottom-gutter">
+    <p class="form-label">
+      All team members can see
+    </p>
+    <ul class="list list-bullet">
+      <li>templates</li>
+      <li>history of sent messages</li>
+      <li>who the other team members are</li>
+    </ul>
+  </div>
+{% endif %}
 
 {% if service_has_email_auth %}
   {% if user_has_no_mobile_number %}

@@ -185,7 +185,9 @@ class InvitedUser(object):
         return set(self.permissions) > set(permissions)
 
     def has_permission_for_service(self, service_id, permission):
-        return self.status != 'cancelled' and self.service == service_id and permission in self.permissions
+        if self.status == 'cancelled' and permission != 'view_activity':
+            return False
+        return self.service == service_id and permission in self.permissions
 
     def __eq__(self, other):
         return ((self.id,

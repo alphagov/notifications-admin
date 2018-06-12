@@ -1162,6 +1162,32 @@ def active_user_with_permissions(fake_uuid):
 
 
 @pytest.fixture(scope='function')
+def active_caseworking_user(fake_uuid):
+    from app.notify_client.user_api_client import User
+
+    user_data = {
+        'id': fake_uuid,
+        'name': 'Test User',
+        'password': 'somepassword',
+        'password_changed_at': str(datetime.utcnow()),
+        'email_address': 'caseworker@example.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'active',
+        'failed_login_count': 0,
+        'permissions': {SERVICE_ONE_ID: [
+            'send_texts',
+            'send_emails',
+            'send_letters',
+        ]},
+        'platform_admin': False,
+        'auth_type': 'sms_auth',
+        'organisations': [],
+    }
+    user = User(user_data)
+    return user
+
+
+@pytest.fixture(scope='function')
 def active_user_no_mobile(fake_uuid):
     from app.notify_client.user_api_client import User
 
@@ -2046,7 +2072,7 @@ def sample_invite(mocker, service_one, status='pending'):
     from_user = service_one['users'][0]
     email_address = 'invited_user@test.gov.uk'
     service_id = service_one['id']
-    permissions = 'send_messages,manage_service,manage_api_keys'
+    permissions = 'view_activity,send_messages,manage_service,manage_api_keys'
     created_at = str(datetime.utcnow())
     auth_type = 'sms_auth'
 

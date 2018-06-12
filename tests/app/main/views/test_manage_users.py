@@ -9,6 +9,7 @@ from app.notify_client.models import InvitedUser
 from app.utils import is_gov_user
 from tests.conftest import (
     SERVICE_ONE_ID,
+    active_caseworking_user,
     active_user_manage_template_permission,
     active_user_no_mobile,
     active_user_view_permissions,
@@ -53,12 +54,24 @@ from tests.conftest import service_one as create_sample_service
             'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
         )
     ),
+    (
+        active_user_manage_template_permission,
+        (
+            'Test User With Permissions (you) '
+            'Can’t Send messages Can Add and edit templates Can’t Manage service Can’t Access API keys'
+        ),
+        (
+            'ZZZZZZZZ zzzzzzz@example.gov.uk '
+            'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
+        )
+    ),
 ])
 def test_should_show_overview_page(
     client_request,
     mocker,
     mock_get_invites_for_service,
     fake_uuid,
+    service_one,
     user,
     expected_self_text,
     expected_coworker_text,
@@ -83,6 +96,42 @@ def test_should_show_overview_page(
     # [1:5] are invited users
     assert normalize_spaces(page.select('.user-list-item')[6].text) == expected_coworker_text
     app.user_api_client.get_users_for_service.assert_called_once_with(service_id=SERVICE_ONE_ID)
+
+
+def test_should_show_caseworker_on_overview_page(
+    client_request,
+    mocker,
+    mock_get_invites_for_service,
+    fake_uuid,
+    service_one,
+):
+    service_one['permissions'].append('caseworking')
+    current_user = active_user_view_permissions(active_user_view_permissions)
+    other_user = active_caseworking_user(fake_uuid)
+    other_user.email_address = 'zzzzzzz@example.gov.uk'
+
+    mocker.patch('app.user_api_client.get_user', return_value=current_user)
+    mocker.patch('app.user_api_client.get_users_for_service', return_value=[
+        current_user,
+        other_user,
+    ])
+
+    page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(page.select_one('h1').text) == 'Team members'
+    assert normalize_spaces(page.select('.user-list-item')[0].text) == (
+        'Test User With Permissions (you) '
+        'Can Admin '
+        'Can’t Send messages '
+        'Can’t Add and edit templates '
+        'Can’t Manage service '
+        'Can’t Access API keys'
+    )
+    # [1:5] are invited users
+    assert normalize_spaces(page.select('.user-list-item')[6].text) == (
+        'Test User zzzzzzz@example.gov.uk '
+        'Can Caseworker'
+    )
 
 
 @pytest.mark.parametrize('endpoint, extra_args, service_has_email_auth, auth_options_hidden', [
@@ -123,6 +172,59 @@ def test_service_with_no_email_auth_hides_auth_type_options(
         service_one['permissions'].append('email_auth')
     page = client_request.get(endpoint, service_id=service_one['id'], **extra_args)
     assert (page.find('input', attrs={"name": "login_authentication"}) is None) == auth_options_hidden
+
+
+@pytest.mark.parametrize('endpoint, extra_args, service_has_caseworking, radio_buttons_on_page', [
+    (
+        'main.edit_user_permissions',
+        {'user_id': 0},
+        True,
+        True,
+    ),
+    (
+        'main.edit_user_permissions',
+        {'user_id': 0},
+        False,
+        False,
+    ),
+    (
+        'main.invite_user',
+        {},
+        True,
+        True,
+    ),
+    (
+        'main.invite_user',
+        {},
+        False,
+        False,
+    )
+])
+def test_service_without_caseworking_doesnt_show_admin_vs_caseworker(
+    client_request,
+    endpoint,
+    extra_args,
+    service_has_caseworking,
+    radio_buttons_on_page,
+    service_one
+):
+    if service_has_caseworking:
+        service_one['permissions'].append('caseworking')
+    page = client_request.get(endpoint, service_id=service_one['id'], **extra_args)
+    radio_buttons = page.select('input[name=user_type]')
+    admin_permissions_panel = page.select_one('#panel-admin')
+    if radio_buttons_on_page:
+        assert radio_buttons[0]['type'] == 'radio'
+        assert radio_buttons[0]['value'] == 'caseworker'
+        assert radio_buttons[1]['type'] == 'radio'
+        assert radio_buttons[1]['value'] == 'admin'
+        assert admin_permissions_panel.select('input')[0]['name'] == 'send_messages'
+        assert admin_permissions_panel.select('input')[1]['name'] == 'manage_templates'
+        assert admin_permissions_panel.select('input')[2]['name'] == 'manage_service'
+        assert admin_permissions_panel.select('input')[3]['name'] == 'manage_api_keys'
+    else:
+        assert not radio_buttons
+        assert not admin_permissions_panel
 
 
 @pytest.mark.parametrize('service_has_email_auth, displays_auth_type', [
@@ -343,6 +445,85 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
     )
 
 
+def test_edit_user_to_be_admin(
+    client_request,
+    active_user_with_permissions,
+    mocker,
+    mock_get_invites_for_service,
+    mock_set_user_permissions,
+    service_one,
+):
+    service_one['permissions'].append('caseworking')
+    client_request.post(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+        _data={
+            'email_address': active_user_with_permissions.email_address,
+            'user_type': 'admin',
+            'send_messages': 'y',
+            'manage_templates': 'y',
+            'manage_service': 'y',
+            'manage_api_keys': 'y',
+        },
+        _expected_redirect=url_for(
+            'main.manage_users', service_id=SERVICE_ONE_ID, _external=True
+        ),
+    )
+    mock_set_user_permissions.assert_called_with(
+        str(active_user_with_permissions.id),
+        SERVICE_ONE_ID,
+        permissions={
+            'send_messages',
+            'manage_service',
+            'manage_templates',
+            'manage_api_keys',
+            'view_activity'
+        }
+    )
+
+
+@pytest.mark.parametrize('extra_args', (
+    # The user shouldn’t be able to forge a request which makes a
+    # caseworker without the ‘send’ permission…
+    ({'send_messages': 'n'}),
+    # …or with any additional permissions
+    ({'manage_templates': 'y'}),
+    ({'manage_service': 'y'}),
+    ({'manage_api_keys': 'y'}),
+))
+def test_edit_user_to_be_caseworker(
+    client_request,
+    active_user_with_permissions,
+    mocker,
+    mock_get_invites_for_service,
+    mock_set_user_permissions,
+    service_one,
+    extra_args,
+):
+    service_one['permissions'].append('caseworking')
+    client_request.post(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=active_user_with_permissions.id,
+        _data=dict(
+            email_address=active_user_with_permissions.email_address,
+            user_type='caseworker',
+            **extra_args
+        ),
+        _expected_redirect=url_for(
+            'main.manage_users', service_id=SERVICE_ONE_ID, _external=True
+        ),
+    )
+    mock_set_user_permissions.assert_called_with(
+        str(active_user_with_permissions.id),
+        SERVICE_ONE_ID,
+        permissions={
+            'send_messages',
+        }
+    )
+
+
 def test_should_show_page_for_inviting_user(
     logged_in_client,
     active_user_with_permissions,
@@ -452,6 +633,41 @@ def test_invite_user_with_email_auth_service(
                                                                 auth_type)
 
 
+@pytest.mark.parametrize('extra_args', (
+    {},
+    {
+        'send_messages': 'y',
+        'manage_templates': 'y',
+        'manage_service': 'y',
+        'manage_api_keys': 'y',
+    },
+))
+def test_invite_user_must_choose_caseworker_or_admin(
+    client_request,
+    mock_set_user_permissions,
+    service_one,
+    fake_uuid,
+    extra_args,
+):
+    service_one['permissions'].append('caseworking')
+    page = client_request.post(
+        'main.invite_user',
+        service_id=service_one['id'],
+        user_id=fake_uuid,
+        _data={
+            'email_address': 'test@example.com',
+            **extra_args
+        },
+        _expected_status=200,
+    )
+    assert page.select_one('.error-message').text.strip() == (
+        'Not a valid choice'
+    )
+    assert mock_set_user_permissions.called is False
+    for form_input in page.select('form input'):
+        assert 'checked' not in form_input
+
+
 def test_cancel_invited_user_cancels_user_invitations(
     logged_in_client,
     active_user_with_permissions,
@@ -496,7 +712,6 @@ def test_manage_users_shows_invited_user(
 ):
     sample_invite['status'] = invite_status
     data = [InvitedUser(**sample_invite)]
-
     mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
 

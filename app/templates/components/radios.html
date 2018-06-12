@@ -135,3 +135,9 @@
     </fieldset>
   </div>
 {% endmacro %}
+
+{% macro conditional_radio_panel(id) %}
+  <div class="js-hidden panel panel-border-wide conditional-radios-panel" id="panel-{{ id }}">
+    {{ caller() }}
+  </div>
+{% endmacro %}
