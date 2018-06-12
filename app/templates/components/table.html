@@ -78,7 +78,7 @@
   </td>
 {%- endmacro %}
 
-{% macro text_field(text, status='') -%}
+{% macro text_field(text, status='', truncate=false) -%}
   {% call field(status=status) %}
     {% if text is iterable and text is not string %}
       <ul class="list list-bullet">
@@ -89,15 +89,20 @@
         {% endfor %}
       </ul>
     {% else %}
-      {{ text }}
+      {% if truncate %}
+        <div class="truncate-text" title="{{ text }}">{{text}}</div>
+      {% else %}
+        {{ text }}
+      {% endif %}
     {% endif %}
   {% endcall %}
 {%- endmacro %}
 
-{% macro optional_text_field(text, default='Not set') -%}
+{% macro optional_text_field(text, default='Not set', truncate=false) -%}
   {{ text_field(
     text or default,
-    status='' if text else 'default'
+    status='' if text else 'default',
+    truncate=truncate
   ) }}
 {%- endmacro %}
 

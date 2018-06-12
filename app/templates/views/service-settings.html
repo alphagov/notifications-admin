@@ -46,6 +46,20 @@
           }}
         {% endcall %}
 
+        {% if 'upload_document' in current_service.permissions %}
+        {% call row() %}
+          {{ text_field('Contact link') }}
+          {{ text_field(current_service.contact_link, truncate=true) }}
+          {{ edit_field(
+              'Change',
+              url_for('.service_set_contact_link',
+              service_id=current_service.id),
+              permissions=['manage_service']
+            )
+          }}
+        {% endcall %}
+        {% endif %}
+
       {% endcall %}
 
       {% call mapping_table(

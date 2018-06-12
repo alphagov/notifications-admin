@@ -322,12 +322,27 @@ def service_switch_can_send_precompiled_letter(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
-@main.route("/services/<service_id>/service-settings/can-upload-document")
+@main.route("/services/<service_id>/service-settings/can-upload-document", methods=['GET', 'POST'])
 @login_required
 @user_is_platform_admin
 def service_switch_can_upload_document(service_id):
-    switch_service_permissions(service_id, 'upload_document')
-    return redirect(url_for('.service_settings', service_id=service_id))
+    form = ServiceContactLinkForm()
+
+    # If turning the permission off, or turning it on and the service already has a contact_link,
+    # don't show the form to add the link
+    if 'upload_document' in current_service['permissions'] or current_service.get('contact_link'):
+        switch_service_permissions(service_id, 'upload_document')
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    if form.validate_on_submit():
+        service_api_client.update_service(
+            current_service['id'],
+            contact_link=form.url.data
+        )
+        switch_service_permissions(service_id, 'upload_document')
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template('views/service-settings/contact_link.html', form=form)
 
 
 @main.route("/services/<service_id>/service-settings/archive", methods=['GET', 'POST'])

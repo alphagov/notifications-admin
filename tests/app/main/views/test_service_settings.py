@@ -1977,6 +1977,77 @@ def test_switch_service_enable_international_sms(
     assert mocked_fn.call_args[0][0] == service_one['id']
 
 
+@pytest.mark.parametrize('start_permissions, contact_link, end_permissions', [
+    (['upload_document'], 'http://example.com/', []),
+    (['upload_document'], None, []),
+    ([], 'http://example.com/', ['upload_document']),
+])
+def test_service_switch_can_upload_document_changes_the_permission_if_not_adding_the_permission_without_a_contact_link(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_update_service,
+    mock_get_service_settings_page_common,
+    mock_get_service_organisation,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    start_permissions,
+    contact_link,
+    end_permissions,
+):
+    service_one['permissions'] = start_permissions
+    service_one['contact_link'] = contact_link
+
+    response = logged_in_platform_admin_client.get(
+        url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
+        follow_redirects=True
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert service_one['permissions'] == end_permissions
+    assert page.h1.text.strip() == 'Settings'
+
+
+def test_service_switch_can_upload_document_turning_permission_on_with_no_contact_link_shows_link_form(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_get_service_settings_page_common,
+    mock_get_service_organisation,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+):
+    response = logged_in_platform_admin_client.get(
+        url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
+        follow_redirects=True
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert 'upload_document' not in service_one['permissions']
+    assert page.h1.text.strip() == "Add link for ‘Download your document’ page"
+
+
+def test_service_switch_can_upload_document_lets_contact_link_be_added_and_switches_permission(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_update_service,
+    mock_get_service_settings_page_common,
+    mock_get_service_organisation,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
+        data={'url': 'http://example.com/'},
+        follow_redirects=True
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert 'upload_document' in service_one['permissions']
+    assert page.h1.text.strip() == 'Settings'
+
+
 def test_archive_service_after_confirm(
     logged_in_platform_admin_client,
     service_one,
@@ -2200,8 +2271,41 @@ def test_service_set_contact_link_does_not_update_invalid_link(
         _follow_redirects=True
     )
 
-    assert page.h1.text == "Change link on ‘Download your document’ page"
+    assert page.h1.text.strip() == "Add link for ‘Download your document’ page"
     update_mock.assert_not_called()
+
+
+def test_contact_link_is_displayed_with_upload_document_permission(
+    logged_in_client,
+    service_one,
+    mock_get_service_settings_page_common,
+    mock_get_service_organisation,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+):
+    service_one['permissions'] = ['upload_document']
+    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert 'Contact link' in page.text
+
+
+def test_contact_link_is_not_displayed_without_the_upload_document_permission(
+    logged_in_client,
+    service_one,
+    mock_get_service_settings_page_common,
+    mock_get_service_organisation,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+):
+    response = logged_in_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert response.status_code == 200
+    assert 'Contact link' not in page.text
 
 
 @pytest.mark.parametrize('endpoint, permissions, expected_p', [
