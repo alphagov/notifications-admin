@@ -1,3 +1,5 @@
+from functools import partial
+
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
@@ -12,6 +14,8 @@ from app.main import main
 from app.main.forms import (
     AdminInviteUserForm,
     AdminPermissionsForm,
+    CaseworkingInviteUserForm,
+    CaseworkingPermissionsForm,
     SearchUsersForm,
 )
 from app.notify_client.models import roles
@@ -44,9 +48,12 @@ def manage_users(service_id):
 @user_has_permissions('manage_service')
 def invite_user(service_id):
 
-    form = AdminInviteUserForm(
-        invalid_email_address=current_user.email_address
-    )
+    if 'caseworking' in current_service['permissions']:
+        form = CaseworkingInviteUserForm
+    else:
+        form = AdminInviteUserForm
+
+    form = form(invalid_email_address=current_user.email_address)
 
     service_has_email_auth = 'email_auth' in current_service['permissions']
     if not service_has_email_auth:
@@ -82,10 +89,19 @@ def edit_user_permissions(service_id, user_id):
     user = user_api_client.get_user(user_id)
     user_has_no_mobile_number = user.mobile_number is None
 
-    form = AdminPermissionsForm(
+    if 'caseworking' in current_service['permissions']:
+        form = partial(
+            CaseworkingPermissionsForm,
+            user_type='admin' if user.has_permission_for_service(service_id, 'view_activity') else 'caseworker',
+        )
+    else:
+        form = AdminPermissionsForm
+
+    form = form(
         **{role: user.has_permission_for_service(service_id, role) for role in roles.keys()},
         login_authentication=user.auth_type
     )
+
     if form.validate_on_submit():
         user_api_client.set_user_permissions(
             user_id, service_id,

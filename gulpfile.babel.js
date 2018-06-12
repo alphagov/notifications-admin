@@ -73,6 +73,7 @@ gulp.task('javascripts', () => gulp
     paths.src + 'javascripts/errorTracking.js',
     paths.src + 'javascripts/preventDuplicateFormSubmissions.js',
     paths.src + 'javascripts/fullscreenTable.js',
+    paths.src + 'javascripts/conditionalRadios.js',
     paths.src + 'javascripts/main.js'
   ])
   .pipe(plugins.prettyerror())

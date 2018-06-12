@@ -1,0 +1,26 @@
+$border-thickness: 9px;
+
+.multiple-choice {
+
+  z-index: 10;
+
+  .block-label {
+    &:before {
+      box-shadow: 0 4px 0 0 $white;
+    }
+  }
+
+}
+
+.conditional-radios {
+
+  &-panel {
+    border-left: $border-thickness solid $border-colour;
+    margin: 0 0 0 ($border-thickness + 6px);
+    padding: $gutter-one-third 0 0 ($gutter - 3px);
+    position: relative;
+    top: -$gutter-one-third;
+    z-index: 1;
+  }
+
+}

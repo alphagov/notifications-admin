@@ -287,6 +287,28 @@ class AdminPermissionsForm(AbstractPermissionsForm):
         self.view_activity.data = True
 
 
+class CaseworkingPermissionsForm(AbstractPermissionsForm):
+
+    def process(self, *args, **kwargs):
+        super().process(*args, **kwargs)
+        if self.user_type.data == 'admin':
+            self.view_activity.data = True
+        elif self.user_type.data == 'caseworker':
+            self.view_activity.data = False
+            self.manage_templates.data = False
+            self.manage_service.data = False
+            self.manage_api_keys.data = False
+            self.send_messages.data = True
+
+    user_type = RadioField(
+        'User type',
+        choices=[
+            ('caseworker', 'Caseworker'),
+            ('admin', 'Admin'),
+        ],
+    )
+
+
 class AbstractInviteUserForm(StripWhitespaceForm):
     email_address = email_address(gov_user=False)
 
@@ -300,6 +322,10 @@ class AbstractInviteUserForm(StripWhitespaceForm):
 
 
 class AdminInviteUserForm(AbstractInviteUserForm, AdminPermissionsForm):
+    pass
+
+
+class CaseworkingInviteUserForm(AbstractInviteUserForm, CaseworkingPermissionsForm):
     pass
 
 
