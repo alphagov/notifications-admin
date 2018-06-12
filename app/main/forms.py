@@ -28,7 +28,7 @@ from wtforms import (
     widgets,
 )
 from wtforms.fields.html5 import EmailField, SearchField, TelField
-from wtforms.validators import DataRequired, Length, Optional, Regexp
+from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
 
 from app.main.validators import (
     Blacklist,
@@ -570,6 +570,14 @@ class RequestToGoLiveForm(StripWhitespaceForm):
 
 class ProviderForm(StripWhitespaceForm):
     priority = IntegerField('Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")])
+
+
+class ServiceContactLinkForm(StripWhitespaceForm):
+    url = StringField(
+        "URL",
+        validators=[DataRequired(message='Can’t be empty'),
+                    URL(message='Must be a valid URL')]
+    )
 
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):

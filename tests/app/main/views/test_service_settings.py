@@ -2141,6 +2141,69 @@ def test_cant_resume_active_service(
     assert 'Resume service' not in {a.text for a in page.find_all('a', class_='button')}
 
 
+def test_service_set_contact_link_displays_the_contact_link(client_request, service_one):
+    service_one['contact_link'] = 'http://example.com/'
+
+    page = client_request.get(
+        'main.service_set_contact_link', service_id=SERVICE_ONE_ID
+    )
+    assert page.find('input').get('value') == 'http://example.com/'
+
+
+def test_service_set_contact_link_updates_contact_link_and_redirects_to_settings_page(
+    client_request,
+    service_one,
+    mock_update_service,
+    mock_get_service_settings_page_common,
+    mock_get_service_organisation,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+):
+    service_one['contact_link'] = 'http://example.com/'
+
+    page = client_request.post(
+        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        _data={
+            'url': 'http://new-link.com/',
+        },
+        _follow_redirects=True
+    )
+
+    assert page.h1.text == 'Settings'
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        contact_link='http://new-link.com/',
+    )
+
+
+@pytest.mark.parametrize('new_link', ['', 'not/a-valid/link'])
+def test_service_set_contact_link_does_not_update_invalid_link(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_service_settings_page_common,
+    mock_get_service_organisation,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    new_link,
+):
+    update_mock = mocker.patch('app.service_api_client.update_service')
+    service_one['contact_link'] = 'http://example.com/'
+
+    page = client_request.post(
+        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        _data={
+            'url': new_link,
+        },
+        _follow_redirects=True
+    )
+
+    assert page.h1.text == "Change link on ‘Download your document’ page"
+    update_mock.assert_not_called()
+
+
 @pytest.mark.parametrize('endpoint, permissions, expected_p', [
     (
         'main.service_set_inbound_sms',

@@ -1,0 +1,28 @@
+{% extends "withnav_template.html" %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Change link on ‘Download your document’ page
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <h1 class="heading-large">Change link on ‘Download your document’ page</h1>
+      <p>
+        When you send users a document to download, you need to include a link to your service
+        on the download page. This is so users can contact you if there’s a problem (for example,
+        if the link to download the document has expired).
+      </p>
+      <form method="post">
+        {{ textbox(form.url, width='1-1') }}
+        {{ page_footer(
+          'Save',
+          back_link=url_for('.service_settings', service_id=current_service.id),
+          back_link_text='Back to settings'
+        ) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}
