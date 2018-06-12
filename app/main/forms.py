@@ -256,13 +256,7 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
-class PermissionsForm(StripWhitespaceForm):
-
-    def process(self, *args, **kwargs):
-        super().process(*args, **kwargs)
-        # view_activity is a default role to be added to all users.
-        self.view_activity.data = True
-
+class AbstractPermissionsForm(StripWhitespaceForm):
     view_activity = HiddenField("View activity")
     send_messages = BooleanField("Send messages from existing templates")
     manage_templates = BooleanField("Add and edit templates")
@@ -278,16 +272,28 @@ class PermissionsForm(StripWhitespaceForm):
     )
 
 
-class InviteUserForm(PermissionsForm):
+class AdminPermissionsForm(AbstractPermissionsForm):
+
+    def process(self, *args, **kwargs):
+        super().process(*args, **kwargs)
+        # view_activity is a default role to be added to all users.
+        self.view_activity.data = True
+
+
+class AbstractInviteUserForm(StripWhitespaceForm):
     email_address = email_address(gov_user=False)
 
     def __init__(self, invalid_email_address, *args, **kwargs):
-        super(InviteUserForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.invalid_email_address = invalid_email_address.lower()
 
     def validate_email_address(self, field):
         if field.data.lower() == self.invalid_email_address:
             raise ValidationError("You can’t send an invitation to yourself")
+
+
+class AdminInviteUserForm(AbstractInviteUserForm, AdminPermissionsForm):
+    pass
 
 
 class InviteOrgUserForm(StripWhitespaceForm):
