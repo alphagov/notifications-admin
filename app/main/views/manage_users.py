@@ -147,9 +147,4 @@ def cancel_invited_user(service_id, invited_user_id):
 
 
 def get_permissions_from_form(form):
-    # view_activity is a default role to be added to all users.
-    # All users will have at minimum view_activity to allow users to see notifications,
-    # templates, team members but no update privileges
-    selected_roles = {role for role in roles.keys() if form[role].data is True}
-    selected_roles.add('view_activity')
-    return selected_roles
+    return {role for role in roles.keys() if form[role].data is True}

@@ -257,6 +257,13 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
 
 
 class PermissionsForm(StripWhitespaceForm):
+
+    def process(self, *args, **kwargs):
+        super().process(*args, **kwargs)
+        # view_activity is a default role to be added to all users.
+        self.view_activity.data = True
+
+    view_activity = HiddenField("View activity")
     send_messages = BooleanField("Send messages from existing templates")
     manage_templates = BooleanField("Add and edit templates")
     manage_service = BooleanField("Modify this service and its team")
