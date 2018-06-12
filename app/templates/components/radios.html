@@ -5,9 +5,19 @@
   option_hints={},
   hide_legend=False
 ) %}
+  {% call radios_wrapper(
+    field, hint, disable, option_hints, hide_legend
+  ) %}
+    {% for option in field %}
+      {{ radio(option, disable, option_hints) }}
+    {% endfor %}
+  {% endcall %}
+{% endmacro %}
+
+{% macro radios_wrapper(field, hint=None, disable=[], option_hints={}, hide_legend=False) %}
   <div class="form-group {% if field.errors %} form-group-error{% endif %}">
     <fieldset>
-      <legend class="form-label">
+      <legend class="{{ 'form-label' if not hide_legend else '' }}">
         {% if hide_legend %}<span class="visually-hidden">{% endif %}
           {{ field.label.text|safe }}
         {% if hide_legend %}</span>{% endif %}
@@ -17,13 +27,10 @@
           </span>
         {% endif %}
       </legend>
-      {% for option in field %}
-        {{ radio(option, disable, option_hints) }}
-      {% endfor %}
+      {{ caller() }}
     </fieldset>
   </div>
 {% endmacro %}
-
 
 {% macro radio(option, disable=[], option_hints={}) %}
   <div class="multiple-choice">
