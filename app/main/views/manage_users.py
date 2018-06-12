@@ -9,7 +9,11 @@ from app import (
     user_api_client,
 )
 from app.main import main
-from app.main.forms import InviteUserForm, PermissionsForm, SearchUsersForm
+from app.main.forms import (
+    AdminInviteUserForm,
+    AdminPermissionsForm,
+    SearchUsersForm,
+)
 from app.notify_client.models import roles
 from app.utils import user_has_permissions
 
@@ -40,7 +44,7 @@ def manage_users(service_id):
 @user_has_permissions('manage_service')
 def invite_user(service_id):
 
-    form = InviteUserForm(
+    form = AdminInviteUserForm(
         invalid_email_address=current_user.email_address
     )
 
@@ -79,7 +83,7 @@ def edit_user_permissions(service_id, user_id):
     user = user_api_client.get_user(user_id)
     user_has_no_mobile_number = user.mobile_number is None
 
-    form = PermissionsForm(
+    form = AdminPermissionsForm(
         **{role: user.has_permission_for_service(service_id, role) for role in roles.keys()},
         login_authentication=user.auth_type
     )
@@ -108,7 +112,7 @@ def remove_user_from_service(service_id, user_id):
     user = user_api_client.get_user(user_id)
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
-    form = PermissionsForm(**{
+    form = AdminPermissionsForm(**{
         role: user.has_permission_for_service(service_id, role) for role in roles.keys()
     })
 
