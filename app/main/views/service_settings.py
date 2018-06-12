@@ -315,6 +315,14 @@ def service_switch_email_auth(service_id):
     return redirect(url_for('.service_settings', service_id=service_id))
 
 
+@main.route("/services/<service_id>/service-settings/caseworking")
+@login_required
+@user_is_platform_admin
+def service_switch_caseworking(service_id):
+    switch_service_permissions(service_id, 'caseworking')
+    return redirect(url_for('.service_settings', service_id=service_id))
+
+
 @main.route("/services/<service_id>/service-settings/can-send-precompiled-letter")
 @login_required
 @user_is_platform_admin
