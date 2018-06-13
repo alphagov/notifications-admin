@@ -14,11 +14,14 @@
     {{ message_count_label(99, message_type, suffix='') | capitalize }}
   </h1>
   {% if not message_type == "letter" %}
-    {{ ajax_block(
-      partials,
-      url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status),
-      'counts'
-    ) }}
+
+    {% if current_user.has_permissions('view_activity') %}
+      {{ ajax_block(
+        partials,
+        url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status),
+        'counts'
+      ) }}
+    {% endif %}
 
     <form
       method="post"
