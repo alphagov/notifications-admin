@@ -40,6 +40,7 @@ from app.main.validators import (
     ValidEmail,
     ValidGovEmail,
 )
+from app.notify_client.models import roles
 
 
 def get_time_value_and_label(future_time):
@@ -257,11 +258,13 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
 
 
 class AbstractPermissionsForm(StripWhitespaceForm):
+
     view_activity = HiddenField("View activity")
     send_messages = BooleanField("Send messages from existing templates")
     manage_templates = BooleanField("Add and edit templates")
     manage_service = BooleanField("Modify this service and its team")
     manage_api_keys = BooleanField("Create and revoke API keys")
+
     login_authentication = RadioField(
         'Sign in using',
         choices=[
@@ -270,6 +273,10 @@ class AbstractPermissionsForm(StripWhitespaceForm):
         ],
         validators=[DataRequired()]
     )
+
+    @property
+    def permissions(self):
+        return {role for role in roles.keys() if self[role].data is True}
 
 
 class AdminPermissionsForm(AbstractPermissionsForm):
