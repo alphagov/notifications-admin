@@ -766,14 +766,20 @@ def get_back_link(service_id, template_id, step_index):
         else:
             return None
     elif step_index == 0:
-        return url_for(
-            '.view_template',
-            service_id=service_id,
-            template_id=template_id,
-        )
+        if current_user.has_permissions('view_activity'):
+            return url_for(
+                '.view_template',
+                service_id=service_id,
+                template_id=template_id,
+            )
+        else:
+            return url_for(
+                '.choose_template',
+                service_id=service_id,
+            )
     else:
         return url_for(
-            request.endpoint,
+            'main.send_one_off_step',
             service_id=service_id,
             template_id=template_id,
             step_index=step_index - 1,
@@ -803,8 +809,7 @@ def _check_notification(service_id, template_id, exception=None):
         sms_sender=sms_sender
     )
 
-    # go back to start of process
-    back_link = get_back_link(service_id, template_id, 0)
+    back_link = get_back_link(service_id, template_id, len(fields_to_fill_in(template)))
 
     if (
         not session.get('recipient') or

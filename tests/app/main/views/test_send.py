@@ -1327,7 +1327,7 @@ def test_send_test_email_message_without_placeholders_redirects_to_check_page(
 
 @pytest.mark.parametrize('user, expected_back_link_endpoint, extra_args', (
     (active_user_with_permissions, 'main.view_template', {'template_id': unchanging_fake_uuid}),
-    (active_caseworking_user, 'main.view_template', {'template_id': unchanging_fake_uuid}),
+    (active_caseworking_user, 'main.choose_template', {}),
 ))
 def test_send_test_sms_message_with_placeholders_shows_first_field(
     logged_in_client,
@@ -1513,7 +1513,7 @@ def test_send_test_indicates_optional_address_columns(
         'Optional'
     )
     assert page.select('.page-footer-back-link')[0]['href'] == url_for(
-        'main.send_test_step',
+        'main.send_one_off_step',
         service_id=service_one['id'],
         template_id=fake_uuid,
         step_index=2,
@@ -2542,9 +2542,10 @@ def test_check_notification_redirects_if_session_not_populated(
     ))
 
     assert resp.location == url_for(
-        'main.view_template',
+        'main.send_one_off_step',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        step_index=1,
         _external=True
     )
 
@@ -2600,9 +2601,10 @@ def test_check_notification_shows_preview(
     assert (
         page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
     ) == url_for(
-        'main.view_template',
+        'main.send_one_off_step',
         service_id=service_one['id'],
         template_id=fake_uuid,
+        step_index=0,
     )
 
     # assert tour not visible
