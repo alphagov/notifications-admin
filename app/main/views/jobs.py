@@ -11,7 +11,7 @@ from flask import (
     stream_with_context,
     url_for,
 )
-from flask_login import login_required
+from flask_login import current_user, login_required
 from notifications_utils.template import Template, WithSubjectTemplate
 
 from app import (
@@ -204,7 +204,7 @@ def get_notifications(service_id, message_type, status_override=None):
         abort(404)
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
-    if request.path.endswith('csv'):
+    if request.path.endswith('csv') and current_user.has_permissions('view_activity'):
         return Response(
             generate_notifications_csv(
                 service_id=service_id,
