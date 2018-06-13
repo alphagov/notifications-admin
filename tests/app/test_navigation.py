@@ -159,5 +159,5 @@ def test_caseworkers_get_caseworking_navigation(
     )
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one('#content nav').text) == (
-        'Send a message'
+        'Send a message Sent messages'
     )

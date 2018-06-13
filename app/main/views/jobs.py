@@ -164,10 +164,11 @@ def view_job_updates(service_id, job_id):
     ))
 
 
+@main.route('/services/<service_id>/notifications', methods=['GET', 'POST'])
 @main.route('/services/<service_id>/notifications/<message_type>', methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('view_activity')
-def view_notifications(service_id, message_type):
+@user_has_permissions('view_activity', 'send_messages')
+def view_notifications(service_id, message_type=None):
     return render_template(
         'views/notifications.html',
         partials=get_notifications(service_id, message_type),
@@ -185,22 +186,23 @@ def view_notifications(service_id, message_type):
     )
 
 
+@main.route('/services/<service_id>/notifications.json', methods=['GET', 'POST'])
 @main.route('/services/<service_id>/notifications/<message_type>.json', methods=['GET', 'POST'])
-@user_has_permissions('view_activity')
-def get_notifications_as_json(service_id, message_type):
+@user_has_permissions('view_activity', 'send_messages')
+def get_notifications_as_json(service_id, message_type=None):
     return jsonify(get_notifications(
         service_id, message_type, status_override=request.args.get('status')
     ))
 
 
 @main.route('/services/<service_id>/notifications/<message_type>.csv', endpoint="view_notifications_csv")
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def get_notifications(service_id, message_type, status_override=None):
     # TODO get the api to return count of pages as well.
     page = get_page_from_request()
     if page is None:
         abort(404, "Invalid page argument ({}).".format(request.args.get('page')))
-    if message_type not in ['email', 'sms', 'letter']:
+    if message_type not in ['email', 'sms', 'letter', None]:
         abort(404)
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
@@ -221,7 +223,7 @@ def get_notifications(service_id, message_type, status_override=None):
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
         page=page,
-        template_type=[message_type],
+        template_type=[message_type] if message_type else [],
         status=filter_args.get('status'),
         limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'],
         to=request.form.get('to', ''),
@@ -238,6 +240,16 @@ def get_notifications(service_id, message_type, status_override=None):
 
     if 'links' in notifications and notifications['links'].get('next', None):
         next_page = generate_next_dict('main.view_notifications', service_id, page, url_args)
+
+    if message_type:
+        download_link = url_for(
+            '.view_notifications_csv',
+            service_id=current_service['id'],
+            message_type=message_type,
+            status=request.args.get('status')
+        )
+    else:
+        download_link = None
 
     return {
         'counts': render_template(
@@ -259,18 +271,22 @@ def get_notifications(service_id, message_type, status_override=None):
             next_page=next_page,
             status=request.args.get('status'),
             message_type=message_type,
-            download_link=url_for(
-                '.view_notifications_csv',
-                service_id=current_service['id'],
-                message_type=message_type,
-                status=request.args.get('status')
-            )
+            download_link=download_link,
         ),
     }
 
 
 def get_status_filters(service, message_type, statistics):
-    stats = statistics[message_type]
+    if message_type is None:
+        stats = {
+            key: sum(
+                statistics[message_type][key]
+                for message_type in {'email', 'sms', 'letter'}
+            )
+            for key in {'requested', 'delivered', 'failed'}
+        }
+    else:
+        stats = statistics[message_type]
     stats['sending'] = stats['requested'] - stats['delivered'] - stats['failed']
 
     filters = [

@@ -506,6 +506,9 @@ class CaseworkNavigation(Navigation):
             'send_one_off_step',
             'send_test',
             'send_test_step',
+        },
+        'sent-messages': {
+            'view_notifications',
             'view_notification',
         },
     }
@@ -704,7 +707,6 @@ class CaseworkNavigation(Navigation):
         'view_letter_notification_as_preview',
         'view_letter_template_preview',
         'view_notification_updates',
-        'view_notifications',
         'view_notifications_csv',
         'view_provider',
         'view_providers',

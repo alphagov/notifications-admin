@@ -22,5 +22,9 @@
   <ul>
     <li><a href="{{ url_for('.choose_template', service_id=current_service.id) }}" {{ casework_navigation.is_selected('send-one-off') }}>Send a message</a></li>
   </ul>
+  <ul>
+    <li><a href="{{ url_for('.view_notifications', service_id=current_service.id, status='sending,delivered,failed') }}" {{ casework_navigation.is_selected('sent-messages') }}>Sent messages</a></li>
+  </ul>
+
 </nav>
 {% endif %}
