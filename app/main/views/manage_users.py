@@ -54,12 +54,11 @@ def invite_user(service_id):
 
     if form.validate_on_submit():
         email_address = form.email_address.data
-        permissions = get_permissions_from_form(form)
         invited_user = invite_api_client.create_invite(
             current_user.id,
             service_id,
             email_address,
-            permissions,
+            form.permissions,
             form.login_authentication.data
         )
 
@@ -90,7 +89,7 @@ def edit_user_permissions(service_id, user_id):
     if form.validate_on_submit():
         user_api_client.set_user_permissions(
             user_id, service_id,
-            permissions=set(get_permissions_from_form(form)),
+            permissions=form.permissions,
         )
         if service_has_email_auth:
             user_api_client.update_user_attribute(user_id, auth_type=form.login_authentication.data)
@@ -148,7 +147,3 @@ def cancel_invited_user(service_id, invited_user_id):
     invite_api_client.cancel_invited_user(service_id=service_id, invited_user_id=invited_user_id)
 
     return redirect(url_for('main.manage_users', service_id=service_id))
-
-
-def get_permissions_from_form(form):
-    return {role for role in roles.keys() if form[role].data is True}
