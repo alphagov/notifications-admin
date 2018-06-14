@@ -11,7 +11,9 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    {{ message_count_label(99, message_type, suffix='') | capitalize }}
+    {% if not current_user.has_permissions('view_activity') %}<span class="visually-hidden">{% endif %}
+      {{ message_count_label(99, message_type, suffix='') | capitalize }}
+    {% if not current_user.has_permissions('view_activity') %}</span>{% endif %}
   </h1>
   {% if not message_type == "letter" %}
 
