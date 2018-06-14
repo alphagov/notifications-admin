@@ -1063,14 +1063,29 @@ def test_send_one_off_or_test_has_correct_page_titles(
     assert (len(page.select('.banner-tour')) == 1) == tour_shown
 
 
-@pytest.mark.parametrize('user', (
-    active_user_with_permissions,
-    active_caseworking_user,
-))
-@pytest.mark.parametrize('template_mock, expected_link_text, expected_link_url', [
-    (mock_get_service_template, 'Use my phone number', partial(url_for, 'main.send_test')),
-    (mock_get_service_email_template, 'Use my email address', partial(url_for, 'main.send_test')),
-    (mock_get_service_letter_template, None, None),
+@pytest.mark.parametrize('user, template_mock, expected_link_text, expected_link_url', [
+    (
+        active_user_with_permissions,
+        mock_get_service_template,
+        'Use my phone number',
+        partial(url_for, 'main.send_test')
+    ),
+    (
+        active_user_with_permissions,
+        mock_get_service_email_template,
+        'Use my email address',
+        partial(url_for, 'main.send_test')
+    ),
+    (
+        active_user_with_permissions,
+        mock_get_service_letter_template,
+        None, None
+    ),
+    (
+        active_caseworking_user,
+        mock_get_service_template,
+        None, None
+    ),
 ])
 def test_send_one_off_has_skip_link(
     logged_in_client,
