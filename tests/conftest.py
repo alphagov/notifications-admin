@@ -953,6 +953,8 @@ def mock_get_service_templates(mocker):
     uuid2 = str(generate_uuid())
     uuid3 = str(generate_uuid())
     uuid4 = str(generate_uuid())
+    uuid5 = str(generate_uuid())
+    uuid6 = str(generate_uuid())
 
     def _create(service_id):
         return {'data': [
@@ -969,7 +971,15 @@ def mock_get_service_templates(mocker):
             template_json(
                 service_id, uuid4, "email_template_two", "email", "email template two content",
                 subject='email template two subject',
-            )
+            ),
+            template_json(
+                service_id, uuid5, "letter_template_one", "letter", "letter template one content",
+                subject='letter template one subject',
+            ),
+            template_json(
+                service_id, uuid6, "letter_template_two", "letter", "letter template two content",
+                subject='letter template two subject',
+            ),
         ]}
 
     return mocker.patch(

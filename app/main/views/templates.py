@@ -102,6 +102,22 @@ def start_tour(service_id, template_id):
 def choose_template(service_id, template_type='all'):
     templates = service_api_client.get_service_templates(service_id)['data']
 
+    letters_available = (
+        'letter' in current_service['permissions'] and
+        current_user.has_permissions('view_activity')
+    )
+
+    available_template_types = list(filter(None, (
+        'email',
+        'sms',
+        'letter' if letters_available else None,
+    )))
+
+    templates = [
+        template for template in templates
+        if template['template_type'] in available_template_types
+    ]
+
     has_multiple_template_types = len({
         template['template_type'] for template in templates
     }) > 1
@@ -112,13 +128,16 @@ def choose_template(service_id, template_type='all'):
             ('All', 'all'),
             ('Text message', 'sms'),
             ('Email', 'email'),
-            ('Letter', 'letter') if 'letter' in current_service['permissions'] else None,
+            ('Letter', 'letter') if letters_available else None,
         ])
     ]
 
     templates_on_page = [
         template for template in templates
-        if template_type in ['all', template['template_type']]
+        if (
+            template_type in ['all', template['template_type']] and
+            template['template_type'] in available_template_types
+        )
     ]
 
     if current_user.has_permissions('view_activity'):

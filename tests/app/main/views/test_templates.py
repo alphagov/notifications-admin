@@ -19,6 +19,7 @@ from tests import (
 from tests.conftest import (
     SERVICE_ONE_ID,
     active_caseworking_user,
+    active_user_view_permissions,
     mock_get_service_email_template,
     mock_get_service_letter_template,
     mock_get_service_template,
@@ -29,30 +30,79 @@ from tests.conftest import service_one as create_sample_service
 from tests.conftest import single_letter_contact_block
 
 
-@pytest.mark.parametrize('extra_args, expected_nav_links, expected_templates', [
-    (
-        {},
-        ['Text message', 'Email'],
-        ['sms_template_one', 'sms_template_two', 'email_template_one', 'email_template_two']
-    ),
-    (
-        {'template_type': 'sms'},
-        ['All', 'Email'],
-        ['sms_template_one', 'sms_template_two'],
-    ),
-    (
-        {'template_type': 'email'},
-        ['All', 'Text message'],
-        ['email_template_one', 'email_template_two'],
-    ),
-])
+@pytest.mark.parametrize(
+    'user, expected_page_title, extra_args, expected_nav_links, expected_templates',
+    [
+        (
+            active_user_view_permissions,
+            'Templates',
+            {},
+            ['Text message', 'Email', 'Letter'],
+            [
+                'sms_template_one',
+                'sms_template_two',
+                'email_template_one',
+                'email_template_two',
+                'letter_template_one',
+                'letter_template_two',
+            ]
+        ),
+        (
+            active_user_view_permissions,
+            'Templates',
+            {'template_type': 'sms'},
+            ['All', 'Email', 'Letter'],
+            ['sms_template_one', 'sms_template_two'],
+        ),
+        (
+            active_user_view_permissions,
+            'Templates',
+            {'template_type': 'email'},
+            ['All', 'Text message', 'Letter'],
+            ['email_template_one', 'email_template_two'],
+        ),
+        (
+            active_user_view_permissions,
+            'Templates',
+            {'template_type': 'letter'},
+            ['All', 'Text message', 'Email'],
+            ['letter_template_one', 'letter_template_two'],
+        ),
+        (
+            active_caseworking_user,
+            'Choose a template',
+            {},
+            ['Text message', 'Email'],
+            [
+                'sms_template_one',
+                'sms_template_two',
+                'email_template_one',
+                'email_template_two',
+            ],
+        ),
+        (
+            active_caseworking_user,
+            'Choose a template',
+            {'template_type': 'email'},
+            ['All', 'Text message'],
+            ['email_template_one', 'email_template_two'],
+        ),
+    ]
+)
 def test_should_show_page_for_choosing_a_template(
     client_request,
     mock_get_service_templates,
     extra_args,
     expected_nav_links,
     expected_templates,
+    service_one,
+    mocker,
+    fake_uuid,
+    user,
+    expected_page_title,
 ):
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    service_one['permissions'].append('letter')
 
     page = client_request.get(
         'main.choose_template',
@@ -60,7 +110,7 @@ def test_should_show_page_for_choosing_a_template(
         **extra_args
     )
 
-    assert normalize_spaces(page.select('h1')[0].text) == 'Templates'
+    assert normalize_spaces(page.select_one('h1').text) == expected_page_title
 
     links_in_page = page.select('.pill a')
 
