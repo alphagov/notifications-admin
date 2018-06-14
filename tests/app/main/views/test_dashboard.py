@@ -23,6 +23,8 @@ from tests import (
 )
 from tests.conftest import (
     SERVICE_ONE_ID,
+    active_caseworking_user,
+    active_user_view_permissions,
     mock_get_inbound_sms_summary,
     mock_get_inbound_sms_summary_with_no_messages,
     normalize_spaces,
@@ -57,10 +59,17 @@ stub_template_stats = [
 ]
 
 
+@pytest.mark.parametrize('user', (
+    active_user_view_permissions,
+    active_caseworking_user,
+))
 def test_redirect_from_old_dashboard(
-    logged_in_client
+    logged_in_client,
+    user,
+    mocker,
+    fake_uuid,
 ):
-
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     expected_location = 'http://localhost/services/{}'.format(SERVICE_ONE_ID)
 
     response = logged_in_client.get('/services/{}/dashboard'.format(SERVICE_ONE_ID))
@@ -68,6 +77,24 @@ def test_redirect_from_old_dashboard(
     assert response.status_code == 302
     assert response.location == expected_location
     assert expected_location == url_for('main.service_dashboard', service_id=SERVICE_ONE_ID, _external=True)
+
+
+def test_redirect_caseworkers_to_templates(
+    client_request,
+    mocker,
+    active_caseworking_user,
+):
+    mocker.patch('app.user_api_client.get_user', return_value=active_caseworking_user)
+    client_request.get(
+        'main.service_dashboard',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.choose_template',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        )
+    )
 
 
 def test_get_started(

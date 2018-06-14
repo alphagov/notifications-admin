@@ -11,7 +11,7 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import login_required
+from flask_login import current_user, login_required
 from werkzeug.utils import redirect
 
 from app import (
@@ -52,15 +52,18 @@ def temp_service_history(service_id):
 
 @main.route("/services/<service_id>/dashboard")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def old_service_dashboard(service_id):
     return redirect(url_for('.service_dashboard', service_id=service_id))
 
 
 @main.route("/services/<service_id>")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def service_dashboard(service_id):
+
+    if not current_user.has_permissions('view_activity'):
+        return redirect(url_for('main.choose_template', service_id=service_id))
 
     if session.get('invited_user'):
         session.pop('invited_user', None)
