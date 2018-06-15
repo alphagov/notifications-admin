@@ -103,23 +103,22 @@ def feedback(ticket_type):
         user_email = form.email_address.data
         user_name = form.name.data or None
         if current_service:
-            service_string = 'Service "{name}": {url}\n'.format(
+            service_string = 'Service: "{name}"\n{url}\n'.format(
                 name=current_service['name'],
                 url=url_for('main.service_dashboard', service_id=current_service['id'], _external=True)
             )
         else:
             service_string = ''
 
-        feedback_msg = 'Environment: {}\n{}{}\n{}'.format(
-            url_for('main.index', _external=True),
+        feedback_msg = '{}\n{}{}'.format(
+            form.feedback.data
             service_string,
             '' if user_email else '{} (no email address supplied)'.format(form.name.data),
-            form.feedback.data
         )
 
         zendesk_client.create_ticket(
             subject='Notify feedback',
-            message=feedback_msg,
+            feedback_msg,
             ticket_type=ticket_type,
             p1=p1,
             user_email=user_email,
