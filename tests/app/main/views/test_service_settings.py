@@ -595,7 +595,7 @@ def test_should_redirect_after_request_to_go_live(
     )
 
     returned_message = mock_post.call_args[1]['message']
-    assert 'On behalf of service one' in returned_message
+    assert 'Service: service one' in returned_message
     assert 'Organisation type: central' in returned_message
     assert 'Agreement signed: Can’t tell' in returned_message
     assert 'Channel: email and text messages' in returned_message
@@ -2610,13 +2610,13 @@ def test_submit_email_branding_request(
     )
 
     zendesk.assert_called_once_with(
-        message=(
-            'On behalf of service one '
-            '(http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb)\n'
-            '\n'
-            '---\n'
+        message='\n'.join([
+            'Service: service one',
+            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
+            '',
+            '---',
             'Branding requested: {}'
-        ).format(requested_branding),
+        ]).format(requested_branding),
         subject='Email branding request - service one',
         ticket_type='question',
         user_email='test@user.gov.uk',

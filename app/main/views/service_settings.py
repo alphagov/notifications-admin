@@ -195,7 +195,8 @@ def submit_request_to_go_live(service_id):
         zendesk_client.create_ticket(
             subject='Request to go live - {}'.format(current_service['name']),
             message=(
-                'On behalf of {} ({})\n'
+                'Service: {}\n'
+                '{}\n'
                 '\n---'
                 '\nOrganisation type: {}'
                 '\nAgreement signed: {}'
@@ -934,7 +935,8 @@ def branding_request(service_id):
         zendesk_client.create_ticket(
             subject='Email branding request - {}'.format(current_service['name']),
             message=(
-                'On behalf of {} ({})\n'
+                'Service: {}\n'
+                '{}\n'
                 '\n---'
                 '\nBranding requested: {}'
             ).format(

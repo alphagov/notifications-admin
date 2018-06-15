@@ -124,7 +124,7 @@ def test_get_feedback_page_with_prefilled_body(
         _data={'feedback': 'blah', 'name': 'Example', 'email_address': 'test@example.com'}
     )
     message = mock_post.call_args[1]['message']
-    assert message.endswith('blah')
+    assert message.startswith('blah')
     assert 'Please send' not in message
 
 
@@ -144,7 +144,7 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
     assert resp.location == url_for('main.thanks', urgent=True, anonymous=False, _external=True)
     mock_post.assert_called_with(
         subject='Notify feedback',
-        message='Environment: http://localhost/\n\nblah',
+        message='blah\n',
         user_email='rip@gmail.com',
         user_name='Steve Irwin',
         ticket_type=ticket_type,
@@ -182,14 +182,14 @@ def test_passes_user_details_through_flow(
         p1=ANY
     )
     assert mock_post.call_args[1]['message'] == '\n'.join([
-        'Environment: http://localhost/',
-        'Service "service one": {}'.format(url_for(
+        'blah',
+        'Service: "service one"',
+        url_for(
             'main.service_dashboard',
             service_id='596364a0-858e-42c8-9062-a8fe822260eb',
             _external=True
-        )),
-        '',
-        'blah',
+        ),
+        ''
     ])
 
 
