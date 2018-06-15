@@ -118,7 +118,7 @@ def feedback(ticket_type):
 
         zendesk_client.create_ticket(
             subject='Notify feedback',
-            feedback_msg,
+            message=feedback_msg,
             ticket_type=ticket_type,
             p1=p1,
             user_email=user_email,
