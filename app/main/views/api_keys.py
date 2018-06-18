@@ -232,6 +232,12 @@ def delivery_status_callback(service_id):
                 bearer_token=form.bearer_token.data,
                 user_id=current_user.id
             )
+        else:
+            # If no callback is set up and the user chooses to continue
+            # having no callback (ie both fields empty) then there’s
+            # nothing for us to do here
+            pass
+
         return redirect(url_for(back_link, service_id=service_id))
 
     return render_template(
