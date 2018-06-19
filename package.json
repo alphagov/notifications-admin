@@ -8,7 +8,9 @@
   "scripts": {
     "test": "gulp lint",
     "build": "gulp",
-    "watch": "gulp watch"
+    "watch": "gulp watch",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -36,7 +38,8 @@
     "hogan": "1.0.2",
     "jquery": "1.12.4",
     "query-command-supported": "1.0.0",
-    "timeago": "1.6.1"
+    "timeago": "1.6.1",
+    "snyk": "^1.83.0"
   },
   "devDependencies": {
     "gulp-css-url-adjuster": "0.2.3",
@@ -45,5 +48,6 @@
     "gulp-sass-lint": "1.2.0",
     "jshint": "2.9.5",
     "jshint-stylish": "2.2.1"
-  }
+  },
+  "snyk": true
 }
