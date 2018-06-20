@@ -1648,14 +1648,11 @@ eastsuffolk.gov.uk:
   owner: Waveney District Council
   crown: false
   agreement_signed: false
-eastsussexcc.gov.uk:
-  owner: East Sussex County Council
-  crown: false
-  agreement_signed: false
+eastsussexcc.gov.uk: eastsussex.gov.uk
 eastsussex.gov.uk:
   owner: East Sussex County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 e-chorley.gov.uk:
   owner: Chorley Borough Council
   crown: false
@@ -1724,6 +1721,10 @@ erewash.gov.uk:
   owner: Erewash Borough Council
   crown: false
   agreement_signed: false
+esfrs.org.uk:
+  owner: East Sussex Fire and Rescue Service
+  crown: false
+  agreement_signed: true  
 essexcc.gov.uk:
   owner: Essex County Council
   crown: false
@@ -4591,7 +4592,7 @@ tivertontowncouncil.gov.uk:
 tmbc.gov.uk:
   owner: Tonbridge & Malling Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 tobaccoregisterni.gov.uk:
   owner: Belfast City Council
   crown: false
