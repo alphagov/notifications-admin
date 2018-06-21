@@ -2,25 +2,21 @@
 {% from "components/radios.html" import radio, radios, radios_wrapper, conditional_radio_panel %}
 
 {% if 'caseworking' in current_service.permissions %}
-  <div data-module="conditional-radios">
-    {% call radios_wrapper(form.user_type, hide_legend=True) %}
+  <div class="conditional-radios" data-module='conditional-radios'>
+    {% call radios_wrapper(form.user_type) %}
       {% for option in form.user_type %}
-        {{ radio(option) }}
+
+        <div class="bottom-gutter-1-3">
+          {{ radio(option, option_hints={
+              'admin': 'See dashboard and team members',
+              'caseworker': 'Send messages and see sent messages'
+          }) }}
+        </div>
         {% if option.data == 'admin' %}
-          {% call conditional_radio_panel(option.data) %}
-            <div class="bottom-gutter-1-2">
-              <p class="form-label">
-                All admin users can see
-              </p>
-              <ul class="list list-bullet">
-                <li>templates</li>
-                <li>history of sent messages</li>
-                <li>who the other team members are</li>
-              </ul>
-            </div>
+          {% call conditional_radio_panel('admin') %}
             <fieldset class="form-group">
               <legend class="form-label">
-                Permissions
+                Extra permissions
               </legend>
               {{ checkbox(form.send_messages) }}
               {{ checkbox(form.manage_templates) }}
@@ -29,9 +25,11 @@
             </fieldset>
           {% endcall %}
         {% endif %}
+
       {% endfor %}
     {% endcall %}
   </div>
+
 {% else %}
   <fieldset class="form-group">
     <legend class="form-label">
