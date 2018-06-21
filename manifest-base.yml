@@ -13,6 +13,10 @@ command: >
 
 instances: 1
 memory: 1G
+
+services:
+  - logit-ssl-syslog-drain
+
 env:
   NOTIFY_APP_NAME: admin
 
