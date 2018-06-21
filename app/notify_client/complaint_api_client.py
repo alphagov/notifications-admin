@@ -9,3 +9,6 @@ class ComplaintApiClient(NotifyAdminAPIClient):
 
     def get_all_complaints(self):
         return self.get('/complaint')
+
+    def get_complaint_count(self, params_dict=None):
+        return self.get('/complaint/count-by-date-range', params=params_dict)

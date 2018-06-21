@@ -53,6 +53,15 @@ def test_client_only_updates_allowed_attributes(mocker):
     assert str(error.value) == 'Not allowed to update service attributes: foo'
 
 
+def test_get_new_aggregate_platform_stats(mocker):
+    client = ServiceAPIClient()
+    mock = mocker.patch.object(client, 'get')
+    params_dict = {'start_date': '2018-06-01', 'end_date': '2018-06-15'}
+
+    client.get_new_aggregate_platform_stats(params_dict=params_dict)
+    mock.assert_called_once_with('/service/platform-stats-new', params=params_dict)
+
+
 def test_client_creates_service_with_correct_data(
     mocker,
     active_user_with_permissions,
