@@ -2369,18 +2369,12 @@ kentalc.gov.uk:
   owner: Kent Association of Local Councils
   crown: false
   agreement_signed: false
-kentconnects.gov.uk:
-  owner: Kent County Council
-  crown: false
-  agreement_signed: false
+kentconnects.gov.uk: kent.gov.uk:
 kent.gov.uk:
   owner: Kent County Council
   crown: false
-  agreement_signed: false
-kentparishes.gov.uk:
-  owner: Kent County Council
-  crown: false
-  agreement_signed: false
+  agreement_signed: true
+kentparishes.gov.uk: kent.gov.uk:
 kerrier.gov.uk:
   owner: Cornwall Council
   crown: false
