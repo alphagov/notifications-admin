@@ -60,3 +60,11 @@ def test_csrf_redirects_to_sign_in_page_if_not_signed_in(client, mocker):
 
     assert response.status_code == 302
     assert response.location == url_for('main.sign_in', next='/cookies', _external=True)
+
+
+def test_405_returns_something_went_wrong_page(client, mocker):
+    response = client.post('/')
+
+    assert response.status_code == 405
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.string.strip() == 'Something went wrong, please go back and try again.'
