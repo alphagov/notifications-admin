@@ -1,7 +1,7 @@
 import itertools
 from datetime import datetime
 
-from flask import render_template, request
+from flask import render_template, request, url_for
 from flask_login import login_required
 
 from app import complaint_api_client, service_api_client
@@ -9,6 +9,10 @@ from app.main import main
 from app.main.forms import DateFilterForm
 from app.statistics_utils import get_formatted_percentage
 from app.utils import user_is_platform_admin
+
+COMPLAINT_THRESHOLD = 0.02
+FAILURE_THRESHOLD = 3
+ZERO_FAILURE_THRESHOLD = 0
 
 
 @main.route("/platform-admin")
@@ -36,6 +40,112 @@ def platform_admin():
         form=form,
         global_stats=platform_stats,
     )
+
+
+@main.route("/platform-admin-new")
+@login_required
+@user_is_platform_admin
+def platform_admin_new():
+    form = DateFilterForm(request.args)
+    api_args = {}
+
+    if form.start_date.data:
+        api_args['start_date'] = form.start_date.data
+        api_args['end_date'] = form.end_date.data or datetime.utcnow().date()
+
+    platform_stats = service_api_client.get_new_aggregate_platform_stats(api_args)
+    number_of_complaints = complaint_api_client.get_complaint_count(api_args)
+
+    return render_template(
+        'views/platform-admin/index_new.html',
+        form=form,
+        global_stats=make_columns(platform_stats, number_of_complaints)
+    )
+
+
+def is_over_threshold(number, total, threshold):
+    percentage = number / total * 100 if total else 0
+    return percentage > threshold
+
+
+def get_status_box_data(stats, key, label, threshold=FAILURE_THRESHOLD):
+    return {
+        'number': stats['failures'][key],
+        'label': label,
+        'failing': is_over_threshold(
+            stats['failures'][key],
+            stats['total'],
+            threshold
+        ),
+        'percentage': get_formatted_percentage(stats['failures'][key], stats['total'])
+    }
+
+
+def get_tech_failure_status_box_data(stats):
+    stats = get_status_box_data(stats, 'technical-failure', 'technical failures', ZERO_FAILURE_THRESHOLD)
+    stats.pop('percentage')
+    return stats
+
+
+def make_columns(global_stats, complaints_number):
+    return [
+        # email
+        {
+            'black_box': {
+                'number': global_stats['email']['total'],
+                'notification_type': 'email'
+            },
+            'other_data': [
+                get_tech_failure_status_box_data(global_stats['email']),
+                get_status_box_data(global_stats['email'], 'permanent-failure', 'permanent failures'),
+                get_status_box_data(global_stats['email'], 'temporary-failure', 'temporary failures'),
+                {
+                    'number': complaints_number,
+                    'label': 'complaints',
+                    'failing': is_over_threshold(complaints_number,
+                                                 global_stats['email']['total'], COMPLAINT_THRESHOLD),
+                    'percentage': get_formatted_percentage(complaints_number, global_stats['email']['total']),
+                    'url': url_for('main.platform_admin_list_complaints')
+                }
+            ],
+            'test_data': {
+                'number': global_stats['email']['test-key'],
+                'label': 'test emails'
+            }
+        },
+        # sms
+        {
+            'black_box': {
+                'number': global_stats['sms']['total'],
+                'notification_type': 'sms'
+            },
+            'other_data': [
+                get_tech_failure_status_box_data(global_stats['sms']),
+                get_status_box_data(global_stats['sms'], 'permanent-failure', 'permanent failures'),
+                get_status_box_data(global_stats['sms'], 'temporary-failure', 'temporary failures')
+            ],
+            'test_data': {
+                'number': global_stats['sms']['test-key'],
+                'label': 'test text messages'
+            }
+        },
+        # letter
+        {
+            'black_box': {
+                'number': global_stats['letter']['total'],
+                'notification_type': 'letter'
+            },
+            'other_data': [
+                get_tech_failure_status_box_data(global_stats['letter']),
+                get_status_box_data(global_stats['letter'],
+                                    'virus-scan-failed', 'virus scan failures', ZERO_FAILURE_THRESHOLD)
+            ],
+            'test_data': {
+                'number': global_stats['letter']['test-key'],
+                'label': 'test letters'
+            }
+        },
+    ]
 
 
 @main.route("/platform-admin/live-services", endpoint='live_services')

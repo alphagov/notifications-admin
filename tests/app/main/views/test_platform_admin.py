@@ -1,14 +1,18 @@
 import datetime
+import re
 import uuid
 from unittest.mock import ANY
 
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
+from freezegun import freeze_time
 
 from app.main.views.platform_admin import (
     create_global_stats,
     format_stats_by_service,
+    get_tech_failure_status_box_data,
+    is_over_threshold,
     sum_service_usage,
 )
 from tests import service_json
@@ -667,3 +671,114 @@ def test_platform_admin_list_complaints(
     resp_data = response.get_data(as_text=True)
     assert 'Email complaints' in resp_data
     assert mock.called
+
+
+@pytest.mark.parametrize('number, total, threshold, result', [
+    (0, 0, 0, False),
+    (1, 1, 0, True),
+    (2, 3, 66, True),
+    (2, 3, 67, False),
+])
+def test_is_over_threshold(number, total, threshold, result):
+    assert is_over_threshold(number, total, threshold) is result
+
+
+def test_get_tech_failure_status_box_data_removes_percentage_data():
+    stats = {
+        'failures':
+            {'permanent-failure': 0, 'technical-failure': 0, 'temporary-failure': 1, 'virus-scan-failed': 0},
+        'test-key': 0,
+        'total': 5589
+    }
+    tech_failure_data = get_tech_failure_status_box_data(stats)
+
+    assert 'percentage' not in tech_failure_data
+
+
+def test_platform_admin_new_with_start_and_end_dates_provided(mocker, logged_in_platform_admin_client):
+    start_date = '2018-01-01'
+    end_date = '2018-06-01'
+    api_args = {'start_date': datetime.date(2018, 1, 1), 'end_date': datetime.date(2018, 6, 1)}
+
+    mocker.patch('app.main.views.platform_admin.make_columns')
+    aggregate_stats_mock = mocker.patch(
+        'app.main.views.platform_admin.service_api_client.get_new_aggregate_platform_stats')
+    complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
+
+    logged_in_platform_admin_client.get(
+        url_for('main.platform_admin_new', start_date=start_date, end_date=end_date)
+    )
+
+    aggregate_stats_mock.assert_called_with(api_args)
+    complaint_count_mock.assert_called_with(api_args)
+
+
+@freeze_time('2018-6-11')
+def test_platform_admin_new_with_only_a_start_date_provided(mocker, logged_in_platform_admin_client):
+    start_date = '2018-01-01'
+    api_args = {'start_date': datetime.date(2018, 1, 1), 'end_date': datetime.datetime.utcnow().date()}
+
+    mocker.patch('app.main.views.platform_admin.make_columns')
+    aggregate_stats_mock = mocker.patch(
+        'app.main.views.platform_admin.service_api_client.get_new_aggregate_platform_stats')
+    complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
+
+    logged_in_platform_admin_client.get(url_for('main.platform_admin_new', start_date=start_date))
+
+    aggregate_stats_mock.assert_called_with(api_args)
+    complaint_count_mock.assert_called_with(api_args)
+
+
+def test_platform_admin_new_without_dates_provided(mocker, logged_in_platform_admin_client):
+    api_args = {}
+
+    mocker.patch('app.main.views.platform_admin.make_columns')
+    aggregate_stats_mock = mocker.patch(
+        'app.main.views.platform_admin.service_api_client.get_new_aggregate_platform_stats')
+    complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
+
+    logged_in_platform_admin_client.get(url_for('main.platform_admin_new'))
+
+    aggregate_stats_mock.assert_called_with(api_args)
+    complaint_count_mock.assert_called_with(api_args)
+
+
+def test_platform_admin_new_displays_stats_in_right_boxes_and_with_correct_styling(
+    mocker,
+    logged_in_platform_admin_client,
+):
+    platform_stats = {
+        'email': {'failures':
+                  {'permanent-failure': 3, 'technical-failure': 0, 'temporary-failure': 0, 'virus-scan-failed': 0},
+                  'test-key': 0,
+                  'total': 145},
+        'sms': {'failures':
+                {'permanent-failure': 0, 'technical-failure': 1, 'temporary-failure': 0, 'virus-scan-failed': 0},
+                'test-key': 5,
+                'total': 168},
+        'letter': {'failures':
+                   {'permanent-failure': 0, 'technical-failure': 0, 'temporary-failure': 1, 'virus-scan-failed': 1},
+                   'test-key': 0,
+                   'total': 500}
+    }
+    mocker.patch('app.main.views.platform_admin.service_api_client.get_new_aggregate_platform_stats',
+                 return_value=platform_stats)
+    mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count', return_value=15)
+
+    response = logged_in_platform_admin_client.get(url_for('main.platform_admin_new'))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    # Email permanent failure status box - number is correct
+    assert '3 permanent failures' in page.find_all('div', class_='column-third')[0].find(string=re.compile('permanent'))
+    # Email complaints status box - link exists and number is correct
+    assert page.find('a', string='15 complaints')
+    # SMS total box - number is correct
+    assert page.find_all('div', class_='big-number-number')[1].text.strip() == '168'
+    # Test SMS box - number is correct
+    assert '5' in page.find_all('div', class_='column-third')[4].text
+    # SMS technical failure status box - number is correct and failure class is used
+    assert '1 technical failures' in page.find_all('div', class_='column-third')[1].find(
+        'div', class_='big-number-status-failing').text
+    # Letter virus scan failure status box - number is correct and failure class is used
+    assert '1 virus scan failures' in page.find_all('div', class_='column-third')[2].find(
+        'div', class_='big-number-status-failing').text
