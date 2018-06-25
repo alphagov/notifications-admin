@@ -7,12 +7,12 @@ from datetime import datetime
 from flask import (
     Response,
     abort,
+    current_app,
     jsonify,
     render_template,
     request,
     stream_with_context,
     url_for,
-    current_app
 )
 from flask_login import login_required
 from notifications_python_client.errors import APIError
