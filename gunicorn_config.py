@@ -1,5 +1,12 @@
+import os
 import sys
 import traceback
+
+workers = 5
+worker_class = "eventlet"
+errorlog = "/home/vcap/logs/gunicorn_error.log"
+bind = "0.0.0.0:{}".format(os.getenv("PORT"))
+disable_redirect_access_to_syslog = True
 
 
 def worker_abort(worker):
