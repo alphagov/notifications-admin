@@ -12,6 +12,7 @@ from flask import (
     request,
     stream_with_context,
     url_for,
+    current_app
 )
 from flask_login import login_required
 from notifications_python_client.errors import APIError
@@ -178,7 +179,8 @@ def download_notifications_csv(service_id):
                 page=request.args.get('page', 1),
                 page_size=5000,
                 format_for_csv=True,
-                template_type=filter_args.get('message_type')
+                template_type=filter_args.get('message_type'),
+                limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'],
             )
         ),
         mimetype='text/csv',
