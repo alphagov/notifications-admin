@@ -149,13 +149,12 @@ def generate_notifications_csv(**kwargs):
                 ]
             else:
                 values = [
-                    notification['to'],
-                    notification['template']['name'],
-                    notification['template']['template_type'],
-                    notification.get('job_name', None),
+                    notification['recipient'],
+                    notification['template_name'],
+                    notification['template_type'],
+                    notification['job_name'],
                     notification['status'],
-                    notification['created_at'],
-                    notification['updated_at']
+                    notification['created_at']
                 ]
             yield Spreadsheet.from_rows([map(str, values)]).as_csv_data
 
