@@ -58,7 +58,7 @@ governmentlegal.gov.uk:
 gov.scot:
   owner: Scottish Government
   crown: true
-  agreement_signed: false
+  agreement_signed: true
 innovateuk.gsi.gov.uk: innovateuk.gov.uk
 innovateuk.gov.uk:
   owner: Innovate UK
