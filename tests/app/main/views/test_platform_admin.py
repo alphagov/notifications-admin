@@ -702,7 +702,7 @@ def test_platform_admin_new_with_start_and_end_dates_provided(mocker, logged_in_
 
     mocker.patch('app.main.views.platform_admin.make_columns')
     aggregate_stats_mock = mocker.patch(
-        'app.main.views.platform_admin.service_api_client.get_new_aggregate_platform_stats')
+        'app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
     logged_in_platform_admin_client.get(
@@ -720,7 +720,7 @@ def test_platform_admin_new_with_only_a_start_date_provided(mocker, logged_in_pl
 
     mocker.patch('app.main.views.platform_admin.make_columns')
     aggregate_stats_mock = mocker.patch(
-        'app.main.views.platform_admin.service_api_client.get_new_aggregate_platform_stats')
+        'app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
     logged_in_platform_admin_client.get(url_for('main.platform_admin_new', start_date=start_date))
@@ -734,7 +734,7 @@ def test_platform_admin_new_without_dates_provided(mocker, logged_in_platform_ad
 
     mocker.patch('app.main.views.platform_admin.make_columns')
     aggregate_stats_mock = mocker.patch(
-        'app.main.views.platform_admin.service_api_client.get_new_aggregate_platform_stats')
+        'app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
     logged_in_platform_admin_client.get(url_for('main.platform_admin_new'))
@@ -761,7 +761,7 @@ def test_platform_admin_new_displays_stats_in_right_boxes_and_with_correct_styli
                    'test-key': 0,
                    'total': 500}
     }
-    mocker.patch('app.main.views.platform_admin.service_api_client.get_new_aggregate_platform_stats',
+    mocker.patch('app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats',
                  return_value=platform_stats)
     mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count', return_value=15)
 

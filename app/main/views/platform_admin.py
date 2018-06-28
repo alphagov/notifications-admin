@@ -4,7 +4,11 @@ from datetime import datetime
 from flask import render_template, request, url_for
 from flask_login import login_required
 
-from app import complaint_api_client, service_api_client
+from app import (
+    complaint_api_client,
+    platform_stats_api_client,
+    service_api_client,
+)
 from app.main import main
 from app.main.forms import DateFilterForm
 from app.statistics_utils import get_formatted_percentage
@@ -53,7 +57,7 @@ def platform_admin_new():
         api_args['start_date'] = form.start_date.data
         api_args['end_date'] = form.end_date.data or datetime.utcnow().date()
 
-    platform_stats = service_api_client.get_new_aggregate_platform_stats(api_args)
+    platform_stats = platform_stats_api_client.get_aggregate_platform_stats(api_args)
     number_of_complaints = complaint_api_client.get_complaint_count(api_args)
 
     return render_template(
