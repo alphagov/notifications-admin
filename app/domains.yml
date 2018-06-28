@@ -70,6 +70,10 @@ nhsdigital.nhs.uk: digital.nhs.uk
 digital.nhs.uk:
   owner: NHS Digital
   agreement_signed: true
+ofgem.gov.uk:
+  owner: Ofgem
+  crown: true  
+  agreement_signed: true  
 ofsted.gsi.gov.uk: ofsted.gov.uk
 ofsted.gov.uk:
   owner: Ofsted
