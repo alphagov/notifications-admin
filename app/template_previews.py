@@ -1,3 +1,5 @@
+from io import BytesIO
+
 import requests
 from flask import current_app, json
 
@@ -43,3 +45,24 @@ def get_page_count_for_letter(template, values=None):
     page_count = json.loads(page_count.decode('utf-8'))['count']
 
     return page_count
+
+
+def get_letter_logos():
+    response = requests.get(
+        '{}/logos.json'.format(
+            current_app.config['TEMPLATE_PREVIEW_API_HOST'],
+        ),
+        headers={'Authorization': 'Token {}'.format(current_app.config['TEMPLATE_PREVIEW_API_KEY'])}
+    )
+    return json.loads(response.content)
+
+
+def get_letter_logo_file(filename):
+    response = requests.get(
+        '{}/static/images/letter-template/{}'.format(
+            current_app.config['TEMPLATE_PREVIEW_API_HOST'],
+            filename
+        ),
+        headers={'Authorization': 'Token {}'.format(current_app.config['TEMPLATE_PREVIEW_API_KEY'])}
+    )
+    return BytesIO(response.content)
