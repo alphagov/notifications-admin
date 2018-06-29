@@ -13,8 +13,7 @@
   <h1 class="heading-large">
     Summary
   </h1>
-
-  <details>
+  <details {% if form.errors %}open{% endif %}>
     <summary>Apply filters</summary>
     <form autocomplete="off" method="get">
       {{ textbox(form.start_date, hint="Enter start date in format YYYY-MM-DD") }}

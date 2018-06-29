@@ -50,8 +50,10 @@ def platform_admin():
 @login_required
 @user_is_platform_admin
 def platform_admin_new():
-    form = DateFilterForm(request.args)
+    form = DateFilterForm(request.args, meta={'csrf': False})
     api_args = {}
+
+    form.validate()
 
     if form.start_date.data:
         api_args['start_date'] = form.start_date.data
