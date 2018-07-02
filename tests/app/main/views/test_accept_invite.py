@@ -264,8 +264,10 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'Create an account'
 
-    email_in_page = page.find('main').find('p')
-    assert email_in_page.text.strip() == 'Your account will be created with this email: invited_user@test.gov.uk'  # noqa
+    assert normalize_spaces(page.select_one('main p').text) == (
+        'Your account will be created with this email address: '
+        'invited_user@test.gov.uk'
+    )
 
     form = page.find('form')
     name = form.find('input', id='name')
