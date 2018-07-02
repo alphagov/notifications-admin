@@ -20,6 +20,7 @@ marinemanagement.org.uk:
   owner: Marine Management Organisation
   agreement_signed: true
 crowncommercial.gov.uk: cabinet-office.gov.uk
+cabinetoffice.gov.uk: cabinet-office.gov.uk
 cabinet-office.gov.uk:
   owner: Cabinet Office
   crown: true
