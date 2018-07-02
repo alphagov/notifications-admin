@@ -25,6 +25,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
+from notifications_utils.formatters import make_quotes_smart
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import (
     EmailPreviewTemplate,
@@ -613,3 +614,13 @@ class GovernmentEmailDomain(AgreementInfo):
 def unicode_truncate(s, length):
     encoded = s.encode('utf-8')[:length]
     return encoded.decode('utf-8', 'ignore')
+
+
+def guess_name_from_email_address(email_address):
+
+    possible_name = re.split(r'[\@\+]', email_address)[0]
+
+    if '.' not in possible_name:
+        return ''
+
+    return make_quotes_smart(possible_name.replace('.', ' ').title())
