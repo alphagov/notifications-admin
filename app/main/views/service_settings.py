@@ -113,19 +113,26 @@ def service_name_change(service_id):
     form = RenameServiceForm()
 
     if request.method == 'GET':
-        form.name.data = current_service.get('name')
+        form.name.data = current_service['name']
 
     if form.validate_on_submit():
+
+        if form.name.data == current_service['name']:
+            return redirect(url_for('.service_settings', service_id=service_id))
+
         unique_name = service_api_client.is_service_name_unique(service_id, form.name.data, email_safe(form.name.data))
+
         if not unique_name:
             form.name.errors.append("This service name is already in use")
             return render_template('views/service-settings/name.html', form=form)
+
         session['service_name_change'] = form.name.data
         return redirect(url_for('.service_name_change_confirm', service_id=service_id))
 
     return render_template(
         'views/service-settings/name.html',
-        form=form)
+        form=form,
+    )
 
 
 @main.route("/services/<service_id>/service-settings/name/confirm", methods=['GET', 'POST'])
