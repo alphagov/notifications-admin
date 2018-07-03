@@ -7,7 +7,16 @@ def test_get_all_complaints(mocker):
     mock = mocker.patch('app.notify_client.complaint_api_client.ComplaintApiClient.get')
 
     client.get_all_complaints()
-    mock.assert_called_once_with('/complaint')
+    mock.assert_called_once_with('/complaint', params={'page': 1})
+
+
+def test_get_all_complaints_with_a_page_number_specified(mocker):
+    client = ComplaintApiClient()
+
+    mock = mocker.patch('app.notify_client.complaint_api_client.ComplaintApiClient.get')
+
+    client.get_all_complaints(page=3)
+    mock.assert_called_once_with('/complaint', params={'page': 3})
 
 
 def test_get_complaint_count(mocker):

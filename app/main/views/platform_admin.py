@@ -12,7 +12,11 @@ from app import (
 from app.main import main
 from app.main.forms import DateFilterForm
 from app.statistics_utils import get_formatted_percentage
-from app.utils import user_is_platform_admin
+from app.utils import (
+    generate_next_dict,
+    generate_previous_dict,
+    user_is_platform_admin,
+)
 
 COMPLAINT_THRESHOLD = 0.02
 FAILURE_THRESHOLD = 3
@@ -190,11 +194,23 @@ def platform_admin_services():
 @login_required
 @user_is_platform_admin
 def platform_admin_list_complaints():
-    complaints = complaint_api_client.get_all_complaints()
+    page = int(request.args.get('page', 1))
+    response = complaint_api_client.get_all_complaints(page=page)
+
+    prev_page = None
+    if response['links'].get('prev'):
+        prev_page = generate_previous_dict('main.platform_admin_list_complaints', None, page)
+    next_page = None
+    if response['links'].get('next'):
+        next_page = generate_next_dict('main.platform_admin_list_complaints', None, page)
+
     return render_template(
         'views/platform-admin/complaints.html',
-        complaints=complaints,
+        complaints=response['complaints'],
         page_title='All Complaints',
+        page=page,
+        prev_page=prev_page,
+        next_page=next_page,
     )
 
 

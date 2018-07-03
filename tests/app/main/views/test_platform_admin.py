@@ -662,7 +662,7 @@ def test_platform_admin_list_complaints(
         'created_at': '2018-06-05T13:50:30.012354',
     }
     mock = mocker.patch('app.complaint_api_client.get_all_complaints',
-                        return_value=[complaint])
+                        return_value={'complaints': [complaint], 'links': {}})
 
     client.login(platform_admin_user)
     response = client.get(url_for('main.platform_admin_list_complaints'))
@@ -671,6 +671,39 @@ def test_platform_admin_list_complaints(
     resp_data = response.get_data(as_text=True)
     assert 'Email complaints' in resp_data
     assert mock.called
+
+
+def test_should_show_complaints_with_next_previous(mocker, client, platform_admin_user, service_one, fake_uuid):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+
+    api_response = {
+        'complaints': [{'complaint_date': None,
+                        'complaint_type': None,
+                        'created_at': '2017-12-18T05:00:00.000000Z',
+                        'id': fake_uuid,
+                        'notification_id': fake_uuid,
+                        'service_id': service_one['id'],
+                        'service_name': service_one['name'],
+                        'ses_feedback_id': 'None'}],
+        'links': {'last': '/complaint?page=3', 'next': '/complaint?page=3', 'prev': '/complaint?page=1'}
+    }
+
+    mocker.patch('app.complaint_api_client.get_all_complaints', return_value=api_response)
+
+    response = client.get(url_for('main.platform_admin_list_complaints', page=2))
+
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    next_page_link = page.find('a', {'rel': 'next'})
+    prev_page_link = page.find('a', {'rel': 'previous'})
+    assert (url_for('main.platform_admin_list_complaints', page=3) in next_page_link['href'])
+    assert 'Next page' in next_page_link.text.strip()
+    assert 'page 3' in next_page_link.text.strip()
+    assert (url_for('main.platform_admin_list_complaints', page=1) in prev_page_link['href'])
+    assert 'Previous page' in prev_page_link.text.strip()
+    assert 'page 1' in prev_page_link.text.strip()
 
 
 @pytest.mark.parametrize('number, total, threshold, result', [
