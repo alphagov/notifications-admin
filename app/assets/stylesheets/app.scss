@@ -251,3 +251,9 @@ details .arrow {
     cursor: pointer;
   }
 }
+
+.bordered-text-box {
+  padding: 5px;
+  outline: 2px solid $black;
+  max-width: 100%;
+}

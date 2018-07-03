@@ -16,6 +16,18 @@
 
 }
 
+.big-number-dark {
+  @extend %big-number;
+  padding: $gutter-half;
+  position: relative;
+  background: $black;
+  color: $white;
+
+  .big-number-number {
+    @include bold-36($tabular-numbers: true);
+  }
+}
+
 .big-number-smaller {
 
   @extend %big-number;
