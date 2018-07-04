@@ -706,6 +706,17 @@ def test_should_show_complaints_with_next_previous(mocker, client, platform_admi
     assert 'page 1' in prev_page_link.text.strip()
 
 
+def test_platform_admin_list_complaints_returns_404_with_invalid_page(mocker, client, platform_admin_user):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+
+    mocker.patch('app.complaint_api_client.get_all_complaints', return_value={'complaints': [], 'links': {}})
+
+    response = client.get(url_for('main.platform_admin_list_complaints', page='invalid'))
+
+    assert response.status_code == 404
+
+
 @pytest.mark.parametrize('number, total, threshold, result', [
     (0, 0, 0, False),
     (1, 1, 0, True),

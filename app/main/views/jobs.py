@@ -199,7 +199,7 @@ def get_notifications(service_id, message_type, status_override=None):
     # TODO get the api to return count of pages as well.
     page = get_page_from_request()
     if page is None:
-        abort(404, "Invalid page argument ({}) reverting to page 1.".format(request.args['page'], None))
+        abort(404, "Invalid page argument ({}).".format(request.args.get('page')))
     if message_type not in ['email', 'sms', 'letter']:
         abort(404)
     filter_args = parse_filter_args(request.args)

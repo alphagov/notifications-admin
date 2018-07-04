@@ -1,7 +1,7 @@
 import itertools
 from datetime import datetime
 
-from flask import render_template, request, url_for
+from flask import abort, render_template, request, url_for
 from flask_login import login_required
 
 from app import (
@@ -15,6 +15,7 @@ from app.statistics_utils import get_formatted_percentage
 from app.utils import (
     generate_next_dict,
     generate_previous_dict,
+    get_page_from_request,
     user_is_platform_admin,
 )
 
@@ -194,7 +195,10 @@ def platform_admin_services():
 @login_required
 @user_is_platform_admin
 def platform_admin_list_complaints():
-    page = int(request.args.get('page', 1))
+    page = get_page_from_request()
+    if page is None:
+        abort(404, "Invalid page argument ({}).".format(request.args.get('page')))
+
     response = complaint_api_client.get_all_complaints(page=page)
 
     prev_page = None
