@@ -3,12 +3,11 @@ import functools
 import pytest
 from flask import url_for
 
-from tests.conftest import client_request as client_request_factory
-
 
 @pytest.fixture
 def get_service_settings_page(
-    logged_in_platform_admin_client,
+    client_request,
+    platform_admin_user,
     service_one,
     mock_get_inbound_number_for_service,
     mock_get_letter_email_branding,
@@ -18,8 +17,8 @@ def get_service_settings_page(
     no_letter_contact_blocks,
     single_sms_sender,
 ):
-    platform_admin_request = client_request_factory(logged_in_platform_admin_client)
-    return functools.partial(platform_admin_request.get, 'main.service_settings', service_id=service_one['id'])
+    client_request.login(platform_admin_user)
+    return functools.partial(client_request.get, 'main.service_settings', service_id=service_one['id'])
 
 
 @pytest.mark.parametrize('service_fields, endpoint, kwargs, text', [

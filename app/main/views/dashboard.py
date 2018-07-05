@@ -62,12 +62,12 @@ def old_service_dashboard(service_id):
 @user_has_permissions('view_activity', 'send_messages')
 def service_dashboard(service_id):
 
-    if not current_user.has_permissions('view_activity'):
-        return redirect(url_for('main.choose_template', service_id=service_id))
-
     if session.get('invited_user'):
         session.pop('invited_user', None)
         session['service_id'] = service_id
+
+    if not current_user.has_permissions('view_activity'):
+        return redirect(url_for('main.choose_template', service_id=service_id))
 
     return render_template(
         'views/dashboard/dashboard.html',

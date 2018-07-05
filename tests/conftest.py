@@ -2597,7 +2597,13 @@ def os_environ():
 
 
 @pytest.fixture
-def client_request(logged_in_client):
+def client_request(
+    logged_in_client,
+    active_user_with_permissions,
+    mocker,
+    service_one,
+    fake_uuid,
+):
     class ClientRequest:
 
         @staticmethod
@@ -2605,6 +2611,9 @@ def client_request(logged_in_client):
         def session_transaction():
             with logged_in_client.session_transaction() as session:
                 yield session
+
+        def login(user, service=service_one):
+            logged_in_client.login(user, mocker, service)
 
         @staticmethod
         def get(
