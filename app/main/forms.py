@@ -40,6 +40,7 @@ from app.main.validators import (
     ValidEmail,
     ValidGovEmail,
 )
+from app.notify_client.models import roles
 
 
 def get_time_value_and_label(future_time):
@@ -256,11 +257,14 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
-class PermissionsForm(StripWhitespaceForm):
+class AbstractPermissionsForm(StripWhitespaceForm):
+
+    view_activity = HiddenField("View activity")
     send_messages = BooleanField("Send messages from existing templates")
     manage_templates = BooleanField("Add and edit templates")
     manage_service = BooleanField("Modify this service and its team")
     manage_api_keys = BooleanField("Create and revoke API keys")
+
     login_authentication = RadioField(
         'Sign in using',
         choices=[
@@ -270,17 +274,59 @@ class PermissionsForm(StripWhitespaceForm):
         validators=[DataRequired()]
     )
 
+    @property
+    def permissions(self):
+        return {role for role in roles.keys() if self[role].data is True}
 
-class InviteUserForm(PermissionsForm):
+
+class AdminPermissionsForm(AbstractPermissionsForm):
+
+    def process(self, *args, **kwargs):
+        super().process(*args, **kwargs)
+        # view_activity is a default role to be added to all users.
+        self.view_activity.data = True
+
+
+class CaseworkingPermissionsForm(AbstractPermissionsForm):
+
+    def process(self, *args, **kwargs):
+        super().process(*args, **kwargs)
+        if self.user_type.data == 'admin':
+            self.view_activity.data = True
+        elif self.user_type.data == 'caseworker':
+            self.view_activity.data = False
+            self.manage_templates.data = False
+            self.manage_service.data = False
+            self.manage_api_keys.data = False
+            self.send_messages.data = True
+
+    user_type = RadioField(
+        'User type',
+        choices=[
+            ('caseworker', 'Caseworker'),
+            ('admin', 'Admin'),
+        ],
+    )
+
+
+class AbstractInviteUserForm(StripWhitespaceForm):
     email_address = email_address(gov_user=False)
 
     def __init__(self, invalid_email_address, *args, **kwargs):
-        super(InviteUserForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.invalid_email_address = invalid_email_address.lower()
 
     def validate_email_address(self, field):
         if field.data.lower() == self.invalid_email_address:
             raise ValidationError("You can’t send an invitation to yourself")
+
+
+class AdminInviteUserForm(AbstractInviteUserForm, AdminPermissionsForm):
+    pass
+
+
+class CaseworkingInviteUserForm(AbstractInviteUserForm, CaseworkingPermissionsForm):
+    pass
 
 
 class InviteOrgUserForm(StripWhitespaceForm):

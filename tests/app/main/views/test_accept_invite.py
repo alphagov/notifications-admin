@@ -1,11 +1,17 @@
 from unittest.mock import ANY, Mock
 
+import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 from notifications_python_client.errors import HTTPError
 
 import app
 from app.notify_client.models import InvitedUser
+from tests.conftest import (
+    SERVICE_ONE_ID,
+    active_caseworking_user,
+    active_user_with_permissions,
+)
 from tests.conftest import mock_check_invite_token as mock_check_token_invite
 from tests.conftest import normalize_spaces
 from tests.conftest import sample_invite as create_sample_invite
@@ -24,7 +30,7 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     mocker,
 ):
     expected_service = service_one['id']
-    expected_permissions = {'send_messages', 'manage_service', 'manage_api_keys'}
+    expected_permissions = {'view_activity', 'send_messages', 'manage_service', 'manage_api_keys'}
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
 
@@ -82,6 +88,81 @@ def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(
     )
 
 
+def test_invite_goes_in_session(
+    client_request,
+    mocker,
+    sample_invite,
+    mock_get_service,
+    api_user_active,
+    mock_check_invite_token,
+    mock_get_user_by_email,
+    mock_get_users_by_service,
+    mock_add_user_to_service,
+    mock_accept_invite,
+):
+    invite = InvitedUser(**sample_invite)
+    invite.email_address = 'test@user.gov.uk'
+    mocker.patch('app.invite_api_client.check_token', return_value=invite)
+
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_dashboard',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+        _follow_redirects=False,
+    )
+
+    with client_request.session_transaction() as session:
+        assert session['invited_user']['email_address'] == invite.email_address
+
+
+@pytest.mark.parametrize('user, landing_page_title', [
+    (active_user_with_permissions, 'Dashboard'),
+    (active_caseworking_user, 'Choose a template'),
+])
+def test_accepting_invite_removes_invite_from_session(
+    client_request,
+    mocker,
+    sample_invite,
+    mock_get_service,
+    service_one,
+    mock_check_invite_token,
+    mock_get_user_by_email,
+    mock_get_users_by_service,
+    mock_add_user_to_service,
+    mock_accept_invite,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_jobs,
+    mock_get_service_statistics,
+    mock_get_usage,
+    mock_get_inbound_sms_summary,
+    fake_uuid,
+    user,
+    landing_page_title,
+):
+    invite = InvitedUser(**sample_invite)
+    user = user(fake_uuid)
+    invite.email_address = user.email_address
+
+    mocker.patch('app.invite_api_client.check_token', return_value=invite)
+    client_request.login(user)
+
+    page = client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _follow_redirects=True,
+    )
+    assert page.h1.string == landing_page_title
+
+    with client_request.session_transaction() as session:
+        assert 'invited_user' not in session
+
+
 def test_existing_user_of_service_get_redirected_to_signin(
     client,
     mocker,
@@ -123,7 +204,7 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
     mocker,
 ):
     expected_service = service_one['id']
-    expected_permissions = {'send_messages', 'manage_service', 'manage_api_keys'}
+    expected_permissions = {'view_activity', 'send_messages', 'manage_service', 'manage_api_keys'}
 
     response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
 
@@ -401,7 +482,7 @@ def test_new_invited_user_verifies_and_added_to_service(
 
     # when they post codes back to admin user should be added to
     # service and sent on to dash board
-    expected_permissions = {'send_messages', 'manage_service', 'manage_api_keys'}
+    expected_permissions = {'view_activity', 'send_messages', 'manage_service', 'manage_api_keys'}
 
     with client.session_transaction() as session:
         new_user_id = session['user_id']

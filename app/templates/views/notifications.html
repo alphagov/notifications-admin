@@ -11,14 +11,19 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    {{ message_count_label(99, message_type, suffix='') | capitalize }}
+    {% if not current_user.has_permissions('view_activity') %}<span class="visually-hidden">{% endif %}
+      {{ message_count_label(99, message_type, suffix='') | capitalize }}
+    {% if not current_user.has_permissions('view_activity') %}</span>{% endif %}
   </h1>
   {% if not message_type == "letter" %}
-    {{ ajax_block(
-      partials,
-      url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status),
-      'counts'
-    ) }}
+
+    {% if current_user.has_permissions('view_activity') %}
+      {{ ajax_block(
+        partials,
+        url_for('.get_notifications_as_json', service_id=current_service.id, message_type=message_type, status=status),
+        'counts'
+      ) }}
+    {% endif %}
 
     <form
       method="post"
@@ -29,7 +34,6 @@
         {{ textbox(
           search_form.to,
           width='1-1',
-          label='Search by {}'.format('email address' if message_type == 'email' else 'phone number')
         ) }}
       </div>
       <div class="column-one-quarter align-button-with-textbox">

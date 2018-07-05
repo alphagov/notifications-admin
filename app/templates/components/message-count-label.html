@@ -1,4 +1,11 @@
 {% macro message_count_label(count, template_type, suffix='sent') -%}
+  {% if template_type == None %}
+    {%- if count == 1 -%}
+      message
+    {%- else -%}
+      messages
+    {%- endif -%}
+  {% endif %}
   {%- if template_type == 'sms' -%}
     {%- if count == 1 -%}
       text message

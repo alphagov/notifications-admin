@@ -42,7 +42,7 @@ from app.utils import (
 
 @main.route("/services/<service_id>/notification/<uuid:notification_id>")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def view_notification(service_id, notification_id):
     notification = notification_api_client.get_notification(service_id, str(notification_id))
     notification['template'].update({'reply_to_text': notification['reply_to_text']})
@@ -126,7 +126,7 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype):
 
 
 @main.route("/services/<service_id>/notification/<notification_id>.json")
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def view_notification_updates(service_id, notification_id):
     return jsonify(**get_single_notification_partials(
         notification_api_client.get_notification(service_id, notification_id)

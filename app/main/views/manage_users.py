@@ -1,3 +1,5 @@
+from functools import partial
+
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
@@ -9,7 +11,13 @@ from app import (
     user_api_client,
 )
 from app.main import main
-from app.main.forms import InviteUserForm, PermissionsForm, SearchUsersForm
+from app.main.forms import (
+    AdminInviteUserForm,
+    AdminPermissionsForm,
+    CaseworkingInviteUserForm,
+    CaseworkingPermissionsForm,
+    SearchUsersForm,
+)
 from app.notify_client.models import roles
 from app.utils import user_has_permissions
 
@@ -40,9 +48,12 @@ def manage_users(service_id):
 @user_has_permissions('manage_service')
 def invite_user(service_id):
 
-    form = InviteUserForm(
-        invalid_email_address=current_user.email_address
-    )
+    if 'caseworking' in current_service['permissions']:
+        form = CaseworkingInviteUserForm
+    else:
+        form = AdminInviteUserForm
+
+    form = form(invalid_email_address=current_user.email_address)
 
     service_has_email_auth = 'email_auth' in current_service['permissions']
     if not service_has_email_auth:
@@ -50,12 +61,11 @@ def invite_user(service_id):
 
     if form.validate_on_submit():
         email_address = form.email_address.data
-        permissions = get_permissions_from_form(form)
         invited_user = invite_api_client.create_invite(
             current_user.id,
             service_id,
             email_address,
-            permissions,
+            form.permissions,
             form.login_authentication.data
         )
 
@@ -79,14 +89,23 @@ def edit_user_permissions(service_id, user_id):
     user = user_api_client.get_user(user_id)
     user_has_no_mobile_number = user.mobile_number is None
 
-    form = PermissionsForm(
+    if 'caseworking' in current_service['permissions']:
+        form = partial(
+            CaseworkingPermissionsForm,
+            user_type='admin' if user.has_permission_for_service(service_id, 'view_activity') else 'caseworker',
+        )
+    else:
+        form = AdminPermissionsForm
+
+    form = form(
         **{role: user.has_permission_for_service(service_id, role) for role in roles.keys()},
         login_authentication=user.auth_type
     )
+
     if form.validate_on_submit():
         user_api_client.set_user_permissions(
             user_id, service_id,
-            permissions=set(get_permissions_from_form(form)),
+            permissions=form.permissions,
         )
         if service_has_email_auth:
             user_api_client.update_user_attribute(user_id, auth_type=form.login_authentication.data)
@@ -108,7 +127,7 @@ def remove_user_from_service(service_id, user_id):
     user = user_api_client.get_user(user_id)
     # Need to make the email address read only, or a disabled field?
     # Do it through the template or the form class?
-    form = PermissionsForm(**{
+    form = AdminPermissionsForm(**{
         role: user.has_permission_for_service(service_id, role) for role in roles.keys()
     })
 
@@ -144,12 +163,3 @@ def cancel_invited_user(service_id, invited_user_id):
     invite_api_client.cancel_invited_user(service_id=service_id, invited_user_id=invited_user_id)
 
     return redirect(url_for('main.manage_users', service_id=service_id))
-
-
-def get_permissions_from_form(form):
-    # view_activity is a default role to be added to all users.
-    # All users will have at minimum view_activity to allow users to see notifications,
-    # templates, team members but no update privileges
-    selected_roles = {role for role in roles.keys() if form[role].data is True}
-    selected_roles.add('view_activity')
-    return selected_roles

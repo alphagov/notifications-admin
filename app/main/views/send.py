@@ -436,7 +436,8 @@ def send_test_step(service_id, template_id, step_index):
         request.endpoint == 'main.send_one_off_step' and
         step_index == 0 and
         template.template_type != 'letter' and
-        not (template.template_type == 'sms' and current_user.mobile_number is None)
+        not (template.template_type == 'sms' and current_user.mobile_number is None) and
+        current_user.has_permissions('view_activity')
     ):
         skip_link = (
             'Use my {}'.format(first_column_headings[template.template_type][0]),
@@ -766,14 +767,20 @@ def get_back_link(service_id, template_id, step_index):
         else:
             return None
     elif step_index == 0:
-        return url_for(
-            '.view_template',
-            service_id=service_id,
-            template_id=template_id,
-        )
+        if current_user.has_permissions('view_activity'):
+            return url_for(
+                '.view_template',
+                service_id=service_id,
+                template_id=template_id,
+            )
+        else:
+            return url_for(
+                '.choose_template',
+                service_id=service_id,
+            )
     else:
         return url_for(
-            request.endpoint,
+            'main.send_one_off_step',
             service_id=service_id,
             template_id=template_id,
             step_index=step_index - 1,
@@ -803,8 +810,7 @@ def _check_notification(service_id, template_id, exception=None):
         sms_sender=sms_sender
     )
 
-    # go back to start of process
-    back_link = get_back_link(service_id, template_id, 0)
+    back_link = get_back_link(service_id, template_id, len(fields_to_fill_in(template)))
 
     if (
         not session.get('recipient') or

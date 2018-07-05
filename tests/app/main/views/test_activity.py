@@ -10,11 +10,17 @@ from freezegun import freeze_time
 from app.main.views.jobs import get_status_filters, get_time_left
 from tests.conftest import (
     SERVICE_ONE_ID,
+    active_caseworking_user,
+    active_user_view_permissions,
     mock_get_notifications,
     normalize_spaces,
 )
 
 
+@pytest.mark.parametrize('user', (
+    active_user_view_permissions,
+    active_caseworking_user,
+))
 @pytest.mark.parametrize(
     "message_type,page_title", [
         ('email', 'Emails'),
@@ -72,7 +78,11 @@ def test_can_show_notifications(
     expected_page_argument,
     to_argument,
     expected_to_argument,
+    mocker,
+    user,
+    fake_uuid,
 ):
+    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
     if expected_to_argument:
         response = logged_in_client.post(
             url_for(

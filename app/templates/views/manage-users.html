@@ -63,22 +63,35 @@
         </h3>
         <ul class="tick-cross-list">
           <div class="tick-cross-list-permissions">
-            {{ tick_cross(
-              user.has_permission_for_service(current_service.id, 'send_messages'),
-              'Send messages'
-            ) }}
-            {{ tick_cross(
-              user.has_permission_for_service(current_service.id, 'manage_templates'),
-              'Add and edit templates'
-            ) }}
-            {{ tick_cross(
-              user.has_permission_for_service(current_service.id, 'manage_service'),
-              'Manage service'
-            ) }}
-            {{ tick_cross(
-              user.has_permission_for_service(current_service.id, 'manage_api_keys'),
-              'Access API keys'
-            ) }}
+            {% if user.has_permission_for_service(current_service.id, 'view_activity') %}
+              {% if 'caseworking' in current_service.permissions %}
+                {{ tick_cross(
+                  user.status != 'cancelled',
+                  'Admin'
+                ) }}
+              {% endif %}
+              {{ tick_cross(
+                user.has_permission_for_service(current_service.id, 'send_messages'),
+                'Send messages'
+              ) }}
+              {{ tick_cross(
+                user.has_permission_for_service(current_service.id, 'manage_templates'),
+                'Add and edit templates'
+              ) }}
+              {{ tick_cross(
+                user.has_permission_for_service(current_service.id, 'manage_service'),
+                'Manage service'
+              ) }}
+              {{ tick_cross(
+                user.has_permission_for_service(current_service.id, 'manage_api_keys'),
+                'Access API keys'
+              ) }}
+            {% else %}
+              {{ tick_cross(
+                True,
+                'Caseworker'
+              ) }}
+            {% endif %}
             {% if 'email_auth' in current_service['permissions'] %}
               <div class="tick-cross-list-hint">
                 {% if user.auth_type == 'sms_auth' %}
