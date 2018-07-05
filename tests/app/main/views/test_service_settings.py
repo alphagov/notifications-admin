@@ -291,6 +291,26 @@ def test_should_redirect_after_change_service_name(
     assert mock_service_name_is_unique.called
 
 
+def test_should_not_hit_api_if_service_name_hasnt_changed(
+    client_request,
+    mock_update_service,
+    mock_service_name_is_unique,
+):
+    client_request.post(
+        'main.service_name_change',
+        service_id=SERVICE_ONE_ID,
+        _data={'name': 'service one'},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
+    assert not mock_service_name_is_unique.called
+    assert not mock_update_service.called
+
+
 @pytest.mark.parametrize('user, expected_text, expected_link', [
     (
         active_user_with_permissions,
