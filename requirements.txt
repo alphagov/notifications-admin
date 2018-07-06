@@ -2,6 +2,7 @@ ago==0.0.92
 Flask==1.0.2
 Flask-WTF==0.14.2
 Flask-Login==0.4.1
+wtforms==2.1  # pyup: ignore
 
 blinker==1.4
 pyexcel==0.5.8
