@@ -829,9 +829,7 @@ class ServiceInboundNumberForm(StripWhitespaceForm):
 class CallbackForm(StripWhitespaceForm):
 
     def validate(self):
-        return super().validate() or (
-            self.url.data == '' and self.bearer_token.data == ''
-        )
+        return super().validate() or self.url.data == ''
 
 
 class ServiceReceiveMessagesCallbackForm(CallbackForm):

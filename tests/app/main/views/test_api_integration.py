@@ -521,6 +521,7 @@ def test_callback_forms_validation(
         mock_get_empty_service_inbound_api,
     ), [], False),
 ])
+@pytest.mark.parametrize('bearer_token', ['', 'some-bearer-token'])
 @pytest.mark.parametrize('endpoint, expected_delete_url', [
     (
         'main.delivery_status_callback',
@@ -539,6 +540,7 @@ def test_callback_forms_can_be_cleared(
     delete_should_be_called,
     endpoint,
     expected_delete_url,
+    bearer_token,
     mocker,
 ):
 
@@ -555,7 +557,7 @@ def test_callback_forms_can_be_cleared(
         service_id=service_one['id'],
         _data={
             'url': '',
-            'bearer_token': '',
+            'bearer_token': bearer_token,
         },
         _expected_redirect=url_for(
             'main.api_callbacks',
