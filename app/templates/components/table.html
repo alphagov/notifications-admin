@@ -56,6 +56,15 @@
   </tbody>
 {%- endmacro %}
 
+{% macro settings_row(if_has_permission='') -%}
+  {% set parent_caller = caller %}
+  {% if if_has_permission in current_service.permissions %}
+    {% call row() %}
+      {{ parent_caller() }}
+    {% endcall %}
+  {% endif %}
+{%- endmacro %}
+
 {% macro field(align='left', status='', border=True) -%}
 
     {% set field_alignment = 'table-field-right-aligned' if align == 'right' else 'table-field-center-aligned' %}
