@@ -170,6 +170,22 @@ def test_should_show_overview(
         'Send letters Off Change',
 
     ]),
+    (['letters', 'caseworking'], [
+
+        'Service name service one Change',
+        'Sign-in method Text message code Change',
+        'Basic view On Change',
+
+        'Label Value Action',
+        'Send emails Off Change',
+
+        'Label Value Action',
+        'Send text messages Off Change',
+
+        'Label Value Action',
+        'Send letters Off Change',
+
+    ]),
 ])
 def test_should_show_overview_for_service_with_more_things_set(
         client,
@@ -2372,6 +2388,16 @@ def test_invitation_pages(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(page.select('main p')[0].text) == expected_p
+
+
+def test_see_basic_view_page(
+    client_request,
+):
+    page = client_request.get(
+        "main.service_set_basic_view",
+        service_id=SERVICE_ONE_ID
+    )
+    assert page.h1.text.strip() == 'Basic view'
 
 
 def test_service_settings_when_inbound_number_is_not_set(

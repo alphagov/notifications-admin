@@ -635,6 +635,15 @@ def service_set_auth_type(service_id):
     )
 
 
+@main.route("/services/<service_id>/service-settings/set-basic-view", methods=['GET'])
+@login_required
+@user_has_permissions('manage_service')
+def service_set_basic_view(service_id):
+    return render_template(
+        'views/service-settings/set-basic-view.html',
+    )
+
+
 @main.route("/services/<service_id>/service-settings/letter-contacts", methods=['GET'])
 @login_required
 @user_has_permissions('manage_service', 'manage_api_keys')
