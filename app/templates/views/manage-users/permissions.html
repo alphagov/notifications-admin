@@ -3,7 +3,7 @@
 
 {% if 'caseworking' in current_service.permissions %}
   <div class="conditional-radios" data-module='conditional-radios'>
-    {% call radios_wrapper(form.user_type) %}
+    {% call radios_wrapper(form.user_type, hide_legend=True) %}
       {% for option in form.user_type %}
 
         <div class="bottom-gutter-1-3">

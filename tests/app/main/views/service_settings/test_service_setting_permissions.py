@@ -45,9 +45,9 @@ def get_service_settings_page(
         '.service_switch_can_upload_document', {}, 'Allow to upload documents'),
 
     ({'permissions': []},
-        '.service_switch_caseworking', {}, 'Allow granting of caseworking permission'),
+        '.service_switch_caseworking', {}, 'Allow basic view'),
     ({'permissions': ['caseworking']},
-        '.service_switch_caseworking', {}, 'Stop granting of caseworking permission'),
+        '.service_switch_caseworking', {}, 'Stop basic view'),
 
     ({'permissions': ['sms']}, '.service_set_inbound_number', {'set_inbound_sms': True}, 'Allow inbound sms'),
 
