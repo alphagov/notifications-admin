@@ -170,6 +170,22 @@ def test_should_show_overview(
         'Send letters Off Change',
 
     ]),
+    (['letters', 'caseworking'], [
+
+        'Service name service one Change',
+        'Sign-in method Text message code Change',
+        'Basic view On Change',
+
+        'Label Value Action',
+        'Send emails Off Change',
+
+        'Label Value Action',
+        'Send text messages Off Change',
+
+        'Label Value Action',
+        'Send letters Off Change',
+
+    ]),
 ])
 def test_should_show_overview_for_service_with_more_things_set(
         client,
@@ -2372,6 +2388,58 @@ def test_invitation_pages(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(page.select('main p')[0].text) == expected_p
+
+
+@pytest.mark.parametrize('permissions, expected_selected', [
+    ('caseworking', 'on'),
+    ('', 'off'),
+])
+def test_see_basic_view_page(
+    client_request,
+    service_one,
+    permissions,
+    expected_selected,
+):
+    service_one['permissions'] = permissions
+    page = client_request.get(
+        "main.service_set_basic_view",
+        service_id=SERVICE_ONE_ID
+    )
+    assert page.h1.text.strip() == 'Basic view'
+    assert page.select_one('input[checked]')['value'] == expected_selected
+
+
+@pytest.mark.parametrize('value, expected_updated_permissions', [
+    ('on', {'email', 'caseworking', 'sms'}),
+    ('off', {'email', 'sms'}),
+])
+def test_update_basic_view(
+    mocker,
+    client_request,
+    service_one,
+    value,
+    expected_updated_permissions,
+):
+    mocked_update = mocker.patch(
+        'app.service_api_client.update_service_with_properties',
+        return_value=service_one,
+    )
+    client_request.post(
+        "main.service_set_basic_view",
+        service_id=SERVICE_ONE_ID,
+        _data={
+            'enabled': value,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
+    )
+    assert set(
+        mocked_update.call_args[0][1]['permissions']
+    ) == expected_updated_permissions
 
 
 def test_service_settings_when_inbound_number_is_not_set(

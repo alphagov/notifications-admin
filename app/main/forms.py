@@ -677,6 +677,20 @@ class ServiceSwitchLettersForm(StripWhitespaceForm):
     )
 
 
+class ServiceBasicViewForm(StripWhitespaceForm):
+
+    def __init__(self, enabled):
+        super().__init__(enabled='on' if enabled else 'off')
+
+    enabled = RadioField(
+        'Basic view',
+        choices=[
+            ('on', 'On'),
+            ('off', 'Off'),
+        ],
+    )
+
+
 class ServiceSetBranding(StripWhitespaceForm):
 
     def __init__(self, email_branding=[], *args, **kwargs):
