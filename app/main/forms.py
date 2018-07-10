@@ -303,8 +303,8 @@ class CaseworkingPermissionsForm(AbstractPermissionsForm):
     user_type = RadioField(
         'User type',
         choices=[
-            ('caseworker', 'Caseworker'),
-            ('admin', 'Admin'),
+            ('caseworker', 'Basic view'),
+            ('admin', 'Admin view'),
         ],
     )
 
