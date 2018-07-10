@@ -855,10 +855,11 @@ class SearchTemplatesForm(StripWhitespaceForm):
 
 class SearchUsersByEmailForm(StripWhitespaceForm):
 
-    search = SearchField('Search by name or email address',
+    search = SearchField(
+        'Search by name or email address',
         validators=[
-            DataRequired("You need to enter full or partial e-mail address to search by.")
-        ]
+            DataRequired("You need to enter full or partial email address to search by.")
+        ],
     )
 
 

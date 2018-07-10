@@ -1,10 +1,10 @@
-from flask import abort, render_template, request, url_for
+from flask import render_template, request
 from flask_login import login_required
 
 from app import user_api_client
 from app.main import main
-from app.utils import user_is_platform_admin
 from app.main.forms import SearchUsersByEmailForm
+from app.utils import user_is_platform_admin
 
 
 @main.route("/find-users-by-email", methods=['GET', 'POST'])
@@ -23,3 +23,14 @@ def find_users_by_email():
         form=form,
         users_found=users_found
     ), status
+
+
+@main.route("/users/<user_id>", methods=['GET'])
+@login_required
+@user_is_platform_admin
+def user_information(user_id):
+    user = user_api_client.get_user(user_id)
+    return render_template(
+        'views/find-users/user-information.html',
+        user=user
+    )
