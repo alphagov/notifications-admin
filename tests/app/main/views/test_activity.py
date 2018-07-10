@@ -1,5 +1,6 @@
 import json
 import uuid
+from functools import partial
 from urllib.parse import parse_qs, quote, urlparse
 
 import pytest
@@ -12,6 +13,7 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     active_caseworking_user,
     active_user_view_permissions,
+    active_user_with_permissions,
     mock_get_notifications,
     normalize_spaces,
 )
@@ -143,6 +145,81 @@ def test_can_show_notifications(
     ))
     json_content = json.loads(json_response.get_data(as_text=True))
     assert json_content.keys() == {'counts', 'notifications'}
+
+
+@pytest.mark.parametrize('user, query_parameters, expected_download_link', [
+    (
+        active_user_with_permissions,
+        {},
+        partial(
+            url_for,
+            '.download_notifications_csv',
+            message_type=None,
+        ),
+    ),
+    (
+        active_user_with_permissions,
+        {'status': 'failed'},
+        partial(
+            url_for,
+            '.download_notifications_csv',
+            status='failed'
+        ),
+    ),
+    (
+        active_user_with_permissions,
+        {'message_type': 'sms'},
+        partial(
+            url_for,
+            '.download_notifications_csv',
+            message_type='sms',
+        ),
+    ),
+    (
+        active_user_view_permissions,
+        {},
+        partial(
+            url_for,
+            '.download_notifications_csv',
+        ),
+    ),
+    (
+        active_caseworking_user,
+        {},
+        lambda service_id: None,
+    ),
+])
+def test_link_to_download_notifications(
+    client_request,
+    fake_uuid,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    user,
+    query_parameters,
+    expected_download_link,
+):
+    client_request.login(user(fake_uuid))
+    page = client_request.get(
+        'main.view_notifications',
+        service_id=SERVICE_ONE_ID,
+        **query_parameters
+    )
+    download_link = page.select_one('a[download=download]')
+    assert (
+        download_link['href'] if download_link else None
+    ) == expected_download_link(service_id=SERVICE_ONE_ID)
+
+
+def test_download_not_available_in_basic_view(
+    client_request,
+    active_caseworking_user,
+):
+    client_request.login(active_caseworking_user)
+    client_request.get(
+        'main.download_notifications_csv',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
 
 
 def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
