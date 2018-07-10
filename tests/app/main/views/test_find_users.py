@@ -30,7 +30,7 @@ def test_find_users_by_email_displays_users_found(
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
     mocker.patch('app.user_api_client.find_users_by_full_or_partial_email', return_value={"data": [user_json()]}, autospec=True)
-    response = client.post(url_for('main.find_users_by_email', data=[{"email": "twilight.sparkle"}]))
+    response = client.post(url_for('main.find_users_by_email'), data={"search": "twilight.sparkle"})
     assert response.status_code == 200
 
     document = html.fromstring(response.get_data(as_text=True))
@@ -44,8 +44,22 @@ def test_find_users_by_email_displays_message_if_no_users_found(
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
     mocker.patch('app.user_api_client.find_users_by_full_or_partial_email', return_value={"data": []}, autospec=True)
-    response = client.post(url_for('main.find_users_by_email', data=[{"email": "twilight.sparkle"}]))
+    response = client.post(url_for('main.find_users_by_email'), data={"search": "twilight.sparkle"})
     assert response.status_code == 200
 
     document = html.fromstring(response.get_data(as_text=True))
     assert "No users found." in document.text_content()
+
+
+def test_find_users_by_email_validates_against_empty_search_submission(
+        client,
+        platform_admin_user,
+        mocker
+):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.post(url_for('main.find_users_by_email'), data={"search": ""})
+    assert response.status_code == 400
+
+    document = html.fromstring(response.get_data(as_text=True))
+    assert "You need to enter full or partial e-mail address to search by." in document.text_content()
