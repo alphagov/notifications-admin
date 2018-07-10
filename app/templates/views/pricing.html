@@ -104,7 +104,9 @@
         {% for sheets, central, local in [
           ('1 sheet', '30', '33'),
           ('2 sheets', '33', '39'),
-          ('3 sheets', '36', '45')
+          ('3 sheets', '36', '45'),
+          ('4 sheets', '39', '51'),
+          ('5 sheets', '42', '57'),
         ] %}
           {% call row() %}
             {% call row_heading() %} {{ sheets }} (double sided) {% endcall %}
