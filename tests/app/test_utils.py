@@ -403,7 +403,7 @@ def test_get_valid_agreement_info_unknown_details(domain_or_email_address):
     assert government_domain.crown_status is None
     assert government_domain.owner is None
     assert government_domain.agreement_signed is None
-    assert government_domain.as_human_readable == 'Can’t tell'
+    assert government_domain.as_human_readable == 'Can’t tell (domain is police.gov.uk)'
 
 
 def test_get_valid_agreement_info_only_org_known():
@@ -442,7 +442,7 @@ def test_get_valid_government_domain_gets_most_specific_first():
     assert generic.owner is None
     assert generic.agreement_signed is None
     assert generic.as_human_readable == (
-        'Can’t tell'
+        'Can’t tell (domain is gov.uk)'
     )
 
     specific = AgreementInfo("dacorum.gov.uk")

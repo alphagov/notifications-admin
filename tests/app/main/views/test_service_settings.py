@@ -2774,6 +2774,7 @@ def test_submit_email_branding_request(
 
     zendesk.assert_called_once_with(
         message='\n'.join([
+            'Organisation: Can’t tell (domain is user.gov.uk)',
             'Service: service one',
             'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
             '',
