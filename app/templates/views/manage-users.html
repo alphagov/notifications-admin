@@ -67,7 +67,7 @@
               {% if 'caseworking' in current_service.permissions %}
                 {{ tick_cross(
                   user.status != 'cancelled',
-                  'Admin'
+                  'Admin view'
                 ) }}
               {% endif %}
               {{ tick_cross(
@@ -89,7 +89,7 @@
             {% else %}
               {{ tick_cross(
                 True,
-                'Caseworker'
+                'Basic view'
               ) }}
             {% endif %}
             {% if 'email_auth' in current_service['permissions'] %}

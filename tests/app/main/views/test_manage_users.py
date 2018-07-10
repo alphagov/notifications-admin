@@ -121,7 +121,7 @@ def test_should_show_caseworker_on_overview_page(
     assert normalize_spaces(page.select_one('h1').text) == 'Team members'
     assert normalize_spaces(page.select('.user-list-item')[0].text) == (
         'Test User With Permissions (you) '
-        'Can Admin '
+        'Can Admin view '
         'Can’t Send messages '
         'Can’t Add and edit templates '
         'Can’t Manage service '
@@ -130,7 +130,7 @@ def test_should_show_caseworker_on_overview_page(
     # [1:5] are invited users
     assert normalize_spaces(page.select('.user-list-item')[6].text) == (
         'Test User zzzzzzz@example.gov.uk '
-        'Can Caseworker'
+        'Can Basic view'
     )
 
 
