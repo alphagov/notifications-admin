@@ -52,13 +52,13 @@
     </form>
   {% endif %}
 
-  <p class="bottom-gutter">
-    {% if current_user.has_permissions('view_activity') %}
+  {% if current_user.has_permissions('view_activity') %}
+    <p class="bottom-gutter">
       <a href="{{ download_link }}" download="download" class="heading-small">Download this report</a>
       &emsp;
-    {% endif %}
-    Data available for 7 days
-  </p>
+      Data available for 7 days
+    </p>
+  {% endif %}
 
   {{ ajax_block(
     partials,

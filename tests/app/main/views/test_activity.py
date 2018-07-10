@@ -289,7 +289,7 @@ def test_shows_message_when_no_notifications(
     )
 
     assert normalize_spaces(page.select('tbody tr')[0].text) == (
-        'No messages found'
+        'No messages found (messages are kept for 7 days)'
     )
 
 
