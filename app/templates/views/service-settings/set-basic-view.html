@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/textbox.html" import textbox %}
+{% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
@@ -9,7 +9,7 @@
 {% block maincolumn_content %}
 
   <div class="grid-row">
-    <div class="column-five-sixths">
+    <form method="post" class="column-five-sixths">
       <h1 class="heading-large">Basic view</h1>
       <p>
         Basic view lets you restrict a team member to only:
@@ -21,11 +21,13 @@
       <p>
         You’ll get to choose which team members have basic view.
       </p>
+      {{ radios(form.enabled, hide_legend=True) }}
       {{ page_footer(
+        'Save',
         back_link=url_for('.service_settings', service_id=current_service.id),
         back_link_text='Back to settings'
       ) }}
-    </div>
+    </form>
   </div>
 
 {% endblock %}

@@ -34,6 +34,7 @@ from app.main.forms import (
     OrganisationTypeForm,
     RenameServiceForm,
     RequestToGoLiveForm,
+    ServiceBasicViewForm,
     ServiceContactLinkForm,
     ServiceEditInboundNumberForm,
     ServiceInboundNumberForm,
@@ -635,12 +636,25 @@ def service_set_auth_type(service_id):
     )
 
 
-@main.route("/services/<service_id>/service-settings/set-basic-view", methods=['GET'])
+@main.route("/services/<service_id>/service-settings/set-basic-view", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
 def service_set_basic_view(service_id):
+    form = ServiceBasicViewForm(
+        enabled='caseworking' in current_service['permissions']
+    )
+    if form.validate_on_submit():
+        force_service_permission(
+            service_id,
+            'caseworking',
+            on=(form.enabled.data == 'on'),
+        )
+        return redirect(
+            url_for('.service_settings', service_id=service_id)
+        )
     return render_template(
         'views/service-settings/set-basic-view.html',
+        form=form,
     )
 
 
