@@ -365,8 +365,8 @@
           </a>
         </li>
         <li class="bottom-gutter">
-          <a href="{{ url_for('.service_switch_caseworking', service_id=current_service.id) }}" class="button">
-            {{ 'Stop basic view' if 'caseworking' in current_service.permissions else 'Allow basic view' }}
+          <a href="{{ url_for('.service_set_basic_view', service_id=current_service.id) }}" class="button">
+            Set basic view
           </a>
         </li>
         <li class="bottom-gutter">
@@ -397,3 +397,4 @@
     {% endif %}
 
 {% endblock %}
+}
