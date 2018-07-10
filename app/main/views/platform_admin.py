@@ -28,33 +28,6 @@ ZERO_FAILURE_THRESHOLD = 0
 @login_required
 @user_is_platform_admin
 def platform_admin():
-    form = DateFilterForm(request.args)
-    api_args = {'detailed': True,
-                'only_active': False,     # specifically DO get inactive services
-                'include_from_test_key': form.include_from_test_key.data,
-                }
-
-    if form.start_date.data:
-        api_args['start_date'] = form.start_date.data
-        api_args['end_date'] = form.end_date.data or datetime.utcnow().date()
-
-    platform_stats = service_api_client.get_aggregate_platform_stats(api_args)
-
-    for stat in platform_stats.values():
-        stat['failure_rate'] = get_formatted_percentage(stat['failed'], stat['requested'])
-
-    return render_template(
-        'views/platform-admin/index.html',
-        include_from_test_key=form.include_from_test_key.data,
-        form=form,
-        global_stats=platform_stats,
-    )
-
-
-@main.route("/platform-admin-new")
-@login_required
-@user_is_platform_admin
-def platform_admin_new():
     form = DateFilterForm(request.args, meta={'csrf': False})
     api_args = {}
 
@@ -68,7 +41,7 @@ def platform_admin_new():
     number_of_complaints = complaint_api_client.get_complaint_count(api_args)
 
     return render_template(
-        'views/platform-admin/index_new.html',
+        'views/platform-admin/index.html',
         form=form,
         global_stats=make_columns(platform_stats, number_of_complaints)
     )

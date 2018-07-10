@@ -412,9 +412,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             }
         )
 
-    def get_aggregate_platform_stats(self, params_dict=None):
-        return self.get("/service/platform-stats", params=params_dict)
-
     def get_sms_senders(self, service_id):
         return self.get(
             "/service/{}/sms-sender".format(service_id)
