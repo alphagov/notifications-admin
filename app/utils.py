@@ -474,6 +474,10 @@ class AgreementInfo:
             return 'Can’t tell (domain is {})'.format(self._domain)
 
     @property
+    def as_info_for_branding_request(self):
+        return self.owner or 'Can’t tell (domain is {})'.format(self._domain)
+
+    @property
     def as_jinja_template(self):
         if self.crown_status is None:
             return 'agreement-choose'

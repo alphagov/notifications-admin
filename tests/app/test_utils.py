@@ -454,6 +454,16 @@ def test_get_valid_government_domain_gets_most_specific_first():
     )
 
 
+def test_get_domain_info_for_branding_request():
+
+    assert AgreementInfo("gov.uk").as_info_for_branding_request == (
+        'Can’t tell (domain is gov.uk)'
+    )
+    assert AgreementInfo("dacorum.gov.uk").as_info_for_branding_request == (
+        'Dacorum Borough Council'
+    )
+
+
 def test_validate_government_domain_data():
 
     for domain in AgreementInfo.domains.keys():

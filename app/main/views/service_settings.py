@@ -986,7 +986,7 @@ def branding_request(service_id):
                 '\n---'
                 '\nBranding requested: {}'
             ).format(
-                AgreementInfo.from_current_user().as_human_readable,
+                AgreementInfo.from_current_user().as_info_for_branding_request,
                 current_service['name'],
                 url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
                 branding_options_dict[form.options.data],
