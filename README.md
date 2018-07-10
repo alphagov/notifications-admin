@@ -82,3 +82,17 @@ Your aws credentials should be stored in a folder located at `~/.aws`. Follow [A
 ```
 
 Then visit [localhost:6012](http://localhost:6012)
+
+
+## Updating application dependencies
+
+`requirements.txt` file is generated from the `requirements-app.txt` in order to pin
+versions of all nested dependencies. If `requirements-app.txt` has been changed (or
+we want to update the unpinned nested dependencies) `requirements.txt` should be
+regenerated with
+
+```
+make freeze-requirements
+```
+
+`requirements.txt` should be committed alongside `requirements-app.txt` changes.
