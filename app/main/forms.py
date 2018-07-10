@@ -262,7 +262,7 @@ class AbstractPermissionsForm(StripWhitespaceForm):
     view_activity = HiddenField("View activity")
     send_messages = BooleanField("Send messages from existing templates")
     manage_templates = BooleanField("Add and edit templates")
-    manage_service = BooleanField("Modify this service and its team")
+    manage_service = BooleanField("Manage this service and its team")
     manage_api_keys = BooleanField("Create and revoke API keys")
 
     login_authentication = RadioField(
