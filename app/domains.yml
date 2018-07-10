@@ -2027,18 +2027,12 @@ hambleton.gov.uk:
   owner: Hambleton District Council
   crown: false
   agreement_signed: false
-hampshire.gov.uk:
-  owner: Hampshire County Council
-  crown: false
-  agreement_signed: false
-hantsdirect.gov.uk:
-  owner: Hampshire County Council
-  crown: false
-  agreement_signed: false
+hampshire.gov.uk: hants.gov.uk
+hantsdirect.gov.uk: hants.gov.uk
 hants.gov.uk:
   owner: Hampshire County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 hantsiowcaddie.gov.uk:
   owner: Hampshire County Council
   crown: false
