@@ -630,8 +630,15 @@ def service_set_auth_type(service_id):
 
 @main.route("/services/<service_id>/service-settings/set-basic-view", methods=['GET', 'POST'])
 @login_required
-@user_has_permissions('manage_service')
+@user_has_permissions('manage_service', 'send_messages')
 def service_set_basic_view(service_id):
+
+    if current_user.previewing_basic_view:
+        session.pop('basic', None)
+
+    if not current_user.has_permissions('manage_service'):
+        abort(403)
+
     form = ServiceBasicViewForm(
         enabled='caseworking' in current_service['permissions']
     )
@@ -648,6 +655,14 @@ def service_set_basic_view(service_id):
         'views/service-settings/set-basic-view.html',
         form=form,
     )
+
+
+@main.route("/services/<service_id>/preview-basic-view")
+@login_required
+@user_has_permissions('manage_service')
+def preview_basic_view(service_id):
+    session['basic'] = True
+    return redirect(url_for('.service_dashboard', service_id=service_id))
 
 
 @main.route("/services/<service_id>/service-settings/letter-contacts", methods=['GET'])
