@@ -2406,6 +2406,10 @@ def test_see_basic_view_page(
         service_id=SERVICE_ONE_ID
     )
     assert page.h1.text.strip() == 'Basic view'
+    assert page.select_one('main a')['href'] == url_for(
+        'main.preview_basic_view',
+        service_id=SERVICE_ONE_ID,
+    )
     assert page.select_one('input[checked]')['value'] == expected_selected
 
 
@@ -2440,6 +2444,77 @@ def test_update_basic_view(
     assert set(
         mocked_update.call_args[0][1]['permissions']
     ) == expected_updated_permissions
+
+
+def test_preview_basic_view(
+    client_request,
+    mock_get_service_templates,
+):
+    page = client_request.get(
+        "main.preview_basic_view",
+        service_id=SERVICE_ONE_ID,
+        _follow_redirects=True,
+    )
+
+    with client_request.session_transaction() as session:
+        assert session['basic'] is True
+
+    assert page.h1.text.strip() == 'Choose a template'
+    page.select('.navigation-service-basic-view-preview')
+    assert normalize_spaces(page.select_one('.navigation-service').text) == (
+        'service one '
+        'Preview of basic view '
+        'Back to settings '
+        'Switch service'
+    )
+    page.select_one('a.navigation-service-basic-view-back-link')['href'] == url_for(
+        'main.service_set_basic_view',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    client_request.get(
+        "main.service_set_basic_view",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    with client_request.session_transaction() as session:
+        assert 'basic' not in session
+
+
+def test_cant_preview_basic_view_for_another_service(
+    client_request,
+    mock_get_service_templates,
+    fake_uuid,
+):
+    client_request.get(
+        "main.preview_basic_view",
+        service_id=SERVICE_ONE_ID,
+        _follow_redirects=True,
+        _expected_status=200,
+    )
+    client_request.get(
+        "main.preview_basic_view",
+        service_id=fake_uuid,
+        _expected_status=403,
+    )
+
+
+def test_actual_basic_view_cant_escape_basic_view(
+    client_request,
+    active_caseworking_user,
+    mock_get_service_templates,
+):
+    client_request.login(active_caseworking_user)
+    client_request.get(
+        "main.preview_basic_view",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
+    client_request.get(
+        "main.service_set_basic_view",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
 
 
 def test_service_settings_when_inbound_number_is_not_set(
