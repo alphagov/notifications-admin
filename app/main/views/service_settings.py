@@ -980,11 +980,13 @@ def branding_request(service_id):
         zendesk_client.create_ticket(
             subject='Email branding request - {}'.format(current_service['name']),
             message=(
+                'Organisation: {}\n'
                 'Service: {}\n'
                 '{}\n'
                 '\n---'
                 '\nBranding requested: {}'
             ).format(
+                AgreementInfo.from_current_user().as_human_readable,
                 current_service['name'],
                 url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
                 branding_options_dict[form.options.data],

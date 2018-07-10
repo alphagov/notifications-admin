@@ -437,6 +437,8 @@ class AgreementInfo:
             self.domain_names,
         ), None)
 
+        self._domain = email_address_or_domain.split('@')[-1]
+
         (
             self.owner,
             self.crown_status,
@@ -469,7 +471,7 @@ class AgreementInfo:
                 }.get(self.crown_status),
             )
         else:
-            return 'Can’t tell'
+            return 'Can’t tell (domain is {})'.format(self._domain)
 
     @property
     def as_jinja_template(self):
