@@ -41,6 +41,7 @@ from app.main.validators import (
     ValidGovEmail,
 )
 from app.notify_client.models import roles
+from app.utils import guess_name_from_email_address
 
 
 def get_time_value_and_label(future_time):
@@ -215,20 +216,18 @@ class RegisterUserForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', default='sms_auth')
 
 
-class RegisterUserFromInviteForm(StripWhitespaceForm):
+class RegisterUserFromInviteForm(RegisterUserForm):
     def __init__(self, invited_user):
         super().__init__(
             service=invited_user['service'],
             email_address=invited_user['email_address'],
             auth_type=invited_user['auth_type'],
+            name=guess_name_from_email_address(
+                invited_user['email_address']
+            ),
         )
 
-    name = StringField(
-        'Full name',
-        validators=[DataRequired(message='Can’t be empty')]
-    )
     mobile_number = InternationalPhoneNumber('Mobile number', validators=[])
-    password = password()
     service = HiddenField('service')
     email_address = HiddenField('email_address')
     auth_type = HiddenField('auth_type', validators=[DataRequired()])

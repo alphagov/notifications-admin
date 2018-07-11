@@ -11,7 +11,10 @@ Create an account
 <div class="grid-row">
   <div class="column-two-thirds">
     <h1 class="heading-large">Create an account</h1>
-    <p>Your account will be created with this email: {{invited_user.email_address}}</p>
+    <p>
+      Your account will be created with this email address:
+      <span class="nowrap">{{invited_user.email_address}}</span>
+    </p>
     <form method="post" autocomplete="off">
       {{ textbox(form.name, width='3-4') }}
       {% if invited_user.auth_type == 'sms_auth' %}

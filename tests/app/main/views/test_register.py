@@ -170,6 +170,44 @@ def test_register_with_existing_email_sends_emails(
     assert response.location == url_for('main.registration_continue', _external=True)
 
 
+@pytest.mark.parametrize('email_address, expected_value', [
+    ("first.last@example.com", "First Last"),
+    ("first.middle.last@example.com", "First Middle Last"),
+    ("first.m.last@example.com", "First Last"),
+    ("first.last-last@example.com", "First Last-Last"),
+    ("first.o'last@example.com", "First O’Last"),
+    ("first.last+testing@example.com", "First Last"),
+    ("first.last+testing+testing@example.com", "First Last"),
+    ("first.last6@example.com", "First Last"),
+    ("first.last.212@example.com", "First Last"),
+    ("first.2.last@example.com", "First Last"),
+    ("first.2b.last@example.com", "First Last"),
+    ("first.1.2.3.last@example.com", "First Last"),
+    ("first.last.1.2.3@example.com", "First Last"),
+    # Instances where we can’t make a good-enough guess:
+    ("example123@example.com", ""),
+    ("f.last@example.com", ""),
+    ("f.m.last@example.com", ""),
+])
+def test_shows_registration_page_from_invite(
+    client_request,
+    fake_uuid,
+    email_address,
+    expected_value,
+):
+    with client_request.session_transaction() as session:
+        session['invited_user'] = InvitedUser(
+            fake_uuid, fake_uuid, "",
+            email_address,
+            ["manage_users"],
+            "pending",
+            datetime.utcnow(),
+            'sms_auth',
+        ).serialize()
+    page = client_request.get('main.register_from_invite')
+    assert page.select_one('input[name=name]')['value'] == expected_value
+
+
 def test_register_from_invite(
     client,
     fake_uuid,
@@ -199,6 +237,13 @@ def test_register_from_invite(
     )
     assert response.status_code == 302
     assert response.location == url_for('main.verify', _external=True)
+    mock_register_user.assert_called_once_with(
+        'Registered in another Browser',
+        invited_user.email_address,
+        '+4407700900460',
+        'somreallyhardthingtoguess',
+        'sms_auth',
+    )
 
 
 def test_register_from_invite_when_user_registers_in_another_browser(
