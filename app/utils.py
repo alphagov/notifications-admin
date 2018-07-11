@@ -27,6 +27,7 @@ from flask import (
 from flask_login import current_user
 from notifications_utils.formatters import make_quotes_smart
 from notifications_utils.recipients import RecipientCSV
+from notifications_utils.take import Take
 from notifications_utils.template import (
     EmailPreviewTemplate,
     LetterImageTemplate,
@@ -616,11 +617,41 @@ def unicode_truncate(s, length):
     return encoded.decode('utf-8', 'ignore')
 
 
+def starts_with_initial(name):
+    return bool(re.match(r'^.\.', name))
+
+
+def remove_middle_initial(name):
+    return re.sub(r'\s+.\s+', ' ', name)
+
+
+def remove_digits(name):
+    return ''.join(c for c in name if not c.isdigit())
+
+
+def normalize_spaces(name):
+    return ' '.join(name.split())
+
+
 def guess_name_from_email_address(email_address):
 
     possible_name = re.split(r'[\@\+]', email_address)[0]
 
-    if '.' not in possible_name:
+    if '.' not in possible_name or starts_with_initial(possible_name):
         return ''
 
-    return make_quotes_smart(possible_name.replace('.', ' ').title())
+    return Take(
+        possible_name
+    ).then(
+        str.replace, '.', ' '
+    ).then(
+        remove_digits
+    ).then(
+        remove_middle_initial
+    ).then(
+        str.title
+    ).then(
+        make_quotes_smart
+    ).then(
+        normalize_spaces
+    )

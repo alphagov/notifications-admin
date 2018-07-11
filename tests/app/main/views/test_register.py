@@ -171,13 +171,23 @@ def test_register_with_existing_email_sends_emails(
 
 
 @pytest.mark.parametrize('email_address, expected_value', [
-    ("example123@example.com", ""),
     ("first.last@example.com", "First Last"),
     ("first.middle.last@example.com", "First Middle Last"),
+    ("first.m.last@example.com", "First Last"),
     ("first.last-last@example.com", "First Last-Last"),
     ("first.o'last@example.com", "First O’Last"),
     ("first.last+testing@example.com", "First Last"),
     ("first.last+testing+testing@example.com", "First Last"),
+    ("first.last6@example.com", "First Last"),
+    ("first.last.212@example.com", "First Last"),
+    ("first.2.last@example.com", "First Last"),
+    ("first.2b.last@example.com", "First Last"),
+    ("first.1.2.3.last@example.com", "First Last"),
+    ("first.last.1.2.3@example.com", "First Last"),
+    # Instances where we can’t make a good-enough guess:
+    ("example123@example.com", ""),
+    ("f.last@example.com", ""),
+    ("f.m.last@example.com", ""),
 ])
 def test_shows_registration_page_from_invite(
     client_request,
