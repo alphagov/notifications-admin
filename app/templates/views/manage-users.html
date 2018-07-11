@@ -88,7 +88,7 @@
               ) }}
             {% else %}
               {{ tick_cross(
-                True,
+                user.status != 'cancelled',
                 'Basic view'
               ) }}
             {% endif %}
