@@ -137,28 +137,6 @@ def test_live_trial_services_toggle_including_from_test_key(
                                                         'include_from_test_key': inc})
 
 
-@pytest.mark.parametrize('include_from_test_key, inc', [
-    ("Y", True),
-    ("N", False)
-])
-def test_platform_admin_toggle_including_from_test_key(
-        include_from_test_key,
-        client,
-        platform_admin_user,
-        mocker,
-        mock_get_aggregate_platform_stats,
-        inc
-):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin', include_from_test_key=include_from_test_key))
-
-    assert response.status_code == 200
-    mock_get_aggregate_platform_stats.assert_called_once_with({'detailed': True,
-                                                               'only_active': False,
-                                                               'include_from_test_key': inc})
-
-
 @pytest.mark.parametrize('endpoint', [
     'main.live_services',
     'main.trial_services'
@@ -184,59 +162,6 @@ def test_live_trial_services_with_date_filter(
         'detailed': True,
         'only_active': False,
     })
-
-
-def test_platform_admin_with_date_filter(
-    client,
-    platform_admin_user,
-    mocker,
-    mock_get_aggregate_platform_stats
-):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin', start_date='2016-12-20', end_date='2016-12-28'))
-
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'Platform admin' in resp_data
-    mock_get_aggregate_platform_stats.assert_called_once_with({
-        'include_from_test_key': False,
-        'end_date': datetime.date(2016, 12, 28),
-        'start_date': datetime.date(2016, 12, 20),
-        'detailed': True,
-        'only_active': False,
-    })
-
-
-def test_should_show_total_on_platform_admin_page(
-    client,
-    platform_admin_user,
-    mocker,
-    mock_get_aggregate_platform_stats
-):
-    stats = {
-        'email': {'requested': 61, 'delivered': 55, 'failed': 6},
-        'sms': {'requested': 121, 'delivered': 110, 'failed': 11},
-        'letter': {'requested': 45, 'delivered': 32, 'failed': 13}
-    }
-    expected = (
-        '61 emails sent 6 failed – 9.8%',
-        '121 text messages sent 11 failed – 9.1%',
-        '45 letters sent 13 failed – 28.9%'
-    )
-
-    mock_get_aggregate_platform_stats.return_value = stats
-
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin'))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert (
-        normalize_spaces(page.select('.big-number-with-status')[0].text),
-        normalize_spaces(page.select('.big-number-with-status')[1].text),
-        normalize_spaces(page.select('.big-number-with-status')[2].text),
-    ) == expected
 
 
 @pytest.mark.parametrize('endpoint, expected_big_numbers', [
@@ -522,37 +447,6 @@ def test_shows_archived_label_instead_of_live_or_research_mode_label(
     assert service_mode == 'archived'
 
 
-def test_should_show_correct_sent_totals_for_platform_admin(
-    client,
-    platform_admin_user,
-    mocker,
-    mock_get_aggregate_platform_stats,
-    fake_uuid,
-):
-    stats = {
-        'email': {'requested': 100, 'delivered': 20, 'failed': 40},
-        'sms': {'requested': 100, 'delivered': 10, 'failed': 30},
-        'letter': {'requested': 60, 'delivered': 40, 'failed': 5}
-
-    }
-    mock_get_aggregate_platform_stats.return_value = stats
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for('main.platform_admin'))
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    totals = page.find_all('div', 'big-number-with-status')
-    email_total = int(totals[0].find_all('div', 'big-number-number')[0].text.strip())
-    sms_total = int(totals[1].find_all('div', 'big-number-number')[0].text.strip())
-    letter_total = int(totals[2].find_all('div', 'big-number-number')[0].text.strip())
-
-    assert email_total == 60
-    assert sms_total == 40
-    assert letter_total == 60
-
-
 @pytest.mark.parametrize('endpoint, restricted, research_mode', [
     ('main.trial_services', True, False),
     ('main.live_services', False, False)
@@ -739,7 +633,7 @@ def test_get_tech_failure_status_box_data_removes_percentage_data():
     assert 'percentage' not in tech_failure_data
 
 
-def test_platform_admin_new_with_start_and_end_dates_provided(mocker, logged_in_platform_admin_client):
+def test_platform_admin_with_start_and_end_dates_provided(mocker, logged_in_platform_admin_client):
     start_date = '2018-01-01'
     end_date = '2018-06-01'
     api_args = {'start_date': datetime.date(2018, 1, 1), 'end_date': datetime.date(2018, 6, 1)}
@@ -750,7 +644,7 @@ def test_platform_admin_new_with_start_and_end_dates_provided(mocker, logged_in_
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
     logged_in_platform_admin_client.get(
-        url_for('main.platform_admin_new', start_date=start_date, end_date=end_date)
+        url_for('main.platform_admin', start_date=start_date, end_date=end_date)
     )
 
     aggregate_stats_mock.assert_called_with(api_args)
@@ -758,7 +652,7 @@ def test_platform_admin_new_with_start_and_end_dates_provided(mocker, logged_in_
 
 
 @freeze_time('2018-6-11')
-def test_platform_admin_new_with_only_a_start_date_provided(mocker, logged_in_platform_admin_client):
+def test_platform_admin_with_only_a_start_date_provided(mocker, logged_in_platform_admin_client):
     start_date = '2018-01-01'
     api_args = {'start_date': datetime.date(2018, 1, 1), 'end_date': datetime.datetime.utcnow().date()}
 
@@ -767,13 +661,13 @@ def test_platform_admin_new_with_only_a_start_date_provided(mocker, logged_in_pl
         'app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
-    logged_in_platform_admin_client.get(url_for('main.platform_admin_new', start_date=start_date))
+    logged_in_platform_admin_client.get(url_for('main.platform_admin', start_date=start_date))
 
     aggregate_stats_mock.assert_called_with(api_args)
     complaint_count_mock.assert_called_with(api_args)
 
 
-def test_platform_admin_new_without_dates_provided(mocker, logged_in_platform_admin_client):
+def test_platform_admin_without_dates_provided(mocker, logged_in_platform_admin_client):
     api_args = {}
 
     mocker.patch('app.main.views.platform_admin.make_columns')
@@ -781,13 +675,13 @@ def test_platform_admin_new_without_dates_provided(mocker, logged_in_platform_ad
         'app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
-    logged_in_platform_admin_client.get(url_for('main.platform_admin_new'))
+    logged_in_platform_admin_client.get(url_for('main.platform_admin'))
 
     aggregate_stats_mock.assert_called_with(api_args)
     complaint_count_mock.assert_called_with(api_args)
 
 
-def test_platform_admin_new_displays_stats_in_right_boxes_and_with_correct_styling(
+def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
     mocker,
     logged_in_platform_admin_client,
 ):
@@ -809,7 +703,7 @@ def test_platform_admin_new_displays_stats_in_right_boxes_and_with_correct_styli
                  return_value=platform_stats)
     mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count', return_value=15)
 
-    response = logged_in_platform_admin_client.get(url_for('main.platform_admin_new'))
+    response = logged_in_platform_admin_client.get(url_for('main.platform_admin'))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     # Email permanent failure status box - number is correct

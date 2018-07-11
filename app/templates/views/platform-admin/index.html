@@ -1,9 +1,8 @@
 {% extends "views/platform-admin/_base_template.html" %}
 {% from "components/textbox.html" import textbox %}
-{% from "components/big-number.html" import big_number %}
-{% from "components/checkbox.html" import checkbox %}
-{% from "components/page-footer.html" import page_footer %}
-{% from "components/table.html" import mapping_table, field, stats_fields, row_group, row, right_aligned_field_heading, hidden_field_heading, text_field %}
+{% from "components/big-number.html" import big_number_simple %}
+{% from "components/message-count-label.html" import message_count_label %}
+{% from "components/status-box.html" import status_box %}
 
 {% block per_page_title %}
   Platform admin
@@ -14,18 +13,46 @@
   <h1 class="heading-large">
     Summary
   </h1>
-
-  <details>
+  <details {% if form.errors %}open{% endif %}>
     <summary>Apply filters</summary>
     <form autocomplete="off" method="get">
       {{ textbox(form.start_date, hint="Enter start date in format YYYY-MM-DD") }}
       {{ textbox(form.end_date, hint="Enter end date in format YYYY-MM-DD") }}
-      {{ checkbox(form.include_from_test_key) }}
       </br>
       <button type="submit" class="button">Filter</button>
     </form>
   </details>
 
-  {% include "views/platform-admin/_global_stats.html" %}
+  <div class="grid-row bottom-gutter">
+    {% for noti_type in global_stats %}
+      <div class="column-third">
+        {{ big_number_simple(
+            noti_type.black_box.number,
+            message_count_label(noti_type.black_box.number, noti_type.black_box.notification_type)
+          ) }}
+
+        {% for item in noti_type.other_data %}
+          {{ status_box(
+              number=item.number,
+              label=item.label,
+              failing=item.failing,
+              percentage=item.percentage,
+              url=item.url)
+          }}
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="grid-row bottom-gutter">
+    {% for noti_type in global_stats %}
+      <div class="column-third">
+        <div class="bordered-text-box">
+          <span class="big-number-number">{{ "{:,}".format(noti_type.test_data.number) }}</span>
+          {{ noti_type.test_data.label }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 
 {% endblock %}

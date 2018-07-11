@@ -2671,17 +2671,6 @@ def normalize_spaces(input):
 
 
 @pytest.fixture(scope='function')
-def mock_get_aggregate_platform_stats(mocker):
-    stats = {
-        'email': {'requested': 0, 'delivered': 0, 'failed': 0},
-        'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
-        'letter': {'requested': 0, 'delivered': 0, 'failed': 0}
-
-    }
-    return mocker.patch('app.service_api_client.get_aggregate_platform_stats', return_value=stats)
-
-
-@pytest.fixture(scope='function')
 def mock_get_free_sms_fragment_limit(mocker):
     sample_limit = 250000
     return mocker.patch('app.billing_api_client.get_free_sms_fragment_limit_for_year',
