@@ -50,6 +50,7 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Service name service one Change',
         'Sign-in method Text message code Change',
+        'Basic view Off Change',
 
         'Label Value Action',
         'Send emails On Change',
@@ -72,6 +73,7 @@ def mock_get_service_settings_page_common(
         'Label Value Action',
         'Service name service one Change',
         'Sign-in method Text message code Change',
+        'Basic view Off Change',
 
         'Label Value Action',
         'Send emails On Change',
@@ -132,6 +134,7 @@ def test_should_show_overview(
 
         'Service name service one Change',
         'Sign-in method Text message code Change',
+        'Basic view Off Change',
 
         'Label Value Action',
         'Send emails On Change',
@@ -153,6 +156,7 @@ def test_should_show_overview(
 
         'Service name service one Change',
         'Sign-in method Email link or text message code Change',
+        'Basic view Off Change',
 
         'Label Value Action',
         'Send emails On Change',
@@ -240,7 +244,7 @@ def test_letter_contact_block_shows_none_if_not_set(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = page.find_all('tr')[9].find_all('td')[1].div
+    div = page.find_all('tr')[10].find_all('td')[1].div
     assert div.text.strip() == 'Not set'
     assert 'default' in div.attrs['class'][0]
 
@@ -261,7 +265,7 @@ def test_escapes_letter_contact_block(
     ))
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    div = str(page.find_all('tr')[9].find_all('td')[1].div)
+    div = str(page.find_all('tr')[10].find_all('td')[1].div)
     assert 'foo<br/>bar' in div
     assert '<script>' not in div
 
@@ -814,9 +818,9 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
             page.select('tbody tr')[index].text
         )
 
-    assert get_row(page, 3) == "Email reply to addresses test@example.com …and 2 more Manage"
-    assert get_row(page, 6) == "Text message sender Example …and 2 more Manage"
-    assert get_row(page, 11) == "Sender addresses 1 Example Street …and 2 more Manage"
+    assert get_row(page, 4) == "Email reply to addresses test@example.com …and 2 more Manage"
+    assert get_row(page, 7) == "Text message sender Example …and 2 more Manage"
+    assert get_row(page, 12) == "Sender addresses 1 Example Street …and 2 more Manage"
 
 
 @pytest.mark.parametrize('sender_list_page, expected_output', [
