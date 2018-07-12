@@ -765,7 +765,48 @@ def test_file_name_truncated_to_fit_in_s3_metadata(
     assert sys.getsizeof(''.join((
         '{}{}'.format(key, value) for key, value in
         mock_s3_set_metadata.call_args_list[0][1].items()
-    )).encode('utf-8')) == 1724
+    )).encode('utf-8')) == 1726
+
+
+def test_check_messages_replaces_invalid_characters_in_file_name(
+    client_request,
+    mocker,
+    mock_get_live_service,
+    mock_get_service_template_with_placeholders,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_s3_set_metadata,
+    fake_uuid,
+):
+    with client_request.session_transaction() as session:
+        session['file_uploads'] = {
+            fake_uuid: {'template_id': fake_uuid}
+        }
+
+    mocker.patch('app.main.views.send.s3download', return_value="""
+        phone number,name,thing,thing,thing
+        07700900001, A,   foo,  foo,  foo
+    """)
+
+    file_name = 'ü😁’€'
+
+    client_request.get(
+        'main.check_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        original_file_name=file_name,
+    )
+
+    mock_s3_set_metadata.assert_called_once_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        notification_count=1,
+        original_file_name="u?'?",
+        template_id=fake_uuid,
+        valid=True
+    )
 
 
 def test_show_all_columns_if_there_are_duplicate_recipient_columns(
