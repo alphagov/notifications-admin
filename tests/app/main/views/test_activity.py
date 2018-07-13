@@ -19,14 +19,11 @@ from tests.conftest import (
 )
 
 
-@pytest.mark.parametrize('user', (
-    active_user_view_permissions,
-    active_caseworking_user,
-))
 @pytest.mark.parametrize(
-    "message_type,page_title", [
-        ('email', 'Emails'),
-        ('sms', 'Text messages')
+    "user,extra_args,expected_update_endpoint,page_title", [
+        (active_user_view_permissions, {'message_type': 'email'}, '/email.json', 'Emails'),
+        (active_user_view_permissions, {'message_type': 'sms'}, '/sms.json', 'Text messages'),
+        (active_caseworking_user, {}, '.json', 'Sent messages'),
     ]
 )
 @pytest.mark.parametrize(
@@ -68,11 +65,14 @@ from tests.conftest import (
     ]
 )
 def test_can_show_notifications(
+    client_request,
     logged_in_client,
     service_one,
     mock_get_notifications,
     mock_get_service_statistics,
-    message_type,
+    user,
+    extra_args,
+    expected_update_endpoint,
     page_title,
     status_argument,
     expected_api_call,
@@ -81,33 +81,29 @@ def test_can_show_notifications(
     to_argument,
     expected_to_argument,
     mocker,
-    user,
     fake_uuid,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    client_request.login(user(fake_uuid))
     if expected_to_argument:
-        response = logged_in_client.post(
-            url_for(
-                'main.view_notifications',
-                service_id=service_one['id'],
-                message_type=message_type,
-                status=status_argument,
-                page=page_argument,
-            ),
-            data={
-                'to': to_argument
-            }
-        )
-    else:
-        response = logged_in_client.get(url_for(
+        page = client_request.post(
             'main.view_notifications',
             service_id=service_one['id'],
-            message_type=message_type,
             status=status_argument,
             page=page_argument,
-        ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+            _data={
+                'to': to_argument
+            },
+            _expected_status=200,
+            **extra_args
+        )
+    else:
+        page = client_request.get(
+            'main.view_notifications',
+            service_id=service_one['id'],
+            status=status_argument,
+            page=page_argument,
+            **extra_args
+        )
     text_of_first_row = page.select('tbody tr')[0].text
     assert '07123456789' in text_of_first_row
     assert (
@@ -120,7 +116,10 @@ def test_can_show_notifications(
     path_to_json = page.find("div", {'data-key': 'notifications'})['data-resource']
 
     url = urlparse(path_to_json)
-    assert url.path == '/services/{}/notifications/{}.json'.format(service_one['id'], message_type)
+    assert url.path == '/services/{}/notifications{}'.format(
+        service_one['id'],
+        expected_update_endpoint,
+    )
     query_dict = parse_qs(url.query)
     if status_argument:
         assert query_dict['status'] == [status_argument]
@@ -133,15 +132,15 @@ def test_can_show_notifications(
         page=expected_page_argument,
         service_id=service_one['id'],
         status=expected_api_call,
-        template_type=[message_type],
+        template_type=list(extra_args.values()),
         to=expected_to_argument,
     )
 
     json_response = logged_in_client.get(url_for(
         'main.get_notifications_as_json',
         service_id=service_one['id'],
-        message_type=message_type,
-        status=status_argument
+        status=status_argument,
+        **extra_args
     ))
     json_content = json.loads(json_response.get_data(as_text=True))
     assert json_content.keys() == {'counts', 'notifications'}
