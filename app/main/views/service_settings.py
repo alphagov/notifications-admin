@@ -86,6 +86,7 @@ def service_settings(service_id):
     )
 
     free_sms_fragment_limit = billing_api_client.get_free_sms_fragment_limit_for_year(service_id)
+    data_retention = service_api_client.get_service_data_retention(service_id)
 
     return render_template(
         'views/service-settings.html',
@@ -104,6 +105,7 @@ def service_settings(service_id):
         free_sms_fragment_limit=free_sms_fragment_limit,
         prefix_sms=current_service['prefix_sms'],
         organisation=organisation,
+        data_retention=data_retention,
     )
 
 
@@ -1005,6 +1007,18 @@ def branding_request(service_id):
     return render_template(
         'views/service-settings/branding/email-options.html',
         form=form,
+    )
+
+
+@main.route("/services/<service_id>/set-data-retention", methods=['GET', 'POST'])
+@login_required
+@user_is_platform_admin
+def set_data_retention(service_id):
+    results = service_api_client.get_service_data_retention(service_id)
+    print("DATA RETENTION: ", results[0])
+    return render_template(
+        'views/service-settings/set-data-retention.html',
+        data_retentions=results
     )
 
 

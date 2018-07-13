@@ -480,3 +480,23 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "updated_by_id": user_id
         }
         return self.post("/service/{}/delivery-receipt-api".format(service_id), data)
+
+    def create_service_data_retention(self, service_id, notification_type, days_of_retention):
+        data = {
+            "notification_type": notification_type,
+            "days_of_retention": days_of_retention
+        }
+
+        return self.post("/service/{}/data-retention".format(service_id), data)
+
+    def update_service_data_retention(self, service_id, data_retention_id, days_of_retention):
+        data = {
+            "days_of_retention": days_of_retention
+        }
+        return self.post("/service/{}/data-retention/{}".format(service_id, data_retention_id), data)
+
+    def get_service_data_retention(self, service_id):
+        return self.get("/service/{}/data-retention".format(service_id))
+
+    def get_service_data_retention_by_id(self, service_id, data_retention_id):
+        return self.get("service/{}/data-retention/{}".format(service_id, data_retention_id))

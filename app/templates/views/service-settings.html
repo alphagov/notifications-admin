@@ -320,6 +320,11 @@
           {{ text_field(letter_branding) }}
           {{ edit_field('Change', url_for('.set_letter_branding', service_id=current_service.id)) }}
         {% endcall %}
+        {% call row() %}
+          {{ text_field('Data Retention')}}
+          {{ text_field(data_retention[0]['notification_type']) }}
+          {{ edit_field('Change', url_for('.set_data_retention', service_id=current_service.id)) }}
+        {% endcall %}
       {% endcall %}
 
       <ul>
