@@ -122,7 +122,7 @@ def test_invite_goes_in_session(
 
 @pytest.mark.parametrize('user, landing_page_title', [
     (active_user_with_permissions, 'Dashboard'),
-    (active_caseworking_user, 'Choose a template'),
+    (active_caseworking_user, 'Templates'),
 ])
 def test_accepting_invite_removes_invite_from_session(
     client_request,
