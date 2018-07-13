@@ -21,6 +21,7 @@ from notifications_utils.recipients import (
     first_column_headings,
     optional_address_columns,
 )
+from notifications_utils.sanitise_text import SanitiseASCII
 from orderedset import OrderedSet
 from werkzeug.routing import RequestRedirect
 from xlrd.biffh import XLRDError
@@ -576,7 +577,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         row_errors=get_errors_for_csv(recipients, template.template_type),
         count_of_recipients=len(recipients),
         count_of_displayed_recipients=len(list(recipients.displayed_rows)),
-        original_file_name=request.args.get('original_file_name'),
+        original_file_name=request.args.get('original_file_name', ''),
         upload_id=upload_id,
         form=CsvUploadForm(),
         remaining_messages=remaining_messages,
@@ -619,6 +620,8 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
     ):
         return render_template('views/check/column-errors.html', **data)
 
+    data['original_file_name'] = SanitiseASCII.encode(data.get('original_file_name', ''))
+
     set_metadata_on_csv_upload(
         service_id,
         upload_id,
@@ -626,7 +629,7 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
         template_id=str(template_id),
         valid=True,
         original_file_name=unicode_truncate(
-            request.args.get('original_file_name', ''),
+            data['original_file_name'],
             1600,
         ),
     )
