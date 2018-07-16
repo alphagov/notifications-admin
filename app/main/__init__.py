@@ -26,6 +26,7 @@ from app.main.views import (  # noqa
     invites,
     feedback,
     providers,
+    find_users,
     platform_admin,
     letter_jobs,
     email_branding,

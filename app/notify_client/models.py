@@ -59,6 +59,7 @@ class User(UserMixin):
         self.failed_login_count = fields.get('failed_login_count')
         self.state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
+        self.logged_in_at = fields.get('logged_in_at')
         self.platform_admin = fields.get('platform_admin')
         self.current_session_id = fields.get('current_session_id')
         self.services = fields.get('services', [])

@@ -853,6 +853,16 @@ class SearchTemplatesForm(StripWhitespaceForm):
     search = SearchField('Search by name')
 
 
+class SearchUsersByEmailForm(StripWhitespaceForm):
+
+    search = SearchField(
+        'Search by name or email address',
+        validators=[
+            DataRequired("You need to enter full or partial email address to search by.")
+        ],
+    )
+
+
 class SearchUsersForm(StripWhitespaceForm):
 
     search = SearchField('Search by name or email address')
