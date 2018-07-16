@@ -3,94 +3,87 @@ from lxml import html
 
 from app.notify_client.user_api_client import User
 from tests import user_json
-from tests.conftest import mock_get_user
 
 
-def test_find_users_by_email_page_loads_correctly(
-    client,
-    platform_admin_user,
-    mocker
-):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.get(url_for('main.find_users_by_email'))
-    assert response.status_code == 200
+def test_find_users_by_email_page_loads_correctly(client_request, platform_admin_user):
+    client_request.login(platform_admin_user)
+    document = client_request.get('main.find_users_by_email')
 
-    document = html.fromstring(response.get_data(as_text=True))
-    assert document.xpath("//h1/text()[normalize-space()='Find users by email']")
-    assert len(document.xpath("//input[@type='search']")) > 0
+    assert document.h1.text.strip() == 'Find users by email'
+    assert len(document.find_all('input', {'type': 'search'})) > 0
 
 
 def test_find_users_by_email_displays_users_found(
-    client,
+    client_request,
     platform_admin_user,
     mocker
 ):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
+    client_request.login(platform_admin_user)
     mocker.patch(
         'app.user_api_client.find_users_by_full_or_partial_email',
         return_value={"data": [user_json()]},
         autospec=True,
     )
-    response = client.post(url_for('main.find_users_by_email'), data={"search": "twilight.sparkle"})
-    assert response.status_code == 200
+    document = client_request.post(
+        'main.find_users_by_email',
+        _data={"search": "twilight.sparkle"},
+        _expected_status=200
+    )
 
-    document = html.fromstring(response.get_data(as_text=True))
-    assert document.xpath("//a/text()[normalize-space()='test@gov.uk']")
-    assert document.xpath("//p/text()[normalize-space()='Test User']")
+    assert any(element.text.strip() == 'test@gov.uk' for element in document.find_all(
+        'a', {'class': 'browse-list-link'}, href=True)
+    )
+    assert any(element.text.strip() == 'Test User' for element in document.find_all('p', {'class': 'browse-list-hint'}))
+
+    assert document.find('a', {'class': 'browse-list-link'}).text.strip() == 'test@gov.uk'
+    assert document.find('p', {'class': 'browse-list-hint'}).text.strip() == 'Test User'
 
 
 def test_find_users_by_email_displays_multiple_users(
-    client,
+    client_request,
     platform_admin_user,
     mocker
 ):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    mocker.patch('app.user_api_client.find_users_by_full_or_partial_email', return_value={"data": [
-        user_json(name="Apple Jack"),
-        user_json(name="Apple Bloom")
-    ]}, autospec=True)
-    response = client.post(url_for('main.find_users_by_email'), data={"search": "apple"})
-    assert response.status_code == 200
+    client_request.login(platform_admin_user)
+    mocker.patch(
+        'app.user_api_client.find_users_by_full_or_partial_email',
+        return_value={"data": [user_json(name="Apple Jack"), user_json(name="Apple Bloom")]},
+        autospec=True,
+    )
+    document = client_request.post('main.find_users_by_email', _data={"search": "apple"}, _expected_status=200)
 
-    document = html.fromstring(response.get_data(as_text=True))
-
-    assert document.xpath("//p/text()[normalize-space()='Apple Jack']")
-    assert document.xpath("//p/text()[normalize-space()='Apple Bloom']")
+    assert any(
+        element.text.strip() == 'Apple Jack' for element in document.find_all('p', {'class': 'browse-list-hint'})
+    )
+    assert any(
+        element.text.strip() == 'Apple Bloom' for element in document.find_all('p', {'class': 'browse-list-hint'})
+    )
 
 
 def test_find_users_by_email_displays_message_if_no_users_found(
-    client,
+    client_request,
     platform_admin_user,
     mocker
 ):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
+    client_request.login(platform_admin_user)
     mocker.patch('app.user_api_client.find_users_by_full_or_partial_email', return_value={"data": []}, autospec=True)
-    response = client.post(url_for('main.find_users_by_email'), data={"search": "twilight.sparkle"})
-    assert response.status_code == 200
+    document = client_request.post(
+        'main.find_users_by_email', _data={"search": "twilight.sparkle"}, _expected_status=200
+    )
 
-    document = html.fromstring(response.get_data(as_text=True))
-    assert document.xpath("//p/text()[normalize-space()='No users found.']")
+    assert document.find('p', {'class': 'browse-list-hint'}).text.strip() == 'No users found.'
 
 
 def test_find_users_by_email_validates_against_empty_search_submission(
-    client,
+    client_request,
     platform_admin_user,
     mocker
 ):
-    mock_get_user(mocker, user=platform_admin_user)
-    client.login(platform_admin_user)
-    response = client.post(url_for('main.find_users_by_email'), data={"search": ""})
-    assert response.status_code == 400
+    client_request.login(platform_admin_user)
+    document = client_request.post('main.find_users_by_email', _data={"search": ""}, _expected_status=400)
 
-    document = html.fromstring(response.get_data(as_text=True))
     expected_message = "You need to enter full or partial email address to search by."
-    assert document.xpath(
-        "//span[contains(@class, 'error-message') and normalize-space(text()) = '{}']".format(expected_message)
-    )
+    assert document.find('span', {'class': 'error-message'}).text.strip() == expected_message
 
 
 def test_user_information_page_shows_information_about_user(
