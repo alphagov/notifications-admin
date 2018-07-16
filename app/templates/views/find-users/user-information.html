@@ -16,9 +16,9 @@
       <h2 class="heading-medium">Services</h2>
       <nav class="browse-list">
         <ul>
-        {% for service in user.services %}
+        {% for service in services %}
           <li class="browse-list-item">
-            <p class="browse-list-sub-item">{{ service.name }}</p>
+            <p class="browse-list-hint">{{ service.name }}</p>
           </li>
         {% endfor %}
         </ul>

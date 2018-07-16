@@ -93,11 +93,17 @@ def test_user_information_page_shows_information_about_user(
 ):
     mocker.patch('app.user_api_client.get_user', side_effect=[
         platform_admin_user,
-        User(user_json(name="Apple Bloom", services=[
+        User(user_json(name="Apple Bloom", services=[1, 2]))
+    ], autospec=True)
+
+    mocker.patch(
+        'app.user_api_client.get_organisations_and_services_for_user',
+        return_value={'organisations': [], 'services_without_organisations': [
             {"id": 1, "name": "Fresh Orchard Juice"},
             {"id": 2, "name": "Nature Therapy"},
-        ]))
-    ], autospec=True)
+        ]},
+        autospec=True
+    )
     client.login(platform_admin_user)
     response = client.get(url_for('main.user_information', user_id=345))
     assert response.status_code == 200
@@ -125,6 +131,15 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
         platform_admin_user,
         User(user_json(name="Apple Bloom", failed_login_count=2))
     ], autospec=True)
+
+    mocker.patch(
+        'app.user_api_client.get_organisations_and_services_for_user',
+        return_value={'organisations': [], 'services_without_organisations': [
+            {"id": 1, "name": "Fresh Orchard Juice"},
+            {"id": 2, "name": "Nature Therapy"},
+        ]},
+        autospec=True
+    )
     client.login(platform_admin_user)
     response = client.get(url_for('main.user_information', user_id=345))
     assert response.status_code == 200
