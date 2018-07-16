@@ -18,7 +18,7 @@
         <ul>
         {% for service in services %}
           <li class="browse-list-item">
-            <p class="browse-list-hint">{{ service.name }}</p>
+            <a class="browse-list-hint" href={{url_for('.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
           </li>
         {% endfor %}
         </ul>
