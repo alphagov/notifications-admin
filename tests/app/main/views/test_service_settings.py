@@ -95,7 +95,7 @@ def mock_get_service_settings_page_common(
         'Free text message allowance 250,000 Change',
         'Email branding GOV.UK Change',
         'Letter branding HM Government Change',
-        'Data Retention Change'
+        'Data Retention email Change'
 
     ]),
 ])
@@ -2793,3 +2793,60 @@ def test_submit_email_branding_request(
         'Thanks for your branding request. We’ll get back to you '
         'within one working day.'
     )
+
+
+def test_show_service_data_retention(
+        logged_in_platform_admin_client,
+        service_one,
+        mock_get_service_data_retention,
+
+):
+    response = logged_in_platform_admin_client.get(url_for('main.data_retention', service_id=service_one['id']))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(page.select_one('main p').text) == "Email notifications will be kept for 5 days Change"
+
+
+def test_view_add_service_data_retention(
+        logged_in_platform_admin_client,
+        service_one,
+
+):
+    response = logged_in_platform_admin_client.get(url_for('main.add_data_retention', service_id=service_one['id']))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert normalize_spaces(page.select_one('input')['value']) == "email"
+    assert page.find('input', attrs={'name': 'days_of_retention'})
+
+
+def test_add_service_data_retention(
+        logged_in_platform_admin_client,
+        service_one,
+        mock_create_service_data_retention
+):
+    response = logged_in_platform_admin_client.post(url_for('main.add_data_retention', service_id=service_one['id']),
+                                                    data={'notification_type': "email",
+                                                          'days_of_retention': 5
+                                                          }
+                                                    )
+    assert response.status_code == 302
+    settings_url = url_for(
+        'main.data_retention', service_id=service_one['id'], _external=True)
+    assert settings_url == response.location
+    assert mock_create_service_data_retention.called
+
+
+def test_update_service_data_retention(
+        logged_in_platform_admin_client,
+        service_one,
+        fake_uuid,
+        mock_update_service_data_retention,
+):
+    response = logged_in_platform_admin_client.post(url_for('main.edit_data_retention',
+                                                            service_id=service_one['id'],
+                                                            data_retention_id=fake_uuid),
+                                                    data={'days_of_retention': 5}
+                                                    )
+    assert response.status_code == 302
+    settings_url = url_for(
+        'main.data_retention', service_id=service_one['id'], _external=True)
+    assert settings_url == response.location
+    assert mock_update_service_data_retention.called
