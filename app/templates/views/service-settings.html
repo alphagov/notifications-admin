@@ -321,7 +321,7 @@
           {{ edit_field('Change', url_for('.set_letter_branding', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}
-          {{ text_field('Data Retention')}}
+          {{ text_field('Data retention')}}
           {% call field() %}
               {{ data_retention | join(', ', attribute='notification_type') }}
           {% endcall %}

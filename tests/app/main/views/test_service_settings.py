@@ -95,7 +95,7 @@ def mock_get_service_settings_page_common(
         'Free text message allowance 250,000 Change',
         'Email branding GOV.UK Change',
         'Letter branding HM Government Change',
-        'Data Retention email Change'
+        'Data retention email Change'
 
     ]),
 ])
