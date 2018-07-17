@@ -18,6 +18,7 @@ class NotificationApiClient(NotifyAdminAPIClient):
         include_from_test_key=None,
         format_for_csv=None,
         to=None,
+        include_one_off=None,
     ):
         params = {}
         if page is not None:
@@ -36,6 +37,8 @@ class NotificationApiClient(NotifyAdminAPIClient):
             params['format_for_csv'] = format_for_csv
         if to is not None:
             params['to'] = to
+        if include_one_off is not None:
+            params['include_one_off'] = include_one_off
         if job_id:
             return self.get(
                 url='/service/{}/job/{}/notifications'.format(service_id, job_id),
@@ -64,7 +67,12 @@ class NotificationApiClient(NotifyAdminAPIClient):
         return self.get(url='/service/{}/notifications/{}'.format(service_id, notification_id))
 
     def get_api_notifications_for_service(self, service_id):
-        ret = self.get_notifications_for_service(service_id, include_jobs=False, include_from_test_key=True)
+        ret = self.get_notifications_for_service(
+            service_id,
+            include_jobs=False,
+            include_from_test_key=True,
+            include_one_off=False
+        )
         return self.map_letters_to_accepted(ret)
 
     @staticmethod

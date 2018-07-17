@@ -1810,6 +1810,7 @@ def mock_get_notifications(
         include_jobs=None,
         include_from_test_key=None,
         to=None,
+        include_one_off=None,
     ):
         job = None
         if job_id is not None:
@@ -1858,6 +1859,7 @@ def mock_get_notifications_with_previous_next(mocker):
                            include_jobs=None,
                            include_from_test_key=None,
                            to=None,
+                           include_one_off=None
                            ):
         return notification_json(service_id, with_links=True)
 
@@ -1878,6 +1880,7 @@ def mock_get_notifications_with_no_notifications(mocker):
                            include_jobs=None,
                            include_from_test_key=None,
                            to=None,
+                           include_one_off=None
                            ):
         return notification_json(service_id, rows=0)
 
