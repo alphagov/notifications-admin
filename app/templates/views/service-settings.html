@@ -322,8 +322,10 @@
         {% endcall %}
         {% call row() %}
           {{ text_field('Data Retention')}}
-          {{ text_field(data_retention[0]['notification_type']) }}
-          {{ edit_field('Change', url_for('.set_data_retention', service_id=current_service.id)) }}
+          {% call field() %}
+              {{ data_retention | join(', ', attribute='notification_type') }}
+          {% endcall %}
+          {{ edit_field('Change', url_for('.data_retention', service_id=current_service.id)) }}
         {% endcall %}
       {% endcall %}
 

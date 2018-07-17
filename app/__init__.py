@@ -338,6 +338,14 @@ def valid_phone_number(phone_number):
         return False
 
 
+def format_notification_type(notification_type):
+    return {
+        'email': 'Email',
+        'sms': 'SMS',
+        'letter': 'Letter'
+    }[notification_type]
+
+
 def format_notification_status(status, template_type):
     return {
         'email': {
@@ -640,6 +648,7 @@ def add_template_filters(application):
         format_datetime_relative,
         format_delta,
         format_notification_status,
+        format_notification_type,
         format_notification_status_as_time,
         format_notification_status_as_field_status,
         format_notification_status_as_url,

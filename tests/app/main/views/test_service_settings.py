@@ -40,6 +40,7 @@ def mock_get_service_settings_page_common(
     mock_get_letter_email_branding,
     mock_get_inbound_number_for_service,
     mock_get_free_sms_fragment_limit,
+    mock_get_service_data_retention,
 ):
     return
 
@@ -94,6 +95,7 @@ def mock_get_service_settings_page_common(
         'Free text message allowance 250,000 Change',
         'Email branding GOV.UK Change',
         'Letter branding HM Government Change',
+        'Data Retention Change'
 
     ]),
 ])
@@ -2527,6 +2529,7 @@ def test_service_settings_when_inbound_number_is_not_set(
     mocker,
     mock_get_letter_email_branding,
     mock_get_free_sms_fragment_limit,
+    mock_get_service_data_retention,
 ):
     mocker.patch('app.inbound_number_client.get_inbound_sms_number_for_service',
                  return_value={'data': {}})
