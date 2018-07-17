@@ -1349,6 +1349,10 @@ crowboroughtowncouncil.gov.uk:
   owner: Crowborough Town Council
   crown: false
   agreement_signed: false
+croydon.gov.uk:
+  owner: Croydon Council
+  crown: false
+  agreement_signed: true
 cullomptontowncouncil.gov.uk:
   owner: Cullompton Town Council
   crown: false
