@@ -205,12 +205,12 @@ def test_caseworker_redirected_to_one_off(
     ),
     (
         ['send_messages'],
-        ['.send_messages', '.set_sender'],
+        ['.set_sender'],
         None,
     ),
     (
         ['send_messages', 'manage_templates'],
-        ['.send_messages', '.set_sender', '.edit_service_template'],
+        ['.set_sender', '.edit_service_template'],
         None,
     ),
 ])
