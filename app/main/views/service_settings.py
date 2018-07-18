@@ -1041,9 +1041,8 @@ def add_data_retention(service_id):
 @login_required
 @user_is_platform_admin
 def edit_data_retention(service_id, data_retention_id):
-    form = ServiceDataRetentionEditForm()
-    if request.method == 'GET':
-        data_retention_item = service_api_client.get_service_data_retention_by_id(service_id, data_retention_id)
+    data_retention_item = service_api_client.get_service_data_retention_by_id(service_id, data_retention_id)
+    form = ServiceDataRetentionEditForm(days_of_retention=data_retention_item['days_of_retention'])
     if form.validate_on_submit():
         service_api_client.update_service_data_retention(service_id, data_retention_id, form.days_of_retention.data)
         return redirect(url_for('.data_retention', service_id=service_id))
@@ -1051,8 +1050,7 @@ def edit_data_retention(service_id, data_retention_id):
         'views/service-settings/data-retention/edit.html',
         form=form,
         data_retention_id=data_retention_id,
-        notification_type=data_retention_item['notification_type'],
-        days_of_retention=data_retention_item['days_of_retention']
+        notification_type=data_retention_item['notification_type']
     )
 
 

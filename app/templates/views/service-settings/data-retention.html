@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/api-key.html" import api_key %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
+{% from "components/table.html" import mapping_table, row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
 
 {% block service_page_title %}
   Email reply to addresses
@@ -30,15 +30,21 @@
         <span class="hint">You haven’t added any data retention</span>
       </div>
     {% endif %}
-    {% for item in data_retention_settings %}
-      <div class="user-list-item">
+       {% call mapping_table(
+        caption='Data retention',
+        field_headings=['Label', 'Value', 'Action'],
+        field_headings_visible=False,
+        caption_visible=False
+      ) %}
+        {% for item in data_retention_settings %}
+            {% call row() %}
+              {{ text_field(item.notification_type | format_notification_type)}}
+              {{ text_field(item.days_of_retention) }}
+              {{ edit_field('Change', url_for('.link_service_to_organisation', service_id=current_service.id)) }}
+            {% endcall %}
 
-          <p>
-            {{ item.notification_type | format_notification_type }} notifications will be kept for {{ item.days_of_retention }} days
-              <a class="user-list-edit-link" href="{{ url_for('.edit_data_retention', service_id =current_service.id, data_retention_id = item.id) }}">Change</a>
-          </p>
-      </div>
-    {% endfor %}
+        {% endfor %}
+      {% endcall %}
   </div>
 
 {% endblock %}

@@ -2685,6 +2685,20 @@ def mock_get_service_data_retention(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_service_data_retention_by_id(mocker):
+    data = {"id": str(fake_uuid),
+            "service_id": str(fake_uuid),
+            "service_name": "service name",
+            "notification_type": "email",
+            "days_of_retention": 5,
+            "created_at": datetime.now(),
+            "updated_at": None,
+            }
+    return mocker.patch('app.service_api_client.get_service_data_retention_by_id',
+                        return_value=data)
+
+
+@pytest.fixture(scope='function')
 def mock_create_service_data_retention(mocker):
     return mocker.patch('app.service_api_client.create_service_data_retention')
 

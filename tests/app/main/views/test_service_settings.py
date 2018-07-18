@@ -2803,7 +2803,9 @@ def test_show_service_data_retention(
 ):
     response = logged_in_platform_admin_client.get(url_for('main.data_retention', service_id=service_one['id']))
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert normalize_spaces(page.select_one('main p').text) == "Email notifications will be kept for 5 days Change"
+    rows = page.select('tbody tr')
+    assert len(rows) == 1
+    assert normalize_spaces(rows[0].text) == 'Email 5 Change'
 
 
 def test_view_add_service_data_retention(
@@ -2838,6 +2840,7 @@ def test_update_service_data_retention(
         logged_in_platform_admin_client,
         service_one,
         fake_uuid,
+        mock_get_service_data_retention_by_id,
         mock_update_service_data_retention,
 ):
     response = logged_in_platform_admin_client.post(url_for('main.edit_data_retention',
@@ -2850,3 +2853,38 @@ def test_update_service_data_retention(
         'main.data_retention', service_id=service_one['id'], _external=True)
     assert settings_url == response.location
     assert mock_update_service_data_retention.called
+
+
+def test_update_service_data_retention_return_validation_error_for_negative_days_of_retention(
+        logged_in_platform_admin_client,
+        service_one,
+        fake_uuid,
+        mock_get_service_data_retention_by_id,
+        mock_update_service_data_retention,
+):
+    response = logged_in_platform_admin_client.post(url_for('main.edit_data_retention',
+                                                            service_id=service_one['id'],
+                                                            data_retention_id=fake_uuid),
+                                                    data={'days_of_retention': -5}
+                                                    )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    error_message = page.find('span', class_='error-message').text.strip()
+    assert error_message == 'Must be between 3 and 90'
+    mock_get_service_data_retention_by_id.called
+    assert not mock_update_service_data_retention.called
+
+
+def test_update_service_data_retention_populates_form(
+        logged_in_platform_admin_client,
+        service_one,
+        fake_uuid,
+        mock_get_service_data_retention_by_id,
+):
+    response = logged_in_platform_admin_client.get(url_for('main.edit_data_retention',
+                                                           service_id=service_one['id'],
+                                                           data_retention_id=fake_uuid)
+                                                   )
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.find('input', attrs={'name': 'days_of_retention'})['value'] == '5'
