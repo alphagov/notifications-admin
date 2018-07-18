@@ -14,27 +14,34 @@
   {% else %}
     <div class="bottom-gutter-2-3">
       <div class="grid-row">
-        {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
-        <div class="{{ 'column-half' if template.template_type == 'letter' else 'column-third' }}">
-          <a href="{{ url_for(".send_messages", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
-            Upload recipients
-          </a>
-        </div>
-        <div class="{{ 'column-half' if template.template_type == 'letter' else 'column-third' }}">
-          <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
-            {{ 'Print a test letter' if template.template_type == 'letter' else 'Send to one recipient' }}
-          </a>
-        </div>
-        {% endif %}
-        {% if
-          current_user.has_permissions('manage_templates') and
-          template.template_type != 'letter'
-        %}
-        <div class="column-one-third">
-          <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
-            Edit template
-          </a>
-        </div>
+        {% if template.template_type == 'letter' %}
+          {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
+            <div class="column-half">
+              <a href="{{ url_for(".send_messages", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
+                Upload recipients
+              </a>
+            </div>
+            <div class="column-half">
+              <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
+                Print a test letter
+              </a>
+            </div>
+          {% endif %}
+        {% else %}
+          {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
+            <div class="column-half">
+              <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
+                Send
+              </a>
+            </div>
+          {% endif %}
+          {% if current_user.has_permissions('manage_templates') %}
+            <div class="column-half">
+              <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="pill-separate-item">
+                Edit
+              </a>
+            </div>
+          {% endif %}
         {% endif %}
       </div>
     </div>
