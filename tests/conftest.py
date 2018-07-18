@@ -2642,7 +2642,7 @@ def client_request(
                 url_for(endpoint, **(endpoint_kwargs or {})),
                 follow_redirects=_follow_redirects,
             )
-            assert resp.status_code == _expected_status
+            assert resp.status_code == _expected_status, resp.location
             if _expected_redirect:
                 assert resp.location == _expected_redirect
             page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
