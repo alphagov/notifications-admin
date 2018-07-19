@@ -680,6 +680,7 @@ def mock_update_service_raise_httperror_duplicate_name(mocker):
 SERVICE_ONE_ID = "596364a0-858e-42c8-9062-a8fe822260eb"
 SERVICE_TWO_ID = "147ad62a-2951-4fa1-9ca0-093cd1a52c52"
 ORGANISATION_ID = "c011fa40-4cbe-4524-b415-dde2f421bd9c"
+TEMPLATE_ONE_ID = "b22d7d94-2197-4a7d-a8e7-fd5f9770bf48"
 
 
 @pytest.fixture(scope='function')
@@ -949,7 +950,7 @@ def mock_update_service_template_400_content_too_big(mocker):
 
 @pytest.fixture(scope='function')
 def mock_get_service_templates(mocker):
-    uuid1 = str(generate_uuid())
+    uuid1 = TEMPLATE_ONE_ID
     uuid2 = str(generate_uuid())
     uuid3 = str(generate_uuid())
     uuid4 = str(generate_uuid())
@@ -3005,6 +3006,30 @@ def mock_get_organisations_and_services_for_user(mocker, organisation_one, api_u
         return {
             'organisations': [],
             'services_without_organisations': []
+        }
+
+    return mocker.patch(
+        'app.user_api_client.get_organisations_and_services_for_user',
+        side_effect=_get_orgs_and_services
+    )
+
+
+@pytest.fixture
+def mock_get_non_empty_organisations_and_services_for_user(mocker, organisation_one, api_user_active):
+
+    def _make_services(name):
+        return [{
+            'name': '{} {}'.format(name, i),
+            'id': SERVICE_TWO_ID,
+        } for i in range(1, 3)]
+
+    def _get_orgs_and_services(user_id):
+        return {
+            'organisations': [
+                {'name': 'Org 1', 'services': _make_services('Org 1 service')},
+                {'name': 'Org 2', 'services': _make_services('Org 2 service')},
+            ],
+            'services_without_organisations': _make_services('Service')
         }
 
     return mocker.patch(

@@ -1,3 +1,5 @@
+from itertools import chain
+
 from notifications_python_client.errors import HTTPError
 
 from app.notify_client import NotifyAdminAPIClient, cache
@@ -209,3 +211,17 @@ class UserApiClient(NotifyAdminAPIClient):
     def get_organisations_and_services_for_user(self, user):
         endpoint = '/user/{}/organisations-and-services'.format(user.id)
         return self.get(endpoint)
+
+    def get_services_for_user(self, user):
+        orgs_and_services_for_user = self.get_organisations_and_services_for_user(user)
+        return orgs_and_services_for_user['services_without_organisations'] + next(chain(
+            org['services'] for org in orgs_and_services_for_user['organisations']
+        ), [])
+
+    def get_service_ids_for_user(self, user):
+        return {
+            service['id'] for service in self.get_services_for_user(user)
+        }
+
+    def user_belongs_to_service(self, user, service_id):
+        return service_id in self.get_service_ids_for_user(user)
