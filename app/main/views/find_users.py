@@ -30,9 +30,9 @@ def find_users_by_email():
 @user_is_platform_admin
 def user_information(user_id):
     user = user_api_client.get_user(user_id)
-    services = user_api_client.get_organisations_and_services_for_user(user)
+    services = user_api_client.get_services_for_user(user)
     return render_template(
         'views/find-users/user-information.html',
         user=user,
-        services=services['services_without_organisations'],
+        services=services,
     )
