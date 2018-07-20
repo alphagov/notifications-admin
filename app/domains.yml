@@ -1020,7 +1020,7 @@ chesham.gov.uk:
 cheshireeast.gov.uk:
   owner: Cheshire East Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 cheshire.gov.uk:
   owner: Cheshire West and Chester Council
   crown: false
