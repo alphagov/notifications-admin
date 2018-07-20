@@ -1104,31 +1104,7 @@ chesham.gov.uk:
 cheshireeast.gov.uk:
   owner: Cheshire East Council
   crown: false
-  agreement_signed: false
-cheshire.gov.uk:
-  owner: Cheshire West and Chester Council
-  crown: false
-  agreement_signed: false
-cheshireprepared.gov.uk:
-  owner: Cheshire West and Chester Council
-  crown: false
-  agreement_signed: false
-cheshiresharedservices.gov.uk:
-  owner: Crewe & Nantwich Borough Council
-  crown: false
-  agreement_signed: false
-cheshirewestandchester.gov.uk:
-  owner: Cheshire West and Chester Council
-  crown: false
-  agreement_signed: false
-cheshirewest.gov.uk:
-  owner: Cheshire West and Chester Council
-  crown: false
-  agreement_signed: false
-chesterfield.gov.uk:
-  owner: Chesterfield Borough Council
-  crown: false
-  agreement_signed: false
+  agreement_signed: true
 chester.gov.uk:
   owner: Cheshire West and Chester Council
   crown: false
