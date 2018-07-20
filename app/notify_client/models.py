@@ -261,3 +261,13 @@ class AnonymousUser(AnonymousUserMixin):
     # set the anonymous user so that if a new browser hits us we don't error http://stackoverflow.com/a/19275188
     def logged_in_elsewhere(self):
         return False
+
+
+class Service(dict):
+
+    def __init__(self, _dict):
+        # in the case of a bad request current service may be `None`
+        super().__init__(_dict or {})
+
+    def has_permission(self, permission):
+        return permission in self['permissions']

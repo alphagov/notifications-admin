@@ -2039,8 +2039,10 @@ def test_service_switch_can_upload_document_changes_the_permission_if_not_adding
         follow_redirects=True
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert service_one['permissions'] == end_permissions
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        permissions=end_permissions,
+    )
     assert page.h1.text.strip() == 'Settings'
 
 
@@ -2080,7 +2082,7 @@ def test_service_switch_can_upload_document_lets_contact_link_be_added_and_switc
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert 'upload_document' in service_one['permissions']
+    assert 'upload_document' in mock_update_service.call_args[1]['permissions']
     assert page.h1.text.strip() == 'Settings'
 
 

@@ -93,7 +93,7 @@ def service_settings(service_id):
         letter_branding=letter_branding_organisations.get(
             current_service.get('dvla_organisation', '001')
         ),
-        can_receive_inbound=('inbound_sms' in current_service['permissions']),
+        can_receive_inbound=(current_service.has_permission('inbound_sms')),
         inbound_number=disp_inbound_number,
         default_reply_to_email_address=default_reply_to_email_address,
         reply_to_email_address_count=reply_to_email_address_count,
@@ -289,9 +289,7 @@ def force_service_permission(service_id, permission, on=False, sms_sender=None):
 
 def update_service_permissions(service_id, permissions, sms_sender=None):
 
-    current_service['permissions'] = list(permissions)
-
-    data = {'permissions': current_service['permissions']}
+    data = {'permissions': list(permissions)}
 
     if sms_sender:
         data['sms_sender'] = sms_sender
@@ -339,7 +337,7 @@ def service_switch_can_upload_document(service_id):
 
     # If turning the permission off, or turning it on and the service already has a contact_link,
     # don't show the form to add the link
-    if 'upload_document' in current_service['permissions'] or current_service.get('contact_link'):
+    if current_service.has_permission('upload_document') or current_service.get('contact_link'):
         switch_service_permissions(service_id, 'upload_document')
         return redirect(url_for('.service_settings', service_id=service_id))
 
@@ -569,7 +567,7 @@ def service_set_sms_prefix(service_id):
 @user_has_permissions('manage_service')
 def service_set_international_sms(service_id):
     form = InternationalSMSForm(
-        enabled='on' if 'international_sms' in current_service['permissions'] else 'off'
+        enabled='on' if current_service.has_permission('international_sms') else 'off'
     )
     if form.validate_on_submit():
         force_service_permission(
@@ -602,7 +600,7 @@ def service_set_inbound_sms(service_id):
 @user_has_permissions('manage_service')
 def service_set_letters(service_id):
     form = ServiceSwitchLettersForm(
-        enabled='on' if 'letter' in current_service['permissions'] else 'off'
+        enabled='on' if current_service.has_permission('letter') else 'off'
     )
     if form.validate_on_submit():
         force_service_permission(
@@ -640,7 +638,7 @@ def service_set_basic_view(service_id):
         abort(403)
 
     form = ServiceBasicViewForm(
-        enabled='caseworking' in current_service['permissions']
+        enabled=current_service.has_permission('caseworking')
     )
     if form.validate_on_submit():
         force_service_permission(

@@ -91,7 +91,7 @@ def view_notification(service_id, notification_id):
         help=get_help_argument(),
         estimated_letter_delivery_date=get_letter_timings(notification['created_at']).earliest_delivery,
         notification_id=notification['id'],
-        can_receive_inbound=('inbound_sms' in current_service['permissions']),
+        can_receive_inbound=(current_service.has_permission('inbound_sms')),
         is_precompiled_letter=notification['template']['is_precompiled_letter']
     )
 

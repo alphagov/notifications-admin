@@ -108,7 +108,7 @@ def choose_template(service_id, template_type='all'):
     templates = service_api_client.get_service_templates(service_id)['data']
 
     letters_available = (
-        'letter' in current_service['permissions'] and
+        current_service.has_permission('letter') and
         current_user.has_permissions('view_activity')
     )
 
@@ -207,9 +207,9 @@ def view_template_version_preview(service_id, template_id, version, filetype):
 def add_template_by_type(service_id):
 
     form = ChooseTemplateType(
-        include_letters='letter' in current_service['permissions'],
+        include_letters=current_service.has_permission('letter'),
         include_copy=any((
-            service_api_client.count_service_templates(service_id),
+            service_api_client.count_service_templates(service_id) > 0,
             len(user_api_client.get_service_ids_for_user(current_user)) > 1,
         )),
     )
@@ -672,5 +672,5 @@ def get_human_readable_delta(from_time, until_time):
 def should_show_template(template_type):
     return (
         template_type != 'letter' or
-        'letter' in current_service['permissions']
+        current_service.has_permission('letter')
     )
