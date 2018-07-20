@@ -1104,7 +1104,7 @@ chesham.gov.uk:
 cheshireeast.gov.uk:
   owner: Cheshire East Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 cheshire.gov.uk:
   owner: Cheshire West and Chester Council
   crown: false
@@ -4386,10 +4386,7 @@ surreyi.gov.uk:
   owner: Surrey County Council
   crown: false
   agreement_signed: false
-surreylocalgovernment.gov.uk:
-  owner: Woking Borough Council
-  crown: false
-  agreement_signed: false
+surreylocalgovernment.gov.uk: woking.gov.uk
 sussexsaferroads.gov.uk:
   owner: West Sussex County Council
   crown: false
@@ -5039,7 +5036,7 @@ wixford-pc.gov.uk:
 woking.gov.uk:
   owner: Woking Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 wokingham.gov.uk:
   owner: Wokingham Borough Council
   crown: false
