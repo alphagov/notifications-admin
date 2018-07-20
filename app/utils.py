@@ -292,8 +292,8 @@ def get_template(
     if 'email' == template['template_type']:
         return EmailPreviewTemplate(
             template,
-            from_name=service['name'],
-            from_address='{}@notifications.service.gov.uk'.format(service['email_from']),
+            from_name=service.name,
+            from_address='{}@notifications.service.gov.uk'.format(service.email_from),
             expanded=expand_emails,
             show_recipient=show_recipient,
             redact_missing_personalisation=redact_missing_personalisation,
@@ -302,8 +302,8 @@ def get_template(
     if 'sms' == template['template_type']:
         return SMSPreviewTemplate(
             template,
-            prefix=service['name'],
-            show_prefix=service['prefix_sms'],
+            prefix=service.name,
+            show_prefix=service.prefix_sms,
             sender=sms_sender,
             show_sender=bool(sms_sender),
             show_recipient=show_recipient,
