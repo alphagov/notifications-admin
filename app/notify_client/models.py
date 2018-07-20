@@ -269,5 +269,73 @@ class Service(dict):
         # in the case of a bad request current service may be `None`
         super().__init__(_dict or {})
 
+    @property
+    def id(self):
+        return self['id']
+
+    @property
+    def name(self):
+        return self['name']
+
+    @property
+    def inbound_api(self):
+        return self['inbound_api']
+
+    @property
+    def callback_api(self):
+        return self['callback_api']
+
+    @property
+    def service_callback_api(self):
+        return self['service_callback_api']
+
+    @property
+    def organisation_type(self):
+        return self['organisation_type']
+
+    @property
+    def active(self):
+        return self['active']
+
+    @property
+    def message_limit(self):
+        return self['message_limit']
+
+    @property
+    def email_branding(self):
+        return self['email_branding']
+
+    @property
+    def email_from(self):
+        return self['email_from']
+
+    @property
+    def letter_contact_block(self):
+        return self['letter_contact_block']
+
+    @property
+    def prefix_sms(self):
+        return self['prefix_sms']
+
+    @property
+    def research_mode(self):
+        return self['research_mode']
+
+    @property
+    def branding(self):
+        return self['branding']
+
+    @property
+    def dvla_organisation(self):
+        return self['dvla_organisation']
+
+    @property
+    def permissions(self):
+        return self['permissions']
+
+    @property
+    def trial_mode(self):
+        return self['restricted']
+
     def has_permission(self, permission):
-        return permission in self['permissions']
+        return permission in self.permissions

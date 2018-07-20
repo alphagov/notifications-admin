@@ -49,7 +49,7 @@ def test_from_database_object_makes_request(
 ):
     resp = Mock(content='a', status_code='b', headers={'c': 'd'})
     request_mock = mocker.patch('app.template_previews.requests.post', return_value=resp)
-    mocker.patch('app.template_previews.current_service', __getitem__=Mock(return_value='123'))
+    mocker.patch('app.template_previews.current_service', dvla_organisation='123')
     template = mock_get_service_letter_template('123', '456')['data']
 
     ret = partial_call(template=template)

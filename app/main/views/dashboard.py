@@ -238,7 +238,7 @@ def inbox_download(service_id):
 
 def get_inbox_partials(service_id):
     page = int(request.args.get('page', 1))
-    if 'inbound_sms' not in current_service['permissions']:
+    if not current_service.has_permission('inbound_sms'):
         abort(403)
 
     inbound_messages_data = service_api_client.get_most_recent_inbound_sms(service_id, page=page)

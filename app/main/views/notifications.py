@@ -188,6 +188,6 @@ def download_notifications_csv(service_id):
             'Content-Disposition': 'inline; filename="{} - {} - {} report.csv"'.format(
                 format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
                 filter_args['message_type'][0],
-                current_service['name'])
+                current_service.name)
         }
     )
