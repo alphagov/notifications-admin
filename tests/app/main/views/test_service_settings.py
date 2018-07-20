@@ -2459,7 +2459,7 @@ def test_preview_basic_view(
     with client_request.session_transaction() as session:
         assert session['basic'] is True
 
-    assert page.h1.text.strip() == 'Choose a template'
+    assert page.h1.text.strip() == 'Templates'
     page.select('.navigation-service-basic-view-preview')
     assert normalize_spaces(page.select_one('.navigation-service').text) == (
         'service one '

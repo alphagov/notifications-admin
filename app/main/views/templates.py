@@ -140,14 +140,8 @@ def choose_template(service_id, template_type='all'):
         )
     ]
 
-    if current_user.has_permissions('view_activity'):
-        page_title = 'Templates'
-    else:
-        page_title = 'Choose a template'
-
     return render_template(
         'views/templates/choose.html',
-        page_title=page_title,
         templates=templates_on_page,
         show_search_box=(len(templates_on_page) > 7),
         show_template_nav=has_multiple_template_types and (len(templates) > 2),

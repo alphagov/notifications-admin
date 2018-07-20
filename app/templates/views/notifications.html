@@ -4,16 +4,20 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/textbox.html" import textbox %}
 
+{% set page_title = (
+  message_count_label(99, message_type, suffix='') | capitalize
+  if current_user.has_permissions('view_activity')
+  else 'Sent messages'
+) %}
+
 {% block service_page_title %}
-  {{ message_count_label(99, message_type, suffix='') | capitalize }}
+  {{ page_title }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <h1 class="heading-large">
-    {% if not current_user.has_permissions('view_activity') %}<span class="visually-hidden">{% endif %}
-      {{ message_count_label(99, message_type, suffix='') | capitalize }}
-    {% if not current_user.has_permissions('view_activity') %}</span>{% endif %}
+    {{ page_title }}
   </h1>
   {% if not message_type == "letter" %}
 

@@ -70,7 +70,7 @@ from tests.conftest import single_letter_contact_block
         ),
         (
             active_caseworking_user,
-            'Choose a template',
+            'Templates',
             {},
             ['Text message', 'Email'],
             [
@@ -82,7 +82,7 @@ from tests.conftest import single_letter_contact_block
         ),
         (
             active_caseworking_user,
-            'Choose a template',
+            'Templates',
             {'template_type': 'email'},
             ['All', 'Text message'],
             ['email_template_one', 'email_template_two'],
