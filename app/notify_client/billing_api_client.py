@@ -7,26 +7,12 @@ class BillingAPIClient(NotifyAdminAPIClient):
     def __init__(self):
         super().__init__("a" * 73, "b")
 
-    def get_billable_units(self, service_id, year):
-        return self.get(
-            '/service/{0}/billing/monthly-usage'.format(service_id),
-            params=dict(year=year)
-        )
-
-    def get_service_usage(self, service_id, year=None):
-        return self.get(
-            '/service/{0}/billing/yearly-usage-summary'.format(service_id),
-            params=dict(year=year)
-        )
-
-    # Temporary methods to compare the usage before and after using ft_billing
     def get_billable_units_ft(self, service_id, year):
         return self.get(
             '/service/{0}/billing/ft-monthly-usage'.format(service_id),
             params=dict(year=year)
         )
 
-    # Temporary methods to compare the usage before and after using ft_billing
     def get_service_usage_ft(self, service_id, year=None):
         return self.get(
             '/service/{0}/billing/ft-yearly-usage-summary'.format(service_id),
