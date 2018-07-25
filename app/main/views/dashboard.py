@@ -321,7 +321,7 @@ def get_dashboard_partials(service_id):
         add_rate_to_job(job)
         for job in job_api_client.get_jobs(service_id, limit_days=7, statuses=statuses_to_display)['data']
     ]
-    stats = service_api_client.get_service_statistics(service_id, today_only=False)
+    stats = service_api_client.get_service_statistics(service_id)
     column_width, max_notifiction_count = get_column_properties(
         number_of_columns=(
             3 if 'letter' in current_service['permissions'] else 2
