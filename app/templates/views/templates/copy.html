@@ -1,0 +1,36 @@
+{% from "components/message-count-label.html" import message_count_label %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Copy an existing template
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    <div class="bottom-gutter-3-2">
+      <h1 class="heading-large">Copy an existing template</h1>
+    </div>
+    <nav>
+      {% for service in services %}
+        {% if service.templates and services|length > 1 %}
+          <h2 class="">
+            {{ service.name }}
+          </h2>
+          <div class="left-gutter-4-3 bottom-gutter-3-2">
+        {% endif %}
+        {% for template in service.templates %}
+          <h2 class="message-name">
+            <a href="{{ url_for('.copy_template', service_id=current_service.id, template_id=template.id, from_service=service.id) }}">{{ template.name }}</a>
+          </h2>
+          <p class="message-type">
+            {{ message_count_label(1, template.template_type, suffix='')|capitalize }} template
+          </p>
+        {% endfor %}
+        {% if service.templates %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </nav>
+
+{% endblock %}

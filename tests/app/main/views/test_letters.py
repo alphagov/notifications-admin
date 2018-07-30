@@ -56,17 +56,19 @@ def test_letters_lets_in_without_permission(
 @pytest.mark.parametrize('permissions, choices', [
     (
         ['email', 'sms', 'letter'],
-        ['Email', 'Text message', 'Letter']
+        ['Email', 'Text message', 'Letter', 'Copy of an existing template']
     ),
     (
         ['email', 'sms'],
-        ['Email', 'Text message']
+        ['Email', 'Text message', 'Copy of an existing template']
     ),
 ])
 def test_given_option_to_add_letters_if_allowed(
     logged_in_client,
     service_one,
     mocker,
+    mock_get_service_templates,
+    mock_get_organisations_and_services_for_user,
     permissions,
     choices,
 ):

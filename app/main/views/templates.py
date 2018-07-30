@@ -9,7 +9,12 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.formatters import nl2br
 from notifications_utils.recipients import first_column_headings
 
-from app import current_service, service_api_client, template_statistics_client
+from app import (
+    current_service,
+    service_api_client,
+    template_statistics_client,
+    user_api_client,
+)
 from app.main import main
 from app.main.forms import (
     ChooseTemplateType,
@@ -202,10 +207,20 @@ def view_template_version_preview(service_id, template_id, version, filetype):
 def add_template_by_type(service_id):
 
     form = ChooseTemplateType(
-        include_letters='letter' in current_service['permissions']
+        include_letters='letter' in current_service['permissions'],
+        include_copy=any((
+            service_api_client.count_service_templates(service_id),
+            len(user_api_client.get_service_ids_for_user(current_user)) > 1,
+        )),
     )
 
     if form.validate_on_submit():
+
+        if form.template_type.data == 'copy-existing':
+            return redirect(url_for(
+                '.choose_template_to_copy',
+                service_id=service_id,
+            ))
 
         if form.template_type.data == 'letter':
             blank_letter = service_api_client.create_service_template(
@@ -238,6 +253,51 @@ def add_template_by_type(service_id):
             ))
 
     return render_template('views/templates/add.html', form=form)
+
+
+@main.route("/services/<service_id>/templates/copy")
+@login_required
+@user_has_permissions('manage_templates')
+def choose_template_to_copy(service_id):
+    return render_template(
+        'views/templates/copy.html',
+        services=[{
+            'name': service['name'],
+            'id': service['id'],
+            'templates': [
+                template for template in
+                service_api_client.get_service_templates(service['id'])['data']
+                if template['template_type'] in current_service['permissions']
+            ],
+        } for service in user_api_client.get_services_for_user(current_user)],
+    )
+
+
+@main.route("/services/<service_id>/templates/copy/<uuid:template_id>", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_templates')
+def copy_template(service_id, template_id):
+
+    if not user_api_client.user_belongs_to_service(
+        current_user, request.args.get('from_service')
+    ):
+        abort(403)
+
+    template = service_api_client.get_service_template(
+        request.args.get('from_service'),
+        str(template_id),
+    )['data']
+    template['template_content'] = template['content']
+    template['name'] = 'Copy of ‘{}’'.format(template['name'])
+    form = form_objects[template['template_type']](**template)
+
+    return render_template(
+        'views/edit-{}-template.html'.format(template['template_type']),
+        form=form,
+        template_type=template['template_type'],
+        heading_action='Add',
+        services=user_api_client.get_service_ids_for_user(current_user),
+    )
 
 
 @main.route("/services/<service_id>/templates/action-blocked/<notification_type>/<return_to>/<template_id>")
