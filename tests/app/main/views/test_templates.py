@@ -94,6 +94,7 @@ from tests.conftest import single_letter_contact_block
 def test_should_show_page_for_choosing_a_template(
     client_request,
     mock_get_service_templates,
+    mock_has_no_jobs,
     extra_args,
     expected_nav_links,
     expected_templates,

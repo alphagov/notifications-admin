@@ -8,6 +8,7 @@
 {% block maincolumn_content %}
     <h1 class="heading-large">Uploaded files</h1>
     <div class="dashboard">
+      {{ scheduled_jobs|safe }}
       {% include 'views/dashboard/_jobs.html' %}
       {{ previous_next_navigation(prev_page, next_page) }}
     </div>
