@@ -183,6 +183,10 @@ innovateuk.gov.uk:
   owner: Innovate UK
   agreement_signed: false
   crown: false
+gamblingcommission.gov.uk:
+  owner: Gambling Commission
+  agreement_signed: true
+  crown: false
   
 # Crown bodies who haven’t signed the MOU  
 charitycommission.gsi.gov.uk:
