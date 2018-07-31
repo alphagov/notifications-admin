@@ -116,7 +116,7 @@ def send_messages(service_id, template_id):
     session['sender_id'] = None
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
-    if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
+    if email_or_sms_not_enabled(db_template['template_type'], current_service.permissions):
         return redirect(url_for(
             '.action_blocked',
             service_id=service_id,
@@ -294,7 +294,7 @@ def send_test(service_id, template_id):
     if db_template['template_type'] == 'letter':
         session['sender_id'] = None
 
-    if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
+    if email_or_sms_not_enabled(db_template['template_type'], current_service.permissions):
         return redirect(url_for(
             '.action_blocked',
             service_id=service_id,
@@ -401,7 +401,7 @@ def send_test_step(service_id, template_id, step_index):
         dict_to_populate_from=get_normalised_placeholders_from_session(),
         template_type=template.template_type,
         optional_placeholder=optional_placeholder,
-        allow_international_phone_numbers='international_sms' in current_service['permissions'],
+        allow_international_phone_numbers=current_service.has_permission('international_sms'),
     )
 
     if form.validate_on_submit():
@@ -511,7 +511,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
     users = user_api_client.get_users_for_service(service_id=service_id)
 
     statistics = service_api_client.get_service_statistics(service_id, today_only=True)
-    remaining_messages = (current_service['message_limit'] - sum(stat['requested'] for stat in statistics.values()))
+    remaining_messages = (current_service.message_limit - sum(stat['requested'] for stat in statistics.values()))
 
     contents = s3download(service_id, upload_id)
 
@@ -549,9 +549,9 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         max_errors_shown=50,
         whitelist=itertools.chain.from_iterable(
             [user.name, user.mobile_number, user.email_address] for user in users
-        ) if current_service['restricted'] else None,
+        ) if current_service.trial_mode else None,
         remaining_messages=remaining_messages,
-        international_sms='international_sms' in current_service['permissions'],
+        international_sms=current_service.has_permission('international_sms'),
     )
 
     if request.args.get('from_test'):
@@ -585,7 +585,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         back_link=back_link,
         help=get_help_argument(),
         trying_to_send_letters_in_trial_mode=all((
-            current_service['restricted'],
+            current_service.trial_mode,
             template.template_type == 'letter',
             not request.args.get('from_test'),
         )),
@@ -873,7 +873,7 @@ def send_notification(service_id, template_id):
         )
     except HTTPError as exception:
         current_app.logger.info('Service {} could not send notification: "{}"'.format(
-            current_service['id'],
+            current_service.id,
             exception.message
         ))
         return _check_notification(service_id, template_id, exception)

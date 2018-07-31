@@ -92,7 +92,7 @@
                 'Basic view'
               ) }}
             {% endif %}
-            {% if 'email_auth' in current_service['permissions'] %}
+            {% if current_service.has_permission('email_auth') %}
               <div class="tick-cross-list-hint">
                 {% if user.auth_type == 'sms_auth' %}
                   Signs in with a text message code

@@ -155,7 +155,7 @@ def view_job_updates(service_id, job_id):
     return jsonify(**get_job_partials(
         job,
         service_api_client.get_service_template(
-            service_id=current_service['id'],
+            service_id=current_service.id,
             template_id=job['template'],
             version=job['template_version']
         )['data'],
@@ -177,7 +177,7 @@ def view_notifications(service_id, message_type=None):
         search_form=SearchNotificationsForm(to=request.form.get('to', '')),
         download_link=url_for(
             '.download_notifications_csv',
-            service_id=current_service['id'],
+            service_id=current_service.id,
             message_type=message_type,
             status=request.args.get('status')
         )
@@ -242,7 +242,7 @@ def get_notifications(service_id, message_type, status_override=None):
     if message_type:
         download_link = url_for(
             '.view_notifications_csv',
-            service_id=current_service['id'],
+            service_id=current_service.id,
             message_type=message_type,
             status=request.args.get('status')
         )
@@ -380,7 +380,7 @@ def get_job_partials(job, template):
             percentage_complete=(job['notifications_requested'] / job['notification_count'] * 100),
             download_link=url_for(
                 '.view_job_csv',
-                service_id=current_service['id'],
+                service_id=current_service.id,
                 job_id=job['id'],
                 status=request.args.get('status')
             ),

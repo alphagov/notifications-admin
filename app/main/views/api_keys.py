@@ -37,7 +37,7 @@ dummy_bearer_token = 'bearer_token_set'
 @user_has_permissions('manage_api_keys')
 def api_integration(service_id):
     callbacks_link = (
-        '.api_callbacks' if 'inbound_sms' in current_service['permissions']
+        '.api_callbacks' if current_service.has_permission('inbound_sms')
         else '.delivery_status_callback'
     )
     return render_template(
@@ -98,13 +98,13 @@ def create_api_key(service_id):
         (KEY_TYPE_TEST, 'Test – pretends to send messages'),
     ]
     disabled_options, option_hints = [], {}
-    if current_service['restricted']:
+    if current_service.trial_mode:
         disabled_options = [KEY_TYPE_NORMAL]
         option_hints[KEY_TYPE_NORMAL] = Markup(
             'Not available because your service is in '
             '<a href="{}#trial-mode">trial mode</a>'.format(url_for(".using_notify"))
         )
-    if 'letter' in current_service['permissions']:
+    if current_service.has_permission('letter'):
         option_hints[KEY_TYPE_TEAM] = 'Can’t be used to send letters'
     if form.validate_on_submit():
         if form.key_type.data in disabled_options:
@@ -148,14 +148,14 @@ def revoke_api_key(service_id, key_id):
 def get_apis():
     callback_api = None
     inbound_api = None
-    if current_service['service_callback_api']:
+    if current_service.service_callback_api:
         callback_api = service_api_client.get_service_callback_api(
-            current_service['id'],
+            current_service.id,
             current_service.get('service_callback_api')[0]
         )
-    if current_service['inbound_api']:
+    if current_service.inbound_api:
         inbound_api = service_api_client.get_service_inbound_api(
-            current_service['id'],
+            current_service.id,
             current_service.get('inbound_api')[0]
         )
 
@@ -172,7 +172,7 @@ def check_token_against_dummy_bearer(token):
 @main.route("/services/<service_id>/api/callbacks", methods=['GET'])
 @login_required
 def api_callbacks(service_id):
-    if 'inbound_sms' not in current_service['permissions']:
+    if not current_service.has_permission('inbound_sms'):
         return redirect(url_for('.delivery_status_callback', service_id=service_id))
 
     delivery_status_callback, received_text_messages_callback = get_apis()
@@ -186,10 +186,10 @@ def api_callbacks(service_id):
 
 
 def get_delivery_status_callback_details():
-    if current_service['service_callback_api']:
+    if current_service.service_callback_api:
         return service_api_client.get_service_callback_api(
-            current_service['id'],
-            current_service.get('service_callback_api')[0]
+            current_service.id,
+            current_service.service_callback_api[0]
         )
 
 
@@ -198,7 +198,7 @@ def get_delivery_status_callback_details():
 def delivery_status_callback(service_id):
     delivery_status_callback = get_delivery_status_callback_details()
     back_link = (
-        '.api_callbacks' if 'inbound_sms' in current_service['permissions']
+        '.api_callbacks' if current_service.has_permission('inbound_sms')
         else '.api_integration'
     )
 
@@ -248,9 +248,9 @@ def delivery_status_callback(service_id):
 
 
 def get_received_text_messages_callback():
-    if current_service['inbound_api']:
+    if current_service.inbound_api:
         return service_api_client.get_service_inbound_api(
-            current_service['id'],
+            current_service.id,
             current_service.get('inbound_api')[0]
         )
 
@@ -258,7 +258,7 @@ def get_received_text_messages_callback():
 @main.route("/services/<service_id>/api/callbacks/received-text-messages-callback", methods=['GET', 'POST'])
 @login_required
 def received_text_messages_callback(service_id):
-    if 'inbound_sms' not in current_service['permissions']:
+    if not current_service.has_permission('inbound_sms'):
         return redirect(url_for('.api_integration', service_id=service_id))
 
     received_text_messages_callback = get_received_text_messages_callback()

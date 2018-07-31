@@ -108,7 +108,7 @@ def choose_template(service_id, template_type='all'):
     templates = service_api_client.get_service_templates(service_id)['data']
 
     letters_available = (
-        'letter' in current_service['permissions'] and
+        current_service.has_permission('letter') and
         current_user.has_permissions('view_activity')
     )
 
@@ -128,7 +128,7 @@ def choose_template(service_id, template_type='all'):
     }) > 1
 
     template_nav_items = [
-        (label, key, url_for('.choose_template', service_id=current_service['id'], template_type=key), '')
+        (label, key, url_for('.choose_template', service_id=current_service.id, template_type=key), '')
         for label, key in filter(None, [
             ('All', 'all'),
             ('Text message', 'sms'),
@@ -207,9 +207,9 @@ def view_template_version_preview(service_id, template_id, version, filetype):
 def add_template_by_type(service_id):
 
     form = ChooseTemplateType(
-        include_letters='letter' in current_service['permissions'],
+        include_letters=current_service.has_permission('letter'),
         include_copy=any((
-            service_api_client.count_service_templates(service_id),
+            service_api_client.count_service_templates(service_id) > 0,
             len(user_api_client.get_service_ids_for_user(current_user)) > 1,
         )),
     )
@@ -237,7 +237,7 @@ def add_template_by_type(service_id):
                 template_id=blank_letter['data']['id'],
             ))
 
-        if email_or_sms_not_enabled(form.template_type.data, current_service['permissions']):
+        if email_or_sms_not_enabled(form.template_type.data, current_service.permissions):
             return redirect(url_for(
                 '.action_blocked',
                 service_id=service_id,
@@ -325,7 +325,7 @@ def add_service_template(service_id, template_type):
 
     if template_type not in ['sms', 'email', 'letter']:
         abort(404)
-    if 'letter' not in current_service['permissions'] and template_type == 'letter':
+    if not current_service.has_permission('letter') and template_type == 'letter':
         abort(403)
 
     form = form_objects[template_type]()
@@ -355,7 +355,7 @@ def add_service_template(service_id, template_type):
                 url_for('.view_template', service_id=service_id, template_id=new_template['data']['id'])
             )
 
-    if email_or_sms_not_enabled(template_type, current_service['permissions']):
+    if email_or_sms_not_enabled(template_type, current_service.permissions):
         return redirect(url_for(
             '.action_blocked',
             service_id=service_id,
@@ -444,7 +444,7 @@ def edit_service_template(service_id, template_id):
 
     db_template = service_api_client.get_service_template(service_id, template_id)['data']
 
-    if email_or_sms_not_enabled(db_template['template_type'], current_service['permissions']):
+    if email_or_sms_not_enabled(db_template['template_type'], current_service.permissions):
         return redirect(url_for(
             '.action_blocked',
             service_id=service_id,
@@ -672,5 +672,5 @@ def get_human_readable_delta(from_time, until_time):
 def should_show_template(template_type):
     return (
         template_type != 'letter' or
-        'letter' in current_service['permissions']
+        current_service.has_permission('letter')
     )

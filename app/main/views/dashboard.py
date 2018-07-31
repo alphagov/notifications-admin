@@ -152,7 +152,7 @@ def usage(service_id):
     yearly_usage = billing_api_client.get_service_usage_ft(service_id, year)
 
     usage_template = 'views/usage.html'
-    if 'letter' in current_service['permissions']:
+    if current_service.has_permission('letter'):
         usage_template = 'views/usage-with-letters.html'
     return render_template(
         usage_template,
@@ -238,7 +238,7 @@ def inbox_download(service_id):
 
 def get_inbox_partials(service_id):
     page = int(request.args.get('page', 1))
-    if 'inbound_sms' not in current_service['permissions']:
+    if not current_service.has_permission('inbound_sms'):
         abort(403)
 
     inbound_messages_data = service_api_client.get_most_recent_inbound_sms(service_id, page=page)
@@ -290,7 +290,7 @@ def get_dashboard_partials(service_id):
     stats = service_api_client.get_service_statistics(service_id, today_only=False)
     column_width, max_notifiction_count = get_column_properties(
         number_of_columns=(
-            3 if 'letter' in current_service['permissions'] else 2
+            3 if current_service.has_permission('letter') else 2
         )
     )
     dashboard_totals = get_dashboard_totals(stats),
@@ -310,7 +310,7 @@ def get_dashboard_partials(service_id):
             'views/dashboard/_inbox.html',
             inbound_sms_summary=(
                 service_api_client.get_inbound_sms_summary(service_id)
-                if 'inbound_sms' in current_service['permissions'] else None
+                if current_service.has_permission('inbound_sms') else None
             ),
         ),
         'totals': render_template(
