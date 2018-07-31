@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from app.notify_client import NotifyAdminAPIClient, _attach_current_user
+from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
 
 class JobApiClient(NotifyAdminAPIClient):
@@ -15,6 +15,8 @@ class JobApiClient(NotifyAdminAPIClient):
         'ready to send',
         'sent to dvla'
     }
+
+    NON_SCHEDULED_JOB_STATUSES = JOB_STATUSES - {'scheduled', 'cancelled'}
 
     def __init__(self):
         super().__init__("a" * 73, "b")
@@ -60,7 +62,37 @@ class JobApiClient(NotifyAdminAPIClient):
 
         return jobs
 
+    def get_page_of_jobs(self, service_id, page):
+        return self.get_jobs(
+            service_id,
+            statuses=self.NON_SCHEDULED_JOB_STATUSES,
+            page=page,
+        )
+
+    def get_immediate_jobs(self, service_id):
+        return self.get_jobs(
+            service_id,
+            limit_days=7,
+            statuses=self.NON_SCHEDULED_JOB_STATUSES,
+        )['data']
+
+    def get_scheduled_jobs(self, service_id):
+        return sorted(
+            self.get_jobs(service_id, statuses=['scheduled'])['data'],
+            key=lambda job: job['scheduled_for']
+        )
+
+    @cache.set('has_jobs-{service_id}')
+    def has_jobs(self, service_id):
+        return bool(self.get_jobs(service_id)['data'])
+
     def create_job(self, job_id, service_id, scheduled_for=None):
+
+        self.redis_client.set(
+            'has_jobs-{}'.format(service_id),
+            True,
+            ex=cache.TTL,
+        )
 
         data = {"id": job_id}
 
@@ -78,6 +110,7 @@ class JobApiClient(NotifyAdminAPIClient):
 
         return job
 
+    @cache.delete('has_jobs-{service_id}')
     def cancel_job(self, service_id, job_id):
 
         job = self.post(

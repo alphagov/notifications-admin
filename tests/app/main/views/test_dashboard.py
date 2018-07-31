@@ -2,7 +2,7 @@ import copy
 import json
 from datetime import datetime
 from functools import partial
-from unittest.mock import ANY, call
+from unittest.mock import call
 
 import pytest
 from bs4 import BeautifulSoup
@@ -573,9 +573,9 @@ def test_should_show_upcoming_jobs_on_dashboard(
 ):
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
-    first_call = mock_get_jobs.call_args_list[0]
-    assert first_call[0] == (SERVICE_ONE_ID,)
-    assert first_call[1]['statuses'] == ['scheduled']
+    second_call = mock_get_jobs.call_args_list[1]
+    assert second_call[0] == (SERVICE_ONE_ID,)
+    assert second_call[1]['statuses'] == ['scheduled']
 
     assert response.status_code == 200
 
@@ -702,10 +702,10 @@ def test_should_show_recent_jobs_on_dashboard(
 ):
     response = logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
-    second_call = mock_get_jobs.call_args_list[1]
-    assert second_call[0] == (SERVICE_ONE_ID,)
-    assert second_call[1]['limit_days'] == 7
-    assert 'scheduled' not in second_call[1]['statuses']
+    third_call = mock_get_jobs.call_args_list[2]
+    assert third_call[0] == (SERVICE_ONE_ID,)
+    assert third_call[1]['limit_days'] == 7
+    assert 'scheduled' not in third_call[1]['statuses']
 
     assert response.status_code == 200
 
@@ -1266,11 +1266,14 @@ def test_should_show_all_jobs_with_valid_statuses(
     logged_in_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
 
     first_call = mock_get_jobs.call_args_list[0]
-    # first call - scheduled jobs only
-    assert first_call == call(ANY, statuses=['scheduled'])
-    # second call - everything but scheduled and cancelled
+    # first call - checking for any jobs
+    assert first_call == call(SERVICE_ONE_ID)
     second_call = mock_get_jobs.call_args_list[1]
-    assert second_call == call(ANY, limit_days=ANY, statuses={
+    # second call - scheduled jobs only
+    assert second_call == call(SERVICE_ONE_ID, statuses=['scheduled'])
+    # third call - everything but scheduled and cancelled
+    third_call = mock_get_jobs.call_args_list[2]
+    assert third_call == call(SERVICE_ONE_ID, limit_days=7, statuses={
         'pending',
         'in progress',
         'finished',

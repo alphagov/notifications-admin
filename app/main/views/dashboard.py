@@ -275,21 +275,18 @@ def aggregate_usage(template_statistics, sort_key='count'):
 
 
 def get_dashboard_partials(service_id):
-    # all but scheduled and cancelled
-    statuses_to_display = job_api_client.JOB_STATUSES - {'scheduled', 'cancelled'}
-
     template_statistics = aggregate_usage(
         template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
     )
 
-    scheduled_jobs = sorted(
-        job_api_client.get_jobs(service_id, statuses=['scheduled'])['data'],
-        key=lambda job: job['scheduled_for']
-    )
-    immediate_jobs = [
-        add_rate_to_job(job)
-        for job in job_api_client.get_jobs(service_id, limit_days=7, statuses=statuses_to_display)['data']
-    ]
+    scheduled_jobs, immediate_jobs = [], []
+    if job_api_client.has_jobs(service_id):
+        scheduled_jobs = job_api_client.get_scheduled_jobs(service_id)
+        immediate_jobs = [
+            add_rate_to_job(job)
+            for job in job_api_client.get_immediate_jobs(service_id)
+        ]
+
     stats = service_api_client.get_service_statistics(service_id, today_only=False)
     column_width, max_notifiction_count = get_column_properties(
         number_of_columns=(
