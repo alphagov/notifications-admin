@@ -355,12 +355,16 @@ def test_has_jobs_returns_from_cache(
     cache_value,
     return_value,
 ):
+    mock_get = mocker.patch(
+        'app.notify_client.job_api_client.JobApiClient.get'
+    )
     mock_redis_get = mocker.patch(
         'app.notify_client.RedisClient.get',
         return_value=cache_value,
     )
 
     assert JobApiClient().has_jobs(fake_uuid) is return_value
+    assert not mock_get.called
     mock_redis_get.assert_called_once_with(
         'has_jobs-{}'.format(fake_uuid)
     )
