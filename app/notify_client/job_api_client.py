@@ -16,7 +16,7 @@ class JobApiClient(NotifyAdminAPIClient):
         'sent to dvla'
     }
 
-    NORMAL_JOB_STATUSES = JOB_STATUSES - {'scheduled', 'cancelled'}
+    NON_SCHEDULED_JOB_STATUSES = JOB_STATUSES - {'scheduled', 'cancelled'}
 
     def __init__(self):
         super().__init__("a" * 73, "b")
@@ -65,7 +65,7 @@ class JobApiClient(NotifyAdminAPIClient):
     def get_page_of_jobs(self, service_id, page):
         return self.get_jobs(
             service_id,
-            statuses=self.NORMAL_JOB_STATUSES,
+            statuses=self.NON_SCHEDULED_JOB_STATUSES,
             page=page,
         )
 
@@ -73,7 +73,7 @@ class JobApiClient(NotifyAdminAPIClient):
         return self.get_jobs(
             service_id,
             limit_days=7,
-            statuses=self.NORMAL_JOB_STATUSES,
+            statuses=self.NON_SCHEDULED_JOB_STATUSES,
         )['data']
 
     def get_scheduled_jobs(self, service_id):
