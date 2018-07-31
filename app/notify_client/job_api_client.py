@@ -90,7 +90,7 @@ class JobApiClient(NotifyAdminAPIClient):
 
         self.redis_client.set(
             'has_jobs-{}'.format(service_id),
-            True,
+            b'true',
             ex=cache.TTL,
         )
 
