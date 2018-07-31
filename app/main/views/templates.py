@@ -287,6 +287,10 @@ def copy_template(service_id, template_id):
         request.args.get('from_service'),
         str(template_id),
     )['data']
+
+    if request.method == 'POST':
+        return add_service_template(service_id, template['template_type'])
+
     template['template_content'] = template['content']
     template['name'] = 'Copy of ‘{}’'.format(template['name'])
     form = form_objects[template['template_type']](**template)
@@ -458,7 +462,7 @@ def edit_service_template(service_id, template_id):
             form=form,
             template_id=template_id,
             template_type=template['template_type'],
-            heading_action='Edit'
+            heading_action='Edit',
         )
 
 

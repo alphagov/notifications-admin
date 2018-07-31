@@ -13,10 +13,7 @@
       {{ heading_action }} text message template
     </h1>
 
-    <form
-      method="post"
-      action="{{ url_for('.add_service_template', service_id=current_service.id, template_type=template_type) }}"
-    >
+    <form method="post">
       <div class="grid-row">
         <div class="column-two-thirds">
           {{ textbox(form.name, width='1-1', hint='Your recipients won’t see this') }}
