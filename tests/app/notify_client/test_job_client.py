@@ -29,7 +29,7 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
     mock_post.assert_called_once_with(url=expected_url, data=expected_data)
     mock_redis_set.assert_called_once_with(
         'has_jobs-{}'.format(service_id),
-        True,
+        b'true',
         ex=604800,
     )
 
