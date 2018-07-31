@@ -12,10 +12,7 @@
       {{ heading_action }} letter template
     </h1>
 
-    <form
-      method="post"
-      action="{{ url_for('.add_service_template', service_id=current_service.id, template_type=template_type) }}"
-    >
+    <form method="post">
       <div class="grid-row">
         <div class="column-five-sixths">
           {{ textbox(form.name, width='1-1', hint='Your recipients won’t see this', rows=10) }}
