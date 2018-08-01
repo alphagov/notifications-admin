@@ -514,7 +514,7 @@ def useful_headers_after_request(response):
         "object-src 'self';"
         "font-src 'self' data:;"
         "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk {} data:;"
-        "frame-src www.youtube.com;".format(get_cdn_domain())
+        "frame-src 'self' www.youtube.com;".format(get_cdn_domain())
     ))
     if 'Cache-Control' in response.headers:
         del response.headers['Cache-Control']
