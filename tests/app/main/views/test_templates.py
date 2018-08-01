@@ -477,11 +477,6 @@ def test_load_edit_template_with_copy_of_template(
     )
 
     assert page.select_one('form')['method'] == 'post'
-    assert page.select_one('form')['action'] == url_for(
-        'main.add_service_template',
-        service_id=SERVICE_ONE_ID,
-        template_type='email',
-    )
 
     assert page.select_one('input')['value'] == (
         'Copy of ‘Two week reminder’'
