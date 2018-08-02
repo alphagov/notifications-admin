@@ -1,0 +1,24 @@
+{% extends "views/platform-admin/_base_template.html" %}
+
+{% block service_page_title %}
+  Preview email branding
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-large">Preview email branding</h1>
+  <div class="grid-row">
+    <div class="column-full">
+      <iframe src="{{ url_for('main.email_template', branding_type=form.branding_type.data, branding_style=form.branding_style.data) }}" class="email-branding-preview"></iframe>
+      <form method="post" action="{{ action }}">
+        <div class="form-group">
+          {{ form.hidden_tag() }}
+          <div class="page-footer">
+            <button type="submit" class="button">Save</button>
+            <a class="page-footer-back-link" href="{{ url_for('main.service_settings', service_id=service_id) }}">Back to service settings</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

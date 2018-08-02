@@ -717,6 +717,12 @@ class ServiceSetBranding(StripWhitespaceForm):
     )
 
 
+class ServicePreviewBranding(StripWhitespaceForm):
+
+    branding_type = HiddenField('branding_type')
+    branding_style = HiddenField('branding_style')
+
+
 class ServiceSelectEmailBranding(StripWhitespaceForm):
 
     def __init__(self, email_brandings=[], *args, **kwargs):
