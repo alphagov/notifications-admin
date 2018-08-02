@@ -14,8 +14,8 @@
             class="navigation-service-basic-view-preview"
             data-module="track-event"
             data-event-category="basic-view"
-            data-error-action="preview"
-            data-error-label="{{ current_service.id }}"
+            data-event-action="preview"
+            data-event-label="{{ current_service.id }}"
           >Preview of basic view</span>
           <a class="navigation-service-basic-view-back-link" href="{{ url_for('main.service_set_basic_view', service_id=current_service.id)}}">Back to settings</a>
         {% endif %}
