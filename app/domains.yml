@@ -187,6 +187,10 @@ gamblingcommission.gov.uk:
   owner: Gambling Commission
   agreement_signed: true
   crown: false
+geo.gov.uk:
+  owner: Government Equalities Office
+  agreement_signed: true
+  crown: true
   
 # Crown bodies who haven’t signed the MOU  
 charitycommission.gsi.gov.uk:
