@@ -8,8 +8,8 @@
 
         <div class="bottom-gutter-1-3">
           {{ radio(option, option_hints={
-              'admin': 'Show dashboard, templates and team members',
-              'caseworker': 'Hide dashboard and other options, send messages from existing templates'
+              'admin': 'Show dashboard and other options',
+              'caseworker': 'Send messages, hide dashboard and other options'
           }) }}
         </div>
         {% if option.data == 'admin' %}
