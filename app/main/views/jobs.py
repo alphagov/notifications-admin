@@ -39,7 +39,7 @@ from app.utils import (
 
 @main.route("/services/<service_id>/jobs")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def view_jobs(service_id):
     page = int(request.args.get('page', 1))
     jobs_response = job_api_client.get_page_of_jobs(service_id, page=page)
@@ -54,18 +54,27 @@ def view_jobs(service_id):
     if jobs_response['links'].get('next', None):
         next_page = generate_next_dict('main.view_jobs', service_id, page)
 
+    scheduled_jobs = ''
+    if not current_user.has_permissions('view_activity') and page == 1:
+        scheduled_jobs = render_template(
+            'views/dashboard/_upcoming.html',
+            scheduled_jobs=job_api_client.get_scheduled_jobs(service_id),
+            hide_heading=True,
+        )
+
     return render_template(
         'views/jobs/jobs.html',
         jobs=jobs,
         page=page,
         prev_page=prev_page,
         next_page=next_page,
+        scheduled_jobs=scheduled_jobs,
     )
 
 
 @main.route("/services/<service_id>/jobs/<job_id>")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def view_job(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
     if job['job_status'] == 'cancelled':
@@ -147,7 +156,7 @@ def cancel_job(service_id, job_id):
 
 
 @main.route("/services/<service_id>/jobs/<job_id>.json")
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def view_job_updates(service_id, job_id):
 
     job = job_api_client.get_job(service_id, job_id)['data']

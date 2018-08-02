@@ -298,3 +298,8 @@ class Service(dict):
 
     def has_permission(self, permission):
         return permission in self.permissions
+
+    def has_jobs(self):
+        # Can’t import at top-level because app isn’t yet initialised
+        from app import job_api_client
+        return job_api_client.has_jobs(self.id)
