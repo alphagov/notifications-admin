@@ -14,7 +14,7 @@ def test_owasp_useful_headers_set(client, mocker):
         "object-src 'self';"
         "font-src 'self' data:;"
         "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk static-logos.test.com data:;"
-        "frame-src www.youtube.com;"
+        "frame-src 'self' www.youtube.com;"
     )
 
 
@@ -31,5 +31,5 @@ def test_headers_non_ascii_characters_are_replaced(client, mocker):
         "object-src 'self';"
         "font-src 'self' data:;"
         "img-src 'self' *.google-analytics.com *.notifications.service.gov.uk static-logos??.test.com data:;"
-        "frame-src www.youtube.com;"
+        "frame-src 'self' www.youtube.com;"
     )

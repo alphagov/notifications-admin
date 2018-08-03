@@ -1785,7 +1785,8 @@ def test_should_set_branding_and_organisations(
         }
     )
     assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert response.location == url_for('main.service_preview_email_branding',
+                                        service_id=service_one['id'], _external=True)
 
     mock_get_all_email_branding.assert_called_once_with()
     mock_update_service.assert_called_once_with(
