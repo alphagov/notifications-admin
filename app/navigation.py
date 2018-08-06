@@ -519,6 +519,10 @@ class CaseworkNavigation(Navigation):
             'view_notifications',
             'view_notification',
         },
+        'uploaded-files': {
+            'view_jobs',
+            'view_job',
+        },
     }
 
     exclude = {
@@ -712,10 +716,8 @@ class CaseworkNavigation(Navigation):
         'verify',
         'verify_email',
         'verify_mobile',
-        'view_job',
         'view_job_csv',
         'view_job_updates',
-        'view_jobs',
         'view_letter_notification_as_preview',
         'view_letter_template_preview',
         'view_notification_updates',

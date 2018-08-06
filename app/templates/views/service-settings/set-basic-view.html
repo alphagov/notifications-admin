@@ -9,18 +9,25 @@
 {% block maincolumn_content %}
 
   <div class="grid-row">
-    <form method="post" class="column-five-sixths">
+    <form
+      method="post"
+      class="column-five-sixths"
+      data-module="track-form-submission"
+    >
       <h1 class="heading-large">Basic view</h1>
       <p>
-        Basic view lets you restrict a team member to only:
+        Hide the dashboard and other options from team members who only need to send messages.
+      </p>
+      <p>
+        Turn on basic view then edit team members’ permissions.
+      </p>
+      <p>
+        Team members with basic view can only:
       </p>
       <ul class="list list-bullet">
-        <li>send messages</li>
-        <li>see sent messages</li>
+        <li>send messages using existing templates</li>
+        <li>see a list of sent messages</li>
       </ul>
-      <p>
-        You’ll get to choose which team members have basic view.
-      </p>
       <p>
         <a href="{{ url_for('main.preview_basic_view', service_id=current_service.id) }}">See a preview of basic view</a>.
       </p>

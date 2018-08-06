@@ -1753,6 +1753,16 @@ def mock_get_job_in_progress(mocker, api_user_active):
 
 
 @pytest.fixture(scope='function')
+def mock_has_jobs(mocker):
+    mocker.patch('app.job_api_client.has_jobs', return_value=True)
+
+
+@pytest.fixture(scope='function')
+def mock_has_no_jobs(mocker):
+    mocker.patch('app.job_api_client.has_jobs', return_value=False)
+
+
+@pytest.fixture(scope='function')
 def mock_get_jobs(mocker, api_user_active):
     def _get_jobs(service_id, limit_days=None, statuses=None, page=1):
         if statuses is None:

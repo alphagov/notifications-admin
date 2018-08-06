@@ -33,6 +33,7 @@ from tests.conftest import (
 def test_notification_status_page_shows_details(
     client_request,
     mocker,
+    mock_has_no_jobs,
     service_one,
     fake_uuid,
     user,

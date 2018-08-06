@@ -2451,6 +2451,7 @@ def test_update_basic_view(
 def test_preview_basic_view(
     client_request,
     mock_get_service_templates,
+    mock_has_no_jobs,
 ):
     page = client_request.get(
         "main.preview_basic_view",
@@ -2486,6 +2487,7 @@ def test_preview_basic_view(
 def test_cant_preview_basic_view_for_another_service(
     client_request,
     mock_get_service_templates,
+    mock_has_no_jobs,
     fake_uuid,
 ):
     client_request.get(

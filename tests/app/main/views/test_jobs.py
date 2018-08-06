@@ -8,42 +8,147 @@ from freezegun import freeze_time
 from app.main.views.jobs import get_time_left
 from tests.conftest import (
     SERVICE_ONE_ID,
+    active_caseworking_user,
+    active_user_with_permissions,
     mock_get_notifications,
     normalize_spaces,
 )
 
 
-def test_get_jobs_should_return_list_of_all_real_jobs(
-    logged_in_client,
+@pytest.mark.parametrize('user, expected_rows', [
+    (active_user_with_permissions, (
+        (
+            'File Sending Delivered Failed'
+        ),
+        (
+            'export 1/1/2016.xls '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+        (
+            'all email addresses.xlsx '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+        (
+            'applicants.ods '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+        (
+            'thisisatest.csv '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+    )),
+    (active_caseworking_user, (
+        (
+            'File Messages to be sent'
+        ),
+        (
+            'send_me_later.csv '
+            'Sending 1 January at 11:09am 1'
+        ),
+        (
+            'even_later.csv '
+            'Sending 1 January at 11:09pm 1'
+        ),
+        (
+            'File Sending Delivered Failed'
+        ),
+        (
+            'export 1/1/2016.xls '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+        (
+            'all email addresses.xlsx '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+        (
+            'applicants.ods '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+        (
+            'thisisatest.csv '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+    )),
+])
+@freeze_time("2012-12-12 12:12")
+def test_jobs_page_shows_scheduled_jobs_in_basic_view(
+    client_request,
     service_one,
     active_user_with_permissions,
     mock_get_jobs,
-    mocker,
+    fake_uuid,
+    user,
+    expected_rows,
 ):
-    response = logged_in_client.get(url_for('main.view_jobs', service_id=service_one['id']))
+    client_request.login(user(fake_uuid))
+    page = client_request.get('main.view_jobs', service_id=service_one['id'])
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.h1.string == 'Uploaded files'
-    jobs = [x.text for x in page.tbody.find_all('a', {'class': 'file-list-filename'})]
-    assert len(jobs) == 4
+    for index, row in enumerate(expected_rows):
+        assert normalize_spaces(page.select('tr')[index].text) == row
 
 
+@pytest.mark.parametrize('user', [
+    active_user_with_permissions,
+    active_caseworking_user,
+])
 def test_get_jobs_shows_page_links(
-    logged_in_client,
-    service_one,
+    client_request,
     active_user_with_permissions,
     mock_get_jobs,
-    mocker,
+    user,
+    fake_uuid,
 ):
-    response = logged_in_client.get(url_for('main.view_jobs', service_id=service_one['id']))
+    client_request.login(user(fake_uuid))
+    page = client_request.get('main.view_jobs', service_id=SERVICE_ONE_ID)
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert 'Next page' in page.find('li', {'class': 'next-page'}).text
     assert 'Previous page' in page.find('li', {'class': 'previous-page'}).text
 
 
+@pytest.mark.parametrize('user', [
+    active_user_with_permissions,
+    active_caseworking_user,
+])
+@freeze_time("2012-12-12 12:12")
+def test_jobs_page_doesnt_show_scheduled_on_page_2(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_jobs,
+    fake_uuid,
+    user,
+):
+    client_request.login(user(fake_uuid))
+    page = client_request.get('main.view_jobs', service_id=service_one['id'], page=2)
+
+    for index, row in enumerate((
+        (
+            'File Sending Delivered Failed'
+        ),
+        (
+            'export 1/1/2016.xls '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+        (
+            'all email addresses.xlsx '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+        (
+            'applicants.ods '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+        (
+            'thisisatest.csv '
+            'Sent 12 December at 12:12pm 1 0 0'
+        ),
+    )):
+        assert normalize_spaces(page.select('tr')[index].text) == row
+
+
+@pytest.mark.parametrize('user', [
+    active_user_with_permissions,
+    active_caseworking_user,
+])
 @pytest.mark.parametrize(
     "status_argument, expected_api_call", [
         (
@@ -70,8 +175,7 @@ def test_get_jobs_shows_page_links(
 )
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_page_for_one_job(
-    logged_in_client,
-    service_one,
+    client_request,
     active_user_with_permissions,
     mock_get_service_template,
     mock_get_job,
@@ -80,38 +184,37 @@ def test_should_show_page_for_one_job(
     fake_uuid,
     status_argument,
     expected_api_call,
+    user,
 ):
 
-    response = logged_in_client.get(url_for(
+    page = client_request.get(
         'main.view_job',
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
         status=status_argument
-    ))
+    )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.text.strip() == 'thisisatest.csv'
     assert ' '.join(page.find('tbody').find('tr').text.split()) == (
         '07123456789 template content Delivered 1 January at 11:10am'
     )
     assert page.find('div', {'data-key': 'notifications'})['data-resource'] == url_for(
         'main.view_job_updates',
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
         status=status_argument,
     )
     csv_link = page.select_one('a[download]')
     assert csv_link['href'] == url_for(
         'main.view_job_csv',
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
         status=status_argument
     )
     assert csv_link.text == 'Download this report'
     assert page.find('span', {'id': 'time-left'}).text == 'Data available for 7 days'
     mock_get_notifications.assert_called_with(
-        service_one['id'],
+        SERVICE_ONE_ID,
         fake_uuid,
         status=expected_api_call
     )

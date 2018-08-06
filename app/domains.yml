@@ -187,6 +187,10 @@ gamblingcommission.gov.uk:
   owner: Gambling Commission
   agreement_signed: true
   crown: false
+geo.gov.uk:
+  owner: Government Equalities Office
+  agreement_signed: true
+  crown: true
   
 # Crown bodies who haven’t signed the MOU  
 charitycommission.gsi.gov.uk:
@@ -1276,7 +1280,7 @@ copeland.gov.uk:
 corby.gov.uk:
   owner: Corby Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 cornwall-aonb.gov.uk:
   owner: Cornwall Council
   crown: false
