@@ -59,7 +59,7 @@ def old_service_dashboard(service_id):
 
 @main.route("/services/<service_id>")
 @login_required
-@user_has_permissions('view_activity', 'send_messages')
+@user_has_permissions()
 def service_dashboard(service_id):
 
     if session.get('invited_user'):

@@ -124,7 +124,10 @@ class User(UserMixin):
         org_id = _get_org_id_from_view_args()
 
         if self.previewing_basic_view:
-            return self._permissions.get(service_id) and 'send_messages' in permissions
+            return self._permissions.get(service_id) and (
+                'send_messages' in permissions or
+                permissions == ()
+            )
 
         if not service_id and not org_id:
             # we shouldn't have any pages that require permissions, but don't specify a service or organisation.
@@ -137,7 +140,9 @@ class User(UserMixin):
 
         if org_id:
             return org_id in self.organisations
-        elif service_id:
+        if not permissions:
+            return service_id in self._permissions
+        if service_id:
             return any(x in self._permissions.get(service_id, []) for x in permissions)
 
     def has_permission_for_service(self, service_id, permission):

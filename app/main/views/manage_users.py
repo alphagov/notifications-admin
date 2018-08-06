@@ -24,7 +24,7 @@ from app.utils import user_has_permissions
 
 @main.route("/services/<service_id>/users")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions()
 def manage_users(service_id):
     users = sorted(
         user_api_client.get_users_for_service(service_id=service_id) + [

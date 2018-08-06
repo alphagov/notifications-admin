@@ -2216,13 +2216,13 @@ def test_route_permissions_send_check_notifications(
     )
 
 
-@pytest.mark.parametrize('route', [
-    'main.choose_template',
-    'main.send_messages',
-    'main.get_example_csv',
-    'main.send_test'
+@pytest.mark.parametrize('route, expected_status', [
+    ('main.choose_template', 200),
+    ('main.send_messages', 403),
+    ('main.get_example_csv', 403),
+    ('main.send_test', 403),
 ])
-def test_route_invalid_permissions(
+def test_route_permissions_sending(
     mocker,
     app_,
     client,
@@ -2235,12 +2235,13 @@ def test_route_invalid_permissions(
     mock_create_job,
     fake_uuid,
     route,
+    expected_status,
 ):
     validate_route_permission(
         mocker,
         app_,
         "GET",
-        403,
+        expected_status,
         url_for(
             route,
             service_id=service_one['id'],
