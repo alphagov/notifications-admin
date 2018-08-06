@@ -187,6 +187,32 @@ def test_caseworker_redirected_to_one_off(
     )
 
 
+def test_user_with_only_send_and_view_redirected_to_one_off(
+    client_request,
+    mock_get_service_templates,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+):
+    active_user_with_permissions._permissions[SERVICE_ONE_ID] = [
+        'send_messages',
+        'view_activity',
+    ]
+    client_request.login(active_user_with_permissions)
+    client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.send_one_off',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
+    )
+
+
 @pytest.mark.parametrize('permissions, links_to_be_shown, permissions_warning_to_be_shown', [
     (
         ['view_activity'],
@@ -201,11 +227,6 @@ def test_caseworker_redirected_to_one_off(
     (
         ['manage_templates'],
         ['.edit_service_template'],
-        None,
-    ),
-    (
-        ['send_messages'],
-        ['.set_sender'],
         None,
     ),
     (

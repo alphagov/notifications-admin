@@ -48,7 +48,10 @@ page_headings = {
 @login_required
 @user_has_permissions('view_activity', 'send_messages')
 def view_template(service_id, template_id):
-    if not current_user.has_permissions('view_activity'):
+    if (
+        current_user.has_permissions('send_messages') and
+        not current_user.has_permissions('manage_templates', 'manage_api_keys')
+    ):
         return redirect(url_for(
             '.send_one_off', service_id=service_id, template_id=template_id
         ))
