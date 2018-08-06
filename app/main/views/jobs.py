@@ -39,12 +39,10 @@ from app.utils import (
 
 @main.route("/services/<service_id>/jobs")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def view_jobs(service_id):
     page = int(request.args.get('page', 1))
-    # all but scheduled and cancelled
-    statuses_to_display = job_api_client.JOB_STATUSES - {'scheduled', 'cancelled'}
-    jobs_response = job_api_client.get_jobs(service_id, statuses=statuses_to_display, page=page)
+    jobs_response = job_api_client.get_page_of_jobs(service_id, page=page)
     jobs = [
         add_rate_to_job(job) for job in jobs_response['data']
     ]
@@ -56,18 +54,27 @@ def view_jobs(service_id):
     if jobs_response['links'].get('next', None):
         next_page = generate_next_dict('main.view_jobs', service_id, page)
 
+    scheduled_jobs = ''
+    if not current_user.has_permissions('view_activity') and page == 1:
+        scheduled_jobs = render_template(
+            'views/dashboard/_upcoming.html',
+            scheduled_jobs=job_api_client.get_scheduled_jobs(service_id),
+            hide_heading=True,
+        )
+
     return render_template(
         'views/jobs/jobs.html',
         jobs=jobs,
         page=page,
         prev_page=prev_page,
         next_page=next_page,
+        scheduled_jobs=scheduled_jobs,
     )
 
 
 @main.route("/services/<service_id>/jobs/<job_id>")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def view_job(service_id, job_id):
     job = job_api_client.get_job(service_id, job_id)['data']
     if job['job_status'] == 'cancelled':
@@ -149,7 +156,7 @@ def cancel_job(service_id, job_id):
 
 
 @main.route("/services/<service_id>/jobs/<job_id>.json")
-@user_has_permissions('view_activity')
+@user_has_permissions('view_activity', 'send_messages')
 def view_job_updates(service_id, job_id):
 
     job = job_api_client.get_job(service_id, job_id)['data']
@@ -157,7 +164,7 @@ def view_job_updates(service_id, job_id):
     return jsonify(**get_job_partials(
         job,
         service_api_client.get_service_template(
-            service_id=current_service['id'],
+            service_id=current_service.id,
             template_id=job['template'],
             version=job['template_version']
         )['data'],
@@ -179,7 +186,7 @@ def view_notifications(service_id, message_type=None):
         search_form=SearchNotificationsForm(to=request.form.get('to', '')),
         download_link=url_for(
             '.download_notifications_csv',
-            service_id=current_service['id'],
+            service_id=current_service.id,
             message_type=message_type,
             status=request.args.get('status')
         )
@@ -244,7 +251,7 @@ def get_notifications(service_id, message_type, status_override=None):
     if message_type:
         download_link = url_for(
             '.view_notifications_csv',
-            service_id=current_service['id'],
+            service_id=current_service.id,
             message_type=message_type,
             status=request.args.get('status')
         )
@@ -383,7 +390,7 @@ def get_job_partials(job, template):
             percentage_complete=(job['notifications_requested'] / job['notification_count'] * 100),
             download_link=url_for(
                 '.view_job_csv',
-                service_id=current_service['id'],
+                service_id=current_service.id,
                 job_id=job['id'],
                 status=request.args.get('status')
             ),

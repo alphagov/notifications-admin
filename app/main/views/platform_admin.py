@@ -138,6 +138,14 @@ def make_columns(global_stats, complaints_number):
 @user_is_platform_admin
 def platform_admin_services():
     form = DateFilterForm(request.args)
+    if all((
+        request.args.get('include_from_test_key') is None,
+        request.args.get('start_date') is None,
+        request.args.get('end_date') is None,
+    )):
+        # Default to True if the user hasn’t done any filtering,
+        # otherwise respect their choice
+        form.include_from_test_key.data = True
     api_args = {'detailed': True,
                 'only_active': False,    # specifically DO get inactive services
                 'include_from_test_key': form.include_from_test_key.data,

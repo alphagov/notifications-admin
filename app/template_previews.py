@@ -11,7 +11,7 @@ class TemplatePreview:
             'letter_contact_block': template.get('reply_to_text', ''),
             'template': template,
             'values': values,
-            'dvla_org_id': current_service['dvla_organisation'],
+            'dvla_org_id': current_service.dvla_organisation,
         }
         resp = requests.post(
             '{}/preview.{}{}'.format(

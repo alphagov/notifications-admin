@@ -837,20 +837,31 @@ class ChooseTemplateType(StripWhitespaceForm):
         ]
     )
 
-    def __init__(self, include_letters=False, *args, **kwargs):
+    def __init__(self, include_letters=False, include_copy=False, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
 
         self.template_type.choices = filter(None, [
             ('email', 'Email'),
             ('sms', 'Text message'),
-            ('letter', 'Letter') if include_letters else None
+            ('letter', 'Letter') if include_letters else None,
+            ('copy-existing', 'Copy of an existing template') if include_copy else None,
         ])
 
 
 class SearchTemplatesForm(StripWhitespaceForm):
 
     search = SearchField('Search by name')
+
+
+class SearchUsersByEmailForm(StripWhitespaceForm):
+
+    search = SearchField(
+        'Search by name or email address',
+        validators=[
+            DataRequired("You need to enter full or partial email address to search by.")
+        ],
+    )
 
 
 class SearchUsersForm(StripWhitespaceForm):

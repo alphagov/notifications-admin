@@ -5,12 +5,14 @@
 <div class="ajax-block-container">
   {% if scheduled_jobs %}
     <div class='dashboard-table'>
-      <h2 class="heading-medium">
-        In the next few days
-      </h2>
+      {% if not hide_heading %}
+        <h2 class="heading-medium">
+          In the next few days
+        </h2>
+      {% endif %}
       {% call(item, row_number) list_table(
         scheduled_jobs,
-        caption="In the next 24 hours",
+        caption="In the next few days",
         caption_visible=False,
         empty_message='Nothing to see here',
         field_headings=[

@@ -152,6 +152,7 @@ def test_caseworkers_get_caseworking_navigation(
     mocker,
     fake_uuid,
     mock_get_service_templates,
+    mock_has_no_jobs,
 ):
     mocker.patch(
         'app.user_api_client.get_user',
@@ -159,5 +160,22 @@ def test_caseworkers_get_caseworking_navigation(
     )
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one('#content nav').text) == (
-        'Send a message Sent messages'
+        'Templates Sent messages'
+    )
+
+
+def test_caseworkers_see_jobs_nav_if_jobs_exist(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_get_service_templates,
+    mock_has_jobs,
+):
+    mocker.patch(
+        'app.user_api_client.get_user',
+        return_value=active_caseworking_user(fake_uuid)
+    )
+    page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
+    assert normalize_spaces(page.select_one('#content nav').text) == (
+        'Templates Sent messages Uploaded files'
     )

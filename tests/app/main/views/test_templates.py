@@ -18,6 +18,8 @@ from tests import (
 )
 from tests.conftest import (
     SERVICE_ONE_ID,
+    SERVICE_TWO_ID,
+    TEMPLATE_ONE_ID,
     active_caseworking_user,
     active_user_view_permissions,
     mock_get_service_email_template,
@@ -70,7 +72,7 @@ from tests.conftest import single_letter_contact_block
         ),
         (
             active_caseworking_user,
-            'Choose a template',
+            'Templates',
             {},
             ['Text message', 'Email'],
             [
@@ -82,7 +84,7 @@ from tests.conftest import single_letter_contact_block
         ),
         (
             active_caseworking_user,
-            'Choose a template',
+            'Templates',
             {'template_type': 'email'},
             ['All', 'Text message'],
             ['email_template_one', 'email_template_two'],
@@ -92,6 +94,7 @@ from tests.conftest import single_letter_contact_block
 def test_should_show_page_for_choosing_a_template(
     client_request,
     mock_get_service_templates,
+    mock_has_no_jobs,
     extra_args,
     expected_nav_links,
     expected_templates,
@@ -394,11 +397,122 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
     assert mock_get_service_template.called is False
 
 
+def test_choosing_to_copy_redirects(
+    client_request,
+    mock_get_service_templates,
+    mock_get_organisations_and_services_for_user,
+):
+    client_request.post(
+        'main.add_template_by_type',
+        service_id=SERVICE_ONE_ID,
+        _data={'template_type': 'copy-existing'}
+    )
+
+
+def test_choose_a_template_to_copy(
+    client_request,
+    mock_get_service_templates,
+    mock_get_non_empty_organisations_and_services_for_user,
+):
+    page = client_request.get(
+        'main.choose_template_to_copy',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert normalize_spaces(
+        page.select_one('main nav').text
+    ) == normalize_spaces(
+        'Service 1 '
+        '    sms_template_one '
+        '    Text message template'
+        '    sms_template_two Text message template'
+        '    email_template_one Email template'
+        '    email_template_two Email template '
+        'Service 2 '
+        '    sms_template_one'
+        '    Text message template'
+        '    sms_template_two'
+        '    Text message template'
+        '    email_template_one'
+        '    Email template'
+        '    email_template_two'
+        '    Email template '
+        'Org 1 service 1 '
+        '    sms_template_one'
+        '    Text message template'
+        '    sms_template_two'
+        '    Text message template'
+        '    email_template_one'
+        '    Email template'
+        '    email_template_two'
+        '    Email template '
+        'Org 1 service 2 '
+        '    sms_template_one'
+        '    Text message template'
+        '    sms_template_two'
+        '    Text message template'
+        '    email_template_one'
+        '    Email template'
+        '    email_template_two'
+        '    Email template'
+    )
+
+    assert page.select_one('main nav a')['href'] == url_for(
+        'main.copy_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+    )
+
+
+def test_load_edit_template_with_copy_of_template(
+    client_request,
+    mock_get_service_email_template,
+    mock_get_non_empty_organisations_and_services_for_user,
+):
+    page = client_request.get(
+        'main.copy_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+    )
+
+    assert page.select_one('form')['method'] == 'post'
+
+    assert page.select_one('input')['value'] == (
+        'Copy of ‘Two week reminder’'
+    )
+    assert page.select_one('textarea').text == (
+        'Your ((thing)) is due soon'
+    )
+    mock_get_service_email_template.assert_called_once_with(
+        SERVICE_TWO_ID,
+        TEMPLATE_ONE_ID,
+    )
+
+
+def test_cant_copy_template_from_non_member_service(
+    client_request,
+    mock_get_service_email_template,
+    mock_get_organisations_and_services_for_user,
+):
+    client_request.get(
+        'main.copy_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+        _expected_status=403,
+    )
+    assert mock_get_service_email_template.call_args_list == []
+
+
 @pytest.mark.parametrize('type_of_template', ['email', 'sms'])
 def test_should_not_allow_creation_of_template_through_form_without_correct_permission(
     logged_in_client,
     service_one,
     mocker,
+    mock_get_service_templates,
+    mock_get_organisations_and_services_for_user,
     type_of_template,
 ):
     service_one['permissions'] = []

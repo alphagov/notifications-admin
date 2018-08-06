@@ -59,6 +59,7 @@ class User(UserMixin):
         self.failed_login_count = fields.get('failed_login_count')
         self.state = fields.get('state')
         self.max_failed_login_count = max_failed_login_count
+        self.logged_in_at = fields.get('logged_in_at')
         self.platform_admin = fields.get('platform_admin')
         self.current_session_id = fields.get('current_session_id')
         self.services = fields.get('services', [])
@@ -260,3 +261,45 @@ class AnonymousUser(AnonymousUserMixin):
     # set the anonymous user so that if a new browser hits us we don't error http://stackoverflow.com/a/19275188
     def logged_in_elsewhere(self):
         return False
+
+
+class Service(dict):
+
+    ALLOWED_PROPERTIES = {
+        'active',
+        'branding',
+        'dvla_organisation',
+        'email_branding',
+        'email_from',
+        'id',
+        'inbound_api',
+        'letter_contact_block',
+        'message_limit',
+        'name',
+        'organisation_type',
+        'permissions',
+        'prefix_sms',
+        'research_mode',
+        'service_callback_api',
+    }
+
+    def __init__(self, _dict):
+        # in the case of a bad request current service may be `None`
+        super().__init__(_dict or {})
+
+    def __getattr__(self, attr):
+        if attr in self.ALLOWED_PROPERTIES:
+            return self[attr]
+        raise AttributeError
+
+    @property
+    def trial_mode(self):
+        return self['restricted']
+
+    def has_permission(self, permission):
+        return permission in self.permissions
+
+    def has_jobs(self):
+        # Can’t import at top-level because app isn’t yet initialised
+        from app import job_api_client
+        return job_api_client.has_jobs(self.id)

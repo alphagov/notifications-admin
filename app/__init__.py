@@ -40,6 +40,7 @@ from werkzeug.local import LocalProxy
 from app import proxy_fix
 from app.config import configs
 from app.asset_fingerprinter import AssetFingerprinter
+from app.notify_client.models import Service
 from app.navigation import (
     CaseworkNavigation,
     HeaderNavigation,
@@ -94,8 +95,13 @@ billing_api_client = BillingAPIClient()
 complaint_api_client = ComplaintApiClient()
 platform_stats_api_client = PlatformStatsAPIClient()
 
+
 # The current service attached to the request stack.
-current_service = LocalProxy(partial(_lookup_req_object, 'service'))
+def _get_current_service():
+    return Service(_lookup_req_object('service'))
+
+
+current_service = LocalProxy(_get_current_service)
 
 # The current organisation attached to the request stack.
 current_organisation = LocalProxy(partial(_lookup_req_object, 'organisation'))

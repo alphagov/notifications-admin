@@ -141,37 +141,6 @@ def template_usage(service_id):
     )
 
 
-@main.route("/services/<service_id>/monthly-billing-usage")
-@login_required
-@user_has_permissions('manage_service')
-def monthly_billing_usage(service_id):
-    year, current_financial_year = requested_and_current_financial_year(request)
-
-    free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year)
-    units = billing_api_client.get_billable_units(service_id, year)
-    yearly_usage = billing_api_client.get_service_usage(service_id, year)
-
-    usage_template = 'views/usage.html'
-    if 'letter' in current_service['permissions']:
-        usage_template = 'views/usage-with-letters.html'
-    return render_template(
-        usage_template,
-        months=list(get_free_paid_breakdown_for_billable_units(
-            year,
-            free_sms_allowance,
-            units
-        )),
-        selected_year=year,
-        years=get_tuples_of_financial_years(
-            partial(url_for, '.monthly_billing_usage', service_id=service_id),
-            start=current_financial_year - 1,
-            end=current_financial_year + 1,
-        ),
-        **calculate_usage(yearly_usage,
-                          free_sms_allowance)
-    )
-
-
 @main.route("/services/<service_id>/usage")
 @login_required
 @user_has_permissions('manage_service')
@@ -183,7 +152,7 @@ def usage(service_id):
     yearly_usage = billing_api_client.get_service_usage_ft(service_id, year)
 
     usage_template = 'views/usage.html'
-    if 'letter' in current_service['permissions']:
+    if current_service.has_permission('letter'):
         usage_template = 'views/usage-with-letters.html'
     return render_template(
         usage_template,
@@ -269,7 +238,7 @@ def inbox_download(service_id):
 
 def get_inbox_partials(service_id):
     page = int(request.args.get('page', 1))
-    if 'inbound_sms' not in current_service['permissions']:
+    if not current_service.has_permission('inbound_sms'):
         abort(403)
 
     inbound_messages_data = service_api_client.get_most_recent_inbound_sms(service_id, page=page)
@@ -306,25 +275,22 @@ def aggregate_usage(template_statistics, sort_key='count'):
 
 
 def get_dashboard_partials(service_id):
-    # all but scheduled and cancelled
-    statuses_to_display = job_api_client.JOB_STATUSES - {'scheduled', 'cancelled'}
-
     template_statistics = aggregate_usage(
         template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
     )
 
-    scheduled_jobs = sorted(
-        job_api_client.get_jobs(service_id, statuses=['scheduled'])['data'],
-        key=lambda job: job['scheduled_for']
-    )
-    immediate_jobs = [
-        add_rate_to_job(job)
-        for job in job_api_client.get_jobs(service_id, limit_days=7, statuses=statuses_to_display)['data']
-    ]
-    stats = service_api_client.get_service_statistics(service_id)
+    scheduled_jobs, immediate_jobs = [], []
+    if job_api_client.has_jobs(service_id):
+        scheduled_jobs = job_api_client.get_scheduled_jobs(service_id)
+        immediate_jobs = [
+            add_rate_to_job(job)
+            for job in job_api_client.get_immediate_jobs(service_id)
+        ]
+
+    stats = service_api_client.get_service_statistics(service_id, today_only=False)
     column_width, max_notifiction_count = get_column_properties(
         number_of_columns=(
-            3 if 'letter' in current_service['permissions'] else 2
+            3 if current_service.has_permission('letter') else 2
         )
     )
     dashboard_totals = get_dashboard_totals(stats),
@@ -344,7 +310,7 @@ def get_dashboard_partials(service_id):
             'views/dashboard/_inbox.html',
             inbound_sms_summary=(
                 service_api_client.get_inbound_sms_summary(service_id)
-                if 'inbound_sms' in current_service['permissions'] else None
+                if current_service.has_permission('inbound_sms') else None
             ),
         ),
         'totals': render_template(

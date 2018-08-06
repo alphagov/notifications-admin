@@ -109,9 +109,9 @@
 {% block footer_support_links %}
   <nav class="footer-nav">
     Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service">Government Digital Service</a>
-    <a href="{{ url_for("main.privacy") }}">Privacy</a>    
+    <a href="{{ url_for("main.privacy") }}">Privacy</a>
     <a href="{{ url_for("main.cookies") }}">Cookies</a>
-    {% if current_service.research_mode %}
+    {% if current_service and current_service.research_mode %}
     <span id="research-mode" class="research-mode">research mode</span>
     {% endif %}
   </nav>
@@ -128,10 +128,7 @@
     ga('set', 'anonymizeIp', true);
     ga('set', 'displayFeaturesTask', null);
     ga('set', 'transport', 'beacon');
-    // strip UUIDs
-    page = (window.location.pathname + window.location.search).replace(
-      /[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}/g, '…'
-    )
-    ga('send', 'pageview', page);
+    page = window.location.pathname + window.location.search;
+    ga('send', 'pageview', stripUUIDs(page));
   </script>
 {% endblock %}

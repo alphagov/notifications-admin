@@ -1,3 +1,5 @@
+from itertools import chain
+
 from notifications_python_client.errors import HTTPError
 
 from app.notify_client import NotifyAdminAPIClient, cache
@@ -179,6 +181,12 @@ class UserApiClient(NotifyAdminAPIClient):
         data = {'email': email_address}
         self.post(endpoint, data=data)
 
+    def find_users_by_full_or_partial_email(self, email_address):
+        endpoint = '/user/find-users-by-email'
+        data = {'email': email_address}
+        users = self.post(endpoint, data=data)
+        return users
+
     def is_email_already_in_use(self, email_address):
         if self.get_user_by_email_or_none(email_address):
             return True
@@ -203,3 +211,17 @@ class UserApiClient(NotifyAdminAPIClient):
     def get_organisations_and_services_for_user(self, user):
         endpoint = '/user/{}/organisations-and-services'.format(user.id)
         return self.get(endpoint)
+
+    def get_services_for_user(self, user):
+        orgs_and_services_for_user = self.get_organisations_and_services_for_user(user)
+        return orgs_and_services_for_user['services_without_organisations'] + next(chain(
+            org['services'] for org in orgs_and_services_for_user['organisations']
+        ), [])
+
+    def get_service_ids_for_user(self, user):
+        return {
+            service['id'] for service in self.get_services_for_user(user)
+        }
+
+    def user_belongs_to_service(self, user, service_id):
+        return service_id in self.get_service_ids_for_user(user)

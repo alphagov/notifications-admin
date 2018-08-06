@@ -24,6 +24,9 @@ if [[ -z "$VIRTUAL_ENV" ]] && [[ -d venv ]]; then
   source ./venv/bin/activate
 fi
 
+make test-requirements
+display_result $? 1 "Requirements check"
+
 flake8 .
 display_result $? 1 "Code style check"
 

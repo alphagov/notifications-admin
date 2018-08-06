@@ -1,6 +1,8 @@
 import uuid
 from unittest.mock import ANY
 
+import pytest
+
 from app.notify_client.job_api_client import JobApiClient
 
 
@@ -8,6 +10,7 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
     job_id = fake_uuid
     service_id = fake_uuid
     mocker.patch('app.notify_client.current_user', id='1')
+    mock_redis_set = mocker.patch('app.notify_client.RedisClient.set')
 
     expected_data = {
         "id": job_id,
@@ -24,6 +27,11 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
 
     client.create_job(service_id, job_id)
     mock_post.assert_called_once_with(url=expected_url, data=expected_data)
+    mock_redis_set.assert_called_once_with(
+        'has_jobs-{}'.format(service_id),
+        b'true',
+        ex=604800,
+    )
 
 
 def test_client_schedules_job(mocker, fake_uuid):
@@ -299,4 +307,64 @@ def test_cancel_job(mocker):
     mock_post.assert_called_once_with(
         url='/service/{}/job/{}/cancel'.format('service_id', 'job_id'),
         data={}
+    )
+
+
+@pytest.mark.parametrize('job_data, expected_cache_value', [
+    (
+        [{'data': [1, 2, 3], 'statistics': []}],
+        'true',
+    ),
+    (
+        [],
+        'false',
+    ),
+])
+def test_has_jobs_sets_cache(
+    mocker,
+    fake_uuid,
+    job_data,
+    expected_cache_value,
+):
+    mock_get = mocker.patch(
+        'app.notify_client.job_api_client.JobApiClient.get',
+        return_value={'data': job_data}
+    )
+    mock_redis_set = mocker.patch('app.notify_client.RedisClient.set')
+
+    JobApiClient().has_jobs(fake_uuid)
+
+    mock_get.assert_called_once_with(
+        url='/service/{}/job'.format(fake_uuid),
+        params={'page': 1}
+    )
+    mock_redis_set.assert_called_once_with(
+        'has_jobs-{}'.format(fake_uuid),
+        expected_cache_value,
+        ex=604800,
+    )
+
+
+@pytest.mark.parametrize('cache_value, return_value', [
+    (b'true', True),
+    (b'false', False),
+])
+def test_has_jobs_returns_from_cache(
+    mocker,
+    fake_uuid,
+    cache_value,
+    return_value,
+):
+    mock_get = mocker.patch(
+        'app.notify_client.job_api_client.JobApiClient.get'
+    )
+    mock_redis_get = mocker.patch(
+        'app.notify_client.RedisClient.get',
+        return_value=cache_value,
+    )
+
+    assert JobApiClient().has_jobs(fake_uuid) is return_value
+    assert not mock_get.called
+    mock_redis_get.assert_called_once_with(
+        'has_jobs-{}'.format(fake_uuid)
     )

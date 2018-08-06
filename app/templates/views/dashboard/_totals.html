@@ -27,7 +27,7 @@
         smaller=smaller_font_size
       ) }}
     </div>
-    {% if 'letter' in current_service['permissions'] %}
+    {% if current_service.has_permission('letter') %}
       <div id="total-letters" class="{{column_width}}">
         {{ big_number_with_status(
           statistics['letter']['requested'],

@@ -64,8 +64,8 @@ def service_settings(service_id):
     letter_branding_organisations = email_branding_client.get_letter_email_branding()
     organisation = organisations_client.get_service_organisation(service_id).get('name', None)
 
-    if current_service['email_branding']:
-        email_branding = email_branding_client.get_email_branding(current_service['email_branding'])['email_branding']
+    if current_service.email_branding:
+        email_branding = email_branding_client.get_email_branding(current_service.email_branding)['email_branding']
     else:
         email_branding = None
 
@@ -96,7 +96,7 @@ def service_settings(service_id):
         letter_branding=letter_branding_organisations.get(
             current_service.get('dvla_organisation', '001')
         ),
-        can_receive_inbound=('inbound_sms' in current_service['permissions']),
+        can_receive_inbound=(current_service.has_permission('inbound_sms')),
         inbound_number=disp_inbound_number,
         default_reply_to_email_address=default_reply_to_email_address,
         reply_to_email_address_count=reply_to_email_address_count,
@@ -105,7 +105,7 @@ def service_settings(service_id):
         default_sms_sender=default_sms_sender,
         sms_sender_count=sms_sender_count,
         free_sms_fragment_limit=free_sms_fragment_limit,
-        prefix_sms=current_service['prefix_sms'],
+        prefix_sms=current_service.prefix_sms,
         organisation=organisation,
         data_retention=data_retention,
     )
@@ -118,11 +118,11 @@ def service_name_change(service_id):
     form = RenameServiceForm()
 
     if request.method == 'GET':
-        form.name.data = current_service['name']
+        form.name.data = current_service.name
 
     if form.validate_on_submit():
 
-        if form.name.data == current_service['name']:
+        if form.name.data == current_service.name:
             return redirect(url_for('.service_settings', service_id=service_id))
 
         unique_name = service_api_client.is_service_name_unique(service_id, form.name.data, email_safe(form.name.data))
@@ -153,7 +153,7 @@ def service_name_change_confirm(service_id):
     if form.validate_on_submit():
         try:
             service_api_client.update_service(
-                current_service['id'],
+                current_service.id,
                 name=session['service_name_change'],
                 email_from=email_safe(session['service_name_change'])
             )
@@ -205,7 +205,7 @@ def submit_request_to_go_live(service_id):
 
     if form.validate_on_submit():
         zendesk_client.create_ticket(
-            subject='Request to go live - {}'.format(current_service['name']),
+            subject='Request to go live - {}'.format(current_service.name),
             message=(
                 'Service: {}\n'
                 '{}\n'
@@ -216,9 +216,9 @@ def submit_request_to_go_live(service_id):
                 '\nPeak volume: {}'
                 '\nFeatures: {}'
             ).format(
-                current_service['name'],
-                url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
-                current_service['organisation_type'],
+                current_service.name,
+                url_for('main.service_dashboard', service_id=current_service.id, _external=True),
+                current_service.organisation_type,
                 AgreementInfo.from_current_user().as_human_readable,
                 formatted_list(filter(None, (
                     'email' if form.channel_email.data else None,
@@ -250,11 +250,11 @@ def submit_request_to_go_live(service_id):
 @user_is_platform_admin
 def service_switch_live(service_id):
     service_api_client.update_service(
-        current_service['id'],
+        current_service.id,
         # TODO This limit should be set depending on the agreement signed by
         # with Notify.
-        message_limit=250000 if current_service['restricted'] else 50,
-        restricted=(not current_service['restricted'])
+        message_limit=250000 if current_service.trial_mode else 50,
+        restricted=(not current_service.trial_mode)
     )
     return redirect(url_for('.service_settings', service_id=service_id))
 
@@ -265,7 +265,7 @@ def service_switch_live(service_id):
 def service_switch_research_mode(service_id):
     service_api_client.update_service_with_properties(
         service_id,
-        {"research_mode": not current_service['research_mode']}
+        {"research_mode": not current_service.research_mode}
     )
     return redirect(url_for('.service_settings', service_id=service_id))
 
@@ -275,14 +275,14 @@ def switch_service_permissions(service_id, permission, sms_sender=None):
     force_service_permission(
         service_id,
         permission,
-        on=permission not in current_service['permissions'],
+        on=permission not in current_service.permissions,
         sms_sender=sms_sender
     )
 
 
 def force_service_permission(service_id, permission, on=False, sms_sender=None):
 
-    permissions, permission = set(current_service['permissions']), {permission}
+    permissions, permission = set(current_service.permissions), {permission}
 
     update_service_permissions(
         service_id,
@@ -293,9 +293,7 @@ def force_service_permission(service_id, permission, on=False, sms_sender=None):
 
 def update_service_permissions(service_id, permissions, sms_sender=None):
 
-    current_service['permissions'] = list(permissions)
-
-    data = {'permissions': current_service['permissions']}
+    data = {'permissions': list(permissions)}
 
     if sms_sender:
         data['sms_sender'] = sms_sender
@@ -343,13 +341,13 @@ def service_switch_can_upload_document(service_id):
 
     # If turning the permission off, or turning it on and the service already has a contact_link,
     # don't show the form to add the link
-    if 'upload_document' in current_service['permissions'] or current_service.get('contact_link'):
+    if current_service.has_permission('upload_document') or current_service.get('contact_link'):
         switch_service_permissions(service_id, 'upload_document')
         return redirect(url_for('.service_settings', service_id=service_id))
 
     if form.validate_on_submit():
         service_api_client.update_service(
-            current_service['id'],
+            current_service.id,
             contact_link=form.url.data
         )
         switch_service_permissions(service_id, 'upload_document')
@@ -406,10 +404,10 @@ def service_set_contact_link(service_id):
 
     if form.validate_on_submit():
         service_api_client.update_service(
-            current_service['id'],
+            current_service.id,
             contact_link=form.url.data
         )
-        return redirect(url_for('.service_settings', service_id=current_service['id']))
+        return redirect(url_for('.service_settings', service_id=current_service.id))
 
     return render_template('views/service-settings/contact_link.html', form=form)
 
@@ -449,7 +447,7 @@ def service_add_email_reply_to(service_id):
     first_email_address = reply_to_email_address_count == 0
     if form.validate_on_submit():
         service_api_client.add_reply_to_email_address(
-            current_service['id'],
+            current_service.id,
             email_address=form.email_address.data,
             is_default=first_email_address if first_email_address else form.is_default.data
         )
@@ -480,7 +478,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
         form.is_default.data = reply_to_email_address['is_default']
     if form.validate_on_submit():
         service_api_client.update_reply_to_email_address(
-            current_service['id'],
+            current_service.id,
             reply_to_email_id=reply_to_email_id,
             email_address=form.email_address.data,
             is_default=True if reply_to_email_address['is_default'] else form.is_default.data
@@ -499,7 +497,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
 @user_has_permissions('manage_service')
 def service_delete_email_reply_to(service_id, reply_to_email_id):
     service_api_client.delete_reply_to_email_address(
-        service_id=current_service['id'],
+        service_id=current_service.id,
         reply_to_email_id=reply_to_email_id,
     )
     return redirect(url_for('.service_email_reply_to', service_id=service_id))
@@ -520,12 +518,12 @@ def service_set_inbound_number(service_id):
     )
     if form.validate_on_submit():
         service_api_client.add_sms_sender(
-            current_service['id'],
+            current_service.id,
             sms_sender=form.inbound_number.data,
             is_default=True,
             inbound_number_id=form.inbound_number.data
         )
-        switch_service_permissions(current_service['id'], 'inbound_sms')
+        switch_service_permissions(current_service.id, 'inbound_sms')
         return redirect(url_for('.service_settings', service_id=service_id))
     return render_template(
         'views/service-settings/set-inbound-number.html',
@@ -550,14 +548,14 @@ def service_set_sms(service_id):
 def service_set_sms_prefix(service_id):
 
     form = SMSPrefixForm(enabled=(
-        'on' if current_service['prefix_sms'] else 'off'
+        'on' if current_service.prefix_sms else 'off'
     ))
 
-    form.enabled.label.text = 'Start all text messages with ‘{}:’'.format(current_service['name'])
+    form.enabled.label.text = 'Start all text messages with ‘{}:’'.format(current_service.name)
 
     if form.validate_on_submit():
         service_api_client.update_service(
-            current_service['id'],
+            current_service.id,
             prefix_sms=(form.enabled.data == 'on')
         )
         return redirect(url_for('.service_settings', service_id=service_id))
@@ -573,7 +571,7 @@ def service_set_sms_prefix(service_id):
 @user_has_permissions('manage_service')
 def service_set_international_sms(service_id):
     form = InternationalSMSForm(
-        enabled='on' if 'international_sms' in current_service['permissions'] else 'off'
+        enabled='on' if current_service.has_permission('international_sms') else 'off'
     )
     if form.validate_on_submit():
         force_service_permission(
@@ -606,7 +604,7 @@ def service_set_inbound_sms(service_id):
 @user_has_permissions('manage_service')
 def service_set_letters(service_id):
     form = ServiceSwitchLettersForm(
-        enabled='on' if 'letter' in current_service['permissions'] else 'off'
+        enabled='on' if current_service.has_permission('letter') else 'off'
     )
     if form.validate_on_submit():
         force_service_permission(
@@ -644,7 +642,7 @@ def service_set_basic_view(service_id):
         abort(403)
 
     form = ServiceBasicViewForm(
-        enabled='caseworking' in current_service['permissions']
+        enabled=current_service.has_permission('caseworking')
     )
     if form.validate_on_submit():
         force_service_permission(
@@ -688,7 +686,7 @@ def service_add_letter_contact(service_id):
     first_contact_block = letter_contact_blocks_count == 0
     if form.validate_on_submit():
         service_api_client.add_letter_contact(
-            current_service['id'],
+            current_service.id,
             contact_block=form.letter_contact_block.data.replace('\r', '') or None,
             is_default=first_contact_block if first_contact_block else form.is_default.data
         )
@@ -713,7 +711,7 @@ def service_edit_letter_contact(service_id, letter_contact_id):
         form.is_default.data = letter_contact_block['is_default']
     if form.validate_on_submit():
         service_api_client.update_letter_contact(
-            current_service['id'],
+            current_service.id,
             letter_contact_id=letter_contact_id,
             contact_block=form.letter_contact_block.data.replace('\r', '') or None,
             is_default=True if letter_contact_block['is_default'] else form.is_default.data
@@ -759,7 +757,7 @@ def service_add_sms_sender(service_id):
     first_sms_sender = sms_sender_count == 0
     if form.validate_on_submit():
         service_api_client.add_sms_sender(
-            current_service['id'],
+            current_service.id,
             sms_sender=form.sms_sender.data.replace('\r', '') or None,
             is_default=first_sms_sender if first_sms_sender else form.is_default.data
         )
@@ -792,7 +790,7 @@ def service_edit_sms_sender(service_id, sms_sender_id):
 
     if form.validate_on_submit():
         service_api_client.update_sms_sender(
-            current_service['id'],
+            current_service.id,
             sms_sender_id=sms_sender_id,
             sms_sender=sms_sender['sms_sender'] if is_inbound_number else form.sms_sender.data.replace('\r', ''),
             is_default=True if sms_sender['is_default'] else form.is_default.data
@@ -818,7 +816,7 @@ def service_edit_sms_sender(service_id, sms_sender_id):
 @user_has_permissions('manage_service')
 def service_delete_sms_sender(service_id, sms_sender_id):
     service_api_client.delete_sms_sender(
-        service_id=current_service['id'],
+        service_id=current_service.id,
         sms_sender_id=sms_sender_id,
     )
     return redirect(url_for('.service_sms_senders', service_id=service_id))
@@ -829,13 +827,13 @@ def service_delete_sms_sender(service_id, sms_sender_id):
 @user_has_permissions('manage_service')
 def service_set_letter_contact_block(service_id):
 
-    if 'letter' not in current_service['permissions']:
+    if not current_service.has_permission('letter'):
         abort(403)
 
-    form = ServiceLetterContactBlockForm(letter_contact_block=current_service['letter_contact_block'])
+    form = ServiceLetterContactBlockForm(letter_contact_block=current_service.letter_contact_block)
     if form.validate_on_submit():
         service_api_client.update_service(
-            current_service['id'],
+            current_service.id,
             letter_contact_block=form.letter_contact_block.data.replace('\r', '') or None
         )
         if request.args.get('from_template'):
@@ -912,7 +910,7 @@ def service_set_email_branding(service_id):
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 
-    form.branding_style.data = current_service['email_branding'] or 'None'
+    form.branding_style.data = current_service.email_branding or 'None'
 
     return render_template(
         'views/service-settings/set-email-branding.html',
@@ -977,12 +975,12 @@ def link_service_to_organisation(service_id):
 def branding_request(service_id):
 
     form = BrandingOptionsEmail(
-        options=current_service['branding']
+        options=current_service.branding
     )
 
     if form.validate_on_submit():
         zendesk_client.create_ticket(
-            subject='Email branding request - {}'.format(current_service['name']),
+            subject='Email branding request - {}'.format(current_service.name),
             message=(
                 'Organisation: {}\n'
                 'Service: {}\n'
@@ -991,8 +989,8 @@ def branding_request(service_id):
                 '\nBranding requested: {}'
             ).format(
                 AgreementInfo.from_current_user().as_info_for_branding_request,
-                current_service['name'],
-                url_for('main.service_dashboard', service_id=current_service['id'], _external=True),
+                current_service.name,
+                url_for('main.service_dashboard', service_id=current_service.id, _external=True),
                 branding_options_dict[form.options.data],
             ),
             ticket_type=zendesk_client.TYPE_QUESTION,

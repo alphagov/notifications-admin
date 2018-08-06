@@ -487,6 +487,7 @@ def test_should_validate_whitelist_items(
 def test_callback_forms_validation(
     client_request,
     service_one,
+    mock_get_valid_service_callback_api,
     endpoint,
     url,
     bearer_token,
@@ -606,7 +607,8 @@ def test_callbacks_button_links_straight_to_delivery_status_if_service_has_no_in
 def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_sms(
     client_request,
     service_one,
-    mocker
+    mocker,
+    mock_get_valid_service_callback_api,
 ):
     page = client_request.get(
         'main.api_callbacks',

@@ -1,6 +1,7 @@
 import datetime
 import re
 import uuid
+from functools import partial
 from unittest.mock import ANY
 
 import pytest
@@ -114,12 +115,13 @@ def test_should_render_platform_admin_page(
     'main.live_services',
     'main.trial_services',
 ])
-@pytest.mark.parametrize('include_from_test_key, inc', [
-    ("Y", True),
-    ("N", False)
+@pytest.mark.parametrize('partial_url_for, inc', [
+    (partial(url_for), True),
+    (partial(url_for, include_from_test_key='y', start_date='', end_date=''), True),
+    (partial(url_for, start_date='', end_date=''), False),
 ])
 def test_live_trial_services_toggle_including_from_test_key(
-    include_from_test_key,
+    partial_url_for,
     client,
     platform_admin_user,
     mocker,
@@ -129,12 +131,14 @@ def test_live_trial_services_toggle_including_from_test_key(
 ):
     mock_get_user(mocker, user=platform_admin_user)
     client.login(platform_admin_user)
-    response = client.get(url_for(endpoint, include_from_test_key=include_from_test_key))
+    response = client.get(partial_url_for(endpoint))
 
     assert response.status_code == 200
-    mock_get_detailed_services.assert_called_once_with({'detailed': True,
-                                                        'only_active': False,
-                                                        'include_from_test_key': inc})
+    mock_get_detailed_services.assert_called_once_with({
+        'detailed': True,
+        'only_active': False,
+        'include_from_test_key': inc,
+    })
 
 
 @pytest.mark.parametrize('endpoint', [

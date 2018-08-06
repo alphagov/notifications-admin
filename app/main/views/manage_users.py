@@ -48,14 +48,14 @@ def manage_users(service_id):
 @user_has_permissions('manage_service')
 def invite_user(service_id):
 
-    if 'caseworking' in current_service['permissions']:
+    if current_service.has_permission('caseworking'):
         form = CaseworkingInviteUserForm
     else:
         form = AdminInviteUserForm
 
     form = form(invalid_email_address=current_user.email_address)
 
-    service_has_email_auth = 'email_auth' in current_service['permissions']
+    service_has_email_auth = current_service.has_permission('email_auth')
     if not service_has_email_auth:
         form.login_authentication.data = 'sms_auth'
 
@@ -83,13 +83,13 @@ def invite_user(service_id):
 @login_required
 @user_has_permissions('manage_service')
 def edit_user_permissions(service_id, user_id):
-    service_has_email_auth = 'email_auth' in current_service['permissions']
+    service_has_email_auth = current_service.has_permission('email_auth')
     # TODO we should probably using the service id here in the get user
     # call as well. eg. /user/<user_id>?&service=service_id
     user = user_api_client.get_user(user_id)
     user_has_no_mobile_number = user.mobile_number is None
 
-    if 'caseworking' in current_service['permissions']:
+    if current_service.has_permission('caseworking'):
         form = partial(
             CaseworkingPermissionsForm,
             user_type='admin' if user.has_permission_for_service(service_id, 'view_activity') else 'caseworker',
