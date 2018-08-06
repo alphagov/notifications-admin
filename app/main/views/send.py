@@ -451,7 +451,8 @@ def send_test_step(service_id, template_id, step_index):
         page_title=get_send_test_page_title(
             template.template_type,
             get_help_argument(),
-            entering_recipient=not session['recipient']
+            entering_recipient=not session['recipient'],
+            name=template.name,
         ),
         template=template,
         form=form,
@@ -751,13 +752,13 @@ def all_placeholders_in_session(placeholders):
     )
 
 
-def get_send_test_page_title(template_type, help_argument, entering_recipient):
+def get_send_test_page_title(template_type, help_argument, entering_recipient, name=None):
     if help_argument:
         return 'Example text message'
     if template_type == 'letter':
         return 'Print a test letter'
     if entering_recipient:
-        return 'Who should this message be sent to?'
+        return 'Send ‘{}’'.format(name)
     return 'Personalise this message'
 
 

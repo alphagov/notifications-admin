@@ -919,7 +919,7 @@ def test_send_test_doesnt_show_file_contents(
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.select('h1')[0].text.strip() == 'Preview of Two week reminder'
+    assert page.select('h1')[0].text.strip() == 'Preview of ‘Two week reminder’'
     assert len(page.select('table')) == 0
     assert len(page.select('.banner-dangerous')) == 0
     assert page.select_one('button[type=submit]').text.strip() == 'Send 1 text message'
@@ -1039,7 +1039,7 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_one_off'),
-        'Who should this message be sent to?',
+        'Send ‘Two week reminder’',
         False,
     ),
     (
@@ -1063,7 +1063,7 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_one_off'),
-        'Who should this message be sent to?',
+        'Send ‘Two week reminder’',
         False,
     ),
     (
@@ -1479,7 +1479,7 @@ def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.select('h1')[0].text.strip() == 'Preview of Two week reminder'
+    assert page.select('h1')[0].text.strip() == 'Preview of ‘Two week reminder’'
 
 
 @pytest.mark.parametrize('user, expected_back_link_endpoint, extra_args', (
@@ -2755,7 +2755,7 @@ def test_check_notification_shows_preview(
         template_id=fake_uuid
     )
 
-    assert page.h1.text.strip() == 'Preview of Two week reminder'
+    assert page.h1.text.strip() == 'Preview of ‘Two week reminder’'
     assert (
         page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
     ) == url_for(
