@@ -35,24 +35,15 @@ def test_client_gets_service(mocker):
     mock_get.assert_called_once_with('/service/foo')
 
 
-def test_client_gets_service_statistics(mocker):
+@pytest.mark.parametrize('today_only', [True, False])
+def test_client_gets_service_statistics(mocker, today_only):
     client = ServiceAPIClient()
     mock_get = mocker.patch.object(client, 'get', return_value={'data': {'a': 'b'}})
 
-    ret = client.get_service_statistics('foo')
+    ret = client.get_service_statistics('foo', today_only)
 
     assert ret == {'a': 'b'}
-    mock_get.assert_called_once_with('/service/foo/statistics')
-
-
-def test_client_gets_service_statistics_for_today(mocker):
-    client = ServiceAPIClient()
-    mock_get = mocker.patch.object(client, 'get', return_value={'data': {'a': 'b'}})
-
-    ret = client.get_service_statistics_for_today('foo')
-
-    assert ret == {'a': 'b'}
-    mock_get.assert_called_once_with('/service/foo/statistics', params={'today_only': True})
+    mock_get.assert_called_once_with('/service/foo/statistics', params={'today_only': today_only})
 
 
 def test_client_only_updates_allowed_attributes(mocker):
