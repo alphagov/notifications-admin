@@ -10,6 +10,7 @@ from app.utils import is_gov_user
 from tests.conftest import (
     SERVICE_ONE_ID,
     active_caseworking_user,
+    active_user_empty_permissions,
     active_user_manage_template_permission,
     active_user_no_mobile,
     active_user_view_permissions,
@@ -24,45 +25,96 @@ from tests.conftest import service_one as create_sample_service
         active_user_with_permissions,
         (
             'Test User (you) '
-            'Can Send messages Can Add and edit templates Can Manage service Can Access API keys'
+            'Can See dashboard and reports '
+            'Can Send messages '
+            'Can Add and edit templates '
+            'Can Manage service '
+            'Can Access API keys'
         ),
         (
             'ZZZZZZZZ zzzzzzz@example.gov.uk '
-            'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys '
+            'Can See dashboard and reports '
+            'Can’t Send messages '
+            'Can’t Add and edit templates '
+            'Can’t Manage service '
+            'Can’t Access API keys '
             'Edit permissions'
         )
+    ),
+    (
+        active_user_empty_permissions,
+        (
+            'Test User With Empty Permissions (you) '
+            'Can’t See dashboard and reports '
+            'Can’t Send messages '
+            'Can’t Add and edit templates '
+            'Can’t Manage service '
+            'Can’t Access API keys'
+        ),
+        (
+            'ZZZZZZZZ zzzzzzz@example.gov.uk '
+            'Can See dashboard and reports '
+            'Can’t Send messages '
+            'Can’t Add and edit templates '
+            'Can’t Manage service '
+            'Can’t Access API keys'
+        ),
     ),
     (
         active_user_view_permissions,
         (
             'Test User With Permissions (you) '
-            'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
+            'Can See dashboard and reports '
+            'Can’t Send messages '
+            'Can’t Add and edit templates '
+            'Can’t Manage service '
+            'Can’t Access API keys'
         ),
         (
             'ZZZZZZZZ zzzzzzz@example.gov.uk '
-            'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
+            'Can See dashboard and reports '
+            'Can’t Send messages '
+            'Can’t Add and edit templates '
+            'Can’t Manage service '
+            'Can’t Access API keys'
         )
     ),
     (
         active_user_manage_template_permission,
         (
             'Test User With Permissions (you) '
-            'Can’t Send messages Can Add and edit templates Can’t Manage service Can’t Access API keys'
+            'Can See dashboard and reports '
+            'Can’t Send messages '
+            'Can Add and edit templates '
+            'Can’t Manage service '
+            'Can’t Access API keys'
         ),
         (
             'ZZZZZZZZ zzzzzzz@example.gov.uk '
-            'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
+            'Can See dashboard and reports '
+            'Can’t Send messages '
+            'Can’t Add and edit templates '
+            'Can’t Manage service '
+            'Can’t Access API keys'
         )
     ),
     (
         active_user_manage_template_permission,
         (
             'Test User With Permissions (you) '
-            'Can’t Send messages Can Add and edit templates Can’t Manage service Can’t Access API keys'
+            'Can See dashboard and reports '
+            'Can’t Send messages '
+            'Can Add and edit templates '
+            'Can’t Manage service '
+            'Can’t Access API keys'
         ),
         (
             'ZZZZZZZZ zzzzzzz@example.gov.uk '
-            'Can’t Send messages Can’t Add and edit templates Can’t Manage service Can’t Access API keys'
+            'Can See dashboard and reports '
+            'Can’t Send messages '
+            'Can’t Add and edit templates '
+            'Can’t Manage service '
+            'Can’t Access API keys'
         )
     ),
 ])
@@ -70,6 +122,7 @@ def test_should_show_overview_page(
     client_request,
     mocker,
     mock_get_invites_for_service,
+    mock_has_no_jobs,
     fake_uuid,
     service_one,
     user,
@@ -121,7 +174,7 @@ def test_should_show_caseworker_on_overview_page(
     assert normalize_spaces(page.select_one('h1').text) == 'Team members'
     assert normalize_spaces(page.select('.user-list-item')[0].text) == (
         'Test User With Permissions (you) '
-        'Can Admin view '
+        'Can See dashboard and reports '
         'Can’t Send messages '
         'Can’t Add and edit templates '
         'Can’t Manage service '
@@ -130,7 +183,11 @@ def test_should_show_caseworker_on_overview_page(
     # [1:5] are invited users
     assert normalize_spaces(page.select('.user-list-item')[6].text) == (
         'Test User zzzzzzz@example.gov.uk '
-        'Can Basic view'
+        'Can’t See dashboard and reports '
+        'Can Send messages '
+        'Can’t Add and edit templates '
+        'Can’t Manage service '
+        'Can’t Access API keys'
     )
 
 
@@ -174,57 +231,33 @@ def test_service_with_no_email_auth_hides_auth_type_options(
     assert (page.find('input', attrs={"name": "login_authentication"}) is None) == auth_options_hidden
 
 
-@pytest.mark.parametrize('endpoint, extra_args, service_has_caseworking, radio_buttons_on_page', [
+@pytest.mark.parametrize('service_has_caseworking', (True, False))
+@pytest.mark.parametrize('endpoint, extra_args', [
     (
         'main.edit_user_permissions',
         {'user_id': 0},
-        True,
-        True,
-    ),
-    (
-        'main.edit_user_permissions',
-        {'user_id': 0},
-        False,
-        False,
     ),
     (
         'main.invite_user',
         {},
-        True,
-        True,
     ),
-    (
-        'main.invite_user',
-        {},
-        False,
-        False,
-    )
 ])
 def test_service_without_caseworking_doesnt_show_admin_vs_caseworker(
     client_request,
     endpoint,
-    extra_args,
     service_has_caseworking,
-    radio_buttons_on_page,
-    service_one
+    extra_args,
 ):
-    if service_has_caseworking:
-        service_one['permissions'].append('caseworking')
-    page = client_request.get(endpoint, service_id=service_one['id'], **extra_args)
-    radio_buttons = page.select('input[name=user_type]')
-    admin_permissions_panel = page.select_one('#panel-admin')
-    if radio_buttons_on_page:
-        assert radio_buttons[0]['type'] == 'radio'
-        assert radio_buttons[0]['value'] == 'caseworker'
-        assert radio_buttons[1]['type'] == 'radio'
-        assert radio_buttons[1]['value'] == 'admin'
-        assert admin_permissions_panel.select('input')[0]['name'] == 'send_messages'
-        assert admin_permissions_panel.select('input')[1]['name'] == 'manage_templates'
-        assert admin_permissions_panel.select('input')[2]['name'] == 'manage_service'
-        assert admin_permissions_panel.select('input')[3]['name'] == 'manage_api_keys'
-    else:
-        assert not radio_buttons
-        assert not admin_permissions_panel
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        **extra_args
+    )
+    assert page.select('input[type=checkbox]')[0]['name'] == 'view_activity'
+    assert page.select('input[type=checkbox]')[1]['name'] == 'send_messages'
+    assert page.select('input[type=checkbox]')[2]['name'] == 'manage_templates'
+    assert page.select('input[type=checkbox]')[3]['name'] == 'manage_service'
+    assert page.select('input[type=checkbox]')[4]['name'] == 'manage_api_keys'
 
 
 @pytest.mark.parametrize('service_has_email_auth, displays_auth_type', [
@@ -292,6 +325,7 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
         'main.edit_user_permissions',
         {'user_id': 0},
         [
+            ('view_activity', True),
             ('send_messages', True),
             ('manage_templates', True),
             ('manage_service', True),
@@ -302,6 +336,7 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
         'main.invite_user',
         {},
         [
+            ('view_activity', False),
             ('send_messages', False),
             ('manage_templates', False),
             ('manage_service', False),
@@ -318,7 +353,7 @@ def test_should_show_page_for_one_user(
     page = client_request.get(endpoint, service_id=SERVICE_ONE_ID, **extra_args)
     checkboxes = page.select('input[type=checkbox]')
 
-    assert len(checkboxes) == 4
+    assert len(checkboxes) == 5
 
     for index, expected in enumerate(expected_checkboxes):
         expected_input_name, expected_checked = expected
@@ -326,71 +361,67 @@ def test_should_show_page_for_one_user(
         assert checkboxes[index].has_attr('checked') == expected_checked
 
 
-def test_edit_user_permissions(
-    logged_in_client,
-    active_user_with_permissions,
-    mocker,
-    mock_get_invites_for_service,
-    mock_set_user_permissions,
-):
-    service = create_sample_service(active_user_with_permissions)
-    response = logged_in_client.post(url_for(
-        'main.edit_user_permissions', service_id=service['id'], user_id=active_user_with_permissions.id
-    ), data={'email_address': active_user_with_permissions.email_address,
-             'send_messages': 'y',
-             'manage_templates': 'y',
-             'manage_service': 'y',
-             'manage_api_keys': 'y'})
-
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.manage_users', service_id=service['id'], _external=True
-    )
-    mock_set_user_permissions.assert_called_with(
-        str(active_user_with_permissions.id),
-        service['id'],
-        permissions={
+@pytest.mark.parametrize('submitted_permissions, permissions_sent_to_api', [
+    (
+        {
+            'view_activity': 'y',
+            'send_messages': 'y',
+            'manage_templates': 'y',
+            'manage_service': 'y',
+            'manage_api_keys': 'y',
+        },
+        {
+            'view_activity',
             'send_messages',
             'manage_service',
             'manage_templates',
             'manage_api_keys',
-            'view_activity'
         }
-    )
-
-
-def test_edit_some_user_permissions(
-    logged_in_client,
+    ),
+    (
+        {
+            'view_activity': 'y',
+            'send_messages': 'y',
+            'manage_templates': '',
+        },
+        {
+            'view_activity',
+            'send_messages',
+        }
+    ),
+    (
+        {},
+        set(),
+    ),
+])
+def test_edit_user_permissions(
+    client_request,
     mocker,
-    active_user_with_permissions,
-    sample_invite,
     mock_get_invites_for_service,
     mock_set_user_permissions,
+    fake_uuid,
+    submitted_permissions,
+    permissions_sent_to_api,
 ):
-    service = create_sample_service(active_user_with_permissions)
-    data = [InvitedUser(**sample_invite)]
-
-    service_id = service['id']
-
-    mocker.patch('app.invite_api_client.get_invites_for_service', return_value=data)
-    response = logged_in_client.post(url_for(
-        'main.edit_user_permissions', service_id=service_id, user_id=active_user_with_permissions.id
-    ), data={'email_address': active_user_with_permissions.email_address,
-             'send_messages': 'y',
-             'manage_service': '',
-             'manage_api_keys': ''})
-
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.manage_users', service_id=service_id, _external=True
+    client_request.post(
+        'main.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=fake_uuid,
+        _data=dict(
+            email_address="test@example.com",
+            **submitted_permissions
+        ),
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.manage_users',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
     )
     mock_set_user_permissions.assert_called_with(
-        str(active_user_with_permissions.id),
-        service_id,
-        permissions={
-            'send_messages',
-            'view_activity'
-        }
+        fake_uuid,
+        SERVICE_ONE_ID,
+        permissions=permissions_sent_to_api,
     )
 
 
@@ -431,7 +462,6 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
             'manage_templates',
             'manage_service',
             'manage_api_keys',
-            'view_activity'
         }
     )
     mock_update_user_attribute.assert_called_with(
@@ -442,85 +472,6 @@ def test_edit_user_permissions_including_authentication_with_email_auth_service(
     assert response.status_code == 302
     assert response.location == url_for(
         'main.manage_users', service_id=service_one['id'], _external=True
-    )
-
-
-def test_edit_user_to_be_admin(
-    client_request,
-    active_user_with_permissions,
-    mocker,
-    mock_get_invites_for_service,
-    mock_set_user_permissions,
-    service_one,
-):
-    service_one['permissions'].append('caseworking')
-    client_request.post(
-        'main.edit_user_permissions',
-        service_id=SERVICE_ONE_ID,
-        user_id=active_user_with_permissions.id,
-        _data={
-            'email_address': active_user_with_permissions.email_address,
-            'user_type': 'admin',
-            'send_messages': 'y',
-            'manage_templates': 'y',
-            'manage_service': 'y',
-            'manage_api_keys': 'y',
-        },
-        _expected_redirect=url_for(
-            'main.manage_users', service_id=SERVICE_ONE_ID, _external=True
-        ),
-    )
-    mock_set_user_permissions.assert_called_with(
-        str(active_user_with_permissions.id),
-        SERVICE_ONE_ID,
-        permissions={
-            'send_messages',
-            'manage_service',
-            'manage_templates',
-            'manage_api_keys',
-            'view_activity'
-        }
-    )
-
-
-@pytest.mark.parametrize('extra_args', (
-    # The user shouldn’t be able to forge a request which makes a
-    # caseworker without the ‘send’ permission…
-    ({'send_messages': 'n'}),
-    # …or with any additional permissions
-    ({'manage_templates': 'y'}),
-    ({'manage_service': 'y'}),
-    ({'manage_api_keys': 'y'}),
-))
-def test_edit_user_to_be_caseworker(
-    client_request,
-    active_user_with_permissions,
-    mocker,
-    mock_get_invites_for_service,
-    mock_set_user_permissions,
-    service_one,
-    extra_args,
-):
-    service_one['permissions'].append('caseworking')
-    client_request.post(
-        'main.edit_user_permissions',
-        service_id=SERVICE_ONE_ID,
-        user_id=active_user_with_permissions.id,
-        _data=dict(
-            email_address=active_user_with_permissions.email_address,
-            user_type='caseworker',
-            **extra_args
-        ),
-        _expected_redirect=url_for(
-            'main.manage_users', service_id=SERVICE_ONE_ID, _external=True
-        ),
-    )
-    mock_set_user_permissions.assert_called_with(
-        str(active_user_with_permissions.id),
-        SERVICE_ONE_ID,
-        permissions={
-            'send_messages',
-        }
     )
 
 
@@ -559,6 +510,7 @@ def test_invite_user(
     response = logged_in_client.post(
         url_for('main.invite_user', service_id=service['id']),
         data={'email_address': email_address,
+              'view_activity': 'y',
               'send_messages': 'y',
               'manage_templates': 'y',
               'manage_service': 'y',
@@ -610,6 +562,7 @@ def test_invite_user_with_email_auth_service(
     response = logged_in_client.post(
         url_for('main.invite_user', service_id=service_one['id']),
         data={'email_address': email_address,
+              'view_activity': 'y',
               'send_messages': 'y',
               'manage_templates': 'y',
               'manage_service': 'y',
@@ -633,41 +586,6 @@ def test_invite_user_with_email_auth_service(
                                                                 auth_type)
 
 
-@pytest.mark.parametrize('extra_args', (
-    {},
-    {
-        'send_messages': 'y',
-        'manage_templates': 'y',
-        'manage_service': 'y',
-        'manage_api_keys': 'y',
-    },
-))
-def test_invite_user_must_choose_caseworker_or_admin(
-    client_request,
-    mock_set_user_permissions,
-    service_one,
-    fake_uuid,
-    extra_args,
-):
-    service_one['permissions'].append('caseworking')
-    page = client_request.post(
-        'main.invite_user',
-        service_id=service_one['id'],
-        user_id=fake_uuid,
-        _data={
-            'email_address': 'test@example.com',
-            **extra_args
-        },
-        _expected_status=200,
-    )
-    assert page.select_one('.error-message').text.strip() == (
-        'Not a valid choice'
-    )
-    assert mock_set_user_permissions.called is False
-    for form_input in page.select('form input'):
-        assert 'checked' not in form_input
-
-
 def test_cancel_invited_user_cancels_user_invitations(
     logged_in_client,
     active_user_with_permissions,
@@ -687,6 +605,7 @@ def test_cancel_invited_user_cancels_user_invitations(
 @pytest.mark.parametrize('invite_status, expected_text', [
     ('pending', (
         'invited_user@test.gov.uk (invited) '
+        'Can See dashboard and reports '
         'Can Send messages '
         'Can’t Add and edit templates '
         'Can Manage service '
@@ -696,6 +615,7 @@ def test_cancel_invited_user_cancels_user_invitations(
     ('cancelled', (
         'invited_user@test.gov.uk (cancelled invite) '
         # all permissions are greyed out
+        'Can’t See dashboard and reports '
         'Can’t Send messages '
         'Can’t Add and edit templates '
         'Can’t Manage service '

@@ -353,7 +353,8 @@ def test_should_show_page_template_with_priority_select_if_platform_admin(
     response = logged_in_platform_admin_client.get(url_for(
         '.edit_service_template',
         service_id='1234',
-        template_id=template_id))
+        template_id=template_id,
+    ))
 
     assert response.status_code == 200
     assert "Two week reminder" in response.get_data(as_text=True)

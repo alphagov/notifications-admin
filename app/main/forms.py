@@ -256,13 +256,13 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
-class AbstractPermissionsForm(StripWhitespaceForm):
+class PermissionsForm(StripWhitespaceForm):
 
-    view_activity = HiddenField("View activity")
-    send_messages = BooleanField("Send messages from existing templates")
+    view_activity = BooleanField("See dashboard and reports")
+    send_messages = BooleanField("Send messages")
     manage_templates = BooleanField("Add and edit templates")
     manage_service = BooleanField("Manage this service and its team")
-    manage_api_keys = BooleanField("Create and revoke API keys")
+    manage_api_keys = BooleanField("Manage API keys")
 
     login_authentication = RadioField(
         'Sign in using',
@@ -277,38 +277,18 @@ class AbstractPermissionsForm(StripWhitespaceForm):
     def permissions(self):
         return {role for role in roles.keys() if self[role].data is True}
 
-
-class AdminPermissionsForm(AbstractPermissionsForm):
-
-    def process(self, *args, **kwargs):
-        super().process(*args, **kwargs)
-        # view_activity is a default role to be added to all users.
-        self.view_activity.data = True
-
-
-class CaseworkingPermissionsForm(AbstractPermissionsForm):
-
-    def process(self, *args, **kwargs):
-        super().process(*args, **kwargs)
-        if self.user_type.data == 'admin':
-            self.view_activity.data = True
-        elif self.user_type.data == 'caseworker':
-            self.view_activity.data = False
-            self.manage_templates.data = False
-            self.manage_service.data = False
-            self.manage_api_keys.data = False
-            self.send_messages.data = True
-
-    user_type = RadioField(
-        'User type',
-        choices=[
-            ('caseworker', 'Basic view'),
-            ('admin', 'Admin view'),
-        ],
-    )
+    @classmethod
+    def from_user(cls, user, service_id):
+        return cls(
+            **{
+                role: user.has_permission_for_service(service_id, role)
+                for role in roles.keys()
+            },
+            login_authentication=user.auth_type
+        )
 
 
-class AbstractInviteUserForm(StripWhitespaceForm):
+class InviteUserForm(PermissionsForm):
     email_address = email_address(gov_user=False)
 
     def __init__(self, invalid_email_address, *args, **kwargs):
@@ -318,14 +298,6 @@ class AbstractInviteUserForm(StripWhitespaceForm):
     def validate_email_address(self, field):
         if field.data.lower() == self.invalid_email_address:
             raise ValidationError("You can’t send an invitation to yourself")
-
-
-class AdminInviteUserForm(AbstractInviteUserForm, AdminPermissionsForm):
-    pass
-
-
-class CaseworkingInviteUserForm(AbstractInviteUserForm, CaseworkingPermissionsForm):
-    pass
 
 
 class InviteOrgUserForm(StripWhitespaceForm):

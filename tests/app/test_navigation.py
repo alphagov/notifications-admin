@@ -160,7 +160,7 @@ def test_caseworkers_get_caseworking_navigation(
     )
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one('#content nav').text) == (
-        'Templates Sent messages'
+        'Templates Sent messages Team members'
     )
 
 
@@ -177,5 +177,5 @@ def test_caseworkers_see_jobs_nav_if_jobs_exist(
     )
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one('#content nav').text) == (
-        'Templates Sent messages Uploaded files'
+        'Templates Sent messages Uploaded files Team members'
     )

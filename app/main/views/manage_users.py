@@ -1,5 +1,3 @@
-from functools import partial
-
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
@@ -11,14 +9,7 @@ from app import (
     user_api_client,
 )
 from app.main import main
-from app.main.forms import (
-    AdminInviteUserForm,
-    AdminPermissionsForm,
-    CaseworkingInviteUserForm,
-    CaseworkingPermissionsForm,
-    SearchUsersForm,
-)
-from app.notify_client.models import roles
+from app.main.forms import InviteUserForm, PermissionsForm, SearchUsersForm
 from app.utils import user_has_permissions
 
 
@@ -48,12 +39,7 @@ def manage_users(service_id):
 @user_has_permissions('manage_service')
 def invite_user(service_id):
 
-    if current_service.has_permission('caseworking'):
-        form = CaseworkingInviteUserForm
-    else:
-        form = AdminInviteUserForm
-
-    form = form(invalid_email_address=current_user.email_address)
+    form = InviteUserForm(invalid_email_address=current_user.email_address)
 
     service_has_email_auth = current_service.has_permission('email_auth')
     if not service_has_email_auth:
@@ -89,18 +75,7 @@ def edit_user_permissions(service_id, user_id):
     user = user_api_client.get_user(user_id)
     user_has_no_mobile_number = user.mobile_number is None
 
-    if current_service.has_permission('caseworking'):
-        form = partial(
-            CaseworkingPermissionsForm,
-            user_type='admin' if user.has_permission_for_service(service_id, 'view_activity') else 'caseworker',
-        )
-    else:
-        form = AdminPermissionsForm
-
-    form = form(
-        **{role: user.has_permission_for_service(service_id, role) for role in roles.keys()},
-        login_authentication=user.auth_type
-    )
+    form = PermissionsForm.from_user(user, service_id)
 
     if form.validate_on_submit():
         user_api_client.set_user_permissions(
@@ -125,11 +100,7 @@ def edit_user_permissions(service_id, user_id):
 @user_has_permissions('manage_service')
 def remove_user_from_service(service_id, user_id):
     user = user_api_client.get_user(user_id)
-    # Need to make the email address read only, or a disabled field?
-    # Do it through the template or the form class?
-    form = AdminPermissionsForm(**{
-        role: user.has_permission_for_service(service_id, role) for role in roles.keys()
-    })
+    form = PermissionsForm.from_user(user, service_id)
 
     if request.method == 'POST':
         try:

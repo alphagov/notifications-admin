@@ -1248,6 +1248,27 @@ def active_user_view_permissions(fake_uuid):
 
 
 @pytest.fixture
+def active_user_empty_permissions(fake_uuid):
+    from app.notify_client.user_api_client import User
+
+    user_data = {'id': fake_uuid,
+                 'name': 'Test User With Empty Permissions',
+                 'password': 'somepassword',
+                 'password_changed_at': str(datetime.utcnow()),
+                 'email_address': 'test@user.gov.uk',
+                 'mobile_number': '07700 900763',
+                 'state': 'active',
+                 'failed_login_count': 0,
+                 'permissions': {SERVICE_ONE_ID: []},
+                 'platform_admin': False,
+                 'auth_type': 'sms_auth',
+                 'organisations': []
+                 }
+    user = User(user_data)
+    return user
+
+
+@pytest.fixture
 def active_user_manage_template_permission(fake_uuid):
     from app.notify_client.user_api_client import User
 
