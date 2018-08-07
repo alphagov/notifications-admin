@@ -46,7 +46,7 @@
           }}
         {% endcall %}
 
-        {% call settings_row(if_has_permission='caseworking') %}
+        {% call row() %}
           {{ text_field('Basic view') }}
           {{ boolean_field('caseworking' in current_service.permissions) }}
           {{ edit_field(
