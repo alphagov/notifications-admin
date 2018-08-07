@@ -36,6 +36,8 @@ from app.main.forms import (
     RequestToGoLiveForm,
     ServiceBasicViewForm,
     ServiceContactLinkForm,
+    ServiceDataRetentionEditForm,
+    ServiceDataRetentionForm,
     ServiceEditInboundNumberForm,
     ServiceInboundNumberForm,
     ServiceLetterContactBlockForm,
@@ -86,6 +88,7 @@ def service_settings(service_id):
     )
 
     free_sms_fragment_limit = billing_api_client.get_free_sms_fragment_limit_for_year(service_id)
+    data_retention = service_api_client.get_service_data_retention(service_id)
 
     return render_template(
         'views/service-settings.html',
@@ -104,6 +107,7 @@ def service_settings(service_id):
         free_sms_fragment_limit=free_sms_fragment_limit,
         prefix_sms=current_service.prefix_sms,
         organisation=organisation,
+        data_retention=data_retention,
     )
 
 
@@ -1003,6 +1007,48 @@ def branding_request(service_id):
     return render_template(
         'views/service-settings/branding/email-options.html',
         form=form,
+    )
+
+
+@main.route("/services/<service_id>/data-retention", methods=['GET'])
+@login_required
+@user_is_platform_admin
+def data_retention(service_id):
+    results = service_api_client.get_service_data_retention(service_id)
+    return render_template('views/service-settings/data-retention.html',
+                           data_retention_settings=results)
+
+
+@main.route("/services/<service_id>/data-retention/add", methods=['GET', 'POST'])
+@login_required
+@user_is_platform_admin
+def add_data_retention(service_id):
+    form = ServiceDataRetentionForm()
+    if form.validate_on_submit():
+        service_api_client.create_service_data_retention(service_id,
+                                                         form.notification_type.data,
+                                                         form.days_of_retention.data)
+        return redirect(url_for('.data_retention', service_id=service_id))
+    return render_template(
+        'views/service-settings/data-retention/add.html',
+        form=form
+    )
+
+
+@main.route("/services/<service_id>/data-retention/<data_retention_id>/edit", methods=['GET', 'POST'])
+@login_required
+@user_is_platform_admin
+def edit_data_retention(service_id, data_retention_id):
+    data_retention_item = service_api_client.get_service_data_retention_by_id(service_id, data_retention_id)
+    form = ServiceDataRetentionEditForm(days_of_retention=data_retention_item['days_of_retention'])
+    if form.validate_on_submit():
+        service_api_client.update_service_data_retention(service_id, data_retention_id, form.days_of_retention.data)
+        return redirect(url_for('.data_retention', service_id=service_id))
+    return render_template(
+        'views/service-settings/data-retention/edit.html',
+        form=form,
+        data_retention_id=data_retention_id,
+        notification_type=data_retention_item['notification_type']
     )
 
 

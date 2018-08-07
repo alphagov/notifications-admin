@@ -1035,3 +1035,27 @@ class BrandingOptionsEmail(StripWhitespaceForm):
             DataRequired()
         ],
     )
+
+
+class ServiceDataRetentionForm(StripWhitespaceForm):
+
+    notification_type = RadioField(
+        'What notification type?',
+        choices=[
+            ('email', 'Email'),
+            ('sms', 'SMS'),
+            ('letter', 'Letter'),
+        ],
+        validators=[DataRequired()],
+    )
+    days_of_retention = IntegerField(label="Days of retention",
+                                     validators=[validators.NumberRange(min=3, max=90,
+                                                                        message="Must be between 3 and 90")],
+                                     )
+
+
+class ServiceDataRetentionEditForm(StripWhitespaceForm):
+    days_of_retention = IntegerField(label="Days of retention",
+                                     validators=[validators.NumberRange(min=3, max=90,
+                                                                        message="Must be between 3 and 90")],
+                                     )

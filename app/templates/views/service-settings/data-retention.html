@@ -1,0 +1,50 @@
+{% extends "withnav_template.html" %}
+{% from "components/api-key.html" import api_key %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/table.html" import mapping_table, row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
+
+{% block service_page_title %}
+  Email reply to addresses
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="grid-row bottom-gutter">
+    <div class="column-two-thirds">
+      <h1 class="heading-large">
+        Data retention
+      </h1>
+    </div>
+   <div class="column-one-third">
+	    <a href="{{ url_for('.add_data_retention', service_id=current_service.id) }}" class="button align-with-heading">Add data retention</a>
+  </div>
+  </div>
+  <div class="grid-row bottom-gutter">
+      <div class="column-full">
+          By default data is kept for 7 days
+      </div>
+  </div>
+  <div class="user-list">
+    {% if not data_retention_settings %}
+      <div class="user-list-item">
+        <span class="hint">You haven’t added any data retention</span>
+      </div>
+    {% endif %}
+       {% call mapping_table(
+        caption='Data retention',
+        field_headings=['Label', 'Value', 'Action'],
+        field_headings_visible=False,
+        caption_visible=False
+      ) %}
+        {% for item in data_retention_settings %}
+            {% call row() %}
+              {{ text_field(item.notification_type | format_notification_type)}}
+              {{ text_field(item.days_of_retention) }}
+              {{ edit_field('Change', url_for('.edit_data_retention', service_id=current_service.id, data_retention_id=item.id)) }}
+            {% endcall %}
+
+        {% endfor %}
+      {% endcall %}
+  </div>
+
+{% endblock %}
