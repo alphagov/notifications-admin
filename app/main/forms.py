@@ -871,7 +871,19 @@ class SearchUsersForm(StripWhitespaceForm):
 
 class SearchNotificationsForm(StripWhitespaceForm):
 
-    to = SearchField('Search by phone number or email address')
+    to = SearchField()
+
+    labels = {
+        'email': 'Search by email address',
+        'sms': 'Search by phone number',
+    }
+
+    def __init__(self, message_type, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.to.label.text = self.labels.get(
+            message_type,
+            'Search by phone number or email address',
+        )
 
 
 class PlaceholderForm(StripWhitespaceForm):

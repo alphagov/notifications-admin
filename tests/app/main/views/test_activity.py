@@ -297,13 +297,21 @@ def test_shows_message_when_no_notifications(
 @pytest.mark.parametrize((
     'initial_query_arguments,'
     'form_post_data,'
+    'expected_search_box_label,'
     'expected_search_box_contents'
 ), [
+    (
+        {},
+        {},
+        'Search by phone number or email address',
+        '',
+    ),
     (
         {
             'message_type': 'sms',
         },
         {},
+        'Search by phone number',
         '',
     ),
     (
@@ -313,6 +321,7 @@ def test_shows_message_when_no_notifications(
         {
             'to': '+33(0)5-12-34-56-78',
         },
+        'Search by phone number',
         '+33(0)5-12-34-56-78',
     ),
     (
@@ -324,6 +333,7 @@ def test_shows_message_when_no_notifications(
         {
             'to': 'test@example.com',
         },
+        'Search by email address',
         'test@example.com',
     ),
 ])
@@ -333,6 +343,7 @@ def test_search_recipient_form(
     mock_get_service_statistics,
     initial_query_arguments,
     form_post_data,
+    expected_search_box_label,
     expected_search_box_contents,
 ):
     response = logged_in_client.post(
@@ -351,10 +362,12 @@ def test_search_recipient_form(
     url = urlparse(action_url)
     assert url.path == '/services/{}/notifications/{}'.format(
         SERVICE_ONE_ID,
-        initial_query_arguments['message_type']
-    )
+        initial_query_arguments.get('message_type', '')
+    ).rstrip('/')
     query_dict = parse_qs(url.query)
     assert query_dict == {}
+
+    assert page.select_one('label[for=to]').text.strip() == expected_search_box_label
 
     recipient_inputs = page.select("input[name=to]")
     assert(len(recipient_inputs) == 2)
