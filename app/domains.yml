@@ -191,6 +191,11 @@ geo.gov.uk:
   owner: Government Equalities Office
   agreement_signed: true
   crown: true
+insolvency.gsi.gov.uk: insolvency.gov.uk
+insolvency.gov.uk:
+  owner: The Insolvency Service
+  agreement_signed: true
+  crown: true
   
 # Crown bodies who haven’t signed the MOU  
 charitycommission.gsi.gov.uk:
