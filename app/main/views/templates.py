@@ -48,14 +48,15 @@ page_headings = {
 @login_required
 @user_has_permissions()
 def view_template(service_id, template_id):
+    template = service_api_client.get_service_template(service_id, str(template_id))['data']
     if (
         current_user.has_permissions('send_messages') and
-        not current_user.has_permissions('manage_templates', 'manage_api_keys')
+        not current_user.has_permissions('manage_templates', 'manage_api_keys') and
+        template['template_type'] != 'letter'
     ):
         return redirect(url_for(
             '.send_one_off', service_id=service_id, template_id=template_id
         ))
-    template = service_api_client.get_service_template(service_id, str(template_id))['data']
     if template["template_type"] == "letter":
         letter_contact_details = service_api_client.get_letter_contacts(service_id)
         default_letter_contact_block_id = next(

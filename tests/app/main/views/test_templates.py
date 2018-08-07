@@ -167,6 +167,7 @@ def test_should_show_page_for_one_template(
 def test_caseworker_redirected_to_one_off(
     client_request,
     mock_get_service_templates,
+    mock_get_service_template,
     mocker,
     fake_uuid,
 ):
@@ -190,6 +191,7 @@ def test_caseworker_redirected_to_one_off(
 def test_user_with_only_send_and_view_redirected_to_one_off(
     client_request,
     mock_get_service_templates,
+    mock_get_service_template,
     active_user_with_permissions,
     mocker,
     fake_uuid,
@@ -211,6 +213,34 @@ def test_user_with_only_send_and_view_redirected_to_one_off(
             _external=True,
         ),
     )
+
+
+@pytest.mark.parametrize('permissions', (
+    {'send_messages', 'view_activity'},
+    {'send_messages'},
+    {'view_activity'},
+    {},
+))
+def test_user_with_only_send_and_view_sees_letter_page(
+    client_request,
+    mock_get_service_templates,
+    mock_get_service_letter_template,
+    single_letter_contact_block,
+    mock_has_jobs,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+    permissions,
+):
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
+    active_user_with_permissions._permissions[SERVICE_ONE_ID] = permissions
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert page.select_one('h1').text.strip() == 'Two week reminder'
 
 
 @pytest.mark.parametrize('permissions, links_to_be_shown, permissions_warning_to_be_shown', [
