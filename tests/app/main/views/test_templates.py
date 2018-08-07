@@ -74,19 +74,21 @@ from tests.conftest import single_letter_contact_block
             active_caseworking_user,
             'Templates',
             {},
-            ['Text message', 'Email'],
+            ['Text message', 'Email', 'Letter'],
             [
                 'sms_template_one',
                 'sms_template_two',
                 'email_template_one',
                 'email_template_two',
+                'letter_template_one',
+                'letter_template_two',
             ],
         ),
         (
             active_caseworking_user,
             'Templates',
             {'template_type': 'email'},
-            ['All', 'Text message'],
+            ['All', 'Text message', 'Letter'],
             ['email_template_one', 'email_template_two'],
         ),
     ]

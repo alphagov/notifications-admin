@@ -111,10 +111,7 @@ def start_tour(service_id, template_id):
 def choose_template(service_id, template_type='all'):
     templates = service_api_client.get_service_templates(service_id)['data']
 
-    letters_available = (
-        current_service.has_permission('letter') and
-        current_user.has_permissions('view_activity')
-    )
+    letters_available = current_service.has_permission('letter')
 
     available_template_types = list(filter(None, (
         'email',
