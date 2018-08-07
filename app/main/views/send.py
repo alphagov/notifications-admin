@@ -438,7 +438,7 @@ def send_test_step(service_id, template_id, step_index):
         step_index == 0 and
         template.template_type != 'letter' and
         not (template.template_type == 'sms' and current_user.mobile_number is None) and
-        current_user.has_permissions('view_activity')
+        current_user.has_permissions('manage_templates', 'manage_service')
     ):
         skip_link = (
             'Use my {}'.format(first_column_headings[template.template_type][0]),
