@@ -2,15 +2,17 @@
 {% from "components/radios.html" import radio, radios, radios_wrapper, conditional_radio_panel %}
 
 <fieldset class="form-group">
-  <legend class="form-label visually-hidden">
+  <legend class="form-label">
     Permissions
   </legend>
-  {{ checkbox(form.view_activity) }}
-  {{ checkbox(form.send_messages) }}
-  {{ checkbox(form.manage_templates) }}
-  {{ checkbox(form.manage_service) }}
-  {{ checkbox(form.manage_api_keys) }}
+  {% for field in form.permissions_fields %}
+    {{ checkbox(field) }}
+  {% endfor %}
 </fieldset>
+
+<p class="bottom-gutter">
+  All team members can see sent messages.
+</p>
 
 {% if service_has_email_auth %}
   {% if user_has_no_mobile_number %}

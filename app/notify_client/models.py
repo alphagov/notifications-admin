@@ -20,6 +20,14 @@ roles_by_permission = {
 
 all_permissions = set(roles_by_permission.values())
 
+permissions = (
+    ('view_activity', 'See dashboard and reports'),
+    ('send_messages', 'Send messages using templates'),
+    ('manage_templates', 'Add and edit templates'),
+    ('manage_service', 'Manage settings, team members and usage'),
+    ('manage_api_keys', 'Manage API integration'),
+)
+
 
 def _get_service_id_from_view_args():
     return request.view_args.get('service_id', None)

@@ -63,26 +63,12 @@
         </h3>
         <ul class="tick-cross-list">
           <div class="tick-cross-list-permissions">
-            {{ tick_cross(
-              user.has_permission_for_service(current_service.id, 'view_activity'),
-              'See dashboard and reports'
-            ) }}
-            {{ tick_cross(
-              user.has_permission_for_service(current_service.id, 'send_messages'),
-              'Send messages'
-            ) }}
-            {{ tick_cross(
-              user.has_permission_for_service(current_service.id, 'manage_templates'),
-              'Add and edit templates'
-            ) }}
-            {{ tick_cross(
-              user.has_permission_for_service(current_service.id, 'manage_service'),
-              'Manage service'
-            ) }}
-            {{ tick_cross(
-              user.has_permission_for_service(current_service.id, 'manage_api_keys'),
-              'Access API keys'
-            ) }}
+            {% for permission, label in permissions %}
+              {{ tick_cross(
+                user.has_permission_for_service(current_service.id, permission),
+                label
+              ) }}
+            {% endfor %}
             {% if current_service.has_permission('email_auth') %}
               <div class="tick-cross-list-hint">
                 {% if user.auth_type == 'sms_auth' %}

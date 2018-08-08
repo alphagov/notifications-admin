@@ -40,7 +40,7 @@ from app.main.validators import (
     ValidEmail,
     ValidGovEmail,
 )
-from app.notify_client.models import roles
+from app.notify_client.models import permissions, roles
 from app.utils import guess_name_from_email_address
 
 
@@ -256,13 +256,12 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField('auth_type', validators=[DataRequired()])
 
 
-class PermissionsForm(StripWhitespaceForm):
+PermissionsAbstract = type("PermissionsAbstract", (StripWhitespaceForm,), {
+    permission: BooleanField(label) for permission, label in permissions
+})
 
-    view_activity = BooleanField("See dashboard and reports")
-    send_messages = BooleanField("Send messages")
-    manage_templates = BooleanField("Add and edit templates")
-    manage_service = BooleanField("Manage this service and its team")
-    manage_api_keys = BooleanField("Manage API keys")
+
+class PermissionsForm(PermissionsAbstract):
 
     login_authentication = RadioField(
         'Sign in using',
@@ -276,6 +275,10 @@ class PermissionsForm(StripWhitespaceForm):
     @property
     def permissions(self):
         return {role for role in roles.keys() if self[role].data is True}
+
+    @property
+    def permissions_fields(self):
+        return (getattr(self, permission) for permission, _ in permissions)
 
     @classmethod
     def from_user(cls, user, service_id):
