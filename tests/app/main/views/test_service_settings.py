@@ -1,6 +1,7 @@
 import uuid
 from functools import partial
 from unittest.mock import ANY, call
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 from bs4 import BeautifulSoup
@@ -1803,10 +1804,14 @@ def test_should_preview_email_branding(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     iframe = page.find('iframe', attrs={"class": "email-branding-preview"})
+    iframeURLComponents = urlparse(iframe['src'])
+    iframeQString = parse_qs(iframeURLComponents.query)
 
     assert page.find('input', attrs={"id": "branding_type"})['value'] == 'org'
     assert page.find('input', attrs={"id": "branding_style"})['value'] == '1'
-    assert iframe and iframe['src'] == '/_email?branding_type=org&branding_style=1'
+    assert iframeURLComponents.path == '/_email'
+    assert iframeQString['branding_type'] == ['org']
+    assert iframeQString['branding_style'] == ['1']
 
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
 
