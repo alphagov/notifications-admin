@@ -25,18 +25,18 @@ from tests.conftest import service_one as create_sample_service
         active_user_with_permissions,
         (
             'Test User (you) '
-            'Can See dashboard and reports '
-            'Can Send messages using templates '
+            'Can See dashboard '
+            'Can Send messages '
             'Can Add and edit templates '
-            'Can Manage settings, team members and usage '
+            'Can Manage settings, team and usage '
             'Can Manage API integration'
         ),
         (
             'ZZZZZZZZ zzzzzzz@example.gov.uk '
-            'Can See dashboard and reports '
-            'Can’t Send messages using templates '
+            'Can See dashboard '
+            'Can’t Send messages '
             'Can’t Add and edit templates '
-            'Can’t Manage settings, team members and usage '
+            'Can’t Manage settings, team and usage '
             'Can’t Manage API integration '
             'Edit permissions'
         )
@@ -45,18 +45,18 @@ from tests.conftest import service_one as create_sample_service
         active_user_empty_permissions,
         (
             'Test User With Empty Permissions (you) '
-            'Can’t See dashboard and reports '
-            'Can’t Send messages using templates '
+            'Can’t See dashboard '
+            'Can’t Send messages '
             'Can’t Add and edit templates '
-            'Can’t Manage settings, team members and usage '
+            'Can’t Manage settings, team and usage '
             'Can’t Manage API integration'
         ),
         (
             'ZZZZZZZZ zzzzzzz@example.gov.uk '
-            'Can See dashboard and reports '
-            'Can’t Send messages using templates '
+            'Can See dashboard '
+            'Can’t Send messages '
             'Can’t Add and edit templates '
-            'Can’t Manage settings, team members and usage '
+            'Can’t Manage settings, team and usage '
             'Can’t Manage API integration'
         ),
     ),
@@ -64,18 +64,18 @@ from tests.conftest import service_one as create_sample_service
         active_user_view_permissions,
         (
             'Test User With Permissions (you) '
-            'Can See dashboard and reports '
-            'Can’t Send messages using templates '
+            'Can See dashboard '
+            'Can’t Send messages '
             'Can’t Add and edit templates '
-            'Can’t Manage settings, team members and usage '
+            'Can’t Manage settings, team and usage '
             'Can’t Manage API integration'
         ),
         (
             'ZZZZZZZZ zzzzzzz@example.gov.uk '
-            'Can See dashboard and reports '
-            'Can’t Send messages using templates '
+            'Can See dashboard '
+            'Can’t Send messages '
             'Can’t Add and edit templates '
-            'Can’t Manage settings, team members and usage '
+            'Can’t Manage settings, team and usage '
             'Can’t Manage API integration'
         )
     ),
@@ -83,18 +83,18 @@ from tests.conftest import service_one as create_sample_service
         active_user_manage_template_permission,
         (
             'Test User With Permissions (you) '
-            'Can See dashboard and reports '
-            'Can’t Send messages using templates '
+            'Can See dashboard '
+            'Can’t Send messages '
             'Can Add and edit templates '
-            'Can’t Manage settings, team members and usage '
+            'Can’t Manage settings, team and usage '
             'Can’t Manage API integration'
         ),
         (
             'ZZZZZZZZ zzzzzzz@example.gov.uk '
-            'Can See dashboard and reports '
-            'Can’t Send messages using templates '
+            'Can See dashboard '
+            'Can’t Send messages '
             'Can’t Add and edit templates '
-            'Can’t Manage settings, team members and usage '
+            'Can’t Manage settings, team and usage '
             'Can’t Manage API integration'
         )
     ),
@@ -102,18 +102,18 @@ from tests.conftest import service_one as create_sample_service
         active_user_manage_template_permission,
         (
             'Test User With Permissions (you) '
-            'Can See dashboard and reports '
-            'Can’t Send messages using templates '
+            'Can See dashboard '
+            'Can’t Send messages '
             'Can Add and edit templates '
-            'Can’t Manage settings, team members and usage '
+            'Can’t Manage settings, team and usage '
             'Can’t Manage API integration'
         ),
         (
             'ZZZZZZZZ zzzzzzz@example.gov.uk '
-            'Can See dashboard and reports '
-            'Can’t Send messages using templates '
+            'Can See dashboard '
+            'Can’t Send messages '
             'Can’t Add and edit templates '
-            'Can’t Manage settings, team members and usage '
+            'Can’t Manage settings, team and usage '
             'Can’t Manage API integration'
         )
     ),
@@ -174,19 +174,19 @@ def test_should_show_caseworker_on_overview_page(
     assert normalize_spaces(page.select_one('h1').text) == 'Team members'
     assert normalize_spaces(page.select('.user-list-item')[0].text) == (
         'Test User With Permissions (you) '
-        'Can See dashboard and reports '
-        'Can’t Send messages using templates '
+        'Can See dashboard '
+        'Can’t Send messages '
         'Can’t Add and edit templates '
-        'Can’t Manage settings, team members and usage '
+        'Can’t Manage settings, team and usage '
         'Can’t Manage API integration'
     )
     # [1:5] are invited users
     assert normalize_spaces(page.select('.user-list-item')[6].text) == (
         'Test User zzzzzzz@example.gov.uk '
-        'Can’t See dashboard and reports '
-        'Can Send messages using templates '
+        'Can’t See dashboard '
+        'Can Send messages '
         'Can’t Add and edit templates '
-        'Can’t Manage settings, team members and usage '
+        'Can’t Manage settings, team and usage '
         'Can’t Manage API integration'
     )
 
@@ -605,20 +605,20 @@ def test_cancel_invited_user_cancels_user_invitations(
 @pytest.mark.parametrize('invite_status, expected_text', [
     ('pending', (
         'invited_user@test.gov.uk (invited) '
-        'Can See dashboard and reports '
-        'Can Send messages using templates '
+        'Can See dashboard '
+        'Can Send messages '
         'Can’t Add and edit templates '
-        'Can Manage settings, team members and usage '
+        'Can Manage settings, team and usage '
         'Can Manage API integration '
         'Cancel invitation'
     )),
     ('cancelled', (
         'invited_user@test.gov.uk (cancelled invite) '
         # all permissions are greyed out
-        'Can’t See dashboard and reports '
-        'Can’t Send messages using templates '
+        'Can’t See dashboard '
+        'Can’t Send messages '
         'Can’t Add and edit templates '
-        'Can’t Manage settings, team members and usage '
+        'Can’t Manage settings, team and usage '
         'Can’t Manage API integration'
     )),
 ])

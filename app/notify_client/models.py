@@ -21,10 +21,10 @@ roles_by_permission = {
 all_permissions = set(roles_by_permission.values())
 
 permissions = (
-    ('view_activity', 'See dashboard and reports'),
-    ('send_messages', 'Send messages using templates'),
+    ('view_activity', 'See dashboard'),
+    ('send_messages', 'Send messages'),
     ('manage_templates', 'Add and edit templates'),
-    ('manage_service', 'Manage settings, team members and usage'),
+    ('manage_service', 'Manage settings, team and usage'),
     ('manage_api_keys', 'Manage API integration'),
 )
 
