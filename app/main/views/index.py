@@ -1,15 +1,22 @@
-from flask import abort, redirect, render_template, request, url_for
+from flask import (
+    abort,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user, login_required
 from notifications_utils.international_billing_rates import (
     INTERNATIONAL_BILLING_RATES,
 )
 from notifications_utils.template import HTMLEmailTemplate
 
-from app import convert_to_boolean
+from app import email_branding_client
 from app.main import main
 from app.main.forms import SearchTemplatesForm
 from app.main.views.sub_navigation_dictionaries import features_nav
-from app.utils import AgreementInfo
+from app.utils import AgreementInfo, get_cdn_domain
 
 
 @main.route('/')
@@ -73,45 +80,79 @@ def design_content():
 
 @main.route('/_email')
 def email_template():
-    return str(HTMLEmailTemplate({'subject': 'foo', 'content': (
-        'Lorem Ipsum is simply dummy text of the printing and typesetting '
-        'industry.\n\nLorem Ipsum has been the industry’s standard dummy '
-        'text ever since the 1500s, when an unknown printer took a galley '
-        'of type and scrambled it to make a type specimen book. '
-        '\n\n'
-        '# History'
-        '\n\n'
-        'It has '
-        'survived not only'
-        '\n\n'
-        '* five centuries'
-        '\n'
-        '* but also the leap into electronic typesetting'
-        '\n\n'
-        'It was '
-        'popularised in the 1960s with the release of Letraset sheets '
-        'containing Lorem Ipsum passages, and more recently with desktop '
-        'publishing software like Aldus PageMaker including versions of '
-        'Lorem Ipsum.'
-        '\n\n'
-        '^ It is a long established fact that a reader will be distracted '
-        'by the readable content of a page when looking at its layout.'
-        '\n\n'
-        'The point of using Lorem Ipsum is that it has a more-or-less '
-        'normal distribution of letters, as opposed to using ‘Content '
-        'here, content here’, making it look like readable English.'
-        '\n\n\n'
-        '1. One'
-        '\n'
-        '2. Two'
-        '\n'
-        '10. Three'
-        '\n\n'
-        'This is an example of an email sent using GOV.UK Notify.'
-        '\n\n'
-        'https://www.notifications.service.gov.uk'
-    )}, govuk_banner=convert_to_boolean(request.args.get('govuk_banner', True))
-    ))
+    branding_type = request.args.get('branding_type', 'govuk')
+    branding_style = request.args.get('branding_style', 'None')
+
+    if branding_type == 'govuk' or branding_style == 'None':
+        brand_name = None
+        brand_colour = None
+        brand_logo = None
+        govuk_banner = True
+        brand_banner = False
+    else:
+        email_branding = email_branding_client.get_email_branding(branding_style)['email_branding']
+        brand_name = email_branding['name']
+        brand_colour = email_branding['colour']
+        brand_logo = 'https://{}/{}'.format(get_cdn_domain(), email_branding['logo'])
+        govuk_banner = branding_type in ['govuk', 'both']
+        brand_banner = branding_type == 'org_banner'
+
+    template = {
+        'subject': 'foo',
+        'content': (
+            'Lorem Ipsum is simply dummy text of the printing and typesetting '
+            'industry.\n\nLorem Ipsum has been the industry’s standard dummy '
+            'text ever since the 1500s, when an unknown printer took a galley '
+            'of type and scrambled it to make a type specimen book. '
+            '\n\n'
+            '# History'
+            '\n\n'
+            'It has '
+            'survived not only'
+            '\n\n'
+            '* five centuries'
+            '\n'
+            '* but also the leap into electronic typesetting'
+            '\n\n'
+            'It was '
+            'popularised in the 1960s with the release of Letraset sheets '
+            'containing Lorem Ipsum passages, and more recently with desktop '
+            'publishing software like Aldus PageMaker including versions of '
+            'Lorem Ipsum.'
+            '\n\n'
+            '^ It is a long established fact that a reader will be distracted '
+            'by the readable content of a page when looking at its layout.'
+            '\n\n'
+            'The point of using Lorem Ipsum is that it has a more-or-less '
+            'normal distribution of letters, as opposed to using ‘Content '
+            'here, content here’, making it look like readable English.'
+            '\n\n\n'
+            '1. One'
+            '\n'
+            '2. Two'
+            '\n'
+            '10. Three'
+            '\n\n'
+            'This is an example of an email sent using GOV.UK Notify.'
+            '\n\n'
+            'https://www.notifications.service.gov.uk'
+        )
+    }
+
+    if not bool(request.args):
+        resp = make_response(str(HTMLEmailTemplate(template)))
+    else:
+        resp = make_response(str(HTMLEmailTemplate(
+            template,
+            govuk_banner=govuk_banner,
+            brand_name=brand_name,
+            brand_colour=brand_colour,
+            brand_logo=brand_logo,
+            brand_banner=brand_banner,
+        )))
+
+    resp.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    return resp
 
 
 @main.route('/documentation')

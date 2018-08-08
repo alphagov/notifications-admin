@@ -41,6 +41,7 @@ from app.main.forms import (
     ServiceEditInboundNumberForm,
     ServiceInboundNumberForm,
     ServiceLetterContactBlockForm,
+    ServicePreviewBranding,
     ServiceReplyToEmailForm,
     ServiceSetBranding,
     ServiceSmsSenderForm,
@@ -895,11 +896,35 @@ def set_free_sms_allowance(service_id):
 @user_is_platform_admin
 def service_set_email_branding(service_id):
     email_branding = email_branding_client.get_all_email_branding()
+    branding_type = current_service.get('branding')
 
-    form = ServiceSetBranding(branding_type=current_service.get('branding'))
+    form = ServiceSetBranding(branding_type=branding_type)
 
     # dynamically create org choices, including the null option
     form.branding_style.choices = [('None', 'None')] + get_branding_as_value_and_label(email_branding)
+
+    if form.validate_on_submit():
+        branding_style = None if form.branding_style.data == 'None' else form.branding_style.data
+        return redirect(url_for('.service_preview_email_branding', service_id=service_id,
+                        branding_type=form.branding_type.data, branding_style=branding_style))
+
+    form.branding_style.data = current_service['email_branding'] or 'None'
+
+    return render_template(
+        'views/service-settings/set-email-branding.html',
+        form=form,
+        branding_dict=get_branding_as_dict(email_branding)
+    )
+
+
+@main.route("/services/<service_id>/service-settings/preview-email-branding", methods=['GET', 'POST'])
+@login_required
+@user_is_platform_admin
+def service_preview_email_branding(service_id):
+    branding_type = request.args.get('branding_type', None)
+    branding_style = request.args.get('branding_style', None)
+
+    form = ServicePreviewBranding(branding_type=branding_type, branding_style=branding_style)
 
     if form.validate_on_submit():
         branding_style = None if form.branding_style.data == 'None' else form.branding_style.data
@@ -910,12 +935,11 @@ def service_set_email_branding(service_id):
         )
         return redirect(url_for('.service_settings', service_id=service_id))
 
-    form.branding_style.data = current_service.email_branding or 'None'
-
     return render_template(
-        'views/service-settings/set-email-branding.html',
+        'views/service-settings/preview-email-branding.html',
         form=form,
-        branding_dict=get_branding_as_dict(email_branding)
+        service_id=service_id,
+        action=url_for('main.service_preview_email_branding', service_id=service_id),
     )
 
 

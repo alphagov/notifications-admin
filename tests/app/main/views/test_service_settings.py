@@ -1769,7 +1769,7 @@ def test_should_show_organisations(
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
 
 
-def test_should_set_branding_and_organisations(
+def test_should_send_branding_and_organisations_to_preview(
     logged_in_platform_admin_client,
     service_one,
     mock_get_all_email_branding,
@@ -1781,17 +1781,58 @@ def test_should_set_branding_and_organisations(
         ),
         data={
             'branding_type': 'org',
-            'organisation': '1'
+            'branding_style': '1'
         }
     )
     assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
+    assert response.location == url_for('main.service_preview_email_branding',
+                                        service_id=service_one['id'], branding_type='org',
+                                        branding_style='1', _external=True)
 
     mock_get_all_email_branding.assert_called_once_with()
+
+
+def test_should_preview_email_branding(
+    logged_in_platform_admin_client,
+    service_one,
+):
+    response = logged_in_platform_admin_client.get(url_for(
+        'main.service_preview_email_branding', service_id=service_one['id'],
+        branding_type='org', branding_style='1'
+    ))
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    iframe = page.find('iframe', attrs={"class": "email-branding-preview"})
+
+    assert page.find('input', attrs={"id": "branding_type"})['value'] == 'org'
+    assert page.find('input', attrs={"id": "branding_style"})['value'] == '1'
+    assert iframe and iframe['src'] == '/_email?branding_type=org&branding_style=1'
+
+    app.service_api_client.get_service.assert_called_once_with(service_one['id'])
+
+
+def test_should_set_branding_and_organisations(
+    logged_in_platform_admin_client,
+    service_one,
+    mock_update_service,
+):
+    response = logged_in_platform_admin_client.post(
+        url_for(
+            'main.service_preview_email_branding', service_id=service_one['id']
+        ),
+        data={
+            'branding_type': 'org',
+            'branding_style': '1'
+        }
+    )
+    assert response.status_code == 302
+    assert response.location == url_for('main.service_settings',
+                                        service_id=service_one['id'], _external=True)
+
     mock_update_service.assert_called_once_with(
         service_one['id'],
         branding='org',
-        email_branding=None
+        email_branding='1'
     )
 
 
