@@ -26,3 +26,32 @@
     {%- endif -%}
   {%- endif %} {{ suffix }}
 {%- endmacro %}
+
+{% macro recipient_count_label(count, template_type) -%}
+  {% if template_type == None %}
+    {%- if count == 1 -%}
+      recipient
+    {%- else -%}
+      recipients
+    {%- endif -%}
+  {% endif %}
+  {%- if template_type == 'sms' -%}
+    {%- if count == 1 -%}
+      phone number
+    {%- else -%}
+      phone numbers
+    {%- endif -%}
+  {%- elif template_type == 'email' -%}
+    {%- if count == 1 -%}
+      email address
+    {%- else -%}
+      email addresses
+    {%- endif -%}
+  {%- elif template_type == 'letter' -%}
+    {%- if count == 1 -%}
+      address
+    {%- else -%}
+      addresses
+    {%- endif -%}
+  {%- endif %}
+{%- endmacro %}

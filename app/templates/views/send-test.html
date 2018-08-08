@@ -1,8 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/file-upload.html" import file_upload %}
+{% from "components/message-count-label.html" import recipient_count_label %}
 {% from "components/textbox.html" import textbox %}
-{% from "components/table.html" import list_table, field, text_field, index_field, index_field_heading %}
 
 {% block service_page_title %}
   {{ page_title }}
@@ -29,6 +28,13 @@
         </div>
       {% endif %}
     </div>
+    {% if link_to_upload %}
+      <p>
+        <a href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">
+          Upload a list of {{ recipient_count_label(999, template.template_type) }}
+        </a>
+      </p>
+    {% endif %}
     {{ page_footer('Continue', back_link=back_link) }}
   </form>
 
