@@ -128,7 +128,10 @@
     ga('set', 'anonymizeIp', true);
     ga('set', 'displayFeaturesTask', null);
     ga('set', 'transport', 'beacon');
-    page = window.location.pathname + window.location.search;
-    ga('send', 'pageview', stripUUIDs(page));
+    // strip UUIDs
+    page = (window.location.pathname + window.location.search).replace(
+      /[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}/g, '…'
+    )
+    ga('send', 'pageview', page);
   </script>
 {% endblock %}
