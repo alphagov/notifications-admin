@@ -96,6 +96,9 @@ publicguardian.gov.uk:
 srft.nhs.uk:
   owner: Salford Royal NHS Trust
   agreement_signed: true
+btuh.nhs.uk:
+  owner: Basildon and Thurrock University Hospitals NHS Foundation Trust
+  agreement_signed: true
 nationalarchives.gsi.gov.uk: nationalarchives.gov.uk
 nationalarchives.gov.uk:
   owner: National Archives
@@ -218,11 +221,11 @@ dexeu.gov.uk:
 dvsa.gov.uk:
   owner: Driver & Vehicle Standards Agency
   crown: true
-  agreement_signed: false
+  agreement_signed: true
 dfid.gov.uk:
   owner: Department for International Development
   crown: true
-  agreement_signed: false      
+  agreement_signed: false
 fco.gov.uk:
   owner: Foreign & Commonwealth Office
   crown: true
@@ -235,7 +238,7 @@ hmtreasury.gsi.gov.uk:
 hmtreasury.gov.uk:
   owner: HM Treasury
   crown: true
-  agreement_signed: false  
+  agreement_signed: false
 nio.gov.uk:
   owner: Northern Ireland Office
   crown: true
@@ -2864,6 +2867,10 @@ merthyr.gov.uk:
   owner: Merthyr Tydfil County Borough Council
   crown: false
   agreement_signed: false
+met.pnn.police.uk:
+  owner: Metropolitan Police Service
+  crown: false
+  agreement_signed: true
 midandeastantrim.gov.uk:
   owner: Mid and East Antrim Borough Council
   crown: false
