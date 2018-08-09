@@ -729,7 +729,8 @@ class ServiceSelectEmailBranding(StripWhitespaceForm):
 
 class ServiceUpdateEmailBranding(StripWhitespaceForm):
 
-    name = StringField('Name')
+    name = StringField('Name of brand')
+    text = StringField('Text')
     colour = StringField(
         'Colour',
         render_kw={'onchange': 'update_colour(this)'},
@@ -742,7 +743,8 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
 
 class ServiceCreateEmailBranding(StripWhitespaceForm):
 
-    name = StringField('Name')
+    name = StringField('Name of brand')
+    text = StringField('Text')
     colour = StringField(
         'Colour',
         render_kw={'onchange': 'update_colour(this)'},

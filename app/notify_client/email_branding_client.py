@@ -24,10 +24,11 @@ class EmailBrandingClient(NotifyAdminAPIClient):
         }
         return self.post(url="/email-branding", data=data)
 
-    def update_email_branding(self, branding_id, logo, name, colour):
+    def update_email_branding(self, branding_id, logo, name, text, colour):
         data = {
             "logo": logo,
             "name": name,
+            "text": text,
             "colour": colour
         }
         return self.post(url="/email-branding/{}".format(branding_id), data=data)
