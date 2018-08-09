@@ -49,6 +49,7 @@ from app.utils import (
     get_errors_for_csv,
     get_help_argument,
     get_template,
+    should_skip_template_page,
     unicode_truncate,
     user_has_permissions,
 )
@@ -428,7 +429,7 @@ def send_test_step(service_id, template_id, step_index):
             help=get_help_argument(),
         ))
 
-    back_link = get_back_link(service_id, template_id, step_index)
+    back_link = get_back_link(service_id, template, step_index)
 
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
     template.values[current_placeholder] = None
@@ -762,35 +763,36 @@ def get_send_test_page_title(template_type, help_argument, entering_recipient, n
     return 'Personalise this message'
 
 
-def get_back_link(service_id, template_id, step_index):
+def get_back_link(service_id, template, step_index):
     if get_help_argument():
         # if we're on the check page, redirect back to the beginning. anywhere else, don't return the back link
         if request.endpoint == 'main.check_notification':
             return url_for(
                 'main.send_test',
                 service_id=service_id,
-                template_id=template_id,
+                template_id=template.id,
                 help=get_help_argument()
             )
         else:
             return None
     elif step_index == 0:
-        if current_user.has_permissions('view_activity'):
-            return url_for(
-                '.view_template',
-                service_id=service_id,
-                template_id=template_id,
-            )
-        else:
+        if should_skip_template_page(template.template_type):
             return url_for(
                 '.choose_template',
                 service_id=service_id,
             )
+        else:
+            return url_for(
+                '.view_template',
+                service_id=service_id,
+                template_id=template.id,
+            )
+
     else:
         return url_for(
             'main.send_one_off_step',
             service_id=service_id,
-            template_id=template_id,
+            template_id=template.id,
             step_index=step_index - 1,
         )
 
@@ -818,7 +820,7 @@ def _check_notification(service_id, template_id, exception=None):
         sms_sender=sms_sender
     )
 
-    back_link = get_back_link(service_id, template_id, len(fields_to_fill_in(template)))
+    back_link = get_back_link(service_id, template, len(fields_to_fill_in(template)))
 
     if (
         not session.get('recipient') or
