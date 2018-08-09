@@ -20,6 +20,14 @@ roles_by_permission = {
 
 all_permissions = set(roles_by_permission.values())
 
+permissions = (
+    ('view_activity', 'See dashboard'),
+    ('send_messages', 'Send messages'),
+    ('manage_templates', 'Add and edit templates'),
+    ('manage_service', 'Manage settings, team and usage'),
+    ('manage_api_keys', 'Manage API integration'),
+)
+
 
 def _get_service_id_from_view_args():
     return request.view_args.get('service_id', None)
@@ -124,7 +132,10 @@ class User(UserMixin):
         org_id = _get_org_id_from_view_args()
 
         if self.previewing_basic_view:
-            return self._permissions.get(service_id) and 'send_messages' in permissions
+            return self._permissions.get(service_id) and (
+                'send_messages' in permissions or
+                permissions == ()
+            )
 
         if not service_id and not org_id:
             # we shouldn't have any pages that require permissions, but don't specify a service or organisation.
@@ -137,7 +148,9 @@ class User(UserMixin):
 
         if org_id:
             return org_id in self.organisations
-        elif service_id:
+        if not permissions:
+            return service_id in self._permissions
+        if service_id:
             return any(x in self._permissions.get(service_id, []) for x in permissions)
 
     def has_permission_for_service(self, service_id, permission):
@@ -192,7 +205,7 @@ class InvitedUser(object):
         return set(self.permissions) > set(permissions)
 
     def has_permission_for_service(self, service_id, permission):
-        if self.status == 'cancelled' and permission != 'view_activity':
+        if self.status == 'cancelled':
             return False
         return self.service == service_id and permission in self.permissions
 

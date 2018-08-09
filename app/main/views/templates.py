@@ -46,13 +46,17 @@ page_headings = {
 
 @main.route("/services/<service_id>/templates/<uuid:template_id>")
 @login_required
-@user_has_permissions('view_activity', 'send_messages')
+@user_has_permissions()
 def view_template(service_id, template_id):
-    if not current_user.has_permissions('view_activity'):
+    template = service_api_client.get_service_template(service_id, str(template_id))['data']
+    if (
+        current_user.has_permissions('send_messages') and
+        not current_user.has_permissions('manage_templates', 'manage_api_keys') and
+        template['template_type'] != 'letter'
+    ):
         return redirect(url_for(
             '.send_one_off', service_id=service_id, template_id=template_id
         ))
-    template = service_api_client.get_service_template(service_id, str(template_id))['data']
     if template["template_type"] == "letter":
         letter_contact_details = service_api_client.get_letter_contacts(service_id)
         default_letter_contact_block_id = next(
@@ -103,14 +107,11 @@ def start_tour(service_id, template_id):
 @main.route("/services/<service_id>/templates")
 @main.route("/services/<service_id>/templates/<template_type>")
 @login_required
-@user_has_permissions('view_activity', 'send_messages')
+@user_has_permissions()
 def choose_template(service_id, template_type='all'):
     templates = service_api_client.get_service_templates(service_id)['data']
 
-    letters_available = (
-        current_service.has_permission('letter') and
-        current_user.has_permissions('view_activity')
-    )
+    letters_available = current_service.has_permission('letter')
 
     available_template_types = list(filter(None, (
         'email',
@@ -158,7 +159,7 @@ def choose_template(service_id, template_type='all'):
 
 @main.route("/services/<service_id>/templates/<template_id>.<filetype>")
 @login_required
-@user_has_permissions('view_activity', 'send_messages')
+@user_has_permissions()
 def view_letter_template_preview(service_id, template_id, filetype):
     if filetype not in ('pdf', 'png'):
         abort(404)
@@ -185,7 +186,7 @@ def _view_template_version(service_id, template_id, version, letters_as_pdf=Fals
 
 @main.route("/services/<service_id>/templates/<template_id>/version/<int:version>")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions()
 def view_template_version(service_id, template_id, version):
     return render_template(
         'views/templates/template_history.html',
@@ -195,7 +196,7 @@ def view_template_version(service_id, template_id, version):
 
 @main.route("/services/<service_id>/templates/<template_id>/version/<int:version>.<filetype>")
 @login_required
-@user_has_permissions('view_activity')
+@user_has_permissions()
 def view_template_version_preview(service_id, template_id, version, filetype):
     db_template = service_api_client.get_service_template(service_id, template_id, version=version)['data']
     return TemplatePreview.from_database_object(db_template, filetype)

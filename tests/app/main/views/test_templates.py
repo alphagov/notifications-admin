@@ -74,19 +74,21 @@ from tests.conftest import single_letter_contact_block
             active_caseworking_user,
             'Templates',
             {},
-            ['Text message', 'Email'],
+            ['Text message', 'Email', 'Letter'],
             [
                 'sms_template_one',
                 'sms_template_two',
                 'email_template_one',
                 'email_template_two',
+                'letter_template_one',
+                'letter_template_two',
             ],
         ),
         (
             active_caseworking_user,
             'Templates',
             {'template_type': 'email'},
-            ['All', 'Text message'],
+            ['All', 'Text message', 'Letter'],
             ['email_template_one', 'email_template_two'],
         ),
     ]
@@ -167,6 +169,7 @@ def test_should_show_page_for_one_template(
 def test_caseworker_redirected_to_one_off(
     client_request,
     mock_get_service_templates,
+    mock_get_service_template,
     mocker,
     fake_uuid,
 ):
@@ -187,6 +190,61 @@ def test_caseworker_redirected_to_one_off(
     )
 
 
+def test_user_with_only_send_and_view_redirected_to_one_off(
+    client_request,
+    mock_get_service_templates,
+    mock_get_service_template,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+):
+    active_user_with_permissions._permissions[SERVICE_ONE_ID] = [
+        'send_messages',
+        'view_activity',
+    ]
+    client_request.login(active_user_with_permissions)
+    client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.send_one_off',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
+    )
+
+
+@pytest.mark.parametrize('permissions', (
+    {'send_messages', 'view_activity'},
+    {'send_messages'},
+    {'view_activity'},
+    {},
+))
+def test_user_with_only_send_and_view_sees_letter_page(
+    client_request,
+    mock_get_service_templates,
+    mock_get_service_letter_template,
+    single_letter_contact_block,
+    mock_has_jobs,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+    permissions,
+):
+    mocker.patch('app.main.views.templates.get_page_count_for_letter', return_value=1)
+    active_user_with_permissions._permissions[SERVICE_ONE_ID] = permissions
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert page.select_one('h1').text.strip() == 'Two week reminder'
+
+
 @pytest.mark.parametrize('permissions, links_to_be_shown, permissions_warning_to_be_shown', [
     (
         ['view_activity'],
@@ -204,13 +262,8 @@ def test_caseworker_redirected_to_one_off(
         None,
     ),
     (
-        ['send_messages'],
-        ['.send_messages', '.set_sender'],
-        None,
-    ),
-    (
         ['send_messages', 'manage_templates'],
-        ['.send_messages', '.set_sender', '.edit_service_template'],
+        ['.set_sender', '.edit_service_template'],
         None,
     ),
 ])
@@ -332,7 +385,8 @@ def test_should_show_page_template_with_priority_select_if_platform_admin(
     response = logged_in_platform_admin_client.get(url_for(
         '.edit_service_template',
         service_id='1234',
-        template_id=template_id))
+        template_id=template_id,
+    ))
 
     assert response.status_code == 200
     assert "Two week reminder" in response.get_data(as_text=True)

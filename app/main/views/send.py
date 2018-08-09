@@ -438,7 +438,7 @@ def send_test_step(service_id, template_id, step_index):
         step_index == 0 and
         template.template_type != 'letter' and
         not (template.template_type == 'sms' and current_user.mobile_number is None) and
-        current_user.has_permissions('view_activity')
+        current_user.has_permissions('manage_templates', 'manage_service')
     ):
         skip_link = (
             'Use my {}'.format(first_column_headings[template.template_type][0]),
@@ -451,7 +451,8 @@ def send_test_step(service_id, template_id, step_index):
         page_title=get_send_test_page_title(
             template.template_type,
             get_help_argument(),
-            entering_recipient=not session['recipient']
+            entering_recipient=not session['recipient'],
+            name=template.name,
         ),
         template=template,
         form=form,
@@ -459,6 +460,10 @@ def send_test_step(service_id, template_id, step_index):
         optional_placeholder=optional_placeholder,
         back_link=back_link,
         help=get_help_argument(),
+        link_to_upload=(
+            request.endpoint == 'main.send_one_off_step' and
+            step_index == 0
+        ),
     )
 
 
@@ -747,13 +752,13 @@ def all_placeholders_in_session(placeholders):
     )
 
 
-def get_send_test_page_title(template_type, help_argument, entering_recipient):
+def get_send_test_page_title(template_type, help_argument, entering_recipient, name=None):
     if help_argument:
         return 'Example text message'
     if template_type == 'letter':
         return 'Print a test letter'
     if entering_recipient:
-        return 'Who should this message be sent to?'
+        return 'Send ‘{}’'.format(name)
     return 'Personalise this message'
 
 

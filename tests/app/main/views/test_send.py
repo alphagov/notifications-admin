@@ -919,7 +919,7 @@ def test_send_test_doesnt_show_file_contents(
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.select('h1')[0].text.strip() == 'Preview of Two week reminder'
+    assert page.select('h1')[0].text.strip() == 'Preview of ‘Two week reminder’'
     assert len(page.select('table')) == 0
     assert len(page.select('.banner-dangerous')) == 0
     assert page.select_one('button[type=submit]').text.strip() == 'Send 1 text message'
@@ -1039,7 +1039,7 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     (
         mock_get_service_template_with_placeholders,
         partial(url_for, 'main.send_one_off'),
-        'Who should this message be sent to?',
+        'Send ‘Two week reminder’',
         False,
     ),
     (
@@ -1063,7 +1063,7 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     (
         mock_get_service_email_template,
         partial(url_for, 'main.send_one_off'),
-        'Who should this message be sent to?',
+        'Send ‘Two week reminder’',
         False,
     ),
     (
@@ -1191,6 +1191,101 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     assert not skip_links
 
 
+@pytest.mark.parametrize('user, link_index', (
+    (active_user_with_permissions, 1),
+    (active_caseworking_user, 0),
+))
+def test_send_one_off_offers_link_to_upload(
+    client_request,
+    fake_uuid,
+    mock_get_service_template,
+    mock_has_jobs,
+    user,
+    link_index,
+):
+    client_request.login(user(fake_uuid))
+
+    page = client_request.get(
+        'main.send_one_off',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _follow_redirects=True,
+    )
+
+    link = page.select('main a')[link_index]
+
+    assert link.text.strip() == 'Upload a list of phone numbers'
+    assert link['href'] == url_for(
+        'main.send_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+
+@pytest.mark.parametrize('user', (
+    active_user_with_permissions,
+    active_caseworking_user,
+))
+def test_link_to_upload_not_offered_in_tour(
+    client_request,
+    fake_uuid,
+    mock_get_service_template,
+    user,
+):
+    client_request.login(user(fake_uuid))
+
+    page = client_request.get(
+        'main.send_test',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        help=1,
+        _follow_redirects=True,
+    )
+
+    # We’re in the tour…
+    assert page.select('.banner-tour')
+    # …but first link on the page is ‘Back’, so not preceeded by ‘Upload’
+    assert page.select_one('main a').text == 'Back'
+
+
+@pytest.mark.parametrize('user', (
+    active_user_with_permissions,
+    active_caseworking_user,
+))
+@pytest.mark.parametrize('endpoint, step_index', (
+    ('main.send_one_off_step', 1),
+    ('main.send_test_step', 0),
+))
+def test_link_to_upload_not_offered_when_entering_personalisation(
+    client_request,
+    fake_uuid,
+    mock_get_service_template_with_placeholders,
+    mock_has_jobs,
+    user,
+    endpoint,
+    step_index,
+):
+    client_request.login(user(fake_uuid))
+
+    with client_request.session_transaction() as session:
+        session['recipient'] = '07900900900'
+        session['placeholders'] = {'phone number': '07900900900'}
+
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=step_index,
+    )
+
+    # We’re entering personalisation
+    assert page.select_one('input[type=text]')['name'] == 'placeholder_value'
+    assert page.select_one('label[for=placeholder_value]').text.strip() == 'name'
+    # …but first link on the page is ‘Back’, so not preceeded by ‘Upload’
+    assert page.select_one('main a').text == 'Back'
+    assert 'Upload' not in page.select_one('main').text
+
+
 @pytest.mark.parametrize('user', (
     active_user_with_permissions,
     active_caseworking_user,
@@ -1208,9 +1303,8 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     ),
 ])
 def test_send_test_redirects_to_end_if_step_out_of_bounds(
-    logged_in_client,
+    client_request,
     mock_has_no_jobs,
-    service_one,
     fake_uuid,
     endpoint,
     placeholders,
@@ -1218,26 +1312,24 @@ def test_send_test_redirects_to_end_if_step_out_of_bounds(
     mocker,
     user,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    client_request.login(user(fake_uuid))
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['placeholders'] = placeholders
 
-    response = logged_in_client.get(url_for(
+    client_request.get(
         endpoint,
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         step_index=999,
-    ))
-
-    assert response.status_code == 302
-    expected_url = url_for(
-        expected_redirect,
-        service_id=service_one['id'],
-        template_id=fake_uuid,
-        _external=True,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            expected_redirect,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        )
     )
-    assert response.location == expected_url
 
 
 @pytest.mark.parametrize('user', (
@@ -1387,7 +1479,7 @@ def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     )
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert page.select('h1')[0].text.strip() == 'Preview of Two week reminder'
+    assert page.select('h1')[0].text.strip() == 'Preview of ‘Two week reminder’'
 
 
 @pytest.mark.parametrize('user, expected_back_link_endpoint, extra_args', (
@@ -2124,13 +2216,13 @@ def test_route_permissions_send_check_notifications(
     )
 
 
-@pytest.mark.parametrize('route', [
-    'main.choose_template',
-    'main.send_messages',
-    'main.get_example_csv',
-    'main.send_test'
+@pytest.mark.parametrize('route, expected_status', [
+    ('main.choose_template', 200),
+    ('main.send_messages', 403),
+    ('main.get_example_csv', 403),
+    ('main.send_test', 403),
 ])
-def test_route_invalid_permissions(
+def test_route_permissions_sending(
     mocker,
     app_,
     client,
@@ -2143,12 +2235,13 @@ def test_route_invalid_permissions(
     mock_create_job,
     fake_uuid,
     route,
+    expected_status,
 ):
     validate_route_permission(
         mocker,
         app_,
         "GET",
-        403,
+        expected_status,
         url_for(
             route,
             service_id=service_one['id'],
@@ -2663,7 +2756,7 @@ def test_check_notification_shows_preview(
         template_id=fake_uuid
     )
 
-    assert page.h1.text.strip() == 'Preview of Two week reminder'
+    assert page.h1.text.strip() == 'Preview of ‘Two week reminder’'
     assert (
         page.findAll('a', {'class': 'page-footer-back-link'})[0]['href']
     ) == url_for(
