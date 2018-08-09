@@ -214,9 +214,10 @@ class UserApiClient(NotifyAdminAPIClient):
 
     def get_services_for_user(self, user):
         orgs_and_services_for_user = self.get_organisations_and_services_for_user(user)
-        return orgs_and_services_for_user['services_without_organisations'] + next(chain(
+        all_services = orgs_and_services_for_user['services_without_organisations'] + next(chain(
             org['services'] for org in orgs_and_services_for_user['organisations']
         ), [])
+        return sorted(all_services, key=lambda service: service['name'])
 
     def get_service_ids_for_user(self, user):
         return {
