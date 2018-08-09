@@ -10,13 +10,7 @@
       <div class="navigation-service-name">
         {{ current_service.name }}
         {% if current_user.previewing_basic_view %}
-          <span
-            class="navigation-service-basic-view-preview"
-            data-module="track-event"
-            data-event-category="basic-view"
-            data-event-action="preview"
-            data-event-label="{{ current_service.id }}"
-          >Preview of basic view</span>
+          <span class="navigation-service-basic-view-preview">Preview of basic view</span>
           <a class="navigation-service-basic-view-back-link" href="{{ url_for('main.service_set_basic_view', service_id=current_service.id)}}">Back to settings</a>
         {% endif %}
       </div>
