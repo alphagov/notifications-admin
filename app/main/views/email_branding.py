@@ -124,6 +124,7 @@ def create_email_branding(logo=None):
         email_branding_client.create_email_branding(
             logo=logo,
             name=form.name.data,
+            text=form.text.data,
             colour=form.colour.data
         )
 

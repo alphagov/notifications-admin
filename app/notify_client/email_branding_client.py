@@ -15,10 +15,11 @@ class EmailBrandingClient(NotifyAdminAPIClient):
     def get_letter_email_branding(self):
         return self.get(url='/dvla_organisations')
 
-    def create_email_branding(self, logo, name, colour):
+    def create_email_branding(self, logo, name, text, colour):
         data = {
             "logo": logo,
             "name": name,
+            "text": text,
             "colour": colour
         }
         return self.post(url="/email-branding", data=data)
