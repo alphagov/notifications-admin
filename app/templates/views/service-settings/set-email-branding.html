@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/radios.html" import radios, branding_radios %}
+{% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
@@ -15,7 +15,7 @@
         {{ radios(form.branding_type) }}
       </div>
       <div class="column-one-half">
-        {{ branding_radios(form.branding_style, branding_dict=branding_dict) }}
+        {{ radios(form.branding_style) }}
       </div>
     </div>
     <div class="grid-row">
