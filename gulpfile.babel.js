@@ -58,6 +58,7 @@ gulp.task('copy:govuk_template:fonts', () => gulp.src(paths.template + 'assets/s
 gulp.task('javascripts', () => gulp
   .src([
     paths.toolkit + 'javascripts/govuk/modules.js',
+    paths.toolkit + 'javascripts/govuk/show-hide-content.js',
     paths.toolkit + 'javascripts/govuk/stop-scrolling-at-footer.js',
     paths.toolkit + 'javascripts/govuk/stick-at-top-when-scrolling.js',
     paths.src + 'javascripts/detailsPolyfill.js',

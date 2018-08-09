@@ -10,6 +10,7 @@ from notifications_utils.columns import Columns
 from notifications_utils.formatters import strip_whitespace
 from notifications_utils.recipients import (
     InvalidPhoneError,
+    normalise_phone_number,
     validate_phone_number,
 )
 from wtforms import (
@@ -592,12 +593,40 @@ class ProviderForm(StripWhitespaceForm):
     priority = IntegerField('Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")])
 
 
-class ServiceContactLinkForm(StripWhitespaceForm):
-    url = StringField(
-        "URL",
-        validators=[DataRequired(message='Can’t be empty'),
-                    URL(message='Must be a valid URL')]
+class ServiceContactDetailsForm(StripWhitespaceForm):
+    contact_details_type = RadioField(
+        'Type of contact details',
+        choices=[
+            ('url', 'Link'),
+            ('email_address', 'Email address'),
+            ('phone_number', 'Phone number'),
+        ],
+        validators=[DataRequired()]
     )
+
+    url = StringField("URL")
+    email_address = EmailField("Email address")
+    phone_number = StringField("Phone number")
+
+    def validate(self):
+
+        if self.contact_details_type.data == 'url':
+            self.url.validators = [DataRequired(), URL(message='Must be a valid URL')]
+
+        elif self.contact_details_type.data == 'email_address':
+            self.email_address.validators = [DataRequired(), Length(min=5, max=255), ValidEmail()]
+
+        elif self.contact_details_type.data == 'phone_number':
+            # we can't use the existing phone number validation functions here since we want to allow landlines
+            def valid_phone_number(self, num):
+                try:
+                    normalise_phone_number(num.data)
+                    return True
+                except InvalidPhoneError:
+                    raise ValidationError('Must be a valid phone number')
+            self.phone_number.validators = [DataRequired(), Length(min=5, max=20), valid_phone_number]
+
+        return super().validate()
 
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):

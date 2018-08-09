@@ -32,8 +32,8 @@
   </div>
 {% endmacro %}
 
-{% macro radio(option, disable=[], option_hints={}) %}
-  <div class="multiple-choice">
+{% macro radio(option, disable=[], option_hints={}, data_target=None) %}
+  <div class="multiple-choice" {% if data_target %}data-target="{{ data_target }}"{% endif %}>
     <input
       id="{{ option.id }}" name="{{ option.name }}" type="radio" value="{{ option.data }}"
       {% if option.data in disable %}

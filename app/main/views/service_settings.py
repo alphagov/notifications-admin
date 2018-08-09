@@ -34,7 +34,7 @@ from app.main.forms import (
     OrganisationTypeForm,
     RenameServiceForm,
     RequestToGoLiveForm,
-    ServiceContactLinkForm,
+    ServiceContactDetailsForm,
     ServiceDataRetentionEditForm,
     ServiceDataRetentionForm,
     ServiceEditInboundNumberForm,
@@ -337,7 +337,7 @@ def service_switch_can_send_precompiled_letter(service_id):
 @login_required
 @user_is_platform_admin
 def service_switch_can_upload_document(service_id):
-    form = ServiceContactLinkForm()
+    form = ServiceContactDetailsForm()
 
     # If turning the permission off, or turning it on and the service already has a contact_link,
     # don't show the form to add the link
@@ -346,9 +346,11 @@ def service_switch_can_upload_document(service_id):
         return redirect(url_for('.service_settings', service_id=service_id))
 
     if form.validate_on_submit():
+        contact_type = form.contact_details_type.data
+
         service_api_client.update_service(
             current_service.id,
-            contact_link=form.url.data
+            contact_link=form.data[contact_type]
         )
         switch_service_permissions(service_id, 'upload_document')
         return redirect(url_for('.service_settings', service_id=service_id))
@@ -397,15 +399,22 @@ def resume_service(service_id):
 @login_required
 @user_has_permissions('manage_service')
 def service_set_contact_link(service_id):
-    form = ServiceContactLinkForm()
+    form = ServiceContactDetailsForm()
 
     if request.method == 'GET':
-        form.url.data = current_service.get('contact_link')
+        contact_details = current_service.get('contact_link')
+        contact_type = check_contact_details_type(contact_details)
+        field_to_update = getattr(form, contact_type)
+
+        form.contact_details_type.data = contact_type
+        field_to_update.data = contact_details
 
     if form.validate_on_submit():
+        contact_type = form.contact_details_type.data
+
         service_api_client.update_service(
             current_service.id,
-            contact_link=form.url.data
+            contact_link=form.data[contact_type]
         )
         return redirect(url_for('.service_settings', service_id=current_service.id))
 
@@ -1058,3 +1067,12 @@ def convert_dictionary_to_wtforms_choices_format(dictionary, value, label):
     return [
         (item[value], item[label]) for item in dictionary
     ]
+
+
+def check_contact_details_type(contact_details):
+    if contact_details.startswith('http'):
+        return 'url'
+    elif '@' in contact_details:
+        return 'email_address'
+    else:
+        return 'phone_number'

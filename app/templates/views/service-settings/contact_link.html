@@ -1,24 +1,46 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/radios.html" import radio, radios_wrapper %}
 
 {% block service_page_title %}
-  {{ 'Change link on' if 'upload_document' in current_service.permissions else 'Add link for' }} ‘Download your document’ page
+  {{ 'Change' if 'upload_document' in current_service.permissions else 'Add' }} contact details for ‘Download your document’ page
 {% endblock %}
 
 {% block maincolumn_content %}
   <div class="grid-row">
     <div class="column-five-sixths">
       <h1 class="heading-large">
-        {{ 'Change link on' if 'upload_document' in current_service.permissions else 'Add link for' }} ‘Download your document’ page
+        {{ 'Change' if 'upload_document' in current_service.permissions else 'Add' }} contact details for ‘Download your document’ page
       </h1>
       <p>
-        When you send users a document to download, you need to include a link to your service
+        When you send users a document to download, you need to include the contact details for your service
         on the download page. This is so users can contact you if there’s a problem (for example,
         if the link to download the document has expired).
       </p>
-      <form method="post">
-        {{ textbox(form.url, width='1-1') }}
+      <form method="post" novalidate>
+
+        {% call radios_wrapper(form.contact_details_type, hide_legend=true) %}
+          {% for option in form.contact_details_type %}
+            {% if option.data == 'url' %}
+              {{ radio(option, data_target="url-type") }}
+              <div class="panel panel-border-narrow js-hidden" id="url-type">
+                {{ textbox(form.url, label=' ', width='1-1') }}
+              </div>
+            {% elif option.data == 'email_address' %}
+              {{ radio(option, data_target="email-address-type") }}
+              <div class="panel panel-border-narrow js-hidden" id="email-address-type">
+                {{ textbox(form.email_address, label=' ', width='1-1') }}
+              </div>
+            {% elif option.data == 'phone_number' %}
+              {{ radio(option, data_target="phone-number-type") }}
+              <div class="panel panel-border-narrow js-hidden" id="phone-number-type">
+                {{ textbox(form.phone_number, label=' ', width='1-1') }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endcall %}
+
         {{ page_footer(
           'Save',
           back_link=url_for('.service_settings', service_id=current_service.id),
