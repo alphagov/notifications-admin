@@ -46,18 +46,6 @@
           }}
         {% endcall %}
 
-        {% call settings_row(if_has_permission='caseworking') %}
-          {{ text_field('Basic view') }}
-          {{ boolean_field('caseworking' in current_service.permissions) }}
-          {{ edit_field(
-              'Change',
-              url_for('.service_set_basic_view',
-              service_id=current_service.id),
-              permissions=['manage_service']
-            )
-          }}
-        {% endcall %}
-
         {% call settings_row(if_has_permission='upload_document') %}
           {{ text_field('Contact link') }}
           {{ text_field(current_service.contact_link, truncate=true) }}
@@ -370,11 +358,6 @@
         <li class="bottom-gutter">
           <a href="{{ url_for('.service_switch_email_auth', service_id=current_service.id) }}" class="button">
             {{ 'Stop user auth type editing' if 'email_auth' in current_service.permissions else 'Allow user auth type editing' }}
-          </a>
-        </li>
-        <li class="bottom-gutter">
-          <a href="{{ url_for('.service_set_basic_view', service_id=current_service.id) }}" class="button">
-            Set basic view
           </a>
         </li>
         <li class="bottom-gutter">

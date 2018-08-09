@@ -117,10 +117,6 @@ class User(UserMixin):
     def permissions(self, permissions):
         raise AttributeError("Read only property")
 
-    @property
-    def previewing_basic_view(self):
-        return bool(session.get('basic'))
-
     def has_permissions(self, *permissions, restrict_admin_usage=False):
         unknown_permissions = set(permissions) - all_permissions
 
@@ -130,12 +126,6 @@ class User(UserMixin):
         # Service id is always set on the request for service specific views.
         service_id = _get_service_id_from_view_args()
         org_id = _get_org_id_from_view_args()
-
-        if self.previewing_basic_view:
-            return self._permissions.get(service_id) and (
-                'send_messages' in permissions or
-                permissions == ()
-            )
 
         if not service_id and not org_id:
             # we shouldn't have any pages that require permissions, but don't specify a service or organisation.

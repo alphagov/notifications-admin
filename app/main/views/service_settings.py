@@ -34,7 +34,6 @@ from app.main.forms import (
     OrganisationTypeForm,
     RenameServiceForm,
     RequestToGoLiveForm,
-    ServiceBasicViewForm,
     ServiceContactLinkForm,
     ServiceDataRetentionEditForm,
     ServiceDataRetentionForm,
@@ -629,43 +628,6 @@ def service_set_auth_type(service_id):
     return render_template(
         'views/service-settings/set-auth-type.html',
     )
-
-
-@main.route("/services/<service_id>/service-settings/set-basic-view", methods=['GET', 'POST'])
-@login_required
-@user_has_permissions('manage_service', 'send_messages')
-def service_set_basic_view(service_id):
-
-    if current_user.previewing_basic_view:
-        session.pop('basic', None)
-
-    if not current_user.has_permissions('manage_service'):
-        abort(403)
-
-    form = ServiceBasicViewForm(
-        enabled=current_service.has_permission('caseworking')
-    )
-    if form.validate_on_submit():
-        force_service_permission(
-            service_id,
-            'caseworking',
-            on=(form.enabled.data == 'on'),
-        )
-        return redirect(
-            url_for('.service_settings', service_id=service_id)
-        )
-    return render_template(
-        'views/service-settings/set-basic-view.html',
-        form=form,
-    )
-
-
-@main.route("/services/<service_id>/preview-basic-view")
-@login_required
-@user_has_permissions('manage_service')
-def preview_basic_view(service_id):
-    session['basic'] = True
-    return redirect(url_for('.service_dashboard', service_id=service_id))
 
 
 @main.route("/services/<service_id>/service-settings/letter-contacts", methods=['GET'])

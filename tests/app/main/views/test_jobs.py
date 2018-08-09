@@ -71,7 +71,7 @@ from tests.conftest import (
     )),
 ])
 @freeze_time("2012-12-12 12:12")
-def test_jobs_page_shows_scheduled_jobs_in_basic_view(
+def test_jobs_page_shows_scheduled_jobs_if_user_doesnt_have_dashboard(
     client_request,
     service_one,
     active_user_with_permissions,
