@@ -211,7 +211,7 @@ def test_link_to_download_notifications(
     ) == expected_download_link(service_id=SERVICE_ONE_ID)
 
 
-def test_download_not_available_in_basic_view(
+def test_download_not_available_to_users_without_dashboard(
     client_request,
     active_caseworking_user,
 ):

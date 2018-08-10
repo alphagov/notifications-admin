@@ -14,29 +14,6 @@
       margin: 0 0 0 0;
     }
 
-    &-basic-view {
-
-      &-preview {
-        @include bold-16;
-        display: inline-block;
-        background: $yellow;
-        padding: 4px 10px 3px 10px;
-        position: relative;
-        top: -1px;
-        margin-left: 8px;
-        margin-top: -1px;
-        margin-bottom: -7px;
-      }
-
-      &-back-link {
-        @include core-16;
-        display: inline-block;
-        font-weight: normal;
-        margin-left: 10px;
-      }
-
-    }
-
     &-switch {
 
       @include core-16;
