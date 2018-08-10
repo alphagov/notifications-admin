@@ -26,9 +26,7 @@ def test_email_branding_page_shows_full_branding_list(
     ) == "Select an email branding to update or create a new email branding"
 
     first_label = page.select('div.multiple-choice > label')[0]
-    assert 'background: red;' in first_label.find('span')['style']
     assert normalize_spaces(first_label.text) == 'org 1'
-    assert first_label.find('img')['src'].endswith('/logo1.png')
 
     assert normalize_spaces((page.select('div.multiple-choice > label')[-1]).text) == 'Create a new email branding'
 
@@ -47,6 +45,7 @@ def test_edit_email_branding_shows_the_correct_branding_info(
 
     assert page.select_one('#logo-img > img')['src'].endswith('/example.png')
     assert page.select_one('#name').attrs.get('value') == 'Organisation name'
+    assert page.select_one('#text').attrs.get('value') == 'Organisation name'
     assert page.select_one('#colour').attrs.get('value') == '#f00'
 
 
@@ -64,6 +63,7 @@ def test_create_email_branding_does_not_show_any_branding_info(
 
     assert page.select_one('#logo-img > img') is None
     assert page.select_one('#name').attrs.get('value') == ''
+    assert page.select_one('#text').attrs.get('value') == ''
     assert page.select_one('#colour').attrs.get('value') == ''
 
 
@@ -76,7 +76,8 @@ def test_create_new_email_branding_without_logo(
     data = {
         'logo': None,
         'colour': '#ff0000',
-        'name': 'new name'
+        'text': 'new text',
+        'name': 'new name',
     }
 
     mock_persist = mocker.patch('app.main.views.email_branding.persist_logo')
@@ -92,6 +93,7 @@ def test_create_new_email_branding_without_logo(
     assert mock_create_email_branding.call_args == call(
         logo=data['logo'],
         name=data['name'],
+        text=data['text'],
         colour=data['colour']
     )
     assert mock_persist.call_args_list == []
@@ -109,7 +111,8 @@ def test_create_new_email_branding_when_branding_saved(
     data = {
         'logo': 'test.png',
         'colour': '#ff0000',
-        'name': 'new name'
+        'text': 'new text',
+        'name': 'new name',
     }
 
     temp_filename = LOGO_LOCATION_STRUCTURE.format(
@@ -127,6 +130,7 @@ def test_create_new_email_branding_when_branding_saved(
         data={
             'colour': data['colour'],
             'name': data['name'],
+            'text': data['text'],
             'cdn_url': 'https://static-logos.cdn.com'
         }
     )
@@ -135,6 +139,7 @@ def test_create_new_email_branding_when_branding_saved(
     assert mock_create_email_branding.call_args == call(
         logo=data['logo'],
         name=data['name'],
+        text=data['text'],
         colour=data['colour']
     )
 
@@ -199,6 +204,7 @@ def test_update_exisiting_branding(
     data = {
         'logo': 'test.png',
         'colour': '#0000ff',
+        'text': 'new text',
         'name': 'new name'
     }
 
@@ -214,7 +220,8 @@ def test_update_exisiting_branding(
     logged_in_platform_admin_client.post(
         url_for('.update_email_branding', logo=temp_filename, branding_id=fake_uuid),
         content_type='multipart/form-data',
-        data={'colour': data['colour'], 'name': data['name'], 'cdn_url': 'https://static-logos.cdn.com'}
+        data={'colour': data['colour'], 'name': data['name'], 'text': data['text'],
+              'cdn_url': 'https://static-logos.cdn.com'}
     )
 
     assert mock_update_email_branding.called
@@ -222,6 +229,7 @@ def test_update_exisiting_branding(
         branding_id=fake_uuid,
         logo=data['logo'],
         name=data['name'],
+        text=data['text'],
         colour=data['colour']
     )
 
@@ -303,6 +311,7 @@ def test_colour_regex_validation(
     data = {
         'logo': None,
         'colour': colour_hex,
+        'text': 'new text',
         'name': 'new name'
     }
 
