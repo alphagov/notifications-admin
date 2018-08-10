@@ -655,3 +655,11 @@ def guess_name_from_email_address(email_address):
     ).then(
         normalize_spaces
     )
+
+
+def should_skip_template_page(template_type):
+    return (
+        current_user.has_permissions('send_messages') and
+        not current_user.has_permissions('manage_templates', 'manage_api_keys') and
+        template_type != 'letter'
+    )

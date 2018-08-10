@@ -1482,47 +1482,55 @@ def test_send_test_email_message_without_placeholders_redirects_to_check_page(
     assert page.select('h1')[0].text.strip() == 'Preview of ‘Two week reminder’'
 
 
-@pytest.mark.parametrize('user, expected_back_link_endpoint, extra_args', (
-    (active_user_with_permissions, 'main.view_template', {'template_id': unchanging_fake_uuid}),
-    (active_caseworking_user, 'main.choose_template', {}),
+@pytest.mark.parametrize('permissions, expected_back_link_endpoint, extra_args', (
+    (
+        {'send_messages', 'manage_templates'},
+        'main.view_template',
+        {'template_id': unchanging_fake_uuid}
+    ),
+    (
+        {'send_messages'},
+        'main.choose_template',
+        {},
+    ),
+    (
+        {'send_messages', 'view_activity'},
+        'main.choose_template',
+        {},
+    ),
 ))
 def test_send_test_sms_message_with_placeholders_shows_first_field(
-    logged_in_client,
-    mocker,
-    service_one,
+    client_request,
+    active_user_with_permissions,
     mock_login,
     mock_get_service,
     mock_get_service_template_with_placeholders,
     mock_has_no_jobs,
-    fake_uuid,
-    user,
+    permissions,
     expected_back_link_endpoint,
     extra_args,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=user(fake_uuid))
+    active_user_with_permissions._permissions[SERVICE_ONE_ID] = permissions
+    client_request.login(active_user_with_permissions)
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert 'placeholders' not in session
 
-    response = logged_in_client.get(
-        url_for(
-            'main.send_test',
-            service_id=service_one['id'],
-            template_id=unchanging_fake_uuid,
-        ),
-        follow_redirects=True,
+    page = client_request.get(
+        'main.send_test',
+        service_id=SERVICE_ONE_ID,
+        template_id=unchanging_fake_uuid,
+        _follow_redirects=True,
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.select('label')[0].text.strip() == 'name'
     assert page.select('input')[0]['name'] == 'placeholder_value'
     assert page.select('.page-footer-back-link')[0]['href'] == url_for(
         expected_back_link_endpoint,
-        service_id=service_one['id'],
+        service_id=SERVICE_ONE_ID,
         **extra_args
     )
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert session['recipient'] == '07700 900762'
 
 

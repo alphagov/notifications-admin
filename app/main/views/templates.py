@@ -29,6 +29,7 @@ from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import (
     email_or_sms_not_enabled,
     get_template,
+    should_skip_template_page,
     user_has_permissions,
 )
 
@@ -49,11 +50,7 @@ page_headings = {
 @user_has_permissions()
 def view_template(service_id, template_id):
     template = service_api_client.get_service_template(service_id, str(template_id))['data']
-    if (
-        current_user.has_permissions('send_messages') and
-        not current_user.has_permissions('manage_templates', 'manage_api_keys') and
-        template['template_type'] != 'letter'
-    ):
+    if should_skip_template_page(template['template_type']):
         return redirect(url_for(
             '.send_one_off', service_id=service_id, template_id=template_id
         ))
