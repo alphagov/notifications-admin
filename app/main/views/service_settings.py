@@ -339,10 +339,8 @@ def service_switch_can_send_precompiled_letter(service_id):
 def service_switch_can_upload_document(service_id):
     form = ServiceContactDetailsForm()
 
-    # If turning the permission off, or turning it on and the service already has a contact_link,
-    # don't show the form to add the link
-    if current_service.has_permission('upload_document') or (
-       current_service.get('contact_link') or current_service.get('contact_details')):
+    # If turning the permission off, or turning it on and the service already has contact_details, don't show the form
+    if current_service.has_permission('upload_document') or current_service.get('contact_details'):
         switch_service_permissions(service_id, 'upload_document')
         return redirect(url_for('.service_settings', service_id=service_id))
 
@@ -351,13 +349,12 @@ def service_switch_can_upload_document(service_id):
 
         service_api_client.update_service(
             current_service.id,
-            contact_link=form.data[contact_type],
             contact_details=form.data[contact_type],
         )
         switch_service_permissions(service_id, 'upload_document')
         return redirect(url_for('.service_settings', service_id=service_id))
 
-    return render_template('views/service-settings/contact_link.html', form=form)
+    return render_template('views/service-settings/contact_details.html', form=form)
 
 
 @main.route("/services/<service_id>/service-settings/archive", methods=['GET', 'POST'])
@@ -397,14 +394,14 @@ def resume_service(service_id):
         return service_settings(service_id)
 
 
-@main.route("/services/<service_id>/service-settings/contact-link", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/contact-details", methods=['GET', 'POST'])
 @login_required
 @user_has_permissions('manage_service')
-def service_set_contact_link(service_id):
+def service_set_contact_details(service_id):
     form = ServiceContactDetailsForm()
 
     if request.method == 'GET':
-        contact_details = current_service.get('contact_link') or current_service.get('contact_details')
+        contact_details = current_service.get('contact_details')
         contact_type = check_contact_details_type(contact_details)
         field_to_update = getattr(form, contact_type)
 
@@ -416,12 +413,11 @@ def service_set_contact_link(service_id):
 
         service_api_client.update_service(
             current_service.id,
-            contact_link=form.data[contact_type],
             contact_details=form.data[contact_type],
         )
         return redirect(url_for('.service_settings', service_id=current_service.id))
 
-    return render_template('views/service-settings/contact_link.html', form=form)
+    return render_template('views/service-settings/contact_details.html', form=form)
 
 
 @main.route("/services/<service_id>/service-settings/set-email", methods=['GET'])
