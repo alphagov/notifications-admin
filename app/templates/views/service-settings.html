@@ -48,10 +48,10 @@
 
         {% call settings_row(if_has_permission='upload_document') %}
           {{ text_field('Contact details') }}
-          {{ text_field(current_service.contact_link, truncate=true) }}
+          {{ text_field(current_service.contact_details, truncate=true) }}
           {{ edit_field(
               'Change',
-              url_for('.service_set_contact_link',
+              url_for('.service_set_contact_details',
               service_id=current_service.id),
               permissions=['manage_service']
             )

@@ -2079,7 +2079,7 @@ def test_service_switch_can_upload_document_changes_the_permission_if_service_co
     end_permissions,
 ):
     service_one['permissions'] = start_permissions
-    service_one['contact_link'] = contact_details
+    service_one['contact_details'] = contact_details
 
     response = logged_in_platform_admin_client.get(
         url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
@@ -2311,16 +2311,16 @@ def test_cant_resume_active_service(
     ('email_address', 'me@example.com'),
     ('phone_number', '0207 123 4567'),
 ])
-def test_service_set_contact_link_prefills_the_form_with_the_existing_contact_details(
+def test_service_set_contact_details_prefills_the_form_with_the_existing_contact_details(
     client_request,
     service_one,
     contact_details_type,
     contact_details_value,
 ):
-    service_one['contact_link'] = contact_details_value
+    service_one['contact_details'] = contact_details_value
 
     page = client_request.get(
-        'main.service_set_contact_link', service_id=SERVICE_ONE_ID
+        'main.service_set_contact_details', service_id=SERVICE_ONE_ID
     )
     assert page.find('input', attrs={'name': 'contact_details_type', 'value': contact_details_type}).has_attr('checked')
     assert page.find('input', {'id': contact_details_type}).get('value') == contact_details_value
@@ -2331,7 +2331,7 @@ def test_service_set_contact_link_prefills_the_form_with_the_existing_contact_de
     ('email_address', 'old@example.com', 'new@example.com'),
     ('phone_number', '0207 12345', '0207 56789'),
 ])
-def test_service_set_contact_link_updates_contact_details_and_redirects_to_settings_page(
+def test_service_set_contact_details_updates_contact_details_and_redirects_to_settings_page(
     client_request,
     service_one,
     mock_update_service,
@@ -2344,10 +2344,10 @@ def test_service_set_contact_link_updates_contact_details_and_redirects_to_setti
     old_value,
     new_value,
 ):
-    service_one['contact_link'] = old_value
+    service_one['contact_details'] = old_value
 
     page = client_request.post(
-        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        'main.service_set_contact_details', service_id=SERVICE_ONE_ID,
         _data={
             'contact_details_type': contact_details_type,
             contact_details_type: new_value,
@@ -2356,10 +2356,10 @@ def test_service_set_contact_link_updates_contact_details_and_redirects_to_setti
     )
 
     assert page.h1.text == 'Settings'
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link=new_value)
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_details=new_value)
 
 
-def test_service_set_contact_link_updates_contact_details_for_the_selected_field_when_multiple_textboxes_contain_data(
+def test_service_set_contact_details_updates_details_for_the_selected_field_when_multiple_textboxes_contain_data(
     client_request,
     service_one,
     mock_update_service,
@@ -2369,10 +2369,10 @@ def test_service_set_contact_link_updates_contact_details_for_the_selected_field
     no_letter_contact_blocks,
     single_sms_sender,
 ):
-    service_one['contact_link'] = 'http://www.old-url.com'
+    service_one['contact_details'] = 'http://www.old-url.com'
 
     page = client_request.post(
-        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        'main.service_set_contact_details', service_id=SERVICE_ONE_ID,
         _data={
             'contact_details_type': 'url',
             'url': 'http://www.new-url.com',
@@ -2383,15 +2383,15 @@ def test_service_set_contact_link_updates_contact_details_for_the_selected_field
     )
 
     assert page.h1.text == 'Settings'
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link='http://www.new-url.com')
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_details='http://www.new-url.com')
 
 
-def test_service_set_contact_link_displays_error_message_when_no_radio_button_selected(
+def test_service_set_contact_details_displays_error_message_when_no_radio_button_selected(
     client_request,
     service_one
 ):
     page = client_request.post(
-        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        'main.service_set_contact_details', service_id=SERVICE_ONE_ID,
         _data={
             'contact_details_type': None,
             'url': '',
@@ -2409,7 +2409,7 @@ def test_service_set_contact_link_displays_error_message_when_no_radio_button_se
     ('email_address', 'me@co', 'Enter a valid email address'),
     ('phone_number', 'abcde', 'Must be a valid phone number'),
 ])
-def test_service_set_contact_link_does_not_update_invalid_contact_details(
+def test_service_set_contact_details_does_not_update_invalid_contact_details(
     mocker,
     client_request,
     service_one,
@@ -2417,11 +2417,11 @@ def test_service_set_contact_link_does_not_update_invalid_contact_details(
     invalid_value,
     error,
 ):
-    service_one['contact_link'] = 'http://example.com/'
+    service_one['contact_details'] = 'http://example.com/'
     service_one['permissions'].append('upload_document')
 
     page = client_request.post(
-        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        'main.service_set_contact_details', service_id=SERVICE_ONE_ID,
         _data={
             'contact_details_type': contact_details_type,
             contact_details_type: invalid_value,
@@ -2433,7 +2433,7 @@ def test_service_set_contact_link_does_not_update_invalid_contact_details(
     assert normalize_spaces(page.h1.text) == "Change contact details for ‘Download your document’ page"
 
 
-def test_contact_link_is_displayed_with_upload_document_permission(
+def test_contact_details_are_displayed_with_upload_document_permission(
     logged_in_client,
     service_one,
     mock_get_service_settings_page_common,
@@ -2450,7 +2450,7 @@ def test_contact_link_is_displayed_with_upload_document_permission(
     assert 'Contact details' in page.text
 
 
-def test_contact_link_is_not_displayed_without_the_upload_document_permission(
+def test_contact_details_are_not_displayed_without_the_upload_document_permission(
     logged_in_client,
     service_one,
     mock_get_service_settings_page_common,
