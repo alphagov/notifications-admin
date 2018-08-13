@@ -500,5 +500,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_service_data_retention(self, service_id):
         return self.get("/service/{}/data-retention".format(service_id))
 
+    def get_service_data_retention_by_notification_type(self, service_id, notification_type):
+        return self.get("/service/{}/data-retention/notification-type/{}".format(service_id, notification_type))
+
     def get_service_data_retention_by_id(self, service_id, data_retention_id):
         return self.get("service/{}/data-retention/{}".format(service_id, data_retention_id))
