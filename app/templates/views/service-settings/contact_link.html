@@ -22,22 +22,12 @@
 
         {% call radios_wrapper(form.contact_details_type, hide_legend=true) %}
           {% for option in form.contact_details_type %}
-            {% if option.data == 'url' %}
-              {{ radio(option, data_target="url-type") }}
-              <div class="panel panel-border-narrow js-hidden" id="url-type">
-                {{ textbox(form.url, label=' ', width='1-1') }}
-              </div>
-            {% elif option.data == 'email_address' %}
-              {{ radio(option, data_target="email-address-type") }}
-              <div class="panel panel-border-narrow js-hidden" id="email-address-type">
-                {{ textbox(form.email_address, label=' ', width='1-1') }}
-              </div>
-            {% elif option.data == 'phone_number' %}
-              {{ radio(option, data_target="phone-number-type") }}
-              <div class="panel panel-border-narrow js-hidden" id="phone-number-type">
-                {{ textbox(form.phone_number, label=' ', width='1-1') }}
-              </div>
-            {% endif %}
+            {% set data_target = option.data.replace('_', '-') ~ "-type" %}
+
+            {{ radio(option, data_target=data_target) }}
+            <div class="panel panel-border-narrow js-hidden" id={{data_target}}>
+              {{ textbox(form|attr(option.data), label=' ', width='1-1') }}
+            </div>
           {% endfor %}
         {% endcall %}
 
