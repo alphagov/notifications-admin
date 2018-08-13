@@ -47,7 +47,7 @@
         {% endcall %}
 
         {% call settings_row(if_has_permission='upload_document') %}
-          {{ text_field('Contact link') }}
+          {{ text_field('Contact details') }}
           {{ text_field(current_service.contact_link, truncate=true) }}
           {{ edit_field(
               'Change',

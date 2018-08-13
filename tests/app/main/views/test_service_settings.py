@@ -2060,12 +2060,12 @@ def test_switch_service_enable_international_sms(
     assert mocked_fn.call_args[0][0] == service_one['id']
 
 
-@pytest.mark.parametrize('start_permissions, contact_link, end_permissions', [
+@pytest.mark.parametrize('start_permissions, contact_details, end_permissions', [
     (['upload_document'], 'http://example.com/', []),
     (['upload_document'], None, []),
-    ([], 'http://example.com/', ['upload_document']),
+    ([], '0207 123 4567', ['upload_document']),
 ])
-def test_service_switch_can_upload_document_changes_the_permission_if_not_adding_the_permission_without_a_contact_link(
+def test_service_switch_can_upload_document_changes_the_permission_if_service_contact_details_exist(
     logged_in_platform_admin_client,
     service_one,
     mock_update_service,
@@ -2075,11 +2075,11 @@ def test_service_switch_can_upload_document_changes_the_permission_if_not_adding
     no_letter_contact_blocks,
     single_sms_sender,
     start_permissions,
-    contact_link,
+    contact_details,
     end_permissions,
 ):
     service_one['permissions'] = start_permissions
-    service_one['contact_link'] = contact_link
+    service_one['contact_link'] = contact_details
 
     response = logged_in_platform_admin_client.get(
         url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
@@ -2090,10 +2090,10 @@ def test_service_switch_can_upload_document_changes_the_permission_if_not_adding
         SERVICE_ONE_ID,
         permissions=end_permissions,
     )
-    assert page.h1.text.strip() == 'Settings'
+    assert normalize_spaces(page.h1.text) == 'Settings'
 
 
-def test_service_switch_can_upload_document_turning_permission_on_with_no_contact_link_shows_link_form(
+def test_service_switch_can_upload_document_turning_permission_on_with_no_contact_details_shows_form(
     logged_in_platform_admin_client,
     service_one,
     mock_get_service_settings_page_common,
@@ -2109,10 +2109,15 @@ def test_service_switch_can_upload_document_turning_permission_on_with_no_contac
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert 'upload_document' not in service_one['permissions']
-    assert page.h1.text.strip() == "Add link for ‘Download your document’ page"
+    assert normalize_spaces(page.h1.text) == "Add contact details for ‘Download your document’ page"
 
 
-def test_service_switch_can_upload_document_lets_contact_link_be_added_and_switches_permission(
+@pytest.mark.parametrize('contact_details_type, contact_details_value', [
+    ('url', 'http://example.com/'),
+    ('email_address', 'old@example.com'),
+    ('phone_number', '0207 12345'),
+])
+def test_service_switch_can_upload_document_lets_contact_details_be_added_and_switches_permission(
     logged_in_platform_admin_client,
     service_one,
     mock_update_service,
@@ -2121,16 +2126,20 @@ def test_service_switch_can_upload_document_lets_contact_link_be_added_and_switc
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
+    contact_details_type,
+    contact_details_value,
 ):
+    data = {'contact_details_type': contact_details_type, contact_details_type: contact_details_value}
+
     response = logged_in_platform_admin_client.post(
         url_for('main.service_switch_can_upload_document', service_id=SERVICE_ONE_ID),
-        data={'url': 'http://example.com/'},
+        data=data,
         follow_redirects=True
     )
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert 'upload_document' in mock_update_service.call_args[1]['permissions']
-    assert page.h1.text.strip() == 'Settings'
+    assert normalize_spaces(page.h1.text) == 'Settings'
 
 
 def test_archive_service_after_confirm(
@@ -2297,16 +2306,60 @@ def test_cant_resume_active_service(
     assert 'Resume service' not in {a.text for a in page.find_all('a', class_='button')}
 
 
-def test_service_set_contact_link_displays_the_contact_link(client_request, service_one):
-    service_one['contact_link'] = 'http://example.com/'
+@pytest.mark.parametrize('contact_details_type, contact_details_value', [
+    ('url', 'http://example.com/'),
+    ('email_address', 'me@example.com'),
+    ('phone_number', '0207 123 4567'),
+])
+def test_service_set_contact_link_prefills_the_form_with_the_existing_contact_details(
+    client_request,
+    service_one,
+    contact_details_type,
+    contact_details_value,
+):
+    service_one['contact_link'] = contact_details_value
 
     page = client_request.get(
         'main.service_set_contact_link', service_id=SERVICE_ONE_ID
     )
-    assert page.find('input').get('value') == 'http://example.com/'
+    assert page.find('input', attrs={'name': 'contact_details_type', 'value': contact_details_type}).has_attr('checked')
+    assert page.find('input', {'id': contact_details_type}).get('value') == contact_details_value
 
 
-def test_service_set_contact_link_updates_contact_link_and_redirects_to_settings_page(
+@pytest.mark.parametrize('contact_details_type, old_value, new_value', [
+    ('url', 'http://example.com/', 'http://new-link.com/'),
+    ('email_address', 'old@example.com', 'new@example.com'),
+    ('phone_number', '0207 12345', '0207 56789'),
+])
+def test_service_set_contact_link_updates_contact_details_and_redirects_to_settings_page(
+    client_request,
+    service_one,
+    mock_update_service,
+    mock_get_service_settings_page_common,
+    mock_get_service_organisation,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    contact_details_type,
+    old_value,
+    new_value,
+):
+    service_one['contact_link'] = old_value
+
+    page = client_request.post(
+        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        _data={
+            'contact_details_type': contact_details_type,
+            contact_details_type: new_value,
+        },
+        _follow_redirects=True
+    )
+
+    assert page.h1.text == 'Settings'
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link=new_value)
+
+
+def test_service_set_contact_link_updates_contact_details_for_the_selected_field_when_multiple_textboxes_contain_data(
     client_request,
     service_one,
     mock_update_service,
@@ -2316,48 +2369,68 @@ def test_service_set_contact_link_updates_contact_link_and_redirects_to_settings
     no_letter_contact_blocks,
     single_sms_sender,
 ):
-    service_one['contact_link'] = 'http://example.com/'
+    service_one['contact_link'] = 'http://www.old-url.com'
 
     page = client_request.post(
         'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
         _data={
-            'url': 'http://new-link.com/',
+            'contact_details_type': 'url',
+            'url': 'http://www.new-url.com',
+            'email_address': 'me@example.com',
+            'phone_number': '0207 123 4567'
         },
         _follow_redirects=True
     )
 
     assert page.h1.text == 'Settings'
-    mock_update_service.assert_called_once_with(
-        SERVICE_ONE_ID,
-        contact_link='http://new-link.com/',
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link='http://www.new-url.com')
+
+
+def test_service_set_contact_link_displays_error_message_when_no_radio_button_selected(
+    client_request,
+    service_one
+):
+    page = client_request.post(
+        'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
+        _data={
+            'contact_details_type': None,
+            'url': '',
+            'email_address': '',
+            'phone_number': '',
+        },
+        _follow_redirects=True
     )
+    assert normalize_spaces(page.find('span', class_='error-message').text) == 'Not a valid choice'
+    assert normalize_spaces(page.h1.text) == "Add contact details for ‘Download your document’ page"
 
 
-@pytest.mark.parametrize('new_link', ['', 'not/a-valid/link'])
-def test_service_set_contact_link_does_not_update_invalid_link(
+@pytest.mark.parametrize('contact_details_type, invalid_value, error', [
+    ('url', 'invalid.com/', 'Must be a valid URL'),
+    ('email_address', 'me@co', 'Enter a valid email address'),
+    ('phone_number', 'abcde', 'Must be a valid phone number'),
+])
+def test_service_set_contact_link_does_not_update_invalid_contact_details(
     mocker,
     client_request,
     service_one,
-    mock_get_service_settings_page_common,
-    mock_get_service_organisation,
-    no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    single_sms_sender,
-    new_link,
+    contact_details_type,
+    invalid_value,
+    error,
 ):
-    update_mock = mocker.patch('app.service_api_client.update_service')
     service_one['contact_link'] = 'http://example.com/'
+    service_one['permissions'].append('upload_document')
 
     page = client_request.post(
         'main.service_set_contact_link', service_id=SERVICE_ONE_ID,
         _data={
-            'url': new_link,
+            'contact_details_type': contact_details_type,
+            contact_details_type: invalid_value,
         },
         _follow_redirects=True
     )
 
-    assert page.h1.text.strip() == "Add link for ‘Download your document’ page"
-    update_mock.assert_not_called()
+    assert normalize_spaces(page.find('span', class_='error-message').text) == error
+    assert normalize_spaces(page.h1.text) == "Change contact details for ‘Download your document’ page"
 
 
 def test_contact_link_is_displayed_with_upload_document_permission(
@@ -2374,7 +2447,7 @@ def test_contact_link_is_displayed_with_upload_document_permission(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert response.status_code == 200
-    assert 'Contact link' in page.text
+    assert 'Contact details' in page.text
 
 
 def test_contact_link_is_not_displayed_without_the_upload_document_permission(
@@ -2390,7 +2463,7 @@ def test_contact_link_is_not_displayed_without_the_upload_document_permission(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert response.status_code == 200
-    assert 'Contact link' not in page.text
+    assert 'Contact details' not in page.text
 
 
 @pytest.mark.parametrize('endpoint, permissions, expected_p', [
