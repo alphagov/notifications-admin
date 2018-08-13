@@ -2356,7 +2356,7 @@ def test_service_set_contact_link_updates_contact_details_and_redirects_to_setti
     )
 
     assert page.h1.text == 'Settings'
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link=new_value)
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link=new_value, contact_details=new_value)
 
 
 def test_service_set_contact_link_updates_contact_details_for_the_selected_field_when_multiple_textboxes_contain_data(
@@ -2383,7 +2383,10 @@ def test_service_set_contact_link_updates_contact_details_for_the_selected_field
     )
 
     assert page.h1.text == 'Settings'
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link='http://www.new-url.com')
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        contact_link='http://www.new-url.com',
+        contact_details='http://www.new-url.com')
 
 
 def test_service_set_contact_link_displays_error_message_when_no_radio_button_selected(
