@@ -216,6 +216,11 @@ def get_notifications(service_id, message_type, status_override=None):
         abort(404)
     filter_args = parse_filter_args(request.args)
     filter_args['status'] = set_status_filters(filter_args)
+
+    service_data_retention_days = service_api_client.get_service_data_retention_by_notification_type(
+        service_id, message_type
+    ).get('days_of_retention', current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
+
     if request.path.endswith('csv') and current_user.has_permissions('view_activity'):
         return Response(
             generate_notifications_csv(
@@ -224,7 +229,7 @@ def get_notifications(service_id, message_type, status_override=None):
                 page_size=5000,
                 template_type=[message_type],
                 status=filter_args.get('status'),
-                limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS']
+                limit_days=service_data_retention_days
             ),
             mimetype='text/csv',
             headers={
@@ -235,7 +240,7 @@ def get_notifications(service_id, message_type, status_override=None):
         page=page,
         template_type=[message_type] if message_type else [],
         status=filter_args.get('status'),
-        limit_days=current_app.config['ACTIVITY_STATS_LIMIT_DAYS'],
+        limit_days=service_data_retention_days,
         to=request.form.get('to', ''),
     )
     url_args = {
@@ -262,13 +267,18 @@ def get_notifications(service_id, message_type, status_override=None):
         download_link = None
 
     return {
+        'service_data_retention_days': service_data_retention_days,
         'counts': render_template(
             'views/activity/counts.html',
             status=request.args.get('status'),
             status_filters=get_status_filters(
                 current_service,
                 message_type,
-                service_api_client.get_service_statistics(service_id, today_only=False)
+                service_api_client.get_service_statistics(
+                    service_id,
+                    today_only=False,
+                    limit_days=service_data_retention_days
+                )
             )
         ),
         'notifications': render_template(
@@ -277,6 +287,7 @@ def get_notifications(service_id, message_type, status_override=None):
                 notifications['notifications']
             )),
             page=page,
+            limit_days=service_data_retention_days,
             prev_page=prev_page,
             next_page=next_page,
             status=request.args.get('status'),

@@ -145,7 +145,7 @@ def test_can_show_notifications(
         **extra_args
     ))
     json_content = json.loads(json_response.get_data(as_text=True))
-    assert json_content.keys() == {'counts', 'notifications'}
+    assert json_content.keys() == {'counts', 'notifications', 'service_data_retention_days'}
 
 
 @pytest.mark.parametrize('user, query_parameters, expected_download_link', [
