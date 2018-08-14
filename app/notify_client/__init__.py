@@ -37,7 +37,7 @@ class NotifyAdminAPIClient(BaseAPIClient):
     def _add_request_id_header(headers):
         if not has_request_context():
             return headers
-        headers['NotifyRequestID'] = request.request_id
+        headers['X-B3-TraceId'] = request.request_id
         return headers
 
     def check_inactive_service(self):
