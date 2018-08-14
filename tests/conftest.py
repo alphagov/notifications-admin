@@ -2474,7 +2474,7 @@ def mock_get_email_branding(mocker, fake_uuid):
             'email_branding': {
                 'logo': 'example.png',
                 'name': 'Organisation name',
-                'text': 'Organisation name',
+                'text': 'Organisation text',
                 'id': fake_uuid,
                 'colour': '#f00'
             }
