@@ -78,12 +78,14 @@ def update_email_branding(branding_id, logo=None):
             branding_id=branding_id,
             logo=logo,
             name=form.name.data,
+            text=form.text.data,
             colour=form.colour.data
         )
 
         return redirect(url_for('.email_branding', branding_id=branding_id))
 
     form.name.data = email_branding['name']
+    form.text.data = email_branding['text']
     form.colour.data = email_branding['colour']
 
     return render_template(
@@ -124,6 +126,7 @@ def create_email_branding(logo=None):
         email_branding_client.create_email_branding(
             logo=logo,
             name=form.name.data,
+            text=form.text.data,
             colour=form.colour.data
         )
 

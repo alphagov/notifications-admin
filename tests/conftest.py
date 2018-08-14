@@ -2432,11 +2432,11 @@ def mock_send_already_registered_email(mocker):
 def mock_get_all_email_branding(mocker):
     def _get_all_email_branding():
         return [
-            {'id': '1', 'name': 'org 1', 'colour': 'red', 'logo': 'logo1.png'},
-            {'id': '2', 'name': 'org 2', 'colour': 'orange', 'logo': 'logo2.png'},
-            {'id': '3', 'name': None, 'colour': None, 'logo': 'logo3.png'},
-            {'id': '4', 'name': 'org 4', 'colour': None, 'logo': 'logo4.png'},
-            {'id': '5', 'name': None, 'colour': 'blue', 'logo': 'logo5.png'},
+            {'id': '1', 'name': 'org 1', 'text': 'org 1', 'colour': 'red', 'logo': 'logo1.png'},
+            {'id': '2', 'name': 'org 2', 'text': 'org 2', 'colour': 'orange', 'logo': 'logo2.png'},
+            {'id': '3', 'name': 'org 3', 'text': None, 'colour': None, 'logo': 'logo3.png'},
+            {'id': '4', 'name': 'org 4', 'text': 'org 4', 'colour': None, 'logo': 'logo4.png'},
+            {'id': '5', 'name': 'org 5', 'text': None, 'colour': 'blue', 'logo': 'logo5.png'},
         ]
 
     return mocker.patch(
@@ -2474,6 +2474,7 @@ def mock_get_email_branding(mocker, fake_uuid):
             'email_branding': {
                 'logo': 'example.png',
                 'name': 'Organisation name',
+                'text': 'Organisation text',
                 'id': fake_uuid,
                 'colour': '#f00'
             }
@@ -2486,7 +2487,7 @@ def mock_get_email_branding(mocker, fake_uuid):
 
 @pytest.fixture(scope='function')
 def mock_create_email_branding(mocker):
-    def _create_email_branding(logo, name, colour):
+    def _create_email_branding(logo, name, text, colour):
         return
 
     return mocker.patch(
@@ -2496,7 +2497,7 @@ def mock_create_email_branding(mocker):
 
 @pytest.fixture(scope='function')
 def mock_update_email_branding(mocker):
-    def _update_email_branding(branding_id, logo, name, colour):
+    def _update_email_branding(branding_id, logo, name, text, colour):
         return
 
     return mocker.patch(
