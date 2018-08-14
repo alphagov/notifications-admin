@@ -23,7 +23,7 @@ notifications-python-client==5.0.0
 # PaaS
 awscli-cwlogs>=1.4,<1.5
 
-git+https://github.com/alphagov/notifications-utils.git@29.3.6#egg=notifications-utils==29.3.6
+git+https://github.com/alphagov/notifications-utils.git@30.0.0#egg=notifications-utils==30.0.0
 
 ## The following requirements were added by pip freeze:
 awscli==1.15.77
