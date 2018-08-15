@@ -4,6 +4,7 @@ from flask_login import login_required
 from app import email_branding_client
 from app.main import main
 from app.main.forms import (
+    SearchTemplatesForm,
     ServiceSelectEmailBranding,
     ServiceUpdateEmailBranding,
 )
@@ -41,6 +42,8 @@ def email_branding():
         'views/email-branding/select-branding.html',
         form=form,
         branding_dict=get_branding_as_dict(brandings),
+        search_form=SearchTemplatesForm(),
+        show_search_box=len(brandings) > 9,
     )
 
 
