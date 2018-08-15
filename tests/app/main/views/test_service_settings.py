@@ -1718,11 +1718,10 @@ def test_set_letter_branding_saves(
     mock_update_service.assert_called_once_with(service_one['id'], dvla_organisation='500')
 
 
-def test_should_show_branding(
+def test_should_show_branding_types(
     logged_in_platform_admin_client,
     service_one,
     mock_get_all_email_branding,
-    mock_get_letter_email_branding,
 ):
     response = logged_in_platform_admin_client.get(url_for(
         'main.service_set_email_branding', service_id=service_one['id']
@@ -1744,7 +1743,7 @@ def test_should_show_branding(
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
 
 
-def test_should_show_organisations(
+def test_should_show_branding_styles(
     logged_in_platform_admin_client,
     service_one,
     mock_get_all_email_branding,
@@ -1755,15 +1754,19 @@ def test_should_show_organisations(
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    assert page.find('input', attrs={"id": "branding_type-0"})['value'] == 'govuk'
-    assert page.find('input', attrs={"id": "branding_type-1"})['value'] == 'both'
-    assert page.find('input', attrs={"id": "branding_type-2"})['value'] == 'org'
-    assert page.find('input', attrs={"id": "branding_type-3"})['value'] == 'org_banner'
+    assert page.find('input', attrs={"id": "branding_style-0"})['value'] == 'None'
+    assert page.find('input', attrs={"id": "branding_style-1"})['value'] == '1'
+    assert page.find('input', attrs={"id": "branding_style-2"})['value'] == '2'
+    assert page.find('input', attrs={"id": "branding_style-3"})['value'] == '3'
+    assert page.find('input', attrs={"id": "branding_style-4"})['value'] == '4'
+    assert page.find('input', attrs={"id": "branding_style-5"})['value'] == '5'
 
-    assert 'checked' in page.find('input', attrs={"id": "branding_type-0"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_type-1"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_type-2"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_type-3"}).attrs
+    assert 'checked' in page.find('input', attrs={"id": "branding_style-0"}).attrs
+    assert 'checked' not in page.find('input', attrs={"id": "branding_style-1"}).attrs
+    assert 'checked' not in page.find('input', attrs={"id": "branding_style-2"}).attrs
+    assert 'checked' not in page.find('input', attrs={"id": "branding_style-3"}).attrs
+    assert 'checked' not in page.find('input', attrs={"id": "branding_style-4"}).attrs
+    assert 'checked' not in page.find('input', attrs={"id": "branding_style-5"}).attrs
 
     app.email_branding_client.get_all_email_branding.assert_called_once_with()
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
