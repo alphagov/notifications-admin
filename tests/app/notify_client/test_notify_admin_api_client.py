@@ -99,6 +99,7 @@ def test_generate_headers_sets_request_id_if_in_request_context(app_):
         headers = api_client.generate_headers('api_token')
 
     assert set(headers.keys()) == {
-        'Authorization', 'Content-type', 'User-agent', 'X-Custom-Forwarder', 'X-B3-TraceId'
+        'Authorization', 'Content-type', 'User-agent', 'X-Custom-Forwarder', 'X-B3-TraceId', 'X-B3-SpanId',
     }
     assert headers['X-B3-TraceId'] == request_context.request.request_id
+    assert headers['X-B3-SpanId'] == request_context.request.span_id
