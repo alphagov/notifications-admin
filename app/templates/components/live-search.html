@@ -1,0 +1,21 @@
+{% from "components/textbox.html" import textbox %}
+
+{% macro live_search(
+    target_selector=None,
+    show=False,
+    form=None,
+    label=None
+) %}
+    {%- set search_label = label or form.search.label.text %}
+    {% if show %}
+      <div data-module="autofocus">
+        <div class="live-search" data-module="live-search" data-targets="{{ target_selector }}">
+          {{ textbox(
+            form.search,
+            width='1-1',
+            label=search_label
+          ) }}
+        </div>
+      </div>
+    {% endif %}
+{% endmacro %}

@@ -1,6 +1,7 @@
 {% from "components/pill.html" import pill %}
 {% from "components/message-count-label.html" import message_count_label %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/live-search.html" import live_search %}
 
 {% extends "withnav_template.html" %}
 
@@ -55,7 +56,7 @@
       </div>
     {% endif %}
 
-    {% include "views/templates/_search-box.html" %}
+    {{ live_search(target_selector='#template-list .column-whole', show=show_search_box, form=search_form) }}
 
     <nav class="grid-row" id=template-list>
       {% for template in templates %}
