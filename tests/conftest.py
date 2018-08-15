@@ -2435,8 +2435,8 @@ def mock_get_all_email_branding(mocker):
             {'id': '1', 'name': 'org 1', 'text': 'org 1', 'colour': 'red', 'logo': 'logo1.png'},
             {'id': '2', 'name': 'org 2', 'text': 'org 2', 'colour': 'orange', 'logo': 'logo2.png'},
             {'id': '3', 'name': 'org 3', 'text': None, 'colour': None, 'logo': 'logo3.png'},
-            {'id': '4', 'name': 'org 4', 'text': 'org 4', 'colour': None, 'logo': 'logo4.png'},
             {'id': '5', 'name': 'org 5', 'text': None, 'colour': 'blue', 'logo': 'logo5.png'},
+            {'id': '4', 'name': 'org 4', 'text': 'org 4', 'colour': None, 'logo': 'logo4.png'},
         ]
 
     return mocker.patch(
