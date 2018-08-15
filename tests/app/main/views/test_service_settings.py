@@ -1753,20 +1753,30 @@ def test_should_show_branding_styles(
     ))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    branding_style_choices = page.find_all('input', attrs={"name": "branding_style"})
 
-    assert page.find('input', attrs={"id": "branding_style-0"})['value'] == 'None'
-    assert page.find('input', attrs={"id": "branding_style-1"})['value'] == '1'
-    assert page.find('input', attrs={"id": "branding_style-2"})['value'] == '2'
-    assert page.find('input', attrs={"id": "branding_style-3"})['value'] == '3'
-    assert page.find('input', attrs={"id": "branding_style-4"})['value'] == '4'
-    assert page.find('input', attrs={"id": "branding_style-5"})['value'] == '5'
+    radio_labels = [
+        page.find('label', attrs={"for": branding_style_choices[idx]['id']}).get_text().strip()
+        for idx, element in enumerate(branding_style_choices)]
 
-    assert 'checked' in page.find('input', attrs={"id": "branding_style-0"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_style-1"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_style-2"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_style-3"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_style-4"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_style-5"}).attrs
+    assert len(branding_style_choices) == 6
+
+    assert branding_style_choices[0]['value'] == 'None'
+    assert branding_style_choices[1]['value'] == '1'
+    assert branding_style_choices[2]['value'] == '2'
+    assert branding_style_choices[3]['value'] == '3'
+    assert branding_style_choices[4]['value'] == '4'
+    assert branding_style_choices[5]['value'] == '5'
+
+    # radios should be in alphabetical order, based on their labels
+    assert radio_labels == ['None', 'org 1', 'org 2', 'org 3', 'org 4', 'org 5']
+
+    assert 'checked' in branding_style_choices[0].attrs
+    assert 'checked' not in branding_style_choices[1].attrs
+    assert 'checked' not in branding_style_choices[2].attrs
+    assert 'checked' not in branding_style_choices[3].attrs
+    assert 'checked' not in branding_style_choices[4].attrs
+    assert 'checked' not in branding_style_choices[5].attrs
 
     app.email_branding_client.get_all_email_branding.assert_called_once_with()
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])

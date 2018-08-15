@@ -20,15 +20,19 @@ def test_email_branding_page_shows_full_branding_list(
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    radio_labels = page.select('div.multiple-choice > label')
+    brand_names = [element.get_text().strip() for idx, element in enumerate(radio_labels)]
 
     assert normalize_spaces(
         page.select_one('h1').text
     ) == "Select an email branding to update or create a new email branding"
 
-    first_label = page.select('div.multiple-choice > label')[0]
+    first_label = radio_labels[0]
     assert normalize_spaces(first_label.text) == 'org 1'
+    assert brand_names == [
+        'org 1', 'org 2', 'org 3', 'org 4', 'org 5', 'Create a new email branding']
 
-    assert normalize_spaces((page.select('div.multiple-choice > label')[-1]).text) == 'Create a new email branding'
+    assert normalize_spaces((radio_labels[-1]).text) == 'Create a new email branding'
 
 
 def test_edit_email_branding_shows_the_correct_branding_info(
