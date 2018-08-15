@@ -29,7 +29,8 @@ def email_branding():
     brandings = email_branding_client.get_all_email_branding()
 
     form = ServiceSelectEmailBranding()
-    form.email_branding.choices = get_branding_as_value_and_label(brandings) + [('None', 'Create a new email branding')]
+    email_brandings = sorted(get_branding_as_value_and_label(brandings), key=lambda tup: tup[1].lower())
+    form.email_branding.choices = email_brandings + [('None', 'Create a new email branding')]
 
     if form.validate_on_submit():
         if form.email_branding.data != 'None':
