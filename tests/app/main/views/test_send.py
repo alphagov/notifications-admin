@@ -2916,7 +2916,7 @@ TRIAL_MODE_MSG = (
     'Can’t send to this recipient when service is in trial mode – '
     'see https://www.notifications.service.gov.uk/trial-mode'
 )
-TOO_LONG_MSG = 'Content for template has a character count greater than the limit of 495'
+TOO_LONG_MSG = 'Content for template has a character count greater than the limit of 612'
 SERVICE_DAILY_LIMIT_MSG = 'Exceeded send limits (1000) for today'
 
 
@@ -2929,7 +2929,7 @@ SERVICE_DAILY_LIMIT_MSG = 'Exceeded send limits (1000) for today'
     (
         TOO_LONG_MSG,
         'Message too long',
-        'Text messages can’t be longer than 459 characters. Your message is 554 characters.'
+        'Text messages can’t be longer than 612 characters. Your message is 654 characters.'
     ),
     (
         SERVICE_DAILY_LIMIT_MSG,
@@ -2957,7 +2957,7 @@ def test_send_notification_shows_error_if_400(
     )
     with client_request.session_transaction() as session:
         session['recipient'] = '07700900001'
-        session['placeholders'] = {'name': 'a' * 500}
+        session['placeholders'] = {'name': 'a' * 600}
 
     page = client_request.post(
         'main.send_notification',

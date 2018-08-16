@@ -47,7 +47,8 @@
         {% for message_length, charge in [
           ('Up to 160 characters', '1 text message'),
           ('Up to 306 characters', '2 text messages'),
-          ('Up to 459 characters', '3 text messages')
+          ('Up to 459 characters', '3 text messages'),
+          ('Up to 612 characters', '4 text messages'),
         ] %}
           {% call row() %}
             {{ text_field(message_length) }}
