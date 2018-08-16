@@ -523,7 +523,7 @@ def mock_get_international_service(mocker, api_user_active):
 
 @pytest.fixture(scope='function')
 def mock_get_service_statistics(mocker, api_user_active):
-    def _get(service_id, today_only):
+    def _get(service_id, today_only, limit_days=None):
         return {
             'email': {'requested': 0, 'delivered': 0, 'failed': 0},
             'sms': {'requested': 0, 'delivered': 0, 'failed': 0},
@@ -531,6 +531,14 @@ def mock_get_service_statistics(mocker, api_user_active):
         }
 
     return mocker.patch('app.service_api_client.get_service_statistics', side_effect=_get)
+
+
+@pytest.fixture(scope='function')
+def mock_get_service_data_retention_by_notification_type(mocker, api_user_active):
+    def _get(service_id, notification_type):
+        return {}
+
+    return mocker.patch('app.service_api_client.get_service_data_retention_by_notification_type', side_effect=_get)
 
 
 @pytest.fixture(scope='function')

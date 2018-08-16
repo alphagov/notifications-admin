@@ -41,8 +41,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         return self.get('/service/{0}'.format(service_id))
 
-    def get_service_statistics(self, service_id, today_only):
-        return self.get('/service/{0}/statistics'.format(service_id), params={'today_only': today_only})['data']
+    def get_service_statistics(self, service_id, today_only, limit_days=None):
+        return self.get('/service/{0}/statistics'.format(service_id), params={
+            'today_only': today_only, 'limit_days': limit_days
+        })['data']
 
     def get_services(self, params_dict=None):
         """
@@ -497,6 +499,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     def get_service_data_retention(self, service_id):
         return self.get("/service/{}/data-retention".format(service_id))
+
+    def get_service_data_retention_by_notification_type(self, service_id, notification_type):
+        return self.get("/service/{}/data-retention/notification-type/{}".format(service_id, notification_type))
 
     def get_service_data_retention_by_id(self, service_id, data_retention_id):
         return self.get("service/{}/data-retention/{}".format(service_id, data_retention_id))

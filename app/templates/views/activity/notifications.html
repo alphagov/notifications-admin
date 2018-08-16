@@ -11,7 +11,7 @@
       notifications,
       caption="Recent activity",
       caption_visible=False,
-      empty_message='No messages found &thinsp;(messages are kept for 7 days)'|safe,
+      empty_message='No messages found &thinsp;(messages are kept for {} days)'.format(limit_days)|safe,
       field_headings=['Recipient', 'Status'],
       field_headings_visible=False
     ) %}
