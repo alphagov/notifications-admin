@@ -147,6 +147,32 @@ def test_should_not_show_template_nav_if_only_one_type_of_template(
     assert not page.select('.pill')
 
 
+def test_should_not_show_live_search_if_list_of_templates_fits_onscreen(
+    client_request,
+    mock_get_service_templates
+):
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert not page.select('.live-search')
+
+
+def test_should_show_live_search_if_list_of_templates_taller_than_screen(
+    client_request,
+    mock_get_more_service_templates_than_can_fit_onscreen
+):
+
+    page = client_request.get(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert page.select('.live-search')
+
+
 def test_should_show_page_for_one_template(
     logged_in_client,
     mock_get_service_template,
