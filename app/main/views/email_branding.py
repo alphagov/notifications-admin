@@ -26,10 +26,11 @@ from app.utils import get_cdn_domain, user_is_platform_admin
 @login_required
 @user_is_platform_admin
 def email_branding():
-    brandings = email_branding_client.get_all_email_branding()
+    brandings = email_branding_client.get_all_email_branding(sort_key='name')
 
     form = ServiceSelectEmailBranding()
-    form.email_branding.choices = get_branding_as_value_and_label(brandings) + [('None', 'Create a new email branding')]
+    email_brandings = get_branding_as_value_and_label(brandings)
+    form.email_branding.choices = email_brandings + [('None', 'Create a new email branding')]
 
     if form.validate_on_submit():
         if form.email_branding.data != 'None':
