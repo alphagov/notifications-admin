@@ -956,40 +956,31 @@ def mock_update_service_template_400_content_too_big(mocker):
         side_effect=_update)
 
 
+def create_service_templates(service_id, number_of_templates=6):
+    template_types = ["sms", "sms", "email", "email", "letter", "letter"]
+    service_templates = []
+
+    for _ in range(1, number_of_templates + 1):
+        template_number = "two" if _ % 2 == 0 else "one"
+        template_type = template_types[(_ % 6) - 1]
+
+        service_templates.append(template_json(
+            service_id,
+            TEMPLATE_ONE_ID if _ == 1 else str(generate_uuid),
+            "{}_template_{}".format(template_type, template_number),
+            template_type,
+            "{} template {} content".format(template_type, template_number),
+            subject="{} template {} subject".format(template_type, template_number)
+                    if template_type in ["email", "letter"] else None
+        ))
+
+    return {'data': service_templates}
+
+
 @pytest.fixture(scope='function')
 def mock_get_service_templates(mocker):
-    uuid1 = TEMPLATE_ONE_ID
-    uuid2 = str(generate_uuid())
-    uuid3 = str(generate_uuid())
-    uuid4 = str(generate_uuid())
-    uuid5 = str(generate_uuid())
-    uuid6 = str(generate_uuid())
-
     def _create(service_id):
-        return {'data': [
-            template_json(
-                service_id, uuid1, "sms_template_one", "sms", "sms template one content"
-            ),
-            template_json(
-                service_id, uuid2, "sms_template_two", "sms", "sms template two content"
-            ),
-            template_json(
-                service_id, uuid3, "email_template_one", "email", "email template one content",
-                subject='email template one subject',
-            ),
-            template_json(
-                service_id, uuid4, "email_template_two", "email", "email template two content",
-                subject='email template two subject',
-            ),
-            template_json(
-                service_id, uuid5, "letter_template_one", "letter", "letter template one content",
-                subject='letter template one subject',
-            ),
-            template_json(
-                service_id, uuid6, "letter_template_two", "letter", "letter template two content",
-                subject='letter template two subject',
-            ),
-        ]}
+        return create_service_templates(service_id)
 
     return mocker.patch(
         'app.service_api_client.get_service_templates',
