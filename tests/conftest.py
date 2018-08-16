@@ -990,7 +990,7 @@ def mock_get_service_templates(mocker):
 @pytest.fixture(scope='function')
 def mock_get_more_service_templates_than_can_fit_onscreen(mocker):
     def _create(service_id):
-        return create_service_templates(service_id, number_of_templates=10)
+        return create_service_templates(service_id, number_of_templates=20)
 
     return mocker.patch(
         'app.service_api_client.get_service_templates',
