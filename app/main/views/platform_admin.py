@@ -11,7 +11,10 @@ from app import (
 )
 from app.main import main
 from app.main.forms import DateFilterForm
-from app.statistics_utils import get_formatted_percentage
+from app.statistics_utils import (
+    get_formatted_percentage,
+    get_formatted_percentage_two_dp,
+)
 from app.utils import (
     generate_next_dict,
     generate_previous_dict,
@@ -54,7 +57,7 @@ def is_over_threshold(number, total, threshold):
 
 def get_status_box_data(stats, key, label, threshold=FAILURE_THRESHOLD):
     return {
-        'number': stats['failures'][key],
+        'number': "{:,}".format(stats['failures'][key]),
         'label': label,
         'failing': is_over_threshold(
             stats['failures'][key],
@@ -88,7 +91,7 @@ def make_columns(global_stats, complaints_number):
                     'label': 'complaints',
                     'failing': is_over_threshold(complaints_number,
                                                  global_stats['email']['total'], COMPLAINT_THRESHOLD),
-                    'percentage': get_formatted_percentage(complaints_number, global_stats['email']['total']),
+                    'percentage': get_formatted_percentage_two_dp(complaints_number, global_stats['email']['total']),
                     'url': url_for('main.platform_admin_list_complaints')
                 }
             ],
