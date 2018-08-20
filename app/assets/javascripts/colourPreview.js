@@ -9,7 +9,10 @@
     this.start = component => {
 
       this.$input = $('input', component);
-      this.$preview = $('.textbox-colour-preview', component);
+
+      $(component).append(
+        this.$preview = $('<span class="textbox-colour-preview"></span>')
+      );
 
       this.$input
         .on('change keyup', this.update)
