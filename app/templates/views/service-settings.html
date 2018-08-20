@@ -80,7 +80,7 @@
         {% endcall %}
 
         {% call settings_row(if_has_permission='email') %}
-          {{ text_field('Email reply to addresses') }}
+          {{ text_field('Email reply-to addresses') }}
           {% call field(status='default' if default_reply_to_email_address == "Not set" else '') %}
 
             {{ default_reply_to_email_address }}
