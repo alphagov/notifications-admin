@@ -33,7 +33,7 @@
         {% if has_email_templates %}
           {{ tick_cross_done_not_done(
             has_email_reply_to_address,
-            'Add an <a href="{}">email reply to address</a>'.format(
+            'Add an <a href="{}">email reply-to address</a>'.format(
               url_for('main.service_email_reply_to', service_id=current_service.id)
             )|safe,
           ) }}

@@ -55,7 +55,7 @@ def mock_get_service_settings_page_common(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to addresses Not set Change',
+        'Email reply-to addresses Not set Change',
         'Email branding GOV.UK Change',
 
         'Label Value Action',
@@ -77,7 +77,7 @@ def mock_get_service_settings_page_common(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to addresses Not set Change',
+        'Email reply-to addresses Not set Change',
         'Email branding GOV.UK Change',
 
         'Label Value Action',
@@ -138,7 +138,7 @@ def test_should_show_overview(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to addresses test@example.com Manage',
+        'Email reply-to addresses test@example.com Manage',
         'Email branding GOV.UK Change',
 
         'Label Value Action',
@@ -159,7 +159,7 @@ def test_should_show_overview(
 
         'Label Value Action',
         'Send emails On Change',
-        'Email reply to addresses test@example.com Manage',
+        'Email reply-to addresses test@example.com Manage',
         'Email branding GOV.UK Change',
 
         'Label Value Action',
@@ -514,8 +514,8 @@ def test_should_raise_duplicate_name_handled(
 @pytest.mark.parametrize('count_of_email_templates, reply_to_email_addresses, expected_reply_to_checklist_item', [
     pytest.mark.xfail((0, [], ''), raises=IndexError),
     pytest.mark.xfail((0, [{}], ''), raises=IndexError),
-    (1, [], 'Not done: Add an email reply to address'),
-    (1, [{}], 'Done: Add an email reply to address'),
+    (1, [], 'Not done: Add an email reply-to address'),
+    (1, [{}], 'Done: Add an email reply-to address'),
 ])
 def test_should_show_request_to_go_live_checklist(
     client_request,
@@ -816,7 +816,7 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
             page.select('tbody tr')[index].text
         )
 
-    assert get_row(page, 3) == "Email reply to addresses test@example.com …and 2 more Manage"
+    assert get_row(page, 3) == "Email reply-to addresses test@example.com …and 2 more Manage"
     assert get_row(page, 6) == "Text message sender Example …and 2 more Manage"
     assert get_row(page, 11) == "Sender addresses 1 Example Street …and 2 more Manage"
 
@@ -901,7 +901,7 @@ def test_default_option_shows_for_default_sender(
     (
         'main.service_email_reply_to',
         no_reply_to_email_addresses,
-        'You haven’t added any email reply to addresses yet'
+        'You haven’t added any email reply-to addresses yet'
     ),
     (
         'main.service_letter_contact_details',
@@ -1226,7 +1226,7 @@ def test_confirm_delete_reply_to_email_address(
     )
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
-        'Are you sure you want to delete this email reply to address?'
+        'Are you sure you want to delete this email reply-to address?'
     )
     assert 'action' not in page.select_one('.banner-dangerous form')
     assert page.select_one('.banner-dangerous form')['method'] == 'post'
@@ -1320,14 +1320,14 @@ def test_edit_sms_sender(
     (
         'main.service_edit_email_reply_to',
         get_default_reply_to_email_address,
-        'This is the default reply to address for service one emails',
+        'This is the default reply-to address for service one emails',
         'reply_to_email_id',
         False
     ),
     (
         'main.service_edit_email_reply_to',
         get_non_default_reply_to_email_address,
-        'This is the default reply to address for service one emails',
+        'This is the default reply-to address for service one emails',
         'reply_to_email_id',
         True
     ),
