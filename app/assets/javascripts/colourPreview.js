@@ -15,7 +15,7 @@
       );
 
       this.$input
-        .on('change keyup', this.update)
+        .on('input', this.update)
         .trigger('change');
 
     };
