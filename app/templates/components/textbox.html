@@ -60,10 +60,9 @@
 
 {% macro colour_textbox(
   field,
-  width='2-3',
-  colour='#FFFFFF'
+  width='2-3'
 ) %}
-  <div class="form-group{% if field.errors %} form-group-error{% endif %}">
+  <div class="form-group{% if field.errors %} form-group-error{% endif %}" data-module="colour-preview">
     <label class="form-label" for="{{ field.name }}">
       {{ field.label.text }}
       {% if field.errors %}
@@ -80,6 +79,6 @@
       rows='1',
       **kwargs
     ) }}
-    <span class="textbox-colour-preview" style="background:{{ colour }}"></span>
+    <span class="textbox-colour-preview"></span>
   </div>
 {% endmacro %}

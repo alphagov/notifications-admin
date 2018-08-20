@@ -34,15 +34,5 @@
         </div>
       </form>
     </div>
-  </div>
-  <script type="text/javascript">
-    function update_colour(element){
-      colour_preview = document.getElementsByClassName("textbox-colour-preview")[0];
-      if (element.value.match(/^#[0-9A-F]{6}$/i)) {
-        colour_preview.style.background = element.value;
-      } else {
-        colour_preview.style.background = '#FFFFFF';
-      }
-    }
-  </script>
+
 {% endblock %}
