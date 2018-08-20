@@ -12,7 +12,6 @@
   <h1 class="heading-large">{{ '{} email branding'.format('Update' if email_branding else 'Create')}}</h1>
   <div class="grid-row">
     <div class="column-three-quarters">
-
       {% if logo %}
         <div id="logo-img">
           <img src="https://{{ cdn_url }}/{{ logo }}"/>
@@ -24,6 +23,9 @@
           <div style='margin-top:15px;'>{{textbox(form.name)}}</div>
           <div style='margin-top:15px;'>{{textbox(form.text)}}</div>
           {{colour_textbox(form.colour, width='1-4', colour=email_branding.colour if email_branding)}}
+          {{colour_textbox(form.banner_colour, width='1-4', colour=email_branding.banner_colour if email_branding)}}
+          {{colour_textbox(form.single_id_colour, width='1-4', colour=email_branding.single_id_colour if email_branding)}}
+           <div style='margin-top:15px;'>{{textbox(form.domain)}}</div>
           {{ page_footer(
             'Save',
             back_link=url_for('.email_branding'),

@@ -51,6 +51,9 @@ def test_edit_email_branding_shows_the_correct_branding_info(
     assert page.select_one('#name').attrs.get('value') == 'Organisation name'
     assert page.select_one('#text').attrs.get('value') == 'Organisation text'
     assert page.select_one('#colour').attrs.get('value') == '#f00'
+    assert page.select_one('#banner_colour').attrs.get('value') == '#f11'
+    assert page.select_one('#single_id_colour').attrs.get('value') == '#f22'
+    assert page.select_one('#domain').attrs.get('value') == 'sample.com'
 
 
 def test_create_email_branding_does_not_show_any_branding_info(
@@ -69,6 +72,9 @@ def test_create_email_branding_does_not_show_any_branding_info(
     assert page.select_one('#name').attrs.get('value') == ''
     assert page.select_one('#text').attrs.get('value') == ''
     assert page.select_one('#colour').attrs.get('value') == ''
+    assert page.select_one('#banner_colour').attrs.get('value') == ''
+    assert page.select_one('#single_id_colour').attrs.get('value') == ''
+    assert page.select_one('#domain').attrs.get('value') == ''
 
 
 def test_create_new_email_branding_without_logo(
@@ -82,6 +88,9 @@ def test_create_new_email_branding_without_logo(
         'colour': '#ff0000',
         'text': 'new text',
         'name': 'new name',
+        'domain': 'sample.com',
+        'banner_colour': '#FFFF00',
+        'single_id_colour': '#00FF00',
     }
 
     mock_persist = mocker.patch('app.main.views.email_branding.persist_logo')
@@ -98,7 +107,10 @@ def test_create_new_email_branding_without_logo(
         logo=data['logo'],
         name=data['name'],
         text=data['text'],
-        colour=data['colour']
+        colour=data['colour'],
+        banner_colour=data['banner_colour'],
+        single_id_colour=data['single_id_colour'],
+        domain=data['domain']
     )
     assert mock_persist.call_args_list == []
 
@@ -117,6 +129,9 @@ def test_create_new_email_branding_when_branding_saved(
         'colour': '#ff0000',
         'text': 'new text',
         'name': 'new name',
+        'domain': 'sample.com',
+        'banner_colour': '#FFFF00',
+        'single_id_colour': '#00FF00',
     }
 
     temp_filename = LOGO_LOCATION_STRUCTURE.format(
@@ -135,7 +150,10 @@ def test_create_new_email_branding_when_branding_saved(
             'colour': data['colour'],
             'name': data['name'],
             'text': data['text'],
-            'cdn_url': 'https://static-logos.cdn.com'
+            'cdn_url': 'https://static-logos.cdn.com',
+            'domain': data['domain'],
+            'banner_colour': data['banner_colour'],
+            'single_id_colour': data['single_id_colour'],
         }
     )
 
@@ -144,7 +162,10 @@ def test_create_new_email_branding_when_branding_saved(
         logo=data['logo'],
         name=data['name'],
         text=data['text'],
-        colour=data['colour']
+        colour=data['colour'],
+        banner_colour=data['banner_colour'],
+        single_id_colour=data['single_id_colour'],
+        domain=data['domain']
     )
 
 
@@ -195,7 +216,7 @@ def test_deletes_previous_temp_logo_after_uploading_logo(
     assert mocked_delete_temp_file.call_args == call(temp_old_filename)
 
 
-def test_update_exisiting_branding(
+def test_update_existing_branding(
     logged_in_platform_admin_client,
     mocker,
     fake_uuid,
@@ -209,7 +230,10 @@ def test_update_exisiting_branding(
         'logo': 'test.png',
         'colour': '#0000ff',
         'text': 'new text',
-        'name': 'new name'
+        'name': 'new name',
+        'banner_colour': '#FFFF00',
+        'single_id_colour': '#00FF00',
+        'domain': 'sample.com',
     }
 
     temp_filename = LOGO_LOCATION_STRUCTURE.format(
@@ -225,7 +249,10 @@ def test_update_exisiting_branding(
         url_for('.update_email_branding', logo=temp_filename, branding_id=fake_uuid),
         content_type='multipart/form-data',
         data={'colour': data['colour'], 'name': data['name'], 'text': data['text'],
-              'cdn_url': 'https://static-logos.cdn.com'}
+              'cdn_url': 'https://static-logos.cdn.com',
+              'banner_colour': data['banner_colour'], 'single_id_colour': data['single_id_colour'],
+              'domain': data['domain']
+              }
     )
 
     assert mock_update_email_branding.called
@@ -234,7 +261,10 @@ def test_update_exisiting_branding(
         logo=data['logo'],
         name=data['name'],
         text=data['text'],
-        colour=data['colour']
+        colour=data['colour'],
+        banner_colour=data['banner_colour'],
+        single_id_colour=data['single_id_colour'],
+        domain=data['domain'],
     )
 
 
@@ -316,7 +346,10 @@ def test_colour_regex_validation(
         'logo': None,
         'colour': colour_hex,
         'text': 'new text',
-        'name': 'new name'
+        'name': 'new name',
+        'domain': 'sample.com',
+        'banner_colour': '#FFFF00',
+        'single_id_colour': '#00FF00',
     }
 
     mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
