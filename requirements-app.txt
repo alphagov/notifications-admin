@@ -14,7 +14,7 @@ pyexcel-xlsx==0.5.6
 pyexcel-ods3==0.5.2
 pytz==2018.5
 gunicorn==19.8.1
-whitenoise==3.3.1  #manages static assets
+whitenoise==4.0  #manages static assets
 eventlet==0.22.1
 notifications-python-client==5.0.0
 
