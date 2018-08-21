@@ -15,9 +15,8 @@
         Your letters have the {{ letter_branding }} logo.
       </p>
       <p>
-        If you want a different logo then
-        <a href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback', body='letter-branding') }}">contact support</a>
-        and we’ll help you set one up.
+        <a href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback', body='letter-branding') }}">Contact support</a>
+        if you want to use a different logo.
       </p>
       {{ page_footer(
         back_link=url_for('.service_settings', service_id=current_service.id),
