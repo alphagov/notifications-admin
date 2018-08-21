@@ -173,7 +173,7 @@ def test_should_show_overview(
         'Send letters Off Change',
 
     ]),
-    (['letters'], [
+    (['letter'], [
 
         'Service name service one Change',
         'Sign-in method Text message code Change',
@@ -185,7 +185,9 @@ def test_should_show_overview(
         'Send text messages Off Change',
 
         'Label Value Action',
-        'Send letters Off Change',
+        'Send letters On Change',
+        'Sender addresses 1 Example Street Manage',
+        'Letter branding HM Government Change',
 
     ]),
 ])
@@ -1674,6 +1676,24 @@ def test_set_letter_contact_block_has_max_10_lines(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     error_message = page.find('span', class_='error-message').text.strip()
     assert error_message == 'Contains 11 lines, maximum is 10'
+
+
+def test_request_letter_branding(
+    client_request,
+    mock_get_letter_email_branding,
+):
+    request_page = client_request.get(
+        'main.request_letter_branding',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert request_page.select_one('main p').text.strip() == (
+        'Your letters have the HM Government logo.'
+    )
+    link_href = request_page.select_one('main a')['href']
+    feedback_page = client_request.get_url(link_href)
+    assert feedback_page.select_one('textarea').text.strip() == (
+        'I would like my own logo on my letter templates.'
+    )
 
 
 def test_set_letter_branding_platform_admin_only(

@@ -227,6 +227,16 @@
           }}
         {% endcall %}
 
+        {% call settings_row(if_has_permission='letter') %}
+          {{ text_field('Letter branding') }}
+          {{ text_field(letter_branding) }}
+          {{ edit_field(
+            'Change',
+            url_for('.request_letter_branding', service_id=current_service.id),
+            permissions=['manage_service']
+          )}}
+        {% endcall %}
+
       {% endcall %}
     </div>
 
