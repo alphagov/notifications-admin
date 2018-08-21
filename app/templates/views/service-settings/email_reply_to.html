@@ -4,7 +4,7 @@
 {% from "components/table.html" import row_group, row, text_field, edit_field, field, boolean_field, list_table with context %}
 
 {% block service_page_title %}
-  Email reply to addresses
+  Email reply-to addresses
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -12,7 +12,7 @@
   <div class="grid-row bottom-gutter">
     <div class="column-two-thirds">
       <h1 class="heading-large">
-        Email reply to addresses
+        Email reply-to addresses
       </h1>
     </div>
   {% if current_user.has_permissions('manage_service') %}
@@ -24,7 +24,7 @@
   <div class="user-list">
     {% if not reply_to_email_addresses %}
       <div class="user-list-item">
-        <span class="hint">You haven’t added any email reply to addresses yet</span>
+        <span class="hint">You haven’t added any email reply-to addresses yet</span>
       </div>
     {% endif %}
     {% for item in reply_to_email_addresses %}
@@ -60,7 +60,7 @@
         from your users.
         {% if current_service.restricted and not reply_to_email_addresses %}
           Your service can’t go live until you’ve added at least one
-          reply to address.
+          reply-to address.
         {% endif %}
       </p>
     </div>
