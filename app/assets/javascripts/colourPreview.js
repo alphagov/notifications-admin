@@ -1,0 +1,29 @@
+(function(Modules) {
+  "use strict";
+
+  let isSixDigitHex = value => value.match(/^#[0-9A-F]{6}$/i);
+  let colourOrWhite = value => isSixDigitHex(value) ? value : '#FFFFFF';
+
+  Modules.ColourPreview = function() {
+
+    this.start = component => {
+
+      this.$input = $('input', component);
+
+      $(component).append(
+        this.$preview = $('<span class="textbox-colour-preview"></span>')
+      );
+
+      this.$input
+        .on('input', this.update)
+        .trigger('change');
+
+    };
+
+    this.update = () => this.$preview.css(
+      'background', colourOrWhite(this.$input.val())
+    );
+
+  };
+
+})(window.GOVUK.Modules);

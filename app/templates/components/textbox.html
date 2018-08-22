@@ -4,6 +4,7 @@
   hint=False,
   highlight_tags=False,
   autofocus=False,
+  colour_preview=False,
   help_link=None,
   help_link_text=None,
   width='2-3',
@@ -11,7 +12,10 @@
   safe_error_message=False,
   rows=8
 ) %}
-  <div class="form-group{% if field.errors %} form-group-error{% endif %}" {% if autofocus %}data-module="autofocus"{% endif %}>
+  <div
+    class="form-group{% if field.errors %} form-group-error{% endif %}"
+    data-module="{% if autofocus %}autofocus{% elif colour_preview %}colour-preview{% endif %}"
+  >
     <label class="form-label" for="{{ field.name }}">
       {% if label %}
         {{ label }}
@@ -55,31 +59,5 @@
         <a href='{{ help_link }}'>{{ help_link_text }}</a>
       </p>
     {% endif %}
-  </div>
-{% endmacro %}
-
-{% macro colour_textbox(
-  field,
-  width='2-3',
-  colour='#FFFFFF'
-) %}
-  <div class="form-group{% if field.errors %} form-group-error{% endif %}">
-    <label class="form-label" for="{{ field.name }}">
-      {{ field.label.text }}
-      {% if field.errors %}
-        <span class="error-message" data-module="track-error" data-error-type="{{ field.errors[0] }}" data-error-label="{{ field.name }}">
-          {{ field.errors[0] }}
-        </span>
-      {% endif %}
-    </label>
-    {% set field_class = 'form-control-{} {}'.format(width, 'textbox-right-aligned' if suffix else '') %}
-    {% set field_class = 'form-control ' + field_class + (' form-control-error' if field.errors else '') %}
-    {{ field(
-      class=field_class,
-      data_module='',
-      rows='1',
-      **kwargs
-    ) }}
-    <span class="textbox-colour-preview" style="background:{{ colour }}"></span>
   </div>
 {% endmacro %}
