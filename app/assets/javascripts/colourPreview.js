@@ -16,7 +16,7 @@
 
       this.$input
         .on('input', this.update)
-        .trigger('change');
+        .trigger('input');
 
     };
 
