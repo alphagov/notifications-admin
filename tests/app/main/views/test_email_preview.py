@@ -4,6 +4,8 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
+from app.main.views.index import _set_colour
+
 
 @pytest.mark.parametrize(
     "query_args, result", [
@@ -86,7 +88,7 @@ def test_displays_org_branding_with_banner(client, mock_get_email_branding):
 
     assert not page.find("a", attrs={"href": "https://www.gov.uk"})
     assert page.find("img", attrs={"src": re.compile("example.png")})
-    assert page.select("body > table > tr > td[bgcolor='#f00']")  # banner colour is set
+    assert page.select("body > table > tr > td[bgcolor='#f11']")  # banner colour is set
     assert page.select("body > table table > tr > td > span")[0]\
         .get_text().strip() == 'Organisation text'  # brand text is set
 
@@ -104,5 +106,28 @@ def test_displays_org_branding_with_banner_without_brand_text(
 
     assert not page.find("a", attrs={"href": "https://www.gov.uk"})
     assert page.find("img", attrs={"src": re.compile("example.png")})
-    assert page.select("body > table > tr > td[bgcolor='#f00']")  # banner colour is set
+    assert page.select("body > table > tr > td[bgcolor='#f11']")  # banner colour is set
     assert not page.select("body > table table > tr > td > span") == 0  # brand text is not set
+
+
+@pytest.mark.parametrize('colour, banner_colour, single_id_colour, branding_type, expected_colour', [
+    ('black', 'yellow', 'red', 'org', 'red'),
+    ('black', 'yellow', None, 'org', 'black'),
+    ('black', 'yellow', 'red', 'org_banner', 'yellow'),
+    ('black', None, 'red', 'org_banner', 'black'),
+    ('black', 'yellow', 'red', 'govuk', None),
+    ('black', 'yellow', 'red', 'both', 'red'),
+    ('black', 'yellow', None, 'both', 'black'),
+])
+def test_set_colour(colour, banner_colour, single_id_colour, branding_type, expected_colour):
+    email_branding = {
+        'logo': None,
+        'colour': colour,
+        'text': 'new text',
+        'name': 'new name',
+        'domain': 'sample.com',
+        'banner_colour': banner_colour,
+        'single_id_colour': single_id_colour,
+    }
+    colour = _set_colour(branding_type, email_branding)
+    assert colour == expected_colour

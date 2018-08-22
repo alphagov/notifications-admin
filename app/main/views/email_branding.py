@@ -4,7 +4,6 @@ from flask_login import login_required
 from app import email_branding_client
 from app.main import main
 from app.main.forms import (
-    ServiceCreateEmailBranding,
     ServiceSelectEmailBranding,
     ServiceUpdateEmailBranding,
 )
@@ -109,7 +108,7 @@ def update_email_branding(branding_id, logo=None):
 @login_required
 @user_is_platform_admin
 def create_email_branding(logo=None):
-    form = ServiceCreateEmailBranding()
+    form = ServiceUpdateEmailBranding()
 
     if form.validate_on_submit():
         if form.file.data:

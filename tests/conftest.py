@@ -2514,7 +2514,9 @@ def mock_get_email_branding_without_brand_text(mocker, fake_uuid):
                 'name': 'Organisation name',
                 'text': '',
                 'id': fake_uuid,
-                'colour': '#f00'
+                'colour': '#f00',
+                'banner_colour': '#f11',
+                'single_id_colour': '#f22'
             }
         }
 
