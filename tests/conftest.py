@@ -2436,25 +2436,36 @@ def mock_send_already_registered_email(mocker):
     return mocker.patch('app.user_api_client.send_already_registered_email')
 
 
+def create_email_brandings(number_of_brandings, non_standard_values={}, shuffle=False):
+    brandings = [
+        {
+            'id': str(idx),
+            'name': 'org {}'.format(idx),
+            'text': 'org {}'.format(idx),
+            'colour': None,
+            'logo': 'logo{}.png'.format(idx),
+        } for idx in range(1, number_of_brandings + 1)]
+
+    for idx, row in enumerate(non_standard_values):
+        brandings[row['idx']].update(non_standard_values)
+
+    if shuffle:
+        brandings.insert(3, brandings.pop(4))
+
+    return brandings
+
+
 @pytest.fixture(scope='function')
 def mock_get_all_email_branding(mocker):
     def _get_all_email_branding(sort_key=None):
-        if sort_key:
-            return [
-                {'id': '1', 'name': 'org 1', 'text': 'org 1', 'colour': 'red', 'logo': 'logo1.png'},
-                {'id': '2', 'name': 'org 2', 'text': 'org 2', 'colour': 'orange', 'logo': 'logo2.png'},
-                {'id': '3', 'name': 'org 3', 'text': None, 'colour': None, 'logo': 'logo3.png'},
-                {'id': '4', 'name': 'org 4', 'text': 'org 4', 'colour': None, 'logo': 'logo4.png'},
-                {'id': '5', 'name': 'org 5', 'text': None, 'colour': 'blue', 'logo': 'logo5.png'},
-            ]
-        else:
-            return [
-                {'id': '1', 'name': 'org 1', 'text': 'org 1', 'colour': 'red', 'logo': 'logo1.png'},
-                {'id': '2', 'name': 'org 2', 'text': 'org 2', 'colour': 'orange', 'logo': 'logo2.png'},
-                {'id': '3', 'name': 'org 3', 'text': None, 'colour': None, 'logo': 'logo3.png'},
-                {'id': '5', 'name': 'org 5', 'text': None, 'colour': 'blue', 'logo': 'logo5.png'},
-                {'id': '4', 'name': 'org 4', 'text': 'org 4', 'colour': None, 'logo': 'logo4.png'},
-            ]
+        non_standard_values = [
+            {'idx': 1, 'colour': 'red'},
+            {'idx': 2, 'colour': 'orange'},
+            {'idx': 3, 'text': None},
+            {'idx': 4, 'colour': 'blue'},
+        ]
+        shuffle = sort_key is None
+        return create_email_brandings(5, non_standard_values=non_standard_values, shuffle=shuffle)
 
     return mocker.patch(
         'app.email_branding_client.get_all_email_branding', side_effect=_get_all_email_branding
