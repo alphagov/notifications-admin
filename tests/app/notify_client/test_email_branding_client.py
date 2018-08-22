@@ -26,11 +26,15 @@ def test_get_letter_email_branding(mocker):
 
 
 def test_create_email_branding(mocker):
-    org_data = {'logo': 'test.png', 'name': 'test name', 'text': 'test name', 'colour': 'red'}
+    org_data = {'logo': 'test.png', 'name': 'test name', 'text': 'test name', 'colour': 'red',
+                'banner_colour': 'blue', 'single_id_colour': 'yellow', 'domain': 'sample.com'}
 
     mock_post = mocker.patch('app.notify_client.email_branding_client.EmailBrandingClient.post')
     EmailBrandingClient().create_email_branding(
-        logo=org_data['logo'], name=org_data['name'], text=org_data['text'], colour=org_data['colour'])
+        logo=org_data['logo'], name=org_data['name'], text=org_data['text'], colour=org_data['colour'],
+        banner_colour=org_data['banner_colour'], single_id_colour=org_data['single_id_colour'],
+        domain=org_data['domain']
+    )
 
     mock_post.assert_called_once_with(
         url='/email-branding',
@@ -39,12 +43,14 @@ def test_create_email_branding(mocker):
 
 
 def test_update_email_branding(mocker, fake_uuid):
-    org_data = {'logo': 'test.png', 'name': 'test name', 'text': 'test name', 'colour': 'red'}
+    org_data = {'logo': 'test.png', 'name': 'test name', 'text': 'test name', 'colour': 'red',
+                'banner_colour': 'blue', 'single_id_colour': 'yellow', 'domain': 'sample.com'}
 
     mock_post = mocker.patch('app.notify_client.email_branding_client.EmailBrandingClient.post')
     EmailBrandingClient().update_email_branding(
         branding_id=fake_uuid, logo=org_data['logo'], name=org_data['name'], text=org_data['text'],
-        colour=org_data['colour'])
+        colour=org_data['colour'], banner_colour=org_data['banner_colour'],
+        single_id_colour=org_data['single_id_colour'], domain=org_data['domain'])
 
     mock_post.assert_called_once_with(
         url='/email-branding/{}'.format(fake_uuid),

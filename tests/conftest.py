@@ -2493,7 +2493,10 @@ def mock_get_email_branding(mocker, fake_uuid):
                 'name': 'Organisation name',
                 'text': 'Organisation text',
                 'id': fake_uuid,
-                'colour': '#f00'
+                'colour': '#f00',
+                'banner_colour': '#f11',
+                'single_id_colour': '#f22',
+                'domain': 'sample.com',
             }
         }
 
@@ -2511,7 +2514,9 @@ def mock_get_email_branding_without_brand_text(mocker, fake_uuid):
                 'name': 'Organisation name',
                 'text': '',
                 'id': fake_uuid,
-                'colour': '#f00'
+                'colour': '#f00',
+                'banner_colour': '#f11',
+                'single_id_colour': '#f22'
             }
         }
 
@@ -2523,7 +2528,7 @@ def mock_get_email_branding_without_brand_text(mocker, fake_uuid):
 
 @pytest.fixture(scope='function')
 def mock_create_email_branding(mocker):
-    def _create_email_branding(logo, name, text, colour):
+    def _create_email_branding(logo, name, text, colour, banner_colour, single_id_colour, domain):
         return
 
     return mocker.patch(
@@ -2533,7 +2538,7 @@ def mock_create_email_branding(mocker):
 
 @pytest.fixture(scope='function')
 def mock_update_email_branding(mocker):
-    def _update_email_branding(branding_id, logo, name, text, colour):
+    def _update_email_branding(branding_id, logo, name, text, colour, banner_colour, single_id_colour, domain):
         return
 
     return mocker.patch(

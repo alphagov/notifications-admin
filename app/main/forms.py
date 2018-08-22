@@ -731,6 +731,7 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
 
     name = StringField('Name of brand')
     text = StringField('Text')
+    domain = StringField('Domain')
     colour = StringField(
         'Colour',
         render_kw={'onchange': 'update_colour(this)'},
@@ -738,15 +739,15 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
             Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')
         ]
     )
-    file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
-
-
-class ServiceCreateEmailBranding(StripWhitespaceForm):
-
-    name = StringField('Name of brand')
-    text = StringField('Text')
-    colour = StringField(
-        'Colour',
+    banner_colour = StringField(
+        'Banner colour',
+        render_kw={'onchange': 'update_colour(this)'},
+        validators=[
+            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')
+        ]
+    )
+    single_id_colour = StringField(
+        'Single identity colour',
         render_kw={'onchange': 'update_colour(this)'},
         validators=[
             Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')

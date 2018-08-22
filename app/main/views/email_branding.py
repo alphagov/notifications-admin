@@ -4,7 +4,6 @@ from flask_login import login_required
 from app import email_branding_client
 from app.main import main
 from app.main.forms import (
-    ServiceCreateEmailBranding,
     ServiceSelectEmailBranding,
     ServiceUpdateEmailBranding,
 )
@@ -80,7 +79,10 @@ def update_email_branding(branding_id, logo=None):
             logo=logo,
             name=form.name.data,
             text=form.text.data,
-            colour=form.colour.data
+            colour=form.colour.data,
+            banner_colour=form.banner_colour.data,
+            single_id_colour=form.single_id_colour.data,
+            domain=form.domain.data,
         )
 
         return redirect(url_for('.email_branding', branding_id=branding_id))
@@ -88,6 +90,9 @@ def update_email_branding(branding_id, logo=None):
     form.name.data = email_branding['name']
     form.text.data = email_branding['text']
     form.colour.data = email_branding['colour']
+    form.banner_colour.data = email_branding['banner_colour']
+    form.single_id_colour.data = email_branding['single_id_colour']
+    form.domain.data = email_branding['domain']
 
     return render_template(
         'views/email-branding/manage-branding.html',
@@ -103,7 +108,7 @@ def update_email_branding(branding_id, logo=None):
 @login_required
 @user_is_platform_admin
 def create_email_branding(logo=None):
-    form = ServiceCreateEmailBranding()
+    form = ServiceUpdateEmailBranding()
 
     if form.validate_on_submit():
         if form.file.data:
@@ -128,7 +133,10 @@ def create_email_branding(logo=None):
             logo=logo,
             name=form.name.data,
             text=form.text.data,
-            colour=form.colour.data
+            colour=form.colour.data,
+            banner_colour=form.banner_colour.data,
+            single_id_colour=form.single_id_colour.data,
+            domain=form.domain.data
         )
 
         return redirect(url_for('.email_branding'))
