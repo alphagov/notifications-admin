@@ -20,8 +20,9 @@ def test_email_branding_page_shows_full_branding_list(
 
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    radio_labels = page.select('div.multiple-choice > label')
-    brand_names = [element.get_text().strip() for idx, element in enumerate(radio_labels)]
+    links = page.select('.message-name a')
+    brand_names = [normalize_spaces(link.text) for link in links]
+    hrefs = [link['href'] for link in links]
 
     assert normalize_spaces(
         page.select_one('h1').text
@@ -29,10 +30,15 @@ def test_email_branding_page_shows_full_branding_list(
 
     assert page.select_one('.column-three-quarters a')['href'] == url_for('main.create_email_branding')
 
-    first_label = radio_labels[0]
-    assert normalize_spaces(first_label.text) == 'org 1'
     assert brand_names == [
         'org 1', 'org 2', 'org 3', 'org 4', 'org 5'
+    ]
+    assert hrefs == [
+        url_for('.update_email_branding', branding_id=1),
+        url_for('.update_email_branding', branding_id=2),
+        url_for('.update_email_branding', branding_id=3),
+        url_for('.update_email_branding', branding_id=4),
+        url_for('.update_email_branding', branding_id=5),
     ]
 
 

@@ -17,16 +17,15 @@
       <a href="{{ url_for('.create_email_branding') }}" class="button align-with-heading">Add new brand</a>
     </div>
   </div>
-  <div class="grid-row">
-    <div class="column-three-quarters">
-      <form method="post">
-        {{ live_search(target_selector='.multiple-choice', show=show_search_box, form=search_form) }}
-        {{ radios(form.email_branding) }}
-        {{ page_footer(
-          'Next'
-        ) }}
-      </form>
-    </div>
-  </div>
+  {{ live_search(target_selector='.message-name', show=show_search_box, form=search_form) }}
+  <nav>
+    {% for id, name in email_brandings %}
+      <div class="message-name">
+        <a href="{{ url_for('.update_email_branding', branding_id=id) }}">
+          {{name}}
+        </a>
+      </div>
+    {% endfor %}
+  </nav>
 
 {% endblock %}
