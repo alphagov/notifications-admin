@@ -1,0 +1,16 @@
+{% macro task_list_item(completed, label) %}
+  <li class="task-list-item">
+    {{ label }}
+    {% if completed %}
+      <span class="task-list-indicator-completed">Completed</span>
+    {% else %}
+      <span class="task-list-indicator-not-completed">Not completed</span>
+    {% endif %}
+  </li>
+{% endmacro %}
+
+{% macro task_list_wrapper() %}
+  <ul class="task-list">
+    {{ caller() }}
+  </ul>
+{% endmacro %}

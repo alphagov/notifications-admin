@@ -503,19 +503,19 @@ def test_should_raise_duplicate_name_handled(
 
 
 @pytest.mark.parametrize('count_of_users_with_manage_service, expected_user_checklist_item', [
-    (1, 'Not done: Have more than one team member with the ‘Manage service’ permission'),
-    (2, 'Done: Have more than one team member with the ‘Manage service’ permission'),
+    (1, 'More than one team member with the ‘Manage settings’ permission Not completed'),
+    (2, 'More than one team member with the ‘Manage settings’ permission Completed'),
 ])
 @pytest.mark.parametrize('count_of_templates, expected_templates_checklist_item', [
-    (0, 'Not done: Create templates showing the kind of messages you plan to send'),
-    (1, 'Done: Create templates showing the kind of messages you plan to send'),
-    (2, 'Done: Create templates showing the kind of messages you plan to send'),
+    (0, 'Templates showing the kind of messages you plan to send Not completed'),
+    (1, 'Templates showing the kind of messages you plan to send Completed'),
+    (2, 'Templates showing the kind of messages you plan to send Completed'),
 ])
 @pytest.mark.parametrize('count_of_email_templates, reply_to_email_addresses, expected_reply_to_checklist_item', [
     pytest.mark.xfail((0, [], ''), raises=IndexError),
     pytest.mark.xfail((0, [{}], ''), raises=IndexError),
-    (1, [], 'Not done: Add an email reply-to address'),
-    (1, [{}], 'Done: Add an email reply-to address'),
+    (1, [], 'An email reply-to address Not completed'),
+    (1, [{}], 'An email reply-to address Completed'),
 ])
 def test_should_show_request_to_go_live_checklist(
     client_request,
@@ -552,7 +552,7 @@ def test_should_show_request_to_go_live_checklist(
     )
     assert page.h1.text == 'Request to go live'
 
-    checklist_items = page.select('main ul[class=bottom-gutter] li')
+    checklist_items = page.select('.task-list .task-list-item')
 
     assert normalize_spaces(checklist_items[0].text) == expected_user_checklist_item
     assert normalize_spaces(checklist_items[1].text) == expected_templates_checklist_item
