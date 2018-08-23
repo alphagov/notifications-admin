@@ -30,13 +30,10 @@ def email_branding():
 
     form = ServiceSelectEmailBranding()
     email_brandings = get_branding_as_value_and_label(brandings)
-    form.email_branding.choices = email_brandings + [('None', 'Create a new email branding')]
+    form.email_branding.choices = email_brandings
 
     if form.validate_on_submit():
-        if form.email_branding.data != 'None':
-            return redirect(url_for('.update_email_branding', branding_id=form.email_branding.data))
-        else:
-            return redirect(url_for('.create_email_branding'))
+        return redirect(url_for('.update_email_branding', branding_id=form.email_branding.data))
 
     return render_template(
         'views/email-branding/select-branding.html',
