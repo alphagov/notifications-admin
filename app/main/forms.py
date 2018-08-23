@@ -728,6 +728,16 @@ class ServiceSelectEmailBranding(StripWhitespaceForm):
 
 
 class ServiceUpdateEmailBranding(StripWhitespaceForm):
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.brand_type.choices = filter(None, [
+            ('govuk', 'GOV.UK only'),
+            ('both', 'GOV.UK and branding'),
+            ('org', 'Branding only'),
+            ('org_banner', 'Branding banner'),
+        ])
 
     name = StringField('Name of brand')
     text = StringField('Text')
@@ -738,19 +748,10 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
             Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')
         ]
     )
-    banner_colour = StringField(
-        'Banner colour',
-        validators=[
-            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')
-        ]
-    )
-    single_id_colour = StringField(
-        'Single identity colour',
-        validators=[
-            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')
-        ]
-    )
     file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
+    brand_type = RadioField(
+        "Brand type"
+    )
 
 
 class CreateOrUpdateOrganisation(StripWhitespaceForm):
