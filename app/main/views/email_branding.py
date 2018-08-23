@@ -3,10 +3,7 @@ from flask_login import login_required
 
 from app import email_branding_client
 from app.main import main
-from app.main.forms import (
-    ServiceSelectEmailBranding,
-    ServiceUpdateEmailBranding,
-)
+from app.main.forms import SearchTemplatesForm, ServiceUpdateEmailBranding
 from app.main.s3_client import (
     TEMP_TAG,
     delete_temp_file,
@@ -14,10 +11,7 @@ from app.main.s3_client import (
     persist_logo,
     upload_logo,
 )
-from app.main.views.service_settings import (
-    get_branding_as_dict,
-    get_branding_as_value_and_label,
-)
+from app.main.views.service_settings import get_branding_as_value_and_label
 from app.utils import get_cdn_domain, user_is_platform_admin
 
 
@@ -27,20 +21,11 @@ from app.utils import get_cdn_domain, user_is_platform_admin
 def email_branding():
     brandings = email_branding_client.get_all_email_branding(sort_key='name')
 
-    form = ServiceSelectEmailBranding()
-    email_brandings = get_branding_as_value_and_label(brandings)
-    form.email_branding.choices = email_brandings + [('None', 'Create a new email branding')]
-
-    if form.validate_on_submit():
-        if form.email_branding.data != 'None':
-            return redirect(url_for('.update_email_branding', branding_id=form.email_branding.data))
-        else:
-            return redirect(url_for('.create_email_branding'))
-
     return render_template(
         'views/email-branding/select-branding.html',
-        form=form,
-        branding_dict=get_branding_as_dict(brandings),
+        email_brandings=get_branding_as_value_and_label(brandings),
+        search_form=SearchTemplatesForm(),
+        show_search_box=len(brandings) > 9,
     )
 
 

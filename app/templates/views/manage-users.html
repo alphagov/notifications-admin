@@ -3,6 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/tick-cross.html" import tick_cross %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/live-search.html" import live_search %}
 
 {% set table_options = {
   'field_headings': [
@@ -33,12 +34,7 @@
 
   {% if show_search_box %}
     <div data-module="autofocus">
-      <div class="live-search" data-module="live-search" data-targets=".user-list-item">
-        {{ textbox(
-          form.search,
-          width='1-1'
-        ) }}
-      </div>
+      {{ live_search(target_selector='.user-list-item', show=True, form=form) }}
     </div>
   {% endif %}
 
