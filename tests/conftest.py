@@ -2441,19 +2441,25 @@ def mock_get_all_email_branding(mocker):
     def _get_all_email_branding(sort_key=None):
         if sort_key:
             return [
-                {'id': '1', 'name': 'org 1', 'text': 'org 1', 'colour': 'red', 'logo': 'logo1.png'},
-                {'id': '2', 'name': 'org 2', 'text': 'org 2', 'colour': 'orange', 'logo': 'logo2.png'},
-                {'id': '3', 'name': 'org 3', 'text': None, 'colour': None, 'logo': 'logo3.png'},
-                {'id': '4', 'name': 'org 4', 'text': 'org 4', 'colour': None, 'logo': 'logo4.png'},
-                {'id': '5', 'name': 'org 5', 'text': None, 'colour': 'blue', 'logo': 'logo5.png'},
+                {'id': '1', 'name': 'org 1', 'text': 'org 1', 'colour': 'red', 'logo': 'logo1.png',
+                 'brand_type': 'govuk'},
+                {'id': '2', 'name': 'org 2', 'text': 'org 2', 'colour': 'orange', 'logo': 'logo2.png',
+                 'brand_type': 'both'},
+                {'id': '3', 'name': 'org 3', 'text': None, 'colour': None, 'logo': 'logo3.png', 'brand_type': 'org'},
+                {'id': '4', 'name': 'org 4', 'text': 'org 4', 'colour': None, 'logo': 'logo4.png',
+                 'brand_type': 'org_banner'},
+                {'id': '5', 'name': 'org 5', 'text': None, 'colour': 'blue', 'logo': 'logo5.png', 'brand_type': 'org'},
             ]
         else:
             return [
-                {'id': '1', 'name': 'org 1', 'text': 'org 1', 'colour': 'red', 'logo': 'logo1.png'},
-                {'id': '2', 'name': 'org 2', 'text': 'org 2', 'colour': 'orange', 'logo': 'logo2.png'},
-                {'id': '3', 'name': 'org 3', 'text': None, 'colour': None, 'logo': 'logo3.png'},
-                {'id': '5', 'name': 'org 5', 'text': None, 'colour': 'blue', 'logo': 'logo5.png'},
-                {'id': '4', 'name': 'org 4', 'text': 'org 4', 'colour': None, 'logo': 'logo4.png'},
+                {'id': '1', 'name': 'org 1', 'text': 'org 1', 'colour': 'red', 'logo': 'logo1.png',
+                 'brand_type': 'govuk'},
+                {'id': '2', 'name': 'org 2', 'text': 'org 2', 'colour': 'orange', 'logo': 'logo2.png',
+                 'brand_type': 'both'},
+                {'id': '3', 'name': 'org 3', 'text': None, 'colour': None, 'logo': 'logo3.png', 'brand_type': 'org'},
+                {'id': '5', 'name': 'org 5', 'text': None, 'colour': 'blue', 'logo': 'logo5.png',
+                 'brand_type': 'org_banner'},
+                {'id': '4', 'name': 'org 4', 'text': 'org 4', 'colour': None, 'logo': 'logo4.png', 'brand_type': 'org'},
             ]
 
     return mocker.patch(
@@ -2494,9 +2500,8 @@ def mock_get_email_branding(mocker, fake_uuid):
                 'text': 'Organisation text',
                 'id': fake_uuid,
                 'colour': '#f00',
-                'banner_colour': '#f11',
-                'single_id_colour': '#f22',
                 'domain': 'sample.com',
+                'brand_type': 'org',
             }
         }
 
@@ -2515,8 +2520,7 @@ def mock_get_email_branding_without_brand_text(mocker, fake_uuid):
                 'text': '',
                 'id': fake_uuid,
                 'colour': '#f00',
-                'banner_colour': '#f11',
-                'single_id_colour': '#f22'
+                'brand_type': 'org_banner'
             }
         }
 
@@ -2528,7 +2532,7 @@ def mock_get_email_branding_without_brand_text(mocker, fake_uuid):
 
 @pytest.fixture(scope='function')
 def mock_create_email_branding(mocker):
-    def _create_email_branding(logo, name, text, colour, banner_colour, single_id_colour, domain):
+    def _create_email_branding(logo, name, text, colour, domain, brand_type):
         return
 
     return mocker.patch(
@@ -2538,7 +2542,7 @@ def mock_create_email_branding(mocker):
 
 @pytest.fixture(scope='function')
 def mock_update_email_branding(mocker):
-    def _update_email_branding(branding_id, logo, name, text, colour, banner_colour, single_id_colour, domain):
+    def _update_email_branding(branding_id, logo, name, text, colour, domain, brand_type):
         return
 
     return mocker.patch(

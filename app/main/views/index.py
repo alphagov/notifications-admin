@@ -78,13 +78,6 @@ def design_content():
     return render_template('views/design-patterns-content-guidance.html')
 
 
-def _set_colour(branding_style, email_branding):
-    if branding_style in ['both', 'org']:
-        return email_branding['single_id_colour'] or email_branding['colour']
-    elif branding_style == 'org_banner':
-        return email_branding['banner_colour'] or email_branding['colour']
-
-
 @main.route('/_email')
 def email_template():
     branding_type = request.args.get('branding_type', 'govuk')
@@ -98,7 +91,7 @@ def email_template():
         brand_banner = False
     else:
         email_branding = email_branding_client.get_email_branding(branding_style)['email_branding']
-        colour = _set_colour(branding_type, email_branding)
+        colour = email_branding['colour']
         brand_name = email_branding['text']
         brand_colour = colour
         brand_logo = 'https://{}/{}'.format(get_cdn_domain(), email_branding['logo'])

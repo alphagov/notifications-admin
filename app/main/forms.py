@@ -728,17 +728,6 @@ class ServiceSelectEmailBranding(StripWhitespaceForm):
 
 
 class ServiceUpdateEmailBranding(StripWhitespaceForm):
-    def __init__(self, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-
-        self.brand_type.choices = filter(None, [
-            ('govuk', 'GOV.UK only'),
-            ('both', 'GOV.UK and branding'),
-            ('org', 'Branding only'),
-            ('org_banner', 'Branding banner'),
-        ])
-
     name = StringField('Name of brand')
     text = StringField('Text')
     domain = StringField('Domain')
@@ -750,7 +739,13 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
     )
     file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
     brand_type = RadioField(
-        "Brand type"
+        "Brand type",
+        choices=[
+            ('govuk', 'GOV.UK only'),
+            ('both', 'GOV.UK and branding'),
+            ('org', 'Branding only'),
+            ('org_banner', 'Branding banner'),
+        ]
     )
 
 

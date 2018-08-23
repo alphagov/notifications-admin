@@ -30,7 +30,6 @@ def email_branding():
     form = ServiceSelectEmailBranding()
     email_brandings = get_branding_as_value_and_label(brandings)
     form.email_branding.choices = email_brandings + [('None', 'Create a new email branding')]
-
     if form.validate_on_submit():
         if form.email_branding.data != 'None':
             return redirect(url_for('.update_email_branding', branding_id=form.email_branding.data))
@@ -107,7 +106,6 @@ def update_email_branding(branding_id, logo=None):
 @user_is_platform_admin
 def create_email_branding(logo=None):
     form = ServiceUpdateEmailBranding()
-
     if form.validate_on_submit():
         if form.file.data:
             upload_filename = upload_logo(
