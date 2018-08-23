@@ -38,6 +38,12 @@
             )|safe,
           ) }}
         {% endif %}
+        {% if has_sms_templates and shouldnt_use_govuk_as_sms_sender %}
+          {{ task_list_item(
+            not sms_sender_is_govuk,
+            'Change your text message sender from GOVUK'
+          ) }}
+        {% endif %}
       {% endcall %}
       <p>
         You also need to accept our <a href="{{ url_for('.terms') }}">terms of use</a>.

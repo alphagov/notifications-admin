@@ -53,6 +53,7 @@ from app.utils import (
     AgreementInfo,
     email_safe,
     get_cdn_domain,
+    get_default_sms_sender,
     user_has_permissions,
     user_is_platform_admin,
 )
@@ -83,10 +84,6 @@ def service_settings(service_id):
         (Field(x['contact_block'], html='escape') for x in letter_contact_details if x['is_default']), "Not set"
     )
     sms_senders = service_api_client.get_sms_senders(service_id)
-    sms_sender_count = len(sms_senders)
-    default_sms_sender = next(
-        (Field(x['sms_sender'], html='escape') for x in sms_senders if x['is_default']), "None"
-    )
 
     free_sms_fragment_limit = billing_api_client.get_free_sms_fragment_limit_for_year(service_id)
     data_retention = service_api_client.get_service_data_retention(service_id)
@@ -103,8 +100,8 @@ def service_settings(service_id):
         reply_to_email_address_count=reply_to_email_address_count,
         default_letter_contact_block=default_letter_contact_block,
         letter_contact_details_count=letter_contact_details_count,
-        default_sms_sender=default_sms_sender,
-        sms_sender_count=sms_sender_count,
+        default_sms_sender=get_default_sms_sender(sms_senders),
+        sms_sender_count=len(sms_senders),
         free_sms_fragment_limit=free_sms_fragment_limit,
         prefix_sms=current_service.prefix_sms,
         organisation=organisation,
@@ -192,9 +189,18 @@ def request_to_go_live(service_id):
         has_email_templates=(
             service_api_client.count_service_templates(service_id, template_type='email') > 0
         ),
+        has_sms_templates=(
+            service_api_client.count_service_templates(service_id, template_type='sms') > 0
+        ),
         has_email_reply_to_address=bool(
             service_api_client.get_reply_to_email_addresses(service_id)
-        )
+        ),
+        shouldnt_use_govuk_as_sms_sender=(
+            current_service.organisation_type in {'local', 'nhs'}
+        ),
+        sms_sender_is_govuk=get_default_sms_sender(
+            service_api_client.get_sms_senders(service_id)
+        ) in {'GOVUK', 'None'},
     )
 
 
