@@ -15,10 +15,7 @@ from app.main.s3_client import (
     persist_logo,
     upload_logo,
 )
-from app.main.views.service_settings import (
-    get_branding_as_dict,
-    get_branding_as_value_and_label,
-)
+from app.main.views.service_settings import get_branding_as_value_and_label
 from app.utils import get_cdn_domain, user_is_platform_admin
 
 
@@ -38,7 +35,6 @@ def email_branding():
     return render_template(
         'views/email-branding/select-branding.html',
         form=form,
-        branding_dict=get_branding_as_dict(brandings),
         search_form=SearchTemplatesForm(),
         show_search_box=len(brandings) > 9,
     )
