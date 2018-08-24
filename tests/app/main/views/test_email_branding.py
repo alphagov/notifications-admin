@@ -205,9 +205,7 @@ def test_deletes_previous_temp_logo_after_uploading_logo(
 
     logged_in_platform_admin_client.post(
         url_for('main.create_email_branding', logo=temp_old_filename, branding_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'test.png'),
-              'brand_type': 'govuk'
-              },
+        data={'file': (BytesIO(''.encode('utf-8')), 'test.png')},
         content_type='multipart/form-data'
     )
 
@@ -284,8 +282,7 @@ def test_temp_logo_is_shown_after_uploading_logo(
 
     response = logged_in_platform_admin_client.post(
         url_for('main.create_email_branding'),
-        data={'file': (BytesIO(''.encode('utf-8')), 'test.png'),
-              'brand_type': 'govuk'},
+        data={'file': (BytesIO(''.encode('utf-8')), 'test.png')},
         content_type='multipart/form-data',
         follow_redirects=True
     )
@@ -315,7 +312,6 @@ def test_logo_persisted_when_organisation_saved(
 
     resp = logged_in_platform_admin_client.post(
         url_for('.create_email_branding', logo=temp_filename),
-        data={'brand_type': 'govuk'},
         content_type='multipart/form-data'
     )
     assert resp.status_code == 302
