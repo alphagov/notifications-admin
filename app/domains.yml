@@ -2176,7 +2176,7 @@ herefordcitycouncil.gov.uk:
 herefordshire.gov.uk:
   owner: Herefordshire Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 hertford.gov.uk:
   owner: Hertford Town Council
   crown: false
