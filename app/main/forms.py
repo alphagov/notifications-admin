@@ -713,20 +713,6 @@ class ServicePreviewBranding(StripWhitespaceForm):
     branding_style = HiddenField('branding_style')
 
 
-class ServiceSelectEmailBranding(StripWhitespaceForm):
-
-    def __init__(self, email_brandings=[], *args, **kwargs):
-        self.email_branding.choices = email_brandings
-        super(ServiceSelectEmailBranding, self).__init__(*args, **kwargs)
-
-    email_branding = RadioField(
-        'Email branding',
-        validators=[
-            DataRequired()
-        ]
-    )
-
-
 class ServiceUpdateEmailBranding(StripWhitespaceForm):
     name = StringField('Name of brand')
     text = StringField('Text')

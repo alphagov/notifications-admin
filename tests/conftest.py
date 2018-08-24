@@ -956,40 +956,41 @@ def mock_update_service_template_400_content_too_big(mocker):
         side_effect=_update)
 
 
+def create_service_templates(service_id, number_of_templates=6):
+    template_types = ["sms", "sms", "email", "email", "letter", "letter"]
+    service_templates = []
+
+    for _ in range(1, number_of_templates + 1):
+        template_number = "two" if _ % 2 == 0 else "one"
+        template_type = template_types[(_ % 6) - 1]
+
+        service_templates.append(template_json(
+            service_id,
+            TEMPLATE_ONE_ID if _ == 1 else str(generate_uuid),
+            "{}_template_{}".format(template_type, template_number),
+            template_type,
+            "{} template {} content".format(template_type, template_number),
+            subject="{} template {} subject".format(template_type, template_number)
+                    if template_type in ["email", "letter"] else None
+        ))
+
+    return {'data': service_templates}
+
+
 @pytest.fixture(scope='function')
 def mock_get_service_templates(mocker):
-    uuid1 = TEMPLATE_ONE_ID
-    uuid2 = str(generate_uuid())
-    uuid3 = str(generate_uuid())
-    uuid4 = str(generate_uuid())
-    uuid5 = str(generate_uuid())
-    uuid6 = str(generate_uuid())
-
     def _create(service_id):
-        return {'data': [
-            template_json(
-                service_id, uuid1, "sms_template_one", "sms", "sms template one content"
-            ),
-            template_json(
-                service_id, uuid2, "sms_template_two", "sms", "sms template two content"
-            ),
-            template_json(
-                service_id, uuid3, "email_template_one", "email", "email template one content",
-                subject='email template one subject',
-            ),
-            template_json(
-                service_id, uuid4, "email_template_two", "email", "email template two content",
-                subject='email template two subject',
-            ),
-            template_json(
-                service_id, uuid5, "letter_template_one", "letter", "letter template one content",
-                subject='letter template one subject',
-            ),
-            template_json(
-                service_id, uuid6, "letter_template_two", "letter", "letter template two content",
-                subject='letter template two subject',
-            ),
-        ]}
+        return create_service_templates(service_id)
+
+    return mocker.patch(
+        'app.service_api_client.get_service_templates',
+        side_effect=_create)
+
+
+@pytest.fixture(scope='function')
+def mock_get_more_service_templates_than_can_fit_onscreen(mocker):
+    def _create(service_id):
+        return create_service_templates(service_id, number_of_templates=20)
 
     return mocker.patch(
         'app.service_api_client.get_service_templates',
@@ -2436,34 +2437,62 @@ def mock_send_already_registered_email(mocker):
     return mocker.patch('app.user_api_client.send_already_registered_email')
 
 
+def create_email_brandings(number_of_brandings, non_standard_values={}, shuffle=False):
+    brandings = [
+        {
+            'id': str(idx),
+            'name': 'org {}'.format(idx),
+            'text': 'org {}'.format(idx),
+            'colour': None,
+            'logo': 'logo{}.png'.format(idx),
+            'brand_type': 'org',
+        } for idx in range(1, number_of_brandings + 1)]
+
+    for idx, row in enumerate(non_standard_values):
+        brandings[row['idx']].update(non_standard_values)
+
+    if shuffle:
+        brandings.insert(3, brandings.pop(4))
+
+    return brandings
+
+
 @pytest.fixture(scope='function')
 def mock_get_all_email_branding(mocker):
     def _get_all_email_branding(sort_key=None):
-        if sort_key:
-            return [
-                {'id': '1', 'name': 'org 1', 'text': 'org 1', 'colour': 'red', 'logo': 'logo1.png',
-                 'brand_type': 'govuk'},
-                {'id': '2', 'name': 'org 2', 'text': 'org 2', 'colour': 'orange', 'logo': 'logo2.png',
-                 'brand_type': 'both'},
-                {'id': '3', 'name': 'org 3', 'text': None, 'colour': None, 'logo': 'logo3.png', 'brand_type': 'org'},
-                {'id': '4', 'name': 'org 4', 'text': 'org 4', 'colour': None, 'logo': 'logo4.png',
-                 'brand_type': 'org_banner'},
-                {'id': '5', 'name': 'org 5', 'text': None, 'colour': 'blue', 'logo': 'logo5.png', 'brand_type': 'org'},
-            ]
-        else:
-            return [
-                {'id': '1', 'name': 'org 1', 'text': 'org 1', 'colour': 'red', 'logo': 'logo1.png',
-                 'brand_type': 'govuk'},
-                {'id': '2', 'name': 'org 2', 'text': 'org 2', 'colour': 'orange', 'logo': 'logo2.png',
-                 'brand_type': 'both'},
-                {'id': '3', 'name': 'org 3', 'text': None, 'colour': None, 'logo': 'logo3.png', 'brand_type': 'org'},
-                {'id': '5', 'name': 'org 5', 'text': None, 'colour': 'blue', 'logo': 'logo5.png',
-                 'brand_type': 'org_banner'},
-                {'id': '4', 'name': 'org 4', 'text': 'org 4', 'colour': None, 'logo': 'logo4.png', 'brand_type': 'org'},
-            ]
+        non_standard_values = [
+            {'idx': 1, 'colour': 'red'},
+            {'idx': 2, 'colour': 'orange'},
+            {'idx': 3, 'text': None},
+            {'idx': 4, 'colour': 'blue'},
+        ]
+        shuffle = sort_key is None
+        return create_email_brandings(5, non_standard_values=non_standard_values, shuffle=shuffle)
 
     return mocker.patch(
         'app.email_branding_client.get_all_email_branding', side_effect=_get_all_email_branding
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_more_email_branding_than_can_fit_onscreen(mocker):
+    def _get_more_email_branding_than_can_fit_onscreen():
+        return create_email_brandings(8)
+
+    return mocker.patch(
+        'app.email_branding_client.get_all_email_branding',
+        side_effect=_get_more_email_branding_than_can_fit_onscreen
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_email_branding_that_can_fit_onscreen(mocker):
+    def _get_email_branding_that_can_fit_onscreen():
+        return create_email_brandings(4)
+
+    return mocker.patch(
+        'app.email_branding_client.get_all_email_branding',
+        side_effect=_get_email_branding_that_can_fit_onscreen
     )
 
 

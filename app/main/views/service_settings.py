@@ -34,6 +34,7 @@ from app.main.forms import (
     OrganisationTypeForm,
     RenameServiceForm,
     RequestToGoLiveForm,
+    SearchTemplatesForm,
     ServiceContactDetailsForm,
     ServiceDataRetentionEditForm,
     ServiceDataRetentionForm,
@@ -886,7 +887,9 @@ def service_set_email_branding(service_id):
     return render_template(
         'views/service-settings/set-email-branding.html',
         form=form,
-        branding_dict=get_branding_as_dict(email_branding)
+        branding_dict=get_branding_as_dict(email_branding),
+        search_form=SearchTemplatesForm(),
+        show_search_box=(len(email_branding) > 6)
     )
 
 

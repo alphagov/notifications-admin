@@ -278,6 +278,34 @@ def test_conversation_reply_shows_templates(
         )
 
 
+def test_conversation_reply_shows_live_search_if_list_of_templates_taller_than_screen(
+    client_request,
+    fake_uuid,
+    mock_get_more_service_templates_than_can_fit_onscreen,
+):
+    page = client_request.get(
+        'main.conversation_reply',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert page.select('.live-search')
+
+
+def test_conversation_reply_shows_live_search_if_list_of_templates_fits_onscreen(
+    client_request,
+    fake_uuid,
+    mock_get_service_templates,
+):
+    page = client_request.get(
+        'main.conversation_reply',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert not page.select('.live-search')
+
+
 def test_conversation_reply_redirects_with_phone_number_from_notification(
     client_request,
     fake_uuid,

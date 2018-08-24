@@ -1,26 +1,31 @@
 {% extends "views/platform-admin/_base_template.html" %}
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/live-search.html" import live_search %}
 
 {% block service_page_title %}
-  Select email branding
+  Email branding
 {% endblock %}
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-large">
-    <div>Select an email branding to update</div>
-    <div>or create a new email branding</div>
-  </h1>
-  <div class="grid-row">
-    <div class="column-three-quarters">
-      <form method="post">
-        {{ radios(form.email_branding) }}
-        {{ page_footer(
-          'Next'
-        ) }}
-      </form>
+  <div class="grid-row bottom-gutter-2-3">
+    <div class="column-two-thirds">
+      <h1 class="heading-large">Email branding</h1>
+    </div>
+    <div class="column-one-third">
+      <a href="{{ url_for('.create_email_branding') }}" class="button align-with-heading">Add new brand</a>
     </div>
   </div>
+  {{ live_search(target_selector='.message-name', show=show_search_box, form=search_form) }}
+  <nav>
+    {% for id, name in email_brandings %}
+      <div class="message-name">
+        <a href="{{ url_for('.update_email_branding', branding_id=id) }}">
+          {{name}}
+        </a>
+      </div>
+    {% endfor %}
+  </nav>
 
 {% endblock %}
