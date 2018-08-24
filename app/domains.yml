@@ -2902,7 +2902,7 @@ midsuffolk.gov.uk:
 midsussex.gov.uk:
   owner: Mid Sussex District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 milland-wsx-pc.gov.uk:
   owner: Chichester District Council
   crown: false
