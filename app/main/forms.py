@@ -714,7 +714,6 @@ class ServicePreviewBranding(StripWhitespaceForm):
 
 
 class ServiceUpdateEmailBranding(StripWhitespaceForm):
-
     name = StringField('Name of brand')
     text = StringField('Text')
     domain = StringField('Domain')
@@ -724,19 +723,16 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
             Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')
         ]
     )
-    banner_colour = StringField(
-        'Banner colour',
-        validators=[
-            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')
-        ]
-    )
-    single_id_colour = StringField(
-        'Single identity colour',
-        validators=[
-            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message='Must be a valid color hex code')
-        ]
-    )
     file = FileField_wtf('Upload a PNG logo', validators=[FileAllowed(['png'], 'PNG Images only!')])
+    brand_type = RadioField(
+        "Brand type",
+        choices=[
+            ('govuk', 'GOV.UK only'),
+            ('both', 'GOV.UK and branding'),
+            ('org', 'Branding only'),
+            ('org_banner', 'Branding banner'),
+        ]
+    )
 
 
 class CreateOrUpdateOrganisation(StripWhitespaceForm):

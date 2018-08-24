@@ -36,7 +36,13 @@ def email_branding():
 def update_email_branding(branding_id, logo=None):
     email_branding = email_branding_client.get_email_branding(branding_id)['email_branding']
 
-    form = ServiceUpdateEmailBranding()
+    form = ServiceUpdateEmailBranding(
+        name=email_branding['name'],
+        text=email_branding['text'],
+        colour=email_branding['colour'],
+        domain=email_branding['domain'],
+        brand_type=email_branding['brand_type']
+    )
 
     logo = logo if logo else email_branding.get('logo') if email_branding else None
 
@@ -65,19 +71,11 @@ def update_email_branding(branding_id, logo=None):
             name=form.name.data,
             text=form.text.data,
             colour=form.colour.data,
-            banner_colour=form.banner_colour.data,
-            single_id_colour=form.single_id_colour.data,
             domain=form.domain.data,
+            brand_type=form.brand_type.data,
         )
 
         return redirect(url_for('.email_branding', branding_id=branding_id))
-
-    form.name.data = email_branding['name']
-    form.text.data = email_branding['text']
-    form.colour.data = email_branding['colour']
-    form.banner_colour.data = email_branding['banner_colour']
-    form.single_id_colour.data = email_branding['single_id_colour']
-    form.domain.data = email_branding['domain']
 
     return render_template(
         'views/email-branding/manage-branding.html',
@@ -93,7 +91,7 @@ def update_email_branding(branding_id, logo=None):
 @login_required
 @user_is_platform_admin
 def create_email_branding(logo=None):
-    form = ServiceUpdateEmailBranding()
+    form = ServiceUpdateEmailBranding(brand_type='govuk')
 
     if form.validate_on_submit():
         if form.file.data:
@@ -119,9 +117,8 @@ def create_email_branding(logo=None):
             name=form.name.data,
             text=form.text.data,
             colour=form.colour.data,
-            banner_colour=form.banner_colour.data,
-            single_id_colour=form.single_id_colour.data,
-            domain=form.domain.data
+            domain=form.domain.data,
+            brand_type=form.brand_type.data,
         )
 
         return redirect(url_for('.email_branding'))

@@ -2445,6 +2445,7 @@ def create_email_brandings(number_of_brandings, non_standard_values={}, shuffle=
             'text': 'org {}'.format(idx),
             'colour': None,
             'logo': 'logo{}.png'.format(idx),
+            'brand_type': 'org',
         } for idx in range(1, number_of_brandings + 1)]
 
     for idx, row in enumerate(non_standard_values):
@@ -2528,9 +2529,8 @@ def mock_get_email_branding(mocker, fake_uuid):
                 'text': 'Organisation text',
                 'id': fake_uuid,
                 'colour': '#f00',
-                'banner_colour': '#f11',
-                'single_id_colour': '#f22',
                 'domain': 'sample.com',
+                'brand_type': 'org',
             }
         }
 
@@ -2549,8 +2549,7 @@ def mock_get_email_branding_without_brand_text(mocker, fake_uuid):
                 'text': '',
                 'id': fake_uuid,
                 'colour': '#f00',
-                'banner_colour': '#f11',
-                'single_id_colour': '#f22'
+                'brand_type': 'org_banner'
             }
         }
 
@@ -2562,7 +2561,7 @@ def mock_get_email_branding_without_brand_text(mocker, fake_uuid):
 
 @pytest.fixture(scope='function')
 def mock_create_email_branding(mocker):
-    def _create_email_branding(logo, name, text, colour, banner_colour, single_id_colour, domain):
+    def _create_email_branding(logo, name, text, colour, domain, brand_type):
         return
 
     return mocker.patch(
@@ -2572,7 +2571,7 @@ def mock_create_email_branding(mocker):
 
 @pytest.fixture(scope='function')
 def mock_update_email_branding(mocker):
-    def _update_email_branding(branding_id, logo, name, text, colour, banner_colour, single_id_colour, domain):
+    def _update_email_branding(branding_id, logo, name, text, colour, domain, brand_type):
         return
 
     return mocker.patch(

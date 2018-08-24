@@ -58,8 +58,6 @@ def test_edit_email_branding_shows_the_correct_branding_info(
     assert page.select_one('#name').attrs.get('value') == 'Organisation name'
     assert page.select_one('#text').attrs.get('value') == 'Organisation text'
     assert page.select_one('#colour').attrs.get('value') == '#f00'
-    assert page.select_one('#banner_colour').attrs.get('value') == '#f11'
-    assert page.select_one('#single_id_colour').attrs.get('value') == '#f22'
     assert page.select_one('#domain').attrs.get('value') == 'sample.com'
 
 
@@ -79,8 +77,6 @@ def test_create_email_branding_does_not_show_any_branding_info(
     assert page.select_one('#name').attrs.get('value') == ''
     assert page.select_one('#text').attrs.get('value') == ''
     assert page.select_one('#colour').attrs.get('value') == ''
-    assert page.select_one('#banner_colour').attrs.get('value') == ''
-    assert page.select_one('#single_id_colour').attrs.get('value') == ''
     assert page.select_one('#domain').attrs.get('value') == ''
 
 
@@ -96,8 +92,7 @@ def test_create_new_email_branding_without_logo(
         'text': 'new text',
         'name': 'new name',
         'domain': 'sample.com',
-        'banner_colour': '#FFFF00',
-        'single_id_colour': '#00FF00',
+        'brand_type': 'govuk'
     }
 
     mock_persist = mocker.patch('app.main.views.email_branding.persist_logo')
@@ -115,9 +110,8 @@ def test_create_new_email_branding_without_logo(
         name=data['name'],
         text=data['text'],
         colour=data['colour'],
-        banner_colour=data['banner_colour'],
-        single_id_colour=data['single_id_colour'],
-        domain=data['domain']
+        domain=data['domain'],
+        brand_type=data['brand_type']
     )
     assert mock_persist.call_args_list == []
 
@@ -137,8 +131,7 @@ def test_create_new_email_branding_when_branding_saved(
         'text': 'new text',
         'name': 'new name',
         'domain': 'sample.com',
-        'banner_colour': '#FFFF00',
-        'single_id_colour': '#00FF00',
+        'brand_type': 'govuk'
     }
 
     temp_filename = LOGO_LOCATION_STRUCTURE.format(
@@ -159,8 +152,7 @@ def test_create_new_email_branding_when_branding_saved(
             'text': data['text'],
             'cdn_url': 'https://static-logos.cdn.com',
             'domain': data['domain'],
-            'banner_colour': data['banner_colour'],
-            'single_id_colour': data['single_id_colour'],
+            'brand_type': data['brand_type']
         }
     )
 
@@ -170,9 +162,8 @@ def test_create_new_email_branding_when_branding_saved(
         name=data['name'],
         text=data['text'],
         colour=data['colour'],
-        banner_colour=data['banner_colour'],
-        single_id_colour=data['single_id_colour'],
-        domain=data['domain']
+        domain=data['domain'],
+        brand_type=data['brand_type']
     )
 
 
@@ -238,9 +229,8 @@ def test_update_existing_branding(
         'colour': '#0000ff',
         'text': 'new text',
         'name': 'new name',
-        'banner_colour': '#FFFF00',
-        'single_id_colour': '#00FF00',
         'domain': 'sample.com',
+        'brand_type': 'govuk'
     }
 
     temp_filename = LOGO_LOCATION_STRUCTURE.format(
@@ -257,8 +247,7 @@ def test_update_existing_branding(
         content_type='multipart/form-data',
         data={'colour': data['colour'], 'name': data['name'], 'text': data['text'],
               'cdn_url': 'https://static-logos.cdn.com',
-              'banner_colour': data['banner_colour'], 'single_id_colour': data['single_id_colour'],
-              'domain': data['domain']
+              'domain': data['domain'], 'brand_type': data['brand_type']
               }
     )
 
@@ -269,9 +258,8 @@ def test_update_existing_branding(
         name=data['name'],
         text=data['text'],
         colour=data['colour'],
-        banner_colour=data['banner_colour'],
-        single_id_colour=data['single_id_colour'],
         domain=data['domain'],
+        brand_type=data['brand_type']
     )
 
 
@@ -326,7 +314,6 @@ def test_logo_persisted_when_organisation_saved(
         url_for('.create_email_branding', logo=temp_filename),
         content_type='multipart/form-data'
     )
-
     assert resp.status_code == 302
 
     assert not mocked_upload_logo.called
@@ -355,8 +342,7 @@ def test_colour_regex_validation(
         'text': 'new text',
         'name': 'new name',
         'domain': 'sample.com',
-        'banner_colour': '#FFFF00',
-        'single_id_colour': '#00FF00',
+        'brand_type': 'govuk'
     }
 
     mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
@@ -366,5 +352,4 @@ def test_colour_regex_validation(
         content_type='multipart/form-data',
         data=data
     )
-
     assert response.status_code == expected_status_code
