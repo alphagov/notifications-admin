@@ -505,23 +505,24 @@ def test_should_raise_duplicate_name_handled(
 
 
 @pytest.mark.parametrize('count_of_users_with_manage_service, expected_user_checklist_item', [
-    (1, 'Not done: Have more than one team member with the ‘Manage service’ permission'),
-    (2, 'Done: Have more than one team member with the ‘Manage service’ permission'),
+    (1, 'Add a team member who can manage settings, team and usage Not completed'),
+    (2, 'Add a team member who can manage settings, team and usage Completed'),
 ])
 @pytest.mark.parametrize('count_of_templates, expected_templates_checklist_item', [
-    (0, 'Not done: Create templates showing the kind of messages you plan to send'),
-    (1, 'Done: Create templates showing the kind of messages you plan to send'),
-    (2, 'Done: Create templates showing the kind of messages you plan to send'),
+    (0, 'Add content to templates to show the kind of messages you’ll send Not completed'),
+    (1, 'Add content to templates to show the kind of messages you’ll send Completed'),
+    (2, 'Add content to templates to show the kind of messages you’ll send Completed'),
 ])
 @pytest.mark.parametrize('count_of_email_templates, reply_to_email_addresses, expected_reply_to_checklist_item', [
     pytest.mark.xfail((0, [], ''), raises=IndexError),
     pytest.mark.xfail((0, [{}], ''), raises=IndexError),
-    (1, [], 'Not done: Add an email reply-to address'),
-    (1, [{}], 'Done: Add an email reply-to address'),
+    (1, [], 'Add an email reply-to address Not completed'),
+    (1, [{}], 'Add an email reply-to address Completed'),
 ])
 def test_should_show_request_to_go_live_checklist(
     client_request,
     mocker,
+    single_sms_sender,
     count_of_users_with_manage_service,
     expected_user_checklist_item,
     count_of_templates,
@@ -533,7 +534,8 @@ def test_should_show_request_to_go_live_checklist(
 
     def _count_templates(service_id, template_type=None):
         return {
-            'email': count_of_email_templates
+            'email': count_of_email_templates,
+            'sms': 0,
         }.get(template_type, count_of_templates)
 
     mock_count_users = mocker.patch(
@@ -552,9 +554,9 @@ def test_should_show_request_to_go_live_checklist(
     page = client_request.get(
         'main.request_to_go_live', service_id=SERVICE_ONE_ID
     )
-    assert page.h1.text == 'Request to go live'
+    assert page.h1.text == 'Before you request to go live'
 
-    checklist_items = page.select('main ul[class=bottom-gutter] li')
+    checklist_items = page.select('.task-list .task-list-item')
 
     assert normalize_spaces(checklist_items[0].text) == expected_user_checklist_item
     assert normalize_spaces(checklist_items[1].text) == expected_templates_checklist_item
@@ -569,10 +571,116 @@ def test_should_show_request_to_go_live_checklist(
     assert mock_count_templates.call_args_list == [
         call(SERVICE_ONE_ID),
         call(SERVICE_ONE_ID, template_type='email'),
+        call(SERVICE_ONE_ID, template_type='sms'),
     ]
 
     if count_of_email_templates:
         mock_get_reply_to_email_addresses.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize('organisation_type,count_of_sms_templates, sms_senders, expected_sms_sender_checklist_item', [
+    pytest.mark.xfail((
+        'local',
+        0,
+        [],
+        '',
+    ), raises=IndexError),
+    pytest.mark.xfail((
+        'local',
+        0,
+        [{'is_default': True, 'sms_sender': 'GOVUK'}],
+        '',
+    ), raises=IndexError),
+    pytest.mark.xfail((
+        None,
+        99,
+        [{'is_default': True, 'sms_sender': 'GOVUK'}],
+        '',
+    ), raises=IndexError),
+    pytest.mark.xfail((
+        'central',
+        99,
+        [{'is_default': True, 'sms_sender': 'GOVUK'}],
+        '',
+    ), raises=IndexError),
+    (
+        'local',
+        1,
+        [],
+        'Change your text message sender name Not completed',
+    ),
+    (
+        'local',
+        1,
+        [{'is_default': True, 'sms_sender': 'GOVUK'}],
+        'Change your text message sender name Not completed',
+    ),
+    (
+        'local',
+        1,
+        [
+            {'is_default': False, 'sms_sender': 'GOVUK'},
+            {'is_default': True, 'sms_sender': 'KUVOG'},
+        ],
+        'Change your text message sender name Completed',
+    ),
+    (
+        'nhs',
+        1,
+        [{'is_default': True, 'sms_sender': 'KUVOG'}],
+        'Change your text message sender name Completed',
+    ),
+])
+def test_should_check_for_sms_sender_on_go_live(
+    client_request,
+    service_one,
+    mocker,
+    organisation_type,
+    count_of_sms_templates,
+    sms_senders,
+    expected_sms_sender_checklist_item,
+):
+
+    service_one['organisation_type'] = organisation_type
+
+    def _count_templates(service_id, template_type=None):
+        return {
+            'email': 0,
+            'sms': count_of_sms_templates,
+        }.get(template_type, count_of_sms_templates)
+
+    mocker.patch(
+        'app.main.views.service_settings.user_api_client.get_count_of_users_with_permission',
+        return_value=99,
+    )
+    mock_count_templates = mocker.patch(
+        'app.main.views.service_settings.service_api_client.count_service_templates',
+        side_effect=_count_templates,
+    )
+    mock_get_sms_senders = mocker.patch(
+        'app.main.views.service_settings.service_api_client.get_sms_senders',
+        return_value=sms_senders,
+    )
+    mocker.patch(
+        'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
+        return_value=[],
+    )
+
+    page = client_request.get(
+        'main.request_to_go_live', service_id=SERVICE_ONE_ID
+    )
+    assert page.h1.text == 'Before you request to go live'
+
+    checklist_items = page.select('.task-list .task-list-item')
+    assert normalize_spaces(checklist_items[2].text) == expected_sms_sender_checklist_item
+
+    assert mock_count_templates.call_args_list == [
+        call(SERVICE_ONE_ID),
+        call(SERVICE_ONE_ID, template_type='email'),
+        call(SERVICE_ONE_ID, template_type='sms'),
+    ]
+
+    mock_get_sms_senders.assert_called_once_with(SERVICE_ONE_ID)
 
 
 def test_should_show_request_to_go_live(
@@ -581,7 +689,7 @@ def test_should_show_request_to_go_live(
     page = client_request.get(
         'main.submit_request_to_go_live', service_id=SERVICE_ONE_ID
     )
-    assert page.h1.text == 'How do you plan to use Notify?'
+    assert page.h1.text == 'Request to go live'
     for channel, label in (
         ('email', 'Emails'),
         ('sms', 'Text messages'),

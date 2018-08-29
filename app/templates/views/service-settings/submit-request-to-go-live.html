@@ -6,12 +6,16 @@
 {% from "components/banner.html" import banner_wrapper %}
 
 {% block service_page_title %}
-  How do you plan to use Notify?
+  Request to go live
 {% endblock %}
 
 {% block maincolumn_content %}
 
-      <h1 class="heading-large">How do you plan to use Notify?</h1>
+      <h1 class="heading-large">Request to go live</h1>
+
+      <p class="bottom-gutter">
+        Tell us how you plan to use Notify. When we receive your request we’ll make your service live within one working day.
+      </p>
 
       <form method="post" class="top-gutter">
         {{ checkbox_group('What kind of messages will you be sending?', [

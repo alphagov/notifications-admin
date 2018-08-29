@@ -4,46 +4,50 @@
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/banner.html" import banner_wrapper %}
-{% from "components/tick-cross.html" import tick_cross_done_not_done %}
+{% from "components/task-list.html" import task_list_wrapper, task_list_item %}
 
 {% block service_page_title %}
-  Request to go live
+  Before you request to go live
 {% endblock %}
 
 {% block maincolumn_content %}
   <div class="grid-row">
     <div class="column-whole">
-      <h1 class="heading-large">Request to go live</h1>
-      <p>
-        Before your service can go live on Notify, you’ll need to:
-      </p>
-      <ul class='bottom-gutter'>
-        {{ tick_cross_done_not_done(
+      <h1 class="heading-large">Before you request to go live</h1>
+      {% call task_list_wrapper() %}
+        {{ task_list_item(
           has_team_members,
-          'Have more than one <a href="{}">team member</a> with the ‘Manage service’ permission'.format(
+          '<a href="{}">Add a team member who can manage settings, team and usage</a>
+'.format(
             url_for('main.manage_users', service_id=current_service.id)
           )|safe,
         ) }}
-        {{ tick_cross_done_not_done(
+        {{ task_list_item(
           has_templates,
-          'Create <a href="{}">templates</a> showing the kind of messages you plan to send'.format(
+          '<a href="{}">Add content to
+templates to show the kind of messages you’ll send</a>'.format(
             url_for('main.choose_template', service_id=current_service.id)
           )|safe,
         ) }}
         {% if has_email_templates %}
-          {{ tick_cross_done_not_done(
+          {{ task_list_item(
             has_email_reply_to_address,
-            'Add an <a href="{}">email reply-to address</a>'.format(
+            '<a href="{}">Add an email reply-to address</a>'.format(
               url_for('main.service_email_reply_to', service_id=current_service.id)
             )|safe,
           ) }}
         {% endif %}
-      </ul>
+        {% if has_sms_templates and shouldnt_use_govuk_as_sms_sender %}
+          {{ task_list_item(
+            not sms_sender_is_govuk,
+            '<a href="{}">Change your text message sender name</a>'.format(
+              url_for('main.service_sms_senders', service_id=current_service.id)
+            )|safe
+          ) }}
+        {% endif %}
+      {% endcall %}
       <p>
         You also need to accept our <a href="{{ url_for('.terms') }}">terms of use</a>.
-      </p>
-      <p class="bottom-gutter">
-        We’ll make your service live within one working day.
       </p>
       <p>
         <a href="{{ url_for('main.submit_request_to_go_live', service_id=current_service.id) }}" class="button">Continue</a>
