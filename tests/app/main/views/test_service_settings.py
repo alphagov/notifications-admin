@@ -2731,10 +2731,13 @@ def test_update_service_organisation_does_not_update_if_same_value(
 
 def test_show_email_branding_request_page(
     client_request,
+    mock_get_email_branding
 ):
     page = client_request.get(
         '.branding_request', service_id=SERVICE_ONE_ID
     )
+
+    mock_get_email_branding.called_once_with(None)
 
     radios = page.select('input[type=radio]')
 
@@ -2767,6 +2770,11 @@ def test_submit_email_branding_request(
     single_sms_sender,
 ):
 
+    email_branding_client = mocker.patch(
+        'app.email_branding_client.get_email_branding',
+        return_value={'email_branding': {'brand_type': choice}}
+    )
+
     zendesk = mocker.patch(
         'app.main.views.service_settings.zendesk_client.create_ticket',
         autospec=True,
@@ -2779,6 +2787,8 @@ def test_submit_email_branding_request(
         },
         _follow_redirects=True,
     )
+
+    email_branding_client.assert_called_once_with(None)
 
     zendesk.assert_called_once_with(
         message='\n'.join([
