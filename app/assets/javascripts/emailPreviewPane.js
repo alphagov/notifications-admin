@@ -13,7 +13,7 @@
 
   const $paneWrapper = $('<div class="column-full"></div>');
   const $form = $('form');
-  const $previewPane = $('<iframe src="/_email?' + 
+  const $previewPane = $('<iframe src="/_email?' +
                           buildQueryString(['branding_style', branding_style]) +
                           '" class="email-branding-preview"></iframe>');
 
