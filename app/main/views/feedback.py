@@ -23,6 +23,9 @@ def get_prefilled_message():
             'Please can you tell me if there’s an agreement in place '
             'between GOV.UK Notify and my organisation?'
         ),
+        'letter-branding': (
+            'I would like my own logo on my letter templates.'
+        ),
     }.get(
         request.args.get('body'), ''
     )

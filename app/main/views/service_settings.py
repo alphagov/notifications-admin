@@ -941,6 +941,18 @@ def set_letter_branding(service_id):
     )
 
 
+@main.route("/services/<service_id>/service-settings/request-letter-branding", methods=['GET', 'POST'])
+@login_required
+@user_has_permissions('manage_service')
+def request_letter_branding(service_id):
+    return render_template(
+        'views/service-settings/request-letter-branding.html',
+        letter_branding=email_branding_client.get_letter_email_branding()[
+            current_service.get('dvla_organisation', '001')
+        ]
+    )
+
+
 @main.route("/services/<service_id>/service-settings/link-service-to-organisation", methods=['GET', 'POST'])
 @login_required
 @user_is_platform_admin
