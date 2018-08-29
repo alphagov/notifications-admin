@@ -91,7 +91,7 @@ def update_email_branding(branding_id, logo=None):
 @login_required
 @user_is_platform_admin
 def create_email_branding(logo=None):
-    form = ServiceUpdateEmailBranding(brand_type='govuk')
+    form = ServiceUpdateEmailBranding(brand_type='org')
 
     if form.validate_on_submit():
         if form.file.data:
