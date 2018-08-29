@@ -1718,31 +1718,6 @@ def test_set_letter_branding_saves(
     mock_update_service.assert_called_once_with(service_one['id'], dvla_organisation='500')
 
 
-def test_should_show_branding_types(
-    logged_in_platform_admin_client,
-    service_one,
-    mock_get_all_email_branding,
-):
-    response = logged_in_platform_admin_client.get(url_for(
-        'main.service_set_email_branding', service_id=service_one['id']
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert page.find('input', attrs={"id": "branding_type-0"})['value'] == 'govuk'
-    assert page.find('input', attrs={"id": "branding_type-1"})['value'] == 'both'
-    assert page.find('input', attrs={"id": "branding_type-2"})['value'] == 'org'
-    assert page.find('input', attrs={"id": "branding_type-3"})['value'] == 'org_banner'
-
-    assert 'checked' in page.find('input', attrs={"id": "branding_type-0"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_type-1"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_type-2"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_type-3"}).attrs
-
-    app.email_branding_client.get_all_email_branding.assert_called_once_with()
-    app.service_api_client.get_service.assert_called_once_with(service_one['id'])
-
-
 def test_should_show_branding_styles(
     logged_in_platform_admin_client,
     service_one,
@@ -1827,8 +1802,8 @@ def test_should_send_branding_and_organisations_to_preview(
     )
     assert response.status_code == 302
     assert response.location == url_for('main.service_preview_email_branding',
-                                        service_id=service_one['id'], branding_type='org',
-                                        branding_style='1', _external=True)
+                                        service_id=service_one['id'], branding_style='1',
+                                        _external=True)
 
     mock_get_all_email_branding.assert_called_once_with()
 
@@ -1847,10 +1822,8 @@ def test_should_preview_email_branding(
     iframeURLComponents = urlparse(iframe['src'])
     iframeQString = parse_qs(iframeURLComponents.query)
 
-    assert page.find('input', attrs={"id": "branding_type"})['value'] == 'org'
     assert page.find('input', attrs={"id": "branding_style"})['value'] == '1'
     assert iframeURLComponents.path == '/_email'
-    assert iframeQString['branding_type'] == ['org']
     assert iframeQString['branding_style'] == ['1']
 
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
@@ -1866,7 +1839,6 @@ def test_should_set_branding_and_organisations(
             'main.service_preview_email_branding', service_id=service_one['id']
         ),
         data={
-            'branding_type': 'org',
             'branding_style': '1'
         }
     )
@@ -1876,7 +1848,6 @@ def test_should_set_branding_and_organisations(
 
     mock_update_service.assert_called_once_with(
         service_one['id'],
-        branding='org',
         email_branding='1'
     )
 
