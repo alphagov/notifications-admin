@@ -2503,10 +2503,7 @@ lawleyoverdale-pc.gov.uk:
   owner: Telford & Wrekin Council
   crown: false
   agreement_signed: false
-lbbd.gov.uk:
-  owner: Barking & Dagenham London Borough Council
-  crown: false
-  agreement_signed: false
+lbbd.gov.uk: barking-dagenham.gov.uk
 lbhf.gov.uk:
   owner: Hammersmith and Fulham London Borough Council
   crown: false
