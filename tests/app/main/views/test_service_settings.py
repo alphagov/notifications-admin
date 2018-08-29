@@ -503,22 +503,19 @@ def test_should_raise_duplicate_name_handled(
 
 
 @pytest.mark.parametrize('count_of_users_with_manage_service, expected_user_checklist_item', [
-    (1, 'More than one team member with the ‘Manage settings’ permission Not completed'),
-    (2, 'More than one team member with the ‘Manage settings’ permission Completed'),
+    (1, 'Add a team member who can manage settings, team and usage Not completed'),
+    (2, 'Add a team member who can manage settings, team and usage Completed'),
 ])
 @pytest.mark.parametrize('count_of_templates, expected_templates_checklist_item', [
-    (0, 'Templates showing the kind of messages you plan to send Not completed'),
-    (1, 'Templates showing the kind of messages you plan to send Completed'),
-    (2, 'Templates showing the kind of messages you plan to send Completed'),
+    (0, 'Add content to templates to show the kind of messages you’ll send Not completed'),
+    (1, 'Add content to templates to show the kind of messages you’ll send Completed'),
+    (2, 'Add content to templates to show the kind of messages you’ll send Completed'),
 ])
 @pytest.mark.parametrize('count_of_email_templates, reply_to_email_addresses, expected_reply_to_checklist_item', [
     pytest.mark.xfail((0, [], ''), raises=IndexError),
     pytest.mark.xfail((0, [{}], ''), raises=IndexError),
-    (1, [], 'An email reply-to address Not completed'),
-    (1, [{}], 'An email reply-to address Completed'),
-])
-@pytest.mark.parametrize('expected_sms_sender_item', [
-    ('Templates showing the kind of messages you plan to send Not completed'),
+    (1, [], 'Add an email reply-to address Not completed'),
+    (1, [{}], 'Add an email reply-to address Completed'),
 ])
 def test_should_show_request_to_go_live_checklist(
     client_request,
@@ -531,7 +528,6 @@ def test_should_show_request_to_go_live_checklist(
     count_of_email_templates,
     reply_to_email_addresses,
     expected_reply_to_checklist_item,
-    expected_sms_sender_item,
 ):
 
     def _count_templates(service_id, template_type=None):
@@ -556,7 +552,7 @@ def test_should_show_request_to_go_live_checklist(
     page = client_request.get(
         'main.request_to_go_live', service_id=SERVICE_ONE_ID
     )
-    assert page.h1.text == 'Request to go live'
+    assert page.h1.text == 'Before you request to go live'
 
     checklist_items = page.select('.task-list .task-list-item')
 
@@ -609,13 +605,13 @@ def test_should_show_request_to_go_live_checklist(
         'local',
         1,
         [],
-        'Change your text message sender from GOVUK Not completed',
+        'Change your text message sender name Not completed',
     ),
     (
         'local',
         1,
         [{'is_default': True, 'sms_sender': 'GOVUK'}],
-        'Change your text message sender from GOVUK Not completed',
+        'Change your text message sender name Not completed',
     ),
     (
         'local',
@@ -624,13 +620,13 @@ def test_should_show_request_to_go_live_checklist(
             {'is_default': False, 'sms_sender': 'GOVUK'},
             {'is_default': True, 'sms_sender': 'KUVOG'},
         ],
-        'Change your text message sender from GOVUK Completed',
+        'Change your text message sender name Completed',
     ),
     (
         'nhs',
         1,
         [{'is_default': True, 'sms_sender': 'KUVOG'}],
-        'Change your text message sender from GOVUK Completed',
+        'Change your text message sender name Completed',
     ),
 ])
 def test_should_check_for_sms_sender_on_go_live(
@@ -671,7 +667,7 @@ def test_should_check_for_sms_sender_on_go_live(
     page = client_request.get(
         'main.request_to_go_live', service_id=SERVICE_ONE_ID
     )
-    assert page.h1.text == 'Request to go live'
+    assert page.h1.text == 'Before you request to go live'
 
     checklist_items = page.select('.task-list .task-list-item')
     assert normalize_spaces(checklist_items[2].text) == expected_sms_sender_checklist_item
@@ -691,7 +687,7 @@ def test_should_show_request_to_go_live(
     page = client_request.get(
         'main.submit_request_to_go_live', service_id=SERVICE_ONE_ID
     )
-    assert page.h1.text == 'How do you plan to use Notify?'
+    assert page.h1.text == 'Request to go live'
     for channel, label in (
         ('email', 'Emails'),
         ('sms', 'Text messages'),
