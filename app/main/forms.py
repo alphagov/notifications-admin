@@ -727,7 +727,6 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
     brand_type = RadioField(
         "Brand type",
         choices=[
-            ('govuk', 'GOV.UK only'),
             ('both', 'GOV.UK and branding'),
             ('org', 'Branding only'),
             ('org_banner', 'Branding banner'),

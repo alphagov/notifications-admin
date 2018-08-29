@@ -92,7 +92,7 @@ def test_create_new_email_branding_without_logo(
         'text': 'new text',
         'name': 'new name',
         'domain': 'sample.com',
-        'brand_type': 'govuk'
+        'brand_type': 'org'
     }
 
     mock_persist = mocker.patch('app.main.views.email_branding.persist_logo')
@@ -131,7 +131,7 @@ def test_create_new_email_branding_when_branding_saved(
         'text': 'new text',
         'name': 'new name',
         'domain': 'sample.com',
-        'brand_type': 'govuk'
+        'brand_type': 'org_banner'
     }
 
     temp_filename = LOGO_LOCATION_STRUCTURE.format(
@@ -230,7 +230,7 @@ def test_update_existing_branding(
         'text': 'new text',
         'name': 'new name',
         'domain': 'sample.com',
-        'brand_type': 'govuk'
+        'brand_type': 'both'
     }
 
     temp_filename = LOGO_LOCATION_STRUCTURE.format(
@@ -342,7 +342,7 @@ def test_colour_regex_validation(
         'text': 'new text',
         'name': 'new name',
         'domain': 'sample.com',
-        'brand_type': 'govuk'
+        'brand_type': 'org'
     }
 
     mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
