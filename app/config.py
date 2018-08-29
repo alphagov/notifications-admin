@@ -109,7 +109,7 @@ class Preview(Config):
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-preview'
     MOU_BUCKET_NAME = 'notify.works-mou'
     NOTIFY_ENVIRONMENT = 'preview'
-    CHECK_PROXY_HEADER = True
+    CHECK_PROXY_HEADER = False
 
 
 class Staging(Config):
