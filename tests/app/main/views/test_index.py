@@ -40,6 +40,20 @@ def test_logged_in_user_redirects_to_choose_account(
     assert response.location == url_for('main.choose_account', _external=True)
 
 
+def test_robots(client):
+    assert url_for('main.robots') == '/robots.txt'
+    response = client.get(url_for('main.robots'))
+    assert response.headers['Content-Type'] == 'text/plain'
+    assert response.status_code == 200
+    assert response.get_data(as_text=True) == (
+        'User-agent: *\n'
+        'Disallow: /sign-in\n'
+        'Disallow: /support\n'
+        'Disallow: /support/\n'
+        'Disallow: /register\n'
+    )
+
+
 @pytest.mark.parametrize('view', [
     'cookies', 'privacy', 'using_notify', 'pricing', 'terms', 'integration_testing', 'roadmap',
     'features', 'callbacks', 'documentation', 'security'
