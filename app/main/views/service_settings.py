@@ -971,8 +971,11 @@ def link_service_to_organisation(service_id):
 @user_has_permissions('manage_service')
 def branding_request(service_id):
 
+    email_branding = email_branding_client.get_email_branding(
+        current_service.email_branding)['email_branding']
+
     form = BrandingOptionsEmail(
-        options=current_service.branding
+        options=email_branding['brand_type']
     )
 
     if form.validate_on_submit():
