@@ -17,22 +17,22 @@
       {% call task_list_wrapper() %}
         {{ task_list_item(
           has_team_members,
-          'Add a <a href="{}">team member</a> who can manage settings, team and usage
+          '<a href="{}">Add a team member who can manage settings, team and usage</a>
 '.format(
             url_for('main.manage_users', service_id=current_service.id)
           )|safe,
         ) }}
         {{ task_list_item(
           has_templates,
-          'Add content to
-<a href="{}">templates</a> to show the kind of messages you’ll send'.format(
+          '<a href="{}">Add content to
+templates to show the kind of messages you’ll send</a>'.format(
             url_for('main.choose_template', service_id=current_service.id)
           )|safe,
         ) }}
         {% if has_email_templates %}
           {{ task_list_item(
             has_email_reply_to_address,
-            'Add an <a href="{}">email reply-to address</a>'.format(
+            '<a href="{}">Add an email reply-to address</a>'.format(
               url_for('main.service_email_reply_to', service_id=current_service.id)
             )|safe,
           ) }}
@@ -40,7 +40,7 @@
         {% if has_sms_templates and shouldnt_use_govuk_as_sms_sender %}
           {{ task_list_item(
             not sms_sender_is_govuk,
-            'Change your <a href="{}">text message sender name</a>'.format(
+            '<a href="{}">Change your text message sender name</a>'.format(
               url_for('main.service_sms_senders', service_id=current_service.id)
             )|safe
           ) }}
