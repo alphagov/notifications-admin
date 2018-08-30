@@ -81,9 +81,9 @@ def design_content():
 @main.route('/_email')
 def email_template():
     branding_type = 'govuk'
-    branding_style = request.args.get('branding_style', None)
+    branding_style = request.args.get('branding_style', 'None')
 
-    if branding_style:
+    if branding_style != 'None':
         email_branding = email_branding_client.get_email_branding(branding_style)['email_branding']
         branding_type = email_branding['brand_type']
 
