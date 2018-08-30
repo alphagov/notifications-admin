@@ -101,9 +101,7 @@
 
         {% call settings_row(if_has_permission='email') %}
           {{ text_field('Email branding') }}
-          {{ text_field(
-            'GOV.UK' if current_service.branding == 'govuk' else 'Your branding'
-          ) }}
+          {{ text_field('Your branding' if email_branding else 'GOV.UK') }}
           {{ edit_field(
             'Change',
             url_for('.branding_request', service_id=current_service.id),
@@ -301,17 +299,7 @@
         {% endcall %}
         {% call row() %}
           {{ text_field('Email branding' )}}
-          {% call field() %}
-            {% if current_service.branding == 'govuk' %}
-              GOV.UK
-            {% elif current_service.branding == 'both' %}
-              GOV.UK and {{ email_branding.name if email_branding else None }}
-            {% elif current_service.branding == 'org' %}
-              Only {{ email_branding.name if email_branding else None }}
-            {% elif current_service.branding == 'org_banner' %}
-              Only {{ email_branding.name if email_branding else None }} banner
-            {% endif %}
-          {% endcall %}
+          {{ text_field(email_branding.name or 'GOV.UK') }}
           {{ edit_field('Change', url_for('.service_set_email_branding', service_id=current_service.id)) }}
         {% endcall %}
         {% call row() %}
