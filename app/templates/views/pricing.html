@@ -93,21 +93,21 @@
     <div class="bottom-gutter-3-2">
       {% call mapping_table(
         caption='Letter pricing',
-        field_headings=['', 'Crown bodies', 'Other public sector organisations'],
+        field_headings=['', 'Current price', 'Price from 1 October 2018'],
         field_headings_visible=True,
         caption_visible=False
       ) %}
-        {% for sheets, central, local in [
-          ('1 sheet', '30', '33'),
-          ('2 sheets', '33', '39'),
-          ('3 sheets', '36', '45'),
-          ('4 sheets', '39', '51'),
-          ('5 sheets', '42', '57'),
+        {% for sheets, current, future in [
+          ('1 sheet', '30', '30'),
+          ('2 sheets', '33', '35'),
+          ('3 sheets', '36', '40'),
+          ('4 sheets', '39', '45'),
+          ('5 sheets', '42', '50'),
         ] %}
           {% call row() %}
             {% call row_heading() %} {{ sheets }} (double-sided) {% endcall %}
-            {{ text_field(central + 'p + VAT') }}
-            {{ text_field(local + 'p + VAT') }}
+            {{ text_field(current + 'p + VAT') }}
+            {{ text_field(future + 'p + VAT') }}
           {% endcall %}
         {% endfor %}
       {% endcall %}
