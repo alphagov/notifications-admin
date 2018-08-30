@@ -14,7 +14,6 @@ from flask import (
 from flask_login import current_user, login_required
 from notifications_python_client.errors import HTTPError
 from notifications_utils.field import Field
-from notifications_utils.formatters import formatted_list
 
 from app import (
     billing_api_client,
@@ -217,13 +216,14 @@ def submit_request_to_go_live(service_id):
         zendesk_client.create_ticket(
             subject='Request to go live - {}'.format(current_service.name),
             message=(
-                'Service: {}\n'
-                '{}\n'
+                'Service: {service_name}\n'
+                '{service_dashboard}\n'
                 '\n---'
-                '\nOrganisation type: {}'
-                '\nAgreement signed: {}'
-                '\nChannel: {}\nStart date: {}\nStart volume: {}'
-                '\nPeak volume: {}'
+                '\nOrganisation type: {organisation_type}'
+                '\nAgreement signed: {agreement}'
+                '\nEmails in next year: {volume_email}'
+                '\nText messages in next year: {volume_sms}'
+                '\nLetters in next year: {volume_letter}'
                 '\n'
                 '\n---'
                 '\n'
@@ -233,23 +233,20 @@ def submit_request_to_go_live(service_id):
                 '{user_name}\t'
                 '{user_email}\t'
                 '-\t'
-                '{date}'
+                '{date}\t'
+                '{volume_sms}\t'
+                '{volume_email}\t'
+                '{volume_letter}'
             ).format(
-                current_service.name,
-                url_for('main.service_dashboard', service_id=current_service.id, _external=True),
-                current_service.organisation_type,
-                AgreementInfo.from_current_user().as_human_readable,
-                formatted_list(filter(None, (
-                    'email' if form.channel_email.data else None,
-                    'text messages' if form.channel_sms.data else None,
-                    'letters' if form.channel_letter.data else None,
-                )), before_each='', after_each=''),
-                form.start_date.data,
-                form.start_volume.data,
-                form.peak_volume.data,
+                service_name=current_service.name,
+                service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
+                organisation_type=current_service.organisation_type,
+                agreement=AgreementInfo.from_current_user().as_human_readable,
+                volume_email=form.volume_email.data,
+                volume_sms=form.volume_sms.data,
+                volume_letter=form.volume_letter.data,
                 service_id=current_service.id,
                 organisation=AgreementInfo.from_current_user().owner,
-                service_name=current_service.name,
                 user_name=current_user.name,
                 user_email=current_user.email_address,
                 date=datetime.now(tz=pytz.timezone('Europe/London')).strftime('%d/%m/%Y'),

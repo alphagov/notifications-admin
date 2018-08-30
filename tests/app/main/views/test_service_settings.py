@@ -691,12 +691,21 @@ def test_should_show_request_to_go_live(
     )
     assert page.h1.text == 'Request to go live'
     for channel, label in (
-        ('email', 'Emails'),
-        ('sms', 'Text messages'),
-        ('letter', 'Letters'),
+        (
+            'email',
+            'How many emails do you expect to send in the next year? For example, 1,000,000'
+        ),
+        (
+            'sms',
+            'How many text messages do you expect to send in the next year? For example, 500,000'
+        ),
+        (
+            'letter',
+            'How many letters do you expect to send in the next year? For example, 5,000'
+        ),
     ):
         assert normalize_spaces(
-            page.select_one('label[for=channel_{}]'.format(channel)).text
+            page.select_one('label[for=volume_{}]'.format(channel)).text
         ) == label
 
 
@@ -716,11 +725,9 @@ def test_should_redirect_after_request_to_go_live(
         'main.submit_request_to_go_live',
         service_id=SERVICE_ONE_ID,
         _data={
-            'channel_email': 'y',
-            'channel_sms': 'y',
-            'start_date': '01/01/2017',
-            'start_volume': '100,000',
-            'peak_volume': '2,000,000',
+            'volume_email': '111',
+            'volume_sms': '222',
+            'volume_letter': '333',
         },
         _follow_redirects=True
     )
@@ -738,13 +745,12 @@ def test_should_redirect_after_request_to_go_live(
         '---\n'
         'Organisation type: central\n'
         'Agreement signed: Can’t tell (domain is user.gov.uk)\n'
-        'Channel: email and text messages\n'
-        'Start date: 01/01/2017\n'
-        'Start volume: 100,000\n'
-        'Peak volume: 2,000,000\n'
+        'Emails in next year: 111\n'
+        'Text messages in next year: 222\n'
+        'Letters in next year: 333\n'
         '\n'
         '---\n'
-        '{}\tNone\tservice one\tTest User\ttest@user.gov.uk\t-\t21/12/2012'
+        '{}\tNone\tservice one\tTest User\ttest@user.gov.uk\t-\t21/12/2012\t222\t111\t333'
     ).format(SERVICE_ONE_ID, SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (

@@ -569,19 +569,16 @@ class Triage(StripWhitespaceForm):
 
 
 class RequestToGoLiveForm(StripWhitespaceForm):
-    channel_email = BooleanField('Emails')
-    channel_sms = BooleanField('Text messages')
-    channel_letter = BooleanField('Letters')
-    start_date = StringField(
-        'When will you be ready to start sending messages?',
+    volume_email = StringField(
+        'How many emails do you expect to send in the next year?',
         validators=[DataRequired(message='Can’t be empty')]
     )
-    start_volume = StringField(
-        'How many messages do you expect to send to start with?',
+    volume_sms = StringField(
+        'How many text messages do you expect to send in the next year?',
         validators=[DataRequired(message='Can’t be empty')]
     )
-    peak_volume = StringField(
-        'Will the number of messages increase and when will that start?',
+    volume_letter = StringField(
+        'How many letters do you expect to send in the next year?',
         validators=[DataRequired(message='Can’t be empty')]
     )
 
