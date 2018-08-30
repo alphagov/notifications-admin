@@ -224,6 +224,7 @@ def submit_request_to_go_live(service_id):
                 '\nEmails in next year: {volume_email}'
                 '\nText messages in next year: {volume_sms}'
                 '\nLetters in next year: {volume_letter}'
+                '\nConsent to research: {research_consent}'
                 '\n'
                 '\n---'
                 '\n'
@@ -240,11 +241,12 @@ def submit_request_to_go_live(service_id):
             ).format(
                 service_name=current_service.name,
                 service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
-                organisation_type=current_service.organisation_type,
+                organisation_type=str(current_service.organisation_type).title(),
                 agreement=AgreementInfo.from_current_user().as_human_readable,
                 volume_email=form.volume_email.data,
                 volume_sms=form.volume_sms.data,
                 volume_letter=form.volume_letter.data,
+                research_consent=form.research_consent.data.title(),
                 service_id=current_service.id,
                 organisation=AgreementInfo.from_current_user().owner,
                 user_name=current_user.name,

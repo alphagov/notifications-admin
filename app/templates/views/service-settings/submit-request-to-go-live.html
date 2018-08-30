@@ -13,20 +13,18 @@
 
       <h1 class="heading-large">Request to go live</h1>
 
-      <div class="grid-row bottom-gutter-1-3">
-        <div class="column-five-sixths">
-          <p>
-            Tell us how you plan to use Notify. When we receive your request we’ll make your service live within one working day.
-          </p>
-        </div>
-      </div>
-
       <form method="post">
         <div class="form-group">
           {{ textbox(form.volume_email, width='1-2', hint='For example, 1,000,000') }}
           {{ textbox(form.volume_sms, width='1-2', hint='For example, 500,000') }}
           {{ textbox(form.volume_letter, width='1-2', hint='For example, 5,000') }}
         </div>
+        {{ radios(form.research_consent, hint='You don’t have to take part and you can unsubscribe at any time') }}
+        <p>
+          When we receive your request we’ll get back to you within one working day.
+        </p>
+
+
         <p class="bottom-gutter">
           By requesting to go live you’re agreeing to our <a href="{{ url_for('.terms') }}">terms of use</a>.
         </p>

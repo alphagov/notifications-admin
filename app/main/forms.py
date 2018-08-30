@@ -581,6 +581,14 @@ class RequestToGoLiveForm(StripWhitespaceForm):
         'How many letters do you expect to send in the next year?',
         validators=[DataRequired(message='Can’t be empty')]
     )
+    research_consent = RadioField(
+        'Can we contact you when we’re doing user research?',
+        choices=[
+            ('yes', 'Yes'),
+            ('no', 'No'),
+        ],
+        validators=[DataRequired()]
+    )
 
 
 class ProviderForm(StripWhitespaceForm):

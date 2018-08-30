@@ -728,6 +728,7 @@ def test_should_redirect_after_request_to_go_live(
             'volume_email': '111',
             'volume_sms': '222',
             'volume_letter': '333',
+            'research_consent': 'yes',
         },
         _follow_redirects=True
     )
@@ -743,11 +744,12 @@ def test_should_redirect_after_request_to_go_live(
         'http://localhost/services/{}\n'
         '\n'
         '---\n'
-        'Organisation type: central\n'
+        'Organisation type: Central\n'
         'Agreement signed: Can’t tell (domain is user.gov.uk)\n'
         'Emails in next year: 111\n'
         'Text messages in next year: 222\n'
         'Letters in next year: 333\n'
+        'Consent to research: Yes\n'
         '\n'
         '---\n'
         '{}\tNone\tservice one\tTest User\ttest@user.gov.uk\t-\t21/12/2012\t222\t111\t333'
