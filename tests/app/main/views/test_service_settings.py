@@ -698,14 +698,6 @@ def test_should_show_request_to_go_live(
         assert normalize_spaces(
             page.select_one('label[for=channel_{}]'.format(channel)).text
         ) == label
-    for feature, label in (
-        ('one_off', 'One at a time'),
-        ('upload', 'Upload a spreadsheet of recipients'),
-        ('api', 'Integrate with the GOV.UK Notify API'),
-    ):
-        assert normalize_spaces(
-            page.select_one('label[for=method_{}]'.format(feature)).text
-        ) == label
 
 
 @freeze_time("2012-12-21")
@@ -729,9 +721,6 @@ def test_should_redirect_after_request_to_go_live(
             'start_date': '01/01/2017',
             'start_volume': '100,000',
             'peak_volume': '2,000,000',
-            'method_one_off': 'y',
-            'method_upload': 'y',
-            'method_api': 'y',
         },
         _follow_redirects=True
     )
@@ -753,7 +742,6 @@ def test_should_redirect_after_request_to_go_live(
         'Start date: 01/01/2017\n'
         'Start volume: 100,000\n'
         'Peak volume: 2,000,000\n'
-        'Features: one off, file upload and API\n'
         '\n'
         '---\n'
         '{}\tNone\tservice one\tTest User\ttest@user.gov.uk\t-\t21/12/2012'

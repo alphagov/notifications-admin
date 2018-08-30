@@ -224,7 +224,6 @@ def submit_request_to_go_live(service_id):
                 '\nAgreement signed: {}'
                 '\nChannel: {}\nStart date: {}\nStart volume: {}'
                 '\nPeak volume: {}'
-                '\nFeatures: {}'
                 '\n'
                 '\n---'
                 '\n'
@@ -248,11 +247,6 @@ def submit_request_to_go_live(service_id):
                 form.start_date.data,
                 form.start_volume.data,
                 form.peak_volume.data,
-                formatted_list(filter(None, (
-                    'one off' if form.method_one_off.data else None,
-                    'file upload' if form.method_upload.data else None,
-                    'API' if form.method_api.data else None,
-                )), before_each='', after_each=''),
                 service_id=current_service.id,
                 organisation=AgreementInfo.from_current_user().owner,
                 service_name=current_service.name,

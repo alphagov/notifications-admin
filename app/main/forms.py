@@ -584,9 +584,6 @@ class RequestToGoLiveForm(StripWhitespaceForm):
         'Will the number of messages increase and when will that start?',
         validators=[DataRequired(message='Can’t be empty')]
     )
-    method_one_off = BooleanField('One at a time')
-    method_upload = BooleanField('Upload a spreadsheet of recipients')
-    method_api = BooleanField('Integrate with the GOV.UK Notify API')
 
 
 class ProviderForm(StripWhitespaceForm):

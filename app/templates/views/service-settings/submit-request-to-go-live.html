@@ -28,11 +28,6 @@
           {{ textbox(form.start_volume, width='1-1', hint='For example, ‘1,000 per month’.') }}
           {{ textbox(form.peak_volume, width='1-1', hint='For example, ‘Messages will increase to 20,000 per month in January’.') }}
         </div>
-        {{ checkbox_group('How are you going to send messages?', [
-          form.method_one_off,
-          form.method_upload,
-          form.method_api
-        ]) }}
         <p class="bottom-gutter">
           By requesting to go live you’re agreeing to our <a href="{{ url_for('.terms') }}">terms of use</a>.
         </p>
