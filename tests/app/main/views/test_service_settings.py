@@ -752,7 +752,7 @@ def test_should_redirect_after_request_to_go_live(
         'Consent to research: Yes\n'
         '\n'
         '---\n'
-        '{}\tNone\tservice one\tTest User\ttest@user.gov.uk\t-\t21/12/2012\t222\t111\t333'
+        '{}, None, service one, Test User, test@user.gov.uk, -, 21/12/2012, 222, 111, 333'
     ).format(SERVICE_ONE_ID, SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (

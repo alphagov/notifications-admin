@@ -85,7 +85,6 @@ class Development(Config):
     API_HOST_NAME = 'http://localhost:6011'
     DANGEROUS_SALT = 'dev-notify-salt'
     SECRET_KEY = 'dev-notify-secret-key'
-    ZENDESK_API_KEY = "some-key"
 
 
 class Test(Development):
