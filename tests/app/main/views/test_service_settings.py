@@ -1744,7 +1744,7 @@ def test_should_show_branding_styles(
     assert branding_style_choices[5]['value'] == '5'
 
     # radios should be in alphabetical order, based on their labels
-    assert radio_labels == ['None', 'org 1', 'org 2', 'org 3', 'org 4', 'org 5']
+    assert radio_labels == ['GOV.UK', 'org 1', 'org 2', 'org 3', 'org 4', 'org 5']
 
     assert 'checked' in branding_style_choices[0].attrs
     assert 'checked' not in branding_style_choices[1].attrs
