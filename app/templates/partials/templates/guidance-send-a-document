@@ -1,0 +1,14 @@
+<h2 class="heading-medium">
+  Send a document by email
+</h2>
+<p>
+  Use double brackets to add a placeholder field to your template. This will contain a secure link to download the document.
+</p>
+<div class="panel panel-border-wide">
+  <p>
+    Download your document at: ((link_to_document))
+  </p>
+</div>
+<p>
+  Next, upload your document. Follow the instructions to send a document by email in the <a href="https://www.notifications.service.gov.uk/documentation">API client documentation</a>.
+</p>
