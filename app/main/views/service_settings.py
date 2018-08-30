@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import pytz
 from flask import (
     abort,
     current_app,
@@ -222,6 +225,16 @@ def submit_request_to_go_live(service_id):
                 '\nChannel: {}\nStart date: {}\nStart volume: {}'
                 '\nPeak volume: {}'
                 '\nFeatures: {}'
+                '\n'
+                '\n---'
+                '\n'
+                '{service_id}\t'
+                '{organisation}\t'
+                '{service_name}\t'
+                '{user_name}\t'
+                '{user_email}\t'
+                '-\t'
+                '{date}'
             ).format(
                 current_service.name,
                 url_for('main.service_dashboard', service_id=current_service.id, _external=True),
@@ -239,7 +252,13 @@ def submit_request_to_go_live(service_id):
                     'one off' if form.method_one_off.data else None,
                     'file upload' if form.method_upload.data else None,
                     'API' if form.method_api.data else None,
-                )), before_each='', after_each='')
+                )), before_each='', after_each=''),
+                service_id=current_service.id,
+                organisation=AgreementInfo.from_current_user().owner,
+                service_name=current_service.name,
+                user_name=current_user.name,
+                user_email=current_user.email_address,
+                date=datetime.now(tz=pytz.timezone('Europe/London')).strftime('%d/%m/%Y'),
             ),
             ticket_type=zendesk_client.TYPE_QUESTION,
             user_email=current_user.email_address,

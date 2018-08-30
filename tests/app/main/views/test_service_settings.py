@@ -708,6 +708,7 @@ def test_should_show_request_to_go_live(
         ) == label
 
 
+@freeze_time("2012-12-21")
 def test_should_redirect_after_request_to_go_live(
     client_request,
     mocker,
@@ -741,16 +742,22 @@ def test_should_redirect_after_request_to_go_live(
         user_name=active_user_with_permissions.name,
         user_email=active_user_with_permissions.email_address
     )
-
-    returned_message = mock_post.call_args[1]['message']
-    assert 'Service: service one' in returned_message
-    assert 'Organisation type: central' in returned_message
-    assert 'Agreement signed: Can’t tell' in returned_message
-    assert 'Channel: email and text messages' in returned_message
-    assert 'Start date: 01/01/2017' in returned_message
-    assert 'Start volume: 100,000' in returned_message
-    assert 'Peak volume: 2,000,000' in returned_message
-    assert 'Features: one off, file upload and API' in returned_message
+    assert mock_post.call_args[1]['message'] == (
+        'Service: service one\n'
+        'http://localhost/services/{}\n'
+        '\n'
+        '---\n'
+        'Organisation type: central\n'
+        'Agreement signed: Can’t tell (domain is user.gov.uk)\n'
+        'Channel: email and text messages\n'
+        'Start date: 01/01/2017\n'
+        'Start volume: 100,000\n'
+        'Peak volume: 2,000,000\n'
+        'Features: one off, file upload and API\n'
+        '\n'
+        '---\n'
+        '{}\tNone\tservice one\tTest User\ttest@user.gov.uk\t-\t21/12/2012'
+    ).format(SERVICE_ONE_ID, SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'Thanks for your request to go live. We’ll get back to you within one working day.'
