@@ -509,9 +509,9 @@ def test_should_raise_duplicate_name_handled(
     (2, 'Add a team member who can manage settings, team and usage Completed'),
 ])
 @pytest.mark.parametrize('count_of_templates, expected_templates_checklist_item', [
-    (0, 'Add content to templates to show the kind of messages you’ll send Not completed'),
-    (1, 'Add content to templates to show the kind of messages you’ll send Completed'),
-    (2, 'Add content to templates to show the kind of messages you’ll send Completed'),
+    (0, 'Add templates with examples of the content you plan to send Not completed'),
+    (1, 'Add templates with examples of the content you plan to send Completed'),
+    (2, 'Add templates with examples of the content you plan to send Completed'),
 ])
 @pytest.mark.parametrize('count_of_email_templates, reply_to_email_addresses, expected_reply_to_checklist_item', [
     pytest.mark.xfail((0, [], ''), raises=IndexError),
