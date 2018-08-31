@@ -887,24 +887,17 @@ def set_free_sms_allowance(service_id):
 def service_set_email_branding(service_id):
     email_branding = email_branding_client.get_all_email_branding()
 
-    form = ServiceSetBranding()
-
-    # dynamically create org choices, including the null option
-    form.branding_style.choices = sorted(
-        get_branding_as_value_and_label(email_branding) + [('None', 'GOV.UK')],
-        key=lambda branding: (
-            branding[0] != current_service.email_branding,
-            branding[0] is not 'None',
-            branding[1].lower(),
-        ),
+    form = ServiceSetBranding(
+        all_email_brandings=get_branding_as_value_and_label(email_branding),
+        current_email_branding=current_service.email_branding,
     )
 
     if form.validate_on_submit():
-        branding_style = None if form.branding_style.data == 'None' else form.branding_style.data
-        return redirect(url_for('.service_preview_email_branding', service_id=service_id,
-                        branding_style=branding_style))
-
-    form.branding_style.data = current_service['email_branding'] or 'None'
+        return redirect(url_for(
+            '.service_preview_email_branding',
+            service_id=service_id,
+            branding_style=form.branding_style.data,
+        ))
 
     return render_template(
         'views/service-settings/set-email-branding.html',
