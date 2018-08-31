@@ -1021,7 +1021,7 @@ def test_default_option_shows_for_default_sender(
     (
         'main.service_sms_senders',
         no_sms_senders,
-        'You haven’t added any sms senders yet'
+        'You haven’t added any text message senders yet'
     ),
 ])
 def test_no_senders_message_shows(
