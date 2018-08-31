@@ -890,9 +890,14 @@ def service_set_email_branding(service_id):
     form = ServiceSetBranding()
 
     # dynamically create org choices, including the null option
-    email_brandings = sorted(get_branding_as_value_and_label(email_branding),
-                             key=lambda tup: tup[1].lower())
-    form.branding_style.choices = [('None', 'GOV.UK')] + email_brandings
+    form.branding_style.choices = sorted(
+        get_branding_as_value_and_label(email_branding) + [('None', 'GOV.UK')],
+        key=lambda branding: (
+            branding[0] != current_service.email_branding,
+            branding[0] is not 'None',
+            branding[1].lower(),
+        ),
+    )
 
     if form.validate_on_submit():
         branding_style = None if form.branding_style.data == 'None' else form.branding_style.data
