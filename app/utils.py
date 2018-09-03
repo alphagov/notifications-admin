@@ -445,7 +445,8 @@ class AgreementInfo:
         (
             self.owner,
             self.crown_status,
-            self.agreement_signed
+            self.agreement_signed,
+            self.canonical_domain,
         ) = self._get_info()
 
     @classmethod
@@ -584,13 +585,16 @@ class AgreementInfo:
         details = self.domains.get(self._match) or {}
 
         if isinstance(details, str):
+            self.is_canonical = False
             return AgreementInfo(details)._get_info()
 
         elif isinstance(details, dict):
+            self.is_canonical = bool(details)
             return(
                 details.get("owner"),
                 details.get("crown"),
                 details.get("agreement_signed"),
+                self._match,
             )
 
 

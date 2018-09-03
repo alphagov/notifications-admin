@@ -395,6 +395,21 @@ def test_get_valid_agreement_info_known_details(domain_or_email_address):
     )
 
 
+@pytest.mark.parametrize("domain_or_email_address, is_canonical", (
+    ("test@dclgdatamart.co.uk", False),
+    ("test@communities.gsi.gov.uk", False),
+    ("test@communities.gov.uk", True),
+))
+def test_get_canonical_domain(domain_or_email_address, is_canonical):
+    assert AgreementInfo(domain_or_email_address).canonical_domain == 'communities.gov.uk'
+    assert AgreementInfo(domain_or_email_address).is_canonical == is_canonical
+
+
+def test_get_canonical_domain_passes_through_unknown_domain():
+    assert AgreementInfo('example.com').canonical_domain is None
+    assert AgreementInfo('example.com').is_canonical is False
+
+
 @pytest.mark.parametrize("domain_or_email_address", (
     "test@police.gov.uk", "police.gov.uk",
 ))
