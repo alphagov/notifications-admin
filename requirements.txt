@@ -9,9 +9,9 @@ Flask-WTF==0.14.2
 Flask-Login==0.4.1
 
 blinker==1.4
-pyexcel==0.5.8
+pyexcel==0.5.9
 pyexcel-io==0.5.9.1
-pyexcel-xls==0.5.7
+pyexcel-xls==0.5.8
 pyexcel-xlsx==0.5.6
 pyexcel-ods3==0.5.2
 pytz==2018.5
@@ -47,7 +47,7 @@ itsdangerous==0.24
 jdcal==1.4
 Jinja2==2.10
 jmespath==0.9.3
-lml==0.0.1
+lml==0.0.4
 lxml==4.2.4
 MarkupSafe==1.0
 mistune==0.8.3
