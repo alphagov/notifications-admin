@@ -33,6 +33,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     mock_get_services_with_no_services,
     api_user_active,
     mock_create_or_update_free_sms_fragment_limit,
+    mock_get_all_email_branding,
 ):
     response = logged_in_client.post(
         url_for('main.add_service'),
@@ -84,7 +85,8 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     api_user_active,
     organisation_type,
     free_allowance,
-    mock_create_or_update_free_sms_fragment_limit
+    mock_create_or_update_free_sms_fragment_limit,
+    mock_get_all_email_branding,
 ):
     response = logged_in_client.post(
         url_for('main.add_service'),
@@ -109,6 +111,43 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     assert response.location == url_for('main.service_dashboard', service_id=101, _external=True)
 
 
+@pytest.mark.parametrize('email_address, expected_branding', [
+    ('test@example.voa.gsi.gov.uk', '5'),
+    ('test@example.voa.gov.uk', '5'),
+    ('test@example.gov.uk', None),
+])
+def test_should_lookup_branding_for_known_domain(
+    app_,
+    client_request,
+    active_user_with_permissions,
+    mock_create_service,
+    mock_get_services,
+    mock_update_service,
+    mock_create_or_update_free_sms_fragment_limit,
+    mock_get_all_email_branding,
+    email_address,
+    expected_branding,
+):
+    active_user_with_permissions.email_address = email_address
+    client_request.login(active_user_with_permissions)
+    client_request.post(
+        'main.add_service',
+        _data={
+            'name': 'testing the post',
+            'organisation_type': 'central',
+        }
+    )
+    mock_get_all_email_branding.assert_called_once_with()
+    assert mock_create_service.called is True
+    if expected_branding:
+        mock_update_service.assert_called_once_with(
+            101,
+            email_branding=expected_branding,
+        )
+    else:
+        assert mock_update_service.called is False
+
+
 def test_should_return_form_errors_when_service_name_is_empty(
     logged_in_client
 ):
@@ -120,6 +159,7 @@ def test_should_return_form_errors_when_service_name_is_empty(
 def test_should_return_form_errors_with_duplicate_service_name_regardless_of_case(
     logged_in_client,
     mock_create_duplicate_service,
+    mock_get_all_email_branding,
 ):
     response = logged_in_client.post(
         url_for('main.add_service'),

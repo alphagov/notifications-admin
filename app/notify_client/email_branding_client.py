@@ -17,6 +17,12 @@ class EmailBrandingClient(NotifyAdminAPIClient):
             brandings.sort(key=lambda branding: branding[sort_key].lower())
         return brandings
 
+    def get_email_branding_id_for_domain(self, domain):
+        for branding in self.get_all_email_branding():
+            if domain and branding.get('domain') == domain:
+                return branding['id']
+        return None
+
     def get_letter_email_branding(self):
         return self.get(url='/dvla_organisations')
 

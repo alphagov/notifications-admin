@@ -2449,7 +2449,7 @@ def create_email_brandings(number_of_brandings, non_standard_values={}, shuffle=
         } for idx in range(1, number_of_brandings + 1)]
 
     for idx, row in enumerate(non_standard_values):
-        brandings[row['idx']].update(non_standard_values)
+        brandings[row['idx']].update(non_standard_values[idx])
 
     if shuffle:
         brandings.insert(3, brandings.pop(4))
@@ -2464,7 +2464,7 @@ def mock_get_all_email_branding(mocker):
             {'idx': 1, 'colour': 'red'},
             {'idx': 2, 'colour': 'orange'},
             {'idx': 3, 'text': None},
-            {'idx': 4, 'colour': 'blue'},
+            {'idx': 4, 'colour': 'blue', 'domain': 'voa.gov.uk'},
         ]
         shuffle = sort_key is None
         return create_email_brandings(5, non_standard_values=non_standard_values, shuffle=shuffle)
