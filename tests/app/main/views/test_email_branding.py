@@ -6,7 +6,11 @@ from bs4 import BeautifulSoup
 from flask import url_for
 
 from app.main.s3_client import LOGO_LOCATION_STRUCTURE, TEMP_TAG
-from tests.conftest import mock_get_email_branding, normalize_spaces
+from tests.conftest import (
+    mock_get_email_branding,
+    normalize_spaces,
+    platform_admin_user,
+)
 
 
 def test_email_branding_page_shows_full_branding_list(
@@ -91,7 +95,7 @@ def test_create_new_email_branding_without_logo(
         'colour': '#ff0000',
         'text': 'new text',
         'name': 'new name',
-        'domain': 'sample.com',
+        'domain': 'voa.gov.uk',
         'brand_type': 'org'
     }
 
@@ -116,6 +120,38 @@ def test_create_new_email_branding_without_logo(
     assert mock_persist.call_args_list == []
 
 
+def test_cant_create_new_email_branding_with_unknown_domain(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_create_email_branding
+):
+    mock_persist = mocker.patch('app.main.views.email_branding.persist_logo')
+    mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+
+    client_request.login(platform_admin_user(fake_uuid))
+    page = client_request.post(
+        '.create_email_branding',
+        content_type='multipart/form-data',
+        _data={
+            'logo': None,
+            'colour': '#ff0000',
+            'text': 'new text',
+            'name': 'new name',
+            'domain': 'example.gov.uk',
+            'brand_type': 'org',
+        },
+        _expected_status=200,
+    )
+
+    assert mock_create_email_branding.called is False
+    assert mock_persist.called is False
+
+    assert page.select_one('.error-message').text.strip() == (
+        'Not a known government domain (you might need to update domains.yml)'
+    )
+
+
 def test_create_new_email_branding_when_branding_saved(
     logged_in_platform_admin_client,
     mocker,
@@ -130,7 +166,7 @@ def test_create_new_email_branding_when_branding_saved(
         'colour': '#ff0000',
         'text': 'new text',
         'name': 'new name',
-        'domain': 'sample.com',
+        'domain': 'voa.gov.uk',
         'brand_type': 'org_banner'
     }
 
@@ -229,7 +265,7 @@ def test_update_existing_branding(
         'colour': '#0000ff',
         'text': 'new text',
         'name': 'new name',
-        'domain': 'sample.com',
+        'domain': 'voa.gov.uk',
         'brand_type': 'both'
     }
 
@@ -341,7 +377,7 @@ def test_colour_regex_validation(
         'colour': colour_hex,
         'text': 'new text',
         'name': 'new name',
-        'domain': 'sample.com',
+        'domain': 'voa.gov.uk',
         'brand_type': 'org'
     }
 

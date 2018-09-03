@@ -35,6 +35,7 @@ from app.main.validators import (
     Blacklist,
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
+    KnownGovernmentDomain,
     LettersNumbersAndFullStopsOnly,
     NoCommasInPlaceHolders,
     OnlyGSMCharacters,
@@ -722,7 +723,7 @@ class ServicePreviewBranding(StripWhitespaceForm):
 class ServiceUpdateEmailBranding(StripWhitespaceForm):
     name = StringField('Name of brand')
     text = StringField('Text')
-    domain = StringField('Domain')
+    domain = StringField('Domain', validators=[KnownGovernmentDomain()])
     colour = StringField(
         'Colour',
         validators=[
