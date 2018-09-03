@@ -682,23 +682,6 @@ class ServiceSwitchLettersForm(StripWhitespaceForm):
 
 class ServiceSetBranding(StripWhitespaceForm):
 
-    def __init__(self, email_branding=[], *args, **kwargs):
-        self.branding_style.choices = email_branding
-        super(ServiceSetBranding, self).__init__(*args, **kwargs)
-
-    branding_type = RadioField(
-        'Branding type',
-        choices=[
-            ('govuk', 'GOV.UK only'),
-            ('both', 'GOV.UK and branding'),
-            ('org', 'Branding only'),
-            ('org_banner', 'Branding banner')
-        ],
-        validators=[
-            DataRequired()
-        ]
-    )
-
     branding_style = RadioField(
         'Branding style',
         validators=[
@@ -709,7 +692,6 @@ class ServiceSetBranding(StripWhitespaceForm):
 
 class ServicePreviewBranding(StripWhitespaceForm):
 
-    branding_type = HiddenField('branding_type')
     branding_style = HiddenField('branding_style')
 
 

@@ -509,9 +509,9 @@ def test_should_raise_duplicate_name_handled(
     (2, 'Add a team member who can manage settings, team and usage Completed'),
 ])
 @pytest.mark.parametrize('count_of_templates, expected_templates_checklist_item', [
-    (0, 'Add content to templates to show the kind of messages you’ll send Not completed'),
-    (1, 'Add content to templates to show the kind of messages you’ll send Completed'),
-    (2, 'Add content to templates to show the kind of messages you’ll send Completed'),
+    (0, 'Add templates with examples of the content you plan to send Not completed'),
+    (1, 'Add templates with examples of the content you plan to send Completed'),
+    (2, 'Add templates with examples of the content you plan to send Completed'),
 ])
 @pytest.mark.parametrize('count_of_email_templates, reply_to_email_addresses, expected_reply_to_checklist_item', [
     pytest.mark.xfail((0, [], ''), raises=IndexError),
@@ -1021,7 +1021,7 @@ def test_default_option_shows_for_default_sender(
     (
         'main.service_sms_senders',
         no_sms_senders,
-        'You haven’t added any sms senders yet'
+        'You haven’t added any text message senders yet'
     ),
 ])
 def test_no_senders_message_shows(
@@ -1846,31 +1846,6 @@ def test_set_letter_branding_saves(
     mock_update_service.assert_called_once_with(service_one['id'], dvla_organisation='500')
 
 
-def test_should_show_branding_types(
-    logged_in_platform_admin_client,
-    service_one,
-    mock_get_all_email_branding,
-):
-    response = logged_in_platform_admin_client.get(url_for(
-        'main.service_set_email_branding', service_id=service_one['id']
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert page.find('input', attrs={"id": "branding_type-0"})['value'] == 'govuk'
-    assert page.find('input', attrs={"id": "branding_type-1"})['value'] == 'both'
-    assert page.find('input', attrs={"id": "branding_type-2"})['value'] == 'org'
-    assert page.find('input', attrs={"id": "branding_type-3"})['value'] == 'org_banner'
-
-    assert 'checked' in page.find('input', attrs={"id": "branding_type-0"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_type-1"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_type-2"}).attrs
-    assert 'checked' not in page.find('input', attrs={"id": "branding_type-3"}).attrs
-
-    app.email_branding_client.get_all_email_branding.assert_called_once_with()
-    app.service_api_client.get_service.assert_called_once_with(service_one['id'])
-
-
 def test_should_show_branding_styles(
     logged_in_platform_admin_client,
     service_one,
@@ -1897,7 +1872,7 @@ def test_should_show_branding_styles(
     assert branding_style_choices[5]['value'] == '5'
 
     # radios should be in alphabetical order, based on their labels
-    assert radio_labels == ['None', 'org 1', 'org 2', 'org 3', 'org 4', 'org 5']
+    assert radio_labels == ['GOV.UK', 'org 1', 'org 2', 'org 3', 'org 4', 'org 5']
 
     assert 'checked' in branding_style_choices[0].attrs
     assert 'checked' not in branding_style_choices[1].attrs
@@ -1955,8 +1930,8 @@ def test_should_send_branding_and_organisations_to_preview(
     )
     assert response.status_code == 302
     assert response.location == url_for('main.service_preview_email_branding',
-                                        service_id=service_one['id'], branding_type='org',
-                                        branding_style='1', _external=True)
+                                        service_id=service_one['id'], branding_style='1',
+                                        _external=True)
 
     mock_get_all_email_branding.assert_called_once_with()
 
@@ -1975,10 +1950,8 @@ def test_should_preview_email_branding(
     iframeURLComponents = urlparse(iframe['src'])
     iframeQString = parse_qs(iframeURLComponents.query)
 
-    assert page.find('input', attrs={"id": "branding_type"})['value'] == 'org'
     assert page.find('input', attrs={"id": "branding_style"})['value'] == '1'
     assert iframeURLComponents.path == '/_email'
-    assert iframeQString['branding_type'] == ['org']
     assert iframeQString['branding_style'] == ['1']
 
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
@@ -1994,7 +1967,6 @@ def test_should_set_branding_and_organisations(
             'main.service_preview_email_branding', service_id=service_one['id']
         ),
         data={
-            'branding_type': 'org',
             'branding_style': '1'
         }
     )
@@ -2004,7 +1976,6 @@ def test_should_set_branding_and_organisations(
 
     mock_update_service.assert_called_once_with(
         service_one['id'],
-        branding='org',
         email_branding='1'
     )
 
@@ -2886,12 +2857,15 @@ def test_update_service_organisation_does_not_update_if_same_value(
     mock_update_service_organisation.called is False
 
 
-def test_show_email_branding_request_page(
+def test_show_email_branding_request_page_when_no_email_branding_is_set(
     client_request,
+    mock_get_email_branding
 ):
     page = client_request.get(
         '.branding_request', service_id=SERVICE_ONE_ID
     )
+
+    mock_get_email_branding.assert_not_called()
 
     radios = page.select('input[type=radio]')
 
@@ -2903,6 +2877,35 @@ def test_show_email_branding_request_page(
     )):
         assert radios[index]['name'] == 'options'
         assert radios[index]['value'] == option
+
+
+def test_show_email_branding_request_page_when_email_branding_is_set(
+    client_request,
+    mock_get_email_branding,
+    active_user_with_permissions,
+):
+
+    service_one = service_json(email_branding='1234')
+    client_request.login(active_user_with_permissions, service=service_one)
+
+    page = client_request.get(
+        '.branding_request', service_id=SERVICE_ONE_ID
+    )
+
+    mock_get_email_branding.called_once_with('1234')
+
+    radios = page.select('input[type=radio]')
+
+    for index, option in enumerate((
+        'govuk',
+        'both',
+        'org',
+        'org_banner',
+    )):
+        assert radios[index]['name'] == 'options'
+        assert radios[index]['value'] == option
+        if option == 'org':
+            assert 'checked' in radios[index].attrs
 
 
 @pytest.mark.parametrize('choice, requested_branding', (

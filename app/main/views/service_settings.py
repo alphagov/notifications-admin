@@ -874,19 +874,18 @@ def set_free_sms_allowance(service_id):
 @user_is_platform_admin
 def service_set_email_branding(service_id):
     email_branding = email_branding_client.get_all_email_branding()
-    branding_type = current_service.get('branding')
 
-    form = ServiceSetBranding(branding_type=branding_type)
+    form = ServiceSetBranding()
 
     # dynamically create org choices, including the null option
     email_brandings = sorted(get_branding_as_value_and_label(email_branding),
                              key=lambda tup: tup[1].lower())
-    form.branding_style.choices = [('None', 'None')] + email_brandings
+    form.branding_style.choices = [('None', 'GOV.UK')] + email_brandings
 
     if form.validate_on_submit():
         branding_style = None if form.branding_style.data == 'None' else form.branding_style.data
         return redirect(url_for('.service_preview_email_branding', service_id=service_id,
-                        branding_type=form.branding_type.data, branding_style=branding_style))
+                        branding_style=branding_style))
 
     form.branding_style.data = current_service['email_branding'] or 'None'
 
@@ -903,16 +902,14 @@ def service_set_email_branding(service_id):
 @login_required
 @user_is_platform_admin
 def service_preview_email_branding(service_id):
-    branding_type = request.args.get('branding_type', None)
     branding_style = request.args.get('branding_style', None)
 
-    form = ServicePreviewBranding(branding_type=branding_type, branding_style=branding_style)
+    form = ServicePreviewBranding(branding_style=branding_style)
 
     if form.validate_on_submit():
         branding_style = None if form.branding_style.data == 'None' else form.branding_style.data
         service_api_client.update_service(
             service_id,
-            branding=form.branding_type.data,
             email_branding=branding_style
         )
         return redirect(url_for('.service_settings', service_id=service_id))
@@ -992,8 +989,15 @@ def link_service_to_organisation(service_id):
 @user_has_permissions('manage_service')
 def branding_request(service_id):
 
+    branding_type = 'govuk'
+
+    if current_service.email_branding:
+        email_branding = email_branding_client.get_email_branding(
+            current_service.email_branding)['email_branding']
+        branding_type = email_branding['brand_type']
+
     form = BrandingOptionsEmail(
-        options=current_service.branding
+        options=branding_type
     )
 
     if form.validate_on_submit():

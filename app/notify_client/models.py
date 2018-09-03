@@ -270,7 +270,6 @@ class Service(dict):
 
     ALLOWED_PROPERTIES = {
         'active',
-        'branding',
         'dvla_organisation',
         'email_branding',
         'email_from',
@@ -293,7 +292,7 @@ class Service(dict):
     def __getattr__(self, attr):
         if attr in self.ALLOWED_PROPERTIES:
             return self[attr]
-        raise AttributeError
+        raise AttributeError('`{}` is not a service attribute'.format(attr))
 
     @property
     def trial_mode(self):
