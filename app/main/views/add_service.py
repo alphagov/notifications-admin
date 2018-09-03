@@ -29,6 +29,7 @@ def _add_invited_user_to_service(invited_user):
 def _create_service(service_name, organisation_type, email_from, form):
     free_sms_fragment_limit = current_app.config['DEFAULT_FREE_SMS_FRAGMENT_LIMITS'].get(organisation_type)
     email_branding = email_branding_client.get_email_branding_id_for_domain(
+        'nhs.uk' if organisation_type == 'nhs' else
         AgreementInfo.from_current_user().canonical_domain
     )
     try:

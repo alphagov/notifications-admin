@@ -2463,7 +2463,7 @@ def mock_get_all_email_branding(mocker):
         non_standard_values = [
             {'idx': 1, 'colour': 'red'},
             {'idx': 2, 'colour': 'orange'},
-            {'idx': 3, 'text': None},
+            {'idx': 3, 'text': None, 'domain': 'nhs.uk'},
             {'idx': 4, 'colour': 'blue', 'domain': 'voa.gov.uk'},
         ]
         shuffle = sort_key is None
