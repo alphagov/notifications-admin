@@ -121,7 +121,7 @@ class Staging(Config):
     LOGO_UPLOAD_BUCKET_NAME = 'public-logos-staging'
     MOU_BUCKET_NAME = 'staging-notify.works-mou'
     NOTIFY_ENVIRONMENT = 'staging'
-    CHECK_PROXY_HEADER = True
+    CHECK_PROXY_HEADER = False
 
 
 class Live(Config):
