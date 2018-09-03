@@ -43,7 +43,7 @@ from app.main.validators import (
     ValidGovEmail,
 )
 from app.notify_client.models import permissions, roles
-from app.utils import guess_name_from_email_address
+from app.utils import AgreementInfo, guess_name_from_email_address
 
 
 def get_time_value_and_label(future_time):
@@ -720,10 +720,18 @@ class ServicePreviewBranding(StripWhitespaceForm):
     branding_style = HiddenField('branding_style')
 
 
+class GovernmentDomainField(StringField):
+    validators = [KnownGovernmentDomain()]
+
+    def post_validate(self, form, validation_stopped):
+        if self.data and not self.errors:
+            self.data = AgreementInfo(self.data).canonical_domain
+
+
 class ServiceUpdateEmailBranding(StripWhitespaceForm):
     name = StringField('Name of brand')
     text = StringField('Text')
-    domain = StringField('Domain', validators=[KnownGovernmentDomain()])
+    domain = GovernmentDomainField('Domain')
     colour = StringField(
         'Colour',
         validators=[

@@ -150,6 +150,49 @@ def test_cant_create_new_email_branding_with_unknown_domain(
     assert page.select_one('.error-message').text.strip() == (
         'Not a known government domain (you might need to update domains.yml)'
     )
+    assert page.select_one('input[name=domain]')['value'] == (
+        'example.gov.uk'
+    )
+
+
+@pytest.mark.parametrize('posted_domain, persisted_domain', [
+    ('voa.gsi.gov.uk', 'voa.gov.uk'),
+    ('voa.gov.uk', 'voa.gov.uk'),
+    ('hmcts.net', 'hmcts.gov.uk'),
+])
+def test_persists_canonical_domain_when_adding_email_branding(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_create_email_branding,
+    posted_domain,
+    persisted_domain,
+):
+    mocker.patch('app.main.views.email_branding.persist_logo')
+    mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
+    data = {
+        'logo': None,
+        'colour': '#ff0000',
+        'text': 'new text',
+        'name': 'new name',
+        'domain': posted_domain,
+        'brand_type': 'org',
+    }
+    client_request.login(platform_admin_user(fake_uuid))
+    client_request.post(
+        '.create_email_branding',
+        content_type='multipart/form-data',
+        _data=data,
+    )
+
+    assert mock_create_email_branding.call_args == call(
+        logo=data['logo'],
+        name=data['name'],
+        text=data['text'],
+        colour=data['colour'],
+        domain=persisted_domain,
+        brand_type=data['brand_type']
+    )
 
 
 def test_create_new_email_branding_when_branding_saved(
