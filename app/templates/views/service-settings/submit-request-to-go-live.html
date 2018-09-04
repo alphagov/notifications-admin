@@ -13,32 +13,22 @@
 
       <h1 class="heading-large">Request to go live</h1>
 
-      <p class="bottom-gutter">
-        Tell us how you plan to use Notify. When we receive your request we’ll make your service live within one working day.
-      </p>
-
-      <form method="post" class="top-gutter">
-        {{ checkbox_group('What kind of messages will you be sending?', [
-          form.channel_email,
-          form.channel_sms,
-          form.channel_letter
-        ]) }}
+      <form method="post">
         <div class="form-group">
-          {{ textbox(form.start_date, width='1-1') }}
-          {{ textbox(form.start_volume, width='1-1', hint='For example, ‘1,000 per month’.') }}
-          {{ textbox(form.peak_volume, width='1-1', hint='For example, ‘Messages will increase to 20,000 per month in January’.') }}
+          {{ textbox(form.volume_email, width='1-2', hint='For example, 1,000,000') }}
+          {{ textbox(form.volume_sms, width='1-2', hint='For example, 500,000') }}
+          {{ textbox(form.volume_letter, width='1-2', hint='For example, 5,000') }}
         </div>
-        {{ checkbox_group('How are you going to send messages?', [
-          form.method_one_off,
-          form.method_upload,
-          form.method_api
-        ]) }}
+        {{ radios(form.research_consent, hint='You don’t have to take part and you can unsubscribe at any time') }}
+        <p>
+          When we receive your request we’ll get back to you within one working day.
+        </p>
+
+
         <p class="bottom-gutter">
           By requesting to go live you’re agreeing to our <a href="{{ url_for('.terms') }}">terms of use</a>.
         </p>
-
         {{ page_footer('Request to go live') }}
       </form>
-
 
 {% endblock %}

@@ -21,6 +21,11 @@
         {% if hide_legend %}<span class="visually-hidden">{% endif %}
           {{ field.label.text|safe }}
         {% if hide_legend %}</span>{% endif %}
+        {% if hint %}
+          <span class="form-hint">
+            {{ hint }}
+          </span>
+        {% endif %}
         {% if field.errors %}
           <span class="error-message" data-module="track-error" data-error-type="{{ field.errors[0] }}" data-error-label="{{ field.name }}">
             {{ field.errors[0] }}
