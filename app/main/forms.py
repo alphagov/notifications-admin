@@ -682,14 +682,36 @@ class ServiceSwitchLettersForm(StripWhitespaceForm):
     )
 
 
+class BrandingStyle(RadioField):
+
+    def post_validate(self, form, validation_stopped):
+        if self.data == 'None':
+            self.data = None
+
+
 class ServiceSetBranding(StripWhitespaceForm):
 
-    branding_style = RadioField(
+    branding_style = BrandingStyle(
         'Branding style',
         validators=[
             DataRequired()
         ]
     )
+
+    DEFAULT = ('None', 'GOV.UK')
+
+    def __init__(self, all_email_brandings, current_email_branding):
+
+        super().__init__(branding_style=current_email_branding)
+
+        self.branding_style.choices = sorted(
+            all_email_brandings + [self.DEFAULT],
+            key=lambda branding: (
+                branding[0] != current_email_branding,
+                branding[0] is not self.DEFAULT[0],
+                branding[1].lower(),
+            ),
+        )
 
 
 class ServicePreviewBranding(StripWhitespaceForm):

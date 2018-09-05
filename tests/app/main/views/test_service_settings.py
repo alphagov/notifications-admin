@@ -1849,11 +1849,27 @@ def test_set_letter_branding_saves(
     mock_update_service.assert_called_once_with(service_one['id'], dvla_organisation='500')
 
 
+@pytest.mark.parametrize('current_branding, expected_values, expected_labels', [
+    (None, [
+        'None', '1', '2', '3', '4', '5',
+    ], [
+        'GOV.UK', 'org 1', 'org 2', 'org 3', 'org 4', 'org 5'
+    ]),
+    ('5', [
+        '5', 'None', '1', '2', '3', '4',
+    ], [
+        'org 5', 'GOV.UK', 'org 1', 'org 2', 'org 3', 'org 4',
+    ]),
+])
 def test_should_show_branding_styles(
     logged_in_platform_admin_client,
     service_one,
     mock_get_all_email_branding,
+    current_branding,
+    expected_values,
+    expected_labels,
 ):
+    service_one['email_branding'] = current_branding
     response = logged_in_platform_admin_client.get(url_for(
         'main.service_set_email_branding', service_id=service_one['id']
     ))
@@ -1867,15 +1883,11 @@ def test_should_show_branding_styles(
 
     assert len(branding_style_choices) == 6
 
-    assert branding_style_choices[0]['value'] == 'None'
-    assert branding_style_choices[1]['value'] == '1'
-    assert branding_style_choices[2]['value'] == '2'
-    assert branding_style_choices[3]['value'] == '3'
-    assert branding_style_choices[4]['value'] == '4'
-    assert branding_style_choices[5]['value'] == '5'
+    for index, expected_value in enumerate(expected_values):
+        assert branding_style_choices[index]['value'] == expected_value
 
     # radios should be in alphabetical order, based on their labels
-    assert radio_labels == ['GOV.UK', 'org 1', 'org 2', 'org 3', 'org 4', 'org 5']
+    assert radio_labels == expected_labels
 
     assert 'checked' in branding_style_choices[0].attrs
     assert 'checked' not in branding_style_choices[1].attrs
