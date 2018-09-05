@@ -65,7 +65,8 @@ innovateuk.gov.uk:
   owner: Innovate UK
   agreement_signed: true
 ncsc.gov.uk: gchq.gov.uk
-nhs.net:
+nhs.net: nhs.uk
+nhs.uk:
   owner: NHS
 nhsdigital.nhs.uk: digital.nhs.uk
 digital.nhs.uk:

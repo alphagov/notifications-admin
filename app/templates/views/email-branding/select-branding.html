@@ -17,13 +17,20 @@
       <a href="{{ url_for('.create_email_branding') }}" class="button align-with-heading">Add new brand</a>
     </div>
   </div>
-  {{ live_search(target_selector='.message-name', show=show_search_box, form=search_form) }}
+  {{ live_search(target_selector='.email-brand', show=show_search_box, form=search_form) }}
   <nav>
-    {% for id, name in email_brandings %}
-      <div class="message-name">
-        <a href="{{ url_for('.update_email_branding', branding_id=id) }}">
-          {{name}}
-        </a>
+    {% for brand in email_brandings %}
+      <div class="email-brand">
+        <div class="message-name">
+          <a href="{{ url_for('.update_email_branding', branding_id=brand.id) }}">
+            {{ brand.name }}
+          </a>
+        </div>
+        {% if brand.domain_owner %}
+          <p class="message-type">
+            Default for {{ brand.domain_owner }}
+          </p>
+        {% endif %}
       </div>
     {% endfor %}
   </nav>

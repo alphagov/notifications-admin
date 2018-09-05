@@ -11,8 +11,7 @@ from app.main.s3_client import (
     persist_logo,
     upload_logo,
 )
-from app.main.views.service_settings import get_branding_as_value_and_label
-from app.utils import get_cdn_domain, user_is_platform_admin
+from app.utils import AgreementInfo, get_cdn_domain, user_is_platform_admin
 
 
 @main.route("/email-branding", methods=['GET', 'POST'])
@@ -23,9 +22,10 @@ def email_branding():
 
     return render_template(
         'views/email-branding/select-branding.html',
-        email_brandings=get_branding_as_value_and_label(brandings),
+        email_brandings=_add_domain_info(brandings),
         search_form=SearchTemplatesForm(),
         show_search_box=len(brandings) > 9,
+        agreement_info=AgreementInfo,
     )
 
 
@@ -129,3 +129,11 @@ def create_email_branding(logo=None):
         cdn_url=get_cdn_domain(),
         logo=logo
     )
+
+
+def _add_domain_info(email_brands):
+    for brand in email_brands:
+        yield dict(
+            domain_owner=AgreementInfo(brand.get('domain') or '').owner,
+            **brand
+        )
