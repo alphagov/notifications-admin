@@ -285,7 +285,7 @@ def test_should_show_letter_job(
     )
     assert page.select('.banner-default-with-tick') == []
     assert normalize_spaces(page.select('tbody tr')[0].text) == (
-        '1 Example Street template content 1 January at 11:09am'
+        '1 Example Street template subject 1 January at 11:09am'
     )
     assert normalize_spaces(page.select('.keyline-block')[0].text) == (
         '1 Letter'

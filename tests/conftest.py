@@ -1856,7 +1856,7 @@ def mock_get_notifications(
         job = None
         if job_id is not None:
             job = job_json(service_id, api_user_active, job_id=job_id)
-        if template_type:
+        if diff_template_type or template_type:
             template = template_json(
                 service_id,
                 id_=str(generate_uuid()),

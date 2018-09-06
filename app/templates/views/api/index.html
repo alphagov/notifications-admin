@@ -2,6 +2,7 @@
 {% from "components/table.html" import list_table, field, hidden_field_heading %}
 {% from "components/api-key.html" import api_key %}
 {% from "components/banner.html" import banner_wrapper %}
+{% from "components/message-count-label.html" import message_count_label %}
 
 {% block service_page_title %}
   API integration
@@ -73,8 +74,8 @@
                 <dd class="api-notifications-item-data-item">{{ notification[key] }}</dd>
               {% endif %}
             {% endfor %}
-            {% if notification['notification_type'] == 'letter' and notification.status not in ('pending-virus-check', 'virus-scan-failed') %}
-              <a href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View letter</a>
+            {% if notification.status not in ('pending-virus-check', 'virus-scan-failed') %}
+              <a href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View {{ message_count_label(1, notification.template.template_type, suffix='') }}</a>
             {% endif %}
           </dl>
         </div>
