@@ -155,18 +155,31 @@ def test_cant_create_new_email_branding_with_unknown_domain(
     )
 
 
-@pytest.mark.parametrize('posted_domain, persisted_domain', [
-    ('voa.gsi.gov.uk', 'voa.gov.uk'),
-    ('voa.gov.uk', 'voa.gov.uk'),
-    ('hmcts.net', 'hmcts.gov.uk'),
+@pytest.mark.parametrize('posted_domain, expected_error', [
+    (
+        'voa.gsi.gov.uk',
+        'Not a canonical domain (use voa.gov.uk if appropriate)',
+    ),
+    (
+        'hmcts.net',
+        'Not a canonical domain (use hmcts.gov.uk if appropriate)',
+    ),
+    (
+        'southend.essex.gov.uk',
+        'Not an organisation-level domain (use essex.gov.uk if appropriate)',
+    ),
+    pytest.mark.xfail(
+        ('voa.gov.uk', ''),
+        raises=AssertionError
+    ),
 ])
-def test_persists_canonical_domain_when_adding_email_branding(
+def test_rejects_non_canonical_domain_when_adding_email_branding(
     client_request,
     mocker,
     fake_uuid,
     mock_create_email_branding,
     posted_domain,
-    persisted_domain,
+    expected_error,
 ):
     mocker.patch('app.main.views.email_branding.persist_logo')
     mocker.patch('app.main.views.email_branding.delete_temp_files_created_by')
@@ -179,20 +192,15 @@ def test_persists_canonical_domain_when_adding_email_branding(
         'brand_type': 'org',
     }
     client_request.login(platform_admin_user(fake_uuid))
-    client_request.post(
+    page = client_request.post(
         '.create_email_branding',
         content_type='multipart/form-data',
         _data=data,
+        _expected_status=200,
     )
 
-    assert mock_create_email_branding.call_args == call(
-        logo=data['logo'],
-        name=data['name'],
-        text=data['text'],
-        colour=data['colour'],
-        domain=persisted_domain,
-        brand_type=data['brand_type']
-    )
+    assert page.select_one('.error-message').text.strip() == expected_error
+    assert mock_create_email_branding.called is False
 
 
 def test_create_new_email_branding_when_branding_saved(
