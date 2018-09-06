@@ -19,7 +19,7 @@
         </div>
       {% endif %}
       {{ file_upload(form.file, button_text='{} logo'.format('Update' if email_branding else 'Upload')) }}
-      <form method="post">
+      <form method="post" novalidate>
         <div class="form-group">
           <div style='margin-top:15px;'>{{textbox(form.name)}}</div>
           <div style='margin-top:15px;'>{{textbox(form.text)}}</div>
