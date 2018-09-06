@@ -729,7 +729,7 @@ class GovernmentDomainField(StringField):
 
 
 class ServiceUpdateEmailBranding(StripWhitespaceForm):
-    name = StringField('Name of brand')
+    name = StringField('Name of brand', validators=[DataRequired()])
     text = StringField('Text')
     domain = GovernmentDomainField('Domain')
     colour = StringField(
