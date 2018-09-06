@@ -111,3 +111,25 @@ class KnownGovernmentDomain:
     def __call__(self, form, field):
         if field.data and AgreementInfo(field.data).owner is None:
             raise ValidationError(self.message)
+
+
+class CanonicalGovernmentDomain:
+
+    message = 'Not {} domain (use {} if appropriate)'
+
+    def __call__(self, form, field):
+
+        if not field.data:
+            return
+
+        domain = AgreementInfo(field.data)
+
+        if not domain.is_canonical:
+            raise ValidationError(
+                self.message.format('a canonical', domain.canonical_domain)
+            )
+
+        if field.data != domain.canonical_domain:
+            raise ValidationError(
+                self.message.format('an organisation-level', domain.canonical_domain)
+            )

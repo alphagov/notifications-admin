@@ -33,6 +33,7 @@ from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
 
 from app.main.validators import (
     Blacklist,
+    CanonicalGovernmentDomain,
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
     KnownGovernmentDomain,
@@ -721,7 +722,10 @@ class ServicePreviewBranding(StripWhitespaceForm):
 
 
 class GovernmentDomainField(StringField):
-    validators = [KnownGovernmentDomain()]
+    validators = [
+        KnownGovernmentDomain(),
+        CanonicalGovernmentDomain(),
+    ]
 
     def post_validate(self, form, validation_stopped):
         if self.data and not self.errors:
