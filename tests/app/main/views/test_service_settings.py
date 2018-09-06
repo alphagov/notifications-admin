@@ -1926,6 +1926,9 @@ def test_should_show_live_search_if_list_of_brand_styles_taller_than_page(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.select('.live-search')
+    search_target = page.select_one('.live-search')['data-targets']
+    assert search_target == '.multiple-choice'
+    assert len(page.select(search_target)) == 9
 
 
 def test_should_send_branding_and_organisations_to_preview(
