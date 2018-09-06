@@ -33,7 +33,6 @@ from app.utils import (
     get_help_argument,
     get_letter_timings,
     get_template,
-    get_time_left,
     parse_filter_args,
     set_status_filters,
     user_has_permissions,
@@ -135,13 +134,6 @@ def view_notification_updates(service_id, notification_id):
 
 def get_single_notification_partials(notification):
     return {
-        'notifications': render_template(
-            'partials/notifications/notifications.html',
-            notification=notification,
-            more_than_one_page=False,
-            percentage_complete=100,
-            time_left=get_time_left(notification['created_at']),
-        ),
         'status': render_template(
             'partials/notifications/status.html',
             notification=notification
