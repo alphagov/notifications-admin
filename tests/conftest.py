@@ -1881,6 +1881,7 @@ def mock_get_notifications(
             template_type=diff_template_type,
             client_reference=client_reference,
             status=noti_status,
+            created_by_name='Firstname Lastname',
         )
 
     return mocker.patch(
