@@ -385,6 +385,7 @@ def format_notification_status(status, template_type):
             'sent': 'Delivered',
             'pending-virus-check': 'Pending virus check',
             'virus-scan-failed': 'Virus detected',
+            'returned-letter': 'Delivered',
         }
     }[template_type].get(status, status)
 
@@ -410,6 +411,7 @@ def format_notification_status_as_field_status(status, notification_type):
             'accepted': None,
             'pending-virus-check': None,
             'virus-scan-failed': 'error',
+            'returned-letter': None,
         }
     }.get(
         notification_type,

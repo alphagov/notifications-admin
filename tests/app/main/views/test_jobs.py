@@ -155,7 +155,7 @@ def test_jobs_page_doesnt_show_scheduled_on_page_2(
             '',
             [
                 'created', 'pending', 'sending', 'pending-virus-check',
-                'delivered', 'sent',
+                'delivered', 'sent', 'returned-letter',
                 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure', 'virus-scan-failed',
             ]
         ),
@@ -165,7 +165,7 @@ def test_jobs_page_doesnt_show_scheduled_on_page_2(
         ),
         (
             'delivered',
-            ['delivered', 'sent']
+            ['delivered', 'sent', 'returned-letter']
         ),
         (
             'failed',
@@ -306,6 +306,7 @@ def test_should_show_letter_job(
             'pending-virus-check',
             'delivered',
             'sent',
+            'returned-letter',
             'failed',
             'temporary-failure',
             'permanent-failure',

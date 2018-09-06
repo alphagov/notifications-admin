@@ -14,3 +14,9 @@ class LetterJobsClient(NotifyAdminAPIClient):
             url='/send-letter-jobs',
             data={"job_ids": job_ids}
         )['data']
+
+    def submit_returned_letters(self, references):
+        return self.post(
+            url='/letters/returned',
+            data={'references': references}
+        )
