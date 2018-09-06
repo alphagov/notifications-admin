@@ -16,14 +16,19 @@ from tests.conftest import (
 )
 
 
-@pytest.mark.parametrize('notification_status, expected_status', [
-    ('created', 'Sending'),
-    ('sending', 'Sending'),
-    ('delivered', 'Delivered'),
-    ('failed', 'Failed'),
-    ('temporary-failure', 'Phone not accepting messages right now'),
-    ('permanent-failure', 'Phone number doesn’t exist'),
-    ('technical-failure', 'Technical failure'),
+@pytest.mark.parametrize('key_type, notification_status, expected_status', [
+    (None, 'created', 'Sending'),
+    (None, 'sending', 'Sending'),
+    (None, 'delivered', 'Delivered'),
+    (None, 'failed', 'Failed'),
+    (None, 'temporary-failure', 'Phone not accepting messages right now'),
+    (None, 'permanent-failure', 'Phone number doesn’t exist'),
+    (None, 'technical-failure', 'Technical failure'),
+    ('team', 'delivered', 'Delivered'),
+    ('live', 'delivered', 'Delivered'),
+    ('test', 'sending', 'Sending (test)'),
+    ('test', 'delivered', 'Delivered (test)'),
+    ('test', 'permanent-failure', 'Phone number doesn’t exist (test)'),
 ])
 @pytest.mark.parametrize('user', [
     active_user_with_permissions,
@@ -37,6 +42,7 @@ def test_notification_status_page_shows_details(
     service_one,
     fake_uuid,
     user,
+    key_type,
     notification_status,
     expected_status,
 ):
@@ -46,7 +52,8 @@ def test_notification_status_page_shows_details(
     _mock_get_notification = mock_get_notification(
         mocker,
         fake_uuid,
-        notification_status=notification_status
+        notification_status=notification_status,
+        key_type=key_type,
     )
 
     page = client_request.get(
