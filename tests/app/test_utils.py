@@ -23,8 +23,6 @@ from tests.conftest import fake_uuid
 
 
 def _get_notifications_csv(
-    service_id,
-    page=1,
     row_number=1,
     recipient='foo@bar.com',
     template_name='foo',
@@ -34,34 +32,46 @@ def _get_notifications_csv(
     created_at='Thursday 19 April at 12:00',
     rows=1,
     with_links=False,
-    job_id=fake_uuid
+    job_id=fake_uuid,
+    created_by_name=None,
 ):
-    links = {}
-    if with_links:
-        links = {
-            'prev': '/service/{}/notifications?page=0'.format(service_id),
-            'next': '/service/{}/notifications?page=1'.format(service_id),
-            'last': '/service/{}/notifications?page=2'.format(service_id)
+
+    def _get(
+        service_id,
+        page=1,
+        job_id=None,
+        template_type=template_type,
+    ):
+        links = {}
+        if with_links:
+            links = {
+                'prev': '/service/{}/notifications?page=0'.format(service_id),
+                'next': '/service/{}/notifications?page=1'.format(service_id),
+                'last': '/service/{}/notifications?page=2'.format(service_id)
+            }
+
+        data = {
+            'notifications': [{
+                "row_number": row_number + i,
+                "to": recipient,
+                "recipient": recipient,
+                "template_name": template_name,
+                "template_type": template_type,
+                "template": {"name": template_name, "template_type": template_type},
+                "job_name": job_name,
+                "status": status,
+                "created_at": created_at,
+                "updated_at": None,
+                "created_by_name": created_by_name,
+            } for i in range(rows)],
+            'total': rows,
+            'page_size': 50,
+            'links': links
         }
 
-    data = {
-        'notifications': [{
-            "row_number": row_number + i,
-            "to": recipient,
-            "recipient": recipient,
-            "template_name": template_name,
-            "template_type": template_type,
-            "template": {"name": template_name, "template_type": template_type},
-            "job_name": job_name,
-            "status": status,
-            "created_at": created_at,
-            "updated_at": None
-        } for i in range(rows)],
-        'total': rows,
-        'page_size': 50,
-        'links': links
-    }
-    return data
+        return data
+
+    return _get
 
 
 @pytest.fixture(scope='function')
@@ -72,7 +82,7 @@ def _get_notifications_csv_mock(
 ):
     return mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
-        side_effect=_get_notifications_csv
+        side_effect=_get_notifications_csv()
     )
 
 
@@ -129,6 +139,37 @@ def test_can_create_spreadsheet_from_dict():
 
 def test_can_create_spreadsheet_from_dict_with_filename():
     assert Spreadsheet.from_dict({}, filename='empty.csv').as_dict['file_name'] == "empty.csv"
+
+
+@pytest.mark.parametrize('created_by_name, expected_content', [
+    (
+        None, [
+            'Recipient,Template,Type,Sent by,Job,Status,Time\n',
+            'foo@bar.com,foo,sms,,,Delivered,Thursday 19 April at 12:00\r\n',
+        ]
+    ),
+    (
+        'Anne Example', [
+            'Recipient,Template,Type,Sent by,Job,Status,Time\n',
+            'foo@bar.com,foo,sms,Anne Example,,Delivered,Thursday 19 April at 12:00\r\n',
+        ]
+    ),
+])
+def test_generate_notifications_csv_without_job(
+    app_,
+    mocker,
+    created_by_name,
+    expected_content,
+):
+    mocker.patch(
+        'app.notification_api_client.get_notifications_for_service',
+        side_effect=_get_notifications_csv(
+            created_by_name=created_by_name,
+            job_id=None,
+            job_name=None,
+        )
+    )
+    assert list(generate_notifications_csv(service_id=fake_uuid)) == expected_content
 
 
 @pytest.mark.parametrize('original_file_contents, expected_column_headers, expected_1st_row', [
@@ -209,14 +250,14 @@ def test_generate_notifications_csv_calls_twice_if_next_link(
     )
 
     service_id = '1234'
-    response_with_links = _get_notifications_csv(service_id, rows=7, with_links=True)
-    response_with_no_links = _get_notifications_csv(service_id, rows=3, row_number=8, with_links=False)
+    response_with_links = _get_notifications_csv(rows=7, with_links=True)
+    response_with_no_links = _get_notifications_csv(rows=3, row_number=8, with_links=False)
 
     mock_get_notifications = mocker.patch(
         'app.notification_api_client.get_notifications_for_service',
         side_effect=[
-            response_with_links,
-            response_with_no_links,
+            response_with_links(service_id),
+            response_with_no_links(service_id),
         ]
     )
 
