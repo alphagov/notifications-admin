@@ -1856,7 +1856,7 @@ def mock_get_notifications(
         job = None
         if job_id is not None:
             job = job_json(service_id, api_user_active, job_id=job_id)
-        if template_type:
+        if diff_template_type or template_type:
             template = template_json(
                 service_id,
                 id_=str(generate_uuid()),
@@ -2640,7 +2640,8 @@ def mock_get_notification(
     redact_personalisation=False,
     template_type=None,
     template_name='sample template',
-    is_precompiled_letter=False
+    is_precompiled_letter=False,
+    key_type=None,
 ):
     def _get_notification(
         service_id,
@@ -2670,6 +2671,8 @@ def mock_get_notification(
             is_precompiled_letter=is_precompiled_letter,
             name=template_name
         )
+        if key_type:
+            noti['key_type'] = key_type
         return noti
 
     return mocker.patch(
