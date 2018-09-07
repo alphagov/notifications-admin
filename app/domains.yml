@@ -4289,11 +4289,8 @@ stock-pc.gov.uk:
 stockport.gov.uk:
   owner: Stockport Metropolitan Borough Council
   crown: false
-  agreement_signed: false
-stockportmbc.gov.uk:
-  owner: Stockport Metropolitan Borough Council
-  crown: false
-  agreement_signed: false
+  agreement_signed: true
+stockportmbc.gov.uk: stockport.gov.uk
 stockton.gov.uk:
   owner: Stockton-on-Tees Borough Council
   crown: false
