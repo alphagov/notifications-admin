@@ -23,7 +23,7 @@
       <div class="email-brand">
         <div class="message-name">
           <a href="{{ url_for('.update_email_branding', branding_id=brand.id) }}">
-            {{ brand.name }}
+            {{ brand.name or 'Unnamed' }}
           </a>
         </div>
         {% if brand.domain_owner %}
