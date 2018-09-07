@@ -1,16 +1,19 @@
 import itertools
+import re
 from datetime import datetime
 
-from flask import abort, render_template, request, url_for
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import login_required
+from notifications_python_client.errors import HTTPError
 
 from app import (
     complaint_api_client,
+    letter_jobs_client,
     platform_stats_api_client,
     service_api_client,
 )
 from app.main import main
-from app.main.forms import DateFilterForm
+from app.main.forms import DateFilterForm, ReturnedLettersForm
 from app.statistics_utils import (
     get_formatted_percentage,
     get_formatted_percentage_two_dp,
@@ -199,6 +202,41 @@ def platform_admin_list_complaints():
         page=page,
         prev_page=prev_page,
         next_page=next_page,
+    )
+
+
+@main.route("/platform-admin/returned-letters", methods=["GET", "POST"])
+@login_required
+@user_is_platform_admin
+def platform_admin_returned_letters():
+    form = ReturnedLettersForm()
+
+    if form.validate_on_submit():
+        references = [
+            re.sub('NOTIFY00[0-9]', '', r.strip())
+            for r in form.references.data.split('\n')
+            if r.strip()
+        ]
+
+        try:
+            letter_jobs_client.submit_returned_letters(references)
+        except HTTPError as error:
+            if error.status_code == 400:
+                error_references = [
+                    re.match('references (.*) does not match', e['message']).group(1)
+                    for e in error.message
+                ]
+                form.references.errors.append("Invalid references: {}".format(', '.join(error_references)))
+            else:
+                raise error
+        else:
+            flash('Submitted {} letter references'.format(len(references)), 'default')
+            return redirect(
+                url_for('.platform_admin_returned_letters')
+            )
+    return render_template(
+        'views/platform-admin/returned-letters.html',
+        form=form,
     )
 
 

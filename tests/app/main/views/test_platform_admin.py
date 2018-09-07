@@ -724,3 +724,37 @@ def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
     # Letter virus scan failure status box - number is correct and failure class is used
     assert '1 virus scan failures' in page.find_all('div', class_='column-third')[2].find(
         'div', class_='big-number-status-failing').text
+
+
+def test_platform_admin_submit_returned_letters(mocker, client, platform_admin_user):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+
+    mock_client = mocker.patch('app.letter_jobs_client.submit_returned_letters')
+
+    response = client.post(
+        url_for('main.platform_admin_returned_letters'),
+        data={'references': ' NOTIFY000REF1 \n NOTIFY002REF2 '}
+    )
+
+    mock_client.assert_called_once_with(['REF1', 'REF2'])
+
+    assert response.status_code == 302
+    assert response.location == url_for('main.platform_admin_returned_letters', _external=True)
+
+
+def test_platform_admin_submit_empty_returned_letters(mocker, client, platform_admin_user):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+
+    mock_client = mocker.patch('app.letter_jobs_client.submit_returned_letters')
+
+    response = client.post(
+        url_for('main.platform_admin_returned_letters'),
+        data={'references': '  \n  '}
+    )
+
+    assert not mock_client.called
+
+    assert response.status_code == 200
+    assert "Can’t be empty" in response.get_data(as_text=True)

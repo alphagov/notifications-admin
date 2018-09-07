@@ -1067,3 +1067,12 @@ class ServiceDataRetentionEditForm(StripWhitespaceForm):
                                      validators=[validators.NumberRange(min=3, max=90,
                                                                         message="Must be between 3 and 90")],
                                      )
+
+
+class ReturnedLettersForm(StripWhitespaceForm):
+    references = TextAreaField(
+        u'Letter references',
+        validators=[
+            DataRequired(message="Can’t be empty"),
+        ]
+    )

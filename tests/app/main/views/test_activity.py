@@ -32,7 +32,7 @@ from tests.conftest import (
             '',
             [
                 'created', 'pending', 'sending', 'pending-virus-check',
-                'delivered', 'sent',
+                'delivered', 'sent', 'returned-letter',
                 'failed', 'temporary-failure', 'permanent-failure', 'technical-failure', 'virus-scan-failed',
             ]
         ),
@@ -42,7 +42,7 @@ from tests.conftest import (
         ),
         (
             'delivered',
-            ['delivered', 'sent']
+            ['delivered', 'sent', 'returned-letter']
         ),
         (
             'failed',
