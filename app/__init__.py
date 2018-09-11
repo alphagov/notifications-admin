@@ -372,6 +372,7 @@ def format_notification_status(status, template_type):
             'delivered': 'Delivered',
             'sending': 'Sending',
             'created': 'Sending',
+            'pending': 'Sending',
             'sent': 'Sent internationally'
         },
         'letter': {
@@ -391,10 +392,9 @@ def format_notification_status(status, template_type):
 
 
 def format_notification_status_as_time(status, created, updated):
-    return {
-        'sending': ' since {}'.format(created),
-        'created': ' since {}'.format(created)
-    }.get(status, updated)
+    return dict.fromkeys(
+        {'created', 'pending', 'sending'}, ' since {}'.format(created)
+    ).get(status, updated)
 
 
 def format_notification_status_as_field_status(status, notification_type):
@@ -423,7 +423,8 @@ def format_notification_status_as_field_status(status, notification_type):
             'delivered': None,
             'sent': None,
             'sending': 'default',
-            'created': 'default'
+            'created': 'default',
+            'pending': 'default',
         }
     ).get(status, 'error')
 
