@@ -728,6 +728,8 @@ class GovernmentDomainField(StringField):
     ]
 
     def post_validate(self, form, validation_stopped):
+        if self.data == '':
+            self.data = None
         if self.data and not self.errors:
             self.data = AgreementInfo(self.data).canonical_domain
 

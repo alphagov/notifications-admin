@@ -84,18 +84,24 @@ def test_create_email_branding_does_not_show_any_branding_info(
     assert page.select_one('#domain').attrs.get('value') == ''
 
 
+@pytest.mark.parametrize('posted_domain, persisted_domain', [
+    ('voa.gov.uk', 'voa.gov.uk'),
+    ('', None),
+])
 def test_create_new_email_branding_without_logo(
     logged_in_platform_admin_client,
     mocker,
     fake_uuid,
-    mock_create_email_branding
+    mock_create_email_branding,
+    posted_domain,
+    persisted_domain,
 ):
     data = {
         'logo': None,
         'colour': '#ff0000',
         'text': 'new text',
         'name': 'new name',
-        'domain': 'voa.gov.uk',
+        'domain': posted_domain,
         'brand_type': 'org'
     }
 
@@ -114,7 +120,7 @@ def test_create_new_email_branding_without_logo(
         name=data['name'],
         text=data['text'],
         colour=data['colour'],
-        domain=data['domain'],
+        domain=persisted_domain,
         brand_type=data['brand_type']
     )
     assert mock_persist.call_args_list == []
