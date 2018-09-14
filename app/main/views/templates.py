@@ -39,11 +39,6 @@ form_objects = {
     'letter': LetterTemplateForm
 }
 
-page_headings = {
-    'email': 'email',
-    'sms': 'text message'
-}
-
 
 @main.route("/services/<service_id>/templates/<uuid:template_id>")
 @login_required
