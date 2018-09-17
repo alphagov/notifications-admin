@@ -3063,7 +3063,7 @@ newcastle.gov.uk:
 newcastle-staffs.gov.uk:
   owner: Newcastle under Lyme Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 newenttowncouncil.gov.uk:
   owner: Newent Town Council
   crown: false
