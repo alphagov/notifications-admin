@@ -3753,7 +3753,7 @@ rydetowncouncil.gov.uk:
 ryedale.gov.uk:
   owner: Ryedale District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 ryetowncouncil.gov.uk:
   owner: Rye Town Council
   crown: false
