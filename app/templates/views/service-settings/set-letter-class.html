@@ -10,18 +10,22 @@
 
   <div class="grid-row">
     <div class="column-five-sixths">
-      <h1 class="heading-large">Postage classes</h1>
+      <h1 class="heading-large">Postage</h1>
+      <p>You can send letters by first or second class post.</p>
       <p>
-        Letters sent before 5:30pm will be printed and despatched the following business day.
+        See a list of <a href="{{ url_for(".pricing", _anchor="letters") }}">postage prices</a>.
+      </p>
+      <h2 class="heading-medium">Delivery times</h2>
+      <p>
+        Letters sent before 5:30pm are dispatched the next working day (Monday to Friday).
       </p>
       <p>
-        1st class letters will be delivered the day after they are despatched (Monday to Saturday).
-        2nd class letters will be delivered 2 days after they are despatched.
+        First class letters are delivered one day after they're dispatched. Second class letters are delivered 2 days after they're dispatched.
       </p>
       <p>
-        See <a href="{{ url_for(".pricing", _anchor="letters") }}">pricing</a> for the list
-        of rates.
+        Royal Mail delivers from Monday to Saturday, excluding bank holidays.
       </p>
+      <h2 class="heading-medium">Choose your postage</h2>
       <form method="post">
         {{ radios(form.letter_class) }}
         {{ page_footer(
