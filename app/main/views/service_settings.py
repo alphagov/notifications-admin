@@ -42,6 +42,7 @@ from app.main.forms import (
     ServiceDataRetentionForm,
     ServiceEditInboundNumberForm,
     ServiceInboundNumberForm,
+    ServiceLetterClassForm,
     ServiceLetterContactBlockForm,
     ServicePreviewBranding,
     ServiceReplyToEmailForm,
@@ -647,6 +648,19 @@ def service_set_letters(service_id):
         'views/service-settings/set-letters.html',
         form=form,
     )
+
+
+@main.route("/services/<service_id>/service-settings/set-letter-class", methods=['GET', 'POST'])
+@login_required
+@user_is_platform_admin
+def service_set_letter_class(service_id):
+    form = ServiceLetterClassForm(letter_class=current_service.letter_class)
+
+    if form.validate_on_submit():
+        service_api_client.update_service(service_id, letter_class=form.letter_class.data)
+        return redirect(url_for(".service_settings", service_id=service_id))
+
+    return render_template('views/service-settings/set-letter-class.html', form=form)
 
 
 @main.route("/services/<service_id>/service-settings/set-auth-type", methods=['GET'])

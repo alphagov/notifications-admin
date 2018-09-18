@@ -1,0 +1,36 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radios %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Postage classes
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="grid-row">
+    <div class="column-five-sixths">
+      <h1 class="heading-large">Postage classes</h1>
+      <p>
+        Letters sent before 5:30pm will be printed and despatched the following business day.
+      </p>
+      <p>
+        1st class letters will be delivered the day after they are despatched (Monday to Saturday).
+        2nd class letters will be delivered 2 days after they are despatched.
+      </p>
+      <p>
+        See <a href="{{ url_for(".pricing", _anchor="letters") }}">pricing</a> for the list
+        of rates.
+      </p>
+      <form method="post">
+        {{ radios(form.letter_class) }}
+        {{ page_footer(
+          'Save',
+          back_link=url_for('.service_settings', service_id=current_service.id),
+          back_link_text='Back to settings'
+        ) }}
+      </form>
+    </div>
+  </div>
+
+{% endblock %}

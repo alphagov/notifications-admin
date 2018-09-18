@@ -235,6 +235,21 @@
           )}}
         {% endcall %}
 
+        {% if current_user.platform_admin %}
+          {% call row() %}
+            {{ text_field('Post class') }}
+              {% set letter_class = {'first': '1st class only', 'second': '2nd class only'} %}
+              {{ text_field(letter_class[current_service.letter_class]) }}
+            {{ edit_field(
+                'Change',
+                url_for('.service_set_letter_class',
+                service_id=current_service.id),
+                permissions=['manage_service']
+            )
+            }}
+          {% endcall %}
+        {% endif %}
+
       {% endcall %}
     </div>
 

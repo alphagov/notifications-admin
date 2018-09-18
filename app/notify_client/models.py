@@ -275,6 +275,7 @@ class Service(dict):
         'email_from',
         'id',
         'inbound_api',
+        'letter_class',
         'letter_contact_block',
         'message_limit',
         'name',
