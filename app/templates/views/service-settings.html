@@ -237,8 +237,8 @@
 
         {% if current_user.platform_admin %}
           {% call row() %}
-            {{ text_field('Post class') }}
-              {% set letter_class = {'first': '1st class only', 'second': '2nd class only'} %}
+            {{ text_field('Postage') }}
+              {% set letter_class = {'first': 'First class only', 'second': 'Second class only'} %}
               {{ text_field(letter_class[current_service.letter_class]) }}
             {{ edit_field(
                 'Change',
