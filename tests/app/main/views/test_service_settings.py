@@ -89,7 +89,7 @@ def mock_get_service_settings_page_common(
 
         'Label Value Action',
         'Send letters Off Change',
-        'Post class 2nd class only Change',
+        'Postage Second class only Change',
 
         'Label Value Action',
         'Organisation Org 1 Change',
