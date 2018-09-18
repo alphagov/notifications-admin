@@ -687,10 +687,10 @@ class ServiceSwitchLettersForm(StripWhitespaceForm):
 class ServiceLetterClassForm(StripWhitespaceForm):
 
     letter_class = RadioField(
-        'Postage classes',
+        'Choose your postage',
         choices=[
-            ('first', '1st class only'),
-            ('second', '2nd class only'),
+            ('first', 'First class only'),
+            ('second', 'Second class only'),
         ],
     )
 
