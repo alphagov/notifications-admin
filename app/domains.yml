@@ -4795,7 +4795,7 @@ warwick.gov.uk:
 warwickshire.gov.uk:
   owner: Warwickshire County Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 warwicktowncouncil.gov.uk:
   owner: Warwick Town Council
   crown: false
