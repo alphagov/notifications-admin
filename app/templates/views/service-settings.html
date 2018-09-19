@@ -238,11 +238,11 @@
         {% if current_user.platform_admin %}
           {% call row() %}
             {{ text_field('Postage') }}
-              {% set letter_class = {'first': 'First class only', 'second': 'Second class only'} %}
-              {{ text_field(letter_class[current_service.letter_class]) }}
+              {% set postage = {'first': 'First class only', 'second': 'Second class only'} %}
+              {{ text_field(postage[current_service.postage]) }}
             {{ edit_field(
                 'Change',
-                url_for('.service_set_letter_class',
+                url_for('.service_set_postage',
                 service_id=current_service.id),
                 permissions=['manage_service']
             )

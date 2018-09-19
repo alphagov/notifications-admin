@@ -81,7 +81,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'created_by',
             'branding',
             'email_branding',
-            'letter_class',
             'letter_contact_block',
             'dvla_organisation',
             'permissions',
@@ -89,6 +88,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'free_sms_fragment_limit',
             'prefix_sms',
             'contact_link',
+            'postage',
         }
         if disallowed_attributes:
             raise TypeError('Not allowed to update service attributes: {}'.format(

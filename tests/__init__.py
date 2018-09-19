@@ -139,7 +139,6 @@ def service_json(
     email_branding=None,
     branding='govuk',
     created_at=None,
-    letter_class='second',
     letter_contact_block=None,
     inbound_api=None,
     service_callback_api=None,
@@ -147,6 +146,7 @@ def service_json(
     organisation_type='central',
     prefix_sms=True,
     contact_link=None,
+    postage='second',
 ):
     if users is None:
         users = []
@@ -169,13 +169,13 @@ def service_json(
         'email_branding': email_branding,
         'branding': branding,
         'created_at': created_at or str(datetime.utcnow()),
-        'letter_class': letter_class,
         'letter_contact_block': letter_contact_block,
         'dvla_organisation': '001',
         'permissions': permissions,
         'inbound_api': inbound_api,
         'service_callback_api': service_callback_api,
         'prefix_sms': prefix_sms,
+        'postage': postage,
     }
 
 

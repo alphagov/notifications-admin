@@ -42,8 +42,8 @@ from app.main.forms import (
     ServiceDataRetentionForm,
     ServiceEditInboundNumberForm,
     ServiceInboundNumberForm,
-    ServiceLetterClassForm,
     ServiceLetterContactBlockForm,
+    ServicePostageForm,
     ServicePreviewBranding,
     ServiceReplyToEmailForm,
     ServiceSetBranding,
@@ -650,17 +650,17 @@ def service_set_letters(service_id):
     )
 
 
-@main.route("/services/<service_id>/service-settings/set-letter-class", methods=['GET', 'POST'])
+@main.route("/services/<service_id>/service-settings/set-postage", methods=['GET', 'POST'])
 @login_required
 @user_is_platform_admin
-def service_set_letter_class(service_id):
-    form = ServiceLetterClassForm(letter_class=current_service.letter_class)
+def service_set_postage(service_id):
+    form = ServicePostageForm(postage=current_service.postage)
 
     if form.validate_on_submit():
-        service_api_client.update_service(service_id, letter_class=form.letter_class.data)
+        service_api_client.update_service(service_id, postage=form.postage.data)
         return redirect(url_for(".service_settings", service_id=service_id))
 
-    return render_template('views/service-settings/set-letter-class.html', form=form)
+    return render_template('views/service-settings/set-postage.html', form=form)
 
 
 @main.route("/services/<service_id>/service-settings/set-auth-type", methods=['GET'])

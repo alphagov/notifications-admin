@@ -26,7 +26,7 @@
         Royal Mail delivers from Monday to Saturday, excluding bank holidays.
       </p>
       <form method="post">
-        {{ radios(form.letter_class) }}
+        {{ radios(form.postage) }}
         {{ page_footer(
           'Save',
           back_link=url_for('.service_settings', service_id=current_service.id),

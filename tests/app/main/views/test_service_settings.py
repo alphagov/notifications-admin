@@ -1850,36 +1850,36 @@ def test_set_letter_branding_saves(
     mock_update_service.assert_called_once_with(service_one['id'], dvla_organisation='500')
 
 
-def test_set_letter_class_platform_admin_only(
+def test_set_postage_platform_admin_only(
     logged_in_client,
     service_one,
 ):
-    response = logged_in_client.get(url_for('main.service_set_letter_class', service_id=SERVICE_ONE_ID))
+    response = logged_in_client.get(url_for('main.service_set_postage', service_id=SERVICE_ONE_ID))
     assert response.status_code == 403
 
 
-def test_set_letter_class_prepopulates(
+def test_set_postage_prepopulates(
     logged_in_platform_admin_client,
     service_one,
 ):
-    response = logged_in_platform_admin_client.get(url_for('main.service_set_letter_class', service_id=SERVICE_ONE_ID))
+    response = logged_in_platform_admin_client.get(url_for('main.service_set_postage', service_id=SERVICE_ONE_ID))
     assert response.status_code == 200
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select('input[checked]')[0]['value'] == 'second'
 
 
-def test_set_letter_class_saves(
+def test_set_postage_saves(
     logged_in_platform_admin_client,
     service_one,
     mock_update_service,
 ):
     response = logged_in_platform_admin_client.post(
-        url_for('main.service_set_letter_class', service_id=SERVICE_ONE_ID),
-        data={'letter_class': 'first'}
+        url_for('main.service_set_postage', service_id=SERVICE_ONE_ID),
+        data={'postage': 'first'}
     )
     assert response.status_code == 302
     assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, letter_class='first')
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, postage='first')
 
 
 @pytest.mark.parametrize('current_branding, expected_values, expected_labels', [

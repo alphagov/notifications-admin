@@ -684,9 +684,9 @@ class ServiceSwitchLettersForm(StripWhitespaceForm):
     )
 
 
-class ServiceLetterClassForm(StripWhitespaceForm):
+class ServicePostageForm(StripWhitespaceForm):
 
-    letter_class = RadioField(
+    postage = RadioField(
         'Choose your postage',
         choices=[
             ('first', 'First class only'),
