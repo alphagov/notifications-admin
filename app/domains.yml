@@ -2874,7 +2874,7 @@ mendip.gov.uk:
 merthyr.gov.uk:
   owner: Merthyr Tydfil County Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 met.pnn.police.uk:
   owner: Metropolitan Police Service
   crown: false
