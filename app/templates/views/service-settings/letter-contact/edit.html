@@ -2,6 +2,7 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/checkbox.html" import checkbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Edit an address
@@ -13,7 +14,7 @@
     Edit an address
   </h1>
   <div class="grid-row">
-    <form method="post" class="column-half">
+    {% call form_wrapper() %}
       {{ textbox(
         form.letter_contact_block,
         label='This will appear as the ‘sender’ address on your letters.'|safe,
@@ -36,7 +37,7 @@
         back_link=None if request.args.get('from_template') else url_for('.service_letter_contact_details', service_id=current_service.id),
         back_link_text='Back to settings'
       ) }}
-    </form>
+    {% endcall %}
   </div>
 
 {% endblock %}

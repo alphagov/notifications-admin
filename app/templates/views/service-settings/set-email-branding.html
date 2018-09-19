@@ -2,6 +2,7 @@
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/live-search.html" import live_search %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Set email branding
@@ -10,7 +11,7 @@
 {% block maincolumn_content %}
 
   <h1 class="heading-large">Set email branding</h1>
-  <form method="post" novalidate autocomplete="off">
+  {% call form_wrapper() %}
     <div class="grid-row">
       <div class="column-full preview-pane">
       </div>
@@ -30,6 +31,6 @@
         ) }}
       </div>
     </div>
-  </form>
+  {% endcall %}
 
 {% endblock %}

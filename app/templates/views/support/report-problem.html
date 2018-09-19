@@ -2,6 +2,7 @@
 {% from "components/checkbox.html" import checkbox %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
   Report a problem
@@ -20,7 +21,7 @@
             page to see if there are any known issues with GOV.UK Notify.
           </p>
         </div>
-        <form method="post" autocomplete="off" novalidate>
+        {% call form_wrapper() %}
             {{ textbox(form.feedback, width='1-1', hint='', rows=10) }}
             {% if not current_user.is_authenticated %}
               {{ textbox(form.name, width='1-1') }}
@@ -33,7 +34,7 @@
               secondary_link=url_for('.support'),
               secondary_link_text='Back to support',
             ) }}
-        </form>
+        {% endcall %}
       </div>
     </div>
 

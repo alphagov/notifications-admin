@@ -4,6 +4,7 @@
 {% from "components/api-key.html" import api_key %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/list-entry.html" import list_entry %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Whitelist
@@ -42,7 +43,7 @@
     are included in the whitelist automatically.
   </p>
 
-  <form method="post" autocomplete="off" novalidate>
+  {% call form_wrapper() %}
 
     <div class="grid-row">
       <div class="column-two-thirds">
@@ -68,6 +69,6 @@
       secondary_link_text='Back to API integration'
     ) }}
 
-  </form>
+  {% endcall %}
 
 {% endblock %}

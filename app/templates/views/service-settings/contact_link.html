@@ -2,6 +2,7 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/radios.html" import radio, radios_wrapper %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   {{ 'Change' if 'upload_document' in current_service.permissions else 'Add' }} contact details for ‘Download your document’ page
@@ -18,7 +19,7 @@
         on the download page. This is so users can contact you if there’s a problem (for example,
         if the link to download the document has expired).
       </p>
-      <form method="post" novalidate>
+      {% call form_wrapper() %}
 
         {% call radios_wrapper(form.contact_details_type, hide_legend=true) %}
           {% for option in form.contact_details_type %}
@@ -36,7 +37,7 @@
           back_link=url_for('.service_settings', service_id=current_service.id),
           back_link_text='Back to settings'
         ) }}
-      </form>
+      {% endcall %}
     </div>
   </div>
 {% endblock %}

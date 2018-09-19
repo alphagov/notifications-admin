@@ -1,5 +1,6 @@
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% extends "withnav_template.html" %}
 
@@ -11,11 +12,11 @@
 
     <h1 class="heading-large">Add new template</h1>
 
-    <form method="post">
+    {% call form_wrapper() %}
       {{ radios(form.template_type) }}
       {{ page_footer(
         'Continue'
       ) }}
-    </form>
+    {% endcall %}
 
 {% endblock %}

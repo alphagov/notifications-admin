@@ -2,6 +2,7 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/radios.html" import radios %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   {{ heading_action }} text message template
@@ -13,7 +14,7 @@
       {{ heading_action }} text message template
     </h1>
 
-    <form method="post">
+    {% call form_wrapper() %}
       <div class="grid-row">
         <div class="column-two-thirds">
           {{ textbox(form.name, width='1-1', hint='Your recipients won’t see this') }}
@@ -34,7 +35,7 @@
           {% include "partials/templates/guidance-character-count.html" %}
         </aside>
       </div>
-    </form>
+    {% endcall %}
 
 
 {% endblock %}

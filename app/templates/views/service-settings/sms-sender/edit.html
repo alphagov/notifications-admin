@@ -3,6 +3,7 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/checkbox.html" import checkbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Edit text message sender
@@ -24,7 +25,7 @@
       Edit text message sender
     </h1>
   {% endif %}
-  <form method="post">
+  {% call form_wrapper() %}
     {% if inbound_number %}
       <p>
         <span class="bottom-gutter-1-3"> {{ sms_sender.sms_sender }} </span>
@@ -66,6 +67,6 @@
         ) }}
       {% endif %}
     {% endif %}
-  </form>
+  {% endcall %}
 
 {% endblock %}

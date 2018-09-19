@@ -1,0 +1,20 @@
+{% macro form_wrapper(
+  method="post",
+  action=None,
+  autocomplete=False,
+  class=None,
+  id=None,
+  module=None
+) %}
+  <form
+    method="{{ method }}"
+    {% if action %}action="{{ action }}"{% endif %}
+    {% if not autocomplete %}autocomplete="off"{% endif %}
+    {% if class %}class="{{ class }}"{% endif %}
+    {% if id %}id="{{ id }}"{% endif %}
+    {% if module %}data-module="{{ module }}"{% endif %}
+    novalidate
+  >
+    {{ caller() }}
+  </form>
+{% endmacro %}

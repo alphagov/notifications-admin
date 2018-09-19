@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Set letter branding
@@ -11,14 +12,14 @@
   <h1 class="heading-large">Set letter branding</h1>
   <div class="grid-row">
     <div class="column-three-quarters">
-      <form method="post">
+      {% call form_wrapper() %}
         {{ radios(form.dvla_org_id) }}
         {{ page_footer(
           'Save',
           back_link=url_for('.service_settings', service_id=current_service.id),
           back_link_text='Back to settings'
         ) }}
-      </form>
+      {% endcall %}
     </div>
   </div>
 

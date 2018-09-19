@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Callbacks for received text messages
@@ -15,7 +16,7 @@
         Check the <a href="{{ url_for('.callbacks') }}"> callback documentation </a> for more information.
       </p>
 
-      <form method="post">
+      {% call form_wrapper() %}
         {{ textbox(
           form.url,
           width='1-1',
@@ -27,12 +28,12 @@
           hint='At least 10 characters',
           autocomplete='new-password'
         ) }}
-          {{ page_footer(
+        {{ page_footer(
           'Save',
           back_link=url_for('.api_callbacks', service_id=current_service.id),
           back_link_text='Back to settings'
-      ) }}
-      </form>
+        ) }}
+      {% endcall %}
     </div>
   </div>
 

@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   Change your service name
@@ -22,13 +23,13 @@
     {% endif %}
   </div>
 
-  <form method="post">
+  {% call form_wrapper() %}
     {{ textbox(form.name) }}
     {{ page_footer(
       'Save',
       back_link=url_for('.service_settings', service_id=current_service.id),
       back_link_text='Back to settings'
     ) }}
-  </form>
+  {% endcall %}
 
 {% endblock %}

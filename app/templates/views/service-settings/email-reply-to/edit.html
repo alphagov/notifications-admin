@@ -3,6 +3,7 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/checkbox.html" import checkbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
  Edit email reply to address
@@ -24,7 +25,7 @@
       Edit email reply to address
     </h1>
   {% endif %}
-  <form method="post">
+  {% call form_wrapper() %}
     {{ textbox(
       form.email_address,
       width='2-3',
@@ -51,6 +52,6 @@
         delete_link_text='Delete'
       ) }}
     {% endif %}
-  </form>
+  {% endcall %}
 
 {% endblock %}

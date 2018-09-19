@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   {{ user.name or user.email_localpart }}
@@ -17,7 +18,7 @@
   </p>
 
   <div class="grid-row">
-    <form method="post" class="column-three-quarters">
+    {% call form_wrapper(class="column-three-quarters") %}
 
       {% include 'views/manage-users/permissions.html' %}
 
@@ -27,6 +28,6 @@
           delete_link_text='Remove user from service'
         ) }}
 
-    </form>
+    {% endcall %}
   </div>
 {% endblock %}

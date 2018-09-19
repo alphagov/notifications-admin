@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-footer.html" import page_footer %}
-
+{% from "components/form.html" import form_wrapper %}
 {% from "components/radios.html" import radios %}
 
 {% block service_page_title %}
@@ -12,7 +12,7 @@
 
 
   <h1 class="heading-large">Set data retention</h1>
-    <form method="post">
+    {% call form_wrapper() %}
       {{ radios(form.notification_type) }}
       {{  textbox(form.days_of_retention) }}
       {{ page_footer(
@@ -20,6 +20,6 @@
       back_link=url_for('.add_data_retention', service_id=current_service.id),
       back_link_text='Back'
     ) }}
-    </form>
+    {% endcall %}
 
 {% endblock %}

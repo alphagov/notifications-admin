@@ -2,6 +2,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/message-count-label.html" import recipient_count_label %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
   {{ page_title }}
@@ -13,7 +14,7 @@
     {{ page_title }}
   </h1>
 
-  <form method="post" class="js-stick-at-top-when-scrolling" data-module="autofocus" autocomplete="off" novalidate>
+  {% call form_wrapper(class="js-stick-at-top-when-scrolling", module="autofocus") %}
     <div class="grid-row">
       <div class="column-two-thirds {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
         {{ textbox(
@@ -36,7 +37,7 @@
       </p>
     {% endif %}
     {{ page_footer('Continue', back_link=back_link) }}
-  </form>
+  {% endcall %}
 
   {{ template|string }}
 

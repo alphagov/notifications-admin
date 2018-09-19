@@ -2,6 +2,7 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/checkbox.html" import checkbox %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
   Text verification
@@ -15,7 +16,7 @@
 
     <p>We’ve sent you a text message with a security code.</p>
 
-    <form autocomplete="off" method="post" class="extra-tracking" novalidate>
+    {% call form_wrapper(class="extra-tracking") %}
       {{ textbox(
         form.sms_code,
         width='5em',
@@ -26,7 +27,7 @@
         secondary_link=url_for('main.check_and_resend_text_code'),
         secondary_link_text='Not received a text message?'
       ) }}
-    </form>
+    {% endcall %}
   </div>
 </div>
 

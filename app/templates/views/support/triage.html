@@ -1,6 +1,7 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/radios.html" import radios %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
   Feedback
@@ -13,10 +14,10 @@
       <h1 class="heading-large">
         Report a problem
       </h1>
-      <form method="post">
+      {% call form_wrapper() %}
         {{ radios(form.severe) }}
         {{ page_footer('Continue') }}
-      </form>
+      {% endcall %}
       <h2 class="heading-small">
         It’s only an emergency if:
       </h2>

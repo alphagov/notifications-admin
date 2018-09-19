@@ -1,5 +1,5 @@
 {% extends "views/platform-admin/_base_template.html" %}
-
+{% from "components/form.html" import form_wrapper %}
 {% block service_page_title %}
   Preview email branding
 {% endblock %}
@@ -10,7 +10,7 @@
   <div class="grid-row">
     <div class="column-full">
       <iframe src="{{ url_for('main.email_template', branding_style=form.branding_style.data) }}" class="email-branding-preview"></iframe>
-      <form method="post" action="{{ action }}">
+      {% call form_wrapper(action=action) %}
         <div class="form-group">
           {{ form.hidden_tag() }}
           <div class="page-footer">
@@ -18,7 +18,7 @@
             <a class="page-footer-back-link" href="{{ url_for('main.service_settings', service_id=service_id) }}">Back to service settings</a>
           </div>
         </div>
-      </form>
+      {% endcall %}
     </div>
   </div>
 {% endblock %}
