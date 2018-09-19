@@ -13,7 +13,7 @@
 
       <h1 class="heading-large">Request to go live</h1>
 
-      <form method="post">
+      <form method="post" autocomplete="off" novalidate>
         <div class="form-group">
           {{ textbox(form.volume_email, width='1-2', hint='For example, 1,000,000') }}
           {{ textbox(form.volume_sms, width='1-2', hint='For example, 500,000') }}
