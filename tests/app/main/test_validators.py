@@ -214,11 +214,11 @@ def test_sms_sender_form_validation(
     form.validate()
     assert 'Use letters and numbers only' == form.errors['sms_sender'][0]
 
-    form.sms_sender.data = '0'
+    form.sms_sender.data = '333'
     form.validate()
-    assert 'Enter 3 characters or more' == form.errors['sms_sender'][0]
+    assert 'Enter 4 characters or more' == form.errors['sms_sender'][0]
 
-    form.sms_sender.data = '111'
+    form.sms_sender.data = '4444'
     form.validate()
     assert not form.errors
 
