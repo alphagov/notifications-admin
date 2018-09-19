@@ -222,7 +222,7 @@ def submit_request_to_go_live(service_id):
                 service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
                 organisation_type=str(current_service.organisation_type).title(),
                 agreement=AgreementInfo.from_current_user().as_human_readable,
-                checklist='Yes' if current_service.go_live_checklist_completed else 'No',
+                checklist=current_service.go_live_checklist_completed_as_yes_no,
                 volume_email=form.volume_email.data,
                 volume_sms=form.volume_sms.data,
                 volume_letter=form.volume_letter.data,
@@ -235,7 +235,8 @@ def submit_request_to_go_live(service_id):
             ),
             ticket_type=zendesk_client.TYPE_QUESTION,
             user_email=current_user.email_address,
-            user_name=current_user.name
+            user_name=current_user.name,
+            tags=get_request_to_go_live_tags(current_service, current_user),
         )
 
         flash('Thanks for your request to go live. We’ll get back to you within one working day.', 'default')
@@ -1106,3 +1107,46 @@ def check_contact_details_type(contact_details):
         return 'email_address'
     else:
         return 'phone_number'
+
+
+def get_request_to_go_live_tags(service, user):
+    return list(_get_request_to_go_live_tags(
+        service,
+        AgreementInfo.from_user(user).agreement_signed,
+    ))
+
+
+def _get_request_to_go_live_tags(service, agreement_signed):
+
+    BASE = 'notify_request_to_go_live'
+    COMPLETE = BASE + '_complete'
+    INCOMPLETE = BASE + '_incomplete'
+
+    yield BASE
+
+    if service.go_live_checklist_completed and agreement_signed:
+        return COMPLETE
+
+    yield INCOMPLETE
+
+    if not service.go_live_checklist_completed:
+        yield INCOMPLETE + '_checklist'
+
+    if not agreement_signed:
+        yield INCOMPLETE + '_mou'
+
+    if service.has_email_templates and not service.has_email_reply_to_address:
+        yield INCOMPLETE + '_email_reply_to'
+
+    if not service.has_team_members:
+        yield INCOMPLETE + '_team_member'
+
+    if not service.has_templates:
+        yield INCOMPLETE + '_template_content'
+
+    if (
+        service.has_sms_templates and
+        service.shouldnt_use_govuk_as_sms_sender and
+        service.sms_sender_is_govuk
+    ):
+        yield INCOMPLETE + '_sms_sender'

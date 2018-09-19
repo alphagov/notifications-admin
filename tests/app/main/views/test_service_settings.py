@@ -758,7 +758,14 @@ def test_should_redirect_after_request_to_go_live(
         message=ANY,
         ticket_type=ZendeskClient.TYPE_QUESTION,
         user_name=active_user_with_permissions.name,
-        user_email=active_user_with_permissions.email_address
+        user_email=active_user_with_permissions.email_address,
+        tags=[
+            'notify_request_to_go_live',
+            'notify_request_to_go_live_incomplete',
+            'notify_request_to_go_live_incomplete_checklist',
+            'notify_request_to_go_live_incomplete_mou',
+            'notify_request_to_go_live_incomplete_team_member',
+        ],
     )
     assert mock_post.call_args[1]['message'] == (
         'Service: service one\n'
@@ -794,7 +801,9 @@ def test_should_redirect_after_request_to_go_live(
         'has_email_reply_to_address,'
         'shouldnt_use_govuk_as_sms_sender,'
         'sms_sender_is_govuk,'
-        'expected,'
+        'expected_readyness,'
+        'agreement_signed,'
+        'expected_tags,'
     ),
     (
         (  # Just sending email
@@ -806,6 +815,10 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             'Yes',
+            True,
+            [
+                'notify_request_to_go_live',
+            ],
         ),
         (  # Needs to set reply to address
             True,
@@ -816,6 +829,13 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             'No',
+            True,
+            [
+                'notify_request_to_go_live',
+                'notify_request_to_go_live_incomplete',
+                'notify_request_to_go_live_incomplete_checklist',
+                'notify_request_to_go_live_incomplete_email_reply_to',
+            ],
         ),
         (  # Just sending SMS
             True,
@@ -826,6 +846,10 @@ def test_should_redirect_after_request_to_go_live(
             True,
             False,
             'Yes',
+            True,
+            [
+                'notify_request_to_go_live',
+            ],
         ),
         (  # Needs to change SMS sender
             True,
@@ -836,6 +860,13 @@ def test_should_redirect_after_request_to_go_live(
             True,
             True,
             'No',
+            True,
+            [
+                'notify_request_to_go_live',
+                'notify_request_to_go_live_incomplete',
+                'notify_request_to_go_live_incomplete_checklist',
+                'notify_request_to_go_live_incomplete_sms_sender',
+            ],
         ),
         (  # Needs team members
             False,
@@ -846,6 +877,13 @@ def test_should_redirect_after_request_to_go_live(
             True,
             False,
             'No',
+            True,
+            [
+                'notify_request_to_go_live',
+                'notify_request_to_go_live_incomplete',
+                'notify_request_to_go_live_incomplete_checklist',
+                'notify_request_to_go_live_incomplete_team_member',
+            ],
         ),
         (  # Needs templates
             True,
@@ -856,6 +894,34 @@ def test_should_redirect_after_request_to_go_live(
             True,
             False,
             'No',
+            True,
+            [
+                'notify_request_to_go_live',
+                'notify_request_to_go_live_incomplete',
+                'notify_request_to_go_live_incomplete_checklist',
+                'notify_request_to_go_live_incomplete_template_content',
+            ],
+        ),
+        (  # Everything is wrong
+            False,
+            False,
+            True,
+            True,
+            False,
+            True,
+            True,
+            'No',
+            False,
+            [
+                'notify_request_to_go_live',
+                'notify_request_to_go_live_incomplete',
+                'notify_request_to_go_live_incomplete_checklist',
+                'notify_request_to_go_live_incomplete_mou',
+                'notify_request_to_go_live_incomplete_email_reply_to',
+                'notify_request_to_go_live_incomplete_team_member',
+                'notify_request_to_go_live_incomplete_template_content',
+                'notify_request_to_go_live_incomplete_sms_sender',
+            ],
         ),
     ),
 )
@@ -869,7 +935,9 @@ def test_ready_to_go_live(
     has_email_reply_to_address,
     shouldnt_use_govuk_as_sms_sender,
     sms_sender_is_govuk,
-    expected,
+    expected_readyness,
+    agreement_signed,
+    expected_tags,
 ):
     for prop in {
         'has_team_members',
@@ -887,7 +955,12 @@ def test_ready_to_go_live(
 
     assert app.notify_client.models.Service({
         'id': fake_uuid()
-    }).go_live_checklist_completed_as_yes_no == expected
+    }).go_live_checklist_completed_as_yes_no == expected_readyness
+
+    assert list(app.main.views.service_settings._get_request_to_go_live_tags(
+        app.notify_client.models.Service({'id': fake_uuid()}),
+        agreement_signed,
+    )) == expected_tags
 
 
 @pytest.mark.parametrize('route', [
