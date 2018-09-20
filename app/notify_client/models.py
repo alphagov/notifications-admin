@@ -355,3 +355,23 @@ class Service(dict):
         return get_default_sms_sender(
             service_api_client.get_sms_senders(self.id)
         ) in {'GOVUK', 'None'}
+
+    @property
+    def go_live_checklist_completed(self):
+        return all((
+            self.has_team_members,
+            self.has_templates,
+            any((
+                not self.has_email_templates,
+                self.has_email_reply_to_address,
+            )),
+            any((
+                not self.has_sms_templates,
+                not self.shouldnt_use_govuk_as_sms_sender,
+                not self.sms_sender_is_govuk,
+            ))
+        ))
+
+    @property
+    def go_live_checklist_completed_as_yes_no(self):
+        return 'Yes' if self.go_live_checklist_completed else 'No'

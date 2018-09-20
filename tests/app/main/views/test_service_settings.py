@@ -1,6 +1,6 @@
 import uuid
 from functools import partial
-from unittest.mock import ANY, call
+from unittest.mock import ANY, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
 
 import pytest
@@ -737,7 +737,9 @@ def test_should_redirect_after_request_to_go_live(
     single_letter_contact_block,
     mock_get_service_organisation,
     single_sms_sender,
-    mock_get_service_settings_page_common
+    mock_get_service_settings_page_common,
+    mock_get_service_templates,
+    mock_get_users_by_service,
 ):
     mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
     page = client_request.post(
@@ -765,6 +767,7 @@ def test_should_redirect_after_request_to_go_live(
         '---\n'
         'Organisation type: Central\n'
         'Agreement signed: Can’t tell (domain is user.gov.uk)\n'
+        'Checklist completed: No\n'
         'Emails in next year: 111\n'
         'Text messages in next year: 222\n'
         'Letters in next year: 333\n'
@@ -780,6 +783,111 @@ def test_should_redirect_after_request_to_go_live(
     assert normalize_spaces(page.select_one('h1').text) == (
         'Settings'
     )
+
+
+@pytest.mark.parametrize(
+    (
+        'has_team_members,'
+        'has_templates,'
+        'has_email_templates,'
+        'has_sms_templates,'
+        'has_email_reply_to_address,'
+        'shouldnt_use_govuk_as_sms_sender,'
+        'sms_sender_is_govuk,'
+        'expected,'
+    ),
+    (
+        (  # Just sending email
+            True,
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            'Yes',
+        ),
+        (  # Needs to set reply to address
+            True,
+            True,
+            True,
+            False,
+            False,
+            True,
+            True,
+            'No',
+        ),
+        (  # Just sending SMS
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            False,
+            'Yes',
+        ),
+        (  # Needs to change SMS sender
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            True,
+            'No',
+        ),
+        (  # Needs team members
+            False,
+            True,
+            False,
+            True,
+            True,
+            True,
+            False,
+            'No',
+        ),
+        (  # Needs templates
+            True,
+            False,
+            False,
+            True,
+            True,
+            True,
+            False,
+            'No',
+        ),
+    ),
+)
+def test_ready_to_go_live(
+    client_request,
+    mocker,
+    has_team_members,
+    has_templates,
+    has_email_templates,
+    has_sms_templates,
+    has_email_reply_to_address,
+    shouldnt_use_govuk_as_sms_sender,
+    sms_sender_is_govuk,
+    expected,
+):
+    for prop in {
+        'has_team_members',
+        'has_templates',
+        'has_email_templates',
+        'has_sms_templates',
+        'has_email_reply_to_address',
+        'shouldnt_use_govuk_as_sms_sender',
+        'sms_sender_is_govuk',
+    }:
+        mocker.patch(
+            'app.notify_client.models.Service.{}'.format(prop),
+            new_callable=PropertyMock
+        ).return_value = locals()[prop]
+
+    assert app.notify_client.models.Service({
+        'id': fake_uuid()
+    }).go_live_checklist_completed_as_yes_no == expected
 
 
 @pytest.mark.parametrize('route', [

@@ -199,6 +199,7 @@ def submit_request_to_go_live(service_id):
                 '\n---'
                 '\nOrganisation type: {organisation_type}'
                 '\nAgreement signed: {agreement}'
+                '\nChecklist completed: {checklist}'
                 '\nEmails in next year: {volume_email}'
                 '\nText messages in next year: {volume_sms}'
                 '\nLetters in next year: {volume_letter}'
@@ -221,6 +222,7 @@ def submit_request_to_go_live(service_id):
                 service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
                 organisation_type=str(current_service.organisation_type).title(),
                 agreement=AgreementInfo.from_current_user().as_human_readable,
+                checklist='Yes' if current_service.go_live_checklist_completed else 'No',
                 volume_email=form.volume_email.data,
                 volume_sms=form.volume_sms.data,
                 volume_letter=form.volume_letter.data,
