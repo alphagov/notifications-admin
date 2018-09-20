@@ -3,6 +3,8 @@ from itertools import chain
 from flask import request, session
 from flask_login import AnonymousUserMixin, UserMixin
 
+from app.utils import get_default_sms_sender
+
 roles = {
     'send_messages': ['send_texts', 'send_emails', 'send_letters'],
     'manage_templates': ['manage_templates'],
@@ -302,7 +304,54 @@ class Service(dict):
     def has_permission(self, permission):
         return permission in self.permissions
 
+    @property
     def has_jobs(self):
         # Can’t import at top-level because app isn’t yet initialised
         from app import job_api_client
         return job_api_client.has_jobs(self.id)
+
+    @property
+    def has_team_members(self):
+        from app import user_api_client
+        return user_api_client.get_count_of_users_with_permission(
+            self.id, 'manage_service'
+        ) > 1
+
+    @property
+    def has_templates(self):
+        from app import service_api_client
+        return service_api_client.count_service_templates(
+            self.id
+        ) > 0
+
+    @property
+    def has_email_templates(self):
+        from app import service_api_client
+        return service_api_client.count_service_templates(
+            self.id, template_type='email'
+        ) > 0
+
+    @property
+    def has_sms_templates(self):
+        from app import service_api_client
+        return service_api_client.count_service_templates(
+            self.id, template_type='sms'
+        ) > 0
+
+    @property
+    def has_email_reply_to_address(self):
+        from app import service_api_client
+        return bool(service_api_client.get_reply_to_email_addresses(
+            self.id
+        ))
+
+    @property
+    def shouldnt_use_govuk_as_sms_sender(self):
+        return self.organisation_type in {'local', 'nhs'}
+
+    @property
+    def sms_sender_is_govuk(self):
+        from app import service_api_client
+        return get_default_sms_sender(
+            service_api_client.get_sms_senders(self.id)
+        ) in {'GOVUK', 'None'}
