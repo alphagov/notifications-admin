@@ -31,6 +31,7 @@ cica.gov.uk:
   agreement_signed: true
 dbs.gsi.gov.uk: dbs.gov.uk
 dbs.gov.uk:
+  owner: Disclosure and Barring Service
   agreement_signed: true
 dvla.gsi.gov.uk: dvla.gov.uk
 dvla.gov.uk:
