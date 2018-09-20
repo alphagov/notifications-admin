@@ -684,6 +684,17 @@ class ServiceSwitchLettersForm(StripWhitespaceForm):
     )
 
 
+class ServicePostageForm(StripWhitespaceForm):
+
+    postage = RadioField(
+        'Choose your postage',
+        choices=[
+            ('first', 'First class only'),
+            ('second', 'Second class only'),
+        ],
+    )
+
+
 class BrandingStyle(RadioField):
 
     def post_validate(self, form, validation_stopped):

@@ -146,6 +146,7 @@ def service_json(
     organisation_type='central',
     prefix_sms=True,
     contact_link=None,
+    postage='second',
 ):
     if users is None:
         users = []
@@ -174,6 +175,7 @@ def service_json(
         'inbound_api': inbound_api,
         'service_callback_api': service_callback_api,
         'prefix_sms': prefix_sms,
+        'postage': postage,
     }
 
 
