@@ -2446,7 +2446,7 @@ kingsbridge.gov.uk:
 kingston.gov.uk:
   owner: Kingston upon Thames London Borough Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 kingtontowncouncil.gov.uk:
   owner: KIngton Town Council
   crown: false
