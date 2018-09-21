@@ -39,6 +39,13 @@
             url_for('main.service_sms_senders', service_id=current_service.id),
           ) }}
         {% endif %}
+        {% if show_agreement %}
+          {{ task_list_item(
+            agreement_signed,
+            'Get our data sharing and financial agreement signed',
+            url_for('main.agreement'),
+          ) }}
+        {% endif %}
       {% endcall %}
       <p>
         You also need to accept our <a href="{{ url_for('.terms') }}">terms of use</a>.
