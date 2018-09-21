@@ -236,7 +236,7 @@
         {% endcall %}
 
         {% if current_user.platform_admin %}
-          {% call row() %}
+          {% call settings_row(if_has_permission='letter') %}
             {{ text_field('Postage') }}
               {% set postage = {'first': 'First class only', 'second': 'Second class only'} %}
               {{ text_field(postage[current_service.postage]) }}

@@ -89,7 +89,6 @@ def mock_get_service_settings_page_common(
 
         'Label Value Action',
         'Send letters Off Change',
-        'Postage Second class only Change',
 
         'Label Value Action',
         'Organisation Org 1 Change',
@@ -214,6 +213,25 @@ def test_should_show_overview_for_service_with_more_things_set(
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     for index, row in enumerate(expected_rows):
         assert row == " ".join(page.find_all('tr')[index + 1].text.split())
+
+
+def test_if_cant_send_letters_then_cant_see_postage(
+    logged_in_platform_admin_client,
+    service_one,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_service_organisation,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+):
+    response = logged_in_platform_admin_client.get(url_for('main.service_settings', service_id=SERVICE_ONE_ID))
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    letter_table = page.find_all('table')[3]
+    rows = letter_table.find_all('tr')
+
+    assert len(rows) == 2
+    assert 'Postage' not in letter_table
 
 
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
