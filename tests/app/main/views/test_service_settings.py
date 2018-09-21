@@ -3203,6 +3203,7 @@ def test_submit_email_branding_request(
         ticket_type='question',
         user_email='test@user.gov.uk',
         user_name='Test User',
+        tags=['notify_action_add_branding'],
     )
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'Thanks for your branding request. We’ll get back to you '

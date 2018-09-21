@@ -1022,6 +1022,7 @@ def branding_request(service_id):
             ticket_type=zendesk_client.TYPE_QUESTION,
             user_email=current_user.email_address,
             user_name=current_user.name,
+            tags=['notify_action_add_branding'],
         )
 
         flash((
