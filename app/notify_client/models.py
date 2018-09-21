@@ -346,6 +346,10 @@ class Service(dict):
         ))
 
     @property
+    def needs_to_add_email_reply_to_address(self):
+        return self.has_email_templates and not self.has_email_reply_to_address
+
+    @property
     def shouldnt_use_govuk_as_sms_sender(self):
         return self.organisation_type in {'local', 'nhs'}
 
@@ -357,19 +361,20 @@ class Service(dict):
         ) in {'GOVUK', 'None'}
 
     @property
+    def needs_to_change_sms_sender(self):
+        return all((
+            self.has_sms_templates,
+            self.shouldnt_use_govuk_as_sms_sender,
+            self.sms_sender_is_govuk,
+        ))
+
+    @property
     def go_live_checklist_completed(self):
         return all((
             self.has_team_members,
             self.has_templates,
-            any((
-                not self.has_email_templates,
-                self.has_email_reply_to_address,
-            )),
-            any((
-                not self.has_sms_templates,
-                not self.shouldnt_use_govuk_as_sms_sender,
-                not self.sms_sender_is_govuk,
-            ))
+            not self.needs_to_add_email_reply_to_address,
+            not self.needs_to_change_sms_sender,
         ))
 
     @property

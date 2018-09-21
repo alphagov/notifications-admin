@@ -1128,26 +1128,14 @@ def _get_request_to_go_live_tags(service, agreement_signed):
     if service.go_live_checklist_completed and agreement_signed:
         return COMPLETE
 
-    yield INCOMPLETE
-
-    if not service.go_live_checklist_completed:
-        yield INCOMPLETE + '_checklist'
-
-    if not agreement_signed:
-        yield INCOMPLETE + '_mou'
-
-    if service.has_email_templates and not service.has_email_reply_to_address:
-        yield INCOMPLETE + '_email_reply_to'
-
-    if not service.has_team_members:
-        yield INCOMPLETE + '_team_member'
-
-    if not service.has_templates:
-        yield INCOMPLETE + '_template_content'
-
-    if (
-        service.has_sms_templates and
-        service.shouldnt_use_govuk_as_sms_sender and
-        service.sms_sender_is_govuk
+    for test, tag in (
+        (True, ''),
+        (not service.go_live_checklist_completed, '_checklist'),
+        (not agreement_signed, '_mou'),
+        (service.needs_to_add_email_reply_to_address, '_email_reply_to'),
+        (not service.has_team_members, '_team_member'),
+        (not service.has_templates, '_template_content'),
+        (service.needs_to_change_sms_sender, '_sms_sender'),
     ):
-        yield INCOMPLETE + '_sms_sender'
+        if test:
+            yield INCOMPLETE + tag
