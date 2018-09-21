@@ -206,6 +206,10 @@ def email_safe(string, whitespace='.'):
     return string.strip('.')
 
 
+def id_safe(string):
+    return email_safe(string, whitespace='-')
+
+
 class Spreadsheet():
 
     allowed_file_extensions = ['csv', 'xlsx', 'xls', 'ods', 'xlsm', 'tsv']
