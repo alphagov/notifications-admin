@@ -4504,7 +4504,7 @@ teesvalleyunlimited.gov.uk:
 teignbridge.gov.uk:
   owner: Teignbridge District Council
   crown: false
-  agreement_signed: false
+  agreement_signed: true
 teignmouth-devon.gov.uk:
   owner: Teignmouth Town Council
   crown: false
