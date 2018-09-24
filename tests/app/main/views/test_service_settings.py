@@ -818,6 +818,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             [
                 'notify_request_to_go_live',
+                'notify_request_to_go_live_complete',
             ],
         ),
         (  # Needs to set reply to address
@@ -849,6 +850,7 @@ def test_should_redirect_after_request_to_go_live(
             True,
             [
                 'notify_request_to_go_live',
+                'notify_request_to_go_live_complete',
             ],
         ),
         (  # Needs to change SMS sender

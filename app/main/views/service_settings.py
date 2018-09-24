@@ -1120,13 +1120,12 @@ def get_request_to_go_live_tags(service, user):
 def _get_request_to_go_live_tags(service, agreement_signed):
 
     BASE = 'notify_request_to_go_live'
-    COMPLETE = BASE + '_complete'
-    INCOMPLETE = BASE + '_incomplete'
 
     yield BASE
 
     if service.go_live_checklist_completed and agreement_signed:
-        return COMPLETE
+        yield BASE + '_complete'
+        return
 
     for test, tag in (
         (True, ''),
@@ -1138,4 +1137,4 @@ def _get_request_to_go_live_tags(service, agreement_signed):
         (service.needs_to_change_sms_sender, '_sms_sender'),
     ):
         if test:
-            yield INCOMPLETE + tag
+            yield BASE + '_incomplete' + tag
