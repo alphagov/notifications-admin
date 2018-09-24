@@ -180,30 +180,7 @@ def service_name_change_confirm(service_id):
 @user_has_permissions('manage_service')
 def request_to_go_live(service_id):
     return render_template(
-        'views/service-settings/request-to-go-live.html',
-        has_team_members=(
-            user_api_client.get_count_of_users_with_permission(
-                service_id, 'manage_service'
-            ) > 1
-        ),
-        has_templates=(
-            service_api_client.count_service_templates(service_id) > 0
-        ),
-        has_email_templates=(
-            service_api_client.count_service_templates(service_id, template_type='email') > 0
-        ),
-        has_sms_templates=(
-            service_api_client.count_service_templates(service_id, template_type='sms') > 0
-        ),
-        has_email_reply_to_address=bool(
-            service_api_client.get_reply_to_email_addresses(service_id)
-        ),
-        shouldnt_use_govuk_as_sms_sender=(
-            current_service.organisation_type in {'local', 'nhs'}
-        ),
-        sms_sender_is_govuk=get_default_sms_sender(
-            service_api_client.get_sms_senders(service_id)
-        ) in {'GOVUK', 'None'},
+        'views/service-settings/request-to-go-live.html'
     )
 
 
@@ -222,6 +199,7 @@ def submit_request_to_go_live(service_id):
                 '\n---'
                 '\nOrganisation type: {organisation_type}'
                 '\nAgreement signed: {agreement}'
+                '\nChecklist completed: {checklist}'
                 '\nEmails in next year: {volume_email}'
                 '\nText messages in next year: {volume_sms}'
                 '\nLetters in next year: {volume_letter}'
@@ -244,6 +222,7 @@ def submit_request_to_go_live(service_id):
                 service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
                 organisation_type=str(current_service.organisation_type).title(),
                 agreement=AgreementInfo.from_current_user().as_human_readable,
+                checklist=current_service.go_live_checklist_completed_as_yes_no,
                 volume_email=form.volume_email.data,
                 volume_sms=form.volume_sms.data,
                 volume_letter=form.volume_letter.data,
@@ -256,7 +235,8 @@ def submit_request_to_go_live(service_id):
             ),
             ticket_type=zendesk_client.TYPE_QUESTION,
             user_email=current_user.email_address,
-            user_name=current_user.name
+            user_name=current_user.name,
+            tags=get_request_to_go_live_tags(current_service, current_user),
         )
 
         flash('Thanks for your request to go live. We’ll get back to you within one working day.', 'default')
@@ -1042,6 +1022,7 @@ def branding_request(service_id):
             ticket_type=zendesk_client.TYPE_QUESTION,
             user_email=current_user.email_address,
             user_name=current_user.name,
+            tags=['notify_action_add_branding'],
         )
 
         flash((
@@ -1127,3 +1108,34 @@ def check_contact_details_type(contact_details):
         return 'email_address'
     else:
         return 'phone_number'
+
+
+def get_request_to_go_live_tags(service, user):
+    return list(_get_request_to_go_live_tags(
+        service,
+        AgreementInfo.from_user(user).agreement_signed,
+    ))
+
+
+def _get_request_to_go_live_tags(service, agreement_signed):
+
+    BASE = 'notify_request_to_go_live'
+    COMPLETE = BASE + '_complete'
+    INCOMPLETE = BASE + '_incomplete'
+
+    yield BASE
+
+    if service.go_live_checklist_completed and agreement_signed:
+        return COMPLETE
+
+    for test, tag in (
+        (True, ''),
+        (not service.go_live_checklist_completed, '_checklist'),
+        (not agreement_signed, '_mou'),
+        (service.needs_to_add_email_reply_to_address, '_email_reply_to'),
+        (not service.has_team_members, '_team_member'),
+        (not service.has_templates, '_template_content'),
+        (service.needs_to_change_sms_sender, '_sms_sender'),
+    ):
+        if test:
+            yield INCOMPLETE + tag

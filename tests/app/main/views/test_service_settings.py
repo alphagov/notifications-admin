@@ -1,6 +1,6 @@
 import uuid
 from functools import partial
-from unittest.mock import ANY, call
+from unittest.mock import ANY, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
 
 import pytest
@@ -737,7 +737,9 @@ def test_should_redirect_after_request_to_go_live(
     single_letter_contact_block,
     mock_get_service_organisation,
     single_sms_sender,
-    mock_get_service_settings_page_common
+    mock_get_service_settings_page_common,
+    mock_get_service_templates,
+    mock_get_users_by_service,
 ):
     mock_post = mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
     page = client_request.post(
@@ -756,7 +758,14 @@ def test_should_redirect_after_request_to_go_live(
         message=ANY,
         ticket_type=ZendeskClient.TYPE_QUESTION,
         user_name=active_user_with_permissions.name,
-        user_email=active_user_with_permissions.email_address
+        user_email=active_user_with_permissions.email_address,
+        tags=[
+            'notify_request_to_go_live',
+            'notify_request_to_go_live_incomplete',
+            'notify_request_to_go_live_incomplete_checklist',
+            'notify_request_to_go_live_incomplete_mou',
+            'notify_request_to_go_live_incomplete_team_member',
+        ],
     )
     assert mock_post.call_args[1]['message'] == (
         'Service: service one\n'
@@ -765,6 +774,7 @@ def test_should_redirect_after_request_to_go_live(
         '---\n'
         'Organisation type: Central\n'
         'Agreement signed: Can’t tell (domain is user.gov.uk)\n'
+        'Checklist completed: No\n'
         'Emails in next year: 111\n'
         'Text messages in next year: 222\n'
         'Letters in next year: 333\n'
@@ -780,6 +790,177 @@ def test_should_redirect_after_request_to_go_live(
     assert normalize_spaces(page.select_one('h1').text) == (
         'Settings'
     )
+
+
+@pytest.mark.parametrize(
+    (
+        'has_team_members,'
+        'has_templates,'
+        'has_email_templates,'
+        'has_sms_templates,'
+        'has_email_reply_to_address,'
+        'shouldnt_use_govuk_as_sms_sender,'
+        'sms_sender_is_govuk,'
+        'expected_readyness,'
+        'agreement_signed,'
+        'expected_tags,'
+    ),
+    (
+        (  # Just sending email
+            True,
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            'Yes',
+            True,
+            [
+                'notify_request_to_go_live',
+            ],
+        ),
+        (  # Needs to set reply to address
+            True,
+            True,
+            True,
+            False,
+            False,
+            True,
+            True,
+            'No',
+            True,
+            [
+                'notify_request_to_go_live',
+                'notify_request_to_go_live_incomplete',
+                'notify_request_to_go_live_incomplete_checklist',
+                'notify_request_to_go_live_incomplete_email_reply_to',
+            ],
+        ),
+        (  # Just sending SMS
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            False,
+            'Yes',
+            True,
+            [
+                'notify_request_to_go_live',
+            ],
+        ),
+        (  # Needs to change SMS sender
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            True,
+            'No',
+            True,
+            [
+                'notify_request_to_go_live',
+                'notify_request_to_go_live_incomplete',
+                'notify_request_to_go_live_incomplete_checklist',
+                'notify_request_to_go_live_incomplete_sms_sender',
+            ],
+        ),
+        (  # Needs team members
+            False,
+            True,
+            False,
+            True,
+            True,
+            True,
+            False,
+            'No',
+            True,
+            [
+                'notify_request_to_go_live',
+                'notify_request_to_go_live_incomplete',
+                'notify_request_to_go_live_incomplete_checklist',
+                'notify_request_to_go_live_incomplete_team_member',
+            ],
+        ),
+        (  # Needs templates
+            True,
+            False,
+            False,
+            True,
+            True,
+            True,
+            False,
+            'No',
+            True,
+            [
+                'notify_request_to_go_live',
+                'notify_request_to_go_live_incomplete',
+                'notify_request_to_go_live_incomplete_checklist',
+                'notify_request_to_go_live_incomplete_template_content',
+            ],
+        ),
+        (  # Everything is wrong
+            False,
+            False,
+            True,
+            True,
+            False,
+            True,
+            True,
+            'No',
+            False,
+            [
+                'notify_request_to_go_live',
+                'notify_request_to_go_live_incomplete',
+                'notify_request_to_go_live_incomplete_checklist',
+                'notify_request_to_go_live_incomplete_mou',
+                'notify_request_to_go_live_incomplete_email_reply_to',
+                'notify_request_to_go_live_incomplete_team_member',
+                'notify_request_to_go_live_incomplete_template_content',
+                'notify_request_to_go_live_incomplete_sms_sender',
+            ],
+        ),
+    ),
+)
+def test_ready_to_go_live(
+    client_request,
+    mocker,
+    has_team_members,
+    has_templates,
+    has_email_templates,
+    has_sms_templates,
+    has_email_reply_to_address,
+    shouldnt_use_govuk_as_sms_sender,
+    sms_sender_is_govuk,
+    expected_readyness,
+    agreement_signed,
+    expected_tags,
+):
+    for prop in {
+        'has_team_members',
+        'has_templates',
+        'has_email_templates',
+        'has_sms_templates',
+        'has_email_reply_to_address',
+        'shouldnt_use_govuk_as_sms_sender',
+        'sms_sender_is_govuk',
+    }:
+        mocker.patch(
+            'app.notify_client.models.Service.{}'.format(prop),
+            new_callable=PropertyMock
+        ).return_value = locals()[prop]
+
+    assert app.notify_client.models.Service({
+        'id': fake_uuid()
+    }).go_live_checklist_completed_as_yes_no == expected_readyness
+
+    assert list(app.main.views.service_settings._get_request_to_go_live_tags(
+        app.notify_client.models.Service({'id': fake_uuid()}),
+        agreement_signed,
+    )) == expected_tags
 
 
 @pytest.mark.parametrize('route', [
@@ -3022,6 +3203,7 @@ def test_submit_email_branding_request(
         ticket_type='question',
         user_email='test@user.gov.uk',
         user_name='Test User',
+        tags=['notify_action_add_branding'],
     )
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'Thanks for your branding request. We’ll get back to you '
