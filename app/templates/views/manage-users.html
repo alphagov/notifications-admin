@@ -5,14 +5,6 @@
 {% from "components/textbox.html" import textbox %}
 {% from "components/live-search.html" import live_search %}
 
-{% set table_options = {
-  'field_headings': [
-    'Name', 'Send messages', 'Modify service', 'Access API keys', hidden_field_heading('Link to change')
-  ],
-  'field_headings_visible': True,
-  'caption_visible': True
-} %}
-
 {% block service_page_title %}
   Team members
 {% endblock %}
