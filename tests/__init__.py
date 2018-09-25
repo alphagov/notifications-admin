@@ -369,6 +369,7 @@ def notification_json(
     reply_to_text=None,
     client_reference=None,
     created_by_name=None,
+    postage=None,
 ):
     if template is None:
         template = template_json(service_id, str(generate_uuid()), type_=template_type)
@@ -388,6 +389,8 @@ def notification_json(
     if status is None:
         status = 'delivered'
     links = {}
+    if template_type == 'letter':
+        postage = 'second'
 
     if with_links:
         links = {
@@ -415,6 +418,7 @@ def notification_json(
             'service': service_id,
             'template_version': template['version'],
             'personalisation': personalisation or {},
+            'postage': postage,
             'notification_type': template_type,
             'reply_to_text': reply_to_text,
             'client_reference': client_reference,

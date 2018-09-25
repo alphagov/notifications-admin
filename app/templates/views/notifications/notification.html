@@ -36,6 +36,9 @@
 
     {% if template.template_type == 'letter' %}
       <p>
+        Postage: {{ postage }} class
+      </p>
+      <p>
         Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
       </p>
       <p class="bottom-gutter">
