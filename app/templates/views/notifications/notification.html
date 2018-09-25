@@ -36,7 +36,7 @@
 
     {% if template.template_type == 'letter' %}
       <p>
-        Sent by {{ postage }} class
+        Postage: {{ postage }} class
       </p>
       <p>
         Estimated delivery date: {{ estimated_letter_delivery_date|string|format_date_short }}
