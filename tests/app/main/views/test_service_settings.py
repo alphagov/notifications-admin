@@ -710,11 +710,11 @@ def test_should_check_for_sms_sender_on_go_live(
     ),
     (
         'test@education.gov.uk',
-        'Get our data sharing and financial agreement signed Completed',
+        'Sign our data sharing and financial agreement Completed',
     ),
     (
         'test@aylesbury.gov.uk',
-        'Get our data sharing and financial agreement signed Not completed',
+        'Sign our data sharing and financial agreement Not completed',
     ),
 ))
 def test_should_check_for_mou_on_request_to_go_live(
