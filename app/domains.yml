@@ -201,6 +201,11 @@ insolvency.gov.uk:
   owner: The Insolvency Service
   agreement_signed: true
   crown: true
+dwp.gsi.gov.uk: dwp.gov.uk
+dwp.gov.uk:
+  owner: Department for Work and Pensions
+  agreement_signed: true
+  crown: true
   
 # Crown bodies who haven’t signed the MOU  
 charitycommission.gsi.gov.uk:
