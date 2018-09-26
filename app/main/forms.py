@@ -766,6 +766,13 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
     )
 
 
+class PDFUploadForm(StripWhitespaceForm):
+    file = FileField_wtf(
+        'Upload a letter in PDF format to check if it fits in the printable area',
+        validators=[FileAllowed(['pdf'], 'PDF documents only!')]
+    )
+
+
 class CreateOrUpdateOrganisation(StripWhitespaceForm):
 
     name = StringField('Name', validators=[DataRequired()])

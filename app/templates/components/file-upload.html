@@ -3,7 +3,9 @@
   action=None,
   button_text="Choose file",
   alternate_link=None,
-  alternate_link_text=None
+  alternate_link_text=None,
+  hint=None
+
 ) %}
   <form method="post" enctype="multipart/form-data" {% if action %}action="{{ action }}"{% endif %} class="{% if field.errors %}form-group-error{% endif %}" data-module="file-upload">
     <label class="file-upload-label" for="{{ field.name }}">

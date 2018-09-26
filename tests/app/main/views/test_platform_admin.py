@@ -758,3 +758,10 @@ def test_platform_admin_submit_empty_returned_letters(mocker, client, platform_a
 
     assert response.status_code == 200
     assert "Can’t be empty" in response.get_data(as_text=True)
+
+
+def test_letter_validation_preview(mocker, client, platform_admin_user):
+    mock_get_user(mocker, user=platform_admin_user)
+    client.login(platform_admin_user)
+    response = client.get(url_for('main.platform_admin_letter_validation_preview'))
+    assert response.status_code == 200

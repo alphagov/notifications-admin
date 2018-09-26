@@ -13,11 +13,12 @@ from app import (
     service_api_client,
 )
 from app.main import main
-from app.main.forms import DateFilterForm, ReturnedLettersForm
+from app.main.forms import DateFilterForm, ReturnedLettersForm, PDFUploadForm
 from app.statistics_utils import (
     get_formatted_percentage,
     get_formatted_percentage_two_dp,
 )
+from app.template_previews import validate_letter
 from app.utils import (
     generate_next_dict,
     generate_previous_dict,
@@ -239,6 +240,29 @@ def platform_admin_returned_letters():
         form=form,
     )
 
+
+@main.route("/platform-admin/letter-validation-preview", methods=["GET", "POST"])
+@login_required
+@user_is_platform_admin
+def platform_admin_letter_validation_preview():
+    message, pages, result = None, [], None
+    form = PDFUploadForm()
+
+    if request.method == "POST":
+        pdf_file = form.file.data
+        response = validate_letter(pdf_file)
+        if response.status_code == 200:
+            pages=response.json()["pages"]
+            message = response.json()["message"]
+            result = response.json()["result"]
+
+    return render_template(
+        'views/platform-admin/letter-validation-preview.html',
+        form=form,
+        message=message,
+        pages=pages,
+        result=result
+    )
 
 def sum_service_usage(service):
     total = 0
