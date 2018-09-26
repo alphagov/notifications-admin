@@ -702,6 +702,58 @@ def test_should_check_for_sms_sender_on_go_live(
     mock_get_sms_senders.assert_called_once_with(SERVICE_ONE_ID)
 
 
+@pytest.mark.parametrize('email_address, expected_item', (
+    pytest.param(
+        'test@unknown.gov.uk',
+        '',
+        marks=pytest.mark.xfail(raises=IndexError)
+    ),
+    (
+        'test@education.gov.uk',
+        'Sign our data sharing and financial agreement Completed',
+    ),
+    (
+        'test@aylesbury.gov.uk',
+        'Sign our data sharing and financial agreement Not completed',
+    ),
+))
+def test_should_check_for_mou_on_request_to_go_live(
+    client_request,
+    service_one,
+    mocker,
+    email_address,
+    expected_item,
+):
+    mocker.patch(
+        'app.main.views.service_settings.user_api_client.get_count_of_users_with_permission',
+        return_value=0,
+    )
+    mocker.patch(
+        'app.main.views.service_settings.service_api_client.count_service_templates',
+        return_value=0,
+    )
+    mocker.patch(
+        'app.main.views.service_settings.service_api_client.get_sms_senders',
+        return_value=[],
+    )
+    mocker.patch(
+        'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
+        return_value=[],
+    )
+
+    user = active_user_with_permissions(fake_uuid())
+    user.email_address = email_address
+    client_request.login(user)
+
+    page = client_request.get(
+        'main.request_to_go_live', service_id=SERVICE_ONE_ID
+    )
+    assert page.h1.text == 'Before you request to go live'
+
+    checklist_items = page.select('.task-list .task-list-item')
+    assert normalize_spaces(checklist_items[2].text) == expected_item
+
+
 def test_should_show_request_to_go_live(
     client_request,
 ):

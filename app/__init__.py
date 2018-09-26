@@ -67,8 +67,7 @@ from app.notify_client.billing_api_client import BillingAPIClient
 from app.notify_client.complaint_api_client import ComplaintApiClient
 from app.notify_client.platform_stats_api_client import PlatformStatsAPIClient
 from app.commands import setup_commands
-from app.utils import get_cdn_domain
-from app.utils import gmt_timezones
+from app.utils import get_cdn_domain, gmt_timezones, id_safe
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -664,5 +663,6 @@ def add_template_filters(application):
         formatted_list,
         nl2br,
         format_phone_number_human_readable,
+        id_safe,
     ]:
         application.add_template_filter(fn)
